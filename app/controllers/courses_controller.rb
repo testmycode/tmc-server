@@ -1,15 +1,14 @@
 class CoursesController < ApplicationController
-  # GET /courses
-  # GET /courses.json
+
   def index
-    #@courses = Course.all
-    @courses = Course.order("LOWER(name)")
-    @ongoing_courses = Course.all(:conditions => ["hide_after > ?", Time.now])
-    @expired_courses = Course.all(:conditions => ["hide_after <= ?", Time.now])
-    @points_in_queue = PointsUploadQueue.all
+    ordering = 'LOWER(name)'
+    @courses = Course.order(ordering)
+    @ongoing_courses = Course.all(:conditions => ["hide_after IS NULL OR hide_after > ?", Time.now], :order => ordering)
+    @expired_courses = Course.all(:conditions => ["hide_after IS NOT NULL AND hide_after <= ?", Time.now], :order => ordering)
+    @num_points_in_queue = PointsUploadQueue.count
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.html
       format.json {
         render :json =>
           @courses.to_json(:only => [:name, :hide_after],
@@ -18,54 +17,45 @@ class CoursesController < ApplicationController
     end
   end
 
-  # GET /courses/1
   def show
-    @course = Course.find_by_name(params[:id])
+    @course = Course.find(params[:id])
     @exercises =
       Exercise.find(:all, :conditions => {:course_id => @course.id})
   end
 
   def refresh
-    @course = Course.find_by_name(params[:id])
+    @course = Course.find(params[:id])
 
     @course.refresh
     redirect_to course_exercises_path(@course)
   end
 
-  # GET /courses/new
   def new
     @course = Course.new
   end
 
   def points
-    @course = Course.find_by_name!(params[:id])
+    @course = Course.find(params[:id])
     @points = Point.order("(created_at)DESC LIMIT 50")
     @points_in_queue = PointsUploadQueue.all
   end
 
-  # POST /courses
-  # POST /courses.xml
   def create
     @course = Course.new(params[:course])
 
     respond_to do |format|
       if @course.save
-        format.html { redirect_to(course_exercises_path(@course), :notice => 'Course was successfully created.') }
-        format.xml  { render :xml => @course, :status => :created, :location => @course }
-        #format.html { redirect_to(@course, :notice => 'Course was successfully created.') }
-        #format.xml  { render :xml => @course, :status => :created, :location => @course }
+        format.html { redirect_to(@course, :notice => 'Course was successfully created.') }
       else
-        format.html { render :action => "new" , :notice => 'Course could not be created.'}
-        format.xml  { render :xml => @course.errors, :status => :unprocessable_entity }
+        format.html { render :action => "new" , :notice => 'Course could not be created.' }
       end
     end
   end
 
-  # DELETE /courses/1
   def destroy
-    @course = Course.find_by_name(params[:id])
+    @course = Course.find(params[:id])
     @course.destroy
 
-    redirect_to(courses_url)
+    redirect_to(courses_path)
   end
 end

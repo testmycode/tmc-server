@@ -9,8 +9,8 @@
 
 <body>
 <center>
-<TABLE border="0" width="1024" style="border-collapse: collapse" bgcolor="#FFFFFF">
-  <tr class="trTop">
+  <table border="0" width="1024" style="border-collapse: collapse" bgcolor="#FFFFFF">
+    <tr class="trTop">
       <td align ="left">
         <h1>HELSINKI UNIVERSITY</h1>
         <h2>Department of Computer Science</h2>
@@ -51,8 +51,10 @@
     </tr>
     <tr>
       <td class="tdYield" colspan="2">
-    
-           
+        <% if notice %>
+          <p id="notice"><%= notice %></p>
+        <% end %>
+        
         <%= yield %>
     
       </td>

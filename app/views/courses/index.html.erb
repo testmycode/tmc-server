@@ -1,4 +1,3 @@
-<p id="notice"><%= notice %></p>
 
 <h1>Test Runner</h1>
 <h2>All Courses [<%= link_to "json", "#{courses_path}.json" %>] </h2>
@@ -15,7 +14,7 @@
           <p class="error"><%= flash[:alert] %></p>
         <% end %>
 
-        <p>Non uploaded points to gdocs: <%= @points_in_queue.length %></p>
+        <p>Non uploaded points to gdocs: <%= @num_points_in_queue %></p>
         </td><td align="right">
         <%= form_tag(upload_points_path) do %>
           <%= submit_tag("Upload points to gdocs") %>

@@ -8,10 +8,6 @@ class Exercise < ActiveRecord::Base
   has_many :exercise_points, :dependent => :destroy
   #after_save :add_sheet_to_gdocs
 
-  #def to_param
-    #self.name
-  #end
-
   def path
     name.gsub(/-/, '/')
   end

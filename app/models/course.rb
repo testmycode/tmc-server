@@ -4,21 +4,17 @@ class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers
   include GitBackend
 
-  validates :name, :presence     => true,
+  validates :name,
+            :presence     => true,
+            :uniqueness => true,
             :length       => { :within => 1..40 },
             :format       => { :without => / / ,
             :message => 'should not contain white spaces'}
-
-  validates_uniqueness_of :name
 
   has_many :exercises, :dependent => :destroy
   #has_many :points, :dependent => :destroy
   after_create :create_repository #, :create_spreadsheet_to_google
   after_destroy :delete_repository
-
-  def to_param
-    self.name
-  end
 
   def create_spreadsheet_to_google
     account = GDocs.new
@@ -27,12 +23,6 @@ class Course < ActiveRecord::Base
 
   def exercises_json
     "#{course_exercises_url(self)}.json"
-  end
-
-  def self.default_options
-    {
-      "hide_after" => Time.at(0)
-    }
   end
 
   def refresh_options
@@ -73,6 +63,10 @@ class Course < ActiveRecord::Base
     self.refresh_options
     self.refresh_exercises
     self.refresh_exercise_archives
+  end
+  
+  def self.default_options
+    {}
   end
 
 end

@@ -69,6 +69,13 @@ describe Course do
           Course.create(:name => tooLongName)
         }.to change(Course, :count).by(0)
       end
+      
+      it "name is non-unique" do
+        Course.create!(:name => 'TestCourse')
+        expect {
+          Course.create(:name => 'TestCourse')
+        }.to change(Course, :count).by(0)
+      end
 
       it "name has space in it" do
         spacedName = 'Test Course'

@@ -7,33 +7,33 @@ require 'spec_helper'
 describe CoursesController do
 
   before(:each) do
-    @testCourses = Course.create!(:name => 'TestCourse')
+    session[:user_id] = User.create!(:login => 'testuser', :password => 'testpassword').id
+    @courses = [
+      Course.create!(:name => 'SomeTestCourse'),
+      Course.create!(:name => 'ExpiredCourse', :hide_after => Time.now - 1.week),
+      Course.create!(:name => 'AnotherTestCourse')
+    ]
   end
-  
-  #this method destroys also the repository, not only rspec db
-  after(:each) do
-    @testCourses.destroy
-  end
-
-# This should return the minimal set of attributes required to create a valid
-  # Course. As you add validations to Course, be sure to
-  # update the return value of this method accordingly.
-  
-  #def valid_attributes
-    #{:name => 'rspecCourse2'}
-  #end 
   
   describe "GET index" do
-    it "assigns @courses in order by name" do 
+    it "shows courses in order by name, split into ongoing and expired" do 
       get :index
-      assigns(:courses).should eq(Course.order("LOWER(name)"))
+      assigns(:ongoing_courses).map(&:name).should == ['AnotherTestCourse', 'SomeTestCourse']
+      assigns(:expired_courses).map(&:name).should == ['ExpiredCourse']
+    end
+    
+    describe "as json" do
+      it "shows renders courses in orderby name" do
+        get :index, :format => 'json'
+        assigns(:courses).map(&:name).should == ['AnotherTestCourse', 'ExpiredCourse', 'SomeTestCourse']
+      end 
     end
   end
   
   describe "GET show" do
-    it "assigns the requested course as @testCourses" do 
-      get :show, :id => @testCourses.name
-      assigns(:course).should eq(@testCourses)
+    it "shows the requested course" do 
+      get :show, :id => @courses[0].id
+      assigns(:course).should == @courses[0]
     end
   end
   
@@ -41,91 +41,37 @@ describe CoursesController do
    
     describe "with valid parameters" do
       after(:each) do
-        Course.find_by_name('newCourse').destroy
-      end
-      
-      it "creates a new course to @testCourses" do 
-        post :create, :course => { :name => 'newCourse' }
-        assigns(:course).name.should eq(Course.new(:name => 'newCourse').name)
+        c = Course.find_by_name!('NewCourse')
+        c.destroy if c != nil
       end
 
       it "redirects to the created course" do 
-        post :create, :course => { :name => 'newCourse' }
+        post :create, :course => { :name => 'NewCourse' }
         response.should redirect_to(Course.last)
       end
     end
     
     describe "with invalid parameters" do
-      it "should not create course with wrong name" do 
-        post :create, :course => { :name => 'new Course' }
-        Course.find_by_name('new Course').should be_false
-      end
-      
-      it "should not create course without a name" do 
-        expect {
-          post :create, :course => {}
-        }.to change(Course, :count).by(0) 
-      end
-      
-      it "re-renders the 'new' template" do 
-        post :create, :course => {}
+      it "re-renders the course creation form" do 
+        post :create, :course => { :name => 'invalid name with spaces' }
         response.should render_template("new")
+        assigns(:course).name.should == 'invalid name with spaces'
       end
     end
     
   end
   
   describe "DELETE course" do
-    it "destroy a course from @testCourses by name" do
-      delete :destroy, :id => @testCourses.name
-      Course.find_by_id("TestCourse").should be_nil
+    it "destroys the given course" do
+      delete :destroy, :id => @courses[0].id
+      Course.find_by_id(@courses[0].id).should be_nil
     end
     
-    it "re-renders the 'new' template" do 
-      delete :destroy, :id => @testCourses.name
+    it "redirects to the course list" do 
+      delete :destroy, :id => @courses[0].id
       response.should redirect_to(courses_url)
     end    
   end 
-  
-=begin
-  describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Course" do 
-        expect {
-          post :create, :course => valid_attributes #virhe: repository already exists
-        }.to change(Course, :count).by(1)           
-      end
-
-      it "assigns a newly created course as @course" do 
-        post :create, :course => valid_attributes #virhe: repository already exists
-        assigns(:course).should be_a(Course)
-        assigns(:course).should be_persisted
-      end
-
-      it "redirects to the created course" do 
-        post :create, :course => valid_attributes #virhe: repository already exists
-        response.should redirect_to(Course.last)
-      end
-    end
-
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved course as @course" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Course.any_instance.stub(:save).and_return(false)
-        post :create, :course => {}
-        assigns(:course).should be_a_new(Course)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Course.any_instance.stub(:save).and_return(false)
-        post :create, :course => {}
-        response.should render_template("new")
-      end
-    end
-  end
-
-=end
 end
 
 

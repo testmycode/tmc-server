@@ -35,7 +35,7 @@ describe "The system" do
         system! "git push -q -u origin master >/dev/null 2>&1"
       end
       
-      visit '/courses/mycourse/refresh' #FIXME FIXME FIXME
+      visit "/courses/#{course.id}/refresh" #FIXME FIXME FIXME - shouldn't be needed
       
       visit '/courses'
       click_link 'mycourse'

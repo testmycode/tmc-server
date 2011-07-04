@@ -34,7 +34,7 @@ class ExercisesController < ApplicationController
 
   private
   def get_course
-    @course = Course.find_by_name!(params[:course_id])
+    @course = Course.find(params[:course_id])
   end
 
 end
