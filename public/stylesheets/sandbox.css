@@ -1,0 +1,85 @@
+  BODY { 
+	background-color: #B9D0F7;  
+	color: Black; 
+	font-family: Arial;
+	font-size: 80%;
+	margin-left: 5%; } 
+
+  H1 {
+	margin-left: 5%;
+	margin-right: 10%;
+  color: #09214A; 
+  font-family: Arial;
+	}
+
+
+  H2 {
+	margin-left: 15%;
+	margin-right: 10%;
+  color: #09214A; 
+  font-family: Arial;
+	}
+
+  H1 { font-size: 200%; }
+  H2 { font-size: 150%; }
+
+  a { color: #09214A;
+    text-decoration: none; }
+    
+  a:visited { color: #09214A; } 
+  a:hover { text-decoration: underline; }
+         
+ .tableLoginMenu{
+  /*float: right; */
+  margin-left: auto;
+  margin-right: auto;
+  /*display: block;*/
+  text-align: center;
+  width: 190px;
+  font-size: 90%;
+  padding: 20px;
+  }    
+    
+  .tdLogin {
+  padding-right: 5em;
+  padding-bottom: 3em;
+  }
+
+  .tdNav {
+  color: black; 
+  font-weight: bold;
+  background: #B9D0F7; 
+	font-size: 100%;
+	padding: 0.7em;
+  }
+  
+  .tdYield {
+  padding-left: 5em;
+  padding-bottom: 3em;
+  padding-right: 5em;
+  }
+  
+  .tdCopyright {
+  background-color: #B9D0F7; 
+  text-align: center;
+  font-size: 80%;
+  }
+
+ .tableListings tr td {
+  text-align: center;
+  padding-left: 0.2em;
+  color: black; 
+  background: #C0D9F7; 
+	font-size: 100%;
+	padding: 0.4em;
+	border-left: 2;
+	border-right: none;
+	border-top: none;
+	border-bottom: solid; 
+	border-bottom-width: thick;
+	border-color: #FFFFFF; 
+  }	
+
+  .error {
+    color: red;
+  }

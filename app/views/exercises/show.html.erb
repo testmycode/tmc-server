@@ -1,0 +1,59 @@
+<p id="notice"><%= notice %></p>
+
+<h1> Test Runner: Return file - <%= link_to @course.name, course_exercises_path(@course) %> - <%= @exercise.name  %></h1>
+
+<ul>
+  <li>
+  <%= link_to 'Download zip-file', @exercise.exercise_file %>
+    <br><br>
+  </li>
+  <li>
+    <%= render 'exercise_returns/form' %>
+  </li>
+</ul>
+
+
+
+<!--lists all returned exercises-->
+
+<table class="tableListings" width="600">
+  <tr>
+    <th>Course</th>
+    <th>Exercise</th>
+    <th>Student</th>
+    <th>Returned file</th>
+    <th></th>
+  </tr>
+
+<% @exercise_returns.each do |exercise_return| %> 
+
+  <tr>
+    <td><%= @course.name %></td>
+    <td><%= @exercise.name %></td>
+    <td><%= exercise_return.student_id %></td>
+      <% if signed_in? %>
+        <td>
+          <%= link_to("#{@exercise.name}-#{exercise_return.id}.zip",
+                "#{course_exercise_return_path(@course, @exercise, exercise_return)}.zip") %> 
+        </td>
+        <td>
+         <%= form_tag test_suite_runs_path, :id => "run-ex-return-#{exercise_return.id}", :method => :post do %>
+            <%= hidden_field_tag 'test_suite_run[exercise_return_id]', exercise_return.id %>
+            <a href="#" onclick="javascript: document.getElementById('run-ex-return-<%=exercise_return.id%>').submit()">Run</a>
+          <% end %>
+        </td>
+        <td>
+          <%= link_to 'Destroy', course_exercise_return_path(@course, @exercise, exercise_return), :confirm => 'Are you sure?', :method => :delete %>
+        </td>
+      <% else %>
+         <td>
+          <%= "#{@exercise.name}-#{exercise_return.id}.zip" %>
+         </td>
+      <% end %>
+   </tr>
+<% end %>
+</table>
+
+
+<%= link_to 'Back', course_exercises_path(@course) %>
+

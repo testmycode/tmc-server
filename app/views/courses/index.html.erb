@@ -1,0 +1,88 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Test Runner</h1>
+<h2>All Courses [<%= link_to "json", "#{courses_path}.json" %>] </h2>
+
+<p>
+  <% if signed_in? %>
+  <table border="0" width="600">
+    <tr>
+      <td>
+        <%= link_to 'Create New Course', new_course_path %>
+      </td>
+      <td align="right">
+        <% if flash[:alert] %>
+          <p class="error"><%= flash[:alert] %></p>
+        <% end %>
+
+        <p>Non uploaded points to gdocs: <%= @points_in_queue.length %></p>
+        </td><td align="right">
+        <%= form_tag(upload_points_path) do %>
+          <%= submit_tag("Upload points to gdocs") %>
+        <% end %>
+      </td>
+    </table>
+  <% end %>
+</p>
+
+<h3>Ongoing courses</h3>
+<table class="tableListings">
+  <tr>
+    <th>
+      Choose course
+    </th>
+    <% if signed_in? %>
+      <th>
+        Repository address
+      </th>
+    <% end %>
+  </tr>
+<% @ongoing_courses.each do |course| %>
+  <tr>
+    <td width="150">
+      <%= link_to course.name, course_exercises_path(course) %>
+    </td>
+    <% if signed_in? %>
+      <td>
+        <%= course.bare_path %>
+      </td>
+      <td>
+        <%= link_to 'remove', course_path(course), :method => :delete %>
+      </td>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+
+<% if signed_in? and not @expired_courses.empty? %>
+<h3>Expired courses</h3>
+<table class="tableListings">
+  <tr>
+    <th>
+      Choose course
+    </th>
+    <% if signed_in? %>
+      <th>
+        Repository address
+      </th>
+    <% end %>
+  </tr>
+<% @expired_courses.each do |course| %>
+    <tr>
+      <td width="150">
+        <%= link_to course.name, course_exercises_path(course) %>
+      </td>
+      <% if signed_in? %>
+        <td>
+          <%= course.bare_path %>
+        </td>
+        <td>
+          <%= link_to 'remove', course_path(course), :method => :delete %>
+        </td>
+      <% end %>
+    </tr>
+<% end %>
+</table>
+<% end %>  
+  
+

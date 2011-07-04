@@ -1,0 +1,25 @@
+
+<table class="tableLoginMenu"><tr><td>
+  <% if signed_in? %>
+    <%= link_to "Sign out", signout_path, :method => :delete %>
+    </td></tr>
+  <% else %>
+    <%= form_for(:session, :url => sessions_path) do |f| %>
+    
+      <tr>
+        <td><%= f.label :login %></td>
+        <td><%= f.text_field :login, :size => 10 %></td>
+      </tr>
+      <tr>
+        <td><%= f.label :password %></td>
+        <td><%= f.password_field :password, :size => 10 %></td>
+      </tr>
+      <tr>
+        <td align="right" colspan="2"><%= f.submit "Sign in" %></td>
+      </tr>
+  
+    <% end %>
+  <% end %>
+</table>
+
+

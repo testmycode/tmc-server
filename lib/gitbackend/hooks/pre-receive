@@ -1,0 +1,19 @@
+#!/bin/bash
+
+unset SHARED
+
+if [ "x${SHARED}" != "x" ]; then
+	unset USERNAME
+	unset USERHOME
+
+	USERNAME="tkt_poh2"
+	USERHOME=$(eval echo ~${USERNAME})
+
+	export PATH="${USERHOME}/bin:${PATH}"
+	export PATH="${USERHOME}/.gem/ruby/1.8/bin:${PATH}"
+	export RUBYLIB="${USERHOME}/lib"
+	export GEM_HOME="${USERHOME}/.gem/ruby/1.8"
+fi
+
+exec ruby hooks/pre-receive.rb
+

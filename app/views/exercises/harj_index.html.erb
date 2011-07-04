@@ -1,0 +1,35 @@
+<!--<h1>
+  Exercises for <%= @course.name %>
+  [<%= link_to "json", "#{course_exercises_path(@course)}.json" %>]
+</h1>
+
+<table widht="400" border ="1">
+  <tr>
+    <th>Page for the exercise</th>
+    <th>Download exercise</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+ 
+<% @books.each do |book| %>
+  <tr>
+    <td><%= book.title %></td>
+    <td><%= book.content %></td>
+    <td><%= link_to 'Show', book %></td>
+    <td><%= link_to 'Edit', edit_book_path(book) %></td>
+    <td><%= link_to 'Remove', book, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+
+<ul>
+  <% @exercises.each do |exercise| %>
+    <li>
+    <%= link_to exercise.name, [@course, exercise] %>,
+    <%= link_to 'zip', "#{course_exercise_path(@course, exercise)}.zip" %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Courses listing', courses_path %>
+-->

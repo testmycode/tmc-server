@@ -1,0 +1,14 @@
+/* AUTOMATICALLY GENERATED ON Tue Jun 21 15:04:42 EEST 2011*/
+/* DO NOT EDIT */
+
+grant {
+  permission java.io.FilePermission "/dev/null", "write";
+  permission java.io.FilePermission "/tmp/-", "write";
+  permission java.io.FilePermission "/tmp/-", "read";
+  permission java.lang.RuntimePermission "setIO";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.RuntimePermission "accessDeclaredMembers";
+  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+  permission java.util.PropertyPermission "com.google.gson.annotation_cache_size_hint", "read";
+};
+

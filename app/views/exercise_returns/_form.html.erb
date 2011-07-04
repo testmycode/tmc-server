@@ -1,0 +1,33 @@
+<%= form_for(@exercise_return, :url => course_exercise_returns_path(@course, @exercise), :action => @form_action,
+            :html => {:multipart => true}) do |f| %>
+  <% if @exercise_return.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= pluralize(@exercise_return.errors.count, "error") %>
+        prohibited this exercise_return from being saved:
+      </h2>
+
+      <ul>
+      <% @exercise_return.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    Return Java file - 
+    Course: <%= @course.name %> - 
+    Exercise: <%= @exercise.name %>  
+  </div>
+  <div class="field">
+    Student number<br />
+    <%= f.text_field :student_id %>
+  </div>
+  <div class="field">
+    <%= f.file_field 'tmp_file' %>
+  </div>
+  <div class="actions">
+    <%= f.submit 'Submit'%>
+  </div>
+<% end %>

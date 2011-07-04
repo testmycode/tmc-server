@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<h1>
+  Test Runner: <%= @course.name %> - all exercises
+  [<%= link_to "json", "#{course_exercises_path(@course)}.json" %>]
+</h1>
+
+<%= link_to 'refresh', refresh_course_path(@course) %>
+
+<table class="tableListings" width="600">
+    <tr>
+      <th>
+        Exercise home
+      </th>
+      <th>
+        Deadline
+      </th>
+      <th>
+        Download exercise
+      </th>
+    </tr>
+    <% @exercises.each do |exercise| %>
+    <tr>
+      <td>
+        <%= link_to exercise.name, [@course, exercise] %>
+        </td>
+        <td>
+          <%= exercise.deadline.strftime("%d.%m.%Y %H:%M") %>
+        </td>
+        <td>
+          <%= link_to 'zip', exercise.exercise_file %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+
+<%= link_to 'Back', courses_path %>
+
+

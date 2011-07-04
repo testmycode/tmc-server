@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Test case runs for exercise return: <%= @test_suite_run.exercise_return_id %></h1>
+
+<table class="tableListings" width="100%">
+  <tr>
+    <th>Test suite run</th>
+    <th>exercise return id</th>
+    <th>Exercise</th>
+    <th>Class name</th>
+    <th>Method name</th>
+    <th>Success</th>
+    <th>Message</th>
+  </tr>
+
+<% @test_case_runs.each do |test_case_run| %>
+  <tr>
+    <td><%= test_case_run.test_suite_run_id %></td>
+    <td><%= @test_suite_run.exercise_return_id %></td>
+    <td><%= test_case_run.exercise %></td>
+    <td><%= test_case_run.class_name %></td>
+    <td><%= test_case_run.method_name %></td>
+    <td><%= test_case_run.success %></td>
+    <td><%= test_case_run.message %></td>
+    
+  </tr>
+<% end %>
+</table>
+
+
+<%= link_to 'Back', :back %>
+
+

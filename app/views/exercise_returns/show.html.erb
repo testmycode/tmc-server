@@ -1,0 +1,27 @@
+<!--<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Course:</b>
+  <%= @course.name %>
+</p>
+
+<p>
+  <b>Exercise:</b>
+  <%= @exercise.name %>
+</p>
+
+<p>
+  <b>Student:</b>
+  <%= @exercise_return.student_id %>
+</p>
+
+<p>
+  <b>Return file:</b>
+  <%= link_to("#{@exercise.name}-#{@exercise_return.id}.zip",
+    "#{course_exercise_return_path(@course, @exercise, @exercise_return)}.zip")
+  %>
+</p>
+
+
+<%= link_to 'Edit', edit_course_exercise_return_path(@course, @exercise, @exercise_return) %> |
+<%= link_to 'Back', course_exercise_returns_path %>-->

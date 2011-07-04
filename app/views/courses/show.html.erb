@@ -1,0 +1,19 @@
+<!-- Not needed
+<p id="notice"><%= notice %></p>
+
+<h1>Test Runner</h1>
+
+<h2><%= @course.name %></h1>
+
+<ul>
+  <li><%= link_to('exercises', course_exercises_path(@course)) %></li>
+  <li>Repository: <%= @course.bare_path %></li>
+  <% if signed_in? %>
+    <li><%= link_to 'remove', course_path(@course), :method => :delete %></li>
+  <% end %>
+</ul>
+
+<p>
+<%= link_to 'Courses listing', courses_path %>
+</p>
+-->
