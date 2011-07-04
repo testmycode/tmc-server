@@ -4,7 +4,7 @@ describe "The system" do
   include IntegrationTestActions
   include SystemCommands
 
-  it "should show the university name on front page" do
+  it "should show the university name on the front page" do
     visit '/'
     page.should have_content('HELSINKI UNIVERSITY')
   end
@@ -25,15 +25,11 @@ describe "The system" do
     
     it "should show exercises pushed to the course's git repo" do
       create_new_course('mycourse')
-      course = Course.find_by_name('mycourse')
+      course = Course.find_by_name!('mycourse')
       
-      clone_course_repo 'mycourse'
-      Dir.chdir 'mycourse' do
-        FileUtils.cp_r "#{@testdata_dir}/exercises/ModelExercise", "MyExercise"
-        system! "git add MyExercise"
-        system! "git commit -q -m 'added MyExercise'"
-        system! "git push -q -u origin master >/dev/null 2>&1"
-      end
+      repo = clone_course_repo(course)
+      repo.copy_model_exercise('MyExercise')
+      repo.add_commit_push
       
       visit "/courses/#{course.id}/refresh" #FIXME FIXME FIXME - shouldn't be needed
       

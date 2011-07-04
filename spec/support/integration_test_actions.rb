@@ -1,4 +1,8 @@
+require File.expand_path(File.join(File.dirname(__FILE__), 'git_test_actions.rb'))
+
 module IntegrationTestActions
+  include GitTestActions
+
   def log_in_as(username)
     fill_in 'Login', :with => username
     fill_in 'Password', :with => 'xooxer'
@@ -13,11 +17,5 @@ module IntegrationTestActions
     click_button 'Add Course'
     page.should have_content('Course was successfully created.')
     page.should have_content(coursename)
-  end
-  
-  def clone_course_repo(coursename)
-    FileUtils.pwd.start_with?(@test_tmp_dir).should == true
-    course = Course.find_by_name(coursename)
-    system! "git clone -q #{course.bare_path} #{coursename}"
   end
 end
