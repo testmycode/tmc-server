@@ -6,7 +6,7 @@ class Exercise < ActiveRecord::Base
   belongs_to :course
   has_many :exercise_returns, :dependent => :destroy
   has_many :exercise_points, :dependent => :destroy
-  #after_save :add_sheet_to_gdocs
+  #after_create :add_sheet_to_gdocs
 
   def path
     name.gsub(/-/, '/')
@@ -35,9 +35,9 @@ class Exercise < ActiveRecord::Base
 
   def self.default_options
     {
-      "deadline" => Time.at(0),
-      "publish_date" => Time.at(0),
-      "gdocs_sheet" => "101"
+      "deadline" => nil,
+      "publish_date" => nil,
+      "gdocs_sheet" => nil
     }
   end
 

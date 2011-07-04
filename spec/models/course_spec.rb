@@ -2,88 +2,65 @@ require 'spec_helper'
 
 describe Course do
 
-  before :all do
-    @x = Course.count
+  it "can be created with just a name parameter" do
+    Course.create!(:name => 'TestCourse')
   end
 
-  before :each do
-    @repo_dir = Dir.mktmpdir
-    @cache_dir = Dir.mktmpdir
-
-    @course = Course.new
-    GitBackend.stub!(:repositories_root).and_return(@repo_dir)
-    GitBackend.stub!(:cache_root).and_return(@cache_dir)
+  it "should create a repository when created" do
+    repo_path = Course.create!(:name => 'TestCourse').bare_path
+    File.exists?(repo_path).should be_true
   end
-
-  after :each do
-    FileUtils.remove_entry_secure @repo_dir
-    FileUtils.remove_entry_secure @cache_dir
-  end
-
-  it "has x amount to begin with" do
-    Course.count.should == @x
-  end
-
-  it "has one more after adding one" do
+  
+  it "should delete the repository when destroyed" do
     course = Course.create!(:name => 'TestCourse')
-    Course.count.should == @x+1
-    course.destroy #this is needed in order to destroy repository
+    repo_path = course.bare_path
+    course.destroy
+    File.exists?(repo_path).should be_false
   end
 
-  it "has x amount after one was created in a previous example" do
-    Course.count.should == @x
-  end
+  describe "validations" do
+    it "requires a name" do
+      should_be_invalid_params({})
+    end
 
-  describe Course, "when it has repository" do
+    it "requires name to be reasonably short" do
+      should_be_invalid_params(:name => 'a'*41)
+    end
+    
+    it "requires name to be non-unique" do
+      Course.create!(:name => 'TestCourse')
+      should_be_invalid_params(:name => 'TestCourse')
+    end
+
+    it "forbids spaces in the name" do # this could eventually be lifted as long as everything else is made to tolerate spaces
+      should_be_invalid_params(:name => 'Test Course')
+    end
+
+    def should_be_invalid_params(params)
+      expect { Course.create!(params) }.to raise_error
+    end
+  end
+  
+  describe "when refreshed" do
+    include GitTestActions
+    
     before :each do
-      @course = Course.new(:name => "testcourse")
-      @course.create_repository
+      @course = Course.create!(:name => 'TestCourse')
+      @repo = clone_course_repo(@course)
     end
-
-    after :each do
-      @course.delete_repository
+    
+    it "should discover new exercises" do
+      add_exercise('MyExercise')
+      @course.refresh
+      @course.exercises.should have(1).items
+      @course.exercises[0].name.should == 'MyExercise'
     end
-  end
-
-  describe "Validations" do
-    describe "with valid params" do
-      it "course name 'TestCourse2' create" do
-        course = nil
-        expect {
-          course = Course.create!(:name => 'TestCourse2')
-        }.to change(Course, :count).by(1)
-        course.destroy #this is needed in order to destroy repository
-      end
-    end
-
-    describe "with invalid params" do
-      it "name doesn't exist" do
-        expect {
-          Course.create
-        }.to change(Course, :count).by(0)
-      end
-
-      it "name is too long" do
-        tooLongName = 'a'*41
-        expect {
-          Course.create(:name => tooLongName)
-        }.to change(Course, :count).by(0)
-      end
-      
-      it "name is non-unique" do
-        Course.create!(:name => 'TestCourse')
-        expect {
-          Course.create(:name => 'TestCourse')
-        }.to change(Course, :count).by(0)
-      end
-
-      it "name has space in it" do
-        spacedName = 'Test Course'
-        expect {
-          Course.create(:name => spacedName)
-        }.to change(Course, :count).by(0)
-      end
-
+    
+    def add_exercise(name)
+      ex = Exercise.new(:name => name)
+      Exercise.stub(:read_exercises => [ex])
+      @repo.copy_model_exercise(name)
+      @repo.add_commit_push
     end
   end
 

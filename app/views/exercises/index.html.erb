@@ -24,7 +24,9 @@
         <%= link_to exercise.name, [@course, exercise] %>
         </td>
         <td>
-          <%= exercise.deadline.strftime("%d.%m.%Y %H:%M") %>
+          <% if exercise.deadline %>
+            <%= exercise.deadline.strftime("%d.%m.%Y %H:%M") %>
+          <% end %>
         </td>
         <td>
           <%= link_to 'zip', exercise.exercise_file %>
