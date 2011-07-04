@@ -22,8 +22,10 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    FileUtils.pwd.should == "#{::Rails.root}/tmp/tests"
-    FileUtils.remove_entry_secure @test_tmp_dir
+    FileUtils.pwd.should == @test_tmp_dir
+    FileUtils.rm_rf @test_tmp_dir
+    FileUtils.mkdir @test_tmp_dir
+    FileUtils.cd @test_tmp_dir
   end
 end
 
