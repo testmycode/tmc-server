@@ -4,24 +4,23 @@ module GitBackend
   extend SystemCommands
   include SystemCommands
 
-  def create_repository
-    raise "repository already exists" if repository_exists?
+  def create_local_repository
+    raise "repository already exists" if local_repository_exists?
 
     begin
       copy_model_repository
       #link_hooks #TODO: we're getting rid of or changing these awfully slow hooks soon - at least for tests
-      raise "invalid repository" unless valid_repository?
     rescue Exception => e
-      delete_repository
+      delete_local_repository
       raise e
     end
   end
 
-  def repository_exists?
+  def local_repository_exists?
     FileTest.exists? bare_path
   end
 
-  def delete_repository
+  def delete_local_repository
     FileUtils.rm_rf bare_path
     FileUtils.rm_rf cache_path
   end
@@ -54,6 +53,10 @@ module GitBackend
   def bare_path
     "#{GitBackend.repositories_root}/#{self.name}.git"
   end
+  
+  def bare_url # Overridden if using a remote repo
+    "file://#{bare_path}"
+  end
 
   def hooks_path
     "#{bare_path}/hooks"
@@ -71,13 +74,8 @@ module GitBackend
     "#{zip_path}/#{exercise_name}.zip"
   end
 
-  def valid_repository?
-    return false unless FileTest.exists? bare_path
-    return true
-  end
-
   def refresh_working_copy
-    system! "git clone -q #{bare_path} #{clone_path}"
+    system! "git clone -q #{bare_url} #{clone_path}"
   end
 
   def refresh_exercise_archives

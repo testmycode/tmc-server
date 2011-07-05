@@ -2,23 +2,51 @@ require 'spec_helper'
 
 describe Course do
 
+  let(:remote_repo_path) { "#{@test_tmp_dir}/fake_remote_repo" }
+  let(:remote_repo_url) { "file://#{remote_repo_path}" }
+
   it "can be created with just a name parameter" do
     Course.create!(:name => 'TestCourse')
   end
 
-  it "should create a repository when created" do
-    repo_path = Course.create!(:name => 'TestCourse').bare_path
-    File.exists?(repo_path).should be_true
+  describe "when given no remote repo url" do
+    it "should create a local repository when created" do
+      course = Course.create!(:name => 'TestCourse')
+      course.should have_local_repo
+      course.should_not have_remote_repo
+      course.bare_url.should == "file://#{course.bare_path}"
+      File.should exist(course.bare_path)
+    end
+    
+    it "should delete the repository when destroyed" do
+      course = Course.create!(:name => 'TestCourse')
+      repo_path = course.bare_path
+      course.destroy
+      File.should_not exist(repo_path)
+    end
   end
   
-  it "should delete the repository when destroyed" do
-    course = Course.create!(:name => 'TestCourse')
-    repo_path = course.bare_path
-    course.destroy
-    File.exists?(repo_path).should be_false
+  describe "when given a remote repo url" do
+    let(:course) { Course.create!(:name => 'TestCourse', :remote_repo_url => remote_repo_url) }
+    
+    it "should not create a local repository" do
+      course.should have_remote_repo
+      course.should_not have_local_repo
+      course.bare_path.should be_nil
+      course.bare_url.should == remote_repo_url
+      File.should_not exist("#{GitBackend.repositories_root}/TestCourse.git")
+    end
+    
+    it "should not attempt to destroy a local repository when destroyed" do
+      local_repo_path = "#{GitBackend.repositories_root}/TestCourse.git"
+      FileUtils.mkdir local_repo_path
+      course.destroy
+      File.should exist(local_repo_path)
+    end
   end
 
-  describe "validations" do
+
+  describe "validation" do
     it "requires a name" do
       should_be_invalid_params({})
     end
@@ -41,59 +69,69 @@ describe Course do
     end
   end
   
-  describe "when refreshed" do
-    include GitTestActions
-    
-    before :each do
-      @course = Course.create!(:name => 'TestCourse')
-      @repo = clone_course_repo(@course)
-    end
-    
-    it "should discover new exercises" do
-      add_exercise('MyExercise')
-      @course.refresh
-      @course.exercises.should have(1).items
-      @course.exercises[0].name.should == 'MyExercise'
-    end
-    
-    it "should reload course metadata" do
-      @course.hide_after.should be_nil
+  
+  [:local, :remote].each do |repo_type|
+    describe "when refreshed (using #{repo_type} repo)" do
+      include GitTestActions
       
-      change_course_metadata_file 'hide_after' => "2011-07-01 13:00"
-      @course.refresh
-      @course.hide_after.should == Time.parse("2011-07-01 13:00") # local time zone
+      case repo_type
+      when :local then
+        let!(:course) { Course.create!(:name => 'TestCourse') }
+      when :remote then
+        let!(:course) { Course.create!(:name => 'TestCourse', :remote_repo_url => remote_repo_url) }
+        
+        before :each do
+          copy_model_repo(remote_repo_path)
+        end
+      end
       
-      change_course_metadata_file 'hide_after' => "2011-07-01 14:00"
-      @course.refresh
-      @course.hide_after.should == Time.parse("2011-07-01 14:00")
-    end
-    
-    it "should fail if the course metadata file cannot be parsed" do
-      change_course_metadata_file('xooxer', :raw => true)
+      let(:local_clone) { clone_course_repo(course) }
       
-      expect { @course.refresh }.to raise_error
-    end
-    
-    it "should load exercise metadata with defaults from superdirs" do
-      add_exercise('MyExercise', :commit => false)
-      change_metadata_file(
-        'metadata.yml',
-        {'deadline' => "2000-01-01 00:00", 'gdocs_sheet' => 'xoo'},
-        {:commit => false}
-      )
-      change_metadata_file(
-        'MyExercise/metadata.yml',
-        {'deadline' => "2012-01-02 12:34"},
-        {:commit => true}
-      )
+      it "should discover new exercises" do
+        add_exercise('MyExercise')
+        course.refresh
+        course.exercises.should have(1).items
+        course.exercises[0].name.should == 'MyExercise'
+      end
       
-      @course.refresh
+      it "should reload course metadata" do
+        course.hide_after.should be_nil
+        
+        change_course_metadata_file 'hide_after' => "2011-07-01 13:00"
+        course.refresh
+        course.hide_after.should == Time.parse("2011-07-01 13:00") # local time zone
+        
+        change_course_metadata_file 'hide_after' => "2011-07-01 14:00"
+        course.refresh
+        course.hide_after.should == Time.parse("2011-07-01 14:00")
+      end
       
-      @course.exercises.first.deadline.should == Time.parse("2012-01-02 12:34")
-      @course.exercises.first.gdocs_sheet.should == "xoo"
-    end
-    
-    it "should reload changed exercise metadata" do
+      it "should fail if the course metadata file cannot be parsed" do
+        change_course_metadata_file('xooxer', :raw => true)
+        
+        expect { course.refresh }.to raise_error
+      end
+      
+      it "should load exercise metadata with defaults from superdirs" do
+        add_exercise('MyExercise', :commit => false)
+        change_metadata_file(
+          'metadata.yml',
+          {'deadline' => "2000-01-01 00:00", 'gdocs_sheet' => 'xoo'},
+          {:commit => false}
+        )
+        change_metadata_file(
+          'MyExercise/metadata.yml',
+          {'deadline' => "2012-01-02 12:34"},
+          {:commit => true}
+        )
+        
+        course.refresh
+        
+        course.exercises.first.deadline.should == Time.parse("2012-01-02 12:34")
+        course.exercises.first.gdocs_sheet.should == "xoo"
+      end
+      
+      it "should reload changed exercise metadata" do
         add_exercise('MyExercise', :commit => false)
         change_metadata_file(
           'metadata.yml',
@@ -104,7 +142,7 @@ describe Course do
           {'deadline' => "2012-01-02 12:34"},
           {:commit => true}
         )
-        @course.refresh
+        course.refresh
         
         change_metadata_file(
           'metadata.yml',
@@ -116,29 +154,30 @@ describe Course do
           {'gdocs_sheet' => "foo"},
           {:commit => true}
         )
-        @course.refresh
+        course.refresh
         
-        @course.exercises.first.deadline.should == Time.parse("2013-01-01 00:00")
-        @course.exercises.first.gdocs_sheet.should == "foo"
-    end
-    
-    def add_exercise(name, options = {})
-      options = options.merge :commit => true
-      @repo.copy_model_exercise(name)
-      @repo.add_commit_push if options[:commit]
-    end
-    
-    def change_course_metadata_file(data, options = {})
-      change_metadata_file('course_options.yml', data, options)
-    end
-    
-    def change_metadata_file(filename, data, options = {})
-      options = options.merge :raw => false, :commit => true
-      Dir.chdir @repo.path do
-        data = YAML.dump data unless options[:raw]
-        File.open(filename, 'wb') {|f| f.write(data) }
-        @repo.add_commit_push if options[:commit]
+        course.exercises.first.deadline.should == Time.parse("2013-01-01 00:00")
+        course.exercises.first.gdocs_sheet.should == "foo"
       end
+    end
+  end
+  
+  def add_exercise(name, options = {})
+    options = options.merge :commit => true
+    local_clone.copy_model_exercise(name)
+    local_clone.add_commit_push if options[:commit]
+  end
+  
+  def change_course_metadata_file(data, options = {})
+    change_metadata_file('course_options.yml', data, options)
+  end
+  
+  def change_metadata_file(filename, data, options = {})
+    options = options.merge :raw => false, :commit => true
+    Dir.chdir local_clone.path do
+      data = YAML.dump data unless options[:raw]
+      File.open(filename, 'wb') {|f| f.write(data) }
+      local_clone.add_commit_push if options[:commit]
     end
   end
 

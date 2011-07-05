@@ -5,22 +5,21 @@ describe GitBackend do
   before :each do
     @test_exercises = "#{::Rails.root}/testdata/exercises"
 
-    @course = Course.new
+    @course = Course.new #TODO: use an empty class instead
     @course.name = 'testcourse'
   end
 
-  describe "#create_repository" do
+  describe "#create_local_repository" do
 
     it "should create a repository" do
-      @course.valid_repository?.should be_false
-      @course.create_repository
-      @course.valid_repository?.should be_true
-      @course.delete_repository
+      @course.create_local_repository
+      File.should exist(@course.bare_path)
+      File.should exist("#{@course.bare_path}/objects")
     end
 
     it "should raise an exception if the repo already exists" do
       FileTest.stub!(:exists?).and_return(true)
-      lambda { @course.create_repository }.should raise_error
+      lambda { @course.create_local_repository }.should raise_error
     end
 
     it "should raise an exception if console commands fail" do
@@ -29,7 +28,7 @@ describe GitBackend do
       begin
         ENV['PATH'] = ''
         system("true").should be_false
-        lambda { @course.create_repository }.should raise_error
+        lambda { @course.create_local_repository }.should raise_error
       ensure
         ENV['PATH'] = path
       end

@@ -12,9 +12,30 @@ class Course < ActiveRecord::Base
             :message => 'should not contain white spaces'}
 
   has_many :exercises, :dependent => :destroy
-  #has_many :points, :dependent => :destroy
-  after_create :create_repository #, :create_spreadsheet_to_google
-  after_destroy :delete_repository
+  #TODO: what's this?: has_many :points, :dependent => :destroy
+  
+  after_create :create_local_repository, :if => lambda { has_local_repo? }
+  after_destroy :delete_local_repository, :if => lambda { has_local_repo? }
+
+  def has_remote_repo?
+    !remote_repo_url.blank?
+  end
+  
+  def has_local_repo?
+    !has_remote_repo?
+  end
+  
+  def bare_path
+    super if has_local_repo?
+  end
+  
+  def bare_url
+    if has_local_repo?
+      super
+    else
+      remote_repo_url
+    end
+  end
 
   def create_spreadsheet_to_google
     account = GDocs.new
