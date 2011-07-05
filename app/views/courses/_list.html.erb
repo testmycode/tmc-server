@@ -1,0 +1,27 @@
+<table class="tableListings">
+  <tr>
+    <th>
+      Choose course
+    </th>
+    <% if signed_in? %>
+      <th>
+        Repository address
+      </th>
+    <% end %>
+  </tr>
+<% locals[:courses].each do |course| %>
+  <tr>
+    <td width="150">
+      <%= link_to course.name, course_exercises_path(course) %>
+    </td>
+    <% if signed_in? %>
+      <td>
+        <%= course.bare_url %>
+      </td>
+      <td>
+        <%= link_to 'remove', course_path(course), :method => :delete %>
+      </td>
+    <% end %>
+  </tr>
+<% end %>
+</table>
