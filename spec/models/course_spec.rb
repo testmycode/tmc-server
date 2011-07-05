@@ -74,7 +74,7 @@ describe Course do
       expect { @course.refresh }.to raise_error
     end
     
-    it "should load exercise metadata" do
+    it "should load exercise metadata with defaults from superdirs" do
       add_exercise('MyExercise', :commit => false)
       change_metadata_file(
         'metadata.yml',
