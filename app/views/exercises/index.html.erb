@@ -1,12 +1,15 @@
 
 <h1>
-  Test Runner: <%= @course.name %> - all exercises
+  <%= @course.name %> - all exercises
   [<%= link_to "json", "#{course_exercises_path(@course)}.json" %>]
 </h1>
 
-<%= link_to 'refresh', refresh_course_path(@course) %>
+<div class="link-refresh">
+  <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
+</div>
 
-<table class="tableListings" width="600">
+<table class="exercise-list">
+  <thead>
     <tr>
       <th>
         Exercise home
@@ -18,24 +21,27 @@
         Download exercise
       </th>
     </tr>
+  </thead>
+  <tbody>
     <% @exercises.each do |exercise| %>
-    <tr>
-      <td>
-        <%= link_to exercise.name, [@course, exercise] %>
-        </td>
+      <tr>
         <td>
-          <% if exercise.deadline %>
-            <%= exercise.deadline.strftime("%d.%m.%Y %H:%M") %>
-          <% end %>
+          <%= link_to exercise.name, [@course, exercise] %>
+          </td>
+          <td>
+            <% if exercise.deadline %>
+              <%= exercise.deadline.strftime("%d.%m.%Y %H:%M") %>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to 'zip', exercise.exercise_file %>
         </td>
-        <td>
-          <%= link_to 'zip', exercise.exercise_file %>
-      </td>
-    </tr>
-  <% end %>
+      </tr>
+    <% end %>
+  </tbody>
 </table>
 
-
-<%= link_to 'Back', courses_path %>
-
+<div class="link-back">
+  <%= link_to 'Back', courses_path %>
+</div>
 

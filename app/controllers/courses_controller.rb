@@ -27,7 +27,7 @@ class CoursesController < ApplicationController
     @course = Course.find(params[:id])
 
     @course.refresh
-    redirect_to course_exercises_path(@course)
+    redirect_to course_exercises_path(@course), :notice => 'Course refreshed from repository.'
   end
 
   def new

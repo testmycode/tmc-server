@@ -1,28 +1,17 @@
 
-<h1>Test Runner</h1>
-<h2>All Courses [<%= link_to "json", "#{courses_path}.json" %>] </h2>
+<h1>All Courses [<%= link_to "json", "#{courses_path}.json" %>]</h1>
 
-<p>
-  <% if signed_in? %>
-  <table border="0" width="600">
-    <tr>
-      <td>
-        <%= link_to 'Create New Course', new_course_path %>
-      </td>
-      <td align="right">
-        <% if flash[:alert] %>
-          <p class="error"><%= flash[:alert] %></p>
-        <% end %>
-
-        <p>Non uploaded points to gdocs: <%= @num_points_in_queue %></p>
-        </td><td align="right">
-        <%= form_tag(upload_points_path) do %>
-          <%= submit_tag("Upload points to gdocs") %>
-        <% end %>
-      </td>
-    </table>
+<% if signed_in? %>
+  <%= link_to 'Create New Course', new_course_path %>
+  <% if flash[:alert] %>
+    <p class="error"><%= flash[:alert] %></p>
   <% end %>
-</p>
+
+  <p>Non uploaded points to gdocs: <%= @num_points_in_queue %></p>
+  <%= form_tag(upload_points_path) do %>
+    <%= submit_tag("Upload points to gdocs") %>
+  <% end %>
+<% end %>
 
 <h3>Ongoing courses</h3>
 <%= render 'list', :locals => { :courses => @ongoing_courses } %>

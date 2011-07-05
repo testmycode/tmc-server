@@ -12,6 +12,7 @@ SandboxServer::Application.routes.draw do
   resources :courses do
     member do
       get 'refresh'
+      post 'refresh'
       get 'points'
     end
     resources :exercises, :except => [:destroy, :create] do

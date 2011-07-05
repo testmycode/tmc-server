@@ -26,6 +26,7 @@ module IntegrationTestActions
   def manually_refresh_course(coursename)
     visit '/courses'
     click_link coursename
-    click_link 'refresh'
+    click_button 'Refresh from repository'
+    page.should have_content('Course refreshed from repository.')
   end
 end

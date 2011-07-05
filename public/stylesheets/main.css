@@ -1,0 +1,142 @@
+
+/* Basic commons */
+
+h1 {
+  margin-left: 5%;
+  margin-right: 10%;
+  color: #09214A; 
+  font-family: Arial;
+  font-size: 200%;
+}
+
+h2 {
+  margin-left: 15%;
+  margin-right: 10%;
+  color: #09214A; 
+  font-family: Arial;
+  font-size: 150%;
+}
+
+a {
+  color: #09214A;
+  text-decoration: none;
+}
+  
+a:visited { color: #09214A; } 
+a:hover { text-decoration: underline; }
+
+.error {
+  color: red;
+}
+
+.warning {
+  color: #FF8000;
+}
+
+.notice {
+  color: green;
+}
+
+pre {
+  background-color: #eee;
+  padding: 10px;
+  font-size: 11px;
+}
+
+.field_with_errors {
+  padding: 2px;
+  background-color: red;
+  display: table;
+}
+
+#error_explanation {
+  width: 450px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 0;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#error_explanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px;
+  margin-bottom: 0px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  list-style: square;
+}
+
+
+/* General layout */
+
+body {
+  background-color: #B9D0F7;
+  color: black;
+  font-family: sans-serif;
+  font-size: 80%;
+}
+
+#everything {
+  background-color: white;
+  margin-left: 4%;
+  margin-right: 4%;
+  padding-bottom: 8%;
+}
+
+#everything > div {
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+#title-area > #titles {
+  float: left;
+}
+
+#title-area > #login {
+  margin-top: 20px;
+  float: right;
+}
+
+#navigation-area {
+  clear: both;
+  background-color: #B9D0F7;
+  font-weight: bold;
+  margin-top: 20px;
+  padding: 5px 5px 5px 5px;
+}
+
+.flash {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* Minor layout */
+
+div.link-refresh {
+  margin-bottom: 20px;
+}
+
+div.link-back {
+  margin-top: 30px;
+}
+
+/* Lists and tables */
+
+table {
+  border-collapse: collapse;
+}
+
+table > thead > tr > th,
+table > tbody > tr > td {
+  padding: 6px 14px 6px 14px;
+  border: 1px solid gray;
+}
+

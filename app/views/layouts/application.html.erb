@@ -1,67 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SandboxServer</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <%= stylesheet_link_tag :all %>
   <%= javascript_include_tag 'jquery', 'jquery_ujs' %>
   <%= csrf_meta_tag %>
+  <title>Test My Code server</title>
 </head>
 
 <body>
-<center>
-  <table border="0" width="1024" style="border-collapse: collapse" bgcolor="#FFFFFF">
-    <tr class="trTop">
-      <td align ="left">
+  <div id="everything">
+    <div id="title-area">
+      <div id="titles">
         <h1>HELSINKI UNIVERSITY</h1>
         <h2>Department of Computer Science</h2>
-      </td>
-      <td class="tdLogin" align="right"><%= render 'sessions/login_menu' %></td>
-    </tr>
-    <tr>
-      <td class="tdNav" colspan="2"> 
-            
-        <%= link_to 'Courses', courses_path %>
-        
-        <% if signed_in? %>
-          <% if @course and @course.valid? %>
-            | <%= link_to "Latest points for #{@course.name}",
-            points_course_path(@course) %> 
-            | <%= link_to @course.name, course_exercises_path(@course) %>
-          <% end %>
-        <% else %> 
-          <% if @course != nil %>  
-            <% if @exercise == nil %>
-              &raquo <%= @course.name %>
-            <% else %>
-              &raquo <%= link_to @course.name, course_exercises_path %> 
-            <% end %>
-          <% end %>
-        
-        <% end %>
-       
-          
-        <% if @exercise %> 
-          &raquo <%= @exercise.name %> 
-        <% end %>
-        
-        
-        
-        
-      </td>
-    </tr>
-    <tr>
-      <td class="tdYield" colspan="2">
-        <% if notice %>
-          <p id="notice"><%= notice %></p>
-        <% end %>
-        
-        <%= yield %>
+      </div>
     
-      </td>
-    </tr>
-  </table>
-</center>
- 
+      <div id="login">
+        <%= render 'sessions/login_form' %>
+      </div>
+    </div>
+          
+    <div id="navigation-area">
+      <%= link_to 'Courses', courses_path %>
+      
+      <!-- needs cleanup -->
+      <% if signed_in? %>
+        <% if @course and @course.valid? %>
+          | <%= link_to "Latest points for #{@course.name}",
+          points_course_path(@course) %> 
+          | <%= link_to @course.name, course_exercises_path(@course) %>
+        <% end %>
+      <% else %> 
+        <% if @course != nil %>  
+          <% if @exercise == nil %>
+            &raquo <%= @course.name %>
+          <% else %>
+            &raquo <%= link_to @course.name, course_exercises_path %> 
+          <% end %>
+        <% end %>
+      
+      <% end %>
+     
+        
+      <% if @exercise %> 
+        &raquo <%= @exercise.name %> 
+      <% end %>
+    </div>
+
+    <div id="content-area">
+      <% if notice %>
+        <div class="flash notice"><%= notice %></div>
+      <% end %>
+      
+      <%= yield %>
+    </div>
+  </div>
 </body>
 </html>
 
