@@ -40,11 +40,17 @@ describe CoursesController do
   describe "POST create" do
    
     describe "with valid parameters" do
-      after(:each) do
-        c = Course.find_by_name!('NewCourse')
-        c.destroy if c != nil
+      it "creates the course with a local repo if no remote repo url is given" do
+        post :create, :course => { :name => 'NewCourse' }
+        Course.last.should have_local_repo
       end
 
+      it "creates the course without a local repo if a remote repo url is given" do
+        post :create, :course => { :name => 'NewCourse', :remote_repo_url => 'git@example.com' }
+        Course.last.should have_remote_repo
+        Course.last.bare_url.should == 'git@example.com'
+      end
+    
       it "redirects to the created course" do 
         post :create, :course => { :name => 'NewCourse' }
         response.should redirect_to(Course.last)

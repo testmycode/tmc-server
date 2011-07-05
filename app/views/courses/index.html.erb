@@ -43,7 +43,7 @@
     </td>
     <% if signed_in? %>
       <td>
-        <%= course.bare_path %>
+        <%= course.bare_url %>
       </td>
       <td>
         <%= link_to 'remove', course_path(course), :method => :delete %>
@@ -73,7 +73,7 @@
       </td>
       <% if signed_in? %>
         <td>
-          <%= course.bare_path %>
+          <%= course.bare_url %>
         </td>
         <td>
           <%= link_to 'remove', course_path(course), :method => :delete %>

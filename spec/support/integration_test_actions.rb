@@ -10,11 +10,15 @@ module IntegrationTestActions
     page.should have_content('Sign out')
   end
   
-  def create_new_course(coursename)
+  def create_new_course(coursename, options = {})
+    options = { :remote_repo_url => nil }.merge options
+
     visit '/courses'
     click_link 'Create New Course'
     fill_in 'course_name', :with => coursename
+    fill_in 'course_remote_repo_url', :with => options[:remote_repo_url] if options[:remote_repo_url]
     click_button 'Add Course'
+    
     page.should have_content('Course was successfully created.')
     page.should have_content(coursename)
   end

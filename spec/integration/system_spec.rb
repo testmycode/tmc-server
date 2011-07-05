@@ -17,10 +17,19 @@ describe "The system" do
       log_in_as(@user.login)
     end
     
-    it "should create a git repository for new courses" do
+    it "should create a local git repo for new courses by default" do
       create_new_course('mycourse')
       bare_repo_path = GitBackend.repositories_root + '/mycourse.git'
       File.should exist(bare_repo_path)
+    end
+    
+    it "should allow using a remote git repo for new courses" do
+      copy_model_repo("#{@test_tmp_dir}/fake_remote_repo")
+      
+      create_new_course('mycourse', :remote_repo_url => "file://#{@test_tmp_dir}/fake_remote_repo")
+      
+      bare_repo_path = GitBackend.repositories_root + '/mycourse.git'
+      File.should_not exist(bare_repo_path)
     end
     
     it "should show exercises pushed to the course's git repo" do
@@ -37,6 +46,5 @@ describe "The system" do
       click_link 'mycourse'
       page.should have_content('MyExercise')
     end
-    
   end
 end
