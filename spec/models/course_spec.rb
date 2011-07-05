@@ -26,6 +26,14 @@ describe Course do
     end
   end
   
+  describe "when given a blank remote repo url" do
+    it "should save and treat is as nil" do
+      course = Course.create!(:name => 'MyCourse', :remote_repo_url => '')
+      course.remote_repo_url.should be_nil
+      course.should_not have_remote_repo
+    end
+  end
+  
   describe "when given a remote repo url" do
     let(:course) { Course.create!(:name => 'TestCourse', :remote_repo_url => remote_repo_url) }
     
