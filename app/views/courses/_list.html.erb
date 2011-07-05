@@ -19,7 +19,10 @@
         <%= course.bare_url %>
       </td>
       <td>
-        <%= link_to 'remove', course_path(course), :method => :delete %>
+        <%= link_to 'refresh', refresh_course_path(course) %>
+      </td>
+      <td>
+        <%= link_to 'remove', course_path(course), :method => :delete, :confirm => 'Really truly delete this course?' %>
       </td>
     <% end %>
   </tr>
