@@ -52,6 +52,14 @@ class Exercise < ActiveRecord::Base
     return exercises
   end
 
+  def copy_metadata from
+    self.deadline = from.deadline
+    self.publish_date = from.publish_date
+    self.gdocs_sheet = from.gdocs_sheet
+  end
+
+private
+
   def self.read_exercise course_path, exercise_path
     e = Exercise.new
 
@@ -65,12 +73,6 @@ class Exercise < ActiveRecord::Base
     e.exercise_points = ExercisePoint.extract_exercise_points exercise_path
 
     return e
-  end
-
-  def update_attributes from
-    self.deadline = from.deadline
-    self.publish_date = from.publish_date
-    self.gdocs_sheet = from.gdocs_sheet
   end
 
   def self.merge_file hash, file
@@ -103,7 +105,7 @@ class Exercise < ActiveRecord::Base
       next if !FileTest.exists? "#{path}/src"
       next if !FileTest.exists? "#{path}/test"
       next if !FileTest.exists? "#{path}/nbproject"
-        exercise_paths << path
+      exercise_paths << path
     end
 
     return exercise_paths

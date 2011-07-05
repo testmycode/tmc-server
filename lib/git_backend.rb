@@ -9,7 +9,7 @@ module GitBackend
 
     begin
       copy_model_repository
-      link_hooks
+      #link_hooks #TODO: we're getting rid of or changing these awfully slow hooks soon - at least for tests
       raise "invalid repository" unless valid_repository?
     rescue Exception => e
       delete_repository
@@ -73,7 +73,6 @@ module GitBackend
 
   def valid_repository?
     return false unless FileTest.exists? bare_path
-    return false unless valid_hooks?
     return true
   end
 
@@ -91,20 +90,6 @@ module GitBackend
   end
 
   private
-
-  def self.hooks
-    Dir.chdir GitBackend.hooks_dir do
-      Dir.glob "*"
-    end
-  end
-
-  def valid_hooks?
-    GitBackend.hooks.each do |hook|
-      raise "expected #{hook} hook was not found" unless
-        FileTest.exists? "#{hooks_path}/#{hook}"
-    end
-    return true
-  end
 
   def valid_cache?
     return false unless FileTest.exists? zip_path

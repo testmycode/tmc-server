@@ -33,7 +33,11 @@ class Course < ActiveRecord::Base
       options = options.merge(YAML.load_file(options_file))
     end
 
-    self.hide_after = options["hide_after"]
+    if !options["hide_after"].blank?
+      self.hide_after = Time.parse(options["hide_after"])
+    else
+      self.hide_after = nil
+    end
   end
 
   def refresh_exercises
@@ -42,7 +46,7 @@ class Course < ActiveRecord::Base
     self.exercises.each do |old_e|
       read_e = read_exs.find {|x| x.name == old_e.name}
       if read_e
-        old_e.update_attributes read_e
+        old_e.copy_metadata read_e
       else
         old_e.destroy
       end
