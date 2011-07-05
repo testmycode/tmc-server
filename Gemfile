@@ -5,6 +5,7 @@ gem 'rails', '~> 3.0.0'
 gem 'rake', '~> 0.8.0'
 gem 'google-spreadsheet-ruby'
 gem 'sqlite3'
+gem 'jquery-rails'
 gem 'gdocs4ruby'
 gem 'spreadsheet'
 
