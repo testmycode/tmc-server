@@ -22,4 +22,10 @@ module IntegrationTestActions
     page.should have_content('Course was successfully created.')
     page.should have_content(coursename)
   end
+  
+  def manually_refresh_course(coursename)
+    visit '/courses'
+    click_link coursename
+    click_link 'refresh'
+  end
 end

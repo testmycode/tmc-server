@@ -30,6 +30,7 @@ describe "The system" do
       
       bare_repo_path = GitBackend.repositories_root + '/mycourse.git'
       File.should_not exist(bare_repo_path)
+      
     end
     
     it "should show exercises pushed to the course's git repo" do
@@ -40,7 +41,7 @@ describe "The system" do
       repo.copy_model_exercise('MyExercise')
       repo.add_commit_push
       
-      visit "/courses/#{course.id}/refresh" #FIXME FIXME FIXME - shouldn't be needed
+      manually_refresh_course(course.name)
       
       visit '/courses'
       click_link 'mycourse'
