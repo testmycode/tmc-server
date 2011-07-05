@@ -1,19 +1,14 @@
 class User < ActiveRecord::Base
-
-#User db has attributes login, password and salt, all String. Login and session  are using this file.
-
   validates :login, :presence     => true,
                     :confirmation => true,
                     :length       => { :within => 2..20 }
 
-  validates :password, :presence     => true,
-                       :confirmation => true,
-                       :length       => { :within => 6..40 }
-
+  attr_accessor :password
+  validate :check_password
   before_save :encrypt_password
 
   def has_password?(submitted_password)
-    password == encrypt(submitted_password)
+    password_hash == encrypt(submitted_password)
   end
 
   def self.authenticate(login, submitted_password)
@@ -26,7 +21,7 @@ class User < ActiveRecord::Base
 
   def encrypt_password
     self.salt = make_salt if new_record?
-    self.password = encrypt(password)
+    self.password_hash = encrypt(password)
   end
 
   def encrypt(string)
@@ -39,5 +34,12 @@ class User < ActiveRecord::Base
 
   def secure_hash(string)
     Digest::SHA2.hexdigest(string)
+  end
+  
+  def check_password
+    errors[:password] << "password must be set" if new_record? && password.blank?
+    if password != nil
+      errors[:password] << "the password is too short" if password.length < 6
+    end
   end
 end

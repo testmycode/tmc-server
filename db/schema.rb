@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110627194220) do
+ActiveRecord::Schema.define(:version => 20110705110351) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -79,8 +79,8 @@ ActiveRecord::Schema.define(:version => 20110627194220) do
   end
 
   create_table "users", :force => true do |t|
-    t.string   "login",      :null => false
-    t.string   "password",   :null => false
+    t.string   "login",         :null => false
+    t.string   "password_hash", :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "salt"
