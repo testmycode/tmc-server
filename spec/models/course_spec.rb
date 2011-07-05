@@ -163,7 +163,7 @@ describe Course do
   end
   
   def add_exercise(name, options = {})
-    options = options.merge :commit => true
+    options = { :commit => true }.merge options
     local_clone.copy_model_exercise(name)
     local_clone.add_commit_push if options[:commit]
   end
@@ -173,7 +173,7 @@ describe Course do
   end
   
   def change_metadata_file(filename, data, options = {})
-    options = options.merge :raw => false, :commit => true
+    options = { :raw => false, :commit => true }.merge options
     Dir.chdir local_clone.path do
       data = YAML.dump data unless options[:raw]
       File.open(filename, 'wb') {|f| f.write(data) }
