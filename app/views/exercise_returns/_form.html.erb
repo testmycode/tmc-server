@@ -15,18 +15,11 @@
     </div>
   <% end %>
 
-  <div class="field">
-    Return Java file - 
-    Course: <%= @course.name %> - 
-    Exercise: <%= @exercise.name %>  
+  <div>
+    
   </div>
-  <div class="field">
-    Student number<br />
-    <%= f.text_field :student_id %>
-  </div>
-  <div class="field">
-    <%= f.file_field 'tmp_file' %>
-  </div>
+  <%= labeled_field("Student ID", f.text_field(:student_id)) %>
+  <%= labeled_field("Zipped project", f.file_field('tmp_file')) %>
   <div class="actions">
     <%= f.submit 'Submit'%>
   </div>

@@ -2,19 +2,20 @@
 /* Basic commons */
 
 h1 {
-  margin-left: 5%;
-  margin-right: 10%;
   color: #09214A; 
   font-family: Arial;
   font-size: 200%;
 }
 
 h2 {
-  margin-left: 15%;
-  margin-right: 10%;
+  margin-left: 0.3em;
   color: #09214A; 
   font-family: Arial;
   font-size: 150%;
+}
+
+section {
+  margin-left: 1.5em;
 }
 
 a {
@@ -75,7 +76,7 @@ pre {
 }
 
 
-/* General layout */
+/* Toplevel layout */
 
 body {
   background-color: #B9D0F7;
@@ -118,7 +119,23 @@ body {
   font-weight: bold;
 }
 
-/* Minor layout */
+/* Form layout */
+
+.field label {
+  font-size: 90%;
+  font-weight: bold;
+  display: block;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+
+.actions {
+  margin-bottom: 18px;
+}
+
+/* Miscellaneous layout */
 
 div.link-refresh {
   margin-bottom: 20px;
