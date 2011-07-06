@@ -48,4 +48,26 @@ describe "The system" do
       page.should have_content('MyExercise')
     end
   end
+  
+  describe "(used by a student)" do
+    before :each do
+      @course = Course.create!(:name => 'mycourse')
+      repo = clone_course_repo(@course)
+      repo.copy_model_exercise('MyExercise')
+      repo.add_commit_push
+      @course.refresh
+      
+      visit '/'
+      click_link 'mycourse'
+    end
+    
+    it "should offer exercises as downloadable zips" do
+      click_link('zip')
+      File.open('MyExercise.zip', 'wb') {|f| f.write(page.source) }
+      system!("unzip -qq MyExercise.zip")
+      File.should be_a_directory('MyExercise')
+      File.should be_a_directory('MyExercise/nbproject')
+    end
+  end
+  
 end

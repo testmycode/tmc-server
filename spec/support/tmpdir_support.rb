@@ -5,6 +5,7 @@
 RSpec.configure do |config|
   config.before(:each) do
     @test_tmp_dir = "#{::Rails.root}/tmp/tests"
+    FileUtils.rm_rf @test_tmp_dir
     FileUtils.mkdir_p @test_tmp_dir
     FileUtils.cd @test_tmp_dir
     
@@ -23,9 +24,11 @@ RSpec.configure do |config|
 
   config.after(:each) do
     FileUtils.pwd.should == @test_tmp_dir
-    FileUtils.rm_rf @test_tmp_dir
-    FileUtils.mkdir @test_tmp_dir
-    FileUtils.cd @test_tmp_dir
+    # We don't clean up @test_tmp_dir here because in some cases
+    # Capybara may leave a file handle to a downloadable repo cache resource open.
+    # When on NFS, the deletion will be deferred, causing problems.
+    # File handles are cleaned up soon after this block, so the cleanup can safely
+    # be done in the before :each above.
   end
 end
 
