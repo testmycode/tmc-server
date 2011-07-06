@@ -34,9 +34,9 @@
       <% else %> 
         <% if @course != nil %>  
           <% if @exercise == nil %>
-            &raquo <%= @course.name %>
+            &raquo; <%= @course.name %>
           <% else %>
-            &raquo <%= link_to @course.name, course_exercises_path %> 
+            &raquo; <%= link_to @course.name, course_exercises_path %> 
           <% end %>
         <% end %>
       
