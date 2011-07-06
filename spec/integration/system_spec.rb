@@ -51,11 +51,12 @@ describe "The system" do
   
   describe "(used by a student)" do
     before :each do
-      @course = Course.create!(:name => 'mycourse')
-      repo = clone_course_repo(@course)
+      course = Course.create!(:name => 'mycourse')
+      repo = clone_course_repo(course)
       repo.copy_simple_exercise('MyExercise')
       repo.add_commit_push
-      @course.refresh
+      
+      course.refresh
       
       visit '/'
       click_link 'mycourse'
@@ -65,6 +66,7 @@ describe "The system" do
       click_link('zip')
       File.open('MyExercise.zip', 'wb') {|f| f.write(page.source) }
       system!("unzip -qq MyExercise.zip")
+      
       File.should be_a_directory('MyExercise')
       File.should be_a_directory('MyExercise/nbproject')
       File.should exist('MyExercise/src/SimpleStuff.java')
