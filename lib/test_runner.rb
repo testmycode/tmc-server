@@ -4,7 +4,7 @@ require 'find'
 module TestRunner
 
   def self.lib_path
-    "#{::Rails.root.to_s}/lib/testrunner/"
+    "#{::Rails.root}/lib/testrunner/"
   end
 
   def self.jar_path
@@ -54,8 +54,8 @@ module TestRunner
       Process.setrlimit Process::RLIMIT_CPU, 10, 10
       exec "java", "-cp", "#{classpath}:#{src_classpath}",
         "-Djava.security.manager",
-        "-Djava.security.policy=#{::Rails::root}/lib/testrunner/testrunner_policy",
-        "testrunner.Main", "run", test_classpath, classname,
+        "-Djava.security.policy=#{lib_path}/testrunner_policy",
+        "fi.helsinki.cs.tmc.testrunner.Main", "run", test_classpath, classname,
         "/dev/null", results_fn
     end
 
@@ -116,8 +116,8 @@ module TestRunner
 
       test_classes.each do |classname|
         system "java", "-cp", "#{classpath}:#{src_classpath}",
-        "testrunner.Main", "list", test_classpath, classname,
-          "/dev/null", results_fn
+        "fi.helsinki.cs.tmc.testrunner.Main", "list", test_classpath,
+        classname, "/dev/null", results_fn
 
         class_exercises = ActiveSupport::JSON.decode IO.read(results_fn)
         if class_exercises.is_a? Array

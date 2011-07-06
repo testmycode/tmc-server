@@ -2,7 +2,7 @@ package mystring;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import testrunner.Exercise;
+import fi.helsinki.cs.tmc.testrunner.Exercise;
 
 public class MyStringTest {
 

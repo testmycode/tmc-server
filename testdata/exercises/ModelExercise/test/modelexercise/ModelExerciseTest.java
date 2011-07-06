@@ -1,6 +1,6 @@
 package modelexercise;
 
-import testrunner.Exercise;
+import fi.helsinki.cs.tmc.testrunner.Exercise;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
