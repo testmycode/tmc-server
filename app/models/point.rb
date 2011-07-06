@@ -33,22 +33,22 @@ class Point < ActiveRecord::Base
 
       if exercise_success[key]
         ep = ExercisePoint.where(
-          :exercise_id => test_suite_run.exercise_return.exercise.id,
+          :exercise_id => test_suite_run.submission.exercise.id,
           :point_id => run.exercise).first
 
         created_point = Point.create!(:exercise_number => run.exercise,
-          :student_id => test_suite_run.exercise_return.student_id,
+          :student_id => test_suite_run.submission.student_id,
           :exercise_point_id => ep.id,
           :tests_pass => true)
 
         PointsUploadQueue.create! :point_id => created_point.id
       else
         ep = ExercisePoint.where(
-          :exercise_id => test_suite_run.exercise_return.exercise.id,
+          :exercise_id => test_suite_run.submission.exercise.id,
           :point_id => exercise_fail[key].exercise).first
 
         Point.create!(:exercise_number => exercise_fail[key].exercise,
-          :student_id => test_suite_run.exercise_return.student_id,
+          :student_id => test_suite_run.submission.student_id,
           :exercise_point_id => ep.id,
           :tests_pass => false)
       end

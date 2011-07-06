@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110705115649) do
+ActiveRecord::Schema.define(:version => 20110706185531) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -25,14 +25,6 @@ ActiveRecord::Schema.define(:version => 20110705115649) do
     t.string   "point_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "exercise_returns", :force => true do |t|
-    t.integer  "exercise_id"
-    t.binary   "return_file"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "student_id"
   end
 
   create_table "exercises", :force => true do |t|
@@ -61,6 +53,14 @@ ActiveRecord::Schema.define(:version => 20110705115649) do
     t.datetime "updated_at"
   end
 
+  create_table "submissions", :force => true do |t|
+    t.integer  "exercise_id"
+    t.binary   "return_file"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "student_id"
+  end
+
   create_table "test_case_runs", :force => true do |t|
     t.integer  "test_suite_run_id"
     t.string   "exercise"
@@ -74,7 +74,7 @@ ActiveRecord::Schema.define(:version => 20110705115649) do
 
   create_table "test_suite_runs", :force => true do |t|
     t.integer  "status"
-    t.integer  "exercise_return_id"
+    t.integer  "submission_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

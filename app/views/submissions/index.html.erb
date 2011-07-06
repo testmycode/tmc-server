@@ -1,0 +1,40 @@
+<!--<h1>Listing submissions</h1>
+
+<table>
+  <tr>
+    <th>Course</th>
+    <th>Exercise</th>
+    <th>Student</th>
+    <th>Return file</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @submissions.each do |submission| %> 
+  <%
+    exercise = Exercise.find(submission.exercise_id)
+    course = Course.find(exercise.course_id)
+  %>
+  <tr>
+    <td><%= course.name %></td>
+    <td><%= exercise.name %></td>
+    <td><%= submission.student_id %></td>
+    <td>
+      <%=
+        link_to("#{exercise.name}-#{submission.id}.zip",
+                "#{course_exercise_submission_path(course, exercise, submission)}.zip")
+      %>
+    </td>
+    <td><%= link_to 'Run', new_test_suite_run_path %></td>
+    <td><%= link_to 'Show', course_exercise_submission_path(@course, @exercise, submission) %></td>
+    <td><%= link_to 'Edit', edit_course_exercise_submission_path(@course, @exercise, submission) %></td>
+    <td><%= link_to 'Destroy', course_exercise_submission_path(@course, @exercise, submission),
+      :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Exercise return', new_course_exercise_submission_path %>-->

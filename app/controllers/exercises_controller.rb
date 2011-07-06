@@ -16,8 +16,8 @@ class ExercisesController < ApplicationController
 
   def show
     @exercise = @course.exercises.find(params[:id])
-    @exercise_return = ExerciseReturn.new
-    @exercise_returns = ExerciseReturn.where(:exercise_id => @exercise.id).order("(created_at)DESC LIMIT 15")
+    @submission = Submission.new
+    @submissions = Submission.where(:exercise_id => @exercise.id).order("(created_at)DESC LIMIT 15")
 
     respond_to do |format|
       format.html

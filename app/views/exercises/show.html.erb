@@ -8,14 +8,14 @@
 <h2>Submit answer</h2>
 
 <section>
-  <%= render 'exercise_returns/form' %>
+  <%= render 'submissions/form' %>
 </section>
 
 
 <h2>Submissions</h2>
 
 <section>
-  <% if !@exercise_returns.empty? %>
+  <% if !@submissions.empty? %>
     <table>
       <tr>
         <th>Course</th>
@@ -25,29 +25,29 @@
         <th></th>
       </tr>
 
-    <% @exercise_returns.each do |exercise_return| %> 
+    <% @submissions.each do |submission| %> 
 
       <tr>
         <td><%= @course.name %></td>
         <td><%= @exercise.name %></td>
-        <td><%= exercise_return.student_id %></td>
+        <td><%= submission.student_id %></td>
           <% if signed_in? %>
             <td>
-              <%= link_to("#{@exercise.name}-#{exercise_return.id}.zip",
-                    "#{course_exercise_return_path(@course, @exercise, exercise_return)}.zip") %> 
+              <%= link_to("#{@exercise.name}-#{submission.id}.zip",
+                    "#{course_exercise_submission_path(@course, @exercise, submission)}.zip") %> 
             </td>
             <td>
-             <%= form_tag test_suite_runs_path, :id => "run-ex-return-#{exercise_return.id}", :method => :post do %>
-                <%= hidden_field_tag 'test_suite_run[exercise_return_id]', exercise_return.id %>
-                <a href="#" onclick="javascript: document.getElementById('run-ex-return-<%=exercise_return.id%>').submit()">Run</a>
+             <%= form_tag test_suite_runs_path, :id => "run-ex-return-#{submission.id}", :method => :post do %>
+                <%= hidden_field_tag 'test_suite_run[submission_id]', submission.id %>
+                <a href="#" onclick="javascript: document.getElementById('run-ex-return-<%=submission.id%>').submit()">Run</a>
               <% end %>
             </td>
             <td>
-              <%= link_to 'Destroy', course_exercise_return_path(@course, @exercise, exercise_return), :confirm => 'Are you sure?', :method => :delete %>
+              <%= link_to 'Destroy', course_exercise_submission_path(@course, @exercise, submission), :confirm => 'Are you sure?', :method => :delete %>
             </td>
           <% else %>
              <td>
-              <%= "#{@exercise.name}-#{exercise_return.id}.zip" %>
+              <%= "#{@exercise.name}-#{submission.id}.zip" %>
              </td>
           <% end %>
        </tr>

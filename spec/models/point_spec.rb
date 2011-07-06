@@ -10,12 +10,12 @@ describe Point do
 
     system "git clone #{::Rails.root.to_s}/spec"
 
-    exercise_return = ExerciseReturn.create!(
+    submission = Submission.create!(
       :student_id => "test_student_id",
       :return_file => File.open(Rails.root.to_s + "/spec/models/OhjaV1T2.zip", 'rb').read,
       :exercise_id => exercise.id
     )
-    @test_suite_run = TestSuiteRun.create! :exercise_return_id => exercise_return.id
+    @test_suite_run = TestSuiteRun.create! :submission_id => submission.id
   end
 
   after :each do
@@ -24,11 +24,11 @@ describe Point do
 
   describe "with all tests true" do
     before :each do
-      exercise_return = ExerciseReturn.create!(
+      submission = Submission.create!(
         :student_id => 123,
         :return_file => File.open(Rails.root.to_s + "/spec/models/OhjaV1T2.zip", 'rb').read
       )
-      @test_suite_run = TestSuiteRun.create! :exercise_return_id => exercise_return.id
+      @test_suite_run = TestSuiteRun.create! :submission_id => submission.id
     end
 
     it "should not have any failed tests" do

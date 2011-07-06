@@ -16,7 +16,7 @@ SandboxServer::Application.routes.draw do
       get 'points'
     end
     resources :exercises, :except => [:destroy, :create] do
-      resources :exercise_returns, :as => 'returns'
+      resources :submissions
     end
   end
 

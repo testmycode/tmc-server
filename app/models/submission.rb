@@ -1,4 +1,4 @@
-class ExerciseReturn < ActiveRecord::Base
+class Submission < ActiveRecord::Base
 
  #does validates, but doesn't give error info given here
   validates :student_id, :presence     => true,

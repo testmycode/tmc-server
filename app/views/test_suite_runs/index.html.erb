@@ -12,7 +12,7 @@
 <% @test_suite_runs.each do |test_suite_run| %>
   <tr>
     <td><%= test_suite_run.status %></td>
-    <td><%= test_suite_run.exercise_return_id %></td>
+    <td><%= test_suite_run.submission_id %></td>
     <td><%= link_to 'Show', test_suite_run %></td>
     <td><%= link_to 'Edit', edit_test_suite_run_path(test_suite_run) %></td>
     <td><%= link_to 'Destroy', test_suite_run, :method => :delete %></td>

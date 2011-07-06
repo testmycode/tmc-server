@@ -150,7 +150,7 @@ module TestRunner
   end
 
   def self.test_suite_run test_suite_run
-    submission = ExerciseReturn.find(test_suite_run.exercise_return_id)
+    submission = Submission.find(test_suite_run.submission_id)
     exercise = Exercise.find(submission.exercise_id)
     course = Course.find(exercise.course_id)
 

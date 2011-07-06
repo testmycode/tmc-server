@@ -1,5 +1,5 @@
 class TestSuiteRun < ActiveRecord::Base
-  belongs_to :exercise_return
+  belongs_to :submission
   has_many :test_case_runs, :dependent => :destroy
   after_create :run_tests
 

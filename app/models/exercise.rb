@@ -4,7 +4,7 @@ class Exercise < ActiveRecord::Base
   include Rails.application.routes.url_helpers
 
   belongs_to :course
-  has_many :exercise_returns, :dependent => :destroy
+  has_many :submissions, :dependent => :destroy
   has_many :exercise_points, :dependent => :destroy
   #after_create :add_sheet_to_gdocs
 
@@ -17,7 +17,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def return_address
-    course_exercise_returns_url(self.course, self)
+    course_exercise_submissions_url(self.course, self)
   end
 
   def add_sheet_to_gdocs
