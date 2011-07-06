@@ -11,8 +11,8 @@ module GitTestActions
       @commit_count = 0
     end
     
-    def copy_model_exercise(name = 'ModelExercise')
-      FileUtils.cp_r("#{::Rails.root}/testdata/exercises/ModelExercise", "#{@path}/#{name}")
+    def copy_simple_exercise(name = 'SimpleExercise')
+      FileUtils.cp_r("#{::Rails.root}/spec/fixtures/SimpleExercise", "#{@path}/#{name}")
     end
     
     def add_commit_push

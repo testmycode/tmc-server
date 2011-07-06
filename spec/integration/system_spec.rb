@@ -38,7 +38,7 @@ describe "The system" do
       course = Course.find_by_name!('mycourse')
       
       repo = clone_course_repo(course)
-      repo.copy_model_exercise('MyExercise')
+      repo.copy_simple_exercise('MyExercise')
       repo.add_commit_push
       
       manually_refresh_course(course.name)
@@ -53,7 +53,7 @@ describe "The system" do
     before :each do
       @course = Course.create!(:name => 'mycourse')
       repo = clone_course_repo(@course)
-      repo.copy_model_exercise('MyExercise')
+      repo.copy_simple_exercise('MyExercise')
       repo.add_commit_push
       @course.refresh
       
@@ -67,6 +67,7 @@ describe "The system" do
       system!("unzip -qq MyExercise.zip")
       File.should be_a_directory('MyExercise')
       File.should be_a_directory('MyExercise/nbproject')
+      File.should exist('MyExercise/src/SimpleStuff.java')
     end
   end
   

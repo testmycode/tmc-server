@@ -172,7 +172,7 @@ describe Course do
   
   def add_exercise(name, options = {})
     options = { :commit => true }.merge options
-    local_clone.copy_model_exercise(name)
+    local_clone.copy_simple_exercise(name)
     local_clone.add_commit_push if options[:commit]
   end
   
