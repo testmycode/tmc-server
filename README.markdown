@@ -11,7 +11,7 @@ The project started as a Software Engineering Lab project at the [University of 
 
 - Patrik Marjanen
 - Jarno Mynttinen
-- Martti Rannanjärvi
+- Martti Rannanjärvi ([mrannanj](https://github.com/mrannanj))
 - Katri Rantanen
 
 Another team wrote a [NetBeans plugin](https://github.com/testmycode/tmc-netbeans) for the system.
