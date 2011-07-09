@@ -27,8 +27,6 @@ class Point < ActiveRecord::Base
     exercise_success = success_fail_tests_list[0]
     exercise_fail = success_fail_tests_list[1]
 
-    puts "Exercise success: " + exercise_success.inspect
-    puts "Exercise fail: " + exercise_fail.inspect
     exercise_success.each do |key, run|
 
       if exercise_success[key]
