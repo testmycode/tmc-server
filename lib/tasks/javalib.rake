@@ -3,7 +3,15 @@ require 'lib/tmc_javalib.rb'
 
 file TmcJavalib.jar_path => FileList['.gitmodules'] do
   puts "Compiling #{TmcJavalib.jar_path} ..."
-  TmcJavalib.compile!
+  begin
+    TmcJavalib.compile!
+  rescue
+    puts "*** Failed to compile tmc-javalib ***"
+    puts "  Have you done `git submodule update`?"
+    puts "  You also need to do this the first time: `git submodule sync; git submodule update --init`"
+    puts
+    raise
+  end
   # In case it was already compiled and ant had nothing to do,
   # we'll touch the jar file to make it newer than the deps.
   FileUtils.touch(TmcJavalib.jar_path) if File.exists?(TmcJavalib.jar_path)
