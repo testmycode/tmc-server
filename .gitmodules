@@ -1,0 +1,3 @@
+[submodule "lib/tmc-javalib"]
+	path = lib/tmc-javalib
+	url = git@github.com:testmycode/tmc-javalib.git
