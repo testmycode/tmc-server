@@ -102,31 +102,8 @@ module TestRunner
   end
 
   def self.extract_exercise_list project_root
-    exercises = []
-
-    Dir.mktmpdir do |dir|
-      cp_dir project_root, dir
-      cp_makefile dir
-      raise "failed to compile tests" unless compile_tests dir
-      test_classpath = "#{dir}/build/test/classes"
-      src_classpath = "#{dir}/build/classes"
-
-      test_classes = find_test_classes "#{test_classpath}"
-      results_fn = "#{dir}/results"
-
-      test_classes.each do |classname|
-        system "java", "-cp", "#{classpath}:#{src_classpath}",
-        "fi.helsinki.cs.tmc.testrunner.Main", "list", test_classpath,
-        classname, "/dev/null", results_fn
-
-        class_exercises = ActiveSupport::JSON.decode IO.read(results_fn)
-        if class_exercises.is_a? Array
-          exercises.concat(class_exercises)
-        end
-      end
-    end
-
-    return exercises
+    methods = TmcJavalib.get_exercise_methods(project_root)
+    methods.map {|m| m[:exercises] }.flatten
   end
 
   def self.populate_build_dir dir, course, exercise, submission
