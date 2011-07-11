@@ -72,7 +72,7 @@ describe "The system" do
       File.should exist('MyExercise/src/SimpleStuff.java')
     end
     
-    it "should accept correct solutions" do
+    it "should show successful test results correct solutions" do
       ex = SimpleExercise.new('MyExercise')
       ex.solve_all
       ex.make_zip
@@ -82,7 +82,23 @@ describe "The system" do
       attach_file('Zipped project', 'MyExercise.zip')
       click_button 'Submit'
       
-      # TODO: assertions
+      page.should have_content('All tests successful')
+      page.should have_content('OK')
+      page.should_not have_content('Fail')
+    end
+    
+    it "should show unsuccessful test results incorrect solutions" do
+      ex = SimpleExercise.new('MyExercise')
+      ex.make_zip
+      
+      click_link 'MyExercise'
+      fill_in 'Student ID', :with => '123'
+      attach_file('Zipped project', 'MyExercise.zip')
+      click_button 'Submit'
+      
+      page.should have_content('Some tests failed')
+      page.should_not have_content('OK')
+      page.should have_content('Fail')
     end
   end
   

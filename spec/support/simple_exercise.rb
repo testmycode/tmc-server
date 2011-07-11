@@ -17,6 +17,7 @@ class SimpleExercise
 
   def solve_all
     solve_ex_addsub
+    solve_ex_mul
   end
 
   def solve_ex_addsub
@@ -29,11 +30,11 @@ class SimpleExercise
   end
   
   def solve_ex_mul
-    replace_method_body_in_file(simple_stuff_path, 'mul', 'return a + b;')
+    replace_method_body_in_file(simple_stuff_path, 'mul', 'return a * b;')
   end
   
-  def introduce_compilation_error
-    replace_method_body_in_file(simple_stuff_path, 'add', 'oops')
+  def introduce_compilation_error(text)
+    replace_method_body_in_file(simple_stuff_path, 'add', "BAD INPUT #{text}")
   end
   
   def make_zip
@@ -74,13 +75,14 @@ private
 
   def replace_method_body_in_file(path, method, body)
     lines = IO.readlines(path)
-    lines.map do |line|
-      if line =~ /METHOD BODY #{method}/
-        line = body + " // METHOD BODY #{method}"
+    lines = lines.map do |line|
+      if line.include? "METHOD BODY #{method}"
+        line = body + " // METHOD BODY #{method}\n"
       else
         line
       end
     end
+    File.open(path, "wb") {|f| f.write(lines.join) }
   end
 end
 

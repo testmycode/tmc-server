@@ -26,7 +26,8 @@ a {
 a:visited { color: #09214A; } 
 a:hover { text-decoration: underline; }
 
-.error {
+.error,
+.failure {
   color: red;
 }
 
@@ -34,7 +35,8 @@ a:hover { text-decoration: underline; }
   color: #FF8000;
 }
 
-.notice {
+.notice,
+.success {
   color: green;
 }
 

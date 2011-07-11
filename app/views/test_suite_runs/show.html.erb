@@ -1,27 +1,38 @@
 
-<h1>Test case runs for exercise return: <%= @test_suite_run.submission_id %></h1>
+<h1>Test results for submission <%= @test_suite_run.submission_id %></h1>
 
-<table class="tableListings" width="100%">
+<% if @test_suite_run.all_successful? %>
+  <p class="success">All tests successful</p>
+<% else %>
+  <p class="failure">Some tests failed</p>
+<% end %>
+
+<table>
   <tr>
-    <th>Test suite run</th>
-    <th>exercise return id</th>
     <th>Exercise</th>
     <th>Class name</th>
     <th>Method name</th>
-    <th>Success</th>
-    <th>Message</th>
+    <th>Status</th>
+    <% if !@test_suite_run.all_successful? %>
+      <th>Info</th>
+    <% end %>
   </tr>
 
 <% @test_case_runs.each do |test_case_run| %>
   <tr>
-    <td><%= test_case_run.test_suite_run_id %></td>
-    <td><%= @test_suite_run.submission_id %></td>
     <td><%= test_case_run.exercise %></td>
     <td><%= test_case_run.class_name %></td>
     <td><%= test_case_run.method_name %></td>
-    <td><%= test_case_run.success %></td>
-    <td><%= test_case_run.message %></td>
-    
+    <td>
+      <% if test_case_run.success %>
+        <span class="success">OK</span>
+      <% else %>
+        <span class="failure">Fail</span>
+      <% end %>
+    </td>
+    <% if !@test_suite_run.all_successful? %>
+      <td><%= test_case_run.message %></td>
+    <% end %>
   </tr>
 <% end %>
 </table>
