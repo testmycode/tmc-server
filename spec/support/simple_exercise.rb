@@ -1,3 +1,4 @@
+require 'find'
 
 # Operations on a copy of fixtures/SimpleExercise.
 # The fixture has two exercises 'addsub' and 'mul'.
@@ -57,11 +58,20 @@ class SimpleExercise
   
   def self.ensure_fixture_clean
     Dir.chdir fixture_path do
-      system!("ant clean > /dev/null 2>&1")
+      system!("ant clean > /dev/null 2>&1") unless fixture_clean?
     end
   end
   
 private
+  def self.fixture_clean?
+    Find.find('.') do |path|
+      if path.end_with? '.class'
+        return false
+      end
+    end
+    true
+  end
+
   def replace_method_body_in_file(path, method, body)
     lines = IO.readlines(path)
     lines.map do |line|
