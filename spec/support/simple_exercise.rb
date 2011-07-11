@@ -74,8 +74,10 @@ private
   end
 end
 
-# before :all is run many times for some reason and this is quite slow,
-# so we do it when this file is loaded.
-SimpleExercise.ensure_fixture_clean
+RSpec.configure do |config|
+  config.before(:suite) do
+    SimpleExercise.ensure_fixture_clean
+  end
+end
 
 
