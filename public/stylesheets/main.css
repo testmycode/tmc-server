@@ -28,7 +28,8 @@ a:hover { text-decoration: underline; }
 
 .error,
 .alert,
-.failure {
+.failure,
+.fail {
   color: red;
 }
 
@@ -37,7 +38,8 @@ a:hover { text-decoration: underline; }
 }
 
 .notice,
-.success {
+.success,
+.ok {
   color: green;
 }
 

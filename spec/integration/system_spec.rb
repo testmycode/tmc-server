@@ -9,7 +9,7 @@ describe "The system" do
     page.should have_content('HELSINKI UNIVERSITY')
   end
 
-  describe "(used by an instructor)" do
+  describe "(used by an instructor for administration)" do
   
     before :each do
       visit '/'
@@ -49,6 +49,8 @@ describe "The system" do
     end
   end
   
+  
+  
   describe "(used by a student)" do
     before :each do
       course = Course.create!(:name => 'mycourse')
@@ -72,7 +74,7 @@ describe "The system" do
       File.should exist('MyExercise/src/SimpleStuff.java')
     end
     
-    it "should show successful test results correct solutions" do
+    it "should show successful test results for correct solutions" do
       ex = SimpleExercise.new('MyExercise')
       ex.solve_all
       ex.make_zip
@@ -83,11 +85,11 @@ describe "The system" do
       click_button 'Submit'
       
       page.should have_content('All tests successful')
-      page.should have_content('OK')
+      page.should have_content('Ok')
       page.should_not have_content('Fail')
     end
     
-    it "should show unsuccessful test results incorrect solutions" do
+    it "should show unsuccessful test results for incorrect solutions" do
       ex = SimpleExercise.new('MyExercise')
       ex.make_zip
       
@@ -97,11 +99,11 @@ describe "The system" do
       click_button 'Submit'
       
       page.should have_content('Some tests failed')
-      page.should_not have_content('OK')
+      page.should_not have_content('Ok')
       page.should have_content('Fail')
     end
     
-    it "should show compilation error if given uncompilable solution" do
+    it "should show compilation error for uncompilable solutions" do
       ex = SimpleExercise.new('MyExercise')
       ex.introduce_compilation_error('oops')
       ex.make_zip
@@ -115,5 +117,66 @@ describe "The system" do
       page.should have_content('oops')
     end
   end
+  
+  
+  
+  describe "(used by an instructor for viewing statistics)" do
+  
+    before :each do
+      course = Course.create!(:name => 'mycourse')
+      repo = clone_course_repo(course)
+      repo.copy_simple_exercise('EasyExercise')
+      repo.copy_simple_exercise('HardExercise')
+      repo.add_commit_push
+      
+      course.refresh
+    end
+    
+    it "should show all submissions for an exercise" do
+      submit_exercise('EasyExercise', :solve => true, :student_id => '123')
+      submit_exercise('EasyExercise', :solve => false, :student_id => '456')
+      submit_exercise('EasyExercise', :compilation_error => true, :student_id => '789')
+      
+      log_in_as_instructor
+      click_link 'mycourse' 
+      click_link 'EasyExercise'
+      
+      save_and_open_page
+      page.should have_content('123')
+      page.should have_content('456')
+      page.should have_content('789')
+      page.should have_content('Ok')
+      page.should have_content('Fail')
+      page.should have_content('Error')
+    end
+    
+    def submit_exercise(exercise_name, options = {})
+      options = {
+        :solve => true,
+        :compilation_error => false,
+        :student_id => 'some_student_id'
+      }.merge(options)
+      
+      FileUtils.rm_rf exercise_name
+      ex = SimpleExercise.new(exercise_name)
+      ex.solve_all if options[:solve]
+      ex.introduce_compilation_error('oops') if options[:compilation_error]
+      ex.make_zip
+      
+      visit '/'
+      click_link 'mycourse'
+      click_link exercise_name
+      fill_in 'Student ID', :with => options[:student_id]
+      attach_file('Zipped project', "#{exercise_name}.zip")
+      click_button 'Submit'
+    end
+    
+    def log_in_as_instructor
+      visit '/'
+      user = User.create!(:login => 'user', :password => 'xooxer')
+      log_in_as(user.login)
+    end
+  end
+  
   
 end

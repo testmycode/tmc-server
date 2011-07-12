@@ -19,6 +19,16 @@ class Submission < ActiveRecord::Base
     @fully_successful |= tests_ran? && test_case_runs.map(&:success?).all?
   end
   
+  def status
+    if all_tests_passed?
+      :ok
+    elsif tests_ran?
+      :fail
+    else
+      :error
+    end
+  end
+  
 private
   def run_tests
     begin

@@ -33,7 +33,7 @@ class SubmissionsController < ApplicationController
       :student_id => params[:submission]['student_id']
     )
 
-    @submission.exercise_id = @exercise
+    @submission.exercise_id = @exercise.id
     @submission.return_file_tmp_path = params[:submission]['tmp_file'].tempfile.path
 
     if @submission.save
