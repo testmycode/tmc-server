@@ -2,6 +2,7 @@ require 'tempfile'
 require 'find'
 
 module TestRunner
+  extend SystemCommands
 
   def self.lib_path
     "#{::Rails.root}/lib/testrunner/"
@@ -19,7 +20,7 @@ module TestRunner
     Dir.glob("#{jar_path}/*.jar").join(":")
   end
 
-  def self.find_dir_containing root, seeked
+  def self.find_dir_containing(root, seeked)
     Find.find(root) do |path|
       next unless FileTest.directory? path
       next unless FileTest.directory? "#{path}/#{seeked}"
@@ -28,24 +29,29 @@ module TestRunner
     return nil
   end
 
-  def self.compile_src project_root
-    system "env CLASSPATH=#{classpath} make -sC #{project_root} build-src"
+  def self.compile_src(project_root)
+    compile_target(project_root, 'build-src')
   end
 
-  def self.compile_tests project_root
-    system "env CLASSPATH=#{classpath} make -sC #{project_root} build-test"
+  def self.compile_tests(project_root)
+    compile_target(project_root, 'build-test')
+  end
+  
+  def self.compile_target(project_root, target)
+    output = `env CLASSPATH=#{classpath} make -sC #{project_root} #{target} 2>&1`
+    raise "Compilation error:\n#{output}" unless $?.success?
   end
 
-  def self.run_tests exercise_dir, suite_run
+  def self.run_tests(exercise_dir, submission)
     tests_classpath = "#{exercise_dir}/build/test/classes"
 
     test_classes = find_test_classes tests_classpath
     test_classes.each do |classname|
-      run_test_class exercise_dir, classname, suite_run
+      run_test_class exercise_dir, classname, submission
     end
   end
 
-  def self.run_test_class exercise_dir, classname, suite_run
+  def self.run_test_class(exercise_dir, classname, submission)
     test_classpath = "#{exercise_dir}/build/test/classes"
     src_classpath = "#{exercise_dir}/build/classes"
     results_fn = "#{exercise_dir}/results"
@@ -66,17 +72,20 @@ module TestRunner
 
     results.each do |exercise_name, test_results|
       test_results.each do |test_result|
-        TestCaseRun.create(:exercise => exercise_name,
-                           :method_name => test_result["methodName"],
-                           :class_name => test_result["className"],
-                           :message => test_result["message"],
-                           :success => test_result["status"] == 1,
-                           :test_suite_run_id => suite_run.id)
+        tcr = TestCaseRun.new(
+          :exercise => exercise_name,
+          :method_name => test_result["methodName"],
+          :class_name => test_result["className"],
+          :message => test_result["message"],
+          :success => test_result["status"] == 1,
+          :submission_id => submission.id
+        )
+        submission.test_case_runs << tcr
       end
     end
   end
 
-  def self.find_test_classes classpath
+  def self.find_test_classes(classpath)
     test_classes = []
     Find.find(classpath) do |path|
       next if FileTest.directory? path
@@ -89,7 +98,7 @@ module TestRunner
     test_classes
   end
 
-  def self.cp_dir source, destination
+  def self.cp_dir(source, destination)
     Dir.chdir source do
       Dir.glob("*").each do |file|
         FileUtils.cp_r file, destination
@@ -97,24 +106,20 @@ module TestRunner
     end
   end
 
-  def self.cp_makefile destination
+  def self.cp_makefile(destination)
     FileUtils.cp makefile, destination
   end
 
-  def self.extract_exercise_list project_root
+  def self.extract_exercise_list(project_root)
     methods = TmcJavalib.get_exercise_methods(project_root)
     methods.map {|m| m[:exercises] }.flatten
   end
 
-  def self.populate_build_dir dir, course, exercise, submission
-    Tempfile.open(['submission', '.zip']) do |tempfile|
-      tempfile.write(submission.return_file)
-      tempfile.close
-      system "unzip -q #{tempfile.path} -d #{dir}"
-    end
+  def self.populate_build_dir(dir, course, exercise, submission)
+    system! "unzip -q #{submission.return_file_tmp_path} -d #{dir}"
 
-    project_root = find_dir_containing dir, "src"
-    raise "unable to find 'src' directory in submision" unless project_root
+    project_root = find_dir_containing(dir, "src")
+    raise "unable to find 'src' directory in submission" unless project_root
 
     source = "#{course.clone_path}/#{exercise.path}/test"
     FileUtils.rm_rf "#{project_root}/test"
@@ -126,26 +131,17 @@ module TestRunner
     return project_root
   end
 
-  def self.test_suite_run test_suite_run
-    submission = Submission.find(test_suite_run.submission_id)
+  def self.run_submission_tests(submission)
     exercise = Exercise.find(submission.exercise_id)
     course = Course.find(exercise.course_id)
 
-    test_suite_run.status = 0
-    submission.test_suite_runs << test_suite_run
-    test_suite_run.save
-
     Dir.mktmpdir do |dir|
-      project_root = populate_build_dir dir, course, exercise, submission
-      raise "unable to find source directory (src)" unless project_root
-      raise "failed to compile submission" unless compile_src project_root
-      raise "failed to compile tests" unless compile_tests project_root
+      project_root = populate_build_dir(dir, course, exercise, submission)
+      compile_src(project_root)
+      compile_tests(project_root)
 
-      run_tests project_root, test_suite_run
+      run_tests(project_root, submission)
     end
-
-    test_suite_run.status = 1
-    test_suite_run.save
   end
 end
 

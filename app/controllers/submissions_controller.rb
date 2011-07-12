@@ -6,7 +6,6 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml  { render :xml => @submissions }
     end
   end
 
@@ -15,7 +14,6 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml { render :xml => @submission }
       format.zip { send_data(@submission.return_file) }
     end
   end
@@ -27,14 +25,7 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml  { render :xml => @submission }
     end
-  end
-
-  def edit
-    @submission = Submission.find(params[:id])
-    @form_url = course_exercise_submission_path
-    @form_for = :put
   end
 
   def create
@@ -42,52 +33,19 @@ class SubmissionsController < ApplicationController
       :student_id => params[:submission]['student_id']
     )
 
-    @exercise.submissions << @submission
-    @submission.return_file =
-      params[:submission]['tmp_file'].read
+    @submission.exercise_id = @exercise
+    @submission.return_file_tmp_path = params[:submission]['tmp_file'].tempfile.path
 
-    if !@submission.save
-      
-      return redirect_to(course_exercise_path(@course, @exercise), :notice => 'Failed to upload returned exercise.') 
-    end
-
-    suite_run = TestSuiteRun.create(:submission_id => @submission.id)
-
-    redirect_to(test_suite_run_path(suite_run),
-                :notice => 'Exercise return was successfully created.')
-  end
-
-  def update
-    @submission = Submission.find(params[:id])
-
-    respond_to do |format|
-      if @submission.update_attributes(params[:submission])
-        format.html {
-          redirect_to(course_exercise_submission_path(@course, @exercise,
-            @submission),
-            :notice => 'Exercise return was successfully updated.')
-        }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @submission.errors,
-                      :status => :unprocessable_entity }
-      end
+    if @submission.save
+      redirect_to(course_exercise_submission_path(@course, @exercise, @submission),
+                  :notice => 'Submission processed.')
+    else
+      redirect_to(course_exercise_path(@course, @exercise),
+                  :alert => 'Failed to process submission.') 
     end
   end
 
-  def destroy
-    @submission = Submission.find(params[:id])
-    @submission.destroy
-
-    respond_to do |format|
-      format.html {
-        redirect_to(course_exercise_path(@course, @exercise))
-      }
-      format.xml  { head :ok }
-    end
-  end
-
+private
   def get_course_and_exercise
     @course = Course.find(params[:course_id])
     @exercise = @course.exercises.find(params[:exercise_id])

@@ -100,6 +100,20 @@ describe "The system" do
       page.should_not have_content('OK')
       page.should have_content('Fail')
     end
+    
+    it "should show compilation error if given uncompilable solution" do
+      ex = SimpleExercise.new('MyExercise')
+      ex.introduce_compilation_error('oops')
+      ex.make_zip
+      
+      click_link 'MyExercise'
+      fill_in 'Student ID', :with => '123'
+      attach_file('Zipped project', 'MyExercise.zip')
+      click_button 'Submit'
+      
+      page.should have_content('Compilation error')
+      page.should have_content('oops')
+    end
   end
   
 end

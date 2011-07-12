@@ -49,8 +49,10 @@
     </div>
 
     <div id="content-area">
-      <% if notice %>
-        <div class="flash notice"><%= notice %></div>
+      <% for msg_type in [:notice, :warning, :error, :alert] %>
+        <% if flash[msg_type] %>
+          <div class="flash <%= msg_type %>"><%= flash[msg_type] %></div>
+        <% end %>
       <% end %>
       
       <%= yield %>

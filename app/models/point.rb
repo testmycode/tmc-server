@@ -5,8 +5,8 @@ class Point < ActiveRecord::Base
 
   validates :exercise_point_id, :presence => true
  
-  def self.separate_succ_and_fail test_suite_run
-    test_case_runs = test_suite_run.test_case_runs
+  def self.separate_succ_and_fail(submission)
+    test_case_runs = submission.test_case_runs
 
     exercise_success = {}
     exercise_fail = {}
@@ -21,8 +21,8 @@ class Point < ActiveRecord::Base
     return [exercise_success, exercise_fail]
   end
 
-  def self.check_points test_suite_run
-    success_fail_tests_list = separate_succ_and_fail test_suite_run
+  def self.check_points(submission)
+    success_fail_tests_list = separate_succ_and_fail(submission)
 
     exercise_success = success_fail_tests_list[0]
     exercise_fail = success_fail_tests_list[1]
@@ -31,22 +31,22 @@ class Point < ActiveRecord::Base
 
       if exercise_success[key]
         ep = ExercisePoint.where(
-          :exercise_id => test_suite_run.submission.exercise.id,
+          :exercise_id => submission.exercise.id,
           :point_id => run.exercise).first
 
         created_point = Point.create!(:exercise_number => run.exercise,
-          :student_id => test_suite_run.submission.student_id,
+          :student_id => submission.student_id,
           :exercise_point_id => ep.id,
           :tests_pass => true)
 
         PointsUploadQueue.create! :point_id => created_point.id
       else
         ep = ExercisePoint.where(
-          :exercise_id => test_suite_run.submission.exercise.id,
+          :exercise_id => submission.exercise.id,
           :point_id => exercise_fail[key].exercise).first
 
         Point.create!(:exercise_number => exercise_fail[key].exercise,
-          :student_id => test_suite_run.submission.student_id,
+          :student_id => submission.student_id,
           :exercise_point_id => ep.id,
           :tests_pass => false)
       end

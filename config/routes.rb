@@ -1,9 +1,5 @@
 SandboxServer::Application.routes.draw do
 
-  resources :test_case_runs
-
-  resources :test_suite_runs
-
   resources :sessions, :only => [:new, :create, :destroy]
 
   match '/signin',  :to => 'sessions#new'
