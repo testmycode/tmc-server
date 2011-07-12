@@ -141,7 +141,6 @@ describe "The system" do
       click_link 'mycourse' 
       click_link 'EasyExercise'
       
-      save_and_open_page
       page.should have_content('123')
       page.should have_content('456')
       page.should have_content('789')
