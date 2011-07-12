@@ -4,6 +4,21 @@ require 'find'
 module TestRunner
   extend SystemCommands
 
+  def self.run_submission_tests(submission)
+    exercise = Exercise.find(submission.exercise_id)
+    course = Course.find(exercise.course_id)
+
+    Dir.mktmpdir do |dir|
+      project_root = populate_build_dir(dir, course, exercise, submission)
+      compile_src(project_root)
+      compile_tests(project_root)
+
+      run_tests(project_root, submission)
+    end
+  end
+
+private
+
   def self.lib_path
     "#{::Rails.root}/lib/testrunner/"
   end
@@ -129,19 +144,6 @@ module TestRunner
     raise "failed to cleanup" unless system "make -sC #{project_root} clean"
 
     return project_root
-  end
-
-  def self.run_submission_tests(submission)
-    exercise = Exercise.find(submission.exercise_id)
-    course = Course.find(exercise.course_id)
-
-    Dir.mktmpdir do |dir|
-      project_root = populate_build_dir(dir, course, exercise, submission)
-      compile_src(project_root)
-      compile_tests(project_root)
-
-      run_tests(project_root, submission)
-    end
   end
 end
 
