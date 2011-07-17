@@ -5,11 +5,8 @@ module TestRunner
   extend SystemCommands
 
   def self.run_submission_tests(submission)
-    exercise = Exercise.find(submission.exercise_id)
-    course = Course.find(exercise.course_id)
-
     Dir.mktmpdir do |dir|
-      project_root = populate_build_dir(dir, course, exercise, submission)
+      project_root = populate_build_dir(dir, submission)
       compile_src(project_root)
       compile_tests(project_root)
 
@@ -88,11 +85,9 @@ private
     results.each do |exercise_name, test_results|
       test_results.each do |test_result|
         tcr = TestCaseRun.new(
-          :exercise => exercise_name,
-          :method_name => test_result["methodName"],
-          :class_name => test_result["className"],
+          :test_case_name => "#{test_result["className"]} #{test_result["methodName"]}",
           :message => test_result["message"],
-          :success => test_result["status"] == 1,
+          :successful => test_result["status"] == 1,
           :submission_id => submission.id
         )
         submission.test_case_runs << tcr
@@ -130,13 +125,14 @@ private
     methods.map {|m| m[:exercises] }.flatten
   end
 
-  def self.populate_build_dir(dir, course, exercise, submission)
+  def self.populate_build_dir(dir, submission)
     system! "unzip -q #{submission.return_file_tmp_path} -d #{dir}"
 
     project_root = find_dir_containing(dir, "src")
     raise "unable to find 'src' directory in submission" unless project_root
 
-    source = "#{course.clone_path}/#{exercise.path}/test"
+    exercise = submission.exercise
+    source = "#{exercise.course.clone_path}/#{exercise.path}/test"
     FileUtils.rm_rf "#{project_root}/test"
     FileUtils.cp_r source, project_root
     cp_makefile project_root

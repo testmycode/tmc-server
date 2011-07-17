@@ -6,6 +6,7 @@ class Submission < ActiveRecord::Base
 
   belongs_to :exercise
   has_many :test_case_runs, :dependent => :destroy
+  has_many :awarded_points, :dependent => :destroy
   
   before_create :run_tests
   
@@ -16,7 +17,7 @@ class Submission < ActiveRecord::Base
   end
   
   def all_tests_passed?
-    @fully_successful |= tests_ran? && test_case_runs.map(&:success?).all?
+    @fully_successful |= tests_ran? && test_case_runs.map(&:successful?).all?
   end
   
   def status
@@ -35,7 +36,6 @@ private
       self.return_file = IO.read(return_file_tmp_path)
     
       TestRunner.run_submission_tests(self)
-      raise 'No test cases found' if test_case_runs.empty?
     rescue
       if $!.message.start_with?("Compilation error") # haxy - should fix
         self.pretest_error = $!.message

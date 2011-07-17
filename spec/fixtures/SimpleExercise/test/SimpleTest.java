@@ -11,7 +11,8 @@ public class SimpleTest {
         assertEquals(-2, SimpleStuff.add(-9, 7));
     }
     
-    @Exercise("addsub")
+    @Test
+    @Exercise("addsub justsub")
     public void testSubtract() {
         assertEquals(3, SimpleStuff.subtract(7, 4));
         assertEquals(-333, SimpleStuff.subtract(123, 456));

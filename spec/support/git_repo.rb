@@ -9,7 +9,7 @@ class GitRepo
   end
   
   def copy_simple_exercise(name = 'SimpleExercise')
-    FileUtils.cp_r("#{::Rails.root}/spec/fixtures/SimpleExercise", "#{@path}/#{name}")
+    FileUtils.cp_r(SimpleExercise.fixture_path, "#{@path}/#{name}")
   end
   
   def add_commit_push

@@ -16,9 +16,7 @@
 <% if @submission.tests_ran? %>
   <table>
     <tr>
-      <th>Exercise</th>
-      <th>Class name</th>
-      <th>Method name</th>
+      <th>Test case</th>
       <th>Status</th>
       <% if !@submission.all_tests_passed? %>
         <th>Info</th>
@@ -27,11 +25,9 @@
 
   <% @submission.test_case_runs.each do |tcr| %>
     <tr>
-      <td><%= tcr.exercise %></td>
-      <td><%= tcr.class_name %></td>
-      <td><%= tcr.method_name %></td>
+      <td><%= tcr.test_case_name %></td>
       <td>
-        <% if tcr.success %>
+        <% if tcr.successful? %>
           <span class="success">Ok</span>
         <% else %>
           <span class="failure">Fail</span>

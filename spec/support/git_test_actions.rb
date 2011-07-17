@@ -1,8 +1,17 @@
 module GitTestActions
   include SystemCommands
 
+  def model_repo_path
+    "#{::Rails.root}/lib/gitbackend/modelrepo"
+  end
+
   def copy_model_repo(path)
-    FileUtils.cp_r "#{::Rails.root}/lib/gitbackend/modelrepo", path
+    FileUtils.cp_r(model_repo_path, path)
+  end
+  
+  def clone_empty_course_repo(path)
+    clone_repo(model_repo_path, path)
+    GitRepo.new(path)
   end
 
   def clone_course_repo(course_or_course_name)
@@ -13,8 +22,12 @@ module GitTestActions
     end
     
     FileUtils.pwd.start_with?(@test_tmp_dir).should == true
-    system! "git clone -q #{course.bare_url} #{course.name}"
+    clone_repo(course.bare_url, course.name)
     
     GitRepo.new("#{course.name}")
+  end
+  
+  def clone_repo(from, to)
+    system! "git clone -q #{from} #{to}"
   end
 end
