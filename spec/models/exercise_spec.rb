@@ -1,18 +1,42 @@
 require 'spec_helper'
 
 describe Exercise do
+  include GitTestActions
 
-  before :each do
-    @repo_dir = Dir.mktmpdir
-    @cache_dir = Dir.mktmpdir
-
-    @course = Course.new
-    GitBackend.stub!(:repositories_root).and_return(@repo_dir)
-    GitBackend.stub!(:cache_root).and_return(@cache_dir)
-  end
-
-  after :each do
-    FileUtils.remove_entry_secure @repo_dir
-    FileUtils.remove_entry_secure @cache_dir
+  describe "when read from a course repo" do
+    before :each do
+      @course_name = 'MyCourse'
+      FileUtils.mkdir_p 'bare_repo'
+      copy_model_repo("bare_repo/#{@course_name}")
+      system! "git clone -q bare_repo/#{@course_name} #{@course_name}"
+      @repo = GitRepo.new("#{@course_name}")
+    end
+    
+    it "should find all exercises" do
+      @repo.copy_simple_exercise('Ex1')
+      @repo.copy_simple_exercise('Ex2')
+      @repo.add_commit_push
+      
+      exercises = Exercise.read_exercises(@course_name)
+      exercises.length.should == 2
+      
+      exercises.sort_by &:name
+      exercises[0].name.should == 'Ex1'
+      exercises[1].name.should == 'Ex2'
+    end
+    
+    it "should produce a valid exercise object when plugged into a course" do
+      @repo.copy_simple_exercise('Exercise')
+      @repo.add_commit_push
+      
+      exercise = Exercise.read_exercises(@course_name)[0]
+      
+      exercise.should be_valid
+    end
+    
+    # TODO: should test metadata loading, but tests for Course.refresh already test that.
+    # Some more mocking should probably happen somewhere..
+    
   end
 end
+
