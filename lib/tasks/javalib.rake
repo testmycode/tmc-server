@@ -1,7 +1,7 @@
 require 'lib/system_commands.rb'
 require 'lib/tmc_javalib.rb'
 
-file TmcJavalib.jar_path => FileList['#{TmcJavalib.project_path}/**/*.java'] do
+file TmcJavalib.jar_path => FileList["#{TmcJavalib.project_path}/**/*.java"] do
   puts "Compiling #{TmcJavalib.jar_path} ..."
   begin
     TmcJavalib.compile!
