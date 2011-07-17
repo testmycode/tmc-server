@@ -36,8 +36,6 @@ private
     
       TestRunner.run_submission_tests(self)
       raise 'No test cases found' if test_case_runs.empty?
-      
-      Point.check_points(self)
     rescue
       if $!.message.start_with?("Compilation error") # haxy - should fix
         self.pretest_error = $!.message

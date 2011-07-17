@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110711225831) do
+ActiveRecord::Schema.define(:version => 20110717095945) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -18,13 +18,6 @@ ActiveRecord::Schema.define(:version => 20110711225831) do
     t.datetime "updated_at"
     t.datetime "hide_after"
     t.string   "remote_repo_url"
-  end
-
-  create_table "exercise_points", :force => true do |t|
-    t.integer  "exercise_id"
-    t.string   "point_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "exercises", :force => true do |t|
@@ -35,16 +28,6 @@ ActiveRecord::Schema.define(:version => 20110711225831) do
     t.datetime "deadline"
     t.datetime "publish_date"
     t.string   "gdocs_sheet"
-  end
-
-  create_table "points", :force => true do |t|
-    t.string   "exercise_number"
-    t.boolean  "tests_pass"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "student_id"
-    t.integer  "course_id"
-    t.integer  "exercise_point_id"
   end
 
   create_table "points_upload_queues", :force => true do |t|

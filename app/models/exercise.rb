@@ -5,7 +5,6 @@ class Exercise < ActiveRecord::Base
 
   belongs_to :course
   has_many :submissions, :dependent => :destroy
-  has_many :exercise_points, :dependent => :destroy
   #after_create :add_sheet_to_gdocs
 
   def path
@@ -69,8 +68,6 @@ private
     e.deadline = options["deadline"]
     e.publish_date = options["publish_date"]
     e.gdocs_sheet = options["gdocs_sheet"]
-
-    e.exercise_points = ExercisePoint.extract_exercise_points exercise_path
 
     return e
   end
