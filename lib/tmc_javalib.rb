@@ -8,7 +8,7 @@ module TmcJavalib
     default_instance.send(*args)
   end
   
-  def self.default_instance
+  def self.default_instance # No need to call explicitly - you can say TmcJavalib.methodname
     if @default_instance.nil?
       @default_instance = Object.new
       class << @default_instance; include TmcJavalib; end
