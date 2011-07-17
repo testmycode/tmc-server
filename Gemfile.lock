@@ -72,6 +72,7 @@ GEM
       rack (>= 1.0.0)
     rack-test (0.5.7)
       rack (>= 1.0)
+    railroady (1.0.2)
     rails (3.0.7)
       actionmailer (= 3.0.7)
       actionpack (= 3.0.7)
@@ -125,6 +126,7 @@ DEPENDENCIES
   google-spreadsheet-ruby
   jquery-rails
   launchy
+  railroady
   rails (~> 3.0.0)
   rake (~> 0.8.0)
   rspec (~> 2.6.0)

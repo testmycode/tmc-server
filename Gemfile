@@ -15,5 +15,6 @@ group :development, :test do
   gem 'rspec-rails', '~> 2.6.0'
   gem 'capybara', '~> 1.0.0'
   gem 'launchy'  # for capybara's save_and_open_page
+  gem 'railroady' # for doc/diagrams
 end
 
