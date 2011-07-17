@@ -12,7 +12,7 @@ class Course < ActiveRecord::Base
             :message => 'should not contain white spaces'}
 
   has_many :exercises, :dependent => :destroy
-  #TODO: what's this?: has_many :points, :dependent => :destroy
+  has_many :awarded_points, :dependent => :destroy
   
   before_save lambda { self.remote_repo_url = nil if self.remote_repo_url.blank? }
   after_create :create_local_repository, :if => lambda { has_local_repo? }

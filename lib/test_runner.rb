@@ -16,20 +16,15 @@ module TestRunner
 
 private
 
-  def self.lib_path
+  def self.sandbox_root
     "#{::Rails.root}/lib/testrunner/"
   end
-
-  def self.jar_path
-    "#{lib_path}/jar"
-  end
-
   def self.makefile
-    "#{lib_path}/Makefile"
+    "#{sandbox_root}/Makefile"
   end
 
   def self.classpath
-    Dir.glob("#{jar_path}/*.jar").join(":")
+    TmcJavalib.classpath
   end
 
   def self.find_dir_containing(root, seeked)
@@ -72,7 +67,7 @@ private
       Process.setrlimit Process::RLIMIT_CPU, 10, 10
       exec "java", "-cp", "#{classpath}:#{src_classpath}",
         "-Djava.security.manager",
-        "-Djava.security.policy=#{lib_path}/testrunner_policy",
+        "-Djava.security.policy=#{sandbox_root}/testrunner_policy",
         "fi.helsinki.cs.tmc.testrunner.Main", "run", test_classpath, classname,
         "/dev/null", results_fn
     end
@@ -82,17 +77,8 @@ private
     results = ActiveSupport::JSON.decode IO.read(results_fn)
     return unless results
 
-    results.each do |exercise_name, test_results|
-      test_results.each do |test_result|
-        tcr = TestCaseRun.new(
-          :test_case_name => "#{test_result["className"]} #{test_result["methodName"]}",
-          :message => test_result["message"],
-          :successful => test_result["status"] == 1,
-          :submission_id => submission.id
-        )
-        submission.test_case_runs << tcr
-      end
-    end
+    create_test_case_runs(submission, results)
+    award_points(submission, results)
   end
 
   def self.find_test_classes(classpath)
@@ -140,6 +126,42 @@ private
     raise "failed to cleanup" unless system "make -sC #{project_root} clean"
 
     return project_root
+  end
+  
+  def self.create_test_case_runs(submission, results)
+    results.each do |point_name, test_results|
+      test_results.each do |test_result|
+        tcr = TestCaseRun.new(
+          :test_case_name => "#{test_result["className"]} #{test_result["methodName"]}",
+          :message => test_result["message"],
+          :successful => test_result["status"] == 1
+        )
+        submission.test_case_runs << tcr
+      end
+    end
+  end
+  
+  def self.award_points(submission, results)
+    user = submission.user
+    course = submission.exercise.course
+    for point_name in points_from_test_results(results)
+      unless user.awarded_points_for_course(course).map(&:name).include?(point_name) # (hope this never becomes too slow)
+        point = AwardedPoint.new(
+          :user => user,
+          :course => course,
+          :name => point_name
+        )
+        submission.awarded_points << point
+      end
+    end
+  end
+  
+  def self.points_from_test_results(results)
+    points = []
+    results.each do |point_name, test_results|
+      points << point_name if test_results.all? {|tr| tr['status'] == 1}
+    end
+    points
   end
 end
 

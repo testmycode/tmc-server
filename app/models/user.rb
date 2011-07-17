@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+  has_many :submissions, :dependent => :destroy
+  has_many :awarded_points, :dependent => :destroy
+
   validates :login, :presence     => true,
                     :confirmation => true,
                     :length       => { :within => 2..20 }
@@ -6,6 +9,7 @@ class User < ActiveRecord::Base
   attr_accessor :password
   validate :check_password
   before_save :encrypt_password
+
 
   def has_password?(submitted_password)
     password_hash == encrypt(submitted_password)
@@ -16,8 +20,14 @@ class User < ActiveRecord::Base
     return nil  if user.nil?
     return user if user.has_password?(submitted_password)
   end
+  
+  
+  def awarded_points_for_course(course)
+    awarded_points.where(:course_id => course.id)
+  end
+  
 
-  private
+private
 
   def encrypt_password
     self.salt = make_salt if new_record?
@@ -37,7 +47,6 @@ class User < ActiveRecord::Base
   end
   
   def check_password
-    errors[:password] << "password must be set" if new_record? && password.blank?
     if password != nil
       errors[:password] << "the password is too short" if password.length < 6
     end

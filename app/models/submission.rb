@@ -1,16 +1,12 @@
 class Submission < ActiveRecord::Base
-
-  validates :student_id, :presence     => true,
-            :length       => { :within => 1..40 },
-            :format       => { :without => / / , :message => 'should not contain whitespace'}
-
+  belongs_to :user
   belongs_to :exercise
   has_many :test_case_runs, :dependent => :destroy
-  has_many :awarded_points, :dependent => :destroy
-  
-  before_create :run_tests
+  has_many :awarded_points, :dependent => :nullify
   
   attr_accessor :return_file_tmp_path
+  
+  before_create :run_tests
   
   def tests_ran?
     pretest_error == nil

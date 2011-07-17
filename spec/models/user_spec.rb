@@ -21,11 +21,11 @@ describe User do
       User.new(long_login).should have(1).error_on(:login)
     end
     
-    it "should fail without a password for new records" do
-      User.new(:login => 'instructor').should have(1).error_on(:password)
+    it "should succeed without a password for new records" do
+      User.new(:login => 'instructor').should be_valid
     end
     
-    it "should fail without a password for existing records" do
+    it "should succeed without a password for existing records" do
       User.create!(:login => 'instructor', :password => 'cookiestastegood')
       user = User.find_by_login!('instructor')
       user.password.should be_nil

@@ -14,11 +14,16 @@ describe TestRunner do
       @exercise_dir = SimpleExercise.new('MyExercise')
       @exercise = @course.exercises.first
       
-      @submission = Submission.new(:exercise => @exercise, :return_file_tmp_path => 'MyExercise.zip')
+      @user = User.create!(:login => 'student', :password => 'student')
+      @submission = Submission.new(
+        :user => @user,
+        :exercise => @exercise,
+        :return_file_tmp_path => 'MyExercise.zip'
+      )
     end
     
     it "should create test results for the submission" do
-      @exercise_dir.solve_ex_addsub_partially
+      @exercise_dir.solve_add
       @exercise_dir.make_zip
       TestRunner.run_submission_tests(@submission)
       
@@ -30,12 +35,50 @@ describe TestRunner do
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testSubtract' }
       tcr.should_not be_nil
       tcr.should_not be_successful
+      
+      @submission.should be_valid
+      @submission.save!
     end
     
     it "should raise an error if compilation of a test fails" do
       @exercise_dir.introduce_compilation_error
       @exercise_dir.make_zip
       expect { TestRunner.run_submission_tests(@submission) }.to raise_error(/Compilation error/)
+    end
+    
+    it "should award points for successful exercises" do
+      @exercise_dir.solve_sub
+      @exercise_dir.make_zip
+      TestRunner.run_submission_tests(@submission)
+      @submission.save!
+      
+      points = @user.awarded_points_for_course(@course).to_a
+      points.find {|ap| ap.name == 'justsub' }.should_not be_nil
+      points.find {|ap| ap.name == 'addsub' }.should be_nil
+      points.find {|ap| ap.name == 'mul' }.should be_nil
+    end
+    
+    it "should only ever award more points, never delete old points" do
+      @exercise_dir.solve_sub
+      @exercise_dir.make_zip
+      TestRunner.run_submission_tests(@submission)
+      @submission.save!
+      
+      @submission = Submission.new(
+        :user => @user,
+        :exercise => @exercise,
+        :return_file_tmp_path => 'MyExercise.zip'
+      )
+      
+      @exercise_dir.solve_add
+      @exercise_dir.make_zip
+      TestRunner.run_submission_tests(@submission)
+      @submission.save!
+      
+      points = @user.awarded_points_for_course(@course).to_a
+      points.find {|ap| ap.name == 'justsub' }.should_not be_nil
+      points.find {|ap| ap.name == 'addsub' }.should_not be_nil
+      points.find {|ap| ap.name == 'mul' }.should be_nil
     end
   end
 end

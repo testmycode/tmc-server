@@ -16,20 +16,24 @@ class SimpleExercise
   end
 
   def solve_all
-    solve_ex_addsub
-    solve_ex_mul
+    solve_addsub
+    solve_mul
   end
 
-  def solve_ex_addsub
+  def solve_addsub
+    solve_add
+    solve_sub
+  end
+  
+  def solve_add
     replace_method_body_in_file(simple_stuff_path, 'add', 'return a + b;')
+  end
+  
+  def solve_sub
     replace_method_body_in_file(simple_stuff_path, 'sub', 'return a - b;')
   end
   
-  def solve_ex_addsub_partially
-    replace_method_body_in_file(simple_stuff_path, 'add', 'return a + b;')
-  end
-  
-  def solve_ex_mul
+  def solve_mul
     replace_method_body_in_file(simple_stuff_path, 'mul', 'return a * b;')
   end
   

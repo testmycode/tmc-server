@@ -6,4 +6,7 @@ class AwardedPoint < ActiveRecord::Base
 
   belongs_to :course
   belongs_to :user
+  belongs_to :submission
+  
+  validates :name, :presence => true, :uniqueness => { :scope => [:course_id, :user_id] }
 end

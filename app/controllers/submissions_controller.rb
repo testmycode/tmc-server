@@ -29,12 +29,15 @@ class SubmissionsController < ApplicationController
   end
 
   def create
+    student_id = params[:submission][:student_id]
+    user = User.find_by_login(student_id)
+    user ||= User.create!(:login => student_id, :password => nil)
+    
     @submission = Submission.new(
-      :student_id => params[:submission]['student_id']
+      :user => user,
+      :exercise => @exercise,
+      :return_file_tmp_path => params[:submission][:tmp_file].tempfile.path
     )
-
-    @submission.exercise_id = @exercise.id
-    @submission.return_file_tmp_path = params[:submission]['tmp_file'].tempfile.path
 
     if @submission.save
       redirect_to(course_exercise_submission_path(@course, @exercise, @submission),

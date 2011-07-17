@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Submission do
   describe "when created" do
     before :each do
-      @submission = Submission.new(:student_id => '123xyz', :return_file_tmp_path => 'the_file.zip')
+      @user = mock_model(User)
+      @submission = Submission.new(:user => @user, :return_file_tmp_path => 'the_file.zip')
       
       IO.should_receive(:read).with('the_file.zip').and_return('xoo')
       TestRunner.stub(:run_submission_tests)

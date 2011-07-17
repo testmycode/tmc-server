@@ -10,12 +10,13 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110717162749) do
+ActiveRecord::Schema.define(:version => 20110717171009) do
 
   create_table "awarded_points", :force => true do |t|
-    t.integer "course_id", :null => false
-    t.integer "user_id",   :null => false
-    t.text    "name",      :null => false
+    t.integer "course_id",     :null => false
+    t.integer "user_id",       :null => false
+    t.text    "name",          :null => false
+    t.integer "submission_id"
   end
 
   add_index "awarded_points", ["course_id", "user_id", "name"], :name => "index_awarded_points_on_course_id_and_user_id_and_name", :unique => true
@@ -45,12 +46,12 @@ ActiveRecord::Schema.define(:version => 20110717162749) do
   end
 
   create_table "submissions", :force => true do |t|
+    t.integer  "user_id"
     t.integer  "exercise_id"
     t.binary   "return_file"
+    t.text     "pretest_error"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "student_id"
-    t.text     "pretest_error"
   end
 
   create_table "test_case_runs", :force => true do |t|
