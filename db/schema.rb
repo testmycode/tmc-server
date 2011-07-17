@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110717093715) do
+ActiveRecord::Schema.define(:version => 20110711225831) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(:version => 20110717093715) do
 
   create_table "exercise_points", :force => true do |t|
     t.integer  "exercise_id"
-    t.integer  "point_id"
+    t.string   "point_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(:version => 20110717093715) do
     t.boolean  "tests_pass"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "student_id"
+    t.string   "student_id"
     t.integer  "course_id"
     t.integer  "exercise_point_id"
   end
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(:version => 20110717093715) do
     t.binary   "return_file"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "student_id"
+    t.string   "student_id"
     t.text     "pretest_error"
   end
 
