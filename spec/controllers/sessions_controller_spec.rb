@@ -2,56 +2,93 @@ require 'spec_helper'
 
 describe SessionsController do
 
-  def valid_attributes
-    { :login    => 'ohjaaja',
-      :password => 'ohjaaja' }
+  before :each do
+    @user = mock_model(User, :administrator? => true)
+    User.stub(:authenticate) do |login, pwd|
+      @user if login == 'instructor' && pwd == 'correct_password'
+    end
+  end
+
+  def post_create
+    session_attrs = {
+      :login    => 'instructor',
+      :password => 'correct_password'
+    }
+    post :create, :session => session_attrs
   end
 
   describe "POST create" do
     describe "with valid params" do
-      it "it assigns new user to @current_user" do
-        post :create, :session => valid_attributes
-        assigns(:session).should eq(@current_user)
+      it "should set the current user" do
+        post_create
+        controller.send(:current_user).should be(@user)
       end
       
-      it "after login it redirects to current page" do
-        post :create, :session => valid_attributes
-        response.should render_template(request.env["HTTP_REFERER"]) # :back doesn't work (:back is short for request.env["HTTP_REFERER"])
+      it "should redirect back to the current page if there is a referer" do
+        request.env["HTTP_REFERER"] = '/xooxers'
+        post_create
+        response.should redirect_to('/xooxers')
+      end
+      
+      it "should redirect back to the home page if there is no referer" do
+        request.env["HTTP_REFERER"] = nil
+        post_create
+        response.should redirect_to(root_path)
       end
     end
     
-    describe "with invalid params" do
-      it "login is incorrect" do
-        post :create, :session => { :password => 'ohjaaja' }
-        assigns(:session).should eq(nil)
+    describe "when authentication fails" do
+      before :each do
+        User.stub(:authenticate => nil)
       end
       
-      it "password is incorrect for correct login" do
-        post :create, :session => { :login    => 'ohjaaja', 
-                                    :password => 'iswrong' }
-        assigns(:session).should eq(nil)
+      it "should not set current_user" do
+        post_create
+        controller.send(:current_user).should be_nil
       end
       
-      it "redirects to same page" do
-        post :create, :session => {}
-        response.should render_template(request.env["HTTP_REFERER"])
+      it "should redirect back to the current page if there is a referer" do
+        request.env['HTTP_REFERER'] = '/xooxers'
+        post_create
+        response.should redirect_to('/xooxers')
       end
+      
+      it "should redirect to the home page if there is no referer" do
+        request.env['HTTP_REFERER'] = nil
+        post_create
+        response.should redirect_to(root_path)
+      end
+    end
+    
+    it "should not allow non-administrators to log in" do  # at least for now
+      @user.stub(:administrator? => false)
+      post_create
+      controller.send(:current_user).should be_nil
     end
   end
   
   describe "DELETE destroy" do
     before(:each) do
-      post :create, :session => valid_attributes
+      post_create
+      controller.send(:current_user).should be(@user)
     end
   
-    it "assign @current_user to nil" do
-      :destroy
-      assigns(:session).should eq(nil)
+    it "should clear current_user and the session" do
+      post :destroy
+      controller.send(:current_user).should be(nil)
+      session.should be_empty
     end
     
-    it "redirects to same page" do
-      :destroy
-      response.should render_template(request.env["HTTP_REFERER"])
+    it "should redirect back to the current page if there is a referer" do
+      request.env['HTTP_REFERER'] = '/xooxers'
+      post :destroy
+      response.should redirect_to('/xooxers')
+    end
+    
+    it "should redirects to the home page if there is no referer" do
+      request.env['HTTP_REFERER'] = nil
+      post :destroy
+      response.should redirect_to(root_path)
     end
   end
 end

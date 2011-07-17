@@ -48,8 +48,8 @@ describe User do
     user.should_not have_password("ihatecookies")
   end
   
-  it "should allow authentication with a correct login/password" do
-    user = User.create!(:login => "instructor", :password => "ilikecookies")
+  it "should allow authentication of administrators with a correct login/password" do
+    user = User.create!(:login => "instructor", :password => "ilikecookies", :administrator => true)
     User.authenticate("instructor", "ilikecookies").should eq(user)
     User.authenticate("instructor", "ihatecookies").should be_nil
     User.authenticate("root", "ilikecookies").should be_nil

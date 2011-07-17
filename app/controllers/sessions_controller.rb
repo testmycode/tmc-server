@@ -1,23 +1,31 @@
 class SessionsController < ApplicationController
 
-# Sign in the user with correct password info and redirect to the user's show
-# page. 
-
   def create
     user = User.authenticate(params[:session][:login],
-                          params[:session][:password])
-    if user.nil?
-      @title = "Sign in"
-      redirect_to courses_path, :notice => "Login or password incorrect. Try again."
+                             params[:session][:password])
+
+    redirect_params = {}
+    if user.nil? || !user.administrator?
+      redirect_params = {:alert => "Login or password incorrect. Try again."}
     else
       sign_in user
-      redirect_to :back
     end
+    
+    try_to_redirect_back(redirect_params)
   end
 
   def destroy
     sign_out
-    redirect_to :back
+    try_to_redirect_back(:notice => 'Goodbye')
+  end
+  
+private
+  def try_to_redirect_back(redirect_params = {})
+    if not request.env['HTTP_REFERER'].blank?
+      redirect_to :back, redirect_params
+    else
+      redirect_to root_path, redirect_params
+    end
   end
 
 end

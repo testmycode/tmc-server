@@ -13,7 +13,7 @@ describe "The system" do
   
     before :each do
       visit '/'
-      @user = User.create!(:login => 'user', :password => 'xooxer')
+      @user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
       log_in_as(@user.login)
     end
     
@@ -172,7 +172,7 @@ describe "The system" do
     
     def log_in_as_instructor
       visit '/'
-      user = User.create!(:login => 'user', :password => 'xooxer')
+      user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
       log_in_as(user.login)
     end
   end

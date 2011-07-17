@@ -39,9 +39,11 @@ describe SessionsHelper do
   end
   
   describe "sign_out" do
-    it "should assign @current_user to nil" do
+    it "should assign @current_user to nil and reset the session" do
       user = create_user
       sign_in(user).should eq(@current_user)
+      
+      self.should_receive(:reset_session)
       sign_out
       @current_user.should eq(nil)
     end
