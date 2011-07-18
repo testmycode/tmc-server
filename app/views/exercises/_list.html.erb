@@ -1,18 +1,8 @@
-
-<h1>
-  <%= @course.name %> - all exercises
-  [<%= link_to "json", "#{course_exercises_path(@course)}.json" %>]
-</h1>
-
-<div class="link-refresh">
-  <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
-</div>
-
 <table class="exercise-list">
   <thead>
     <tr>
       <th>
-        Exercise home
+        Exercise
       </th>
       <th>
         Deadline
@@ -23,10 +13,10 @@
     </tr>
   </thead>
   <tbody>
-    <% @exercises.each do |exercise| %>
+    <% exercises.each do |exercise| %>
       <tr>
         <td>
-          <%= link_to exercise.name, [@course, exercise] %>
+          <%= link_to exercise.name, [course, exercise] %>
           </td>
           <td>
             <% if exercise.deadline %>
@@ -41,9 +31,7 @@
   </tbody>
 </table>
 
-<%= use_datatables('table.exercise-list') %>
+<div class="as-json">[<%= link_to "json", "#{course_exercises_path(course)}.json" %>]</div>
 
-<div class="link-back">
-  <%= link_to 'Back', courses_path %>
-</div>
+<%= use_datatables('table.exercise-list') %>
 

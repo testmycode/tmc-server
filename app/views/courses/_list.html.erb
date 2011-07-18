@@ -1,25 +1,23 @@
 <table class="course-list">
   <thead>
-    <tr>
+    <th>
+      Course
+    </th>
+    <% if signed_in? %>
       <th>
-        Choose course
+        Repository URL
       </th>
-      <% if signed_in? %>
-        <th>
-          Repository address
-        </th>
-        <th>
-        </th>
-        <th>
-        </th>
-      <% end %>
-    </tr>
+      <th>
+      </th>
+      <th>
+      </th>
+    <% end %>
   </thead>
-<% locals[:courses].each do |course| %>
   <tbody>
+  <% locals[:courses].each do |course| %>
     <tr>
       <td>
-        <%= link_to course.name, course_exercises_path(course) %>
+        <%= link_to course.name, course_path(course) %>
       </td>
       <% if signed_in? %>
         <td>
@@ -29,10 +27,17 @@
           <%= link_to 'refresh', refresh_course_path(course) %>
         </td>
         <td>
-          <%= link_to 'remove', course_path(course), :method => :delete, :confirm => 'Really truly delete this course?' %>
+          <%= link_to 'Show', course_path(course) %>
+          |
+          <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', :confirm => 'Really truly delete this course?' %>
         </td>
       <% end %>
     </tr>
+  <% end %>
   </tbody>
-<% end %>
 </table>
+
+<%= use_datatables('table.course-list') %>
+
+<div class="as-json">[<%= link_to "json", "#{courses_path}.json" %>]</div>
+

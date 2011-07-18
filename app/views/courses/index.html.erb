@@ -1,5 +1,5 @@
 
-<h1>All Courses [<%= link_to "json", "#{courses_path}.json" %>]</h1>
+<h1>All Courses</h1>
 
 <% if signed_in? %>
   <%= link_to 'Create New Course', new_course_path %>
@@ -14,11 +14,15 @@
 <% end %>
 
 <h3>Ongoing courses</h3>
-<%= render 'list', :locals => { :courses => @ongoing_courses } %>
+<section>
+  <%= render 'list', :locals => { :courses => @ongoing_courses } %>
+</section>
 
 <% if signed_in? and not @expired_courses.empty? %>
   <h3>Expired courses</h3>
-  <%= render 'list', :locals => { :courses => @expired_courses } %>
+  <section>
+    <%= render 'list', :locals => { :courses => @expired_courses } %>
+  </section>
 <% end %>  
   
 

@@ -1,6 +1,6 @@
 
 <% if signed_in? %>
-  <%= link_to "Sign out", signout_path, :method => :delete %>
+  <%= link_to "Sign out", signout_path, :method => :delete, :id => 'logout-link' %>
 <% else %>
   <%= form_for(:session, :url => sessions_path) do |f| %>
     <%= f.label :login %>

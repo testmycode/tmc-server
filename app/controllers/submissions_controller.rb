@@ -18,16 +18,6 @@ class SubmissionsController < ApplicationController
     end
   end
 
-  def new
-    @submission = Submission.new
-    @form_url = course_exercise_submissions_path
-    @form_action = :post
-
-    respond_to do |format|
-      format.html
-    end
-  end
-
   def create
     student_id = params[:submission][:student_id]
     user = User.find_by_login(student_id)

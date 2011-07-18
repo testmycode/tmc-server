@@ -5,7 +5,6 @@ class ExercisesController < ApplicationController
     @exercises = @course.exercises
 
     respond_to do |format|
-      format.html
       format.json {
         render :json =>
           @exercises.to_json(:only => [:name, :deadline, :publish_date],
@@ -16,7 +15,7 @@ class ExercisesController < ApplicationController
 
   def show
     @exercise = @course.exercises.find(params[:id])
-    @submissions = @exercise.submissions.order("(created_at)DESC LIMIT 15")
+    @submissions = @exercise.submissions.order("created_at DESC")
     
     @submission = Submission.new
 

@@ -26,6 +26,10 @@ class Submission < ActiveRecord::Base
     end
   end
   
+  def downloadable_file_name
+    "#{exercise.name}-#{self.id}.zip"
+  end
+  
 private
   def run_tests
     begin

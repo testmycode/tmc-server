@@ -1,19 +1,22 @@
-<!-- Not needed
-<p id="notice"><%= notice %></p>
 
-<h1>Test Runner</h1>
+<h1>
+  <%= @course.name %>
+</h1>
 
-<h2><%= @course.name %></h1>
+<h2>All exercises</h2>
 
-<ul>
-  <li><%= link_to('exercises', course_exercises_path(@course)) %></li>
-  <li>Repository: <%= @course.bare_path %></li>
-  <% if signed_in? %>
-    <li><%= link_to 'remove', course_path(@course), :method => :delete %></li>
-  <% end %>
-</ul>
+<section>
+  <div class="refresh-course-button">
+    <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
+  </div>
 
-<p>
-<%= link_to 'Courses listing', courses_path %>
-</p>
--->
+  <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises } %>
+
+</section>
+
+<h2>Latest submissions</h2>
+
+<section>
+  <%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
+</section>
+

@@ -11,18 +11,41 @@ module ApplicationHelper
     raw('<div class="field">' + labeled(label, tags) + '</div>')
   end
   
-  def use_datatables(table_selector)
+  def use_datatables(table_selector, options = {})
+    options = {
+      :bJQueryUI => true,
+      :bSort => false
+    }.merge options
     script =<<EOS
 <script type="text/javascript">
 <!--
 $(document).ready(function() {
-  $('#{escape_javascript table_selector}').dataTable({
-    bJQueryUI: true
-  });
+  $('#{escape_javascript table_selector}').dataTable(#{options.to_json});
 });
 //-->
 </script>
 EOS
     raw(script)
+  end
+  
+  def breadcrumb
+    parts = []
+    
+    if signed_in?
+      parts << link_to('Courses', courses_path)
+      
+      if @course && !@course.new_record?
+        parts << link_to(@course.name, @course)
+        
+        if @exercise && !@exercise.new_record? && @exercise.course == @course
+          parts << link_to(@exercise.name, course_exercise_path(@course, @exercise))
+          
+          if @submission && !@submission.new_record? && @submission.exercise == @exercise
+            parts << link_to("Submission #{@submission.id}", course_exercise_submission_path(@course, @exercise, @submission))
+          end
+        end
+      end
+    end
+    raw(parts.join(' &raquo; '))
   end
 end
