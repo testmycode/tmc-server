@@ -4,6 +4,8 @@ class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers
   include GitBackend
 
+  self.include_root_in_json = false
+
   validates :name,
             :presence     => true,
             :uniqueness => true,

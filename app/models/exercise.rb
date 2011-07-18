@@ -3,6 +3,8 @@ require 'gdocs'
 class Exercise < ActiveRecord::Base
   include Rails.application.routes.url_helpers
 
+  self.include_root_in_json = false
+
   belongs_to :course
   has_many :submissions, :dependent => :destroy
   #after_create :add_sheet_to_gdocs

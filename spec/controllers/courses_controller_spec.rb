@@ -1,7 +1,3 @@
-#Tests have been written with name as id. Name and id will / should be separated later on?
-
-#Should courses be sorted somehow sometimes? Like alphabethical order? 
-
 require 'spec_helper'
 
 describe CoursesController do
@@ -23,9 +19,15 @@ describe CoursesController do
     end
     
     describe "as json" do
-      it "shows renders courses in orderby name" do
+      it "renders all courses in order by name" do
         get :index, :format => 'json'
-        assigns(:courses).map(&:name).should == ['AnotherTestCourse', 'ExpiredCourse', 'SomeTestCourse']
+        result = JSON.parse(response.body)
+        result.should be_a(Array)
+        result[0]['name'].should == 'AnotherTestCourse'
+        result[1]['name'].should == 'ExpiredCourse'
+        result[0]['hide_after'].should be_nil
+        result[1]['hide_after'].should_not be_nil
+        result[0]['exercises_json'].should == course_exercises_url(@courses[2], :format => 'json')
       end 
     end
   end

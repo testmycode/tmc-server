@@ -12,7 +12,7 @@ class CoursesController < ApplicationController
       format.json do
         @courses = Course.order(ordering)
         render :json =>
-          @courses.to_json(:only => [:name, :hide_after],
+          @courses.as_json(:only => [:name, :hide_after],
                            :methods => :exercises_json)
       end
     end
