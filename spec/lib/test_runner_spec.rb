@@ -40,6 +40,8 @@ describe TestRunner do
       @submission.save!
     end
     
+    it "should not create test results for the same test method even if it is involved in multiple points"
+    
     it "should raise an error if compilation of a test fails" do
       @exercise_dir.introduce_compilation_error
       @exercise_dir.make_zip
