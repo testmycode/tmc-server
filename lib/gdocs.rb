@@ -2,14 +2,14 @@ require 'google_spreadsheet'
 
 class GDocs
   include GoogleSpreadsheet
-    
+
   def initialize
     @disabled = false
     self.setup
   end
-  
+
   def add_points_to_student(course_name, student_id, sheet_id, exercise)
-    if @disabled 
+    if @disabled
       return true
     end
     if validate_attributes({ :course_name => course_name,
@@ -19,30 +19,30 @@ class GDocs
                              :points      => "0"})
       return false
     end
-    
+
     student_id = student_id.sub(/0*/, '')
-    
+
     doc = self.get_document_from_google(course_name)
     if doc == nil
       raise RuntimeError, 'Cannot find right document. Missing document name is ' + course_name
       return false
     end
-   
+
     sheet = get_worksheet(doc, sheet_id)
     if sheet == nil 
       raise RuntimeError, 'Cannot find right worksheet. Missing sheet in document ' + course_name + ' is ' + sheet_id.to_s
       return false 
     end
-   
+
     if student_exists?(sheet, student_id)
       row = student_row(sheet, student_id)
-     
+
       col = exercise_column(sheet, exercise)
       if col == -1
         raise RuntimeError, 'Cannot find exercise ' + exercise + ' in document ' + course_name
         return false
       end
-      
+
       if cell_empty?(sheet, row, col)
         sheet[row, col] = 1
         sheet.save
@@ -53,11 +53,11 @@ class GDocs
       end
     else
       raise RuntimeError, "Student doesn't exist in worksheet. " + 
-                          "Missing student id in document " + course_name + " is " + student_id
+        "Missing student id in document " + course_name + " is " + student_id
       return false
-    end  
+    end
   end
-  
+
   def create_new_spreadsheet(course_name)
     if @disabled
       return true
@@ -78,7 +78,7 @@ class GDocs
     end
     return nil
   end
-  
+
   def setup
     if !@disabled
       @account = GoogleSpreadsheet.login('pajaohtu@gmail.com', 'qwerty1234567')
@@ -92,22 +92,18 @@ class GDocs
       end
     end
     return nil
-  end  
-    
-  def student_exists?(sheet, student_id)
-    if self.student_row(sheet, student_id) > 0
-      return true
-    else
-      return false
-    end
   end
-  
+
+  def student_exists?(sheet, student_id)
+    self.student_row(sheet, student_id) > 0
+  end
+
   def student_row(sheet, student_id)
     col = find_students(sheet)
     if col == -1
       return -1
     end
-    
+
     for row in 3..sheet.max_rows
       if sheet[row, col] == student_id.to_s
         return row
@@ -115,7 +111,7 @@ class GDocs
     end
     return -1
   end
-  
+
   def exercise_column(sheet, exercise)
     for col in 1..sheet.max_cols
       if sheet[2, col] == exercise
@@ -124,13 +120,9 @@ class GDocs
     end
     return -1
   end
-  
+
   def cell_empty?(sheet, row, col)
-    if sheet[row, col] == ""
-      return true
-    else
-      return false
-    end
+    sheet[row, col] == ""
   end
 
   def find_exercises_start(sheet)
@@ -141,7 +133,7 @@ class GDocs
     end
     return -1
   end
-  
+
   def find_students(sheet)
     for col in 1..sheet.num_cols
       if sheet[2, col] == 'Opnro'
@@ -150,24 +142,25 @@ class GDocs
     end
     return -1
   end
-  
+
   def validate_attributes(attr = {})
     cn = attr[:course_name]
     si = attr[:student_id]
     we = attr[:sheet_id]
     ex = attr[:exercise]
     po = attr[:points]
-    
+
     if cn == nil or cn == ""
       return true end
-      if si == nil
+    if si == nil
       return true end
-      if we == nil
+    if we == nil
       return true end
-      if ex == nil
+    if ex == nil
       return true end
-      if po == nil
+    if po == nil
       return true end
     return false
   end
 end
+
