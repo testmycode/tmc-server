@@ -1,0 +1,6 @@
+
+grant {
+  permission java.io.FilePermission "${testclasspath}/-", "read";
+  permission java.io.FilePermission "/tmp/-", "read";
+};
+

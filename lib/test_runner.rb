@@ -19,8 +19,17 @@ private
   def self.sandbox_root
     "#{::Rails.root}/lib/testrunner/"
   end
+
   def self.makefile
     "#{sandbox_root}/Makefile"
+  end
+
+  def self.policy_file
+    "#{sandbox_root}/testrunner.policy"
+  end
+
+  def self.default_timeout
+    60
   end
 
   def self.classpath
@@ -43,7 +52,7 @@ private
   def self.compile_tests(project_root)
     compile_target(project_root, 'build-test')
   end
-  
+
   def self.compile_target(project_root, target)
     output = `env CLASSPATH=#{classpath} make -sC #{project_root} #{target} 2>&1`
     raise "Compilation error:\n#{output}" unless $?.success?
@@ -63,16 +72,9 @@ private
     src_classpath = "#{exercise_dir}/build/classes"
     results_fn = "#{exercise_dir}/results"
 
-    pid = Process.fork do
-      Process.setrlimit Process::RLIMIT_CPU, 10, 10
-      exec "java", "-cp", "#{classpath}:#{src_classpath}",
-        "-Djava.security.manager",
-        "-Djava.security.policy=#{sandbox_root}/testrunner_policy",
-        "fi.helsinki.cs.tmc.testrunner.Main", "run", test_classpath, classname,
-        "/dev/null", results_fn
-    end
-
-    Process.waitpid(pid)
+    system! "java -cp #{classpath}:#{src_classpath} " +
+      "fi.helsinki.cs.tmc.testrunner.Main #{test_classpath} #{classname} " +
+      "#{default_timeout} #{results_fn} /dev/null #{policy_file}"
 
     results = ActiveSupport::JSON.decode IO.read(results_fn)
     return unless results
@@ -127,25 +129,25 @@ private
 
     return project_root
   end
-  
+
   def self.create_test_case_runs(submission, results)
-    results.each do |point_name, test_results|
-      test_results.each do |test_result|
-        tcr = TestCaseRun.new(
-          :test_case_name => "#{test_result["className"]} #{test_result["methodName"]}",
-          :message => test_result["message"],
-          :successful => test_result["status"] == 1
-        )
-        submission.test_case_runs << tcr
-      end
+    results.each do |test_result|
+      tcr = TestCaseRun.new(
+        :test_case_name => "#{test_result["className"]} #{test_result["methodName"]}",
+        :message => test_result["message"],
+        :successful => test_result["status"] == 1
+      )
+      submission.test_case_runs << tcr
     end
   end
-  
+
   def self.award_points(submission, results)
     user = submission.user
     course = submission.exercise.course
     for point_name in points_from_test_results(results)
-      unless user.awarded_points_for_course(course).map(&:name).include?(point_name) # (hope this never becomes too slow)
+      unless user.awarded_points_for_course(course).
+          map(&:name).include?(point_name) # (hope this never becomes too slow)
+
         point = AwardedPoint.new(
           :user => user,
           :course => course,
@@ -155,13 +157,17 @@ private
       end
     end
   end
-  
+
   def self.points_from_test_results(results)
-    points = []
-    results.each do |point_name, test_results|
-      points << point_name if test_results.all? {|tr| tr['status'] == 1}
+    points = {}
+    results.each do |test_result|
+      test_result["pointNames"].each do |point_name|
+        if points[point_name].nil? or points[point_name] == true
+          points[point_name] = test_result["status"] == 1
+        end
+      end
     end
-    points
+    points.keys.select{|k| points[k]}
   end
 end
 
