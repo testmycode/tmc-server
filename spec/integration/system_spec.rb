@@ -116,6 +116,8 @@ describe "The system" do
       page.should have_content('Compilation error')
       page.should have_content('oops')
     end
+    
+    it "should not show exercises that have existed but have since been deleted"
   end
   
   

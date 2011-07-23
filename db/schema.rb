@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110717171009) do
+ActiveRecord::Schema.define(:version => 20110723190455) do
 
   create_table "awarded_points", :force => true do |t|
     t.integer "course_id",     :null => false
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(:version => 20110717171009) do
     t.datetime "deadline"
     t.datetime "publish_date"
     t.string   "gdocs_sheet"
+    t.boolean  "deleted",      :default => false, :null => false
   end
 
   create_table "points_upload_queues", :force => true do |t|

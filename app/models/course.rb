@@ -71,8 +71,9 @@ class Course < ActiveRecord::Base
       read_e = read_exs.find {|x| x.name == old_e.name}
       if read_e
         old_e.copy_metadata read_e
+        old_e.deleted = false
       else
-        old_e.destroy
+        old_e.deleted = true
       end
     end
 

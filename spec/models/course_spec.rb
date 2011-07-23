@@ -186,6 +186,48 @@ describe Course do
         File.should exist(course.zip_path + '/MyExercise.zip')
         File.should exist(course.zip_path + '/MyCategory/MyExercise.zip')
       end
+      
+      it "should mark removed exercises as deleted" do
+        add_exercise('MyExercise')
+        course.refresh
+        
+        FileUtils.rm_rf "#{local_clone.path}/MyExercise"
+        local_clone.add_commit_push
+        course.refresh
+        
+        course.exercises.should have(1).items
+        course.exercises[0].should be_deleted
+      end
+      
+      it "should mark removed and restored exercises as not deleted" do
+        add_exercise('MyExercise')
+        course.refresh
+        
+        FileUtils.rm_rf "#{local_clone.path}/MyExercise"
+        local_clone.add_commit_push
+        course.refresh
+        
+        add_exercise('MyExercise')
+        course.refresh
+        
+        course.exercises.should have(1).items
+        course.exercises[0].should_not be_deleted
+      end
+      
+      it "should delete zip files of removed exercises" do
+        expected_zip_path = course.zip_path + '/MyCategory/MyExercise.zip'
+        
+        add_exercise('MyCategory/MyExercise')
+        course.refresh
+        
+        File.should exist(expected_zip_path)
+        
+        FileUtils.rm_rf "#{local_clone.path}/MyCategory/MyExercise"
+        local_clone.add_commit_push
+        course.refresh
+        
+        File.should_not exist(expected_zip_path)
+      end
     end
   end
   
