@@ -31,18 +31,16 @@ EOS
   def breadcrumb
     parts = []
     
-    if signed_in?
-      parts << link_to('Courses', courses_path)
+    parts << link_to('Courses', courses_path)
+    
+    if @course && !@course.new_record?
+      parts << link_to(@course.name, @course)
       
-      if @course && !@course.new_record?
-        parts << link_to(@course.name, @course)
+      if @exercise && !@exercise.new_record? && @exercise.course == @course
+        parts << link_to(@exercise.name, course_exercise_path(@course, @exercise))
         
-        if @exercise && !@exercise.new_record? && @exercise.course == @course
-          parts << link_to(@exercise.name, course_exercise_path(@course, @exercise))
-          
-          if @submission && !@submission.new_record? && @submission.exercise == @exercise
-            parts << link_to("Submission #{@submission.id}", course_exercise_submission_path(@course, @exercise, @submission))
-          end
+        if @submission && !@submission.new_record? && @submission.exercise == @exercise
+          parts << link_to("Submission #{@submission.id}", course_exercise_submission_path(@course, @exercise, @submission))
         end
       end
     end
