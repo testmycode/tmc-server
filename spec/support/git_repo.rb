@@ -9,7 +9,9 @@ class GitRepo
   end
   
   def copy_simple_exercise(name = 'SimpleExercise')
-    FileUtils.cp_r(SimpleExercise.fixture_path, "#{@path}/#{name}")
+    dest = "#{@path}/#{name}"
+    FileUtils.mkdir_p(File.dirname(dest))
+    FileUtils.cp_r(SimpleExercise.fixture_path, dest)
   end
   
   def add_commit_push

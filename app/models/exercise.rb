@@ -9,11 +9,11 @@ class Exercise < ActiveRecord::Base
   has_many :submissions, :dependent => :destroy
   #after_create :add_sheet_to_gdocs
 
-  def path
-    name.gsub(/-/, '/')
+  def zip_file_path
+    "#{course.zip_path}/#{self.name}.zip"
   end
-
-  def exercise_file
+  
+  def zip_url
     "#{course_exercise_url(self.course, self)}.zip"
   end
 
@@ -26,20 +26,6 @@ class Exercise < ActiveRecord::Base
 
     account = GDocs.new
     account.add_new_worksheet(course_name, self.gdocs_sheet.to_s)
-  end
-
-  def self.path_to_name root_path, exercise_path
-    name = exercise_path.gsub(/^#{root_path}\//, '')
-    name = name.gsub(/\//, '-')
-    return name
-  end
-
-  def self.default_options
-    {
-      "deadline" => nil,
-      "publish_date" => nil,
-      "gdocs_sheet" => nil
-    }
   end
 
   def self.read_exercises course_path
@@ -60,6 +46,19 @@ class Exercise < ActiveRecord::Base
   end
 
 private
+
+  def self.path_to_name(root_path, exercise_path)
+    name = exercise_path.gsub(/^#{root_path}\//, '')
+    return name
+  end
+
+  def self.default_options
+    {
+      "deadline" => nil,
+      "publish_date" => nil,
+      "gdocs_sheet" => nil
+    }
+  end
 
   def self.read_exercise course_path, exercise_path
     e = Exercise.new

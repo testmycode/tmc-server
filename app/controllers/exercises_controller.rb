@@ -8,7 +8,7 @@ class ExercisesController < ApplicationController
       format.json {
         render :json =>
           @exercises.to_json(:only => [:name, :deadline, :publish_date],
-                             :methods => [:return_address, :exercise_file])
+                             :methods => [:return_address, :zip_url])
       }
     end
   end
@@ -22,7 +22,7 @@ class ExercisesController < ApplicationController
     respond_to do |format|
       format.html
       format.zip {
-        send_file @course.exercise_file(@exercise.name)
+        send_file @exercise.zip_file_path
       }
     end
   end

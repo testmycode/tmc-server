@@ -98,8 +98,17 @@ describe Course do
       it "should discover new exercises" do
         add_exercise('MyExercise')
         course.refresh
-        course.exercises.should have(1).items
+        course.exercises.should have(1).item
         course.exercises[0].name.should == 'MyExercise'
+      end
+      
+      it "should discover exercises in subdirectories" do
+        add_exercise('MyCategory/MyExercise')
+        add_exercise('MyCategory/MySubcategory/MyExercise')
+        course.refresh
+        course.exercises.should have(2).items
+        course.exercises[0].name.should == 'MyCategory/MyExercise'
+        course.exercises[1].name.should == 'MyCategory/MySubcategory/MyExercise'
       end
       
       it "should reload course metadata" do
@@ -166,6 +175,16 @@ describe Course do
         
         course.exercises.first.deadline.should == Time.parse("2013-01-01 00:00")
         course.exercises.first.gdocs_sheet.should == "foo"
+      end
+      
+      it "should generate exercise zip files" do
+        add_exercise('MyExercise')
+        add_exercise('MyCategory/MyExercise')
+        
+        course.refresh
+
+        File.should exist(course.zip_path + '/MyExercise.zip')
+        File.should exist(course.zip_path + '/MyCategory/MyExercise.zip')
       end
     end
   end

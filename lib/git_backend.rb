@@ -70,10 +70,6 @@ module GitBackend
     "#{cache_path}/clone"
   end
 
-  def exercise_file exercise_name
-    "#{zip_path}/#{exercise_name}.zip"
-  end
-
   def refresh_working_copy
     system! "git clone -q #{bare_url} #{clone_path}"
   end
@@ -81,8 +77,10 @@ module GitBackend
   def refresh_exercise_archives
     self.exercises.each do |e|
       Dir.chdir(clone_path) do
-        path = "#{clone_path}/#{e.path}"
-        system! "git archive --output=#{exercise_file e.name} HEAD #{path}"
+        path = "#{clone_path}/#{e.name}"
+        zip_file_abs_path = "#{zip_path}/#{e.name}.zip"
+        FileUtils.mkdir_p(File.dirname(zip_file_abs_path))
+        system! "git archive --output=#{zip_file_abs_path} HEAD #{path}"
       end
     end
   end
