@@ -9,6 +9,10 @@ class Exercise < ActiveRecord::Base
   has_many :submissions, :dependent => :destroy
   #after_create :add_sheet_to_gdocs
 
+  def path
+    name.gsub('-', '/')
+  end
+
   def zip_file_path
     "#{course.zip_path}/#{self.name}.zip"
   end
@@ -49,6 +53,7 @@ private
 
   def self.path_to_name(root_path, exercise_path)
     name = exercise_path.gsub(/^#{root_path}\//, '')
+    name = name.gsub('/', '-')
     return name
   end
 

@@ -75,6 +75,7 @@ class Course < ActiveRecord::Base
       else
         old_e.deleted = true
       end
+      old_e.save!
     end
 
     read_exs.each do |read_e|

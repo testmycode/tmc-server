@@ -102,13 +102,13 @@ describe Course do
         course.exercises[0].name.should == 'MyExercise'
       end
       
-      it "should discover exercises in subdirectories" do
+      it "should discover new exercises in subdirectories" do
         add_exercise('MyCategory/MyExercise')
         add_exercise('MyCategory/MySubcategory/MyExercise')
         course.refresh
         course.exercises.should have(2).items
-        course.exercises[0].name.should == 'MyCategory/MyExercise'
-        course.exercises[1].name.should == 'MyCategory/MySubcategory/MyExercise'
+        course.exercises[0].name.should == 'MyCategory-MyExercise'
+        course.exercises[1].name.should == 'MyCategory-MySubcategory-MyExercise'
       end
       
       it "should reload course metadata" do
@@ -184,7 +184,7 @@ describe Course do
         course.refresh
 
         File.should exist(course.zip_path + '/MyExercise.zip')
-        File.should exist(course.zip_path + '/MyCategory/MyExercise.zip')
+        File.should exist(course.zip_path + '/MyCategory-MyExercise.zip')
       end
       
       it "should mark removed exercises as deleted" do
@@ -197,6 +197,7 @@ describe Course do
         
         course.exercises.should have(1).items
         course.exercises[0].should be_deleted
+        course.exercises[0].should_not be_changed # i.e. should be saved
       end
       
       it "should mark removed and restored exercises as not deleted" do
@@ -212,10 +213,11 @@ describe Course do
         
         course.exercises.should have(1).items
         course.exercises[0].should_not be_deleted
+        course.exercises[0].should_not be_changed # i.e. should be saved
       end
       
       it "should delete zip files of removed exercises" do
-        expected_zip_path = course.zip_path + '/MyCategory/MyExercise.zip'
+        expected_zip_path = course.zip_path + '/MyCategory-MyExercise.zip'
         
         add_exercise('MyCategory/MyExercise')
         course.refresh
