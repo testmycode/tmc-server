@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
 
   attr_accessor :password
   validate :check_password
-  before_save :encrypt_password
+  before_create :encrypt_password
 
   def has_password?(submitted_password)
     password_hash == encrypt(submitted_password)
