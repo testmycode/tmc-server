@@ -2,6 +2,24 @@ require 'spec_helper'
 
 describe User do
 
+  describe "modification" do
+    it "should be able to login after modification" do
+      created_user = User.create!(:login => "root",
+                           :password => "qwerty123",
+                           :administrator => false)
+
+      u = User.authenticate("root", "qwerty123")
+      u.should eq(created_user)
+      u.administrator = true
+      u.save
+
+      u2 = User.authenticate("root", "qwerty123")
+      u2.should_not eq(nil)
+
+      created_user.destroy
+    end
+  end
+
   describe "validation" do
     it "should succeed given a valid login and password" do
       User.new(:login => 'matt', :password => 'horner').should have(0).errors_on(:login)
