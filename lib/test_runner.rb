@@ -120,7 +120,7 @@ private
     raise "unable to find 'src' directory in submission" unless project_root
 
     exercise = submission.exercise
-    source = "#{exercise.course.clone_path}/#{exercise.name}/test"
+    source = "#{exercise.course.clone_path}/#{exercise.path}/test"
     FileUtils.rm_rf "#{project_root}/test"
     FileUtils.cp_r source, project_root
     cp_makefile project_root
