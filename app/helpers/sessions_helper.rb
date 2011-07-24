@@ -14,10 +14,10 @@ module SessionsHelper
   end
 
   def sign_out
-    reset_session
+    session[:user_id] = nil
     @current_user = nil
+    reset_session
   end
-
 
   private
 

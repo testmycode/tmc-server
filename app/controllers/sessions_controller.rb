@@ -5,12 +5,14 @@ class SessionsController < ApplicationController
                              params[:session][:password])
 
     redirect_params = {}
-    if user.nil? || !user.administrator?
+    if user.nil?
       redirect_params = {:alert => "Login or password incorrect. Try again."}
+    elsif !user.administrator?
+      redirect_params = {:alert => "Become an administrator and try again."}
     else
       sign_in user
     end
-    
+
     try_to_redirect_back(redirect_params)
   end
 
@@ -18,7 +20,7 @@ class SessionsController < ApplicationController
     sign_out
     try_to_redirect_back(:notice => 'Goodbye')
   end
-  
+
 private
   def try_to_redirect_back(redirect_params = {})
     if not request.env['HTTP_REFERER'].blank?
