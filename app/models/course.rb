@@ -15,23 +15,31 @@ class Course < ActiveRecord::Base
 
   has_many :exercises, :dependent => :destroy
   has_many :awarded_points, :dependent => :destroy
-  
+
   before_save lambda { self.remote_repo_url = nil if self.remote_repo_url.blank? }
   after_create :create_local_repository, :if => lambda { has_local_repo? }
   after_destroy :delete_local_repository, :if => lambda { has_local_repo? }
 
+  def users
+    User.find(:all,
+              :joins => :awarded_points,
+              :group => 'id',
+              :conditions => { :awarded_points =>
+                               { :course_id => self.id }})
+  end
+
   def has_remote_repo?
     !remote_repo_url.nil?
   end
-  
+
   def has_local_repo?
     !has_remote_repo?
   end
-  
+
   def bare_path
     super if has_local_repo?
   end
-  
+
   def bare_url
     if has_local_repo?
       super
@@ -94,7 +102,7 @@ class Course < ActiveRecord::Base
     self.refresh_exercises
     self.refresh_exercise_archives
   end
-  
+
   def self.default_options
     {}
   end

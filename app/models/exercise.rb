@@ -16,7 +16,7 @@ class Exercise < ActiveRecord::Base
   def zip_file_path
     "#{course.zip_path}/#{self.name}.zip"
   end
-  
+
   def zip_url
     "#{course_exercise_url(self.course, self)}.zip"
   end
@@ -47,6 +47,14 @@ class Exercise < ActiveRecord::Base
     self.deadline = from.deadline
     self.publish_date = from.publish_date
     self.gdocs_sheet = from.gdocs_sheet
+  end
+
+  def awarded_points
+    AwardedPoint.find(:all,
+                      :joins => :submission,
+                      :group => 'id',
+                      :conditions => { :submissions =>
+                                       { :exercise_id => self.id }})
   end
 
 private

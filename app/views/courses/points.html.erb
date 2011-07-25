@@ -1,0 +1,37 @@
+<h1>Points</h1>
+
+<table>
+
+  <tr>
+    <td></td>
+    <% @exercises.each do |exercise| %>
+      <% points = exercise.awarded_points %>
+      <% if points.size > 0 %>
+        <td colspan="<%= points.size %>"><%= exercise.name %></td>
+      <% end %>
+    <% end %>
+  </tr>
+
+  <tr>
+    <td></td>
+    <% @exercises.each do |exercise| %>
+      <% exercise.awarded_points.each do |point| %>
+        <td><%= point.name %></td>
+      <% end %>
+    <% end %>
+  </tr>
+
+  <% @users.each do |user| %>
+    <% user_points = user.awarded_points %>
+    <tr>
+      <td><%= user.login %></td>
+      <% @exercises.each do |exercise| %>
+        <% exercise.awarded_points.each do |point| %>
+          <td><%= x_if_point_awarded(user_points, point.name) %></td>
+        <% end %>
+      <% end %>
+    </tr>
+  <% end %>
+
+</table>
+

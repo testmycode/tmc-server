@@ -53,4 +53,11 @@ class CoursesController < ApplicationController
 
     redirect_to(courses_path)
   end
+
+  def points
+    @course = Course.find(params[:id])
+    @exercises = @course.exercises
+    @points = @course.awarded_points
+    @users = @course.users
+  end
 end

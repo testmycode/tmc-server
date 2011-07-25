@@ -16,8 +16,6 @@ SandboxServer::Application.routes.draw do
     end
   end
 
-  resources :points
-
   match '/upload_points', :to => 'points#upload_to_gdocs'
 
   root :to => "courses#index"
