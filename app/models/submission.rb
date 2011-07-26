@@ -30,6 +30,10 @@ class Submission < ActiveRecord::Base
     "#{exercise.name}-#{self.id}.zip"
   end
   
+  def test_failure_messages
+    test_case_runs.reject(&:successful?).map {|tcr| "#{tcr.test_case_name} - #{tcr.message}" }
+  end
+  
 private
   def run_tests
     begin

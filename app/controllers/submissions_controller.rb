@@ -15,6 +15,19 @@ class SubmissionsController < ApplicationController
     respond_to do |format|
       format.html
       format.zip { send_data(@submission.return_file) }
+      format.json do
+        output = {
+          :status => @submission.status
+        }
+        output = output.merge(
+          case @submission.status
+          when :error then { :error => @submission.pretest_error }
+          when :fail then { :failures => @submission.test_failure_messages }
+          when :ok then {}
+          end
+        )
+        render :json => output
+      end
     end
   end
 
@@ -29,12 +42,25 @@ class SubmissionsController < ApplicationController
       :return_file_tmp_path => params[:submission][:tmp_file].tempfile.path
     )
 
-    if @submission.save
-      redirect_to(course_exercise_submission_path(@course, @exercise, @submission),
-                  :notice => 'Submission processed.')
-    else
-      redirect_to(course_exercise_path(@course, @exercise),
-                  :alert => 'Failed to process submission.') 
+    ok = @submission.save
+    
+    respond_to do |format|
+      format.html do
+        if ok
+          redirect_to(course_exercise_submission_path(@course, @exercise, @submission),
+                      :notice => 'Submission processed.')
+        else
+          redirect_to(course_exercise_path(@course, @exercise),
+                      :alert => 'Failed to process submission.') 
+        end
+      end
+      format.json do
+        if ok
+          redirect_to(course_exercise_submission_path(@course, @exercise, @submission, :format => 'json'))
+        else
+          render :json => {:error => 'Failed to save submission. Sorry :('}
+        end
+      end
     end
   end
 

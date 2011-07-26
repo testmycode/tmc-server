@@ -26,5 +26,13 @@ describe Submission do
       @submission.pretest_error.should include('oh no')
     end
   end
+  
+  it "can summarize test failure messages" do
+    submission = Submission.new
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Yoo hoo()', :successful => true)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Xoo xoo()', :message => 'you fail again', :successful => false)
+    submission.test_failure_messages.should == ['Moo moo() - you fail', 'Xoo xoo() - you fail again']
+  end
 end
 
