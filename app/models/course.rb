@@ -14,6 +14,7 @@ class Course < ActiveRecord::Base
             :message => 'should not contain white spaces'}
 
   has_many :exercises, :dependent => :destroy
+  has_many :submissions, :dependent => :destroy
   has_many :awarded_points, :dependent => :destroy
   
   before_save lambda { self.remote_repo_url = nil if self.remote_repo_url.blank? }
@@ -71,11 +72,10 @@ class Course < ActiveRecord::Base
       read_e = read_exs.find {|x| x.name == old_e.name}
       if read_e
         old_e.copy_metadata read_e
-        old_e.deleted = false
+        old_e.save!
       else
-        old_e.deleted = true
+        old_e.destroy
       end
-      old_e.save!
     end
 
     read_exs.each do |read_e|
@@ -85,6 +85,7 @@ class Course < ActiveRecord::Base
     end
 
     self.save
+    self.exercises.reload
   end
 
   def refresh

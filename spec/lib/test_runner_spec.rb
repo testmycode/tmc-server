@@ -17,6 +17,7 @@ describe TestRunner do
       @user = User.create!(:login => 'student', :password => 'student')
       @submission = Submission.new(
         :user => @user,
+        :course => @course,
         :exercise => @exercise,
         :return_file_tmp_path => 'MyExercise.zip'
       )
@@ -68,6 +69,7 @@ describe TestRunner do
       
       @submission = Submission.new(
         :user => @user,
+        :course => @course,
         :exercise => @exercise,
         :return_file_tmp_path => 'MyExercise.zip'
       )

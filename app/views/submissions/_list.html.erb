@@ -13,14 +13,13 @@
         <td><%= submission.created_at.strftime("%Y-%m-%d %H:%M") %></td>
         <td><%= submission.user.login %></td>
         <td>
-          <%= link_to(submission.downloadable_file_name,
-                "#{course_exercise_submission_path(submission.exercise.course, submission.exercise, submission)}.zip") %> 
+          <%= link_to(submission.downloadable_file_name, "#{submission_path(submission)}.zip") %> 
         </td>
         <td>
           <%= submission_status(submission) %>
         </td>
         <td>
-          <%= link_to 'Details', course_exercise_submission_path(submission.exercise.course, submission.exercise, submission)  %>
+          <%= link_to 'Details', submission_path(submission)  %>
         </td>
        </tr>
     <% end %>

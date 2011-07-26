@@ -27,7 +27,7 @@ class ExercisesController < ApplicationController
     end
   end
 
-  private
+private
   def get_course
     @course = Course.find(params[:course_id])
   end

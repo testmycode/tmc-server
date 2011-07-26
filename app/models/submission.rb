@@ -1,12 +1,25 @@
 class Submission < ActiveRecord::Base
   belongs_to :user
-  belongs_to :exercise
+  belongs_to :course
   has_many :test_case_runs, :dependent => :destroy
   has_many :awarded_points, :dependent => :nullify
   
   attr_accessor :return_file_tmp_path
+  attr_accessor :skip_test_runner if ::Rails.env == 'test'
+  
+  validates :user, :presence => true
+  validates :course, :presence => true
+  validates :exercise_name, :presence => true
   
   before_create :run_tests
+  
+  def exercise
+    Exercise.find_by_course_id_and_name(self.course_id, self.exercise_name)
+  end
+  
+  def exercise=(ex)
+    self.exercise_name = ex.name
+  end
   
   def tests_ran?
     pretest_error == nil
@@ -27,7 +40,7 @@ class Submission < ActiveRecord::Base
   end
   
   def downloadable_file_name
-    "#{exercise.name}-#{self.id}.zip"
+    "#{exercise_name}-#{self.id}.zip"
   end
   
   def test_failure_messages
@@ -36,6 +49,7 @@ class Submission < ActiveRecord::Base
   
 private
   def run_tests
+    return if ::Rails.env == 'test' && self.skip_test_runner
     begin
       self.return_file = IO.read(return_file_tmp_path)
     

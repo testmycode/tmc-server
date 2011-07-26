@@ -12,9 +12,11 @@ SandboxServer::Application.routes.draw do
       get 'points'
     end
     resources :exercises, :except => [:destroy, :create] do
-      resources :submissions
+      resources :submissions, :only => [:create, :index]
     end
   end
+  
+  resources :submissions, :only => [:show]
 
   resources :points
 

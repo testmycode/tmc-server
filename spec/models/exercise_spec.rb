@@ -38,5 +38,32 @@ describe Exercise do
     # Some more mocking should probably happen somewhere..
     
   end
+  
+  
+  describe "associated submissions" do
+    before :each do
+      # FactoryGirl would be useful here. Probably elsewhere too.
+      @course = Course.create!(:name => 'MyCourse')
+      @exercise = Exercise.create!(:course => @course, :name => 'MyExercise')
+      @user = User.create!(:login => 'JohnShepard')
+      @submission_attrs = {
+        :course => @course,
+        :exercise_name => 'MyExercise',
+        :user => @user,
+        :skip_test_runner => true
+      }
+      Submission.create!(@submission_attrs)
+      Submission.create!(@submission_attrs)
+      @submissions = Submission.all
+    end
+    
+    it "should be associated by exercise name" do
+      @exercise.submissions.size.should == 2
+      @submissions[0].exercise.should == @exercise
+      @submissions[0].exercise_name = 'AnotherExercise'
+      @submissions[0].save!
+      @exercise.submissions.size.should == 1
+    end
+  end
 end
 

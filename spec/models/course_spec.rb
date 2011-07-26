@@ -187,7 +187,7 @@ describe Course do
         File.should exist(course.zip_path + '/MyCategory-MyExercise.zip')
       end
       
-      it "should mark removed exercises as deleted" do
+      it "should delete removed exercises from the database" do
         add_exercise('MyExercise')
         course.refresh
         
@@ -195,12 +195,10 @@ describe Course do
         local_clone.add_commit_push
         course.refresh
         
-        course.exercises.should have(1).items
-        course.exercises[0].should be_deleted
-        course.exercises[0].should_not be_changed # i.e. should be saved
+        course.exercises.should have(0).items
       end
       
-      it "should mark removed and restored exercises as not deleted" do
+      it "should restore removed and restored exercises in the database" do
         add_exercise('MyExercise')
         course.refresh
         
@@ -212,8 +210,6 @@ describe Course do
         course.refresh
         
         course.exercises.should have(1).items
-        course.exercises[0].should_not be_deleted
-        course.exercises[0].should_not be_changed # i.e. should be saved
       end
       
       it "should delete zip files of removed exercises" do

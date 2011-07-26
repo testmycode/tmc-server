@@ -19,8 +19,6 @@
     <% if !@submissions.empty? %>
       <%=
         render :partial => 'submissions/list', :locals => {
-          :course => @course,
-          :exercise => @exercise,
           :submissions => @submissions
         }
       %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110723190455) do
+ActiveRecord::Schema.define(:version => 20110726183541) do
 
   create_table "awarded_points", :force => true do |t|
     t.integer "course_id",     :null => false
@@ -37,8 +37,9 @@ ActiveRecord::Schema.define(:version => 20110723190455) do
     t.datetime "deadline"
     t.datetime "publish_date"
     t.string   "gdocs_sheet"
-    t.boolean  "deleted",      :default => false, :null => false
   end
+
+  add_index "exercises", ["name"], :name => "index_exercises_on_name"
 
   create_table "points_upload_queues", :force => true do |t|
     t.integer  "point_id"
@@ -48,12 +49,15 @@ ActiveRecord::Schema.define(:version => 20110723190455) do
 
   create_table "submissions", :force => true do |t|
     t.integer  "user_id"
-    t.integer  "exercise_id"
     t.binary   "return_file"
     t.text     "pretest_error"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "exercise_name", :null => false
+    t.integer  "course_id",     :null => false
   end
+
+  add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
 
   create_table "test_case_runs", :force => true do |t|
     t.integer  "submission_id"

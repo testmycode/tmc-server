@@ -17,7 +17,7 @@ describe SubmissionsController do
       User.stub(:find_by_login).with('xoo').and_return(@user)
       
       @submission = mock_model(Submission, :id => '3')
-      Submission.stub(:new).with(:user => @user, :exercise => @exercise, :return_file_tmp_path => 'submitted_file.zip').and_return(@submission)
+      Submission.stub(:new).with(:user => @user, :exercise => @exercise, :course => @course, :return_file_tmp_path => 'submitted_file.zip').and_return(@submission)
     end
     
     def post_create(options = {})
@@ -33,14 +33,14 @@ describe SubmissionsController do
       it "should redirect to show" do
         @submission.should_receive(:save).and_return(true)
         post_create
-        response.should redirect_to(course_exercise_submission_path(@course, @exercise, @submission))
+        response.should redirect_to(submission_path(@submission))
       end
       
       describe "with json format" do
         it "should redirect to show in JSON format" do
           @submission.should_receive(:save).and_return(true)
           post_create :format => :json
-          response.should redirect_to(course_exercise_submission_path(@course, @exercise, @submission, :format => 'json'))
+          response.should redirect_to(submission_path(@submission, :format => 'json'))
         end
       end
     end

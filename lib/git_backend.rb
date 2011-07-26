@@ -75,7 +75,7 @@ module GitBackend
   end
 
   def refresh_exercise_archives
-    self.exercises.reject(&:deleted?).each do |e|
+    self.exercises.each do |e|
       Dir.chdir(clone_path) do
         path = "#{clone_path}/#{e.path}"
         zip_file_abs_path = "#{zip_path}/#{e.name}.zip"

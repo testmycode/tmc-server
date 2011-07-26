@@ -6,7 +6,14 @@ class Exercise < ActiveRecord::Base
   self.include_root_in_json = false
 
   belongs_to :course
-  has_many :submissions, :dependent => :destroy
+  
+  def submissions
+    raise 'cannot access submissions with no course set' if course_id == nil
+    raise 'cannot access submissions with no exercise name set' if name == nil
+    if course && name
+      Submission.where(:course_id => course_id, :exercise_name => name)
+    end
+  end
   #after_create :add_sheet_to_gdocs
 
   def path

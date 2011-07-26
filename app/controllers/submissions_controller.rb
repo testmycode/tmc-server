@@ -38,6 +38,7 @@ class SubmissionsController < ApplicationController
     
     @submission = Submission.new(
       :user => user,
+      :course => @course,
       :exercise => @exercise,
       :return_file_tmp_path => params[:submission][:file].tempfile.path
     )
@@ -47,7 +48,7 @@ class SubmissionsController < ApplicationController
     respond_to do |format|
       format.html do
         if ok
-          redirect_to(course_exercise_submission_path(@course, @exercise, @submission),
+          redirect_to(submission_path(@submission),
                       :notice => 'Submission processed.')
         else
           redirect_to(course_exercise_path(@course, @exercise),
@@ -56,7 +57,7 @@ class SubmissionsController < ApplicationController
       end
       format.json do
         if ok
-          redirect_to(course_exercise_submission_path(@course, @exercise, @submission, :format => 'json'))
+          redirect_to(submission_path(@submission, :format => 'json'))
         else
           render :json => {:error => 'Failed to save submission. Sorry :('}
         end
@@ -66,7 +67,9 @@ class SubmissionsController < ApplicationController
 
 private
   def get_course_and_exercise
-    @course = Course.find(params[:course_id])
-    @exercise = @course.exercises.find(params[:exercise_id])
+    if params[:course_id] && params[:exercise_id]
+      @course = Course.find(params[:course_id])
+      @exercise = @course.exercises.find(params[:exercise_id])
+    end
   end
 end

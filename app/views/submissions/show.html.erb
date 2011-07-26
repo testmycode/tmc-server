@@ -44,7 +44,7 @@
 <% end %>
 
 <div class="submission-download-link">
-  <%= link_to "Download #{@submission.downloadable_file_name}", course_exercise_submission_path(@course, @exercise, @submission, :format => 'zip') %>
+  <%= link_to "Download #{@submission.downloadable_file_name}", submission_path(@submission, :format => 'zip') %>
 </div>
 
 <div class="link-back"><%= link_to 'Back', :back %></div>
