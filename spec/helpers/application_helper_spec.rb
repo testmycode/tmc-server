@@ -27,4 +27,35 @@ describe ApplicationHelper do
         '<div class="field"><label for="foo">Xooxer</label><input type="text id="foo" name="foo" /></div>'
     end
   end
+  
+  describe "breadcrumb" do
+    it "should show the current course" do
+      @course = mock_model(Course, :name => 'MyCourse', :new_record? => false)
+      breadcrumb.should include('MyCourse')
+    end
+    
+    it "should show the current exercise and its course" do
+      @course = mock_model(Course, :name => 'MyCourse', :new_record? => false)
+      @exercise = mock_model(Exercise, :name => 'MyExercise', :course => @course, :new_record? => false)
+      breadcrumb.should include('MyCourse')
+      breadcrumb.should include('MyExercise')
+    end
+    
+    it "should show the current submission, its course and its exercise" do
+      @course = mock_model(Course, :name => 'MyCourse', :new_record? => false)
+      @exercise = mock_model(Exercise, :name => 'MyExercise', :course => @course, :new_record? => false)
+      @submission = mock_model(Submission, :id => 123, :course => @course, :exercise => @exercise, :new_record? => false)
+      breadcrumb.should include('MyCourse')
+      breadcrumb.should include('MyExercise')
+      breadcrumb.should include('Submission #123')
+    end
+    
+    it "should show the current submission, its course and its exercise name even if the exercise was deleted" do
+      @course = mock_model(Course, :name => 'MyCourse', :new_record? => false)
+      @submission = mock_model(Submission, :id => 123, :course => @course, :exercise_name => 'MyExercise', :new_record? => false)
+      breadcrumb.should include('MyCourse')
+      breadcrumb.should include('(deleted exercise MyExercise)')
+      breadcrumb.should include('Submission #123')
+    end
+  end
 end

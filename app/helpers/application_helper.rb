@@ -40,8 +40,11 @@ EOS
         parts << link_to(@exercise.name, course_exercise_path(@course, @exercise))
         
         if @submission && !@submission.new_record? && @submission.exercise == @exercise
-          parts << link_to("Submission #{@submission.id}", course_exercise_submission_path(@course, @exercise, @submission))
+          parts << link_to("Submission ##{@submission.id}", submission_path(@submission))
         end
+      elsif @submission && !@submission.new_record?
+        parts << "(deleted exercise #{@submission.exercise_name})"
+        parts << link_to("Submission ##{@submission.id}", submission_path(@submission))
       end
     end
     raw(parts.join(' &raquo; '))
