@@ -18,8 +18,8 @@
   <div>
     
   </div>
-  <%= labeled_field("Student ID", text_field_tag('submission[student_id]')) %>
-  <%= labeled_field("Zipped project", f.file_field('tmp_file')) %>
+  <%= labeled_field("Username", text_field_tag('submission[username]')) %>
+  <%= labeled_field("Zipped project", f.file_field('file')) %>
   <div class="actions">
     <%= f.submit 'Submit'%>
   </div>

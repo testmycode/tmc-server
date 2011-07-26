@@ -46,7 +46,7 @@ class PointsUploadQueue < ActiveRecord::Base
 
   def self.upload_point point, doc, course_name, sheet
     begin
-      doc.add_points_to_student(course_name, point.student_id, sheet, point.exercise_number)
+      doc.add_points_to_student(course_name, point.username, sheet, point.exercise_number)
       return {:success => true, :error => nil}
     rescue RuntimeError => e
       case e.to_s

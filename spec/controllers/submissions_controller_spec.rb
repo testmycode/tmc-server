@@ -24,7 +24,7 @@ describe SubmissionsController do
       options = {
         :course_id => '1',
         :exercise_id => '2',
-        :submission => { :student_id => 'xoo', :tmp_file => @submitted_file }
+        :submission => { :username => 'xoo', :file => @submitted_file }
       }.merge options
       post :create, options
     end
@@ -92,7 +92,7 @@ describe SubmissionsController do
         @submission.stub(:test_failure_messages => ['one', 'two'], :status => :fail)
         result = get_show_json
         result['status'].should == 'fail'
-        result['failures'].should == ['one', 'two']
+        result['test_failures'].should == ['one', 'two']
       end
       
       it "should mark submissions with no error or failure as successful" do
@@ -100,7 +100,7 @@ describe SubmissionsController do
         result = get_show_json
         result['status'].should == 'ok'
         result['error'].should be_nil
-        result['failures'].should be_nil
+        result['test_failures'].should be_nil
       end
     end
   end

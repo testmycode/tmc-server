@@ -80,7 +80,7 @@ describe "The system" do
       ex.make_zip
       
       click_link 'MyExercise'
-      fill_in 'Student ID', :with => '123'
+      fill_in 'Username', :with => '123'
       attach_file('Zipped project', 'MyExercise.zip')
       click_button 'Submit'
       
@@ -94,7 +94,7 @@ describe "The system" do
       ex.make_zip
       
       click_link 'MyExercise'
-      fill_in 'Student ID', :with => '123'
+      fill_in 'Username', :with => '123'
       attach_file('Zipped project', 'MyExercise.zip')
       click_button 'Submit'
       
@@ -109,7 +109,7 @@ describe "The system" do
       ex.make_zip
       
       click_link 'MyExercise'
-      fill_in 'Student ID', :with => '123'
+      fill_in 'Username', :with => '123'
       attach_file('Zipped project', 'MyExercise.zip')
       click_button 'Submit'
       
@@ -135,9 +135,9 @@ describe "The system" do
     end
     
     it "should show all submissions for an exercise" do
-      submit_exercise('EasyExercise', :solve => true, :student_id => '123')
-      submit_exercise('EasyExercise', :solve => false, :student_id => '456')
-      submit_exercise('EasyExercise', :compilation_error => true, :student_id => '789')
+      submit_exercise('EasyExercise', :solve => true, :username => '123')
+      submit_exercise('EasyExercise', :solve => false, :username => '456')
+      submit_exercise('EasyExercise', :compilation_error => true, :username => '789')
       
       log_in_as_instructor
       click_link 'mycourse' 
@@ -155,7 +155,7 @@ describe "The system" do
       options = {
         :solve => true,
         :compilation_error => false,
-        :student_id => 'some_student_id'
+        :username => 'some_username'
       }.merge(options)
       
       FileUtils.rm_rf exercise_name
@@ -167,7 +167,7 @@ describe "The system" do
       visit '/'
       click_link 'mycourse'
       click_link exercise_name
-      fill_in 'Student ID', :with => options[:student_id]
+      fill_in 'Username', :with => options[:username]
       attach_file('Zipped project', "#{exercise_name}.zip")
       click_button 'Submit'
     end

@@ -22,7 +22,7 @@ class SubmissionsController < ApplicationController
         output = output.merge(
           case @submission.status
           when :error then { :error => @submission.pretest_error }
-          when :fail then { :failures => @submission.test_failure_messages }
+          when :fail then { :test_failures => @submission.test_failure_messages }
           when :ok then {}
           end
         )
@@ -32,14 +32,14 @@ class SubmissionsController < ApplicationController
   end
 
   def create
-    student_id = params[:submission][:student_id]
-    user = User.find_by_login(student_id)
-    user ||= User.create!(:login => student_id, :password => nil)
+    username = params[:submission][:username]
+    user = User.find_by_login(username)
+    user ||= User.create!(:login => username, :password => nil)
     
     @submission = Submission.new(
       :user => user,
       :exercise => @exercise,
-      :return_file_tmp_path => params[:submission][:tmp_file].tempfile.path
+      :return_file_tmp_path => params[:submission][:file].tempfile.path
     )
 
     ok = @submission.save
