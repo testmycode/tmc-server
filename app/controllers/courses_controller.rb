@@ -21,7 +21,7 @@ class CoursesController < ApplicationController
   def show
     @course = Course.find(params[:id])
     @exercises = @course.exercises.order('LOWER(name)')
-    @submissions = Submission.order('created_at DESC').limit(500)
+    @submissions = @course.submissions.order('created_at DESC').limit(500)
   end
 
   def refresh
