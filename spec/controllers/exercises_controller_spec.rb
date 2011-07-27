@@ -21,7 +21,7 @@ describe ExercisesController do
         result[0]['name'].should == 'Exercise1'
         result[1]['name'].should == 'Exercise2'
         result[0]['zip_url'].should == course_exercise_url(1, 1, :format => 'zip')
-        result[0]['return_address'].should == course_exercise_submissions_url(1, 1)
+        result[0]['return_address'].should == course_exercise_submissions_url(1, 1, :format => 'json')
       end
     end
   end
