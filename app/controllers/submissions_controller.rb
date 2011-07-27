@@ -1,14 +1,6 @@
 class SubmissionsController < ApplicationController
   before_filter :get_course_and_exercise
 
-  def index
-    @submissions = Submission.where(:exercise_id => @exercise.id)
-
-    respond_to do |format|
-      format.html
-    end
-  end
-
   def show
     @submission = Submission.find(params[:id])
 
