@@ -29,7 +29,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def return_address
-    course_exercise_submissions_url(self.course, self)
+    "#{course_exercise_submissions_url(self.course, self)}.json"
   end
 
   def add_sheet_to_gdocs
