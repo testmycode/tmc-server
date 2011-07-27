@@ -3,6 +3,12 @@
   <%= @course.name %>
 </h1>
 
+<% if signed_in? %>
+<ul>
+  <li>Repository URL: <span class="repo-url"><%= @course.bare_url %></span></li>
+</ul>
+<% end %>
+
 <h2>All exercises</h2>
 
 <section>

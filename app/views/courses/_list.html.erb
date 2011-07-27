@@ -21,7 +21,7 @@
       </td>
       <% if signed_in? %>
         <td>
-          <%= course.bare_url %>
+          <span class="repo-url"><%= course.bare_url %></span>
         </td>
         <td>
           <%= link_to 'refresh', refresh_course_path(course) %>
