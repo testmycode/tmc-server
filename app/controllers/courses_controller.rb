@@ -10,10 +10,15 @@ class CoursesController < ApplicationController
         @expired_courses = Course.where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now]).order(ordering)
       end
       format.json do
-        @courses = Course.order(ordering)
-        render :json =>
-          @courses.as_json(:only => [:name, :hide_after],
-                           :methods => :exercises_json)
+        courses = Course.order(ordering)
+        data = courses.map do |c|
+          {
+            :name => c.name,
+            :hide_after => c.hide_after,
+            :exercises => c.exercises.map {|ex| exercise_data_for_json(ex) }
+          }
+        end
+        render :json => data.to_json
       end
     end
   end
@@ -53,4 +58,23 @@ class CoursesController < ApplicationController
 
     redirect_to(courses_path)
   end
+  
+private
+
+  def exercise_data_for_json(exercise)
+    user = if !params[:username].blank? then User.find_by_login!(params[:username]) else nil end
+    
+    fields = [:name, :deadline, :publish_date, :return_address, :zip_url]
+    result = fields.reduce({}) do |r, field|
+      r.merge({ field => exercise.send(field) })
+    end
+    
+    if user
+      result[:attempted] = exercise.attempted_by?(user)
+      result[:completed] = exercise.completed_by?(user)
+    end
+    
+    result
+  end
+  
 end
