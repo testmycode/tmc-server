@@ -4,9 +4,8 @@ class AwardedPoint < ActiveRecord::Base
   # That would be way too slow, and error-prone too, so we store these.
   # It also makes queries like "points awarded to student X" easier.
 
-  belongs_to :course
   belongs_to :user
-  belongs_to :submission
-  
-  validates :name, :presence => true, :uniqueness => { :scope => [:course_id, :user_id] }
+  belongs_to :point
+
+  #validates :name, :presence => true, :uniqueness => { :scope => [:course_id, :user_id] }
 end

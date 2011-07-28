@@ -7,6 +7,7 @@ class Exercise < ActiveRecord::Base
 
   belongs_to :course
   has_many :submissions, :dependent => :destroy
+  has_many :points, :dependent => :destroy
   #after_create :add_sheet_to_gdocs
 
   def path
