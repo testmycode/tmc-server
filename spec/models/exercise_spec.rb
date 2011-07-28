@@ -2,6 +2,9 @@ require 'spec_helper'
 
 describe Exercise do
   include GitTestActions
+  
+  let(:user) { Factory.create(:user) }
+  let(:course) { Factory.create(:course) }
 
   describe "when read from a course repo" do
     before :each do
@@ -42,14 +45,11 @@ describe Exercise do
   
   describe "associated submissions" do
     before :each do
-      # FactoryGirl would be useful here. Probably elsewhere too.
-      @course = Course.create!(:name => 'MyCourse')
-      @exercise = Exercise.create!(:course => @course, :name => 'MyExercise')
-      @user = User.create!(:login => 'JohnShepard')
+      @exercise = Exercise.create!(:course => course, :name => 'MyExercise')
       @submission_attrs = {
-        :course => @course,
+        :course => course,
         :exercise_name => 'MyExercise',
-        :user => @user,
+        :user => user,
         :skip_test_runner => true
       }
       Submission.create!(@submission_attrs)
@@ -64,6 +64,37 @@ describe Exercise do
       @submissions[0].save!
       @exercise.submissions.size.should == 1
     end
+  end
+  
+  it "can tell whether a user has ever attempted an exercise" do
+    exercise = Exercise.new(:course => course, :name => 'MyExercise')
+    exercise.should_not be_attempted_by(user)
+    
+    Submission.create!(:user => user, :course => course, :exercise_name => exercise.name)
+    exercise.should be_attempted_by(user)
+  end
+  
+  it "can tell whether a user has completed an exercise" do
+    exercise = Exercise.new(:course => course, :name => 'MyExercise')
+    exercise.should_not be_completed_by(user)
+    
+    other_user = Factory.create(:user)
+    other_user_sub = Submission.create!(:user => other_user, :course => course, :exercise_name => exercise.name)
+    other_user_sub.test_case_runs.create!(:test_case_name => 'one', :successful => true)
+    other_user_sub.test_case_runs.create!(:test_case_name => 'two', :successful => true)
+    exercise.should_not be_completed_by(user)
+    
+    Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :pretest_error => 'oops')
+    exercise.should_not be_completed_by(user)
+    
+    sub = Submission.create!(:user => user, :course => course, :exercise_name => exercise.name)
+    tcr1 = sub.test_case_runs.create!(:test_case_name => 'one', :successful => true)
+    tcr2 = sub.test_case_runs.create!(:test_case_name => 'one', :successful => false)
+    exercise.should_not be_completed_by(user)
+
+    tcr2.successful = true
+    tcr2.save!
+    exercise.should be_completed_by(user)
   end
 end
 

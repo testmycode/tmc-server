@@ -38,6 +38,28 @@ class Exercise < ActiveRecord::Base
     account = GDocs.new
     account.add_new_worksheet(course_name, self.gdocs_sheet.to_s)
   end
+  
+  def attempted_by?(user)
+    submissions.where(:user_id => user.id).exists?
+  end
+  
+  def completed_by?(user)
+    # We try to find a submission whose test case runs are all successful
+    conn = ActiveRecord::Base.connection
+    query = <<EOS
+SELECT COUNT(*) AS total,
+       SUM(CASE WHEN successful = #{conn.quote(true)} THEN 1 ELSE 0 END) AS good
+FROM test_case_runs AS tcr
+  JOIN submissions AS sub ON (sub.id = tcr.submission_id)
+GROUP BY submission_id
+HAVING sub.exercise_name = #{conn.quote self.name} AND
+       sub.user_id = #{conn.quote user.id} AND
+       good = total AND
+       total > 0
+LIMIT 1
+EOS
+    !conn.execute(query).empty?
+  end
 
   def self.read_exercises course_path
     exercise_paths = Exercise.find_exercise_paths course_path
