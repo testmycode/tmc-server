@@ -24,4 +24,10 @@ FactoryGirl.define do
     user
     exercise
   end
+  
+  factory :test_case_run do
+    sequence(:test_case_name) {|n| "test case #{n}" }
+    submission
+    successful false
+  end
 end
