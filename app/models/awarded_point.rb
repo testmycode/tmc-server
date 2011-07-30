@@ -7,5 +7,5 @@ class AwardedPoint < ActiveRecord::Base
   belongs_to :user
   belongs_to :point
 
-  #validates :name, :presence => true, :uniqueness => { :scope => [:course_id, :user_id] }
+  validates_uniqueness_of :point_id, :scope => :user_id
 end

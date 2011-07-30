@@ -57,7 +57,6 @@ class CoursesController < ApplicationController
   def points
     @course = Course.find(params[:id])
     @exercises = @course.exercises
-    @points = @course.awarded_points
-    @users = @course.users
+    @users = User.course_students(@course)
   end
 end

@@ -1,5 +1,7 @@
 class User < ActiveRecord::Base
+
   has_many :submissions, :dependent => :destroy
+  has_many :exercises, :through => :submissions, :uniq => true
   has_many :awarded_points, :dependent => :destroy
 
   validates :login, :presence     => true,
@@ -11,6 +13,12 @@ class User < ActiveRecord::Base
   validate :check_password
   before_create :encrypt_password
 
+  scope :course_students, lambda { |course|
+    joins(:exercises).
+    where(:exercises => { :course_id => course.id }).
+    group("users.id")
+  }
+
   def has_password?(submitted_password)
     password_hash == encrypt(submitted_password)
   end
@@ -19,10 +27,6 @@ class User < ActiveRecord::Base
     user = find_by_login(login)
     return nil  if user.nil?
     return user if user.has_password?(submitted_password)
-  end
-
-  def awarded_points_for_course(course)
-    awarded_points.where(:course_id => course.id)
   end
 
 private
