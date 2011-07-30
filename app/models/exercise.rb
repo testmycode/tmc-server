@@ -44,12 +44,13 @@ class Exercise < ActiveRecord::Base
   end
 
   def refresh
-    unless Exercise.exercise_path? fullpath
+    unless Exercise.exercise_path? self.fullpath
       self.deleted = true
       self.save
       return
     end
 
+    self.deleted = false
     refresh_options
     refresh_points
     self.save

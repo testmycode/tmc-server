@@ -69,7 +69,7 @@ class Course < ActiveRecord::Base
     exercise_names = Exercise.read_exercise_names self.clone_path
     exercise_names.each do |name|
       if self.exercises.none? {|x| x.name == name}
-        Exercise.create(:name => name, :course => self)
+        self.exercises << Exercise.new(:name => name)
       end
     end
 
