@@ -8,14 +8,8 @@ class Exercise < ActiveRecord::Base
   belongs_to :course
 
   has_many :points, :dependent => :destroy
-
-  def submissions
-    raise 'cannot access submissions with no course set' if course_id == nil
-    raise 'cannot access submissions with no exercise name set' if name == nil
-    if course && name
-      Submission.where(:course_id => course_id, :exercise_name => name)
-    end
-  end
+  has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
+    :conditions => proc { "submissions.course_id = #{self.course_id}" }
 
   def path
     name.gsub('-', '/')
