@@ -1,6 +1,9 @@
 class Submission < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
+  belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
+    :conditions => proc { "exercises.course_id = #{self.course_id}" }
+
   has_many :test_case_runs, :dependent => :destroy
   
   attr_accessor :return_file_tmp_path
@@ -11,14 +14,6 @@ class Submission < ActiveRecord::Base
   validates :exercise_name, :presence => true
   
   before_create :run_tests
-  
-  def exercise
-    Exercise.find_by_course_id_and_name(self.course_id, self.exercise_name)
-  end
-  
-  def exercise=(ex)
-    self.exercise_name = ex.name
-  end
   
   def tests_ran?
     pretest_error == nil
