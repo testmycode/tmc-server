@@ -9,29 +9,20 @@ describe Exercise do
       FileUtils.mkdir_p 'bare_repo'
       copy_model_repo("bare_repo/#{@course_name}")
       system! "git clone -q bare_repo/#{@course_name} #{@course_name}"
-      @repo = GitRepo.new("#{@course_name}")
+      @repo = GitRepo.new(@course_name)
     end
     
-    it "should find all exercises" do
+    it "should find all exercise names" do
       @repo.copy_simple_exercise('Ex1')
       @repo.copy_simple_exercise('Ex2')
       @repo.add_commit_push
       
-      exercises = Exercise.read_exercises(@course_name)
-      exercises.length.should == 2
+      exercise_names = Exercise.read_exercise_names(@course_name)
+      exercise_names.length.should == 2
       
-      exercises.sort_by &:name
-      exercises[0].name.should == 'Ex1'
-      exercises[1].name.should == 'Ex2'
-    end
-    
-    it "should produce a valid exercise object when plugged into a course" do
-      @repo.copy_simple_exercise('Exercise')
-      @repo.add_commit_push
-      
-      exercise = Exercise.read_exercises(@course_name)[0]
-      
-      exercise.should be_valid
+      exercise_names.sort!
+      exercise_names[0].should == 'Ex1'
+      exercise_names[1].should == 'Ex2'
     end
     
     # TODO: should test metadata loading, but tests for Course.refresh already test that.
