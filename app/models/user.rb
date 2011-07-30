@@ -1,7 +1,6 @@
 class User < ActiveRecord::Base
 
   has_many :submissions, :dependent => :destroy
-  has_many :exercises, :through => :submissions, :uniq => true
   has_many :awarded_points, :dependent => :destroy
 
   validates :login, :presence     => true,
@@ -14,8 +13,8 @@ class User < ActiveRecord::Base
   before_create :encrypt_password
 
   scope :course_students, lambda { |course|
-    joins(:exercises).
-    where(:exercises => { :course_id => course.id }).
+    joins(:submissions).
+    where(:submissions => { :course_id => course.id }).
     group("users.id")
   }
 
