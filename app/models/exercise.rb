@@ -6,7 +6,9 @@ class Exercise < ActiveRecord::Base
   self.include_root_in_json = false
 
   belongs_to :course
-  
+
+  has_many :points, :dependent => :destroy
+
   def submissions
     raise 'cannot access submissions with no course set' if course_id == nil
     raise 'cannot access submissions with no exercise name set' if name == nil
@@ -14,16 +16,19 @@ class Exercise < ActiveRecord::Base
       Submission.where(:course_id => course_id, :exercise_name => name)
     end
   end
-  #after_create :add_sheet_to_gdocs
 
   def path
     name.gsub('-', '/')
   end
 
+  def fullpath
+    "#{course.clone_path}/#{self.path}"
+  end
+
   def zip_file_path
     "#{course.zip_path}/#{self.name}.zip"
   end
-  
+
   def zip_url
     "#{course_exercise_url(self.course, self)}.zip"
   end
@@ -61,24 +66,45 @@ EOS
     !conn.execute(query).empty?
   end
 
-  def self.read_exercises course_path
-    exercise_paths = Exercise.find_exercise_paths course_path
-    exercises = []
-
-    exercise_paths.each do |exercise_path|
-      exercises.push Exercise.read_exercise course_path, exercise_path
+  def refresh
+    unless Exercise.exercise_path? self.fullpath
+      self.destroy
+      return
     end
 
-    return exercises
+    refresh_options
+    refresh_points
+    self.save
   end
 
-  def copy_metadata from
-    self.deadline = from.deadline
-    self.publish_date = from.publish_date
-    self.gdocs_sheet = from.gdocs_sheet
+  def refresh_options
+    options = Exercise.get_options course.clone_path, self.fullpath
+    self.deadline = options["deadline"]
+    self.publish_date = options["publish_date"]
+    self.gdocs_sheet = options["gdocs_sheet"]
   end
 
-private
+  def refresh_points
+    point_names = Point.read_point_names(self.fullpath)
+
+    point_names.each do |name|
+      if self.points.none?{|point| point.name == name}
+        Point.create(:name => name, :exercise => self)
+      end
+    end
+
+    self.points.each do |point|
+      if point_names.none?{|name| name == point.name}
+        point.destroy
+      end
+    end
+  end
+
+  def self.read_exercise_names course_path
+    Exercise.find_exercise_paths(course_path).map do |ex_path|
+      Exercise.path_to_name(course_path, ex_path)
+    end
+  end
 
   def self.path_to_name(root_path, exercise_path)
     name = exercise_path.gsub(/^#{root_path}\//, '')
@@ -86,25 +112,14 @@ private
     return name
   end
 
+private
+
   def self.default_options
     {
       "deadline" => nil,
       "publish_date" => nil,
       "gdocs_sheet" => nil
     }
-  end
-
-  def self.read_exercise course_path, exercise_path
-    e = Exercise.new
-
-    e.name = Exercise.path_to_name course_path, exercise_path
-
-    options = Exercise.get_options course_path, exercise_path
-    e.deadline = options["deadline"]
-    e.publish_date = options["publish_date"]
-    e.gdocs_sheet = options["gdocs_sheet"]
-
-    return e
   end
 
   def self.merge_file hash, file
@@ -129,15 +144,18 @@ private
     return options
   end
 
+  def self.exercise_path? path
+    FileTest.directory? path and FileTest.exists? "#{path}/src" and
+      FileTest.exists? "#{path}/test" and FileTest.exists? "#{path}/nbproject"
+  end
+
   def self.find_exercise_paths root_path
     exercise_paths = []
 
     Find.find(root_path) do |path|
-      next if !FileTest.directory? path
-      next if !FileTest.exists? "#{path}/src"
-      next if !FileTest.exists? "#{path}/test"
-      next if !FileTest.exists? "#{path}/nbproject"
-      exercise_paths << path
+      if Exercise.exercise_path? path
+        exercise_paths << path
+      end
     end
 
     return exercise_paths

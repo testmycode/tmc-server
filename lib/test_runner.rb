@@ -143,17 +143,15 @@ private
 
   def self.award_points(submission, results)
     user = submission.user
-    course = submission.exercise.course
-    for point_name in points_from_test_results(results)
-      unless user.awarded_points_for_course(course).
-          map(&:name).include?(point_name) # (hope this never becomes too slow)
+    points = submission.exercise.points
+    awarded_points = user.awarded_points
 
-        point = AwardedPoint.new(
-          :user => user,
-          :course => course,
-          :name => point_name
-        )
-        submission.awarded_points << point
+    for point_name in points_from_test_results(results)
+      point = points.first(:conditions => {:name => point_name})
+      raise "point '#{point_name}' not found" unless point
+
+      if awarded_points.none?{|p| p.point_id == point.id}
+        AwardedPoint.create(:user => user, :point => point)
       end
     end
   end

@@ -13,6 +13,7 @@ describe TestRunner do
       
       @exercise_dir = SimpleExercise.new('MyExercise')
       @exercise = @course.exercises.first
+      @exercise.should_not be_nil
       
       @user = User.create!(:login => 'student', :password => 'student')
       @submission = Submission.new(
@@ -55,7 +56,7 @@ describe TestRunner do
       TestRunner.run_submission_tests(@submission)
       @submission.save!
       
-      points = @user.awarded_points_for_course(@course).to_a
+      points = Point.course_user_points(@course, @user).to_a
       points.find {|ap| ap.name == 'justsub' }.should_not be_nil
       points.find {|ap| ap.name == 'addsub' }.should be_nil
       points.find {|ap| ap.name == 'mul' }.should be_nil
@@ -79,7 +80,7 @@ describe TestRunner do
       TestRunner.run_submission_tests(@submission)
       @submission.save!
       
-      points = @user.awarded_points_for_course(@course).to_a
+      points = Point.course_user_points(@course, @user).to_a
       points.find {|ap| ap.name == 'justsub' }.should_not be_nil
       points.find {|ap| ap.name == 'addsub' }.should_not be_nil
       points.find {|ap| ap.name == 'mul' }.should be_nil

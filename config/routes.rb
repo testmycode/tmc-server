@@ -7,6 +7,7 @@ SandboxServer::Application.routes.draw do
 
   resources :courses do
     member do
+      get 'points'
       get 'refresh'
       post 'refresh'
     end
@@ -14,10 +15,8 @@ SandboxServer::Application.routes.draw do
       resources :submissions, :only => [:create, :index]
     end
   end
-  
-  resources :submissions, :only => [:show]
 
-  resources :points
+  resources :submissions, :only => [:show]
 
   match '/upload_points', :to => 'points#upload_to_gdocs'
 

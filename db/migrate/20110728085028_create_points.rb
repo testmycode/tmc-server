@@ -1,10 +1,8 @@
 class CreatePoints < ActiveRecord::Migration
   def self.up
     create_table :points do |t|
-      t.string :exercise_number
-      t.boolean :tests_pass
-
-      t.timestamps
+      t.references :exercise
+      t.string :name
     end
   end
 
