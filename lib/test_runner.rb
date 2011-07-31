@@ -157,15 +157,17 @@ private
   end
 
   def self.points_from_test_results(results)
-    points = {}
-    results.each do |test_result|
-      test_result["pointNames"].each do |point_name|
-        if points[point_name].nil? or points[point_name] == true
-          points[point_name] = test_result["status"] == 1
+    results.reduce({}) do |points, result|
+      result["pointNames"].each do |name|
+        unless points[name] == false
+          points[name] = (result["status"] == 1)
         end
       end
+      points
+    end.reduce([]) do |point_names, (name, success)|
+      point_names << name if success
+      point_names
     end
-    points.keys.select{|k| points[k]}
   end
 end
 
