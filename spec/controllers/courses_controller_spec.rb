@@ -81,6 +81,20 @@ describe CoursesController do
           exs[0]['completed'].should be_true
           exs[1]['completed'].should be_false
         end
+        
+        describe "and the user does not exist" do
+          before :each do
+            @user.destroy
+          end
+          
+          it "should behave as if the username parameter was not given" do
+            result = get_index_json :username => @user.login
+          
+            exs = result[0]['exercises']
+            exs[0]['name'].should == 'Exercise1'
+            exs[0]['attempted'].should be_nil
+          end
+        end
       end
       
     end

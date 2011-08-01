@@ -62,7 +62,7 @@ class CoursesController < ApplicationController
 private
 
   def exercise_data_for_json(exercise)
-    user = if !params[:username].blank? then User.find_by_login!(params[:username]) else nil end
+    user = if !params[:username].blank? then User.find_by_login(params[:username]) else nil end
     
     fields = [:name, :deadline, :publish_date, :return_address, :zip_url]
     result = fields.reduce({}) do |r, field|
