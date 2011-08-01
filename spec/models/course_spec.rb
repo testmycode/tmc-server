@@ -107,8 +107,9 @@ describe Course do
         add_exercise('MyCategory/MySubcategory/MyExercise')
         course.refresh
         course.exercises.should have(2).items
-        course.exercises[0].name.should == 'MyCategory-MyExercise'
-        course.exercises[1].name.should == 'MyCategory-MySubcategory-MyExercise'
+        names = course.exercises.map &:name
+        names.should include('MyCategory-MyExercise')
+        names.should include('MyCategory-MySubcategory-MyExercise')
       end
       
       it "should reload course metadata" do
