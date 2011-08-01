@@ -76,10 +76,4 @@ private
     
     result
   end
-
-  def points
-    @course = Course.find(params[:id])
-    @exercises = @course.exercises
-    @users = User.course_students(@course)
-  end
 end
