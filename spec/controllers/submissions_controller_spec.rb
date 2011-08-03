@@ -2,10 +2,9 @@ require 'spec_helper'
 
 describe SubmissionsController do
   before :each do
-    @course = mock_model(Course, :id => '1')
-    Course.stub(:find).with('1').and_return(@course)
-    @exercise = mock_model(Exercise, :id => '2')
-    @course.stub_chain(:exercises, :find).and_return(@exercise)
+    @course = Factory.create(:course)
+    @exercise = Factory.create(:exercise, :course => @course)
+    @exercise.stub(:available_to?).and_return(true)
   end
 
   describe "POST create" do
@@ -13,18 +12,17 @@ describe SubmissionsController do
       @submitted_file = mock(Object)
       @submitted_file.stub_chain(:tempfile, :path).and_return('submitted_file.zip')
       
-      @user = mock_model(User, :username => 'xoo')
-      User.stub(:find_by_login).with('xoo').and_return(@user)
+      @user = Factory.create(:user, :login => 'theuser')
       
-      @submission = mock_model(Submission, :id => '3')
+      @submission = mock_model(Submission)
       Submission.stub(:new).with(:user => @user, :exercise => @exercise, :course => @course, :return_file_tmp_path => 'submitted_file.zip').and_return(@submission)
     end
     
     def post_create(options = {})
       options = {
-        :course_id => '1',
-        :exercise_id => '2',
-        :submission => { :username => 'xoo', :file => @submitted_file }
+        :course_id => @course.id,
+        :exercise_id => @exercise.id,
+        :submission => { :username => 'theuser', :file => @submitted_file }
       }.merge options
       post :create, options
     end
@@ -66,15 +64,15 @@ describe SubmissionsController do
   describe "GET show" do
     describe "in JSON format" do
       before :each do
-        @submission = mock_model(Submission)
+        @submission = mock_model(Submission, :id => '3')
         Submission.stub(:find).with('3').and_return(@submission)
       end
       
       def get_show_json
         options = {
-          :id => '3',
-          :course_id => '1',
-          :exercise_id => '2',
+          :id => @submission.id,
+          :course_id => @course.id,
+          :exercise_id => @exercise.id,
           :format => 'json'
         }
         get :show, options
