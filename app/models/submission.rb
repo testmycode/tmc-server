@@ -38,7 +38,14 @@ class Submission < ActiveRecord::Base
   end
   
   def test_failure_messages
-    test_case_runs.reject(&:successful?).map {|tcr| "#{tcr.test_case_name} - #{tcr.message}" }
+    test_case_runs.reject(&:successful?).map do |tcr|
+      pretty_name = pretty_test_case_name(tcr.test_case_name)
+      if tcr.message.blank?
+        "#{pretty_name} - fail"
+      else
+        "#{pretty_name} - #{tcr.message}"
+      end
+    end
   end
   
 private
@@ -54,6 +61,15 @@ private
       else
         self.pretest_error = $!.message + "\n" + $!.backtrace.join("\n")
       end
+    end
+  end
+  
+  def pretty_test_case_name(long_name)
+    if long_name =~ /^.+\.[^.]+ ([^.]+)$/
+      method_name = $1
+      method_name
+    else
+      long_name
     end
   end
 end
