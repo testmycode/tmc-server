@@ -4,23 +4,24 @@ describe CoursesController do
 
   before(:each) do
     session[:user_id] = User.create!(:login => 'testuser', :password => 'testpassword').id
-    @courses = [
-      Course.create!(:name => 'SomeTestCourse'),
-      Course.create!(:name => 'ExpiredCourse', :hide_after => Time.now - 1.week),
-      Course.create!(:name => 'AnotherTestCourse')
-    ]
   end
   
   describe "GET index" do
     it "shows courses in order by name, split into ongoing and expired" do 
+      @courses = [
+        Factory.create(:course, :name => 'SomeTestCourse'),
+        Factory.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week),
+        Factory.create(:course, :name => 'AnotherTestCourse')
+      ]
+      
       get :index
+      
       assigns(:ongoing_courses).map(&:name).should == ['AnotherTestCourse', 'SomeTestCourse']
       assigns(:expired_courses).map(&:name).should == ['ExpiredCourse']
     end
     
     describe "in JSON format" do
       before :each do
-        @courses.each &:destroy #FIXME!
         @course = Factory.create(:course, :name => 'Course1')
         @course.exercises << Factory.create(:exercise, :name => 'Exercise1', :course => @course)
         @course.exercises << Factory.create(:exercise, :name => 'Exercise2', :course => @course)
@@ -100,15 +101,9 @@ describe CoursesController do
     end
   end
   
-  describe "GET show" do
-    it "shows the requested course" do 
-      get :show, :id => @courses[0].id
-      assigns(:course).should == @courses[0]
-    end
-  end
   
   describe "POST create" do
-   
+    
     describe "with valid parameters" do
       it "creates the course with a local repo if no remote repo url is given" do
         post :create, :course => { :name => 'NewCourse' }
@@ -134,20 +129,7 @@ describe CoursesController do
         assigns(:course).name.should == 'invalid name with spaces'
       end
     end
-    
   end
-  
-  describe "DELETE course" do
-    it "destroys the given course" do
-      delete :destroy, :id => @courses[0].id
-      Course.find_by_id(@courses[0].id).should be_nil
-    end
-    
-    it "redirects to the course list" do 
-      delete :destroy, :id => @courses[0].id
-      response.should redirect_to(courses_url)
-    end    
-  end 
 end
 
 
