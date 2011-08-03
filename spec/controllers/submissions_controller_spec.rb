@@ -4,7 +4,6 @@ describe SubmissionsController do
   before :each do
     @course = Factory.create(:course)
     @exercise = Factory.create(:exercise, :course => @course)
-    @exercise.stub(:available_to?).and_return(true)
   end
 
   describe "POST create" do
@@ -39,6 +38,27 @@ describe SubmissionsController do
           @submission.should_receive(:save).and_return(true)
           post_create :format => :json
           response.should redirect_to(submission_path(@submission, :format => 'json'))
+        end
+      end
+    end
+    
+    describe "when exercise unavailable to current user" do
+      before :each do
+        @exercise.deadline = Date.yesterday
+        @exercise.save
+      end
+      
+      it "should not accept the submission" do
+        @submission.should_not_receive(:save)
+        post_create
+        response.code.to_i.should == 403
+      end
+      
+      describe "with json format" do
+        it "should return a JSON error" do
+          @submission.should_not_receive(:save)
+          post_create :format => :json
+          JSON.parse(response.body)['error'].should_not be_blank
         end
       end
     end

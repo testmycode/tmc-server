@@ -28,6 +28,18 @@ class SubmissionsController < ApplicationController
     user = User.find_by_login(username)
     user ||= User.create!(:login => username, :password => nil)
     
+    if !@exercise.available_to?(user)
+      respond_to do |format|
+        format.html do
+          render :status => 403, :text => 'Exercise not available. The deadline may have passed.', :content_type => 'text/plain'
+        end
+        format.json do
+          render :json => {:error => 'Submissions for this exercise are no longer accepted.'}
+        end
+      end
+      return
+    end
+    
     @submission = Submission.new(
       :user => user,
       :course => @course,
