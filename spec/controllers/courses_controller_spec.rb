@@ -33,17 +33,14 @@ describe CoursesController do
         JSON.parse(response.body)
       end
     
-      it "renders all courses in order by name" do
-        Factory.create(:course, :name => 'Course2', :hide_after => Time.now - 1.week)
+      it "renders all non-hidden courses in order by name" do
+        Factory.create(:course, :name => 'Course2', :hide_after => Time.now + 1.week)
         Factory.create(:course, :name => 'Course3')
+        Factory.create(:course, :name => 'HiddenCourse', :hide_after => Time.now - 1.week)
         
         result = get_index_json
         
-        result[0]['name'].should == 'Course1'
-        result[1]['name'].should == 'Course2'
-        result[2]['name'].should == 'Course3'
-        result[0]['hide_after'].should be_nil
-        result[1]['hide_after'].should_not be_nil
+        result.map {|c| c['name'] }.should == ['Course1', 'Course2', 'Course3']
       end
     
       it "should render the exercises for each course" do

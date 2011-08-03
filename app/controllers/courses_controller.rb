@@ -6,15 +6,14 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html do
         @num_points_in_queue = PointsUploadQueue.count
-        @ongoing_courses = Course.where(["hide_after IS NULL OR hide_after > ?", Time.now]).order(ordering)
-        @expired_courses = Course.where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now]).order(ordering)
+        @ongoing_courses = Course.find_ongoing.order(ordering)
+        @expired_courses = Course.find_expired.order(ordering)
       end
       format.json do
-        courses = Course.order(ordering)
+        courses = Course.find_ongoing.order(ordering)
         data = courses.map do |c|
           {
             :name => c.name,
-            :hide_after => c.hide_after,
             :exercises => c.exercises.map {|ex| exercise_data_for_json(ex) }
           }
         end

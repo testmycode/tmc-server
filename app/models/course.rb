@@ -22,6 +22,14 @@ class Course < ActiveRecord::Base
   after_create :create_local_repository, :if => lambda { has_local_repo? }
   after_destroy :delete_local_repository, :if => lambda { has_local_repo? }
 
+  def self.find_ongoing
+    self.where(["hide_after IS NULL OR hide_after > ?", Time.now])
+  end
+  
+  def self.find_expired
+    self.where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now])
+  end
+
   def has_remote_repo?
     !remote_repo_url.nil?
   end
