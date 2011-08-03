@@ -14,7 +14,7 @@ class CoursesController < ApplicationController
         data = courses.map do |c|
           {
             :name => c.name,
-            :exercises => c.exercises.map {|ex| exercise_data_for_json(ex) }
+            :exercises => c.exercises.map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
           }
         end
         render :json => data.to_json
@@ -67,6 +67,8 @@ private
 
   def exercise_data_for_json(exercise)
     user = if !params[:username].blank? then User.find_by_login(params[:username]) else nil end
+    
+    return nil if !exercise.available_to?(user)
     
     fields = [:name, :deadline, :publish_date, :return_address, :zip_url]
     result = fields.reduce({}) do |r, field|

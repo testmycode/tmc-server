@@ -53,6 +53,25 @@ describe CoursesController do
         exs[0]['return_address'].should == course_exercise_submissions_url(@course.id, @course.exercises[0].id, :format => 'json')
       end
       
+      it "should include only exercises whose deadline has not passed for non-administrators" do
+        @course.exercises[1].deadline = Date.yesterday
+        @course.exercises[1].save!
+        
+        result = get_index_json
+        
+        result[0]['exercises'].map {|ex| ex['name']}.should_not include('Exercise2')
+      end
+      
+      it "should include all exercises for administrators" do
+        Factory.create(:admin, :login => 'TheAdmin')
+        @course.exercises[1].deadline = Date.yesterday
+        @course.exercises[1].save!
+        
+        result = get_index_json :username => 'TheAdmin'
+        
+        result[0]['exercises'].map {|ex| ex['name']}.should include('Exercise2')
+      end
+      
       describe "when given a username parameter" do
         before :each do
           @user = Factory.create(:user)
