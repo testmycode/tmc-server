@@ -8,10 +8,16 @@ class GitRepo
     @commit_count = 0
   end
   
-  def copy_simple_exercise(name = 'SimpleExercise')
-    dest = "#{@path}/#{name}"
+  def copy_simple_exercise(dir = 'SimpleExercise', metadata = {})
+    dest = "#{@path}/#{dir}"
     FileUtils.mkdir_p(File.dirname(dest))
     FileUtils.cp_r(SimpleExercise.fixture_path, dest)
+    set_metadata_in(dir, metadata) unless metadata.empty?
+  end
+  
+  def set_metadata_in(dir, metadata_hash)
+    dest = "#{@path}/#{dir}/metadata.yml"
+    File.open(dest, "wb") { |f| f.write(metadata_hash.to_yaml) }
   end
   
   def add_commit_push

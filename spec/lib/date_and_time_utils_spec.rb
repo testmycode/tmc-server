@@ -1,0 +1,84 @@
+require 'spec_helper'
+
+describe DateAndTimeUtils do
+  describe "#parse_date_or_time" do
+    it "should accept (local time) SQL-like yyyy-mm-dd date strings" do
+      d = DateAndTimeUtils.parse_date_or_time('2011-07-13')
+      d.should be_a(Date)
+      d.day.should == 13
+      d.month.should == 07
+      d.year.should == 2011
+    end
+    
+    it "should accept (local time) SQL-like yyyy-mm-dd hh:ii datetime strings" do
+      t = DateAndTimeUtils.parse_date_or_time('2011-07-13 13:45')
+      t.should be_a(Time)
+      t.day.should == 13
+      t.month.should == 07
+      t.year.should == 2011
+      t.hour.should == 13
+      t.min.should == 45
+      t.sec.should == 00
+    end
+    
+    it "should accept (local time) SQL-like yyyy-mm-dd hh:ii datetime strings" do
+      t = DateAndTimeUtils.parse_date_or_time('2011-07-13 13:45:21')
+      t.should be_a(Time)
+      t.day.should == 13
+      t.month.should == 07
+      t.year.should == 2011
+      t.hour.should == 13
+      t.min.should == 45
+      t.sec.should == 21
+    end
+    
+    it "should accept (local time) Finnish dd.mm.yyyy date strings" do
+      d = DateAndTimeUtils.parse_date_or_time('13.07.2011')
+      d.should be_a(Date)
+      d.day.should == 13
+      d.month.should == 07
+      d.year.should == 2011
+    end
+    
+    it "should accept (local time) Finnish dd.mm.yyyy hh:ii datetime strings" do
+      t = DateAndTimeUtils.parse_date_or_time('13.07.2011 13:45')
+      t.day.should == 13
+      t.month.should == 07
+      t.year.should == 2011
+      t.hour.should == 13
+      t.min.should == 45
+      t.sec.should == 00
+    end
+    
+    it "should accept (local time) Finnish dd.mm.yyyy hh:ii:ss datetime strings" do
+      t = DateAndTimeUtils.parse_date_or_time('13.07.2011 13:45:21')
+      t.day.should == 13
+      t.month.should == 07
+      t.year.should == 2011
+      t.hour.should == 13
+      t.min.should == 45
+      t.sec.should == 21
+    end
+    
+    it "should disregard whitespace around the input" do
+      t = DateAndTimeUtils.parse_date_or_time(" 13.07.2011 13:45 \n")
+      t.day.should == 13
+      t.month.should == 07
+      t.year.should == 2011
+      t.hour.should == 13
+      t.min.should == 45
+      t.sec.should == 00
+    end
+    
+    it "should raise an exception if it cannot parse the string" do
+      expect { DateAndTimeUtils.parse_date_or_time('xooxers') }.to raise_error
+      expect { DateAndTimeUtils.parse_date_or_time('2011-07-13 12:34:56:78') }.to raise_error
+    end
+    
+    it "should raise user-friendly exceptions" do
+      expect { DateAndTimeUtils.parse_date_or_time('xooxers') }.to raise_error(/Cannot parse .* xooxers/)
+      expect { DateAndTimeUtils.parse_date_or_time('2012-99-10') }.to raise_error(/Invalid .* 2012-99-10/)
+    end
+  end
+end
+

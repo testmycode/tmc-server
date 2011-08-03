@@ -57,6 +57,69 @@ describe Exercise do
     end
   end
   
+  it "should treat date deadlines as being at 23:59:59 local time" do
+    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    ex.deadline = Date.today
+    ex.deadline.should == Date.today.end_of_day
+  end
+  
+  it "should accept deadlines in either SQLish or Finnish date format" do
+    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    
+    ex.deadline = '2011-04-19 13:55'
+    ex.deadline.year.should == 2011
+    ex.deadline.month.should == 04
+    ex.deadline.day.should == 19
+    ex.deadline.hour.should == 13
+    ex.deadline.min.should == 55
+    
+    ex.deadline = '25.05.2012 14:56'
+    ex.deadline.day.should == 25
+    ex.deadline.month.should == 5
+    ex.deadline.year.should == 2012
+    ex.deadline.hour.should == 14
+    ex.deadline.min.should == 56
+  end
+  
+  it "should accept a blank deadline" do
+    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    ex.deadline = nil
+    ex.deadline.should be_nil
+    ex.deadline = ""
+    ex.deadline.should be_nil
+  end
+  
+  it "should raise an exception if trying to set a deadline in invalid format" do
+    ex = Factory.create(:exercise)
+    expect { ex.deadline = "xooxers" }.to raise_error
+    expect { ex.deadline = "2011-07-13 12:34:56:78" }.to raise_error
+  end
+  
+  it "should always be available to administrators" do
+    admin = Factory.create(:admin)
+    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    
+    ex.deadline.should be_nil
+    ex.should be_available_to(admin)
+    
+    ex.deadline = Date.today - 1.day
+    ex.should be_available_to(admin)
+  end
+  
+  it "should be available to non-administrators only if the deadline has not passed" do
+    user = Factory.create(:user)
+    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    
+    ex.deadline.should be_nil
+    ex.should be_available_to(user)
+    
+    ex.deadline = Date.today + 1.day
+    ex.should be_available_to(user)
+    
+    ex.deadline = Date.today - 1.day
+    ex.should_not be_available_to(user)
+  end
+  
   it "can tell whether a user has ever attempted an exercise" do
     exercise = Exercise.new(:course => course, :name => 'MyExercise')
     exercise.should_not be_attempted_by(user)

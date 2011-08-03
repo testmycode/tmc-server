@@ -33,15 +33,15 @@ describe "The system" do
       
     end
     
-    it "should show exercises pushed to the course's git repo" do
+    it "should show all exercises pushed to the course's git repo" do
       create_new_course('mycourse')
       course = Course.find_by_name!('mycourse')
       
       repo = clone_course_repo(course)
-      repo.copy_simple_exercise('MyExercise')
+      repo.copy_simple_exercise('MyExercise', :deadline => (Date.today - 1.day).to_s)
       repo.add_commit_push
       
-      manually_refresh_course(course.name)
+      manually_refresh_course('mycourse')
       
       visit '/courses'
       click_link 'mycourse'
@@ -53,12 +53,12 @@ describe "The system" do
   
   describe "(used by a student)" do
     before :each do
-      course = Course.create!(:name => 'mycourse')
-      repo = clone_course_repo(course)
-      repo.copy_simple_exercise('MyExercise')
-      repo.add_commit_push
+      @course = Course.create!(:name => 'mycourse')
+      @repo = clone_course_repo(@course)
+      @repo.copy_simple_exercise('MyExercise')
+      @repo.add_commit_push
       
-      course.refresh
+      @course.refresh
       
       visit '/'
       click_link 'mycourse'
@@ -115,6 +115,17 @@ describe "The system" do
       
       page.should have_content('Compilation error')
       page.should have_content('oops')
+    end
+    
+    it "should not show exercises whose deadline has passed" do
+      @repo.set_metadata_in('MyExercise', 'deadline' => Date.yesterday.to_s)
+      @repo.add_commit_push
+      @course.refresh
+      
+      visit '/'
+      click_link 'mycourse'
+      
+      page.should_not have_content('MyExercise')
     end
   end
   

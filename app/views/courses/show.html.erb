@@ -20,9 +20,11 @@
 
 </section>
 
-<h2>Latest submissions</h2>
+<% if @submissions %>
+  <h2>Latest submissions</h2>
 
-<section>
-  <%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
-</section>
+  <section>
+    <%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
+  </section>
+<% end %>
 

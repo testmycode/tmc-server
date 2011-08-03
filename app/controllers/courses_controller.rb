@@ -6,11 +6,11 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html do
         @num_points_in_queue = PointsUploadQueue.count
-        @ongoing_courses = Course.find_ongoing.order(ordering)
-        @expired_courses = Course.find_expired.order(ordering)
+        @ongoing_courses = Course.ongoing.order(ordering)
+        @expired_courses = Course.expired.order(ordering)
       end
       format.json do
-        courses = Course.find_ongoing.order(ordering)
+        courses = Course.ongoing.order(ordering)
         data = courses.map do |c|
           {
             :name => c.name,
@@ -24,8 +24,13 @@ class CoursesController < ApplicationController
 
   def show
     @course = Course.find(params[:id])
-    @exercises = @course.exercises.order('LOWER(name)')
-    @submissions = @course.submissions.order('created_at DESC').limit(500)
+    @exercises = @course.exercises.order('LOWER(name)').select {|ex| ex.available_to?(current_user) }
+    
+    if current_user
+      @submissions = @course.submissions
+      @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
+      @submissions = @submissions.order('created_at DESC').limit(500)
+    end
   end
 
   def refresh

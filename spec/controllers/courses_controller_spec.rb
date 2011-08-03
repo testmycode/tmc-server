@@ -3,7 +3,7 @@ require 'spec_helper'
 describe CoursesController do
 
   before(:each) do
-    session[:user_id] = User.create!(:login => 'testuser', :password => 'testpassword').id
+    controller.stub(:current_user => Factory.create(:user))
   end
   
   describe "GET index" do
@@ -95,6 +95,65 @@ describe CoursesController do
         end
       end
       
+    end
+  end
+  
+  
+  describe "GET show" do
+    before :each do
+      @course = Factory.create(:course)
+    end
+  
+    describe "for administrators" do
+      before :each do
+        @admin = Factory.create(:admin)
+        controller.stub(:current_user => @admin)
+      end
+    
+      it "should show everyone's submissions" do
+        user1 = Factory.create(:user)
+        user2 = Factory.create(:user)
+        sub1 = Factory.create(:submission, :user => user1, :course => @course)
+        sub2 = Factory.create(:submission, :user => user2, :course => @course)
+        
+        get :show, :id => @course.id
+        
+        assigns['submissions'].should include(sub1)
+        assigns['submissions'].should include(sub2)
+      end
+    end
+    
+    describe "for guests" do
+      before :each do
+        controller.stub(:current_user => nil)
+      end
+      
+      it "should show no submissions" do
+        Factory.create(:submission, :course => @course)
+        Factory.create(:submission, :course => @course)
+        
+        get :show, :id => @course.id
+        
+        assigns['submissions'].should be_nil
+      end
+    end
+    
+    describe "for regular users" do
+      before :each do
+        @user = Factory.create(:user)
+        controller.stub(:current_user => @user)
+      end
+      
+      it "should show only the current user's submissions" do
+        other_user = Factory.create(:user)
+        my_sub = Factory.create(:submission, :user => @user, :course => @course)
+        other_guys_sub = Factory.create(:submission, :user => other_user, :course => @course)
+        
+        get :show, :id => @course.id
+        
+        assigns['submissions'].should include(my_sub)
+        assigns['submissions'].should_not include(other_guys_sub)
+      end
     end
   end
   

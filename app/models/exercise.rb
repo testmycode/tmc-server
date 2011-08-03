@@ -38,6 +38,14 @@ class Exercise < ActiveRecord::Base
     account.add_new_worksheet(course_name, self.gdocs_sheet.to_s)
   end
   
+  def available_to?(user)
+    if user == nil || !user.administrator?
+      !deadline_passed?
+    else
+      true
+    end
+  end
+  
   def attempted_by?(user)
     submissions.where(:user_id => user.id).exists?
   end
@@ -58,6 +66,23 @@ HAVING sub.exercise_name = #{conn.quote self.name} AND
 LIMIT 1
 EOS
     !conn.execute(query).empty?
+  end
+  
+  def deadline=(new_deadline)
+    d = new_deadline
+    if d.blank?
+      super(nil)
+      return
+    end
+    
+    d = DateAndTimeUtils.parse_date_or_time(d) if d.is_a?(String)
+    
+    if d.is_a? Date
+      d = d.end_of_day
+    elsif !d.is_a?(Time)
+      raise "Invalid deadline: #{new_deadline}"
+    end
+    super(d)
   end
 
   def refresh
@@ -107,6 +132,10 @@ EOS
   end
 
 private
+
+  def deadline_passed?
+    self.deadline != nil && self.deadline < Time.now
+  end
 
   def self.default_options
     {
