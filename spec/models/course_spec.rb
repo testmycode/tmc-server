@@ -52,6 +52,26 @@ describe Course do
       File.should exist(local_repo_path)
     end
   end
+  
+  it "should be visible if not hidden and hide_after is nil" do
+    c = Factory.create(:course, :hidden => false, :hide_after => nil)
+    c.should be_visible
+  end
+  
+  it "should be visible if not hidden and hide_after has not passed" do
+    c = Factory.create(:course, :hidden => false, :hide_after => Time.now + 2.minutes)
+    c.should be_visible
+  end
+  
+  it "should not be visible if hidden" do
+    c = Factory.create(:course, :hidden => true, :hide_after => nil)
+    c.should_not be_visible
+  end
+  
+  it "should be expired if hide_after has passed" do
+    c = Factory.create(:course, :hidden => false, :hide_after => Time.now - 2.minutes)
+    c.should_not be_visible
+  end
 
 
   describe "validation" do
@@ -119,9 +139,13 @@ describe Course do
         course.refresh
         course.hide_after.should == Time.parse("2011-07-01 13:00") # local time zone
         
-        change_course_metadata_file 'hide_after' => "2011-07-01 14:00"
+        change_course_metadata_file 'hide_after' => nil
         course.refresh
-        course.hide_after.should == Time.parse("2011-07-01 14:00")
+        course.hide_after.should == nil
+        
+        change_course_metadata_file 'hidden' => true
+        course.refresh
+        course.should be_hidden
       end
       
       it "should fail if the course metadata file cannot be parsed" do

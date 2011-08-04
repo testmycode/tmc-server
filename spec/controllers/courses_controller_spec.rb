@@ -25,6 +25,7 @@ describe CoursesController do
         @course = Factory.create(:course, :name => 'Course1')
         @course.exercises << Factory.create(:exercise, :name => 'Exercise1', :course => @course)
         @course.exercises << Factory.create(:exercise, :name => 'Exercise2', :course => @course)
+        @course.exercises << Factory.create(:exercise, :name => 'Exercise3', :course => @course)
       end
     
       def get_index_json(options = {})
@@ -36,7 +37,8 @@ describe CoursesController do
       it "renders all non-hidden courses in order by name" do
         Factory.create(:course, :name => 'Course2', :hide_after => Time.now + 1.week)
         Factory.create(:course, :name => 'Course3')
-        Factory.create(:course, :name => 'HiddenCourse', :hide_after => Time.now - 1.week)
+        Factory.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week)
+        Factory.create(:course, :name => 'HiddenCourse', :hidden => true)
         
         result = get_index_json
         
@@ -53,23 +55,30 @@ describe CoursesController do
         exs[0]['return_address'].should == course_exercise_submissions_url(@course.id, @course.exercises[0].id, :format => 'json')
       end
       
-      it "should include only exercises whose deadline has not passed for non-administrators" do
+      it "should include only visible exercises whose deadline has not passed for non-administrators" do
+        @course.exercises[0].hidden = true
+        @course.exercises[0].save!
         @course.exercises[1].deadline = Date.yesterday
         @course.exercises[1].save!
         
         result = get_index_json
-        
-        result[0]['exercises'].map {|ex| ex['name']}.should_not include('Exercise2')
+
+        names = result[0]['exercises'].map {|ex| ex['name']}
+        names.should_not include('Exercise1')
+        names.should_not include('Exercise2')
+        names.should include('Exercise3')
       end
       
       it "should include all exercises for administrators" do
         Factory.create(:admin, :login => 'TheAdmin')
+        @course.exercises[0].hidden = true
+        @course.exercises[0].save!
         @course.exercises[1].deadline = Date.yesterday
         @course.exercises[1].save!
         
         result = get_index_json :username => 'TheAdmin'
         
-        result[0]['exercises'].map {|ex| ex['name']}.should include('Exercise2')
+        result[0]['exercises'].map {|ex| ex['name']}.should == ['Exercise1', 'Exercise2', 'Exercise3']
       end
       
       describe "when given a username parameter" do

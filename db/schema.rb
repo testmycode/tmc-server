@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110728092649) do
+ActiveRecord::Schema.define(:version => 20110804175346) do
 
   create_table "awarded_points", :force => true do |t|
     t.integer "user_id"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(:version => 20110728092649) do
     t.datetime "updated_at"
     t.datetime "hide_after"
     t.string   "remote_repo_url"
+    t.boolean  "hidden",          :default => false, :null => false
   end
 
   create_table "exercises", :force => true do |t|
@@ -33,6 +34,7 @@ ActiveRecord::Schema.define(:version => 20110728092649) do
     t.datetime "deadline"
     t.datetime "publish_date"
     t.string   "gdocs_sheet"
+    t.boolean  "hidden",       :default => false, :null => false
   end
 
   add_index "exercises", ["name"], :name => "index_exercises_on_name"

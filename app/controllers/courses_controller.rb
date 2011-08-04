@@ -10,7 +10,7 @@ class CoursesController < ApplicationController
         @expired_courses = Course.expired.order(ordering)
       end
       format.json do
-        courses = Course.ongoing.order(ordering)
+        courses = Course.ongoing.where(:hidden => false).order(ordering)
         data = courses.map do |c|
           {
             :name => c.name,

@@ -25,6 +25,10 @@ class Course < ActiveRecord::Base
   scope :ongoing, lambda { where(["hide_after IS NULL OR hide_after > ?", Time.now]) }
   scope :expired, lambda { where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now]) }
 
+  def visible?
+    !hidden && (hide_after == nil || hide_after > Time.now)
+  end
+
   def has_remote_repo?
     !remote_repo_url.nil?
   end
@@ -67,6 +71,8 @@ class Course < ActiveRecord::Base
     else
       self.hide_after = nil
     end
+    
+    self.hidden = !!options['hidden']
   end
 
   def refresh_exercises
@@ -91,7 +97,10 @@ class Course < ActiveRecord::Base
   end
 
   def self.default_options
-    {}
+    {
+      :hidden => false,
+      :hide_after => nil
+    }
   end
 
 end

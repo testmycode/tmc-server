@@ -104,9 +104,12 @@ describe Exercise do
     
     ex.deadline = Date.today - 1.day
     ex.should be_available_to(admin)
+    
+    ex.hidden = true
+    ex.should be_available_to(admin)
   end
   
-  it "should be available to non-administrators only if the deadline has not passed" do
+  it "should be available to non-administrators only if the deadline has not passed and the exercise is not hidden" do
     user = Factory.create(:user)
     ex = Exercise.create!(:course => course, :name => 'MyExercise')
     
@@ -117,6 +120,10 @@ describe Exercise do
     ex.should be_available_to(user)
     
     ex.deadline = Date.today - 1.day
+    ex.should_not be_available_to(user)
+    
+    ex.deadline = nil
+    ex.hidden = true
     ex.should_not be_available_to(user)
   end
   
