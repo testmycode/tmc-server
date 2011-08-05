@@ -14,6 +14,10 @@ class ApplicationController < ActionController::Base
 
 protected
 
+  def current_ability
+    @current_ability ||= Ability.new(current_user, session)
+  end
+
   def set_default_url_options
     Rails.application.routes.default_url_options[:host]=request.host_with_port
   end

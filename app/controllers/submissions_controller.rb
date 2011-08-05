@@ -5,7 +5,7 @@ class SubmissionsController < ApplicationController
 
   def show
     @submission = Submission.find(params[:id])
-    #authorize! :read, @submission # FIXME: if we do this then an anonymous submitter can't view his submission
+    authorize! :read, @submission
 
     respond_to do |format|
       format.html
@@ -54,6 +54,10 @@ class SubmissionsController < ApplicationController
     
     ok = @submission.save
     
+    if ok
+      record_recent_submission(@submission)
+    end
+    
     respond_to do |format|
       format.html do
         if ok
@@ -82,5 +86,13 @@ private
       @exercise = @course.exercises.find(params[:exercise_id])
       authorize! :read, @exercise
     end
+  end
+  
+  def record_recent_submission(submission)
+    recent = session[:recent_submissions]
+    recent = [] if session[:recent_submissions] == nil
+    recent << submission.id
+    recent = recent[-100, 100] if recent.size > 100
+    session[:recent_submissions] = recent
   end
 end

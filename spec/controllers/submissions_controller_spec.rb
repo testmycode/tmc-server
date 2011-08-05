@@ -33,6 +33,22 @@ describe SubmissionsController do
         response.should redirect_to(submission_path(@submission))
       end
       
+      it "should store the submission in the user's session" do
+        @submission.should_receive(:save).and_return(true)
+        post_create
+        session[:recent_submissions].should_not be_nil
+        session[:recent_submissions].should include(@submission.id)
+      end
+      
+      it "should clean up the recent submissions list if it gets too long" do
+        @submission.should_receive(:save).and_return(true)
+        session[:recent_submissions] = [10,20,30] * 10000 + [123]
+        post_create
+        session[:recent_submissions].size.should == 100
+        session[:recent_submissions].should include(123)
+        session[:recent_submissions].should include(@submission.id)
+      end
+      
       describe "with json format" do
         it "should redirect to show in JSON format" do
           @submission.should_receive(:save).and_return(true)
@@ -85,19 +101,33 @@ describe SubmissionsController do
     before :each do
       @user = Factory.create(:user)
       controller.current_user = @user
+      
+      @submission = mock_model(Submission, :user_id => @user.id)
+      Submission.stub(:find).with(@submission.id.to_s).and_return(@submission)
+    end
+    
+    it "should not allow access to guest" do
+      controller.current_user = Guest.new
+      
+      expect { get :show, :id => @submission.id.to_s }.to raise_error(CanCan::AccessDenied)
+    end
+    
+    it "should allow access to recent submissions" do
+      controller.current_user = Guest.new
+      session[:recent_submissions] = [@submission.id]
+      
+      get :show, :id => @submission.id.to_s
+      
+      response.should be_successful
+      assigns[:submission].should == @submission
     end
     
     describe "in JSON format" do
-      before :each do
-        @submission = mock_model(Submission, :id => '3', :user_id => @user.id)
-        Submission.stub(:find).with('3').and_return(@submission)
-      end
-      
       def get_show_json
         options = {
-          :id => @submission.id,
-          :course_id => @course.id,
-          :exercise_id => @exercise.id,
+          :id => @submission.id.to_s,
+          :course_id => @course.id.to_s,
+          :exercise_id => @exercise.id.to_s,
           :format => 'json'
         }
         get :show, options
