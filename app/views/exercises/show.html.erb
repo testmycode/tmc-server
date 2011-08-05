@@ -8,7 +8,7 @@
 <h2>Submit answer</h2>
 
 <section>
-  <%= render 'submissions/form' %>
+  <%= render :partial => 'submissions/form', :locals => { :submission => @new_submission } %>
 </section>
 
 

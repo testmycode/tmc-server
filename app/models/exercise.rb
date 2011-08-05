@@ -39,10 +39,10 @@ class Exercise < ActiveRecord::Base
   end
   
   def available_to?(user)
-    if user == nil || !user.administrator?
-      !deadline_passed? && !hidden?
-    else
+    if user.administrator?
       true
+    else
+      !deadline_passed? && !hidden?
     end
   end
   

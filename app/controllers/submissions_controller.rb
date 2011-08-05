@@ -1,8 +1,11 @@
 class SubmissionsController < ApplicationController
   before_filter :get_course_and_exercise
+  
+  skip_authorization_check :only => :show
 
   def show
     @submission = Submission.find(params[:id])
+    #authorize! :read, @submission # FIXME: if we do this then an anonymous submitter can't view his submission
 
     respond_to do |format|
       format.html
@@ -46,7 +49,9 @@ class SubmissionsController < ApplicationController
       :exercise => @exercise,
       :return_file_tmp_path => params[:submission][:file].tempfile.path
     )
-
+    
+    authorize! :create, @submission
+    
     ok = @submission.save
     
     respond_to do |format|
@@ -73,7 +78,9 @@ private
   def get_course_and_exercise
     if params[:course_id] && params[:exercise_id]
       @course = Course.find(params[:course_id])
+      authorize! :read, @course
       @exercise = @course.exercises.find(params[:exercise_id])
+      authorize! :read, @exercise
     end
   end
 end

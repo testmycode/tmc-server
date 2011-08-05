@@ -17,6 +17,10 @@ class User < ActiveRecord::Base
     where(:submissions => { :course_id => course.id }).
     group("users.id")
   }
+  
+  def guest?
+    false
+  end
 
   def has_password?(submitted_password)
     password_hash == encrypt(submitted_password)

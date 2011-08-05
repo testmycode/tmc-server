@@ -44,7 +44,7 @@ describe SessionsController do
       
       it "should not set current_user" do
         post_create
-        controller.send(:current_user).should be_nil
+        controller.send(:current_user).should be_guest
       end
       
       it "should redirect back to the current page if there is a referer" do
@@ -63,7 +63,7 @@ describe SessionsController do
     it "should not allow non-administrators to log in" do  # at least for now
       @user.stub(:administrator? => false)
       post_create
-      controller.send(:current_user).should be_nil
+      controller.send(:current_user).should be_guest
     end
   end
   
@@ -75,7 +75,7 @@ describe SessionsController do
   
     it "should clear current_user and the session" do
       post :destroy
-      controller.send(:current_user).should be(nil)
+      controller.send(:current_user).should be_guest
       session.should be_empty
     end
     

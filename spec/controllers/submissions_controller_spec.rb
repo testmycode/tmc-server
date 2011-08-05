@@ -13,7 +13,7 @@ describe SubmissionsController do
       
       @user = Factory.create(:user, :login => 'theuser')
       
-      @submission = mock_model(Submission)
+      @submission = mock_model(Submission, :user_id => @user.id)
       Submission.stub(:new).with(:user => @user, :exercise => @exercise, :course => @course, :return_file_tmp_path => 'submitted_file.zip').and_return(@submission)
     end
     
@@ -82,9 +82,14 @@ describe SubmissionsController do
   end
   
   describe "GET show" do
+    before :each do
+      @user = Factory.create(:user)
+      controller.current_user = @user
+    end
+    
     describe "in JSON format" do
       before :each do
-        @submission = mock_model(Submission, :id => '3')
+        @submission = mock_model(Submission, :id => '3', :user_id => @user.id)
         Submission.stub(:find).with('3').and_return(@submission)
       end
       

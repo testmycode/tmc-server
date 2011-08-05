@@ -8,6 +8,8 @@ class CoursesController < ApplicationController
         @num_points_in_queue = PointsUploadQueue.count
         @ongoing_courses = Course.ongoing.order(ordering)
         @expired_courses = Course.expired.order(ordering)
+        authorize! :read, @ongoing_courses
+        authorize! :read, @expired_courses
       end
       format.json do
         courses = Course.ongoing.where(:hidden => false).order(ordering)
@@ -25,16 +27,20 @@ class CoursesController < ApplicationController
   def show
     @course = Course.find(params[:id])
     @exercises = @course.exercises.order('LOWER(name)').select {|ex| ex.available_to?(current_user) }
+    authorize! :read, @course
+    authorize! :read, @exercises
     
-    if current_user
+    unless current_user.guest?
       @submissions = @course.submissions
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
       @submissions = @submissions.order('created_at DESC').limit(500)
+      authorize! :read, @submissions
     end
   end
 
   def refresh
     @course = Course.find(params[:id])
+    authorize! :refresh, @exercises
 
     @course.refresh
     redirect_to course_path(@course), :notice => 'Course refreshed from repository.'
@@ -42,10 +48,12 @@ class CoursesController < ApplicationController
 
   def new
     @course = Course.new
+    authorize! :create, @exercises
   end
 
   def create
     @course = Course.new(params[:course])
+    authorize! :create, @course
 
     respond_to do |format|
       if @course.save
@@ -66,7 +74,9 @@ class CoursesController < ApplicationController
 private
 
   def exercise_data_for_json(exercise)
+    authorize! :read, exercise
     user = if !params[:username].blank? then User.find_by_login(params[:username]) else nil end
+    user ||= Guest.new
     
     return nil if !exercise.available_to?(user)
     

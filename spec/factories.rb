@@ -5,7 +5,7 @@ FactoryGirl.define do
   end
 
   factory :admin, :class => User do
-    login 'admin'
+    sequence(:login) {|n| 'admin#{n}' }
     password 'adminpass'
     administrator true
   end

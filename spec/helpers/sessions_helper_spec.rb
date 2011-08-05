@@ -2,33 +2,27 @@ require 'spec_helper'
 
 describe SessionsHelper do
   
-  def create_user
-    User.new(:login    => 'ohjaaja',
-             :password => 'ohjaaja')
-  end
+  let!(:user) { Factory.create(:user) }
   
-  describe "sign_in" do
+  describe "#sign_in" do
     it "should assign user to @current_user" do
-      user = create_user
       sign_in(user).should eq(@current_user)
     end
   end
     
-  describe "current_user" do
-    it "should return @current_user if one exists" do
-      user = create_user
+  describe "#current_user" do
+    it "should return the current_user when signed in" do
       sign_in(user)
       current_user.should eq(user)
     end
     
-    it "should return nil if one doesn't exist" do
-      current_user.should eq(nil)
+    it "should return a guest user when not signed in" do
+      current_user.should be_guest
     end 
   end
   
-  describe "signed_in?" do
+  describe "#signed_in?" do
     it "should return true if user is signed in" do
-      user = create_user
       sign_in(user)
       signed_in?.should eq(true)
     end
@@ -38,14 +32,13 @@ describe SessionsHelper do
     end
   end
   
-  describe "sign_out" do
-    it "should assign @current_user to nil and reset the session" do
-      user = create_user
-      sign_in(user).should eq(@current_user)
+  describe "#sign_out" do
+    it "should assign current_user to guest and reset the session" do
+      sign_in(user)
       
       self.should_receive(:reset_session)
       sign_out
-      @current_user.should eq(nil)
+      current_user.should be_guest
     end
   end
 end

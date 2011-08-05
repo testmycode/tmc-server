@@ -30,6 +30,7 @@ GEM
     activesupport (3.0.7)
     arel (2.0.10)
     builder (2.1.2)
+    cancan (1.6.5)
     capybara (1.0.0)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -125,6 +126,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  cancan (~> 1.6.5)
   capybara (~> 1.0.0)
   factory_girl_rails (~> 1.1.0)
   gdocs4ruby (~> 0.1.2)

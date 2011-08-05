@@ -1,11 +1,23 @@
 class ExercisesController < ApplicationController
-  before_filter :get_course
+  before_filter :fetch_course
 
   def show
+    @course = Course.find(params[:course_id])
+    authorize! :read, @course
+    authorize! :read, @exercise
+  
     @exercise = @course.exercises.find(params[:id])
-    @submissions = @exercise.submissions.order("created_at DESC")
     
-    @submission = Submission.new
+    if !current_user.guest?
+      @submissions = @exercise.submissions.order("created_at DESC")
+      @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
+    else
+      @submissions = nil
+    end
+    
+    authorize! :read, @submissions
+    
+    @new_submission = Submission.new
 
     respond_to do |format|
       format.html
@@ -16,7 +28,7 @@ class ExercisesController < ApplicationController
   end
 
 private
-  def get_course
-    @course = Course.find(params[:course_id])
+  def fetch_course
+    
   end
 end

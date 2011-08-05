@@ -3,7 +3,7 @@ require 'spec_helper'
 describe CoursesController do
 
   before(:each) do
-    controller.stub(:current_user => Factory.create(:user))
+    controller.current_user = Factory.create(:user)
   end
   
   describe "GET index" do
@@ -118,7 +118,8 @@ describe CoursesController do
           
             exs = result[0]['exercises']
             exs[0]['name'].should == 'Exercise1'
-            exs[0]['attempted'].should be_nil
+            exs[0]['attempted'].should be_false
+            exs[0]['completed'].should be_false
           end
         end
       end
@@ -153,7 +154,7 @@ describe CoursesController do
     
     describe "for guests" do
       before :each do
-        controller.stub(:current_user => nil)
+        controller.current_user = Guest.new
       end
       
       it "should show no submissions" do
@@ -187,6 +188,10 @@ describe CoursesController do
   
   
   describe "POST create" do
+    
+    before :each do
+      controller.current_user = Factory.create(:admin)
+    end
     
     describe "with valid parameters" do
       it "creates the course with a local repo if no remote repo url is given" do
