@@ -69,20 +69,7 @@ EOS
   end
   
   def deadline=(new_deadline)
-    d = new_deadline
-    if d.blank?
-      super(nil)
-      return
-    end
-    
-    d = DateAndTimeUtils.parse_date_or_time(d) if d.is_a?(String)
-    
-    if d.is_a? Date
-      d = d.end_of_day
-    elsif !d.is_a?(Time)
-      raise "Invalid deadline: #{new_deadline}"
-    end
-    super(d)
+    super(DateAndTimeUtils.to_time(new_deadline, :prefer_end_of_day => true))
   end
 
   def refresh

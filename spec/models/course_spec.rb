@@ -72,6 +72,26 @@ describe Course do
     c = Factory.create(:course, :hidden => false, :hide_after => Time.now - 2.minutes)
     c.should_not be_visible
   end
+  
+  it "should accept Finnish dates and datetimes for hide_after" do
+    c = Factory.create(:course)
+    c.hide_after = "19.8.2012"
+    c.hide_after.day.should == 19
+    c.hide_after.month.should == 8
+    c.hide_after.year.should == 2012
+    
+    c.hide_after = "15.9.2011 19:15"
+    c.hide_after.day.should == 15
+    c.hide_after.month.should == 9
+    c.hide_after.hour.should == 19
+    c.hide_after.year.should == 2011
+  end
+  
+  it "should consider a hide_after date without time to mean the end of that day" do
+    c = Factory.create(:course, :hide_after => "18.11.2013")
+    c.hide_after.hour.should == 23
+    c.hide_after.min.should == 59
+  end
 
 
   describe "validation" do

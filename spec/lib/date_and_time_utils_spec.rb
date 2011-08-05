@@ -1,6 +1,41 @@
 require 'spec_helper'
 
 describe DateAndTimeUtils do
+  describe "#to_time" do
+    it "should parse time strings to time" do
+      t = DateAndTimeUtils.to_time("15.07.2011 13:45")
+      t.should be_a(Time)
+      t.day.should == 15
+      t.hour.should == 13
+    end
+    
+    it "should convert dates to local midnight time" do
+      t = DateAndTimeUtils.to_time("15.07.2011")
+      t.should be_a(Time)
+      t.day.should == 15
+      t.hour.should == 00
+      t.min.should == 00
+    end
+    
+    it "should can convert dates to local end of day time" do
+      t = DateAndTimeUtils.to_time("15.07.2011", :prefer_end_of_day => true)
+      t.should be_a(Time)
+      t.day.should == 15
+      t.hour.should == 23
+      t.min.should == 59
+      
+      t = DateAndTimeUtils.to_time("15.07.2011 13:14", :prefer_end_of_day => true)
+      t.hour.should == 13
+      t.min.should == 14
+    end
+    
+    it "should convert blanks to nil" do
+      DateAndTimeUtils.to_time(nil).should be_nil
+      DateAndTimeUtils.to_time("").should be_nil
+      DateAndTimeUtils.to_time("   ").should be_nil
+    end
+  end
+
   describe "#parse_date_or_time" do
     it "should accept (local time) SQL-like yyyy-mm-dd date strings" do
       d = DateAndTimeUtils.parse_date_or_time('2011-07-13')
