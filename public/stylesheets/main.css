@@ -196,6 +196,10 @@ span.repo-url {
   padding-left: 10px;
 }
 
+tr.hidden * {
+  color: gray;
+}
+
 /* Lists and tables */
 
 table {

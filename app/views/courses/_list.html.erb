@@ -1,21 +1,23 @@
 <table class="course-list">
   <thead>
-    <th>
-      Course
-    </th>
-    <% if signed_in? %>
+    <tr>
       <th>
-        Repository URL
+        Course
       </th>
-      <th>
-      </th>
-      <th>
-      </th>
-    <% end %>
+      <% if signed_in? %>
+        <th>
+          Repository URL
+        </th>
+        <th>
+        </th>
+        <th>
+        </th>
+      <% end %>
+    </tr>
   </thead>
   <tbody>
   <% locals[:courses].each do |course| %>
-    <tr>
+    <tr class="course <% if !course.visible? %>hidden<% end %>">
       <td>
         <%= link_to course.name, course_path(course) %>
       </td>
