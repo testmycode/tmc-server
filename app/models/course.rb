@@ -60,10 +60,6 @@ class Course < ActiveRecord::Base
     account.create_new_spreadsheet(self.name)
   end
 
-  def exercises_json
-    "#{course_exercises_url(self)}.json"
-  end
-
   def refresh_options
     options_file = "#{clone_path}/course_options.yml"
     options = Course.default_options

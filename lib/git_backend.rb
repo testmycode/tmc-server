@@ -75,13 +75,7 @@ module GitBackend
     end
   end
 
-  private
-
-  def valid_cache?
-    return false unless FileTest.exists? zip_path
-    return false unless FileTest.exists? clone_path
-    return true
-  end
+private
 
   def copy_model_repository
     FileUtils.mkdir_p GitBackend.repositories_root
