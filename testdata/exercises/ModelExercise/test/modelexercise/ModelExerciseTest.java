@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 public class ModelExerciseTest {
     @Test
-    @Exercise("5.6")
+    @Points("5.6")
     public void testReturnTrue()
     {
         assertTrue(ModelExercise.returnTrue());

@@ -14,7 +14,7 @@ public class MyStringTest {
      */
 
     @Test
-    @Exercise("2.1")
+    @Points("2.1")
     public void merkkijonojenPituusOikein() {
         MyString merkkijono1 = new MyString("koe");
         MyString merkkijono2 = new MyString("pitempi merkkijono");
@@ -23,7 +23,7 @@ public class MyStringTest {
     }
 
     @Test
-    @Exercise("2.1")
+    @Points("2.1")
     public void erittainPitkanMerkkijonojenPituusOikein() {
         String pitkaString = "public void insert(int offset, char c) lisää MyString-merkkijonoon " +
                 "merkin annettuun kohtaan; offset on se indeksi, jonka kohtaan merkki lisätään. " +
@@ -47,7 +47,7 @@ public class MyStringTest {
      */
 
     @Test
-    @Exercise("2.4")
+    @Points("2.4")
     public void konstruktorinKuormitus() {
         MyString merkkijono = new MyString();
 
@@ -55,7 +55,7 @@ public class MyStringTest {
     }
 
     @Test
-    @Exercise("2.5")
+    @Points("2.5")
     public void kirjaintenOttaminen() {
         String mj = "pitempi merkkijono";
         MyString merkkijono = new MyString(mj);
@@ -66,7 +66,7 @@ public class MyStringTest {
     }
 
     @Test
-    @Exercise("2.6")
+    @Points("2.6")
     public void olemattomienKirjaintenOttaminenEiOnnistu() {
         MyString merkkijono = new MyString("pitempi merkkijono");
 
@@ -79,7 +79,7 @@ public class MyStringTest {
     }
 
     @Test
-    @Exercise("2.5")
+    @Points("2.5")
     public void toStringToimii() {
         MyString merkkijono = new MyString("pitempi merkkijono");
 
