@@ -213,3 +213,7 @@ table > tbody > tr > td {
   border: 1px solid gray;
 }
 
+table.points > tbody > tr > td {
+  text-align: center;
+}
+

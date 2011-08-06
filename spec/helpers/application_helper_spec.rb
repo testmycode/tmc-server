@@ -28,7 +28,7 @@ describe ApplicationHelper do
     end
   end
   
-  describe "breadcrumb" do
+  describe "#breadcrumb" do
     it "should show the current course" do
       @course = mock_model(Course, :name => 'MyCourse', :new_record? => false)
       breadcrumb.should include('MyCourse')

@@ -6,10 +6,21 @@
 <% if current_user.administrator? %>
 <ul>
   <li>Repository URL: <span class="repo-url"><%= @course.bare_url %></span></li>
+  
   <% github_url = github_repo_url_to_project_page_url(@course.bare_url) %>
   <% if github_url %><li>Github URL: <%= link_to github_url, github_url %></li><% end %>
-  <% if !@course.visible? %><li>The course is currently hidden. Unhide by editing <code>course_options.yml</code></li><% end %>
-  <% if @course.hide_after != nil %><li>Course hidden after: <%= @course.hide_after %></li><% end %>
+  
+  <% if !@course.visible? %>
+    <li>The course is currently hidden. Unhide by editing <code>course_options.yml</code></li>
+  <% end %>
+  
+  <% if @course.hide_after != nil %>
+    <li>Course hidden after: <%= @course.hide_after %></li>
+  <% end %>
+  
+  <li>Number of submissions: <%= @course.submissions.count %></li>
+  
+  <li><%= link_to 'View points', course_points_path(@course) %></li>
 </ul>
 <% end %>
 

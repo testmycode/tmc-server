@@ -1,38 +1,38 @@
-<h1>Points</h1>
-FIXME
-<% if false %>
-<table>
+<h1>Points for <%= @course.name %></h1>
 
-  <tr>
-    <td></td>
-    <% @exercises.each do |exercise| %>
-      <% points = exercise.points %>
-      <% if points.size > 0 %>
-        <td colspan="<%= points.size %>"><%= exercise.name %></td>
-      <% end %>
-    <% end %>
-  </tr>
-
-  <tr>
-    <td></td>
-    <% @exercises.each do |exercise| %>
-      <% exercise.points.each do |point| %>
-        <td><%= point.name %></td>
-      <% end %>
-    <% end %>
-  </tr>
-
-  <% @users.each do |user| %>
-    <% user_points = Point.course_user_points(@course, user) %>
+<table class="points">
+  <thead>
     <tr>
-      <td><%= user.login %></td>
+      <th></th>
       <% @exercises.each do |exercise| %>
-        <% exercise.points.each do |p| %>
-          <td><%= "x" if user_points.any?{|x| x.id == p.id} %></td>
+        <% points = exercise.available_points %>
+        <% if points.size > 0 %>
+          <th colspan="<%= points.size %>"><%= exercise.name %></th>
         <% end %>
       <% end %>
     </tr>
-  <% end %>
+    <tr>
+      <th></th>
+      <% @exercises.each do |exercise| %>
+        <% exercise.available_points.each do |point| %>
+          <th><%= point.name %></th>
+        <% end %>
+      <% end %>
+    </tr>
+  </thead>
 
+  <tbody>
+    <% @users.each do |user| %>
+      <% user_points = AwardedPoint.where(:course_id => @course.id, :user_id => user.id).map(&:name) %>
+      <tr>
+        <td><%= user.login %></td>
+        <% @exercises.each do |exercise| %>
+          <% exercise.available_points.each do |p| %>
+            <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
+          <% end %>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
 </table>
-<% end %>
+
