@@ -66,6 +66,7 @@ class CoursesController < ApplicationController
 
   def destroy
     @course = Course.find(params[:id])
+    authorize! :destroy, @course
     @course.destroy
 
     redirect_to(courses_path)
