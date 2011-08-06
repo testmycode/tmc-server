@@ -83,6 +83,12 @@ EOS
     self.save
   end
 
+private
+
+  def deadline_passed?
+    self.deadline != nil && self.deadline < Time.now
+  end
+
   def refresh_options
     options = Exercise.get_options course.clone_path, self.fullpath
     self.deadline = options["deadline"]
@@ -116,12 +122,6 @@ EOS
     name = exercise_path.gsub(/^#{root_path}\//, '')
     name = name.gsub('/', '-')
     return name
-  end
-
-private
-
-  def deadline_passed?
-    self.deadline != nil && self.deadline < Time.now
   end
 
   def self.default_options

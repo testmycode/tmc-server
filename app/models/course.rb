@@ -60,6 +60,24 @@ class Course < ActiveRecord::Base
     account.create_new_spreadsheet(self.name)
   end
 
+  def refresh
+    clear_cache
+    refresh_working_copy
+    refresh_options
+    refresh_exercises
+    refresh_exercise_archives
+  end
+
+  def self.default_options
+    {
+      :hidden => false,
+      :hide_after => nil
+    }
+  end
+
+
+private
+
   def refresh_options
     options_file = "#{clone_path}/course_options.yml"
     options = Course.default_options
@@ -85,24 +103,9 @@ class Course < ActiveRecord::Base
       end
     end
 
-    self.exercises.each{|e| e.refresh}
+    self.exercises.each {|e| e.refresh }
     self.exercises.reload
     self.save
-  end
-
-  def refresh
-    self.clear_cache
-    self.refresh_working_copy
-    self.refresh_options
-    self.refresh_exercises
-    self.refresh_exercise_archives
-  end
-
-  def self.default_options
-    {
-      :hidden => false,
-      :hide_after => nil
-    }
   end
 
 end
