@@ -17,6 +17,6 @@ class Point < ActiveRecord::Base
   }
 
   def self.read_point_names path
-    TmcJavalib.get_exercise_methods(path).map{|x| x[:exercises]}.flatten.uniq
+    TmcJavalib.get_test_case_methods(path).map{|x| x[:points]}.flatten.uniq
   end
 end

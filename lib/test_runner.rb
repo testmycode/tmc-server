@@ -108,9 +108,9 @@ private
     FileUtils.cp makefile, destination
   end
 
-  def self.extract_exercise_list(project_root)
-    methods = TmcJavalib.get_exercise_methods(project_root)
-    methods.map {|m| m[:exercises] }.flatten
+  def self.get_all_available_points(project_root)
+    methods = TmcJavalib.get_test_case_methods(project_root)
+    methods.map {|m| m[:points] }.flatten.uniq
   end
 
   def self.populate_build_dir(dir, submission)

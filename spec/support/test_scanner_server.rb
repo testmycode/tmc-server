@@ -14,7 +14,7 @@ class TestScannerServer
     @port_num = @pipe.read.strip.to_i
   end
   
-  def get_exercise_methods(course_or_exercise_path)
+  def get_test_case_methods(course_or_exercise_path)
     socket = connect_socket
     socket.write(course_or_exercise_path + "\n\n")
     socket.flush

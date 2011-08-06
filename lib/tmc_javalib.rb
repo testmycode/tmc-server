@@ -56,10 +56,9 @@ module TmcJavalib
   # Returns an array of hashes with
   # :class_name => 'UnqualifiedJavaClassName'
   # :method_name => 'testMethodName',
-  # :exercises => ['exercise', 'annotation', 'values']
+  # :points => ['exercise', 'annotation', 'values']
   #   (split by space from annotation value; empty if none)
-  #TODO: rename method to get_test_case_methods and :exercises to :available_points
-  def get_exercise_methods(course_or_exercise_path)
+  def get_test_case_methods(course_or_exercise_path)
     path = course_or_exercise_path
     cmd = "java -cp #{Shellwords.escape(classpath)} #{package}.testscanner.TestScanner #{Shellwords.escape(path)}"
     output = `#{cmd}`
