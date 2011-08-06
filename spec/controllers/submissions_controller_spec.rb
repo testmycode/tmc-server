@@ -11,10 +11,9 @@ describe SubmissionsController do
       @submitted_file = mock(Object)
       @submitted_file.stub_chain(:tempfile, :path).and_return('submitted_file.zip')
       
-      @user = Factory.create(:user, :login => 'theuser')
-      
-      @submission = mock_model(Submission, :user_id => @user.id)
-      Submission.stub(:new).with(:user => @user, :exercise => @exercise, :course => @course, :return_file_tmp_path => 'submitted_file.zip').and_return(@submission)
+      @submission = mock_model(Submission)
+      @submission.stub(:save).and_return(true)
+      Submission.stub(:new).and_return(@submission)
     end
     
     def post_create(options = {})
@@ -26,22 +25,31 @@ describe SubmissionsController do
       post :create, options
     end
     
+    describe "when the user doesn't exist" do
+      it "should create the user and be successful" do
+        post_create
+        User.last.login.should == 'theuser'
+      end
+    end
+    
     describe "when successful" do
+      it "should save the submission" do
+        @submission.should_receive(:save)
+        post_create
+      end
+    
       it "should redirect to show" do
-        @submission.should_receive(:save).and_return(true)
         post_create
         response.should redirect_to(submission_path(@submission))
       end
       
       it "should store the submission in the user's session" do
-        @submission.should_receive(:save).and_return(true)
         post_create
         session[:recent_submissions].should_not be_nil
         session[:recent_submissions].should include(@submission.id)
       end
       
       it "should clean up the recent submissions list if it gets too long" do
-        @submission.should_receive(:save).and_return(true)
         session[:recent_submissions] = [10,20,30] * 10000 + [123]
         post_create
         session[:recent_submissions].size.should == 100
@@ -50,8 +58,12 @@ describe SubmissionsController do
       end
       
       describe "with json format" do
+        it "should save the submission" do
+          @submission.should_receive(:save)
+          post_create
+        end
+      
         it "should redirect to show in JSON format" do
-          @submission.should_receive(:save).and_return(true)
           post_create :format => :json
           response.should redirect_to(submission_path(@submission, :format => 'json'))
         end

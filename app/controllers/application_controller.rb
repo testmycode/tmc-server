@@ -7,7 +7,10 @@ class ApplicationController < ActionController::Base
   check_authorization
   
   rescue_from CanCan::AccessDenied do |exception|
-    render :text => '<p class="error">Access denied.</p>', :layout => true
+    respond_to do |format|
+      format.html { render :text => '<p class="error">Access denied.</p>', :layout => true }
+      format.json { render :json => { :error => 'Access denied.' } }
+    end
   end unless Rails::env == 'test'  # for clearer error messages
 
   before_filter :set_default_url_options
