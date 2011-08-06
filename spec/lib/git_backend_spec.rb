@@ -48,7 +48,6 @@ describe GitBackend do
       class_paths = [
         :repositories_root,
         :model_repository,
-        :hooks_dir,
         :cache_root
       ]
       for path in class_paths
@@ -58,7 +57,6 @@ describe GitBackend do
       object_paths = [
         :cache_path,
         :bare_path,
-        :hooks_path,
         :zip_path,
         :clone_path
       ]

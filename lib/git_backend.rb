@@ -9,7 +9,6 @@ module GitBackend
 
     begin
       copy_model_repository
-      #link_hooks #TODO: we're getting rid of or changing these awfully slow hooks soon - at least for tests
     rescue Exception => e
       delete_local_repository
       raise e
@@ -38,10 +37,6 @@ module GitBackend
     "#{::Rails.root}/lib/gitbackend/modelrepo"
   end
 
-  def self.hooks_dir
-    "#{::Rails.root}/lib/gitbackend/hooks"
-  end
-
   def self.cache_root
     "#{::Rails.root}/tmp/cache/gitrepos"
   end
@@ -56,10 +51,6 @@ module GitBackend
   
   def bare_url # Overridden if using a remote repo
     "file://#{bare_path}"
-  end
-
-  def hooks_path
-    "#{bare_path}/hooks"
   end
 
   def zip_path
@@ -97,11 +88,6 @@ module GitBackend
     FileUtils.cp_r GitBackend.model_repository, bare_path
     system! "chmod g+rwX #{GitBackend.repositories_root}"
     system! "chmod g+rwX -R #{bare_path}"
-  end
-
-  def link_hooks
-    FileUtils.rm_rf hooks_path
-    FileUtils.ln_s GitBackend.hooks_dir, hooks_path
   end
 
   def self.valid_course_repository? dir
