@@ -17,6 +17,8 @@ class Course < ActiveRecord::Base
 
   has_many :exercises, :dependent => :destroy
   has_many :submissions, :dependent => :destroy
+  has_many :available_points, :through => :exercises
+  has_many :awarded_points, :dependent => :destroy
 
   before_save lambda { self.remote_repo_url = nil if self.remote_repo_url.blank? }
   after_create :create_local_repository, :if => lambda { has_local_repo? }

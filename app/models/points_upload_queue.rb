@@ -1,5 +1,6 @@
 require 'gdocs'
 
+#FIXME
 class PointsUploadQueue < ActiveRecord::Base
   belongs_to :point
 

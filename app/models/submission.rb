@@ -5,6 +5,7 @@ class Submission < ActiveRecord::Base
     :conditions => proc { "exercises.course_id = #{self.course_id}" }
 
   has_many :test_case_runs, :dependent => :destroy
+  has_many :awarded_points, :dependent => :nullify
   
   attr_accessor :return_file_tmp_path
   attr_accessor :skip_test_runner if ::Rails.env == 'test'

@@ -10,11 +10,18 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110804175346) do
+ActiveRecord::Schema.define(:version => 20110806114243) do
+
+  create_table "available_points", :force => true do |t|
+    t.integer "exercise_id", :null => false
+    t.string  "name",        :null => false
+  end
 
   create_table "awarded_points", :force => true do |t|
-    t.integer "user_id"
-    t.integer "point_id"
+    t.integer "course_id",     :null => false
+    t.integer "user_id",       :null => false
+    t.integer "submission_id"
+    t.string  "name",          :null => false
   end
 
   create_table "courses", :force => true do |t|
@@ -38,11 +45,6 @@ ActiveRecord::Schema.define(:version => 20110804175346) do
   end
 
   add_index "exercises", ["name"], :name => "index_exercises_on_name"
-
-  create_table "points", :force => true do |t|
-    t.integer "exercise_id"
-    t.string  "name"
-  end
 
   create_table "points_upload_queues", :force => true do |t|
     t.integer  "point_id"

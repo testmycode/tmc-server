@@ -7,7 +7,7 @@ class Exercise < ActiveRecord::Base
 
   belongs_to :course
 
-  has_many :points, :dependent => :destroy
+  has_many :available_points, :dependent => :destroy
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
 
@@ -91,15 +91,15 @@ EOS
   end
 
   def refresh_points
-    point_names = Point.read_point_names(self.fullpath)
+    point_names = AvailablePoint.read_from_project(self.fullpath)
 
     point_names.each do |name|
-      if self.points.none?{|point| point.name == name}
-        Point.create(:name => name, :exercise => self)
+      if self.available_points.none?{|point| point.name == name}
+        AvailablePoint.create(:name => name, :exercise => self)
       end
     end
 
-    self.points.each do |point|
+    self.available_points.each do |point|
       if point_names.none?{|name| name == point.name}
         point.destroy
       end

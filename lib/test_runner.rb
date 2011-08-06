@@ -75,10 +75,8 @@ private
     system! "java -cp #{classpath}:#{src_classpath} " +
       "fi.helsinki.cs.tmc.testrunner.Main #{test_classpath} #{classname} " +
       "#{default_timeout} #{results_fn} /dev/null #{policy_file}"
-
     results = ActiveSupport::JSON.decode IO.read(results_fn)
     return unless results
-
     create_test_case_runs(submission, results)
     award_points(submission, results)
   end
@@ -143,15 +141,17 @@ private
 
   def self.award_points(submission, results)
     user = submission.user
-    points = submission.exercise.points
     awarded_points = user.awarded_points
 
     for point_name in points_from_test_results(results)
-      point = points.first(:conditions => {:name => point_name})
-      raise "point '#{point_name}' not found" unless point
-
-      if awarded_points.none?{|p| p.point_id == point.id}
-        AwardedPoint.create(:user => user, :point => point)
+      if awarded_points.where(:name => point_name).empty?
+        # FUUU create
+        submission.awarded_points << AwardedPoint.new(
+          :name => point_name,
+          :course => submission.exercise.course,
+          :user => user
+        )
+        user.awarded_points << user.awarded_points
       end
     end
   end

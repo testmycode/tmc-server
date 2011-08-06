@@ -56,10 +56,10 @@ describe TestRunner do
       TestRunner.run_submission_tests(@submission)
       @submission.save!
       
-      points = Point.course_user_points(@course, @user).to_a
-      points.find {|ap| ap.name == 'justsub' }.should_not be_nil
-      points.find {|ap| ap.name == 'addsub' }.should be_nil
-      points.find {|ap| ap.name == 'mul' }.should be_nil
+      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points.should include('justsub')
+      points.should_not include('addsub')
+      points.should_not include('mul')
     end
     
     it "should only ever award more points, never delete old points" do
@@ -80,10 +80,10 @@ describe TestRunner do
       TestRunner.run_submission_tests(@submission)
       @submission.save!
       
-      points = Point.course_user_points(@course, @user).to_a
-      points.find {|ap| ap.name == 'justsub' }.should_not be_nil
-      points.find {|ap| ap.name == 'addsub' }.should_not be_nil
-      points.find {|ap| ap.name == 'mul' }.should be_nil
+      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points.should include('justsub')
+      points.should include('addsub')
+      points.should_not include('mul')
     end
   end
 end
