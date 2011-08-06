@@ -5,7 +5,7 @@ package palindromi;
  * and open the template in the editor.
  */
 
-import fi.helsinki.cs.tmc.testrunner.Exercise;
+import fi.helsinki.cs.tmc.testrunner.Points;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
