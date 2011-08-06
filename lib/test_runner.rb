@@ -145,12 +145,13 @@ private
 
     for point_name in points_from_test_results(results)
       if awarded_points.where(:name => point_name).empty?
-        # FUUU create
+        # To be saved with submission.
         submission.awarded_points << AwardedPoint.new(
           :name => point_name,
           :course => submission.exercise.course,
           :user => user
         )
+        # Added here so we'll find it in subsequent calls
         user.awarded_points << user.awarded_points
       end
     end
