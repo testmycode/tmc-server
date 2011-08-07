@@ -9,22 +9,34 @@ FactoryGirl.define do
     password 'adminpass'
     administrator true
   end
-  
+
   factory :course, :class => Course do
     sequence(:name) {|n| "course#{n}" }
   end
-  
+
   factory :exercise do
     course
     sequence(:name) {|n| "exercise#{n}" }
   end
-  
+
   factory :submission do
     course
     user
     exercise
   end
-  
+
+  factory :awarded_point do
+    course
+    name
+    submission
+    user
+  end
+
+  factory :available_point do
+    sequence(:name) {|n| "point#{n}" }
+    exercise
+  end
+
   factory :test_case_run do
     sequence(:test_case_name) {|n| "test case #{n}" }
     submission
