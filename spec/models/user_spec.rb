@@ -2,24 +2,6 @@ require 'spec_helper'
 
 describe User do
 
-  describe "modification" do
-    it "should be able to login after modification" do
-      created_user = User.create!(:login => "root",
-                           :password => "qwerty123",
-                           :administrator => false)
-
-      u = User.authenticate("root", "qwerty123")
-      u.should eq(created_user)
-      u.administrator = true
-      u.save
-
-      u2 = User.authenticate("root", "qwerty123")
-      u2.should_not eq(nil)
-
-      created_user.destroy
-    end
-  end
-
   describe "validation" do
     it "should succeed given a valid login and password" do
       User.new(:login => 'matt', :password => 'horner').should have(0).errors_on(:login)
@@ -53,17 +35,62 @@ describe User do
     
     it "should fail with too short a password" do
       short_pass = {:login => "instructor", :password => 'a' }
-      User.new(short_pass).should have(1).errors_on(:password)
+      User.new(short_pass).should have(1).error_on(:password)
     end
   end
   
-  it "should hash the password on save" do
+  it "should allow authentication after modification" do
+    created_user = User.create!(:login => "root",
+                         :password => "qwerty123",
+                         :administrator => false)
+
+    u = User.authenticate("root", "qwerty123")
+    u.should eq(created_user)
+    u.administrator = true
+    u.save!
+
+    u2 = User.authenticate("root", "qwerty123")
+    u2.should_not be_nil
+
+    created_user.destroy
+  end
+  
+  it "should not allow authentication with an empty password" do
+    User.create!(:login => 'user')
+    u = User.authenticate('user', '')
+    u.should be_nil
+  end
+  
+  it "should hash the password on create" do
     User.create!(:login => "instructor", :password => "ilikecookies")
     user = User.find_by_login!("instructor")
     user.password.should be_nil
     user.password_hash.should_not be_nil
     user.should have_password("ilikecookies")
     user.should_not have_password("ihatecookies")
+  end
+  
+  it "should hash the password on update" do
+    User.create!(:login => "instructor", :password => "ihatecookies")
+    
+    user = User.find_by_login!("instructor")
+    user.password = 'ilikecookies'
+    user.save!
+    
+    user = User.find_by_login!("instructor")
+    user.password.should be_nil
+    user.password_hash.should_not be_nil
+    user.should have_password("ilikecookies")
+    user.should_not have_password("ihatecookies")
+  end
+    
+  it "should not reset the password when saved without changing the password" do
+    user = User.create!(:login => "instructor", :password => "ihatecookies")
+    user.login = 'funny_person'
+    user.save!
+    
+    user = User.find_by_login!('funny_person')
+    user.should have_password('ihatecookies')
   end
   
   it "should allow authentication of administrators with a correct login/password" do

@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
 
   attr_accessor :password
   validate :check_password
-  before_create :encrypt_password
+  before_save :encrypt_password
 
   scope :course_students, lambda { |course|
     joins(:submissions).
@@ -36,7 +36,7 @@ private
 
   def encrypt_password
     self.salt = make_salt if new_record?
-    self.password_hash = encrypt(password)
+    self.password_hash = encrypt(password) unless password.blank?
   end
 
   def encrypt(string)
@@ -52,8 +52,8 @@ private
   end
 
   def check_password
-    if password != nil
-      errors[:password] << "the password is too short" if password.length < 5
+    unless password.blank?
+      errors[:password] << "too short" if password.length < 5
     end
   end
 end
