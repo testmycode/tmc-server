@@ -1,4 +1,4 @@
-<table class="course-list">
+<table id="<%= locals[:list_id] %>" class="course-list">
   <thead>
     <tr>
       <th>
@@ -39,7 +39,7 @@
   </tbody>
 </table>
 
-<%= use_datatables('table.course-list') %>
+<%= use_datatables('table.course-list#' + locals[:list_id]) %>
 
 <div class="as-json">[<%= link_to "json", "#{courses_path}.json" %>]</div>
 

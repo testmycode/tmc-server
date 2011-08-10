@@ -15,13 +15,13 @@
 
 <h3>Ongoing courses</h3>
 <section>
-  <%= render 'list', :locals => { :courses => @ongoing_courses } %>
+  <%= render 'list', :locals => { :courses => @ongoing_courses, :list_id => 'ongoing-courses' } %>
 </section>
 
 <% if signed_in? and not @expired_courses.empty? %>
   <h3>Expired courses</h3>
   <section>
-    <%= render 'list', :locals => { :courses => @expired_courses } %>
+    <%= render 'list', :locals => { :courses => @expired_courses, :list_id => 'expired-courses' } %>
   </section>
 <% end %>  
   
