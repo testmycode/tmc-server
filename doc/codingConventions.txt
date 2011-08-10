@@ -1,7 +1,0 @@
-Coding Conventions
-
-    * Luokan nimet isolla
-    * metodit, tiedostojen nimet ja muuttujat kokonaan pienellä ja sanat erotellaan alaviivalla
-    * luokat, metodit, kommentointi ym. englanniksi
-    * tabulaattorin pituus tulee olla 2 spacea, sen lisäksi kaikki tabulaattorimerkit muunnetaan spaceksi.
-    * koodi tulee olla hyvin kommentoitu (Yksi isompi kommentti mitä kyseinen luokka tai metodi tekee, ei yksittäisten rivien kommentointia) 
