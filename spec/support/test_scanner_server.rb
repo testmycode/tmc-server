@@ -34,7 +34,7 @@ class TestScannerServer
 private
   def connect_socket
     socket = Socket.new(AF_INET, SOCK_STREAM, 0)
-    sockaddr = Socket.pack_sockaddr_in(@port_num, 'localhost')
+    sockaddr = Socket.pack_sockaddr_in(@port_num, '127.0.0.1')
     socket.connect(sockaddr)
     socket
   end
