@@ -16,6 +16,7 @@ module TestRunner
 
 private
 
+  # FIXME: should really be a tempdir
   def self.sandbox_root
     "#{::Rails.root}/lib/testrunner/"
   end
