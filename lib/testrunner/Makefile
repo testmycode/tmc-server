@@ -25,10 +25,10 @@ build-src: dirs $(SRC_OBJ)
 build-test: dirs build-src $(TEST_OBJ)
 
 $(TEST_CP)/%.class: $(TEST_DIR)/%.java
-	@$(JC) -cp $(CLASSPATH) $< -d $(TEST_CP)
+	@$(JC) -cp $(CLASSPATH):$(TEST_DIR) $< -d $(TEST_CP)
 
 $(SRC_CP)/%.class: $(SRC_DIR)/%.java
-	@$(JC) -cp $(CLASSPATH) $< -d $(SRC_CP)
+	@$(JC) -cp $(CLASSPATH):$(TEST_SRC) $< -d $(SRC_CP)
 
 clean:
 	@$(RM) -r $(BUILD_DIR)
