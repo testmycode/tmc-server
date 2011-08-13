@@ -42,14 +42,43 @@ module GDocsBackend
     }
   end
 
+  # FIXME: handle invalid location, test
   def self.add_point ws, point_name, student
     pos = point_location ws, point_name, student
     ws[pos[:row], pos[:col]] = "1"
   end
 
+  # FIXME: test with row,col -1
   def self.point_granted? ws, point_name, student
     pos = point_location ws, point_name, student
-    return ws[pos[:row], pos[:col]] == "1"
+    ws[pos[:row], pos[:col]] == "1"
+  end
+
+  def self.written_exercises ws
+    hash = {
+      :exercises => [],
+      :points => {}
+    }
+
+    (first_points_col .. ws.num_cols).each do |col|
+      exercise_name = strip_quote(ws[exercise_names_row, col])
+      point_name = strip_quote(ws[point_names_row, col])
+
+      if exercise_name != ""
+        unless hash[:exercises].include? exercise_name
+          hash[:exercises] << exercise_name
+        end
+        hash[:points][exercise_name] ||= []
+      else
+        exercise_name = hash[:exercises].last
+      end
+
+      if point_name != ""
+        hash[:points][exercise_name] << point_name
+      end
+    end
+
+    return hash
   end
 
   def self.update_points ws, course
@@ -104,12 +133,38 @@ module GDocsBackend
   end
 
   def self.update_available_points ws, course
-    exercises = Exercise.course_gdocs_sheet_exercises(course, ws.title)
+    db_exercises = Exercise.course_gdocs_sheet_exercises(course, ws.title)
+    w_exercises = written_exercises ws
+
+    allocate_points_space ws, db_exercises, w_exercises
+    write_available_points ws, w_exercises
+  end
+
+  def self.allocate_points_space ws, db_exercises, w_exercises
     col = first_points_col
-    exercises.each do |exercise|
-      ws[exercise_names_row, col] = quote_prepend(exercise.name)
-      exercise.available_points.each do |ap|
-        ws[point_names_row, col] = quote_prepend(ap.name)
+    db_exercises.each do |db_e|
+      unless w_exercises[:exercises].include? db_e.name
+        w_exercises[:exercises] << db_e.name
+        w_exercises[:points][db_e.name] = db_e.available_points.map &:name
+        next
+      end
+
+      new_points = db_e.available_points.map(&:name).select {|point_name|
+          !w_exercises[:points][db_e.name].include?(point_name)
+      }
+      col += w_exercises[:points][db_e.name].size
+      new_points.size.times{add_column ws, col}
+      w_exercises[:points][db_e.name].concat(new_points)
+      col += new_points.size
+    end
+  end
+
+  def self.write_available_points ws, w_exercises
+    col = first_points_col
+    w_exercises[:exercises].each do |exercise_name|
+      ws[exercise_names_row, col] = quote_prepend(exercise_name)
+      w_exercises[:points][exercise_name].each do |point_name|
+        ws[point_names_row, col] = quote_prepend(point_name)
         col += 1
       end
     end
@@ -158,6 +213,10 @@ module GDocsBackend
     "'#{s}"
   end
 
+  def self.strip_quote s
+    s.sub(/^'/, '')
+  end
+
   def self.student_col
     1
   end
@@ -183,10 +242,11 @@ module GDocsBackend
   end
 
   def self.print_worksheet(ws)
+    puts ""
     for row in 1..ws.num_rows
       rows = ""
       for col in 1..ws.num_cols
-        rows += ws[row, col].ljust(8) + "|"
+        rows += ws[row, col].ljust(12) + "|"
       end
       puts rows
     end
