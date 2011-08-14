@@ -183,7 +183,11 @@ module GDocsBackend
 
   def self.update_total_col ws
     ws[exercise_names_row, total_col] = "total"
-    (first_points_row..ws.num_rows).each {|row| ws[row,total_col] = "s"}
+    (first_points_row..ws.num_rows).each do |row|
+      first = "#{col_num2str(total_col+1)}#{row}"
+      last = "#{col_num2str(ws.num_cols)}#{row}"
+      ws[row,total_col] = "=sum(#{first}:#{last})"
+    end
   end
 
   def self.add_column ws, new_col
@@ -250,6 +254,17 @@ module GDocsBackend
 
   def self.first_points_row
     point_names_row + 1
+  end
+
+  # FIXME: is it correct? dunno
+  def self.col_num2str x
+    s = ""
+    while(x > 0)
+      x -= 1
+      s += (?A + (x % 26)).chr
+      x /= 26
+    end
+    return s.reverse
   end
 
   def self.print_worksheet(ws)

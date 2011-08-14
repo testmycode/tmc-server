@@ -64,7 +64,6 @@ class Course < ActiveRecord::Base
     gsession = GDocsBackend.authenticate
     ss = GDocsBackend.get_course_spreadsheet gsession, self
     gdocs_sheets.each do |sheetname|
-      puts sheetname
       ws = GDocsBackend.get_worksheet ss, sheetname
       GDocsBackend.update_worksheet ws, self
       ws.save
