@@ -1,4 +1,4 @@
-require 'gdocs'
+require 'gdocs_backend'
 
 class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers
@@ -55,6 +55,23 @@ class Course < ActiveRecord::Base
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => true))
   end
 
+  def gdocs_sheets
+    self.exercises.map(&:gdocs_sheet).uniq.
+      select{|sheetname| !sheetname.nil? && sheetname != ""}
+  end
+
+  def refresh_gdocs
+    gsession = GDocsBackend.authenticate
+    ss = GDocsBackend.get_course_spreadsheet gsession, self
+    gdocs_sheets.each do |sheetname|
+      puts sheetname
+      ws = GDocsBackend.get_worksheet ss, sheetname
+      GDocsBackend.update_worksheet ws, self
+      ws.save
+    end
+    return ss.human_url
+  end
+
   def refresh
     clear_cache
     refresh_working_copy
@@ -69,7 +86,6 @@ class Course < ActiveRecord::Base
       :hide_after => nil
     }
   end
-
 
 private
 
@@ -102,5 +118,4 @@ private
     self.exercises.reload
     self.save
   end
-
 end

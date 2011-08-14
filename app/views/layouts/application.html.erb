@@ -17,12 +17,12 @@
         <div class="branding">HELSINKI UNIVERSITY</div>
         <div class="branding">Department of Computer Science</div>
       </div>
-    
+
       <div id="login">
         <%= render 'sessions/login_form' %>
       </div>
     </div>
-          
+
     <div id="navigation-area">
       <%= breadcrumb %>
     </div>
@@ -30,10 +30,10 @@
     <div id="content-area">
       <% for msg_type in [:notice, :warning, :error, :alert] %>
         <% if flash[msg_type] %>
-          <div class="flash <%= msg_type %>"><%= flash[msg_type] %></div>
+          <div class="flash <%= msg_type %>"><%= raw(flash[msg_type]) %></div>
         <% end %>
       <% end %>
-      
+
       <%= yield %>
     </div>
   </div>

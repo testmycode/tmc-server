@@ -18,18 +18,27 @@ module GDocsBackend
   end
 
   def self.create_course_spreadsheet gsession, course
-    if find_course_spreadsheet(gsession, course)
-      raise "course spreadsheet #{course.name} already exists, not creating"
-    end
     gsession.create_spreadsheet course.name
   end
 
+  def self.get_course_spreadsheet gsession, course
+    ss = find_course_spreadsheet gsession, course
+    return ss if ss
+    create_course_spreadsheet gsession, course
+  end
+
   def self.create_worksheet ss, sheetname
-    ss.add_worksheet(sheetname)
+    ss.add_worksheet sheetname
+  end
+
+  def self.find_worksheet ss, sheetname
+    ss.worksheets.find {|w| w.title == sheetname}
   end
 
   def self.get_worksheet ss, sheetname
-    ss.worksheets.find {|w| w.title == sheetname}
+    ws = find_worksheet ss, sheetname
+    return ws if ws
+    create_worksheet ss, sheetname
   end
 
   def self.delete_worksheet ss, sheetname
