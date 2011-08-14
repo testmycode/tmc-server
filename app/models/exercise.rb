@@ -11,6 +11,10 @@ class Exercise < ActiveRecord::Base
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
 
+  scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
+    where("course_id = ? AND gdocs_sheet = ?", course.id, gdocs_sheet)
+  }
+
   def path
     name.gsub('-', '/')
   end
@@ -31,13 +35,6 @@ class Exercise < ActiveRecord::Base
     "#{course_exercise_submissions_url(self.course, self)}.json"
   end
 
-  def add_sheet_to_gdocs
-    course_name = self.course.name
-
-    account = GDocs.new
-    account.add_new_worksheet(course_name, self.gdocs_sheet.to_s)
-  end
-  
   def available_to?(user)
     if user.administrator?
       true
@@ -45,11 +42,11 @@ class Exercise < ActiveRecord::Base
       !deadline_passed? && !hidden?
     end
   end
-  
+
   def attempted_by?(user)
     submissions.where(:user_id => user.id).exists?
   end
-  
+
   def completed_by?(user)
     # We try to find a submission whose test case runs are all successful
     conn = ActiveRecord::Base.connection
@@ -67,7 +64,7 @@ LIMIT 1
 EOS
     !conn.execute(query).empty?
   end
-  
+
   def deadline=(new_deadline)
     super(DateAndTimeUtils.to_time(new_deadline, :prefer_end_of_day => true))
   end

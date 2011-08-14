@@ -1,4 +1,4 @@
-require 'gdocs'
+require 'gdocs_backend'
 
 class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers
@@ -50,14 +50,26 @@ class Course < ActiveRecord::Base
       remote_repo_url
     end
   end
-  
+
   def hide_after=(x)
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => true))
   end
 
-  def create_spreadsheet_to_google
-    account = GDocs.new
-    account.create_new_spreadsheet(self.name)
+  def gdocs_sheets
+    self.exercises.map(&:gdocs_sheet).uniq.
+      select{|sheetname| !sheetname.nil? && sheetname != ""}
+  end
+
+  def refresh_gdocs
+    gsession = GDocsBackend.authenticate
+    ss = GDocsBackend.get_course_spreadsheet gsession, self
+    gdocs_sheets.each do |sheetname|
+      puts sheetname
+      ws = GDocsBackend.get_worksheet ss, sheetname
+      GDocsBackend.update_worksheet ws, self
+      ws.save
+    end
+    return ss.human_url
   end
 
   def refresh
@@ -75,7 +87,6 @@ class Course < ActiveRecord::Base
     }
   end
 
-
 private
 
   def refresh_options
@@ -91,7 +102,7 @@ private
     else
       self.hide_after = nil
     end
-    
+
     self.hidden = !!options['hidden']
   end
 
@@ -107,5 +118,4 @@ private
     self.exercises.reload
     self.save
   end
-
 end

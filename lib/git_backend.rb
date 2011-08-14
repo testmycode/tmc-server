@@ -5,7 +5,7 @@ module GitBackend
   include SystemCommands
 
   def create_local_repository
-    raise "repository already exists" if local_repository_exists?
+    raise "#{bare_path} not empty" if local_repository_exists?
 
     begin
       copy_model_repository
@@ -48,7 +48,7 @@ module GitBackend
   def bare_path
     "#{GitBackend.repositories_root}/#{self.name}.git"
   end
-  
+
   def bare_url # Overridden if using a remote repo
     "file://#{bare_path}"
   end

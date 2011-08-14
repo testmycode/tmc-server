@@ -17,6 +17,7 @@ FactoryGirl.define do
   factory :exercise do
     course
     sequence(:name) {|n| "exercise#{n}" }
+    sequence(:gdocs_sheet) {|n| "exercise#{n}" }
   end
 
   factory :submission do
