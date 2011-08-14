@@ -4,10 +4,12 @@ JC := javac
 BUILD_DIR := build
 SRC_DIR := src
 TEST_DIR := test
+LIB_DIR := lib
 
 SRC_CP := $(BUILD_DIR)/classes
 TEST_CP := $(BUILD_DIR)/test/classes
-CLASSPATH := $(SRC_CP):$(TEST_CP):$(CLASSPATH)
+LIB_CP := $(shell find $(LIB_DIR) -name "*.jar" -printf "%p:")
+CLASSPATH := $(SRC_CP):$(TEST_CP):$(LIB_CP)
 
 SRC_FILES := $(shell find $(SRC_DIR) -name "*.java")
 TEST_FILES := $(shell find $(TEST_DIR) -name "*.java")

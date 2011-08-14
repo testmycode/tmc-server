@@ -1,5 +1,6 @@
 require 'lib/system_commands.rb'
 require 'lib/tmc_javalib.rb'
+require 'fileutils'
 
 file TmcJavalib.jar_path => FileList["#{TmcJavalib.project_path}/**/*.java"] do
   puts "Compiling #{TmcJavalib.jar_path} ..."
@@ -30,6 +31,13 @@ namespace :javalib do
   task :recompile => [:clean, :compile]
 end
 
-# Have rake:spec ensure javalib is compiled
-task :spec => TmcJavalib.jar_path
+
+file 'spec/fixtures/SimpleExercise/lib/tmc-javalib.jar' => TmcJavalib.jar_path do
+  FileUtils.cp TmcJavalib.jar_path, 'spec/fixtures/SimpleExercise/lib/tmc-javalib.jar'
+end
+
+# Have rake spec ensure javalib is compiled
+task :spec => [TmcJavalib.jar_path,
+               'spec/fixtures/SimpleExercise/lib/tmc-javalib.jar']
+
 

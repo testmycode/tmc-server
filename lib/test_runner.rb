@@ -16,25 +16,24 @@ module TestRunner
 
 private
 
-  # FIXME: should really be a tempdir
-  def self.sandbox_root
+  def self.testrunner_dir
     "#{::Rails.root}/lib/testrunner/"
   end
 
   def self.makefile
-    "#{sandbox_root}/Makefile"
+    "#{testrunner_dir}/Makefile"
   end
 
   def self.policy_file
-    "#{sandbox_root}/testrunner.policy"
+    "#{testrunner_dir}/testrunner.policy"
+  end
+  
+  def self.lib_classpath(exercise_dir)
+    Dir.glob("#{exercise_dir}/lib/*.jar").join(":")
   end
 
   def self.default_timeout
     60
-  end
-
-  def self.classpath
-    TmcJavalib.classpath
   end
 
   def self.find_dir_containing(root, seeked)
@@ -55,7 +54,7 @@ private
   end
 
   def self.compile_target(project_root, target)
-    output = `env CLASSPATH=#{classpath} make -sC #{project_root} #{target} 2>&1`
+    output = `make -sC #{project_root} #{target} 2>&1`
     raise "Compilation error:\n#{output}" unless $?.success?
   end
 
@@ -73,9 +72,12 @@ private
     src_classpath = "#{exercise_dir}/build/classes"
     results_fn = "#{exercise_dir}/results"
 
-    system! "java -cp #{classpath}:#{src_classpath} " +
+    command = "java -cp #{lib_classpath(exercise_dir)}:#{src_classpath} " +
       "fi.helsinki.cs.tmc.testrunner.Main #{test_classpath} #{classname} " +
       "#{default_timeout} #{results_fn} /dev/null #{policy_file}"
+    output = `#{command} 2>&1`
+    raise "Failed to run the testrunner (#{$?.inspect}). Output:\n#{output}" unless $?.success?
+    
     results = ActiveSupport::JSON.decode IO.read(results_fn)
     return unless results
     create_test_case_runs(submission, results)
@@ -95,12 +97,9 @@ private
     test_classes
   end
 
-  def self.cp_dir(source, destination)
-    Dir.chdir source do
-      Dir.glob("*").each do |file|
-        FileUtils.cp_r file, destination
-      end
-    end
+  def self.replace_dir(source, destination)
+    FileUtils.rm_rf destination
+    FileUtils.cp_r source, destination
   end
 
   def self.cp_makefile(destination)
@@ -119,9 +118,8 @@ private
     raise "unable to find 'src' directory in submission" unless project_root
 
     exercise = submission.exercise
-    source = "#{exercise.course.clone_path}/#{exercise.path}/test"
-    FileUtils.rm_rf "#{project_root}/test"
-    FileUtils.cp_r source, project_root
+    replace_dir("#{exercise.fullpath}/test", "#{project_root}/test")
+    replace_dir("#{exercise.fullpath}/lib", "#{project_root}/lib")
     cp_makefile project_root
 
     raise "failed to cleanup" unless system "make -sC #{project_root} clean"
