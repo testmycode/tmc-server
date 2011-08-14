@@ -2,8 +2,10 @@ require 'google_spreadsheet'
 
 module GDocsBackend
 
-  def self.create_session username, password
-    GoogleSpreadsheet.login(username, password)
+  def self.authenticate
+    GoogleSpreadsheet.login(
+      SandboxServer::Application.config.gdocs_username,
+      SandboxServer::Application.config.gdocs_password)
   end
 
   def self.delete_course_spreadsheet gsession, course

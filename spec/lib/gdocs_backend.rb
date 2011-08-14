@@ -3,7 +3,7 @@ require 'gdocs_backend'
 
 describe GDocsBackend, :slow => true do
   before :all do
-    #@session = GDocsBackend.create_session('','')
+    @session = GDocsBackend.authenticate
     @session.should_not be_nil
   end
 

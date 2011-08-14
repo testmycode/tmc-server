@@ -50,14 +50,9 @@ class Course < ActiveRecord::Base
       remote_repo_url
     end
   end
-  
+
   def hide_after=(x)
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => true))
-  end
-
-  def create_spreadsheet_to_google
-    account = GDocs.new
-    account.create_new_spreadsheet(self.name)
   end
 
   def refresh
@@ -91,7 +86,7 @@ private
     else
       self.hide_after = nil
     end
-    
+
     self.hidden = !!options['hidden']
   end
 
