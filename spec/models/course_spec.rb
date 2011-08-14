@@ -18,11 +18,17 @@ describe Course do
                            :gdocs_sheet => "sheet1")
       ex3 = Factory.create(:exercise, :course => course,
                            :gdocs_sheet => "sheet2")
+      ex4 = Factory.create(:exercise, :course => course,
+                           :gdocs_sheet => "")
+      ex5 = Factory.create(:exercise, :course => course,
+                           :gdocs_sheet => nil)
       worksheets = course.gdocs_sheets
 
       worksheets.size.should == 2
       worksheets.should include("sheet1")
       worksheets.should include("sheet2")
+      worksheets.should_not include("")
+      worksheets.should_not include(nil)
     end
   end
 
