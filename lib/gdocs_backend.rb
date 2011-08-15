@@ -256,8 +256,9 @@ module GDocsBackend
     point_names_row + 1
   end
 
-  # FIXME: is it correct? dunno
   def self.col_num2str x
+    raise "col_num2str not defined for numbers < 1" if x < 1
+
     s = ""
     while(x > 0)
       x -= 1

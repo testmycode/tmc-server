@@ -163,4 +163,42 @@ describe GDocsBackend, :slow => true do
       end
     end
   end
+
+  describe "helpers" do
+    it "should be able to transform numbers > 0 to column letters" do
+      lambda { GdocsBackend.col_num2str(0) }.should raise_error
+      GDocsBackend.col_num2str(1).should == "A"
+      GDocsBackend.col_num2str(2).should == "B"
+      GDocsBackend.col_num2str(3).should == "C"
+      GDocsBackend.col_num2str(4).should == "D"
+      GDocsBackend.col_num2str(5).should == "E"
+      GDocsBackend.col_num2str(6).should == "F"
+      GDocsBackend.col_num2str(7).should == "G"
+      GDocsBackend.col_num2str(8).should == "H"
+      GDocsBackend.col_num2str(9).should == "I"
+
+      GDocsBackend.col_num2str(10).should == "J"
+      GDocsBackend.col_num2str(11).should == "K"
+      GDocsBackend.col_num2str(12).should == "L"
+      GDocsBackend.col_num2str(13).should == "M"
+      GDocsBackend.col_num2str(14).should == "N"
+      GDocsBackend.col_num2str(15).should == "O"
+      GDocsBackend.col_num2str(16).should == "P"
+      GDocsBackend.col_num2str(17).should == "Q"
+      GDocsBackend.col_num2str(18).should == "R"
+      GDocsBackend.col_num2str(19).should == "S"
+
+      GDocsBackend.col_num2str(20).should == "T"
+      GDocsBackend.col_num2str(21).should == "U"
+      GDocsBackend.col_num2str(22).should == "V"
+      GDocsBackend.col_num2str(23).should == "W"
+      GDocsBackend.col_num2str(24).should == "X"
+      GDocsBackend.col_num2str(25).should == "Y"
+      GDocsBackend.col_num2str(26).should == "Z"
+      GDocsBackend.col_num2str(27).should == "AA"
+      GDocsBackend.col_num2str(28).should == "AB"
+      GDocsBackend.col_num2str(29).should == "AC"
+      GDocsBackend.col_num2str(30).should == "AD"
+    end
+  end
 end
