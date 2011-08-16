@@ -108,13 +108,10 @@ module GDocsBackend
   end
 
   def self.get_free_student_row ws
-    if ws.num_rows < first_points_row
-      return first_points_row
-    elsif ws.num_rows < ws.max_rows
-      return ws.num_rows + 1
-    else
-      return ws.max_rows += 1
+    (first_points_row .. ws.max_rows).each do |row|
+      return row if ws[row, student_col] == ""
     end
+    return ws.max_rows += 1
   end
 
   def self.add_student_row ws, student

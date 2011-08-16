@@ -55,7 +55,8 @@ describe Exercise do
 
   describe "associated submissions" do
     before :each do
-      @exercise = Exercise.create!(:course => course, :name => 'MyExercise')
+      @exercise = Factory.create(:exercise,
+                                   :course => course, :name => 'MyExercise')
       @submission_attrs = {
         :course => course,
         :exercise_name => 'MyExercise',
@@ -77,13 +78,13 @@ describe Exercise do
   end
 
   it "should treat date deadlines as being at 23:59:59 local time" do
-    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
     ex.deadline = Date.today
     ex.deadline.should == Date.today.end_of_day
   end
 
   it "should accept deadlines in either SQLish or Finnish date format" do
-    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
 
     ex.deadline = '2011-04-19 13:55'
     ex.deadline.year.should == 2011
@@ -101,11 +102,20 @@ describe Exercise do
   end
 
   it "should accept a blank deadline" do
-    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
     ex.deadline = nil
     ex.deadline.should be_nil
     ex.deadline = ""
     ex.deadline.should be_nil
+  end
+
+  it "should not accept 'summary' as a gdocs_sheet value" do
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
+    ex.valid?.should be_true
+    ex.gdocs_sheet = 'summary'
+    ex.valid?.should be_false
+    ex.gdocs_sheet = 'nonsummary'
+    ex.valid?.should be_true
   end
 
   it "should raise an exception if trying to set a deadline in invalid format" do
@@ -116,7 +126,7 @@ describe Exercise do
 
   it "should always be available to administrators" do
     admin = Factory.create(:admin)
-    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
 
     ex.deadline.should be_nil
     ex.should be_available_to(admin)
@@ -130,7 +140,7 @@ describe Exercise do
 
   it "should be available to non-administrators only if the deadline has not passed and the exercise is not hidden" do
     user = Factory.create(:user)
-    ex = Exercise.create!(:course => course, :name => 'MyExercise')
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
 
     ex.deadline.should be_nil
     ex.should be_available_to(user)
@@ -147,7 +157,8 @@ describe Exercise do
   end
 
   it "can tell whether a user has ever attempted an exercise" do
-    exercise = Exercise.new(:course => course, :name => 'MyExercise')
+    exercise = Factory.create(:exercise, :course => course,
+                              :name => 'MyExercise')
     exercise.should_not be_attempted_by(user)
 
     Submission.create!(:user => user, :course => course, :exercise_name => exercise.name)
@@ -155,7 +166,8 @@ describe Exercise do
   end
 
   it "can tell whether a user has completed an exercise" do
-    exercise = Exercise.new(:course => course, :name => 'MyExercise')
+    exercise = Factory.create(:exercise, :course => course,
+                               :name => 'MyExercise')
     exercise.should_not be_completed_by(user)
 
     other_user = Factory.create(:user)

@@ -11,7 +11,7 @@ class Course < ActiveRecord::Base
             :uniqueness => true,
             :length     => { :within => 1..40 },
             :format     => {
-              :without => / / ,
+              :without => / /,
               :message  => 'should not contain white spaces'
             }
 
@@ -56,8 +56,7 @@ class Course < ActiveRecord::Base
   end
 
   def gdocs_sheets
-    self.exercises.map(&:gdocs_sheet).uniq.
-      select{|sheetname| !sheetname.nil? && sheetname != ""}
+    self.exercises.map(&:gdocs_sheet).uniq
   end
 
   def refresh_gdocs

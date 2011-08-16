@@ -1,5 +1,3 @@
-require 'gdocs'
-
 class Exercise < ActiveRecord::Base
   include Rails.application.routes.url_helpers
 
@@ -11,8 +9,12 @@ class Exercise < ActiveRecord::Base
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
 
+  validates :gdocs_sheet,
+            :presence => true,
+            :format => { :without => /^summary$/ }
+
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
-    where("course_id = ? AND gdocs_sheet = ?", course.id, gdocs_sheet)
+    where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
   }
 
   def path
@@ -125,7 +127,7 @@ private
     {
       "deadline" => nil,
       "publish_date" => nil,
-      "gdocs_sheet" => nil
+      "gdocs_sheet" => "root"
     }
   end
 
