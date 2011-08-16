@@ -20,21 +20,34 @@ describe GDocsBackend, :slow => true do
     end
   end
 
-  it "should be able to create and delete a spreadsheet" do
-    course = Factory.create(:course, :name => "create_delete_spreadsheet")
+  describe "creating and deleting spreadsheets" do
+    before :all do
+      @course = Factory.create(:course, :name => "create_delete_spreadsheet")
+    end
 
-    GDocsBackend.delete_course_spreadsheet(@session, course)
-    ss = GDocsBackend.create_course_spreadsheet(@session, course)
-    ss.should_not be_nil
+    after :all do
+      @course.destroy
+    end
 
-    ss2 = GDocsBackend.find_course_spreadsheet(@session, course)
-    ss2.title.should == ss.title
+    it "should be able to create and delete a spreadsheet" do
+      GDocsBackend.delete_course_spreadsheet(@session, @course)
+      ss = GDocsBackend.create_course_spreadsheet(@session, @course)
+      ss.should_not be_nil
 
-    GDocsBackend.delete_course_spreadsheet(@session, course)
-    sheets = @session.spreadsheets.find_all {|ss| ss.title == course.name}
-    sheets.should be_empty
+      ss2 = GDocsBackend.find_course_spreadsheet(@session, @course)
+      ss2.title.should == ss.title
 
-    course.destroy
+      GDocsBackend.delete_course_spreadsheet(@session, @course)
+      sheets = @session.spreadsheets.find_all {|ss| ss.title == @course.name}
+      sheets.should be_empty
+    end
+
+    it "newly created spreadsheet should only contain a summary worksheet" do
+      ss = GDocsBackend.get_course_spreadsheet(@session, @course)
+      worksheets = ss.worksheets
+      worksheets.size.should == 1
+      worksheets.first.title.should == 'summary'
+    end
   end
 
   it "should be able to create and delete a worksheet" do

@@ -18,7 +18,14 @@ module GDocsBackend
   end
 
   def self.create_course_spreadsheet gsession, course
-    gsession.create_spreadsheet course.name
+    ss = gsession.create_spreadsheet course.name
+
+    worksheets = ss.worksheets
+    ws = ss.worksheets.first
+    ws.title = "summary"
+    ws.save
+    worksheets[1, worksheets.size-1].each {|ws| ws.delete}
+    return ss
   end
 
   def self.get_course_spreadsheet gsession, course
