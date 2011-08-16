@@ -53,16 +53,20 @@ module GDocsBackend
     }
   end
 
-  # FIXME: handle invalid location, test
   def self.add_point ws, point_name, student
     pos = point_location ws, point_name, student
+    raise "no such student" if pos[:row] == -1
+    raise "no such point" if pos[:col] == -1
     ws[pos[:row], pos[:col]] = "1"
   end
 
-  # FIXME: test with row,col -1
   def self.point_granted? ws, point_name, student
     pos = point_location ws, point_name, student
-    ws[pos[:row], pos[:col]] == "1"
+    if pos[:row] == -1 or pos[:col] == -1
+      false
+    else
+      ws[pos[:row], pos[:col]] == "1"
+    end
   end
 
   def self.written_exercises ws
@@ -145,6 +149,7 @@ module GDocsBackend
     w_exercises = written_exercises ws
 
     allocate_points_space ws, db_exercises, w_exercises
+    blank_row ws, exercise_names_row
     write_available_points ws, w_exercises
   end
 
@@ -165,6 +170,10 @@ module GDocsBackend
       w_exercises[:points][db_e.name].concat(new_points)
       col += new_points.size
     end
+  end
+
+  def self.blank_row ws, row
+    (1 .. ws.num_cols).each {|col| ws[row,col] = nil}
   end
 
   def self.write_available_points ws, w_exercises

@@ -1,0 +1,25 @@
+<table class="points">
+  <thead>
+    <tr>
+      <th></th>
+      <th><%= @sheets.join("</td><td>") %></th>
+      <th>total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+    <tr>
+      <td><%= user.login %></td>
+      <% total = 0 %>
+      <% @sheets.each do |sheet| %>
+        <% sheetpoints = AwardedPoint.
+          course_user_sheet_points(@course, user, sheet).count %>
+        <% total += sheetpoints %>
+        <td><%= sheetpoints %></td>
+      <% end %>
+      <td><%= total %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+

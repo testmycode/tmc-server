@@ -1,38 +1,5 @@
-<h1>Points for <%= @course.name %></h1>
+<h1>Point sheets for <%= @course.name %></h1>
 
-<table class="points">
-  <thead>
-    <tr>
-      <th></th>
-      <% @exercises.each do |exercise| %>
-        <% points = exercise.available_points %>
-        <% if points.size > 0 %>
-          <th colspan="<%= points.size %>"><%= exercise.name %></th>
-        <% end %>
-      <% end %>
-    </tr>
-    <tr>
-      <th></th>
-      <% @exercises.each do |exercise| %>
-        <% exercise.available_points.each do |point| %>
-          <th><%= point.name %></th>
-        <% end %>
-      <% end %>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @users.each do |user| %>
-      <% user_points = AwardedPoint.where(:course_id => @course.id, :user_id => user.id).map(&:name) %>
-      <tr>
-        <td><%= user.login %></td>
-        <% @exercises.each do |exercise| %>
-          <% exercise.available_points.each do |p| %>
-            <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
-          <% end %>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= render :partial => 'list' %>
+<%= render :partial => 'summary' %>
 

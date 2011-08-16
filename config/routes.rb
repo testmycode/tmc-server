@@ -11,7 +11,7 @@ SandboxServer::Application.routes.draw do
       get 'refresh'
       post 'refresh'
     end
-    resources :points, :only => :index
+    resources :points, :only => [:index, :show]
 
     resources :exercises, :except => [:destroy, :create] do
       resources :submissions, :only => [:create, :index]

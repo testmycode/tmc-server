@@ -4,15 +4,18 @@ describe PointsController do
   render_views
   before :each do
     @course = Factory.create(:course)
-    @exercise = Factory.create(:exercise, :course => @course)
+    @sheetname = "testsheet"
+    @exercise = Factory.create(:exercise, :course => @course,
+                               :gdocs_sheet => @sheetname)
     @admin = Factory.create(:admin)
   end
 
-  describe "GET index" do
+  describe "GET show" do
     describe "when guest visits" do
       it "should not allow access" do
-        expect { get :index, :course_id => @course.id.to_s }.to
-          raise_error(CanCan::AccessDenied)
+        expect {
+          get :show, :course_id => @course.id.to_s, :id => @sheetname
+        }.to raise_error(CanCan::AccessDenied)
       end
     end
 
@@ -35,22 +38,22 @@ describe PointsController do
       end
 
       it "should show a page" do
-        get :index, :course_id => @course.id
+        get :show, :course_id => @course.id, :id => @sheetname
         response.should be_success
       end
 
       it "should contain @user login" do
-        get :index, :course_id => @course.id
+        get :show, :course_id => @course.id, :id => @sheetname
         response.body.should have_content(@user.login)
       end
 
       it "should contain available point name" do
-        get :index, :course_id => @course.id
+        get :show, :course_id => @course.id, :id => @sheetname
         response.body.should have_content(@available_point.name)
       end
 
       it "should contain a success marker" do
-        get :index, :course_id => @course.id
+        get :show, :course_id => @course.id, :id => @sheetname
         response.body.should have_content("✔")
       end
     end

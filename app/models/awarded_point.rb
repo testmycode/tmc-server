@@ -9,4 +9,10 @@ class AwardedPoint < ActiveRecord::Base
     where(:course_id => course.id, :user_id => user.id)
   }
 
+  scope :course_user_sheet_points, lambda { |course, user, sheetname|
+    joins(:submission).
+    joins("join exercises on submissions.exercise_name = exercises.name").
+    where("exercises.gdocs_sheet IS ?", sheetname)
+  }
+
 end

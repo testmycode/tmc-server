@@ -1,0 +1,7 @@
+
+<p>sheets:
+  <% @sheets.each do |sheet| %>
+    <%= link_to sheet, course_point_path(@course, sheet) %>
+  <% end %>
+</p>
+
