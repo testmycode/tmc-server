@@ -60,14 +60,7 @@ class Course < ActiveRecord::Base
   end
 
   def refresh_gdocs
-    gsession = GDocsBackend.authenticate
-    ss = GDocsBackend.get_course_spreadsheet gsession, self
-    gdocs_sheets.each do |sheetname|
-      ws = GDocsBackend.get_worksheet ss, sheetname
-      GDocsBackend.update_worksheet ws, self
-      ws.save
-    end
-    return ss.human_url
+    GDocsBackend.refresh_course_spreadsheet self
   end
 
   def refresh

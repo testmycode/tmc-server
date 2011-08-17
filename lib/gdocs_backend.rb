@@ -53,6 +53,17 @@ module GDocsBackend
     ws.delete if ws
   end
 
+  def self.refresh_course_spreadsheet course
+    ss = get_course_spreadsheet authenticate, course
+    course.gdocs_sheets.each do |sheetname|
+      ws = get_worksheet ss, sheetname
+      update_points_worksheet ws, course
+      ws.save
+    end
+    update_summary_worksheet(ss, course).save
+    return ss.human_url
+  end
+
   def self.point_location ws, point_name, student
     {
       :row => find_student_row(ws, student),
@@ -125,7 +136,7 @@ module GDocsBackend
     return ws.max_rows += 1
   end
 
-  def self.add_student_row ws, student
+  def self.add_student ws, student
     row = get_free_student_row(ws)
     ws[row, student_col] = quote_prepend(student.login)
   end
@@ -144,7 +155,45 @@ module GDocsBackend
     return -1
   end
 
-  def self.update_worksheet ws, course
+  def self.update_summary_worksheet ss, course
+    ws = get_worksheet ss, 'summary'
+    update_summary_sheetnames ws, course
+    update_students ws, course
+    update_summary_references ss, ws
+    update_total_col ws
+    return ws
+  end
+
+  def self.update_summary_sheetnames ws, course
+    col = first_points_col
+    course.gdocs_sheets.each do |sheetname|
+      ws[exercise_names_row, col] = sheetname
+      col += 1
+    end
+  end
+
+  def self.summary_sum row, sheet
+    search_range = "$#{col_num2str(student_col)}:$#{col_num2str(student_col)}"
+    criteria = "$#{col_num2str(student_col)}#{row}"
+    sum_range = "$#{col_num2str(total_col)}:$#{col_num2str(total_col)}"
+    "=sumif('#{sheet}'!#{search_range};#{criteria};'#{sheet}'!#{sum_range})"
+  end
+
+  def self.update_summary_references ss, summary_ws
+    (first_points_col .. summary_ws.num_cols).each do |col|
+      sheet_name = summary_ws[exercise_names_row,col]
+      break if sheet_name == ""
+      point_ws = get_worksheet ss, sheet_name
+
+      (first_points_row .. summary_ws.num_rows).each do |row|
+        student_name = summary_ws[row, student_col]
+        break if student_name == ""
+        summary_ws[row,col] = summary_sum row, point_ws.title
+      end
+    end
+  end
+
+  def self.update_points_worksheet ws, course
     update_available_points ws, course
     update_students ws, course
     update_points ws, course
@@ -227,7 +276,7 @@ module GDocsBackend
   def self.add_students ws, course
     User.course_students(course).each do |student|
       if find_student_row(ws, student) < 0
-        add_student_row ws, student
+        add_student ws, student
       end
     end
   end
