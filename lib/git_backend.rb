@@ -83,19 +83,4 @@ private
     system! "chmod g+rwX #{GitBackend.repositories_root}"
     system! "chmod g+rwX -R #{bare_path}"
   end
-
-  def self.valid_course_repository? dir
-    Exercise.find_exercise_paths(dir).each do |path|
-      puts "checking #{path.gsub("#{dir}/", '')}"
-      begin
-        TestRunner.extract_exercise_list path
-      rescue Exception => e
-        puts "Invalid: #{e.message}"
-        puts "Invalid: #{e.backtrace}"
-        return false
-      end
-    end
-    puts "Valid course repository"
-    return true
-  end
 end
