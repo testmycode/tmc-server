@@ -55,18 +55,20 @@ module GDocsBackend
 
   def self.refresh_course_spreadsheet course
     ss = get_course_spreadsheet authenticate, course
+    students = get_spreadsheet_course_students ss, course
+
     course.gdocs_sheets.each do |sheetname|
       ws = get_worksheet ss, sheetname
-      update_points_worksheet ws, course
+      update_points_worksheet ws, course, students
       ws.save
     end
-    update_summary_worksheet(ss, course).save
+    update_summary_worksheet(ss, course, students).save
     return ss.human_url
   end
 
   def self.point_location ws, point_name, student
     {
-      :row => find_student_row(ws, student),
+      :row => find_student_row(ws, student.login),
       :col => find_point_col(ws, point_name)
     }
   end
@@ -124,9 +126,25 @@ module GDocsBackend
 
   def self.find_student_row ws, student
     (first_points_row .. ws.num_rows).each do |row|
-      return row if ws[row, student_col] == quote_prepend(student.login)
+      return row if ws[row, student_col] == quote_prepend(student)
     end
     return -1
+  end
+
+  def self.get_spreadsheet_course_students ss, course
+    students = ss.worksheets.reduce(Set.new) do |students, worksheet|
+      students.merge(get_worksheet_students worksheet)
+    end
+    students.merge(User.course_students(course).map(&:login))
+  end
+
+  def self.get_worksheet_students ws
+    (first_points_row .. ws.num_rows).reduce(Set.new) do |students, row|
+      unless ws[row, student_col].empty?
+        students << strip_quote(ws[row, student_col])
+      end
+      students
+    end
   end
 
   def self.get_free_student_row ws
@@ -138,7 +156,7 @@ module GDocsBackend
 
   def self.add_student ws, student
     row = get_free_student_row(ws)
-    ws[row, student_col] = quote_prepend(student.login)
+    ws[row, student_col] = quote_prepend(student)
   end
 
   def self.find_point_col ws, point_name
@@ -148,17 +166,10 @@ module GDocsBackend
     return -1
   end
 
-  def self.find_student_row ws, student
-    for row in (first_points_row .. ws.num_rows)
-      return row if ws[row, student_col] == quote_prepend(student.login)
-    end
-    return -1
-  end
-
-  def self.update_summary_worksheet ss, course
+  def self.update_summary_worksheet ss, course, students
     ws = get_worksheet ss, 'summary'
     update_summary_sheetnames ws, course
-    update_students ws, course
+    update_students ws, students
     update_summary_references ss, ws
     update_total_col ws
     return ws
@@ -193,9 +204,9 @@ module GDocsBackend
     end
   end
 
-  def self.update_points_worksheet ws, course
+  def self.update_points_worksheet ws, course, students
     update_available_points ws, course
-    update_students ws, course
+    update_students ws, students
     update_points ws, course
     update_total_col ws
   end
@@ -273,16 +284,16 @@ module GDocsBackend
     end
   end
 
-  def self.add_students ws, course
-    User.course_students(course).each do |student|
+  def self.add_students ws, students
+    students.each do |student|
       if find_student_row(ws, student) < 0
         add_student ws, student
       end
     end
   end
 
-  def self.update_students ws, course
-    add_students ws, course
+  def self.update_students ws, students
+    add_students ws, students
     # FIXME: merge duplicate students?
   end
 

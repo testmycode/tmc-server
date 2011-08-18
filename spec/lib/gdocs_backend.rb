@@ -66,6 +66,50 @@ describe GDocsBackend, :slow => true do
     course.destroy
   end
 
+  describe "after course spreadsheet is refreshed" do
+    before :all do
+      @course = Factory.create(:course, :name => "refresh_gdocs")
+      @sheet1 = "week1"
+      @sheet2 = "week2"
+      @ex1 = Factory.create(:exercise, :course => @course,
+                            :gdocs_sheet => @sheet1)
+      @ex2 = Factory.create(:exercise, :course => @course,
+                            :gdocs_sheet => @sheet2)
+    end
+
+    before :each do
+      GDocsBackend.delete_course_spreadsheet(@session, @course)
+      @ss = GDocsBackend.create_course_spreadsheet(@session, @course)
+      @course.refresh_gdocs
+    end
+
+    after :all do
+      @course.destroy
+    end
+
+    it "should create all the worksheets of the course" do
+      worksheet_names = @ss.worksheets.map &:title
+      worksheet_names.should include(@sheet1)
+      worksheet_names.should include(@sheet2)
+      worksheet_names.should include("summary")
+    end
+
+    it "should add manually added students to each sheet" do
+      student = Factory.create(:user)
+      ws = GDocsBackend.find_worksheet @ss, @sheet1
+      ws.should_not be_nil
+
+      GDocsBackend.add_student ws, student.login
+      ws.save
+
+      @course.refresh_gdocs
+      @ss = GDocsBackend.find_course_spreadsheet(@session, @course)
+      @ss.worksheets.each do |ws|
+        GDocsBackend.get_worksheet_students(ws).should include(student.login)
+      end
+    end
+  end
+
   describe "after updating an exercise worksheet" do
     before :all do
       @course = Factory.create(:course, :name => "worksheet_update")
@@ -111,7 +155,8 @@ describe GDocsBackend, :slow => true do
                                :name => @ap4.name, :user => @student4,
                                :submission => @submission4)
 
-      GDocsBackend.update_worksheet(@ws, @course)
+      students = GDocsBackend.get_spreadsheet_course_students(@ss, @course)
+      GDocsBackend.update_points_worksheet(@ws, @course, students)
       match_written_and_db_exercises(@ws, @course)
     end
 
@@ -130,17 +175,17 @@ describe GDocsBackend, :slow => true do
     end
 
     it "should have a row for every student" do
-      GDocsBackend.find_student_row(@ws, @student1).should_not == -1
-      GDocsBackend.find_student_row(@ws, @student2).should_not == -1
-      GDocsBackend.find_student_row(@ws, @student3).should_not == -1
-      GDocsBackend.find_student_row(@ws, @student4).should_not == -1
+      GDocsBackend.find_student_row(@ws, @student1.login).should_not == -1
+      GDocsBackend.find_student_row(@ws, @student2.login).should_not == -1
+      GDocsBackend.find_student_row(@ws, @student3.login).should_not == -1
+      GDocsBackend.find_student_row(@ws, @student4.login).should_not == -1
     end
 
     it "should not have a row for students not on the course" do
       student5 = Factory.create(:user)
       student6 = Factory.create(:user)
-      GDocsBackend.find_student_row(@ws, student5).should == -1
-      GDocsBackend.find_student_row(@ws, student6).should == -1
+      GDocsBackend.find_student_row(@ws, student5.login).should == -1
+      GDocsBackend.find_student_row(@ws, student6.login).should == -1
     end
 
     it "should contain all of the points students have been awarded" do
@@ -163,13 +208,15 @@ describe GDocsBackend, :slow => true do
                              :name => "ap5")
         ap6 = Factory.create(:available_point, :exercise => @ex1,
                              :name => "ap6")
-        GDocsBackend.update_worksheet(@ws, @course)
+        students = GDocsBackend.get_spreadsheet_course_students(@ss, @course)
+
+        GDocsBackend.update_points_worksheet(@ws, @course, students)
         GDocsBackend.find_point_col(@ws, ap5.name).should_not == -1
         GDocsBackend.find_point_col(@ws, ap6.name).should_not == -1
         match_written_and_db_exercises(@ws, @course)
         ap5.destroy
         ap6.destroy
-        GDocsBackend.update_worksheet(@ws, @course)
+        GDocsBackend.update_points_worksheet(@ws, @course, students)
         GDocsBackend.find_point_col(@ws, "ap5").should_not == -1
         GDocsBackend.find_point_col(@ws, "ap6").should_not == -1
         match_written_and_db_exercises(@ws, @course)
