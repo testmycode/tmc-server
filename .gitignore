@@ -1,7 +1,7 @@
-.bundle
-db/*.sqlite3
-db/*.sqlite3-journal
-log/*.log
-tmp/
-gitrepos/
-
+/.bundle
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/log/*.log
+/tmp/
+/gitrepos/
+/spec/fixtures/SimpleExercise/lib/tmc-javalib.jar
