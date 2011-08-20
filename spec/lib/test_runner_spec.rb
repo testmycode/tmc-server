@@ -42,7 +42,7 @@ describe TestRunner do
       @submission.save!
     end
     
-    it "should not create test results for the same test method even if it is involved in multiple points"
+    it "should not create multiple test results for the same test method even if it is involved in multiple points"
     
     it "should raise an error if compilation of a test fails" do
       @exercise_dir.introduce_compilation_error
@@ -60,6 +60,7 @@ describe TestRunner do
       points.should include('justsub')
       points.should_not include('addsub')
       points.should_not include('mul')
+      points.should_not include('simpletest-all')
     end
     
     it "should only ever award more points, never delete old points" do
@@ -83,7 +84,22 @@ describe TestRunner do
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
       points.should include('justsub')
       points.should include('addsub')
-      points.should_not include('mul')
+      points.should include('simpletest-all')
+      points.should_not include('mul') # in SimpleHiddenTest
+    end
+    
+    it "should enforce access restrictions on the student's code" do
+      @exercise_dir.solve_all
+      @exercise_dir.write_empty_method_body('new java.io.FileOutputStream("../omg.hax");')
+      @exercise_dir.make_zip
+      
+      TestRunner.run_submission_tests(@submission)
+      
+      tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testEmptyMethod' }
+      tcr.should_not be_nil
+      tcr.should_not be_successful
+      tcr.message.should include('AccessControlException')
+      tcr.message.should include('FilePermission ../omg.hax write')
     end
   end
 end

@@ -37,6 +37,10 @@ class SimpleExercise
     replace_method_body_in_file(simple_stuff_path, 'mul', 'return a * b;')
   end
   
+  def write_empty_method_body(code)
+    replace_method_body_in_file(simple_stuff_path, 'emptyMethod', code)
+  end
+  
   def introduce_compilation_error(text = 'the compiler should fail here')
     replace_method_body_in_file(simple_stuff_path, 'add', "BAD INPUT #{text}")
   end

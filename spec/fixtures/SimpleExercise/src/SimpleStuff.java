@@ -15,4 +15,8 @@ public class SimpleStuff {
     public static int multiply(int a, int b) {
         return 0; // METHOD BODY multiply
     }
+    
+    public static void emptyMethod() throws Exception {
+        // METHOD BODY emptyMethod
+    }
 }

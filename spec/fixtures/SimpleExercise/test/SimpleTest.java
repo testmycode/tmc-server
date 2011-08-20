@@ -3,6 +3,7 @@ import fi.helsinki.cs.tmc.testrunner.Points;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+@Points("simpletest-all")
 public class SimpleTest {
     @Test
     @Points("addsub")
@@ -16,5 +17,10 @@ public class SimpleTest {
     public void testSubtract() {
         assertEquals(3, SimpleStuff.subtract(7, 4));
         assertEquals(-333, SimpleStuff.subtract(123, 456));
+    }
+    
+    @Test
+    public void testEmptyMethod() throws Exception {
+        SimpleStuff.emptyMethod();
     }
 }

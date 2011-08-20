@@ -99,7 +99,6 @@ describe "The system" do
       click_button 'Submit'
       
       page.should have_content('Some tests failed')
-      page.should_not have_content('Ok')
       page.should have_content('Fail')
     end
     
