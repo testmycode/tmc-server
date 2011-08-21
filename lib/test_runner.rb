@@ -7,7 +7,8 @@ module TestRunner
   extend SystemCommands
 
   def self.run_submission_tests(submission)
-    Dir.mktmpdir do |dir|
+    FileUtils.mkdir_p "tmp/runs"
+    Dir.mktmpdir("tmc-test-run", "tmp/runs") do |dir|
       project_root = populate_build_dir(dir, submission)
       compile_src(project_root)
       compile_tests(project_root)
