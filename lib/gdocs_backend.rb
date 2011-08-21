@@ -294,7 +294,44 @@ module GDocsBackend
 
   def self.update_students ws, students
     add_students ws, students
+    quote_prepend_students ws
+    merge_duplicate_students ws
     # FIXME: merge duplicate students?
+  end
+
+  def self.quote_prepend_students ws
+    (first_points_row .. ws.num_rows).each do |row|
+      unless ws[row, student_col] =~ /^'/
+        ws[row, student_col] = quote_prepend(ws[row,student_col])
+      end
+    end
+  end
+
+  def self.merge_duplicate_students ws
+    (first_points_row .. ws.num_rows).each do |row1|
+      student = ws[row1, student_col]
+      next if student.empty?
+      (row1+1 .. ws.num_rows).each do |row2|
+        student2 = ws[row2, student_col]
+        if student == student2
+          merge_duplicate_student_rows ws, row1, row2
+        end
+      end
+    end
+  end
+
+  def self.merge_duplicate_student_rows ws, r1, r2
+    (first_points_col .. ws.num_cols).each do |col|
+      ws[r1, col] = ws[r2, col] if ws[r1, col].empty?
+    end
+    blank_row ws, r2
+  end
+
+  def self.blank_row ws, row
+    (1 .. ws.num_cols).each {|col| ws[row,col] = nil}
+  end
+
+  def self.compact_student_rows ws
   end
 
   def self.quote_prepend s
