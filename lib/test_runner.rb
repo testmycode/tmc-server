@@ -1,6 +1,5 @@
 require 'tempfile'
 require 'find'
-require 'shellwords'
 require 'pathname'
 
 module TestRunner
@@ -76,7 +75,7 @@ private
     src_classes = "#{exercise_dir}/build/classes"
     results_file = "#{exercise_dir}/results" #FIXME: put elsewhere
 
-    command = [
+    command = mk_command [
       "java",
       "-cp",
       "#{lib_classpath(exercise_dir)}:#{src_classes}",
@@ -97,7 +96,7 @@ private
       classname,
       default_timeout,
       results_file
-    ].map {|arg| Shellwords.escape(arg.to_s) }.join(' ')
+    ]
     
     Dir.chdir(exercise_dir) do
       output = `#{command} 2>&1`
