@@ -1,5 +1,7 @@
 require 'tempfile'
 require 'find'
+require 'shellwords'
+require 'pathname'
 
 module TestRunner
   extend SystemCommands
@@ -17,7 +19,7 @@ module TestRunner
 private
 
   def self.testrunner_dir
-    "#{::Rails.root}/lib/testrunner/"
+    "#{::Rails.root}/lib/testrunner"
   end
 
   def self.makefile
@@ -59,38 +61,58 @@ private
   end
 
   def self.run_tests(exercise_dir, submission)
-    tests_classpath = "#{exercise_dir}/build/test/classes"
+    tests_classes = "#{exercise_dir}/build/test/classes"
 
-    test_classes = find_test_classes tests_classpath
+    test_classes = find_test_classes tests_classes
     test_classes.each do |classname|
       run_test_class exercise_dir, classname, submission
     end
   end
 
   def self.run_test_class(exercise_dir, classname, submission)
-    test_classpath = "#{exercise_dir}/build/test/classes"
-    src_classpath = "#{exercise_dir}/build/classes"
-    results_fn = "#{exercise_dir}/results"
+    exercise_dir = Pathname.new(exercise_dir).realpath.to_s
+    test_classes = "#{exercise_dir}/build/test/classes"
+    src_classes = "#{exercise_dir}/build/classes"
+    results_file = "#{exercise_dir}/results" #FIXME: put elsewhere
 
-    command = "java -cp #{lib_classpath(exercise_dir)}:#{src_classpath} " +
-      "fi.helsinki.cs.tmc.testrunner.Main #{test_classpath} #{classname} " +
-      "#{default_timeout} #{results_fn} /dev/null #{policy_file}"
+    command = [
+      "java",
+      "-cp",
+      "#{lib_classpath(exercise_dir)}:#{src_classes}",
+      
+      "-Djava.security.manager",
+      "-Djava.security.policy=#{policy_file}",
+      
+      # Properties for the policy file
+      "-Dtmc.src_class_dir=#{src_classes}",
+      "-Dtmc.test_class_dir=#{test_classes}",
+      "-Dtmc.lib_dir=#{exercise_dir}/lib",
+      "-Dtmc.exercise_dir=#{exercise_dir}",
+      
+      "fi.helsinki.cs.tmc.testrunner.Main",
+      
+      # Program arguments
+      "#{test_classes}",
+      classname,
+      default_timeout,
+      results_file
+    ].map {|arg| Shellwords.escape(arg.to_s) }.join(' ')
     output = `#{command} 2>&1`
     raise "Failed to run the testrunner (#{$?.inspect}). Output:\n#{output}" unless $?.success?
     
-    results = ActiveSupport::JSON.decode IO.read(results_fn)
+    results = ActiveSupport::JSON.decode IO.read(results_file)
     return unless results
     create_test_case_runs(submission, results)
     award_points(submission, results)
   end
 
-  def self.find_test_classes(classpath)
+  def self.find_test_classes(dir)
     test_classes = []
-    Find.find(classpath) do |path|
+    Find.find(dir) do |path|
       next if FileTest.directory? path
       next if File.extname(path) != ".class"
       classname = path.chomp(File.extname(path))
-      classname = classname.gsub(/^#{classpath}\//, '')
+      classname = classname.gsub(/^#{dir}\//, '')
       classname = classname.gsub(/\//, '.')
       test_classes << classname
     end
