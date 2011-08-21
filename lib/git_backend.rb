@@ -30,7 +30,7 @@ module GitBackend
   end
 
   def self.repositories_root
-    "#{::Rails.root}/gitrepos"
+    "#{::Rails.root}/db/local_git_repos"
   end
 
   def self.model_repository
@@ -38,7 +38,7 @@ module GitBackend
   end
 
   def self.cache_root
-    "#{::Rails.root}/tmp/cache/gitrepos"
+    "#{::Rails.root}/tmp/cache/git_repos"
   end
 
   def cache_path
