@@ -9,6 +9,7 @@ module TmcJavalib
   end
   
   def self.default_instance # No need to call explicitly - you can say TmcJavalib.methodname
+    # fixme: there is a nicer way to do this. extend TmcJavalib in class context.
     if @default_instance.nil?
       @default_instance = Object.new
       class << @default_instance; include TmcJavalib; end
