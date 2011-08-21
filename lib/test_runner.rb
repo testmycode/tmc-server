@@ -97,7 +97,11 @@ private
       default_timeout,
       results_file
     ].map {|arg| Shellwords.escape(arg.to_s) }.join(' ')
-    output = `#{command} 2>&1`
+    
+    Dir.chdir(exercise_dir) do
+      output = `#{command} 2>&1`
+    end
+    
     raise "Failed to run the testrunner (#{$?.inspect}). Output:\n#{output}" unless $?.success?
     
     results = ActiveSupport::JSON.decode IO.read(results_file)
