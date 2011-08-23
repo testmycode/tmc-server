@@ -21,7 +21,6 @@ describe "The system (used by a student)" do
     system!("unzip -qq MyExercise.zip")
     
     File.should be_a_directory('MyExercise')
-    File.should be_a_directory('MyExercise/nbproject')
     File.should exist('MyExercise/src/SimpleStuff.java')
     File.should exist('MyExercise/test/SimpleTest.java')
     File.should_not exist('MyExercise/test/SimpleHiddenTest.java')

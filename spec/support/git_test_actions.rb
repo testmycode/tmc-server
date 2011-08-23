@@ -22,9 +22,9 @@ module GitTestActions
     end
     
     FileUtils.pwd.start_with?(@test_tmp_dir).should == true
-    clone_repo(course.bare_url, course.name)
+    clone_repo(course.bare_url, course.name + "-wc")
     
-    GitRepo.new("#{course.name}")
+    GitRepo.new("#{course.name}-wc")
   end
   
   def clone_repo(from, to)

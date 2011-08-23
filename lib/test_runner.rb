@@ -111,7 +111,7 @@ private
     replace_dir("#{exercise.fullpath}/lib", "#{project_root}/lib")
     cp_makefile project_root
 
-    raise "failed to cleanup" unless system "make -sC #{project_root} clean"
+    raise "failed to clean up" unless system "make -sC #{project_root} clean"
 
     return project_root
   end

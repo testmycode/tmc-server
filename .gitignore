@@ -4,4 +4,3 @@
 /db/local_git_repos
 /log/*.log
 /tmp/
-/spec/fixtures/SimpleExercise/lib/tmc-javalib.jar

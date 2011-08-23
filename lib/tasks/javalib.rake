@@ -2,8 +2,6 @@ require 'lib/system_commands.rb'
 require 'lib/tmc_javalib.rb'
 require 'fileutils'
 
-javalib_copies = ['spec/fixtures/SimpleExercise/lib/tmc-javalib.jar']
-
 file TmcJavalib.jar_path => FileList["#{TmcJavalib.project_path}/**/*.java"] do
   puts "Compiling #{TmcJavalib.jar_path} ..."
   begin
@@ -22,7 +20,7 @@ end
 
 namespace :javalib do
   desc "Compiles #{TmcJavalib.jar_path}"
-  task :compile => [TmcJavalib.jar_path] + javalib_copies
+  task :compile => TmcJavalib.jar_path
   
   desc "Cleans #{TmcJavalib.project_path}"
   task :clean do
@@ -36,14 +34,7 @@ end
 desc "Compiles #{TmcJavalib.jar_path}"
 task :javalib => 'javalib:compile'
 
-
-javalib_copies.each do |javalib_copy|
-  file javalib_copy => TmcJavalib.jar_path do
-    FileUtils.cp TmcJavalib.jar_path, javalib_copy
-  end
-end
-
 # Have rake spec ensure javalib is compiled
-task :spec => [TmcJavalib.jar_path] + javalib_copies
+task :spec => TmcJavalib.jar_path
 
 

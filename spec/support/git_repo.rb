@@ -8,11 +8,18 @@ class GitRepo
     @commit_count = 0
   end
   
-  def copy_simple_exercise(dir = 'SimpleExercise', metadata = {})
-    dest = "#{@path}/#{dir}"
-    FileUtils.mkdir_p(File.dirname(dest))
-    FileUtils.cp_r(SimpleExercise.fixture_path, dest)
-    set_metadata_in(dir, metadata) unless metadata.empty?
+  def copy_simple_exercise(dest_name = nil, metadata = {})
+    copy_fixture_exercise('SimpleExercise', dest_name, metadata)
+  end
+  
+  def copy_fixture_exercise(src_name, dest_name = nil, metadata = {})
+    dest_name ||= src_name
+    
+    dest = "#{@path}/#{dest_name}"
+
+    ex = FixtureExercise.new(src_name, dest)
+    ex.write_metadata(metadata) unless metadata.empty?
+    ex
   end
   
   def set_metadata_in(dir, metadata_hash)

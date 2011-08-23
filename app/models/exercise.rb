@@ -154,8 +154,9 @@ private
   end
 
   def self.exercise_path? path
-    FileTest.directory? path and FileTest.exists? "#{path}/src" and
-      FileTest.exists? "#{path}/test" and FileTest.exists? "#{path}/nbproject"
+    FileTest.directory?(path) &&
+      FileTest.exists?("#{path}/src") &&
+      FileTest.exists?("#{path}/test")
   end
 
   def self.find_exercise_paths root_path
