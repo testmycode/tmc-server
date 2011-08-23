@@ -2,6 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'git_test_actions.rb'
 
 module IntegrationTestActions
   include GitTestActions
+  include SystemCommands
 
   def log_in_as(username)
     fill_in 'Login', :with => username
