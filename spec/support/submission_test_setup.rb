@@ -1,3 +1,4 @@
+require File.expand_path(File.join(File.dirname(__FILE__), 'git_test_actions.rb'))
 
 # Aggregates everything needed to test checking a submission
 class SubmissionTestSetup
