@@ -21,7 +21,6 @@ module GitTestActions
       course = Course.find_by_name(course_or_course_name)
     end
     
-    FileUtils.pwd.start_with?(@test_tmp_dir).should == true
     clone_repo(course.bare_url, course.name + "-wc")
     
     GitRepo.new("#{course.name}-wc")
