@@ -66,8 +66,7 @@ private
     src_classes = "#{exercise_dir}/build/classes"
     results_file = "#{exercise_dir}/results" #FIXME: put elsewhere
     
-    #TODO: would be nice if get_test_case_methods(exercise_dir) were cached
-    test_methods = TmcJavalib.get_test_case_methods(exercise_dir).map do |m|
+    test_methods = TestScanner.get_test_case_methods(exercise_dir).map do |m|
       m[:class_name] + "." + m[:method_name] + "{" + m[:points].join(',') + "}"
     end
     

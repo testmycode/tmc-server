@@ -3,23 +3,7 @@ require 'shellwords'
 # Interface to tmc-javalib.
 module TmcJavalib
   include SystemCommands
-
-  def self.method_missing(*args)
-    default_instance.send(*args)
-  end
-  
-  def self.default_instance # No need to call explicitly - you can say TmcJavalib.methodname
-    # fixme: there is a nicer way to do this. extend TmcJavalib in class context.
-    if @default_instance.nil?
-      @default_instance = Object.new
-      class << @default_instance; include TmcJavalib; end
-    end
-    @default_instance
-  end
-  
-  def self.default_instance=(obj)
-    @default_instance = obj
-  end
+  extend TmcJavalib
 
   def project_path
     "#{::Rails.root}/lib/tmc-javalib"
@@ -54,11 +38,7 @@ module TmcJavalib
     end
   end
   
-  # Returns an array of hashes with
-  # :class_name => 'UnqualifiedJavaClassName'
-  # :method_name => 'testMethodName',
-  # :points => ['exercise', 'annotation', 'values']
-  #   (split by space from annotation value; empty if none)
+  # Use TestScanner.get_test_case_methods instead as it provides caching.
   def get_test_case_methods(course_or_exercise_path)
     path = course_or_exercise_path
     cmd = "java -cp #{Shellwords.escape(classpath)} #{package}.testscanner.TestScanner #{Shellwords.escape(path)}"
@@ -73,6 +53,5 @@ protected
       Hash[item.map {|k,v| [k.underscore.to_sym, v] }]
     end
   end
-
 end
 

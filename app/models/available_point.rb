@@ -6,6 +6,6 @@ class AvailablePoint < ActiveRecord::Base
   has_one :course, :through => :exercise
 
   def self.read_from_project(path)
-    TmcJavalib.get_test_case_methods(path).map{|x| x[:points]}.flatten.uniq
+    TestScanner.get_test_case_methods(path).map{|x| x[:points]}.flatten.uniq
   end
 end
