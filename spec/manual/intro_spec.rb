@@ -4,9 +4,9 @@ require 'capybara/rails'
 describe "User manual", :type => :request do
   
   it "has an introduction" do
-    doc = DocGen.new
+    doc = DocGen.new("intro")
     doc.page("intro") do
-      doc.paragraph("Hello World.")
+      doc.p("Hello World.")
       
       visit '/'
       doc.screenshot

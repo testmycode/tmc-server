@@ -19,5 +19,6 @@ group :development, :test do
   gem 'capybara', '~> 1.0.1'
   gem 'launchy'  # for capybara's save_and_open_page
   gem 'railroady' # for doc/diagrams
+  gem 'builder', '~> 2.1.2' # for the document generator
 end
 

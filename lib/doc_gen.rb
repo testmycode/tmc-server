@@ -3,75 +3,70 @@ require 'capybara'
 require 'capybara/dsl'
 
 class DocGen
-  include Capybara::DSL
-  alias :capybara_page :page
+  include SystemCommands
   
-  def initialize
-    FileUtils.mkdir_p(root_path)
+  attr_reader :doc_name
+  
+  def initialize(name, options = {})
+    if !options[:target]
+      FileUtils.mkdir_p(root_path)
+      file = File.open("#{root_path}/#{name}.html", "wb")
+      ObjectSpace.define_finalizer(self, DocGen.file_closer(file))
+      options[:target] = file
+    end
+    
+    options[:indent] = 2 if !options[:indent]
+    
+    @options = options
+    @doc_name = name
+    
+    @capybara = Object.new
+    class << @capybara
+      include Capybara::DSL
+    end
   end
   
   def page(name, &block)
-    @page = name
-    @file = File.open("#{root_path}/#{name}.html", "wb")
-    
-    Capybara.using_driver :selenium do
-      write_page(name, &block)
+    begin
+      @builder = Builder::XmlMarkup.new(@options)
+      Capybara.using_driver :selenium do
+        write_page(name, &block)
+      end
+    ensure
+      @builder = nil
     end
   end
   
   def screenshot(options = {})
-    rel_img_path = alloc_img
+    rel_img_path = next_img_rel_path
     abs_img_path = "#{root_path}/#{rel_img_path}"
     screenshot_to_file(abs_img_path)
-    @file.puts("<img alt=\"(screenshot)\" src=\"#{rel_img_path}\" />")
+    self.img(:alt => "(screenshot)", :src => rel_img_path)
   end
   
-  def paragraph(text = nil, &block)
-    if block && text
-      raise '#paragraph takes either a string or a block, not both'
-    end
-    if text
-      make_tag "p" do
-        self.puts(text)
-      end
+  def method_missing(name, *args, &block)
+    if name.to_s.end_with?('!')
+      @builder.__send__(name, *args, &block)
     else
-      make_tag("p", &block)
+      @builder.method_missing(name, *args, &block)
     end
-  end
-  
-  def puts(s)
-    @file.puts(s)
-  end
-  
-  def <<(s)
-    @file << s
   end
 
 protected
-  def write_page(name, &block)
-    @file.puts("<!DOCTYPE html>")
-    make_tag("html") do
-      make_tag("head") do
-        make_tag("title") do
-          puts(name.capitalize)
-        end
-      end
-      make_tag("body") do
-        block.call
-      end
-    end
+  def self.file_closer(file)
+    Proc.new { file.close }
   end
 
-  def make_tag(name, &block)
-    if block
-      begin
-        @file.puts("<#{name}>")
-        block.call
-      ensure
-        @file.puts("</#{name}>")
+  def write_page(name, &block)
+    self.declare!(:DOCTYPE, :html)
+    self.html do
+      self.head do
+        self.meta(:'http-equiv' => 'Content-Type', :content => 'text/html; charset=utf-8')
+        self.title(name.capitalize)
       end
-    else
-      @file.puts("<#{name} />")
+      self.body do
+        block.call
+      end
     end
   end
 
@@ -79,22 +74,31 @@ protected
     "#{Rails::root}/doc/manual"
   end
   
-  def relative_img_path
+  def img_dir_rel_path
     "img"
   end
   
-  def alloc_img
+  def next_img_rel_path
     @img_counter ||= 0
     @img_counter += 1
-    "#{relative_img_path}/#{@page}-#{@img_counter}.png"
+    "#{img_dir_rel_path}/#{@doc_name}-#{@img_counter}.png"
   end
   
   def screenshot_to_file(file)
     FileUtils.mkdir_p(File.dirname(file))
-    capybara_page.driver.browser.save_screenshot(file)
-#    File.open(file, "wb") do |f|
-#      f.write(Base64.decode64(page.driver.browser.screenshot_as(:base64)))
-#    end
+    @capybara.page.driver.browser.save_screenshot(file)
+    trim_image_edges(file)
+  end
+  
+  def trim_image_edges(file)
+    cmd = mk_command [
+      'convert',
+      '-trim',
+      file,
+      file + ".tmp"
+    ]
+    system!(cmd)
+    FileUtils.mv(file + ".tmp", file)
   end
 end
 
