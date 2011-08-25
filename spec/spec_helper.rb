@@ -24,4 +24,10 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.use_transactional_fixtures = true
+  
+  # Let's skip gdocs and usermanual tests by default.
+  # GDocs tests require some setup and
+  # the user manual generation is slow (maybe should be in :slow group instead)
+  config.filter_run_excluding :gdocs => true
+  config.filter_run_excluding :usermanual => true
 end

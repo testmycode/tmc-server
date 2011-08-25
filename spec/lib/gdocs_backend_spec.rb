@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'gdocs_backend'
 
-describe GDocsBackend, :slow => true do
+describe GDocsBackend, :gdocs => true do
   before :all do
     @session = GDocsBackend.authenticate
     @session.should_not be_nil
