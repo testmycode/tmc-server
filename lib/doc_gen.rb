@@ -71,7 +71,7 @@ protected
   end
 
   def root_path
-    "#{Rails::root}/doc/manual"
+    "#{Rails::root}/doc/usermanual"
   end
   
   def img_dir_rel_path
