@@ -4,3 +4,4 @@
 /db/local_git_repos
 /log/*.log
 /tmp/
+/doc/manual
