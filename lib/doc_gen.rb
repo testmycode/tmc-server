@@ -90,6 +90,7 @@ protected
   end
   
   def screenshot_to_file(file)
+    FileUtils.mkdir_p(File.dirname(file))
     capybara_page.driver.browser.save_screenshot(file)
 #    File.open(file, "wb") do |f|
 #      f.write(Base64.decode64(page.driver.browser.screenshot_as(:base64)))
