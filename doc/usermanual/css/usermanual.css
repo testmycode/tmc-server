@@ -1,3 +1,60 @@
+
+body {
+  font-family: "Arial", "Helvetica", sans-serif;
+  font-size: 10pt;
+}
+
+body > p,
+body > div {
+  margin-left: 8pt;
+}
+
 img.screenshot {
   border: 3px solid gray;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 3em;
 }
+
+pre.java, .shell {
+  font-family: "DejaVu Sans Mono", "Consolas", monospace;
+}
+
+pre.java, div.shell {
+  margin-left: 10pt;
+  margin-right: 40pt;
+  padding: 10pt;
+  border: 2px solid gray;
+}
+
+.shell {
+  font-weight: bold;
+  color: white;
+  background-color: #2D2D2D;
+}
+
+.shell span.prompt {
+  color: #66BF92;
+}
+
+.shell span.command {
+  color: #E8E8D7;
+}
+
+.shell span.output {
+  color: #749685;
+}
+
+div.file-name {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+footer {
+  margin-top: 12em;
+  font-size: 8pt;
+  color: gray;
+  float: right;
+}
+

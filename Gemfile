@@ -20,6 +20,5 @@ group :development, :test do
   gem 'database_cleaner', '~> 0.6.7'
   gem 'launchy'  # for capybara's save_and_open_page
   gem 'railroady' # for doc/diagrams
-  gem 'builder', '~> 2.1.2' # for the document generator
 end
 

@@ -1,25 +1,21 @@
 require 'fileutils'
-require 'capybara'
-require 'capybara/dsl'
 require 'erb'
 
+# Used for generating documents from acceptance tests.
+# See e.g. spec/usermanual
 class DocGen
   include SystemCommands
   
   attr_reader :doc_name
   
-  def initialize(name)
+  def initialize(name, self_in_test)
     @doc_name = name
-    
-    @capybara = Object.new
-    class << @capybara
-      include Capybara::DSL
-    end
+    @test_case = self_in_test
   end
   
   def render_template(template_path)
     Capybara.using_driver :selenium do
-      @capybara.page.execute_script("window.resizeTo(800, 600);")
+      @test_case.page.execute_script("window.resizeTo(800, 600);")
       
       template = File.read(template_path)
       b = self.send(:binding)
@@ -37,11 +33,11 @@ class DocGen
   end
   
   def highlight(matcher)
-    @capybara.page.execute_script("jQuery('#{matcher}').addClass('highlighted');")
+    @test_case.page.execute_script("jQuery('#{matcher}').addClass('highlighted');")
   end
   
   def method_missing(name, *args, &block)
-    @capybara.send(name, *args, &block)
+    @test_case.send(name, *args, &block)
   end
 
 protected
@@ -62,7 +58,7 @@ protected
   
   def screenshot_to_file(path)
     FileUtils.mkdir_p(File.dirname(path))
-    @capybara.page.driver.browser.save_screenshot(path)
+    @test_case.page.driver.browser.save_screenshot(path)
     trim_image_edges(path)
   end
   
