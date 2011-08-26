@@ -3,7 +3,7 @@ require 'fileutils'
 namespace :doc do
   desc "Generate doc/usermanual"
   task :usermanual => "doc:usermanual:clean" do
-    sh "rspec spec/usermanual"
+    sh "rspec --tag usermanual spec"
   end
   
   namespace :usermanual do

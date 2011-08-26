@@ -25,9 +25,7 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
   
-  # Let's skip gdocs and usermanual tests by default.
-  # GDocs tests require some setup and
-  # the user manual generation is slow (maybe should be in :slow group instead)
+  # FIXME: it turns out this can't be overridden with --tags
+  # See https://github.com/rspec/rspec-core/issues/327
   config.filter_run_excluding :gdocs => true
-  config.filter_run_excluding :usermanual => true
 end
