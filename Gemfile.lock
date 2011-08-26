@@ -41,6 +41,7 @@ GEM
     childprocess (0.2.1)
       ffi (~> 1.0.6)
     configuration (1.2.0)
+    database_cleaner (0.6.7)
     diff-lcs (1.1.2)
     erubis (2.6.6)
       abstract (>= 1.0.0)
@@ -129,6 +130,7 @@ DEPENDENCIES
   builder (~> 2.1.2)
   cancan (~> 1.6.5)
   capybara (~> 1.0.1)
+  database_cleaner (~> 0.6.7)
   factory_girl_rails (~> 1.1.0)
   gdocs4ruby (~> 0.1.2)
   google-spreadsheet-ruby

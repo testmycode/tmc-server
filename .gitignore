@@ -4,4 +4,5 @@
 /db/local_git_repos
 /log/*.log
 /tmp/
-/doc/usermanual
+/doc/usermanual/pages
+/doc/usermanual/screenshots

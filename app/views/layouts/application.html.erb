@@ -5,6 +5,9 @@
   <%= stylesheet_link_tag 'main' %>
   <%= javascript_include_tag 'jquery', 'jquery_ujs', 'jquery.dataTables.min' %>
   <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.14.custom.css' %>
+  <% if Rails.env == 'test' %>
+    <%= stylesheet_link_tag 'highlighting' %>
+  <% end %>
   <%= csrf_meta_tag %>
   <title>Test My Code server</title>
 </head>

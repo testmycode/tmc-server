@@ -1,23 +1,14 @@
 require 'fileutils'
 require 'capybara'
 require 'capybara/dsl'
+require 'erb'
 
 class DocGen
   include SystemCommands
   
   attr_reader :doc_name
   
-  def initialize(name, options = {})
-    if !options[:target]
-      FileUtils.mkdir_p(root_path)
-      file = File.open("#{root_path}/#{name}.html", "wb")
-      ObjectSpace.define_finalizer(self, DocGen.file_closer(file))
-      options[:target] = file
-    end
-    
-    options[:indent] = 2 if !options[:indent]
-    
-    @options = options
+  def initialize(name)
     @doc_name = name
     
     @capybara = Object.new
@@ -26,79 +17,72 @@ class DocGen
     end
   end
   
-  def page(name, &block)
-    begin
-      @builder = Builder::XmlMarkup.new(@options)
-      Capybara.using_driver :selenium do
-        write_page(name, &block)
-      end
-    ensure
-      @builder = nil
+  def render_template(template_path)
+    Capybara.using_driver :selenium do
+      @capybara.page.execute_script("window.resizeTo(800, 600);")
+      
+      template = File.read(template_path)
+      b = self.send(:binding)
+      text = ERB.new(template).result(b)
+      
+      FileUtils.mkdir_p(File.dirname(output_path))
+      File.open(output_path, "wb") {|f| f.write(text) }
     end
   end
   
   def screenshot(options = {})
-    rel_img_path = next_img_rel_path
-    abs_img_path = "#{root_path}/#{rel_img_path}"
-    screenshot_to_file(abs_img_path)
-    self.img(:alt => "(screenshot)", :src => rel_img_path)
+    name = next_screenshot_name
+    screenshot_to_file("#{root_path}/screenshots/#{name}")
+    '<img src="../screenshots/' + name + '" alt="(screenshot)" class="screenshot" />'
+  end
+  
+  def highlight(matcher)
+    @capybara.page.execute_script("jQuery('#{matcher}').addClass('highlighted');")
   end
   
   def method_missing(name, *args, &block)
-    if name.to_s.end_with?('!')
-      @builder.__send__(name, *args, &block)
-    else
-      @builder.method_missing(name, *args, &block)
-    end
+    @capybara.send(name, *args, &block)
   end
 
 protected
-  def self.file_closer(file)
-    Proc.new { file.close }
-  end
-
-  def write_page(name, &block)
-    self.declare!(:DOCTYPE, :html)
-    self.html do
-      self.head do
-        self.meta(:'http-equiv' => 'Content-Type', :content => 'text/html; charset=utf-8')
-        self.title(name.capitalize)
-      end
-      self.body do
-        block.call
-      end
-    end
-  end
 
   def root_path
     "#{Rails::root}/doc/usermanual"
   end
   
-  def img_dir_rel_path
-    "img"
+  def output_path
+    "#{root_path}/pages/#{@doc_name}.html"
   end
   
-  def next_img_rel_path
+  def next_screenshot_name
     @img_counter ||= 0
     @img_counter += 1
-    "#{img_dir_rel_path}/#{@doc_name}-#{@img_counter}.png"
+    "#{@doc_name}-#{@img_counter}.png"
   end
   
-  def screenshot_to_file(file)
-    FileUtils.mkdir_p(File.dirname(file))
-    @capybara.page.driver.browser.save_screenshot(file)
-    trim_image_edges(file)
+  def screenshot_to_file(path)
+    FileUtils.mkdir_p(File.dirname(path))
+    @capybara.page.driver.browser.save_screenshot(path)
+    trim_image_edges(path)
   end
   
-  def trim_image_edges(file)
+  def trim_image_edges(path)
     cmd = mk_command [
       'convert',
       '-trim',
-      file,
-      file + ".tmp"
+      path,
+      path + ".tmp"
     ]
+    cmd2 = mk_command [
+      'mv',
+      '-f',
+      path + ".tmp",
+      path
+    ]
+    
+    # todo: could but these in the background, but Ruby 1.8 doesn't have Process.daemon :(
     system!(cmd)
-    FileUtils.mv(file + ".tmp", file)
+    system!(cmd2)
   end
 end
 
