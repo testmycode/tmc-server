@@ -16,7 +16,7 @@ describe "The system (used by an instructor for administration)" do
   end
   
   it "should allow using a remote git repo for new courses" do
-    copy_model_repo("#{@test_tmp_dir}/fake_remote_repo")
+    create_bare_repo("#{@test_tmp_dir}/fake_remote_repo")
     
     create_new_course('mycourse', :remote_repo_url => "file://#{@test_tmp_dir}/fake_remote_repo")
     

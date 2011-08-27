@@ -22,17 +22,20 @@ describe GitBackend do
       lambda { @course.create_local_repository }.should raise_error
     end
 
-    it "should raise an exception if console commands fail" do
-      path = ENV['PATH']
-      system("true").should be_true
-      begin
-        ENV['PATH'] = ''
-        system("true").should be_false
-        lambda { @course.create_local_repository }.should raise_error
-      ensure
-        ENV['PATH'] = path
-      end
-    end
+    it "should raise an exception if console commands fail"
+    # TODO: get rid of the extra output. Need a better SystemCommands anyway
+    # Something like bash!([cmd], :assert_silent => true) might be nice
+#    it "should raise an exception if console commands fail" do
+#      path = ENV['PATH']
+#      system("true").should be_true
+#      begin
+#        ENV['PATH'] = ''
+#        system("true").should be_false
+#        lambda { @course.create_local_repository }.should raise_error
+#      ensure
+#        ENV['PATH'] = path
+#      end
+#    end
   end
 
   describe "#bare_path" do
@@ -47,7 +50,6 @@ describe GitBackend do
     it "should be absolute" do
       class_paths = [
         :repositories_root,
-        :model_repository,
         :cache_root
       ]
       for path in class_paths

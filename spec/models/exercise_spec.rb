@@ -29,7 +29,7 @@ describe Exercise do
     before :each do
       @course_name = 'MyCourse'
       FileUtils.mkdir_p 'bare_repo'
-      copy_model_repo("bare_repo/#{@course_name}")
+      create_bare_repo("bare_repo/#{@course_name}")
       system! "git clone -q bare_repo/#{@course_name} #{@course_name}"
       @repo = GitRepo.new(@course_name)
     end
@@ -48,7 +48,7 @@ describe Exercise do
     end
 
     # TODO: should test metadata loading, but tests for Course.refresh already test that.
-    # Some more mocking should probably happen somewhere..
+    # Some more refactoring should probably happen somewhere..
 
   end
 

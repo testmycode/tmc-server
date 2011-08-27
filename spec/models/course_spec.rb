@@ -146,7 +146,7 @@ describe Course do
         let!(:course) { Course.create!(:name => 'TestCourse', :remote_repo_url => remote_repo_url) }
 
         before :each do
-          copy_model_repo(remote_repo_path)
+          create_bare_repo(remote_repo_path)
         end
       end
 

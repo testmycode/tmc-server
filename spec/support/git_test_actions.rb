@@ -1,17 +1,24 @@
 module GitTestActions
   include SystemCommands
 
-  def model_repo_path
-    "#{::Rails.root}/lib/gitbackend/modelrepo"
-  end
-
-  def copy_model_repo(path)
-    FileUtils.cp_r(model_repo_path, path)
-  end
-  
-  def clone_empty_course_repo(path)
-    clone_repo(model_repo_path, path)
-    GitRepo.new(path)
+  def create_bare_repo(path, options = {})
+    options = {:initial_commit => true}.merge(options)
+    abs_path = File.expand_path(path)
+    system!("git init -q --bare #{path}")
+    
+    if options[:initial_commit] # To avoid pesky warning about cloning empty repos
+      Dir.mktmpdir do |tmpdir|
+        system!("git init -q #{tmpdir}")
+        Dir.chdir(tmpdir) do
+          system!("echo Hello > README")
+          system!("git add README")
+          system!("git commit -qm \"Added dummy README\"")
+          system!("git remote add origin #{abs_path}")
+          system!("git push -q origin master >/dev/null 2>&1")
+        end
+      end
+    end
+    nil
   end
 
   def clone_course_repo(course_or_course_name)
@@ -27,6 +34,7 @@ module GitTestActions
   end
   
   def clone_repo(from, to)
-    system! "git clone -q #{from} #{to}"
+    # silencing warning about cloning empty repo
+    system!("git clone -q #{from} #{to} >/dev/null 2>&1")
   end
 end

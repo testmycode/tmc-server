@@ -8,7 +8,8 @@ module GitBackend
     raise "#{bare_path} not empty" if local_repository_exists?
 
     begin
-      copy_model_repository
+      FileUtils.mkdir_p(bare_path)
+      system!(mk_command ["git", "init", "-q", "--bare", "--shared=group", bare_path])
     rescue Exception => e
       delete_local_repository
       raise e
@@ -31,10 +32,6 @@ module GitBackend
 
   def self.repositories_root
     "#{::Rails.root}/db/local_git_repos"
-  end
-
-  def self.model_repository
-    "#{::Rails.root}/lib/gitbackend/modelrepo"
   end
 
   def self.cache_root
@@ -66,21 +63,23 @@ module GitBackend
   end
 
   def refresh_exercise_archives
-    self.exercises.each do |e|
-      Dir.chdir(clone_path) do
+    Dir.chdir(clone_path) do
+      File.open(".gitattributes", "wb") { |f| f.write(gitattributes_for_archive) }
+      
+      self.exercises.each do |e|
         path = "#{clone_path}/#{e.path}"
         zip_file_abs_path = "#{zip_path}/#{e.name}.zip"
-        system! "git archive --output=#{zip_file_abs_path} HEAD #{path}"
+        system! "git archive --worktree-attributes --output=#{zip_file_abs_path} HEAD #{path}"
       end
     end
   end
-
+  
 private
-
-  def copy_model_repository
-    FileUtils.mkdir_p GitBackend.repositories_root
-    FileUtils.cp_r GitBackend.model_repository, bare_path
-    system! "chmod g+rwX #{GitBackend.repositories_root}"
-    system! "chmod g+rwX -R #{bare_path}"
+  def gitattributes_for_archive
+    [
+      "*Hidden* export-ignore",
+      ".gitignore export-ignore",
+      ".gitkeep export-ignore"
+    ].join("\n")
   end
 end

@@ -3,7 +3,7 @@ require 'shellwords'
 module SystemCommands
   def system!(cmd)
     ok = system(cmd)
-    raise "Command `#{cmd}` failed with status #{$?}" if !ok
+    raise "Command `#{cmd}` failed with status #{$?.inspect}" if !ok
   end
   
   def mk_command(cmd_parts)
