@@ -77,6 +77,8 @@ protected
     ]
     
     # todo: could but these in the background, but Ruby 1.8 doesn't have Process.daemon :(
+    # would be better to ensure they finish too before the test finishes or
+    # this object is collected or whatever
     system!(cmd)
     system!(cmd2)
   end
