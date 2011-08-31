@@ -1,7 +1,6 @@
 require 'find'
 
 module GitBackend
-  extend SystemCommands
   include SystemCommands
 
   def create_local_repository
@@ -57,31 +56,5 @@ module GitBackend
   def clone_path
     "#{cache_path}/clone"
   end
-
-  def refresh_working_copy
-    system! "git clone -q #{bare_url} #{clone_path}"
-  end
-
-  def refresh_exercise_archives
-    Dir.chdir(clone_path) do
-      File.open(".gitattributes", "wb") { |f| f.write(gitattributes_for_archive) }
-      
-      self.exercises.each do |e|
-        path = "#{clone_path}/#{e.path}"
-        zip_file_abs_path = "#{zip_path}/#{e.name}.zip"
-        system! "git archive --worktree-attributes --output=#{zip_file_abs_path} HEAD #{path}"
-      end
-      
-      File.unlink(".gitattributes")
-    end
-  end
-  
-private
-  def gitattributes_for_archive
-    [
-      "*Hidden* export-ignore",
-      ".gitignore export-ignore",
-      ".gitkeep export-ignore"
-    ].join("\n")
-  end
 end
+

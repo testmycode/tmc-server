@@ -63,14 +63,8 @@ class Course < ActiveRecord::Base
     GDocsBackend.refresh_course_spreadsheet self
   end
 
-  # @deprecated Use CourseRefresher instead
   def refresh
     CourseRefresher.new.refresh_course(self)
-#    clear_cache
-#    refresh_working_copy
-#    refresh_options
-#    refresh_exercises
-#    refresh_exercise_archives
   end
 
   def options=(new_options)
@@ -89,36 +83,5 @@ class Course < ActiveRecord::Base
       :hide_after => nil
     }
   end
-
-private
-
-  def refresh_options
-    options_file = "#{clone_path}/course_options.yml"
-    options = Course.default_options
-
-    if FileTest.exists? options_file
-      options = options.merge(YAML.load_file(options_file))
-    end
-
-    if !options["hide_after"].blank?
-      self.hide_after = options["hide_after"]
-    else
-      self.hide_after = nil
-    end
-
-    self.hidden = !!options['hidden']
-  end
-
-  def refresh_exercises
-    exercise_names = Exercise.read_exercise_names self.clone_path
-    exercise_names.each do |name|
-      if self.exercises.none? {|x| x.name == name}
-        self.exercises << Exercise.new(:name => name)
-      end
-    end
-
-    self.exercises.each {|e| e.refresh }
-    self.exercises.reload
-    self.save
-  end
 end
+

@@ -4,9 +4,4 @@
 class AvailablePoint < ActiveRecord::Base
   belongs_to :exercise
   has_one :course, :through => :exercise
-
-  # @deprecated
-  def self.read_from_project(path)
-    TestScanner.get_test_case_methods(path).map{|x| x[:points]}.flatten.uniq
-  end
 end

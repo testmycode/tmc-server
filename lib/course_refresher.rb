@@ -67,7 +67,7 @@ private
       @exercise_dirs = []
       
       Find.find(@course.clone_path) do |path|
-        if Exercise.exercise_path? path
+        if looks_like_exercise_path? path
           @exercise_dirs << path
         end
       end
@@ -75,7 +75,7 @@ private
       @exercise_dirs
     end
     
-    def exercise_path? path
+    def looks_like_exercise_path? path
       FileTest.directory?(path) &&
         FileTest.exists?("#{path}/src") &&
         FileTest.exists?("#{path}/test")

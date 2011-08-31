@@ -70,17 +70,6 @@ EOS
   def deadline=(new_deadline)
     super(DateAndTimeUtils.to_time(new_deadline, :prefer_end_of_day => true))
   end
-
-  def refresh
-    unless Exercise.exercise_path? self.fullpath
-      self.destroy
-      return
-    end
-
-    refresh_options
-    refresh_points
-    self.save
-  end
   
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
@@ -96,82 +85,11 @@ EOS
       "gdocs_sheet" => "root"
     }
   end
-
+  
 private
 
   def deadline_passed?
     self.deadline != nil && self.deadline < Time.now
   end
 
-  def refresh_options
-    self.options = Exercise.get_options course.clone_path, self.fullpath
-  end
-
-  def refresh_points
-    point_names = AvailablePoint.read_from_project(self.fullpath)
-
-    point_names.each do |name|
-      if self.available_points.none?{|point| point.name == name}
-        AvailablePoint.create(:name => name, :exercise => self)
-      end
-    end
-
-    self.available_points.each do |point|
-      if point_names.none?{|name| name == point.name}
-        point.destroy
-      end
-    end
-  end
-
-  def self.read_exercise_names course_path
-    Exercise.find_exercise_paths(course_path).map do |ex_path|
-      Exercise.path_to_name(course_path, ex_path)
-    end
-  end
-
-  def self.path_to_name(root_path, exercise_path)
-    name = exercise_path.gsub(/^#{root_path}\//, '')
-    name = name.gsub('/', '-')
-    return name
-  end
-
-  def self.merge_file hash, file
-    if FileTest.exists? file
-      new_hash = YAML.load_file(file)
-      hash = hash.merge(new_hash)
-    end
-    return hash
-  end
-
-  def self.get_options root_path, exercise_path
-    subpath = exercise_path.gsub(/^#{root_path}\//, '')
-    subdirs = subpath.split("/")
-    options = Exercise.default_options
-    options = Exercise.merge_file options, "#{root_path}/metadata.yml"
-
-    subdirs.each_index do |i|
-      options_file = "#{root_path}/#{subdirs[0..i].join('/')}/metadata.yml"
-      options = Exercise.merge_file options, options_file
-    end
-
-    return options
-  end
-
-  def self.exercise_path? path
-    FileTest.directory?(path) &&
-      FileTest.exists?("#{path}/src") &&
-      FileTest.exists?("#{path}/test")
-  end
-
-  def self.find_exercise_paths root_path
-    exercise_paths = []
-
-    Find.find(root_path) do |path|
-      if Exercise.exercise_path? path
-        exercise_paths << path
-      end
-    end
-
-    return exercise_paths
-  end
 end
