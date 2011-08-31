@@ -11,11 +11,13 @@
   <% end %>
 </ul>
 
-<h2>Submit answer</h2>
+<% if @exercise.available_to?(current_user) %>
+  <h2>Submit answer</h2>
 
-<section>
-  <%= render :partial => 'submissions/form', :locals => { :submission => @new_submission } %>
-</section>
+  <section>
+    <%= render :partial => 'submissions/form', :locals => { :submission => @new_submission } %>
+  </section>
+<% end %>
 
 
 <% if signed_in? %>

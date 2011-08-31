@@ -68,8 +68,8 @@ describe "The system (used by a student)" do
     page.should have_content('oops')
   end
   
-  it "should not show exercises whose deadline has passed" do
-    @repo.set_metadata_in('MyExercise', 'deadline' => Date.yesterday.to_s)
+  it "should not show exercises that have been explicitly hidden" do
+    @repo.set_metadata_in('MyExercise', 'hidden' => true)
     @repo.add_commit_push
     @course.refresh
     
@@ -77,5 +77,22 @@ describe "The system (used by a student)" do
     click_link 'mycourse'
     
     page.should_not have_content('MyExercise')
+  end
+  
+  it "should show exercises whose deadline has passed but without a submission form" do
+    @repo.set_metadata_in('MyExercise', 'deadline' => Date.yesterday.to_s)
+    @repo.add_commit_push
+    @course.refresh
+    
+    visit '/'
+    click_link 'mycourse'
+    
+    page.should have_content('MyExercise')
+    page.should have_content('(expired)')
+    
+    click_link 'MyExercise'
+    page.should have_content('(expired)')
+    page.should_not have_content('Submit answer')
+    page.should_not have_content('Zipped project')
   end
 end

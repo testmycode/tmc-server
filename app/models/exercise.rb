@@ -44,6 +44,14 @@ class Exercise < ActiveRecord::Base
       !expired? && !hidden?
     end
   end
+  
+  def visible_to?(user)
+    if user.administrator?
+      true
+    else
+      !hidden?
+    end
+  end
 
   def attempted_by?(user)
     submissions.where(:user_id => user.id).exists?

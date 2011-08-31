@@ -25,7 +25,7 @@ class CoursesController < ApplicationController
 
   def show
     @course = Course.find(params[:id])
-    @exercises = @course.exercises.order('LOWER(name)').select {|ex| ex.available_to?(current_user) }
+    @exercises = @course.exercises.order('LOWER(name)').select {|ex| ex.visible_to?(current_user) }
     authorize! :read, @course
     authorize! :read, @exercises
 

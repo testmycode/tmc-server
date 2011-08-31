@@ -1,5 +1,4 @@
 class ExercisesController < ApplicationController
-  before_filter :fetch_course
 
   def show
     @course = Course.find(params[:course_id])
@@ -25,10 +24,5 @@ class ExercisesController < ApplicationController
         send_file @exercise.zip_file_path
       }
     end
-  end
-
-private
-  def fetch_course
-    
   end
 end
