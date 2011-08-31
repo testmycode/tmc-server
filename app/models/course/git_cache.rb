@@ -34,11 +34,11 @@ class Course < ActiveRecord::Base
       FileUtils.mkdir_p [zip_path, clone_path]
     end
 
-    def self.repositories_root
+    def Course.repositories_root
       "#{::Rails.root}/db/local_git_repos"
     end
 
-    def self.cache_root
+    def Course.cache_root
       "#{::Rails.root}/tmp/cache/git_repos"
     end
 
