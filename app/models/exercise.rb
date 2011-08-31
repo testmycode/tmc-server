@@ -76,13 +76,15 @@ EOS
     self.deadline = new_options["deadline"]
     self.publish_date = new_options["publish_date"]
     self.gdocs_sheet = new_options["gdocs_sheet"]
+    self.hidden = new_options["hidden"]
   end
   
   def self.default_options
     {
       "deadline" => nil,
       "publish_date" => nil,
-      "gdocs_sheet" => "root"
+      "gdocs_sheet" => "root",
+      "hidden" => false
     }
   end
   

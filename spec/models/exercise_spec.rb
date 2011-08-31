@@ -49,6 +49,12 @@ describe Exercise do
       @exercise.submissions.size.should == 1
     end
   end
+  
+  it "can be hidden with a boolean 'hidden' option" do
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
+    ex.options = {"hidden" => true}
+    ex.should be_hidden
+  end
 
   it "should treat date deadlines as being at 23:59:59 local time" do
     ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
