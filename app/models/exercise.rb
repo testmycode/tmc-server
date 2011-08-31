@@ -41,7 +41,7 @@ class Exercise < ActiveRecord::Base
     if user.administrator?
       true
     else
-      !deadline_passed? && !hidden?
+      !expired? && !hidden?
     end
   end
 
@@ -71,6 +71,10 @@ EOS
     super(DateAndTimeUtils.to_time(new_deadline, :prefer_end_of_day => true))
   end
   
+  def expired?
+    self.deadline != nil && self.deadline < Time.now
+  end
+  
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
     self.deadline = new_options["deadline"]
@@ -86,12 +90,6 @@ EOS
       "gdocs_sheet" => "root",
       "hidden" => false
     }
-  end
-  
-private
-
-  def deadline_passed?
-    self.deadline != nil && self.deadline < Time.now
   end
 
 end

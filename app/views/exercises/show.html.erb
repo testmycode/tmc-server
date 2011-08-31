@@ -3,6 +3,12 @@
 
 <ul>
   <li><%= link_to 'Download project template (zip)', @exercise.zip_url %></li>
+  <% if @exercise.hidden? %>
+    <li>This exercise is currently hidden</li>
+  <% end %>
+  <% if @exercise.deadline %>
+    <li>Deadline: <%= @exercise.deadline %><% if @exercise.expired? %> (expired)<% end %></li>
+  <% end %>
 </ul>
 
 <h2>Submit answer</h2>

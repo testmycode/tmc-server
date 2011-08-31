@@ -17,6 +17,14 @@
       <tr>
         <td>
           <%= link_to exercise.name, [course, exercise] %>
+          <%
+            notes = []
+            notes << "hidden" if exercise.hidden?
+            notes << "expired" if exercise.expired?
+          %>
+          <% unless notes.empty? %>
+            (<%= notes.join(', ') %>)
+          <% end %>
           </td>
           <td>
             <% if exercise.deadline %>
