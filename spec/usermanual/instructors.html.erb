@@ -257,5 +257,10 @@ require 'cgi' # for escapeHTML
     This page was automatically generated from an acceptance test at <%= Time.now %>.
     <!-- How cool is that? -->
   </footer>
+  
+  <%
+    # Clean up the fake remote repo
+    FileUtils.rm_rf(repo_path)
+  %>
 </body>
 </html>
