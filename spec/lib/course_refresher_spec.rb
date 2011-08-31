@@ -134,6 +134,16 @@ describe CourseRefresher do
         course.exercises.should have(1).items
       end
       
+      it "should cope with exercises that use Java packages" do
+        add_exercise('MyExercise', :fixture_name => 'ExerciseWithPackages')
+        refresher.refresh_course(course)
+        
+        course.exercises.should have(1).items
+        exercise = course.exercises.first
+        exercise.name.should == 'MyExercise'
+        exercise.available_points.map(&:name).should include('packagedtest')
+      end
+      
       it "should scan the exercises for available points" do
         add_exercise('MyExercise')
         refresher.refresh_course(course)
@@ -249,9 +259,12 @@ describe CourseRefresher do
   end
 
 
-  def add_exercise(name, options = {})
-    options = { :commit => true }.merge options
-    local_clone.copy_simple_exercise(name)
+  def add_exercise(dest_name, options = {})
+    options = {
+      :commit => true,
+      :fixture_name => 'SimpleExercise'
+    }.merge options
+    local_clone.copy_fixture_exercise(options[:fixture_name], dest_name)
     local_clone.add_commit_push if options[:commit]
   end
   

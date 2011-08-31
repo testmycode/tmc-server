@@ -27,7 +27,7 @@ protected
   def checksum_test_files(path)
     hash = Digest::MD5.hexdigest('')
     Dir.glob(path + "/test/**").sort.each do |filename|
-      hash = Digest::MD5.hexdigest(hash + IO.read(filename))
+      hash = Digest::MD5.hexdigest(hash + IO.read(filename)) unless File.directory?(filename)
     end
     hash
   end
