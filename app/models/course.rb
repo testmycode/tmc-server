@@ -3,6 +3,7 @@ require 'gdocs_backend'
 class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers
   include SystemCommands
+  include Course::GitCache
 
   self.include_root_in_json = false
 
@@ -30,84 +31,6 @@ class Course < ActiveRecord::Base
   def visible?
     !hidden && (hide_after == nil || hide_after > Time.now)
   end
-
-  def has_remote_repo?
-    !remote_repo_url.nil?
-  end
-
-  def has_local_repo?
-    !has_remote_repo?
-  end
-
-  def create_local_repository
-    raise "#{bare_path} not empty" if local_repository_exists?
-
-    begin
-      FileUtils.mkdir_p(bare_path)
-      system!(mk_command ["git", "init", "-q", "--bare", "--shared=group", bare_path])
-    rescue Exception => e
-      delete_local_repository
-      raise e
-    end
-  end
-
-  def local_repository_exists?
-    FileTest.exists? bare_path
-  end
-
-  def delete_local_repository
-    FileUtils.rm_rf bare_path
-    FileUtils.rm_rf cache_path
-  end
-
-  def clear_cache
-    FileUtils.rm_rf cache_path
-    FileUtils.mkdir_p [zip_path, clone_path]
-  end
-
-  def self.repositories_root
-    "#{::Rails.root}/db/local_git_repos"
-  end
-
-  def self.cache_root
-    "#{::Rails.root}/tmp/cache/git_repos"
-  end
-
-  def cache_path
-    "#{Course.cache_root}/#{self.name}-#{self.cache_version}"
-  end
-
-  def bare_path
-    "#{Course.repositories_root}/#{self.name}.git" if has_local_repo?
-  end
-
-  def bare_url
-    if has_local_repo?
-      "file://#{bare_path}"
-    else
-      remote_repo_url
-    end
-  end
-
-  def zip_path
-    "#{cache_path}/zip"
-  end
-
-  def clone_path
-    "#{cache_path}/clone"
-  end
-
-  def refresh
-    CourseRefresher.new.refresh_course(self)
-  end
-  
-  def gdocs_sheets
-    self.exercises.map(&:gdocs_sheet).uniq
-  end
-
-  def refresh_gdocs
-    GDocsBackend.refresh_course_spreadsheet self
-  end
   
   def hide_after=(x)
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => true))
@@ -129,5 +52,14 @@ class Course < ActiveRecord::Base
       :hide_after => nil
     }
   end
+  
+  def gdocs_sheets
+    self.exercises.map(&:gdocs_sheet).uniq
+  end
+
+  def refresh_gdocs
+    GDocsBackend.refresh_course_spreadsheet self
+  end
+  
 end
 
