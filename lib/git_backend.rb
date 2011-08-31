@@ -39,7 +39,7 @@ module GitBackend
   end
 
   def cache_path
-    "#{GitBackend.cache_root}/#{self.name}"
+    "#{GitBackend.cache_root}/#{self.name}-#{self.cache_version}"
   end
 
   def bare_path
@@ -71,6 +71,8 @@ module GitBackend
         zip_file_abs_path = "#{zip_path}/#{e.name}.zip"
         system! "git archive --worktree-attributes --output=#{zip_file_abs_path} HEAD #{path}"
       end
+      
+      File.unlink(".gitattributes")
     end
   end
   

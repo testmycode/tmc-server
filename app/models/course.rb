@@ -63,12 +63,23 @@ class Course < ActiveRecord::Base
     GDocsBackend.refresh_course_spreadsheet self
   end
 
+  # @deprecated Use CourseRefresher instead
   def refresh
     clear_cache
     refresh_working_copy
     refresh_options
     refresh_exercises
     refresh_exercise_archives
+  end
+
+  def options=(new_options)
+    if !new_options["hide_after"].blank?
+      self.hide_after = new_options["hide_after"]
+    else
+      self.hide_after = nil
+    end
+
+    self.hidden = !!new_options['hidden']
   end
 
   def self.default_options

@@ -81,6 +81,21 @@ EOS
     refresh_points
     self.save
   end
+  
+  def options=(new_options)
+    new_options = self.class.default_options.merge(new_options)
+    self.deadline = new_options["deadline"]
+    self.publish_date = new_options["publish_date"]
+    self.gdocs_sheet = new_options["gdocs_sheet"]
+  end
+  
+  def self.default_options
+    {
+      "deadline" => nil,
+      "publish_date" => nil,
+      "gdocs_sheet" => "root"
+    }
+  end
 
 private
 
@@ -89,10 +104,7 @@ private
   end
 
   def refresh_options
-    options = Exercise.get_options course.clone_path, self.fullpath
-    self.deadline = options["deadline"]
-    self.publish_date = options["publish_date"]
-    self.gdocs_sheet = options["gdocs_sheet"]
+    self.options = Exercise.get_options course.clone_path, self.fullpath
   end
 
   def refresh_points
@@ -121,14 +133,6 @@ private
     name = exercise_path.gsub(/^#{root_path}\//, '')
     name = name.gsub('/', '-')
     return name
-  end
-
-  def self.default_options
-    {
-      "deadline" => nil,
-      "publish_date" => nil,
-      "gdocs_sheet" => "root"
-    }
   end
 
   def self.merge_file hash, file

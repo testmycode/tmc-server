@@ -3,6 +3,8 @@ require 'digest'
 module TestScanner
   extend TestScanner
 
+  #TODO: for efficiency, take multiple paths and get results in one run
+  
   # Returns an array of hashes with
   # :class_name => 'UnqualifiedJavaClassName'
   # :method_name => 'testMethodName',

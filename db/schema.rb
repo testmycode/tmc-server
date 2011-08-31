@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110806114243) do
+ActiveRecord::Schema.define(:version => 20110831122940) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(:version => 20110806114243) do
     t.datetime "hide_after"
     t.string   "remote_repo_url"
     t.boolean  "hidden",          :default => false, :null => false
+    t.integer  "cache_version",   :default => 0,     :null => false
   end
 
   create_table "exercises", :force => true do |t|
