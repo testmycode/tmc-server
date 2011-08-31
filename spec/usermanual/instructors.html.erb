@@ -90,17 +90,18 @@ require 'cgi' # for escapeHTML
   %>
   
   <p>
-    The course was created successfully, and since we're using a local repo in this tutorial,
-    TMC created it for us at <code><%= course.bare_url %></code>.
+    The course was created successfully.
   </p>
   
   <%= screenshot %>
   
   <% workdir = 'tmc-exercises/prog101' %>
   <p>
-    Now we'll need to clone the remote repo.
-    Open the command line and go to a directory you'd like to work in.
-    We'll clone to <code><%= workdir %></code> here.
+    Now we'll need to add some exercises.
+    To do that, we'll need to clone the remote repository, make our changes and push them back,
+    as usual with git.
+    Open the command line and go to the directory you'd like to work in.
+    We'll clone to <code><%= workdir %></code> in this example.
   </p>
   
   <%
