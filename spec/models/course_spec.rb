@@ -34,12 +34,41 @@ describe Course do
       course.bare_url.should == "file://#{course.bare_path}"
       File.should exist(course.bare_path)
     end
+    
+    it "should raise an exception if the local repo already exists" do
+      course = Course.new(:name => 'TestCourse')
+      FileUtils.mkdir_p(course.bare_path)
+      lambda { course.save! }.should raise_error
+    end
 
     it "should delete the repository when destroyed" do
       course = Course.create!(:name => 'TestCourse')
       repo_path = course.bare_path
       course.destroy
       File.should_not exist(repo_path)
+    end
+  end
+  
+  describe "paths used" do
+    it "should be absolute" do
+      class_paths = [
+        :repositories_root,
+        :cache_root
+      ]
+      for path in class_paths
+        Course.send(path).should match /^\//
+      end
+      
+      object_paths = [
+        :cache_path,
+        :bare_path,
+        :zip_path,
+        :clone_path
+      ]
+      
+      for path in object_paths
+        Course.new.send(path).should match /^\//
+      end
     end
   end
 
@@ -59,11 +88,11 @@ describe Course do
       course.should_not have_local_repo
       course.bare_path.should be_nil
       course.bare_url.should == remote_repo_url
-      File.should_not exist("#{GitBackend.repositories_root}/TestCourse.git")
+      File.should_not exist("#{Course.repositories_root}/TestCourse.git")
     end
 
     it "should not attempt to destroy a local repository when destroyed" do
-      local_repo_path = "#{GitBackend.repositories_root}/TestCourse.git"
+      local_repo_path = "#{Course.repositories_root}/TestCourse.git"
       FileUtils.mkdir local_repo_path
       course.destroy
       File.should exist(local_repo_path)

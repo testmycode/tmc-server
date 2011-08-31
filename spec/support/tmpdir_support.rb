@@ -1,5 +1,5 @@
 
-# We make GitBackend use a temporary directory that we can nuke before
+# We make Course use a temporary directory that we can nuke before
 # each test
 
 RSpec.configure do |config|
@@ -18,8 +18,8 @@ RSpec.configure do |config|
     FileUtils.mkdir_p @git_backend_root_dir
     FileUtils.mkdir_p @git_backend_cache_dir
 
-    GitBackend.stub!(:repositories_root).and_return(@git_backend_root_dir)
-    GitBackend.stub!(:cache_root).and_return(@git_backend_cache_dir)
+    Course.stub!(:repositories_root).and_return(@git_backend_root_dir)
+    Course.stub!(:cache_root).and_return(@git_backend_cache_dir)
   end
 
   config.after(:each) do

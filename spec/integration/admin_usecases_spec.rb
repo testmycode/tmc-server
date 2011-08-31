@@ -11,7 +11,7 @@ describe "The system (used by an instructor for administration)" do
   
   it "should create a local git repo for new courses by default" do
     create_new_course('mycourse')
-    bare_repo_path = GitBackend.repositories_root + '/mycourse.git'
+    bare_repo_path = Course.repositories_root + '/mycourse.git'
     File.should exist(bare_repo_path)
   end
   
@@ -20,7 +20,7 @@ describe "The system (used by an instructor for administration)" do
     
     create_new_course('mycourse', :remote_repo_url => "file://#{@test_tmp_dir}/fake_remote_repo")
     
-    bare_repo_path = GitBackend.repositories_root + '/mycourse.git'
+    bare_repo_path = Course.repositories_root + '/mycourse.git'
     File.should_not exist(bare_repo_path)
     
   end
