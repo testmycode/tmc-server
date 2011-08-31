@@ -63,8 +63,9 @@ require 'cgi' # for escapeHTML
     fill_in 'course_name', :with => course_name
     highlight '#course_name'
     
-    repo_path = ENV['HOME'] + '/tmc-example-repo'
+    repo_path = ENV['TMC_USERMANUAL_REPO_PATH'] || (ENV['HOME'] + '/tmc-example-repo')
     FileUtils.rm_rf(repo_path)
+    FileUtils.mkdir_p(repo_path)
     system(mk_command('git', 'init', '--bare', '-q', repo_path))
     repo_url = 'file://' + repo_path
     
