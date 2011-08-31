@@ -24,6 +24,7 @@ pre.java, .shell {
 pre.java, div.shell {
   margin-left: 10pt;
   margin-right: 40pt;
+  margin-bottom: 3em;
   padding: 10pt;
   border: 2px solid gray;
 }
@@ -47,6 +48,7 @@ pre.java, div.shell {
 }
 
 div.file-name {
+  margin-left: 10pt;
   font-family: monospace;
   font-weight: bold;
 }

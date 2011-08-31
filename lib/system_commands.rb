@@ -6,7 +6,8 @@ module SystemCommands
     raise "Command `#{cmd}` failed with status #{$?.inspect}" if !ok
   end
   
-  def mk_command(cmd_parts)
+  def mk_command(*args)
+    cmd_parts = args.flatten
     cmd_parts.map {|arg| Shellwords.escape(arg.to_s) }.join(' ')
   end
 end

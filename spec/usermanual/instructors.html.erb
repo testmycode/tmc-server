@@ -55,19 +55,33 @@ require 'cgi' # for escapeHTML
   
   <% course_name = 'programming101' %>
   <p>
-    We'll name our course "<%= course_name %>".
-    It's recommended you store the exercises in a remote repository and not on the TMC server.
-    <a href="https://github.com/">GitHub</a> is an excellent place to get free Git hosting.
-    If you have an existing repository, say on GitHub, enter its read-only URL as the remote repo.
-    If you want a repo to be created on the TMC server, leave the field blank.
+    We'll name our course "<%= course_name %>", and we'll also have to give the address
+    of the git repository where we'll store the exercises.
   </p>
   
   <%
     fill_in 'course_name', :with => course_name
     highlight '#course_name'
+    
+    repo_path = ENV['HOME'] + '/tmc-example-repo'
+    FileUtils.rm_rf(repo_path)
+    system(mk_command('git', 'init', '--bare', '-q', repo_path))
+    repo_url = 'file://' + repo_path
+    
+    fill_in 'course_remote_repo_url', :with => repo_url
+    highlight '#course_remote_repo_url'
   %>
   
-  <% highlight '#course_remote_repo_url' %>
+  <p>
+    You can either give a remote repository address or leave the address blank to have
+    the TMC server create a local repository. We highly recommend using a remote repository,
+    since a local one requires setup of user git accounts on the TMC server.
+    <a href="https://github.com/">GitHub</a> is an excellent place to get free Git hosting.
+    If you have an existing repository, say on GitHub, enter its <em>read-only</em> URL as
+    the remote repo. In this example we'll pretend the remote repo is at
+    <code><%= CGI::escapeHTML(repo_url) %></code>.
+  </p>
+  
   <%= screenshot %>
   <%
     click_on 'Add Course'
@@ -99,9 +113,16 @@ require 'cgi' # for escapeHTML
   
   <h3>Starting from a template</h3>
   <p>
-    Let's start from the <a href="<%= course_template_homepage %>">template course</a>.
-    We'll name the template repository 'template' and let the target repo be the 'origin'
-    to which we'll push our exercises. Initially we'll push everything we got from the template.
+    If we have a <a href="<%= course_template_homepage %>">course template</a> in another repo,
+    we should clone that instead. We'll name the template repo as the 'template' remote
+    and add the actual course repo as 'origin'. We'll then push everything we got from
+    the template to 'origin'.
+  </p>
+  
+  <p>
+    The <code>-u</code> flag makes the master branch <em>track</em>
+    the master branch in 'origin'. This means that whenever we commit to master and push,
+    it'll push to 'origin' by default (and not to 'template').
   </p>
   
   <%=
@@ -138,8 +159,9 @@ require 'cgi' # for escapeHTML
   %>
   
   <p>
-    An exercise is just a NetBeans project with at least a JUnit and tmc-javalib
-    libraries included. The template course has a template exercise in
+    An exercise is just a NetBeans project with some unit tests and
+    at least the JUnit and tmc-javalib libraries included.
+    The template course has a template exercise in
     <code>private/template-exercise</code>.
   </p>
   
@@ -151,7 +173,7 @@ require 'cgi' # for escapeHTML
   
   <p>
     It's not advised to copy the template directly but instead use <code>scripts/create-project</code>
-    as it automatically also renames the course in all relevant NetBeans settings files.
+    as it automatically also renames the exercise in all relevant NetBeans settings files.
   </p>
   
   <%=
@@ -191,15 +213,14 @@ require 'cgi' # for escapeHTML
   
   <p>
     At this point you'd normally solve the exercise yourself to make sure your testcases are good.
-    When you're done, add commit and push your changes.
+    Then you'd make <code>Factorial.java</code> a stub like above and commit and push your changes.
   </p>
   
   <%=
     shell_session.example do |sh|
       sh.run "git status"
       sh.blank_line
-      sh.run "git add -A"
-      sh.run "git status"
+      sh.run "git add --verbose factorial"
       sh.blank_line
       sh.run "git commit -m \"Added factorial exercise.\""
       sh.blank_line
