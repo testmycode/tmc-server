@@ -65,11 +65,12 @@ class Course < ActiveRecord::Base
 
   # @deprecated Use CourseRefresher instead
   def refresh
-    clear_cache
-    refresh_working_copy
-    refresh_options
-    refresh_exercises
-    refresh_exercise_archives
+    CourseRefresher.new.refresh_course(self)
+#    clear_cache
+#    refresh_working_copy
+#    refresh_options
+#    refresh_exercises
+#    refresh_exercise_archives
   end
 
   def options=(new_options)

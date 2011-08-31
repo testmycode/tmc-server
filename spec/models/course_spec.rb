@@ -275,18 +275,16 @@ describe Course do
       end
 
       it "should delete zip files of removed exercises" do
-        expected_zip_path = course.zip_path + '/MyCategory-MyExercise.zip'
-
         add_exercise('MyCategory/MyExercise')
         course.refresh
 
-        File.should exist(expected_zip_path)
+        File.should exist(course.zip_path + '/MyCategory-MyExercise.zip')
 
         FileUtils.rm_rf "#{local_clone.path}/MyCategory/MyExercise"
         local_clone.add_commit_push
         course.refresh
 
-        File.should_not exist(expected_zip_path)
+        File.should_not exist(course.zip_path + '/MyCategory-MyExercise.zip')
       end
     end
   end
