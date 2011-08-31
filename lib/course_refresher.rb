@@ -151,7 +151,7 @@ private
     def zip_up_exercises
       FileUtils.mkdir_p(@course.zip_path)
       Dir.chdir(@course.clone_path) do
-        File.open(".gitattributes", "wb") { |f| f.write(gitattributes_for_archive) } #TODO: test first
+        File.open(".gitattributes", "wb") { |f| f.write(gitattributes_for_archive) }
         
         @course.exercises.each do |e|
           path = "#{@course.clone_path}/#{e.path}"
