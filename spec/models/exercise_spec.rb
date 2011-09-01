@@ -116,6 +116,34 @@ describe Exercise do
     ex.hidden = true
     ex.should be_available_to(admin)
   end
+  
+  it "should be returnable by default if there is a non-empty test dir" do
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
+    FileUtils.mkdir_p('FakeCache/test')
+    FileUtils.touch('FakeCache/test/Xoo.java')
+    ex.stub(:fullpath => 'FakeCache')
+    ex.should be_returnable
+  end
+  
+  it "should be non-returnable by default if there is an empty test dir" do
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
+    FileUtils.mkdir_p('FakeCache/test')
+    ex.stub(:fullpath => 'FakeCache')
+    ex.should_not be_returnable
+  end
+
+  it "should be non-returnable by default if there is no test dir" do
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
+    FileUtils.mkdir_p('FakeCache')
+    ex.stub(:fullpath => 'FakeCache')
+    ex.should_not be_returnable
+  end
+  
+  it "can be marked non-returable" do
+    ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
+    ex.options = { 'returnable' => true }
+    ex.should be_returnable
+  end
 
   it "should be available to non-administrators only if the deadline has not passed and the exercise is not hidden" do
     user = Factory.create(:user)

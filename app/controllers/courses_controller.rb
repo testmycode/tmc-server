@@ -93,6 +93,8 @@ private
     result = fields.reduce({}) do |r, field|
       r.merge({ field => exercise.send(field) })
     end
+    
+    result[:returnable] = exercise.returnable?
 
     if user
       result[:attempted] = exercise.attempted_by?(user)

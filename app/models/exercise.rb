@@ -89,6 +89,17 @@ EOS
     self.publish_date = new_options["publish_date"]
     self.gdocs_sheet = new_options["gdocs_sheet"]
     self.hidden = new_options["hidden"]
+    self.returnable_forced = new_options["returnable"]
+  end
+  
+  def returnable?
+    if returnable_forced != nil
+      returnable_forced
+    else
+      File.exist?(fullpath) &&
+        File.exist?("#{fullpath}/test") &&
+        !(Dir.entries("#{fullpath}/test") - ['.', '..', '.gitkeep', '.gitignore']).empty?
+    end
   end
   
   def self.default_options
@@ -96,7 +107,8 @@ EOS
       "deadline" => nil,
       "publish_date" => nil,
       "gdocs_sheet" => "root",
-      "hidden" => false
+      "hidden" => false,
+      "returnable" => nil
     }
   end
 
