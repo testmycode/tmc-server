@@ -1,4 +1,5 @@
 require 'digest'
+require 'find'
 
 module TestScanner
   extend TestScanner
@@ -26,8 +27,12 @@ protected
   
   def checksum_test_files(path)
     hash = Digest::MD5.hexdigest('')
-    Dir.glob(path + "/test/**").sort.each do |filename|
-      hash = Digest::MD5.hexdigest(hash + IO.read(filename)) unless File.directory?(filename)
+    files = []
+    Find.find(path + "/test") do |file|
+      files << file unless File.directory?(file)
+    end
+    files.sort.each do |file|
+      hash = Digest::MD5.hexdigest(hash + IO.read(file)) unless File.directory?(file)
     end
     hash
   end
