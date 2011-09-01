@@ -240,6 +240,7 @@ require 'cgi' # for escapeHTML
   <% highlight('[value="Refresh from repository"]') %>
   <%= screenshot %>
   <% click_on 'Refresh from repository' %>
+  <% course.reload %>
   
   <p>
     The system now reloads and all exercises from the repository and rebuilds its
