@@ -32,7 +32,7 @@ protected
       files << file unless File.directory?(file)
     end
     files.sort.each do |file|
-      hash = Digest::MD5.hexdigest(hash + IO.read(file)) unless File.directory?(file)
+      hash = Digest::MD5.hexdigest(hash + file + IO.read(file)) unless File.directory?(file)
     end
     hash
   end
