@@ -164,12 +164,13 @@ require 'cgi' # for escapeHTML
     An exercise is just a NetBeans project with some unit tests and
     at least the JUnit and tmc-javalib libraries included.
     The template course has a template exercise in
-    <code>private/template-exercise</code>.
+    <code>private/template_project</code>.
   </p>
   
   <%=
+    File.should be_directory(shell_session.working_dir + '/private/template_project')
     shell_session.example do |sh|
-      sh.run "cd private/template-exercise; find ."
+      sh.run "cd private/template_project; find ."
     end
   %>
   
