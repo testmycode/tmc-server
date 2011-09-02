@@ -256,6 +256,92 @@ require 'cgi' # for escapeHTML
     from the webapp or from the NetBeans plugin.
   </p>
   
+  
+  <h2>Metadata files</h2>
+  
+  <p>
+    TMC can be configured by placing certain YAML files in certain directories.
+    This is used primarily to set deadlines for exercises.
+  </p>
+  
+  <p>
+    There are two kinds of configuration files:
+  </p>
+  
+  <ul>
+    <li><code>course_metadata.yml</code></li>
+    <li><code>metadata.yml</code></li>
+  </ul>
+  
+  <h3><code>course_metadata.yml</code></h3>
+  
+  <p>
+    <code>course_metadata.yml</code> has to be in the root directory of the
+    repository and may contain directives as in the following example:
+  </p>
+  
+  <pre class="yaml">
+hidden: true
+hide_after: 2010-02-15</pre>
+  
+  <ul>
+    <li><code>hidden</code> hides the course from students (and NetBeans)</li>
+    <li><code>hide_after</code> hides the course after a given date from students (and NetBeans) and refuses to accept any more submissions</li>
+  </ul>
+  
+  <h3><code>metadata.yml</code></h3>
+  
+  <p>
+    <code>metadata.yml</code> may be in an exercise directory
+    or any other directory, which will cause it to be applied to all
+    exercises below that directory. You may specify defaults
+    in a parent directory's <code>metadata.yml</code> and override them
+    selectively in subdirectories.
+  </p>
+  
+  <p>
+    <code>metadata.yml</code> may contain directives as in the following example:
+  </p>
+  
+  <pre class="yaml">
+hidden: false
+deadline: 2010-02-15
+returnable: false</pre>
+    <!--
+    TODO: Not completely implemented:
+    publish_date: nil
+    gdocs_sheet: "root"
+    -->
+  
+  <ul>
+    <li><code>hidden</code> hides the exercise from students (and NetBeans)</li>
+    <li><code>deadline</code> hides the exercise after a given date from students (and NetBeans) and refuses to accept any more submissions</li>
+    <li>
+      <code>returnable</code> tells whether to accept submissions for the
+      exercise. By default if the exercise has a non-empty
+      <code>test/</code> directory then it is considered returnable.
+    </li>
+  </ul>
+  
+  <h2>ProTips</h2>
+  
+  <ul>
+    <li>
+      Don't use a dash ("-") in exercise names. There is a bug related to
+      that at the moment, because a dash is used to replace a slash ("/")
+      when naming exercises that reside in subdirectories.
+    </li>
+    <li>
+      The
+      <a href="http://testmycode.dnsalias.com/edu-test-utils/javadoc/">edu-test-utils minilibrary</a>
+      is quite useful (and included in the default exercise template).
+      Currently it has a bunch of helpers for testing object-oriented code
+      via reflection. Feel free tohttps://github.com/testmycode/edu-test-utils
+      <a href="https://github.com/testmycode/edu-test-utils">contribute</a>.
+    </li>
+  </ul>
+  
+  
   <footer>
     This page was automatically generated from an acceptance test at <%= Time.now %>.
     <!-- How cool is that? -->

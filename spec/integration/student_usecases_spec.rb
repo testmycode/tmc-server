@@ -95,4 +95,10 @@ describe "The system (used by a student)" do
     page.should_not have_content('Submit answer')
     page.should_not have_content('Zipped project')
   end
+  
+  it "should not accept submissions for exercises whose deadline has passed"
+  
+  it "should not accept submissions for hidden courses"
+  
+  it "should not show the submission form for unreturnable exercises"
 end

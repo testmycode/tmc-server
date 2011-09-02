@@ -146,6 +146,7 @@ describe Exercise do
   end
 
   it "should be available to non-administrators only if the deadline has not passed and the exercise is not hidden" do
+    #TODO: publish_date too!
     user = Factory.create(:user)
     ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
 

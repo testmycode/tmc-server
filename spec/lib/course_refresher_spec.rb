@@ -191,6 +191,18 @@ describe CourseRefresher do
     File.should_not exist('MyExercise/test/SimpleHiddenTest.java')
   end
   
+  it "should not include metadata files in the zips" do
+    local_repo = add_exercise('MyExercise')
+    local_repo.write_file('MyExercise/metadata.yml', 'foo: bar')
+    local_repo.write_file('MyExercise/non-metadata.yml', 'foo: bar')
+    local_repo.add_commit_push
+    refresher.refresh_course(course)
+    
+    sh!('unzip', course.zip_path + '/MyExercise.zip')
+    File.should_not exist('MyExercise/metadata.yml')
+    File.should exist('MyExercise/non-metadata.yml')
+  end
+  
   it "should delete zip files of removed exercises" do
     add_exercise('MyCategory/MyExercise')
     refresher.refresh_course(course)
@@ -255,6 +267,7 @@ describe CourseRefresher do
     }.merge options
     local_clone.copy_fixture_exercise(options[:fixture_name], dest_name)
     local_clone.add_commit_push if options[:commit]
+    local_clone
   end
   
   def delete_exercise(name)

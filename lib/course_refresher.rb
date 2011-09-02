@@ -165,7 +165,8 @@ private
       [
         "*Hidden* export-ignore",
         ".gitignore export-ignore",
-        ".gitkeep export-ignore"
+        ".gitkeep export-ignore",
+        "metadata.yml export-ignore"
       ].join("\n")
     end
   
