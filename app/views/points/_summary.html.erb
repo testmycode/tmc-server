@@ -2,7 +2,9 @@
   <thead>
     <tr>
       <th></th>
-      <th><%= @sheets.join("</td><td>") %></th>
+      <% @sheets.each do |sheet| %>
+        <th><%= link_to sheet, course_point_path(@course, sheet) %></th>
+      <% end %>
       <th>total</th>
     </tr>
   </thead>
