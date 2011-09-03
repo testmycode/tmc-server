@@ -35,6 +35,11 @@ describe AwardedPoint do
                             :submission => @sub1)
     end
 
+    after :all do
+      [@course, @user, @user2, @ex1, @ex2, @sub1, @sub2, @ap, @ap2, @ap3].
+        each { |o| o.destroy }
+    end
+
     it "course_user_points" do
       points = AwardedPoint.course_user_points(@course, @user)
       points.size.should == 1
