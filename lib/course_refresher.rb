@@ -30,6 +30,7 @@ private
           update_exercise_options
           update_available_points
           zip_up_exercises
+          set_permissions
           @course.save!
         rescue
           begin
@@ -168,6 +169,22 @@ private
         ".gitkeep export-ignore",
         "metadata.yml export-ignore"
       ].join("\n")
+    end
+    
+    def set_permissions
+      chmod = SiteSetting.value(:git_repos_chmod)
+      chgrp = SiteSetting.value(:git_repos_chgrp)
+      
+      parent_dirs = Course.cache_root.sub(::Rails.root.to_s, '').split('/').reject(&:blank?)
+      for i in 0..(parent_dirs.length)
+        dir = "#{::Rails.root}/#{parent_dirs[0..i].join('/')}"
+        sh!('chmod', chmod, dir) unless chmod.blank?
+        sh!('chgrp', chgrp, dir) unless chgrp.blank?
+      end
+      
+      
+      sh!('chmod', '-R', chmod, @course.cache_path) unless chmod.blank?
+      sh!('chgrp', '-R', chgrp, @course.cache_path) unless chgrp.blank?
     end
   
   end

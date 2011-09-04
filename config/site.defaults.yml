@@ -4,4 +4,10 @@
 # Example: HELSINKI UNIVERSITY<br />Department of Computer Science
 site_subtitle:
 
+# In many installations, tmp/cache/git_repos must be available to the apache user.
+# Either give everyone read access to it (the default) or give the tmc server user
+# and the apache user a common group and set chmod: g+rX and chgrp: the-common-group.
+# These settings will be applied to tmp, tmp/cache and tmp/cache/git_repos as well.
+git_repos_chmod: a+rX
+git_repos_chgrp:
 
