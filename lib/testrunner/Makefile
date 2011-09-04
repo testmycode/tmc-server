@@ -9,7 +9,7 @@ LIB_DIR := lib
 SRC_CP := $(BUILD_DIR)/classes
 TEST_CP := $(BUILD_DIR)/test/classes
 LIB_CP := $(shell find $(LIB_DIR) -name "*.jar" -printf "%p:")
-CLASSPATH := $(SRC_CP):$(TEST_CP):$(LIB_CP)
+CLASSPATH := $(SRC_CP):$(TEST_CP):$(LIB_CP):$(SRC_DIR)
 
 SRC_FILES := $(shell find $(SRC_DIR) -name "*.java")
 TEST_FILES := $(shell find $(TEST_DIR) -name "*.java")
