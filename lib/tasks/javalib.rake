@@ -8,8 +8,7 @@ file TmcJavalib.jar_path => FileList["#{TmcJavalib.project_path}/**/*.java"] do
     TmcJavalib.compile!
   rescue
     puts "*** Failed to compile tmc-javalib ***"
-    puts "  Have you done `git submodule update`?"
-    puts "  You also need to do this the first time: `git submodule sync; git submodule update --init`"
+    puts "  Have you done `git submodule update --init`?"
     puts
     raise
   end
