@@ -1,4 +1,5 @@
 require 'google_spreadsheet'
+require 'active_support/secure_random'
 
 module GDocsBackend
 
@@ -6,6 +7,16 @@ module GDocsBackend
     GoogleSpreadsheet.login(
       SandboxServer::Application.config.gdocs_username,
       SandboxServer::Application.config.gdocs_password)
+  end
+
+  def self.find_temp_prefix gsession
+    10.times do
+      prefix = ActiveSupport::SecureRandom.hex 6
+      unless gsession.spreadsheets.find {|s| s.title =~ /^#{prefix}/ }
+        return prefix
+      end
+    end
+    raise "failed to find a temp prefix"
   end
 
   def self.delete_course_spreadsheet gsession, course
@@ -62,6 +73,7 @@ module GDocsBackend
       update_points_worksheet ws, course, students
       ws.save
     end
+
     update_summary_worksheet(ss, course, students).save
     return ss.human_url
   end
@@ -89,37 +101,19 @@ module GDocsBackend
     end
   end
 
-  def self.written_exercises ws
-    hash = {
-      :exercises => [],
-      :points => {}
-    }
-
-    (first_points_col .. ws.num_cols).each do |col|
-      exercise_name = strip_quote(ws[exercise_names_row, col])
-      point_name = strip_quote(ws[point_names_row, col])
-
-      if exercise_name != ""
-        unless hash[:exercises].include? exercise_name
-          hash[:exercises] << exercise_name
-        end
-        hash[:points][exercise_name] ||= []
-      else
-        exercise_name = hash[:exercises].last
-      end
-
-      if point_name != ""
-        hash[:points][exercise_name] << point_name
-      end
-    end
-
-    return hash
+  def self.points_from_worksheet ws
+    (first_points_col .. ws.num_cols).reduce([]) do |result, col|
+      point = strip_quote(ws[header_row, col])
+      result << point if point != ""
+      result
+    end.uniq
   end
 
   def self.update_points ws, course
     students = User.course_students(course)
     students.each do |student|
-      user_points = AwardedPoint.course_user_points(course, student)
+      user_points =
+        AwardedPoint.course_user_sheet_points(course, student, ws.title)
       user_points.each {|ap| add_point(ws, ap.name, student)}
     end
   end
@@ -161,7 +155,7 @@ module GDocsBackend
 
   def self.find_point_col ws, point_name
     for col in (first_points_col .. ws.num_cols)
-      return col if ws[point_names_row, col] == quote_prepend(point_name)
+      return col if ws[header_row, col] == quote_prepend(point_name)
     end
     return -1
   end
@@ -178,7 +172,7 @@ module GDocsBackend
   def self.update_summary_sheetnames ws, course
     col = first_points_col
     course.gdocs_sheets.each do |sheetname|
-      ws[exercise_names_row, col] = sheetname
+      ws[header_row, col] = sheetname
       col += 1
     end
   end
@@ -192,7 +186,7 @@ module GDocsBackend
 
   def self.update_summary_references ss, summary_ws
     (first_points_col .. summary_ws.num_cols).each do |col|
-      sheet_name = summary_ws[exercise_names_row,col]
+      sheet_name = summary_ws[header_row,col]
       break if sheet_name == ""
       point_ws = get_worksheet ss, sheet_name
 
@@ -212,50 +206,36 @@ module GDocsBackend
   end
 
   def self.update_available_points ws, course
-    db_exercises = Exercise.course_gdocs_sheet_exercises(course, ws.title)
-    w_exercises = written_exercises ws
+    exercises = Exercise.course_gdocs_sheet_exercises(course, ws.title)
+    point_names = exercises.map(&:available_points).flatten.map(&:name).uniq
+    point_names = point_names.concat(points_from_worksheet(ws)).uniq
 
-    allocate_points_space ws, db_exercises, w_exercises
-    blank_row ws, exercise_names_row
-    write_available_points ws, w_exercises
-  end
-
-  def self.allocate_points_space ws, db_exercises, w_exercises
-    col = first_points_col
-    db_exercises.each do |db_e|
-      unless w_exercises[:exercises].include? db_e.name
-        w_exercises[:exercises] << db_e.name
-        w_exercises[:points][db_e.name] = db_e.available_points.map &:name
-        next
-      end
-
-      new_points = db_e.available_points.map(&:name).select {|point_name|
-          !w_exercises[:points][db_e.name].include?(point_name)
-      }
-      col += w_exercises[:points][db_e.name].size
-      new_points.size.times{add_column ws, col}
-      w_exercises[:points][db_e.name].concat(new_points)
-      col += new_points.size
-    end
+    write_available_points ws, point_names
   end
 
   def self.blank_row ws, row
     (1 .. ws.num_cols).each {|col| ws[row,col] = nil}
   end
 
-  def self.write_available_points ws, w_exercises
-    col = first_points_col
-    w_exercises[:exercises].each do |exercise_name|
-      ws[exercise_names_row, col] = quote_prepend(exercise_name)
-      w_exercises[:points][exercise_name].each do |point_name|
-        ws[point_names_row, col] = quote_prepend(point_name)
-        col += 1
+  def self.write_available_points ws, point_names
+    point_names.each do |point_name|
+      if find_point_col(ws, point_name) < 0
+        ws[header_row, get_free_point_col(ws)] = quote_prepend(point_name)
       end
     end
   end
 
+  def self.get_free_point_col ws
+    ensure_col_capacity ws
+    if ws.num_cols < first_points_col
+      first_points_col
+    else
+      ws.num_cols + 1
+    end
+  end
+
   def self.update_total_col ws
-    ws[exercise_names_row, total_col] = "total"
+    ws[header_row, total_col] = "total"
     (first_points_row..ws.num_rows).each do |row|
       first = "#{col_num2str(total_col+1)}#{row}"
       last = "#{col_num2str(ws.num_cols)}#{row}"
@@ -296,6 +276,7 @@ module GDocsBackend
     add_students ws, students
     quote_prepend_students ws
     merge_duplicate_students ws
+    compact_student_rows ws
     # FIXME: merge duplicate students?
   end
 
@@ -354,16 +335,12 @@ module GDocsBackend
     total_col + 1
   end
 
-  def self.exercise_names_row
+  def self.header_row
     1
   end
 
-  def self.point_names_row
-    exercise_names_row + 1
-  end
-
   def self.first_points_row
-    point_names_row + 1
+    header_row + 1
   end
 
   def self.col_num2str x

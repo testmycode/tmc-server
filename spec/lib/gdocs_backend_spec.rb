@@ -5,27 +5,26 @@ describe GDocsBackend, :gdocs => true do
   before :all do
     @session = GDocsBackend.authenticate
     @session.should_not be_nil
+    @prefix = GDocsBackend.find_temp_prefix @session
   end
 
-  def match_written_and_db_exercises(ws, course)
-    w_exercises = GDocsBackend.written_exercises(ws)
-    db_exercises = Exercise.course_gdocs_sheet_exercises(course, ws.title)
-    db_exercises.each do |db_e|
-      w_exercises[:exercises].should include(db_e.name)
-      w_exercises[:points][db_e.name].should_not be_nil
-
-      db_e.available_points.each do |db_point|
-        w_exercises[:points][db_e.name].should include(db_point.name)
+  def match_written_and_db_points(ws, course)
+    ws_points = GDocsBackend.points_from_worksheet(ws)
+    exercises = Exercise.course_gdocs_sheet_exercises(course, ws.title)
+    exercises.each do |e|
+      e.available_points.each do |point|
+        ws_points.should include(point.name)
       end
     end
   end
 
   describe "creating and deleting spreadsheets" do
     before :all do
-      @course = Factory.create(:course, :name => "create_delete_spreadsheet")
+      @course = Factory.create(:course, :name => "#{@prefix}-1")
     end
 
     after :all do
+      GDocsBackend.delete_course_spreadsheet(@session, @course)
       @course.destroy
     end
 
@@ -51,7 +50,7 @@ describe GDocsBackend, :gdocs => true do
   end
 
   it "should be able to create and delete a worksheet" do
-    course = Factory.create(:course, :name => "create_worksheet")
+    course = Factory.create(:course, :name => "#{@prefix}-2")
     sheetname = "test_week"
 
     GDocsBackend.delete_course_spreadsheet(@session, course)
@@ -68,7 +67,7 @@ describe GDocsBackend, :gdocs => true do
 
   describe "after course spreadsheet is refreshed" do
     before :all do
-      @course = Factory.create(:course, :name => "refresh_gdocs")
+      @course = Factory.create(:course, :name => "#{@prefix}-3")
       @sheet1 = "week1"
       @sheet2 = "week2"
       @ex1 = Factory.create(:exercise, :course => @course,
@@ -121,6 +120,22 @@ describe GDocsBackend, :gdocs => true do
         should_not == GDocsBackend.quote_prepend(student.login)
     end
 
+    it "should remove student rows without students" do
+      student = Factory.create(:user)
+      ws = GDocsBackend.find_worksheet @ss, @sheet1
+      ws.should_not be_nil
+      GDocsBackend.blank_row ws, GDocsBackend.first_points_row
+      ws[GDocsBackend.first_points_row, GDocsBackend.student_col].
+        should == ""
+
+      @course.refresh_gdocs
+      @ss = GDocsBackend.find_course_spreadsheet(@session, @course)
+      ws = GDocsBackend.find_worksheet @ss, @sheet1
+
+      ws[GDocsBackend.first_points_row, GDocsBackend.student_col].
+        should_not == GDocsBackend.quote_prepend(student.login)
+    end
+
     it "should quote prepend student names" do
       student = Factory.create(:user)
       ws = GDocsBackend.find_worksheet @ss, @sheet1
@@ -156,7 +171,7 @@ describe GDocsBackend, :gdocs => true do
 
   describe "after updating an exercise worksheet" do
     before :all do
-      @course = Factory.create(:course, :name => "worksheet_update")
+      @course = Factory.create(:course, :name => "#{@prefix}-4")
       GDocsBackend.delete_course_spreadsheet(@session, @course)
       @ss = GDocsBackend.create_course_spreadsheet(@session, @course)
       @sheetname = "week1"
@@ -178,13 +193,13 @@ describe GDocsBackend, :gdocs => true do
       @student4 = Factory.create(:user)
 
       @submission1 = Factory.create(:submission, :course => @course,
-                                    :user => @student1)
+                                    :exercise => @ex1, :user => @student1)
       @submission2 = Factory.create(:submission, :course => @course,
-                                    :user => @student2)
+                                    :exercise => @ex1, :user => @student2)
       @submission3 = Factory.create(:submission, :course => @course,
-                                    :user => @student3)
+                                    :exercise => @ex2, :user => @student3)
       @submission4 = Factory.create(:submission, :course => @course,
-                                    :user => @student4)
+                                    :exercise => @ex2, :user => @student4)
 
       @award1 = Factory.create(:awarded_point, :course => @course,
                                :name => @ap1.name, :user => @student1,
@@ -201,7 +216,7 @@ describe GDocsBackend, :gdocs => true do
 
       students = GDocsBackend.get_spreadsheet_course_students(@ss, @course)
       GDocsBackend.update_points_worksheet(@ws, @course, students)
-      match_written_and_db_exercises(@ws, @course)
+      match_written_and_db_points(@ws, @course)
     end
 
     after :all do
@@ -257,13 +272,13 @@ describe GDocsBackend, :gdocs => true do
         GDocsBackend.update_points_worksheet(@ws, @course, students)
         GDocsBackend.find_point_col(@ws, ap5.name).should_not == -1
         GDocsBackend.find_point_col(@ws, ap6.name).should_not == -1
-        match_written_and_db_exercises(@ws, @course)
+        match_written_and_db_points(@ws, @course)
         ap5.destroy
         ap6.destroy
         GDocsBackend.update_points_worksheet(@ws, @course, students)
         GDocsBackend.find_point_col(@ws, "ap5").should_not == -1
         GDocsBackend.find_point_col(@ws, "ap6").should_not == -1
-        match_written_and_db_exercises(@ws, @course)
+        match_written_and_db_points(@ws, @course)
       end
     end
   end
