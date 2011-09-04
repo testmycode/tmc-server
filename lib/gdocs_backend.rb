@@ -277,7 +277,6 @@ module GDocsBackend
     quote_prepend_students ws
     merge_duplicate_students ws
     compact_student_rows ws
-    # FIXME: merge duplicate students?
   end
 
   def self.quote_prepend_students ws
@@ -312,7 +311,21 @@ module GDocsBackend
     (1 .. ws.num_cols).each {|col| ws[row,col] = nil}
   end
 
+  def self.delete_row ws, row
+    (row+1 .. ws.num_rows).each {|row| copy_row_up ws, row}
+    blank_row ws, ws.num_rows
+  end
+
+  def self.copy_row_up ws, row
+    (1 .. ws.num_cols).each {|col| ws[row-1, col] = ws[row, col]}
+  end
+
   def self.compact_student_rows ws
+    (first_points_row .. ws.num_rows).each do |row|
+      if ws[row, student_col] == ""
+        delete_row ws, row
+      end
+    end
   end
 
   def self.quote_prepend s

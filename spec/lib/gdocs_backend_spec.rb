@@ -74,7 +74,7 @@ describe GDocsBackend, :gdocs => true do
                             :gdocs_sheet => @sheet1)
       @ex2 = Factory.create(:exercise, :course => @course,
                             :gdocs_sheet => @sheet2)
-
+      @user = Factory.create(:user)
     end
 
     before :each do
@@ -95,17 +95,16 @@ describe GDocsBackend, :gdocs => true do
     end
 
     it "should merge duplicate student rows" do
-      student = Factory.create(:user)
       ws = GDocsBackend.find_worksheet @ss, @sheet1
       ws.should_not be_nil
 
       row1 = GDocsBackend.get_free_student_row(ws)
       ws[row1, GDocsBackend.student_col] = GDocsBackend.
-        quote_prepend(student.login)
+        quote_prepend(@user.login)
 
       row2 = GDocsBackend.get_free_student_row(ws)
       ws[row2, GDocsBackend.student_col] = GDocsBackend.
-        quote_prepend(student.login)
+        quote_prepend(@user.login)
       ws.save
 
       row1, row2 = row2, row1 if row1 > row2
@@ -115,15 +114,15 @@ describe GDocsBackend, :gdocs => true do
       ws = GDocsBackend.find_worksheet @ss, @sheet1
 
       ws[row1, GDocsBackend.student_col].
-        should == GDocsBackend.quote_prepend(student.login)
+        should == GDocsBackend.quote_prepend(@user.login)
       ws[row2, GDocsBackend.student_col].
-        should_not == GDocsBackend.quote_prepend(student.login)
+        should_not == GDocsBackend.quote_prepend(@user.login)
     end
 
     it "should remove student rows without students" do
-      student = Factory.create(:user)
       ws = GDocsBackend.find_worksheet @ss, @sheet1
       ws.should_not be_nil
+
       GDocsBackend.blank_row ws, GDocsBackend.first_points_row
       ws[GDocsBackend.first_points_row, GDocsBackend.student_col].
         should == ""
@@ -133,16 +132,15 @@ describe GDocsBackend, :gdocs => true do
       ws = GDocsBackend.find_worksheet @ss, @sheet1
 
       ws[GDocsBackend.first_points_row, GDocsBackend.student_col].
-        should_not == GDocsBackend.quote_prepend(student.login)
+        should_not == GDocsBackend.quote_prepend(@user.login)
     end
 
     it "should quote prepend student names" do
-      student = Factory.create(:user)
       ws = GDocsBackend.find_worksheet @ss, @sheet1
       ws.should_not be_nil
 
       row = GDocsBackend.get_free_student_row(ws)
-      ws[row, GDocsBackend.student_col] = student.login
+      ws[row, GDocsBackend.student_col] = @user.login
       ws.save
 
       @course.refresh_gdocs
@@ -150,21 +148,20 @@ describe GDocsBackend, :gdocs => true do
       ws = GDocsBackend.find_worksheet @ss, @sheet1
 
       ws[row, GDocsBackend.student_col].
-        should == GDocsBackend.quote_prepend(student.login)
+        should == GDocsBackend.quote_prepend(@user.login)
     end
 
     it "should add manually added students to each sheet" do
-      student = Factory.create(:user)
       ws = GDocsBackend.find_worksheet @ss, @sheet1
       ws.should_not be_nil
 
-      GDocsBackend.add_student ws, student.login
+      GDocsBackend.add_student ws, @user.login
       ws.save
 
       @course.refresh_gdocs
       @ss = GDocsBackend.find_course_spreadsheet(@session, @course)
       @ss.worksheets.each do |ws|
-        GDocsBackend.get_worksheet_students(ws).should include(student.login)
+        GDocsBackend.get_worksheet_students(ws).should include(@user.login)
       end
     end
   end
