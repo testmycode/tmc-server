@@ -1,0 +1,7 @@
+# You can make local adjustments by creating a site.yml file and overriding the settings here.
+
+# The subtitle to display on every page. May contain HTML.
+# Example: HELSINKI UNIVERSITY<br />Department of Computer Science
+site_subtitle:
+
+

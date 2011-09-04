@@ -1,3 +1,4 @@
+#TODO: move to config/site.yml
 #SandboxServer::Application.config.gdocs_username = 'username@gmail.com'
 #SandboxServer::Application.config.gdocs_password = 'password'
 

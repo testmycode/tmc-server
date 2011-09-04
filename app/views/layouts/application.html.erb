@@ -17,8 +17,9 @@
     <div id="title-area">
       <div id="titles">
         <h1><%= link_to 'TestMyCode server', root_path %></h1>
-        <div class="branding">HELSINKI UNIVERSITY</div>
-        <div class="branding">Department of Computer Science</div>
+        <% unless SiteSetting.value(:site_subtitle).blank? %>
+        <div class="branding"><%= raw(SiteSetting.value(:site_subtitle)) %></div>
+        <% end %>
       </div>
 
       <div id="login">
