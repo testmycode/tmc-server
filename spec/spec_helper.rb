@@ -15,17 +15,19 @@ RSpec.configure do |config|
   #config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
   config.use_transactional_fixtures = false
-  
+
   config.before :each do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.start
   end
-  
+
   config.after do
     DatabaseCleaner.clean
   end
-  
+
   # FIXME: it turns out this can't be overridden with --tags
   # See https://github.com/rspec/rspec-core/issues/327
-  config.filter_run_excluding :gdocs => true
+  unless ENV['GDOCS_TESTS']
+    config.filter_run_excluding :gdocs => true
+  end
 end
