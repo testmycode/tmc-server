@@ -138,6 +138,15 @@ describe Course do
     c.hide_after.hour.should == 23
     c.hide_after.min.should == 59
   end
+  
+  it "should delete its cache directory when destroyed" do
+    c = Course.create!(:name => 'MyCourse', :remote_repo_url => remote_repo_url)
+    FileUtils.mkdir_p(c.cache_path)
+    FileUtils.touch("#{c.cache_path}/foo.txt")
+    
+    c.destroy
+    File.should_not exist(c.cache_path)
+  end
 
 
   describe "validation" do

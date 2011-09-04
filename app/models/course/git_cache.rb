@@ -26,12 +26,10 @@ class Course < ActiveRecord::Base
 
     def delete_local_repository
       FileUtils.rm_rf bare_path
-      FileUtils.rm_rf cache_path
     end
-
-    def clear_cache
+    
+    def delete_cache
       FileUtils.rm_rf cache_path
-      FileUtils.mkdir_p [zip_path, clone_path]
     end
 
     def Course.repositories_root

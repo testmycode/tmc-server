@@ -24,6 +24,7 @@ class Course < ActiveRecord::Base
   before_save lambda { self.remote_repo_url = nil if self.remote_repo_url.blank? }
   after_create :create_local_repository, :if => lambda { has_local_repo? }
   after_destroy :delete_local_repository, :if => lambda { has_local_repo? }
+  after_destroy :delete_cache
 
   scope :ongoing, lambda { where(["hide_after IS NULL OR hide_after > ?", Time.now]) }
   scope :expired, lambda { where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now]) }
