@@ -44,7 +44,7 @@ class Exercise < ActiveRecord::Base
       !expired? && !hidden?
     end
   end
-  
+
   def visible_to?(user)
     if user.administrator?
       true
@@ -78,20 +78,25 @@ EOS
   def deadline=(new_deadline)
     super(DateAndTimeUtils.to_time(new_deadline, :prefer_end_of_day => true))
   end
-  
+
   def expired?
     self.deadline != nil && self.deadline < Time.now
   end
-  
+
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
     self.deadline = new_options["deadline"]
     self.publish_date = new_options["publish_date"]
-    self.gdocs_sheet = new_options["gdocs_sheet"]
+    self.gdocs_sheet = new_options["gdocs_sheet"] || self.name2gdocs_sheet
     self.hidden = new_options["hidden"]
     self.returnable_forced = new_options["returnable"]
   end
-  
+
+  def name2gdocs_sheet
+    sheetname = self.name.split('-')[0..-2].join('-')
+    sheetname.empty?? "root" : sheetname
+  end
+
   def returnable?
     if returnable_forced != nil
       returnable_forced
@@ -101,12 +106,12 @@ EOS
         !(Dir.entries("#{fullpath}/test") - ['.', '..', '.gitkeep', '.gitignore']).empty?
     end
   end
-  
+
   def self.default_options
     {
       "deadline" => nil,
       "publish_date" => nil,
-      "gdocs_sheet" => "root",
+      "gdocs_sheet" => nil,
       "hidden" => false,
       "returnable" => nil
     }

@@ -6,6 +6,22 @@ describe Exercise do
   let(:user) { Factory.create(:user) }
   let(:course) { Factory.create(:course) }
 
+  describe "gdocs_sheet" do
+    it "should deduce gdocs_sheet from exercise name" do
+      ex1 = Factory.create(:exercise, :name => "ex")
+      ex1.options = {}
+      ex1.gdocs_sheet.should == "root"
+
+      ex2 = Factory.create(:exercise, :name => "wtf-ex")
+      ex2.options = {}
+      ex2.gdocs_sheet.should == "wtf"
+
+      ex3 = Factory.create(:exercise, :name => "omg-wtf-ex")
+      ex3.options = {}
+      ex3.gdocs_sheet.should == "omg-wtf"
+    end
+  end
+
   describe "course_gdocs_sheet_exercises scope" do
     it "should find all the exercises that belong to the gdocs_sheet" do
       sheetname = "lolwat"
@@ -49,7 +65,7 @@ describe Exercise do
       @exercise.submissions.size.should == 1
     end
   end
-  
+
   it "can be hidden with a boolean 'hidden' option" do
     ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
     ex.options = {"hidden" => true}
@@ -116,7 +132,7 @@ describe Exercise do
     ex.hidden = true
     ex.should be_available_to(admin)
   end
-  
+
   it "should be returnable by default if there is a non-empty test dir" do
     ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
     FileUtils.mkdir_p('FakeCache/test')
@@ -124,7 +140,7 @@ describe Exercise do
     ex.stub(:fullpath => 'FakeCache')
     ex.should be_returnable
   end
-  
+
   it "should be non-returnable by default if there is an empty test dir" do
     ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
     FileUtils.mkdir_p('FakeCache/test')
@@ -138,7 +154,7 @@ describe Exercise do
     ex.stub(:fullpath => 'FakeCache')
     ex.should_not be_returnable
   end
-  
+
   it "can be marked non-returable" do
     ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
     ex.options = { 'returnable' => true }
