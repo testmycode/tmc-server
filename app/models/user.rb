@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  include Comparable
 
   has_many :submissions, :dependent => :destroy
   has_many :awarded_points, :dependent => :destroy
@@ -17,7 +18,7 @@ class User < ActiveRecord::Base
     where(:submissions => { :course_id => course.id }).
     group("users.id")
   }
-  
+
   def guest?
     false
   end
@@ -30,6 +31,10 @@ class User < ActiveRecord::Base
     user = find_by_login(login)
     return nil  if user.nil?
     return user if user.has_password?(submitted_password)
+  end
+
+  def <=>(other)
+    self.login <=> other.login
   end
 
 private

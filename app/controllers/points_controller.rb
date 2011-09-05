@@ -7,7 +7,7 @@ class PointsController < ApplicationController
         new("Access denied to points.", :read, AwardedPoint)
     end
     @course = Course.find(params[:course_id])
-    @users = User.course_students(@course)
+    @users = User.course_students(@course).sort!
     @sheets = @course.gdocs_sheets
   end
 
@@ -20,7 +20,7 @@ class PointsController < ApplicationController
     @course = Course.find(params[:course_id])
 
     @sheets = @course.gdocs_sheets
-    @users = User.course_students(@course)
+    @users = User.course_students(@course).sort!
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname)
   end
 end
