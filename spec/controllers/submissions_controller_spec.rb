@@ -153,11 +153,12 @@ describe SubmissionsController do
         result['error'].should == 'oopsie happened'
       end
       
-      it "should return any test failures of submissions" do
-        @submission.stub(:test_failure_messages => ['one', 'two'], :status => :fail)
+      it "should return any test failures in the categorized hash returned by the model" do
+        @submission.stub(:categorized_test_failures => {'x' => ['a']}, :test_failure_messages => ['x - a'], :status => :fail)
         result = get_show_json
         result['status'].should == 'fail'
-        result['test_failures'].should == ['one', 'two']
+        result['test_failures'].should == ['x - a'] #DEPRECATED FIELD
+        result['categorized_test_failures'].should == {'x' => ['a']}
       end
       
       it "should mark submissions with no error or failure as successful" do
@@ -165,7 +166,7 @@ describe SubmissionsController do
         result = get_show_json
         result['status'].should == 'ok'
         result['error'].should be_nil
-        result['test_failures'].should be_nil
+        result['test_failures'].should be_nil #DEPRECATED FIELD
       end
     end
   end
