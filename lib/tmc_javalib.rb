@@ -41,6 +41,8 @@ module TmcJavalib
   # Use TestScanner.get_test_case_methods instead as it provides caching.
   def get_test_case_methods(course_or_exercise_path)
     path = course_or_exercise_path
+    # TODO: the classpath is insufficient and results in errors being printed to stderr,
+    # but everything seems to work still.
     cmd = "java -cp #{Shellwords.escape(classpath)} #{package}.testscanner.TestScanner #{Shellwords.escape(path)}"
     output = `#{cmd}`
     parse_test_scanner_output(output)
