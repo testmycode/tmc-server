@@ -18,11 +18,14 @@ describe Course do
                            :gdocs_sheet => "sheet1")
       ex3 = Factory.create(:exercise, :course => course,
                            :gdocs_sheet => "sheet2")
+      ex4 = Factory.create(:exercise, :course => course,
+                           :gdocs_sheet => nil)
       worksheets = course.gdocs_sheets
 
       worksheets.size.should == 2
       worksheets.should include("sheet1")
       worksheets.should include("sheet2")
+      worksheets.should_not include(nil)
     end
   end
 
@@ -34,7 +37,7 @@ describe Course do
       course.bare_url.should == "file://#{course.bare_path}"
       File.should exist(course.bare_path)
     end
-    
+
     it "should raise an exception if the local repo already exists" do
       course = Course.new(:name => 'TestCourse')
       FileUtils.mkdir_p(course.bare_path)
@@ -48,7 +51,7 @@ describe Course do
       File.should_not exist(repo_path)
     end
   end
-  
+
   describe "paths used" do
     it "should be absolute" do
       class_paths = [
@@ -58,14 +61,14 @@ describe Course do
       for path in class_paths
         Course.send(path).should match /^\//
       end
-      
+
       object_paths = [
         :cache_path,
         :bare_path,
         :zip_path,
         :clone_path
       ]
-      
+
       for path in object_paths
         Course.new.send(path).should match /^\//
       end
@@ -138,12 +141,12 @@ describe Course do
     c.hide_after.hour.should == 23
     c.hide_after.min.should == 59
   end
-  
+
   it "should delete its cache directory when destroyed" do
     c = Course.create!(:name => 'MyCourse', :remote_repo_url => remote_repo_url)
     FileUtils.mkdir_p(c.cache_path)
     FileUtils.touch("#{c.cache_path}/foo.txt")
-    
+
     c.destroy
     File.should_not exist(c.cache_path)
   end

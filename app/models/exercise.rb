@@ -9,9 +9,7 @@ class Exercise < ActiveRecord::Base
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
 
-  validates :gdocs_sheet,
-            :presence => true,
-            :format => { :without => /^summary$/ }
+  validates :gdocs_sheet, :format => { :without => /^summary$/ }
 
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
@@ -87,9 +85,16 @@ EOS
     new_options = self.class.default_options.merge(new_options)
     self.deadline = new_options["deadline"]
     self.publish_date = new_options["publish_date"]
-    self.gdocs_sheet = new_options["gdocs_sheet"] || self.name2gdocs_sheet
+    self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"],
+                                       new_options["gdocs_sheet"])
     self.hidden = new_options["hidden"]
     self.returnable_forced = new_options["returnable"]
+  end
+
+  def new_gdocs_sheet enabled, sheetname
+    return nil unless enabled
+    return sheetname unless sheetname.nil? or sheetname.empty?
+    return self.name2gdocs_sheet
   end
 
   def name2gdocs_sheet
@@ -112,6 +117,7 @@ EOS
       "deadline" => nil,
       "publish_date" => nil,
       "gdocs_sheet" => nil,
+      "points_visible" => true,
       "hidden" => false,
       "returnable" => nil
     }

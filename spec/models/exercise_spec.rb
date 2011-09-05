@@ -19,6 +19,10 @@ describe Exercise do
       ex3 = Factory.create(:exercise, :name => "omg-wtf-ex")
       ex3.options = {}
       ex3.gdocs_sheet.should == "omg-wtf"
+
+      ex4 = Factory.create(:exercise, :name => "omg-wtf-ex")
+      ex4.options = { "points_visible" => false }
+      ex4.gdocs_sheet.should == nil
     end
   end
 

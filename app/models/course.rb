@@ -32,7 +32,7 @@ class Course < ActiveRecord::Base
   def visible?
     !hidden && (hide_after == nil || hide_after > Time.now)
   end
-  
+
   def hide_after=(x)
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => true))
   end
@@ -53,14 +53,14 @@ class Course < ActiveRecord::Base
       :hide_after => nil
     }
   end
-  
+
   def gdocs_sheets
-    self.exercises.map(&:gdocs_sheet).uniq
+    self.exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
   end
 
   def refresh_gdocs
     GDocsBackend.refresh_course_spreadsheet self
   end
-  
+
 end
 
