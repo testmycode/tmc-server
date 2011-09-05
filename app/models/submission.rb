@@ -38,6 +38,9 @@ class Submission < ActiveRecord::Base
     "#{exercise_name}-#{self.id}.zip"
   end
   
+  # @deprecated in favor of categorizing errors by test cases.
+  # To be removed after #22 is resolved.
+  # Btw remember to search for and remove possible stubs in tests too.
   def test_failure_messages
     test_case_runs.reject(&:successful?).map do |tcr|
       pretty_name = pretty_test_case_name(tcr.test_case_name)
@@ -47,6 +50,18 @@ class Submission < ActiveRecord::Base
         "#{pretty_name} - #{tcr.message}"
       end
     end
+  end
+  
+  def categorized_test_failures
+    result = {}
+    test_case_runs.reject(&:successful?).each do |tcr|
+      category, name = test_case_category_and_name(tcr.test_case_name)
+      msg = tcr.message
+      msg = 'fail' if msg.blank?
+      result[category] ||= []
+      result[category] << "#{name} - #{msg}"
+    end
+    result
   end
   
 private
@@ -65,7 +80,16 @@ private
     end
   end
   
-  def pretty_test_case_name(long_name)
+  def test_case_category_and_name(test_case_name)
+    parts = test_case_name.split(/\s+/, 2)
+    if parts.length == 2
+      parts
+    else
+      ['', test_case_name]
+    end
+  end
+  
+  def pretty_test_case_name(long_name) #DEPRECATED - used by deprecated test_failure_messages
     if long_name =~ /^.+\.[^.]+ ([^.]+)$/
       method_name = $1
       method_name

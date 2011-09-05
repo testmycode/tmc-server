@@ -17,7 +17,10 @@ class SubmissionsController < ApplicationController
         output = output.merge(
           case @submission.status
           when :error then { :error => @submission.pretest_error }
-          when :fail then { :test_failures => @submission.test_failure_messages }
+          when :fail then {
+            :test_failures => @submission.test_failure_messages, #DEPRECATED FIELD
+            :categorized_test_failures => @submission.categorized_test_failures
+          }
           when :ok then {}
           end
         )

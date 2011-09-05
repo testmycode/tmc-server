@@ -66,11 +66,24 @@ describe Submission do
   end
   
   it "can summarize test failure messages" do
+    #DEPRECATED FEATURE. May be removed after #22 is resolved.
     submission = Submission.new
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false)
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Yoo hoo()', :successful => true)
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Xoo xoo()', :message => 'you fail again', :successful => false)
     submission.test_failure_messages.should == ['Moo moo() - you fail', 'Xoo xoo() - you fail again']
+  end
+  
+  it "can summarize test failures by category" do
+    submission = Submission.new
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :message => 'you fail twice', :successful => false)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Yoo hoo()', :successful => true)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Xoo xoo()', :message => 'you fail again', :successful => false)
+    submission.categorized_test_failures.should == {
+      'Moo' => ['moo() - you fail', 'moo2() - you fail twice'],
+      'Xoo' => ['xoo() - you fail again']
+    }
   end
 end
 
