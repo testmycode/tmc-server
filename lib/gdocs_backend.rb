@@ -237,7 +237,7 @@ module GDocsBackend
   def self.update_total_col ws
     ws[header_row, total_col] = "total"
     first_row = total_col+1
-    last_row = (first_row < ws.num_cols) ? first_row : ws.num_cols
+    last_row = (first_row >= ws.num_cols) ? first_row : ws.num_cols
     (first_points_row..ws.num_rows).each do |row|
       first = "#{col_num2str(first_row)}#{row}"
       last = "#{col_num2str(last_row)}#{row}"
