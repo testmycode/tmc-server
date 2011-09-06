@@ -3,6 +3,7 @@ import fi.helsinki.cs.tmc.testrunner.Points;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+@Points("both-test-files")
 public class SimpleHiddenTest {
     @Test
     @Points("mul")

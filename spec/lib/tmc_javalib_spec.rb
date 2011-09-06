@@ -8,7 +8,7 @@ describe TmcJavalib do
       methods.should include({
         :class_name => 'SimpleTest',
         :method_name => 'testAdd',
-        :points => ['simpletest-all', 'addsub']
+        :points => ['simpletest-all', 'both-test-files', 'addsub']
       })
     end
   end

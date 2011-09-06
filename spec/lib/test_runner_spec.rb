@@ -53,6 +53,28 @@ describe TestRunner do
       points.should_not include('simpletest-all')
     end
     
+    it "should not award a point if all tests (potentially in multiple files) required for it don't pass" do
+      @exercise_project.solve_addsub
+      @exercise_project.make_zip
+      TestRunner.run_submission_tests(@submission)
+      @submission.save!
+      
+      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points.should include('simpletest-all')
+      points.should_not include('both-test-files')
+    end
+    
+    it "should award a point if all tests (potentially in multiple files) required for it pass" do
+      @exercise_project.solve_all
+      @exercise_project.make_zip
+      TestRunner.run_submission_tests(@submission)
+      @submission.save!
+      
+      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points.should include('simpletest-all')
+      points.should include('both-test-files')
+    end
+    
     it "should only ever award more points, never delete old points" do
       @exercise_project.solve_sub
       @exercise_project.make_zip

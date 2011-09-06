@@ -3,7 +3,7 @@ import fi.helsinki.cs.tmc.testrunner.Points;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-@Points("simpletest-all")
+@Points("simpletest-all both-test-files")
 public class SimpleTest {
     @Test
     @Points("addsub")
