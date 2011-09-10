@@ -45,6 +45,7 @@ class Course < ActiveRecord::Base
     end
 
     self.hidden = !!new_options['hidden']
+    self.spreadsheet_key = new_options['spreadsheet_key']
   end
 
   def self.default_options
