@@ -9,7 +9,7 @@ class Exercise < ActiveRecord::Base
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
 
-  validates :gdocs_sheet, :format => { :without => /^summary$/ }
+  validates :gdocs_sheet, :format => { :without => /^(MASTER|PUBLIC)$/ }
 
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)

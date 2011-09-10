@@ -60,7 +60,7 @@ class Course < ActiveRecord::Base
   end
 
   def refresh_gdocs
-    GDocsBackend.refresh_course_spreadsheet self
+    GDocsExport.refresh_course_points self
   end
 
 end
