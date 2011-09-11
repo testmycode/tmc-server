@@ -1,4 +1,4 @@
-require 'gdocs_backend'
+require 'gdocs_export'
 
 class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers

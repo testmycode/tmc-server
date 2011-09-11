@@ -49,9 +49,9 @@ class CoursesController < ApplicationController
     @course = Course.find(params[:id])
     authorize! :refresh, @course
 
-    url = @course.refresh_gdocs
+    notifications = @course.refresh_gdocs
     redirect_to course_path(@course),
-      :notice => "Refreshed points in <a href=#{url}>Google Docs</a>"
+      :notice => notifications.join("<br>")
   end
 
   def new
@@ -93,7 +93,7 @@ private
     result = fields.reduce({}) do |r, field|
       r.merge({ field => exercise.send(field) })
     end
-    
+
     result[:returnable] = exercise.returnable?
 
     if user
