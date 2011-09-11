@@ -50,8 +50,7 @@ class CoursesController < ApplicationController
     authorize! :refresh, @course
 
     notifications = @course.refresh_gdocs
-    redirect_to course_path(@course),
-      :notice => notifications.join("<br>")
+    render :text => notifications.join("<br>")
   end
 
   def new
