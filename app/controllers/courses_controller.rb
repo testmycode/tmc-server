@@ -1,4 +1,5 @@
 class CoursesController < ApplicationController
+  include CoursesHelper
 
   def index
     ordering = 'LOWER(name)'
@@ -42,7 +43,8 @@ class CoursesController < ApplicationController
     authorize! :refresh, @exercises
 
     @course.refresh
-    redirect_to course_path(@course), :notice => 'Course refreshed from repository.'
+    redirect_to course_path(@course),
+      :notice => 'Course refreshed from repository.'
   end
 
   def refresh_gdocs
@@ -50,7 +52,8 @@ class CoursesController < ApplicationController
     authorize! :refresh, @course
 
     notifications = @course.refresh_gdocs
-    render :text => notifications.join("<br>")
+    redirect_to course_path(@course),
+      :notice => gdocs_notifications(notifications)
   end
 
   def new

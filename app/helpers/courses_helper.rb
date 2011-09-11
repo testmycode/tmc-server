@@ -4,4 +4,20 @@ module CoursesHelper
       "https://github.com/#{$1}/#{$2}"
     end
   end
+
+  def gdocs_notifications notifications
+    ret = "Refreshed points in google docs. "
+    return ret if notifications.empty?
+    ret += "Notifications:"
+    ret += "<ul>"
+    ret += notifications.map do |msg|
+      if msg =~ /^error/ or msg =~ /^exception/
+        "<li><b>#{msg}</b></li>"
+      else
+        "<li>#{msg}</li>"
+      end
+    end.join
+    ret += "</ul>"
+    return ret
+  end
 end
