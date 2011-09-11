@@ -7,6 +7,11 @@ class AvailablePoint < ActiveRecord::Base
   belongs_to :exercise
   has_one :course, :through => :exercise
 
+  scope :course_sheet_points, lambda { |course, sheet|
+    joins(:exercise).
+    where(:exercises => {:course_id => course.id, :gdocs_sheet => sheet})
+  }
+
   def <=>(other)
     self.name.gsub(/\D/, '').to_i <=> other.name.gsub(/\D/, '').to_i
   end

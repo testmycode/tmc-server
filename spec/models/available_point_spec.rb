@@ -11,5 +11,24 @@ describe AvailablePoint do
       a.last.name.should == "1.20"
     end
   end
+
+  describe "scopes" do
+    it "course_sheet_points" do
+      course = Factory.create(:course)
+      ex1 = Factory.create(:exercise, :course => course, :gdocs_sheet => "s1")
+      ex2 = Factory.create(:exercise, :course => course, :gdocs_sheet => "s2")
+
+      ap1 = Factory.create(:available_point, :exercise => ex1)
+      ap2 = Factory.create(:available_point, :exercise => ex2)
+
+      a = AvailablePoint.course_sheet_points(course, "s1")
+      a.size.should == 1
+      a.should include(ap1)
+
+      a = AvailablePoint.course_sheet_points(course, "s2")
+      a.size.should == 1
+      a.should include(ap2)
+    end
+  end
 end
 
