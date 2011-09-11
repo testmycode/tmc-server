@@ -111,9 +111,13 @@ describe Exercise do
   it "should not accept 'summary' as a gdocs_sheet value" do
     ex = Factory.create(:exercise, :course => course, :name => 'MyExercise')
     ex.valid?.should be_true
-    ex.gdocs_sheet = 'summary'
+    ex.gdocs_sheet = 'MASTER'
     ex.valid?.should be_false
-    ex.gdocs_sheet = 'nonsummary'
+    ex.gdocs_sheet = 'PUBLIC'
+    ex.valid?.should be_false
+    ex.gdocs_sheet = 'nonPUBLIC'
+    ex.valid?.should be_true
+    ex.gdocs_sheet = 'nonMASTER'
     ex.valid?.should be_true
   end
 
