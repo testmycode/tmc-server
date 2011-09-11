@@ -96,6 +96,7 @@ module GDocsExport
   def self.point_col ws, point_name
     (points_begin .. ws.num_cols).each do |col|
       return col if ws[header_row, col] == point_name
+      return col if ws[header_row, col] == "'#{point_name}"
     end
     return -1
   end
