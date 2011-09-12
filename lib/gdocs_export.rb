@@ -44,7 +44,7 @@ module GDocsExport
   end
 
   def self.worksheet_students notifications, ws, course, sheetname
-    students = User.course_students(course)
+    students = User.course_sheet_students(course, sheetname)
     students.reduce([]) do |result, student|
       if student_row(ws, student.login) < 0
         notifications << "student #{student.login} not found on sheet " +

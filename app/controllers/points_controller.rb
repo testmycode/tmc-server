@@ -20,7 +20,7 @@ class PointsController < ApplicationController
     @course = Course.find(params[:course_id])
 
     @sheets = @course.gdocs_sheets
-    @users = User.course_students(@course).sort!
+    @users = User.course_sheet_students(@course, @sheetname).sort!
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname)
   end
 end
