@@ -19,6 +19,15 @@ class User < ActiveRecord::Base
     group("users.id")
   }
 
+  scope :course_sheet_students, lambda { |course, sheetname|
+    joins(:awarded_points).
+    where(:awarded_points => { :course_id => course.id }).
+    joins(:submissions).
+    joins("join exercises on submissions.exercise_name = exercises.name").
+    where("exercises.gdocs_sheet IS ?", sheetname).
+    group("users.id")
+  }
+
   def guest?
     false
   end

@@ -28,7 +28,7 @@ FactoryGirl.define do
 
   factory :awarded_point do
     course
-    name
+    sequence(:name) {|n| "point#{n}" }
     submission
     user
   end
