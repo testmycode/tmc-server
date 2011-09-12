@@ -2,10 +2,10 @@ require 'google_spreadsheet'
 
 module GDocsExport
 
-  def self.authenticate
-    raise "gdocs_username undefined" unless
+  def self.authenticate notifications
+    notifications << "gdocs_username undefined" and return nil unless
       SandboxServer::Application.config.gdocs_username
-    raise "gdocs_password undefined" unless
+    notifications << "gdocs_password undefined" and return nil unless
       SandboxServer::Application.config.gdocs_password
 
     GoogleSpreadsheet.login(
@@ -15,27 +15,20 @@ module GDocsExport
 
   def self.refresh_course_points course
     notifications = []
-    begin
-      gsession = authenticate
-      notifications.concat(refresh_course_spreadsheet(gsession, course))
-    rescue Exception => e
-      notifications << e.message
-    end
-
+    gsession = authenticate notifications
+    refresh_course_spreadsheet notifications, gsession, course
     return notifications
   end
 
-  def self.refresh_course_spreadsheet gsession, course
-    notifications = []
+  def self.refresh_course_spreadsheet notifications, gsession, course
     begin
       ss = find_course_spreadsheet gsession, course
       course.gdocs_sheets.each do |sheetname|
-        notifications.concat(update_worksheet ss, course, sheetname)
+        update_worksheet notifications, ss, course, sheetname
       end
     rescue Exception => e
-      notifications << e.message
+      notifications << "exception: #{e.message}"
     end
-    return notifications
   end
 
   def self.worksheet_points notifications, ws, course, sheetname
@@ -63,11 +56,9 @@ module GDocsExport
     end
   end
 
-  def self.update_worksheet ss, course, sheetname
+  def self.update_worksheet notifications, ss, course, sheetname
     ws = ss.worksheets.find {|w| w.title == sheetname}
-    return ["worksheet #{sheetname} not found"] unless ws
-
-    notifications = []
+    notifications << ["worksheet #{sheetname} not found"] and return unless ws
 
     students = worksheet_students notifications, ws, course, sheetname
     points = worksheet_points notifications, ws, course, sheetname
@@ -88,7 +79,7 @@ module GDocsExport
         next unless awarded.include? point
         col = point_col ws, point
         raise "point #{point.name} not found" if col < 0
-        ws[row,col] = "1"
+        ws[row,col] = "1" if ws[row,col] != "1"
       end
     end
   end
@@ -118,9 +109,9 @@ module GDocsExport
   end
 
   def self.find_course_spreadsheet gsession, course
-    raise "error: spreadsheet_key undefined" unless course.spreadsheet_key
+    raise "spreadsheet_key undefined" unless course.spreadsheet_key
     ss = gsession.spreadsheet_by_key course.spreadsheet_key
-    raise "error: spreadsheet not found" unless ss
+    raise "spreadsheet not found" unless ss
     return ss
   end
 
