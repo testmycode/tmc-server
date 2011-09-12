@@ -12,7 +12,7 @@ module CoursesHelper
     ret += "<ul>"
     ret += notifications.map do |msg|
       if msg =~ /^error/ or msg =~ /^exception/
-        "<li><b>#{msg}</b></li>"
+        "<span class='error'><li>#{msg}</li></span>"
       else
         "<li>#{msg}</li>"
       end
