@@ -3,7 +3,7 @@ require 'spec_helper'
 describe AwardedPoint do
 
   describe "scopes" do
-    before :all do
+    before :each do
       @course = Factory.create(:course)
 
       @user = Factory.create(:user)
@@ -33,11 +33,6 @@ describe AwardedPoint do
       @ap3 = Factory.create(:awarded_point, :course => @course,
                             :user => @user2, :name => "ap3",
                             :submission => @sub1)
-    end
-
-    after :all do
-      [@course, @user, @user2, @ex1, @ex2, @sub1, @sub2, @ap, @ap2, @ap3].
-        each { |o| o.destroy }
     end
 
     it "course_user_points" do

@@ -13,7 +13,7 @@ describe User do
   end
 
   describe "scopes" do
-    before :all do
+    before :each do
       @user1 = Factory.create(:user)
       @user2 = Factory.create(:user)
       @course1 = Factory.create(:course)

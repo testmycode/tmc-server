@@ -5,12 +5,15 @@ describe GDocsExport, :gdocs => true do
   before :all do
     @session = GDocsExport.authenticate []
     @session.should_not be_nil
-    @course = Factory.create(:course)
     @fixture1 = "0AnEpZul37faOdE1rc3lib0RLdjc5UXk2bk56a1lyWlE"
+  end
+  
+  before :each do
+    @course = Factory.create(:course)
   end
 
   describe "finding stuff" do
-    before :all do
+    before :each do
       @course.spreadsheet_key = @fixture1
       @ss = GDocsExport.find_course_spreadsheet @session, @course
       @ws = @ss.worksheets.find {|w| w.title == "1"}
