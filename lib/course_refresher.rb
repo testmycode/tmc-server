@@ -129,7 +129,7 @@ private
         point_names = test_case_methods(exercise).map{|x| x[:points]}.flatten.uniq
 
         point_names.each do |name|
-          if @course.available_points.none? {|point| point.name == name}
+          if exercise.available_points.none? {|point| point.name == name}
             point = AvailablePoint.create(:name => name, :exercise => exercise)
             exercise.available_points << point
           end

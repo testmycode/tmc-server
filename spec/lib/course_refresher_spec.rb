@@ -33,6 +33,28 @@ describe CourseRefresher do
     names.should include('MyCategory-MySubcategory-MyExercise')
   end
 
+  it "should allow duplicate available point names for different exercises" do
+    add_exercise('MyCategory/MyExercise')
+    refresher.refresh_course(course)
+    add_exercise('MyCategory/MySubcategory/MyExercise')
+    refresher.refresh_course(course)
+    course.exercises.should have(2).items
+    names = course.exercises.map &:name
+    names.should include('MyCategory-MyExercise')
+    names.should include('MyCategory-MySubcategory-MyExercise')
+
+    points0 = course.exercises[0].available_points.length
+    points1 = course.exercises[1].available_points.length
+    points0.should_not == 0
+    points1.should_not == 0
+    points0.should == points1
+
+    uniq_points = course.available_points.map(&:name).uniq.length
+    uniq_points.should == points0
+    uniq_points.should == points1
+  end
+
+
   it "should reload course metadata" do
     course.hide_after.should be_nil
 
