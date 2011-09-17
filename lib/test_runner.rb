@@ -138,14 +138,17 @@ private
 
   def self.award_points(submission, results)
     user = submission.user
-    awarded_points = user.awarded_points
+    exercise = submission.exercise
+    course = exercise.course
+    awarded_points = AwardedPoint.
+      course_user_sheet_points(course, user, exercise.gdocs_sheet)
 
     for point_name in points_from_test_results(results)
       if awarded_points.where(:name => point_name).empty?
         # To be saved with submission.
         submission.awarded_points << AwardedPoint.new(
           :name => point_name,
-          :course => submission.exercise.course,
+          :course => course,
           :user => user
         )
         # Added here so we'll find it in subsequent calls
