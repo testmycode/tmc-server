@@ -18,7 +18,7 @@ SandboxServer::Application.routes.draw do
     end
   end
 
-  resources :submissions, :only => [:show]
+  resources :submissions, :only => [:show, :update]
 
   root :to => "courses#index"
 

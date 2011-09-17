@@ -3,7 +3,7 @@ require 'spec_helper'
 describe TestRunner do
   include GitTestActions
 
-  describe "running tests on a submission" do
+  describe "running tests on a new submission" do
     before :each do
       @setup = SubmissionTestSetup.new(:exercise_name => 'SimpleExercise')
       @course = @setup.course

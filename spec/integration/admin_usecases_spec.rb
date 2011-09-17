@@ -39,5 +39,24 @@ describe "The system (used by an instructor for administration)" do
     click_link 'mycourse'
     page.should have_content('MyExercise')
   end
+  
+  it "should allow rerunning individual submissions" do
+    setup = SubmissionTestSetup.new(:solve => true, :save => true)
+    setup.make_zip
+    setup.submission.pretest_error = "some funny error"
+    setup.submission.test_case_runs.each do |tcr|
+      tcr.successful = false
+      tcr.save!
+    end
+    setup.submission.save!
+    
+    visit submission_path(setup.submission)
+    page.should_not have_content('All tests successful')
+    
+    click_button 'Rerun submission'
+    page.should_not have_content('some funny error')
+    page.should have_content('All tests successful')
+    page.should have_content('Rerun successful')
+  end
 end
 

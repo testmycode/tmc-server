@@ -24,4 +24,8 @@ protected
   def set_default_url_options
     Rails.application.routes.default_url_options[:host]=request.host_with_port
   end
+  
+  def respond_not_found
+    raise ActionController::RoutingError.new('Not Found')
+  end
 end

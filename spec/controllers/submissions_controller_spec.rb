@@ -12,6 +12,7 @@ describe SubmissionsController do
       @submitted_file.stub_chain(:tempfile, :path).and_return('submitted_file.zip')
       
       @submission = mock_model(Submission)
+      @submission.stub(:run_tests)
       @submission.stub(:save).and_return(true)
       Submission.stub(:new).and_return(@submission)
     end

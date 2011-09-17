@@ -55,6 +55,7 @@ class SubmissionsController < ApplicationController
     
     authorize! :create, @submission
     
+    @submission.run_tests
     ok = @submission.save
     
     if ok
@@ -79,6 +80,14 @@ class SubmissionsController < ApplicationController
         end
       end
     end
+  end
+  
+  def update
+    submission = Submission.find(params[:id]) || respond_not_found
+    authorize! :update, submission
+    submission.run_tests
+    submission.save!
+    redirect_to submission_path(submission), :notice => 'Rerun successful'
   end
 
 private

@@ -11,6 +11,15 @@
   <% end %>
 </div>
 
+<% if can? :update, @submission %>
+  <%= form_tag @submission, :method => :put do %>
+    <%= content_tag :button, :type => 'submit' do %>
+      Rerun submission
+    <% end %>
+    <span>(may add points; never deletes points)</span>
+  <% end %>
+<% end %>
+
 <% if @submission.pretest_error %>
   <pre class="error"><%= @submission.pretest_error %></pre>
 <% end %>

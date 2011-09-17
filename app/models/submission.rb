@@ -64,12 +64,14 @@ class Submission < ActiveRecord::Base
     result
   end
   
-private
   def run_tests
-    return if ::Rails.env == 'test' && self.skip_test_runner
-    begin
-      self.return_file = IO.read(return_file_tmp_path)
+    self.pretest_error = nil
     
+    return if ::Rails.env == 'test' && self.skip_test_runner
+    
+    begin
+      self.return_file = IO.read(return_file_tmp_path) if new_record?
+      
       TestRunner.run_submission_tests(self)
     rescue
       if $!.message.start_with?("Compilation error") # haxy - should fix
@@ -79,6 +81,8 @@ private
       end
     end
   end
+  
+private
   
   def test_case_category_and_name(test_case_name)
     parts = test_case_name.split(/\s+/, 2)

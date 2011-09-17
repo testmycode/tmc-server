@@ -13,11 +13,12 @@ class SubmissionTestSetup
 
   def initialize(options = {})
     options = default_options.merge(options)
-    raise "SubmissionTestSetup needs the option `:exercise_name`" if !options[:exercise_name]
     
     course_name = options[:course_name]
-    exercise_name = options[:exercise_name]
+    exercise_name = options[:exercise_name] || 'SimpleExercise'
     exercise_dest = options[:exercise_dest] || exercise_name
+    should_solve = options[:solve]
+    should_save = options[:save]
     @user = options[:user] || create_user
     
     @course = Course.create!(:name => course_name)
@@ -40,6 +41,15 @@ class SubmissionTestSetup
       :exercise => @exercise,
       :return_file_tmp_path => exercise_dest + ".zip"
     )
+    
+    if should_solve
+      @exercise_project.solve_all
+    end
+    
+    if should_save
+      make_zip
+      @submission.save!
+    end
   end
   
   def make_zip
@@ -51,7 +61,9 @@ class SubmissionTestSetup
       :course_name => 'MyCourse',
       :exercise_name => nil,
       :exercise_dest => nil,
-      :user => nil
+      :user => nil,
+      :solve => false,
+      :save => false
     }
   end
   

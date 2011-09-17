@@ -12,7 +12,14 @@ module TestRunner
       compile_src(project_root)
       compile_tests(project_root)
 
-      run_tests(project_root, submission)
+      results = run_tests(project_root, submission)
+      
+      if !submission.new_record?
+        submission.test_case_runs.destroy_all
+      end
+      
+      create_test_case_runs(submission, results)
+      award_points(submission, results)
     end
   end
 
@@ -96,12 +103,19 @@ private
     results = ActiveSupport::JSON.decode IO.read(results_file)
     raise 'Got no test results from test runner' unless results
     
-    create_test_case_runs(submission, results)
-    award_points(submission, results)
+    results
   end
 
   def self.populate_build_dir(dir, submission)
-    system! "unzip -q #{submission.return_file_tmp_path} -d #{dir}"
+    if submission.new_record?
+      unzip(submission.return_file_tmp_path, dir)
+    else
+      Tempfile.open(['tmc-rerun', '.zip']) do |tmpfile|
+        tmpfile.write(submission.return_file)
+        tmpfile.flush
+        unzip(tmpfile.path, dir)
+      end
+    end
 
     project_root = find_dir_containing(dir, "src")
     raise "unable to find 'src' directory in submission" unless project_root
@@ -116,7 +130,11 @@ private
     return project_root
   end
   
-    def self.replace_dir(source, destination)
+  def self.unzip(zip_file, dir)
+    sh! 'unzip', '-q', zip_file, '-d', dir
+  end
+  
+  def self.replace_dir(source, destination)
     FileUtils.rm_rf destination
     FileUtils.cp_r source, destination
   end
