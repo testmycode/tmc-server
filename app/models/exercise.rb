@@ -1,4 +1,5 @@
 class Exercise < ActiveRecord::Base
+  include Comparable
   include Rails.application.routes.url_helpers
 
   self.include_root_in_json = false
@@ -123,4 +124,7 @@ EOS
     }
   end
 
+  def <=>(other)
+    self.name <=> other.name
+  end
 end
