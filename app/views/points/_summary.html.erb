@@ -1,30 +1,21 @@
 <table class="points">
   <thead>
     <tr>
-      <th></th>
-      <% @sheets.each do |sheet| %>
+      <th>student</th>
+      <% @summary[:sheets].each do |sheet, points| %>
         <th><%= link_to sheet, course_point_path(@course, sheet) %></th>
       <% end %>
       <th>total</th>
     </tr>
   </thead>
-  <tbody>
-    <% @users.each do |user| %>
+  <% @summary[:students].each do |student| %>
     <tr>
-      <td><%= user.login %></td>
-      <% total = 0 %>
-      <% @sheets.each do |sheet| %>
-        <% sheetpoints = AwardedPoint.
-          course_user_sheet_points(@course, user, sheet).count %>
-        <% total += sheetpoints %>
-        <td>
-          <%= "#{sheetpoints} / #{AvailablePoint.
-            course_sheet_points(@course, sheet).count}" %>
-        </td>
+      <td><%= student[:login] %></td>
+      <% @summary[:sheets].each do |sheet, points| %>
+        <td><%= "#{student[:points][sheet]}/#{points}" %></td>
       <% end %>
-      <td><%= total %></td>
+      <td><%= student[:total] %></td>
     </tr>
-    <% end %>
-  </tbody>
+  <% end %>
 </table>
 

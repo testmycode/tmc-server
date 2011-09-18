@@ -7,8 +7,9 @@ class PointsController < ApplicationController
         new("Access denied to points.", :read, AwardedPoint)
     end
     @course = Course.find(params[:course_id])
-    @users = User.course_students(@course).sort!
-    @sheets = @course.gdocs_sheets.sort!
+    users = User.course_students(@course).sort!
+    sheets = @course.gdocs_sheets.sort!
+    @summary = summary_hash(@course, users, sheets)
   end
 
   def show
@@ -22,5 +23,23 @@ class PointsController < ApplicationController
     @users = User.course_sheet_students(@course, @sheetname).sort!
     @exercises = Exercise.
       course_gdocs_sheet_exercises(@course, @sheetname).sort!
+  end
+
+  def summary_hash course, users, sheets
+    h = {
+      :sheets => sheets.reduce({}) { |hash, sheet|
+        hash.merge({ sheet => AvailablePoint.
+          course_sheet_points(course, sheet).count })
+      },
+      :students => users.map{|u| {
+        :login => u.login,
+        :points => sheets.reduce({}){ |hash, sheet|
+          hash.merge({ sheet => AwardedPoint.
+            course_user_sheet_points(course, u, sheet).count })
+          },
+        :total => AwardedPoint.course_user_points(course, u).count
+      }}
+    }
+    return h
   end
 end
