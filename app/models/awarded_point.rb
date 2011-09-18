@@ -3,6 +3,8 @@ class AwardedPoint < ActiveRecord::Base
   belongs_to :user
   belongs_to :submission
 
+  validates_uniqueness_of :name, :scope => [:user_id, :submission_id]
+
   scope :course_user_points, lambda { |course, user|
     where(:course_id => course.id, :user_id => user.id)
   }
