@@ -26,11 +26,12 @@ class PointsController < ApplicationController
   end
 
   def summary_hash course, users, sheets
-    h = {
-      :sheets => sheets.reduce({}) { |hash, sheet|
-        hash.merge({ sheet => AvailablePoint.
-          course_sheet_points(course, sheet).count })
-      },
+    {
+      :sheets => sheets.map{|sheet| {
+        :name => sheet,
+        :points => AvailablePoint.course_sheet_points(course, sheet).count
+      }},
+      :total => AvailablePoint.course_points(course).count,
       :students => users.map{|u| {
         :login => u.login,
         :points => sheets.reduce({}){ |hash, sheet|
@@ -40,6 +41,5 @@ class PointsController < ApplicationController
         :total => AwardedPoint.course_user_points(course, u).count
       }}
     }
-    return h
   end
 end

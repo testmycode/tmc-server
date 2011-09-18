@@ -2,8 +2,10 @@
   <thead>
     <tr>
       <th>student</th>
-      <% @summary[:sheets].each do |sheet, points| %>
-        <th><%= link_to sheet, course_point_path(@course, sheet) %></th>
+      <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
+        <th>
+          <%= link_to sheet, course_point_path(@course, sheet) %>
+        </th>
       <% end %>
       <th>total</th>
     </tr>
@@ -11,10 +13,14 @@
   <% @summary[:students].each do |student| %>
     <tr>
       <td><%= student[:login] %></td>
-      <% @summary[:sheets].each do |sheet, points| %>
-        <td><%= "#{student[:points][sheet]}/#{points}" %></td>
+      <% @summary[:sheets].each do |sheet, (k, v)| %>
+        <% sheetname = sheet[:name] %>
+        <% sheetpoints = sheet[:points] %>
+        <td>
+          <%= "#{student[:points][sheetname]}/#{sheetpoints}" %>
+        </td>
       <% end %>
-      <td><%= student[:total] %></td>
+      <td><%= "#{student[:total]}/#{@summary[:total]}" %></td>
     </tr>
   <% end %>
 </table>
