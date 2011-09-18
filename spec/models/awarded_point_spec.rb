@@ -25,31 +25,30 @@ describe AwardedPoint do
                                    :exercise => @ex2)
 
       @ap = Factory.create(:awarded_point, :course => @course,
-                           :user => @user, :submission => @sub1,
-                           :name => "ap")
+                           :user => @user, :name => "ap",
+                           :submission => @sub1)
       @ap2 = Factory.create(:awarded_point, :course => @course,
                            :user => @user2, :name => "ap2",
                            :submission => @sub2)
       @ap3 = Factory.create(:awarded_point, :course => @course,
-                            :user => @user2, :name => "ap3",
+                            :user => @user, :name => "ap3",
                             :submission => @sub1)
     end
 
     it "course_user_points" do
-      points = AwardedPoint.course_user_points(@course, @user)
-      points.size.should == 1
-      points.first.should == @ap
+      p = AwardedPoint.course_user_points(@course, @user)
+      p.size.should == 2
+      p.should include(@ap)
+      p.should include(@ap3)
 
-      points2 = AwardedPoint.course_user_points(@course, @user2)
-      points2.size.should == 2
-      points2.should include(@ap2)
-      points2.should include(@ap3)
+      p = AwardedPoint.course_user_points(@course, @user2)
+      p.size.should == 1
+      p.should include(@ap2)
     end
 
     it "course_user_sheet_points" do
       points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet1)
-      points.size.should == 1
-      points.first.should == @ap3
+      points.size.should == 0
 
       points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet2)
       points.size.should == 1
@@ -59,11 +58,26 @@ describe AwardedPoint do
       points.size.should == 0
 
       points = AwardedPoint.course_user_sheet_points(@course, @user, @sheet1)
-      points.size.should == 1
+      points.size.should == 2
       points.first.should == @ap
     end
 
-  end
+    it "exercise_user_points" do
+      p = AwardedPoint.exercise_user_points(@ex1, @user)
+      p.size.should == 2
+      p.should include(@ap)
+      p.should include(@ap3)
 
+      p = AwardedPoint.exercise_user_points(@ex2, @user)
+      p.should be_empty
+
+      p = AwardedPoint.exercise_user_points(@ex1, @user2)
+      p.size.should == 0
+
+      p = AwardedPoint.exercise_user_points(@ex2, @user2)
+      p.size.should == 1
+      p.should include(@ap2)
+    end
+  end
 end
 

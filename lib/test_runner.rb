@@ -158,8 +158,7 @@ private
     user = submission.user
     exercise = submission.exercise
     course = exercise.course
-    awarded_points = AwardedPoint.
-      course_user_sheet_points(course, user, exercise.gdocs_sheet)
+    awarded_points = AwardedPoint.exercise_user_points(exercise, user)
 
     for point_name in points_from_test_results(results)
       if awarded_points.where(:name => point_name).empty?
