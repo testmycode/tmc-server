@@ -11,14 +11,6 @@ describe PointsController do
   end
 
   describe "GET show" do
-    describe "when guest visits" do
-      it "should not allow access" do
-        expect {
-          get :show, :course_id => @course.id.to_s, :id => @sheetname
-        }.to raise_error(CanCan::AccessDenied)
-      end
-    end
-
     describe "when user has participated in a course" do
       before :each do
         controller.current_user = @admin

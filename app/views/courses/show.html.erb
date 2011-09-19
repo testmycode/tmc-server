@@ -3,6 +3,10 @@
   <%= @course.name %>
 </h1>
 
+<ul>
+  <li><%= link_to 'View points', course_points_path(@course) %></li>
+</ul>
+
 <% if current_user.administrator? %>
 <ul>
   <li>Repository URL: <span class="repo-url"><%= @course.bare_url %></span></li>
@@ -31,8 +35,6 @@
       <%= link_to 'Refresh', refresh_gdocs_course_path(@course) %>
     </li>
   <% end %>
-
-  <li><%= link_to 'View points', course_points_path(@course) %></li>
 </ul>
 <% end %>
 
