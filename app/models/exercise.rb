@@ -60,18 +60,17 @@ class Exercise < ActiveRecord::Base
     # We try to find a submission whose test case runs are all successful
     conn = ActiveRecord::Base.connection
     query = <<EOS
-SELECT COUNT(*) AS total,
-       SUM(CASE WHEN successful = #{conn.quote(true)} THEN 1 ELSE 0 END) AS good
+SELECT 1
 FROM test_case_runs AS tcr
   JOIN submissions AS sub ON (sub.id = tcr.submission_id)
+WHERE sub.exercise_name = #{conn.quote self.name} AND
+      sub.user_id = #{conn.quote user.id}
 GROUP BY submission_id
-HAVING sub.exercise_name = #{conn.quote self.name} AND
-       sub.user_id = #{conn.quote user.id} AND
-       good = total AND
-       total > 0
+HAVING COUNT(*) = SUM(CASE WHEN successful = #{conn.quote(true)} THEN 1 ELSE 0 END) AND
+       COUNT(*) > 0
 LIMIT 1
 EOS
-    !conn.execute(query).empty?
+    !conn.execute(query).to_a.empty?
   end
 
   def deadline=(new_deadline)
