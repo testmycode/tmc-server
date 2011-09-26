@@ -17,7 +17,7 @@ class CoursesController < ApplicationController
         data = courses.map do |c|
           {
             :name => c.name,
-            :exercises => c.exercises.map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
+            :exercises => c.exercises.order('LOWER(name)').map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
           }
         end
         render :json => data.to_json
