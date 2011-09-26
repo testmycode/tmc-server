@@ -13,6 +13,7 @@ class CoursesController < ApplicationController
       end
       format.json do
         courses = Course.ongoing.where(:hidden => false).order(ordering)
+        authorize! :read, courses
         data = courses.map do |c|
           {
             :name => c.name,
