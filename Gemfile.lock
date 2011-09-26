@@ -69,6 +69,7 @@ GEM
     mime-types (1.16)
     nokogiri (1.5.0)
     oauth (0.4.4)
+    pg (0.11.0)
     polyglot (0.3.1)
     rack (1.2.3)
     rack-mount (0.6.14)
@@ -128,6 +129,7 @@ DEPENDENCIES
   google-spreadsheet-ruby
   jquery-rails (~> 1.0.9)
   launchy
+  pg (~> 0.11.0)
   railroady
   rails (~> 3.0.0)
   rake (~> 0.8.0)
