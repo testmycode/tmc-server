@@ -7,3 +7,4 @@
 /doc/usermanual/pages
 /doc/usermanual/screenshots
 /config/site.yml
+/config/database.local.yml
