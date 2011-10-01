@@ -8,14 +8,21 @@ grant {
 };
 
 grant codeBase "file:${tmc.test_class_dir}/-" {
+  permission java.util.PropertyPermission "*", "read,write";
+  
   permission java.lang.RuntimePermission "setIO";
   
   permission java.lang.RuntimePermission "accessDeclaredMembers";
   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
   permission java.lang.RuntimePermission "getClassLoader";
+  permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
+  permission java.lang.RuntimePermission "getProtectionDomain";
+  permission java.lang.RuntimePermission "reflectionFactoryAccess";
 };
 
 grant codeBase "file:${tmc.lib_dir}/*" {
+  permission java.util.PropertyPermission "*", "read,write";
+
   permission java.lang.RuntimePermission "exitVM.*";
   permission java.lang.RuntimePermission "setIO";
   
@@ -23,5 +30,8 @@ grant codeBase "file:${tmc.lib_dir}/*" {
   permission java.lang.RuntimePermission "createClassLoader";
   permission java.lang.RuntimePermission "accessDeclaredMembers";
   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+  permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
+  permission java.lang.RuntimePermission "getProtectionDomain";
+  permission java.lang.RuntimePermission "reflectionFactoryAccess";
 };
 
