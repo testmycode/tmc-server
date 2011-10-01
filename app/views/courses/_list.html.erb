@@ -39,7 +39,7 @@
   </tbody>
 </table>
 
-<%= use_datatables('table.course-list#' + locals[:list_id]) %>
+<%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false) %>
 
 <div class="as-json">[<%= link_to "json", "#{courses_path}.json" %>]</div>
 
