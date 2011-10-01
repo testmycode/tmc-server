@@ -14,8 +14,6 @@ class Submission < ActiveRecord::Base
   validates :course, :presence => true
   validates :exercise_name, :presence => true
   
-  before_create :run_tests
-  
   def tests_ran?
     pretest_error == nil
   end
