@@ -80,7 +80,7 @@ private
     command = mk_command([
       "java",
       "-cp",
-      "#{lib_classpath(exercise_dir)}:#{src_classes}",
+      "#{lib_classpath(exercise_dir)}:#{src_classes}:#{test_classes}",
       
       "-Djava.security.manager",
       "-Djava.security.policy=#{policy_file}",
