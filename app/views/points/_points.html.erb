@@ -1,3 +1,9 @@
+
+<% if current_user.administrator? and @course.spreadsheet_key %>
+  <p><%= link_to 'Refresh Google Docs worksheet',
+    refresh_gdocs_course_point_path(@course, @sheetname) %></p>
+<% end %>
+
 <table class="points">
   <thead>
     <tr>

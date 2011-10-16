@@ -7,11 +7,15 @@ SandboxServer::Application.routes.draw do
 
   resources :courses do
     member do
-      get 'refresh_gdocs'
       get 'refresh'
       post 'refresh'
     end
-    resources :points, :only => [:index, :show]
+
+    resources :points, :only => [:index, :show] do
+      member do
+        get 'refresh_gdocs'
+      end
+    end
 
     resources :exercises, :except => [:destroy, :create] do
       resources :submissions, :only => [:create, :index]

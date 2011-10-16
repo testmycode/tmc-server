@@ -1,0 +1,7 @@
+<h1>Refreshed Google Docs worksheet</h1>
+<%= link_to 'back to worksheet points', course_point_path(@course) %>
+<% unless @notifications.empty? %>
+  <h2>Notifications:</h2>
+  <%= raw(gdocs_notifications(@notifications)) %>
+<% end %>
+
