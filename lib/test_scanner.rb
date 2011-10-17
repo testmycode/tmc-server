@@ -1,3 +1,4 @@
+require 'tmc_javalib'
 require 'digest'
 require 'find'
 

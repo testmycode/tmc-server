@@ -1,3 +1,5 @@
+require 'test_runner'
+
 class Submission < ActiveRecord::Base
   belongs_to :user
   belongs_to :course

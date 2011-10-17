@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'erb'
+require 'system_commands'
 
 # Used for generating documents from acceptance tests.
 # See e.g. spec/usermanual

@@ -1,3 +1,4 @@
+require 'system_commands'
 require 'tempfile'
 require 'find'
 require 'pathname'
@@ -110,7 +111,7 @@ private
     if submission.new_record?
       unzip(submission.return_file_tmp_path, dir)
     else
-      Tempfile.open(['tmc-rerun', '.zip']) do |tmpfile|
+      Tempfile.open(['tmc-rerun', '.zip'], :encoding => 'ascii-8bit') do |tmpfile|
         tmpfile.write(submission.return_file)
         tmpfile.flush
         unzip(tmpfile.path, dir)

@@ -8,8 +8,11 @@ describe SubmissionsController do
 
   describe "POST create" do
     before :each do
-      @submitted_file = mock(Object)
-      @submitted_file.stub_chain(:tempfile, :path).and_return('submitted_file.zip')
+      FileUtils.touch('submitted_file.zip') # Although we don't need the actual file, fixture_file_upload wants it to exist
+      @submitted_file = fixture_file_upload('submitted_file.zip')
+      class << @submitted_file
+        attr_reader :tempfile # Missing for some reason. See http://comments.gmane.org/gmane.comp.lang.ruby.rails/297939
+      end
       
       @submission = mock_model(Submission)
       @submission.stub(:run_tests)

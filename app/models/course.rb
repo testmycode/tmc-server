@@ -1,4 +1,6 @@
 require 'gdocs_export'
+require 'system_commands'
+require 'date_and_time_utils'
 
 class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers

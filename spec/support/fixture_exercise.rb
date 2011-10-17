@@ -1,3 +1,4 @@
+require 'find'
 
 # A copy of a fixture exercise.
 # Creating an instance of this creates a copy of a fixture exercise combined 
@@ -65,8 +66,8 @@ private
 
   def ensure_fixture_clean
     Dir.chdir fixture_path do
-      system!("ant clean > /dev/null 2>&1") unless fixture_clean?
-    end
+      system!("ant clean > /dev/null 2>&1")
+    end unless fixture_clean?
   end
   
   def fixture_clean?
@@ -75,7 +76,7 @@ private
   end
   
   def fixture_contains_class_files?
-    Find.find(path) do |file|
+    Find.find(fixture_path) do |file|
       return true if file.end_with?('.class')
     end
     false

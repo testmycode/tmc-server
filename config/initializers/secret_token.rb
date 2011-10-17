@@ -4,4 +4,4 @@
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-SandboxServer::Application.config.secret_token = 'b13b2344053a2506723f1edbb0caedaa6fea7b4dc9f7a2ab1339810b2ff10fb17541dba0a22b904102cf20bacffd0247abaa01953f9048a846d301d0491590b0'
+SandboxServer::Application.config.secret_token = 'ca4c4db06798dbe05d33d757700f26c2e2d6ac15d275ab841430761e30b5b6363481fa731f06725ff3bbfcaa07a33b0426466ea420d3eb81b953cfbaf16c53fc'

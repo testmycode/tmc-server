@@ -46,7 +46,7 @@ describe PointsController do
 
       it "should contain a success marker" do
         get :show, :course_id => @course.id, :id => @sheetname
-        response.body.should have_content("✔")
+        response.body.should have_content("&#x2714;")
       end
     end
   end

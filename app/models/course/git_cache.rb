@@ -1,3 +1,5 @@
+require 'course_refresher'
+
 class Course < ActiveRecord::Base
   module GitCache
     def has_remote_repo?

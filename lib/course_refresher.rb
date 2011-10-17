@@ -1,4 +1,6 @@
 require 'find'
+require 'recursive_yaml_reader'
+require 'test_scanner'
 
 # Safely refreshes a course from a git repository
 class CourseRefresher

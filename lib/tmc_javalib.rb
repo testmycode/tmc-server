@@ -1,4 +1,5 @@
 require 'shellwords'
+require 'system_commands'
 
 # Interface to tmc-javalib.
 module TmcJavalib

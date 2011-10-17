@@ -1,5 +1,4 @@
-require 'lib/system_commands.rb'
-require 'lib/tmc_javalib.rb'
+require 'tmc_javalib'
 require 'fileutils'
 
 file TmcJavalib.jar_path => FileList["#{TmcJavalib.project_path}/**/*.java"] do

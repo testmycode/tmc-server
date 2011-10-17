@@ -1,13 +1,17 @@
 require 'spec_helper'
 
 describe ApplicationHelper do
+  def h(*args) # Hack to make 'h' accessible to the helper being tested (Worked in Rails 3.0, found broken on upgrade to 3.1.1)
+    helper.send('h', *args)
+  end
+ 
   describe "#labeled" do
     describe "when given two string parameters" do
       it "should add a label with 1st param as text for the tag given in 2nd param" do
         labeled('Xooxer', '<input type="text" id="foo" name="bar" />').should include('<label for="foo">Xooxer</label><input')
       end
       
-      it "and the 2nd param has multiple tags, should add the label for the first tag with and id" do
+      it "and the 2nd param has multiple tags, should add the label for the first tag with an id" do
         labeled('Mooxer', '<div id="moo"><div id="xoo"></div></div>').should include('<label for="moo">Mooxer</label><div')
       end
       

@@ -17,7 +17,7 @@ class PointsController < ApplicationController
       course_gdocs_sheet_exercises(@course, @sheetname).sort!
   end
 
-  def summary_hash course, users, sheets
+  def summary_hash(course, users, sheets)
     {
       :sheets => sheets.map{|sheet| {
         :name => sheet,
