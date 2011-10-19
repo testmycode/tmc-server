@@ -1,8 +1,8 @@
 # Test My Code server #
 
-*Test My Code* is a tool to automate some of the exercise checking when teaching programming. It runs code submitted by students, gives feedback if tests fail and stores points received for successful submissions. This allows for lots of small exercises without the need for course instructors to manually go through all of them.
+*Test My Code* ("TMC") is a tool to automate some of the exercise checking when teaching programming. It runs code submitted by students, gives feedback if tests fail and stores points received for successful submissions. This allows for lots of small exercises without the need for course instructors to manually go through all of them.
 
-The project is currently undergoing finishing touches to be ready for the Autumn semester. Instructions for setup and use will appear here soon.
+The system has been used by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in an elementary programming [course](http://www.cs.helsinki.fi/u/wikla/ohjelmointi/perus/s2011/). The course had almost 200 participants and TMC saved course assistants a lot of work while giving students instant feedback for many exercises. Development continues in preparation for the Spring semester with plans to move all exercises to TMC and open the course online to anyone in Finland.
 
 
 ## Credits ##
