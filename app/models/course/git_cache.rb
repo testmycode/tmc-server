@@ -15,7 +15,7 @@ class Course < ActiveRecord::Base
 
       begin
         FileUtils.mkdir_p(bare_path)
-        system!(mk_command ["git", "init", "-q", "--bare", "--shared=group", bare_path])
+        system!(mk_command(["git", "init", "-q", "--bare", "--shared=group", bare_path]))
       rescue Exception => e
         delete_local_repository
         raise e

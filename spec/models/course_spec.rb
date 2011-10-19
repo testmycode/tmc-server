@@ -59,7 +59,7 @@ describe Course do
         :cache_root
       ]
       for path in class_paths
-        Course.send(path).should match /^\//
+        Course.send(path).should match(/^\//)
       end
 
       object_paths = [
@@ -70,7 +70,7 @@ describe Course do
       ]
 
       for path in object_paths
-        Course.new.send(path).should match /^\//
+        Course.new.send(path).should match(/^\//)
       end
     end
   end
