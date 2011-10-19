@@ -8,3 +8,8 @@
 /doc/usermanual/screenshots
 /config/site.yml
 /config/database.local.yml
+
+# Eclipse
+/.project
+/.buildpath
+/.settings
