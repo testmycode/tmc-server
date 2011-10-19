@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'spec_helper'
 
 describe PointsController do
@@ -46,7 +47,7 @@ describe PointsController do
 
       it "should contain a success marker" do
         get :show, :course_id => @course.id, :id => @sheetname
-        response.body.should have_content("&#x2714;")
+        response.body.should have_content("✔")
       end
     end
   end
