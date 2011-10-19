@@ -1,6 +1,4 @@
 class CoursesController < ApplicationController
-  include CoursesHelper
-
   def index
     ordering = 'LOWER(name)'
 
@@ -46,15 +44,6 @@ class CoursesController < ApplicationController
     @course.refresh
     redirect_to course_path(@course),
       :notice => 'Course refreshed from repository.'
-  end
-
-  def refresh_gdocs
-    @course = Course.find(params[:id])
-    authorize! :refresh, @course
-
-    notifications = @course.refresh_gdocs
-    redirect_to course_path(@course),
-      :notice => gdocs_notifications(notifications)
   end
 
   def new

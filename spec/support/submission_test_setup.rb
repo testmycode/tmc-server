@@ -48,6 +48,7 @@ class SubmissionTestSetup
     
     if should_save
       make_zip
+      @submission.run_tests
       @submission.save!
     end
   end

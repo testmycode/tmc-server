@@ -61,9 +61,8 @@ class Course < ActiveRecord::Base
     self.exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
   end
 
-  def refresh_gdocs
-    GDocsExport.refresh_course_points self
+  def refresh_gdocs_worksheet sheetname
+    GDocsExport.refresh_course_worksheet_points self, sheetname
   end
-
 end
 

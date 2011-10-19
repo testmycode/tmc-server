@@ -1,11 +1,19 @@
 class PointsController < ApplicationController
-  skip_authorization_check
+  include PointsHelper
+  skip_authorization_check :except => :refresh_gdocs
 
   def index
     @course = Course.find(params[:course_id])
     users = User.course_students(@course).sort!
     sheets = @course.gdocs_sheets.sort!
     @summary = summary_hash(@course, users, sheets)
+  end
+
+  def refresh_gdocs
+    authorize! :refresh, @course
+    @sheetname = params[:id]
+    @course = Course.find(params[:course_id])
+    @notifications = @course.refresh_gdocs_worksheet @sheetname
   end
 
   def show

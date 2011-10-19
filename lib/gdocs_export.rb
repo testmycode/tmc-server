@@ -13,19 +13,20 @@ module GDocsExport
       SandboxServer::Application.config.gdocs_password)
   end
 
-  def self.refresh_course_points course
+  def self.refresh_course_worksheet_points course, sheetname
+    return ["sheetname #{sheetname} not found"] unless
+      course.gdocs_sheets.include?(sheetname)
+
     notifications = []
     gsession = authenticate notifications
-    refresh_course_spreadsheet notifications, gsession, course
+    refresh_course_worksheet notifications, gsession, course, sheetname
     return notifications
   end
 
-  def self.refresh_course_spreadsheet notifications, gsession, course
+  def self.refresh_course_worksheet notifications, gsession, course, sheetname
     begin
       ss = find_course_spreadsheet gsession, course
-      course.gdocs_sheets.each do |sheetname|
-        update_worksheet notifications, ss, course, sheetname
-      end
+      update_worksheet notifications, ss, course, sheetname
     rescue Exception => e
       notifications << "exception: #{e.message}"
     end

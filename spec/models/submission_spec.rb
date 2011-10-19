@@ -15,15 +15,14 @@ describe Submission do
       TestRunner.should_receive(:run_submission_tests).with(@submission)
       
       @submission.should be_valid
-      @submission.save!
+      @submission.run_tests
       
       @submission.return_file.should == 'xoo'
     end
     
     it "should catch and store an exception from the test runner" do
       TestRunner.should_receive(:run_submission_tests).with(@submission).and_raise('oh no')
-      @submission.save!
-      @submission.reload
+      @submission.run_tests
       @submission.pretest_error.should include('oh no')
     end
   end
