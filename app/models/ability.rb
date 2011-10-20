@@ -10,6 +10,9 @@ class Ability
       can :refresh, Course
     else
       can :read, :all
+      
+      cannot :read, User
+      can :read, User, :id => user.id
 
       cannot :read, Submission
       can :read, Submission, :user_id => user.id

@@ -4,6 +4,8 @@ SandboxServer::Application.routes.draw do
 
   match '/signin',  :to => 'sessions#new'
   match '/signout', :to => 'sessions#destroy'
+  
+  resource :profile
 
   resources :courses do
     member do

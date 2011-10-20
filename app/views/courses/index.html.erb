@@ -3,9 +3,6 @@
 
 <% if signed_in? %>
   <%= link_to 'Create New Course', new_course_path %>
-  <% if flash[:alert] %>
-    <p class="error"><%= flash[:alert] %></p>
-  <% end %>
 <% end %>
 
 <h3>Ongoing courses</h3>

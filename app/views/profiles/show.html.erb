@@ -1,0 +1,22 @@
+<h1><%= @user.login %></h1>
+
+<%= render 'shared/error_messages', :target => @user %>
+
+<%= form_for @user, :url => { :action => :update } do |f| %>
+  <section>
+    <h2>User profile</h2>
+    <%= labeled_field('Username:', f.text_field(:login, :disabled => true)) %>
+    <%= labeled_field('E-mail:', f.text_field(:email)) %>
+  </section>
+  
+  <section>
+    <h2>Change password</h2>
+    <%= labeled_field('Old password:', f.password_field(:old_password, :value => '')) %>
+    <%= labeled_field('New password:', f.password_field(:password, :value => '')) %>
+    <%= labeled_field('New password again:', f.password_field(:password_repeat, :value => '')) %>
+  </section>
+  
+  <section>
+    <%= f.submit "Save" %>
+  </section>
+<% end %>

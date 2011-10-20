@@ -7,10 +7,7 @@ class ApplicationController < ActionController::Base
   check_authorization
   
   rescue_from CanCan::AccessDenied do |exception|
-    respond_to do |format|
-      format.html { render :text => '<p class="error">Access denied.</p>', :layout => true }
-      format.json { render :json => { :error => 'Access denied.' } }
-    end
+    respond_access_denied
   end unless Rails::env == 'test'  # for clearer error messages
 
   before_filter :set_default_url_options
@@ -27,5 +24,12 @@ protected
   
   def respond_not_found
     raise ActionController::RoutingError.new('Not Found')
+  end
+  
+  def respond_access_denied
+    respond_to do |format|
+      format.html { render :text => '<p class="error">Access denied.</p>', :layout => true, :status => 403 }
+      format.json { render :json => { :error => 'Access denied.' }, :status => 403 }
+    end
   end
 end

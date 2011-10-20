@@ -1,15 +1,5 @@
 <%= form_for(@course) do |f| %>
-  <% if @course.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@course.errors.count, "error") %> prohibited this course from being saved:</h2>
-
-      <ul>
-      <% @course.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render 'shared/error_messages', :target => @course %>
 
   <%= labeled_field("Course name (should not contain whitespace)", f.text_field(:name)) %>
   <%= labeled_field("Remote repo URL (leave blank to create a local repo)", f.text_field(:remote_repo_url)) %>

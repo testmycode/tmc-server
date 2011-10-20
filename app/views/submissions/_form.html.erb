@@ -1,19 +1,6 @@
 <%= form_for(submission, :url => course_exercise_submissions_path(@course, @exercise), :action => @form_action,
             :html => {:multipart => true}) do |f| %>
-  <% if submission.errors.any? %>
-    <div id="error_explanation">
-      <h2>
-        <%= pluralize(submission.errors.count, "error") %>
-        prohibited this submission from being saved:
-      </h2>
-
-      <ul>
-      <% submission.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render 'shared/error_messages', :target => submission %>
 
   <div>
 
