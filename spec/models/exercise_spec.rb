@@ -169,6 +169,7 @@ describe Exercise do
     ex.should be_returnable
   end
 
+  # TODO: available_to should be removed
   it "should be available to non-administrators only if the deadline has not passed and the exercise is not hidden" do
     #TODO: publish_time too!
     user = Factory.create(:user)
@@ -186,6 +187,34 @@ describe Exercise do
     ex.deadline = nil
     ex.hidden = true
     ex.should_not be_available_to(user)
+  end
+  
+  it "should be visible to regular users by default" do
+    user = Factory.create(:user)
+    ex = Factory.create(:exercise, :course => course)
+    
+    ex.should be_visible_to(user)
+  end
+  
+  it "should not be visible to regular users if explicitly hidden" do
+    user = Factory.create(:user)
+    ex = Factory.create(:exercise, :course => course, :hidden => true)
+    
+    ex.should_not be_visible_to(user)
+  end
+  
+  it "should not be visible to regular users if the publish time has not passed" do
+    user = Factory.create(:user)
+    ex = Factory.create(:exercise, :course => course, :publish_time => Time.now + 10.hours)
+    
+    ex.should_not be_visible_to(user)
+  end
+  
+  it "should always be visible to administrators" do
+    admin = Factory.create(:admin)
+    ex = Factory.create(:exercise, :course => course, :publish_time => Time.now + 10.hours, :hidden => true)
+    
+    ex.should be_visible_to(admin)
   end
 
   it "can tell whether a user has ever attempted an exercise" do

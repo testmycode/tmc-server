@@ -48,8 +48,12 @@ class Exercise < ActiveRecord::Base
     if user.administrator?
       true
     else
-      !hidden?
+      !hidden? && published?
     end
+  end
+  
+  def published? # may still be hidden
+    !publish_time || publish_time <= Time.now
   end
 
   def attempted_by?(user)
