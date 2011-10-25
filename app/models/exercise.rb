@@ -84,7 +84,7 @@ EOS
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
     self.deadline = new_options["deadline"]
-    self.publish_date = new_options["publish_date"]
+    self.publish_time = new_options["publish_time"]
     self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"],
                                        new_options["gdocs_sheet"])
     self.hidden = new_options["hidden"]
@@ -115,7 +115,7 @@ EOS
   def self.default_options
     {
       "deadline" => nil,
-      "publish_date" => nil,
+      "publish_time" => nil,
       "gdocs_sheet" => nil,
       "points_visible" => true,
       "hidden" => false,
