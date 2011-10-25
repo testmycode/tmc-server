@@ -89,11 +89,6 @@ describe User do
       user.should be_valid
       user.save!
     end
-
-    it "should fail with too short a password" do
-      short_pass = {:login => "instructor", :password => 'a' }
-      User.new(short_pass).should have(1).error_on(:password)
-    end
   end
 
   it "should allow authentication after modification" do
