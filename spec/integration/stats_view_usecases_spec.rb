@@ -4,7 +4,9 @@ describe "The system (used by an instructor for viewing statistics)" do
   include IntegrationTestActions
 
   before :each do
-    course = Course.create!(:name => 'mycourse')
+    repo_path = Dir.pwd + '/remote_repo'
+    create_bare_repo(repo_path)
+    course = Course.create!(:name => 'mycourse', :remote_repo_url => repo_path)
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('EasyExercise')
     repo.copy_simple_exercise('HardExercise')

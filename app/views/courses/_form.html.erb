@@ -2,7 +2,7 @@
   <%= render 'shared/error_messages', :target => @course %>
 
   <%= labeled_field("Course name (should not contain whitespace)", f.text_field(:name)) %>
-  <%= labeled_field("Remote repo URL (leave blank to create a local repo)", f.text_field(:remote_repo_url)) %>
+  <%= labeled_field("Remote repo URL", f.text_field(:remote_repo_url)) %>
   <div class="actions">
     <%= f.submit 'Add Course'%>
   </div>

@@ -12,6 +12,7 @@ FactoryGirl.define do
 
   factory :course, :class => Course do
     sequence(:name) {|n| "course#{n}" }
+    remote_repo_url 'git@example.com'
   end
 
   factory :exercise do

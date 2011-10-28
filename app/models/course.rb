@@ -23,9 +23,8 @@ class Course < ActiveRecord::Base
   has_many :available_points, :through => :exercises
   has_many :awarded_points, :dependent => :destroy
 
-  before_save lambda { self.remote_repo_url = nil if self.remote_repo_url.blank? }
-  after_create :create_local_repository, :if => lambda { has_local_repo? }
-  after_destroy :delete_local_repository, :if => lambda { has_local_repo? }
+  validates :remote_repo_url, :presence => true
+  
   after_destroy :delete_cache
 
   scope :ongoing, lambda { where(["hide_after IS NULL OR hide_after > ?", Time.now]) }

@@ -11,14 +11,10 @@ RSpec.configure do |config|
     
     @testdata_dir = "#{::Rails.root}/testdata"
     
-    @git_backend_root_dir = "#{::Rails.root}/tmp/tests/local_git_repos"
     @git_backend_cache_dir = "#{::Rails.root}/tmp/tests/cache/git_repos"
-    FileUtils.rm_rf @git_backend_root_dir
     FileUtils.rm_rf @git_backend_cache_dir
-    FileUtils.mkdir_p @git_backend_root_dir
     FileUtils.mkdir_p @git_backend_cache_dir
 
-    Course.stub!(:repositories_root).and_return(@git_backend_root_dir)
     Course.stub!(:cache_root).and_return(@git_backend_cache_dir)
   end
 

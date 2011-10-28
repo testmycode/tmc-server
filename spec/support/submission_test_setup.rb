@@ -21,7 +21,10 @@ class SubmissionTestSetup
     should_save = options[:save]
     @user = options[:user] || create_user
     
-    @course = Course.create!(:name => course_name)
+    @remote_repo_path = 'remote_repo'
+    create_bare_repo(@remote_repo_path)
+    
+    @course = Course.create!(:name => course_name, :remote_repo_url => @remote_repo_path)
     @repo = clone_course_repo(@course)
     @repo.copy_fixture_exercise(exercise_name, exercise_dest)
     @repo.add_commit_push

@@ -5,10 +5,6 @@ describe Course do
   let(:remote_repo_path) { "#{@test_tmp_dir}/fake_remote_repo" }
   let(:remote_repo_url) { "file://#{remote_repo_path}" }
 
-  it "can be created with just a name parameter" do
-    Course.create!(:name => 'TestCourse')
-  end
-
   describe "gdocs_sheets" do
     it "should list all unique gdocs_sheets of a course" do
       course = Factory.create(:course)
@@ -29,33 +25,9 @@ describe Course do
     end
   end
 
-  describe "when given no remote repo url" do
-    it "should create a local repository when created" do
-      course = Course.create!(:name => 'TestCourse')
-      course.should have_local_repo
-      course.should_not have_remote_repo
-      course.bare_url.should == "file://#{course.bare_path}"
-      File.should exist(course.bare_path)
-    end
-
-    it "should raise an exception if the local repo already exists" do
-      course = Course.new(:name => 'TestCourse')
-      FileUtils.mkdir_p(course.bare_path)
-      lambda { course.save! }.should raise_error
-    end
-
-    it "should delete the repository when destroyed" do
-      course = Course.create!(:name => 'TestCourse')
-      repo_path = course.bare_path
-      course.destroy
-      File.should_not exist(repo_path)
-    end
-  end
-
   describe "paths used" do
     it "should be absolute" do
       class_paths = [
-        :repositories_root,
         :cache_root
       ]
       for path in class_paths
@@ -64,7 +36,6 @@ describe Course do
 
       object_paths = [
         :cache_path,
-        :bare_path,
         :zip_path,
         :clone_path
       ]
@@ -72,33 +43,6 @@ describe Course do
       for path in object_paths
         Course.new.send(path).should match(/^\//)
       end
-    end
-  end
-
-  describe "when given a blank remote repo url" do
-    it "should save and treat is as nil" do
-      course = Course.create!(:name => 'MyCourse', :remote_repo_url => '')
-      course.remote_repo_url.should be_nil
-      course.should_not have_remote_repo
-    end
-  end
-
-  describe "when given a remote repo url" do
-    let(:course) { Course.create!(:name => 'TestCourse', :remote_repo_url => remote_repo_url) }
-
-    it "should not create a local repository" do
-      course.should have_remote_repo
-      course.should_not have_local_repo
-      course.bare_path.should be_nil
-      course.bare_url.should == remote_repo_url
-      File.should_not exist("#{Course.repositories_root}/TestCourse.git")
-    end
-
-    it "should not attempt to destroy a local repository when destroyed" do
-      local_repo_path = "#{Course.repositories_root}/TestCourse.git"
-      FileUtils.mkdir local_repo_path
-      course.destroy
-      File.should exist(local_repo_path)
     end
   end
 
@@ -153,21 +97,33 @@ describe Course do
 
 
   describe "validation" do
+    let(:valid_params) do
+      {
+        :name => 'TestCourse',
+        :remote_repo_url => 'git@example.com'
+      }
+    end
+    
     it "requires a name" do
-      should_be_invalid_params({})
+      should_be_invalid_params(valid_params.merge(:name => nil))
     end
 
     it "requires name to be reasonably short" do
-      should_be_invalid_params(:name => 'a'*41)
+      should_be_invalid_params(valid_params.merge(:name => 'a'*41))
     end
 
     it "requires name to be non-unique" do
-      Course.create!(:name => 'TestCourse')
-      should_be_invalid_params(:name => 'TestCourse')
+      Course.create!(valid_params)
+      should_be_invalid_params(valid_params)
     end
 
     it "forbids spaces in the name" do # this could eventually be lifted as long as everything else is made to tolerate spaces
-      should_be_invalid_params(:name => 'Test Course')
+      should_be_invalid_params(valid_params.merge(:name => 'Test Course'))
+    end
+    
+    it "requires a remote repo url" do
+      should_be_invalid_params(valid_params.merge(:remote_repo_url => nil))
+      should_be_invalid_params(valid_params.merge(:remote_repo_url => ''))
     end
 
     def should_be_invalid_params(params)

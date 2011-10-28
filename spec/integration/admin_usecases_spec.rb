@@ -7,26 +7,17 @@ describe "The system (used by an instructor for administration)" do
     visit '/'
     @user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
     log_in_as(@user.login)
+    
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(@repo_path)
   end
   
-  it "should create a local git repo for new courses by default" do
-    create_new_course('mycourse')
-    bare_repo_path = Course.repositories_root + '/mycourse.git'
-    File.should exist(bare_repo_path)
-  end
-  
-  it "should allow using a remote git repo for new courses" do
-    create_bare_repo("#{@test_tmp_dir}/fake_remote_repo")
-    
-    create_new_course('mycourse', :remote_repo_url => "file://#{@test_tmp_dir}/fake_remote_repo")
-    
-    bare_repo_path = Course.repositories_root + '/mycourse.git'
-    File.should_not exist(bare_repo_path)
-    
+  it "should allow using a git repo as a source for a new course" do
+    create_new_course(:name => 'mycourse', :remote_repo_url => @repo_path)
   end
   
   it "should show all exercises pushed to the course's git repo" do
-    create_new_course('mycourse')
+    create_new_course(:name => 'mycourse', :remote_repo_url => @repo_path)
     course = Course.find_by_name!('mycourse')
     
     repo = clone_course_repo(course)

@@ -194,19 +194,14 @@ describe CoursesController do
     end
     
     describe "with valid parameters" do
-      it "creates the course with a local repo if no remote repo url is given" do
-        post :create, :course => { :name => 'NewCourse' }
-        Course.last.should have_local_repo
-      end
-
-      it "creates the course without a local repo if a remote repo url is given" do
+      it "creates the course" do
         post :create, :course => { :name => 'NewCourse', :remote_repo_url => 'git@example.com' }
-        Course.last.should have_remote_repo
+        Course.last.remote_repo_url.should == 'git@example.com'
         Course.last.bare_url.should == 'git@example.com'
       end
     
       it "redirects to the created course" do 
-        post :create, :course => { :name => 'NewCourse' }
+        post :create, :course => { :name => 'NewCourse', :remote_repo_url => 'git@example.com' }
         response.should redirect_to(Course.last)
       end
     end
