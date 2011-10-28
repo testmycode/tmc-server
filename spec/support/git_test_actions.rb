@@ -28,7 +28,8 @@ module GitTestActions
       course = Course.find_by_name(course_or_course_name)
     end
     
-    clone_repo(course.bare_url, course.name + "-wc")
+    raise 'Course not using git but ' + course.source_backend if course.source_backend != 'git'
+    clone_repo(course.source_url, course.name + "-wc")
     
     GitRepo.new("#{course.name}-wc")
   end

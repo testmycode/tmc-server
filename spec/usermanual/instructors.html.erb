@@ -69,8 +69,8 @@ require 'cgi' # for escapeHTML
     system(mk_command('git', 'init', '--bare', '-q', repo_path))
     repo_url = 'file://' + repo_path
     
-    fill_in 'course_remote_repo_url', :with => repo_url
-    highlight '#course_remote_repo_url'
+    fill_in 'course_source_url', :with => repo_url
+    highlight '#course_source_url'
   %>
   
   <p>
@@ -84,7 +84,8 @@ require 'cgi' # for escapeHTML
   <%= screenshot %>
   <%
     click_on 'Add Course'
-    course = Course.first
+    course = Course.last
+    course.should_not be_nil
   %>
   
   <p>
@@ -135,7 +136,7 @@ require 'cgi' # for escapeHTML
       sh.run "ls"
         
       sh.blank_line
-      sh.run "git remote add origin #{course.bare_url}"
+      sh.run "git remote add origin #{course.source_url}"
       sh.run "git push -u origin master"
     end
   %>

@@ -5,7 +5,6 @@ require 'date_and_time_utils'
 class Course < ActiveRecord::Base
   include Rails.application.routes.url_helpers
   include SystemCommands
-  include Course::GitCache
 
   self.include_root_in_json = false
 
@@ -18,13 +17,15 @@ class Course < ActiveRecord::Base
               :message  => 'should not contain white spaces'
             }
 
+  validates :source_url, :presence => true
+  validate :check_source_backend
+  after_initialize :set_default_source_backend
+
   has_many :exercises, :dependent => :destroy
   has_many :submissions, :dependent => :destroy
   has_many :available_points, :through => :exercises
   has_many :awarded_points, :dependent => :destroy
 
-  validates :remote_repo_url, :presence => true
-  
   after_destroy :delete_cache
 
   scope :ongoing, lambda { where(["hide_after IS NULL OR hide_after > ?", Time.now]) }
@@ -62,6 +63,51 @@ class Course < ActiveRecord::Base
 
   def refresh_gdocs_worksheet sheetname
     GDocsExport.refresh_course_worksheet_points self, sheetname
+  end
+  
+  def self.cache_root
+    "#{::Rails.root}/tmp/cache/course"
+  end
+
+  def cache_path
+    "#{Course.cache_root}/#{self.name}-#{self.cache_version}"
+  end
+  
+  def zip_path
+    "#{cache_path}/zip"
+  end
+
+  # A mirror/checkout/clone of the course
+  def clone_path
+    "#{cache_path}/clone"
+  end
+  
+  def refresh
+    CourseRefresher.new.refresh_course(self)
+  end
+  
+  def delete_cache
+    FileUtils.rm_rf cache_path
+  end
+  
+  def self.valid_source_backends
+    ['git']
+  end
+  
+  def self.default_source_backend
+    'git'
+  end
+  
+  
+private
+  def check_source_backend
+    unless Course.valid_source_backends.include?(source_backend)
+      errors.add(:source_backend, 'must be one of [' + Course.valid_source_backends.join(', ') + "]")
+    end
+  end
+  
+  def set_default_source_backend
+    self.source_backend ||= Course.default_source_backend
   end
 end
 

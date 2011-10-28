@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Course do
 
-  let(:remote_repo_path) { "#{@test_tmp_dir}/fake_remote_repo" }
-  let(:remote_repo_url) { "file://#{remote_repo_path}" }
+  let(:source_path) { "#{@test_tmp_dir}/fake_source" }
+  let(:source_url) { "file://#{source_path}" }
 
   describe "gdocs_sheets" do
     it "should list all unique gdocs_sheets of a course" do
@@ -87,7 +87,7 @@ describe Course do
   end
 
   it "should delete its cache directory when destroyed" do
-    c = Course.create!(:name => 'MyCourse', :remote_repo_url => remote_repo_url)
+    c = Course.create!(:name => 'MyCourse', :source_url => source_url)
     FileUtils.mkdir_p(c.cache_path)
     FileUtils.touch("#{c.cache_path}/foo.txt")
 
@@ -100,7 +100,7 @@ describe Course do
     let(:valid_params) do
       {
         :name => 'TestCourse',
-        :remote_repo_url => 'git@example.com'
+        :source_url => 'git@example.com'
       }
     end
     
@@ -122,8 +122,8 @@ describe Course do
     end
     
     it "requires a remote repo url" do
-      should_be_invalid_params(valid_params.merge(:remote_repo_url => nil))
-      should_be_invalid_params(valid_params.merge(:remote_repo_url => ''))
+      should_be_invalid_params(valid_params.merge(:source_url => nil))
+      should_be_invalid_params(valid_params.merge(:source_url => ''))
     end
 
     def should_be_invalid_params(params)

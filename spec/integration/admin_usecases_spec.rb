@@ -13,11 +13,11 @@ describe "The system (used by an instructor for administration)" do
   end
   
   it "should allow using a git repo as a source for a new course" do
-    create_new_course(:name => 'mycourse', :remote_repo_url => @repo_path)
+    create_new_course(:name => 'mycourse', :source_backend => 'git', :source_url => @repo_path)
   end
   
   it "should show all exercises pushed to the course's git repo" do
-    create_new_course(:name => 'mycourse', :remote_repo_url => @repo_path)
+    create_new_course(:name => 'mycourse', :source_backend => 'git', :source_url => @repo_path)
     course = Course.find_by_name!('mycourse')
     
     repo = clone_course_repo(course)

@@ -6,7 +6,10 @@
       </th>
       <% if signed_in? %>
         <th>
-          Repository URL
+          Source type
+        </th>
+        <th>
+          Source URL
         </th>
         <th>
         </th>
@@ -23,7 +26,10 @@
       </td>
       <% if signed_in? %>
         <td>
-          <span class="repo-url"><%= course.bare_url %></span>
+          <%= course.source_backend.upcase %>
+        </td>
+        <td>
+          <span class="source-url"><%= course.source_url %></span>
         </td>
         <td>
           <%= link_to 'refresh', refresh_course_path(course) %>

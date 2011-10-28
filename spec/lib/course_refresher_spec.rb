@@ -3,13 +3,13 @@ require 'spec_helper'
 describe CourseRefresher do
   include GitTestActions
 
-  let(:remote_repo_path) { "#{@test_tmp_dir}/fake_remote_repo" }
-  let(:remote_repo_url) { "file://#{remote_repo_path}" }
+  let(:repo_path) { "#{@test_tmp_dir}/fake_remote_repo" }
+  let(:repo_url) { "file://#{repo_path}" }
 
-  let!(:course) { Course.create!(:name => 'TestCourse', :remote_repo_url => remote_repo_url) }
+  let!(:course) { Course.create!(:name => 'TestCourse', :source_backend => 'git', :source_url => repo_url) }
 
   before :each do
-    create_bare_repo(remote_repo_path)
+    create_bare_repo(repo_path)
   end
 
   let(:local_clone) { clone_course_repo(course) }

@@ -6,7 +6,7 @@ describe "The system (used by an instructor for viewing statistics)" do
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    course = Course.create!(:name => 'mycourse', :remote_repo_url => repo_path)
+    course = Course.create!(:name => 'mycourse', :source_backend => 'git', :source_url => repo_path)
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('EasyExercise')
     repo.copy_simple_exercise('HardExercise')

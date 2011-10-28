@@ -195,13 +195,12 @@ describe CoursesController do
     
     describe "with valid parameters" do
       it "creates the course" do
-        post :create, :course => { :name => 'NewCourse', :remote_repo_url => 'git@example.com' }
-        Course.last.remote_repo_url.should == 'git@example.com'
-        Course.last.bare_url.should == 'git@example.com'
+        post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
+        Course.last.source_url.should == 'git@example.com'
       end
     
       it "redirects to the created course" do 
-        post :create, :course => { :name => 'NewCourse', :remote_repo_url => 'git@example.com' }
+        post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
         response.should redirect_to(Course.last)
       end
     end
