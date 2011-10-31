@@ -28,7 +28,7 @@
   <tbody>
     <% @users.each do |user| %>
       <% user_points = AwardedPoint.
-          course_user_sheet_points(@course, user, @sheetname).map(&:name) %>
+          course_user_sheet_points(@course, user, @sheetname) %>
       <tr>
         <td><%= user.login %></td>
         <% @exercises.each do |exercise| %>
