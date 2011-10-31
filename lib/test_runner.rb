@@ -161,7 +161,7 @@ private
     awarded_points = AwardedPoint.exercise_user_points(exercise, user)
 
     for point_name in points_from_test_results(results)
-      if awarded_points.where(:name => point_name).empty?
+      unless awarded_points.include?(point_name)
         submission.awarded_points << AwardedPoint.new(
           :name => point_name,
           :course => course,
