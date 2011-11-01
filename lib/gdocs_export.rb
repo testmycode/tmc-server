@@ -33,7 +33,7 @@ module GDocsExport
   end
 
   def self.worksheet_points notifications, ws, course, sheetname
-    points = AvailablePoint.course_sheet_points(course, sheetname)
+    points = AvailablePoint.course_sheet_points(course, sheetname).map(&:name)
     points.reduce([]) do |result, point|
       if point_col(ws, point) < 0
         notifications << "point #{point} not found on sheet #{sheetname}"
@@ -75,7 +75,7 @@ module GDocsExport
       row = student_row ws, student.login
       raise "student #{student.login} not found" if row < 0
       awarded = AwardedPoint.
-        course_user_sheet_points(course, student, ws.title)
+        course_user_sheet_points(course, student, ws.title).map(&:name)
       points.each do |point|
         next unless awarded.include? point
         col = point_col ws, point
