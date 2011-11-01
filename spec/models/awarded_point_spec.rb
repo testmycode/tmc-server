@@ -37,34 +37,34 @@ describe AwardedPoint do
 
     it "course_user_points" do
       p = AwardedPoint.course_user_points(@course, @user)
-      p.size.should == 2
+      p.length.should == 2
       p.should include(@ap)
       p.should include(@ap3)
 
       p = AwardedPoint.course_user_points(@course, @user2)
-      p.size.should == 1
+      p.length.should == 1
       p.should include(@ap2)
     end
 
     it "course_user_sheet_points" do
       points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet1)
-      points.size.should == 0
+      points.length.should == 0
 
       points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet2)
-      points.size.should == 1
+      points.length.should == 1
       points.first.should == @ap2
 
       points = AwardedPoint.course_user_sheet_points(@course, @user, @sheet2)
-      points.size.should == 0
+      points.length.should == 0
 
       points = AwardedPoint.course_user_sheet_points(@course, @user, @sheet1)
-      points.size.should == 2
+      points.length.should == 2
       points.first.should == @ap
     end
 
     it "exercise_user_points" do
       p = AwardedPoint.exercise_user_points(@ex1, @user)
-      p.size.should == 2
+      p.length.should == 2
       p.should include(@ap)
       p.should include(@ap3)
 
@@ -72,10 +72,10 @@ describe AwardedPoint do
       p.should be_empty
 
       p = AwardedPoint.exercise_user_points(@ex1, @user2)
-      p.size.should == 0
+      p.length.should == 0
 
       p = AwardedPoint.exercise_user_points(@ex2, @user2)
-      p.size.should == 1
+      p.length.should == 1
       p.should include(@ap2)
     end
   end

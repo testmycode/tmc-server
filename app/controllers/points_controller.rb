@@ -29,18 +29,18 @@ class PointsController < ApplicationController
     {
       :sheets => sheets.map{|sheet| {
         :name => sheet,
-        :available => AvailablePoint.course_sheet_points(course, sheet).count,
-        :awarded => AwardedPoint.course_sheet_points(course, sheet).count
+        :available => AvailablePoint.course_sheet_points(course, sheet).length,
+        :awarded => AwardedPoint.course_sheet_points(course, sheet).length
       }},
-      :awarded => AwardedPoint.course_points(course).count,
-      :available => AvailablePoint.course_points(course).count,
+      :awarded => AwardedPoint.course_points(course).length,
+      :available => AvailablePoint.course_points(course).length,
       :students => users.map{|u| {
         :login => u.login,
         :points => sheets.reduce({}){ |hash, sheet|
           hash.merge({ sheet => AwardedPoint.
-            course_user_sheet_points(course, u, sheet).count })
+            course_user_sheet_points(course, u, sheet).length })
           },
-        :awarded => AwardedPoint.course_user_points(course, u).count
+        :awarded => AwardedPoint.course_user_points(course, u).length
       }}
     }
   end
