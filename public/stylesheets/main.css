@@ -30,11 +30,11 @@ section {
 }
 
 a {
-  color: #09214A;
+  color: #103D89;
   text-decoration: none;
 }
   
-a:visited { color: #09214A; } 
+a:visited { color: #103D89; }
 a:hover { text-decoration: underline; }
 
 .error,
@@ -207,13 +207,21 @@ table {
   width: 100%;
 }
 
-table > thead > tr > th,
-table > tbody > tr > td {
+table > * > tr > td {
   padding: 6px 14px 6px 14px;
   border: 1px solid gray;
 }
 
-table.points > tbody > tr > td {
+table > * > tr > th {
+  padding: 6px 4px 6px 4px;
+  border: 0;
+}
+
+table.points > * > tr > td {
   text-align: center;
+}
+
+tr.table-totals > td {
+  font-weight: bold;
 }
 

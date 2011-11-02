@@ -7,33 +7,42 @@
           <%= link_to sheet, course_point_path(@course, sheet) %>
         </th>
       <% end %>
-      <th>total</th>
+      <th>Total</th>
     </tr>
   </thead>
-  <% @summary[:students].each do |student| %>
+  <tfoot>
     <tr>
-      <td><%= student[:login] %></td>
-      <% @summary[:sheets].each do |sheet, (k, v)| %>
-        <% sheetname = sheet[:name] %>
-        <% sheetpoints = sheet[:available] %>
+      <th>Number of students</th>
+      <th>Total points/possible</th>
+      <th>Total points/possible</th>
+    </tr>
+    <tr class="table-totals">
+      <% nstudents = @summary[:students].length %>
+      <td><%= nstudents %></td>
+      <% @summary[:sheets].each do |sheet| %>
         <td>
-          <%= "#{student[:points][sheetname]}/#{sheetpoints}" %>
+          <%= "#{sheet[:awarded]}/#{sheet[:available]*nstudents}" %>
         </td>
       <% end %>
-      <td><%= "#{student[:awarded]}/#{@summary[:available]}" %></td>
-    </tr>
-  <% end %>
-  <tr>
-    <% nstudents = @summary[:students].length %>
-    <td><%= nstudents %></td>
-    <% @summary[:sheets].each do |sheet| %>
       <td>
-        <%= "#{sheet[:awarded]}/#{sheet[:available]*nstudents}" %>
+        <%= "#{@summary[:awarded]}/#{@summary[:available]*nstudents}" %>
       </td>
+    </tr>
+  </tfoot>
+  <tbody>
+    <% @summary[:students].each do |student| %>
+      <tr>
+        <td><%= student[:login] %></td>
+        <% @summary[:sheets].each do |sheet, (k, v)| %>
+          <% sheetname = sheet[:name] %>
+          <% sheetpoints = sheet[:available] %>
+          <td>
+            <%= "#{student[:points][sheetname]}/#{sheetpoints}" %>
+          </td>
+        <% end %>
+        <td><%= "#{student[:awarded]}/#{@summary[:available]}" %></td>
+      </tr>
     <% end %>
-    <td>
-      <%= "#{@summary[:awarded]}/#{@summary[:available]*nstudents}" %>
-    </td>
-  </tr>
+  </tbody>
 </table>
 

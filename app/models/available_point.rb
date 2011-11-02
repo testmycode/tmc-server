@@ -7,20 +7,17 @@ class AvailablePoint < ActiveRecord::Base
   belongs_to :exercise
   has_one :course, :through => :exercise
 
-  def self.course_points(course)
+  scope :course_points, lambda { |course|
     joins(:exercise).
-    where(:exercises => {:course_id => course.id}).
-    map(&:name)
-  end
+    where(:exercises => {:course_id => course.id})
+  }
 
-  def self.course_sheet_points(course, sheet)
+  scope :course_sheet_points, lambda { |course, sheet|
     joins(:exercise).
-    where(:exercises => {:course_id => course.id, :gdocs_sheet => sheet}).
-    map(&:name)
-  end
+    where(:exercises => {:course_id => course.id, :gdocs_sheet => sheet})
+  }
 
   def <=>(other)
-    #TODO: secondary sort by string parts
     self.name.gsub(/\D/, '').to_i <=> other.name.gsub(/\D/, '').to_i
   end
 end
