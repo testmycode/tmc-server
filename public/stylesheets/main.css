@@ -30,11 +30,11 @@ section {
 }
 
 a {
-  color: #09214A;
+  color: #103D89;
   text-decoration: none;
 }
   
-a:visited { color: #09214A; } 
+a:visited { color: #103D89; }
 a:hover { text-decoration: underline; }
 
 .error,
