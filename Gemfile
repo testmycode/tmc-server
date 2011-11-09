@@ -8,6 +8,7 @@ gem 'sqlite3', '~> 1.3.4'
 gem 'pg', '~> 0.11.0'
 gem 'jquery-rails', '~> 1.0.9'
 gem 'cancan', '~> 1.6.7'
+gem 'rest-client', '~> 1.6.7'
 
 group :development, :test do
   gem 'rspec', '~> 2.7.0'

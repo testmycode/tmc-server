@@ -11,3 +11,13 @@ site_subtitle:
 git_repos_chmod: a+rX
 git_repos_chgrp:
 
+# List at least one sandbox instance here (in site.yml).
+#
+# Any URL will do. Example:
+# http://user:password@sandbox.example.com:3001/path/to/the/sandbox/service
+#
+# The default points to the local instance that may be started with `rake sandbox:local:start`.
+#
+remote_sandboxes:
+  - http://localhost:3001/
+
