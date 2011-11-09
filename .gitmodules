@@ -1,6 +1,6 @@
-[submodule "lib/tmc-javalib"]
-	path = lib/tmc-javalib
+[submodule "ext/tmc-javalib"]
+	path = ext/tmc-javalib
 	url = git://github.com/testmycode/tmc-javalib.git
-[submodule "lib/tmc-sandbox"]
-	path = lib/tmc-sandbox
+[submodule "ext/tmc-sandbox"]
+	path = ext/tmc-sandbox
 	url = git@github.com:testmycode/tmc-sandbox.git

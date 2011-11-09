@@ -7,7 +7,7 @@ module TmcJavalib
   extend TmcJavalib
 
   def project_path
-    "#{::Rails.root}/lib/tmc-javalib"
+    "#{::Rails.root}/ext/tmc-javalib"
   end
 
   def jar_path
