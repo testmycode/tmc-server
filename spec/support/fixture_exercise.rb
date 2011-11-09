@@ -1,4 +1,5 @@
 require 'find'
+require 'shellwords'
 
 # A copy of a fixture exercise.
 # Creating an instance of this creates a copy of a fixture exercise combined 
@@ -32,11 +33,25 @@ class FixtureExercise
     File.open(dest, "wb") { |f| f.write(metadata_hash.to_yaml) }
   end
   
-  def make_zip
+  def make_zip(options = {})
+    options = {
+      :src_only => true
+    }.merge options
+    
     name = File.basename(@path)
-    Dir.chdir(File.dirname(@path)) do |dir|
-      system!("zip -q -0 -r #{name}.zip #{name}")
+    
+    zip_options = []
+    if options[:src_only]
+      zip_options << '--include ' + Shellwords.escape("#{name}/src/*")
     end
+    
+    Dir.chdir(File.dirname(@path)) do |dir|
+      system!("zip -q -0 -r #{zip_path} #{name} #{zip_options.join(' ')}")
+    end
+  end
+  
+  def zip_path
+    "#{path}.zip"
   end
   
   def self.fixture_exercises_root

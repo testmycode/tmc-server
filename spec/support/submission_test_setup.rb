@@ -56,8 +56,8 @@ class SubmissionTestSetup
     end
   end
   
-  def make_zip
-    @exercise_project.make_zip
+  def make_zip(options = {})
+    @exercise_project.make_zip(options)
   end
   
   def default_options
