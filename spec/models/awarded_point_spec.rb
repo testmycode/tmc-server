@@ -59,7 +59,7 @@ describe AwardedPoint do
 
       points = AwardedPoint.course_user_sheet_points(@course, @user, @sheet1)
       points.length.should == 2
-      points.first.should == @ap
+      points.should include(@ap)
     end
 
     it "exercise_user_points" do
