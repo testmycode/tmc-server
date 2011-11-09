@@ -1,6 +1,8 @@
 require 'shellwords'
 
 module SystemCommands
+  extend self
+
   # @deprecated Use sh! instead
   def system!(cmd)
     ok = system(cmd)
