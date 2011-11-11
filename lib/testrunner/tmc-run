@@ -1,0 +1,22 @@
+#!/bin/sh -e
+# This gets passed with each submission to tmc-sandbox
+
+mkdir -p classes/main
+mkdir -p classes/test
+javac -d classes/main -cp lib/*:src/ src/*.java
+javac -d classes/test -cp lib/*:classes/main:test/ test/*.java
+
+DEFS="
+  -Djava.security.manager
+  -Djava.security.policy=testrunner.policy
+  -Dtmc.exercise_dir=`pwd` 
+  -Dtmc.src_class_dir=`pwd`/classes/main 
+  -Dtmc.test_class_dir=`pwd`/classes/test
+  -Dtmc.lib_dir=`pwd`/lib
+  -Dtmc.results_file=`pwd`/output.txt"
+
+TESTS=`cat tests.txt`
+
+java -cp lib/*:classes/main/:classes/test/ $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
+
+exit 0

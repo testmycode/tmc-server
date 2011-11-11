@@ -1,4 +1,6 @@
 
+#TODO: DELETE ME AFTER test_runner HAS BEEN MIGRATED TO USE REMOTE RUNNERS!
+
 JC := javac
 
 BUILD_DIR := build
