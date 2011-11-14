@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe TestRunner do
+describe TestRunnerIntegrationSetup, :test_runner => true do
   describe "when the exercise has source and test classes in packages" do
     it "should have no problems" do
       setup = SubmissionTestSetup.new(:exercise_name => 'ExerciseWithPackages')
       submission = setup.submission
       
       setup.make_zip
-      TestRunner.run_submission_tests(submission)
+      TestRunnerIntegrationSetup.run_submission_tests(submission)
       
       submission.test_case_runs.size.should == 1
       

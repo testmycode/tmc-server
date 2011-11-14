@@ -23,7 +23,7 @@ private
   def self.create_test_case_runs(submission, results)
     results.each do |test_result|
       tcr = TestCaseRun.new(
-        :test_case_name => "#{test_result["className"]} #{test_result["methodName"]}",
+        :test_case_name => "#{test_result['className']} #{test_result['methodName']}",
         :message => test_result["message"],
         :successful => test_result["status"] == 'PASSED'
       )

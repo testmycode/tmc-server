@@ -58,6 +58,8 @@ class SubmissionTestSetup
   
   def make_zip(options = {})
     @exercise_project.make_zip(options)
+    @submission.return_file = File.read(@exercise_project.zip_path)
+    @submission.save!
   end
   
   def default_options

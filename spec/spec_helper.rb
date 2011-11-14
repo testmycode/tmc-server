@@ -28,9 +28,6 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 
-  # FIXME: it turns out this can't be overridden with --tags
-  # See https://github.com/rspec/rspec-core/issues/327
-  unless ENV['GDOCS_TESTS']
-    config.filter_run_excluding :gdocs => true
-  end
+  # Override with rspec --tag ~test_runner --tag gdocs spec
+  config.filter_run_excluding :gdocs => true, :test_runner => false
 end

@@ -8,6 +8,10 @@ class RemoteSandbox
     @url = url
   end
   
+  def self.random
+    self.all.shuffle.first
+  end
+  
   def send_submission(submission, notify_url)
     raise "Exercise #{submission.exercise_name} for submission gone. Cannot resubmit." if submission.exercise == nil
     
