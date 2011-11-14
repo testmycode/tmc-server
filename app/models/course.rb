@@ -1,4 +1,5 @@
 require 'gdocs_export'
+require 'course_refresher'
 require 'system_commands'
 require 'date_and_time_utils'
 
