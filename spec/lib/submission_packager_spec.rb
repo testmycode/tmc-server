@@ -54,20 +54,43 @@ describe SubmissionPackager do
     end
   end
   
-  it "should add a tmc-run script that compiles and runs the submission" do
-    @exercise_project.solve_all
-    @exercise_project.make_zip(:src_only => false)
+  describe "tmc-run script added to the archive" do
+    it "should compile and run the submission" do
+      @exercise_project.solve_all
+      @exercise_project.make_zip(:src_only => false)
+      
+      SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+      
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          sh! ['tar', 'xf', @tar_path]
+          File.should_not exist('classes/main/SimpleStuff.class')
+          File.should_not exist('output.txt')
+          sh! ['./tmc-run']
+          File.should exist('classes/main/SimpleStuff.class')
+          File.should exist('output.txt')
+        end
+      end
+    end
     
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
-    
-    Dir.mktmpdir do |dir|
-      Dir.chdir(dir) do
-        sh! ['tar', 'xf', @tar_path]
-        File.should_not exist('classes/main/SimpleStuff.class')
-        File.should_not exist('output.txt')
-        sh! ['./tmc-run']
-        File.should exist('classes/main/SimpleStuff.class')
-        File.should exist('output.txt')
+    it "should report compilation errors in output.txt with exit code 101" do
+      @exercise_project.introduce_compilation_error
+      @exercise_project.make_zip(:src_only => false)
+      
+      SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+      
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          sh! ['tar', 'xf', @tar_path]
+          File.should_not exist('classes/main/SimpleStuff.class')
+          File.should_not exist('output.txt')
+          `./tmc-run`
+          $?.exitstatus.should == 101
+          File.should exist('output.txt')
+          
+          output = File.read('output.txt')
+          output.should include('compiler should fail here')
+        end
       end
     end
   end
