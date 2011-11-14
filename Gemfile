@@ -11,9 +11,9 @@ gem 'cancan', '~> 1.6.7'
 gem 'rest-client', '~> 1.6.7'
 
 group :development, :test do
-  gem 'rspec', '~> 2.7.0'
-  gem 'rspec-core', '~> 2.7.0'
-  gem 'rspec-rails', '~> 2.7.0'
+  gem 'rspec', '~> 2.8.0.rc'
+  gem 'rspec-core', '~> 2.8.0.rc'
+  gem 'rspec-rails', '~> 2.8.0.rc'
   gem 'factory_girl_rails', '~> 1.1.0'
   gem 'capybara', '~> 1.1.1'
   gem 'database_cleaner', '~> 0.6.7'
