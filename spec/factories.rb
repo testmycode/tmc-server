@@ -25,6 +25,7 @@ FactoryGirl.define do
     course
     user
     exercise
+    after_build { |sub| sub.exercise.course = sub.course }
   end
 
   factory :awarded_point do
@@ -32,6 +33,7 @@ FactoryGirl.define do
     sequence(:name) {|n| "point#{n}" }
     submission
     user
+    after_build { |pt| pt.submission.course = pt.course }
   end
 
   factory :available_point do

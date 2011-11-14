@@ -27,9 +27,9 @@ describe User do
       @sub2 = Factory.create(:submission, :user => @user2,
                             :course => @course2, :exercise => @ex2)
       @ap1 = Factory.create(:awarded_point, :course => @course1,
-                            :submission => @submission1, :user => @user1)
+                            :submission => @sub1, :user => @user1)
       @ap2 = Factory.create(:awarded_point, :course => @course2,
-                            :submission => @submission2, :user => @user2)
+                            :submission => @sub2, :user => @user2)
     end
 
     it "course_students" do
