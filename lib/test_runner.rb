@@ -149,7 +149,7 @@ private
       tcr = TestCaseRun.new(
         :test_case_name => "#{test_result["className"]} #{test_result["methodName"]}",
         :message => test_result["message"],
-        :successful => test_result["status"] == 1 #FIXME: use descriptive strings instead of magic numbers
+        :successful => test_result["status"] == 'PASSED'
       )
       submission.test_case_runs << tcr
     end
@@ -176,7 +176,7 @@ private
     results.reduce({}) do |points, result|
       result["pointNames"].each do |name|
         unless points[name] == false
-          points[name] = (result["status"] == 1)
+          points[name] = (result["status"] == 'PASSED')
         end
       end
       points
