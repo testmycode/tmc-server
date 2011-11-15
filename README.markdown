@@ -5,6 +5,26 @@
 The system has been used by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in an elementary programming [course](http://www.cs.helsinki.fi/u/wikla/ohjelmointi/perus/s2011/). The course had almost 200 participants and TMC saved course assistants a lot of work while giving students instant feedback for many exercises. Development continues in preparation for the Spring semester with plans to move all exercises to TMC and open the course online to anyone in Finland.
 
 
+## Setup ##
+
+### One-time setup ###
+
+1. Download submodules with `git submodule update --init --recursive`
+2. Install dependencies with `gem install bundler && bundle install`
+3. Edit `config/site.yml` based on `config/site.defaults.yml`.
+4. Install PostgreSQL 9.x+. See `config/database.yml` for database settings.
+5. Initialize the database with `env RAILS_ENV=production rake db:reset`
+6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
+7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`.
+8. Run the test suite with `rake spec`.
+
+### Startup ###
+
+1. `rails server` or some other RoR setup.
+2. Go to `ext/tmc-sandbox/web` and do `rackup --port 3001` or some other Rack setup.
+3. `script/submission_reprocessor start`
+
+
 ## Credits ##
 
 The project started as a Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/). The original authors of the server component were
