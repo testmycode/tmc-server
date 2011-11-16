@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by an instructor for viewing statistics)" do
+describe "The system (used by an instructor for viewing statistics)", :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -15,28 +15,36 @@ describe "The system (used by an instructor for viewing statistics)" do
     course.refresh
   end
 
-  it "should show all submissions for an exercise" do
-    submit_exercise('EasyExercise', :solve => true, :username => '123')
-    submit_exercise('EasyExercise', :solve => false, :username => '456')
-    submit_exercise('EasyExercise', :compilation_error => true, :username => '789')
-
+  it "should show recent submissions for an exercise" do
     log_in_as_instructor
-    click_link 'mycourse'
-    click_link 'EasyExercise'
-
-    page.should have_content('123')
-    page.should have_content('456')
-    page.should have_content('789')
+    
+    submit_exercise('EasyExercise', :solve => true)
+    submit_exercise('EasyExercise', :solve => false)
+    submit_exercise('EasyExercise', :compilation_error => true)
+    
+    visit_exericse 'EasyExercise'
+    
     page.should have_content('Ok')
     page.should have_content('Fail')
     page.should have_content('Error')
   end
 
+  def log_in_as_instructor
+    visit '/'
+    user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
+    log_in_as(user.login, 'xooxer')
+  end
+  
+  def visit_exericse(exercise_name)
+    visit '/'
+    click_link 'mycourse'
+    click_link exercise_name
+  end
+
   def submit_exercise(exercise_name, options = {})
     options = {
       :solve => true,
-      :compilation_error => false,
-      :username => 'some_username'
+      :compilation_error => false
     }.merge(options)
 
     FileUtils.rm_rf exercise_name
@@ -48,15 +56,9 @@ describe "The system (used by an instructor for viewing statistics)" do
     visit '/'
     click_link 'mycourse'
     click_link exercise_name
-    fill_in 'Student number', :with => options[:username]
     attach_file('Zipped project', "#{exercise_name}.zip")
     click_button 'Submit'
-  end
-
-  def log_in_as_instructor
-    visit '/'
-    user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
-    log_in_as(user.login)
+    wait_for_submission_to_be_processed
   end
 
 end

@@ -18,13 +18,23 @@ describe RemoteSandbox do
     end
   end
   
+  before :each do
+    SiteSetting.all_settings['host_for_remote_sandboxes'] = 'localhost:3003'
+  end
+  
+  after :each do
+    SiteSetting.reset
+  end
+  
   after :all do
     Mimic.cleanup!
   end
 
   it "can submit tasks to the remote sandbox" do
     test_sandbox.send_submission(setup.submission, notify_url)
+    
     params = @notify_queue.pop
     params['status'].should == 'finished'
+    params['token'].should == setup.submission.secret_token
   end
 end

@@ -23,7 +23,7 @@ class SubmissionPackager
         tmc_run_file_names.each do |file|
           FileUtils.cp("#{tmc_run_dir}/#{file}", "./#{file}")
         end
-        FileUtils.chmod 'a+x', 'tmc-run'
+        sh! ['chmod', 'a+x', 'tmc-run']
         sh! ['tar', '-rpf', tar_path, *tmc_run_file_names]
       end
     end

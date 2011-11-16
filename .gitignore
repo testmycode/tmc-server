@@ -1,7 +1,6 @@
 /.bundle
 /db/*.sqlite3
 /db/*.sqlite3-journal
-/db/local_git_repos
 /log/*.log
 /tmp/
 /doc/usermanual/pages

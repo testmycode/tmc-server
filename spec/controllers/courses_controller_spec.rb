@@ -3,7 +3,8 @@ require 'spec_helper'
 describe CoursesController do
 
   before(:each) do
-    controller.current_user = Factory.create(:user)
+    @user = Factory.create(:user)
+    controller.current_user = @user
   end
   
   describe "GET index" do
@@ -23,17 +24,20 @@ describe CoursesController do
     describe "in JSON format" do
       before :each do
         @course = Factory.create(:course, :name => 'Course1')
-        @course.exercises << Factory.create(:exercise, :name => 'Exercise1', :course => @course)
-        @course.exercises << Factory.create(:exercise, :name => 'Exercise2', :course => @course)
-        @course.exercises << Factory.create(:exercise, :name => 'Exercise3', :course => @course)
+        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise1', :course => @course)
+        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise2', :course => @course)
+        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise3', :course => @course)
       end
-    
+      
       def get_index_json(options = {})
-        options = { :format => 'json' }.merge options
+        options = {
+          :format => 'json',
+          :username => @user.login
+        }.merge options
         get :index, options
         JSON.parse(response.body)
       end
-    
+      
       it "renders all non-hidden courses in order by name" do
         Factory.create(:course, :name => 'Course2', :hide_after => Time.now + 1.week)
         Factory.create(:course, :name => 'Course3')
@@ -44,7 +48,7 @@ describe CoursesController do
         
         result.map {|c| c['name'] }.should == ['Course1', 'Course2', 'Course3']
       end
-    
+      
       it "should render the exercises for each course" do
         result = get_index_json
         
@@ -55,7 +59,7 @@ describe CoursesController do
         exs[0]['return_address'].should == course_exercise_submissions_url(@course.id, @course.exercises[0].id, :format => 'json')
       end
       
-      it "should include only visible exercises whose deadline has not passed for non-administrators" do
+      it "should include only submittable exercises for non-administrators" do
         @course.exercises[0].hidden = true
         @course.exercises[0].save!
         @course.exercises[1].deadline = Date.yesterday
@@ -69,58 +73,36 @@ describe CoursesController do
         names.should include('Exercise3')
       end
       
-      it "should include all exercises for administrators" do
-        Factory.create(:admin, :login => 'TheAdmin')
-        @course.exercises[0].hidden = true
-        @course.exercises[0].save!
-        @course.exercises[1].deadline = Date.yesterday
-        @course.exercises[1].save!
+      it "should tell for each exercise whether it has been attempted" do
+        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
+        Factory.create(:test_case_run, :submission => sub, :successful => false)
         
-        result = get_index_json :username => 'TheAdmin'
+        result = get_index_json :username => @user.login
         
-        result[0]['exercises'].map {|ex| ex['name']}.should == ['Exercise1', 'Exercise2', 'Exercise3']
+        exs = result[0]['exercises']
+        exs[0]['attempted'].should be_true
+        exs[1]['attempted'].should be_false
       end
       
-      describe "when given a username parameter" do
+      it "should tell for each exercise whether it has been completed" do
+        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
+        Factory.create(:test_case_run, :submission => sub, :successful => true)
+        
+        result = get_index_json :username => @user.login
+        
+        exs = result[0]['exercises']
+        exs[0]['completed'].should be_true
+        exs[1]['completed'].should be_false
+      end
+      
+      describe "and the given username does not exist" do
         before :each do
-          @user = Factory.create(:user)
+          @user.destroy
         end
         
-        it "should tell for each exercise whether it has been attempted" do
-          sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
-          Factory.create(:test_case_run, :submission => sub, :successful => false)
-          
-          result = get_index_json :username => @user.login
-          
-          exs = result[0]['exercises']
-          exs[0]['attempted'].should be_true
-          exs[1]['attempted'].should be_false
-        end
-        
-        it "should tell for each exercise whether it has been completed" do
-          sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
-          Factory.create(:test_case_run, :submission => sub, :successful => true)
-          
-          result = get_index_json :username => @user.login
-          
-          exs = result[0]['exercises']
-          exs[0]['completed'].should be_true
-          exs[1]['completed'].should be_false
-        end
-        
-        describe "and the user does not exist" do
-          before :each do
-            @user.destroy
-          end
-          
-          it "should behave as if the username parameter was not given" do
-            result = get_index_json :username => @user.login
-          
-            exs = result[0]['exercises']
-            exs[0]['name'].should == 'Exercise1'
-            exs[0]['attempted'].should be_false
-            exs[0]['completed'].should be_false
-          end
+        it "should respond with a 403" do
+          get :index, :format => :json, :username => @user.login
+          response.code.to_i.should == 403
         end
       end
       

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111109140507) do
+ActiveRecord::Schema.define(:version => 20111115154221) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -76,6 +76,7 @@ ActiveRecord::Schema.define(:version => 20111109140507) do
     t.string   "exercise_name",                    :null => false
     t.integer  "course_id",                        :null => false
     t.boolean  "processed",     :default => false, :null => false
+    t.string   "secret_token"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"

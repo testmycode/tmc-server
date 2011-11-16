@@ -1,12 +1,13 @@
 FactoryGirl.define do
   factory :user do
     sequence(:login) {|n| "user#{n}" }
+    sequence(:password) {|n| "userpass#{n}" }
     administrator false
   end
 
   factory :admin, :class => User do
     sequence(:login) {|n| 'admin#{n}' }
-    password 'adminpass'
+    sequence(:password) {|n| "adminpass#{n}" }
     administrator true
   end
 
@@ -19,6 +20,10 @@ FactoryGirl.define do
     course
     sequence(:name) {|n| "exercise#{n}" }
     sequence(:gdocs_sheet) {|n| "exercise#{n}" }
+  end
+  
+  factory :returnable_exercise, :parent => :exercise do
+    returnable_forced true
   end
 
   factory :submission do

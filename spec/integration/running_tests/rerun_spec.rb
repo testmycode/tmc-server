@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TestRunnerIntegrationSetup, :test_runner => true do
+describe TestRunnerIntegrationSetup, :integration => true do
   include GitTestActions
 
   describe "rerunning an old submission" do

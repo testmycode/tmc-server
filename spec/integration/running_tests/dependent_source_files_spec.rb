@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TestRunnerIntegrationSetup, :test_runner => true do
+describe TestRunnerIntegrationSetup, :integration => true do
   it "should not have problems compiling a project with source files that depend on each other" do
     setup = SubmissionTestSetup.new(:exercise_name => 'DependentSourceFiles')
     submission = setup.submission

@@ -41,8 +41,7 @@ class SubmissionTestSetup
     @submission = Submission.new(
       :user => @user,
       :course => @course,
-      :exercise => @exercise,
-      :return_file_tmp_path => exercise_dest + ".zip"
+      :exercise => @exercise
     )
     
     if should_solve
@@ -51,7 +50,6 @@ class SubmissionTestSetup
     
     if should_save
       make_zip
-      @submission.run_tests
       @submission.save!
     end
   end

@@ -2,8 +2,10 @@ require 'spec_helper'
 
 describe SubmissionsController do
   before :each do
+    @user = Factory.create(:user)
     @course = Factory.create(:course)
-    @exercise = Factory.create(:exercise, :course => @course)
+    @exercise = Factory.create(:returnable_exercise, :course => @course)
+    controller.current_user = @user
   end
 
   describe "POST create" do
@@ -15,58 +17,39 @@ describe SubmissionsController do
       end
       
       @submission = mock_model(Submission)
-      @submission.stub(:run_tests)
+      @submission.stub(:exercise).and_return(@exercise)
       @submission.stub(:save).and_return(true)
       Submission.stub(:new).and_return(@submission)
+      
+      RemoteSandbox.stub(:try_to_send_submission_to_free_server)
     end
     
     def post_create(options = {})
       options = {
         :course_id => @course.id,
         :exercise_id => @exercise.id,
-        :submission => { :username => 'theuser', :file => @submitted_file }
+        :submission => { :file => @submitted_file }
       }.merge options
       post :create, options
     end
     
-    describe "when the user doesn't exist" do
-      it "should create the user and be successful" do
-        post_create
-        User.last.login.should == 'theuser'
-      end
-    end
-    
     describe "when successful" do
-      it "should save the submission" do
-        @submission.should_receive(:save)
-        post_create
-      end
-    
       it "should redirect to show" do
         post_create
         response.should redirect_to(submission_path(@submission))
       end
       
-      it "should store the submission in the user's session" do
+      it "should save the submission" do
+        @submission.should_receive(:save)
         post_create
-        session[:recent_submissions].should_not be_nil
-        session[:recent_submissions].should include(@submission.id)
       end
       
-      it "should clean up the recent submissions list if it gets too long" do
-        session[:recent_submissions] = [10,20,30] * 10000 + [123]
+      it "should send the submission to a remote sandbox" do
+        RemoteSandbox.should_receive(:try_to_send_submission_to_free_server)
         post_create
-        session[:recent_submissions].size.should == 100
-        session[:recent_submissions].should include(123)
-        session[:recent_submissions].should include(@submission.id)
       end
       
       describe "with json format" do
-        it "should save the submission" do
-          @submission.should_receive(:save)
-          post_create
-        end
-      
         it "should redirect to show in JSON format" do
           post_create :format => :json
           response.should redirect_to(submission_path(@submission, :format => 'json'))
@@ -95,7 +78,7 @@ describe SubmissionsController do
       end
     end
     
-    describe "when unsuccessful" do
+    describe "when unable to save the submission" do
       it "should redirect to exercise with failure message" do
         @submission.should_receive(:save).and_return(false)
         post_create
@@ -128,16 +111,6 @@ describe SubmissionsController do
       expect { get :show, :id => @submission.id.to_s }.to raise_error(CanCan::AccessDenied)
     end
     
-    it "should allow access to recent submissions" do
-      controller.current_user = Guest.new
-      session[:recent_submissions] = [@submission.id]
-      
-      get :show, :id => @submission.id.to_s
-      
-      response.should be_successful
-      assigns[:submission].should == @submission
-    end
-    
     describe "in JSON format" do
       def get_show_json
         options = {
@@ -158,19 +131,18 @@ describe SubmissionsController do
       end
       
       it "should return any test failures in the categorized hash returned by the model" do
-        @submission.stub(:categorized_test_failures => {'x' => ['a']}, :test_failure_messages => ['x - a'], :status => :fail)
+        @submission.stub(:categorized_test_failures => {'x' => ['a']}, :status => :fail)
         result = get_show_json
         result['status'].should == 'fail'
-        result['test_failures'].should == ['x - a'] #DEPRECATED FIELD
         result['categorized_test_failures'].should == {'x' => ['a']}
       end
       
       it "should mark submissions with no error or failure as successful" do
-        @submission.stub(:test_failure_messages => ['one', 'two'], :status => :ok)
+        @submission.stub(:status => :ok)
         result = get_show_json
         result['status'].should == 'ok'
         result['error'].should be_nil
-        result['test_failures'].should be_nil #DEPRECATED FIELD
+        result['categorized_test_failures'].should be_nil
       end
     end
   end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by a student)" do
+describe "The system (used by a student)", :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -13,11 +13,14 @@ describe "The system (used by a student)" do
 
     @course.refresh
 
+    @user = Factory.create(:user, :password => 'xooxer')
+
     visit '/'
+    log_in_as(@user.login, 'xooxer')
     click_link 'mycourse'
   end
 
-  it "should offer exercises as downloadable zips" do
+  it "should offer exercises as downloadable zips", :driver => :rack_test do
     click_link('zip')
     File.open('MyExercise.zip', 'wb') {|f| f.write(page.source) }
     system!("unzip -qq MyExercise.zip")
@@ -34,9 +37,9 @@ describe "The system (used by a student)" do
     ex.make_zip
 
     click_link 'MyExercise'
-    fill_in 'Student number', :with => '123'
     attach_file('Zipped project', 'MyExercise.zip')
     click_button 'Submit'
+    wait_for_submission_to_be_processed
 
     page.should have_content('All tests successful')
     page.should have_content('Ok')
@@ -48,9 +51,9 @@ describe "The system (used by a student)" do
     ex.make_zip
 
     click_link 'MyExercise'
-    fill_in 'Student number', :with => '123'
     attach_file('Zipped project', 'MyExercise.zip')
     click_button 'Submit'
+    wait_for_submission_to_be_processed
 
     page.should have_content('Some tests failed')
     page.should have_content('Fail')
@@ -62,9 +65,9 @@ describe "The system (used by a student)" do
     ex.make_zip
 
     click_link 'MyExercise'
-    fill_in 'Student number', :with => '123'
     attach_file('Zipped project', 'MyExercise.zip')
     click_button 'Submit'
+    wait_for_submission_to_be_processed
 
     page.should have_content('Compilation error')
     page.should have_content('oops')

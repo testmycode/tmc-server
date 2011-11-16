@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe "The system (used by an instructor for administration)" do
+describe "The system (used by an instructor for administration)", :integration => true do
   include IntegrationTestActions
 
   before :each do
     visit '/'
     @user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
-    log_in_as(@user.login)
+    log_in_as(@user.login, 'xooxer')
     
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
@@ -45,9 +45,11 @@ describe "The system (used by an instructor for administration)" do
     page.should_not have_content('All tests successful')
     
     click_button 'Rerun submission'
+    page.should have_content('Rerun scheduled')
+    wait_for_submission_to_be_processed
+    
     page.should_not have_content('some funny error')
     page.should have_content('All tests successful')
-    page.should have_content('Rerun successful')
   end
 end
 

@@ -59,12 +59,6 @@ describe SessionsController do
         response.should redirect_to(root_path)
       end
     end
-    
-    it "should not allow non-administrators to log in" do  # at least for now
-      @user.stub(:administrator? => false)
-      post_create
-      controller.send(:current_user).should be_guest
-    end
   end
   
   describe "DELETE destroy" do

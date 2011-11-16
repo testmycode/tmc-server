@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TestRunnerIntegrationSetup, :test_runner => true do
+describe TestRunnerIntegrationSetup, :integration => true do
   describe "when the exercise has source and test classes in packages" do
     it "should have no problems" do
       setup = SubmissionTestSetup.new(:exercise_name => 'ExerciseWithPackages')

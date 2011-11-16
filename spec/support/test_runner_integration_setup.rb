@@ -7,7 +7,7 @@ module TestRunnerIntegrationSetup
   
   def self.run_submission_tests(submission)
     ensure_notify_server_inited
-    sandbox = RemoteSandbox.random
+    sandbox = RemoteSandbox.all.first
     sandbox.send_submission(submission, notify_url)
     notification = @notify_queue.pop
     case notification['status']

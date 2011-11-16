@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'daemons'
+require 'fileutils'
+
+root_dir = File.expand_path('../', File.dirname(__FILE__))
+pid_dir = root_dir + '/tmp/pids'
+log_dir = root_dir + '/log'
+FileUtils.mkdir_p(pid_dir)
+FileUtils.mkdir_p(log_dir)
+
+# for some reason, log_output doesn't seem to work. Oh well..
+Daemons.run_proc('submission_reprocessor', :dir_mode => :normal, :dir => pid_dir, :log_dir => log_dir, :log_output => false) do
+  Dir.chdir root_dir
+  require root_dir + '/config/environment'
+  #require File.expand_path('../lib/submission_reprocessor',  File.dirname(__FILE__))
+  require 'submission_reprocessor'
+  Rails.logger.auto_flushing = true
+  
+  reprocessor = SubmissionReprocessor.new
+  loop do
+    reprocessor.reprocess_timed_out_submissions
+    sleep 5
+  end
+end
+

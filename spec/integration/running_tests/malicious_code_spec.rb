@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TestRunnerIntegrationSetup, :test_runner => true do
+describe TestRunnerIntegrationSetup, :integration => true do
   describe "when the student's code attempts to delete tests" do
     it "should not leave tests unrun" do
       setup = SubmissionTestSetup.new(:exercise_name => 'malicious/TestDeleter')

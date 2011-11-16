@@ -76,10 +76,9 @@ private
 
   def exercise_data_for_json(exercise)
     authorize! :read, exercise
-    user = if !params[:username].blank? then User.find_by_login(params[:username]) else nil end
-    user ||= Guest.new
+    user = if !params[:username].blank? then User.find_by_login!(params[:username]) else Guest.new end
 
-    return nil if !exercise.available_to?(user)
+    return nil if !exercise.submittable_by?(user)
 
     fields = [:name, :deadline, :publish_time, :return_address, :zip_url]
     result = fields.reduce({}) do |r, field|

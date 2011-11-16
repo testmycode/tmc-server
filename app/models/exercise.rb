@@ -36,14 +36,16 @@ class Exercise < ActiveRecord::Base
     "#{course_exercise_submissions_url(self.course, self)}.json"
   end
 
-  def available_to?(user)
-    if user.administrator?
+  # Whether a user may make submissions
+  def submittable_by?(user)
+    returnable? && if user.administrator?
       true
     else
-      !expired? && !hidden?
+      !expired? && !hidden? && published? && !user.guest?
     end
   end
 
+  # Whether a user may see the exercise
   def visible_to?(user)
     if user.administrator?
       true
@@ -51,15 +53,18 @@ class Exercise < ActiveRecord::Base
       !hidden? && published?
     end
   end
-  
-  def published? # may still be hidden
+ 
+  # Whether the exercise has been published (it may still be hidden)
+  def published?
     !publish_time || publish_time <= Time.now
   end
 
+  # Whether a user has made a submission for this exercise
   def attempted_by?(user)
     submissions.where(:user_id => user.id).exists?
   end
 
+  # Whether a user has made a submission with all test cases passing
   def completed_by?(user)
     # We try to find a submission whose test case runs are all successful
     conn = ActiveRecord::Base.connection
@@ -81,6 +86,7 @@ EOS
     super(DateAndTimeUtils.to_time(new_deadline, :prefer_end_of_day => true))
   end
 
+  # Whether the deadline has passed
   def expired?
     self.deadline != nil && self.deadline < Time.now
   end
@@ -103,9 +109,11 @@ EOS
 
   def name2gdocs_sheet
     sheetname = self.name.split('-')[0..-2].join('-')
-    sheetname.empty?? "root" : sheetname
+    sheetname.empty? ? "root" : sheetname
   end
 
+  # Whether this exercise accepts submissions at all.
+  # TMC may be used to distribute exercise templates without tests.
   def returnable?
     if returnable_forced != nil
       returnable_forced

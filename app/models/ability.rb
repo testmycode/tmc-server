@@ -16,11 +16,9 @@ class Ability
 
       cannot :read, Submission
       can :read, Submission, :user_id => user.id
-      can :read, Submission do |sub|
-        recent = session[:recent_submissions] || []
-        recent.include? sub.id
+      can :create, Submission do |sub|
+        sub.exercise.submittable_by?(user)
       end
-      can :create, Submission
     end
   end
 end

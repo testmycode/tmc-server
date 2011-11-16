@@ -16,9 +16,12 @@ class SubmissionsController < ApplicationController
         }
         output = output.merge(
           case @submission.status
+          when :processing then {
+            :submissions_before_this => @submission.unprocessed_submissions_before_this,
+            :total_unprocessed => Submission.unprocessed_count
+          }
           when :error then { :error => @submission.pretest_error }
           when :fail then {
-            :test_failures => @submission.test_failure_messages, #DEPRECATED FIELD
             :categorized_test_failures => @submission.categorized_test_failures
           }
           when :ok then {}
@@ -30,46 +33,37 @@ class SubmissionsController < ApplicationController
   end
 
   def create
-    username = params[:submission][:username]
-    user = User.find_by_login(username)
-    user ||= User.create!(:login => username, :password => nil)
+    if !params[:submission] || !params[:submission][:file]
+      return respond_not_found('No ZIP file selected or failed to receive it')
+    end
     
-    if !@exercise.available_to?(user)
-      respond_to do |format|
-        format.html do
-          render :status => 403, :text => 'Exercise not available. The deadline may have passed.', :content_type => 'text/plain'
-        end
-        format.json do
-          render :json => {:error => 'Submissions for this exercise are no longer accepted.'}
-        end
-      end
-      return
+    if !@exercise.submittable_by?(current_user)
+      return respond_access_denied('Submissions for this exercise are no longer accepted.')
     end
     
     @submission = Submission.new(
-      :user => user,
+      :user => current_user,
       :course => @course,
       :exercise => @exercise,
-      :return_file_tmp_path => params[:submission][:file].tempfile.path
+      :return_file => File.read(params[:submission][:file].tempfile.path)
     )
     
     authorize! :create, @submission
     
-    @submission.run_tests
     ok = @submission.save
     
     if ok
-      record_recent_submission(@submission)
+      send_submission_to_sandbox(@submission)
     end
     
     respond_to do |format|
       format.html do
         if ok
           redirect_to(submission_path(@submission),
-                      :notice => 'Submission processed.')
+                      :notice => 'Submission received.')
         else
           redirect_to(course_exercise_path(@course, @exercise),
-                      :alert => 'Failed to process submission.') 
+                      :alert => 'Failed to receive submission.') 
         end
       end
       format.json do
@@ -85,9 +79,11 @@ class SubmissionsController < ApplicationController
   def update
     submission = Submission.find(params[:id]) || respond_not_found
     authorize! :update, submission
-    submission.run_tests
+    submission.processed = false
+    submission.randomize_secret_token
     submission.save!
-    redirect_to submission_path(submission), :notice => 'Rerun successful'
+    send_submission_to_sandbox(submission)
+    redirect_to submission_path(submission), :notice => 'Rerun scheduled'
   end
 
 private
@@ -100,11 +96,8 @@ private
     end
   end
   
-  def record_recent_submission(submission)
-    recent = session[:recent_submissions]
-    recent = [] if session[:recent_submissions] == nil
-    recent << submission.id
-    recent = recent[-100, 100] if recent.size > 100
-    session[:recent_submissions] = recent
+  def send_submission_to_sandbox(submission)
+    notify_url = submission_result_url(submission, :host => SiteSetting.host_for_remote_sandboxes, :port => SiteSetting.port_for_remote_sandboxes)
+    RemoteSandbox.try_to_send_submission_to_free_server(submission, notify_url)
   end
 end

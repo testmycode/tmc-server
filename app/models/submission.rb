@@ -1,4 +1,3 @@
-require 'test_runner'
 
 class Submission < ActiveRecord::Base
   belongs_to :user
@@ -9,15 +8,22 @@ class Submission < ActiveRecord::Base
   has_many :test_case_runs, :dependent => :destroy
   has_many :awarded_points, :dependent => :nullify
   
-  attr_accessor :return_file_tmp_path
-  attr_accessor :skip_test_runner if ::Rails.env == 'test'
-  
   validates :user, :presence => true
   validates :course, :presence => true
   validates :exercise_name, :presence => true
   
+  def self.to_be_reprocessed
+    self.where(:processed => false).where('updated_at < ?', Time.now - reprocess_attempt_interval).order(:id)
+  end
+  
+  def self.unprocessed_count
+    self.where(:processed => false).count
+  end
+  
+  before_create :randomize_secret_token
+  
   def tests_ran?
-    pretest_error == nil
+    processed? && pretest_error == nil
   end
   
   def all_tests_passed?
@@ -25,7 +31,9 @@ class Submission < ActiveRecord::Base
   end
   
   def status
-    if all_tests_passed?
+    if !processed?
+      :processing
+    elsif all_tests_passed?
       :ok
     elsif tests_ran?
       :fail
@@ -34,22 +42,16 @@ class Submission < ActiveRecord::Base
     end
   end
   
-  def downloadable_file_name
-    "#{exercise_name}-#{self.id}.zip"
+  def unprocessed_submissions_before_this
+    if !self.processed?
+      self.class.where(:processed => false).order(:id).map(&:id).index(self.id) + 1
+    else
+      nil
+    end
   end
   
-  # @deprecated in favor of categorizing errors by test cases.
-  # To be removed after #22 is resolved.
-  # Btw remember to search for and remove possible stubs in tests too.
-  def test_failure_messages
-    test_case_runs.reject(&:successful?).map do |tcr|
-      pretty_name = pretty_test_case_name(tcr.test_case_name)
-      if tcr.message.blank?
-        "#{pretty_name} - fail"
-      else
-        "#{pretty_name} - #{tcr.message}"
-      end
-    end
+  def downloadable_file_name
+    "#{exercise_name}-#{self.id}.zip"
   end
   
   def categorized_test_failures
@@ -64,25 +66,18 @@ class Submission < ActiveRecord::Base
     result
   end
   
-  def run_tests
-    self.pretest_error = nil
-    
-    return if ::Rails.env == 'test' && self.skip_test_runner
-    
-    begin
-      self.return_file = IO.read(return_file_tmp_path) if new_record?
-      
-      TestRunner.run_submission_tests(self)
-    rescue
-      if $!.message.start_with?("Compilation error") # haxy - should fix
-        self.pretest_error = $!.message
-      else
-        self.pretest_error = $!.message + "\n" + $!.backtrace.join("\n")
-      end
-    end
+  # When a remote sandbox returns a result to the webapp,
+  # it authenticates the result by passing back the secret token.
+  # Changing it in the meantime will obsolete any runs currently being processed.
+  def randomize_secret_token
+    self.secret_token = rand(10**100).to_s
   end
   
 private
+  
+  def self.reprocess_attempt_interval
+    10.seconds
+  end
   
   def test_case_category_and_name(test_case_name)
     parts = test_case_name.split(/\s+/, 2)
@@ -90,15 +85,6 @@ private
       parts
     else
       ['', test_case_name]
-    end
-  end
-  
-  def pretty_test_case_name(long_name) #DEPRECATED - used by deprecated test_failure_messages
-    if long_name =~ /^.+\.[^.]+ ([^.]+)$/
-      method_name = $1
-      method_name
-    else
-      long_name
     end
   end
 end

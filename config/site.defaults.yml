@@ -11,6 +11,12 @@ site_subtitle:
 git_repos_chmod: a+rX
 git_repos_chgrp:
 
+# A remote sandbox will need to contact the web server when it's done processing.
+# Enter the hostname (and port) with which the sandboxes will find the web server.
+# Leave empty to use what the `hostname` command provides and port 80.
+host_for_remote_sandboxes: localhost
+port_for_remote_sandboxes: 3000
+
 # List at least one sandbox instance here (in site.yml).
 #
 # Any URL will do. Example:

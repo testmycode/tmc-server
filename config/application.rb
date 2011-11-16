@@ -39,7 +39,7 @@ module SandboxServer
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password, :submission_file]
+    config.filter_parameters += [:password, :submission_file, :return_file]
 
     # Enable the asset pipeline [TODO: later]
     config.assets.enabled = false

@@ -11,6 +11,9 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 # Require everything in lib too.
 Dir[Rails.root.join("lib/**/*.rb")].each {|f| require f}
 
+Capybara.default_driver = :selenium
+Capybara.server_port = 3009
+
 RSpec.configure do |config|
   config.mock_with :rspec
 
@@ -19,15 +22,25 @@ RSpec.configure do |config|
 
   config.use_transactional_fixtures = false
 
-  config.before :each do
+  config.before(:each) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.start
   end
+  
+  config.before(:each, :integration => true) do
+    DatabaseCleaner.clean
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.start
+    SiteSetting.stub(
+      :host_for_remote_sandboxes => '127.0.0.1',
+      :port_for_remote_sandboxes => Capybara.server_port
+    )
+  end
 
-  config.after do
+  config.after :each do
     DatabaseCleaner.clean
   end
 
-  # Override with rspec --tag ~test_runner --tag gdocs spec
-  config.filter_run_excluding :gdocs => true, :test_runner => false
+  # Override with rspec --tag ~integration --tag gdocs spec
+  config.filter_run_excluding :gdocs => true
 end
