@@ -29,7 +29,7 @@ $(document).ready(function() {
   }, 700)
 
   // Refresh status until processed, then refresh page
-  var url = '<%= j submission_url(@submission, :format => :json) %>';
+  var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApplicationController::API_VERSION) %>';
   var refreshCooldown = 5000;
   function refreshStatus() {
     $.ajax({

@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  API_VERSION = 1 # To be incremented on BC-breaking changes
+  
   helper :all
   
   protect_from_forgery
@@ -15,6 +17,7 @@ class ApplicationController < ActionController::Base
   end
 
   before_filter :set_default_url_options
+  before_filter :check_api_version
 
 private
 
@@ -24,6 +27,16 @@ private
 
   def set_default_url_options
     Rails.application.routes.default_url_options[:host]=request.host_with_port
+  end
+  
+  def check_api_version
+    if params[:format] == 'json'
+      if params[:api_version].blank?
+        respond_with_error("Please update the TMC client. No API version received from client.", 404)
+      elsif params[:api_version] != API_VERSION.to_s
+        respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404)
+      end
+    end
   end
   
   def respond_not_found(msg = 'Not Found')
@@ -40,4 +53,5 @@ private
       format.json { render :json => { :error => msg }, :status => 403 }
     end
   end
+  
 end

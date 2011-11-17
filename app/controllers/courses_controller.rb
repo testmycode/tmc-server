@@ -12,8 +12,10 @@ class CoursesController < ApplicationController
       format.json do
         courses = Course.ongoing.where(:hidden => false).order(ordering)
         authorize! :read, courses
+        return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
         data = courses.map do |c|
           {
+            :api_version => API_VERSION,
             :name => c.name,
             :exercises => c.exercises.order('LOWER(name)').map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
           }
@@ -76,21 +78,18 @@ private
 
   def exercise_data_for_json(exercise)
     authorize! :read, exercise
-    user = if !params[:username].blank? then User.find_by_login!(params[:username]) else Guest.new end
 
-    return nil if !exercise.submittable_by?(user)
+    return nil if !exercise.visible_to?(current_user)
 
-    fields = [:name, :deadline, :publish_time, :return_address, :zip_url]
+    fields = [:name, :deadline, :return_url, :zip_url]
     result = fields.reduce({}) do |r, field|
       r.merge({ field => exercise.send(field) })
     end
 
     result[:returnable] = exercise.returnable?
 
-    if user
-      result[:attempted] = exercise.attempted_by?(user)
-      result[:completed] = exercise.completed_by?(user)
-    end
+    result[:attempted] = exercise.attempted_by?(current_user)
+    result[:completed] = exercise.completed_by?(current_user)
 
     result
   end

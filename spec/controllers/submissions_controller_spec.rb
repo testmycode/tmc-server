@@ -51,8 +51,8 @@ describe SubmissionsController do
       
       describe "with json format" do
         it "should redirect to show in JSON format" do
-          post_create :format => :json
-          response.should redirect_to(submission_path(@submission, :format => 'json'))
+          post_create :format => :json, :api_version => ApplicationController::API_VERSION
+          response.should redirect_to(submission_path(@submission, :format => 'json', :api_version => ApplicationController::API_VERSION))
         end
       end
     end
@@ -72,7 +72,7 @@ describe SubmissionsController do
       describe "with json format" do
         it "should return a JSON error" do
           @submission.should_not_receive(:save)
-          post_create :format => :json
+          post_create :format => :json, :api_version => ApplicationController::API_VERSION
           JSON.parse(response.body)['error'].should_not be_blank
         end
       end
@@ -89,8 +89,8 @@ describe SubmissionsController do
       describe "with json format" do
         it "should return a JSON error" do
           @submission.should_receive(:save).and_return(false)
-          post_create :format => :json
-          JSON.parse(response.body)['error'].should_not be_blank
+          post_create :format => :json, :api_version => ApplicationController::API_VERSION
+          JSON.parse(response.body)['error'].should include('Failed to save submission')
         end
       end
     end
@@ -114,6 +114,7 @@ describe SubmissionsController do
     describe "in JSON format" do
       def get_show_json
         options = {
+          :api_version => ApplicationController::API_VERSION,
           :id => @submission.id.to_s,
           :course_id => @course.id.to_s,
           :exercise_id => @exercise.id.to_s,

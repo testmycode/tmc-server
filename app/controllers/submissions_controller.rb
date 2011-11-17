@@ -12,6 +12,7 @@ class SubmissionsController < ApplicationController
       format.zip { send_data(@submission.return_file) }
       format.json do
         output = {
+          :api_version => API_VERSION,
           :status => @submission.status
         }
         output = output.merge(
@@ -68,7 +69,7 @@ class SubmissionsController < ApplicationController
       end
       format.json do
         if ok
-          redirect_to(submission_path(@submission, :format => 'json'))
+          redirect_to(submission_path(@submission, :format => 'json', :api_version => API_VERSION))
         else
           render :json => {:error => 'Failed to save submission. Sorry :('}
         end

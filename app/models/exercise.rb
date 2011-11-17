@@ -32,7 +32,7 @@ class Exercise < ActiveRecord::Base
     "#{course_exercise_url(self.course, self)}.zip"
   end
 
-  def return_address
+  def return_url
     "#{course_exercise_submissions_url(self.course, self)}.json"
   end
 
