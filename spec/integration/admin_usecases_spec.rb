@@ -34,6 +34,7 @@ describe "The system (used by an instructor for administration)", :integration =
   it "should allow rerunning individual submissions" do
     setup = SubmissionTestSetup.new(:solve => true, :save => true)
     setup.make_zip
+    setup.submission.processed = true
     setup.submission.pretest_error = "some funny error"
     setup.submission.test_case_runs.each do |tcr|
       tcr.successful = false
