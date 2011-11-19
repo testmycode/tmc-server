@@ -1,4 +1,5 @@
 class SubmissionsController < ApplicationController
+  around_filter :course_transaction
   before_filter :get_course_and_exercise
   
   skip_authorization_check :only => :show
@@ -88,9 +89,15 @@ class SubmissionsController < ApplicationController
   end
 
 private
+  def course_transaction
+    Course.transaction(:requires_new => true) do
+      yield
+    end
+  end
+
   def get_course_and_exercise
     if params[:course_id] && params[:exercise_id]
-      @course = Course.find(params[:course_id])
+      @course = Course.find(params[:course_id], :lock => 'FOR SHARE')
       authorize! :read, @course
       @exercise = @course.exercises.find(params[:exercise_id])
       authorize! :read, @exercise
