@@ -48,13 +48,13 @@ describe CoursesController do
         
         result = get_index_json
         
-        result.map {|c| c['name'] }.should == ['Course1', 'Course2', 'Course3']
+        result['courses'].map {|c| c['name'] }.should == ['Course1', 'Course2', 'Course3']
       end
       
       it "should render the exercises for each course" do
         result = get_index_json
         
-        exs = result[0]['exercises']
+        exs = result['courses'][0]['exercises']
         exs[0]['name'].should == 'Exercise1'
         exs[1]['name'].should == 'Exercise2'
         exs[0]['zip_url'].should == course_exercise_url(@course.id, @course.exercises[0].id, :format => 'zip')
@@ -69,7 +69,7 @@ describe CoursesController do
         
         result = get_index_json
 
-        names = result[0]['exercises'].map {|ex| ex['name']}
+        names = result['courses'][0]['exercises'].map {|ex| ex['name']}
         names.should_not include('Exercise1')
         names.should include('Exercise2')
         names.should include('Exercise3')
@@ -81,7 +81,7 @@ describe CoursesController do
         
         result = get_index_json
         
-        result[0]['exercises'][0]['deadline'].should == '2011-11-16T23:59:59+02:00'
+        result['courses'][0]['exercises'][0]['deadline'].should == '2011-11-16T23:59:59+02:00'
       end
       
       it "should tell for each exercise whether it has been attempted" do
@@ -90,7 +90,7 @@ describe CoursesController do
         
         result = get_index_json
         
-        exs = result[0]['exercises']
+        exs = result['courses'][0]['exercises']
         exs[0]['attempted'].should be_true
         exs[1]['attempted'].should be_false
       end
@@ -101,7 +101,7 @@ describe CoursesController do
         
         result = get_index_json
         
-        exs = result[0]['exercises']
+        exs = result['courses'][0]['exercises']
         exs[0]['completed'].should be_true
         exs[1]['completed'].should be_false
       end

@@ -13,13 +13,16 @@ class CoursesController < ApplicationController
         courses = Course.ongoing.where(:hidden => false).order(ordering)
         authorize! :read, courses
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
-        data = courses.map do |c|
+        courses_data = courses.map do |c|
           {
-            :api_version => API_VERSION,
             :name => c.name,
             :exercises => c.exercises.order('LOWER(name)').map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
           }
         end
+        data = {
+          :api_version => API_VERSION,
+          :courses => courses_data
+        }
         render :json => data.to_json
       end
     end
