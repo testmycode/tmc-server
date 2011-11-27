@@ -55,7 +55,7 @@ class SubmissionsController < ApplicationController
     ok = @submission.save
     
     if ok
-      send_submission_to_sandbox(@submission)
+      try_to_send_submission_to_sandbox(@submission)
     end
     
     respond_to do |format|
@@ -84,7 +84,7 @@ class SubmissionsController < ApplicationController
     submission.processed = false
     submission.randomize_secret_token
     submission.save!
-    send_submission_to_sandbox(submission)
+    try_to_send_submission_to_sandbox(submission)
     redirect_to submission_path(submission), :notice => 'Rerun scheduled'
   end
 
@@ -104,7 +104,7 @@ private
     end
   end
   
-  def send_submission_to_sandbox(submission)
+  def try_to_send_submission_to_sandbox(submission)
     notify_url = submission_result_url(submission, :host => SiteSetting.host_for_remote_sandboxes, :port => SiteSetting.port_for_remote_sandboxes)
     RemoteSandbox.try_to_send_submission_to_free_server(submission, notify_url)
   end
