@@ -32,10 +32,9 @@ describe CoursesController do
       def get_index_json(options = {})
         options = {
           :format => 'json',
-          :api_version => ApplicationController::API_VERSION,
-          :api_username => @user.login,
-          :api_password => @user.password
+          :api_version => ApplicationController::API_VERSION
         }.merge options
+        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("#{@user.login}:#{@user.password}")
         get :index, options
         JSON.parse(response.body)
       end

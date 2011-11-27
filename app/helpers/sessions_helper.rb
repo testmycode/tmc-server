@@ -6,7 +6,7 @@ module SessionsHelper
   end
 
   def current_user
-    @current_user ||= user_from_api_call || user_from_session || Guest.new
+    @current_user ||= user_from_basic_auth || user_from_session || Guest.new
   end
   
   def current_user=(user)
@@ -33,14 +33,14 @@ private
     User.find_by_id(session[:user_id])
   end
   
-  def user_from_api_call
-    username = params[:api_username]
-    password = params[:api_password]
-    
-    if params[:format] == 'json' && username && password
-      User.authenticate(username, password)
-    else
-      nil
+  def user_from_basic_auth
+    if params[:format] == 'json' && request.authorization
+      username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
+      if username && password
+        User.authenticate(username, password)
+      else
+        nil
+      end
     end
   end
 
