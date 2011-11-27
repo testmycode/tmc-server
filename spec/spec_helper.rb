@@ -44,3 +44,9 @@ RSpec.configure do |config|
   # Override with rspec --tag ~integration --tag gdocs spec
   config.filter_run_excluding :gdocs => true
 end
+
+# Ensure the DB is clean
+DatabaseCleaner.strategy = :truncation
+DatabaseCleaner.start
+DatabaseCleaner.clean
+
