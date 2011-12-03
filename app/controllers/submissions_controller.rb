@@ -70,9 +70,9 @@ class SubmissionsController < ApplicationController
       end
       format.json do
         if ok
-          redirect_to(submission_path(@submission, :format => 'json', :api_version => API_VERSION))
+          render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => API_VERSION) }
         else
-          render :json => {:error => 'Failed to save submission. Sorry :('}
+          render :json => { :error => 'Failed to save submission. Sorry :(' }
         end
       end
     end

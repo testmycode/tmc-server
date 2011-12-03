@@ -50,9 +50,9 @@ describe SubmissionsController do
       end
       
       describe "with json format" do
-        it "should redirect to show in JSON format" do
+        it "should return url to submission in JSON format" do
           post_create :format => :json, :api_version => ApplicationController::API_VERSION
-          response.should redirect_to(submission_path(@submission, :format => 'json', :api_version => ApplicationController::API_VERSION))
+          JSON.parse(response.body)['submission_url'].should == submission_url(@submission, :format => 'json', :api_version => ApplicationController::API_VERSION)
         end
       end
     end
