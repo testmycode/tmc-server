@@ -44,7 +44,7 @@ class Submission < ActiveRecord::Base
   
   def unprocessed_submissions_before_this
     if !self.processed?
-      self.class.where(:processed => false).order(:id).map(&:id).index(self.id) + 1
+      self.class.where(:processed => false).where('id < ?', self.id).count
     else
       nil
     end

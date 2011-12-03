@@ -38,7 +38,7 @@ $(document).ready(function() {
       success: function(data) {
         if (data.status == 'processing') {
           status =
-            'Place in queue: ' + data.submissions_before_this +
+            'Place in queue: ' + (data.submissions_before_this + 1) +
             ' / ' + data.total_unprocessed
           $('.processing-status').text(status);
         } else {

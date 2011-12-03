@@ -49,5 +49,16 @@ describe Submission do
       'Xoo' => ['xoo() - you fail again']
     }
   end
+  
+  it "can tell how many unprocessed submissions are in queue before itself" do
+    Factory.create(:submission, :processed => false)
+    Factory.create(:submission, :processed => false)
+    Factory.create(:submission, :processed => false)
+    s = Factory.create(:submission, :processed => false)
+    Factory.create(:submission, :processed => false)
+    Factory.create(:submission, :processed => false)
+    
+    s.unprocessed_submissions_before_this.should == 3
+  end
 end
 
