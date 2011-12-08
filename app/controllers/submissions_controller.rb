@@ -24,9 +24,11 @@ class SubmissionsController < ApplicationController
           }
           when :error then { :error => @submission.pretest_error }
           when :fail then {
-            :categorized_test_failures => @submission.categorized_test_failures
+            :test_cases => @submission.test_case_records
           }
-          when :ok then {}
+          when :ok then {
+            :test_cases => @submission.test_case_records
+          }
           end
         )
         render :json => output

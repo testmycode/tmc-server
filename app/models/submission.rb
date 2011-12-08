@@ -54,16 +54,14 @@ class Submission < ActiveRecord::Base
     "#{exercise_name}-#{self.id}.zip"
   end
   
-  def categorized_test_failures
-    result = {}
-    test_case_runs.reject(&:successful?).each do |tcr|
-      category, name = test_case_category_and_name(tcr.test_case_name)
-      msg = tcr.message
-      msg = 'fail' if msg.blank?
-      result[category] ||= []
-      result[category] << "#{name} - #{msg}"
+  def test_case_records
+    test_case_runs.map do |tcr|
+      {
+        :name => tcr.test_case_name,
+        :successful => tcr.successful?,
+        :message => tcr.message
+      }
     end
-    result
   end
   
   # When a remote sandbox returns a result to the webapp,
@@ -77,14 +75,5 @@ private
   
   def self.reprocess_attempt_interval
     10.seconds
-  end
-  
-  def test_case_category_and_name(test_case_name)
-    parts = test_case_name.split(/\s+/, 2)
-    if parts.length == 2
-      parts
-    else
-      ['', test_case_name]
-    end
   end
 end

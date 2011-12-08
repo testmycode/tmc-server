@@ -38,16 +38,22 @@ describe Submission do
     end
   end
   
-  it "can summarize test failures by category" do
+  it "can summarize test cases" do
     submission = Submission.new
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false)
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :message => 'you fail twice', :successful => false)
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Yoo hoo()', :successful => true)
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Xoo xoo()', :message => 'you fail again', :successful => false)
-    submission.categorized_test_failures.should == {
-      'Moo' => ['moo() - you fail', 'moo2() - you fail twice'],
-      'Xoo' => ['xoo() - you fail again']
-    }
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :successful => true)
+    submission.test_case_records.should == [
+      {
+        :name => 'Moo moo()',
+        :successful => false,
+        :message => 'you fail'
+      },
+      {
+        :name => 'Moo moo2()',
+        :successful => true,
+        :message => nil
+      }
+    ]
   end
   
   it "can tell how many unprocessed submissions are in queue before itself" do

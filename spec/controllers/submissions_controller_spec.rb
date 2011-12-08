@@ -131,19 +131,21 @@ describe SubmissionsController do
         result['error'].should == 'oopsie happened'
       end
       
-      it "should return any test failures in the categorized hash returned by the model" do
-        @submission.stub(:categorized_test_failures => {'x' => ['a']}, :status => :fail)
+      it "should return any test case records returned by the model if the submission is failed" do
+        records = [{'name' => 'a', 'successful' => false, 'message' => 'abc'}]
+        @submission.stub(:test_case_records => records, :status => :fail)
         result = get_show_json
         result['status'].should == 'fail'
-        result['categorized_test_failures'].should == {'x' => ['a']}
+        result['test_cases'].should == records
       end
       
       it "should mark submissions with no error or failure as successful" do
-        @submission.stub(:status => :ok)
+        records = [{'name' => 'a', 'successful' => false, 'message' => 'abc'}]
+        @submission.stub(:test_case_records => records, :status => :ok)
         result = get_show_json
         result['status'].should == 'ok'
         result['error'].should be_nil
-        result['categorized_test_failures'].should be_nil
+        result['test_cases'].should == records
       end
     end
   end
