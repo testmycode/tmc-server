@@ -9,8 +9,6 @@ find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:clas
 rm -f output.txt
 
 DEFS="
-  -Djava.security.manager
-  -Djava.security.policy=testrunner.policy
   -Dtmc.exercise_dir=`pwd` 
   -Dtmc.src_class_dir=`pwd`/classes/main 
   -Dtmc.test_class_dir=`pwd`/classes/test
