@@ -84,19 +84,5 @@ describe TestRunnerIntegrationSetup, :integration => true do
       points.should include('simpletest-all')
       points.should_not include('mul') # in SimpleHiddenTest
     end
-    
-    it "should enforce access restrictions on the student's code" do
-      @exercise_project.solve_all
-      @exercise_project.write_empty_method_body('new java.io.FileOutputStream("../omg.hax");')
-      @setup.make_zip
-      
-      TestRunnerIntegrationSetup.run_submission_tests(@submission)
-      
-      tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testEmptyMethod' }
-      tcr.should_not be_nil
-      tcr.should_not be_successful
-      tcr.message.should include('AccessControlException')
-      tcr.message.should include('FilePermission ../omg.hax write')
-    end
   end
 end

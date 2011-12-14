@@ -17,6 +17,6 @@ DEFS="
 
 TESTS=`cat tests.txt`
 
-java -cp lib/*:classes/main/:classes/test/ $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
+java -cp lib/testrunner/*:lib/*:classes/main/:classes/test/ $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
 
 exit 0

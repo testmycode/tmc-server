@@ -108,8 +108,8 @@ require 'cgi' # for escapeHTML
   %>
   
   <%
-    course_template_homepage = 'https://github.com/testmycode/tmc-course-template_helsinki-university'
-    course_template_repo = 'git://github.com/testmycode/tmc-course-template_helsinki-university.git'
+    course_template_homepage = 'https://github.com/testmycode/tmc-course-template'
+    course_template_repo = 'git://github.com/testmycode/tmc-course-template.git'
   %>
   
   <h3>Starting from a template</h3>
@@ -142,26 +142,8 @@ require 'cgi' # for escapeHTML
   %>
   
   <p>
-    The template contains some example exercises. We'll delete those since we want to create our own.
-  </p>
-  
-  <%
-    template_examples = ["viikkoX"]
-    template_examples.each {|dir| File.should exist(workdir + "/" + dir) }
-  %>
-  <%=
-    shell_session.example do |sh|
-      sh.run "rm -Rf #{template_examples.join(' ')}"
-      sh.run "git add -A"
-      sh.run "git commit -m \"Removed examples that came with the template.\""
-      sh.run "git push"
-      sh.run "ls"
-    end
-  %>
-  
-  <p>
     An exercise is just a NetBeans project with some unit tests and
-    at least the JUnit and tmc-javalib libraries included.
+    at least the JUnit and edu-test-utils libraries included.
     The template course has a template exercise in
     <code>private/template_project</code>.
   </p>

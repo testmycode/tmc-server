@@ -1,5 +1,5 @@
 import org.junit.Test;
-import fi.helsinki.cs.tmc.testrunner.Points;
+import fi.helsinki.cs.tmc.edutestutils.Points;
 
 @Points("tb")
 public class TB {

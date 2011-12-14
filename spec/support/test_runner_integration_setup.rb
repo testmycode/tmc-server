@@ -20,6 +20,7 @@ module TestRunnerIntegrationSetup
           raise 'Running the submission failed. Exit code: ' + notification['exit_code'].to_s
         end
       when 'finished'
+        raise 'No JSON output from test runner' if notification['output'].blank?
         TestRunGrader.grade_results(submission, ActiveSupport::JSON.decode(notification['output']))
       else
         raise 'Unknown status: ' + notification['status']

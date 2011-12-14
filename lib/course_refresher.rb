@@ -1,5 +1,6 @@
 require 'find'
 require 'recursive_yaml_reader'
+require 'exercise_dir'
 require 'test_scanner'
 
 # Safely refreshes a course from a git repository
@@ -66,35 +67,12 @@ private
     end
     
     def exercise_dirs
-      return @exercise_dirs if @exercise_dirs != nil
-      
-      @exercise_dirs = []
-      
-      Find.find(@course.clone_path) do |path|
-        if looks_like_exercise_path? path
-          @exercise_dirs << path
-        end
-      end
-      
-      @exercise_dirs
+      @exercise_dirs ||= ExerciseDir.find_exercise_dirs(@course.clone_path)
     end
     
-    def looks_like_exercise_path? path
-      FileTest.directory?(path) &&
-        FileTest.exists?("#{path}/src") &&
-        FileTest.exists?("#{path}/test")
-    end
     
     def exercise_names
-      @exercise_names ||= exercise_dirs.map do |dir|
-        exercise_path_to_name(File.expand_path(dir))
-      end
-    end
-    
-    def exercise_path_to_name(exercise_path)
-      name = exercise_path.gsub(/^#{@course.clone_path}\//, '')
-      name = name.gsub('/', '-')
-      return name
+      @exercise_names ||= exercise_dirs.map { |ed| ed.name_based_on_path(@course.clone_path) }
     end
     
     def add_records_for_new_exercises

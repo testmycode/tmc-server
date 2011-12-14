@@ -54,6 +54,23 @@ describe SubmissionPackager do
     end
   end
   
+  it "should add tmc-junit-runner.jar and its deps to lib/testrunner/" do
+    @exercise_project.solve_all
+    @exercise_project.make_zip(:src_only => false)
+    
+    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.read('lib/testrunner/tmc-junit-runner.jar').should == File.read(TmcJunitRunner.jar_path)
+        for original_path in TmcJunitRunner.jar_and_lib_paths
+          File.read("lib/testrunner/#{original_path.basename}").should == File.read(original_path)
+        end
+      end
+    end
+  end
+  
   describe "tmc-run script added to the archive" do
     it "should compile and run the submission" do
       @exercise_project.solve_all

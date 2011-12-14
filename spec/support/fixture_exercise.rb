@@ -3,7 +3,7 @@ require 'shellwords'
 
 # A copy of a fixture exercise.
 # Creating an instance of this creates a copy of a fixture exercise combined 
-# with the template and with the latest tmc-javalib.jar added.
+# with the template and with the latest tmc-junit-runner.jar added.
 # It can then be modified or compiled or whatever by the test.
 class FixtureExercise
   include SystemCommands
@@ -69,7 +69,6 @@ private
     end
     
     FileUtils.ln("#{common_files_path}/.gitignore", "#{path}/.gitignore")
-    FileUtils.ln(TmcJavalib.jar_path, "#{path}/lib/tmc-javalib.jar")
     
     FileUtils.cp_r("#{fixture_path}/src", "#{path}/src")
     FileUtils.cp_r("#{fixture_path}/test", "#{path}/test")

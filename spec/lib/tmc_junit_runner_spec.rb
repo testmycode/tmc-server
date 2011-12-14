@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe TmcJavalib do
+describe TmcJunitRunner do
   describe "#get_test_case_methods" do
-    it "should find all exercise methods", :use_javalib_server => false do
+    it "should find all exercise methods" do
       SimpleExercise.new('MyExercise')
-      methods = TmcJavalib.get_test_case_methods('MyExercise/test')
+      methods = TmcJunitRunner.get_test_case_methods('MyExercise')
       methods.should include({
         :class_name => 'SimpleTest',
         :method_name => 'testAdd',
