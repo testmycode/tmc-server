@@ -40,18 +40,20 @@ describe Submission do
   
   it "can summarize test cases" do
     submission = Submission.new
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :stack_trace => "frame1\nframe2")
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :successful => true)
     submission.test_case_records.should == [
       {
         :name => 'Moo moo()',
         :successful => false,
-        :message => 'you fail'
+        :message => 'you fail',
+        :stack_trace => "frame1\nframe2"
       },
       {
         :name => 'Moo moo2()',
         :successful => true,
-        :message => nil
+        :message => nil,
+        :stack_trace => nil
       }
     ]
   end

@@ -20,7 +20,8 @@ describe TestRunGrader do
           'className' => 'MyTest',
           'methodName' => 'testSomethingDifficult',
           'status' => 'FAILED',
-          'pointNames' => ['1.2']
+          'pointNames' => ['1.2'],
+          'stackTrace' => "frame1\nframe2"
         }
       ]
     end
@@ -32,10 +33,12 @@ describe TestRunGrader do
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'MyTest testSomethingEasy' }
       tcr.should_not be_nil
       tcr.should be_successful
+      tcr.stack_trace.should be_nil
       
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'MyTest testSomethingDifficult' }
       tcr.should_not be_nil
       tcr.should_not be_successful
+      tcr.stack_trace.should == "frame1\nframe2"
     end
     
     it "should not create multiple test case runs for the same test method even if it is involved in multiple points" do

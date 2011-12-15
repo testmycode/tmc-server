@@ -25,7 +25,8 @@ private
       tcr = TestCaseRun.new(
         :test_case_name => "#{test_result['className']} #{test_result['methodName']}",
         :message => test_result["message"],
-        :successful => test_result["status"] == 'PASSED'
+        :successful => test_result["status"] == 'PASSED',
+        :stack_trace => test_result["stackTrace"]
       )
       submission.test_case_runs << tcr
     end

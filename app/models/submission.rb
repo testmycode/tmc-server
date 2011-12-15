@@ -59,7 +59,8 @@ class Submission < ActiveRecord::Base
       {
         :name => tcr.test_case_name,
         :successful => tcr.successful?,
-        :message => tcr.message
+        :message => tcr.message,
+        :stack_trace => tcr.stack_trace
       }
     end
   end

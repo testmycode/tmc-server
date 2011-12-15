@@ -132,7 +132,7 @@ describe SubmissionsController do
       end
       
       it "should return any test case records returned by the model if the submission is failed" do
-        records = [{'name' => 'a', 'successful' => false, 'message' => 'abc'}]
+        records = [{'name' => 'a', 'successful' => false, 'message' => 'abc', 'stack_trace' => "frame1\nframe2"}]
         @submission.stub(:test_case_records => records, :status => :fail)
         result = get_show_json
         result['status'].should == 'fail'
