@@ -2,6 +2,7 @@ require 'find'
 require 'recursive_yaml_reader'
 require 'exercise_dir'
 require 'test_scanner'
+require 'digest/md5'
 
 # Safely refreshes a course from a git repository
 class CourseRefresher
@@ -35,6 +36,7 @@ private
           zip_up_exercises
           set_permissions
           @course.save!
+          @course.exercises.each &:save!
         rescue
           begin
             # Delete the new cache we were working on
@@ -136,9 +138,11 @@ private
         File.open(".gitattributes", "wb") { |f| f.write(gitattributes_for_archive) }
         
         @course.exercises.each do |e|
+          # The exercise record's accessors can't be reliably used here yet
           path = "#{@course.clone_path}/#{e.path}"
-          zip_file_abs_path = "#{@course.zip_path}/#{e.name}.zip"
-          sh!('git', 'archive', '--worktree-attributes', "--output=#{zip_file_abs_path}", 'HEAD', path)
+          zip_file_path = "#{@course.zip_path}/#{e.name}.zip"
+          sh!('git', 'archive', '--worktree-attributes', "--output=#{zip_file_path}", 'HEAD', path)
+          e.checksum = Digest::MD5.file(zip_file_path).hexdigest
         end
       end
     end
@@ -162,7 +166,6 @@ private
         sh!('chmod', chmod, dir) unless chmod.blank?
         sh!('chgrp', chgrp, dir) unless chgrp.blank?
       end
-      
       
       sh!('chmod', '-R', chmod, @course.cache_path) unless chmod.blank?
       sh!('chgrp', '-R', chgrp, @course.cache_path) unless chgrp.blank?

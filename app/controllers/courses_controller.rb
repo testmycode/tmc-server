@@ -84,7 +84,7 @@ private
 
     return nil if !exercise.visible_to?(current_user)
 
-    fields = [:name, :deadline, :return_url, :zip_url]
+    fields = [:name, :deadline, :return_url, :zip_url, :checksum]
     result = fields.reduce({}) do |r, field|
       r.merge({ field => exercise.send(field) })
     end
