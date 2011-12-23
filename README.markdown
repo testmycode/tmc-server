@@ -16,7 +16,8 @@ The system has been used by the [University of Helsinki CS Dept.](http://cs.hels
 5. Initialize the database with `env RAILS_ENV=production rake db:reset`
 6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
 7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`.
-8. Run the test suite with `rake spec`.
+8. Install ImageMagick. Documentation-generating tests use it.
+9. Run the test suite with `rake spec`.
 
 ### Startup ###
 
