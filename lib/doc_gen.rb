@@ -16,7 +16,7 @@ class DocGen
   
   def render_template(template_path)
     Capybara.using_driver :selenium do
-      @test_case.page.execute_script("window.resizeTo(800, 600);")
+      @test_case.page.execute_script("window.resizeTo(800, 600);") # Firefox is often set to block this :(
       
       template = File.read(template_path)
       b = self.send(:binding)

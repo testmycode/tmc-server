@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TestRunnerIntegrationSetup, :integration => true do
+describe RemoteSandboxForTesting, :integration => true do
   include GitTestActions
 
   describe "running tests on a new submission" do
@@ -17,7 +17,7 @@ describe TestRunnerIntegrationSetup, :integration => true do
     it "should create test results for the submission" do
       @exercise_project.solve_add
       @setup.make_zip
-      TestRunnerIntegrationSetup.run_submission_tests(@submission)
+      RemoteSandboxForTesting.run_submission(@submission)
       
       @submission.test_case_runs.should_not be_empty
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testAdd' }
@@ -34,13 +34,13 @@ describe TestRunnerIntegrationSetup, :integration => true do
     it "should raise an error if compilation of a test fails" do
       @exercise_project.introduce_compilation_error
       @setup.make_zip
-      expect { TestRunnerIntegrationSetup.run_submission_tests(@submission) }.to raise_error(/Compilation error/)
+      expect { RemoteSandboxForTesting.run_submission(@submission) }.to raise_error(/Compilation error/)
     end
     
     it "should award points for successful exercises" do
       @exercise_project.solve_sub
       @setup.make_zip
-      TestRunnerIntegrationSetup.run_submission_tests(@submission)
+      RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
       points.should include('justsub')
@@ -52,7 +52,7 @@ describe TestRunnerIntegrationSetup, :integration => true do
     it "should not award a point if all tests (potentially in multiple files) required for it don't pass" do
       @exercise_project.solve_addsub
       @setup.make_zip
-      TestRunnerIntegrationSetup.run_submission_tests(@submission)
+      RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
       points.should include('simpletest-all')
@@ -62,7 +62,7 @@ describe TestRunnerIntegrationSetup, :integration => true do
     it "should award a point if all tests (potentially in multiple files) required for it pass" do
       @exercise_project.solve_all
       @setup.make_zip
-      TestRunnerIntegrationSetup.run_submission_tests(@submission)
+      RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
       points.should include('simpletest-all')
@@ -72,11 +72,11 @@ describe TestRunnerIntegrationSetup, :integration => true do
     it "should only ever award more points, never delete old points" do
       @exercise_project.solve_sub
       @setup.make_zip
-      TestRunnerIntegrationSetup.run_submission_tests(@submission)
+      RemoteSandboxForTesting.run_submission(@submission)
       
       @exercise_project.solve_add
       @setup.make_zip
-      TestRunnerIntegrationSetup.run_submission_tests(@submission)
+      RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
       points.should include('justsub')

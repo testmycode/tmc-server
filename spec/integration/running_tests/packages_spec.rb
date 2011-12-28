@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe TestRunnerIntegrationSetup, :integration => true do
+describe RemoteSandboxForTesting, :integration => true do
   describe "when the exercise has source and test classes in packages" do
     it "should have no problems" do
       setup = SubmissionTestSetup.new(:exercise_name => 'ExerciseWithPackages')
       submission = setup.submission
       
       setup.make_zip
-      TestRunnerIntegrationSetup.run_submission_tests(submission)
+      RemoteSandboxForTesting.run_submission(submission)
       
       submission.test_case_runs.size.should == 1
       

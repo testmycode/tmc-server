@@ -12,13 +12,10 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 Dir[Rails.root.join("lib/**/*.rb")].each {|f| require f}
 
 Capybara.default_driver = :selenium
-Capybara.server_port = 3009
+Capybara.server_port = FreePorts.take_next
 
 RSpec.configure do |config|
   config.mock_with :rspec
-
-  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  #config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
   config.use_transactional_fixtures = false
 
