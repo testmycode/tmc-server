@@ -1,6 +1,6 @@
 require 'fileutils'
 
-module RemoteSandboxForTesting
+class RemoteSandboxForTesting
 
   @server_pids = nil
   @result_queue = nil
@@ -10,36 +10,18 @@ module RemoteSandboxForTesting
     @server_ports ||= [FreePorts.take_next, FreePorts.take_next]
   end
   
-  # Runs a submission and returns the hash returned by the sandbox server
-  def self.run_submission_get_result_hash(submission)
+  # Runs a submission and asserts the run succeeded, then calls SandboxResultsSaver.
+  def self.run_submission(submission)
+    submission.randomize_secret_token if submission.secret_token == nil
+  
     sandbox = RemoteSandbox.all.first
     sandbox.send_submission(submission, result_queue.receiver_url)
-    result_queue.pop
-  end
-  
-  # Runs a submission and asserts the run succeeded.
-  # Calls TestRunGrader to insert results and points into the database
-  def self.run_submission(submission)
-    notification = run_submission_get_result_hash(submission)
-    
-    case notification['status']
-      when 'timeout'
-        raise 'Timed out'
-      when 'failed'
-        if notification['exit_code'] == '101'
-          raise "Compilation error:\n" + notification['output']
-        else
-          raise 'Running the submission failed. Exit code: ' + notification['exit_code'].to_s
-        end
-      when 'finished'
-        raise 'No JSON output from test runner' if notification['output'].blank?
-        TestRunGrader.grade_results(submission, ActiveSupport::JSON.decode(notification['output']))
-      else
-        raise 'Unknown status: ' + notification['status']
-    end
+    results = result_queue.pop
+    SandboxResultsSaver.save_results(submission, results)
   end
 
 
+private
   def self.init_stubs!
     RemoteSandbox.stub!(:all) do
       if !@server_pids
@@ -48,8 +30,6 @@ module RemoteSandboxForTesting
       end
       server_ports.map {|port| RemoteSandbox.new("http://localhost:#{port}/") }
     end
-    
-    SiteSetting.all_settings['host_for_remote_sandboxes'] = "localhost:#{result_queue.receiver_port}"
   end
   
   def self.cleanup_after_all_tests!
@@ -63,8 +43,6 @@ module RemoteSandboxForTesting
     
     result_queue.cleanup!
     @result_queue = nil
-    
-    SiteSetting.reset
   end
   
 private
@@ -110,7 +88,7 @@ RSpec.configure do |config|
     RemoteSandboxForTesting.init_stubs!
   end
   
-  config.after :all do
+  config.after :suite do
     RemoteSandboxForTesting.cleanup_after_all_tests!
   end
 end

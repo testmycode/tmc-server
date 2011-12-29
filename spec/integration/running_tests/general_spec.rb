@@ -19,6 +19,8 @@ describe RemoteSandboxForTesting, :integration => true do
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
       
+      @submission.should be_processed
+      
       @submission.test_case_runs.should_not be_empty
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testAdd' }
       tcr.should_not be_nil
@@ -34,7 +36,11 @@ describe RemoteSandboxForTesting, :integration => true do
     it "should raise an error if compilation of a test fails" do
       @exercise_project.introduce_compilation_error
       @setup.make_zip
-      expect { RemoteSandboxForTesting.run_submission(@submission) }.to raise_error(/Compilation error/)
+      
+      RemoteSandboxForTesting.run_submission(@submission)
+      
+      @submission.status.should == :error
+      @submission.pretest_error.should match(/Compilation error/)
     end
     
     it "should award points for successful exercises" do
