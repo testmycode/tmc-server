@@ -15,16 +15,12 @@ class DocGen
   end
   
   def render_template(template_path)
-    Capybara.using_driver :selenium do
-      @test_case.page.execute_script("window.resizeTo(800, 600);") # Firefox is often set to block this :(
-      
-      template = File.read(template_path)
-      b = self.send(:binding)
-      text = ERB.new(template).result(b)
-      
-      FileUtils.mkdir_p(File.dirname(output_path))
-      File.open(output_path, "wb") {|f| f.write(text) }
-    end
+    template = File.read(template_path)
+    b = self.send(:binding)
+    text = ERB.new(template).result(b)
+    
+    FileUtils.mkdir_p(File.dirname(output_path))
+    File.open(output_path, "wb") {|f| f.write(text) }
   end
   
   def screenshot(options = {})
@@ -59,7 +55,11 @@ protected
   
   def screenshot_to_file(path)
     FileUtils.mkdir_p(File.dirname(path))
-    @test_case.page.driver.browser.save_screenshot(path)
+    if @test_case.page.driver.respond_to? :render
+      @test_case.page.driver.render(path) # Webkit
+    else
+      @test_case.page.driver.browser.save_screenshot(path) # Selenium
+    end
     trim_image_edges(path)
   end
   

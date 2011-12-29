@@ -17,6 +17,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 2.8.0.rc'
   gem 'factory_girl_rails', '~> 1.1.0'
   gem 'capybara', '~> 1.1.2'
+  gem 'capybara-webkit', '~> 0.7.2'
   gem 'database_cleaner', '~> 0.6.7'
   gem 'mimic', '~> 0.4.3'
   gem 'launchy'  # for capybara's save_and_open_page

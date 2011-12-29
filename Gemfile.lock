@@ -40,6 +40,8 @@ GEM
       rack-test (>= 0.5.4)
       selenium-webdriver (~> 2.0)
       xpath (~> 0.1.4)
+    capybara-webkit (0.7.2)
+      capybara (>= 1.0.0, < 1.2)
     childprocess (0.2.3)
       ffi (~> 1.0.6)
     daemons (1.1.5)
@@ -162,6 +164,7 @@ PLATFORMS
 DEPENDENCIES
   cancan (~> 1.6.7)
   capybara (~> 1.1.2)
+  capybara-webkit (~> 0.7.2)
   daemons (~> 1.1.4)
   database_cleaner (~> 0.6.7)
   factory_girl_rails (~> 1.1.0)

@@ -11,7 +11,7 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 # Require everything in lib too.
 Dir[Rails.root.join("lib/**/*.rb")].each {|f| require f}
 
-Capybara.default_driver = :selenium
+Capybara.default_driver = :webkit
 Capybara.server_port = FreePorts.take_next
 
 RSpec.configure do |config|
