@@ -84,6 +84,9 @@ require 'cgi' # for escapeHTML
   <%= screenshot %>
   <%
     click_on 'Add Course'
+    wait_until do
+      Course.count > 0
+    end
     course = Course.last
     course.should_not be_nil
   %>
