@@ -1,4 +1,5 @@
 require 'find'
+require 'pathname'
 require 'recursive_yaml_reader'
 require 'exercise_dir'
 require 'test_scanner'
@@ -33,7 +34,8 @@ private
           delete_records_for_removed_exercises
           update_exercise_options
           update_available_points
-          zip_up_exercises
+          checksum_exercises
+          zip_exercises
           set_permissions
           @course.save!
           @course.exercises.each &:save!
@@ -132,28 +134,56 @@ private
       TestScanner.get_test_case_methods(path)
     end
     
-    def zip_up_exercises
-      FileUtils.mkdir_p(@course.zip_path)
-      Dir.chdir(@course.clone_path) do
-        File.open(".gitattributes", "wb") { |f| f.write(gitattributes_for_archive) }
-        
-        @course.exercises.each do |e|
-          # The exercise record's accessors can't be reliably used here yet
-          path = "#{@course.clone_path}/#{e.path}"
-          zip_file_path = "#{@course.zip_path}/#{e.name}.zip"
-          sh!('git', 'archive', '--worktree-attributes', "--output=#{zip_file_path}", 'HEAD', path)
-          e.checksum = Digest::MD5.file(zip_file_path).hexdigest
+    def checksum_exercises
+      @course.exercises.each do |e|
+        base_path = Pathname("#{@course.clone_path}/#{e.path}")
+        digest = Digest::MD5.new
+        Dir.chdir(base_path) do
+          exercise_files_for_zip(e).each do |path|
+            digest.update(path.to_s)
+            digest.file(path.to_s) unless path.directory?
+          end
         end
+        e.checksum = digest.hexdigest
       end
     end
     
-    def gitattributes_for_archive
-      [
-        "*Hidden* export-ignore",
-        ".gitignore export-ignore",
-        ".gitkeep export-ignore",
-        "metadata.yml export-ignore"
-      ].join("\n")
+    # Returns a sorted list of relative pathnames to files of the exercise that should be
+    # checksummed and in the zip.
+    def exercise_files_for_zip(e)
+      result = []
+      base_path = Pathname("#{@course.clone_path}/#{e.path}")
+      Dir.chdir(base_path) do
+        Pathname('.').find do |path|
+          if should_skip_file_or_dir(path)
+            Find.prune
+          else
+            result << path unless path.to_s == '.'
+          end
+        end
+      end
+      result.sort
+    end
+    
+    def should_skip_file_or_dir(path)
+      fn = path.basename.to_s
+      [fn.include?('Hidden'), fn.start_with?('.git'), fn == 'metadata.yml'].any?
+    end
+    
+    def zip_exercises
+      FileUtils.mkdir_p(@course.zip_path)
+      @course.exercises.each do |e|
+        base_path = Pathname("#{@course.clone_path}/#{e.path}")
+        zip_file_path = "#{@course.zip_path}/#{e.name}.zip"
+        
+        Dir.chdir(@course.clone_path) do
+          IO.popen(mk_command(['zip', '--quiet', '-@', zip_file_path]), 'w') do |pipe|
+            exercise_files_for_zip(e).each do |path|
+              pipe.puts(Pathname(e.path) + path)
+            end
+          end
+        end
+      end
     end
     
     def set_permissions

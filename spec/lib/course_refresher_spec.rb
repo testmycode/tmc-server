@@ -213,8 +213,8 @@ describe CourseRefresher do
     refresher.refresh_course(course)
 
     sh!('unzip', course.zip_path + '/MyExercise.zip')
-    File.should exist('MyExercise/test/SimpleTest.java')
     File.should_not exist('MyExercise/test/SimpleHiddenTest.java')
+    File.should exist('MyExercise/test/SimpleTest.java')
   end
 
   it "should not include metadata files in the zips" do
@@ -263,20 +263,29 @@ describe CourseRefresher do
     File.should_not exist(expected_path + '/foo.txt')
   end
   
-  it "should store the checksum of each exercise's zip in the database" do
+  it "should store the checksum of each exercise's files in the database" do
     local_repo = add_exercise('MyExercise')
+    local_repo.write_file('MyExercise/foo.txt', 'something')
+    local_repo.add_commit_push
     
     refresher.refresh_course(course)
     cs1 = course.exercises.first.checksum
+    
+    local_repo.write_file('MyExercise/foo.txt', 'something else')
+    local_repo.add_commit_push
+    local_repo.write_file('MyExercise/foo.txt', 'something')
+    local_repo.add_commit_push
+    
     refresher.refresh_course(course)
     cs2 = course.exercises.first.checksum
-    local_repo.write_file('MyExercise/foo.txt', 'hello')
+    
+    local_repo.write_file('MyExercise/foo.txt', 'something else')
     local_repo.add_commit_push
     refresher.refresh_course(course)
     cs3 = course.exercises.first.checksum
     
     [cs1, cs2, cs3].each {|cs| cs.should_not be_blank }
-    cs1.should == cs2
+    cs1.should == cs2 # Only file contents should be checksummed
     cs2.should_not == cs3
   end
 
