@@ -16,12 +16,12 @@ class Exercise < ActiveRecord::Base
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
   }
 
-  def path
+  def relative_path
     name.gsub('-', '/')
   end
 
-  def fullpath
-    "#{course.clone_path}/#{self.path}"
+  def clone_path
+    "#{course.clone_path}/#{self.relative_path}"
   end
 
   def zip_file_path
@@ -118,9 +118,9 @@ EOS
     if returnable_forced != nil
       returnable_forced
     else
-      File.exist?(fullpath) &&
-        File.exist?("#{fullpath}/test") &&
-        !(Dir.entries("#{fullpath}/test") - ['.', '..', '.gitkeep', '.gitignore']).empty?
+      File.exist?(clone_path) &&
+        File.exist?("#{clone_path}/test") &&
+        !(Dir.entries("#{clone_path}/test") - ['.', '..', '.gitkeep', '.gitignore']).empty?
     end
   end
 

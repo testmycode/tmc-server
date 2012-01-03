@@ -48,7 +48,7 @@ describe SubmissionPackager do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.read('test/SimpleTest.java').should == File.read(@exercise.fullpath + '/test/SimpleTest.java')
+        File.read('test/SimpleTest.java').should == File.read(@exercise.clone_path + '/test/SimpleTest.java')
         File.should_not exist('test/NewTest.java')
       end
     end

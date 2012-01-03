@@ -129,21 +129,21 @@ describe Exercise do
     ex = Factory.create(:exercise, :course => course)
     FileUtils.mkdir_p('FakeCache/test')
     FileUtils.touch('FakeCache/test/Xoo.java')
-    ex.stub(:fullpath => 'FakeCache')
+    ex.stub(:clone_path => 'FakeCache')
     ex.should be_returnable
   end
 
   it "should be non-returnable by default if there is an empty test dir" do
     ex = Factory.create(:exercise, :course => course)
     FileUtils.mkdir_p('FakeCache/test')
-    ex.stub(:fullpath => 'FakeCache')
+    ex.stub(:clone_path => 'FakeCache')
     ex.should_not be_returnable
   end
 
   it "should be non-returnable by default if there is no test dir" do
     ex = Factory.create(:exercise, :course => course)
     FileUtils.mkdir_p('FakeCache')
-    ex.stub(:fullpath => 'FakeCache')
+    ex.stub(:clone_path => 'FakeCache')
     ex.should_not be_returnable
   end
 

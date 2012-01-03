@@ -101,7 +101,7 @@ private
       @course.exercises.each do |e|
         e.options = reader.read_settings({
           :root_dir => @course.clone_path,
-          :target_dir => File.join(@course.clone_path, e.path),
+          :target_dir => File.join(@course.clone_path, e.relative_path),
           :file_name => 'metadata.yml',
           :defaults => Exercise.default_options
         })
@@ -130,13 +130,13 @@ private
     end
     
     def test_case_methods(exercise)
-      path = File.join(@course.clone_path, exercise.path)
+      path = File.join(@course.clone_path, exercise.relative_path)
       TestScanner.get_test_case_methods(path)
     end
     
     def checksum_exercises
       @course.exercises.each do |e|
-        base_path = Pathname("#{@course.clone_path}/#{e.path}")
+        base_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         digest = Digest::MD5.new
         Dir.chdir(base_path) do
           exercise_files_for_zip(e).each do |path|
@@ -152,7 +152,7 @@ private
     # checksummed and in the zip.
     def exercise_files_for_zip(e)
       result = []
-      base_path = Pathname("#{@course.clone_path}/#{e.path}")
+      base_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
       Dir.chdir(base_path) do
         Pathname('.').find do |path|
           if should_skip_file_or_dir(path)
@@ -173,13 +173,13 @@ private
     def zip_exercises
       FileUtils.mkdir_p(@course.zip_path)
       @course.exercises.each do |e|
-        base_path = Pathname("#{@course.clone_path}/#{e.path}")
+        base_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         zip_file_path = "#{@course.zip_path}/#{e.name}.zip"
         
         Dir.chdir(@course.clone_path) do
           IO.popen(mk_command(['zip', '--quiet', '-@', zip_file_path]), 'w') do |pipe|
             exercise_files_for_zip(e).each do |path|
-              pipe.puts(Pathname(e.path) + path)
+              pipe.puts(Pathname(e.relative_path) + path)
             end
           end
         end
