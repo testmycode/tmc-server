@@ -24,6 +24,14 @@ class Exercise < ActiveRecord::Base
     "#{course.clone_path}/#{self.relative_path}"
   end
 
+  def solution_path
+    "#{course.solution_path}/#{self.relative_path}"
+  end
+
+  def stub_path
+    "#{course.stub_path}/#{self.relative_path}"
+  end
+
   def zip_file_path
     "#{course.zip_path}/#{self.name}.zip"
   end

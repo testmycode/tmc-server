@@ -198,7 +198,39 @@ describe CourseRefresher do
     AwardedPoint.all.should include(awarded_point)
   end
 
-  it "should generate exercise zip files" do
+  it "should generate stub versions of exercises" do
+    # Tested more thoroughly in lib/course_refresher/exercise_file_filter_spec.rb
+    add_exercise('MyExercise')
+
+    refresher.refresh_course(course)
+    
+    stub = Exercise.find_by_name('MyExercise').stub_path
+    
+    simple_stuff = File.read(stub + '/src/SimpleStuff.java')
+    simple_stuff.should_not include('return a + b;')
+    simple_stuff.should include('return 0;')
+    simple_stuff.should_not include('STUB:')
+    
+    File.should_not exist(stub + '/test/SimpleHiddenTest.java')
+  end
+  
+  it "should generate solution versions of exercises" do
+    # Tested more thoroughly in lib/course_refresher/exercise_file_filter_spec.rb
+    add_exercise('MyExercise')
+
+    refresher.refresh_course(course)
+    
+    solution = Exercise.find_by_name('MyExercise').solution_path
+    
+    simple_stuff = File.read(solution + '/src/SimpleStuff.java')
+    simple_stuff.should include('return a + b;')
+    simple_stuff.should_not include('BEGIN SOLUTION')
+    simple_stuff.should_not include('return 0;')
+    
+    File.should_not exist(solution + '/test/SimpleHiddenTest.java')
+  end
+  
+  it "should generate zips from the stubs" do
     add_exercise('MyExercise')
     add_exercise('MyCategory/MyExercise')
 
@@ -229,7 +261,7 @@ describe CourseRefresher do
     File.should exist('MyExercise/non-metadata.yml')
   end
 
-  it "should delete zip files of removed exercises" do
+  it "should not remake zip files of removed exercises" do
     add_exercise('MyCategory/MyExercise')
     refresher.refresh_course(course)
 
@@ -315,7 +347,7 @@ describe CourseRefresher do
   def add_exercise(dest_name, options = {})
     options = {
       :commit => true,
-      :fixture_name => 'SimpleExercise'
+      :fixture_name => 'SimpleExerciseWithSolutionsAndStubs'
     }.merge options
     local_clone.copy_fixture_exercise(options[:fixture_name], dest_name)
     local_clone.add_commit_push if options[:commit]

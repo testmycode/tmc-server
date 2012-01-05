@@ -4,6 +4,7 @@ require 'recursive_yaml_reader'
 require 'exercise_dir'
 require 'test_scanner'
 require 'digest/md5'
+require 'course_refresher/exercise_file_filter'
 
 # Safely refreshes a course from a git repository
 class CourseRefresher
@@ -34,8 +35,10 @@ private
           delete_records_for_removed_exercises
           update_exercise_options
           update_available_points
-          checksum_exercises
-          zip_exercises
+          make_solutions
+          make_stubs
+          checksum_stubs
+          make_zips_of_stubs
           set_permissions
           @course.save!
           @course.exercises.each &:save!
@@ -134,12 +137,43 @@ private
       TestScanner.get_test_case_methods(path)
     end
     
-    def checksum_exercises
+    def make_solutions
+      @course.exercises.each do |e|
+        clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
+        solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
+        FileUtils.mkdir_p(solution_path)
+        ExerciseFileFilter.new.make_solution(clone_path, solution_path)
+      end
+    end
+    
+    def make_stubs
+      @course.exercises.each do |e|
+        clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
+        stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
+        FileUtils.mkdir_p(stub_path)
+        ExerciseFileFilter.new.make_stub(clone_path, stub_path)
+      end
+    end
+    
+    # Returns a sorted list of relative pathnames to stub files of the exercise.
+    # These are checksummed and zipped.
+    def stub_files(e)
+      result = []
+      base_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
+      Dir.chdir(base_path) do
+        Pathname('.').find do |path|
+          result << path unless path.to_s == '.'
+        end
+      end
+      result.sort
+    end
+    
+    def checksum_stubs
       @course.exercises.each do |e|
         base_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         digest = Digest::MD5.new
         Dir.chdir(base_path) do
-          exercise_files_for_zip(e).each do |path|
+          stub_files(e).each do |path|
             digest.update(path.to_s)
             digest.file(path.to_s) unless path.directory?
           end
@@ -148,37 +182,14 @@ private
       end
     end
     
-    # Returns a sorted list of relative pathnames to files of the exercise that should be
-    # checksummed and in the zip.
-    def exercise_files_for_zip(e)
-      result = []
-      base_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
-      Dir.chdir(base_path) do
-        Pathname('.').find do |path|
-          if should_skip_file_or_dir(path)
-            Find.prune
-          else
-            result << path unless path.to_s == '.'
-          end
-        end
-      end
-      result.sort
-    end
-    
-    def should_skip_file_or_dir(path)
-      fn = path.basename.to_s
-      [fn.include?('Hidden'), fn.start_with?('.git'), fn == 'metadata.yml'].any?
-    end
-    
-    def zip_exercises
+    def make_zips_of_stubs #TODO: refactor
       FileUtils.mkdir_p(@course.zip_path)
       @course.exercises.each do |e|
-        base_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         zip_file_path = "#{@course.zip_path}/#{e.name}.zip"
         
-        Dir.chdir(@course.clone_path) do
+        Dir.chdir(@course.stub_path) do
           IO.popen(mk_command(['zip', '--quiet', '-@', zip_file_path]), 'w') do |pipe|
-            exercise_files_for_zip(e).each do |path|
+            stub_files(e).each do |path|
               pipe.puts(Pathname(e.relative_path) + path)
             end
           end

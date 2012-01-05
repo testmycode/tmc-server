@@ -83,7 +83,17 @@ describe SubmissionPackager do
           sh! ['tar', 'xf', @tar_path]
           File.should_not exist('classes/main/SimpleStuff.class')
           File.should_not exist('output.txt')
-          sh! ['./tmc-run']
+          
+          begin
+            sh! ['./tmc-run']
+          rescue
+            if File.exist?('output.txt')
+              raise($!.message + "\n" + "The contents of output.txt:\n" + File.read('output.txt'))
+            else
+              raise
+            end
+          end
+          
           File.should exist('classes/main/SimpleStuff.class')
           File.should exist('output.txt')
         end

@@ -74,13 +74,24 @@ class Course < ActiveRecord::Base
     "#{Course.cache_root}/#{self.name}-#{self.cache_version}"
   end
   
-  def zip_path
-    "#{cache_path}/zip"
-  end
-
-  # A mirror/checkout/clone of the course
+  # A clone of the course repository
   def clone_path
     "#{cache_path}/clone"
+  end
+  
+  # Directory for solutions
+  def solution_path
+    "#{cache_path}/solution"
+  end
+  
+  # Directory for stubs
+  def stub_path
+    "#{cache_path}/stub"
+  end
+  
+  # Directory for zips of the stubs
+  def zip_path
+    "#{cache_path}/zip"
   end
   
   def refresh
