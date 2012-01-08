@@ -101,7 +101,7 @@ describe SubmissionsController do
       @user = Factory.create(:user)
       controller.current_user = @user
       
-      @submission = mock_model(Submission, :user_id => @user.id)
+      @submission = mock_model(Submission, :user_id => @user.id, :course => @course, :exercise => @exercise)
       Submission.stub(:find).with(@submission.id.to_s).and_return(@submission)
     end
     
