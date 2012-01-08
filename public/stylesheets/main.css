@@ -139,6 +139,12 @@ body {
   font-weight: bold;
 }
 
+#title-area > #login > #registration-link {
+  font-weight: bold;
+  margin-top: 5pt;
+  float: right;
+}
+
 #navigation-area {
   clear: both;
   background-color: #F5F9FD;

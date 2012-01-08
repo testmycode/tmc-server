@@ -24,6 +24,9 @@
 
       <div id="login">
         <%= render 'sessions/login_form' %>
+        <% if !signed_in? %>
+          <%= link_to 'Sign up', new_user_path, :id => 'registration-link' %>
+        <% end %>
       </div>
     </div>
 

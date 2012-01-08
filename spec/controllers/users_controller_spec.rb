@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe ProfilesController do
+describe UsersController do
   describe "GET show" do
     describe "when accessed as a guest" do
       before :each do
         controller.current_user.should be_guest
       end
       
-      it "should redirect to the front page" do
+      it "should not deny access" do
         get :show
         response.status.should == 403
       end
@@ -25,6 +25,67 @@ describe ProfilesController do
     end
   end
   
+  describe "POST create" do
+    before :each do
+      @valid_attrs = {
+        :login => 'asd',
+        :email => 'asd@example.com',
+        :email_repeat => 'asd@example.com',
+        :password => 'xoox',
+        :password_repeat => 'xoox'
+      }
+    end
+  
+    it "should create a new user account" do
+      post :create, :user => @valid_attrs
+      
+      response.should redirect_to(root_path)
+      user = User.find_by_login(@valid_attrs[:login])
+      user.should_not be_nil
+      user.email.should == @valid_attrs[:email]
+      user.should have_password(@valid_attrs[:password])
+    end
+  
+    it "should require a username" do
+      @valid_attrs.delete :login
+      post :create, :user => @valid_attrs
+      response.should_not be_successful
+    end
+    
+    it "should require the username to be unique" do
+      post :create, :user => @valid_attrs
+      @valid_attrs[:email] = @valid_attrs[:email_repeat] = 'bsd@example.com'
+      post :create, :user => @valid_attrs
+      response.should_not be_successful
+    end
+    
+    it "should require an email" do
+      @valid_attrs.delete :email
+      @valid_attrs.delete :email_repeat
+      post :create, :user => @valid_attrs
+      response.should_not be_successful
+    end
+    
+    it "should require an email confirmation" do
+      @valid_attrs.delete :email_repeat
+      post :create, :user => @valid_attrs
+      response.should_not be_successful
+    end
+    
+    it "should require a password" do
+      @valid_attrs.delete :password
+      @valid_attrs.delete :password_repeat
+      post :create, :user => @valid_attrs
+      response.should_not be_successful
+    end
+    
+    it "should require a password confirmation" do
+      @valid_attrs.delete :password_repeat
+      post :create, :user => @valid_attrs
+      response.should_not be_successful      
+    end
+  end
+  
   describe "PUT update" do
     before :each do
       @user = Factory.create(:user, :email => 'oldemail')
@@ -33,14 +94,14 @@ describe ProfilesController do
     
     it "should save the email field" do
       put :update, :user => { :email => 'newemail' }
-      response.should redirect_to(profile_path)
+      response.should redirect_to(user_path)
       @user.reload.email.should == 'newemail'
     end
     
     it "should not allow changing the login" do
       old_login = @user.login
       put :update, :user => { :email => 'newemail', :login => 'newlogin' }
-      response.should redirect_to(profile_path)
+      response.should redirect_to(user_path)
       @user.reload.login.should == old_login
     end
     
@@ -55,7 +116,7 @@ describe ProfilesController do
       
       it "should not try to change the password unless specified" do
         put :update, :user => params
-        response.should redirect_to(profile_path)
+        response.should redirect_to(user_path)
         @user.reload.should have_password('oldpassword')
       end
       
@@ -65,7 +126,7 @@ describe ProfilesController do
           :password => 'newpassword',
           :password_repeat => 'newpassword'
         })
-        response.should redirect_to(profile_path)
+        response.should redirect_to(user_path)
         @user.reload.should have_password('newpassword')
       end
       

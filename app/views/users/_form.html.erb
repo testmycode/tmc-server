@@ -1,0 +1,33 @@
+<%= form_for @user, :url => { :action => :update } do |f| %>
+  <%= render 'shared/error_messages', :target => @user %>
+
+  <section>
+    <h2>User account</h2>
+    <%= labeled_field('Username:', f.text_field(:login, :disabled => !@user.new_record?)) %>
+    <%= labeled_field('E-mail:', f.text_field(:email)) %>
+    <%= labeled_field('Confirm e-mail:', f.text_field(:email_repeat, :value => '')) %>
+  </section>
+  
+  <% if @user.new_record? %>
+    <section>
+      <h2>Password</h2>
+      <%= labeled_field('Password:', f.password_field(:password, :value => '', :autocomplete => 'off')) %>
+      <%= labeled_field('Confirm password:', f.password_field(:password_repeat, :value => '', :autocomplete => 'off')) %>
+    </section>
+  <% else %>
+    <section>
+      <h2>Change password</h2>
+      <%= labeled_field('Old password:', f.password_field(:old_password, :value => '')) %>
+      <%= labeled_field('New password:', f.password_field(:password, :value => '')) %>
+      <%= labeled_field('Confirm new password:', f.password_field(:password_repeat, :value => '')) %>
+    </section>
+  <% end %>
+  
+  <section>
+    <% if @user.new_record? %>
+      <%= f.submit "Sign up" %>
+    <% else %>
+      <%= f.submit "Save" %>
+    <% end %>
+  </section>
+<% end %>
