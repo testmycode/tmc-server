@@ -7,6 +7,10 @@ class SubmissionsController < ApplicationController
   def show
     @submission = Submission.find(params[:id])
     authorize! :read, @submission
+    
+    # Set the following for the breadcrumb
+    @course = @submission.course
+    @exercise = @submission.exercise
 
     respond_to do |format|
       format.html

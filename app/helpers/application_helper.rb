@@ -31,7 +31,7 @@ EOS
   def breadcrumb
     parts = []
     
-    parts << link_to('Courses', courses_path)
+    parts << link_to('TMC', root_path)
     
     if @course && !@course.new_record?
       parts << link_to(@course.name, @course)
@@ -48,6 +48,12 @@ EOS
       elsif @submission && !@submission.new_record?
         parts << "(deleted exercise #{@submission.exercise_name})"
         parts << link_to("Submission ##{@submission.id}", submission_path(@submission))
+      end
+    elsif @user
+      if @user.new_record?
+        parts << link_to("Sign up", new_user_path)
+      else
+        parts << link_to("User account", user_path)
       end
     end
     raw(parts.join(' &raquo; '))

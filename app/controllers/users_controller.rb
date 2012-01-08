@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   def new
     if signed_in?
       # Logged in from this page. No need to be here, so redirect away
-      redirect_to root_page
+      redirect_to root_path
     else
       @user = User.new
     end
