@@ -133,16 +133,16 @@ body {
 #title-area > #login {
   margin-top: 20px;
   float: right;
+  text-align: right;
 }
 
 #title-area > #login > #logout-link {
   font-weight: bold;
 }
 
-#title-area > #login > #registration-link {
+#title-area > #login > #account-details {
   font-weight: bold;
   margin-top: 5pt;
-  float: right;
 }
 
 #navigation-area {
