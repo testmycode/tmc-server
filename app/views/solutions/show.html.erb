@@ -1,0 +1,17 @@
+<h1>Solution for <%= @exercise.name %></h1>
+
+<%= stylesheet_link_tag 'shCore', 'shThemeDefault' %>
+<%= javascript_include_tag 'shCore', 'shBrushJava' %>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  SyntaxHighlighter.all();
+});
+</script>
+
+<div class="solution-files">
+  <% for file in @solution.files %>
+    <h2><%= file[:path] %></h2>
+    <pre class="brush: java"><%= file[:content] %></pre>
+  <% end %>
+</div>

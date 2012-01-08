@@ -21,6 +21,7 @@ SandboxServer::Application.routes.draw do
 
     resources :exercises, :except => [:destroy, :create] do
       resources :submissions, :only => [:create, :index]
+      resource :solution, :only => [:show]
     end
   end
 

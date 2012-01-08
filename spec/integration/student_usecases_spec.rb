@@ -106,4 +106,8 @@ describe "The system (used by a student)", :integration => true do
   it "should not accept submissions for hidden courses"
 
   it "should not show the submission form for unreturnable exercises"
+  
+  it "should show solutions for completed exercises"
+  
+  it "should not show solutions for uncompleted exercises"
 end

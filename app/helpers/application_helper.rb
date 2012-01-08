@@ -41,7 +41,10 @@ EOS
         
         if @submission && !@submission.new_record? && @submission.exercise == @exercise
           parts << link_to("Submission ##{@submission.id}", submission_path(@submission))
+        elsif @solution
+          parts << link_to('Suggested solution', course_exercise_solution_path(@course, @exercise))
         end
+        
       elsif @submission && !@submission.new_record?
         parts << "(deleted exercise #{@submission.exercise_name})"
         parts << link_to("Submission ##{@submission.id}", submission_path(@submission))

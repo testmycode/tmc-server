@@ -43,6 +43,10 @@ class Exercise < ActiveRecord::Base
   def return_url
     "#{course_exercise_submissions_url(self.course, self)}.json"
   end
+  
+  def solution
+    Solution.new(self)
+  end
 
   # Whether a user may make submissions
   def submittable_by?(user)

@@ -19,6 +19,10 @@ class Ability
       can :create, Submission do |sub|
         sub.exercise.submittable_by?(user)
       end
+      
+      can :read, Solution do |sol|
+        sol.visible_to?(user)
+      end
     end
   end
 end
