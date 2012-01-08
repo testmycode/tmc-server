@@ -7,9 +7,10 @@ class CourseRefresher
       from_dir = Pathname(from_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
       
-      for_each_file_in_stub_or_solution(from_dir, to_dir) do |rel_path|
+      paths = files_for_stub(from_dir)
+      while_copying(from_dir, to_dir, paths) do |rel_path|
         contents = filter_for_stub(from_dir + rel_path)
-        File.open(to_dir + rel_path, 'wb') {|f| f.write(contents) } unless contents.nil?
+        write_file(to_dir + rel_path, contents) unless contents.nil?
       end
     end
     
@@ -17,15 +18,19 @@ class CourseRefresher
       from_dir = Pathname(from_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
       
-      for_each_file_in_stub_or_solution(from_dir, to_dir) do |rel_path|
+      paths = files_for_solution(from_dir)
+      while_copying(from_dir, to_dir, paths) do |rel_path|
         contents = filter_for_solution(from_dir + rel_path)
-        File.open(to_dir + rel_path, 'wb') {|f| f.write(contents) } unless contents.nil?
+        write_file(to_dir + rel_path, contents) unless contents.nil?
       end
     end
     
   private
-    def for_each_file_in_stub_or_solution(from_dir, to_dir, &block)
-      paths = files_for_stub_or_solution(from_dir)
+    def write_file(path, contents)
+      File.open(path, 'wb') {|f| f.write(contents) }
+    end
+    
+    def while_copying(from_dir, to_dir, paths, &block)
       for path in paths
         if (from_dir + path).directory?
           FileUtils.mkdir_p(to_dir + path)
@@ -36,23 +41,41 @@ class CourseRefresher
     end
   
     # Returns a sorted list of relative pathnames to files that should be in the stub
-    def files_for_stub_or_solution(base_path)
+    def files_for_stub(from_dir)
+      filter_relative_pathnames(from_dir) do |path|
+        should_include_in_stub(path)
+      end
+    end
+    
+    def files_for_solution(from_dir)
+      filter_relative_pathnames(from_dir) do |path|
+        should_include_in_solution(path)
+      end
+    end
+    
+    def filter_relative_pathnames(dir, &block)
       result = []
-      Dir.chdir(base_path) do
+      Dir.chdir(dir) do
         Pathname('.').find do |path|
-          if should_skip_file_or_dir(path)
-            Find.prune
-          else
+          if block.call(path)
             result << path unless path.to_s == '.'
+          else
+            Find.prune
           end
         end
       end
       result.sort
     end
     
-    def should_skip_file_or_dir(path)
+    def should_include_in_stub(path)
       fn = path.basename.to_s
-      [fn.include?('Hidden'), fn.start_with?('.git'), fn == 'metadata.yml'].any?
+      !(fn.include?('Hidden') || fn.start_with?('.git') || fn == 'metadata.yml')
+    end
+    
+    def should_include_in_solution(path)
+      fn = path.basename.to_s
+      rel_path = path.to_s
+      !(rel_path =~ /(?:^|\/)test(?:\/|$)/ || fn.start_with?('.git') || fn == 'metadata.yml')
     end
     
     

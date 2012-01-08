@@ -183,10 +183,12 @@ EOF
     end
     
     
-    it "should not include hidden tests" do
-      make_file('original/HiddenThing.java', '...')
+    it "should not include any tests" do
+      FileUtils.mkdir_p('original/stuff/test')
+      make_file('original/stuff/test/Foo.java', '...')
       @filter.make_solution('original', 'solution')
-      File.should_not exist('solution/HiddenThing.java')
+      File.should_not exist('solution/stuff/test/Foo.java')
+      File.should_not exist('solution/stuff/test')
     end
     
     it "should not include metadata files" do
