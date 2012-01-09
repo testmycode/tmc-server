@@ -7,6 +7,12 @@ The system has been used by the [University of Helsinki CS Dept.](http://cs.hels
 
 ## Setup ##
 
+### System Dependencies ###
+
+The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`.
+
+An X server is currently needed for tests to pass (required by [capybara-webkit](https://github.com/thoughtbot/capybara-webkit)). `Xvfb` will do, but remember to set your `DISPLAY`.
+
 ### One-time setup ###
 
 1. Download submodules with `git submodule update --init --recursive`
@@ -16,8 +22,7 @@ The system has been used by the [University of Helsinki CS Dept.](http://cs.hels
 5. Initialize the database with `env RAILS_ENV=production rake db:reset`
 6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
 7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`.
-8. Install ImageMagick. Documentation-generating tests use it.
-9. Run the test suite with `rake spec`.
+8. Run the test suite with `rake spec`.
 
 ### Startup ###
 
