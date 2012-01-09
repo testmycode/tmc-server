@@ -11,9 +11,9 @@ gem 'rest-client', '~> 1.6.7'
 gem 'daemons', '~> 1.1.4'
 
 group :development, :test do
-  gem 'rspec', '~> 2.8.0.rc'
-  gem 'rspec-core', '~> 2.8.0.rc'
-  gem 'rspec-rails', '~> 2.8.0.rc'
+  gem 'rspec', '~> 2.8.0'
+  gem 'rspec-core', '~> 2.8.0'
+  gem 'rspec-rails', '~> 2.8.0'
   gem 'factory_girl_rails', '~> 1.1.0'
   gem 'capybara', '~> 1.1.2'
   gem 'capybara-webkit', '~> 0.7.2'
