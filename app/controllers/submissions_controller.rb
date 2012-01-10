@@ -35,6 +35,11 @@ class SubmissionsController < ApplicationController
           }
           end
         )
+        
+        if @exercise.solution.visible_to?(current_user)
+          output[:solution_url] = view_context.exercise_solution_url(@exercise)
+        end
+        
         render :json => output
       end
     end
