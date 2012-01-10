@@ -28,7 +28,7 @@ module IntegrationTestActions
     visit '/courses'
     click_link coursename
     click_button 'Refresh from repository'
-    page.should have_content('Course refreshed from repository.')
+    page.should have_content('Refresh successful.')
   end
   
   # Evil override fix for Capybara 1.1.2 + Selenium + Firefox 7.

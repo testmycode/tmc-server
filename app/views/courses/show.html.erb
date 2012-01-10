@@ -3,6 +3,10 @@
   <%= @course.name %>
 </h1>
 
+<% if @refresh_report %>
+  <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
+<% end %>
+
 <ul>
   <li><%= link_to 'View points', course_points_path(@course) %></li>
 </ul>

@@ -1,0 +1,14 @@
+<% if report.successful? %>
+  <p class="success">Refresh successful.</p>
+<% else %>
+  <p class="error">Refresh failed and rolled back.</p>
+<% end %>
+
+<ul>
+  <% for warning in report.warnings %>
+    <li class="warning"><pre><%= warning %></pre></li>
+  <% end %>
+  <% for error in report.errors %>
+    <li class="error"><pre><%= error %></pre></li>
+  <% end %>
+</ul>

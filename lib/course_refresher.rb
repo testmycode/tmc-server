@@ -13,12 +13,35 @@ class CourseRefresher
     Impl.new.refresh_course(course)
   end
   
+  class Report
+    def initialize
+      @errors = []
+      @warnings = []
+    end
+    attr_reader :errors
+    attr_reader :warnings
+    
+    def successful?
+      @errors.empty?
+    end
+  end
+  
+  class Failure < StandardError
+    def initialize(report)
+      super("Course refresh failed")
+      @report = report
+    end
+    attr_reader :report
+  end
+  
 private
 
   class Impl
     include SystemCommands
     
     def refresh_course(course)
+      @report = Report.new
+      
       Course.transaction(:requires_new => true) do
         @course = Course.find(course.id, :lock => true)
         
@@ -43,18 +66,18 @@ private
           @course.save!
           @course.exercises.each &:save!
         rescue
-          begin
-            # Delete the new cache we were working on
-            FileUtils.rm_rf(@course.cache_path)
-          ensure
-            raise
-          end
+          @report.errors << $!.to_s
+          # Delete the new cache we were working on
+          FileUtils.rm_rf(@course.cache_path)
+        else
+          FileUtils.rm_rf(@old_cache_path)
         end
-        
-        FileUtils.rm_rf(@old_cache_path)
       end
       
       course.reload # reload the record given as parameter
+      
+      raise Failure.new(@report) unless @report.errors.empty?
+      @report
     end
   
     
@@ -102,13 +125,17 @@ private
     def update_exercise_options
       reader = RecursiveYamlReader.new
       @course.exercises.each do |e|
-        e.options = reader.read_settings({
-          :root_dir => @course.clone_path,
-          :target_dir => File.join(@course.clone_path, e.relative_path),
-          :file_name => 'metadata.yml',
-          :defaults => Exercise.default_options
-        })
-        e.save!
+        begin
+          e.options = reader.read_settings({
+            :root_dir => @course.clone_path,
+            :target_dir => File.join(@course.clone_path, e.relative_path),
+            :file_name => 'metadata.yml',
+            :defaults => Exercise.default_options
+          })
+          e.save!
+        rescue SyntaxError
+          @report.errors << "Failed to parse metadata: #{$!}"
+        end
       end
     end
     

@@ -54,15 +54,25 @@ module TmcJunitRunner
     ExerciseDir.find_exercise_dirs(course_or_exercise_path).each do |exdir|
       ex_cp = exdir.library_jars.map(&:to_s).join(':')
       runner_cp = classpath
-      cmd = mk_command([
-        'java',
-        '-cp',
-        runner_cp + ':' + ex_cp,
-        "#{package}.testscanner.TestScanner",
-        exdir.path.to_s
-      ])
-      output = `#{cmd}`
-      result += parse_test_scanner_output(output)
+      
+      Dir.mktmpdir do |tmpdir|
+        stderr_file = "#{tmpdir}/stderr"
+        cmd = mk_command([
+          'java',
+          '-cp',
+          runner_cp + ':' + ex_cp,
+          "#{package}.testscanner.TestScanner",
+          exdir.path.to_s
+        ])
+        
+        output = `#{cmd} 2>#{Shellwords.escape(stderr_file)}`
+        
+        if !$?.success?
+          raise File.read(stderr_file)
+        end
+        
+        result += parse_test_scanner_output(output)
+      end
     end
     result
   end

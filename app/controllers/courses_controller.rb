@@ -1,3 +1,5 @@
+require 'course_refresher'
+
 class CoursesController < ApplicationController
   def index
     ordering = 'LOWER(name)'
@@ -29,26 +31,21 @@ class CoursesController < ApplicationController
   end
 
   def show
-    @course = Course.find(params[:id])
-    @exercises = @course.exercises.order('LOWER(name)').select {|ex| ex.visible_to?(current_user) }
-    authorize! :read, @course
-    authorize! :read, @exercises
-
-    unless current_user.guest?
-      @submissions = @course.submissions
-      @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
-      @submissions = @submissions.order('created_at DESC').limit(500)
-      authorize! :read, @submissions
-    end
+    assign_show_view_vars
   end
 
   def refresh
     @course = Course.find(params[:id])
-    authorize! :refresh, @exercises
+    authorize! :refresh, @course
 
-    @course.refresh
-    redirect_to course_path(@course),
-      :notice => 'Course refreshed from repository.'
+    begin
+      @refresh_report = @course.refresh
+    rescue CourseRefresher::Failure => e
+      @refresh_report = e.report
+    end
+    
+    assign_show_view_vars
+    render :action => :show
   end
 
   def new
@@ -78,6 +75,20 @@ class CoursesController < ApplicationController
   end
 
 private
+
+  def assign_show_view_vars
+    @course = Course.find(params[:id])
+    @exercises = @course.exercises.order('LOWER(name)').select {|ex| ex.visible_to?(current_user) }
+    authorize! :read, @course
+    authorize! :read, @exercises
+
+    unless current_user.guest?
+      @submissions = @course.submissions
+      @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
+      @submissions = @submissions.order('created_at DESC').limit(500)
+      authorize! :read, @submissions
+    end
+  end
 
   def exercise_data_for_json(exercise)
     authorize! :read, exercise
