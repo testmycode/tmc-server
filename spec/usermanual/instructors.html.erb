@@ -11,16 +11,30 @@ require 'cgi' # for escapeHTML
   <link rel="stylesheet" type="text/css" href="../css/usermanual.css" />
   <link rel="stylesheet" type="text/css" href="../lib/shjs/sh_style.css" />
   
+  <script type="text/javascript" src="../lib/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="../lib/shjs/sh_main.min.js"></script>
   <script type="text/javascript" src="../lib/shjs/sh_java.min.js"></script>
-</head>
-<body onload="sh_highlightDocument();">
+  <script type="text/javascript" src="../js/toc.js"></script>
   
+  <script type="text/javascript">
+    $(document).ready(function() {
+      sh_highlightDocument();
+      $('#toc').prepend('<h2>Contents</h2>');
+      makeToc($('#toc'));
+    });
+  </script>
+</head>
+<body>
+
   <%
     Factory.create(:admin, :login => 'admin', :password => 'admin')
   %>
   
-  <h1>How to administer exercises with TMC</h1>
+  <h1>TMC Manual for Instructors</h1>
+  
+  <div id="toc"></div>
+  
+  <h2>Creating a course</h2>
   
   <p>
     TMC exercises are stored in a <a href="http://git-scm.com/">git</a>
@@ -30,9 +44,7 @@ require 'cgi' # for escapeHTML
     that saves time and frustration even when working alone.
   </p>
   
-  <h2>Creating a course</h2>
-  
-  <p>First let's log in as an administrator.</p>
+  <p>Let's log in as an administrator.</p>
   
   <%
     visit '/'
@@ -75,9 +87,9 @@ require 'cgi' # for escapeHTML
   
   <p>
     You need to give a remote GIT repository address.
-    <a href="https://github.com/">GitHub</a> is an excellent place to get free Git hosting.
-    If you have an existing repository, say on GitHub, enter its <em>read-only</em> URL as
-    the remote repo. In this example we'll pretend the remote repo is at
+    If you have an existing repository, say on <a href="https://github.com/">GitHub</a>,
+    enter its <em>read-only</em> URL as the remote repo.
+    In this example we'll pretend the remote repo is at
     <code><%= CGI::escapeHTML(repo_url) %></code>.
   </p>
   
@@ -97,13 +109,11 @@ require 'cgi' # for escapeHTML
   
   <%= screenshot %>
   
-  <% workdir = 'tmc-exercises/prog101' %>
+  <% workdir = 'tmc-courses/prog101' %>
   <p>
     Now we'll need to add some exercises.
     To do that, we'll need to clone the remote repository, make our changes and push them back,
     as usual with git.
-    Open the command line and go to the directory you'd like to work in.
-    We'll clone to <code><%= workdir %></code> in this example.
   </p>
   
   <%
@@ -117,16 +127,9 @@ require 'cgi' # for escapeHTML
   
   <h3>Starting from a template</h3>
   <p>
-    If we have a <a href="<%= course_template_homepage %>">course template</a> in another repo,
-    we should clone that instead. We'll name the template repo as the 'template' remote
-    and add the actual course repo as 'origin'. We'll then push everything we got from
-    the template to 'origin'.
-  </p>
-  
-  <p>
-    The <code>-u</code> flag makes the master branch <em>track</em>
-    the master branch in 'origin'. This means that whenever we commit to master and push,
-    it'll push to 'origin' by default (and not to 'template').
+    We start by cloning the <a href="<%= course_template_homepage %>">course template</a>,
+    which has some useful scripts. We'll name the template repo as the 'template' remote,
+    since won't be pushing back to the template. The actual course repo will be the 'origin' remote.
   </p>
   
   <%=
@@ -137,9 +140,21 @@ require 'cgi' # for escapeHTML
       sh.run "cd #{workdir}"
       shell_session.working_dir = workdir
       sh.run "ls"
-        
+      
       sh.blank_line
       sh.run "git remote add origin #{course.source_url}"
+    end
+  %>
+  
+  <p>
+    Now we'll push everything we got from the template into 'origin'.
+    The <code>-u</code> flag makes the master branch <em>track</em>
+    the master branch in 'origin'. This means that whenever we commit to master and push,
+    it'll push to 'origin' by default (and not to 'template').
+  </p>
+  
+  <%=
+    shell_session.example do |sh|
       sh.run "git push -u origin master"
     end
   %>
@@ -147,8 +162,7 @@ require 'cgi' # for escapeHTML
   <p>
     An exercise is just a NetBeans project with some unit tests and
     at least the JUnit and edu-test-utils libraries included.
-    The template course has a template exercise in
-    <code>private/template_project</code>.
+    We pulled a handy template exercise into <code>private/template_project</code> from the course template.
   </p>
   
   <%=
@@ -173,6 +187,7 @@ require 'cgi' # for escapeHTML
   <% File.should be_directory("#{workdir}/factorial/src") %>
   <% File.should be_directory("#{workdir}/factorial/test") %>
   <% File.should be_directory("#{workdir}/factorial/nbproject") %>
+  
   
   <h3>Writing the exercise</h3>
   
@@ -199,9 +214,26 @@ require 'cgi' # for escapeHTML
   %>
   
   <p>
-    At this point you'd normally solve the exercise yourself to make sure your testcases are good.
-    Then you'd make <code>Factorial.java</code> a stub like above and commit and push your changes.
+    We marked solution code we don't want the student to see with special comments.
+    TMC will automatically make two versions of each exercise: a <em>stub</em> version
+    that will be given to students and a <em>solution</em> version that will be shown as
+    the model solution.
   </p>
+  
+  <p>
+    The stub version has the parts in begin/end solution tags removed
+    and lines starting with <code>// STUB:</code> uncommented. The stub comments are
+    mainly useful to avoid the missing return statement compilation error.
+    The solution version is effectively the same as the original but has stub and solution
+    comments removed.
+  </p>
+  
+  <p>
+    The tmc-netbeans-author plugin is recommended as it provides syntax highlighting
+    for all these comments.
+  </p>
+  
+  <p>Let's commit and push our changes.</p>
   
   <%=
     shell_session.example do |sh|
@@ -217,8 +249,7 @@ require 'cgi' # for escapeHTML
   
   <p>
     The webapp won't react to changes in the repository before you 'refresh' the course.
-    This may be inconvenient, but it also somewhat protects students from erroneus git pushes
-    by undercaffeinated exercise authors.
+    This may be inconvenient, but it also somewhat protects against mistakes.
   </p>
   
   <% page.visit(page.current_url) %>
@@ -228,7 +259,7 @@ require 'cgi' # for escapeHTML
   <% course.reload %>
   
   <p>
-    The system now reloads and all exercises from the repository and rebuilds its
+    The system now reloads all exercises from the repository and rebuilds its
     internal caches. Any submissions made to previous exercises will survive this process,
     even if the exercise is deleted in the push.
   </p>
@@ -238,6 +269,49 @@ require 'cgi' # for escapeHTML
   <p>
     The exercise should now be available for download and accept submissions either
     from the webapp or from the NetBeans plugin.
+  </p>
+  
+  
+  <h1>Reference</h1>
+  
+  <h2>Special comments</h2>
+  
+  <p>
+    Solution code can be demarcated with special comments so it will be removed from
+    the version the student gets (the "<em>stub</em>" version).
+  </p>
+  
+  <ul>
+    <li><code>// BEGIN SOLUTION</code> ... <code>// END SOLUTION</code> - will be removed from the stub.</li>
+    <li><code>// STUB: ...</code> - will be uncommented in the stub version.</li>
+    <li><code>// SOLUTION FILE</code> - files containing this line will be removed from the stub.</li>
+  </ul>
+  
+  <pre class="java sh_java">
+public class Example {
+    public int sampleMethod(int a, int b) {
+        // BEGIN SOLUTION
+        // The student will not see this implementation nor this comment
+        // before the model solution is published.
+        return a * (b + 3);
+        // END SOLUTION
+        // STUB: return 0;
+    }
+}
+</pre>
+
+  <pre class="java sh_java">
+// SOLUTION FILE
+// This file will not be present in the exercise given to the student
+// but will be part of the model solution.
+public class AnotherExample {
+    // ...
+}
+</pre>
+  
+  <p>
+    The tmc-netbeans-author plugin is recommended as it provides syntax highlighting
+    for the special comments.
   </p>
   
   
@@ -290,21 +364,17 @@ hide_after: 2010-02-15</pre>
   <pre class="yaml">
 hidden: false
 deadline: 2010-02-15
-returnable: false</pre>
-    <!--
-    TODO: Not completely implemented:
-    publish_date: nil
-    gdocs_sheet: "root"
-    -->
+publish_time: 2010-02-01
+returnable: false
+gdocs_sheet: week1</pre>
   
   <ul>
     <li><code>hidden</code> hides the exercise from students (and NetBeans)</li>
     <li><code>deadline</code> hides the exercise after a given date from students (and NetBeans) and refuses to accept any more submissions</li>
-    <li>
-      <code>returnable</code> tells whether to accept submissions for the
-      exercise. By default if the exercise has a non-empty
-      <code>test/</code> directory then it is considered returnable.
-    </li>
+    <li><code>publish_time</code> sets the time the exercise becomes available to students (and NetBeans). If <code>hidden</code> is false then it overrides this.</li>
+    <li><code>returnable</code> tells whether to accept submissions for the exercise. By default if the exercise has a non-empty <code>test/</code> directory then it is considered returnable.</li>
+    <li><code>gdocs_sheet</code> names the GDocs sheet to which the exercise's points are exported.</li>
+    <li><code></code></li>
   </ul>
   
   <h2>ProTips</h2>
