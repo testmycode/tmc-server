@@ -4,7 +4,7 @@
       <th>
         Course
       </th>
-      <% if signed_in? %>
+      <% if current_user.administrator? %>
         <th>
           Source type
         </th>
