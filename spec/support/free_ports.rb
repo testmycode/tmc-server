@@ -1,7 +1,7 @@
 
 # Dispenses free TCP ports for tests
 module FreePorts
-  FIRST = 3002
+  FIRST = 3030
   
   def self.take_next
     @next ||= FIRST
