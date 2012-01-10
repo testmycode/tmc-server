@@ -23,12 +23,14 @@ An X server is currently needed for tests to pass (required by [capybara-webkit]
 6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
 7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`.
 8. Run the test suite with `rake spec`.
+9. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
 
 ### Startup ###
 
 1. `rails server` or some other RoR setup.
 2. Go to `ext/tmc-sandbox/web` and do `rackup --port 3001` or some other Rack setup.
 3. `script/submission_reprocessor start`
+4. The default user account is `admin`/`admin`.
 
 
 ## Credits ##
