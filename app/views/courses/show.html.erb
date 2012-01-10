@@ -17,6 +17,7 @@
     <% if github_url %>
       <li>Github URL: <%= link_to github_url, github_url %></li>
     <% end %>
+    <li>Git Branch: <%= @course.git_branch %></li>
   <% end %>
 
   <% if !@course.visible? %>

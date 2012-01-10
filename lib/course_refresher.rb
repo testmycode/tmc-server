@@ -60,7 +60,7 @@ private
     
     def clone_repository
       raise 'Source types other than git not yet implemented' if @course.source_backend != 'git'
-      sh!('git', 'clone', '-q', @course.source_url, @course.clone_path)
+      sh!('git', 'clone', '-q', '-b', @course.git_branch, @course.source_url, @course.clone_path)
     end
     
     def update_course_options

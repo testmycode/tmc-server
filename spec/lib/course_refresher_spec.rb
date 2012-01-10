@@ -22,6 +22,20 @@ describe CourseRefresher do
     course.exercises.should have(1).item
     course.exercises[0].name.should == 'MyExercise'
   end
+  
+  it "clones the given git branch" do
+    local_clone.chdir do
+      system!("git checkout -b foo >/dev/null 2>&1")
+    end
+    local_clone.active_branch = 'foo'
+    course.git_branch = 'foo'
+    course.save!
+    
+    add_exercise('MyExercise')
+    refresher.refresh_course(course)
+    course.exercises.should have(1).item
+    course.exercises[0].name.should == 'MyExercise'
+  end
 
   it "should discover new exercises in subdirectories" do
     add_exercise('MyCategory/MyExercise')

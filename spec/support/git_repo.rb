@@ -6,6 +6,13 @@ class GitRepo
   def initialize(path)
     @path = File.expand_path(path)
     @commit_count = 0
+    @active_branch = 'master'
+  end
+  
+  attr_reader :active_branch
+  
+  def active_branch=(branch)
+    @active_branch = branch
   end
   
   def copy_simple_exercise(dest_name = nil, metadata = {})
@@ -42,21 +49,27 @@ class GitRepo
   end
   
   def add
-    Dir.chdir @path do
+    chdir do
       system!("git add -A")
     end
   end
   
   def commit
-    Dir.chdir @path do
+    chdir do
       @commit_count += 1
       system!("git commit -q -m 'commit #{@commit_count} from test case'")
     end
   end
   
   def push
+    chdir do
+      system!("git push -q origin #{active_branch} >/dev/null 2>&1")
+    end
+  end
+  
+  def chdir(&block)
     Dir.chdir @path do
-      system!("git push -q origin master >/dev/null 2>&1")
+      block.call
     end
   end
 end

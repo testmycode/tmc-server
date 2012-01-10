@@ -24,12 +24,15 @@
       <td>
         <%= link_to course.name, course_path(course) %>
       </td>
-      <% if signed_in? %>
+      <% if current_user.administrator? %>
         <td>
           <%= course.source_backend.upcase %>
         </td>
         <td>
           <span class="source-url"><%= course.source_url %></span>
+          <% if course.source_backend == 'git' %>
+            <span class="git-branch">(branch: <%= course.git_branch %>)</span>
+          <% end %>
         </td>
         <td>
           <%= link_to 'refresh', refresh_course_path(course) %>

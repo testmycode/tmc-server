@@ -199,7 +199,12 @@ div.submission-download-link {
 span.source-url {
   font-family: monospace;
   font-size: 120%;
-  padding-left: 10px;
+  padding-left: 8pt;
+}
+
+span.git-branch {
+  font-family: monospace;
+  padding-left: 10pt;
 }
 
 tr.hidden * {
