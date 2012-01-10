@@ -2,7 +2,7 @@
 <h1><%= @exercise.name %></h1>
 
 <ul>
-  <li><%= link_to 'Download project template (zip)', @exercise.zip_url %></li>
+  <li><%= link_to 'Download project template (zip)', exercise_zip_url(@exercise) %></li>
   <% if @exercise.hidden? %>
     <li>This exercise is currently hidden</li>
   <% end %>

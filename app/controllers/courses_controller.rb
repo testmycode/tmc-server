@@ -95,16 +95,17 @@ private
 
     return nil if !exercise.visible_to?(current_user)
 
-    fields = [:name, :deadline, :return_url, :zip_url, :checksum]
-    result = fields.reduce({}) do |r, field|
-      r.merge({ field => exercise.send(field) })
-    end
+    helpers = view_context
 
-    result[:returnable] = exercise.returnable?
-
-    result[:attempted] = exercise.attempted_by?(current_user)
-    result[:completed] = exercise.completed_by?(current_user)
-
-    result
+    {
+      :name => exercise.name,
+      :deadline => exercise.deadline,
+      :checksum => exercise.checksum,
+      :return_url => helpers.exercise_return_url(exercise),
+      :zip_url => helpers.exercise_zip_url(exercise),
+      :returnable => exercise.returnable?,
+      :attempted => exercise.attempted_by?(current_user),
+      :completed => exercise.completed_by?(current_user)
+    }
   end
 end

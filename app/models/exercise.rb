@@ -1,6 +1,5 @@
 class Exercise < ActiveRecord::Base
   include Comparable
-  include Rails.application.routes.url_helpers
 
   self.include_root_in_json = false
 
@@ -34,14 +33,6 @@ class Exercise < ActiveRecord::Base
 
   def zip_file_path
     "#{course.zip_path}/#{self.name}.zip"
-  end
-
-  def zip_url
-    "#{course_exercise_url(self.course, self)}.zip"
-  end
-
-  def return_url
-    "#{course_exercise_submissions_url(self.course, self)}.json"
   end
   
   def solution
