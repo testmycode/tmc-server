@@ -6,7 +6,12 @@ class Solution
   end
   
   def visible_to?(user)
-    user.administrator? || @exercise.completed_by?(user)
+    if user.administrator?
+      true
+    else
+      show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')
+      (show_when_completed && @exercise.completed_by?(user)) || @exercise.expired?
+    end
   end
   
   def files

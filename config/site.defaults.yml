@@ -27,3 +27,10 @@ port_for_remote_sandboxes: 3000
 remote_sandboxes:
   - http://localhost:3001/
 
+# Whether to show the model solution immediately after
+# a student has completed the exercise.
+#
+# The NetBeans plugin will not advertise the model solution
+# if this is set to false.
+show_model_solutions_when_exercise_completed: true
+
