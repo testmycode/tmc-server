@@ -32,9 +32,9 @@ private
   def check_api_version
     if params[:format] == 'json'
       if params[:api_version].blank?
-        respond_with_error("Please update the TMC client. No API version received from client.", 404)
+        respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
       elsif params[:api_version] != API_VERSION.to_s
-        respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404)
+        respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
       end
     end
   end
@@ -47,10 +47,10 @@ private
     respond_with_error(msg, 403)
   end
   
-  def respond_with_error(msg, code = 500)
+  def respond_with_error(msg, code = 500, extra_json_keys = {})
     respond_to do |format|
-      format.html { render :text => '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', :layout => true, :status => 403 }
-      format.json { render :json => { :error => msg }, :status => 403 }
+      format.html { render :text => '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', :layout => true, :status => code }
+      format.json { render :json => { :error => msg }.merge(extra_json_keys), :status => code }
     end
   end
   

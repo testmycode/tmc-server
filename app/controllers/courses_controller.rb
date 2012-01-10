@@ -15,6 +15,7 @@ class CoursesController < ApplicationController
         courses = Course.ongoing.where(:hidden => false).order(ordering)
         authorize! :read, courses
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
+        
         courses_data = courses.map do |c|
           {
             :name => c.name,

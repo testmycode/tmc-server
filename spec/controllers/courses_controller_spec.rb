@@ -119,7 +119,7 @@ describe CoursesController do
         end
         
         it "should respond with a 403" do
-          get :index, :format => :json
+          get_index_json
           response.code.to_i.should == 403
         end
       end
