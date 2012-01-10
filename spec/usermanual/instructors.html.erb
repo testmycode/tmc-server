@@ -51,7 +51,7 @@ require 'cgi' # for escapeHTML
     fill_in 'Login', :with => 'admin'
     fill_in 'Password', :with => 'admin'
   %>
-  <% highlight '#session_submit' %>
+  <% highlight '[value="Sign in"]' %>
   <%= screenshot %>
   <%
     click_on 'Sign in'
