@@ -6,23 +6,11 @@ class SiteSetting
   end
   
   def self.all_settings
-    @@settings ||= settings_from_files
+    @settings ||= settings_from_files
   end
   
   def self.reset # for tests
-    @@settings = settings_from_files
-  end
-  
-  def self.host_for_remote_sandboxes
-    host = value('host_for_remote_sandboxes').strip
-    host = `hostname`.strip if host.blank?
-    host
-  end
-  
-  def self.port_for_remote_sandboxes
-    port = value('port_for_remote_sandboxes').to_i
-    port = 80 if port == 0
-    port
+    @settings = settings_from_files
   end
   
 private

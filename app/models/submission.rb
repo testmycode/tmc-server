@@ -30,6 +30,10 @@ class Submission < ActiveRecord::Base
     tests_ran? && test_case_runs.map(&:successful?).all?
   end
   
+  def result_url
+    "#{SiteSetting.value(:baseurl_for_remote_sandboxes).sub(/\/+$/, '')}/submissions/#{self.id}/result"
+  end
+  
   def status
     if !processed?
       :processing

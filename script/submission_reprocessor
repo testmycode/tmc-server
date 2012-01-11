@@ -13,7 +13,6 @@ FileUtils.mkdir_p(log_dir)
 Daemons.run_proc('submission_reprocessor', :dir_mode => :normal, :dir => pid_dir, :log_dir => log_dir, :log_output => false) do
   Dir.chdir root_dir
   require root_dir + '/config/environment'
-  #require File.expand_path('../lib/submission_reprocessor',  File.dirname(__FILE__))
   require 'submission_reprocessor'
   Rails.logger.auto_flushing = true
   

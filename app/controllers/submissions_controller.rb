@@ -116,7 +116,6 @@ private
   end
   
   def try_to_send_submission_to_sandbox(submission)
-    notify_url = submission_result_url(submission, :host => SiteSetting.host_for_remote_sandboxes, :port => SiteSetting.port_for_remote_sandboxes)
-    RemoteSandbox.try_to_send_submission_to_free_server(submission, notify_url)
+    RemoteSandbox.try_to_send_submission_to_free_server(submission, submission.result_url)
   end
 end

@@ -28,10 +28,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
-    SiteSetting.stub(
-      :host_for_remote_sandboxes => '127.0.0.1',
-      :port_for_remote_sandboxes => Capybara.server_port
-    )
+    SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://127.0.0.1:#{Capybara.server_port}"
   end
 
   config.after :each do

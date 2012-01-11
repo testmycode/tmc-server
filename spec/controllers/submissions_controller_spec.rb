@@ -18,6 +18,7 @@ describe SubmissionsController do
       
       @submission = mock_model(Submission)
       @submission.stub(:exercise).and_return(@exercise)
+      @submission.stub(:result_url).and_return('http://example.com/whatever')
       @submission.stub(:save).and_return(true)
       Submission.stub(:new).and_return(@submission)
       

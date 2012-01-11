@@ -7,6 +7,7 @@ class RemoteSandboxForTesting
   @server_ports = nil
 
   def self.server_ports
+    # FIXME: only one at a time will work because UML performs file locking :/
     @server_ports ||= [FreePorts.take_next, FreePorts.take_next]
   end
   
@@ -78,6 +79,7 @@ private
     
     File.open("#{instance_dir}/site.yml", "w") do |f|
       f.puts "sandbox_files_root: #{::Rails.root}/ext/tmc-sandbox"
+      f.puts "debug_log_file: debug.log"
     end
   end
   
