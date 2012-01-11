@@ -4,6 +4,7 @@ require 'recursive_yaml_reader'
 require 'exercise_dir'
 require 'test_scanner'
 require 'digest/md5'
+require 'tmc_junit_runner'
 require 'course_refresher/exercise_file_filter'
 
 # Safely refreshes a course from a git repository
@@ -28,7 +29,7 @@ class CourseRefresher
   
   class Failure < StandardError
     def initialize(report)
-      super("Course refresh failed")
+      super(report.errors.join("\n"))
       @report = report
     end
     attr_reader :report
@@ -66,7 +67,7 @@ private
           @course.save!
           @course.exercises.each &:save!
         rescue
-          @report.errors << $!.to_s
+          @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
           # Delete the new cache we were working on
           FileUtils.rm_rf(@course.cache_path)
         else
@@ -179,6 +180,10 @@ private
         stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
         FileUtils.mkdir_p(stub_path)
         ExerciseFileFilter.new.make_stub(clone_path, stub_path)
+        
+        FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
+        FileUtils.cp(TmcJunitRunner.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
+        FileUtils.cp(TmcJunitRunner.lib_paths, stub_path + 'lib' + 'testrunner')
       end
     end
     
@@ -197,7 +202,7 @@ private
     
     def checksum_stubs
       @course.exercises.each do |e|
-        base_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
+        base_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
         digest = Digest::MD5.new
         Dir.chdir(base_path) do
           stub_files(e).each do |path|
@@ -209,7 +214,7 @@ private
       end
     end
     
-    def make_zips_of_stubs #TODO: refactor
+    def make_zips_of_stubs
       FileUtils.mkdir_p(@course.zip_path)
       @course.exercises.each do |e|
         zip_file_path = "#{@course.zip_path}/#{e.name}.zip"
