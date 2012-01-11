@@ -20,6 +20,7 @@ class Ability
         sub.exercise.submittable_by?(user)
       end
       
+      cannot :read, Solution
       can :read, Solution do |sol|
         sol.visible_to?(user)
       end
