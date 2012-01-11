@@ -21,7 +21,7 @@ describe TestRunGrader do
           'methodName' => 'testSomethingDifficult',
           'status' => 'FAILED',
           'pointNames' => ['1.2'],
-          'stackTrace' => "frame1\nframe2"
+          'stackTrace' => {'a' => 'b'}
         }
       ]
     end
@@ -38,7 +38,7 @@ describe TestRunGrader do
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'MyTest testSomethingDifficult' }
       tcr.should_not be_nil
       tcr.should_not be_successful
-      tcr.stack_trace.should == "frame1\nframe2"
+      ActiveSupport::JSON.decode(tcr.stack_trace).should == {'a' => 'b'}
     end
     
     it "should not create multiple test case runs for the same test method even if it is involved in multiple points" do

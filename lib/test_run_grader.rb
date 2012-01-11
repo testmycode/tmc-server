@@ -8,6 +8,7 @@
 #     - message: error message, if any
 #     - status: 'PASSED' or some other string
 #     - pointNames: array of point names that require this test to pass
+#     - stackTrace: a stack trace structure, if any
 #
 module TestRunGrader
   extend TestRunGrader
@@ -26,7 +27,7 @@ private
         :test_case_name => "#{test_result['className']} #{test_result['methodName']}",
         :message => test_result["message"],
         :successful => test_result["status"] == 'PASSED',
-        :stack_trace => test_result["stackTrace"]
+        :stack_trace => translate_stacktrace_to_json(test_result["stackTrace"])
       )
       submission.test_case_runs << tcr
     end
@@ -60,6 +61,14 @@ private
     end.reduce([]) do |point_names, (name, success)|
       point_names << name if success
       point_names
+    end
+  end
+  
+  def self.translate_stacktrace_to_json(yaml_stacktrace)
+    if yaml_stacktrace
+      ActiveSupport::JSON.encode(yaml_stacktrace)
+    else
+      nil
     end
   end
 end
