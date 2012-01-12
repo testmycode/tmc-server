@@ -25,6 +25,8 @@ An X server is currently needed for tests to pass (required by [capybara-webkit]
 8. Run the test suite with `rake spec`.
 9. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
 
+The application should not be deployed into a multithreaded server! It often changes the current working directory, which is a process-specific attribute. Each request should have its process all to itself. If you use Apache with say Passenger, then use the prefork MPM.
+
 ### Startup ###
 
 1. `rails server` or some other RoR setup.
