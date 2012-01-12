@@ -9,7 +9,7 @@
   <% if @exercise.deadline %>
     <li>Deadline: <%= @exercise.deadline %><% if @exercise.expired? %> (expired)<% end %></li>
   <% end %>
-  <% if @exercise.solution %>
+  <% if @exercise.solution && @exercise.solution.visible_to?(current_user) %>
     <li><%= link_to 'View suggested solution', course_exercise_solution_path(@exercise.course, @exercise) %></li>
   <% end %>
 </ul>
