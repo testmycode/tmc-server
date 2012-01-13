@@ -33,8 +33,12 @@ class UsersController < ApplicationController
     end
     
     if @user.errors.empty? && @user.save
-      flash[:notice] = 'User account created. You can now log in.'
-      redirect_to root_path
+      if @bare_layout
+        render :text => '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', :layout => true
+      else
+        flash[:notice] = 'User account created. You can now log in.'
+        redirect_to root_path
+      end
     else
       flash.now[:error] = 'Failed'
       render :action => :show, :status => 403
@@ -70,7 +74,6 @@ class UsersController < ApplicationController
   end
   
 private
-  
   def maybe_update_password(user, user_params)
     if !user_params[:old_password].blank? || !user_params[:password].blank?
       if !user.has_password?(user_params[:old_password])

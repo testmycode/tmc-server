@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   
   helper :all
   
+  layout :select_layout
+  
   protect_from_forgery
 
   include SessionsHelper
@@ -18,6 +20,15 @@ class ApplicationController < ActionController::Base
 
   before_filter :set_default_url_options
   before_filter :check_api_version
+  before_filter :set_bare_layout
+
+  def url_options
+    if @bare_layout
+      {:bare_layout => '1'}.merge(super)
+    else
+      super
+    end
+  end
 
 private
 
@@ -26,7 +37,7 @@ private
   end
 
   def set_default_url_options
-    Rails.application.routes.default_url_options[:host]=request.host_with_port
+    Rails.application.routes.default_url_options[:host] = request.host_with_port
   end
   
   def check_api_version
@@ -37,6 +48,10 @@ private
         respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
       end
     end
+  end
+  
+  def set_bare_layout
+    @bare_layout = !!params[:bare_layout]
   end
   
   def respond_not_found(msg = 'Not Found')
@@ -51,6 +66,14 @@ private
     respond_to do |format|
       format.html { render :text => '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', :layout => true, :status => code }
       format.json { render :json => { :error => msg }.merge(extra_json_keys), :status => code }
+    end
+  end
+  
+  def select_layout
+    if params[:bare_layout]
+      "bare"
+    else
+      "application"
     end
   end
   

@@ -96,11 +96,14 @@ pre {
 /* Toplevel layout */
 
 body {
-  background-color: #DDDDDD;
   color: black;
   font-family: sans-serif;
   font-size: 80%;
   margin-top: 0;
+}
+
+body.default {
+  background-color: #DDDDDD;
 }
 
 #everything {
