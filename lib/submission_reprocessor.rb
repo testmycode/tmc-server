@@ -8,7 +8,7 @@ class SubmissionReprocessor
   def reprocess_timed_out_submissions
     for sub in Submission.to_be_reprocessed
       Rails.logger.info "Attempting to reprocess submission #{sub.id}"
-      sub.save!
+      sub.save! # Update updated_at so we won't try to reprocess this immediately
       RemoteSandbox.try_to_send_submission_to_free_server(sub, sub.result_url)
     end
   end
