@@ -21,7 +21,7 @@ An X server is currently needed for tests to pass (required by [capybara-webkit]
 4. Install PostgreSQL 9.x+. See `config/database.yml` for database settings.
 5. Initialize the database with `env RAILS_ENV=production rake db:reset`
 6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
-7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`.
+7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Run tests with `rake test`.
 8. Run the test suite with `rake spec`.
 9. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
 
