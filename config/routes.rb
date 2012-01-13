@@ -6,6 +6,10 @@ SandboxServer::Application.routes.draw do
   match '/signout', :to => 'sessions#destroy'
   
   resource :user
+  
+  resources :participants, :only => [:index]
+  
+  resources :emails, :only => [:index]
 
   resources :courses do
     member do

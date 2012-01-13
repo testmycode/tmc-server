@@ -1,0 +1,26 @@
+
+<h1>List of participants</h1>
+
+<p>(Users with administrative privileges not included.)</p>
+
+<p><%= link_to 'List of e-mails as plain-text', emails_path(:format => 'txt') %>.</p>
+
+<table class="participants">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>E-mail</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for user in @participants %>
+    <tr>
+      <td><%= user.login %></td>
+      <td><%= user.email %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= use_datatables('table.participants', :bPaginate => false) %>
+

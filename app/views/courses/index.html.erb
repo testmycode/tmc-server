@@ -1,7 +1,13 @@
 
-<h1>All Courses</h1>
+<h1>Welcome to TMC</h1>
 
-<% if signed_in? %>
+<% if current_user.administrator? %>
+  <%= link_to 'List of registered users', participants_path %>
+<% end %>
+
+<h2>All Courses</h2>
+
+<% if current_user.administrator? %>
   <%= link_to 'Create New Course', new_course_path %>
 <% end %>
 

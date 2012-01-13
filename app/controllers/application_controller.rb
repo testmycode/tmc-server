@@ -66,6 +66,7 @@ private
     respond_to do |format|
       format.html { render :text => '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', :layout => true, :status => code }
       format.json { render :json => { :error => msg }.merge(extra_json_keys), :status => code }
+      format.text { render :text => 'ERROR: ' + msg }
     end
   end
   
