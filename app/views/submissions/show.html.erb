@@ -89,12 +89,35 @@ $(document).ready(function() {
         <% end %>
       </td>
       <% if !@submission.all_tests_passed? %>
-        <td><%= tcr.message %></td>
+        <td>
+          <%= tcr.message %>
+          <% if tcr.stack_trace != nil %>
+            <br />
+            <div class="stack-trace">
+              <%= format_stack_trace(ActiveSupport::JSON.decode(tcr.stack_trace)) %>
+            </div>
+          <% end %>
+        </td>
       <% end %>
     </tr>
   <% end %>
   </table>
 <% end %>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('.stack-trace').each(function() {
+    var trace = this;
+    var button = $('<button>Show stack trace</button>')[0];
+    $(trace).before(button);
+    $(trace).hide();
+    $(button).click(function() {
+      $(button).hide();
+      $(trace).show();
+    });
+  });
+});
+</script>
 
 <div class="submission-download-link">
   <%= link_to "Download #{@submission.downloadable_file_name}", submission_path(@submission, :format => 'zip') %>

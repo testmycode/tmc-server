@@ -211,6 +211,10 @@ tr.hidden * {
   color: gray;
 }
 
+div.stack-trace {
+  font-family: monospace;
+}
+
 /* Lists and tables */
 
 table {
