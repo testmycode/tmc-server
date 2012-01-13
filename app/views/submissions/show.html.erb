@@ -91,10 +91,10 @@ $(document).ready(function() {
       <% if !@submission.all_tests_passed? %>
         <td>
           <%= tcr.message %>
-          <% if tcr.stack_trace != nil %>
+          <% if tcr.exception != nil %>
             <br />
             <div class="stack-trace">
-              <%= format_stack_trace(ActiveSupport::JSON.decode(tcr.stack_trace)) %>
+              <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
             </div>
           <% end %>
         </td>

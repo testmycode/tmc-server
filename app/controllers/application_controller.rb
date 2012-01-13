@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  API_VERSION = 1 # To be incremented on BC-breaking changes
+  API_VERSION = 2 # To be incremented on BC-breaking changes
   
   helper :all
   

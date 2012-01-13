@@ -27,7 +27,7 @@ private
         :test_case_name => "#{test_result['className']} #{test_result['methodName']}",
         :message => test_result["message"],
         :successful => test_result["status"] == 'PASSED',
-        :stack_trace => translate_stacktrace_to_json(test_result["stackTrace"])
+        :exception => to_json_or_null(test_result["exception"])
       )
       submission.test_case_runs << tcr
     end
@@ -64,9 +64,9 @@ private
     end
   end
   
-  def self.translate_stacktrace_to_json(yaml_stacktrace)
-    if yaml_stacktrace
-      ActiveSupport::JSON.encode(yaml_stacktrace)
+  def self.to_json_or_null(obj)
+    if obj != nil
+      ActiveSupport::JSON.encode(obj)
     else
       nil
     end

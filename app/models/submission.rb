@@ -64,7 +64,7 @@ class Submission < ActiveRecord::Base
         :name => tcr.test_case_name,
         :successful => tcr.successful?,
         :message => tcr.message,
-        :stack_trace => if tcr.stack_trace then ActiveSupport::JSON.decode(tcr.stack_trace) else nil end
+        :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end
       }
     end
   end
