@@ -79,6 +79,6 @@ class Submission < ActiveRecord::Base
 private
   
   def self.reprocess_attempt_interval
-    10.seconds
+    2.minutes
   end
 end
