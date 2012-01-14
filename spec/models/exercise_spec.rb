@@ -220,11 +220,18 @@ describe Exercise do
     ex.should_not be_visible_to(user)
   end
   
-  it "should always be visible to administrators" do
+  it "should always be visible to administrators unless hidden" do
+    admin = Factory.create(:admin)
+    ex = Factory.create(:exercise, :course => course, :publish_time => Time.now + 10.hours, :hidden => false)
+    
+    ex.should be_visible_to(admin)
+  end
+  
+  it "should not be visible to administrators if hidden" do
     admin = Factory.create(:admin)
     ex = Factory.create(:exercise, :course => course, :publish_time => Time.now + 10.hours, :hidden => true)
     
-    ex.should be_visible_to(admin)
+    ex.should_not be_visible_to(admin)
   end
 
   it "can tell whether a user has ever attempted an exercise" do

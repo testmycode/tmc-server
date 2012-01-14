@@ -41,20 +41,12 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user may make submissions
   def submittable_by?(user)
-    returnable? && if user.administrator?
-      true
-    else
-      !expired? && !hidden? && published? && !user.guest?
-    end
+    returnable? && (user.administrator? || (!expired? && !hidden? && published? && !user.guest?))
   end
 
   # Whether a user may see the exercise
   def visible_to?(user)
-    if user.administrator?
-      true
-    else
-      !hidden? && published?
-    end
+    !hidden? && (user.administrator? || published?)
   end
  
   # Whether the exercise has been published (it may still be hidden)
