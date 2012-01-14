@@ -78,7 +78,7 @@ private
     FileUtils.cp_r "#{::Rails.root}/ext/tmc-sandbox/web", instance_dir
     
     File.open("#{instance_dir}/site.yml", "w") do |f|
-      f.puts "sandbox_files_root: #{::Rails.root}/ext/tmc-sandbox"
+      f.puts "sandbox_files_root: #{::Rails.root}/ext/tmc-sandbox/output"
       f.puts "debug_log_file: debug.log"
     end
   end
