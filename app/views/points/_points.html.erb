@@ -6,15 +6,17 @@
 
 <table class="points">
   <thead>
-    <tr>
-      <th></th>
-      <% @exercises.each do |exercise| %>
-        <% points = exercise.available_points.sort! %>
-        <% if points.size > 0 %>
-          <th colspan="<%= points.size %>"><%= tailoring.exercise_name_for_points_table(exercise) %></th>
+    <% if tailoring.show_exercise_names_in_points_table %>
+      <tr>
+        <th></th>
+        <% @exercises.each do |exercise| %>
+          <% points = exercise.available_points.sort! %>
+          <% if points.size > 0 %>
+            <th colspan="<%= points.size %>"><%= tailoring.exercise_name_for_points_table(exercise) %></th>
+          <% end %>
         <% end %>
-      <% end %>
-    </tr>
+      </tr>
+    <% end %>
     <tr>
       <th></th>
       <% @exercises.each do |exercise| %>
