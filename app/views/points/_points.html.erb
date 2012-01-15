@@ -11,7 +11,7 @@
       <% @exercises.each do |exercise| %>
         <% points = exercise.available_points.sort! %>
         <% if points.size > 0 %>
-          <th colspan="<%= points.size %>"><%= exercise.name %></th>
+          <th colspan="<%= points.size %>"><%= tailoring.exercise_name_for_points_table(exercise) %></th>
         <% end %>
       <% end %>
     </tr>

@@ -20,6 +20,7 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
 
   config.before(:each) do
+    Tailoring.stub(:get => Tailoring.new)
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.start
   end

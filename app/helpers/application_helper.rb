@@ -1,4 +1,10 @@
+require 'tailoring'
+
 module ApplicationHelper
+  def tailoring
+    Tailoring.get
+  end
+
   def labeled(label, tags)
     if tags =~ /id\s*=\s*"([^"]+)"/
       raw('<label for="' + h($1) + '">' + h(label) + '</label>' + tags)
