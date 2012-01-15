@@ -30,6 +30,7 @@ FactoryGirl.define do
     course
     user
     exercise
+    processed true
     after_build { |sub| sub.exercise.course = sub.course }
   end
 

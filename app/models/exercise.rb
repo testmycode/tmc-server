@@ -18,6 +18,12 @@ class Exercise < ActiveRecord::Base
   def relative_path
     name.gsub('-', '/')
   end
+  
+  def category
+    parts = name.split('-')
+    parts.pop
+    parts.join('-')
+  end
 
   def clone_path
     "#{course.clone_path}/#{self.relative_path}"

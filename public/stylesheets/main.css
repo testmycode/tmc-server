@@ -21,6 +21,10 @@ h3 {
   font-size: 120%;
 }
 
+.list-title {
+  font-weight: bold;
+}
+
 #content-area h2 {
   margin-top: 1.6em;
 }

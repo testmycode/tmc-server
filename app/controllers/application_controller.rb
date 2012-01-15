@@ -41,7 +41,7 @@ private
   end
   
   def check_api_version
-    if params[:format] == 'json'
+    if params[:format] == 'json' && controller_name != 'stats'
       if params[:api_version].blank?
         respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
       elsif params[:api_version] != API_VERSION.to_s

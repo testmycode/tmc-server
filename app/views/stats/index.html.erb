@@ -1,0 +1,24 @@
+<h1>Statistics</h1>
+
+<ul>
+  <% for course_name, course_stats in @stats[:course_stats].sort %>
+    <li>
+      <span class="list-title"><%= course_name %></span>
+      <ul>
+        <li>Participants with submissions: <%= course_stats[:participants_with_submissions_count] %></li>
+        <li>Completed exercises: <%= course_stats[:completed_exercise_count] %> / <%= course_stats[:possible_completed_exercise_count] %></li>
+        
+        <% for group_name, group_stats in course_stats[:exercise_group_stats].sort %>
+          <li>
+            <span class="list-title"><%= group_name %></span>
+            <ul>
+              <li>Participants with submissions: <%= group_stats[:participants_with_submissions_count] %></li>
+              <li>Completed exercises: <%= group_stats[:completed_exercise_count] %> / <%= group_stats[:possible_completed_exercise_count] %></li>
+            </ul>
+          </li>
+        <% end %>
+      </ul>
+    </li>
+  <% end %>
+</ul>
+

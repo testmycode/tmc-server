@@ -10,6 +10,8 @@ SandboxServer::Application.routes.draw do
   resources :participants, :only => [:index]
   
   resources :emails, :only => [:index]
+  
+  resources :stats, :only => [:index]
 
   resources :courses do
     member do
