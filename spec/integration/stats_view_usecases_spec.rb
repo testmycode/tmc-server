@@ -31,7 +31,7 @@ describe "The system (used by an instructor for viewing statistics)", :integrati
 
   def log_in_as_instructor
     visit '/'
-    user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
+    user = Factory.create(:admin, :password => 'xooxer')
     log_in_as(user.login, 'xooxer')
   end
   

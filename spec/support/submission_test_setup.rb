@@ -73,6 +73,6 @@ class SubmissionTestSetup
   
 private
   def create_user
-    User.create!(:login => 'student', :password => 'student')
+    Factory.create(:user, :login => 'student', :password => 'student')
   end
 end

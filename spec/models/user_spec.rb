@@ -60,31 +60,58 @@ describe User do
   end
 
   describe "validation" do
-    it "should succeed given a valid login and password" do
-      User.new(:login => 'matt', :password => 'horner').should have(0).errors_on(:login)
+    before :each do
+      @params = {
+        :login => 'matt',
+        :password => 'horner',
+        :email => 'matt@example.com'
+      }
+    end
+  
+    it "should succeed given a valid login, password and email" do
+      User.new(@params).should have(0).errors_on(:login)
     end
 
     it "should fail without login" do
-      User.new(:password => "instructor").should have(2).errors_on(:login)
+      @params.delete(:login)
+      User.new(@params).should have(2).errors_on(:login)
+    end
+    
+    it "should fail with a duplicate login" do
+      User.create!(@params)
+      @params[:email] = 'another@example.com'
+      User.new(@params).should have(1).errors_on(:login)
+    end
+    
+    it "should fail without email" do
+      @params.delete(:email)
+      User.new(@params).should have(1).error_on(:email)
+    end
+    
+    it "should fail with duplicate email" do
+      User.create!(@params)
+      @params[:login] = 'another'
+      User.new(@params).should have(1).errors_on(:email)
     end
 
     it "should fail with too short a login" do
-      short_login = {:login => "a", :password => 'instructor' }
-      User.new(short_login).should have(1).error_on(:login)
+      @params[:login] = 'a'
+      User.new(@params).should have(1).error_on(:login)
     end
 
     it "should fail with too long a login" do
-      long_login = {:login => "a"*21, :password => 'instructor' }
-      User.new(long_login).should have(1).error_on(:login)
+      @params[:login] = 'a'*21
+      User.new(@params).should have(1).error_on(:login)
     end
 
     it "should succeed without a password for new records" do
-      User.new(:login => 'instructor').should be_valid
+      @params.delete(:password)
+      User.new(@params).should be_valid
     end
 
-    it "should succeed without a password for existing records" do
-      User.create!(:login => 'instructor', :password => 'cookiestastegood')
-      user = User.find_by_login!('instructor')
+    it "should be valid after it's reloaded" do
+      User.create!(@params)
+      user = User.find_by_login!(@params[:login])
       user.password.should be_nil
       user.should be_valid
       user.save!
@@ -94,6 +121,7 @@ describe User do
   it "should allow authentication after modification" do
     created_user = User.create!(:login => "root",
                          :password => "qwerty123",
+                         :email => "qwerty123@example.com",
                          :administrator => false)
 
     u = User.authenticate("root", "qwerty123")
@@ -108,13 +136,13 @@ describe User do
   end
 
   it "should not allow authentication with an empty password" do
-    User.create!(:login => 'user')
+    User.create!(:login => 'user', :email => 'user@example.com')
     u = User.authenticate('user', '')
     u.should be_nil
   end
 
   it "should hash the password on create" do
-    User.create!(:login => "instructor", :password => "ilikecookies")
+    User.create!(:login => "instructor", :password => "ilikecookies", :email => 'instructor@example.com')
     user = User.find_by_login!("instructor")
     user.password.should be_nil
     user.password_hash.should_not be_nil
@@ -123,7 +151,7 @@ describe User do
   end
 
   it "should hash the password on update" do
-    User.create!(:login => "instructor", :password => "ihatecookies")
+    User.create!(:login => "instructor", :password => "ihatecookies", :email => 'instructor@example.com')
 
     user = User.find_by_login!("instructor")
     user.password = 'ilikecookies'
@@ -137,7 +165,7 @@ describe User do
   end
 
   it "should not reset the password when saved without changing the password" do
-    user = User.create!(:login => "instructor", :password => "ihatecookies")
+    user = User.create!(:login => "instructor", :password => "ihatecookies", :email => 'instructor@example.com')
     user.login = 'funny_person'
     user.save!
 
@@ -146,7 +174,7 @@ describe User do
   end
 
   it "should allow authentication of administrators with a correct login/password" do
-    user = User.create!(:login => "instructor", :password => "ilikecookies", :administrator => true)
+    user = User.create!(:login => "instructor", :password => "ilikecookies", :administrator => true, :email => 'instructor@example.com')
     User.authenticate("instructor", "ilikecookies").should eq(user)
     User.authenticate("instructor", "ihatecookies").should be_nil
     User.authenticate("root", "ilikecookies").should be_nil

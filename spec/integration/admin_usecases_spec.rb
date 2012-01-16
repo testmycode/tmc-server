@@ -5,7 +5,7 @@ describe "The system (used by an instructor for administration)", :integration =
 
   before :each do
     visit '/'
-    @user = User.create!(:login => 'user', :password => 'xooxer', :administrator => true)
+    @user = Factory.create(:admin, :password => 'xooxer')
     log_in_as(@user.login, 'xooxer')
     
     @repo_path = @test_tmp_dir + '/fake_remote_repo'

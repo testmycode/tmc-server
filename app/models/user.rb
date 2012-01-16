@@ -5,9 +5,11 @@ class User < ActiveRecord::Base
   has_many :awarded_points, :dependent => :destroy
 
   validates :login, :presence     => true,
-                    :confirmation => true,
                     :uniqueness   => true,
                     :length       => { :within => 2..20 }
+
+  validates :email, :presence => true,
+                    :uniqueness => true
 
   attr_accessor :password
   before_save :encrypt_password

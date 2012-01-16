@@ -2,12 +2,14 @@ FactoryGirl.define do
   factory :user do
     sequence(:login) {|n| "user#{n}" }
     sequence(:password) {|n| "userpass#{n}" }
+    sequence(:email) {|n| "user#{n}@example.com" }
     administrator false
   end
 
   factory :admin, :class => User do
     sequence(:login) {|n| 'admin#{n}' }
     sequence(:password) {|n| "adminpass#{n}" }
+    sequence(:email) {|n| "admin#{n}@example.com" }
     administrator true
   end
 
