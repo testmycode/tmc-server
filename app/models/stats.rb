@@ -1,7 +1,7 @@
 module Stats
   def self.all
     {
-      :registered_users => not_admins.count,
+      :registered_users => all_regular_users.count,
       :course_stats => Course.all.reduce({}) {|h, c| h.merge(c.name => for_course(c)) }
     }
   end
@@ -30,7 +30,7 @@ module Stats
   
   def self.exercise_groups(course)
     groups = {}
-    for exercise in course.exercises
+    for exercise in course.exercises.where(:hidden => false)
       groups[exercise.category] ||= []
       groups[exercise.category] << exercise
     end
@@ -38,21 +38,21 @@ module Stats
   end
   
   def self.participants_with_submissions_count(exercises = nil)
-    exercises = exercises.exercises if exercises.is_a?(Course)
+    exercises = exercises.exercises.where(:hidden => false) if exercises.is_a?(Course)
     if exercises && !exercises.empty?
       exercise_names = exercises.map {|e| ActiveRecord::Base.quote_value(e.name) }
       exercises_clause = "AND exercise_name IN (#{exercise_names.join(',')})"
     else
       exercises_clause = ''
     end
-    not_admins.where("EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{exercises_clause})").count
+    all_regular_users.where("EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{exercises_clause})").count
   end
   
   def self.completed_exercise_count(exercises = nil)
-    exercises = exercises.exercises if exercises.is_a?(Course)
-    exercises = Exercise.all if exercises == nil
+    exercises = exercises.exercises.where(:hidden => false) if exercises.is_a?(Course)
+    exercises = all_nonhidden_exercises if exercises == nil
     count = 0
-    for user in not_admins
+    for user in all_regular_users
       for exercise in exercises
         count += 1 if exercise.completed_by?(user)
       end
@@ -61,14 +61,18 @@ module Stats
   end
   
   def self.possible_completed_exercise_count(exercises = nil)
-    exercises = exercises.exercises if exercises.is_a?(Course)
-    exercises = Exercise.all if exercises == nil
+    exercises = exercises.exercises.where(:hidden => false) if exercises.is_a?(Course)
+    exercises = all_nonhidden_exercises if exercises == nil
     participants_with_submissions_count(exercises) * exercises.size
   end
   
 private
-  def self.not_admins
+  def self.all_regular_users
     User.where(:administrator => false)
+  end
+  
+  def self.all_nonhidden_exercises
+    Exercise.where(:hidden => false)
   end
 end
 

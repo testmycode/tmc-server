@@ -8,6 +8,7 @@ describe Stats do
     cat1ex2 = Factory.create(:exercise, :course => course1, :name => 'cat1-ex2')
     cat2ex1 = Factory.create(:exercise, :course => course1, :name => 'cat2-ex1')
     cat3ex1 = Factory.create(:exercise, :course => course2, :name => 'cat3-ex1')
+    hiddenex = Factory.create(:exercise, :course => course1, :name => 'cat1-hiddenex', :hidden => true)
     
     user1 = Factory.create(:user)
     user2 = Factory.create(:user)
