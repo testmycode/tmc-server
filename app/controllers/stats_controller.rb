@@ -5,7 +5,7 @@ class StatsController < ApplicationController
     @stats = Stats.all
     respond_to do |format|
       format.html { render }
-      format.json { render :json => @stats }
+      format.json { render :json => @stats, :callback => params[:jsonp] }
     end
   end
 end
