@@ -39,7 +39,7 @@ module Stats
   
   def self.participants_with_submissions_count(exercises = nil)
     exercises = exercises.exercises if exercises.is_a?(Course)
-    if exercises
+    if exercises && !exercises.empty?
       exercise_names = exercises.map {|e| ActiveRecord::Base.quote_value(e.name) }
       exercises_clause = "AND exercise_name IN (#{exercise_names.join(',')})"
     else
