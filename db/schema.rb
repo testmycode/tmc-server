@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120113120508) do
+ActiveRecord::Schema.define(:version => 20120116114808) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -82,6 +82,7 @@ ActiveRecord::Schema.define(:version => 20120113120508) do
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
+  add_index "submissions", ["user_id", "exercise_name"], :name => "index_submissions_on_user_id_and_exercise_name"
 
   create_table "test_case_runs", :force => true do |t|
     t.integer  "submission_id"
@@ -92,6 +93,8 @@ ActiveRecord::Schema.define(:version => 20120113120508) do
     t.datetime "updated_at"
     t.text     "exception"
   end
+
+  add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"
 
   create_table "users", :force => true do |t|
     t.string   "login",                            :null => false
