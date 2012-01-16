@@ -54,36 +54,48 @@ class SubmissionsController < ApplicationController
       return respond_access_denied('Submissions for this exercise are no longer accepted.')
     end
     
-    @submission = Submission.new(
-      :user => current_user,
-      :course => @course,
-      :exercise => @exercise,
-      :return_file => File.read(params[:submission][:file].tempfile.path)
-    )
+    file_contents = File.read(params[:submission][:file].tempfile.path)
     
-    authorize! :create, @submission
+    errormsg = nil
     
-    ok = @submission.save
+    if !file_contents.start_with?('PK')
+      errormsg = "The uploaded file doesn't look like a ZIP file."
+    end
     
-    if ok
+    if !errormsg
+      @submission = Submission.new(
+        :user => current_user,
+        :course => @course,
+        :exercise => @exercise,
+        :return_file => file_contents
+      )
+      
+      authorize! :create, @submission
+      
+      if !@submission.save
+        errormsg = 'Failed to save submission.'
+      end
+    end
+    
+    if !errormsg
       try_to_send_submission_to_sandbox(@submission)
     end
     
     respond_to do |format|
       format.html do
-        if ok
+        if !errormsg
           redirect_to(submission_path(@submission),
                       :notice => 'Submission received.')
         else
           redirect_to(course_exercise_path(@course, @exercise),
-                      :alert => 'Failed to receive submission.') 
+                      :alert => errormsg) 
         end
       end
       format.json do
-        if ok
+        if !errormsg
           render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => API_VERSION) }
         else
-          render :json => { :error => 'Failed to save submission. Sorry :(' }
+          render :json => { :error => errormsg }
         end
       end
     end

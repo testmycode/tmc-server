@@ -7,14 +7,18 @@ describe SubmissionsController do
     @exercise = Factory.create(:returnable_exercise, :course => @course)
     controller.current_user = @user
   end
+  
+  def set_upload_file_contents(contents)
+    File.open('submitted_file.zip', 'wb') {|f| f.write(contents) }
+    @submitted_file = fixture_file_upload('submitted_file.zip')
+    class << @submitted_file
+      attr_reader :tempfile # Missing for some reason. See http://comments.gmane.org/gmane.comp.lang.ruby.rails/297939
+    end
+  end
 
   describe "POST create" do
     before :each do
-      FileUtils.touch('submitted_file.zip') # Although we don't need the actual file, fixture_file_upload wants it to exist
-      @submitted_file = fixture_file_upload('submitted_file.zip')
-      class << @submitted_file
-        attr_reader :tempfile # Missing for some reason. See http://comments.gmane.org/gmane.comp.lang.ruby.rails/297939
-      end
+      set_upload_file_contents('PK') # fake zip file
       
       @submission = mock_model(Submission)
       @submission.stub(:exercise).and_return(@exercise)
@@ -80,8 +84,11 @@ describe SubmissionsController do
     end
     
     describe "when unable to save the submission" do
-      it "should redirect to exercise with failure message" do
+      before :each do
         @submission.should_receive(:save).and_return(false)
+      end
+    
+      it "should redirect to exercise with failure message" do
         post_create
         response.should redirect_to(course_exercise_path(@course, @exercise))
         flash[:alert].should_not be_blank
@@ -89,9 +96,27 @@ describe SubmissionsController do
       
       describe "with json format" do
         it "should return a JSON error" do
-          @submission.should_receive(:save).and_return(false)
           post_create :format => :json, :api_version => ApplicationController::API_VERSION
           JSON.parse(response.body)['error'].should include('Failed to save submission')
+        end
+      end
+    end
+    
+    describe "when uploaded something that doesn't look like a zip file" do
+      before :each do
+        set_upload_file_contents('oops what is this')
+      end
+      
+      it "should redirect to exercise with failure message" do
+        post_create
+        response.should redirect_to(course_exercise_path(@course, @exercise))
+        flash[:alert].should_not be_blank
+      end
+      
+      describe "with json format" do
+        it "should return a JSON error" do
+          post_create :format => :json, :api_version => ApplicationController::API_VERSION
+          JSON.parse(response.body)['error'].should_not be_blank
         end
       end
     end
