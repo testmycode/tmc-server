@@ -45,7 +45,7 @@ module Stats
     else
       exercises_clause = ''
     end
-    User.where("EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{exercises_clause})").count
+    not_admins.where("EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{exercises_clause})").count
   end
   
   def self.completed_exercise_count(exercises = nil)
