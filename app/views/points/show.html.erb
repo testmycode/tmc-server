@@ -1,6 +1,9 @@
 
-<h1>Points for <%= @sheetname %> of <%= @course.name %></h1>
+<% unless @bare_layout %>
+  <h1>Points for <%= @sheetname %> of <%= @course.name %></h1>
 
-<p><%= link_to 'back to summary', course_points_path(@course) %></p>
+  <p><%= link_to 'back to summary', course_points_path(@course) %></p>
+<% end %>
+
 <%= render :partial => 'points' %>
 
