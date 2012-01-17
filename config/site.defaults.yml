@@ -15,6 +15,12 @@ git_repos_chgrp:
 # Enter the baseurl of the webapp with which the sandboxes will find the web server.
 baseurl_for_remote_sandboxes: http://localhost:3000/
 
+# Settings for e-mails.
+emails:
+  reset_password:
+    baseurl: http://localhost:3000/
+    from: noreply@example.com
+
 # List at least one sandbox instance here (in site.yml).
 #
 # Any URL will do. Example:

@@ -1,3 +1,4 @@
+require 'fileutils'
 require File.expand_path(File.join(File.dirname(__FILE__), 'git_test_actions.rb'))
 
 module IntegrationTestActions
@@ -53,12 +54,56 @@ module IntegrationTestActions
     end
   end
   
+  # :deprecated:
   def wait_for_with_timeout(expected, timeout, &block)
+    wait_until(:timeout => timeout) {
+      block.call == expected
+    }
+  end
+  
+  def wait_until(options = {}, &block)
+    options = {
+      :timeout => 15,
+      :sleep_time => 0.1
+    }.merge(options)
     start_time = Time.now
-    while block.call != expected
-      if Time.now - start_time > timeout
+    while !block.call
+      if Time.now - start_time > options[:timeout]
         raise 'timeout'
       end
+      sleep options[:sleep_time]
     end
+  end
+  
+  def screenshot_to_file(path)
+    FileUtils.mkdir_p(File.dirname(path))
+    if page.driver.respond_to? :render
+      page.driver.render(path) # Webkit
+    else
+      page.driver.browser.save_screenshot(path) # Selenium
+    end
+    trim_image_edges(path)
+  end
+  
+private
+  def trim_image_edges(path)
+    cmd = mk_command [
+      'convert',
+      '-trim',
+      path,
+      path + ".tmp"
+    ]
+    cmd2 = mk_command [
+      'mv',
+      '-f',
+      path + ".tmp",
+      path
+    ]
+    
+    # todo: could put these in the background, but Ruby 1.8 doesn't have Process.daemon :(
+    # would be better to ensure they finish too before the test finishes or
+    # this object is collected or whatever
+    system!(cmd)
+    system!(cmd2)
   end
 end

@@ -3,6 +3,7 @@ class User < ActiveRecord::Base
 
   has_many :submissions, :dependent => :destroy
   has_many :awarded_points, :dependent => :destroy
+  has_one :password_reset_key, :dependent => :destroy
 
   validates :login, :presence     => true,
                     :uniqueness   => true,

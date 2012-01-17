@@ -4,13 +4,13 @@ module GDocsExport
 
   def self.authenticate notifications
     notifications << "gdocs_username undefined" and return nil unless
-      SandboxServer::Application.config.gdocs_username
+      TmcServer::Application.config.gdocs_username
     notifications << "gdocs_password undefined" and return nil unless
-      SandboxServer::Application.config.gdocs_password
+      TmcServer::Application.config.gdocs_password
 
     GoogleSpreadsheet.login(
-      SandboxServer::Application.config.gdocs_username,
-      SandboxServer::Application.config.gdocs_password)
+      TmcServer::Application.config.gdocs_username,
+      TmcServer::Application.config.gdocs_password)
   end
 
   def self.refresh_course_worksheet_points course, sheetname

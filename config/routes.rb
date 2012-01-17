@@ -1,4 +1,4 @@
-SandboxServer::Application.routes.draw do
+TmcServer::Application.routes.draw do
 
   resources :sessions, :only => [:new, :create, :destroy]
 
@@ -12,6 +12,10 @@ SandboxServer::Application.routes.draw do
   resources :emails, :only => [:index]
   
   resources :stats, :only => [:index]
+  
+  resources :password_reset_keys
+  match '/reset_password/:code' => 'password_reset_keys#show', :via => :get, :as => 'reset_password'
+  match '/reset_password/:code' => 'password_reset_keys#destroy', :via => :delete
 
   resources :courses do
     member do

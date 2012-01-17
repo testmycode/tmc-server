@@ -5,7 +5,7 @@ require 'system_commands'
 # Used for generating documents from acceptance tests.
 # See e.g. spec/usermanual
 class DocGen
-  include SystemCommands
+  include IntegrationTestActions
   
   attr_reader :doc_name
   
@@ -37,7 +37,7 @@ class DocGen
     @test_case.send(name, *args, &block)
   end
 
-protected
+private
 
   def root_path
     "#{Rails::root}/doc/usermanual"
@@ -51,37 +51,6 @@ protected
     @img_counter ||= 0
     @img_counter += 1
     "#{@doc_name}-#{@img_counter}.png"
-  end
-  
-  def screenshot_to_file(path)
-    FileUtils.mkdir_p(File.dirname(path))
-    if @test_case.page.driver.respond_to? :render
-      @test_case.page.driver.render(path) # Webkit
-    else
-      @test_case.page.driver.browser.save_screenshot(path) # Selenium
-    end
-    trim_image_edges(path)
-  end
-  
-  def trim_image_edges(path)
-    cmd = mk_command [
-      'convert',
-      '-trim',
-      path,
-      path + ".tmp"
-    ]
-    cmd2 = mk_command [
-      'mv',
-      '-f',
-      path + ".tmp",
-      path
-    ]
-    
-    # todo: could put these in the background, but Ruby 1.8 doesn't have Process.daemon :(
-    # would be better to ensure they finish too before the test finishes or
-    # this object is collected or whatever
-    system!(cmd)
-    system!(cmd2)
   end
 end
 

@@ -1,0 +1,6 @@
+<h1>Forgot password</h1>
+
+<%= form_tag password_reset_keys_path do %>
+  <%= labeled_field('E-mail: ', text_field_tag(:email)) %>
+  <%= submit_tag 'Send password reset link' %>
+<% end %>
