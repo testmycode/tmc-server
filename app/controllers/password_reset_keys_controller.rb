@@ -39,7 +39,8 @@ class PasswordResetKeysController < ApplicationController
     @user.password = params[:password]
     if @user.save
       @key.destroy
-      render :action => 'done'
+      flash[:success] = 'Your password has been reset.'
+      redirect_to root_path
     else
       if @user.errors[:password]
         flash.now[:alert] = 'Password ' + @user.errors[:password]

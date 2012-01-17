@@ -40,7 +40,7 @@
     </div>
 
     <div id="content-area">
-      <% for msg_type in [:notice, :warning, :error, :alert] %>
+      <% for msg_type in [:success, :notice, :warning, :error, :alert] %>
         <% if flash[msg_type] %>
           <div class="flash <%= msg_type %>"><%= raw(flash[msg_type]) %></div>
         <% end %>
