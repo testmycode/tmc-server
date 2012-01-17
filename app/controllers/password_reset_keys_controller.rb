@@ -31,12 +31,21 @@ class PasswordResetKeysController < ApplicationController
       return render :action => :show, :status => 403
     end
     
+    if params[:password].blank?
+      flash.now[:alert] = 'Password may not be empty'
+      return render :action => :show, :status => 403
+    end
+    
     @user.password = params[:password]
     if @user.save
       @key.destroy
       render :action => 'done'
     else
-      flash.now[:alert] = 'Failed to set password'
+      if @user.errors[:password]
+        flash.now[:alert] = 'Password ' + @user.errors[:password]
+      else
+        flash.now[:alert] = 'Failed to set password'
+      end
       render :action => :show, :status => 403
     end
   end
