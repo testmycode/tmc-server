@@ -1,4 +1,6 @@
-<h1>Summary of points for <%= @course.name %></h1>
+<% unless @bare_layout %>
+  <h1>Summary of points for <%= @course.name %></h1>
+<% end %>
 
 <%= render :partial => 'summary' %>
 
