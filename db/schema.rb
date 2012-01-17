@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120116233637) do
+ActiveRecord::Schema.define(:version => 20120117231925) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -93,7 +93,7 @@ ActiveRecord::Schema.define(:version => 20120116233637) do
   create_table "test_case_runs", :force => true do |t|
     t.integer  "submission_id"
     t.text     "test_case_name"
-    t.string   "message"
+    t.text     "message"
     t.boolean  "successful"
     t.datetime "created_at"
     t.datetime "updated_at"
