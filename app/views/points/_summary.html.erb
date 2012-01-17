@@ -1,20 +1,9 @@
 <table class="points">
   <thead>
     <tr>
-      <th>student</th>
-      <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
-        <th>
-          <%= link_to sheet, course_point_path(@course, sheet) %>
-        </th>
-      <% end %>
-      <th>Total</th>
-    </tr>
-  </thead>
-  <tfoot>
-    <tr>
       <th>Number of students</th>
-      <th>Total points/possible</th>
-      <th>Total points/possible</th>
+      <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
+      <th>Total</th>
     </tr>
     <tr class="table-totals">
       <% nstudents = @summary[:students].length %>
@@ -28,7 +17,16 @@
         <%= "#{@summary[:awarded]}/#{@summary[:available]*nstudents}" %>
       </td>
     </tr>
-  </tfoot>
+    <tr>
+      <th>Student</th>
+      <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
+        <th>
+          <%= link_to sheet, course_point_path(@course, sheet) %>
+        </th>
+      <% end %>
+      <th>Total</th>
+    </tr>
+  </thead>
   <tbody>
     <% @summary[:students].each do |student| %>
       <tr>
