@@ -34,7 +34,7 @@ private
   end
   
   def user_from_basic_auth
-    if params[:format] == 'json' && request.authorization
+    if request && request.authorization
       username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
       if username && password
         User.authenticate(username, password)
