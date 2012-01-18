@@ -18,6 +18,7 @@ class CoursesController < ApplicationController
         
         courses_data = courses.map do |c|
           {
+            :id => c.id,
             :name => c.name,
             :exercises => c.exercises.order('LOWER(name)').map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
           }
@@ -99,6 +100,7 @@ private
     helpers = view_context
 
     {
+      :id => exercise.id,
       :name => exercise.name,
       :deadline => exercise.deadline,
       :checksum => exercise.checksum,
