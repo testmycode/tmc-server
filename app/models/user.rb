@@ -45,7 +45,7 @@ class User < ActiveRecord::Base
   end
 
   def <=>(other)
-    self.login <=> other.login
+    self.login.downcase <=> other.login.downcase
   end
 
 private
