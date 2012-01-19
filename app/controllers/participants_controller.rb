@@ -18,5 +18,14 @@ class ParticipantsController < ApplicationController
       end
     end
   end
+  
+  def destroy
+    return respond_access_denied unless current_user.administrator?
+    
+    user = User.find(params[:id])
+    user.destroy
+    flash[:success] = 'User account deleted'
+    redirect_to root_path
+  end
 
 end

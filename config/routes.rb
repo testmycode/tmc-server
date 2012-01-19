@@ -7,7 +7,7 @@ TmcServer::Application.routes.draw do
   
   resource :user
   
-  resources :participants, :only => [:index]
+  resources :participants
   
   resources :emails, :only => [:index]
   
