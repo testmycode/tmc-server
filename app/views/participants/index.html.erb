@@ -21,6 +21,7 @@
   <% end %>
   </tbody>
 </table>
+<div class="as-json">[<%= link_to "json", "#{participants_path :format => :json, :api_version => ApplicationController::API_VERSION}" %>]</div>
 
 <%= use_datatables('table.participants', :bPaginate => false) %>
 
