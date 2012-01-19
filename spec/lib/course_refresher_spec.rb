@@ -340,24 +340,38 @@ describe CourseRefresher do
   end
 
   describe "on failure" do
-    def cause_failure
-      change_course_metadata_file('xooxer', :raw => true)
+    def sabotage
+      CourseRefresher.should_receive(:simulate_failure!).and_raise('simulated failure')
     end
 
-    it "should not leave the new cache directory lying around after a failure" do
-      cause_failure
+    it "should not leave the new cache directory lying around" do
+      sabotage
       expect { refresher.refresh_course(course) }.to raise_error
 
       File.should_not exist(course.cache_path)
     end
 
-    it "should not delete the old cache directory after a failure" do
+    it "should not delete the old cache directory" do
       refresher.refresh_course(course)
       old_path = course.cache_path
-      cause_failure
+      sabotage
       expect { refresher.refresh_course(course) }.to raise_error
 
       File.should exist(old_path)
+    end
+    
+    it "should roll back any database changes" do
+      old_cache_version = course.cache_version
+      old_exercises = Exercise.order(:id).to_a
+      old_points = AvailablePoint.order(:id).to_a
+      
+      sabotage
+      expect { refresher.refresh_course(course) }.to raise_error
+      
+      course.reload
+      course.cache_version.should == old_cache_version
+      Exercise.order(:id).to_a.should == old_exercises
+      AvailablePoint.order(:id).to_a.should == old_points
     end
   end
 

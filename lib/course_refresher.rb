@@ -42,17 +42,17 @@ private
     
     def refresh_course(course)
       @report = Report.new
-      
-      Course.transaction(:requires_new => true) do
-        @course = Course.find(course.id, :lock => true)
+
+      begin      
+        Course.transaction(:requires_new => true) do
+          @course = Course.find(course.id, :lock => true)
+          
+          @old_cache_path = @course.cache_path
+          @course.cache_version += 1 # causes @course.*_path to return paths in the new cache
+          
+          FileUtils.rm_rf(@course.cache_path)
+          FileUtils.mkdir_p(@course.cache_path)
         
-        @old_cache_path = @course.cache_path
-        @course.cache_version += 1 # causes @course.*_path to return paths in the new cache
-        
-        FileUtils.rm_rf(@course.cache_path)
-        FileUtils.mkdir_p(@course.cache_path)
-        
-        begin
           clone_repository
           update_course_options
           add_records_for_new_exercises
@@ -66,13 +66,15 @@ private
           set_permissions
           @course.save!
           @course.exercises.each &:save!
-        rescue
-          @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
-          # Delete the new cache we were working on
-          FileUtils.rm_rf(@course.cache_path)
-        else
-          FileUtils.rm_rf(@old_cache_path)
+          
+          CourseRefresher.simulate_failure! if ::Rails::env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
         end
+      rescue
+        @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
+        # Delete the new cache we were working on
+        FileUtils.rm_rf(@course.cache_path)
+      else
+        FileUtils.rm_rf(@old_cache_path)
       end
       
       course.reload # reload the record given as parameter
