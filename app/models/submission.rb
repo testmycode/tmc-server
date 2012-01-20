@@ -5,7 +5,7 @@ class Submission < ActiveRecord::Base
   belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "exercises.course_id = #{self.course_id}" }
 
-  has_many :test_case_runs, :dependent => :destroy
+  has_many :test_case_runs, :dependent => :destroy, :order => :id
   has_many :awarded_points, :dependent => :nullify
   
   validates :user, :presence => true
