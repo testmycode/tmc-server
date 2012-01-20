@@ -79,6 +79,6 @@ class Submission < ActiveRecord::Base
 private
   
   def self.reprocess_attempt_interval
-    10.seconds
+    20.seconds # TODO: fix https://github.com/testmycode/tmc-server/issues/71
   end
 end
