@@ -25,9 +25,6 @@ class SubmissionPackager
         sh! ['tar', '-C', project_root, '-cf', tar_path, 'src', 'lib']
         sh! ['tar', '-C', exercise.clone_path, '-rf', tar_path, 'lib', 'test']
         
-        write_tests_file(exercise, 'tests.txt')
-        sh! ['tar', '-rf', tar_path, 'tests.txt']
-        
         FileUtils.cp(tmc_run_path, "./")
         sh! ['chmod', 'a+x', 'tmc-run']
         sh! ['tar', '-rpf', tar_path, 'tmc-run']
@@ -51,14 +48,6 @@ private
       return path
     end
     return nil
-  end
-  
-  def write_tests_file(exercise, tests_file_name)
-    File.open(tests_file_name, 'w') do |file|
-      TestScanner.get_test_case_methods(exercise.clone_path).map do |m|
-        file.write(m[:class_name] + "." + m[:method_name] + "{" + m[:points].join(',') + "}\n")
-      end
-    end
   end
 end
 

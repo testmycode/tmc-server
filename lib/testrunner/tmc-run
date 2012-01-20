@@ -1,12 +1,22 @@
 #!/bin/sh -e
 # This gets passed with each submission to tmc-sandbox
 
+# Compile project
 mkdir -p classes/main
 mkdir -p classes/test
 find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp lib/*:src/ > output.txt 2>&1 || exit 101
-find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:classes/main:test/ > output.txt 2>&1 || exit 101
+find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:classes/main:test/ > output.txt 2>&1 || exit 102
+
+CLASSPATH="lib/testrunner/*:lib/*:classes/main/:classes/test/"
+
+# Discover tests
+java -cp "$CLASSPATH" "fi.helsinki.cs.tmc.testscanner.TestScanner" --test-runner-format test > tests.txt 2> output.txt || exit 103
+
+# Run tests
 
 rm -f output.txt
+
+TESTS=`cat tests.txt`
 
 DEFS="
   -Dtmc.exercise_dir=`pwd` 
@@ -15,8 +25,7 @@ DEFS="
   -Dtmc.lib_dir=`pwd`/lib
   -Dtmc.results_file=`pwd`/output.txt"
 
-TESTS=`cat tests.txt`
-
-java -cp lib/testrunner/*:lib/*:classes/main/:classes/test/ $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
+java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
 
 exit 0
+
