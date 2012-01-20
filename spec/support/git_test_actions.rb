@@ -29,13 +29,27 @@ module GitTestActions
     end
     
     raise 'Course not using git but ' + course.source_backend if course.source_backend != 'git'
-    clone_repo(course.source_url, course.name + "-wc")
     
-    GitRepo.new("#{course.name}-wc")
+    repo_path = pick_free_file_name("#{course.name}-wc")
+    clone_repo(course.source_url, repo_path)
+    
+    GitRepo.new(repo_path)
   end
   
   def clone_repo(from, to)
     # silencing warning about cloning empty repo
     system!("git clone -q #{from} #{to} >/dev/null 2>&1")
+  end
+  
+private
+  def pick_free_file_name(base_name)
+    return base_name if !File.exist?(base_name)
+    
+    n = 1
+    begin
+      n += 1
+      name = base_name + n.to_s
+    end while File.exist?(name)
+    name
   end
 end

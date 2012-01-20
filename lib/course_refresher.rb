@@ -48,12 +48,13 @@ private
           @course = Course.find(course.id, :lock => true)
           
           @old_cache_path = @course.cache_path
+          
           @course.cache_version += 1 # causes @course.*_path to return paths in the new cache
           
           FileUtils.rm_rf(@course.cache_path)
           FileUtils.mkdir_p(@course.cache_path)
         
-          clone_repository
+          update_or_clone_repository
           update_course_options
           add_records_for_new_exercises
           delete_records_for_removed_exercises
@@ -82,10 +83,33 @@ private
       raise Failure.new(@report) unless @report.errors.empty?
       @report
     end
-  
+    
+    def update_or_clone_repository
+      raise 'Source types other than git not yet implemented' if @course.source_backend != 'git'
+
+      if File.exists?("#{@old_cache_path}/clone/.git")
+        begin
+          # Try a fast path: copy old clone and git fetch new stuff
+          copy_and_update_repository
+        rescue
+          FileUtils.rm_rf(@course.clone_path)
+          clone_repository
+        end
+      else
+        clone_repository
+      end
+    end
+    
+    def copy_and_update_repository
+      FileUtils.cp_r("#{@old_cache_path}/clone", "#{@course.clone_path}")
+      Dir.chdir(@course.clone_path) do
+        sh!('git', 'remote', 'set-url', 'origin', @course.source_url)
+        sh!('git', 'fetch', 'origin')
+        sh!('git', 'checkout', 'origin/' + @course.git_branch)
+      end
+    end
     
     def clone_repository
-      raise 'Source types other than git not yet implemented' if @course.source_backend != 'git'
       sh!('git', 'clone', '-q', '-b', @course.git_branch, @course.source_url, @course.clone_path)
     end
     
