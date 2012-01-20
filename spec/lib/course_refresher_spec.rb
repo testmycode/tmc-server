@@ -248,6 +248,23 @@ describe CourseRefresher do
     File.should_not exist(solution + '/test/SimpleHiddenTest.java')
   end
   
+  it "should regenerate changed solutions" do
+    repo = add_exercise('MyExercise')
+    @refresher.refresh_course(@course)
+    
+    @local_clone.chdir do
+      new_file = File.read('MyExercise/src/SimpleStuff.java').gsub('return a + b;', 'return b + a;')
+      File.open('MyExercise/src/SimpleStuff.java', 'wb') {|f| f.write(new_file) }
+    end
+    @local_clone.add_commit_push
+    
+    @refresher.refresh_course(@course)
+    
+    solution = Exercise.find_by_name('MyExercise').solution_path
+    simple_stuff = File.read(solution + '/src/SimpleStuff.java')
+    simple_stuff.should include('return b + a;')
+  end
+  
   it "should generate zips from the stubs" do
     add_exercise('MyExercise')
     add_exercise('MyCategory/MyExercise')
