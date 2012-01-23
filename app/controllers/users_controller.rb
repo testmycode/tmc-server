@@ -14,14 +14,14 @@ class UsersController < ApplicationController
     @user = User.new
     user_params = params[:user]
     
-    @user.login = user_params[:login]
+    @user.login = user_params[:login].strip
     
     if user_params[:email].blank?
       @user.errors.add(:email, 'needed')
     elsif user_params[:email] != user_params[:email_repeat]
       @user.errors.add(:email_repeat, 'did not match')
     else
-      @user.email = user_params[:email]
+      @user.email = user_params[:email].strip
     end
     
     if user_params[:password].blank?
