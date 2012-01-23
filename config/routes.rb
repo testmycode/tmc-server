@@ -28,11 +28,13 @@ TmcServer::Application.routes.draw do
         get 'refresh_gdocs'
       end
     end
-
-    resources :exercises, :except => [:destroy, :create] do
-      resources :submissions, :only => [:create, :index]
-      resource :solution, :only => [:show]
-    end
+    
+    resources :exercises, :only => [:index]
+  end
+  
+  resources :exercises, :only => [:show] do
+    resources :submissions, :only => [:create, :index]
+    resource :solution, :only => [:show]
   end
 
   resources :submissions, :only => [:show, :update] do

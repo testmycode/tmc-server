@@ -43,12 +43,12 @@ EOS
       parts << link_to(@course.name, @course)
       
       if @exercise && !@exercise.new_record? && @exercise.course == @course
-        parts << link_to(@exercise.name, course_exercise_path(@course, @exercise))
+        parts << link_to(@exercise.name, exercise_path(@exercise))
         
         if @submission && !@submission.new_record? && @submission.exercise == @exercise
           parts << link_to("Submission ##{@submission.id}", submission_path(@submission))
         elsif @solution
-          parts << link_to('Suggested solution', course_exercise_solution_path(@course, @exercise))
+          parts << link_to('Suggested solution', exercise_solution_path(@exercise))
         end
         
       elsif @submission && !@submission.new_record?

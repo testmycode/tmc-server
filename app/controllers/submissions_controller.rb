@@ -87,7 +87,7 @@ class SubmissionsController < ApplicationController
           redirect_to(submission_path(@submission),
                       :notice => 'Submission received.')
         else
-          redirect_to(course_exercise_path(@course, @exercise),
+          redirect_to(exercise_path(@exercise),
                       :alert => errormsg) 
         end
       end
@@ -119,10 +119,10 @@ private
   end
 
   def get_course_and_exercise
-    if params[:course_id] && params[:exercise_id]
-      @course = Course.find(params[:course_id], :lock => 'FOR SHARE')
+    if params[:exercise_id]
+      @exercise = Exercise.find(params[:exercise_id])
+      @course = Course.find(@exercise.course_id, :lock => 'FOR SHARE')
       authorize! :read, @course
-      @exercise = @course.exercises.find(params[:exercise_id])
       authorize! :read, @exercise
     end
   end

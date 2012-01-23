@@ -56,8 +56,8 @@ describe CoursesController do
         exs = result['courses'][0]['exercises']
         exs[0]['name'].should == 'Exercise1'
         exs[1]['name'].should == 'Exercise2'
-        exs[0]['zip_url'].should == course_exercise_url(@course.id, @course.exercises[0].id, :format => 'zip')
-        exs[0]['return_url'].should == course_exercise_submissions_url(@course.id, @course.exercises[0].id, :format => 'json')
+        exs[0]['zip_url'].should == exercise_url(@course.exercises[0].id, :format => 'zip')
+        exs[0]['return_url'].should == exercise_submissions_url(@course.exercises[0].id, :format => 'json')
       end
       
       it "should include only visible exercises" do

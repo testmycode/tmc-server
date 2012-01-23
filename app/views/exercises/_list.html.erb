@@ -16,7 +16,7 @@
     <% exercises.each do |exercise| %>
       <tr>
         <td>
-          <%= link_to exercise.name, [course, exercise] %>
+          <%= link_to exercise.name, exercise %>
           <%
             notes = []
             notes << "hidden" if exercise.hidden?

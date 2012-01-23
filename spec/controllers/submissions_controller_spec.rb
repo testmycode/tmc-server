@@ -90,7 +90,7 @@ describe SubmissionsController do
     
       it "should redirect to exercise with failure message" do
         post_create
-        response.should redirect_to(course_exercise_path(@course, @exercise))
+        response.should redirect_to(exercise_path(@exercise))
         flash[:alert].should_not be_blank
       end
       
@@ -109,7 +109,7 @@ describe SubmissionsController do
       
       it "should redirect to exercise with failure message" do
         post_create
-        response.should redirect_to(course_exercise_path(@course, @exercise))
+        response.should redirect_to(exercise_path(@exercise))
         flash[:alert].should_not be_blank
       end
       

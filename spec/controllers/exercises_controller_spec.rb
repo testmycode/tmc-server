@@ -7,7 +7,7 @@ describe ExercisesController do
     let!(:exercise) { Factory.create(:exercise, :course => course) }
   
     def get_show
-      get :show, :course_id => course.id, :id => exercise.id
+      get :show, :id => exercise.id
     end
   
     describe "for guests" do
@@ -28,6 +28,7 @@ describe ExercisesController do
         
         get_show
         
+        assigns[:submissions].should_not be_nil
         assigns[:submissions].should include(s1)
         assigns[:submissions].should_not include(s2)
       end
@@ -44,6 +45,7 @@ describe ExercisesController do
         
         get_show
         
+        assigns[:submissions].should_not be_nil
         assigns[:submissions].should include(s1)
         assigns[:submissions].should include(s2)
         assigns[:submissions].should_not include(irrelevant)
