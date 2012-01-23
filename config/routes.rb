@@ -40,6 +40,8 @@ TmcServer::Application.routes.draw do
   resources :submissions, :only => [:show, :update] do
     resource :result, :only => :create
   end
+  
+  match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
 
   root :to => "courses#index"
 

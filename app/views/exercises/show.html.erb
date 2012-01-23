@@ -39,3 +39,16 @@
   </section>
 <% end %>
 
+<% if current_user.administrator? && !@submissions.empty? %>
+  <section>
+    <%
+      if @submissions.count > 10
+        confirm_msg = "Really rerun all #{@submissions.count} submissions?\nIt may take a while."
+      else
+        confirm_msg = nil
+      end
+    %>
+    <%= button_to 'Rerun all submissions', exercise_update_submissions_path(@exercise), :method => :put, :confirm => confirm_msg %>
+    (may add points; never deletes points; may take a long time)
+  </section>
+<% end %>

@@ -103,12 +103,15 @@ class SubmissionsController < ApplicationController
   
   def update
     submission = Submission.find(params[:id]) || respond_not_found
-    authorize! :update, submission
-    submission.processed = false
-    submission.randomize_secret_token
-    submission.save!
-    try_to_send_submission_to_sandbox(submission)
+    rerun_submission(submission)
     redirect_to submission_path(submission), :notice => 'Rerun scheduled'
+  end
+  
+  def update_by_exercise
+    for submission in @exercise.submissions
+      rerun_submission(submission)
+    end
+    redirect_to exercise_path(@exercise), :notice => 'Reruns scheduled'
   end
 
 private
@@ -125,6 +128,14 @@ private
       authorize! :read, @course
       authorize! :read, @exercise
     end
+  end
+  
+  def rerun_submission(submission)
+    authorize! :update, submission
+    submission.processed = false
+    submission.randomize_secret_token
+    submission.save!
+    try_to_send_submission_to_sandbox(submission)
   end
   
   def try_to_send_submission_to_sandbox(submission)

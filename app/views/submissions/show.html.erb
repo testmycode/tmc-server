@@ -15,53 +15,51 @@
 </div>
 
 <% if !@submission.processed? %>
-<script type="text/javascript">
-$(document).ready(function() {
-  // Animate the "Processing..." text
-  var dots = '...'
-  setInterval(function() {
-    if (dots == '...') {
-      dots = '';
-    } else {
-      dots += '.';
-    }
-    $('.submission-summary p:first').text('Processing' + dots);
-  }, 700)
-
-  // Refresh status until processed, then refresh page
-  var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApplicationController::API_VERSION) %>';
-  var refreshCooldown = 5000;
-  function refreshStatus() {
-    $.ajax({
-      url: url,
-      dataType: 'json',
-      success: function(data) {
-        if (data.status == 'processing') {
-          status =
-            'Place in queue: ' + (data.submissions_before_this + 1) +
-            ' / ' + data.total_unprocessed
-          $('.processing-status').text(status);
-        } else {
-          window.location.reload();
-        }
-      },
-      complete: function() {
-        setTimeout(refreshStatus, refreshCooldown);
+  <script type="text/javascript">
+  $(document).ready(function() {
+    // Animate the "Processing..." text
+    var dots = '...'
+    setInterval(function() {
+      if (dots == '...') {
+        dots = '';
+      } else {
+        dots += '.';
       }
-    });
-  }
-  refreshStatus();
-});
-</script>
+      $('.submission-summary p:first').text('Processing' + dots);
+    }, 700)
+
+    // Refresh status until processed, then refresh page
+    var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApplicationController::API_VERSION) %>';
+    var refreshCooldown = 5000;
+    function refreshStatus() {
+      $.ajax({
+        url: url,
+        dataType: 'json',
+        success: function(data) {
+          if (data.status == 'processing') {
+            status =
+              'Place in queue: ' + (data.submissions_before_this + 1) +
+              ' / ' + data.total_unprocessed
+            $('.processing-status').text(status);
+          } else {
+            window.location.reload();
+          }
+        },
+        complete: function() {
+          setTimeout(refreshStatus, refreshCooldown);
+        }
+      });
+    }
+    refreshStatus();
+  });
+  </script>
 <% end %>
 
 <% if can? :update, @submission %>
-  <%= form_tag @submission, :method => :put do %>
-    <%= content_tag :button, :type => 'submit' do %>
-      Rerun submission
-    <% end %>
-    <span>(may add points; never deletes points)</span>
-  <% end %>
+  <div>
+    <%= button_to 'Rerun submission', submission_path(@submission), :method => :put %>
+    (may add points; never deletes points)
+  </div>
 <% end %>
 
 <% if @submission.pretest_error %>
