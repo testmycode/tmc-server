@@ -1,7 +1,7 @@
 class SolutionsController < ApplicationController
   def show
-    @course = Course.find(params[:course_id])
-    @exercise = @course.exercises.find(params[:exercise_id])
+    @exercise = Exercise.find(params[:exercise_id])
+    @course = @exercise.course
     @solution = @exercise.solution
     begin
       authorize! :read, @solution
