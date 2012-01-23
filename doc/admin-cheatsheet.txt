@@ -1,0 +1,10 @@
+
+Stuff an admin might need to do especially when upgrading.
+
+- env RAILS_ENV=production ...
+
+- rake db:migrate
+- rake junit_runner:recompile
+- rake test_scanner_cache:clear
+- script/submission_reprocessor restart
+
