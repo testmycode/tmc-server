@@ -231,6 +231,11 @@ div.stack-trace {
 
 table {
   border-collapse: collapse;
+  width: 100%;
+}
+
+table.points {
+  width: auto;
 }
 
 table > * > tr > td {
