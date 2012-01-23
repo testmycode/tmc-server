@@ -49,44 +49,34 @@ module TmcJunitRunner
   end
   
   # Use TestScanner.get_test_case_methods instead.
-  def get_test_case_methods(course_or_exercise_path)
+  def get_test_case_methods(exercise_path)
     result = []
-    ExerciseDir.find_exercise_dirs(course_or_exercise_path).each do |exdir|
-      ex_cp = exdir.library_jars.map(&:to_s).join(':')
-      runner_cp = classpath
+    ex_dir = ExerciseDir.new(exercise_path)
+    ex_cp = ex_dir.library_jars.map(&:to_s).join(':')
+    runner_cp = classpath
+    
+    Dir.mktmpdir do |tmpdir|
+      stderr_file = "#{tmpdir}/stderr"
+      cmd = mk_command([
+        'java',
+        '-cp',
+        runner_cp + ':' + ex_cp,
+        "#{package}.testscanner.TestScanner",
+        ex_dir.path.to_s
+      ])
       
-      Dir.mktmpdir do |tmpdir|
-        stderr_file = "#{tmpdir}/stderr"
-        cmd = mk_command([
-          'java',
-          '-cp',
-          runner_cp + ':' + ex_cp,
-          "#{package}.testscanner.TestScanner",
-          exdir.path.to_s
-        ])
-        
-        output = `#{cmd} 2>#{Shellwords.escape(stderr_file)}`
-        
-        if !$?.success?
-          raise File.read(stderr_file)
-        end
-        
-        result += parse_test_scanner_output(output)
+      output = `#{cmd} 2>#{Shellwords.escape(stderr_file)}`
+      
+      if !$?.success?
+        raise File.read(stderr_file)
       end
+      
+      result += parse_test_scanner_output(output)
     end
     result
   end
   
 protected
-
-  def find_project_dirs(path)
-    ExerciseDir.find_exercise_dirs(path)
-    result = []
-    Pathname(path).find do |entry|
-      result << entry.parent if entry.directory? && entry.basename == 'test'
-    end
-    result
-  end
 
   def parse_test_scanner_output(output)
     JSON.parse(output).map do |item|

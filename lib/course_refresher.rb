@@ -188,7 +188,7 @@ private
     
     def test_case_methods(exercise)
       path = File.join(@course.clone_path, exercise.relative_path)
-      TestScanner.get_test_case_methods(path)
+      TestScanner.get_test_case_methods(@course, exercise.name, path)
     end
     
     def make_solutions

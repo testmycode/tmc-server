@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120117231925) do
+ActiveRecord::Schema.define(:version => 20120123064427) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -101,6 +101,16 @@ ActiveRecord::Schema.define(:version => 20120117231925) do
   end
 
   add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"
+
+  create_table "test_scanner_cache_entries", :force => true do |t|
+    t.integer  "course_id",     :null => false
+    t.string   "exercise_name"
+    t.string   "files_hash"
+    t.text     "value"
+    t.datetime "created_at"
+  end
+
+  add_index "test_scanner_cache_entries", ["course_id", "exercise_name"], :name => "index_test_scanner_cache_entries_on_course_id_and_exercise_name", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "login",                            :null => false
