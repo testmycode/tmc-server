@@ -223,11 +223,14 @@ div.stack-trace {
   font-family: monospace;
 }
 
+.scrollable {
+  overflow: auto;
+}
+
 /* Lists and tables */
 
 table {
   border-collapse: collapse;
-  width: 100%;
 }
 
 table > * > tr > td {
