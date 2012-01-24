@@ -14,7 +14,7 @@ class UsersController < ApplicationController
     @user = User.new
     user_params = params[:user]
     
-    @user.login = user_params[:login].strip
+    @user.login = user_params[:login].to_s.strip
     
     if user_params[:email].blank?
       @user.errors.add(:email, 'needed')
