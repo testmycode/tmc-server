@@ -107,7 +107,37 @@ describe "The system (used by a student)", :integration => true do
 
   it "should not show the submission form for unreturnable exercises"
   
-  it "should show solutions for completed exercises"
+  it "should show solutions for completed exercises" do
+    ex = FixtureExercise.new('SimpleExerciseWithSolutionsAndStubs', 'MyExercise')
+    ex.make_zip
+    
+    click_link 'MyExercise'
+    attach_file('Zipped project', 'MyExercise.zip')
+    click_button 'Submit'
+    wait_for_submission_to_be_processed
+    
+    visit '/'
+    click_link 'mycourse'
+    click_link 'MyExercise'
+    click_link 'View suggested solution'
+    page.should have_content('Solution for MyExercise')
+    page.should have_content('src/SimpleStuff.java')
+  end
   
-  it "should not show solutions for uncompleted exercises"
+  it "should not show solutions for uncompleted exercises" do
+    ex = SimpleExercise.new('MyExercise')
+    ex.solve_add
+    ex.make_zip
+    
+    click_link 'MyExercise'
+    attach_file('Zipped project', 'MyExercise.zip')
+    click_button 'Submit'
+    wait_for_submission_to_be_processed
+  
+    visit '/'
+    click_link 'mycourse'
+    click_link 'MyExercise'
+    
+    page.should_not have_content('View suggested solution')
+  end
 end
