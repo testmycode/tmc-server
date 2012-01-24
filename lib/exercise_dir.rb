@@ -28,6 +28,10 @@ class ExerciseDir
     
     path.find do |subpath|
       if looks_like_exercise_path? subpath
+        if subpath.basename.to_s.include?('-')
+          raise "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
+        end
+        
         result << ExerciseDir.new(subpath)
       end
     end
