@@ -153,12 +153,16 @@ body.default {
   margin-top: 5pt;
 }
 
-#navigation-area {
+#breadcrumb {
   clear: both;
   background-color: #F5F9FD;
   font-weight: bold;
   padding: 5px 5px 5px 5px;
   border-top: 1px #E8EBFB solid;
+}
+
+#breadcrumb .breadcrumb-resource {
+  font-style: italic;
 }
 
 .flash {

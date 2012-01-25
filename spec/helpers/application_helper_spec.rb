@@ -35,6 +35,8 @@ describe ApplicationHelper do
   describe "#breadcrumb" do # Not a complete specification
     it "should show the current course" do
       @course = mock_model(Course, :name => 'MyCourse', :new_record? => false)
+      @controller_name = 'unknown_controller'
+      @action_name = 'unknown_action'
       breadcrumb.should include('MyCourse')
     end
     
@@ -51,15 +53,18 @@ describe ApplicationHelper do
       @submission = mock_model(Submission, :id => 123, :course => @course, :exercise => @exercise, :new_record? => false)
       breadcrumb.should include('MyCourse')
       breadcrumb.should include('MyExercise')
-      breadcrumb.should include('Submission #123')
+      breadcrumb.should include('Submission')
+      breadcrumb.should include('#123')
     end
     
     it "should show the current submission, its course and its exercise name even if the exercise was deleted" do
       @course = mock_model(Course, :name => 'MyCourse', :new_record? => false)
       @submission = mock_model(Submission, :id => 123, :course => @course, :exercise_name => 'MyExercise', :new_record? => false)
       breadcrumb.should include('MyCourse')
-      breadcrumb.should include('(deleted exercise MyExercise)')
-      breadcrumb.should include('Submission #123')
+      breadcrumb.should include('deleted exercise')
+      breadcrumb.should include('MyExercise')
+      breadcrumb.should include('Submission')
+      breadcrumb.should include('#123')
     end
   end
 end

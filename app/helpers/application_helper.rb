@@ -39,21 +39,25 @@ EOS
     
     parts << link_to('TMC', root_path)
     
+    action = "#{@controller_name}##{@action_name}"
+    
     if @course && !@course.new_record?
-      parts << link_to(@course.name, @course)
+      parts << link_to(raw("Course #{breadcrumb_resource(@course.name)}"), @course)
       
       if @exercise && !@exercise.new_record? && @exercise.course == @course
-        parts << link_to(@exercise.name, exercise_path(@exercise))
+        parts << link_to(raw("Exercise #{breadcrumb_resource(@exercise.name)}"), exercise_path(@exercise))
         
         if @submission && !@submission.new_record? && @submission.exercise == @exercise
-          parts << link_to("Submission ##{@submission.id}", submission_path(@submission))
+          parts << link_to(raw("Submission #{breadcrumb_resource('#' + @submission.id.to_s)}"), submission_path(@submission))
         elsif @solution
           parts << link_to('Suggested solution', exercise_solution_path(@exercise))
         end
         
       elsif @submission && !@submission.new_record?
-        parts << "(deleted exercise #{@submission.exercise_name})"
-        parts << link_to("Submission ##{@submission.id}", submission_path(@submission))
+        parts << raw("(deleted exercise #{breadcrumb_resource(@submission.exercise_name)})")
+        parts << link_to(raw("Submission #{breadcrumb_resource('#' + @submission.id.to_s)}"), submission_path(@submission))
+      elsif action == 'submissions#index'
+        parts << link_to("Submissions", course_submissions_path(@course))
       end
     elsif @user
       if @user.new_record?
@@ -63,5 +67,10 @@ EOS
       end
     end
     raw(parts.join(' &raquo; '))
+  end
+  
+private
+  def breadcrumb_resource(name)
+    content_tag(:span, h(name), :class => 'breadcrumb-resource')
   end
 end

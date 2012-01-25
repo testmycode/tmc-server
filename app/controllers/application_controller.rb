@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_default_url_options
   before_filter :check_api_version
   before_filter :set_bare_layout
+  before_filter :set_controller_and_action_name
 
   def url_options
     if @bare_layout
@@ -52,6 +53,11 @@ private
   
   def set_bare_layout
     @bare_layout = !!params[:bare_layout]
+  end
+  
+  def set_controller_and_action_name
+    @controller_name = controller_name
+    @action_name = action_name
   end
   
   def respond_not_found(msg = 'Not Found')
