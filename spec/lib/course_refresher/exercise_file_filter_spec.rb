@@ -77,6 +77,35 @@ EOF
       File.should_not exist('stub/Thing.java')
     end
     
+    it "should convert end-of-lines to unix style" do
+      make_file 'original/Thing.java', <<EOF
+public class Thing {\r
+    // BEGIN SOLUTION\r
+    public int foo() {\r
+        return 3;\r
+    }\r
+    // END SOLUTION\r
+    \r
+    public void bar() {\r
+        // BEGIN SOLUTION\r
+        System.out.println("hello");\r
+        // END SOLUTION\r
+        // STUB: // code here\r
+    }\r
+}\r
+EOF
+      @filter.make_stub('original', 'stub')
+      result = File.read('stub/Thing.java')
+      result.should == <<EOF
+public class Thing {
+    
+    public void bar() {
+        // code here
+    }
+}
+EOF
+    end 
+    
     it "should not include hidden tests" do
       make_file('original/HiddenThing.java', '...')
       @filter.make_stub('original', 'stub')
@@ -181,6 +210,38 @@ public class Thing {
 }
 EOF
     end
+    
+    it "should convert end-of-lines to unix style" do
+      make_file 'original/Thing.java', <<EOF
+public class Thing {\r
+    // BEGIN SOLUTION\r
+    public int foo() {\r
+        return 3;\r
+    }\r
+    // END SOLUTION\r
+    \r
+    public void bar() {\r
+        // BEGIN SOLUTION\r
+        System.out.println("hello");\r
+        // END SOLUTION\r
+        // STUB: // code here
+    }\r
+}\r
+EOF
+      @filter.make_solution('original', 'solution')
+      result = File.read('solution/Thing.java')
+      result.should == <<EOF
+public class Thing {
+    public int foo() {
+        return 3;
+    }
+    
+    public void bar() {
+        System.out.println("hello");
+    }
+}
+EOF
+    end 
     
     
     it "should not include any tests" do

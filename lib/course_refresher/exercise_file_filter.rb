@@ -83,10 +83,15 @@ class CourseRefresher
       text = File.read(source_path)
       if source_path.extname == '.java'
         return nil if text =~ solution_file_regexp
+        text = fix_line_endings(text)
         text = remove_solution_blocks(text)
         text = uncomment_stubs(text)
       end
       text
+    end
+    
+    def fix_line_endings(text)
+      text.gsub("\r", "")
     end
     
     def remove_solution_blocks(text)
@@ -127,6 +132,7 @@ class CourseRefresher
     def filter_for_solution(source_path)
       text = File.read(source_path)
       if source_path.extname == '.java'
+        text = fix_line_endings(text)
         text = remove_stub_and_solution_comments(text)
       end
       text
