@@ -87,7 +87,7 @@ private
     unless current_user.guest?
       @submissions = @course.submissions
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
-      @submissions = @submissions.order('created_at DESC').limit(500)
+      @submissions = @submissions.order('created_at DESC').includes(:user).limit(500)
       authorize! :read, @submissions
     end
   end
