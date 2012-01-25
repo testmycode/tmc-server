@@ -58,9 +58,18 @@
 
 <% if @submissions %>
   <h2>Latest submissions</h2>
-
+  
   <section>
-    <%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
+    <% if @course.submissions.count > @submissions.count %>
+      <p>
+        Only showing <%= @submissions.count %> of <%= @course.submissions.count %>
+        <%= link_to "(show all)", course_submissions_path(@course) %>.
+      </p>
+    <% end %>
+    
+    <div>
+      <%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
+    </div>
   </section>
 <% end %>
 

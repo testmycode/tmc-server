@@ -4,6 +4,13 @@ class SubmissionsController < ApplicationController
   
   skip_authorization_check :only => :show
 
+  def index
+    @submissions = @course.submissions
+    @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
+    @submissions = @submissions.order('created_at DESC').includes(:user)
+    authorize! @submissions, :read
+  end
+
   def show
     @submission = Submission.find(params[:id])
     authorize! :read, @submission
@@ -128,6 +135,9 @@ private
       @course = Course.find(@exercise.course_id, :lock => 'FOR SHARE')
       authorize! :read, @course
       authorize! :read, @exercise
+    elsif params[:course_id]
+      @course = Course.find(params[:course_id], :lock => 'FOR SHARE')
+      authorize! :read, @course
     end
   end
   

@@ -85,9 +85,11 @@ private
     authorize! :read, @exercises
 
     unless current_user.guest?
+      max_submissions = 100
       @submissions = @course.submissions
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
-      @submissions = @submissions.order('created_at DESC').includes(:user).limit(500)
+      @submissions = @submissions.order('created_at DESC').includes(:user)
+      @submissions = @submissions.limit(max_submissions)
       authorize! :read, @submissions
     end
   end

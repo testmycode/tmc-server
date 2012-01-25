@@ -30,6 +30,7 @@ TmcServer::Application.routes.draw do
     end
     
     resources :exercises, :only => [:index]
+    resources :submissions, :only => [:index]
   end
   
   resources :exercises, :only => [:show] do

@@ -1,0 +1,8 @@
+
+<h1>All submissions for <%= @course.name %></h2>
+
+<%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
+
+<div class="link-back">
+  <%= link_to 'Back', course_path(@course) %>
+</div>
