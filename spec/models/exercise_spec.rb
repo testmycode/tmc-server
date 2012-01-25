@@ -247,22 +247,14 @@ describe Exercise do
     exercise.should_not be_completed_by(user)
 
     other_user = Factory.create(:user)
-    other_user_sub = Submission.create!(:user => other_user, :course => course, :exercise_name => exercise.name)
-    other_user_sub.test_case_runs.create!(:test_case_name => 'one', :successful => true)
-    other_user_sub.test_case_runs.create!(:test_case_name => 'two', :successful => true)
+    other_user_sub = Submission.create!(:user => other_user, :course => course, :exercise_name => exercise.name, :all_tests_passed => true)
     exercise.should_not be_completed_by(user)
 
-    Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :pretest_error => 'oops')
+    Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :pretest_error => 'oops', :all_tests_passed => true) # in reality all_tests_passed should always be false if pretest_error is not null
     exercise.should_not be_completed_by(user)
 
-    sub = Submission.create!(:user => user, :course => course, :exercise_name => exercise.name)
-    tcr1 = sub.test_case_runs.create!(:test_case_name => 'one', :successful => true)
-    tcr2 = sub.test_case_runs.create!(:test_case_name => 'one', :successful => false)
+    sub = Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :all_tests_passed => false)
     exercise.should_not be_completed_by(user)
-
-    tcr2.successful = true
-    tcr2.save!
-    exercise.should be_completed_by(user)
   end
 end
 

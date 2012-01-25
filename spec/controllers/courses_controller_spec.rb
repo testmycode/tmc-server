@@ -95,8 +95,7 @@ describe CoursesController do
       end
       
       it "should tell for each exercise whether it has been completed" do
-        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
-        Factory.create(:test_case_run, :submission => sub, :successful => true)
+        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user, :all_tests_passed => true)
         
         result = get_index_json
         

@@ -67,20 +67,12 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user has made a submission with all test cases passing
   def completed_by?(user)
-    # We try to find a submission whose test case runs are all successful
-    conn = ActiveRecord::Base.connection
-    query = <<EOS
-SELECT 1
-FROM test_case_runs AS tcr
-  JOIN submissions AS sub ON (sub.id = tcr.submission_id)
-WHERE sub.exercise_name = #{conn.quote self.name} AND
-      sub.user_id = #{conn.quote user.id}
-GROUP BY submission_id
-HAVING COUNT(*) = SUM(CASE WHEN successful = #{conn.quote(true)} THEN 1 ELSE 0 END) AND
-       COUNT(*) > 0
-LIMIT 1
-EOS
-    !conn.execute(query).to_a.empty?
+    Submission.where({
+      :exercise_name => self.name,
+      :user_id => user.id,
+      :pretest_error => nil,
+      :all_tests_passed => true
+    }).any?
   end
 
   def deadline=(new_deadline)
