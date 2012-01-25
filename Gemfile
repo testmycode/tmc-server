@@ -19,6 +19,7 @@ group :development, :test do
   gem 'capybara-webkit', '~> 0.7.2'
   gem 'database_cleaner', '~> 0.6.7'
   gem 'mimic', '~> 0.4.3'
+  gem 'ruby-prof', '~> 0.10.8' # for performance tests
   gem 'launchy'  # for capybara's save_and_open_page
   gem 'railroady' # for doc/diagrams
 end
