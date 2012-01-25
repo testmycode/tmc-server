@@ -41,7 +41,7 @@ describe Stats do
   end
   
   def create_successful_submission(opts)
-    sub = Factory.create(:submission, opts)
+    sub = Factory.create(:submission, opts.merge(:all_tests_passed => true))
     Factory.create(:test_case_run, :submission => sub, :successful => true)
     sub.status.should == :ok
     sub

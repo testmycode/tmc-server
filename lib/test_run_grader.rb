@@ -1,6 +1,7 @@
 
 #
 # Stores test run results in the database.
+# Called in a transaction from SandboxResultsSaver.
 # Expected format of results:
 #   An array of hashes with the following keys:
 #     - className: the test class name
@@ -22,15 +23,19 @@ module TestRunGrader
   
 private
   def self.create_test_case_runs(submission, results)
+    all_passed = true
     results.each do |test_result|
+      passed = test_result["status"] == 'PASSED'
       tcr = TestCaseRun.new(
         :test_case_name => "#{test_result['className']} #{test_result['methodName']}",
         :message => test_result["message"],
-        :successful => test_result["status"] == 'PASSED',
+        :successful => passed,
         :exception => to_json_or_null(test_result["exception"])
       )
+      all_passed = false if not passed
       submission.test_case_runs << tcr
     end
+    submission.all_tests_passed = all_passed
   end
 
   def self.award_points(submission, results)

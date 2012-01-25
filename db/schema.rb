@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120123064427) do
+ActiveRecord::Schema.define(:version => 20120125044449) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -81,10 +81,11 @@ ActiveRecord::Schema.define(:version => 20120123064427) do
     t.text     "pretest_error"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "exercise_name",                    :null => false
-    t.integer  "course_id",                        :null => false
-    t.boolean  "processed",     :default => false, :null => false
+    t.string   "exercise_name",                       :null => false
+    t.integer  "course_id",                           :null => false
+    t.boolean  "processed",        :default => false, :null => false
     t.string   "secret_token"
+    t.boolean  "all_tests_passed", :default => false, :null => false
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"

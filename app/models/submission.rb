@@ -26,10 +26,6 @@ class Submission < ActiveRecord::Base
     processed? && pretest_error == nil
   end
   
-  def all_tests_passed?
-    tests_ran? && test_case_runs.map(&:successful?).all?
-  end
-  
   def result_url
     "#{SiteSetting.value(:baseurl_for_remote_sandboxes).sub(/\/+$/, '')}/submissions/#{self.id}/result"
   end
