@@ -5,18 +5,23 @@
   <%= link_to 'List of registered users', participants_path %>
 <% end %>
 
-<h2>All Courses</h2>
+<h2>Courses</h2>
 
 <% if current_user.administrator? %>
-  <%= link_to 'Create New Course', new_course_path %>
+  <section>
+    <%= link_to 'Create New Course', new_course_path %>
+  </section>
 <% end %>
 
-<h3>Ongoing courses</h3>
+
+<% if current_user.administrator? && !@expired_courses.empty? %>
+  <h3>Ongoing courses</h3>
+<% end %>
 <section>
   <%= render 'list', :locals => { :courses => @ongoing_courses, :list_id => 'ongoing-courses' } %>
 </section>
 
-<% if signed_in? and not @expired_courses.empty? %>
+<% if current_user.administrator? && !@expired_courses.empty? %>
   <h3>Expired courses</h3>
   <section>
     <%= render 'list', :locals => { :courses => @expired_courses, :list_id => 'expired-courses' } %>
