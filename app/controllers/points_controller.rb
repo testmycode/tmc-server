@@ -8,7 +8,7 @@ class PointsController < ApplicationController
     @summary = summary_hash(@course, sheets)
     
     if params[:sort_by] == 'total_points'
-      @summary[:users].sort_by! {|username| [-@summary[:total_for_user][username].to_i, username] }
+      @summary[:users] = @summary[:users].sort_by {|username| [-@summary[:total_for_user][username].to_i, username] }
     end
   end
 
