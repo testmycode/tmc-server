@@ -13,6 +13,8 @@ module SandboxResultsSaver
         when 'failed'
           if results['exit_code'] == '101'
             submission.pretest_error = "Compilation error:\n" + results['output']
+          elsif results['exit_code'] == '102'
+            submission.pretest_error = "Test compilation error:\n" + results['output']
           else
             submission.pretest_error = 'Running the submission failed. Exit code: ' + results['exit_code']
           end
