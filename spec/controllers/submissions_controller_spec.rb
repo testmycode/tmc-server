@@ -127,7 +127,12 @@ describe SubmissionsController do
       @user = Factory.create(:user)
       controller.current_user = @user
       
-      @submission = mock_model(Submission, :user_id => @user.id, :course => @course, :exercise => @exercise)
+      @submission = mock_model(Submission, {
+        :user_id => @user.id,
+        :course => @course,
+        :exercise => @exercise,
+        :points_list => ['1.1', '1.2']
+      })
       Submission.stub(:find).with(@submission.id.to_s).and_return(@submission)
     end
     
@@ -159,10 +164,11 @@ describe SubmissionsController do
       
       it "should return any test case records returned by the model if the submission is failed" do
         records = [{'name' => 'a', 'successful' => false, 'message' => 'abc', 'exception' => "foo\nbar"}]
-        @submission.stub(:test_case_records => records, :status => :fail)
+        @submission.stub(:test_case_records => records, :status => :fail, :points_list => ['1.1'])
         result = get_show_json
         result['status'].should == 'fail'
         result['test_cases'].should == records
+        result['points'].should == ['1.1']
       end
       
       it "should mark submissions with no error or failure as successful" do
@@ -172,6 +178,7 @@ describe SubmissionsController do
         result['status'].should == 'ok'
         result['error'].should be_nil
         result['test_cases'].should == records
+        result['points'].should == ['1.1', '1.2']
       end
     end
   end

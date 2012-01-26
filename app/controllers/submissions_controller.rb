@@ -25,7 +25,8 @@ class SubmissionsController < ApplicationController
       format.json do
         output = {
           :api_version => API_VERSION,
-          :status => @submission.status
+          :status => @submission.status,
+          :points => @submission.points_list
         }
         output = output.merge(
           case @submission.status

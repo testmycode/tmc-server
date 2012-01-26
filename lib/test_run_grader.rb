@@ -44,7 +44,9 @@ private
     course = exercise.course
     awarded_points = AwardedPoint.exercise_user_points(exercise, user)
 
+    all_points = []
     for point_name in points_from_test_results(results)
+      all_points << point_name
       if awarded_points.where(:name => point_name).empty?
         submission.awarded_points << AwardedPoint.new(
           :name => point_name,
@@ -53,6 +55,8 @@ private
         )
       end
     end
+    
+    submission.points = all_points.join(" ") unless all_points.empty?
   end
 
   def self.points_from_test_results(results)

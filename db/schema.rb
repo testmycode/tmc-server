@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120126002231) do
+ActiveRecord::Schema.define(:version => 20120126174157) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(:version => 20120126002231) do
   end
 
   add_index "awarded_points", ["course_id", "user_id", "submission_id"], :name => "index_awarded_points_on_course_id_and_user_id_and_submission_id"
+  add_index "awarded_points", ["user_id", "submission_id", "name"], :name => "index_awarded_points_on_user_id_and_submission_id_and_name", :unique => true
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -89,6 +90,7 @@ ActiveRecord::Schema.define(:version => 20120126002231) do
     t.boolean  "processed",        :default => false, :null => false
     t.string   "secret_token"
     t.boolean  "all_tests_passed", :default => false, :null => false
+    t.text     "points"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
@@ -125,5 +127,9 @@ ActiveRecord::Schema.define(:version => 20120126002231) do
     t.boolean  "administrator", :default => false, :null => false
     t.text     "email",         :default => "",    :null => false
   end
+
+  set_table_comment 'awarded_points', 'Stores points awarded to a user in a particular course. Each point is stored only once per user/course and each row refers to the first submission that awarded the point.'
+
+  set_column_comment 'submissions', 'points', 'Space-separated list of points awarded. Filled each time unlike the awarded_points table, where a point is given at most once.'
 
 end

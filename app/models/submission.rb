@@ -42,6 +42,10 @@ class Submission < ActiveRecord::Base
     end
   end
   
+  def points_list
+    points.to_s.split(' ')
+  end
+  
   def unprocessed_submissions_before_this
     if !self.processed?
       self.class.where(:processed => false).where('id < ?', self.id).count

@@ -14,6 +14,10 @@
   <% end %>
 </div>
 
+<% unless @submission.points_list.empty? %>
+  <p>Points awarded: <%= @submission.points_list.join(', ') %></p>
+<% end %>
+
 <% if !@submission.processed? %>
   <script type="text/javascript">
   $(document).ready(function() {
@@ -26,7 +30,7 @@
         dots += '.';
       }
       $('.submission-summary p:first').text('Processing' + dots);
-    }, 700)
+    }, 700);
 
     // Refresh status until processed, then refresh page
     var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApplicationController::API_VERSION) %>';
