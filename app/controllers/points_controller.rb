@@ -6,10 +6,7 @@ class PointsController < ApplicationController
     @course = Course.find(params[:course_id])
     sheets = @course.gdocs_sheets.sort!
     @summary = summary_hash(@course, sheets)
-    
-    if params[:sort_by] == 'total_points'
-      @summary[:users] = @summary[:users].sort_by {|username| [-@summary[:total_for_user][username].to_i, username] }
-    end
+    sort_summary(@summary, params[:sort_by]) if params[:sort_by]
   end
 
   def refresh_gdocs
@@ -57,5 +54,14 @@ class PointsController < ApplicationController
       :total_for_user => user_totals,
       :users => per_user_and_sheet.keys.sort_by(&:downcase)
     }
+  end
+  
+  def sort_summary(summary, sorting)
+    if sorting == 'total_points'
+      summary[:users] = summary[:users].sort_by {|username| [-summary[:total_for_user][username].to_i, username] }
+    elsif sorting =~ /(.*)_points$/
+      sheet = $1
+      summary[:users] = summary[:users].sort_by {|username| [-summary[:awarded_for_user_and_sheet][username][sheet].to_i, username] }
+    end
   end
 end
