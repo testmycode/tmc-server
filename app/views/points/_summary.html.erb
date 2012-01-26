@@ -7,15 +7,15 @@
         <th>Total</th>
       </tr>
       <tr class="table-totals">
-        <% nstudents = @summary[:students].length %>
+        <% nstudents = @summary[:users].length %>
         <td><%= nstudents %></td>
         <% @summary[:sheets].each do |sheet| %>
           <td>
-            <%= "#{sheet[:awarded]}/#{sheet[:available]*nstudents}" %>
+            <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
           </td>
         <% end %>
         <td>
-          <%= "#{@summary[:awarded]}/#{@summary[:available]*nstudents}" %>
+          <%= "#{@summary[:total_awarded]}/#{@summary[:total_available]*nstudents}" %>
         </td>
       </tr>
       <tr>
@@ -29,17 +29,16 @@
       </tr>
     </thead>
     <tbody>
-      <% @summary[:students].each do |student| %>
+      <% @summary[:users].each do |username| %>
         <tr>
-          <td><%= student[:login] %></td>
-          <% @summary[:sheets].each do |sheet, (k, v)| %>
-            <% sheetname = sheet[:name] %>
-            <% sheetpoints = sheet[:available] %>
+          <td><%= username %></td>
+          <% @summary[:sheets].each do |sheet| %>
+            <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>
             <td>
-              <%= "#{student[:points][sheetname]}/#{sheetpoints}" %>
+              <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
             </td>
           <% end %>
-          <td><%= "#{student[:awarded]}/#{@summary[:available]}" %></td>
+          <td><%= "#{@summary[:total_for_user][username].to_i}/#{@summary[:total_available]}" %></td>
         </tr>
       <% end %>
     </tbody>
