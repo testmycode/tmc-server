@@ -55,7 +55,7 @@ class PointsController < ApplicationController
       :total_available => AvailablePoint.course_points(course).length,
       :awarded_for_user_and_sheet => per_user_and_sheet,
       :total_for_user => user_totals,
-      :users => per_user_and_sheet.keys.sort
+      :users => per_user_and_sheet.keys.sort_by(&:downcase)
     }
   end
 end
