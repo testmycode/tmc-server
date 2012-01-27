@@ -1,12 +1,21 @@
 <%
-  if question.intrange?
-    intrange_min, intrange_max = question.intrange.minmax
-  else
-    intrange_min, intrange_max = [0, 10]
-  end
+if question.intrange?
+  intrange_min, intrange_max = question.intrange.minmax
+  question.kind = 'intrange' # so it works with the radio button
+else
+  intrange_min, intrange_max = [0, 10]
+end
+
+if question.new_record?
+  url = course_feedback_questions_path(question.course)
+else
+  url = feedback_question_path(question)
+end
+
+kind_disabled = !question.new_record?
 %>
 
-<%= form_for question, :url => course_feedback_questions_path(question.course) do |f| %>
+<%= form_for question, :url => url do |f| %>
   <%= render 'shared/error_messages', :target => question %>
   
   <%= labeled_field("Question", f.text_field(:question, :style => 'width: 30em')) %>
@@ -14,15 +23,19 @@
   <%= labeled_field("Question type") do %>
     <div id="feedback_question_kind">
       <div class="field">
-        <%= labeled('Integer range', f.radio_button(:kind, 'intrange'), :order => :label_last) %>
+        <%= labeled('Integer range', f.radio_button(:kind, 'intrange', :disabled => kind_disabled), :order => :label_last) %>
         <div class="suboption">
-          Min: <%= text_field_tag :intrange_min, intrange_min, :style => 'width: 4em' %>
-          Max: <%= text_field_tag :intrange_max, intrange_max, :style => 'width: 4em' %> (inclusive)
+          Min: <%= text_field_tag :intrange_min, intrange_min, :style => 'width: 4em', :disabled => kind_disabled %>
+          Max: <%= text_field_tag :intrange_max, intrange_max, :style => 'width: 4em', :disabled => kind_disabled %> (inclusive)
         </div>
       </div>
-      <%= labeled_field('Text area', f.radio_button(:kind, 'text'), :order => :label_last) %>
+      <%= labeled_field('Text area', f.radio_button(:kind, 'text', :disabled => kind_disabled), :order => :label_last) %>
     </div>
   <% end %>
-  
-  <%= f.submit("Create question") %>
+
+  <% if question.new_record? %>
+    <%= f.submit("Create question") %>
+  <% else %>
+    <%= f.submit("Save changes") %>
+  <% end %>
 <% end %>

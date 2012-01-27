@@ -1,12 +1,7 @@
 <%= form_for(submission, :url => exercise_submissions_path(@exercise), :action => @form_action,
             :html => {:multipart => true}) do |f| %>
   <%= render 'shared/error_messages', :target => submission %>
-
-  <div>
-
-  </div>
+  
   <%= labeled_field("Zipped project", f.file_field('file')) %>
-  <div class="actions">
-    <%= f.submit 'Submit'%>
-  </div>
+  <%= f.submit 'Submit'%>
 <% end %>

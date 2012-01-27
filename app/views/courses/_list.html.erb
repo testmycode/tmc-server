@@ -38,9 +38,7 @@
           <%= link_to 'refresh', refresh_course_path(course) %>
         </td>
         <td>
-          <%= link_to 'Show', course_path(course) %>
-          |
-          <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', :confirm => 'Really truly delete this course?' %>
+          <%= link_to 'delete', course_path(course), :method => :delete, :class => 'dangerous', :confirm => 'Really truly delete this course?' %>
         </td>
       <% end %>
     </tr>

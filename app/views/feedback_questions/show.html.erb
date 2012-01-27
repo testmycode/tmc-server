@@ -1,0 +1,5 @@
+<h1>Feedback question for <%= @course.name %></h1>
+
+<p class="warning">Note: editing the question will NOT delete existing answers.</p>
+
+<%= render :partial => 'feedback_questions/form', :locals => { :question => @question } %>

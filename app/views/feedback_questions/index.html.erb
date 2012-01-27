@@ -2,15 +2,25 @@
 
 <% if !@questions.empty? %>
   <table>
+    <tr>
+      <th>Question</th>
+      <th></th>
+    </tr>
     <% for question in @questions %>
       <tr>
-        <td><%= link_to question.question, question %></td>
+        <td>
+          <%= link_to question.question, question %>
+        </td>
+        <td>
+          <%= link_to 'delete', feedback_question_path(question), :method => :delete, :class => 'dangerous', :confirm => 'Really delete question and all its answers?' %>
+        </td>
       </tr>
     <% end %>
   </table>
 <% else %>
-  <p>No feedback questions set. Feedback will not be asked.</p>
+  <p>No feedback questions set. Feedback will not be collected.</p>
 <% end %>
 
-<%= link_to 'Add question', new_course_feedback_question_path(@course) %>
-
+<div class="actions">
+  <%= link_to 'Add question', new_course_feedback_question_path(@course) %>
+</div>

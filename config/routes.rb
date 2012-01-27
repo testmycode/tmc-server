@@ -43,7 +43,7 @@ TmcServer::Application.routes.draw do
     resource :result, :only => :create
   end
   
-  resources :feedback_questions, :only => [:show, :update]
+  resources :feedback_questions, :only => [:show, :update, :destroy]
   
   match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
 

@@ -1,6 +1,6 @@
 class FeedbackQuestion < ActiveRecord::Base
   belongs_to :course
-  has_many :feedback_answers
+  has_many :feedback_answers, :dependent => :destroy
   
   validates :course, :presence => true
   validates :kind, :presence => true do validate_kind end
