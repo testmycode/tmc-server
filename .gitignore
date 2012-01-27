@@ -13,3 +13,7 @@
 /.project
 /.buildpath
 /.settings
+
+# IntelliJ IDEA
+/.idea
+
