@@ -5,7 +5,7 @@ class FeedbackAnswer::AnswerFormatValidator < ActiveModel::Validator
     ans = record.answer.strip
     errors = record.errors[:answer]
     
-    if kind =~ /^intrange\[(-?\d+)..(-?\d+)\]$/
+    if kind =~ FeedbackAnswer.send(:intrange_regex)
       range = ($1.to_i)..($2.to_i)
       if !(ans =~ /^(-?\d+)$/)
         errors << 'is not an integer'

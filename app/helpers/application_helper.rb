@@ -4,18 +4,50 @@ module ApplicationHelper
   def tailoring
     Tailoring.get
   end
-
-  def labeled(label, tags)
+  
+  
+  def labeled(label, tags = nil, options = {}, &block)
+    if tags.is_a?(Hash) && options.empty?
+      options = tags
+      tags = nil
+    end
+    
+    options = {
+      :order => :label_first,
+      :class => nil
+    }.merge(options)
+    
+    tags = capture(&block) if tags == nil && block != nil
+    tags = tags.html_safe
+    
     if tags =~ /id\s*=\s*"([^"]+)"/
-      raw('<label for="' + h($1) + '">' + h(label) + '</label>' + tags)
+      target = ' for="' + $1 + '"'
     else
       raise 'Cannot label a tag without an id'
     end
+    
+    cls = []
+    cls << options[:order].to_s
+    cls << h(options[:class].to_s) if options[:class]
+    cls = ' class="' + cls.join(' ') + '"'
+    
+    label = '<label' + target + cls + '>' + h(label) + '</label>'
+    label = label.html_safe
+    
+    case options[:order]
+    when :label_first
+      label + tags
+    when :label_last
+      tags + label
+    else
+      raise 'invalid :order option for labeled()'
+    end
   end
   
-  def labeled_field(label, tags)
-    raw('<div class="field">' + labeled(label, tags) + '</div>')
+  def labeled_field(label, tags = nil, options = {}, &block)
+    raw('<div class="field">' + labeled(label, tags, options, &block) + '</div>')
   end
+  
   
   def use_datatables(table_selector, options = {})
     options = {
@@ -33,6 +65,7 @@ $(document).ready(function() {
 EOS
     raw(script)
   end
+  
   
   def breadcrumb
     parts = []
@@ -58,6 +91,8 @@ EOS
         parts << link_to(raw("Submission #{breadcrumb_resource('#' + @submission.id.to_s)}"), submission_path(@submission))
       elsif action == 'submissions#index'
         parts << link_to("Submissions", course_submissions_path(@course))
+      elsif action.start_with? 'feedback_questions'
+        parts << link_to("Feedback questions", course_feedback_questions_path(@course))
       end
     elsif @user
       if @user.new_record?

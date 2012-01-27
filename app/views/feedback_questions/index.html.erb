@@ -1,0 +1,16 @@
+<h1>Feedback questions for <%= @course.name %></h1>
+
+<% if !@questions.empty? %>
+  <table>
+    <% for question in @questions %>
+      <tr>
+        <td><%= link_to question.question, question %></td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+  <p>No feedback questions set. Feedback will not be asked.</p>
+<% end %>
+
+<%= link_to 'Add question', new_course_feedback_question_path(@course) %>
+

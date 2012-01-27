@@ -1,0 +1,28 @@
+<%
+  if question.intrange?
+    intrange_min, intrange_max = question.intrange.minmax
+  else
+    intrange_min, intrange_max = [0, 10]
+  end
+%>
+
+<%= form_for question, :url => course_feedback_questions_path(question.course) do |f| %>
+  <%= render 'shared/error_messages', :target => question %>
+  
+  <%= labeled_field("Question", f.text_field(:question, :style => 'width: 30em')) %>
+  
+  <%= labeled_field("Question type") do %>
+    <div id="feedback_question_kind">
+      <div class="field">
+        <%= labeled('Integer range', f.radio_button(:kind, 'intrange'), :order => :label_last) %>
+        <div class="suboption">
+          Min: <%= text_field_tag :intrange_min, intrange_min, :style => 'width: 4em' %>
+          Max: <%= text_field_tag :intrange_max, intrange_max, :style => 'width: 4em' %> (inclusive)
+        </div>
+      </div>
+      <%= labeled_field('Text area', f.radio_button(:kind, 'text'), :order => :label_last) %>
+    </div>
+  <% end %>
+  
+  <%= f.submit("Create question") %>
+<% end %>

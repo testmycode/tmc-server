@@ -175,6 +175,9 @@ body.default {
 .field label {
   font-size: 90%;
   font-weight: bold;
+}
+
+.field label.label_first {
   display: block;
 }
 
@@ -184,6 +187,10 @@ body.default {
 
 .actions {
   margin-bottom: 18px;
+}
+
+.suboption {
+  margin-left: 3em;
 }
 
 /* Miscellaneous */
