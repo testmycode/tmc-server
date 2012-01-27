@@ -54,4 +54,25 @@ FactoryGirl.define do
     submission
     successful false
   end
+  
+  factory :feedback_question do
+    course
+    sequence(:question) {|n| "feedback question #{n}" }
+    kind 'text'
+  end
+  
+  factory :feedback_answer do
+    feedback_question
+    course
+    exercise
+    user
+    submission
+    sequence(:answer) {|n| "feedback answer #{n}" }
+    after_build do |a|
+      a.course = a.feedback_question.course
+      a.exercise.course = a.course
+      a.submission.course = a.course
+      a.submission.exercise_name = a.exercise.name
+    end
+  end
 end

@@ -26,6 +26,7 @@ class Course < ActiveRecord::Base
   has_many :available_points, :through => :exercises
   has_many :awarded_points, :dependent => :destroy
   has_many :test_scanner_cache_entries, :dependent => :destroy
+  has_many :feedback_questions, :dependent => :destroy
 
   after_destroy :delete_cache
 

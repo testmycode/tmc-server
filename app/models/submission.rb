@@ -7,6 +7,7 @@ class Submission < ActiveRecord::Base
 
   has_many :test_case_runs, :dependent => :destroy, :order => :id
   has_many :awarded_points, :dependent => :nullify
+  has_many :feedback_answers, :dependent => :nullify
   
   validates :user, :presence => true
   validates :course, :presence => true

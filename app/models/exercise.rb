@@ -8,6 +8,8 @@ class Exercise < ActiveRecord::Base
   has_many :available_points, :dependent => :destroy
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
+  has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,
+    :conditions => proc { "feedback_answers.course_id = #{self.course_id}" }
 
   validates :gdocs_sheet, :format => { :without => /^(MASTER|PUBLIC)$/ }
 
