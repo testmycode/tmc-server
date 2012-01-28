@@ -1,11 +1,10 @@
-
-class FeedbackAnswer::AnswerFormatValidator < ActiveModel::Validator
+class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
   def validate(record)
     kind = record.feedback_question.kind
     ans = record.answer.strip
     errors = record.errors[:answer]
-    
-    if kind =~ FeedbackAnswer.send(:intrange_regex)
+
+    if kind =~ FeedbackQuestion.send(:intrange_regex)
       range = ($1.to_i)..($2.to_i)
       if !(ans =~ /^(-?\d+)$/)
         errors << 'is not an integer'
@@ -19,4 +18,3 @@ class FeedbackAnswer::AnswerFormatValidator < ActiveModel::Validator
     end
   end
 end
-

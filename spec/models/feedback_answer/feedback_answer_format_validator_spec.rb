@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FeedbackAnswer::AnswerFormatValidator do
+describe Validators::FeedbackAnswerFormatValidator do
   it "should validate integer ranges" do
     answer = Factory.create(:feedback_answer)
     answer.question.kind = 'intrange[-5..5]'
