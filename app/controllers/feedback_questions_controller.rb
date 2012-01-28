@@ -3,18 +3,18 @@ class FeedbackQuestionsController < ApplicationController
 
   def index
     @questions = @course.feedback_questions.order(:position)
-    authorize! @questions, :read
+    authorize! :show, @questions
   end
   
   def new
     @question = FeedbackQuestion.new(:course => @course)
-    authorize! @question, :create
+    authorize! :create, @question
   end
 
   def create
     @question = FeedbackQuestion.new(params[:feedback_question])
     @question.course = @course
-    authorize! @question, :create
+    authorize! :create, @question
 
     fix_question_kind(@question)
     
@@ -30,15 +30,15 @@ class FeedbackQuestionsController < ApplicationController
   def show
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! @question, :read
-    authorize! @course, :read
+    authorize! :read,  @question
+    authorize! :read,  @course
   end
 
   def update
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! @course, :read
-    authorize! @question, :update
+    authorize! :read,  @course
+    authorize! :update, @question
 
     @question.question = params[:feedback_question][:question]
 
@@ -54,8 +54,8 @@ class FeedbackQuestionsController < ApplicationController
   def destroy
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! @course, :read
-    authorize! @question, :delete
+    authorize! :read,  @course
+    authorize! :delete, @question
 
     begin
       @question.destroy
@@ -70,7 +70,7 @@ class FeedbackQuestionsController < ApplicationController
 private
   def get_course
     @course = Course.find(params[:course_id]) if params[:course_id]
-    authorize! @course, :read
+    authorize! :read, @course
   end
 
   def fix_question_kind(question)
