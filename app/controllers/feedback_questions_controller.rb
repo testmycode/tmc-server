@@ -44,7 +44,7 @@ class FeedbackQuestionsController < ApplicationController
 
     if @question.save
       flash[:success] = 'Question updated.'
-      redirect_to feedback_question_path(@question)
+      redirect_to course_feedback_questions_path(@question.course)
     else
       flash.now[:error] = 'Failed to update question.'
       render :new

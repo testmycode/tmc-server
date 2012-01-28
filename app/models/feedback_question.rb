@@ -26,7 +26,7 @@ private
   end
   
   def self.intrange_regex
-    /^intrange\[(-?\d+)..(-?\d+)\]$/
+    /^intrange\[(-?\d+)\.\.(-?\d+)\]$/
   end
   
   def validate_kind
