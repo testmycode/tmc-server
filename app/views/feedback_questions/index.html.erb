@@ -4,6 +4,7 @@
   <table>
     <tr>
       <th>Question</th>
+      <th>Order</th>
       <th></th>
     </tr>
     <% for question in @questions %>
@@ -12,7 +13,12 @@
           <%= link_to question.question, question %>
         </td>
         <td>
-          <%= link_to 'delete', feedback_question_path(question), :method => :delete, :class => 'dangerous', :confirm => 'Really delete question and all its answers?' %>
+          <%= link_to 'Up', feedback_question_position_path(question, :direction => 'backward'), :method => 'put' %>
+          |
+          <%= link_to 'Down', feedback_question_position_path(question, :direction => 'forward'), :method => 'put' %>
+        </td>
+        <td>
+          <%= link_to 'Delete', feedback_question_path(question), :method => :delete, :class => 'dangerous', :confirm => 'Really delete question and all its answers?' %>
         </td>
       </tr>
     <% end %>

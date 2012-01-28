@@ -2,7 +2,7 @@ class FeedbackQuestionsController < ApplicationController
   before_filter :get_course
 
   def index
-    @questions = @course.feedback_questions
+    @questions = @course.feedback_questions.order(:position)
     authorize! @questions, :read
   end
   

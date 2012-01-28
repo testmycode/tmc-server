@@ -1,4 +1,6 @@
 class FeedbackQuestion < ActiveRecord::Base
+  include Orderable
+
   belongs_to :course
   has_many :feedback_answers, :dependent => :destroy
   
