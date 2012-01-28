@@ -68,9 +68,9 @@ ActiveRecord::Schema.define(:version => 20120127224356) do
     t.datetime "updated_at"
   end
 
-  add_index "feedback_answers", ["feedback_question_id", "course_id", "exercise_name"], :name => "[:index_feedback_answers_question_course_exercise]"
-  add_index "feedback_answers", ["feedback_question_id", "course_id", "user_id"], :name => "[:index_feedback_answers_question_course_user]"
-  add_index "feedback_answers", ["submission_id"], :name => "[:index_feedback_answers_question]"
+  add_index "feedback_answers", ["feedback_question_id", "course_id", "exercise_name"], :name => "index_feedback_answers_question_course_exercise"
+  add_index "feedback_answers", ["feedback_question_id", "course_id", "user_id"], :name => "index_feedback_answers_question_course_user"
+  add_index "feedback_answers", ["submission_id"], :name => "index_feedback_answers_question"
 
   create_table "feedback_questions", :force => true do |t|
     t.integer  "course_id",  :null => false
