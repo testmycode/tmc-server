@@ -9,8 +9,10 @@ class CourseRefresher
       
       paths = files_for_stub(from_dir)
       while_copying(from_dir, to_dir, paths) do |rel_path|
-        contents = filter_for_stub(from_dir + rel_path)
-        write_file(to_dir + rel_path, contents) unless contents.nil?
+        from = from_dir + rel_path
+        to = to_dir + rel_path
+        contents = filter_for_stub(from)
+        write_file(to, contents) unless contents.nil?
       end
     end
     
@@ -20,8 +22,11 @@ class CourseRefresher
       
       paths = files_for_solution(from_dir)
       while_copying(from_dir, to_dir, paths) do |rel_path|
-        contents = filter_for_solution(from_dir + rel_path)
-        write_file(to_dir + rel_path, contents) unless contents.nil?
+        from = from_dir + rel_path
+        to = to_dir + rel_path
+        contents = filter_for_solution(from)
+        write_file(to, contents) unless contents.nil?
+        maybe_write_html_file(File.read(from), "#{to}.html") if from.extname == '.java'
       end
     end
     
@@ -86,6 +91,7 @@ class CourseRefresher
         text = fix_line_endings(text)
         text = remove_solution_blocks(text)
         text = uncomment_stubs(text)
+        text = remove_html_comments(text)
       end
       text
     end
@@ -127,6 +133,10 @@ class CourseRefresher
         before.gsub(/[^\t]/, ' ') + after
       end
     end
+
+    def remove_html_comments(text)
+      text.gsub(prepended_html_regexp, '')
+    end
     
     
     def filter_for_solution(source_path)
@@ -134,6 +144,7 @@ class CourseRefresher
       if source_path.extname == '.java'
         text = fix_line_endings(text)
         text = remove_stub_and_solution_comments(text)
+        text = remove_html_comments(text)
       end
       text
     end
@@ -147,6 +158,16 @@ class CourseRefresher
         result << line unless match
       end
       result.join('')
+    end
+
+    def maybe_write_html_file(text, dest_path)
+      if text =~ prepended_html_regexp
+        html = $1
+        html.gsub!(/^[ \t*]*/, '')
+        File.open(dest_path, 'wb') do |f|
+          f.write(html)
+        end
+      end
     end
     
     def stub_regexp
@@ -163,6 +184,10 @@ class CourseRefresher
     
     def solution_file_regexp
       /\/\/[ \t]*SOLUTION[ \t]+FILE[ \t]*/
+    end
+
+    def prepended_html_regexp
+      /^[ \t]*\/\*[ t*\r\n]*PREPEND[ \t]+HTML[ \t]*((?:[*][^\/]|[^*])*)\*\/[ \t]*\n/m
     end
   end
 end

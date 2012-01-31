@@ -104,7 +104,24 @@ public class Thing {
     }
 }
 EOF
-    end 
+    end
+
+    it "should remove html comments" do
+      make_file 'original/Thing.java', <<EOF
+      /*
+       * PREPEND HTML
+       * <p>foo</p>
+       */
+public class Thing {
+}
+EOF
+      @filter.make_stub('original', 'stub')
+      result = File.read('stub/Thing.java')
+      result.should == <<EOF
+public class Thing {
+}
+EOF
+    end
     
     it "should not include hidden tests" do
       make_file('original/HiddenThing.java', '...')
@@ -242,7 +259,32 @@ public class Thing {
 }
 EOF
     end 
-    
+
+
+    it "should remove html comments and make files out of them" do
+      make_file 'original/Thing.java', <<EOF
+      /*
+       * PREPEND HTML <strong>hi</strong>
+       * <p>foo</p>
+       * <p>bar</p>
+       */
+public class Thing {
+}
+EOF
+      @filter.make_solution('original', 'solution')
+      result = File.read('solution/Thing.java')
+      result.should == <<EOF
+public class Thing {
+}
+EOF
+
+      html_file = File.read('solution/Thing.java.html')
+      html_file.should == <<EOF
+<strong>hi</strong>
+<p>foo</p>
+<p>bar</p>
+EOF
+    end
     
     it "should not include any tests" do
       FileUtils.mkdir_p('original/stuff/test')

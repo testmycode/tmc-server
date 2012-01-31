@@ -15,13 +15,21 @@ class Solution
   end
   
   def files
-    result = []
+    return @files if @files
+    
+    @files = []
     Find.find(@exercise.solution_path) do |path|
-      result << {
-        :path => path[(@exercise.solution_path.length + 1)...(path.length)],
-        :content => File.read(path)
-      } if File.file?(path) && path.ends_with?('.java')
+      if File.file?(path) && path.ends_with?('.java')
+        record = {
+          :path => path[(@exercise.solution_path.length + 1)...(path.length)],
+          :content => File.read(path)
+        }
+        if File.exists?("#{path}.html")
+          record[:html] = File.read("#{path}.html")
+        end
+        @files << record
+      end
     end
-    result
+    @files
   end
 end
