@@ -7,8 +7,8 @@ class RemoteSandboxForTesting
   @server_ports = nil
 
   def self.server_ports
-    # FIXME: only one at a time will work because UML performs file locking :/
-    @server_ports ||= [FreePorts.take_next, FreePorts.take_next]
+    # FIXME: can have only one at a time because UML performs file locking :/
+    @server_ports ||= [FreePorts.take_next]
   end
   
   # Runs a submission and asserts the run succeeded, then calls SandboxResultsSaver.
