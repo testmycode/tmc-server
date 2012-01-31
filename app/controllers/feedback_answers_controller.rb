@@ -21,7 +21,7 @@ class FeedbackAnswersController < ApplicationController
       joins(:submission).
       joins(:submission => :user).
       #joins(:exercise). # fails due to :conditions receiving incorrect self :(
-      order('created_at DESC').
+      order('created_at DESC'). # TODO: could sort by questions those whose created_at are very close
       all
   end
 
