@@ -65,6 +65,10 @@ $(document).ready(function() {
 EOS
     raw(script)
   end
+
+  def link_back
+    raw('<div class="link-back">' + link_to('Back', :back) + '</div>')
+  end
   
   
   def breadcrumb
@@ -101,6 +105,11 @@ EOS
         parts << link_to("User account", user_path)
       end
     end
+
+    if action == 'feedback_answers#index'
+      parts << link_to("Feedback answers")
+    end
+
     raw(parts.join(' &raquo; '))
   end
   

@@ -1,0 +1,24 @@
+<h1>Feedback for <%= @parent.name %></h1>
+
+<% if !@answers.empty? %>
+  <% for answer in @answers %>
+    <section>
+      <div class="feedback-question"><%= answer.feedback_question.question %></div>
+      <div class="feedback-source">
+        <% if !@parent.is_a?(Exercise) %>
+          For <%= link_to answer.exercise_name, answer.exercise %>
+          by <%= answer.submission.user.login %>
+        <% else %>
+          By <%= answer.submission.user.login %>
+        <% end %>
+        with <%= link_to "submission ##{answer.submission.id}", answer.submission %>
+        at <%= answer.created_at.strftime("%H:%M %d.%m.%Y") %>
+      </div>
+      <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
+    </section>
+  <% end %>
+<% else %>
+  <p>No feedback yet.</p>
+<% end %>
+
+<%= link_back %>

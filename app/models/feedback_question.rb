@@ -19,6 +19,14 @@ class FeedbackQuestion < ActiveRecord::Base
       raise 'not an intrange question'
     end
   end
+
+  def record_for_api
+    {
+      :id => id,
+      :question => question,
+      :kind => kind
+    }
+  end
   
 private
   def intrange_regex

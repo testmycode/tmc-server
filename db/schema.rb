@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120127224356) do
+ActiveRecord::Schema.define(:version => 20120128181256) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -59,9 +59,8 @@ ActiveRecord::Schema.define(:version => 20120127224356) do
 
   create_table "feedback_answers", :force => true do |t|
     t.integer  "feedback_question_id", :null => false
-    t.integer  "user_id",              :null => false
     t.integer  "course_id",            :null => false
-    t.integer  "exercise_name",        :null => false
+    t.string   "exercise_name",        :null => false
     t.integer  "submission_id"
     t.text     "answer",               :null => false
     t.datetime "created_at"
@@ -69,7 +68,6 @@ ActiveRecord::Schema.define(:version => 20120127224356) do
   end
 
   add_index "feedback_answers", ["feedback_question_id", "course_id", "exercise_name"], :name => "index_feedback_answers_question_course_exercise"
-  add_index "feedback_answers", ["feedback_question_id", "course_id", "user_id"], :name => "index_feedback_answers_question_course_user"
   add_index "feedback_answers", ["submission_id"], :name => "index_feedback_answers_question"
 
   create_table "feedback_questions", :force => true do |t|

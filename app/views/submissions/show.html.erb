@@ -125,6 +125,6 @@ $(document).ready(function() {
   <%= link_to "Download #{@submission.downloadable_file_name}", submission_path(@submission, :format => 'zip') %>
 </div>
 
-<div class="link-back"><%= link_to 'Back', :back %></div>
+<%= link_back %>
 
 

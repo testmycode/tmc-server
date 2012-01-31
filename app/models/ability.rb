@@ -19,6 +19,11 @@ class Ability
       can :create, Submission do |sub|
         sub.exercise.submittable_by?(user)
       end
+
+      cannot :read, FeedbackAnswer
+      can :create, FeedbackAnswer do |ans|
+        ans.submission.user_id == user.id
+      end
       
       cannot :read, Solution
       can :read, Solution do |sol|

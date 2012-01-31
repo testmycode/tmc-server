@@ -39,7 +39,9 @@ class SubmissionsController < ApplicationController
             :test_cases => @submission.test_case_records
           }
           when :ok then {
-            :test_cases => @submission.test_case_records
+            :test_cases => @submission.test_case_records,
+            :feedback_questions => @course.feedback_questions.order(:position).map(&:record_for_api),
+            :feedback_answer_url => submission_feedback_answers_url(@submission, :format => :json)
           }
           end
         )
@@ -47,7 +49,7 @@ class SubmissionsController < ApplicationController
         if @exercise.solution.visible_to?(current_user)
           output[:solution_url] = view_context.exercise_solution_url(@exercise)
         end
-        
+
         render :json => output
       end
     end

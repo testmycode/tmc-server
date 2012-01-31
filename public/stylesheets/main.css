@@ -238,6 +238,15 @@ div.stack-trace {
   overflow: auto;
 }
 
+div.feedback-question {
+  font-weight: bold;
+  margin-bottom: 6pt;
+}
+
+div.feedback-source {
+  font-style: italic;
+}
+
 /* Lists and tables */
 
 table {
