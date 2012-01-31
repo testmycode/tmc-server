@@ -60,17 +60,16 @@ private
   end
 
   def self.points_from_test_results(results)
-    results.reduce({}) do |points, result|
-      result["pointNames"].each do |name|
-        unless points[name] == false
-          points[name] = (result["status"] == 'PASSED')
+    point_status = {}  # point -> true/false/nil i.e. ok so far/failed/unseen
+    for result in results
+      result['pointNames'].each do |name|
+        if (point_status[name] != false) # not already failed
+          point_status[name] = (result["status"] == 'PASSED')
         end
       end
-      points
-    end.reduce([]) do |point_names, (name, success)|
-      point_names << name if success
-      point_names
     end
+
+    point_status.keys.select {|name| point_status[name] == true }.sort
   end
   
   def self.to_json_or_null(obj)

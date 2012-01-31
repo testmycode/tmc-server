@@ -68,6 +68,15 @@ describe TestRunGrader do
       points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
       points.should include('1.1')
       points.should_not include('1.2')
+
+      # Should not depend on result order, so let's try the same in reverse order
+
+      @submission = Factory.create(:submission, :processed => false)
+      TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+      
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should include('1.1')
+      points.should_not include('1.2')
     end
     
     it "should always mark awarded points in the submission record but not create duplicate awarded_points rows" do
