@@ -18,7 +18,7 @@ module SandboxResultsSaver
             when '102'
               "Test compilation error:\n" + results['output']
             when '137'
-              'Program was forcibly terminated most likely due to using too much memory.'
+              'Program was forcibly terminated most likely due to using too much time or memory.'
             else
               'Running the submission failed. Exit code: ' + results['exit_code']
             end
