@@ -9,15 +9,19 @@ module SandboxResultsSaver
       
       case results['status']
         when 'timeout'
-          submission.submission.pretest_error = 'Timed out. Check your program for infinite loops.'
+          submission.pretest_error = 'Timed out. Check your program for infinite loops.'
         when 'failed'
-          if results['exit_code'] == '101'
-            submission.pretest_error = "Compilation error:\n" + results['output']
-          elsif results['exit_code'] == '102'
-            submission.pretest_error = "Test compilation error:\n" + results['output']
-          else
-            submission.pretest_error = 'Running the submission failed. Exit code: ' + results['exit_code']
-          end
+          submission.pretest_error =
+            case results['exit_code']
+            when '101'
+               "Compilation error:\n" + results['output']
+            when '102'
+              "Test compilation error:\n" + results['output']
+            when '137'
+              'Program was forcibly terminated most likely due to using too much memory.'
+            else
+              'Running the submission failed. Exit code: ' + results['exit_code']
+            end
         when 'finished'
           submission.pretest_error = nil
           TestRunGrader.grade_results(submission, ActiveSupport::JSON.decode(results['output']))
