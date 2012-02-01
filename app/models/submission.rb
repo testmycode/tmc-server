@@ -14,11 +14,19 @@ class Submission < ActiveRecord::Base
   validates :exercise_name, :presence => true
   
   def self.to_be_reprocessed
-    self.where(:processed => false).where('updated_at < ?', Time.now - reprocess_attempt_interval).order(:id)
+    self.where(:processed => false).
+      where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval).
+      where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval).
+      order('processing_tried_at ASC')
   end
   
   def self.unprocessed_count
     self.where(:processed => false).count
+  end
+
+  # How many times at most should a submission be (successfully) sent to a sandbox
+  def self.max_attempts_at_processing
+    3
   end
   
   before_create :randomize_secret_token
@@ -69,7 +77,17 @@ class Submission < ActiveRecord::Base
       }
     end
   end
-  
+
+  def set_to_be_reprocessed!
+    self.processed = false
+    self.times_sent_to_sandbox = 0
+    self.processing_tried_at = nil
+    self.processing_began_at = nil
+    self.processing_completed_at = nil
+    self.randomize_secret_token
+    self.save!
+  end
+
   # When a remote sandbox returns a result to the webapp,
   # it authenticates the result by passing back the secret token.
   # Changing it in the meantime will obsolete any runs currently being processed.
@@ -77,9 +95,13 @@ class Submission < ActiveRecord::Base
     self.secret_token = rand(10**100).to_s
   end
   
-private
-  
-  def self.reprocess_attempt_interval
-    20.seconds # TODO: fix https://github.com/testmycode/tmc-server/issues/71
+  # How often we try to resend if no sandbox has received it yet
+  def self.processing_retry_interval
+    7.seconds
+  end
+
+  # How often we try to resend after a sandbox has received but not responded with a result
+  def self.processing_resend_interval
+    5.minutes
   end
 end

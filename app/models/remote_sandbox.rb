@@ -13,14 +13,16 @@ class RemoteSandbox
     for server in self.all.shuffle # could be smarter about this
       begin
         server.send_submission(submission, notify_url)
-        Rails.logger.info "Submission #{submission.id} sent to remote sandbox at #{server.url}"
-        Rails.logger.debug "Notify url: #{notify_url}"
-        return
       rescue => e
         # ignore
+      else
+        Rails.logger.info "Submission #{submission.id} sent to remote sandbox at #{server.url}"
+        Rails.logger.debug "Notify url: #{notify_url}"
+        return true
       end
     end
     Rails.logger.warn "No free server to send submission to. Leaving to reprocessor daemon."
+    false
   end
   
   def send_submission(submission, notify_url)

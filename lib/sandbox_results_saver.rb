@@ -31,6 +31,7 @@ module SandboxResultsSaver
       
       submission.secret_token = nil
       submission.processed = true
+      submission.processing_completed_at = Time.now
       submission.save!
     end
   end

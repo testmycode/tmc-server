@@ -13,13 +13,13 @@ FileUtils.mkdir_p(log_dir)
 Daemons.run_proc('submission_reprocessor', :dir_mode => :normal, :dir => pid_dir, :log_dir => log_dir, :log_output => false) do
   Dir.chdir root_dir
   require root_dir + '/config/environment'
-  require 'submission_reprocessor'
+  require 'submission_processor'
   Rails.logger.auto_flushing = true
   
-  reprocessor = SubmissionReprocessor.new
+  processor = SubmissionProcessor.new
   loop do
     begin
-      reprocessor.reprocess_timed_out_submissions
+      processor.reprocess_timed_out_submissions
     rescue e
       puts "Exception: " + e.message
       puts e.backtrace.join("\n        from ")

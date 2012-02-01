@@ -1,3 +1,5 @@
+require 'submission_processor'
+
 class SubmissionsController < ApplicationController
   around_filter :course_transaction
   before_filter :get_course_and_exercise
@@ -88,7 +90,7 @@ class SubmissionsController < ApplicationController
     end
     
     if !errormsg
-      try_to_send_submission_to_sandbox(@submission)
+      SubmissionProcessor.new.process_submission(@submission)
     end
     
     respond_to do |format|
@@ -113,8 +115,9 @@ class SubmissionsController < ApplicationController
   
   def update
     submission = Submission.find(params[:id]) || respond_not_found
-    schedule_for_rerun(submission)
-    try_to_send_submission_to_sandbox(submission)
+    authorize! :update, submission
+    submission.set_to_be_reprocessed!
+    SubmissionProcessor.new.process_submission(submission)
     redirect_to submission_path(submission), :notice => 'Rerun scheduled'
   end
   
@@ -142,16 +145,5 @@ private
       @course = Course.find(params[:course_id], :lock => 'FOR SHARE')
       authorize! :read, @course
     end
-  end
-  
-  def schedule_for_rerun(submission)
-    authorize! :update, submission
-    submission.processed = false
-    submission.randomize_secret_token
-    submission.save!
-  end
-  
-  def try_to_send_submission_to_sandbox(submission)
-    RemoteSandbox.try_to_send_submission_to_free_server(submission, submission.result_url)
   end
 end
