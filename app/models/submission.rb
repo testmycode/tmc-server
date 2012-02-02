@@ -12,6 +12,8 @@ class Submission < ActiveRecord::Base
   validates :user, :presence => true
   validates :course, :presence => true
   validates :exercise_name, :presence => true
+
+  before_create :set_processing_attempts_started_at
   
   def self.to_be_reprocessed
     self.where(:processed => false).
@@ -81,6 +83,7 @@ class Submission < ActiveRecord::Base
   def set_to_be_reprocessed!
     self.processed = false
     self.times_sent_to_sandbox = 0
+    self.processing_attempts_started_at = Time.now
     self.processing_tried_at = nil
     self.processing_began_at = nil
     self.processing_completed_at = nil
@@ -103,5 +106,10 @@ class Submission < ActiveRecord::Base
   # How often we try to resend after a sandbox has received but not responded with a result
   def self.processing_resend_interval
     5.minutes
+  end
+
+private
+  def set_processing_attempts_started_at
+    self.processing_attempts_started_at = Time.now
   end
 end

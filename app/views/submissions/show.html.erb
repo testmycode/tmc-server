@@ -18,6 +18,16 @@
   <p>Points awarded: <%= @submission.points_list.join(', ') %></p>
 <% end %>
 
+<p>
+  <div>Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %>.</div>
+  <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
+    <div>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</div>
+  <% end %>
+  <% if @submission.times_sent_to_sandbox > 1 %>
+    <div>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</div>
+  <% end %>
+</p>
+
 <% if !@submission.processed? %>
   <script type="text/javascript">
   $(document).ready(function() {
