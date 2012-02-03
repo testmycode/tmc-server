@@ -26,5 +26,5 @@
 </div>
 
 <% if stats.count > 1 %>
-  <%= use_datatables('table.feedback-numeric-stats', :bSort => true) %>
+  <%= use_datatables('table.feedback-numeric-stats', :bSort => true, :bPaginate => false) %>
 <% end %>
