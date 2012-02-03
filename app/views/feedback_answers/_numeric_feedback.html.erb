@@ -10,13 +10,15 @@
   </thead>
   <tbody>
     <% for exercise, averages, answer_count in stats %>
-      <tr>
-        <td><%= exercise.name %></td>
-        <% for question in questions %>
-          <td><%= if averages[question.id] then sprintf("%.2f", averages[question.id]) else '-' end %></td>
-        <% end %>
-        <td><%= answer_count %></td>
-      </tr>
+      <% if answer_count > 0 %>
+        <tr>
+          <td><%= exercise.name %></td>
+          <% for question in questions %>
+            <td><%= if averages[question.id] then sprintf("%.2f", averages[question.id]) else '-' end %></td>
+          <% end %>
+          <td><%= answer_count %></td>
+        </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>

@@ -1,15 +1,14 @@
 <h1>Feedback for <%= @title %></h1>
 
-<h2>Feedback statistics</h2>
-
-<%= render :partial => 'feedback_answers/numeric_feedback', :locals => { :questions => @numeric_questions, :stats => @numeric_stats } %>
+<% unless @numeric_stats.all? {|_, _, answer_count| answer_count == 0 } %>
+  <h2>Feedback statistics</h2>
+  <%= render :partial => 'feedback_answers/numeric_feedback', :locals => { :questions => @numeric_questions, :stats => @numeric_stats } %>
+<% end %>
 
 <% if !@text_answers.empty? %>
   <h2>Free-form feedback</h2>
 
   <%= render :partial => 'feedback_answers/text_feedback', :locals => { :text_answers => @text_answers } %>
-<% else %>
-  <p>No feedback yet.</p>
 <% end %>
 
 <%= link_back %>
