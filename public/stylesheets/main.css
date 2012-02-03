@@ -66,6 +66,10 @@ pre {
   font-size: 11px;
 }
 
+.footnote {
+  font-size: 8pt;
+}
+
 .field_with_errors {
   padding: 2px;
   background-color: red;
@@ -209,10 +213,6 @@ div.as-json {
 
 div.submission-summary {
   font-weight: bold;
-}
-
-div.submission-download-link {
-  margin-top: 20px;
 }
 
 span.source-url {

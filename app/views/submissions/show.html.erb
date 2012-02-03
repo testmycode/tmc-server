@@ -1,120 +1,126 @@
 
 <h1>Submission <%= @submission.id %></h1>
 
-<div class="submission-summary">
-  <% if !@submission.processed? %>
-    <p>Processing...</p>
-    <p class="processing-status"><!-- for JS to fill in --></p>
-  <% elsif @submission.all_tests_passed? %>
-    <p class="success">All tests successful</p>
-  <% elsif @submission.tests_ran? %>
-    <p class="failure">Some tests failed</p>
-  <% else %>
-    <p class="failure">Failed to run tests</p>
-  <% end %>
-</div>
-
-<% unless @submission.points_list.empty? %>
-  <p>Points awarded: <%= @submission.points_list.join(', ') %></p>
-<% end %>
-
-<p>
-  <div>Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %>.</div>
-  <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
-    <div>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</div>
-  <% end %>
-  <% if @submission.times_sent_to_sandbox > 1 %>
-    <div>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</div>
-  <% end %>
-</p>
-
-<% if !@submission.processed? %>
-  <script type="text/javascript">
-  $(document).ready(function() {
-    // Animate the "Processing..." text
-    var dots = '...'
-    setInterval(function() {
-      if (dots == '...') {
-        dots = '';
-      } else {
-        dots += '.';
-      }
-      $('.submission-summary p:first').text('Processing' + dots);
-    }, 700);
-
-    // Refresh status until processed, then refresh page
-    var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApplicationController::API_VERSION) %>';
-    var refreshCooldown = 5000;
-    function refreshStatus() {
-      $.ajax({
-        url: url,
-        dataType: 'json',
-        success: function(data) {
-          if (data.status == 'processing') {
-            status =
-              'Place in queue: ' + (data.submissions_before_this + 1) +
-              ' / ' + data.total_unprocessed
-            $('.processing-status').text(status);
-          } else {
-            window.location.reload();
-          }
-        },
-        complete: function() {
-          setTimeout(refreshStatus, refreshCooldown);
-        }
-      });
-    }
-    refreshStatus();
-  });
-  </script>
-<% end %>
-
-<% if can? :update, @submission %>
-  <div>
-    <%= button_to 'Rerun submission', submission_path(@submission), :method => :put %>
-    (may add points; never deletes points)
+<section>
+  <div class="submission-summary">
+    <% if !@submission.processed? %>
+      <p>Processing...</p>
+      <p class="processing-status"><!-- for JS to fill in --></p>
+    <% elsif @submission.all_tests_passed? %>
+      <p class="success">All tests successful</p>
+    <% elsif @submission.tests_ran? %>
+      <p class="failure">Some tests failed</p>
+    <% else %>
+      <p class="failure">Failed to run tests</p>
+    <% end %>
   </div>
-<% end %>
 
-<% if @submission.pretest_error %>
-  <pre class="error"><%= @submission.pretest_error %></pre>
-<% end %>
-
-<% if @submission.tests_ran? %>
-  <table>
-    <tr>
-      <th>Test case</th>
-      <th>Status</th>
-      <% if !@submission.all_tests_passed? %>
-        <th>Info</th>
-      <% end %>
-    </tr>
-
-  <% @submission.test_case_runs.each do |tcr| %>
-    <tr>
-      <td><%= tcr.test_case_name %></td>
-      <td>
-        <% if tcr.successful? %>
-          <span class="success">Ok</span>
-        <% else %>
-          <span class="failure">Fail</span>
-        <% end %>
-      </td>
-      <% if !@submission.all_tests_passed? %>
-        <td>
-          <%= tcr.message %>
-          <% if tcr.exception != nil %>
-            <br />
-            <div class="stack-trace">
-              <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
-            </div>
-          <% end %>
-        </td>
-      <% end %>
-    </tr>
+  <% unless @submission.points_list.empty? %>
+    <p>Points awarded: <%= @submission.points_list.join(', ') %></p>
   <% end %>
-  </table>
-<% end %>
+
+  <p>
+    <div>Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %>.</div>
+    <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
+      <div>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</div>
+    <% end %>
+    <% if @submission.times_sent_to_sandbox > 1 %>
+      <div>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</div>
+    <% end %>
+  </p>
+
+  <% if !@submission.processed? %>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      // Animate the "Processing..." text
+      var dots = '...'
+      setInterval(function() {
+        if (dots == '...') {
+          dots = '';
+        } else {
+          dots += '.';
+        }
+        $('.submission-summary p:first').text('Processing' + dots);
+      }, 700);
+
+      // Refresh status until processed, then refresh page
+      var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApplicationController::API_VERSION) %>';
+      var refreshCooldown = 5000;
+      function refreshStatus() {
+        $.ajax({
+          url: url,
+          dataType: 'json',
+          success: function(data) {
+            if (data.status == 'processing') {
+              status =
+                'Place in queue: ' + (data.submissions_before_this + 1) +
+                ' / ' + data.total_unprocessed
+              $('.processing-status').text(status);
+            } else {
+              window.location.reload();
+            }
+          },
+          complete: function() {
+            setTimeout(refreshStatus, refreshCooldown);
+          }
+        });
+      }
+      refreshStatus();
+    });
+    </script>
+  <% end %>
+
+  <% if can? :update, @submission %>
+    <div>
+      <%= button_to 'Rerun submission', submission_path(@submission), :method => :put %>
+      (may add points; never deletes points)
+    </div>
+  <% end %>
+</section>
+
+<h2>Results</h2>
+
+<section>
+  <% if @submission.pretest_error %>
+    <pre class="error"><%= @submission.pretest_error %></pre>
+  <% end %>
+
+  <% if @submission.tests_ran? %>
+    <table>
+      <tr>
+        <th>Test case</th>
+        <th>Status</th>
+        <% if !@submission.all_tests_passed? %>
+          <th>Info</th>
+        <% end %>
+      </tr>
+
+      <% @submission.test_case_runs.each do |tcr| %>
+        <tr>
+          <td><%= tcr.test_case_name %></td>
+          <td>
+            <% if tcr.successful? %>
+              <span class="success">Ok</span>
+            <% else %>
+              <span class="failure">Fail</span>
+            <% end %>
+          </td>
+          <% if !@submission.all_tests_passed? %>
+            <td>
+              <%= tcr.message %>
+              <% if tcr.exception != nil %>
+                <br />
+                <div class="stack-trace">
+                  <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
+                </div>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+</section>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -131,9 +137,22 @@ $(document).ready(function() {
 });
 </script>
 
-<div class="submission-download-link">
+<h2>Download</h2>
+
+<section class="submission-download-link">
   <%= link_to "Download #{@submission.downloadable_file_name}", submission_path(@submission, :format => 'zip') %>
-</div>
+</section>
+
+<% unless @submission.feedback_answers.empty? %>
+  <h2>Feedback</h2>
+  <section>
+    <% answers = @submission.feedback_answers.to_a.sort_by! {|a| a.feedback_question.position }%>
+    <% for answer in answers %>
+      <div class="feedback-question"><%= answer.feedback_question.question %></div>
+      <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
+    <% end %>
+  </section>
+<% end %>
 
 <%= link_back %>
 

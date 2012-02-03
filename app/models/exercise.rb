@@ -130,6 +130,10 @@ class Exercise < ActiveRecord::Base
     }
   end
 
+  def submissions_having_feedback
+    submissions.where('EXISTS (SELECT 1 FROM feedback_answers WHERE feedback_answers.submission_id = submissions.id)')
+  end
+
   def <=>(other)
     self.name <=> other.name
   end

@@ -1,22 +1,13 @@
-<h1>Feedback for <%= @parent.name %></h1>
+<h1>Feedback for <%= @title %></h1>
 
-<% if !@answers.empty? %>
-  <% for answer in @answers %>
-    <section>
-      <div class="feedback-question" title="<%= answer.feedback_question.question %>"><%= answer.feedback_question.title_or_question %></div>
-      <div class="feedback-source">
-        <% if !@parent.is_a?(Exercise) %>
-          For <%= link_to answer.exercise_name, answer.exercise %>
-          by <%= answer.submission.user.login %>
-        <% else %>
-          By <%= answer.submission.user.login %>
-        <% end %>
-        with <%= link_to "submission ##{answer.submission.id}", answer.submission %>
-        at <%= answer.created_at.strftime("%H:%M %d.%m.%Y") %>
-      </div>
-      <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
-    </section>
-  <% end %>
+<h2>Feedback statistics</h2>
+
+<%= render :partial => 'feedback_answers/numeric_feedback', :locals => { :questions => @numeric_questions, :stats => @numeric_stats } %>
+
+<% if !@text_answers.empty? %>
+  <h2>Free-form feedback</h2>
+
+  <%= render :partial => 'feedback_answers/text_feedback', :locals => { :text_answers => @text_answers } %>
 <% else %>
   <p>No feedback yet.</p>
 <% end %>

@@ -4,24 +4,33 @@ class FeedbackAnswersController < ApplicationController
     if params[:course_id]
       @course = Course.find(params[:course_id])
       @parent = @course
-    elsif params
+      @numeric_stats = @course.exercises.order(:name).map do |ex|
+        [ex, FeedbackAnswer.numeric_answer_averages(ex), ex.submissions_having_feedback.count]
+      end
+      @title = @course.name
+    elsif params[:exercise_id]
       @exercise = Exercise.find(params[:exercise_id])
       @course = @exercise.course
       @parent = @exercise
+      @numeric_stats = [[@exercise, FeedbackAnswer.numeric_answer_averages(@exercise), @exercise.submissions_having_feedback.count]]
+      @title = @exercise.name
     else
       return respond_not_found
     end
 
+    @numeric_questions = @course.feedback_questions.where("kind LIKE 'intrange%'").order(:position)
+
     authorize! :read, @parent
     authorize! :read, FeedbackQuestion
     authorize! :read, FeedbackAnswer
-
-    @answers = @parent.feedback_answers.
+    
+    @text_answers = @parent.feedback_answers.
       joins(:feedback_question).
       joins(:submission).
       joins(:submission => :user).
       #joins(:exercise). # fails due to :conditions receiving incorrect self :(
-      order('created_at DESC'). # TODO: could sort by questions those whose created_at are very close
+      where(:feedback_questions => { :kind => 'text' }).
+      order('created_at DESC').
       all
   end
 

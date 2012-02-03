@@ -1,0 +1,14 @@
+<% for answer in text_answers %>
+  <section>
+    <div class="feedback-question" title="<%= answer.feedback_question.question %>"><%= answer.feedback_question.title_or_question %></div>
+    <div class="feedback-source">
+      By <%= answer.submission.user.login %>
+      with <%= link_to "submission ##{answer.submission.id}", answer.submission %>
+      <% unless @exercise %>
+        for <%= link_to answer.exercise.name, answer.exercise %>
+      <% end %>
+      at <%= answer.created_at.strftime("%H:%M %d.%m.%Y") %>
+    </div>
+    <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
+  </section>
+<% end %>

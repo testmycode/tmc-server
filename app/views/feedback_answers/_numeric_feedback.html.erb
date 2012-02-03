@@ -1,0 +1,30 @@
+<table class="feedback-numeric-stats">
+  <thead>
+    <tr>
+      <th>Exercise</th>
+      <% for question in questions %>
+        <th title="<%= question.question %>"><%= question.title_or_question %></th>
+      <% end %>
+      <th>Answers*</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for exercise, averages, answer_count in stats %>
+      <tr>
+        <td><%= exercise.name %></td>
+        <% for question in questions %>
+          <td><%= if averages[question.id] then sprintf("%.2f", averages[question.id]) else '-' end %></td>
+        <% end %>
+        <td><%= answer_count %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div class="footnote">
+  * Number of submissions answering at least one feedback question.
+</div>
+
+<% if stats.count > 1 %>
+  <%= use_datatables('table.feedback-numeric-stats', :bSort => true) %>
+<% end %>
