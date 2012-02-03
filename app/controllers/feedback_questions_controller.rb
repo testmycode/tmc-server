@@ -41,6 +41,7 @@ class FeedbackQuestionsController < ApplicationController
     authorize! :update, @question
 
     @question.question = params[:feedback_question][:question]
+    @question.title = params[:feedback_question][:title]
 
     if @question.save
       flash[:success] = 'Question updated.'

@@ -3,7 +3,7 @@
 <% if !@answers.empty? %>
   <% for answer in @answers %>
     <section>
-      <div class="feedback-question"><%= answer.feedback_question.question %></div>
+      <div class="feedback-question" title="<%= answer.feedback_question.question %>"><%= answer.feedback_question.title_or_question %></div>
       <div class="feedback-source">
         <% if !@parent.is_a?(Exercise) %>
           For <%= link_to answer.exercise_name, answer.exercise %>

@@ -19,6 +19,8 @@ kind_disabled = !question.new_record?
   <%= render 'shared/error_messages', :target => question %>
   
   <%= labeled_field("Question", f.text_field(:question, :style => 'width: 30em')) %>
+
+  <%= labeled_field("Question title in results views", f.text_field(:title, :style => 'width: 10em')) %>
   
   <%= labeled_field("Question type") do %>
     <div id="feedback_question_kind">

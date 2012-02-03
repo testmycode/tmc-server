@@ -7,7 +7,11 @@ class FeedbackQuestion < ActiveRecord::Base
   validates :course, :presence => true
   validates :kind, :presence => true do validate_kind end
   validates :question, :presence => true
-  
+
+  def title_or_question
+    title || question
+  end
+
   def intrange?
     kind =~ intrange_regex
   end
