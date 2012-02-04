@@ -42,13 +42,19 @@ private
   end
   
   def check_api_version
-    if params[:format] == 'json' && controller_name != 'stats'
+    if should_check_api_version?
       if params[:api_version].blank?
         respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
       elsif params[:api_version] != API_VERSION.to_s
         respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
       end
     end
+  end
+
+  def should_check_api_version?
+    params[:format] == 'json' &&
+      controller_name != 'stats' &&
+      !(controller_name == 'feedback_answers' && action_name == 'index')
   end
   
   def set_bare_layout

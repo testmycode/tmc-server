@@ -2,7 +2,7 @@
 
 <% unless @numeric_stats.all? {|_, _, answer_count| answer_count == 0 } %>
   <h2>Feedback statistics</h2>
-  <%= render :partial => 'feedback_answers/numeric_feedback', :locals => { :questions => @numeric_questions, :stats => @numeric_stats } %>
+  <%= render :partial => 'feedback_answers/numeric_feedback', :locals => { :parent => @parent, :questions => @numeric_questions, :stats => @numeric_stats } %>
 <% end %>
 
 <% if !@text_answers.empty? %>

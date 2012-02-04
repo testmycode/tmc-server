@@ -20,18 +20,47 @@ class FeedbackAnswersController < ApplicationController
 
     @numeric_questions = @course.feedback_questions.where("kind LIKE 'intrange%'").order(:position)
 
-    authorize! :read, @parent
-    authorize! :read, FeedbackQuestion
-    authorize! :read, FeedbackAnswer
-    
-    @text_answers = @parent.feedback_answers.
-      joins(:feedback_question).
-      joins(:submission).
-      joins(:submission => :user).
-      #joins(:exercise). # fails due to :conditions receiving incorrect self :(
-      where(:feedback_questions => { :kind => 'text' }).
-      order('created_at DESC').
-      all
+    respond_to do |format|
+      format.html do
+        authorize! :read, @parent
+        authorize! :read, FeedbackQuestion
+        authorize! :read, FeedbackAnswer
+
+        @text_answers = @parent.feedback_answers.
+          joins(:feedback_question).
+          joins(:submission).
+          joins(:submission => :user).
+          #joins(:exercise). # fails due to :conditions receiving incorrect self :(
+          where(:feedback_questions => { :kind => 'text' }).
+          order('created_at DESC').
+          all
+      end
+      format.json do
+        authorize! :read, @parent
+        # We only deliver public statistics so no authorization required
+
+        render :json => {
+          :numeric_questions => @numeric_questions.map {|q|
+            {
+              :id => q.id,
+              :title => q.title,
+              :question => q.question,
+              :position => q.position
+            }
+          },
+          :numeric_stats => @numeric_stats.map {|ex, averages, answer_count|
+            {
+              :exercise => {
+                :id => ex.id,
+                :name => ex.name,
+              },
+              :averages => averages,
+              :answer_count => answer_count
+            }
+          }
+        }
+      end
+    end
   end
 
   def show
