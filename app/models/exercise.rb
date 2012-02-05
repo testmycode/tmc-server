@@ -70,6 +70,7 @@ class Exercise < ActiveRecord::Base
   # Whether a user has made a submission with all test cases passing
   def completed_by?(user)
     Submission.where({
+      :course_id => self.course_id,
       :exercise_name => self.name,
       :user_id => user.id,
       :pretest_error => nil,
