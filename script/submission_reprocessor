@@ -20,7 +20,7 @@ Daemons.run_proc('submission_reprocessor', :dir_mode => :normal, :dir => pid_dir
   loop do
     begin
       processor.reprocess_timed_out_submissions
-    rescue e
+    rescue => e
       puts "Exception: " + e.message
       puts e.backtrace.join("\n        from ")
     end
