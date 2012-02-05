@@ -30,7 +30,7 @@ class FeedbackAnswersController < ApplicationController
           joins(:feedback_question).
           joins(:submission).
           joins(:submission => :user).
-          #joins(:exercise). # fails due to :conditions receiving incorrect self :(
+          #joins(:exercise). # fails due to :conditions of belongs_to receiving incorrect self :(
           where(:feedback_questions => { :kind => 'text' }).
           order('created_at DESC').
           all
@@ -55,7 +55,8 @@ class FeedbackAnswersController < ApplicationController
                 :name => ex.name,
               },
               :averages => averages,
-              :answer_count => answer_count
+              :answer_count => answer_count,
+              :answers => FeedbackAnswer.anonymous_numeric_answers(ex)
             }
           }
         }
