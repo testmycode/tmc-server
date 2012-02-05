@@ -135,6 +135,28 @@ class Exercise < ActiveRecord::Base
     submissions.where('EXISTS (SELECT 1 FROM feedback_answers WHERE feedback_answers.submission_id = submissions.id)')
   end
 
+  def self.count_completed(users, exercises)
+    s = Submission.arel_table
+
+    user_ids = users.map(&:id)
+    exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name)})" }
+
+    query =
+      s.
+      project(Arel.sql('COUNT(DISTINCT (course_id, exercise_name, user_id))').as('count')).
+      where(s[:user_id].in(user_ids)).
+      where(Arel.sql("(course_id, exercise_name) IN (#{exercise_keys.join(',')})")).
+      where(s[:pretest_error].eq(nil)).
+      where(s[:all_tests_passed].eq(true))
+
+    results = connection.execute(query.to_sql)
+    begin
+      results[0]['count'].to_i
+    ensure
+      results.clear
+    end
+  end
+
   def <=>(other)
     self.name <=> other.name
   end
