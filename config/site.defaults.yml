@@ -36,5 +36,5 @@ remote_sandboxes:
 #
 # The NetBeans plugin will not advertise the model solution
 # if this is set to false.
-show_model_solutions_when_exercise_completed: false
+show_model_solutions_when_exercise_completed: true
 
