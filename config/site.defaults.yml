@@ -39,6 +39,10 @@ emails:
 
 ### Model solutions ###
 
+# Note that a model solution can always be made visible
+# by setting `solution_visible_after` in a metadata.yml
+# even if the settings below are set to false.
+
 # Whether to show the model solution immediately after
 # a student has completed the exercise.
 #

@@ -78,8 +78,12 @@ class Exercise < ActiveRecord::Base
     }).any?
   end
 
-  def deadline=(new_deadline)
-    super(DateAndTimeUtils.to_time(new_deadline, :prefer_end_of_day => true))
+  def deadline=(new_value)
+    super(DateAndTimeUtils.to_time(new_value, :prefer_end_of_day => true))
+  end
+
+  def solution_visible_after=(new_value)
+    super(DateAndTimeUtils.to_time(new_value, :prefer_end_of_day => true))
   end
 
   # Whether the deadline has passed
@@ -91,10 +95,10 @@ class Exercise < ActiveRecord::Base
     new_options = self.class.default_options.merge(new_options)
     self.deadline = new_options["deadline"]
     self.publish_time = new_options["publish_time"]
-    self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"],
-                                       new_options["gdocs_sheet"])
+    self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"], new_options["gdocs_sheet"])
     self.hidden = new_options["hidden"]
     self.returnable_forced = new_options["returnable"]
+    self.solution_visible_after = new_options["solution_visible_after"]
   end
 
   def new_gdocs_sheet enabled, sheetname
@@ -127,7 +131,8 @@ class Exercise < ActiveRecord::Base
       "gdocs_sheet" => nil,
       "points_visible" => true,
       "hidden" => false,
-      "returnable" => nil
+      "returnable" => nil,
+      "solution_visible_after" => nil
     }
   end
 

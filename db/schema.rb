@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120203165326) do
+ActiveRecord::Schema.define(:version => 20120206141225) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -49,9 +49,10 @@ ActiveRecord::Schema.define(:version => 20120203165326) do
     t.datetime "deadline"
     t.datetime "publish_time"
     t.string   "gdocs_sheet"
-    t.boolean  "hidden",            :default => false, :null => false
+    t.boolean  "hidden",                 :default => false, :null => false
     t.boolean  "returnable_forced"
-    t.string   "checksum",          :default => "",    :null => false
+    t.string   "checksum",               :default => "",    :null => false
+    t.datetime "solution_visible_after"
   end
 
   add_index "exercises", ["gdocs_sheet"], :name => "index_exercises_on_gdocs_sheet"
