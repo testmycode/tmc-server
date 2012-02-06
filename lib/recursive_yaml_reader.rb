@@ -23,7 +23,7 @@ class RecursiveYamlReader
     target_dir = @opts[:target_dir]
     file_name = @opts[:file_name]
     
-    subdirs = @opts[:target_dir].gsub(/^#{@opts[:root_dir]}\//, '').split("/")
+    subdirs = target_dir.gsub(/^#{@opts[:root_dir]}\//, '').split("/")
 
     @result = @opts[:defaults] || {}
     merge_file("#{root_dir}/#{file_name}")
@@ -41,7 +41,8 @@ private
   
   def merge_file(path)
     if FileTest.exists? path
-      @result = @result.merge(YAML.load_file(path))
+      file_data = YAML.load_file(path)
+      @result = @result.merge(file_data) unless !file_data
     end
   end
 end
