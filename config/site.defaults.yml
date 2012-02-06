@@ -1,8 +1,13 @@
+
+### Site appearance ###
+
 # You can make local adjustments by creating a site.yml file and overriding the settings here.
 
 # The subtitle to display on every page. May contain HTML.
 # Example: HELSINKI UNIVERSITY<br />Department of Computer Science
 site_subtitle:
+
+### Server and network setup ###
 
 # In many installations, tmp/cache/git_repos must be available to the apache user.
 # Either give everyone read access to it (the default) or give the tmc server user
@@ -15,12 +20,6 @@ git_repos_chgrp:
 # Enter the baseurl of the webapp with which the sandboxes will find the web server.
 baseurl_for_remote_sandboxes: http://localhost:3000/
 
-# Settings for e-mails.
-emails:
-  reset_password:
-    baseurl: http://localhost:3000/
-    from: noreply@example.com
-
 # List at least one sandbox instance here (in site.yml).
 #
 # Any URL will do. Example:
@@ -30,6 +29,15 @@ emails:
 #
 remote_sandboxes:
   - http://localhost:3001/
+
+### E-mails ###
+emails:
+  reset_password:
+    baseurl: http://localhost:3000/
+    from: noreply@example.com
+
+
+### Model solutions ###
 
 # Whether to show the model solution immediately after
 # a student has completed the exercise.
