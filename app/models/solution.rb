@@ -10,7 +10,8 @@ class Solution
       true
     else
       show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')
-      (show_when_completed && @exercise.completed_by?(user)) || @exercise.expired?
+      show_when_expired = SiteSetting.value('show_model_solutions_when_exercise_expired')
+      (show_when_completed && @exercise.completed_by?(user)) || (show_when_expired && @exercise.expired?)
     end
   end
   

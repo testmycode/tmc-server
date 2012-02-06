@@ -38,3 +38,5 @@ remote_sandboxes:
 # if this is set to false.
 show_model_solutions_when_exercise_completed: true
 
+# Whether to show the model solution when the exercise has expired.
+show_model_solutions_when_exercise_expired: false
