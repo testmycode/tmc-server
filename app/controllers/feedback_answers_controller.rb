@@ -59,7 +59,7 @@ class FeedbackAnswersController < ApplicationController
               :answers => FeedbackAnswer.anonymous_numeric_answers(ex)
             }
           }
-        }
+        }, :callback => params[:jsonp]
       end
     end
   end
