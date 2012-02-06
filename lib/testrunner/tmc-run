@@ -25,7 +25,12 @@ DEFS="
   -Dtmc.lib_dir=`pwd`/lib
   -Dtmc.results_file=`pwd`/output.txt"
 
-java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
+# An explicit memory limit somewhat below the sandbox memory limit has been found to avoid
+# very long processing times and the occasional OOM killer.
+TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
+JAVA_RAM_KB=`expr $TOTAL_RAM_KB - 16 \* 1024`
+
+java -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
 
 exit 0
 
