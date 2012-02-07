@@ -72,7 +72,7 @@ class PointsController < ApplicationController
   def sort_users_by_points(users, exercises)
     exercise_names = exercises.map(&:name)
     points = AwardedPoint.joins(:submission).where(:course_id => @course.id, :submissions => {:exercise_name => exercise_names}).to_a
-    users.sort_by! do |u|
+    users.sort_by do |u|
       [-points.count {|pt| pt.user_id == u.id}, u.login]
     end
   end
