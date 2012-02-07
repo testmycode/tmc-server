@@ -1,8 +1,8 @@
 # Test My Code server #
 
-*Test My Code* ("TMC") is a tool to automate some of the exercise checking when teaching programming. It runs code submitted by students, gives feedback if tests fail and stores points received for successful submissions. This allows for lots of small exercises without the need for course instructors to manually go through all of them.
+*Test My Code* ("TMC") is a tool to automate most of the exercise checking when teaching programming. It runs code submitted by students, gives feedback if tests fail and maintains a scoreboard. This allows for lots of small exercises without the need for course instructors to manually go through all of them.
 
-The system has been used by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in an elementary programming [course](http://www.cs.helsinki.fi/u/wikla/ohjelmointi/perus/s2011/). The course had almost 200 participants and TMC saved course assistants a lot of work while giving students instant feedback for many exercises. Development continues in preparation for the Spring semester with plans to move all exercises to TMC and open the course online to anyone in Finland.
+The system has been used by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in an elementary programming course. The course had almost 200 participants and TMC saved course assistants a lot of work while giving students instant feedback for many exercises. Development continued and now TMC is used to check all exercises for over 400 students on two elementary courses and one data structures course.
 
 
 ## Setup ##
@@ -25,7 +25,7 @@ An X server is currently needed for tests to pass (required by [capybara-webkit]
 8. Run the test suite with `rake spec`.
 9. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
 
-The application should not be deployed into a multithreaded server! It often changes the current working directory, which is a process-specific attribute. Each request should have its process all to itself. If you use Apache with say Passenger, then use the prefork MPM.
+The application should not be deployed into a multithreaded server! It often changes the current working directory, which is a process-specific attribute. Each request should have its process all to itself. If you use Apache with, say, Passenger, then use the prefork MPM.
 
 ### Startup ###
 
@@ -37,7 +37,7 @@ The application should not be deployed into a multithreaded server! It often cha
 
 ## Credits ##
 
-The project started as a Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/). The original authors of the server component were
+The project started as a Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) but has since been gradually almost completely rewritten. The original authors of the server component were
 
 - Patrik Marjanen
 - Jarno Mynttinen
