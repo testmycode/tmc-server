@@ -28,7 +28,12 @@ class RecursiveYamlReader
     @result = @opts[:defaults] || {}
     merge_file("#{root_dir}/#{file_name}")
     subdirs.each_index do |i|
-      merge_file("#{root_dir}/#{subdirs[0..i].join('/')}/#{file_name}")
+      rel_path = "#{subdirs[0..i].join('/')}/#{file_name}"
+      begin
+        merge_file("#{root_dir}/#{rel_path}")
+      rescue
+        raise "error while reading #{rel_path}: #{$!}"
+      end
     end
     
     @result
