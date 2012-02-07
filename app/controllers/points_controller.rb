@@ -19,10 +19,14 @@ class PointsController < ApplicationController
   def show
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])
+    @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).sort!
 
-    @users = User.course_sheet_students(@course, @sheetname).sort!
-    @exercises = Exercise.
-      course_gdocs_sheet_exercises(@course, @sheetname).sort!
+    @users = User.course_sheet_students(@course, @sheetname)
+    if params[:sort_by] == 'points'
+      @users = sort_users_by_points(@users, @exercises)
+    else
+      @users.sort!
+    end
   end
 
   def summary_hash(course, sheets)
@@ -62,6 +66,14 @@ class PointsController < ApplicationController
     elsif sorting =~ /(.*)_points$/
       sheet = $1
       summary[:users] = summary[:users].sort_by {|username| [-summary[:awarded_for_user_and_sheet][username][sheet].to_i, username] }
+    end
+  end
+
+  def sort_users_by_points(users, exercises)
+    exercise_names = exercises.map(&:name)
+    points = AwardedPoint.joins(:submission).where(:course_id => @course.id, :submissions => {:exercise_name => exercise_names}).to_a
+    users.sort_by! do |u|
+      [-points.count {|pt| pt.user_id == u.id}, u.login]
     end
   end
 end

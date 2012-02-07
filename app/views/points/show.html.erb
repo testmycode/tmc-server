@@ -2,8 +2,62 @@
 <% unless @bare_layout %>
   <h1>Points for <%= @sheetname %> of <%= @course.name %></h1>
 
-  <p><%= link_to 'back to summary', course_points_path(@course) %></p>
+  <ul>
+    <li>
+      <%= link_to 'Back to summary', course_points_path(@course) %>
+    </li>
+    <li>
+      <% if params[:sort_by].blank? %>
+        <%= link_to 'Sort by points', course_point_path(@course, @sheetname, :sort_by => 'points') %>
+      <% else %>
+        <%= link_to 'Sort by username', course_point_path(@course, @sheetname) %>
+      <% end %>
+    </li>
+    <% if current_user.administrator? and @course.spreadsheet_key %>
+      <li>
+        <%= link_to 'Refresh Google Docs worksheet', refresh_gdocs_course_point_path(@course, @sheetname) %>
+      </li>
+    <% end %>
+  </ul>
 <% end %>
 
-<%= render :partial => 'points' %>
+<div class="scrollable">
+  <table class="points">
+    <thead>
+      <% if tailoring.show_exercise_names_in_points_table %>
+        <tr>
+          <th></th>
+          <% @exercises.each do |exercise| %>
+            <% points = exercise.available_points.sort! %>
+            <% if points.size > 0 %>
+              <th colspan="<%= points.size %>"><%= tailoring.exercise_name_for_points_table(exercise) %></th>
+            <% end %>
+          <% end %>
+        </tr>
+      <% end %>
+      <tr>
+        <th></th>
+        <% @exercises.each do |exercise| %>
+          <% exercise.available_points.each do |point| %>
+            <th><%= point.name %></th>
+          <% end %>
+        <% end %>
+      </tr>
+    </thead>
 
+    <tbody>
+      <% @users.each do |user| %>
+        <% user_points = AwardedPoint.
+            course_user_sheet_points(@course, user, @sheetname).map(&:name) %>
+        <tr>
+          <td><%= user.login %></td>
+          <% @exercises.each do |exercise| %>
+            <% exercise.available_points.each do |p| %>
+              <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
+            <% end %>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

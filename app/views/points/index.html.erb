@@ -2,5 +2,62 @@
   <h1>Summary of points for <%= @course.name %></h1>
 <% end %>
 
-<%= render :partial => 'summary' %>
-
+<div class="scrollable">
+  <table class="points">
+    <thead>
+      <tr>
+        <th>Number of students</th>
+        <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
+        <th>Total</th>
+      </tr>
+      <tr class="table-totals">
+        <% nstudents = @summary[:users].length %>
+        <td><%= nstudents %></td>
+        <% @summary[:sheets].each do |sheet| %>
+          <td>
+            <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
+          </td>
+        <% end %>
+        <td>
+          <%= "#{@summary[:total_awarded]}/#{@summary[:total_available]*nstudents}" %>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Student<br />
+          <% unless params[:sort_by].blank? %>
+            [<%= link_to 'sort', course_points_path(@course) %>]
+          <% else %>
+            [sort]
+          <% end %>
+        </th>
+        <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
+          <th>
+            <%= sheet %><br />
+            [<%= link_to 'open', course_point_path(@course, sheet) %>]
+            <% unless params[:sort_by] == "#{sheet}_points" %>
+              [<%= link_to 'sort', course_points_path(@course, :sort_by => "#{sheet}_points") %>]
+            <% else %>
+              [sort]
+            <% end %>
+          </th>
+        <% end %>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @summary[:users].each do |username| %>
+        <tr>
+          <td><%= username %></td>
+          <% @summary[:sheets].each do |sheet| %>
+            <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>
+            <td>
+              <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
+            </td>
+          <% end %>
+          <td><%= "#{@summary[:total_for_user][username].to_i}/#{@summary[:total_available]}" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
