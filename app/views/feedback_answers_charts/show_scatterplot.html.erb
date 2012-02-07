@@ -1,0 +1,48 @@
+<h1>Feedback scatterplot for <%= @course.name %></h1>
+
+<div id="chart-container"></div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+
+  var chart;
+  function drawChart() {
+    $.getJSON('<%= j(course_feedback_answers_path(@course, :format => :json)) %>', function(data) {
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn('string', 'Name');
+      dataTable.addColumn('number', '<%= @questions[0].title_or_question %>');
+      dataTable.addColumn('number', '<%= @questions[1].title_or_question %>');
+      dataTable.addColumn('string', 'Exercise group');
+      dataTable.addColumn('number', 'Answers');
+
+      var options = {
+        width: 1200, height: 1200,
+        hAxis: {
+          title: '<%= @questions[0].title_or_question %>',
+          minValue: parseInt('<%= @questions[0].intrange.min %>'),
+          maxValue: parseInt('<%= @questions[0].intrange.max %>')
+        },
+        vAxis: {
+          title: '<%= @questions[1].title_or_question %>',
+          minValue: parseInt('<%= @questions[1].intrange.min %>'),
+          maxValue: parseInt('<%= @questions[1].intrange.max %>')
+        },
+        sizeAxis: {minSize: 2, maxSize: 20},
+        bubble: {textStyle: {color: "black", fontSize: 1}}
+      };
+
+      chart = new google.visualization.BubbleChart(document.getElementById('chart-container'));
+
+      var q1Id = '<%= @questions[0].id %>';
+      var q2Id = '<%= @questions[1].id %>';
+      $.each(data['numeric_stats'], function(i,item) {
+        var avg = item.averages;
+        var name = item.exercise.name;
+        dataTable.addRow([name, avg[q1Id], avg[q2Id], name.split('-')[0], item.answer_count]);
+      });
+      chart.draw(dataTable, options);
+    });
+  }
+</script>

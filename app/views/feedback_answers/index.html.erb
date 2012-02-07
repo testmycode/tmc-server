@@ -2,6 +2,11 @@
 
 <% unless @numeric_stats.all? {|_, _, answer_count| answer_count == 0 } %>
   <h2>Feedback statistics</h2>
+  <% if @parent.is_a?(Course) && @numeric_questions.size == 2 %>
+    <ul>
+      <li><%= link_to 'Scatterplot', course_feedback_answers_chart_path(@course, :type => 'scatterplot') %></li>
+    </ul>
+  <% end %>
   <%= render :partial => 'feedback_answers/numeric_feedback', :locals => { :parent => @parent, :questions => @numeric_questions, :stats => @numeric_stats } %>
 <% end %>
 

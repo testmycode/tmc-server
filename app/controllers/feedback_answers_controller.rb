@@ -4,7 +4,7 @@ class FeedbackAnswersController < ApplicationController
     if params[:course_id]
       @course = Course.find(params[:course_id])
       @parent = @course
-      @numeric_stats = @course.exercises.order(:name).map do |ex|
+      @numeric_stats = @course.exercises.where(:hidden => false).order(:name).map do |ex|
         [ex, FeedbackAnswer.numeric_answer_averages(ex), ex.submissions_having_feedback.count]
       end
       @title = @course.name
