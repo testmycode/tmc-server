@@ -42,7 +42,14 @@
             <% end %>
           </th>
         <% end %>
-        <th>Total</th>
+        <th>
+          Total<br />
+          <% unless params[:sort_by] == 'total_points' %>
+            [<%= link_to 'sort', course_points_path(@course, :sort_by => "total_points") %>]
+          <% else %>
+            [sort]
+          <% end %>
+        </th>
       </tr>
     </thead>
     <tbody>
