@@ -1,25 +1,25 @@
 
 <% unless @bare_layout %>
   <h1>Points for <%= @sheetname %> of <%= @course.name %></h1>
-
-  <ul>
-    <li>
-      <%= link_to 'Back to summary', course_points_path(@course) %>
-    </li>
-    <li>
-      <% if params[:sort_by].blank? %>
-        <%= link_to 'Sort by points', course_point_path(@course, @sheetname, :sort_by => 'points') %>
-      <% else %>
-        <%= link_to 'Sort by username', course_point_path(@course, @sheetname) %>
-      <% end %>
-    </li>
-    <% if current_user.administrator? and @course.spreadsheet_key %>
-      <li>
-        <%= link_to 'Refresh Google Docs worksheet', refresh_gdocs_course_point_path(@course, @sheetname) %>
-      </li>
-    <% end %>
-  </ul>
 <% end %>
+
+<ul>
+  <li>
+    <%= link_to 'Back to summary', course_points_path(@course) %>
+  </li>
+  <li>
+    <% if params[:sort_by].blank? %>
+      <%= link_to 'Sort by points', course_point_path(@course, @sheetname, :sort_by => 'points') %>
+    <% else %>
+      <%= link_to 'Sort by username', course_point_path(@course, @sheetname) %>
+    <% end %>
+  </li>
+  <% if current_user.administrator? and @course.spreadsheet_key %>
+    <li>
+      <%= link_to 'Refresh Google Docs worksheet', refresh_gdocs_course_point_path(@course, @sheetname) %>
+    </li>
+  <% end %>
+</ul>
 
 <div class="scrollable">
   <table class="points">
