@@ -85,7 +85,7 @@ describe SubmissionPackager do
           File.should_not exist('output.txt')
           
           begin
-            sh! ['./tmc-run']
+            sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
           rescue
             if File.exist?('output.txt')
               raise($!.message + "\n" + "The contents of output.txt:\n" + File.read('output.txt'))
@@ -111,7 +111,7 @@ describe SubmissionPackager do
           sh! ['tar', 'xf', @tar_path]
           File.should_not exist('classes/main/SimpleStuff.class')
           File.should_not exist('output.txt')
-          `./tmc-run`
+          `env JAVA_RAM_KB=#{64*1024} ./tmc-run`
           $?.exitstatus.should == 101
           File.should exist('output.txt')
           
