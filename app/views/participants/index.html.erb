@@ -1,9 +1,9 @@
 
 <h1>List of participants</h1>
 
-<p>(Users with administrative privileges not included.)</p>
+<%= render :partial => 'participants/filter_controls' %>
 
-<p><%= link_to 'List of e-mails as plain-text', emails_path(:format => 'txt') %>.</p>
+<p><%= link_to 'List of e-mails as plain-text', emails_path(@raw_filter_params.merge(:format => 'txt')) %>.</p>
 
 <table class="participants">
   <thead>
@@ -21,7 +21,7 @@
   <% end %>
   </tbody>
 </table>
-<div class="as-json">[<%= link_to "json", "#{participants_path :format => :json, :api_version => ApplicationController::API_VERSION}" %>]</div>
+<div class="as-json">[<%= link_to "json", "#{participants_path @filter_params.merge(:format => :json, :api_version => ApplicationController::API_VERSION)}" %>]</div>
 
 <%= use_datatables('table.participants', :bPaginate => false) %>
 

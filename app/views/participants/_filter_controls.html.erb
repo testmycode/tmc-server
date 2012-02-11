@@ -1,0 +1,13 @@
+<section>
+  <h3>Filter</h3>
+  <div>
+    <%= form_tag(participants_path, :method => :get) do %>
+      <%= labeled_field('Include administrators', check_box_tag('filter_include_administrators', '1', @filter_params['include_administrators']), :order => :label_last) %>
+
+      <% for field in UserField.all %>
+        <%= extra_field_filter('filter_', field, @filter_params[field.name]) %>
+      <% end %>
+      <%= submit_tag 'Apply filter' %>
+    <% end %>
+  </div>
+</section>

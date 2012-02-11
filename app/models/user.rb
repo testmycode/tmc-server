@@ -40,6 +40,30 @@ class User < ActiveRecord::Base
     value
   end
 
+  def self.filter_by(filter_params, users = nil)
+    users = self unless users
+
+    users = users.where(:administrator => false) unless filter_params['include_administrators']
+
+    for field in UserField.all
+      if !filter_params[field.name].blank?
+        expected_value =
+          case field.field_type
+          when :boolean
+            '1'
+          else
+            filter_params[field.name]
+          end
+        users = users.where(
+          'EXISTS (SELECT 1 FROM user_field_values WHERE user_id = users.id AND field_name = ? AND value = ?)',
+          field.name,
+          expected_value
+        )
+      end
+    end
+    users
+  end
+
   def guest?
     false
   end

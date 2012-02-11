@@ -3,7 +3,10 @@ class ParticipantsController < ApplicationController
   
   def index
     return respond_access_denied unless current_user.administrator?
-    @participants = User.where(:administrator => false).order(:login)
+    @filter_params = params_starting_with('filter_', :remove_prefix => true)
+    @raw_filter_params = params_starting_with('filter_', :remove_prefix => false)
+    @participants = User.filter_by(@filter_params, @participants).order(:login)
+
     respond_to do |format|
       format.html
       format.json do
@@ -27,5 +30,4 @@ class ParticipantsController < ApplicationController
     flash[:success] = 'User account deleted'
     redirect_to root_path
   end
-
 end

@@ -24,4 +24,28 @@ module ExtraFieldHelper
     
     labeled_field(field.label, field_tag)
   end
+
+  def extra_field_filter(prefix, field, value)
+    field_name = prefix + field.name
+
+    field_tag =
+      case field.field_type
+      when :text
+        text_field_tag(field_name, value)
+      when :boolean
+        check_box_tag(field_name, '1', !value.blank?)
+      else
+        raise "Unknown extra field type: #{field.field_type}"
+      end
+
+    label_order =
+      case field.field_type
+      when :boolean
+        :label_last
+      else
+        :label_first
+      end
+
+    labeled_field(field.name.humanize, field_tag, :order => label_order)
+  end
 end

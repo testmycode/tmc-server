@@ -3,7 +3,8 @@ class EmailsController < ApplicationController
   
   def index
     return respond_access_denied unless current_user.administrator?
-    @emails = User.where(:administrator => false).order(:email).map(&:email)
+    filter_params = params_starting_with('filter_', :remove_prefix => true)
+    @emails = User.filter_by(filter_params).order(:email).map(&:email)
     respond_to do |format|
       format.text do
         render :text => @emails.join("\n")

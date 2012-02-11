@@ -89,5 +89,17 @@ private
       "application"
     end
   end
+
+  def params_starting_with(prefix, options = {})
+    options = {
+      :remove_prefix => false
+    }.merge(options)
+
+    result = params.select {|k, v| k.start_with?(prefix) }
+    if options[:remove_prefix]
+      result = Hash[result.map {|k, v| [k.sub(/^#{prefix}/, ''), v] }]
+    end
+    result
+  end
   
 end

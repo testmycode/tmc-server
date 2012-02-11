@@ -1,7 +1,7 @@
 # Configures extra user fields
 group 'Suoritusaikeet' do
   field({
-    :name => 'nimi',
+    :name => 'koko_nimi',
     :field_type => 'text',
     :label => 'Etu- ja sukunimi',
   })
