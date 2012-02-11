@@ -1,4 +1,6 @@
 source 'http://rubygems.org'
+# An alternative when rubygems.org is down
+#source 'http://production.cf.rubygems.org/'
 
 gem 'rails', '~> 3.1.0'
 

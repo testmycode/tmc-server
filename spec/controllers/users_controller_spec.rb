@@ -49,40 +49,57 @@ describe UsersController do
     it "should require a username" do
       @valid_attrs.delete :login
       post :create, :user => @valid_attrs
-      response.should_not be_successful
+      User.count.should == 0
     end
     
     it "should require the username to be unique" do
       post :create, :user => @valid_attrs
       @valid_attrs[:email] = @valid_attrs[:email_repeat] = 'bsd@example.com'
       post :create, :user => @valid_attrs
-      response.should_not be_successful
+      User.count.should == 1
     end
     
     it "should require an email" do
       @valid_attrs.delete :email
       @valid_attrs.delete :email_repeat
       post :create, :user => @valid_attrs
-      response.should_not be_successful
+      User.count.should == 0
     end
     
     it "should require an email confirmation" do
       @valid_attrs.delete :email_repeat
       post :create, :user => @valid_attrs
-      response.should_not be_successful
+      User.count.should == 0
     end
     
     it "should require a password" do
       @valid_attrs.delete :password
       @valid_attrs.delete :password_repeat
       post :create, :user => @valid_attrs
-      response.should_not be_successful
+      User.count.should == 0
     end
     
     it "should require a password confirmation" do
       @valid_attrs.delete :password_repeat
       post :create, :user => @valid_attrs
-      response.should_not be_successful      
+      User.count.should == 0
+    end
+
+    it "should save extra fields" do
+      fields = [
+        UserField.new(:name => 'field1', :field_type => 'text'),
+        UserField.new(:name => 'field2', :field_type => 'boolean'),
+        UserField.new(:name => 'field3', :field_type => 'boolean')
+      ]
+      UserField.stub(:all => fields)
+
+      post :create, :user => @valid_attrs, :user_field => {'field1' => 'foo', 'field2' => '1'}
+      User.count.should == 1
+
+      user = User.find_by_login(@valid_attrs[:login])
+      user.field_value_record(fields[0]).value.should == 'foo'
+      user.field_value_record(fields[1]).value.should_not be_blank
+      user.field_value_record(fields[2]).value.should be_blank
     end
   end
   
@@ -93,7 +110,7 @@ describe UsersController do
     end
     
     it "should save the email field" do
-      put :update, :user => { :email => 'newemail' }
+      put :update, :user => { :email => 'newemail', :email_repeat => 'newemail' }
       response.should redirect_to(user_path)
       @user.reload.email.should == 'newemail'
     end
@@ -103,6 +120,21 @@ describe UsersController do
       put :update, :user => { :email => 'newemail', :login => 'newlogin' }
       response.should redirect_to(user_path)
       @user.reload.login.should == old_login
+    end
+
+    it "should save extra fields" do
+      fields = [
+        UserField.new(:name => 'field1', :field_type => 'text'),
+        UserField.new(:name => 'field2', :field_type => 'boolean'),
+        UserField.new(:name => 'field3', :field_type => 'boolean')
+      ]
+      UserField.stub(:all => fields)
+
+      put :update, :user => {:email => @user.email}, :user_field => {'field1' => 'foo', 'field2' => '1'}
+
+      @user.field_value_record(fields[0]).value.should == 'foo'
+      @user.field_value_record(fields[1]).value.should_not be_blank
+      @user.field_value_record(fields[2]).value.should be_blank
     end
     
     describe "changing the password" do

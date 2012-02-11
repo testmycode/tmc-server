@@ -12,26 +12,13 @@ class UsersController < ApplicationController
   
   def create
     @user = User.new
-    user_params = params[:user]
     
-    @user.login = user_params[:login].to_s.strip
-    
-    if user_params[:email].blank?
-      @user.errors.add(:email, 'needed')
-    elsif user_params[:email] != user_params[:email_repeat]
-      @user.errors.add(:email_repeat, 'did not match')
-    else
-      @user.email = user_params[:email].strip
-    end
-    
-    if user_params[:password].blank?
-      @user.errors.add(:password, 'needed')
-    elsif user_params[:password] != user_params[:password_repeat]
-      @user.errors.add(:password_repeat, 'did not match')
-    else
-      @user.password = user_params[:password]
-    end
-    
+    @user.login = params[:user][:login].to_s.strip
+
+    set_email
+    set_password
+    set_user_fields
+
     if @user.errors.empty? && @user.save
       if @bare_layout
         render :text => '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', :layout => true
@@ -56,12 +43,12 @@ class UsersController < ApplicationController
   def update
     @user = current_user
     
-    user_params = params[:user]
-    @user.email = user_params[:email]
-    password_changed = maybe_update_password(@user, user_params)
-    
+    set_email
+    password_changed = maybe_update_password(@user, params[:user])
+    set_user_fields
+
     if @user.errors.empty? && @user.save
-      if !@user.password.blank?
+      if password_changed
         flash[:notice] = 'Changes saved and password changed'
       else
         flash[:notice] = 'Changes saved'
@@ -74,6 +61,31 @@ class UsersController < ApplicationController
   end
   
 private
+  def set_email
+    user_params = params[:user]
+
+    return if !@user.new_record? && user_params[:email_repeat].blank?
+
+    if user_params[:email].blank?
+      @user.errors.add(:email, 'needed')
+    elsif user_params[:email] != user_params[:email_repeat]
+      @user.errors.add(:email_repeat, 'did not match')
+    else
+      @user.email = user_params[:email].strip
+    end
+  end
+
+  def set_password
+    user_params = params[:user]
+    if user_params[:password].blank?
+      @user.errors.add(:password, 'needed')
+    elsif user_params[:password] != user_params[:password_repeat]
+      @user.errors.add(:password_repeat, 'did not match')
+    else
+      @user.password = user_params[:password]
+    end
+  end
+
   def maybe_update_password(user, user_params)
     if !user_params[:old_password].blank? || !user_params[:password].blank?
       if !user.has_password?(user_params[:old_password])
@@ -88,6 +100,15 @@ private
       true
     else
       false
+    end
+  end
+
+  def set_user_fields
+    return if params[:user_field] == nil
+    for field in UserField.all
+      value_record = @user.field_value_record(field)
+      new_value = params[:user_field][field.name]
+      value_record.set_from_form(new_value)
     end
   end
 end

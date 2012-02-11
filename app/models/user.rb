@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   has_many :submissions, :dependent => :destroy
   has_many :awarded_points, :dependent => :destroy
   has_one :password_reset_key, :dependent => :destroy
+  has_many :user_field_values, :dependent => :destroy, :autosave => true
 
   validates :login, :presence     => true,
                     :uniqueness   => true,
@@ -29,6 +30,15 @@ class User < ActiveRecord::Base
     where(:exercises => {:gdocs_sheet => sheetname.to_s}).
     group("users.id")
   }
+
+  def field_value_record(field)
+    value = self.user_field_values.select {|v| v.field_name == field.name }.first
+    if !value
+      value = UserFieldValue.new(:field_name => field.name, :user_id => self.id, :value => '')
+      self.user_field_values << value
+    end
+    value
+  end
 
   def guest?
     false

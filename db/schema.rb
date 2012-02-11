@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120206141225) do
+ActiveRecord::Schema.define(:version => 20120210064351) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -146,6 +146,16 @@ ActiveRecord::Schema.define(:version => 20120206141225) do
   end
 
   add_index "test_scanner_cache_entries", ["course_id", "exercise_name"], :name => "index_test_scanner_cache_entries_on_course_id_and_exercise_name", :unique => true
+
+  create_table "user_field_values", :force => true do |t|
+    t.integer  "user_id",    :null => false
+    t.string   "field_name", :null => false
+    t.text     "value",      :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_field_values", ["user_id", "field_name"], :name => "index_user_field_values_on_user_id_and_field_name", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "login",                            :null => false

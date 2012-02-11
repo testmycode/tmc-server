@@ -117,6 +117,34 @@ describe User do
       user.save!
     end
   end
+  
+  describe "destruction" do
+    it "should destroy its submissions" do
+      sub = Factory.create(:submission)
+      sub.user.destroy
+      Submission.find_by_id(sub.id).should be_nil
+    end
+    
+    it "should destory its points" do
+      point = Factory.create(:awarded_point)
+      point.user.destroy
+      AwardedPoint.find_by_id(point.id).should be_nil
+    end
+    
+    it "should destroy any password reset key it has" do
+      user = Factory.create(:user)
+      key = PasswordResetKey.create!(:user => user)
+      user.destroy
+      PasswordResetKey.find_by_id(key.id).should be_nil
+    end
+    
+    it "should destroy any user field values" do
+      user = Factory.create(:user)
+      value = UserFieldValue.create!(:field_name => 'foo', :user => user, :value => '')
+      user.destroy
+      UserFieldValue.find_by_id(value.id).should be_nil
+    end
+  end
 
   it "should allow authentication after modification" do
     created_user = User.create!(:login => "root",
