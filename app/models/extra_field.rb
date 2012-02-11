@@ -81,6 +81,8 @@ private
   end
 
   def self.load_fields(kind, config_file_path)
+    return [] unless File.exist?(config_file_path)
+
     kind = kind.to_s
 
     require "#{kind}_field"
