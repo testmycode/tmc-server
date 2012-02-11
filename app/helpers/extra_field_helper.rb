@@ -21,8 +21,16 @@ module ExtraFieldHelper
       else
         raise "Unknown extra field type: #{field.field_type}"
       end
-    
-    labeled_field(field.label, field_tag)
+
+    label_order =
+      case field.field_type
+      when :boolean
+        :label_last
+      else
+        :label_first
+      end
+
+    labeled_field(field.label, field_tag, :order => label_order)
   end
 
   def extra_field_filter(prefix, field, value)
