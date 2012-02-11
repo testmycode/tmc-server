@@ -72,7 +72,7 @@ module ExtraField
       kinds = config_files.map {|file| File.basename(file, '_fields.rb')}
       @fields = Hash[kinds.zip(config_files).map {|k, f| [k.to_sym, load_fields(k, f)] }]
     end
-    @fields[kind.to_sym]
+    @fields[kind.to_sym] || []
   end
 
 private
