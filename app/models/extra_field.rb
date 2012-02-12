@@ -94,6 +94,8 @@ private
     dsl = Object.new
     dsl.instance_variable_set('@cls', cls)
     dsl.instance_variable_set('@fields', [])
+    dsl.instance_variable_set('@html_count', 0)
+
     class << dsl
       def group(group_name, &block)
         raise "Don't nest groups" if @group
@@ -104,10 +106,22 @@ private
           @group = nil
         end
       end
+
       def field(options)
         @fields << @cls.new({:group => @group}.merge(options))
       end
+
+      def html(text)
+        @html_count += 1
+        @fields << @cls.new({
+          :name => "html#{@html_count}",
+          :group => @group,
+          :field_type => :html,
+          :label => text
+        })
+      end
     end
+
     dsl.instance_eval(File.read(config_file_path))
     dsl.instance_variable_get('@fields')
   end

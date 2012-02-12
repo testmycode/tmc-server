@@ -1,7 +1,9 @@
 module ExtraFieldHelper
   def extra_field(field_value, method_options)
     field = field_value.field
+    
     return '' if field.options[:hidden]
+    return raw(field.label) if field.field_type == :html
 
     field_name = field.name
     field_name = "#{method_options[:form_scope]}[#{field_name}]" if method_options[:form_scope]
@@ -30,10 +32,12 @@ module ExtraFieldHelper
         :label_first
       end
 
-    labeled_field(field.label, field_tag, :order => label_order)
+    labeled_field(raw(field.label), field_tag, :order => label_order)
   end
 
   def extra_field_filter(prefix, field, value)
+    return '' if field.field_type == :html
+
     field_name = prefix + field.name
 
     field_tag =
@@ -54,6 +58,6 @@ module ExtraFieldHelper
         :label_first
       end
 
-    labeled_field(field.name.humanize, field_tag, :order => label_order)
+    labeled_field(raw(field.name.humanize), field_tag, :order => label_order)
   end
 end
