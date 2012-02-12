@@ -341,11 +341,13 @@ public class AnotherExample {
   
   <pre class="yaml">
 hidden: true
-hide_after: 2010-02-15</pre>
+hide_after: 2010-02-15
+hidden_if_registered_after: 2010-01-01</pre>
   
   <ul>
-    <li><code>hidden</code> hides the course from students (and NetBeans)</li>
-    <li><code>hide_after</code> hides the course after a given date from students (and NetBeans) and refuses to accept any more submissions</li>
+    <li><code>hidden</code> hides the course from students (and their NetBeans).</li>
+    <li><code>hide_after</code> hides the course after a given date from students (and their NetBeans) and refuses to accept any more submissions.</li>
+    <li><code>hidden_if_registered_after</code> hides the course from students (and their NetBeans) who have registered after the given date.</li>
   </ul>
   
   <h3><code>metadata.yml</code></h3>
@@ -371,8 +373,8 @@ gdocs_sheet: week1
 solution_visible_after: 2010-02-15</pre>
   
   <ul>
-    <li><code>hidden</code> hides the exercise from students (and NetBeans)</li>
-    <li><code>deadline</code> hides the exercise after a given date from students (and NetBeans) and refuses to accept any more submissions</li>
+    <li><code>hidden</code> hides the exercise from students (and NetBeans).</li>
+    <li><code>deadline</code> hides the exercise after a given date from students (and NetBeans) and refuses to accept any more submissions.</li>
     <li><code>publish_time</code> sets the time the exercise becomes available to students (and NetBeans). If <code>hidden</code> is false then it overrides this.</li>
     <li><code>returnable</code> tells whether to accept submissions for the exercise. By default if the exercise has a non-empty <code>test/</code> directory then it is considered returnable.</li>
     <li><code>gdocs_sheet</code> names the GDocs sheet to which the exercise's points are exported.</li>

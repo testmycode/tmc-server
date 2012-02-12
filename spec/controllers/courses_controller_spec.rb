@@ -7,8 +7,8 @@ describe CoursesController do
   end
   
   describe "GET index" do
-    it "shows courses in order by name, split into ongoing and expired" do 
-      controller.current_user = @user
+    it "shows visible courses in order by name, split into ongoing and expired" do
+      controller.current_user = Factory.create(:admin)
       @courses = [
         Factory.create(:course, :name => 'SomeTestCourse'),
         Factory.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week),

@@ -20,7 +20,7 @@
   </thead>
   <tbody>
   <% locals[:courses].each do |course| %>
-    <tr class="course <% if !course.visible? %>hidden<% end %>">
+    <tr class="course <% if course.hidden? %>hidden<% end %>">
       <td>
         <%= link_to course.name, course_path(course) %>
       </td>

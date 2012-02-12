@@ -34,12 +34,20 @@ class Course < ActiveRecord::Base
   scope :ongoing, lambda { where(["hide_after IS NULL OR hide_after > ?", Time.now]) }
   scope :expired, lambda { where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now]) }
 
-  def visible?
-    !hidden && (hide_after == nil || hide_after > Time.now)
+  def visible_to?(user)
+    user.administrator? || (
+      !hidden &&
+      (hide_after == nil || hide_after > Time.now) &&
+      (hidden_if_registered_after == nil || user.created_at == nil || hidden_if_registered_after > user.created_at)
+    )
   end
 
   def hide_after=(x)
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => true))
+  end
+
+  def hidden_if_registered_after=(x)
+    super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => false))
   end
 
   def options=(new_options)
@@ -47,6 +55,12 @@ class Course < ActiveRecord::Base
       self.hide_after = new_options["hide_after"]
     else
       self.hide_after = nil
+    end
+
+    if !new_options["hidden_if_registered_after"].blank?
+      self.hidden_if_registered_after = new_options["hidden_if_registered_after"]
+    else
+      self.hidden_if_registered_after = nil
     end
 
     self.hidden = !!new_options['hidden']

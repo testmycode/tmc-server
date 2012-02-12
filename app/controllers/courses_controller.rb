@@ -6,13 +6,14 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @ongoing_courses = Course.ongoing.order(ordering)
-        @expired_courses = Course.expired.order(ordering)
+        @ongoing_courses = Course.ongoing.order(ordering).select {|c| c.visible_to?(current_user) }
+        @expired_courses = Course.expired.order(ordering).select {|c| c.visible_to?(current_user) }
         authorize! :read, @ongoing_courses
         authorize! :read, @expired_courses
       end
       format.json do
-        courses = Course.ongoing.where(:hidden => false).order(ordering)
+        courses = Course.ongoing.order(ordering)
+        courses = courses.select {|c| c.visible_to?(current_user) }
         authorize! :read, courses
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
         

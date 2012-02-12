@@ -24,13 +24,17 @@
     <li>Git Branch: <%= @course.git_branch %></li>
   <% end %>
 
-  <% if !@course.visible? %>
+  <% if @course.hidden? %>
     <li>The course is currently hidden. Unhide by editing
     <code>course_options.yml</code></li>
   <% end %>
 
   <% if @course.hide_after != nil %>
     <li>Course hidden after: <%= @course.hide_after %></li>
+  <% end %>
+
+  <% if @course.hidden_if_registered_after != nil %>
+    <li>Course hidden from those registered after: <%= @course.hidden_if_registered_after %></li>
   <% end %>
 
   <li>Number of submissions: <%= @course.submissions.count %></li>

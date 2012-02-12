@@ -4,6 +4,7 @@ describe Course do
 
   let(:source_path) { "#{@test_tmp_dir}/fake_source" }
   let(:source_url) { "file://#{source_path}" }
+  let(:user) { Factory.create(:user) }
 
   describe "gdocs_sheets" do
     it "should list all unique gdocs_sheets of a course" do
@@ -48,22 +49,42 @@ describe Course do
 
   it "should be visible if not hidden and hide_after is nil" do
     c = Factory.create(:course, :hidden => false, :hide_after => nil)
-    c.should be_visible
+    c.should be_visible_to(user)
   end
 
   it "should be visible if not hidden and hide_after has not passed" do
     c = Factory.create(:course, :hidden => false, :hide_after => Time.now + 2.minutes)
-    c.should be_visible
+    c.should be_visible_to(user)
   end
 
   it "should not be visible if hidden" do
     c = Factory.create(:course, :hidden => true, :hide_after => nil)
-    c.should_not be_visible
+    c.should_not be_visible_to(user)
   end
 
-  it "should be expired if hide_after has passed" do
+  it "should not be visible if hide_after has passed" do
     c = Factory.create(:course, :hidden => false, :hide_after => Time.now - 2.minutes)
-    c.should_not be_visible
+    c.should_not be_visible_to(user)
+  end
+
+  it "should always be visible to administrators" do
+    admin = Factory.create(:admin)
+    c = Factory.create(:course, :hidden => true, :hide_after => Time.now - 2.minutes)
+    c.should be_visible_to(admin)
+  end
+
+  it "should be visible if user has registered before the hidden_if_registered_after setting" do
+    user.created_at = Time.parse('2010-01-02')
+    user.save!
+    c = Factory.create(:course, :hidden_if_registered_after => Time.parse('2010-01-03'))
+    c.should be_visible_to(user)
+  end
+
+  it "should not be visible if user has registered after the hidden_if_registered_after setting" do
+    user.created_at = Time.parse('2010-01-02')
+    user.save!
+    c = Factory.create(:course, :hidden_if_registered_after => Time.parse('2010-01-01'))
+    c.should_not be_visible_to(user)
   end
 
   it "should accept Finnish dates and datetimes for hide_after" do
