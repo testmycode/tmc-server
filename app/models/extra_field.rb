@@ -45,8 +45,8 @@ module ExtraField
     @options[:label] || @options[:name]
   end
 
-  def default
-    @options[:default]
+  def should_save?
+    !@options[:hidden] && !@options[:disabled]
   end
 
   attr_reader :value_class

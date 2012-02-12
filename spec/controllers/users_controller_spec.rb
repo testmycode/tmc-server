@@ -92,6 +92,7 @@ describe UsersController do
         UserField.new(:name => 'field3', :field_type => 'boolean')
       ]
       UserField.stub(:all => fields)
+      ExtraField.stub(:by_kind).with(:user).and_return(fields)
 
       post :create, :user => @valid_attrs, :user_field => {'field1' => 'foo', 'field2' => '1'}
       User.count.should == 1
@@ -129,6 +130,7 @@ describe UsersController do
         UserField.new(:name => 'field3', :field_type => 'boolean')
       ]
       UserField.stub(:all => fields)
+      ExtraField.stub(:by_kind).with(:user).and_return(fields)
 
       put :update, :user => {:email => @user.email}, :user_field => {'field1' => 'foo', 'field2' => '1'}
 

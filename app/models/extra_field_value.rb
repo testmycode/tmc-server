@@ -7,7 +7,7 @@ module ExtraFieldValue
   end
 
   def field
-    @field ||= ExtraField.by_kind(field_kind).select {|f| f.name == self.field_name }.first
+    @field ||= ExtraField.by_kind(field_kind).find {|f| f.name == self.field_name }
   end
 
   def field_kind
@@ -15,13 +15,15 @@ module ExtraFieldValue
   end
 
   def set_from_form(new_value)
-    self.value =
-      case field_kind
-      when :boolean
-        new_value.to_bool
-      else
-        new_value.to_s
-      end
+    if self.field.should_save?
+      self.value =
+        case field_kind
+        when :boolean
+          new_value.to_bool
+        else
+          new_value.to_s
+        end
+    end
   end
 
 end
