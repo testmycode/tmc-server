@@ -16,14 +16,18 @@ class Submission < ActiveRecord::Base
   before_create :set_processing_attempts_started_at
   
   def self.to_be_reprocessed
-    self.where(:processed => false).
+    self.unprocessed.
       where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval).
-      where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval).
-      order('processing_tried_at ASC')
+      where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval)
+  end
+
+  def self.unprocessed
+    self.where(:processed => false).
+      order('processing_priority DESC, processing_tried_at ASC, id ASC')
   end
   
   def self.unprocessed_count
-    self.where(:processed => false).count
+    self.unprocessed.count
   end
 
   # How many times at most should a submission be (successfully) sent to a sandbox
@@ -59,7 +63,12 @@ class Submission < ActiveRecord::Base
   
   def unprocessed_submissions_before_this
     if !self.processed?
-      self.class.where(:processed => false).where('id < ?', self.id).count
+      i = 0
+      self.class.unprocessed.select(:id).each do |s|
+        return i if s.id == self.id
+        i += 1
+      end
+      nil # race condition
     else
       nil
     end
@@ -80,9 +89,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def set_to_be_reprocessed!
+  def set_to_be_reprocessed!(priority = -1)
     self.processed = false
     self.times_sent_to_sandbox = 0
+    self.processing_priority = priority
     self.processing_attempts_started_at = Time.now
     self.processing_tried_at = nil
     self.processing_began_at = nil

@@ -57,16 +57,30 @@ describe Submission do
       }
     ]
   end
-  
+
   it "can tell how many unprocessed submissions are in queue before itself" do
-    Factory.create(:submission, :processed => false)
-    Factory.create(:submission, :processed => false)
-    Factory.create(:submission, :processed => false)
-    s = Factory.create(:submission, :processed => false)
-    Factory.create(:submission, :processed => false)
-    Factory.create(:submission, :processed => false)
+    t = Time.now
+    Factory.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
+    Factory.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds)
+    Factory.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds, :processing_priority => -2)
+    Factory.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
+    s = Factory.create(:submission, :processed => false, :processing_tried_at => t - 6.seconds)
+    Factory.create(:submission, :processed => false, :processing_tried_at => t - 5.seconds)
+    Factory.create(:submission, :processed => false, :processing_tried_at => t - 4.seconds)
     
     s.unprocessed_submissions_before_this.should == 3
+  end
+
+  it "orders unprocessed submissions by priority, then by last processing attempt time" do
+    t = Time.now
+    s1 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
+    s2 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds)
+    s3 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds, :processing_priority => 1)
+    s4 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
+
+    expected_order = [s3, s4, s2, s1]
+
+    Submission.to_be_reprocessed.map(&:id).should == expected_order.map(&:id)
   end
 end
 
