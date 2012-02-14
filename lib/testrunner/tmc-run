@@ -27,9 +27,9 @@ DEFS="
 
 # An explicit memory limit below the sandbox memory limit has been found to avoid
 # very long processing times and the occasional OOM killer.
-# We leave 24M to the sandbox. Leaving e.g. only 16M has caused problems.
+# We leave 32M to the sandbox. Leaving e.g. only 24M has caused problems.
 TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
-JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 24 \* 1024`}
+JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 32 \* 1024`}
 
 java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
 

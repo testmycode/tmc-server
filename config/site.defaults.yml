@@ -31,7 +31,7 @@ remote_sandboxes:
   - http://localhost:3001/
 
 # The memory limit for a submission in megabytes.
-# Currently this should be configured to be 24M lower than the
+# Currently this should be configured to be 32M lower than the
 # instance_ram setting of sandboxes. For now all this setting
 # does is send the memory limit to the NetBeans plugin
 # for use in local tests.
