@@ -124,6 +124,18 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  # The memory limit in megabytes or nil if not set.
+  # Limited by the global limit in site.yml (if any).
+  # Not configurable per-exercise yet but possibly in the future.
+  def memory_limit
+    global_limit = SiteSetting.value('memory_limit')
+    if global_limit != nil
+      global_limit.to_i
+    else
+      nil
+    end
+  end
+
   def self.default_options
     {
       "deadline" => nil,

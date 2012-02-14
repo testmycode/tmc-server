@@ -111,7 +111,8 @@ private
       :zip_url => helpers.exercise_zip_url(exercise),
       :returnable => exercise.returnable?,
       :attempted => exercise.attempted_by?(current_user),
-      :completed => exercise.completed_by?(current_user)
+      :completed => exercise.completed_by?(current_user),
+      :memory_limit => exercise.memory_limit
     }
   end
 end
