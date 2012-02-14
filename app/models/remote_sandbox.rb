@@ -61,4 +61,8 @@ class RemoteSandbox
     SiteSetting.value('remote_sandboxes').map {|url| RemoteSandbox.new(url)}
   end
 
+  def self.count
+    SiteSetting.value('remote_sandboxes').size
+  end
+
 end

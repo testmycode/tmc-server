@@ -148,6 +148,5 @@ private
 
   def schedule_for_rerun(submission, priority)
     submission.set_to_be_reprocessed!(priority)
-    SubmissionProcessor.new.process_submission(submission)
   end
 end
