@@ -34,6 +34,11 @@ class CoursesController < ApplicationController
   end
 
   def show
+    if session[:refresh_report]
+      @refresh_report = session[:refresh_report]
+      session.delete(:refresh_report)
+    end
+
     assign_show_view_vars
   end
 
@@ -42,13 +47,12 @@ class CoursesController < ApplicationController
     authorize! :refresh, @course
 
     begin
-      @refresh_report = @course.refresh
+      session[:refresh_report] = @course.refresh
     rescue CourseRefresher::Failure => e
-      @refresh_report = e.report
+      session[:refresh_report] = e.report
     end
-    
-    assign_show_view_vars
-    render :action => :show
+
+    redirect_to course_path(@course)
   end
 
   def new
