@@ -4,6 +4,7 @@ class EmailsController < ApplicationController
   def index
     return respond_access_denied unless current_user.administrator?
     filter_params = params_starting_with('filter_', :remove_prefix => true)
+    filter_params['include_administrators'] = '1' # Always include administrators. Could make this exclude_administrators instead
     @emails = User.filter_by(filter_params).order(:email).map(&:email)
     respond_to do |format|
       format.text do
