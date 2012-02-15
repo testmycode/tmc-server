@@ -87,7 +87,6 @@ private
     @course = Course.find(params[:id])
     @exercises = @course.exercises.order('LOWER(name)').select {|ex| ex.visible_to?(current_user) }
     authorize! :read, @course
-    authorize! :read, @exercises
 
     unless current_user.guest?
       max_submissions = 100
@@ -95,7 +94,6 @@ private
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @submissions = @submissions.limit(max_submissions)
-      authorize! :read, @submissions
     end
   end
 
