@@ -47,6 +47,7 @@ describe "The system (used by an instructor for administration)", :integration =
     
     click_button 'Rerun submission'
     page.should have_content('Rerun scheduled')
+    SubmissionProcessor.new.reprocess_timed_out_submissions
     wait_for_submission_to_be_processed
     
     page.should_not have_content('some funny error')
