@@ -38,7 +38,7 @@ class Course < ActiveRecord::Base
     user.administrator? || (
       !hidden &&
       (hide_after == nil || hide_after > Time.now) &&
-      (hidden_if_registered_after == nil || user.created_at == nil || hidden_if_registered_after > user.created_at)
+      (hidden_if_registered_after == nil || (!user.guest? && hidden_if_registered_after > user.created_at))
     )
   end
 

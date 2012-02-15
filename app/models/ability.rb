@@ -14,6 +14,11 @@ class Ability
       cannot :read, User
       can :read, User, :id => user.id
 
+      cannot :read, Course
+      can :read, Course do |c|
+        c.visible_to?(user)
+      end
+
       cannot :read, Submission
       can :read, Submission, :user_id => user.id
       can :create, Submission do |sub|

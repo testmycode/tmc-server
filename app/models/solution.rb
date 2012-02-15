@@ -8,6 +8,8 @@ class Solution
   def visible_to?(user)
     if user.administrator?
       true
+    elsif !@exercise.course.visible_to?(user)
+      false
     else
       show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')
       show_when_expired = SiteSetting.value('show_model_solutions_when_exercise_expired')
