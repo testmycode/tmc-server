@@ -4,7 +4,9 @@
   <ul>
     <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
     <% for field in UserField.all %>
-      <li><%= field.label %>: <%= @user.field_value_record(field).value %></li>
+      <% if field.field_type != :html %>
+        <li><%= raw(field.name.humanize) %>: <%= @user.field_value_record(field).value %></li>
+      <% end %>
     <% end %>
   </ul>
 </section>

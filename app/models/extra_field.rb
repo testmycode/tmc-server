@@ -46,7 +46,7 @@ module ExtraField
   end
 
   def should_save?
-    !@options[:hidden] && !@options[:disabled]
+    !@options[:hidden] && !@options[:disabled] && @options[:field_type] != :html
   end
 
   attr_reader :value_class
@@ -63,7 +63,7 @@ module ExtraField
     {
       :hidden => false,
       :disabled => false,
-      :type => 'text'
+      :field_type => :text
     }
   end
 
