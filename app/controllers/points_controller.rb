@@ -62,10 +62,10 @@ class PointsController < ApplicationController
   
   def sort_summary(summary, sorting)
     if sorting == 'total_points'
-      summary[:users] = summary[:users].sort_by {|username| [-summary[:total_for_user][username].to_i, username] }
+      summary[:users] = summary[:users].sort_by {|user| [-summary[:total_for_user][user.login].to_i, user.login] }
     elsif sorting =~ /(.*)_points$/
       sheet = $1
-      summary[:users] = summary[:users].sort_by {|username| [-summary[:awarded_for_user_and_sheet][username][sheet].to_i, username] }
+      summary[:users] = summary[:users].sort_by {|user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
     end
   end
 
