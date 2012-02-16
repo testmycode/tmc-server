@@ -12,7 +12,7 @@ module PointComparison
 
   def <=>(other)
     if self.name_is_numeric && other.name_is_numeric
-      self.name.to_i <=> other.name.to_i
+      self.name.to_f <=> other.name.to_f
     elsif self.name_is_numeric
       -1 # numeric ones first
     elsif other.name_is_numeric
