@@ -1,0 +1,27 @@
+<h1><%= @user.login %></h1>
+
+<section>
+  <ul>
+    <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
+    <% for field in UserField.all %>
+      <li><%= field.label %>: <%= @user.field_value_record(field).value %></li>
+    <% end %>
+  </ul>
+</section>
+
+<section>
+  <h2>Points</h2>
+  <% for course in @courses %>
+    <h3><%= course.name %></h3>
+    <ul>
+      <li>Completed: <%= sprintf("%.0f", @percent_completed[course.id]) %>%</li>
+      <li>Awarded points: <%= @awarded_points[course.id].join(' ') %></li>
+      <li>Missing points: <%= @missing_points[course.id].join(' ') %></li>
+    </ul>
+  <% end %>
+</section>
+
+<section>
+  <h2>Submissions</h2>
+  <%= render :partial => 'submissions/list', :locals => { :submissions => @user.submissions.order('id DESC') } %>
+</section>

@@ -15,7 +15,7 @@
   <tbody>
   <% for user in @participants %>
     <tr>
-      <td><%= user.login %></td>
+      <td><%= link_to user.login, participant_path(user) %></td>
       <td><%= user.email %></td>
     </tr>
   <% end %>

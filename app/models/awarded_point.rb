@@ -1,4 +1,6 @@
 class AwardedPoint < ActiveRecord::Base
+  include PointComparison
+
   belongs_to :course
   belongs_to :user
   belongs_to :submission

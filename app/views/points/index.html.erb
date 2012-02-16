@@ -53,9 +53,16 @@
       </tr>
     </thead>
     <tbody>
-      <% @summary[:users].each do |username| %>
+      <% @summary[:users].each do |user| %>
+        <% username = user.login %>
         <tr>
-          <td><%= username %></td>
+          <td>
+            <% if can? :read, user %>
+              <%= link_to username, participant_path(user) %>
+            <% else %>
+              <%= username %>
+            <% end %>
+          </td>
           <% @summary[:sheets].each do |sheet| %>
             <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>
             <td>
