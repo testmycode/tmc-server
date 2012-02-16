@@ -60,4 +60,14 @@ module ExtraFieldHelper
 
     labeled_field(raw(field.name.humanize), field_tag, :order => label_order)
   end
+
+  def extra_field_value(value_record)
+    field = value_record.field
+    case field.field_type
+    when :boolean
+      if value_record.value.blank? then 'No' else 'Yes' end
+    else
+      value_record.value
+    end
+  end
 end
