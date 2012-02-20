@@ -1,7 +1,52 @@
 
-<h1>All submissions for <%= @course.name %></h2>
+<h1>All submissions for <%= @course.name %></h1>
 
-<%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
+<p id="loading">Loading...</p>
+
+<%= render :partial => 'submissions/list', :locals => { :submissions => [], :invoke_datatables => false } %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    var loadedUpToId = null;
+    var $status = $('#loading');
+    var rowCount = 0;
+    var dataTable = $('.submissions').dataTable({
+      bJQueryUI: true,
+      bSort: false,
+      bPaginate: false
+    });
+
+    function loadMoreData() {
+      params = {};
+      if (loadedUpToId !== null) {
+        params.max_id = loadedUpToId - 1;
+      }
+      $.ajax({
+        dataType: 'json',
+        type: 'GET',
+        url: '<%= escape_javascript(course_submissions_path(@course, :format => :json, :now => Time.now, :api_version => ApplicationController::API_VERSION)) %>',
+        data: params,
+        success: function(data) {
+          rowCount += data.rows.length;
+          if (data.rows.length == 0) {
+            $status.remove();
+          } else {
+            $status.text('Loading... (' + data.remaining + ' remaining)');
+            loadedUpToId = data.last_id;
+            loadMoreData(); // Start loading more data in the background while DataTables adds the rows.
+            dataTable.fnAddData(data.rows);
+          }
+        },
+        error: function() {
+          $status.text('Failed to load submissions from server.');
+          $status.addClass('error');
+        }
+      })
+    }
+
+    loadMoreData();
+  });
+</script>
 
 <div class="link-back">
   <%= link_to 'Back', course_path(@course) %>

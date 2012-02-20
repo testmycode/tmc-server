@@ -77,7 +77,7 @@
     <% end %>
     
     <div>
-      <%= render :partial => 'submissions/list', :locals => { :submissions => @submissions } %>
+      <%= render :partial => 'submissions/list', :locals => { :submissions => @submissions, :invoke_datatables => true } %>
     </div>
   </section>
 <% end %>

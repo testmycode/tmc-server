@@ -36,7 +36,8 @@
     <% if !@submissions.empty? %>
       <%=
         render :partial => 'submissions/list', :locals => {
-          :submissions => @submissions
+          :submissions => @submissions,
+          :invoke_datatables => true
         }
       %>
     <% else %>

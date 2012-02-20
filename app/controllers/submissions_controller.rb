@@ -7,10 +7,32 @@ class SubmissionsController < ApplicationController
   skip_authorization_check :only => :show
 
   def index
-    @submissions = @course.submissions
-    @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
-    @submissions = @submissions.order('created_at DESC').includes(:user)
-    authorize! @submissions, :read
+    respond_to do |format|
+      format.json do
+        submissions = @course.submissions
+
+        if current_user.administrator?
+          authorize! :read, Submission
+        else
+          submissions = submissions.where(:user_id => current_user.id)
+          authorize! :read, Submission, :user_id => current_user.id
+        end
+
+        if params[:max_id]
+          submissions = submissions.where('id <= ?', params[:max_id])
+        end
+        submissions = submissions.order('id DESC')
+        remaining = submissions.count
+        submissions_limited = submissions.limit(1000).includes(:user)
+        render :json => {
+          :remaining => remaining,
+          :max_id => params[:max_id].to_i,
+          :last_id => if submissions_limited.empty? then nil else submissions_limited.last.id.to_i end,
+          :rows => view_context.submissions_for_datatables(submissions_limited)
+        }
+      end
+      format.html # uses AJAX
+    end
   end
 
   def show

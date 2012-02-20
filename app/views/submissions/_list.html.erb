@@ -34,5 +34,6 @@
   </tbody>
 </table>
 
-<%= use_datatables('table.submissions', :bPaginate => false) %>
-
+<% if invoke_datatables %>
+  <%= use_datatables('table.submissions', :bPaginate => false) %>
+<% end %>

@@ -25,5 +25,5 @@
 
 <section>
   <h2>Submissions</h2>
-  <%= render :partial => 'submissions/list', :locals => { :submissions => @user.submissions.order('id DESC') } %>
+  <%= render :partial => 'submissions/list', :locals => { :submissions => @user.submissions.order('id DESC'), :invoke_datatables => true } %>
 </section>
