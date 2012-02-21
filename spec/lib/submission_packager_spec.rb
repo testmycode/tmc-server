@@ -36,6 +36,23 @@ describe SubmissionPackager do
       end
     end
   end
+
+  it "can handle a zip with no parent directory over the src directory" do
+    @exercise_project.solve_all
+    Dir.chdir(@exercise_project.path) do
+      system!("zip -q -0 -r #{@exercise_project.zip_path} src")
+    end
+
+    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.should exist('src/SimpleStuff.java')
+        File.read('src/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/SimpleStuff.java')
+      end
+    end
+  end
   
   it "should not use any tests from the submission" do
     @exercise_project.solve_all
