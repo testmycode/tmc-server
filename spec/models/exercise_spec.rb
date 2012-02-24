@@ -238,7 +238,10 @@ describe Exercise do
     exercise = Factory.create(:exercise, :course => course)
     exercise.should_not be_attempted_by(user)
 
-    Submission.create!(:user => user, :course => course, :exercise_name => exercise.name)
+    Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :processed => false)
+    exercise.should_not be_attempted_by(user)
+
+    Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :processed => true)
     exercise.should be_attempted_by(user)
   end
 

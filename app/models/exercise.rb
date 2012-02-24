@@ -64,7 +64,7 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user has made a submission for this exercise
   def attempted_by?(user)
-    submissions.where(:user_id => user.id).exists?
+    submissions.where(:user_id => user.id, :processed => true).exists?
   end
 
   # Whether a user has made a submission with all test cases passing
