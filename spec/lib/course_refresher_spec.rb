@@ -153,6 +153,17 @@ describe CourseRefresher do
     @course.exercises.should have(0).items
   end
 
+  it "should ignore exercises under directories with a .tmcignore file" do
+    add_exercise('MyExercise')
+    @refresher.refresh_course(@course)
+
+    FileUtils.touch("#{@local_clone.path}/MyExercise/.tmcignore")
+    @local_clone.add_commit_push
+    @refresher.refresh_course(@course)
+
+    @course.exercises.should have(0).items
+  end
+
   it "should restore exercises that are removed and subsequently readded" do
     add_exercise('MyExercise')
     @refresher.refresh_course(@course)
@@ -357,7 +368,7 @@ describe CourseRefresher do
   end
   
   describe "when done twice" do
-    it "should be able to switch to a different repo sets the remote URL" do
+    it "should be able to use a different repo" do
       @refresher.refresh_course(@course)
       
       repo_path ="#{@test_tmp_dir}/another_fake_remote_repo"
@@ -422,7 +433,7 @@ describe CourseRefresher do
   end
 
   def delete_exercise(name)
-    FileUtils.rm_rf "#{@local_clone.path}/MyExercise"
+    FileUtils.rm_rf "#{@local_clone.path}/#{name}"
     @local_clone.add_commit_push
   end
 

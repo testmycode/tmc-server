@@ -27,6 +27,8 @@ class ExerciseDir
     result = []
     
     path.find do |subpath|
+      Find.prune if irrelevant_directory?(subpath)
+
       if looks_like_exercise_path? subpath
         if subpath.basename.to_s.include?('-')
           raise "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
@@ -40,6 +42,12 @@ class ExerciseDir
   end
   
 private
+  def self.irrelevant_directory?(path)
+    path.directory? && (
+      path.children.map(&:basename).map(&:to_s).include?('.tmcignore') ||
+      path.basename.to_s.start_with?('.')
+    )
+  end
   def self.looks_like_exercise_path?(path)
     path.directory? && (path + 'src').exist? && (path + 'test').exist?
   end
