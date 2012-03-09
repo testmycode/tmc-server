@@ -54,7 +54,7 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user may see the exercise
   def visible_to?(user)
-    !hidden? && (user.administrator? || published?)
+    user.administrator? || (!hidden? && published?)
   end
  
   # Whether the exercise has been published (it may still be hidden)
