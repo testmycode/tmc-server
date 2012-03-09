@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
 private
 
   def current_ability
-    @current_ability ||= Ability.new(current_user, session)
+    @current_ability ||= ::Ability.new(current_user, session)
   end
 
   def set_default_url_options
