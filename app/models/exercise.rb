@@ -153,6 +153,8 @@ class Exercise < ActiveRecord::Base
   end
 
   def self.count_completed(users, exercises)
+    return 0 if exercises.empty?
+    
     s = Submission.arel_table
 
     user_ids = users.map(&:id)
