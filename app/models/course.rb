@@ -74,8 +74,9 @@ class Course < ActiveRecord::Base
     }
   end
 
-  def gdocs_sheets
-    self.exercises.select(&:visible_to_users?).map(&:gdocs_sheet).reject(&:nil?).uniq
+  def gdocs_sheets(exercises = nil)
+    exercises = self.exercises.select(&:visible_to_users?) unless exercises
+    exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
   end
 
   def refresh_gdocs_worksheet sheetname

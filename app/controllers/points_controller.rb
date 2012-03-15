@@ -4,7 +4,7 @@ class PointsController < ApplicationController
 
   def index
     @course = Course.find(params[:course_id])
-    sheets = @course.gdocs_sheets.sort!
+    sheets = @course.gdocs_sheets(@course.exercises.select {|e| e.visible_to?(current_user)}).sort!
     @summary = summary_hash(@course, sheets)
     sort_summary(@summary, params[:sort_by]) if params[:sort_by]
   end
