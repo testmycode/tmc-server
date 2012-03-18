@@ -8,6 +8,8 @@ class Solution
   def visible_to?(user)
     if user.administrator?
       true
+    elsif user.guest?
+      false
     elsif !@exercise.course.visible_to?(user)
       false
     else
