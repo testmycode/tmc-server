@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120214103259) do
+ActiveRecord::Schema.define(:version => 20120318214231) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(:version => 20120214103259) do
     t.string  "name",          :null => false
   end
 
+  add_index "awarded_points", ["course_id", "user_id", "name"], :name => "index_awarded_points_on_course_id_and_user_id_and_name", :unique => true
   add_index "awarded_points", ["course_id", "user_id", "submission_id"], :name => "index_awarded_points_on_course_id_and_user_id_and_submission_id"
   add_index "awarded_points", ["user_id", "submission_id", "name"], :name => "index_awarded_points_on_user_id_and_submission_id_and_name", :unique => true
 
