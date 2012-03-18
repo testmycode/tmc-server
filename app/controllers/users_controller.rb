@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   skip_authorization_check
   
   def new
+    authorize! :create, User
     if signed_in?
       # Logged in from this page. No need to be here, so redirect away
       redirect_to root_path
@@ -11,6 +12,8 @@ class UsersController < ApplicationController
   end
   
   def create
+    authorize! :create, User
+
     @user = User.new
     
     @user.login = params[:user][:login].to_s.strip

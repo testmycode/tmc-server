@@ -13,6 +13,7 @@ class Ability
       
       cannot :read, User
       can :read, User, :id => user.id
+      can :create, User if SiteSetting.value(:enable_signup)
 
       cannot :read, Course
       can :read, Course do |c|

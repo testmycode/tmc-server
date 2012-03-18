@@ -21,6 +21,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Tailoring.stub(:get => Tailoring.new)
+    SiteSetting.use_distribution_defaults!
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.start
   end

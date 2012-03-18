@@ -44,6 +44,12 @@ emails:
     from: noreply@example.com
 
 
+### Enable or disable features ###
+
+# Allow people to create user accounts
+enable_signup: true
+
+
 ### Model solutions ###
 
 # Note that a model solution can always be made visible

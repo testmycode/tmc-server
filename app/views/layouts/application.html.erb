@@ -28,7 +28,9 @@
           <% if signed_in? %>
             <%= link_to 'User account', user_path %>
           <% else %>
-            <%= link_to 'Sign up', new_user_path %><br />
+            <% if can? :create, User %>
+              <%= link_to 'Sign up', new_user_path %><br />
+            <% end %>
             <%= link_to 'Forgot password', new_password_reset_key_path %>
           <% end %>
         </div>

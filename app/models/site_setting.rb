@@ -6,17 +6,17 @@ class SiteSetting
   end
   
   def self.all_settings
-    @settings ||= settings_from_files
+    @settings ||= settings_from_files(settings_files)
   end
   
-  def self.reset # for tests
-    @settings = settings_from_files
+  def self.use_distribution_defaults! # for tests
+    @settings = settings_from_files(settings_files.select {|f| f.end_with?('site.defaults.yml') })
   end
   
 private
-  def self.settings_from_files
+  def self.settings_from_files(files)
     result = {}
-    settings_files.each do |path|
+    files.each do |path|
       if File.exist?(path)
         data = YAML.load_file(path)
         raise "Invalid configuration file #{path}" unless data.is_a? Hash

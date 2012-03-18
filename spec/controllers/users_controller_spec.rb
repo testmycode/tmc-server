@@ -11,6 +11,12 @@ describe UsersController do
         get :show
         response.status.should == 403
       end
+
+      it "should deny access if signup is disabled in site settings" do
+        SiteSetting.all_settings['enable_signup'] = false
+        get :show
+        response.status.should == 403
+      end
     end
     
     describe "when accessed as a logged in user" do
@@ -71,7 +77,7 @@ describe UsersController do
       post :create, :user => @valid_attrs
       User.count.should == 0
     end
-    
+
     it "should require a password" do
       @valid_attrs.delete :password
       @valid_attrs.delete :password_repeat
@@ -101,6 +107,12 @@ describe UsersController do
       user.field_value_record(fields[0]).value.should == 'foo'
       user.field_value_record(fields[1]).value.should_not be_blank
       user.field_value_record(fields[2]).value.should be_blank
+    end
+
+    it "should fail if signup is disabled in site settings" do
+      SiteSetting.all_settings['enable_signup'] = false
+      lambda { post :create, :user => @valid_attrs }.should raise_error(CanCan::AccessDenied)
+      User.count.should == 0
     end
   end
   
