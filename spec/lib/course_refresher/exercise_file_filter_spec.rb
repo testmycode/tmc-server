@@ -76,6 +76,26 @@ EOF
       @filter.make_stub('original', 'stub')
       File.should_not exist('stub/Thing.java')
     end
+
+    it "should not include directories under src/ containing only solution files" do
+      FileUtils.mkdir_p 'original/src/foo/bar'
+      make_file 'original/src/foo/bar/Thing.java', '//SOLUTION FILE'
+      @filter.make_stub('original', 'stub')
+
+      File.should_not exist('stub/src/foo/bar/Thing.java')
+      File.should_not exist('stub/src/foo/bar')
+      File.should_not exist('stub/src/foo')
+      File.should exist('stub/src')
+    end
+
+    it "should still include src/ even if it contains only solution files" do
+      FileUtils.mkdir_p 'original/src'
+      make_file 'original/src/Thing.java', '//SOLUTION FILE'
+      @filter.make_stub('original', 'stub')
+
+      File.should_not exist('stub/src/Thing.java')
+      File.should exist('stub/src')
+    end
     
     it "should convert end-of-lines to unix style" do
       make_file 'original/Thing.java', <<EOF

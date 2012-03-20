@@ -14,6 +14,8 @@ class CourseRefresher
         contents = filter_for_stub(from)
         write_file(to, contents) unless contents.nil?
       end
+
+      clean_empty_dirs_from_stub(to_dir)
     end
     
     def make_solution(from_dir, to_dir)
@@ -169,6 +171,24 @@ class CourseRefresher
         end
       end
     end
+
+    def clean_empty_dirs_from_stub(stub_dir)
+      src = stub_dir + 'src'
+      if src.directory?
+        src.children.each {|c| rmdir_if_only_empty_dirs(c) }
+      end
+    end
+
+    def rmdir_if_only_empty_dirs(dir)
+      if dir.directory?
+        children = dir.children
+        if children.all?(&:directory?)
+          dir.children.each {|c| rmdir_if_only_empty_dirs(c) }
+          dir.rmdir
+        end
+      end
+    end
+
     
     def stub_regexp
       /^([ \t]*)\/\/[ \t]*STUB:[ \t]*([^\r\n]*)$/m

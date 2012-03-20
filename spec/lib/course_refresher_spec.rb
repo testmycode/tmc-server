@@ -363,7 +363,7 @@ describe CourseRefresher do
     cs3 = @course.exercises.first.checksum
     
     [cs1, cs2, cs3].each {|cs| cs.should_not be_blank }
-    cs1.should == cs2 # Only file contents should be checksummed
+    cs1.should == cs2 # Only file contents should be checksummed, not metadata
     cs2.should_not == cs3
   end
   
