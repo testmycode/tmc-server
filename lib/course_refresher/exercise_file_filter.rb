@@ -182,10 +182,8 @@ class CourseRefresher
     def rmdir_if_only_empty_dirs(dir)
       if dir.directory?
         children = dir.children
-        if children.all?(&:directory?)
-          dir.children.each {|c| rmdir_if_only_empty_dirs(c) }
-          dir.rmdir
-        end
+        dir.children.each {|c| rmdir_if_only_empty_dirs(c) if c.directory? }
+        dir.rmdir if dir.children.empty?
       end
     end
 

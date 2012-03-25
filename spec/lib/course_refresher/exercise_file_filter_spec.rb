@@ -80,12 +80,14 @@ EOF
     it "should not include directories under src/ containing only solution files" do
       FileUtils.mkdir_p 'original/src/foo/bar'
       make_file 'original/src/foo/bar/Thing.java', '//SOLUTION FILE'
+      make_file 'original/src/foo/Remaining.java', '//This file should remain'
       @filter.make_stub('original', 'stub')
 
+      File.should exist('stub/src')
+      File.should exist('stub/src/foo')
+      File.should exist('stub/src/foo/Remaining.java')
       File.should_not exist('stub/src/foo/bar/Thing.java')
       File.should_not exist('stub/src/foo/bar')
-      File.should_not exist('stub/src/foo')
-      File.should exist('stub/src')
     end
 
     it "should still include src/ even if it contains only solution files" do
