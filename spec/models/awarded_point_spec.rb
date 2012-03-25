@@ -61,23 +61,6 @@ describe AwardedPoint do
       points.length.should == 2
       points.should include(@ap)
     end
-
-    it "exercise_user_points" do
-      p = AwardedPoint.exercise_user_points(@ex1, @user)
-      p.length.should == 2
-      p.should include(@ap)
-      p.should include(@ap3)
-
-      p = AwardedPoint.exercise_user_points(@ex2, @user)
-      p.should be_empty
-
-      p = AwardedPoint.exercise_user_points(@ex1, @user2)
-      p.length.should == 0
-
-      p = AwardedPoint.exercise_user_points(@ex2, @user2)
-      p.length.should == 1
-      p.should include(@ap2)
-    end
   end
 end
 
