@@ -36,23 +36,28 @@ class AwardedPoint < ActiveRecord::Base
   def self.count_per_user_in_course_with_sheet(course, sheetname)
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
-    submissions = Submission.arel_table
-    
-    exercise_names = course.exercises.where(:gdocs_sheet => sheetname).map(&:name)
+    available_points = AvailablePoint.arel_table
+    exercises = Exercise.arel_table
     
     sql =
       awarded_points.
-      project([users[:login].as('login'), Arel.sql('COUNT(*)').as('count')]).
+      project([users[:login].as('username'), Arel.sql('COUNT(*)').as('count')]).
       join(users).on(awarded_points[:user_id].eq(users[:id])).
-      join(submissions).on(awarded_points[:submission_id].eq(submissions[:id])).
+      join(available_points).on(available_points[:name].eq(awarded_points[:name])).
+      join(exercises).on(available_points[:exercise_id].eq(exercises[:id])).
       where(awarded_points[:course_id].eq(course.id)).
       where(awarded_points[:user_id].eq(users[:id])).
-      where(submissions[:exercise_name].in(exercise_names)).
+      where(exercises[:course_id].eq(course.id)).
+      where(exercises[:gdocs_sheet].eq(sheetname)).
       group(users[:login]).
       order(users[:login]).
       to_sql
-    
-    ActiveRecord::Base.connection.execute(sql).to_a
+
+    result = {}
+    ActiveRecord::Base.connection.execute(sql).each do |record|
+      result[record['username']] = record['count'].to_i
+    end
+    result
   end
 
 end

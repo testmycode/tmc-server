@@ -77,6 +77,16 @@ describe AwardedPoint do
       points.should include(@ap)
     end
 
+    specify "count_per_user_in_course_with_sheet" do
+      counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet1)
+      Hash[counts][@user.login].should == 2
+      Hash[counts][@user2.login].should be_nil
+
+      counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
+      Hash[counts][@user.login].should be_nil
+      Hash[counts][@user2.login].should == 1
+    end
+
     describe "with change in exercise name" do
       before :each do
         @ex2.update_attribute(:name, 'a_different_name')
@@ -92,6 +102,12 @@ describe AwardedPoint do
         points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet2)
         points.length.should == 1
         points.first.should == @ap2
+      end
+
+      specify "count_per_user_in_course_with_sheet" do
+        counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
+        Hash[counts][@user.login].should be_nil
+        Hash[counts][@user2.login].should == 1
       end
     end
   end

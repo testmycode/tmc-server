@@ -32,9 +32,7 @@ class PointsController < ApplicationController
   def summary_hash(course, sheets)
     per_user_and_sheet = {}
     for sheet in sheets
-      for record in AwardedPoint.count_per_user_in_course_with_sheet(course, sheet)
-        username = record['login']
-        count = record['count'].to_i
+      AwardedPoint.count_per_user_in_course_with_sheet(course, sheet).each_pair do |username, count|
         per_user_and_sheet[username] ||= {}
         per_user_and_sheet[username][sheet] = count
       end
