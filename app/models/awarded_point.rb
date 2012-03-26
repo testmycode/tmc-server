@@ -18,17 +18,17 @@ class AwardedPoint < ActiveRecord::Base
 
   scope :course_user_sheet_points, lambda { |course, user, sheetname|
     course_user_points(course, user).
-    joins(:submission).
-    joins("join exercises on submissions.exercise_name = exercises.name").
-    where(:exercises => { :gdocs_sheet => sheetname }).
+    joins("INNER JOIN available_points ON available_points.name = awarded_points.name").
+    joins("INNER JOIN exercises ON available_points.exercise_id = exercises.id").
+    where(:exercises => { :gdocs_sheet => sheetname, :course_id => course.id }).
     group("awarded_points.id")
   }
 
   scope :course_sheet_points, lambda { |course, sheetname|
     where(:course_id => course.id).
-    joins(:submission).
-    joins("join exercises on submissions.exercise_name = exercises.name").
-    where(:exercises => { :gdocs_sheet => sheetname }).
+    joins("INNER JOIN available_points ON available_points.name = awarded_points.name").
+    joins("INNER JOIN exercises ON available_points.exercise_id = exercises.id").
+    where(:exercises => { :gdocs_sheet => sheetname, :course_id => course.id }).
     group("awarded_points.id")
   }
   

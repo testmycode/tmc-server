@@ -24,6 +24,10 @@ describe AwardedPoint do
                                    :user => @user2,
                                    :exercise => @ex2)
 
+      Factory.create(:available_point, :exercise => @ex1, :name => "ap")
+      Factory.create(:available_point, :exercise => @ex2, :name => "ap2")
+      Factory.create(:available_point, :exercise => @ex1, :name => "ap3")
+
       @ap = Factory.create(:awarded_point, :course => @course,
                            :user => @user, :name => "ap",
                            :submission => @sub1)
@@ -35,7 +39,7 @@ describe AwardedPoint do
                             :submission => @sub1)
     end
 
-    it "course_user_points" do
+    specify "course_user_points" do
       p = AwardedPoint.course_user_points(@course, @user)
       p.length.should == 2
       p.should include(@ap)
@@ -46,7 +50,18 @@ describe AwardedPoint do
       p.should include(@ap2)
     end
 
-    it "course_user_sheet_points" do
+    specify "course_sheet_points" do
+      points = AwardedPoint.course_sheet_points(@course, @sheet1)
+      points.length.should == 2
+      points.should include(@ap)
+      points.should include(@ap3)
+
+      points = AwardedPoint.course_sheet_points(@course, @sheet2)
+      points.length.should == 1
+      points.should include(@ap2)
+    end
+
+    specify "course_user_sheet_points" do
       points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet1)
       points.length.should == 0
 
@@ -60,6 +75,24 @@ describe AwardedPoint do
       points = AwardedPoint.course_user_sheet_points(@course, @user, @sheet1)
       points.length.should == 2
       points.should include(@ap)
+    end
+
+    describe "with change in exercise name" do
+      before :each do
+        @ex2.update_attribute(:name, 'a_different_name')
+      end
+
+      specify "course_sheet_points" do
+        points = AwardedPoint.course_sheet_points(@course, @sheet2)
+        points.length.should == 1
+        points.should include(@ap2)
+      end
+
+      specify "course_user_sheet_points" do
+        points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet2)
+        points.length.should == 1
+        points.first.should == @ap2
+      end
     end
   end
 end
