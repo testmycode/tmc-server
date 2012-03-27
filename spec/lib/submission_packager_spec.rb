@@ -70,6 +70,48 @@ describe SubmissionPackager do
       end
     end
   end
+
+  it "should use tests from the submission if specified in .tmcproject.yml's extra_student_files" do
+    File.open("#{@exercise.clone_path}/.tmcproject.yml", 'w') do |f|
+      f.write("extra_student_files:\n  - test/SimpleTest.java\n  - test/NewTest.java")
+    end
+
+    @exercise_project.solve_all
+    File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
+    File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
+    @exercise_project.make_zip(:src_only => false)
+
+    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.read('test/SimpleTest.java').should == 'foo'
+        File.read('test/NewTest.java').should == 'bar'
+      end
+    end
+  end
+
+  it "should not use .tmcproject.yml from the submission" do
+    @exercise_project.solve_all
+    File.open("#{@exercise_project.path}/.tmcproject.yml", 'w') do |f|
+      f.write("extra_student_files:\n  - test/SimpleTest.java\n  - test/NewTest.java")
+    end
+    File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
+    File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
+    @exercise_project.make_zip(:src_only => false)
+
+    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.read('test/SimpleTest.java').should == File.read(@exercise.clone_path + '/test/SimpleTest.java')
+        File.should_not exist('test/NewTest.java')
+        File.should_not exist('.tmcproject.yml')
+      end
+    end
+  end
   
   it "should add tmc-junit-runner.jar and its deps to lib/testrunner/" do
     @exercise_project.solve_all

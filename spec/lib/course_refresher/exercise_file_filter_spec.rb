@@ -4,12 +4,12 @@ require 'fileutils'
 describe CourseRefresher::ExerciseFileFilter do
 
   before :each do
-    @filter = CourseRefresher::ExerciseFileFilter.new
+    FileUtils.mkdir('original')
+    @filter = CourseRefresher::ExerciseFileFilter.new('original')
   end
 
   describe "#make_stub" do
     before :each do
-      FileUtils.mkdir('original')
       FileUtils.mkdir('stub')
     end
     
@@ -29,7 +29,7 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       result = File.read('stub/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -52,7 +52,7 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       result = File.read('stub/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -73,7 +73,7 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       File.should_not exist('stub/Thing.java')
     end
 
@@ -81,7 +81,7 @@ EOF
       FileUtils.mkdir_p 'original/src/foo/bar'
       make_file 'original/src/foo/bar/Thing.java', '//SOLUTION FILE'
       make_file 'original/src/foo/Remaining.java', '//This file should remain'
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
 
       File.should exist('stub/src')
       File.should exist('stub/src/foo')
@@ -93,7 +93,7 @@ EOF
     it "should still include src/ even if it contains only solution files" do
       FileUtils.mkdir_p 'original/src'
       make_file 'original/src/Thing.java', '//SOLUTION FILE'
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
 
       File.should_not exist('stub/src/Thing.java')
       File.should exist('stub/src')
@@ -116,7 +116,7 @@ public class Thing {\r
     }\r
 }\r
 EOF
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       result = File.read('stub/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -137,7 +137,7 @@ EOF
 public class Thing {
 }
 EOF
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       result = File.read('stub/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -147,20 +147,26 @@ EOF
     
     it "should not include hidden tests" do
       make_file('original/HiddenThing.java', '...')
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       File.should_not exist('stub/HiddenThing.java')
     end
     
     it "should not include metadata files" do
       make_file('original/metadata.yml', '...')
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       File.should_not exist('stub/metadata.yml')
     end
     
     it "should not include git files" do
       make_file('original/.gitignore', '...')
-      @filter.make_stub('original', 'stub')
+      @filter.make_stub('stub')
       File.should_not exist('stub/.gitignore')
+    end
+
+    it "should include .tmcproject.yml" do
+      make_file('original/.tmcproject.yml', '---')
+      @filter.make_stub('stub')
+      File.should exist('stub/.tmcproject.yml')
     end
     
     it "should warn about misplaced stubs"
@@ -171,7 +177,6 @@ EOF
   
   describe "#make_solution" do
     before :each do
-      FileUtils.mkdir('original')
       FileUtils.mkdir('solution')
     end
   
@@ -186,7 +191,7 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_solution('original', 'solution')
+      @filter.make_solution('solution')
       result = File.read('solution/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -214,7 +219,7 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_solution('original', 'solution')
+      @filter.make_solution('solution')
       result = File.read('solution/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -239,7 +244,7 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_solution('original', 'solution')
+      @filter.make_solution('solution')
       result = File.read('solution/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -267,7 +272,7 @@ public class Thing {\r
     }\r
 }\r
 EOF
-      @filter.make_solution('original', 'solution')
+      @filter.make_solution('solution')
       result = File.read('solution/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -293,7 +298,7 @@ EOF
 public class Thing {
 }
 EOF
-      @filter.make_solution('original', 'solution')
+      @filter.make_solution('solution')
       result = File.read('solution/Thing.java')
       result.should == <<EOF
 public class Thing {
@@ -309,23 +314,42 @@ EOF
     end
     
     it "should not include any tests" do
-      FileUtils.mkdir_p('original/stuff/test')
-      make_file('original/stuff/test/Foo.java', '...')
-      @filter.make_solution('original', 'solution')
-      File.should_not exist('solution/stuff/test/Foo.java')
-      File.should_not exist('solution/stuff/test')
+      FileUtils.mkdir_p('original/test')
+      make_file('original/test/Foo.java', '...')
+      @filter.make_solution('solution')
+      File.should_not exist('solution/test/Foo.java')
     end
     
     it "should not include metadata files" do
       make_file('original/metadata.yml', '...')
-      @filter.make_solution('original', 'solution')
+      @filter.make_solution('solution')
       File.should_not exist('solution/metadata.yml')
     end
     
     it "should not include git files" do
       make_file('original/.gitignore', '...')
-      @filter.make_solution('original', 'solution')
+      @filter.make_solution('solution')
       File.should_not exist('solution/.gitignore')
+    end
+
+    it "should not include .tmcproject.yml" do
+      make_file('original/.tmcproject.yml', '---')
+      @filter.make_solution('solution')
+      File.should_not exist('solution/.tmcproject.yml')
+    end
+
+    it "should include extra student files specified in .tmcproject.yml" do
+      make_file('original/.tmcproject.yml', "extra_student_files:\n  - test/Foo.java")
+      FileUtils.mkdir('original/test')
+      make_file('original/test/Foo.java', "// This should be in the solution")
+      make_file('original/test/Bar.java', "// This should not be in the solution")
+
+      @filter = CourseRefresher::ExerciseFileFilter.new('original')
+      @filter.make_solution('solution')
+
+      File.should exist('solution/test')
+      File.should exist('solution/test/Foo.java')
+      File.should_not exist('solution/test/Bar.java')
     end
   end
   

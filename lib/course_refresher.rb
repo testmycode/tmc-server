@@ -196,7 +196,7 @@ private
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
         FileUtils.mkdir_p(solution_path)
-        ExerciseFileFilter.new.make_solution(clone_path, solution_path)
+        ExerciseFileFilter.new(clone_path).make_solution(solution_path)
       end
     end
     
@@ -205,7 +205,7 @@ private
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
         FileUtils.mkdir_p(stub_path)
-        ExerciseFileFilter.new.make_stub(clone_path, stub_path)
+        ExerciseFileFilter.new(clone_path).make_stub(stub_path)
         
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
         FileUtils.cp(TmcJunitRunner.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')

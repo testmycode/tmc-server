@@ -1,10 +1,16 @@
 require 'pathname'
 require 'fileutils'
+require 'tmc_project_file'
 
 class CourseRefresher
   class ExerciseFileFilter
-    def make_stub(from_dir, to_dir)
-      from_dir = Pathname(from_dir).expand_path
+    def initialize(project_dir)
+      @project_dir = Pathname(project_dir)
+      @tmc_project_file = TmcProjectFile.for_project(@project_dir)
+    end
+
+    def make_stub(to_dir)
+      from_dir = Pathname(@project_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
       
       paths = files_for_stub(from_dir)
@@ -15,11 +21,11 @@ class CourseRefresher
         write_file(to, contents) unless contents.nil?
       end
 
-      clean_empty_dirs_from_stub(to_dir)
+      clean_empty_dirs_in_project(to_dir)
     end
     
-    def make_solution(from_dir, to_dir)
-      from_dir = Pathname(from_dir).expand_path
+    def make_solution(to_dir)
+      from_dir = Pathname(@project_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
       
       paths = files_for_solution(from_dir)
@@ -30,6 +36,8 @@ class CourseRefresher
         write_file(to, contents) unless contents.nil?
         maybe_write_html_file(File.read(from), "#{to}.html") if from.extname == '.java'
       end
+
+      clean_empty_dirs_in_project(to_dir)
     end
     
   private
@@ -64,10 +72,8 @@ class CourseRefresher
       result = []
       Dir.chdir(dir) do
         Pathname('.').find do |path|
-          if block.call(path)
+          if path.directory? || block.call(path)
             result << path unless path.to_s == '.'
-          else
-            Find.prune
           end
         end
       end
@@ -82,7 +88,11 @@ class CourseRefresher
     def should_include_in_solution(path)
       fn = path.basename.to_s
       rel_path = path.to_s
-      !(rel_path =~ /(?:^|\/)test(?:\/|$)/ || fn.start_with?('.git') || fn == 'metadata.yml')
+      return true if @tmc_project_file.extra_student_files.include?(rel_path)
+      return false if rel_path =~ /(?:^|\/)test(?:\/|$)/
+      return false if fn.start_with?('.git')
+      return false if ['.tmcproject.yml', 'metadata.yml'].include?(fn)
+      true
     end
     
     
@@ -172,17 +182,18 @@ class CourseRefresher
       end
     end
 
-    def clean_empty_dirs_from_stub(stub_dir)
-      src = stub_dir + 'src'
-      if src.directory?
-        src.children.each {|c| rmdir_if_only_empty_dirs(c) }
-      end
+    def clean_empty_dirs_in_project(project_dir)
+      clean_empty_dirs_under(project_dir + 'src') if (project_dir + 'src').directory?
+      clean_empty_dirs_under(project_dir + 'test') if (project_dir + 'test').directory?
     end
 
-    def rmdir_if_only_empty_dirs(dir)
+    def clean_empty_dirs_under(dir)
+      dir.children.each {|c| clean_empty_dirs(c) if c.directory? }
+    end
+
+    def clean_empty_dirs(dir)
       if dir.directory?
-        children = dir.children
-        dir.children.each {|c| rmdir_if_only_empty_dirs(c) if c.directory? }
+        clean_empty_dirs_under(dir)
         dir.rmdir if dir.children.empty?
       end
     end
