@@ -3,6 +3,11 @@ class SessionsController < ApplicationController
   skip_authorization_check
 
   def create
+    begin
+      clear_expired_sessions
+    rescue
+    end
+
     user = User.authenticate(params[:session][:login],
                              params[:session][:password])
 
@@ -28,6 +33,10 @@ private
     else
       redirect_to root_path, redirect_params
     end
+  end
+
+  def clear_expired_sessions
+    ActiveRecord::SessionStore::Session.delete_all(['updated_at < ?', 1.month.ago])
   end
 
 end
