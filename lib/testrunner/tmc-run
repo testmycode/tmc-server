@@ -15,15 +15,12 @@ rm -f output.txt
 
 TESTS=`cat tests.txt`
 
-# Run .tmcrc if any
+# Source .tmcrc if any
 if [ -f .tmcrc ]; then
-  chmod +x .tmcrc
-  ./.tmcrc
+  . ./.tmcrc
 fi
 
 # Run tests
-export TMC_SANDBOX=1
-
 DEFS="
   -Dtmc.exercise_dir=`pwd` 
   -Dtmc.src_class_dir=`pwd`/classes/main 

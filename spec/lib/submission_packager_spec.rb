@@ -216,9 +216,9 @@ describe SubmissionPackager do
       end
     end
 
-    it "should run .tmcrc" do
+    it "should source .tmcrc" do
       File.open("#{@exercise.clone_path}/.tmcrc", 'w') do |f|
-        f.write("#!/bin/sh\necho trol > lol.txt")
+        f.write("echo $TESTS > lol.txt")
       end
 
       @exercise_project.solve_all
@@ -241,6 +241,7 @@ describe SubmissionPackager do
           end
 
           File.should exist('lol.txt')
+          File.read('lol.txt').should include('SimpleTest.testAdd')
         end
       end
     end

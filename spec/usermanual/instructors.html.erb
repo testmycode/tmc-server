@@ -403,9 +403,10 @@ extra_student_files:
   <h3><code>.tmcrc</code></h3>
 
   <p>
-    A script file named <code>.tmcrc</code> may be put in a project directory.
-    It is made executable and run in the sandbox just before the test suite is run.
-    Use it e.g. to start <code>Xvfb</code> for GUI tests.
+    A shell script named <code>.tmcrc</code> may be put in a project directory.
+    It is run (actually, sourced) in the sandbox just before the test suite is run.
+    Use it e.g. to start <code>Xvfb</code> for GUI tests or set environment variables.
+    Note that it is NOT run on the student's machine.
   </p>
   
   <h2>ProTips</h2>
