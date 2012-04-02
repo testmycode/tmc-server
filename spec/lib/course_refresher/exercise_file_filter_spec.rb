@@ -168,6 +168,12 @@ EOF
       @filter.make_stub('stub')
       File.should exist('stub/.tmcproject.yml')
     end
+
+    it "should not include .tmcrc" do
+      make_file('original/.tmcrc', '---')
+      @filter.make_stub('stub')
+      File.should_not exist('stub/.tmcrc')
+    end
     
     it "should warn about misplaced stubs"
   end
@@ -336,6 +342,12 @@ EOF
       make_file('original/.tmcproject.yml', '---')
       @filter.make_solution('solution')
       File.should_not exist('solution/.tmcproject.yml')
+    end
+
+    it "should not include .tmcrc" do
+      make_file('original/.tmcrc', '---')
+      @filter.make_stub('solution')
+      File.should_not exist('solution/.tmcrc')
     end
 
     it "should include extra student files specified in .tmcproject.yml" do

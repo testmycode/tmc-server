@@ -82,7 +82,7 @@ class CourseRefresher
     
     def should_include_in_stub(path)
       fn = path.basename.to_s
-      !(fn.include?('Hidden') || fn.start_with?('.git') || fn == 'metadata.yml')
+      !(fn.include?('Hidden') || fn.start_with?('.git') || fn == 'metadata.yml' || fn == '.tmcrc')
     end
     
     def should_include_in_solution(path)
@@ -91,7 +91,7 @@ class CourseRefresher
       return true if @tmc_project_file.extra_student_files.include?(rel_path)
       return false if rel_path =~ /(?:^|\/)test(?:\/|$)/
       return false if fn.start_with?('.git')
-      return false if ['.tmcproject.yml', 'metadata.yml'].include?(fn)
+      return false if ['.tmcproject.yml', '.tmcrc', 'metadata.yml'].include?(fn)
       true
     end
     
