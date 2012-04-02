@@ -1,6 +1,8 @@
 #!/bin/sh -e
 # This gets passed with each submission to tmc-sandbox
 
+export TMC_SANDBOX=1
+
 # Compile project
 mkdir -p classes/main
 mkdir -p classes/test
