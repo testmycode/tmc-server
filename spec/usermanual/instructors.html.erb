@@ -30,7 +30,7 @@ require 'cgi' # for escapeHTML
     Factory.create(:admin, :login => 'admin', :password => 'admin')
   %>
   
-  <h1>TMC Manual for Instructors</h1>
+  <h1>Tutorial</h1>
   
   <div id="toc"></div>
   
@@ -380,6 +380,33 @@ solution_visible_after: 2010-02-15</pre>
     <li><code>gdocs_sheet</code> names the GDocs sheet to which the exercise's points are exported.</li>
     <li><code>solution_visible_after</code> sets when the suggested solution becomes visible to everyone (including those who didn't complete the exercise). Often set to the same value as the deadline.</li>
   </ul>
+  
+  <h3><code>.tmcproject.yml</code></h3>
+  
+  <p>
+    An exercise directory may contain a <code>.tmcproject.yml</code>. It currently supports one setting,
+    <code>extra_student_files</code>, which is a list of (relative paths to) files to be treated roughly as if
+    they were in <code>src/</code>. It can be used e.g. to mark test files as meant to be implemented by students.
+  </p>
+  
+  <p>Example:</p>
+  
+  <pre class="yaml">
+extra_student_files:
+  - test/StudentTest.java</pre>
+  
+  <p>
+    This causes <code>test/StudentTest.java</code> to be shown as part of the solution.
+    Also, the NetBeans plugin would not overwrite the file when the exercise is updated.
+  </p>
+
+  <h3><code>.tmcrc</code></h3>
+
+  <p>
+    A script file named <code>.tmcrc</code> may be put in a project directory.
+    It is made executable and run in the sandbox just before the test suite is run.
+    Use it e.g. to start <code>Xvfb</code> for GUI tests.
+  </p>
   
   <h2>ProTips</h2>
   
