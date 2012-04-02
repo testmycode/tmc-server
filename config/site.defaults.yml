@@ -7,6 +7,11 @@
 # Example: HELSINKI UNIVERSITY<br />Department of Computer Science
 site_subtitle:
 
+# Session cookie name. If you have multiple deployments in different subdirectories then
+# set this option differently in each or you'll lose your session whenever you move between them
+# in your browser.
+session_cookie_key: _session_id
+
 ### Server and network setup ###
 
 # In many installations, tmp/cache/git_repos must be available to the apache user.
