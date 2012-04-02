@@ -1,8 +1,6 @@
 #!/bin/sh -e
 # This gets passed with each submission to tmc-sandbox
 
-export TMC_SANDBOX=1
-
 # Compile project
 mkdir -p classes/main
 mkdir -p classes/test
@@ -13,12 +11,18 @@ CLASSPATH="lib/testrunner/*:lib/*:classes/main/:classes/test/"
 
 # Discover tests
 java -cp "$CLASSPATH" "fi.helsinki.cs.tmc.testscanner.TestScanner" --test-runner-format test > tests.txt 2> output.txt || exit 103
-
-# Run tests
-
 rm -f output.txt
 
 TESTS=`cat tests.txt`
+
+# Run .tmcrc if any
+if [ -f .tmcrc ]; then
+  chmod +x .tmcrc
+  ./.tmcrc
+fi
+
+# Run tests
+export TMC_SANDBOX=1
 
 DEFS="
   -Dtmc.exercise_dir=`pwd` 

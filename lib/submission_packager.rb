@@ -14,7 +14,6 @@ class SubmissionPackager
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         FileUtils.mkdir_p('received')
-        FileUtils.mkdir_p('pkg')
         FileUtils.mkdir_p('dest')
         Dir.chdir('received') do
           sh! ['unzip', zip_path]
@@ -32,6 +31,8 @@ class SubmissionPackager
 
         FileUtils.cp_r(received + 'src', dest + 'src')
         FileUtils.cp_r(cloned  + 'test', dest + 'test')
+
+        FileUtils.cp(cloned  + '.tmcrc', dest + '.tmcrc') if (cloned + '.tmcrc').file?
 
         tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
         tmc_project_file.extra_student_files.each do |rel_path|

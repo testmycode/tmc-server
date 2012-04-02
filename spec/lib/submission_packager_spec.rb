@@ -112,7 +112,43 @@ describe SubmissionPackager do
       end
     end
   end
-  
+
+  it "should include the .tmcrc file if present" do
+    File.open("#{@exercise.clone_path}/.tmcrc", 'w') do |f|
+      f.write("hello")
+    end
+
+    @exercise_project.solve_all
+    @exercise_project.make_zip(:src_only => false)
+
+    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.should exist('.tmcrc')
+        File.read('.tmcrc').should == 'hello'
+      end
+    end
+  end
+
+  it "should not use .tmcrc from the submission" do
+    @exercise_project.solve_all
+    File.open("#{@exercise_project.path}/.tmcrc", 'w') do |f|
+      f.write("hello")
+    end
+    @exercise_project.make_zip(:src_only => false)
+
+    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.should_not exist('.tmcrc')
+      end
+    end
+  end
+
   it "should add tmc-junit-runner.jar and its deps to lib/testrunner/" do
     @exercise_project.solve_all
     @exercise_project.make_zip(:src_only => false)
@@ -176,6 +212,35 @@ describe SubmissionPackager do
           
           output = File.read('output.txt')
           output.should include('compiler should fail here')
+        end
+      end
+    end
+
+    it "should run .tmcrc" do
+      File.open("#{@exercise.clone_path}/.tmcrc", 'w') do |f|
+        f.write("#!/bin/sh\necho trol > lol.txt")
+      end
+
+      @exercise_project.solve_all
+      @exercise_project.make_zip(:src_only => false)
+
+      SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          sh! ['tar', 'xf', @tar_path]
+
+          begin
+            sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
+          rescue
+            if File.exist?('output.txt')
+              raise($!.message + "\n" + "The contents of output.txt:\n" + File.read('output.txt'))
+            else
+              raise
+            end
+          end
+
+          File.should exist('lol.txt')
         end
       end
     end
