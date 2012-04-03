@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
     respond_with_error(exception.message, 404)
   end
 
+  rescue_from ActionController::MissingFile do
+    respond_with_error("File not found", 404)
+  end
+
   before_filter :set_default_url_options
   before_filter :check_api_version
   before_filter :set_bare_layout
@@ -78,7 +82,8 @@ private
     respond_to do |format|
       format.html { render :text => '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', :layout => true, :status => code }
       format.json { render :json => { :error => msg }.merge(extra_json_keys), :status => code }
-      format.text { render :text => 'ERROR: ' + msg }
+      format.text { render :text => 'ERROR: ' + msg, :status => code }
+      format.zip { render :text => msg, :status => code, :content_type => 'text/plain' }
     end
   end
   
