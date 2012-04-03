@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120318214231) do
+ActiveRecord::Schema.define(:version => 20120403080704) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false

@@ -7,9 +7,16 @@ class SolutionsController < ApplicationController
       authorize! :read, @solution
     rescue CanCan::AccessDenied
       if current_user.guest?
-        respond_with_error("Please log in to view the model solution.", 404)
+        return respond_access_denied("Please log in to view the model solution.")
       else
-        respond_with_error("It seems you haven't solved the exercise yourself yet.", 404)
+        return respond_access_denied("It seems you haven't solved the exercise yourself yet.")
+      end
+    end
+
+    respond_to do |format|
+      format.html
+      format.zip do
+        send_file @exercise.solution_zip_file_path
       end
     end
   end

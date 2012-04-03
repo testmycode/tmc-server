@@ -39,8 +39,12 @@ class Exercise < ActiveRecord::Base
     "#{course.stub_path}/#{self.relative_path}"
   end
 
-  def zip_file_path
-    "#{course.zip_path}/#{self.name}.zip"
+  def stub_zip_file_path
+    "#{course.stub_zip_path}/#{self.name}.zip"
+  end
+
+  def solution_zip_file_path
+    "#{course.solution_zip_path}/#{self.name}.zip"
   end
   
   def solution

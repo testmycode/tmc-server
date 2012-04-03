@@ -107,8 +107,12 @@ class Course < ActiveRecord::Base
   end
   
   # Directory for zips of the stubs
-  def zip_path
-    "#{cache_path}/zip"
+  def stub_zip_path
+    "#{cache_path}/stub_zip"
+  end
+
+  def solution_zip_path
+    "#{cache_path}/solution_zip"
   end
   
   def refresh

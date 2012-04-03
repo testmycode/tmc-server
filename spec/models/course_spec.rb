@@ -37,7 +37,8 @@ describe Course do
 
       object_paths = [
         :cache_path,
-        :zip_path,
+        :stub_zip_path,
+        :solution_zip_path,
         :clone_path
       ]
 

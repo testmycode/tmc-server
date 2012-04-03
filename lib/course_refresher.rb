@@ -64,6 +64,7 @@ private
           make_stubs
           checksum_stubs
           make_zips_of_stubs
+          make_zips_of_solutions
           set_permissions
           @course.save!
           @course.exercises.each &:save!
@@ -216,8 +217,16 @@ private
     # Returns a sorted list of relative pathnames to stub files of the exercise.
     # These are checksummed and zipped.
     def stub_files(e)
+      sorted_list_of_files_under("#{@course.stub_path}/#{e.relative_path}")
+    end
+
+    def solution_files(e)
+      sorted_list_of_files_under("#{@course.solution_path}/#{e.relative_path}")
+    end
+
+    def sorted_list_of_files_under(dir)
       result = []
-      base_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
+      base_path = Pathname(dir)
       Dir.chdir(base_path) do
         Pathname('.').find do |path|
           result << path unless path.to_s == '.'
@@ -241,13 +250,28 @@ private
     end
     
     def make_zips_of_stubs
-      FileUtils.mkdir_p(@course.zip_path)
+      FileUtils.mkdir_p(@course.stub_zip_path)
       @course.exercises.each do |e|
-        zip_file_path = "#{@course.zip_path}/#{e.name}.zip"
+        zip_file_path = "#{@course.stub_zip_path}/#{e.name}.zip"
         
         Dir.chdir(@course.stub_path) do
           IO.popen(mk_command(['zip', '--quiet', '-@', zip_file_path]), 'w') do |pipe|
             stub_files(e).each do |path|
+              pipe.puts(Pathname(e.relative_path) + path)
+            end
+          end
+        end
+      end
+    end
+
+    def make_zips_of_solutions
+      FileUtils.mkdir_p(@course.solution_zip_path)
+      @course.exercises.each do |e|
+        zip_file_path = "#{@course.solution_zip_path}/#{e.name}.zip"
+
+        Dir.chdir(@course.solution_path) do
+          IO.popen(mk_command(['zip', '--quiet', '-@', zip_file_path]), 'w') do |pipe|
+            solution_files(e).each do |path|
               pipe.puts(Pathname(e.relative_path) + path)
             end
           end

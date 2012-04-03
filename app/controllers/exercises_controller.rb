@@ -21,9 +21,9 @@ class ExercisesController < ApplicationController
     
     respond_to do |format|
       format.html
-      format.zip {
-        send_file @exercise.zip_file_path
-      }
+      format.zip do
+        send_file @exercise.stub_zip_file_path
+      end
     end
   end
 end

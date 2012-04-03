@@ -282,15 +282,15 @@ describe CourseRefresher do
 
     @refresher.refresh_course(@course)
 
-    File.should exist(@course.zip_path + '/MyExercise.zip')
-    File.should exist(@course.zip_path + '/MyCategory-MyExercise.zip')
+    File.should exist(@course.stub_zip_path + '/MyExercise.zip')
+    File.should exist(@course.stub_zip_path + '/MyCategory-MyExercise.zip')
   end
 
   it "should not include hidden tests in the zips" do
     add_exercise('MyExercise')
     @refresher.refresh_course(@course)
 
-    sh!('unzip', @course.zip_path + '/MyExercise.zip')
+    sh!('unzip', @course.stub_zip_path + '/MyExercise.zip')
     File.should_not exist('MyExercise/test/SimpleHiddenTest.java')
     File.should exist('MyExercise/test/SimpleTest.java')
   end
@@ -302,7 +302,7 @@ describe CourseRefresher do
     local_repo.add_commit_push
     @refresher.refresh_course(@course)
 
-    sh!('unzip', @course.zip_path + '/MyExercise.zip')
+    sh!('unzip', @course.stub_zip_path + '/MyExercise.zip')
     File.should_not exist('MyExercise/metadata.yml')
     File.should exist('MyExercise/non-metadata.yml')
   end
@@ -311,13 +311,23 @@ describe CourseRefresher do
     add_exercise('MyCategory/MyExercise')
     @refresher.refresh_course(@course)
 
-    File.should exist(@course.zip_path + '/MyCategory-MyExercise.zip')
+    File.should exist(@course.stub_zip_path + '/MyCategory-MyExercise.zip')
 
     FileUtils.rm_rf "#{@local_clone.path}/MyCategory/MyExercise"
     @local_clone.add_commit_push
     @refresher.refresh_course(@course)
 
-    File.should_not exist(@course.zip_path + '/MyCategory-MyExercise.zip')
+    File.should_not exist(@course.stub_zip_path + '/MyCategory-MyExercise.zip')
+  end
+
+  it "should generate solution zips" do
+    add_exercise('MyExercise')
+    add_exercise('MyCategory/MyExercise')
+
+    @refresher.refresh_course(@course)
+
+    File.should exist(@course.solution_zip_path + '/MyExercise.zip')
+    File.should exist(@course.solution_zip_path + '/MyCategory-MyExercise.zip')
   end
 
   it "should delete the old cache directory" do

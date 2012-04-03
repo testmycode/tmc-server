@@ -104,7 +104,7 @@ private
 
     helpers = view_context
 
-    {
+    data = {
       :id => exercise.id,
       :name => exercise.name,
       :deadline => exercise.deadline,
@@ -116,5 +116,9 @@ private
       :completed => exercise.completed_by?(current_user),
       :memory_limit => exercise.memory_limit
     }
+
+    data[:solution_zip_url] = helpers.exercise_solution_zip_url(exercise) if current_user.administrator?
+
+    data
   end
 end
