@@ -5,14 +5,20 @@ class ParticipantsController < ApplicationController
   def index
     @filter_params = params_starting_with('filter_', :remove_prefix => true)
     @raw_filter_params = params_starting_with('filter_', :remove_prefix => false)
-    @participants = User.filter_by(@filter_params, @participants).order(:login)
+    @participants = User.filter_by(@filter_params).order(:login)
+
+    @extra_fields = UserField.all.select(&:show_in_participant_list?)
 
     respond_to do |format|
       format.html
       format.json do
         result = []
         @participants.each do |user|
-          result << { :id => user.id, :username => user.login, :email => user.email }
+          record = { :id => user.id, :username => user.login, :email => user.email }
+          @extra_fields.each do |field|
+            record[field.name] = user.field_value(field)
+          end
+          result << record
         end
         render :json => {
           :api_version => API_VERSION,

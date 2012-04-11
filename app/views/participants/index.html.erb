@@ -10,15 +10,21 @@
     <tr>
       <th>Username</th>
       <th>E-mail</th>
+      <% for field in @extra_fields %>
+        <th><%= field.label %></th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
-  <% for user in @participants %>
-    <tr>
-      <td><%= link_to user.login, participant_path(user) %></td>
-      <td><%= user.email %></td>
-    </tr>
-  <% end %>
+    <% for user in @participants %>
+      <tr>
+        <td><%= link_to user.login, participant_path(user) %></td>
+        <td><%= user.email %></td>
+        <% for field in @extra_fields %>
+          <td><%= user.field_value(field) %></td>
+        <% end %>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 <div class="as-json">[<%= link_to "json", "#{participants_path @filter_params.merge(:format => :json, :api_version => ApplicationController::API_VERSION)}" %>]</div>

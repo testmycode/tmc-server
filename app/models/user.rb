@@ -31,6 +31,10 @@ class User < ActiveRecord::Base
     group("users.id")
   }
 
+  def field_value(field)
+    field_value_record(field).value
+  end
+
   def field_value_record(field)
     value = self.user_field_values.select {|v| v.field_name == field.name }.first
     if !value
@@ -40,8 +44,8 @@ class User < ActiveRecord::Base
     value
   end
 
-  def self.filter_by(filter_params, users = nil)
-    users = self unless users
+  def self.filter_by(filter_params)
+    users = self.includes(:user_field_values)
 
     users = users.where(:administrator => false) unless filter_params['include_administrators']
 
