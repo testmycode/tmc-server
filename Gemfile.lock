@@ -81,6 +81,7 @@ GEM
       sinatra
     multi_json (1.0.4)
     multipart-post (1.1.4)
+    natcmp (1.4.1)
     nokogiri (1.5.0)
     oauth (0.4.5)
     oauth2 (0.5.2)
@@ -174,6 +175,7 @@ DEPENDENCIES
   jquery-rails (~> 1.0.9)
   launchy
   mimic (~> 0.4.3)
+  natcmp (~> 1.4)
   pg (~> 0.11.0)
   pg_comment (~> 0.1.1)
   railroady

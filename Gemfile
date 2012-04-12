@@ -12,6 +12,7 @@ gem 'cancan', '~> 1.6.7'
 gem 'rest-client', '~> 1.6.7'
 gem 'daemons', '~> 1.1.4'
 gem 'pg_comment', '~> 0.1.1'
+gem 'natcmp', '~> 1.4'
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
