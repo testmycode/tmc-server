@@ -186,6 +186,6 @@ class Exercise < ActiveRecord::Base
   end
 
   def <=>(other)
-    self.name <=> other.name
+    Natcmp.natcmp(self.name, other.name)
   end
 end

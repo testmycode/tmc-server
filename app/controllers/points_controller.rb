@@ -4,7 +4,8 @@ class PointsController < ApplicationController
 
   def index
     @course = Course.find(params[:course_id])
-    sheets = @course.gdocs_sheets(@course.exercises.select {|e| e.visible_to?(current_user)}).sort!
+    exercises = @course.exercises.select {|e| e.visible_to?(current_user)}
+    sheets = @course.gdocs_sheets(exercises).sort {|s1, s2| Natcmp.natcmp(s1, s2) }
     @summary = summary_hash(@course, sheets)
     sort_summary(@summary, params[:sort_by]) if params[:sort_by]
   end
