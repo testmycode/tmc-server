@@ -17,6 +17,11 @@ class SubmissionPackager
         FileUtils.mkdir_p('dest')
         Dir.chdir('received') do
           sh! ['unzip', zip_path]
+          # Stupid OS X default zipper puts useless crap into zip files :[
+          # Delete them or they might be mistaken for the actual source files later
+          FileUtils.rm_rf '__MACOSX'
+          # Let's clean up other similarly useless files while we're at it
+          FileUtils.rm_f ['.DS_Store', 'desktop.ini', 'Thumbs.db', '.directory']
         end
 
         received = Pathname(find_dir_containing(dir, "src"))
