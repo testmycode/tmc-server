@@ -28,6 +28,7 @@ class Course < ActiveRecord::Base
   has_many :test_scanner_cache_entries, :dependent => :destroy
   has_many :feedback_questions, :dependent => :destroy
   has_many :feedback_answers  # destroyed transitively when questions are destroyed
+  has_many :student_events, :dependent => :destroy
 
   after_destroy :delete_cache
 

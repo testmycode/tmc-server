@@ -30,6 +30,10 @@ class Ability
       can :create, FeedbackAnswer do |ans|
         ans.submission.user_id == user.id
       end
+
+      can :create, StudentEvent do |ev|
+        ev.user_id = user.id
+      end
       
       cannot :read, Solution
       can :read, Solution do |sol|

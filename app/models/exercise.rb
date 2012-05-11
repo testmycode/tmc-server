@@ -10,6 +10,8 @@ class Exercise < ActiveRecord::Base
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
   has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "feedback_answers.course_id = #{self.course_id}" }
+  has_many :student_events, :foreign_key => :exercise_name, :primary_key => :name,
+      :conditions => proc { "student_events.course_id = #{self.course_id}" }
 
   validates :gdocs_sheet, :format => { :without => /^(MASTER|PUBLIC)$/ }
 

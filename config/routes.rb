@@ -52,6 +52,8 @@ TmcServer::Application.routes.draw do
   end
 
   resources :feedback_answers, :only => [:show]
+
+  resources :student_events, :only => [:create]
   
   match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
 
