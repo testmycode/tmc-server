@@ -16,12 +16,18 @@ describe StudentEventsController do
       attr_reader :tempfile
     end
 
+    events_hash = {}
+    events.each_with_index do |e, i|
+      events_hash[i.to_s] = {
+        :exercise_name => @exercise.name,
+        :course_name => @course.name
+      }.merge(e)
+    end
+
     params = {
       :format => :json,
       :api_version => ApplicationController::API_VERSION,
-      :events => events.map do |e|
-        {:exercise_name => @exercise.name, :course_name => @course.name}.merge(e)
-      end,
+      :events => events_hash,
       :data => file
     }.merge(params)
 
@@ -39,9 +45,14 @@ describe StudentEventsController do
     response.should be_successful
 
     StudentEvent.count.should == 2
+    
+    StudentEvent.first.course_id.should == @course.id
+    StudentEvent.first.exercise_name.should == @exercise.name
+    
     StudentEvent.first.event_type.should == 'code_snapshot'
     StudentEvent.first.data.should == 'foobar'
     StudentEvent.first.happened_at.should == Time.parse('2012-02-02 02:02')
+    
     StudentEvent.last.event_type.should == 'code_snapshot'
     StudentEvent.last.data.should == 'barfooxoo'
     StudentEvent.last.happened_at.should == Time.parse('2013-03-03 03:03')

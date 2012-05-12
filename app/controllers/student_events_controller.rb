@@ -4,7 +4,7 @@ class StudentEventsController < ApplicationController
   def create
     user = current_user
 
-    event_records = params['events']
+    event_records = params['events'].values
 
     File.open(params['data'].tempfile.path, 'rb') do |data_file|
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
