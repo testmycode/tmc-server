@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+root_dir = File.expand_path('../', File.dirname(__FILE__))
+require root_dir + '/config/environment'
+require 'fileutils'
+
+if ARGV.length != 1 || ['-h', '--help'].include?(ARGV[0])
+  puts "Usage: script/export_student_events dest_dir"
+  puts
+  exit!(1)
+end
+
+dest_dir = ARGV[0]
+
+def write_file(filename, data)
+  File.open(filename, 'wb') {|f| f.write(data) }
+end
+
+StudentEvent.all.each do |ev|
+  user_dir = "#{dest_dir}/#{ev.user_id}"
+  FileUtils.mkdir(user_dir) unless File.exist?(user_dir)
+  
+  record_name = ev.happened_at.strftime("%Y-%m-%d_%H-%M-%S_#{ev.id}")
+  json_file = "#{user_dir}/#{record_name}.json"
+  
+  json = {
+    :user_id => ev.user_id,
+    :course_name => ev.course.name,
+    :exercise_name => ev.exercise_name,
+    :event_type => ev.event_type,
+    :happened_at => ev.happened_at
+  }.to_json
+  
+  write_file(json_file, json)
+  
+  case ev.event_type
+  when 'code_snapshot'
+    write_file("#{user_dir}/#{record_name}.zip", ev.data)
+  end
+end
+
