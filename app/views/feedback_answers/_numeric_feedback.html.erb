@@ -35,10 +35,11 @@
 
 <% if stats.count > 1 %>
   <%=
+      cols = [{ :sType => 'natural' }] + [nil]*questions.size + [nil]
       use_datatables('table.feedback-numeric-stats',
                      :bSort => true,
                      :bPaginate => false,
-                     :aoColumns => [{ :sType => 'natural' }, nil, nil, nil]
+                     :aoColumns => cols
       )
   %>
 <% end %>
