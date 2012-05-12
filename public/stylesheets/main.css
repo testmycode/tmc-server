@@ -254,10 +254,6 @@ table {
   width: 100%;
 }
 
-table.points {
-  width: auto;
-}
-
 table > * > tr > td {
   padding: 6px 14px 6px 14px;
   border: 1px solid gray;
@@ -268,11 +264,21 @@ table > * > tr > th {
   border: 0;
 }
 
-table.points > * > tr > td {
-  text-align: center;
-}
-
 tr.table-totals > td {
   font-weight: bold;
+}
+
+/* Points tables */
+
+table.points {
+  width: auto;
+}
+
+table.points tr.admin * {
+  color: gray;
+}
+
+table.points > * > tr > td {
+  text-align: center;
 }
 

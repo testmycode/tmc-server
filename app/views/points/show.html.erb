@@ -47,22 +47,25 @@
 
     <tbody>
       <% @users.each do |user| %>
-        <% user_points = AwardedPoint.
-            course_user_sheet_points(@course, user, @sheetname).map(&:name) %>
-        <tr>
-          <td>
-            <% if can? :read, user %>
-              <%= link_to user.login, participant_path(user) %>
-            <% else %>
-              <%= user.login %>
+        <% if !user.administrator? || current_user.administrator? %>
+          <% row_class = if user.administrator? then "admin" else "student" end %>
+          <% user_points = AwardedPoint.
+              course_user_sheet_points(@course, user, @sheetname).map(&:name) %>
+          <tr class="<%= row_class %>">
+            <td>
+              <% if can? :read, user %>
+                <%= link_to user.login, participant_path(user) %>
+              <% else %>
+                <%= user.login %>
+              <% end %>
+            </td>
+            <% @exercises.each do |exercise| %>
+              <% exercise.available_points.each do |p| %>
+                <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
+              <% end %>
             <% end %>
-          </td>
-          <% @exercises.each do |exercise| %>
-            <% exercise.available_points.each do |p| %>
-              <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
-            <% end %>
-          <% end %>
-        </tr>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>
