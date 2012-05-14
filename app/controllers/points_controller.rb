@@ -44,18 +44,24 @@ class PointsController < ApplicationController
       user_totals[username] ||= 0
       user_totals[username] += per_sheet.values.reduce(0, &:+)
     end
-    
+
+    include_admins = current_user.administrator?
+    users = User.where(:login => per_user_and_sheet.keys.sort_by(&:downcase))
+    users = users.where(:administrator => false) unless include_admins
+
+    sheets = [] if sheets.size == 1 # The total column will be the same as the sheet column
+
     {
       :sheets => sheets.map{|sheet| {
         :name => sheet,
-        :total_available => AvailablePoint.course_sheet_points(course, sheet).length,
-        :total_awarded => AwardedPoint.course_sheet_points(course, sheet).length
+        :total_awarded => AwardedPoint.course_sheet_points(course, sheet, include_admins).length,
+        :total_available => AvailablePoint.course_sheet_points(course, sheet).length
       }},
-      :total_awarded => AwardedPoint.course_points(course).length,
+      :total_awarded => AwardedPoint.course_points(course, include_admins).length,
       :total_available => AvailablePoint.course_points(course).length,
       :awarded_for_user_and_sheet => per_user_and_sheet,
       :total_for_user => user_totals,
-      :users => User.where(:login => per_user_and_sheet.keys.sort_by(&:downcase))
+      :users => users
     }
   end
   

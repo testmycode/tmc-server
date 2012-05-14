@@ -8,6 +8,7 @@ describe AwardedPoint do
 
       @user = Factory.create(:user)
       @user2 = Factory.create(:user)
+      @admin = Factory.create(:admin)
 
       @sheet1 = "sheet1"
       @sheet2 = "sheet2"
@@ -23,10 +24,14 @@ describe AwardedPoint do
       @sub2 = Factory.create(:submission, :course => @course,
                                    :user => @user2,
                                    :exercise => @ex2)
+      @sub_admin = Factory.create(:submission, :course => @course,
+                                         :user => @admin,
+                                         :exercise => @ex1)
 
       Factory.create(:available_point, :exercise => @ex1, :name => "ap")
       Factory.create(:available_point, :exercise => @ex2, :name => "ap2")
       Factory.create(:available_point, :exercise => @ex1, :name => "ap3")
+      Factory.create(:available_point, :exercise => @ex1, :name => "ap_admin")
 
       @ap = Factory.create(:awarded_point, :course => @course,
                            :user => @user, :name => "ap",
@@ -37,6 +42,24 @@ describe AwardedPoint do
       @ap3 = Factory.create(:awarded_point, :course => @course,
                             :user => @user, :name => "ap3",
                             :submission => @sub1)
+      @ap_admin = Factory.create(:awarded_point, :course => @course,
+                                  :user => @admin, :name => "ap_admin",
+                                  :submission => @sub_admin)
+    end
+
+    specify "course_points" do
+      points = AwardedPoint.course_points(@course)
+      points.length.should == 3
+      points.should include(@ap)
+      points.should include(@ap2)
+      points.should include(@ap3)
+
+      points = AwardedPoint.course_points(@course, true)
+      points.length.should == 4
+      points.should include(@ap)
+      points.should include(@ap2)
+      points.should include(@ap3)
+      points.should include(@ap_admin)
     end
 
     specify "course_user_points" do
@@ -55,6 +78,12 @@ describe AwardedPoint do
       points.length.should == 2
       points.should include(@ap)
       points.should include(@ap3)
+
+      points = AwardedPoint.course_sheet_points(@course, @sheet1, true)
+      points.length.should == 3
+      points.should include(@ap)
+      points.should include(@ap3)
+      points.should include(@ap_admin)
 
       points = AwardedPoint.course_sheet_points(@course, @sheet2)
       points.length.should == 1

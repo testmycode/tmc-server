@@ -8,29 +8,34 @@ class AwardedPoint < ActiveRecord::Base
   validates_uniqueness_of :name, :scope => [:user_id, :submission_id]
   validates_uniqueness_of :name, :scope => [:user_id, :course_id]
 
-  scope :course_user_points, lambda { |course, user|
+  def self.course_user_points(course, user)
     where(:course_id => course.id, :user_id => user.id)
-  }
+  end
 
-  scope :course_points, lambda { |course|
-    where(:course_id => course.id)
-  }
+  def self.course_points(course, include_admins = false)
+    result = where(:course_id => course.id)
+    result = without_admins(result) unless include_admins
+    result
+  end
 
-  scope :course_user_sheet_points, lambda { |course, user, sheetname|
+  def self.course_user_sheet_points(course, user, sheetname)
     course_user_points(course, user).
     joins("INNER JOIN available_points ON available_points.name = awarded_points.name").
     joins("INNER JOIN exercises ON available_points.exercise_id = exercises.id").
     where(:exercises => { :gdocs_sheet => sheetname, :course_id => course.id }).
     group("awarded_points.id")
-  }
+  end
 
-  scope :course_sheet_points, lambda { |course, sheetname|
-    where(:course_id => course.id).
-    joins("INNER JOIN available_points ON available_points.name = awarded_points.name").
-    joins("INNER JOIN exercises ON available_points.exercise_id = exercises.id").
-    where(:exercises => { :gdocs_sheet => sheetname, :course_id => course.id }).
-    group("awarded_points.id")
-  }
+  def self.course_sheet_points(course, sheetname, include_admins = false)
+    result =
+      where(:course_id => course.id).
+      joins("INNER JOIN available_points ON available_points.name = awarded_points.name").
+      joins("INNER JOIN exercises ON available_points.exercise_id = exercises.id").
+      where(:exercises => { :gdocs_sheet => sheetname, :course_id => course.id }).
+      group("awarded_points.id")
+    result = without_admins(result) unless include_admins
+    result
+  end
   
   # Gets a hash of user to count of points awarded for exercises of the given sheet
   def self.count_per_user_in_course_with_sheet(course, sheetname)
@@ -60,4 +65,8 @@ class AwardedPoint < ActiveRecord::Base
     result
   end
 
+private
+  def self.without_admins(query)
+    query.joins("INNER JOIN users ON users.id = awarded_points.user_id").where(:users => { :administrator => false })
+  end
 end
