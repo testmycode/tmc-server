@@ -1,0 +1,12 @@
+<% require 'portable_csv' %>
+<%= PortableCSV.generate(:force_quotes => true) do |csv|
+  csv << ["Username"] + @summary[:sheets].map {|sheet| sheet[:name] } + ["Total"]
+
+  @summary[:users].each do |user|
+    points = @summary[:sheets].map do |sheet|
+      @summary[:awarded_for_user_and_sheet][user.login][sheet[:name]].to_i
+    end
+    total = @summary[:total_for_user][user.login].to_i
+    csv << [user.login] + points + [total]
+  end
+end.html_safe %>

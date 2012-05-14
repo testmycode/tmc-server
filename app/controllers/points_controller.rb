@@ -8,6 +8,13 @@ class PointsController < ApplicationController
     sheets = @course.gdocs_sheets(exercises).sort {|s1, s2| Natcmp.natcmp(s1, s2) }
     @summary = summary_hash(@course, sheets)
     sort_summary(@summary, params[:sort_by]) if params[:sort_by]
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        render_csv(:filename => "#{@course.name}_points.csv")
+      end
+    end
   end
 
   def refresh_gdocs
@@ -46,7 +53,7 @@ class PointsController < ApplicationController
     end
 
     include_admins = current_user.administrator?
-    users = User.where(:login => per_user_and_sheet.keys.sort_by(&:downcase))
+    users = User.where(:login => per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
     users = users.where(:administrator => false) unless include_admins
 
     sheets = [] if sheets.size == 1 # The total column will be the same as the sheet column

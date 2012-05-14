@@ -106,5 +106,26 @@ private
     end
     result
   end
+
+  # To be called from a respond_to on csv.
+  # http://stackoverflow.com/questions/94502/in-rails-how-to-return-records-as-a-csv-file
+  def render_csv(options = {})
+    options = {
+      :filename => action_name
+    }.merge(options)
+
+    if request.env['HTTP_USER_AGENT'] =~ /msie/i
+      headers['Pragma'] = 'public'
+      headers["Content-type"] = "text/plain"
+      headers['Cache-Control'] = 'no-cache, must-revalidate, post-check=0, pre-check=0'
+      headers['Content-Disposition'] = "attachment; filename=\"#{options[:filename]}\""
+      headers['Expires'] = "0"
+    else
+      headers["Content-Type"] ||= 'text/csv'
+      headers["Content-Disposition"] = "attachment; filename=\"#{options[:filename]}\""
+    end
+
+    render :layout => false
+  end
   
 end

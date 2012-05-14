@@ -27,7 +27,7 @@
     <% end %>
   </tbody>
 </table>
-<div class="as-json">[<%= link_to "json", "#{participants_path @filter_params.merge(:format => :json, :api_version => ApplicationController::API_VERSION)}" %>]</div>
+<div class="alternative-format-link">[<%= link_to "json", "#{participants_path @filter_params.merge(:format => :json, :api_version => ApplicationController::API_VERSION)}" %>]</div>
 
 <%= use_datatables('table.participants', :bPaginate => false) %>
 
