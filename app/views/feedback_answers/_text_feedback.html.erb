@@ -2,7 +2,11 @@
   <section>
     <div class="feedback-question" title="<%= answer.feedback_question.question %>"><%= answer.feedback_question.title_or_question %></div>
     <div class="feedback-source">
-      By <%= mail_to answer.submission.user.email, answer.submission.user.login %>
+      <% user = answer.submission.user %>
+      By <%= link_to user.login, participant_path(user) %>
+      <% unless user.email.blank? %>
+        (<%= mail_to user.email, user.email %>)
+      <% end %>
       with <%= link_to "submission ##{answer.submission.id}", answer.submission %>
       <% unless @exercise %>
         for <%= link_to answer.exercise.name, answer.exercise %>
