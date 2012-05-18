@@ -23,7 +23,7 @@
     <div>
       Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
       <% if current_user.administrator? %>
-        <%= mail_to @submission.user.email, @submission.user.login %>.
+        <%= link_to @submission.user.login, participant_path(@submission.user) %>.
       <% else %>
         <%= @submission.user.login %>.
       <% end %>
