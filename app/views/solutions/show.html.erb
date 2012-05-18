@@ -1,25 +1,3 @@
 <h1>Solution for <%= @exercise.name %></h1>
 
-<%= stylesheet_link_tag 'shCore', 'shThemeDefault' %>
-<%= javascript_include_tag 'shCore', 'shBrushJava' %>
-
-<script type="text/javascript">
-$(document).ready(function() {
-  SyntaxHighlighter.all();
-});
-</script>
-
-<% just_one_html_file = (@solution.files.count {|f| f[:html] != nil } == 1) %>
-<% if just_one_html_file %>
-  <%= raw(@solution.files.find {|f| f[:html] != nil }[:html]) %>
-<% end %>
-
-<div class="solution-files">
-  <% for file in @solution.files %>
-    <h2><%= file[:path] %></h2>
-    <% if !just_one_html_file && file[:html] %>
-      <%= raw(file[:html]) %>
-    <% end %>
-    <pre class="brush: java"><%= file[:content] %></pre>
-  <% end %>
-</div>
+<%= render :partial => 'files/files', :locals => {:files => @solution.files} %>

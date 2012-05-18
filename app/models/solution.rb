@@ -4,6 +4,12 @@ class Solution
   def initialize(exercise)
     @exercise = exercise
   end
+
+  attr_reader :exercise
+
+  def path
+    @exercise.solution_path
+  end
   
   def visible_to?(user)
     if user.administrator?
@@ -22,21 +28,6 @@ class Solution
   end
   
   def files
-    return @files if @files
-    
-    @files = []
-    Find.find(@exercise.solution_path) do |path|
-      if File.file?(path) && path.ends_with?('.java')
-        record = {
-          :path => path[(@exercise.solution_path.length + 1)...(path.length)],
-          :content => File.read(path)
-        }
-        if File.exists?("#{path}.html")
-          record[:html] = File.read("#{path}.html")
-        end
-        @files << record
-      end
-    end
-    @files
+    @files ||= SourceFileList.for_solution(self)
   end
 end

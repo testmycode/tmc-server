@@ -1,17 +1,3 @@
 <h1><%= @title %></h1>
 
-<%= stylesheet_link_tag 'shCore', 'shThemeDefault' %>
-<%= javascript_include_tag 'shCore', 'shBrushJava' %>
-
-<script type="text/javascript">
-$(document).ready(function() {
-  SyntaxHighlighter.all();
-});
-</script>
-
-<div class="files">
-  <% for file in @files %>
-    <h2><%= file.path %></h2>
-    <pre class="brush: java"><%= file.contents %></pre>
-  <% end %>
-</div>
+<%= render :partial => 'files/files', :locals => {:files => @files} %>
