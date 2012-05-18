@@ -58,6 +58,7 @@ private
   def should_check_api_version?
     params[:format] == 'json' &&
       controller_name != 'stats' &&
+      controller_name != 'auths' &&
       !(controller_name == 'feedback_answers' && action_name == 'index')
   end
   

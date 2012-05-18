@@ -4,7 +4,9 @@ TmcServer::Application.routes.draw do
 
   match '/signin',  :to => 'sessions#new'
   match '/signout', :to => 'sessions#destroy'
-  
+
+  resource :auth, :only => [:show]
+
   resource :user
   
   resources :participants
