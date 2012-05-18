@@ -70,10 +70,11 @@ EOS
     raw('<div class="link-back">' + link_to('Back', :back) + '</div>')
   end
   
-  
+
+  #TODO: this ought to be rethought
   def breadcrumb
     parts = []
-    
+
     parts << link_to('TMC', root_path)
     
     action = "#{@controller_name}##{@action_name}"
@@ -86,6 +87,10 @@ EOS
         
         if @submission && !@submission.new_record? && @submission.exercise == @exercise
           parts << link_to(raw("Submission #{breadcrumb_resource('#' + @submission.id.to_s)}"), submission_path(@submission))
+
+          if @files
+            parts << link_to("Files", submission_files_path(@submission))
+          end
         elsif @solution
           parts << link_to('Suggested solution', exercise_solution_path(@exercise))
         end
@@ -93,6 +98,10 @@ EOS
       elsif @submission && !@submission.new_record?
         parts << raw("(deleted exercise #{breadcrumb_resource(@submission.exercise_name)})")
         parts << link_to(raw("Submission #{breadcrumb_resource('#' + @submission.id.to_s)}"), submission_path(@submission))
+
+        if @files
+          parts << link_to("Files", submission_files_path(@submission))
+        end
       elsif action == 'submissions#index'
         parts << link_to("Submissions", course_submissions_path(@course))
       elsif action.start_with? 'feedback_questions'

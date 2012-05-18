@@ -45,7 +45,7 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.zip { send_data(@submission.return_file) }
+      format.zip { send_data(@submission.return_file, :filename => @submission.downloadable_file_name) }
       format.json do
         output = {
           :api_version => API_VERSION,

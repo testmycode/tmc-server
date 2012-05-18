@@ -15,26 +15,30 @@
     <% end %>
   </div>
 
-  <% unless @submission.points_list.empty? %>
-    <p>Points awarded: <%= @submission.points_list.join(', ') %></p>
-  <% end %>
-
-  <p>
-    <div>
+  <ul>
+    <% unless @submission.points_list.empty? %>
+      <li>
+        <%= pluralize(@submission.points_list.size, "point") %>
+        awarded: <%= @submission.points_list.join(', ') %></li>
+    <% end %>
+    <li>
       Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
       <% if current_user.administrator? %>
         <%= link_to @submission.user.login, participant_path(@submission.user) %>.
       <% else %>
         <%= @submission.user.login %>.
       <% end %>
-    </div>
+    </li>
     <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
-      <div>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</div>
+      <li>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</li>
     <% end %>
     <% if @submission.times_sent_to_sandbox > 1 %>
-      <div>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</div>
+      <li>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</li>
     <% end %>
-  </p>
+
+    <li><%= link_to "View submitted files", submission_files_path(@submission) %></li>
+    <li><%= link_to "Download as zip", submission_path(@submission, :format => 'zip') %></li>
+  </ul>
 
   <% if !@submission.processed? %>
     <script type="text/javascript">
@@ -75,13 +79,6 @@
       refreshStatus();
     });
     </script>
-  <% end %>
-
-  <% if can? :update, @submission %>
-    <div>
-      <%= button_to 'Rerun submission', submission_path(@submission), :method => :put %>
-      (may add points; never deletes points)
-    </div>
   <% end %>
 </section>
 
@@ -144,11 +141,12 @@ $(document).ready(function() {
 });
 </script>
 
-<h2>Download</h2>
-
-<section class="submission-download-link">
-  <%= link_to "Download #{@submission.downloadable_file_name}", submission_path(@submission, :format => 'zip') %>
-</section>
+<% if can? :update, @submission %>
+  <div>
+    <%= button_to 'Rerun submission', submission_path(@submission), :method => :put %>
+    (may add points; never deletes points)
+  </div>
+<% end %>
 
 <% unless @submission.feedback_answers.empty? %>
   <h2>Feedback</h2>

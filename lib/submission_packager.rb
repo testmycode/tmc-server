@@ -1,10 +1,10 @@
 require 'tmpdir'
 require 'fileutils'
-require 'find'
 require 'pathname'
 require 'shellwords'
 require 'system_commands'
 require 'tmc_junit_runner'
+require 'tmc_dir_utils'
 
 # Takes a submission zip and makes a tar file suitable for the sandbox
 class SubmissionPackager
@@ -24,7 +24,10 @@ class SubmissionPackager
           FileUtils.rm_f ['.DS_Store', 'desktop.ini', 'Thumbs.db', '.directory']
         end
 
-        received = Pathname(find_dir_containing(dir, "src"))
+        src_dir_path = TmcDirUtils.find_dir_containing(dir, "src")
+        raise 'No src directory' if src_dir_path == nil
+        received = Pathname(src_dir_path)
+
         cloned = Pathname(exercise.clone_path)
         dest = Pathname('dest')
 
@@ -61,15 +64,6 @@ class SubmissionPackager
 private
   def tmc_run_path
     "#{::Rails.root}/lib/testrunner/tmc-run"
-  end
-
-  def find_dir_containing(root, to_find)
-    Find.find(root) do |path|
-      next unless FileTest.directory? path
-      next unless FileTest.directory? "#{path}/#{to_find}"
-      return path
-    end
-    return nil
   end
 end
 
