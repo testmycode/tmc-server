@@ -129,7 +129,6 @@ class Submission < ActiveRecord::Base
     for sub in submissions
       ex = by_key[[sub.course_id, sub.exercise_name]]
       sub.exercise = ex
-      #sub.instance_variable_set('@exercise', ex)
     end
   end
 
