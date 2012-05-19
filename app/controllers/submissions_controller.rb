@@ -24,6 +24,8 @@ class SubmissionsController < ApplicationController
         submissions = submissions.order('id DESC')
         remaining = submissions.count
         submissions_limited = submissions.limit(1000).includes(:user)
+        Submission.eager_load_exercises(submissions_limited)
+
         render :json => {
           :remaining => remaining,
           :max_id => params[:max_id].to_i,

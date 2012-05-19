@@ -94,6 +94,7 @@ private
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @submissions = @submissions.limit(max_submissions)
+      Submission.eager_load_exercises(@submissions)
     end
   end
 

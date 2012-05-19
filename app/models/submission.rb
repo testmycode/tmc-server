@@ -3,7 +3,7 @@ class Submission < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
   belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "exercises.course_id = #{self.course_id}" }
+    :conditions => proc { "exercises.course_id = #{self.course_id}" } # TODO: self.course_id not available when doing includes(:exercise))
 
   has_many :test_case_runs, :dependent => :destroy, :order => :id
   has_many :awarded_points, :dependent => :nullify
@@ -116,6 +116,19 @@ class Submission < ActiveRecord::Base
   # How often we try to resend after a sandbox has received but not responded with a result
   def self.processing_resend_interval
     5.minutes
+  end
+
+  # A dirty workaround. See http://stackoverflow.com/questions/10666808/rails-eager-loading-a-belongs-to-with-conditions-refering-to-self
+  def self.eager_load_exercises(submissions)
+    keys = submissions.map {|s| "(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})" }
+    keys.uniq!
+    exercises = Exercise.where('(course_id, name) IN (' + keys.join(',') + ')')
+    by_key = Hash[exercises.map {|e| [[e.course_id, e.name], e] }]
+    for sub in submissions
+      ex = by_key[[sub.course_id, sub.exercise_name]]
+      sub.exercise = ex
+      #sub.instance_variable_set('@exercise', ex)
+    end
   end
 
 private
