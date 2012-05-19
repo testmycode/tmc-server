@@ -122,6 +122,8 @@ class Submission < ActiveRecord::Base
   def self.eager_load_exercises(submissions)
     keys = submissions.map {|s| "(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})" }
     keys.uniq!
+    return if keys.empty?
+    
     exercises = Exercise.where('(course_id, name) IN (' + keys.join(',') + ')')
     by_key = Hash[exercises.map {|e| [[e.course_id, e.name], e] }]
     for sub in submissions
