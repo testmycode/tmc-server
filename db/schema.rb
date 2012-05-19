@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120508093025) do
+ActiveRecord::Schema.define(:version => 20120519162832) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -57,8 +57,8 @@ ActiveRecord::Schema.define(:version => 20120508093025) do
     t.datetime "solution_visible_after"
   end
 
+  add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name"
   add_index "exercises", ["gdocs_sheet"], :name => "index_exercises_on_gdocs_sheet"
-  add_index "exercises", ["name"], :name => "index_exercises_on_name"
 
   create_table "feedback_answers", :force => true do |t|
     t.integer  "feedback_question_id", :null => false
