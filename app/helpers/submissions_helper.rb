@@ -26,10 +26,20 @@ module SubmissionsHelper
       [
         sub.created_at.strftime("%Y-%m-%d %H:%M"),
         user_col,
-        link_to(sub.downloadable_file_name, "#{submission_path(sub)}.zip"),
+        link_to_submission_exericse(sub),
         submission_status(sub),
+        link_to('Files', submission_files_path(sub)),
         link_to('Details', submission_path(sub))
       ]
+    end
+  end
+
+  def link_to_submission_exericse(submission, text = nil, missing_text = '')
+    if submission.exercise
+      text = submission.exercise.name if text == nil
+      link_to text, exercise_path(submission.exercise)
+    else
+      missing_text
     end
   end
 end

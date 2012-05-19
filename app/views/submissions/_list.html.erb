@@ -4,8 +4,9 @@
     <tr>
       <th>Time</th>
       <th>Student</th>
-      <th>Returned file</th>
+      <th>Exercise</th>
       <th>Status</th>
+      <th></th>
       <th></th>
     </tr>
   </thead>
@@ -21,10 +22,13 @@
           <% end %>
         </td>
         <td>
-          <%= link_to(submission.downloadable_file_name, "#{submission_path(submission)}.zip") %> 
+          <%= link_to_submission_exericse(submission) %>
         </td>
         <td>
           <%= submission_status(submission) %>
+        </td>
+        <td>
+          <%= link_to 'Files', submission_files_path(submission) %>
         </td>
         <td>
           <%= link_to 'Details', submission_path(submission)  %>
