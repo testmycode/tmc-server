@@ -1,3 +1,7 @@
 <h1><%= @title %></h1>
 
+<ul>
+  <li>Download as <%= link_to @submission.downloadable_file_name, submission_path(@submission) %></li>
+</ul>
+
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
