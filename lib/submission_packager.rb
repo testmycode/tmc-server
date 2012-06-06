@@ -40,7 +40,10 @@ class SubmissionPackager
         FileUtils.cp_r(received + 'src', dest + 'src')
         FileUtils.cp_r(cloned  + 'test', dest + 'test')
 
-        FileUtils.cp(cloned  + '.tmcrc', dest + '.tmcrc') if (cloned + '.tmcrc').file?
+        cloned.children(false).each do |filename|
+          filename = filename.to_s
+          FileUtils.cp(cloned + filename, dest + filename) unless (cloned + filename).directory?
+        end
 
         tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
         tmc_project_file.extra_student_files.each do |rel_path|

@@ -165,6 +165,28 @@ describe SubmissionPackager do
       end
     end
   end
+
+  it "should include files in the root dir from the repo" do
+    @repo.write_file('SimpleExercise/foo.txt', 'repohello')
+    @repo.add_commit_push
+    @course.refresh
+
+    @exercise_project.solve_all
+    File.open("#{@exercise_project.path}/foo.txt", 'w') do |f|
+      f.write("submissionhello")
+    end
+    @exercise_project.make_zip(:src_only => true)
+
+    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.should exist('foo.txt')
+        File.read('foo.txt').should == "repohello"
+      end
+    end
+  end
   
   describe "tmc-run script added to the archive" do
     it "should compile and run the submission" do
