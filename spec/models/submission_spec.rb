@@ -82,5 +82,31 @@ describe Submission do
 
     Submission.to_be_reprocessed.map(&:id).should == expected_order.map(&:id)
   end
+
+  it "stores stdout and stderr compressed" do
+    s = Factory.create(:submission)
+    s.stdout = "hello"
+    s.stdout_compressed.should_not be_empty
+    s.stderr = "world"
+    s.stderr_compressed.should_not be_empty
+    s.save!
+
+    s = Submission.find(s.id)
+    s.stdout.should == "hello"
+    s.stderr.should == "world"
+  end
+
+  it "can have null stdout and stderr" do
+    s = Factory.create(:submission)
+    s.stdout = "hello"
+    s.stdout_compressed.should_not be_empty
+    s.stderr = "world"
+    s.stderr_compressed.should_not be_empty
+    s.stdout = nil
+    s.stdout.should be_nil
+    s.stderr = nil
+    s.stderr.should be_nil
+    s.save!
+  end
 end
 

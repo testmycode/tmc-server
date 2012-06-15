@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120519162832) do
+ActiveRecord::Schema.define(:version => 20120615225538) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -135,6 +135,8 @@ ActiveRecord::Schema.define(:version => 20120519162832) do
     t.integer  "times_sent_to_sandbox",          :default => 0,     :null => false
     t.datetime "processing_attempts_started_at"
     t.integer  "processing_priority",            :default => 0,     :null => false
+    t.binary   "stdout_compressed"
+    t.binary   "stderr_compressed"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"

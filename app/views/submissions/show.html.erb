@@ -126,6 +126,24 @@
   <% end %>
 </section>
 
+<% if !@submission.stdout.blank? || !@submission.stderr.blank? %>
+  <h2>Output</h2>
+  <section>
+    <p>The following was output while running the tests.</p>
+    <% if !@submission.stdout.blank? %>
+      <% if @submission.stderr.blank? %>
+        <h3>Standard output (System.out)</h3>
+      <% end %>
+      <pre><%= @submission.stdout %></pre>
+    <% end %>
+
+    <% if !@submission.stderr.blank? %>
+      <h3>Error output (System.err)</h3>
+      <pre><%= @submission.stderr %></pre>
+    <% end %>
+  </section>
+<% end %>
+
 <script type="text/javascript">
 $(document).ready(function() {
   $('.stack-trace').each(function() {

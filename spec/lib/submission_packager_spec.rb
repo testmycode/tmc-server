@@ -199,25 +199,25 @@ describe SubmissionPackager do
         Dir.chdir(dir) do
           sh! ['tar', 'xf', @tar_path]
           File.should_not exist('classes/main/SimpleStuff.class')
-          File.should_not exist('output.txt')
+          File.should_not exist('test_output.txt')
           
           begin
             sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
           rescue
-            if File.exist?('output.txt')
-              raise($!.message + "\n" + "The contents of output.txt:\n" + File.read('output.txt'))
+            if File.exist?('test_output.txt')
+              raise($!.message + "\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
             else
               raise
             end
           end
           
           File.should exist('classes/main/SimpleStuff.class')
-          File.should exist('output.txt')
+          File.should exist('test_output.txt')
         end
       end
     end
     
-    it "should report compilation errors in output.txt with exit code 101" do
+    it "should report compilation errors in test_output.txt with exit code 101" do
       @exercise_project.introduce_compilation_error
       @exercise_project.make_zip(:src_only => false)
       
@@ -227,12 +227,12 @@ describe SubmissionPackager do
         Dir.chdir(dir) do
           sh! ['tar', 'xf', @tar_path]
           File.should_not exist('classes/main/SimpleStuff.class')
-          File.should_not exist('output.txt')
+          File.should_not exist('test_output.txt')
           `env JAVA_RAM_KB=#{64*1024} ./tmc-run`
           $?.exitstatus.should == 101
-          File.should exist('output.txt')
+          File.should exist('test_output.txt')
           
-          output = File.read('output.txt')
+          output = File.read('test_output.txt')
           output.should include('compiler should fail here')
         end
       end
@@ -255,8 +255,8 @@ describe SubmissionPackager do
           begin
             sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
           rescue
-            if File.exist?('output.txt')
-              raise($!.message + "\n" + "The contents of output.txt:\n" + File.read('output.txt'))
+            if File.exist?('test_output.txt')
+              raise($!.message + "\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
             else
               raise
             end

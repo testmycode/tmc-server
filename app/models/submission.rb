@@ -1,3 +1,4 @@
+require 'zlib'
 
 class Submission < ActiveRecord::Base
   belongs_to :user
@@ -87,6 +88,42 @@ class Submission < ActiveRecord::Base
         :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end
       }
     end
+  end
+
+  def stdout
+    @stdout ||=
+      if stdout_compressed != nil
+        Zlib::Inflate.inflate(stdout_compressed)
+      else
+        nil
+      end
+  end
+
+  def stdout=(value)
+    if value != nil
+      self.stdout_compressed = Zlib::Deflate.deflate(value)
+    else
+      self.stdout_compressed = nil
+    end
+    @stdout = value
+  end
+
+  def stderr
+    @stderr ||=
+      if stderr_compressed != nil
+        Zlib::Inflate.inflate(stderr_compressed)
+      else
+        nil
+      end
+  end
+
+  def stderr=(value)
+    if value != nil
+      self.stderr_compressed = Zlib::Deflate.deflate(value)
+    else
+      self.stderr_compressed = nil
+    end
+    @stderr = value
   end
 
   def set_to_be_reprocessed!(priority = -1)

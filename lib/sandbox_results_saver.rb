@@ -10,6 +10,9 @@ module SandboxResultsSaver
       submission.all_tests_passed = false
       submission.pretest_error = nil
 
+      submission.stdout = results['stdout']
+      submission.stderr = results['stderr']
+
       case results['status']
       when 'timeout'
         submission.pretest_error = 'Timed out. Check your program for infinite loops.'
@@ -17,16 +20,27 @@ module SandboxResultsSaver
         submission.pretest_error =
           case results['exit_code']
           when '101'
-            "Compilation error:\n" + results['output']
+            "Compilation error:\n" + results['test_output']
           when '102'
-            "Test compilation error:\n" + results['output']
+            "Test compilation error:\n" + results['test_output']
           when '137'
             'Program was forcibly terminated most likely due to using too much time or memory.'
           else
             'Running the submission failed. Exit code: ' + results['exit_code']
           end
       when 'finished'
-        TestRunGrader.grade_results(submission, ActiveSupport::JSON.decode(results['output']))
+        begin
+          decoded_output = ActiveSupport::JSON.decode(results['test_output'])
+        rescue # Most likely because results['output'] was empty
+          submission.pretest_error =
+            if results['stderr'].include?("java.lang.OutOfMemoryError")
+              'Out of memory.'
+            else
+              'Unknown error while running tests.'
+            end
+        else
+          TestRunGrader.grade_results(submission, decoded_output)
+        end
       else
         raise 'Unknown status: ' + results['status']
       end

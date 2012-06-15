@@ -4,14 +4,14 @@
 # Compile project
 mkdir -p classes/main
 mkdir -p classes/test
-find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp lib/*:src/ > output.txt 2>&1 || exit 101
-find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:classes/main:test/ > output.txt 2>&1 || exit 102
+find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp lib/*:src/ > test_output.txt 2>&1 || exit 101
+find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:classes/main:test/ > test_output.txt 2>&1 || exit 102
 
 CLASSPATH="lib/testrunner/*:lib/*:classes/main/:classes/test/"
 
 # Discover tests
-java -cp "$CLASSPATH" "fi.helsinki.cs.tmc.testscanner.TestScanner" --test-runner-format test > tests.txt 2> output.txt || exit 103
-rm -f output.txt
+java -cp "$CLASSPATH" "fi.helsinki.cs.tmc.testscanner.TestScanner" --test-runner-format test > tests.txt 2> test_output.txt || exit 103
+rm -f test_output.txt
 
 TESTS=`cat tests.txt`
 
@@ -26,7 +26,7 @@ DEFS="
   -Dtmc.src_class_dir=`pwd`/classes/main 
   -Dtmc.test_class_dir=`pwd`/classes/test
   -Dtmc.lib_dir=`pwd`/lib
-  -Dtmc.results_file=`pwd`/output.txt"
+  -Dtmc.results_file=`pwd`/test_output.txt"
 
 # An explicit memory limit below the sandbox memory limit has been found to avoid
 # very long processing times and the occasional OOM killer.
@@ -34,7 +34,6 @@ DEFS="
 TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
 JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
 
-java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS
+java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
 
 exit 0
-
