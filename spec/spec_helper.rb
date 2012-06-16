@@ -14,6 +14,12 @@ Dir[Rails.root.join("lib/**/*.rb")].each {|f| require f}
 Capybara.default_driver = :webkit
 Capybara.server_port = FreePorts.take_next
 
+def without_db_notices(&block)
+  ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
+  block.call
+  ActiveRecord::Base.connection.execute("SET client_min_messages = 'notice'")
+end
+
 RSpec.configure do |config|
   config.mock_with :rspec
 
@@ -34,7 +40,9 @@ RSpec.configure do |config|
   end
 
   config.after :each do
-    DatabaseCleaner.clean
+    without_db_notices do # Supporess postgres notice about truncation cascade
+      DatabaseCleaner.clean
+    end
   end
 
   # Override with rspec --tag ~integration --tag gdocs spec
@@ -44,5 +52,6 @@ end
 # Ensure the DB is clean
 DatabaseCleaner.strategy = :truncation
 DatabaseCleaner.start
-DatabaseCleaner.clean
-
+without_db_notices do
+  DatabaseCleaner.clean
+end
