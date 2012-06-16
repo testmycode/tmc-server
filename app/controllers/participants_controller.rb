@@ -49,6 +49,9 @@ class ParticipantsController < ApplicationController
         @percent_completed[course_id] = 0
       end
     end
+
+    @submissions = @user.submissions.order('id DESC').includes(:user)
+    Submission.eager_load_exercises(@submissions)
   end
   
   def destroy

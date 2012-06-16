@@ -36,7 +36,7 @@
         </td>
         <% if show_awarded_points %>
           <td>
-            <%= points_list(submission.awarded_points.order('name ASC').map(&:name)) %>
+            <%= points_list(submission.awarded_points.map(&:name).sort) %>
           </td>
         <% end %>
         <td>
