@@ -1,4 +1,14 @@
 module SubmissionsHelper
+  def show_submission_list(submissions, options = {})
+    locals = {
+      :submissions => submissions,
+      :invoke_datatables => true,
+      :show_exercise_column => true,
+      :show_awarded_points => false
+    }.merge(options)
+    render :partial => 'submissions/list', :locals => locals
+  end
+
   def submission_status(submission)
     status = submission.status
     raw("<span class=\"#{status}\">#{status.to_s.capitalize}</span>")

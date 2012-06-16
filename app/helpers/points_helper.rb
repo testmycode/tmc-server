@@ -17,4 +17,8 @@ module PointsHelper
     ret += "</ul></span>"
     return ret
   end
+
+  def points_list(points)
+    points.map {|pt| h(pt) }.join('&nbsp; ').html_safe
+  end
 end

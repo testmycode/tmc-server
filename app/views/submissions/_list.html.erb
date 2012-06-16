@@ -4,8 +4,13 @@
     <tr>
       <th>Time</th>
       <th>Student</th>
-      <th>Exercise</th>
+      <% if show_exercise_column %>
+        <th>Exercise</th>
+      <% end %>
       <th>Status</th>
+      <% if show_awarded_points %>
+        <th>Points</th>
+      <% end %>
       <th></th>
       <th></th>
     </tr>
@@ -21,12 +26,19 @@
             <%= submission.user.login %>
           <% end %>
         </td>
-        <td>
-          <%= link_to_submission_exericse(submission) %>
-        </td>
+        <% if show_exercise_column %>
+          <td>
+            <%= link_to_submission_exericse(submission) %>
+          </td>
+        <% end %>
         <td>
           <%= submission_status(submission) %>
         </td>
+        <% if show_awarded_points %>
+          <td>
+            <%= points_list(submission.awarded_points.order('name ASC').map(&:name)) %>
+          </td>
+        <% end %>
         <td>
           <%= link_to 'Files', submission_files_path(submission) %>
         </td>

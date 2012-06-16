@@ -3,7 +3,7 @@
 
 <p id="loading">Loading...</p>
 
-<%= render :partial => 'submissions/list', :locals => { :submissions => [], :invoke_datatables => false } %>
+<%= show_submission_list([], :invoke_datatables => false) %>
 
 <script type="text/javascript">
   $(document).ready(function() {

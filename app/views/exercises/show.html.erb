@@ -34,12 +34,7 @@
 
   <section>
     <% if !@submissions.empty? %>
-      <%=
-        render :partial => 'submissions/list', :locals => {
-          :submissions => @submissions,
-          :invoke_datatables => true
-        }
-      %>
+      <%= show_submission_list(@submissions, :show_exercise_column => false, :show_awarded_points => true) %>
     <% else %>
       <p>No submissions yet.</p>
     <% end %>
