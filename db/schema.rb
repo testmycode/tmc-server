@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120616095759) do
+ActiveRecord::Schema.define(:version => 20120616103525) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -117,9 +117,15 @@ ActiveRecord::Schema.define(:version => 20120616095759) do
   add_index "student_events", ["user_id", "course_id", "exercise_name", "event_type", "happened_at"], :name => "index_student_events_user_course_exercise_type_time"
   add_index "student_events", ["user_id", "event_type", "happened_at"], :name => "index_student_events_user_type_time"
 
+  create_table "submission_data", :id => false, :force => true do |t|
+    t.integer "submission_id",     :null => false
+    t.binary  "return_file"
+    t.binary  "stdout_compressed"
+    t.binary  "stderr_compressed"
+  end
+
   create_table "submissions", :force => true do |t|
     t.integer  "user_id"
-    t.binary   "return_file"
     t.text     "pretest_error"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -135,8 +141,6 @@ ActiveRecord::Schema.define(:version => 20120616095759) do
     t.integer  "times_sent_to_sandbox",          :default => 0,     :null => false
     t.datetime "processing_attempts_started_at"
     t.integer  "processing_priority",            :default => 0,     :null => false
-    t.binary   "stdout_compressed"
-    t.binary   "stderr_compressed"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
@@ -183,6 +187,8 @@ ActiveRecord::Schema.define(:version => 20120616095759) do
     t.boolean  "administrator", :default => false, :null => false
     t.text     "email",         :default => "",    :null => false
   end
+
+  add_foreign_key "submission_data", "submissions", :name => "submission_data_submission_id_fk", :dependent => :delete
 
   set_table_comment 'awarded_points', 'Stores points awarded to a user in a particular course. Each point is stored only once per user/course and each row refers to the first submission that awarded the point.'
 

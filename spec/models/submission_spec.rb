@@ -86,9 +86,9 @@ describe Submission do
   it "stores stdout and stderr compressed" do
     s = Factory.create(:submission)
     s.stdout = "hello"
-    s.stdout_compressed.should_not be_empty
+    s.submission_data.stdout_compressed.should_not be_empty
     s.stderr = "world"
-    s.stderr_compressed.should_not be_empty
+    s.submission_data.stderr_compressed.should_not be_empty
     s.save!
 
     s = Submission.find(s.id)
@@ -99,14 +99,24 @@ describe Submission do
   it "can have null stdout and stderr" do
     s = Factory.create(:submission)
     s.stdout = "hello"
-    s.stdout_compressed.should_not be_empty
     s.stderr = "world"
-    s.stderr_compressed.should_not be_empty
     s.stdout = nil
     s.stdout.should be_nil
+    s.submission_data.stdout_compressed.should be_nil
     s.stderr = nil
     s.stderr.should be_nil
+    s.submission_data.stderr_compressed.should be_nil
     s.save!
+  end
+
+  it "deletes submission data when destroyed" do
+    s = Factory.create(:submission)
+    s.stdout = "hello"
+    s.save!
+
+    id = s.id
+    s.destroy
+    SubmissionData.find_by_submission_id(id).should be_nil
   end
 end
 

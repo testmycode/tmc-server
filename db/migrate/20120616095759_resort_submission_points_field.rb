@@ -2,11 +2,14 @@ require 'natcmp'
 
 class ResortSubmissionPointsField < ActiveRecord::Migration
   def up
-    # find_each loads stuff in batches and allows the GC to work better
-    # When I tried loading them all to memory at once (.each),
-    # the GC hung for a very long time afterwards.
-    Submission.select([:id, :points]).find_each do |s|
-      s.update_attribute(:points, s.points_list.sort {|a, b| Natcmp.natcmp(a, b) }.join(' '))
+    result = execute("SELECT id, points FROM submissions")
+    result.each do |row|
+      id = row['id']
+      points = row['points']
+      if points != nil && points.include?(' ')
+        new_points = points.to_s.split(' ').sort {|a, b| Natcmp.natcmp(a, b) }.join(' ')
+        execute("UPDATE submissions SET points = #{connection.quote(new_points)} WHERE id = #{id.to_i}")
+      end
     end
   end
 

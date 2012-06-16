@@ -6,6 +6,9 @@ class Submission < ActiveRecord::Base
   belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "exercises.course_id = #{self.course_id}" } # TODO: self.course_id not available when doing includes(:exercise))
 
+  has_one :submission_data, :dependent => :delete # no destructor, can use delete
+  after_save { submission_data.save! if submission_data }
+
   has_many :test_case_runs, :dependent => :destroy, :order => :id
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
@@ -15,7 +18,7 @@ class Submission < ActiveRecord::Base
   validates :exercise_name, :presence => true
 
   before_create :set_processing_attempts_started_at
-  
+
   def self.to_be_reprocessed
     self.unprocessed.
       where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval).
@@ -90,40 +93,27 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def return_file
+    submission_data.return_file
+  end
+  def return_file=(value)
+    build_submission_data if !submission_data
+    submission_data.return_file = value
+  end
+
   def stdout
-    @stdout ||=
-      if stdout_compressed != nil
-        Zlib::Inflate.inflate(stdout_compressed)
-      else
-        nil
-      end
+    submission_data.stdout
   end
-
   def stdout=(value)
-    if value != nil
-      self.stdout_compressed = Zlib::Deflate.deflate(value)
-    else
-      self.stdout_compressed = nil
-    end
-    @stdout = value
+    build_submission_data if !submission_data
+    submission_data.stdout = value
   end
-
   def stderr
-    @stderr ||=
-      if stderr_compressed != nil
-        Zlib::Inflate.inflate(stderr_compressed)
-      else
-        nil
-      end
+    submission_data.stderr
   end
-
   def stderr=(value)
-    if value != nil
-      self.stderr_compressed = Zlib::Deflate.deflate(value)
-    else
-      self.stderr_compressed = nil
-    end
-    @stderr = value
+    build_submission_data if !submission_data
+    submission_data.stderr = value
   end
 
   def set_to_be_reprocessed!(priority = -1)
