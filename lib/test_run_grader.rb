@@ -1,3 +1,4 @@
+require 'point_comparison'
 
 #
 # Stores test run results in the database.
@@ -55,7 +56,7 @@ private
         )
       end
     end
-    
+
     submission.points = all_points.join(" ") unless all_points.empty?
   end
 
@@ -69,7 +70,8 @@ private
       end
     end
 
-    point_status.keys.select {|name| point_status[name] == true }.sort
+    point_names = point_status.keys.select {|name| point_status[name] == true }
+    PointComparison.sort_point_names(point_names)
   end
   
   def self.to_json_or_null(obj)
