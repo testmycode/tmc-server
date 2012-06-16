@@ -45,16 +45,18 @@ describe StudentEventsController do
     response.should be_successful
 
     StudentEvent.count.should == 2
+
+    events = StudentEvent.order('happened_at').all
+
+    events.first.course_id.should == @course.id
+    events.first.exercise_name.should == @exercise.name
     
-    StudentEvent.first.course_id.should == @course.id
-    StudentEvent.first.exercise_name.should == @exercise.name
+    events.first.event_type.should == 'code_snapshot'
+    events.first.data.should == 'foobar'
+    events.first.happened_at.should == Time.parse('2012-02-02 02:02')
     
-    StudentEvent.first.event_type.should == 'code_snapshot'
-    StudentEvent.first.data.should == 'foobar'
-    StudentEvent.first.happened_at.should == Time.parse('2012-02-02 02:02')
-    
-    StudentEvent.last.event_type.should == 'code_snapshot'
-    StudentEvent.last.data.should == 'barfooxoo'
-    StudentEvent.last.happened_at.should == Time.parse('2013-03-03 03:03')
+    events.last.event_type.should == 'code_snapshot'
+    events.last.data.should == 'barfooxoo'
+    events.last.happened_at.should == Time.parse('2013-03-03 03:03')
   end
 end
