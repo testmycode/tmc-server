@@ -2,7 +2,7 @@ class FeedbackQuestion < ActiveRecord::Base
   include Orderable
 
   belongs_to :course
-  has_many :feedback_answers, :dependent => :destroy
+  has_many :feedback_answers, :dependent => :delete_all
   
   validates :course, :presence => true
   validates :kind, :presence => true do validate_kind end

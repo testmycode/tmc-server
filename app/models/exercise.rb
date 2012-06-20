@@ -5,7 +5,7 @@ class Exercise < ActiveRecord::Base
 
   belongs_to :course
 
-  has_many :available_points, :dependent => :destroy
+  has_many :available_points, :dependent => :delete_all
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "submissions.course_id = #{self.course_id}" }
   has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,

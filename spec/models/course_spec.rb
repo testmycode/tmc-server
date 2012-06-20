@@ -108,15 +108,6 @@ describe Course do
     c.hide_after.min.should == 59
   end
 
-  it "should delete its cache directory when destroyed" do
-    c = Course.create!(:name => 'MyCourse', :source_url => source_url)
-    FileUtils.mkdir_p(c.cache_path)
-    FileUtils.touch("#{c.cache_path}/foo.txt")
-
-    c.destroy
-    File.should_not exist(c.cache_path)
-  end
-
 
   describe "validation" do
     let(:valid_params) do
@@ -150,6 +141,65 @@ describe Course do
 
     def should_be_invalid_params(params)
       expect { Course.create!(params) }.to raise_error
+    end
+  end
+
+  describe "destruction" do
+    it "deletes its cache directory" do
+      c = Course.create!(:name => 'MyCourse', :source_url => source_url)
+      FileUtils.mkdir_p(c.cache_path)
+      FileUtils.touch("#{c.cache_path}/foo.txt")
+
+      c.destroy
+      File.should_not exist(c.cache_path)
+    end
+
+    it "deletes dependent exercises" do
+      ex = Factory.create(:exercise)
+      ex.course.destroy
+      assert_destroyed(ex)
+    end
+
+    it "deletes dependent submissions" do
+      sub = Factory.create(:submission)
+      sub.course.destroy
+      assert_destroyed(sub)
+    end
+
+    it "deletes dependent feedback questions and answers" do
+      a = Factory.create(:feedback_answer)
+      q = a.feedback_question
+      q.course.destroy
+      assert_destroyed(a)
+      assert_destroyed(q)
+    end
+
+    it "deletes available points" do
+      pt = Factory.create(:available_point)
+      pt.course.destroy
+      assert_destroyed(pt)
+    end
+
+    it "deletes awarded points" do
+      pt = Factory.create(:awarded_point)
+      pt.course.destroy
+      assert_destroyed(pt)
+    end
+
+    it "deletes student events" do
+      ev = Factory.create(:student_event)
+      ev.course.destroy
+      assert_destroyed(ev)
+    end
+
+    it "deletes test scanner cache entries" do
+      ent = Factory.create(:test_scanner_cache_entry)
+      ent.course.destroy
+      assert_destroyed(ent)
+    end
+
+    def assert_destroyed(obj)
+      obj.class.find_by_id(obj.id).should be_nil
     end
   end
 

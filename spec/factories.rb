@@ -68,4 +68,18 @@ FactoryGirl.define do
     submission
     sequence(:answer) {|n| "feedback answer #{n}" }
   end
+
+  factory :student_event do
+    user
+    course
+    exercise
+    event_type "test_event"
+    sequence(:data) {|n| "testdata#{n}" }
+    happened_at {|| Time.now }
+    after_build {|ev| ev.exercise.course = ev.course }
+  end
+
+  factory :test_scanner_cache_entry do
+    course
+  end
 end

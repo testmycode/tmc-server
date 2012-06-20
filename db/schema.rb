@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120616103525) do
+ActiveRecord::Schema.define(:version => 20120620134550) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -188,7 +188,34 @@ ActiveRecord::Schema.define(:version => 20120616103525) do
     t.text     "email",         :default => "",    :null => false
   end
 
+  add_foreign_key "available_points", "exercises", :name => "available_points_exercise_id_fk", :dependent => :delete
+
+  add_foreign_key "awarded_points", "courses", :name => "awarded_points_course_id_fk", :dependent => :delete
+  add_foreign_key "awarded_points", "submissions", :name => "awarded_points_submission_id_fk", :dependent => :nullify
+  add_foreign_key "awarded_points", "users", :name => "awarded_points_user_id_fk", :dependent => :delete
+
+  add_foreign_key "exercises", "courses", :name => "exercises_course_id_fk", :dependent => :delete
+
+  add_foreign_key "feedback_answers", "feedback_questions", :name => "feedback_answers_feedback_question_id_fk", :dependent => :delete
+  add_foreign_key "feedback_answers", "submissions", :name => "feedback_answers_submission_id_fk", :dependent => :nullify
+
+  add_foreign_key "feedback_questions", "courses", :name => "feedback_questions_course_id_fk", :dependent => :delete
+
+  add_foreign_key "password_reset_keys", "users", :name => "password_reset_keys_user_id_fk", :dependent => :delete
+
+  add_foreign_key "student_events", "courses", :name => "student_events_course_id_fk", :dependent => :delete
+  add_foreign_key "student_events", "users", :name => "student_events_user_id_fk", :dependent => :delete
+
   add_foreign_key "submission_data", "submissions", :name => "submission_data_submission_id_fk", :dependent => :delete
+
+  add_foreign_key "submissions", "courses", :name => "submissions_course_id_fk", :dependent => :delete
+  add_foreign_key "submissions", "users", :name => "submissions_user_id_fk", :dependent => :delete
+
+  add_foreign_key "test_case_runs", "submissions", :name => "test_case_runs_submission_id_fk", :dependent => :delete
+
+  add_foreign_key "test_scanner_cache_entries", "courses", :name => "test_scanner_cache_entries_course_id_fk", :dependent => :delete
+
+  add_foreign_key "user_field_values", "users", :name => "user_field_values_user_id_fk", :dependent => :delete
 
   set_table_comment 'awarded_points', 'Stores points awarded to a user in a particular course. Each point is stored only once per user/course and each row refers to the first submission that awarded the point.'
 

@@ -1,11 +1,11 @@
 class User < ActiveRecord::Base
   include Comparable
 
-  has_many :submissions, :dependent => :destroy
-  has_many :awarded_points, :dependent => :destroy
-  has_one :password_reset_key, :dependent => :destroy
-  has_many :user_field_values, :dependent => :destroy, :autosave => true
-  has_many :student_events, :dependent => :destroy
+  has_many :submissions, :dependent => :delete_all
+  has_many :awarded_points, :dependent => :delete_all
+  has_one :password_reset_key, :dependent => :delete
+  has_many :user_field_values, :dependent => :delete_all, :autosave => true
+  has_many :student_events, :dependent => :delete_all
 
   validates :login, :presence     => true,
                     :uniqueness   => true,

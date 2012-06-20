@@ -21,16 +21,25 @@ class Course < ActiveRecord::Base
   validate :check_source_backend
   after_initialize :set_default_source_backend
 
-  has_many :exercises, :dependent => :destroy
-  has_many :submissions, :dependent => :destroy
+  has_many :exercises, :dependent => :delete_all
+  has_many :submissions, :dependent => :delete_all
   has_many :available_points, :through => :exercises
-  has_many :awarded_points, :dependent => :destroy
-  has_many :test_scanner_cache_entries, :dependent => :destroy
-  has_many :feedback_questions, :dependent => :destroy
+  has_many :awarded_points, :dependent => :delete_all
+  has_many :test_scanner_cache_entries, :dependent => :delete_all
+  has_many :feedback_questions, :dependent => :delete_all
   has_many :feedback_answers  # destroyed transitively when questions are destroyed
-  has_many :student_events, :dependent => :destroy
+  has_many :student_events, :dependent => :delete_all
 
-  after_destroy :delete_cache
+  def destroy
+    # Optimization: delete dependent objects quickly.
+    # Rails' :dependent => :delete_all is very slow.
+    # Even self.association.delete_all first does a SELECT.
+    # This relies on the database to cascade deletes.
+    self.connection.execute("DELETE FROM courses WHERE id = #{self.id}")
+
+    # Delete cache.
+    delete_cache # Would be an after_destroy callback normally
+  end
 
   scope :ongoing, lambda { where(["hide_after IS NULL OR hide_after > ?", Time.now]) }
   scope :expired, lambda { where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now]) }
@@ -131,7 +140,7 @@ class Course < ActiveRecord::Base
   def self.default_source_backend
     'git'
   end
-  
+
   
 private
   def check_source_backend
