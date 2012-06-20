@@ -25,6 +25,8 @@ module SandboxResultsSaver
             "Test compilation error:\n" + results['test_output']
           when '137'
             'Program was forcibly terminated most likely due to using too much time or memory.'
+          when nil
+            "Running the submission failed."
           else
             'Running the submission failed. Exit code: ' + results['exit_code']
           end
