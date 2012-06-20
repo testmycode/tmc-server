@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+root_dir = File.expand_path('../', File.dirname(__FILE__))
+require root_dir + '/config/environment'
+require 'fileutils'
+
+if ![1, 2].include?(ARGV.length) || ['-h', '--help'].include?(ARGV[0])
+  puts "Usage: script/export_submissions dest_dir [course_name]"
+  puts
+  exit(false)
+end
+
+dest_dir = ARGV[0]
+
+def write_file(filename, data)
+  File.open(filename, 'wb') {|f| f.write(data) }
+end
+
+query = Submission.order(:id)
+if ARGV[1]
+  begin
+    course = Course.find_by_name!(ARGV[1])
+  rescue
+    puts "Couldn't find course: #{ARGV[1]}"
+    exit(false)
+  end
+  query = query.where(:course_id => course.id)
+end
+
+total = query.count
+
+if total == 0
+  puts "0 submissions found"
+  exit(true)
+end
+
+i = 1
+query.each do |sub|
+  dest_file = "#{dest_dir}/#{sub.id}.zip"
+  puts "Exporting submission id=#{sub.id}  (#{i}/#{total})"
+  write_file(dest_file, sub.return_file)
+  i += 1
+end
