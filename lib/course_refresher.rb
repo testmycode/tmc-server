@@ -117,11 +117,15 @@ private
     def update_course_options
       options_file = "#{@course.clone_path}/course_options.yml"
 
+      opts = Course.default_options
+
       if FileTest.exists? options_file
-        @course.options = Course.default_options.merge(YAML.load_file(options_file))
-      else
-        @course.options = Course.default_options
+        yaml_data = YAML.load_file(options_file)
+        if yaml_data.is_a?(Hash)
+          opts = opts.merge(YAML.load_file(options_file))
+        end
       end
+      @course.options = opts
     end
     
     def exercise_dirs

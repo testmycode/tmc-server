@@ -89,10 +89,14 @@ describe CourseRefresher do
     @course.spreadsheet_key.should == 'qwerty'
   end
 
-  it "should fail if the course metadata file cannot be parsed" do
-    change_course_metadata_file('xooxer', :raw => true)
+  it "should work with an empty course metadata file" do
+    change_course_metadata_file "", :raw => true
+    @refresher.refresh_course(@course)
+    @course.hide_after.should == nil
 
-    expect { @refresher.refresh_course(@course) }.to raise_error
+    change_course_metadata_file "---", :raw => true
+    @refresher.refresh_course(@course)
+    @course.hide_after.should == nil
   end
 
   it "should load exercise metadata with defaults from superdirs" do
