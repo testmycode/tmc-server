@@ -1,3 +1,5 @@
+require 'version'
+
 class ApplicationController < ActionController::Base
   API_VERSION = 4 # To be incremented on BC-breaking changes
   
@@ -51,6 +53,34 @@ private
         respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
       elsif params[:api_version] != API_VERSION.to_s
         respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
+      end
+
+      if !params[:client].blank? # Client and client version checks are optional
+        begin
+          check_client_version(params[:client], params[:client_version])
+        rescue
+          return respond_with_error($!.message, 404, :obsolete_client => true)
+        end
+      end
+    end
+  end
+
+  def check_client_version(client_name, client_version)
+    begin
+      client_version = Version.new(client_version) if client_version != nil
+    rescue
+      raise "Invalid version string: #{client_version}"
+    end
+
+    valid_clients = SiteSetting.value('valid_clients')
+    if valid_clients.is_a?(Enumerable)
+      vc = valid_clients.find {|c| c['name'] == client_name }
+      raise "Invalid TMC client." if vc == nil
+
+      if client_version != nil && !vc['min_version'].blank?
+        raise "Please update the TMC client." if client_version < Version.new(vc['min_version'])
+      else
+        return # without version check
       end
     end
   end

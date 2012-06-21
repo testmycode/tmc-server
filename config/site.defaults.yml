@@ -70,3 +70,14 @@ show_model_solutions_when_exercise_completed: true
 
 # Whether to show the model solution when the exercise has expired.
 show_model_solutions_when_exercise_expired: false
+
+### IDE integration ###
+
+# A list of valid clients. Leave empty to not check.
+#
+# IDE plugin updates may be forced by two things:
+#   1. A backwards-incompatible change in the server protocol.
+#   2. A minimum version number setting here (if not empty).
+valid_clients:
+  - name: netbeans_plugin
+    min_version: 0.2.21
