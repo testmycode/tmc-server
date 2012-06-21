@@ -80,4 +80,4 @@ show_model_solutions_when_exercise_expired: false
 #   2. A minimum version number setting here (if not empty).
 valid_clients:
   - name: netbeans_plugin
-    min_version: 0.2.21
+    min_version: 0.2.22
