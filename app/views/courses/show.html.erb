@@ -69,7 +69,7 @@
   <h2>Latest submissions</h2>
   
   <section>
-    <% if @course.submissions.count > @submissions.count %>
+    <% if @total_submissions > @submissions.count %>
       <p>
         Only showing <%= @submissions.count %> of <%= @course.submissions.count %>
         <%= link_to "(show all)", course_submissions_path(@course) %>.
