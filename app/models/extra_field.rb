@@ -49,10 +49,6 @@ module ExtraField
     !@options[:hidden] && !@options[:disabled] && @options[:field_type] != :html
   end
 
-  def show_in_participant_list?
-    @options[:show_in_participant_list]
-  end
-
   attr_reader :value_class
 
   def values
@@ -62,13 +58,12 @@ module ExtraField
   def kind
     self.class.extra_field_kind
   end
-  
+
   def default_options
     {
       :hidden => false,
       :disabled => false,
-      :field_type => :text,
-      :show_in_participant_list => false
+      :field_type => :text
     }
   end
 
