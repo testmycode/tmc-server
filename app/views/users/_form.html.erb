@@ -26,10 +26,12 @@
   <% if !UserField.all.empty? %>
     <section>
       <% for group in UserField.groups %>
-        <h2><%= group %></h2>
-        <% for field in UserField.by_group(group) %>
-          <% if field.visible_to?(@user) %>
-            <%= extra_field(@user.field_value_record(field), :form_scope => 'user_field')  %>
+        <% if UserField.by_group(group).any? {|field| field.visible_to?(@user) } %>
+          <h2><%= group %></h2>
+          <% for field in UserField.by_group(group) %>
+            <% if field.visible_to?(@user) %>
+              <%= extra_field(@user.field_value_record(field), :form_scope => 'user_field')  %>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>

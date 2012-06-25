@@ -111,14 +111,14 @@ private
         @fields << @cls.new({:group => @group}.merge(options))
       end
 
-      def html(text)
+      def html(text, options = {})
         @html_count += 1
         @fields << @cls.new({
           :name => "html#{@html_count}",
           :group => @group,
           :field_type => :html,
           :label => text
-        })
+        }.merge(options))
       end
     end
 
