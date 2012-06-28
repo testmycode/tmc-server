@@ -7,13 +7,17 @@ class AvailablePoint < ActiveRecord::Base
   belongs_to :exercise
   has_one :course, :through => :exercise
 
-  scope :course_points, lambda { |course|
+  def self.course_points_of_exercises(course, exercises)
+    course_points(course).where(:exercise_id => exercises.map(&:id))
+  end
+
+  def self.course_points(course)
     joins(:exercise).
     where(:exercises => {:course_id => course.id})
-  }
+  end
 
-  scope :course_sheet_points, lambda { |course, sheet|
+  def self.course_sheet_points(course, sheet)
     joins(:exercise).
     where(:exercises => {:course_id => course.id, :gdocs_sheet => sheet})
-  }
+  end
 end

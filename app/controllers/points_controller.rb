@@ -6,7 +6,7 @@ class PointsController < ApplicationController
     @course = Course.find(params[:course_id])
     exercises = @course.exercises.select {|e| e.visible_to?(current_user)}
     sheets = @course.gdocs_sheets(exercises).sort {|s1, s2| Natcmp.natcmp(s1, s2) }
-    @summary = summary_hash(@course, sheets)
+    @summary = summary_hash(@course, exercises, sheets)
     sort_summary(@summary, params[:sort_by]) if params[:sort_by]
 
     respond_to do |format|
@@ -37,7 +37,7 @@ class PointsController < ApplicationController
     end
   end
 
-  def summary_hash(course, sheets)
+  def summary_hash(course, visible_exercises, sheets)
     per_user_and_sheet = {}
     for sheet in sheets
       AwardedPoint.count_per_user_in_course_with_sheet(course, sheet).each_pair do |username, count|
@@ -65,7 +65,7 @@ class PointsController < ApplicationController
         :total_available => AvailablePoint.course_sheet_points(course, sheet).length
       }},
       :total_awarded => AwardedPoint.course_points(course, include_admins).length,
-      :total_available => AvailablePoint.course_points(course).length,
+      :total_available => AvailablePoint.course_points_of_exercises(course, visible_exercises).length,
       :awarded_for_user_and_sheet => per_user_and_sheet,
       :total_for_user => user_totals,
       :users => users
