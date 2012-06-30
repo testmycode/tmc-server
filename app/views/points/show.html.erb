@@ -49,8 +49,7 @@
       <% @users.each do |user| %>
         <% if !user.administrator? || current_user.administrator? %>
           <% row_class = if user.administrator? then "admin" else "student" end %>
-          <% user_points = AwardedPoint.
-              course_user_sheet_points(@course, user, @sheetname).map(&:name) %>
+          <% user_points = @users_to_points[user.login] %>
           <tr class="<%= row_class %>">
             <td>
               <% if can? :read, user %>

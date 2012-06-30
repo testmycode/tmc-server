@@ -28,10 +28,13 @@ class PointsController < ApplicationController
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).sort!
+    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
 
     @users = User.course_sheet_students(@course, @sheetname)
     if params[:sort_by] == 'points'
-      @users = sort_users_by_points(@users, @exercises)
+      @users = @users.sort_by do |u|
+        [-@users_to_points[u.login].size, u.login.downcase]
+      end
     else
       @users.sort!
     end
@@ -78,14 +81,6 @@ class PointsController < ApplicationController
     elsif sorting =~ /(.*)_points$/
       sheet = $1
       summary[:users] = summary[:users].sort_by {|user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
-    end
-  end
-
-  def sort_users_by_points(users, exercises)
-    exercise_names = exercises.map(&:name)
-    points = AwardedPoint.joins(:submission).where(:course_id => @course.id, :submissions => {:exercise_name => exercise_names}).to_a
-    users.sort_by do |u|
-      [-points.count {|pt| pt.user_id == u.id}, u.login]
     end
   end
 end

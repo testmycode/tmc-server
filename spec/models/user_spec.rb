@@ -26,10 +26,16 @@ describe User do
                             :course => @course1, :exercise => @ex1)
       @sub2 = Factory.create(:submission, :user => @user2,
                             :course => @course2, :exercise => @ex2)
-      @ap1 = Factory.create(:awarded_point, :course => @course1,
-                            :submission => @sub1, :user => @user1)
-      @ap2 = Factory.create(:awarded_point, :course => @course2,
-                            :submission => @sub2, :user => @user2)
+      @avp1 = Factory.create(:available_point, :course => @course1,
+                             :exercise => @ex1, :name => 'p1')
+      @avp2 = Factory.create(:available_point, :course => @course2,
+                             :exercise => @ex2, :name => 'p2')
+      @awp1 = Factory.create(:awarded_point, :course => @course1,
+                             :submission => @sub1, :user => @user1,
+                             :name => 'p1')
+      @awp2 = Factory.create(:awarded_point, :course => @course2,
+                             :submission => @sub2, :user => @user2,
+                             :name => 'p2')
     end
 
     it "course_students" do

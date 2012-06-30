@@ -17,20 +17,15 @@ class User < ActiveRecord::Base
   attr_accessor :password
   before_save :encrypt_password
 
-  scope :course_students, lambda { |course|
-    joins(:submissions).
-    where(:submissions => { :course_id => course.id }).
-    group('users.id')
-  }
-
-  scope :course_sheet_students, lambda { |course, sheetname|
+  def self.course_students(course)
     joins(:awarded_points).
     where(:awarded_points => { :course_id => course.id }).
-    joins(:submissions).
-    joins("join exercises on submissions.exercise_name = exercises.name").
-    where(:exercises => {:gdocs_sheet => sheetname.to_s}).
-    group("users.id")
-  }
+    group('users.id')
+  end
+
+  def self.course_sheet_students(course, sheetname)
+    AwardedPoint.users_in_course_with_sheet(course, sheetname)
+  end
 
   def field_value(field)
     field_value_record(field).value
