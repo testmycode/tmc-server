@@ -18,6 +18,8 @@ class Solution
       false
     elsif !@exercise.course.visible_to?(user)
       false
+    elsif !@exercise.visible_to?(user)
+      false
     elsif @exercise.submittable_by?(user) && !@exercise.completed_by?(user)
       false
     else
