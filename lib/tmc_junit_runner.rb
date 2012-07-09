@@ -1,6 +1,7 @@
 require 'shellwords'
 require 'pathname'
 require 'system_commands'
+require 'maven_pom_file'
 
 # Interface to tmc-junit-runner.
 module TmcJunitRunner
@@ -11,12 +12,16 @@ module TmcJunitRunner
     Pathname("#{::Rails.root}/ext/tmc-junit-runner")
   end
 
+  def version
+    pom_file.artifact_version
+  end
+
   def jar_path
-    Pathname("#{project_path}/dist/tmc-junit-runner.jar")
+    Pathname("#{project_path}/target/tmc-junit-runner-#{version}.jar")
   end
   
   def lib_paths
-    [Pathname("#{project_path}/lib/gson-2.0.jar"), Pathname("#{project_path}/lib/junit-4.10.jar")]
+    @lib_paths ||= build_classpath.split(':').map {|path| Pathname(path) }
   end
   
   def jar_and_lib_paths
@@ -30,6 +35,14 @@ module TmcJunitRunner
   def classpath
     "#{jar_path}:#{lib_paths.join(':')}"
   end
+
+  def pom_file
+    @pom_file ||= MavenPomFile.new(pom_path)
+  end
+
+  def pom_path
+    project_path + 'pom.xml'
+  end
   
   def compiled?
     File.exists? jar_path
@@ -37,14 +50,14 @@ module TmcJunitRunner
   
   def compile!
     Dir.chdir(project_path) do
-      output = `ant -q jar`
+      output = `mvn -q package`
       raise "Failed to compile junit runner\n#{output}" unless $?.success?
     end
   end
   
   def clean_compiled_files!
     Dir.chdir(project_path) do
-      system!('ant -q clean')
+      system!('mvn -q clean')
     end
   end
   
@@ -82,6 +95,35 @@ protected
     JSON.parse(output).map do |item|
       Hash[item.map {|k,v| [k.underscore.to_sym, v] }]
     end
+  end
+
+  def build_classpath
+    file_path = "misc/tmc-junit-runner-build-classpath"
+    begin
+      too_old = FileStore.mtime(file_path) > File.mtime(jar_path)
+    rescue # no such file most likely
+      too_old = true
+    end
+
+    if !too_old
+      cp = FileStore.try_get(file_path)
+    else
+      cp = nil
+    end
+
+    if !cp
+      output = nil
+      Dir.chdir(project_path) do
+        output = `mvn org.apache.maven.plugins:maven-dependency-plugin:2.4:build-classpath`
+      end
+      if output =~ /\[INFO\] Dependencies classpath:\n(.*)\n/
+        cp = $1.strip
+        FileStore.put(file_path, cp)
+      else
+        raise "Failed to get build classpath of tmc-junit-runner."
+      end
+    end
+    cp
   end
 end
 
