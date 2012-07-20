@@ -120,9 +120,11 @@ private
       opts = Course.default_options
 
       if FileTest.exists? options_file
-        yaml_data = YAML.load_file(options_file)
-        if yaml_data.is_a?(Hash)
-          opts = opts.merge(YAML.load_file(options_file))
+        unless File.read(options_file).strip.empty?
+          yaml_data = YAML.load_file(options_file)
+          if yaml_data.is_a?(Hash)
+            opts = opts.merge(YAML.load_file(options_file))
+          end
         end
       end
       @course.options = opts
