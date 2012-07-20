@@ -44,8 +44,7 @@
         width: 1200,
         height: 600,
         hAxis: {
-          title: 'Time',
-          minValue: 0
+          title: 'Time'
         },
         vAxis: {
           title: 'Submission count',
@@ -56,6 +55,11 @@
 
       chart = new google.visualization.AreaChart(document.getElementById('chart-container'));
 
+      var timeUnitGetter = ({
+        'minute': 'getMinutes',
+        'hour': 'getHours',
+        'day': 'getDate'
+      })[timeUnit];
       var timeUnitSetter = ({
         'minute': 'setMinutes',
         'hour': 'setHours',
@@ -63,11 +67,12 @@
       })[timeUnit];
 
       $.each(data, function (i, count) {
+        var offset = startTime[timeUnitGetter]() + i;
         var start = new Date(startTime);
-        start[timeUnitSetter](i);
+        start[timeUnitSetter](offset);
 
         var end = new Date(startTime);
-        end[timeUnitSetter](i + 1);
+        end[timeUnitSetter](offset + 1);
         if (timeUnit != 'minute') {
           end.setSeconds(end.getSeconds() - 1);
         }
