@@ -55,12 +55,12 @@ private
     @start_time =
       if params[:start_time]
       then Time.parse(params[:start_time])
-      else @course.submissions.order('created_at ASC').limit(1).first.created_at.to_date.to_time
+      else @course.time_of_first_submission.to_date.to_time
       end
     @end_time =
       if params[:end_time]
       then Time.parse(params[:end_time])
-      else @course.submissions.order('created_at DESC').limit(1).first.created_at.to_date.to_time
+      else @course.time_of_last_submission.to_date.to_time
       end
     @time_unit = param_as_one_of(:time_unit, [nil, 'minute', 'hour', 'day'])
     @time_unit = 'day' if @time_unit == nil
