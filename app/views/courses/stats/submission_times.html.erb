@@ -1,0 +1,42 @@
+<h1>Submission times for <%= @course.name %></h1>
+
+<div id="chart-container"></div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+
+  var chart;
+  function drawChart() {
+    $.getJSON('<%= raw course_stat_path(@course, 'submission_times', :format => 'json') %>', function(data) {
+
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn('number', 'Hour');
+      dataTable.addColumn('number', 'Count');
+      dataTable.addColumn({type: 'string', role: 'tooltip'});
+
+      var options = {
+        width: 900,
+        height: 800,
+        hAxis: {
+          title: 'Hour',
+          minValue: 0,
+          maxValue: 24
+        },
+        vAxis: {
+          title: 'Submission count',
+          minValue: 0
+        },
+        legend: 'none'
+      };
+
+      chart = new google.visualization.ColumnChart(document.getElementById('chart-container'));
+
+      $.each(data, function (i, count) {
+        dataTable.addRow([i, count, count + ' submissions between ' + i + ':00-' + (i+1) + ':00']);
+      });
+      chart.draw(dataTable, options);
+    });
+  }
+</script>

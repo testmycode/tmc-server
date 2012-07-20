@@ -37,7 +37,11 @@
       <li>Course hidden from those registered after: <%= @course.hidden_if_registered_after %></li>
     <% end %>
 
-    <li>Number of submissions: <%= @course.submissions.count %> (<%= link_to 'stats', course_stat_path(@course, 'submissions') %>)</li>
+    <li>
+      Number of submissions: <%= @course.submissions.count %>
+      (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
+       <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
+    </li>
 
     <% if @course.spreadsheet_key %>
       <li>

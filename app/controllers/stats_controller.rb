@@ -42,8 +42,11 @@ private
   end
 
   def course_stats_show(page)
-    if page == 'submissions'
+    case page
+    when 'submissions'
       course_stats_show_submissions
+    when 'submission_times'
+      course_stats_show_submission_times
     else
       respond_not_found("No such stats page")
     end
@@ -90,6 +93,30 @@ private
         while time < @end_time
           result << lookup[time.strftime(date_format)]
           time += 1.send(@time_unit)
+        end
+
+        render :json => result
+      end
+    end
+  end
+
+  def course_stats_show_submission_times
+    return respond_not_found("No submissions yet") if @course.submissions.empty?
+
+    respond_to do |format|
+      format.html { render :template => 'courses/stats/submission_times', :layout => 'bare' }
+      format.json do
+        records = @course.submissions.select(['COUNT(*) c', "EXTRACT(HOUR FROM created_at) h"]).group('h').order('h ASC')
+
+        lookup = {}
+        for r in records
+          lookup[r.h.to_i] = r.c.to_i
+        end
+        lookup.default = 0
+
+        result = []
+        for h in 0..23
+          result << lookup[h]
         end
 
         render :json => result
