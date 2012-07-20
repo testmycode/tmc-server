@@ -1,0 +1,83 @@
+<h1>Submissions for <%= @course.name %></h1>
+
+<% if [@start_time.hour, @start_time.min, @end_time.hour, @end_time.min].all? {|x| x == 0 } %>
+  <h2><%= @start_time.strftime("%d.%m.%Y") %> &mdash; <%= @end_time.strftime("%d.%m.%Y") %></h2>
+<% else %>
+  <h2><%= @start_time.strftime("%d.%m.%Y %H:%M") %> &mdash; <%= @end_time.strftime("%d.%m.%Y %H:%M") %></h2>
+<% end %>
+
+<div id="chart-container"></div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+
+  var chart;
+  function drawChart() {
+    var startTime = new Date(Date.parse('<%= j(@start_time.to_s)%>'));
+    var endTime = new Date(Date.parse('<%= j(@end_time.to_s)%>'));
+    var timeUnit = '<%= j(@time_unit) %>';
+
+    <%
+      json_args = {
+        :start_time => @start_time,
+        :end_time => @end_time,
+        :time_unit => @time_unit
+      }
+      json_path = course_stat_path(@course, 'submissions', json_args)
+    %>
+
+    $.getJSON('<%= raw json_path %>', function(data) {
+
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn('datetime', 'Time');
+      dataTable.addColumn('number', 'Count');
+      dataTable.addColumn({type: 'string', role: 'tooltip'});
+
+      var dateFormatter = new google.visualization.DateFormat({
+        pattern: 'dd.MM.yyyy HH:mm'
+      });
+      dateFormatter.format(dataTable, 0);
+
+      var options = {
+        width: 1200,
+        height: 600,
+        hAxis: {
+          title: 'Time',
+          minValue: 0
+        },
+        vAxis: {
+          title: 'Submission count',
+          minValue: 0
+        },
+        legend: 'none'
+      };
+
+      chart = new google.visualization.AreaChart(document.getElementById('chart-container'));
+
+      var timeUnitSetter = ({
+        'minute': 'setMinutes',
+        'hour': 'setHours',
+        'day': 'setDate'
+      })[timeUnit];
+
+      $.each(data, function (i, count) {
+        var start = new Date(startTime);
+        start[timeUnitSetter](i);
+
+        var end = new Date(startTime);
+        end[timeUnitSetter](i + 1);
+        if (timeUnit != 'minute') {
+          end.setSeconds(end.getSeconds() - 1);
+        }
+
+        var tooltip = count + " submissions between\n" +
+                dateFormatter.formatValue(start) + " and " + dateFormatter.formatValue(end);
+
+        dataTable.addRow([start, count, tooltip]);
+      });
+      chart.draw(dataTable, options);
+    });
+  }
+</script>
