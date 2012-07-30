@@ -55,6 +55,7 @@ private
           FileUtils.mkdir_p(@course.cache_path)
         
           update_or_clone_repository
+          check_directory_names
           update_course_options
           add_records_for_new_exercises
           delete_records_for_removed_exercises
@@ -112,6 +113,16 @@ private
     
     def clone_repository
       sh!('git', 'clone', '-q', '-b', @course.git_branch, @course.source_url, @course.clone_path)
+    end
+
+    def check_directory_names
+      Dir.chdir(@course.clone_path) do
+        Find.find(".") do |path|
+          if File.directory?(path)
+            raise "Directory names may not currently contain dashes (-). Sorry." if path.include?('-')
+          end
+        end
+      end
     end
     
     def update_course_options
