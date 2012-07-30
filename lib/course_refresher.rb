@@ -43,8 +43,8 @@ private
     def refresh_course(course)
       @report = Report.new
 
-      begin      
-        Course.transaction(:requires_new => true) do
+      Course.transaction(:requires_new => true) do
+        begin
           @course = Course.find(course.id, :lock => true)
           
           @old_cache_path = @course.cache_path
@@ -71,13 +71,14 @@ private
           @course.exercises.each &:save!
           
           CourseRefresher.simulate_failure! if ::Rails::env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
+        rescue
+          @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
+          # Delete the new cache we were working on
+          FileUtils.rm_rf(@course.cache_path)
+          raise ActiveRecord::Rollback
+        else
+          FileUtils.rm_rf(@old_cache_path)
         end
-      rescue
-        @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
-        # Delete the new cache we were working on
-        FileUtils.rm_rf(@course.cache_path)
-      else
-        FileUtils.rm_rf(@old_cache_path)
       end
       
       course.reload # reload the record given as parameter
