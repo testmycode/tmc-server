@@ -119,7 +119,9 @@ private
       Dir.chdir(@course.clone_path) do
         Find.find(".") do |path|
           if File.directory?(path)
-            raise "Directory names may not currently contain dashes (-). Sorry." if path.include?('-')
+            if path.include?('-')
+              raise "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
+            end
           end
         end
       end
