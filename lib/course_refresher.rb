@@ -205,7 +205,7 @@ private
           end
         end
 
-        exercise.available_points.each do |point|
+        exercise.available_points.to_a.clone.each do |point|
           if point_names.none? {|name| name == point.name}
             removed << point.name
             point.destroy
