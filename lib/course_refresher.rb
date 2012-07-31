@@ -132,7 +132,6 @@ private
       @exercise_dirs ||= ExerciseDir.find_exercise_dirs(@course.clone_path)
     end
     
-    
     def exercise_names
       @exercise_names ||= exercise_dirs.map { |ed| ed.name_based_on_path(@course.clone_path) }
     end
@@ -211,10 +210,20 @@ private
         stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
         FileUtils.mkdir_p(stub_path)
         ExerciseFileFilter.new(clone_path).make_stub(stub_path)
-        
+
+        exercise_type = ExerciseDir.exercise_type(clone_path)
+        add_shared_files_to_stub(exercise_type, stub_path)
+      end
+    end
+
+    def add_shared_files_to_stub(exercise_type, stub_path)
+      case exercise_type
+      when :java_simple
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
         FileUtils.cp(TmcJunitRunner.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
         FileUtils.cp(TmcJunitRunner.lib_paths, stub_path + 'lib' + 'testrunner')
+      else
+        # nothing
       end
     end
     

@@ -33,6 +33,14 @@ class Exercise < ActiveRecord::Base
     "#{course.clone_path}/#{self.relative_path}"
   end
 
+  def clone_as_exercise_dir
+    ExerciseDir.get(clone_path)
+  end
+
+  def exercise_type
+    ExerciseDir.exercise_type(clone_path)
+  end
+
   def solution_path
     "#{course.solution_path}/#{self.relative_path}"
   end

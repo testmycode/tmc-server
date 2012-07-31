@@ -64,7 +64,7 @@ module TmcJunitRunner
   # Use TestScanner.get_test_case_methods instead.
   def get_test_case_methods(exercise_path)
     result = []
-    ex_dir = ExerciseDir.new(exercise_path)
+    ex_dir = ExerciseDir.get(exercise_path)
     ex_cp = ex_dir.library_jars.map(&:to_s).join(':')
     runner_cp = classpath
     

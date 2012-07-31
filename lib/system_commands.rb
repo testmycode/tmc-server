@@ -3,7 +3,7 @@ require 'shellwords'
 module SystemCommands
   extend self
 
-  # @deprecated Use sh! instead
+  # Prefer sh! instead
   def system!(cmd)
     ok = system(cmd)
     raise "Command `#{cmd}` failed with status #{$?.inspect}" if !ok

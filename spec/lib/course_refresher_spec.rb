@@ -380,6 +380,8 @@ describe CourseRefresher do
     cs1.should == cs2 # Only file contents should be checksummed, not metadata
     cs2.should_not == cs3
   end
+
+  it "should be able to scan maven exercises" #TODO TODO
   
   describe "when done twice" do
     it "should be able to use a different repo" do

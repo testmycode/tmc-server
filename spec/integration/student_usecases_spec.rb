@@ -32,7 +32,7 @@ describe "The system (used by a student)", :integration => true do
   end
 
   it "should show successful test results for correct solutions" do
-    ex = SimpleExercise.new('MyExercise')
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.solve_all
     ex.make_zip
 
@@ -47,7 +47,7 @@ describe "The system (used by a student)", :integration => true do
   end
 
   it "should show unsuccessful test results for incorrect solutions" do
-    ex = SimpleExercise.new('MyExercise')
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.make_zip
 
     click_link 'MyExercise'
@@ -60,7 +60,7 @@ describe "The system (used by a student)", :integration => true do
   end
 
   it "should show compilation error for uncompilable solutions" do
-    ex = SimpleExercise.new('MyExercise')
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.introduce_compilation_error('oops')
     ex.make_zip
 
@@ -108,7 +108,7 @@ describe "The system (used by a student)", :integration => true do
   it "should not show the submission form for unreturnable exercises"
 
   it "should show the files that the student submitted" do
-    ex = SimpleExercise.new('MyExercise')
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.introduce_compilation_error('oops')
     ex.make_zip
 
@@ -141,7 +141,7 @@ describe "The system (used by a student)", :integration => true do
   end
   
   it "should not show solutions for uncompleted exercises" do
-    ex = SimpleExercise.new('MyExercise')
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.solve_add
     ex.make_zip
     

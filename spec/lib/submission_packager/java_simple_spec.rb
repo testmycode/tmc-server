@@ -3,7 +3,7 @@ require 'tmpdir'
 require 'shellwords'
 require 'system_commands'
 
-describe SubmissionPackager do
+describe SubmissionPackager::JavaSimple do
   include GitTestActions
   include SystemCommands
   
@@ -19,11 +19,15 @@ describe SubmissionPackager do
     @tar_path = Pathname.new('result.tar').expand_path.to_s
   end
 
-  it "should package the submission in a tar file with tests from the repo" do
+  def package_it
+    SubmissionPackager.get(@exercise).package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+  end
+
+  it "packages the submission in a tar file with tests from the repo" do
     @exercise_project.solve_all
     @exercise_project.make_zip(:src_only => false)
     
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
     
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -43,7 +47,7 @@ describe SubmissionPackager do
       system!("zip -q -0 -r #{@exercise_project.zip_path} src")
     end
 
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
 
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -54,13 +58,13 @@ describe SubmissionPackager do
     end
   end
   
-  it "should not use any tests from the submission" do
+  it "does not use any tests from the submission" do
     @exercise_project.solve_all
     File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
     File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
     @exercise_project.make_zip(:src_only => false)
     
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
     
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -71,7 +75,7 @@ describe SubmissionPackager do
     end
   end
 
-  it "should use tests from the submission if specified in .tmcproject.yml's extra_student_files" do
+  it "uses tests from the submission if specified in .tmcproject.yml's extra_student_files" do
     File.open("#{@exercise.clone_path}/.tmcproject.yml", 'w') do |f|
       f.write("extra_student_files:\n  - test/SimpleTest.java\n  - test/NewTest.java")
     end
@@ -81,7 +85,7 @@ describe SubmissionPackager do
     File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
     @exercise_project.make_zip(:src_only => false)
 
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
 
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -92,7 +96,7 @@ describe SubmissionPackager do
     end
   end
 
-  it "should not use .tmcproject.yml from the submission" do
+  it "does not use .tmcproject.yml from the submission" do
     @exercise_project.solve_all
     File.open("#{@exercise_project.path}/.tmcproject.yml", 'w') do |f|
       f.write("extra_student_files:\n  - test/SimpleTest.java\n  - test/NewTest.java")
@@ -101,7 +105,7 @@ describe SubmissionPackager do
     File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
     @exercise_project.make_zip(:src_only => false)
 
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
 
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -113,7 +117,7 @@ describe SubmissionPackager do
     end
   end
 
-  it "should include the .tmcrc file if present" do
+  it "includes the .tmcrc file if present" do
     File.open("#{@exercise.clone_path}/.tmcrc", 'w') do |f|
       f.write("hello")
     end
@@ -121,7 +125,7 @@ describe SubmissionPackager do
     @exercise_project.solve_all
     @exercise_project.make_zip(:src_only => false)
 
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
 
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -132,14 +136,14 @@ describe SubmissionPackager do
     end
   end
 
-  it "should not use .tmcrc from the submission" do
+  it "does not use .tmcrc from the submission" do
     @exercise_project.solve_all
     File.open("#{@exercise_project.path}/.tmcrc", 'w') do |f|
       f.write("hello")
     end
     @exercise_project.make_zip(:src_only => false)
 
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
 
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -149,24 +153,24 @@ describe SubmissionPackager do
     end
   end
 
-  it "should add tmc-junit-runner.jar and its deps to lib/testrunner/" do
+  it "adds tmc-junit-runner.jar and its deps to lib/testrunner/" do
     @exercise_project.solve_all
     @exercise_project.make_zip(:src_only => false)
     
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
     
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
         File.read('lib/testrunner/tmc-junit-runner.jar').should == File.read(TmcJunitRunner.jar_path)
-        for original_path in TmcJunitRunner.jar_and_lib_paths
+        for original_path in TmcJunitRunner.lib_paths
           File.read("lib/testrunner/#{original_path.basename}").should == File.read(original_path)
         end
       end
     end
   end
 
-  it "should include files in the root dir from the repo" do
+  it "includes files in the root dir from the repo" do
     @repo.write_file('SimpleExercise/foo.txt', 'repohello')
     @repo.add_commit_push
     @course.refresh
@@ -177,7 +181,7 @@ describe SubmissionPackager do
     end
     @exercise_project.make_zip(:src_only => true)
 
-    SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    package_it
 
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -193,7 +197,7 @@ describe SubmissionPackager do
       @exercise_project.solve_all
       @exercise_project.make_zip(:src_only => false)
       
-      SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+      package_it
       
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
@@ -205,7 +209,7 @@ describe SubmissionPackager do
             sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
           rescue
             if File.exist?('test_output.txt')
-              raise($!.message + "\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
+              raise($!.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
             else
               raise
             end
@@ -213,6 +217,7 @@ describe SubmissionPackager do
           
           File.should exist('classes/main/SimpleStuff.class')
           File.should exist('test_output.txt')
+          File.read('test_output.txt').should include('"status":"PASSED"')
         end
       end
     end
@@ -221,7 +226,7 @@ describe SubmissionPackager do
       @exercise_project.introduce_compilation_error
       @exercise_project.make_zip(:src_only => false)
       
-      SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+      package_it
       
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
@@ -240,13 +245,13 @@ describe SubmissionPackager do
 
     it "should source .tmcrc" do
       File.open("#{@exercise.clone_path}/.tmcrc", 'w') do |f|
-        f.write("echo $TESTS > lol.txt")
+        f.write("echo $PROJECT_TYPE > lol.txt")
       end
 
       @exercise_project.solve_all
       @exercise_project.make_zip(:src_only => false)
 
-      SubmissionPackager.new.package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+      package_it
 
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
@@ -256,14 +261,14 @@ describe SubmissionPackager do
             sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
           rescue
             if File.exist?('test_output.txt')
-              raise($!.message + "\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
+              raise($!.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
             else
               raise
             end
           end
 
           File.should exist('lol.txt')
-          File.read('lol.txt').should include('SimpleTest.testAdd')
+          File.read('lol.txt').strip.should == 'java_simple'
         end
       end
     end

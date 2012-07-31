@@ -116,6 +116,23 @@ class Submission < ActiveRecord::Base
     submission_data.stderr = value
   end
 
+  def raise_pretest_error_if_any
+    if pretest_error != nil
+      error = "Submission failed: #{pretest_error}."
+      if stdout.blank?
+        error << "\n\n(no stdout)"
+      else
+        error << "\n\nStdout:\n#{stdout}"
+      end
+      if stderr.blank?
+        error << "\n\n(no stderr)"
+      else
+        error << "\n\nStderr:\n#{stderr}"
+      end
+      raise error
+    end
+  end
+
   def set_to_be_reprocessed!(priority = -1)
     self.processed = false
     self.times_sent_to_sandbox = 0

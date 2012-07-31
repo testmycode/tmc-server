@@ -12,7 +12,18 @@ class FixtureExercise
   attr_reader :fixture_name
   attr_reader :path
 
-  def initialize(fixture_name, path = 'SimpleExercise')
+  def self.get(fixture_name, path)
+    case fixture_name
+    when 'SimpleExercise'
+      FixtureExercise::SimpleExercise.new(path)
+    when 'MavenExercise'
+      FixtureExercise::MavenExercise.new(path)
+    else
+      FixtureExercise.new(fixture_name, path)
+    end
+  end
+
+  def initialize(fixture_name, path)
     @fixture_name = fixture_name
     @path = File.expand_path(path)
     
@@ -59,23 +70,37 @@ class FixtureExercise
   end
   
 private
-
   def copy_from_fixture
     FileUtils.mkdir_p(path)
-    
-    FileUtils.mkdir("#{path}/lib")
-    Dir.glob("#{common_files_path}/lib/*.jar") do |file|
-      FileUtils.ln(file, "#{path}/lib/")
-    end
-    
-    FileUtils.ln("#{common_files_path}/.gitignore", "#{path}/.gitignore")
-    
-    FileUtils.cp_r("#{fixture_path}/src", "#{path}/src")
-    FileUtils.cp_r("#{fixture_path}/test", "#{path}/test")
+
+    copy_libs
+    copy_gitignore
+    copy_src
+    copy_tests
   end
   
   def common_files_path
     "#{self.class.fixture_exercises_root}/common_files"
+  end
+
+  def copy_libs
+    # hard link instead as a small optimization
+    FileUtils.mkdir("#{path}/lib")
+    Dir.glob("#{common_files_path}/lib/*.jar") do |file|
+      FileUtils.ln(file, "#{path}/lib/")
+    end
+  end
+
+  def copy_gitignore
+    FileUtils.ln("#{common_files_path}/.gitignore", "#{path}/.gitignore")
+  end
+
+  def copy_src
+    FileUtils.cp_r("#{fixture_path}/src", "#{path}/src")
+  end
+
+  def copy_tests
+    FileUtils.cp_r("#{fixture_path}/test", "#{path}/test")
   end
 
   def ensure_fixture_clean

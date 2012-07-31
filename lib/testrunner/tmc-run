@@ -1,39 +1,97 @@
 #!/bin/sh -e
 # This gets passed with each submission to tmc-sandbox
 
+TMC_MAVEN_PLUGIN_VERSION=1.2
+
+
+# Identify project type
+if [ -f pom.xml ]; then
+  PROJECT_TYPE=java_maven
+else
+  PROJECT_TYPE=java_simple
+fi
+
+TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
+
 # Compile project
-mkdir -p classes/main
-mkdir -p classes/test
-find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp lib/*:src/ > test_output.txt 2>&1 || exit 101
-find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:classes/main:test/ > test_output.txt 2>&1 || exit 102
+case $PROJECT_TYPE in
+  java_simple)
+    # An explicit memory limit below the sandbox memory limit has been found to avoid
+    # the occasional OOM killer. We leave 48M to the sandbox.
+    # Still, Java CAN spin in the GC for a long time if it runs out of memory.
+    JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
 
-CLASSPATH="lib/testrunner/*:lib/*:classes/main/:classes/test/"
+    mkdir -p classes/main
+    mkdir -p classes/test
+    find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp lib/*:src/ > test_output.txt 2>&1 || exit 101
+    find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:classes/main:test/ > test_output.txt 2>&1 || exit 102
+    rm -f test_output.txt
 
-# Discover tests
-java -cp "$CLASSPATH" "fi.helsinki.cs.tmc.testscanner.TestScanner" --test-runner-format test > tests.txt 2> test_output.txt || exit 103
-rm -f test_output.txt
+    CLASSPATH="lib/testrunner/*:lib/*:classes/main/:classes/test/"
+  ;;
 
-TESTS=`cat tests.txt`
+  java_maven)
+    # Enable maven cache
+    if [ -d /ubdd/maven/repository ]; then
+      rm -Rf $HOME/.m2/repository
+      mkdir -p $HOME/.m2
+      ln -s /ubdd/maven/repository $HOME/.m2/repository
+    fi
+
+    # Sandbox: 64MB, Maven: 64MB, Java program: the rest
+    JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - \( 128 \* 1024 \)`}
+    MAVEN_RAM_KB=${JAVA_RAM_KB-`expr 64 \* 1024`}
+
+    export MAVEN_OPTS="-Xmx${MAVEN_RAM_KB}K"
+
+    mvn compiler:compile > test_output.txt 2>&1 || exit 101
+    mvn compiler:testCompile > test_output.txt 2>&1 || exit 102
+    rm -f test_output.txt
+  ;;
+esac
+
 
 # Source .tmcrc if any
 if [ -f .tmcrc ]; then
   . ./.tmcrc
 fi
 
-# Run tests
-DEFS="
-  -Dtmc.exercise_dir=`pwd` 
-  -Dtmc.src_class_dir=`pwd`/classes/main 
-  -Dtmc.test_class_dir=`pwd`/classes/test
-  -Dtmc.lib_dir=`pwd`/lib
-  -Dtmc.results_file=`pwd`/test_output.txt"
+case $PROJECT_TYPE in
+  java_simple)
+    # Discover tests
+    java -cp "$CLASSPATH" "fi.helsinki.cs.tmc.testscanner.TestScanner" --test-runner-format test > tests.txt 2> test_output.txt || exit 103
+    rm -f test_output.txt
 
-# An explicit memory limit below the sandbox memory limit has been found to avoid
-# very long processing times and the occasional OOM killer.
-# We leave 48M to the sandbox. Leaving e.g. only 32M has caused problems.
-TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
-JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
+    TESTS=`cat tests.txt`
 
-java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
+    # Run tests
+    DEFS="
+      -Dtmc.exercise_dir=`pwd`
+      -Dtmc.src_class_dir=`pwd`/classes/main
+      -Dtmc.test_class_dir=`pwd`/classes/test
+      -Dtmc.lib_dir=`pwd`/lib
+      -Dtmc.results_file=`pwd`/test_output.txt"
+
+    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
+  ;;
+
+  java_maven)
+    # MAVEN_OPTS was set above
+    JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K"
+    TEST_RUNNER="fi.helsinki.cs.tmc:tmc-maven-plugin:$TMC_MAVEN_PLUGIN_VERSION:test"
+
+    if mvn -X "$JVM_OPTS_DEF" $TEST_RUNNER > mvn_output.txt 2>&1; then
+      rm -f mvn_output.txt
+      mv target/test_output.txt ./
+      mv target/stdout.txt ./
+      mv target/stderr.txt ./
+    else
+      mv mvn_output.txt test_output.txt
+      [ -f target/stdout.txt ] && mv target/stdout.txt ./
+      [ -f target/stderr.txt ] && mv target/stderr.txt ./
+      exit 103
+    fi
+  ;;
+esac
 
 exit 0

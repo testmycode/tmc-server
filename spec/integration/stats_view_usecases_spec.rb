@@ -48,7 +48,7 @@ describe "The system (used by an instructor for viewing statistics)", :integrati
     }.merge(options)
 
     FileUtils.rm_rf exercise_name
-    ex = SimpleExercise.new(exercise_name)
+    ex = FixtureExercise::SimpleExercise.new(exercise_name)
     ex.solve_all if options[:solve]
     ex.introduce_compilation_error('oops') if options[:compilation_error]
     ex.make_zip

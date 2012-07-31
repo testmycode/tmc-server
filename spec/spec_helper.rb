@@ -3,6 +3,7 @@ ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'database_cleaner'
+require 'etc'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -10,6 +11,25 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
 # Require everything in lib too.
 Dir[Rails.root.join("lib/**/*.rb")].each {|f| require f}
+
+# Sandboxes must be started as root.
+# We infer the actual user from Etc.getlogin or the owner of ::Rails.root.
+Proc.new do
+  raise "Please run tests under sudo (or rvmsudo)" if Process.uid != 0
+
+  if Etc.getlogin != 'root'
+    user = Etc.getpwnam(Etc.getlogin).uid
+  else
+    user = File.stat(::Rails.root).uid
+  end
+
+  group = Etc.getpwuid(user).gid
+
+  RemoteSandboxForTesting.init_servers_as_root!(user, group)
+
+  # Drop root
+  Process::Sys.setreuid(user, user)
+end.call
 
 Capybara.default_driver = :webkit
 Capybara.server_port = FreePorts.take_next

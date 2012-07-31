@@ -1,14 +1,17 @@
 require 'find'
-require File.join(File.dirname(__FILE__), 'fixture_exercise')
+require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise')
 
 # Operations on a copy of fixtures/SimpleExercise.
 # The fixture has two exercises 'addsub' and 'mul'.
 # 'addsub' can be solved partially (so that one test for it succeeds and the other fails).
 # 'mul' only has a hidden test.
 # By default, both exercises are unsolved. Call solve_all to solve them.
-class SimpleExercise < FixtureExercise
-  def initialize(path = 'SimpleExercise')
-    super('SimpleExercise', path)
+class FixtureExercise::SimpleExercise < FixtureExercise
+  def initialize(path = 'SimpleExercise', options = {})
+    options = {
+      :fixture_name => 'SimpleExercise'
+    }.merge(options)
+    super(options[:fixture_name], path)
   end
 
   def solve_all
@@ -42,15 +45,23 @@ class SimpleExercise < FixtureExercise
   end
   
   def simple_stuff_path
-    "#{@path}/src/SimpleStuff.java"
+    "#{java_src_path}/SimpleStuff.java"
   end
   
   def simple_test_path
-    "#{@path}/test/SimpleTest.java"
+    "#{java_test_path}/SimpleTest.java"
   end
   
   def simple_hidden_test_path
-    "#{@path}/test/SimpleHiddenTest.java"
+    "#{java_test_path}/SimpleHiddenTest.java"
+  end
+
+  def java_src_path
+    "#{@path}/src"
+  end
+
+  def java_test_path
+    "#{@path}/test"
   end
   
 private
@@ -59,7 +70,7 @@ private
     lines = IO.readlines(path)
     lines = lines.map do |line|
       if line.include? "METHOD BODY #{method}"
-        line = body + " // METHOD BODY #{method}\n"
+        body + " // METHOD BODY #{method}\n"
       else
         line
       end

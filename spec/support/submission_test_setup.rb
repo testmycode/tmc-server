@@ -31,12 +31,11 @@ class SubmissionTestSetup
     @course.refresh
     
     @exercise = @course.exercises.first
-    
-    if exercise_name == 'SimpleExercise'
-      @exercise_project = SimpleExercise.new(exercise_dest)
-    else
-      @exercise_project = FixtureExercise.new(exercise_name, exercise_dest)
+    if !@exercise
+      raise "Exercise created from fixture was not recognized by course refresher"
     end
+
+    @exercise_project = FixtureExercise.get(exercise_name, exercise_dest)
     
     @submission = Submission.new(
       :user => @user,

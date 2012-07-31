@@ -24,7 +24,7 @@ class GitRepo
     
     dest = "#{@path}/#{dest_name}"
 
-    ex = FixtureExercise.new(src_name, dest)
+    ex = FixtureExercise.get(src_name, dest)
     ex.write_metadata(metadata) unless metadata.empty?
     ex
   end
