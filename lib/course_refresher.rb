@@ -18,9 +18,11 @@ class CourseRefresher
     def initialize
       @errors = []
       @warnings = []
+      @notices = []
     end
     attr_reader :errors
     attr_reader :warnings
+    attr_reader :notices
     
     def successful?
       @errors.empty?
@@ -156,6 +158,7 @@ private
     def add_records_for_new_exercises
       exercise_names.each do |name|
         if !@course.exercises.any? {|e| e.name == name }
+          @report.notices << "Added exercise #{name}"
           exercise = Exercise.new(:name => name)
           @course.exercises << exercise
         end
@@ -165,6 +168,7 @@ private
     def delete_records_for_removed_exercises
       removed_exercises = @course.exercises.reject {|e| exercise_names.include?(e.name) }
       removed_exercises.each do |e|
+        @report.notices << "Removed exercise #{e.name}"
         @course.exercises.delete(e)
         e.destroy
       end
@@ -190,9 +194,12 @@ private
     def update_available_points
       @course.exercises.each do |exercise|
         point_names = test_case_methods(exercise).map{|x| x[:points]}.flatten.uniq
+        added = []
+        removed = []
 
         point_names.each do |name|
           if exercise.available_points.none? {|point| point.name == name}
+            added << name
             point = AvailablePoint.create(:name => name, :exercise => exercise)
             exercise.available_points << point
           end
@@ -200,10 +207,14 @@ private
 
         exercise.available_points.each do |point|
           if point_names.none? {|name| name == point.name}
+            removed << point.name
             point.destroy
             exercise.available_points.delete(point)
           end
         end
+
+        @report.notices << "Added points to exercise #{exercise.name}: #{added.join(' ')}" unless added.empty?
+        @report.notices << "Removed points from exercise #{exercise.name}: #{removed.join(' ')}" unless removed.empty?
       end
     end
     
