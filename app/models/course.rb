@@ -141,6 +141,24 @@ class Course < ActiveRecord::Base
     'git'
   end
 
+  def time_of_first_submission
+    sub = self.submissions.order('created_at ASC').limit(1).first
+    if sub
+      sub.created_at
+    else
+      nil
+    end
+  end
+
+  def time_of_last_submission
+    sub = self.submissions.order('created_at DESC').limit(1).first
+    if sub
+      sub.created_at
+    else
+      nil
+    end
+  end
+
   
 private
   def check_source_backend

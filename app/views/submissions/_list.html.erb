@@ -18,7 +18,7 @@
   <tbody>
     <% submissions.each do |submission| %> 
       <tr>
-        <td><%= submission.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+        <td><%= submission.created_at.strftime("%d.%m.%Y %H:%M") %></td>
         <td>
           <% if can? :read, submission.user %>
             <%= link_to submission.user.login, participant_path(submission.user) %>

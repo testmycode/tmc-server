@@ -20,6 +20,11 @@ class Ability
         c.visible_to?(user)
       end
 
+      cannot :read, Exercise
+      can :read, Exercise do |ex|
+        ex.visible_to?(user)
+      end
+
       cannot :read, Submission
       can :read, Submission, :user_id => user.id
       can :create, Submission do |sub|

@@ -18,9 +18,11 @@ class CourseRefresher
     def initialize
       @errors = []
       @warnings = []
+      @notices = []
     end
     attr_reader :errors
     attr_reader :warnings
+    attr_reader :notices
     
     def successful?
       @errors.empty?
@@ -43,8 +45,8 @@ private
     def refresh_course(course)
       @report = Report.new
 
-      begin      
-        Course.transaction(:requires_new => true) do
+      Course.transaction(:requires_new => true) do
+        begin
           @course = Course.find(course.id, :lock => true)
           
           @old_cache_path = @course.cache_path
@@ -55,6 +57,7 @@ private
           FileUtils.mkdir_p(@course.cache_path)
         
           update_or_clone_repository
+          check_directory_names
           update_course_options
           add_records_for_new_exercises
           delete_records_for_removed_exercises
@@ -70,13 +73,14 @@ private
           @course.exercises.each &:save!
           
           CourseRefresher.simulate_failure! if ::Rails::env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
+        rescue
+          @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
+          # Delete the new cache we were working on
+          FileUtils.rm_rf(@course.cache_path)
+          raise ActiveRecord::Rollback
+        else
+          FileUtils.rm_rf(@old_cache_path)
         end
-      rescue
-        @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
-        # Delete the new cache we were working on
-        FileUtils.rm_rf(@course.cache_path)
-      else
-        FileUtils.rm_rf(@old_cache_path)
       end
       
       course.reload # reload the record given as parameter
@@ -113,6 +117,18 @@ private
     def clone_repository
       sh!('git', 'clone', '-q', '-b', @course.git_branch, @course.source_url, @course.clone_path)
     end
+
+    def check_directory_names
+      Dir.chdir(@course.clone_path) do
+        Find.find(".") do |path|
+          if File.directory?(path)
+            if path.include?('-')
+              raise "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
+            end
+          end
+        end
+      end
+    end
     
     def update_course_options
       options_file = "#{@course.clone_path}/course_options.yml"
@@ -120,9 +136,11 @@ private
       opts = Course.default_options
 
       if FileTest.exists? options_file
-        yaml_data = YAML.load_file(options_file)
-        if yaml_data.is_a?(Hash)
-          opts = opts.merge(YAML.load_file(options_file))
+        unless File.read(options_file).strip.empty?
+          yaml_data = YAML.load_file(options_file)
+          if yaml_data.is_a?(Hash)
+            opts = opts.merge(YAML.load_file(options_file))
+          end
         end
       end
       @course.options = opts
@@ -139,6 +157,7 @@ private
     def add_records_for_new_exercises
       exercise_names.each do |name|
         if !@course.exercises.any? {|e| e.name == name }
+          @report.notices << "Added exercise #{name}"
           exercise = Exercise.new(:name => name)
           @course.exercises << exercise
         end
@@ -148,6 +167,7 @@ private
     def delete_records_for_removed_exercises
       removed_exercises = @course.exercises.reject {|e| exercise_names.include?(e.name) }
       removed_exercises.each do |e|
+        @report.notices << "Removed exercise #{e.name}"
         @course.exercises.delete(e)
         e.destroy
       end
@@ -173,20 +193,27 @@ private
     def update_available_points
       @course.exercises.each do |exercise|
         point_names = test_case_methods(exercise).map{|x| x[:points]}.flatten.uniq
+        added = []
+        removed = []
 
         point_names.each do |name|
           if exercise.available_points.none? {|point| point.name == name}
+            added << name
             point = AvailablePoint.create(:name => name, :exercise => exercise)
             exercise.available_points << point
           end
         end
 
-        exercise.available_points.each do |point|
+        exercise.available_points.to_a.clone.each do |point|
           if point_names.none? {|name| name == point.name}
+            removed << point.name
             point.destroy
             exercise.available_points.delete(point)
           end
         end
+
+        @report.notices << "Added points to exercise #{exercise.name}: #{added.join(' ')}" unless added.empty?
+        @report.notices << "Removed points from exercise #{exercise.name}: #{removed.join(' ')}" unless removed.empty?
       end
     end
     

@@ -5,10 +5,15 @@
 <% end %>
 
 <ul>
-  <% for warning in report.warnings %>
-    <li class="warning"><pre><%= warning %></pre></li>
-  <% end %>
   <% for error in report.errors %>
-    <li class="error"><pre><%= error %></pre></li>
+    <li class="error"><%= simple_format error %></li>
+  <% end %>
+  <% for warning in report.warnings %>
+    <li class="warning"><%= simple_format warning %></li>
+  <% end %>
+  <% for notice in report.notices %>
+    <li class="minor-notice"><%= simple_format notice %></li>
   <% end %>
 </ul>
+
+<hr />

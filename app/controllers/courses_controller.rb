@@ -100,9 +100,8 @@ private
   end
 
   def exercise_data_for_json(exercise)
-    authorize! :read, exercise
-
     return nil if !exercise.visible_to?(current_user)
+    authorize! :read, exercise
 
     helpers = view_context
 

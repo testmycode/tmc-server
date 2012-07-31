@@ -18,8 +18,16 @@
   <ul>
     <% unless @submission.points_list.empty? %>
       <li>
-        <%= pluralize(@submission.points_list.size, "point") %>
-        awarded: <%= @submission.points_list.join(', ') %></li>
+        <%
+           awarded_points = @submission.points_list
+           available_points = @submission.exercise.available_points.to_a.sort.map(&:name)
+           nonawarded_points = available_points - awarded_points
+           all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
+           all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
+        %>
+        Got <%= awarded_points.size %> out of <%= pluralize(available_points.size, 'point') %>
+        (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
+      </li>
     <% end %>
     <li>
       Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by

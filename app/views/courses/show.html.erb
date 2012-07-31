@@ -12,45 +12,49 @@
 </ul>
 
 <% if current_user.administrator? %>
-<ul>
-  <li>Source type: <%= @course.source_backend.upcase %> </li>
-  <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
+  <ul>
+    <li>Source type: <%= @course.source_backend.upcase %> </li>
+    <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
 
-  <% if @course.source_backend == 'git' %>
-    <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
-    <% if github_url %>
-      <li>Github URL: <%= link_to github_url, github_url %></li>
+    <% if @course.source_backend == 'git' %>
+      <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
+      <% if github_url %>
+        <li>Github URL: <%= link_to github_url, github_url %></li>
+      <% end %>
+      <li>Git Branch: <%= @course.git_branch %></li>
     <% end %>
-    <li>Git Branch: <%= @course.git_branch %></li>
-  <% end %>
 
-  <% if @course.hidden? %>
-    <li>The course is currently hidden. Unhide by editing
-    <code>course_options.yml</code></li>
-  <% end %>
+    <% if @course.hidden? %>
+      <li>The course is currently hidden. Unhide by editing
+      <code>course_options.yml</code></li>
+    <% end %>
 
-  <% if @course.hide_after != nil %>
-    <li>Course hidden after: <%= @course.hide_after %></li>
-  <% end %>
+    <% if @course.hide_after != nil %>
+      <li>Course hidden after: <%= @course.hide_after %></li>
+    <% end %>
 
-  <% if @course.hidden_if_registered_after != nil %>
-    <li>Course hidden from those registered after: <%= @course.hidden_if_registered_after %></li>
-  <% end %>
+    <% if @course.hidden_if_registered_after != nil %>
+      <li>Course hidden from those registered after: <%= @course.hidden_if_registered_after %></li>
+    <% end %>
 
-  <li>Number of submissions: <%= @course.submissions.count %></li>
-
-  <% if @course.spreadsheet_key %>
     <li>
-      <%= link_to 'Points spreadsheet in Google Docs',
-      "http://spreadsheets.google.com/ccc?key=#{@course.spreadsheet_key}" %>
+      Number of submissions: <%= @course.submissions.count %>
+      (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
+       <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
     </li>
-  <% end %>
-</ul>
 
-<ul>
-  <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
-  <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
-</ul>
+    <% if @course.spreadsheet_key %>
+      <li>
+        <%= link_to 'Points spreadsheet in Google Docs',
+        "http://spreadsheets.google.com/ccc?key=#{@course.spreadsheet_key}" %>
+      </li>
+    <% end %>
+  </ul>
+
+  <ul>
+    <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
+    <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
+  </ul>
 <% end %>
 
 <h2>All exercises</h2>
