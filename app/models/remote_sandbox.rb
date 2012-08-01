@@ -41,7 +41,7 @@ class RemoteSandbox
         File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
         SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path)
 
-        File.open(tar_path) do |tar_file|
+        File.open(tar_path, 'r') do |tar_file|
           begin
             RestClient.post post_url, :file => tar_file, :notify => notify_url, :token => submission.secret_token
           rescue
@@ -61,6 +61,20 @@ class RemoteSandbox
     end
   end
 
+  def try_to_seed_maven_cache(file_path)
+    begin
+      seed_maven_cache(file_path)
+    rescue
+      Rails.logger.warn "Failed to seed maven cache: #{$!}"
+    end
+  end
+
+  def seed_maven_cache(file_path)
+    File.open(file_path, 'r') do |file|
+      RestClient.post(maven_cache_populate_url, :file => file)
+    end
+  end
+
   def self.all
     SiteSetting.value('remote_sandboxes').map {|url| RemoteSandbox.new(url)}
   end
@@ -73,5 +87,9 @@ class RemoteSandbox
 private
   def post_url
     "#{@baseurl}/tasks.json"
+  end
+
+  def maven_cache_populate_url
+    "#{@baseurl}/maven_cache/populate.json"
   end
 end

@@ -6,6 +6,7 @@ require 'test_scanner'
 require 'digest/md5'
 require 'tmc_junit_runner'
 require 'course_refresher/exercise_file_filter'
+require 'maven_cache_seeder'
 
 # Safely refreshes a course from a git repository
 class CourseRefresher
@@ -80,6 +81,7 @@ private
           raise ActiveRecord::Rollback
         else
           FileUtils.rm_rf(@old_cache_path)
+          seed_maven_cache
         end
       end
       
@@ -333,7 +335,11 @@ private
       sh!('chmod', '-R', chmod, @course.cache_path) unless chmod.blank?
       sh!('chgrp', '-R', chgrp, @course.cache_path) unless chgrp.blank?
     end
-  
+
+    def seed_maven_cache
+      MavenCacheSeeder.start(@course.clone_path, RemoteSandbox.all)
+    end
+
   end
   
 end
