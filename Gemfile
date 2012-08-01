@@ -16,6 +16,7 @@ gem 'natcmp', '~> 1.4'
 gem 'fastercsv', :platforms => :ruby_18
 gem 'foreigner', '~> 1.1.6'
 gem 'xml-simple', '~> 1.1.1'
+gem 'andand'
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
