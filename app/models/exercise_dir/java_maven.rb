@@ -21,5 +21,10 @@ class ExerciseDir
         SystemCommands.sh!('mvn', 'clean')
       end
     end
+
+    def has_tests?
+      File.exist?("#{@path}/src/test/java") &&
+        !(Dir.entries("#{@path}/src/test/java") - ['.', '..', '.gitkeep', '.gitignore']).empty?
+    end
   end
 end

@@ -127,6 +127,7 @@ describe Exercise do
 
   it "should be returnable by default if there is a non-empty test dir" do
     ex = Factory.create(:exercise, :course => course)
+    FileUtils.mkdir_p('FakeCache/src')
     FileUtils.mkdir_p('FakeCache/test')
     FileUtils.touch('FakeCache/test/Xoo.java')
     ex.stub(:clone_path => 'FakeCache')
@@ -135,22 +136,46 @@ describe Exercise do
 
   it "should be non-returnable by default if there is an empty test dir" do
     ex = Factory.create(:exercise, :course => course)
+    FileUtils.mkdir_p('FakeCache/src')
     FileUtils.mkdir_p('FakeCache/test')
     ex.stub(:clone_path => 'FakeCache')
     ex.should_not be_returnable
   end
 
-  it "should be non-returnable by default if there is no test dir" do
+  specify "maven project returnabilty" do
     ex = Factory.create(:exercise, :course => course)
     FileUtils.mkdir_p('FakeCache')
+    ex.stub(:clone_path => 'FakeCache')
+    FileUtils.touch('FakeCache/pom.xml')
+    FileUtils.mkdir_p('FakeCache/src/test/java')
+    ex.should_not be_returnable
+    FileUtils.touch('FakeCache/src/test/java/Xoo.java')
+    ex.should be_returnable
+  end
+
+  it "should be non-returnable by default if there is no test dir" do
+    ex = Factory.create(:exercise, :course => course)
+    FileUtils.mkdir_p('FakeCache/src')
     ex.stub(:clone_path => 'FakeCache')
     ex.should_not be_returnable
   end
 
-  it "can be marked non-returable" do
+  it "can be forced to be returable" do
     ex = Factory.create(:exercise, :course => course)
+    ex.should_not be_returnable
     ex.options = { 'returnable' => true }
     ex.should be_returnable
+  end
+
+  it "can be forced to be non-returable" do
+    ex = Factory.create(:exercise, :course => course)
+    FileUtils.mkdir_p('FakeCache/src')
+    FileUtils.mkdir_p('FakeCache/test')
+    FileUtils.touch('FakeCache/test/Xoo.java')
+    ex.stub(:clone_path => 'FakeCache')
+    ex.should be_returnable
+    ex.options = { 'returnable' => false }
+    ex.should_not be_returnable
   end
 
   it "should always be submittable by administrators as long as it's returnable" do

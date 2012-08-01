@@ -33,8 +33,12 @@ class Exercise < ActiveRecord::Base
     "#{course.clone_path}/#{self.relative_path}"
   end
 
-  def clone_as_exercise_dir
+  def exercise_dir
     ExerciseDir.get(clone_path)
+  end
+
+  def try_get_exercise_dir
+    ExerciseDir.try_get(clone_path)
   end
 
   def exercise_type
@@ -137,9 +141,7 @@ class Exercise < ActiveRecord::Base
     if returnable_forced != nil
       returnable_forced
     else
-      File.exist?(clone_path) &&
-        File.exist?("#{clone_path}/test") &&
-        !(Dir.entries("#{clone_path}/test") - ['.', '..', '.gitkeep', '.gitignore']).empty?
+      File.exist?(clone_path) && !!try_get_exercise_dir.andand.has_tests?
     end
   end
 

@@ -2,14 +2,15 @@ require 'pathname'
 require 'exercise_dir/java_simple'
 require 'exercise_dir/java_maven'
 
-# Holds the path to and metadata about an exercise directory
+# Holds the path to and metadata about an exercise directory.
+# Implemented by subclasses.
 class ExerciseDir
   def self.get(path)
     dir = try_get(path)
     if dir
       dir
     else
-      raise "Exercise type not recognized: #{path}"
+      raise "Not a valid exercise directory: #{path}"
     end
   end
 
@@ -19,7 +20,7 @@ class ExerciseDir
     if cls != nil
       cls.new(path)
     else
-      raise "Not a valid exercise directory: #{path}"
+      nil
     end
   end
 
@@ -39,6 +40,10 @@ class ExerciseDir
   
   def name_based_on_path(base_path)
     @path.to_s.sub(/^#{base_path}\//, '').gsub('/', '-')
+  end
+
+  def has_tests?
+    false
   end
 
   def self.find_exercise_dirs(path)

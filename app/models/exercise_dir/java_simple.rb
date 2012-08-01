@@ -15,5 +15,10 @@ class ExerciseDir
         SystemCommands.sh!('ant', 'clean')
       end
     end
+
+    def has_tests?
+      File.exist?("#{@path}/test") &&
+        !(Dir.entries("#{@path}/test") - ['.', '..', '.gitkeep', '.gitignore']).empty?
+    end
   end
 end
