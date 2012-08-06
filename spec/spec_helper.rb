@@ -4,6 +4,7 @@ require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'database_cleaner'
 require 'etc'
+require 'fileutils'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -26,6 +27,11 @@ Proc.new do
   group = Etc.getpwuid(user).gid
 
   RemoteSandboxForTesting.init_servers_as_root!(user, group)
+
+  # Ensure tmp and tmp/tests are created with correct permissions
+  FileUtils.mkdir_p('tmp/tests')
+  FileUtils.chown(user, group, 'tmp')
+  FileUtils.chown(user, group, 'tmp/tests')
 
   # Drop root
   Process::Sys.setreuid(user, user)
