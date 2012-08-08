@@ -3,7 +3,7 @@ require 'submission_packager'
 
 # A remote machine running the tmc-sandbox web service
 class RemoteSandbox
-  attr_reader :url
+  attr_reader :baseurl
 
   class SandboxUnavailableError < StandardError; end
 
@@ -19,7 +19,7 @@ class RemoteSandbox
       rescue SandboxUnavailableError
         # ignore
       else
-        Rails.logger.info "Submission #{submission.id} sent to remote sandbox at #{server.url}"
+        Rails.logger.info "Submission #{submission.id} sent to remote sandbox at #{server.baseurl}"
         Rails.logger.debug "Notify url: #{notify_url}"
         return true
       end
