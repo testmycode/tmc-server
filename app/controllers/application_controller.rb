@@ -51,7 +51,7 @@ private
     if should_check_api_version?
       if params[:api_version].blank?
         respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
-      elsif params[:api_version] != API_VERSION.to_s
+      elsif params[:api_version].to_s != API_VERSION.to_s
         respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
       end
 
