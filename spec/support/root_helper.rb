@@ -108,7 +108,7 @@ private
         $stderr.reopen($stdout)
         Dir.chdir "#{instance_dir}/web"
         ENV.delete 'BUNDLE_GEMFILE'
-        Process.exec("ruby ./webapp.rb")
+        Process.exec("ruby ./webapp.rb run")
       rescue
         puts "Error starting webapp.rb: " + e.class.to_s + ": " + e.message
       ensure
