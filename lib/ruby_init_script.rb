@@ -1,0 +1,111 @@
+
+require 'shellwords'
+require 'system_commands'
+require 'erb'
+require 'pathname'
+
+# Manages a sysv init script that calls a Ruby program that accepts the standard start|stop|restart|status parameters.
+# Compatible with RVM.
+class RubyInitScript
+  def initialize(options = {})
+    @options = default_options.merge(options)
+    preprocess_options
+    check_options
+  end
+
+  def default_options
+    {
+      :name => nil,
+      :erb_path => File.dirname(File.realpath(__FILE__)) + '/ruby_init_script/initscript.erb',
+      :rails_env => 'production',
+      :working_dir => ::Rails::root,
+      :executable_path => nil,
+      :short_description => nil,
+      :user => 'root'
+    }
+  end
+
+  def script_source
+    rvm_current = `rvm current`
+    if $?.success?
+      puts "Using RVM."
+      rvm_current.strip!
+      rvm_info = YAML::load(`rvm info 2>/dev/null`) # Silenced rvm info complaint "RVM is not a function".
+      ruby_path = rvm_info[rvm_current]['binaries']['ruby']
+      env = rvm_info[rvm_current]['environment']
+    else
+      puts "Not using RVM. Don't forget to invoke this with rvmsudo if you use RVM."
+      ruby_path = `which ruby`
+      env = {}
+    end
+
+    if @options[:rails_env]
+      env['RAILS_ENV'] = @options[:rails_env]
+    end
+
+    def get_binding(name, working_dir, executable_path, ruby_path, user, env)
+      binding
+    end
+
+    erb = ERB.new(File.read(@options[:erb_path]))
+
+    b = get_binding(
+      init_script_full_name,
+      @options[:working_dir],
+      @options[:executable_path],
+      ruby_path,
+      @options[:user],
+      env
+    )
+
+    erb.result(b)
+  end
+
+  def install
+    script = script_source
+
+    puts "Installing into #{init_script_path}"
+    File.open(init_script_path, 'w') {|f| f.write(script) }
+    system("chmod a+x #{Shellwords.escape(init_script_path)}")
+
+    puts "Setting to start/stop by default"
+    system("update-rc.d #{init_script_full_name} defaults")
+  end
+
+  def uninstall
+    system("update-rc.d -f #{init_script_full_name} remove")
+    if File.exist?(init_script_path)
+      File.delete(init_script_path)
+    else
+      puts "#{init_script_path} doesn't exist."
+    end
+  end
+
+  def init_script_full_name
+    @options[:name]
+  end
+
+  def init_script_path
+    "/etc/init.d/#{init_script_full_name}"
+  end
+
+  def short_description
+    @options[:short_description] || init_script_full_name
+  end
+
+private
+  def preprocess_options
+    @options.each_key do |k|
+      if @options[k].is_a? Pathname
+        @options[k] = @options[k].to_s
+      end
+    end
+  end
+
+  def check_options
+    raise ":name required" if !@options[:name]
+    raise ":erb_path required" if !@options[:erb_path]
+    raise ":working_dir required" if !@options[:working_dir]
+    raise ":executable_path required" if !@options[:executable_path]
+  end
+end
