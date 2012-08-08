@@ -69,7 +69,7 @@ class RubyInitScript
     system("chmod a+x #{Shellwords.escape(init_script_path)}")
 
     puts "Setting to start/stop by default"
-    system("update-rc.d #{init_script_full_name} defaults")
+    system("update-rc.d #{init_script_full_name} defaults 90 10")
   end
 
   def uninstall
