@@ -69,8 +69,13 @@ private
     FileUtils.ln_s "#{source}/misc", "#{instance_dir}/misc"
     FileUtils.ln_s "#{source}/uml", "#{instance_dir}/uml"
     FileUtils.cp_r "#{source}/web", instance_dir
+
     FileUtils.rm_rf "#{instance_dir}/web/work"
     FileUtils.mkdir_p "#{instance_dir}/web/work"
+    FileUtils.rm_rf "#{instance_dir}/web/log"
+    FileUtils.mkdir_p "#{instance_dir}/web/log"
+    FileUtils.rm_rf "#{instance_dir}/web/lock"
+    FileUtils.mkdir_p "#{instance_dir}/web/lock"
 
     File.open("#{instance_dir}/web/site.yml", "w") do |f|
       f.puts "tmc_user: #{actual_user}"
