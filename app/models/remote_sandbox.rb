@@ -76,17 +76,34 @@ class RemoteSandbox
   end
 
   def self.all
-    SiteSetting.value('remote_sandboxes').map {|url| RemoteSandbox.new(url)}
+    @all ||= SiteSetting.value('remote_sandboxes').map {|url| RemoteSandbox.new(url)}
   end
 
-  def self.count
-    SiteSetting.value('remote_sandboxes').size
+  def self.total_capacity
+    all.map(&:capacity).reduce(0, &:+)
+  end
+
+  def capacity
+    @capacity ||= begin
+      get_status['total_instances']
+    rescue
+      nil
+    end
+    if @capacity then @capacity else 1 end
   end
 
 
 private
+  def get_status
+    ActiveSupport::JSON.decode(RestClient.get(status_url))
+  end
+
   def post_url
     "#{@baseurl}/tasks.json"
+  end
+
+  def status_url
+    "#{@baseurl}/status.json"
   end
 
   def maven_cache_populate_url
