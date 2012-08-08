@@ -1,11 +1,16 @@
 # Test My Code server #
 
-*Test My Code* ("TMC") is a tool to automate most of the exercise checking when teaching programming. It runs code submitted by students, gives feedback if tests fail and maintains a scoreboard. This allows for lots of small exercises without the need for course instructors to manually go through all of them.
+*Test My Code* ("TMC") is a tool to automate most of the exercise checking when teaching programming.
+It runs code submitted by students, gives feedback if tests fail and maintains a scoreboard.
+This allows for lots of small exercises without the need for course instructors to manually go through all of them.
 
-The system has been used by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in an elementary programming course. The course had almost 200 participants and TMC saved course assistants a lot of work while giving students instant feedback for many exercises. Development continued and now TMC is used to check all exercises for over 400 students on two elementary courses and one data structures course.
+The system has been used with great success by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in
+several elementary programming and data structures courses with hundreds of users.
 
 
 ## Setup ##
+
+Very rought setup instructions below.
 
 ### System Dependencies ###
 
@@ -15,14 +20,16 @@ An X server is currently needed for tests to pass (required by [capybara-webkit]
 
 ### One-time setup ###
 
+We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` with `sudo` below.
+
 1. Download submodules with `git submodule update --init --recursive`
 2. Install dependencies with `gem install bundler && bundle install`
 3. Edit `config/site.yml` based on `config/site.defaults.yml`.
 4. Install PostgreSQL 9.x+. See `config/database.yml` for database settings.
 5. Initialize the database with `env RAILS_ENV=production rake db:reset`
 6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
-7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Run tests with `rake test`.
-8. Run the test suite with `rake spec`.
+7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
+8. Run the test suite with `rvmsudo rake spec`.
 9. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
 
 The application should not be deployed into a multithreaded server! It often changes the current working directory, which is a process-specific attribute. Each request should have its process all to itself. If you use Apache with, say, Passenger, then use the prefork MPM.
@@ -34,6 +41,10 @@ The application should not be deployed into a multithreaded server! It often cha
 3. `script/submission_reprocessor start`
 4. The default user account is `admin`/`admin`.
 
+### Production setup ###
+
+1. Run `rvmsudo rake init:install` to install the init script for the submission rerunner.
+2. Do the same in `ext/tmc-sandbox/web` to install the init script for the sandbox.
 
 ## Credits ##
 
