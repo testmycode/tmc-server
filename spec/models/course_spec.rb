@@ -108,6 +108,28 @@ describe Course do
     c.hide_after.min.should == 59
   end
 
+  it "should know the exercise groups of its exercises" do
+    c = Factory.create(:course)
+    c.exercises << Factory.build(:exercise, :course => c, :name => 'foo-ex1')
+    c.exercises << Factory.build(:exercise, :course => c, :name => 'bar-ex1')
+    c.exercises << Factory.build(:exercise, :course => c, :name => 'foo-ex2')
+    c.exercises << Factory.build(:exercise, :course => c, :name => 'zoox-zaax-ex1')
+    c.exercises << Factory.build(:exercise, :course => c, :name => 'zoox-zoox-ex1')
+
+    # They should be sorted
+    c.exercise_groups.size.should == 5
+    c.exercise_groups[0].name.should == 'bar'
+    c.exercise_groups[1].name.should == 'foo'
+    c.exercise_groups[2].name.should == 'zoox'
+    c.exercise_groups[3].name.should == 'zoox-zaax'
+    c.exercise_groups[4].name.should == 'zoox-zoox'
+
+    c.exercise_group_by_name('zoox-zaax').parent.should == c.exercise_group_by_name('zoox')
+    c.exercise_group_by_name('zoox').children.size.should == 2
+    c.exercise_group_by_name('zoox').children[0].should == c.exercise_group_by_name('zoox-zaax')
+    c.exercise_group_by_name('zoox').children[1].should == c.exercise_group_by_name('zoox-zoox')
+  end
+
 
   describe "validation" do
     let(:valid_params) do

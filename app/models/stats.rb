@@ -31,8 +31,8 @@ module Stats
   def self.exercise_groups(course)
     groups = {}
     for exercise in course.exercises.where(:hidden => false)
-      groups[exercise.category] ||= []
-      groups[exercise.category] << exercise
+      groups[exercise.group_name] ||= []
+      groups[exercise.group_name] << exercise
     end
     groups
   end

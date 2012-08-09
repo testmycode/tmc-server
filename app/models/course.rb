@@ -101,7 +101,7 @@ class Course < ActiveRecord::Base
     "#{Course.cache_root}/#{self.name}-#{self.cache_version}"
   end
   
-  # A clone of the course repository
+  # Holds a clone of the course repository
   def clone_path
     "#{cache_path}/clone"
   end
@@ -121,23 +121,45 @@ class Course < ActiveRecord::Base
     end
   end
   
-  # Directory for solutions
   def solution_path
     "#{cache_path}/solution"
   end
   
-  # Directory for stubs
   def stub_path
     "#{cache_path}/stub"
   end
   
-  # Directory for zips of the stubs
   def stub_zip_path
     "#{cache_path}/stub_zip"
   end
 
   def solution_zip_path
     "#{cache_path}/solution_zip"
+  end
+
+  def exercise_groups
+    @groups ||= begin
+      result = exercises.all.map {|e| e.group_name }.uniq.
+        map {|gname| ExerciseGroup.new(self, gname) }
+
+      new_parents = []
+      begin
+        all_parents = result.map {|eg| eg.parent_name }.reject(&:nil?)
+        new_parents = all_parents.reject {|pn| result.any? {|eg| eg.name == pn } }.uniq
+        result += new_parents.map {|pn| ExerciseGroup.new(self, pn) }
+      end until new_parents.empty?
+
+      result.sort
+    end
+  end
+
+  def exercise_group_by_name(name)
+    exercise_groups.find {|eg| eg.name == name }
+  end
+
+  def reload
+    super
+    @groups = nil
   end
   
   def refresh

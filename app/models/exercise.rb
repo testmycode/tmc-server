@@ -22,8 +22,8 @@ class Exercise < ActiveRecord::Base
   def relative_path
     name.gsub('-', '/')
   end
-  
-  def category
+
+  def group_name
     parts = name.split('-')
     parts.pop
     parts.join('-')
