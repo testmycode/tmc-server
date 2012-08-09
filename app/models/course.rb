@@ -94,7 +94,7 @@ class Course < ActiveRecord::Base
   end
   
   def self.cache_root
-    "#{FileStore.root}course"
+    "#{FileStore.root}/course"
   end
 
   def cache_path
