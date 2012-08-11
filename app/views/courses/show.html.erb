@@ -21,7 +21,11 @@
       <% if github_url %>
         <li>Github URL: <%= link_to github_url, github_url %></li>
       <% end %>
-      <li>Git Branch: <%= @course.git_branch %></li>
+      <li>Git branch: <%= @course.git_branch %></li>
+      <% gitrev = @course.git_revision %>
+      <% if gitrev %>
+        <li>Git revision: <%= gitrev %></li>
+      <% end %>
     <% end %>
 
     <% if @course.hidden? %>

@@ -105,6 +105,21 @@ class Course < ActiveRecord::Base
   def clone_path
     "#{cache_path}/clone"
   end
+
+  def git_revision
+    begin
+      Dir.chdir clone_path do
+        output = `git rev-parse --verify HEAD`
+        if $?.success?
+          output.strip
+        else
+          nil
+        end
+      end
+    rescue
+      nil
+    end
+  end
   
   # Directory for solutions
   def solution_path
