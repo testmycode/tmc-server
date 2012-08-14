@@ -20,21 +20,32 @@
 <table class="participants">
   <thead>
     <tr>
+
       <% for field_name in @ordinary_fields %>
         <% if @visible_columns.include?(field_name) %>
           <th><%= field_name.humanize %></th>
         <% end %>
       <% end %>
+
       <% for field in @extra_fields %>
         <% if @visible_columns.include?(field.name) %>
           <th><%= field.name.humanize %></th>
         <% end %>
       <% end %>
+
+      <% if @group_completion %>
+        <% group_completion_cols = @group_completion.keys.sort {|a, b| Natcmp.natcmp(a, b) } %>
+        <% for group in group_completion_cols %>
+          <th><%= if group.blank? then '<root>' else group end %></th>
+        <% end %>
+      <% end %>
+
     </tr>
   </thead>
   <tbody>
     <% for user in @participants %>
       <tr>
+
         <% for field_name in @ordinary_fields.select {|f| @visible_columns.include?(f) } %>
           <% case field_name %>
           <% when 'username' %>
@@ -43,14 +54,33 @@
             <td><%= user.send(field_name) %></td>
           <% end %>
         <% end %>
+
         <% for field in @extra_fields.select {|f| @visible_columns.include?(f.name) } %>
           <td><%= extra_field_value(user.field_value_record(field)) %></td>
         <% end %>
+
+        <% if @group_completion %>
+          <% for group in group_completion_cols %>
+            <%
+               points = @group_completion[group][:points_by_user][user.id] || 0
+               total = @group_completion[group][:available_points]
+               percentage =  sprintf("%.0f%%", ((points.to_f / total) * 100).ceil)
+            %>
+            <td><%= percentage %></td>
+          <% end %>
+        <% end %>
+
       </tr>
     <% end %>
   </tbody>
 </table>
-<div class="alternative-format-link">[<%= link_to "json", "#{participants_path @filter_params.merge(:format => :json, :api_version => ApplicationController::API_VERSION)}" %>]</div>
+<div class="alternative-format-links">
+  [
+  <%= link_to "json", "#{participants_path params.merge(:format => :json, :api_version => ApplicationController::API_VERSION)}" %>
+  |
+  <%= link_to "csv", "#{participants_path params.merge(:format => :csv, :api_version => ApplicationController::API_VERSION)}" %>
+  ]
+</div>
 
-<%= use_datatables('table.participants', :bPaginate => false, :bSort => true) %>
+<%= use_datatables('table.participants', :bPaginate => false) %>
 

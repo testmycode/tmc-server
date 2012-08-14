@@ -39,6 +39,10 @@ class User < ActiveRecord::Base
     field_value_record(field).value
   end
 
+  def field_ruby_value(field)
+    field_value_record(field).ruby_value
+  end
+
   def field_value_record(field)
     value = self.user_field_values.to_a.select {|v| v.field_name == field.name }.first
     if !value

@@ -14,6 +14,17 @@ module ExtraFieldValue
     @field_kind ||= self.class.name.underscore.gsub(/_field_value$/, '').to_sym
   end
 
+  # Unfortunately, value is actually a string that can be put directly in a form.
+  # May want to refactor some day.
+  def ruby_value
+    case field.field_type
+    when :boolean
+      if value.blank? || value == '0' then false else true end
+    else
+      value
+    end
+  end
+
   def set_from_form(new_value)
     if self.field.should_save?
       self.value =

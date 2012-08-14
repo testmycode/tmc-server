@@ -7,5 +7,46 @@
     <% for field in @extra_fields %>
       <%= extra_field_checkbox('column_', field, @visible_columns.include?(field.name)) %>
     <% end %>
+
+    <%=
+      options = options_for_select([["(Don't show)", ""]] + @courses.map {|c| [c.name, c.id]}, params['group_completion_course_id'])
+      select = select_tag('group_completion_course_id', options)
+      labeled_field('Completion for each exercise group', select)
+    %>
+    <%=
+      checkbox = check_box_tag('show_with_no_points', '1', params['show_with_no_points'])
+      labeled_field('Show users with no points', checkbox, :order => :label_last)
+    %>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var savedValue = null;
+        function updateShowWithNoPoints() {
+          var checkbox = $('#show_with_no_points');
+          var control = checkbox.parent();
+          var enable = $('#group_completion_course_id > option:selected').attr('value') != '';
+          var enabled = checkbox.is(':enabled');
+          if (enable == enabled) {
+            return;
+          }
+
+          if (enable) {
+            checkbox.removeAttr('disabled');
+            control.fadeTo('slow', 1);
+            if (savedValue !== null) {
+              checkbox.attr('checked', savedValue);
+            }
+          } else {
+            checkbox.attr('disabled', 'disabled');
+            control.fadeTo('slow', 0.33);
+            savedValue = checkbox.is(':checked');
+            checkbox.attr('checked', true);
+          }
+        }
+
+        $('#group_completion_course_id').change(updateShowWithNoPoints);
+        updateShowWithNoPoints();
+      });
+    </script>
   </div>
 </section>
