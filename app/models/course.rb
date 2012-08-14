@@ -199,6 +199,7 @@ WHERE exercises.course_id = #{conn.quote(self.id)} AND
       exercises.id = available_points.exercise_id
 EOS
       available_points = conn.select_values(sql)
+      next if available_points.empty?
 
       sql = <<EOS
 SELECT user_id, COUNT(*)
