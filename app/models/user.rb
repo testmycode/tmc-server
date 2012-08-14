@@ -27,12 +27,20 @@ class User < ActiveRecord::Base
     AwardedPoint.users_in_course_with_sheet(course, sheetname)
   end
 
+  def username
+    login  # 'login' is a legacy name that ought to be refactored out some day
+  end
+
+  def username=(name)
+    self.login = name
+  end
+
   def field_value(field)
     field_value_record(field).value
   end
 
   def field_value_record(field)
-    value = self.user_field_values.select {|v| v.field_name == field.name }.first
+    value = self.user_field_values.to_a.select {|v| v.field_name == field.name }.first
     if !value
       value = UserFieldValue.new(:field_name => field.name, :user_id => self.id, :value => '')
       self.user_field_values << value

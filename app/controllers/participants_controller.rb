@@ -3,11 +3,24 @@ class ParticipantsController < ApplicationController
   before_filter :require_administrator
 
   def index
-    @filter_params = params_starting_with('filter_', :remove_prefix => true)
-    @raw_filter_params = params_starting_with('filter_', :remove_prefix => false)
-    @participants = User.filter_by(@filter_params).order(:login)
+    @ordinary_fields = ['username', 'email']
+    @extra_fields = UserField.all
+    valid_fields = @ordinary_fields + @extra_fields.map(&:name)
 
-    @extra_fields = UserField.all.select(&:show_in_participant_list?)
+    @filter_params = params_starting_with('filter_', valid_fields, :remove_prefix => true)
+    @raw_filter_params = params_starting_with('filter_', valid_fields, :remove_prefix => false)
+
+    @column_params = params_starting_with('column_', valid_fields, :remove_prefix => true)
+    @raw_column_params = params_starting_with('column_', valid_fields, :remove_prefix => false)
+    @visible_columns =
+      if @column_params.empty?
+        @ordinary_fields + @extra_fields.select(&:show_in_participant_list?).map(&:name)
+      else
+        @column_params.keys
+      end
+
+
+    @participants = User.filter_by(@filter_params).order(:login)
 
     respond_to do |format|
       format.html
