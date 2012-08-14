@@ -7,7 +7,7 @@ class ParticipantsController < ApplicationController
   def index
     @ordinary_fields = ['username', 'email']
     @extra_fields = UserField.all
-    valid_fields = @ordinary_fields + @extra_fields.map(&:name)
+    valid_fields = @ordinary_fields + @extra_fields.map(&:name) + ['include_administrators']
 
     @filter_params = params_starting_with('filter_', valid_fields, :remove_prefix => true)
     @raw_filter_params = params_starting_with('filter_', valid_fields, :remove_prefix => false)
