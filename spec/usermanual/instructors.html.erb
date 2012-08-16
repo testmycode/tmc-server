@@ -283,9 +283,9 @@ require 'cgi' # for escapeHTML
   
   <ul>
     <li><code>// BEGIN SOLUTION</code> ... <code>// END SOLUTION</code> - will be removed from the stub.</li>
-    <li><code>// STUB: ...</code> - will be uncommented in the stub version.</li>
+    <li><code>// STUB: </code> ... - will be uncommented in the stub version.</li>
     <li><code>// SOLUTION FILE</code> - files containing this line will be removed from the stub.</li>
-    <li><code>/* PREPEND HTML ... */</code> - puts arbitrary HTML on the solution page. Removed from stub.</li>
+    <li><code>/* PREPEND HTML </code> ... <code>*/</code> - puts arbitrary HTML on the solution page. Removed from stub.</li>
   </ul>
   
   <pre class="java sh_java">
@@ -309,10 +309,20 @@ public class AnotherExample {
     // ...
 }
 </pre>
-  
+
+  <p>
+    Analogous XML comments will work for <code>.xml</code> and <code>.jsp</code> files:
+  </p>
+
+  <ul>
+    <li><code>&lt;!-- BEGIN SOLUTION --&gt;</code> ... <code>&lt;!-- END SOLUTION --&gt;</code></li>
+    <li><code>&lt;!-- STUB: </code> ... <code>--&gt;</code></li>
+    <li><code>&lt;!-- SOLUTION FILE --&gt;</code></li>
+  </ul>
+
   <p>
     The tmc-netbeans-author plugin is recommended as it provides syntax highlighting
-    for the special comments.
+    for the special comments (though XML highlighting is not yet supported).
   </p>
   
   

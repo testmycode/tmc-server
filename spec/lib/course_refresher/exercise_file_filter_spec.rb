@@ -12,16 +12,18 @@ describe CourseRefresher::ExerciseFileFilter do
     before :each do
       FileUtils.mkdir('stub')
     end
-    
-    it "should remove solution blocks" do
-      make_file 'original/Thing.java', <<EOF
+
+
+    describe "with java files" do
+      it "should remove solution blocks" do
+        make_file 'original/Thing.java', <<EOF
 public class Thing {
     // BEGIN SOLUTION
     public int foo() {
         return 3;
     }
     // END SOLUTION
-    
+
     public void bar() {
         // BEGIN SOLUTION
         System.out.println("hello");
@@ -29,20 +31,20 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_stub('stub')
-      result = File.read('stub/Thing.java')
-      result.should == <<EOF
+        @filter.make_stub('stub')
+        result = File.read('stub/Thing.java')
+        result.should == <<EOF
 public class Thing {
-    
+
     public void bar() {
     }
 }
 EOF
-    end
-    
-    
-    it "should uncomment stubs" do
-      make_file 'original/Thing.java', <<EOF
+      end
+
+
+      it "should uncomment stubs" do
+        make_file 'original/Thing.java', <<EOF
 public class Thing {
     public int foo() {
         // BEGIN SOLUTION
@@ -52,20 +54,20 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_stub('stub')
-      result = File.read('stub/Thing.java')
-      result.should == <<EOF
+        @filter.make_stub('stub')
+        result = File.read('stub/Thing.java')
+        result.should == <<EOF
 public class Thing {
     public int foo() {
         return 0;
     }
 }
 EOF
-    end
-    
-    
-    it "should not include solution files" do
-      make_file 'original/Thing.java', <<EOF
+      end
+
+
+      it "should not include solution files" do
+        make_file 'original/Thing.java', <<EOF
 // SOLUTION FILE
 public class Thing {
     public int foo() {
@@ -73,9 +75,71 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_stub('stub')
-      File.should_not exist('stub/Thing.java')
+        @filter.make_stub('stub')
+        File.should_not exist('stub/Thing.java')
+      end
+
     end
+
+
+    describe "with XML files" do
+      it "should remove solution blocks" do
+        make_file 'original/Thing.xml', <<EOF
+<trol>
+  <lol/>
+  <!-- BEGIN SOLUTION -->
+  <loo/>
+  <!-- END SOLUTION -->
+</trol>
+EOF
+        @filter.make_stub('stub')
+        result = File.read('stub/Thing.xml')
+        result.should == <<EOF
+<trol>
+  <lol/>
+</trol>
+EOF
+      end
+
+
+      it "should uncomment stubs" do
+        make_file 'original/Thing.xml', <<EOF
+<trol>
+  <lol/>
+  <!-- BEGIN SOLUTION -->
+  <loo/>
+  <!-- END SOLUTION -->
+  <!-- STUB:
+  <foo>
+  </foo>
+  -->
+</trol>
+EOF
+        @filter.make_stub('stub')
+        result = File.read('stub/Thing.xml')
+        result.should == <<EOF
+<trol>
+  <lol/>
+  <foo>
+  </foo>
+</trol>
+EOF
+      end
+
+
+      it "should not include solution files" do
+        make_file 'original/Thing.xml', <<EOF
+<!-- SOLUTION FILE -->
+<trol>
+  <lol/>
+</trol>
+EOF
+        @filter.make_stub('stub')
+        File.should_not exist('stub/Thing.xml')
+      end
+    end
+
+
 
     it "should not include directories under src/ containing only solution files" do
       FileUtils.mkdir_p 'original/src/foo/bar'
@@ -178,16 +242,20 @@ EOF
     it "should warn about misplaced stubs"
   end
   
-  
+
+
+
   
   
   describe "#make_solution" do
     before :each do
       FileUtils.mkdir('solution')
     end
-  
-    it "should remove stubs" do
-      make_file 'original/Thing.java', <<EOF
+
+
+    describe "with java files" do
+      it "should remove stubs" do
+        make_file 'original/Thing.java', <<EOF
 public class Thing {
     public int foo() {
         // BEGIN SOLUTION
@@ -197,27 +265,27 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_solution('solution')
-      result = File.read('solution/Thing.java')
-      result.should == <<EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.java')
+        result.should == <<EOF
 public class Thing {
     public int foo() {
         return 3;
     }
 }
 EOF
-    end
-    
-    
-    it "should remove solution block comments" do
-      make_file 'original/Thing.java', <<EOF
+      end
+
+
+      it "should remove solution block comments" do
+        make_file 'original/Thing.java', <<EOF
 public class Thing {
     // BEGIN SOLUTION
     public int foo() {
         return 3;
     }
     // END SOLUTION
-    
+
     public void bar() {
         // BEGIN SOLUTION
         System.out.println("hello");
@@ -225,24 +293,24 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_solution('solution')
-      result = File.read('solution/Thing.java')
-      result.should == <<EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.java')
+        result.should == <<EOF
 public class Thing {
     public int foo() {
         return 3;
     }
-    
+
     public void bar() {
         System.out.println("hello");
     }
 }
 EOF
-    end
-    
-    
-    it "should remove solution file comments" do
-      make_file 'original/Thing.java', <<EOF
+      end
+
+
+      it "should remove solution file comments" do
+        make_file 'original/Thing.java', <<EOF
 // SOLUTION FILE
 public class Thing {
     public int foo() {
@@ -250,16 +318,80 @@ public class Thing {
     }
 }
 EOF
-      @filter.make_solution('solution')
-      result = File.read('solution/Thing.java')
-      result.should == <<EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.java')
+        result.should == <<EOF
 public class Thing {
     public int foo() {
         return 3;
     }
 }
 EOF
+      end
+
     end
+
+
+    describe "with XML files" do
+      it "should remove stubs" do
+        make_file 'original/Thing.xml', <<EOF
+<trol>
+  <lol/>
+  <!-- STUB:
+  <foo>
+  </foo>
+  -->
+</trol>
+EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.xml')
+        result.should == <<EOF
+<trol>
+  <lol/>
+</trol>
+EOF
+      end
+
+
+      it "should remove solution block comments" do
+        make_file 'original/Thing.xml', <<EOF
+<trol>
+  <lol/>
+  <!-- BEGIN SOLUTION -->
+  <loo/>
+  <!-- END SOLUTION -->
+</trol>
+EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.xml')
+        result.should == <<EOF
+<trol>
+  <lol/>
+  <loo/>
+</trol>
+EOF
+      end
+
+
+      it "should remove solution file comments" do
+        make_file 'original/Thing.xml', <<EOF
+<!-- SOLUTION FILE -->
+<trol>
+  <lol/>
+</trol>
+EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.xml')
+        result.should == <<EOF
+<trol>
+  <lol/>
+</trol>
+EOF
+      end
+    end
+
+
+
     
     it "should convert end-of-lines to unix style" do
       make_file 'original/Thing.java', <<EOF
