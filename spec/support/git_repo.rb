@@ -32,6 +32,11 @@ class GitRepo
   def set_metadata_in(dir, metadata_hash)
     write_file("#{dir}/metadata.yml", metadata_hash.to_yaml)
   end
+
+  def mkdir(name)
+    raise 'Expected relative path' if name.start_with?('/')
+    FileUtils.mkdir_p("#{@path}/#{name}")
+  end
   
   def write_file(name, content)
     raise 'Expected relative path' if name.start_with?('/')

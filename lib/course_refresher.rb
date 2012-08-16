@@ -121,13 +121,12 @@ private
     end
 
     def check_directory_names
-      Dir.chdir(@course.clone_path) do
-        Find.find(".") do |path|
-          if File.directory?(path)
-            if path.include?('-')
-              raise "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
-            end
-          end
+      exdirs = exercise_dirs.map {|exdir| Pathname(exdir.path).realpath.to_s }
+
+      Find.find(@course.clone_path) do |path|
+        relpath = path[@course.clone_path.length..-1]
+        if File.directory?(path) && exdirs.any? {|exdir| exdir.start_with?(path) } && relpath.include?('-')
+          raise "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
         end
       end
     end

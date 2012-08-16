@@ -264,7 +264,7 @@ describe CourseRefresher do
   end
   
   it "should regenerate changed solutions" do
-    repo = add_exercise('MyExercise')
+    add_exercise('MyExercise')
     @refresher.refresh_course(@course)
     
     @local_clone.chdir do
@@ -382,6 +382,29 @@ describe CourseRefresher do
   end
 
   it "should be able to scan maven exercises" #TODO TODO
+
+  it "should not allow dashes in exercise folders" do
+    add_exercise('My-Exercise')
+
+    lambda { @refresher.refresh_course(@course) }.should raise_error
+  end
+
+  it "should not allow dashes in exercise categories" do
+    add_exercise('My-Category/MyExercise')
+
+    lambda { @refresher.refresh_course(@course) }.should raise_error
+  end
+
+  it "should allow dashes in exercise subfolders" do
+    local_repo = add_exercise('MyExercise')
+    local_repo.mkdir("MyExercise/my-dir")
+    local_repo.write_file('MyExercise/my-dir/foo.txt', 'something')
+    local_repo.add_commit_push
+
+    report = @refresher.refresh_course(@course)
+    report.errors.should be_empty
+    report.warnings.should be_empty
+  end
   
   describe "when done twice" do
     it "should be able to use a different repo" do

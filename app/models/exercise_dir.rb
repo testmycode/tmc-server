@@ -54,12 +54,12 @@ class ExerciseDir
     path.find do |subpath|
       Find.prune if !subpath.directory? || irrelevant_directory?(subpath)
 
-      if subpath.basename.to_s.include?('-')
-        raise "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
-      end
-
       cls = exercise_type_impl(subpath)
       if cls != nil
+        if subpath.basename.to_s.include?('-')
+          raise "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
+        end
+
         result << cls.new(subpath)
       end
     end
