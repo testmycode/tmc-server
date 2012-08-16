@@ -3,19 +3,26 @@ root_dir = File.expand_path('../', File.dirname(__FILE__))
 require root_dir + '/config/environment'
 require 'fileutils'
 
-if ARGV.length != 1 || ['-h', '--help'].include?(ARGV[0])
-  puts "Usage: script/export_student_events dest_dir"
+if ARGV.length < 1 || ARGV.length > 2 || ARGV.any? {|a| ['-h', '--help'].include?(a) }
+  puts "Usage: script/export_student_events dest_dir [course]"
   puts
   exit!(1)
 end
 
 dest_dir = ARGV[0]
+course_name = ARGV[1]
 
 def write_file(filename, data)
   File.open(filename, 'wb') {|f| f.write(data) }
 end
 
-StudentEvent.all.each do |ev|
+if course_name
+  events = StudentEvent.where(:course_id => Course.find_by_name!(course_name).id)
+else
+  events = StudentEvent.all
+end
+
+events.each do |ev|
   user_dir = "#{dest_dir}/#{ev.user_id}"
   FileUtils.mkdir(user_dir) unless File.exist?(user_dir)
   
@@ -27,7 +34,7 @@ StudentEvent.all.each do |ev|
     :course_name => ev.course.name,
     :exercise_name => ev.exercise_name,
     :event_type => ev.event_type,
-    :happened_at => ev.happened_at
+    :happened_at => ev.happened_at.to_s
   }.to_json
   
   write_file(json_file, json)

@@ -126,12 +126,16 @@ private
     end
   end
 
-  def params_starting_with(prefix, options = {})
+  def params_starting_with(prefix, permitted, options = {})
     options = {
       :remove_prefix => false
     }.merge(options)
 
-    result = Hash[params.select {|k, v| k.start_with?(prefix) }]
+    permitted = permitted.map {|f| prefix + f } unless permitted == :all
+
+    result = Hash[params.select {|k, v|
+      k.start_with?(prefix) && !v.blank? && (permitted == :all || permitted.include?(k))
+    }]
     if options[:remove_prefix]
       result = Hash[result.map {|k, v| [k.sub(/^#{prefix}/, ''), v] }]
     end
@@ -156,7 +160,12 @@ private
       headers["Content-Disposition"] = "attachment; filename=\"#{options[:filename]}\""
     end
 
-    render :layout => false
+    render_options = {
+      :layout => false
+    }.merge(options)
+    render_options.delete(:filename)
+
+    render render_options
   end
   
 end

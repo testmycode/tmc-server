@@ -105,6 +105,21 @@ class Course < ActiveRecord::Base
   def clone_path
     "#{cache_path}/clone"
   end
+
+  def git_revision
+    begin
+      Dir.chdir clone_path do
+        output = `git rev-parse --verify HEAD`
+        if $?.success?
+          output.strip
+        else
+          nil
+        end
+      end
+    rescue
+      nil
+    end
+  end
   
   # Directory for solutions
   def solution_path
@@ -157,6 +172,50 @@ class Course < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  # Returns a hash of exercise group => {
+  #   :available_points => number of available points,
+  #   :points_by_user => {user_id => number_of_points}
+  # }
+  def exercise_group_completion_by_user
+    #TODO: clean up exercise group discovery after merging to master branch
+
+    groups = self.exercises.map(&:name).map {|name| if name =~ /^(.+)-[^-]+$/ then $1 else "" end }.uniq
+
+    result = {}
+    for group in groups
+      conn = self.connection
+
+      # FIXME: this bit is duplicated in MetadataValue in master branch.
+      # http://stackoverflow.com/questions/5709887/a-proper-way-to-escape-when-building-like-queries-in-rails-3-activerecord
+      pattern = (group.gsub(/[!%_]/) {|x| '!' + x }) + '-%'
+
+      sql = <<EOS
+SELECT available_points.name
+FROM exercises, available_points
+WHERE exercises.course_id = #{conn.quote(self.id)} AND
+      exercises.name LIKE #{conn.quote(pattern)} AND
+      exercises.id = available_points.exercise_id
+EOS
+      available_points = conn.select_values(sql)
+      next if available_points.empty?
+
+      sql = <<EOS
+SELECT user_id, COUNT(*)
+FROM awarded_points
+WHERE course_id = #{conn.quote(self.id)} AND
+      name IN (#{available_points.map {|ap| conn.quote(ap)}.join(',')})
+GROUP BY user_id
+EOS
+      by_user = Hash[conn.select_rows(sql).map! {|uid, count| [uid.to_i, count.to_i]}]
+
+      result[group] = {
+        :available_points => available_points.size,
+        :points_by_user => by_user
+      }
+    end
+    result
   end
 
   
