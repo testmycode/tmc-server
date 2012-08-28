@@ -1,7 +1,7 @@
 #!/bin/sh -e
 # This gets passed with each submission to tmc-sandbox
 
-TMC_MAVEN_PLUGIN_VERSION=1.2
+TMC_MAVEN_PLUGIN_VERSION=1.3
 
 
 # Identify project type
