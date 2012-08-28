@@ -21,7 +21,7 @@
   <% end %>
 </ul>
 
-<div class="scrollable">
+<%= content_tag('div', :class => if @bare_layout then nil else 'scrollable' end) do %>
   <table class="points">
     <thead>
       <% if tailoring.show_exercise_names_in_points_table %>
@@ -68,4 +68,4 @@
       <% end %>
     </tbody>
   </table>
-</div>
+<% end %>
