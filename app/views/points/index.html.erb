@@ -2,7 +2,7 @@
   <h1>Summary of points for <%= @course.name %></h1>
 <% end %>
 
-<div class="scrollable">
+<%= content_tag('div', :class => if @bare_layout then nil else 'scrollable' end) do %>
   <table class="points">
     <thead>
       <tr>
@@ -77,6 +77,6 @@
       <% end %>
     </tbody>
   </table>
-</div>
+<% end %>
 
 <div class="alternative-format-links">[<%= link_to('csv', course_points_path(@course, :sort_by => params[:sort_by], :format => 'csv')) %>]</div>
