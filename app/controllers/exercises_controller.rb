@@ -10,7 +10,7 @@ class ExercisesController < ApplicationController
       format.html do
         Course.transaction(:requires_new => true) do
           if !current_user.guest?
-            @submissions = @exercise.submissions.order("created_at DESC")
+            @submissions = @exercise.submissions.order("submissions.created_at DESC")
             @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
             @submissions = @submissions.includes(:awarded_points).includes(:user)
           else
