@@ -56,6 +56,8 @@ class SourceFileList
 
     make_path_names_relative(solution.path, files)
 
+    files = sort_solution_files(files)
+
     self.new(files)
   end
 
@@ -63,10 +65,10 @@ private
   def self.find_source_files_under(root_dir)
     files = []
     total_size = 0
-    Pathname(root_dir).find do |file|
+    Pathname(root_dir).realpath.find do |file|
       Find.prune if file.directory? && should_skip_dir?(file)
 
-      if file.file? && file.basename.to_s.end_with?('.java')
+      if source_file?(file)
         total_size += file.size
         raise "Files are too large" if total_size > MAX_SIZE
 
@@ -75,6 +77,13 @@ private
     end
 
     files.sort_by(&:path)
+  end
+
+  def self.source_file?(file)
+    return false unless file.file?
+    dir = file.parent.to_s
+    name = file.basename.to_s
+    name.end_with?('.java') || name == 'pom.xml' || dir.include?('/WEB-INF')
   end
 
   def self.should_skip_dir?(file)
@@ -86,6 +95,18 @@ private
     root_dir = root_dir.to_s
     for file in files
       file.path = file.path[(root_dir.size+1)...file.path.length] if file.path.start_with?(root_dir)
+    end
+  end
+
+  def self.sort_solution_files(files)
+    files.sort_by do |f|
+      priority = begin
+        if f.path.include?('WEB-INF/') then 1
+        elsif f.path == 'pom.xml' then 2
+        else 0
+        end
+      end
+      [priority, f.path]
     end
   end
 end

@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'shCore', 'shThemeDefault' %>
-<%= javascript_include_tag 'shCore', 'shBrushJava' %>
+<%= javascript_include_tag 'shCore', 'shBrushJava', 'shBrushXml', 'shBrushPlain' %>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -18,6 +18,14 @@ $(document).ready(function() {
     <% if !just_one_html_prelude && file.html_prelude %>
       <%= raw(file.html_prelude) %>
     <% end %>
-    <pre class="brush: java"><%= file.contents %></pre>
+    <%
+       brush = case File.extname(file.path)
+       when '.java' then 'java'
+       when '.xml' then 'xml'
+       when '.jsp' then 'xml'
+       else 'plain'
+       end
+    %>
+    <pre class="brush: <%= brush %>"><%= file.contents %></pre>
   <% end %>
 </div>
