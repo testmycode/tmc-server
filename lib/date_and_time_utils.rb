@@ -10,7 +10,7 @@ module DateAndTimeUtils
       return nil
     end
     
-    d = DateAndTimeUtils.parse_date_or_time(d) if d.is_a?(String)
+    d = self.parse_date_or_time(d) if d.is_a?(String)
     
     if d.is_a? Date
       if options[:prefer_end_of_day]
@@ -35,8 +35,8 @@ module DateAndTimeUtils
     begin
       if s =~ /^\d+-\d+-\d+$/
         result = Date.parse(s)
-      elsif s =~ /^\d+-\d+-\d+\s+\d+:\d+(:?:\d+)?$/
-        result = Time.parse(s)
+      elsif s =~ /^\d+-\d+-\d+\s+\d+:\d+(:?:\d+(:?\.\d+)?)?(:?\s+\S+)?$/
+        result = Time.zone.parse(s)
       end
     rescue
       raise "Invalid date/time: #{input}"
@@ -45,6 +45,15 @@ module DateAndTimeUtils
     raise "Cannot parse date/time: #{input}" if !result
     
     result
+  end
+
+  def self.to_utc_str(time, options = {})
+    t = to_time(time, options)
+    if t != nil
+      t.utc.strftime('%Y-%m-%d %H:%M:%S.%6N %Z')
+    else
+      t
+    end
   end
 end
 

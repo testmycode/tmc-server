@@ -114,6 +114,18 @@ describe DateAndTimeUtils do
       expect { DateAndTimeUtils.parse_date_or_time('xooxers') }.to raise_error(/Cannot parse .* xooxers/)
       expect { DateAndTimeUtils.parse_date_or_time('2012-99-10') }.to raise_error(/Invalid .* 2012-99-10/)
     end
+
+    it "should accept an SQL-like time with a timezone" do
+      t = DateAndTimeUtils.parse_date_or_time('2011-07-13 13:45:21 +0600')
+      t.utc.hour.should == 7
+    end
+  end
+
+  describe "#to_utc_str" do
+    it "should format to a full time string with microseconds and timezone" do
+      t = DateAndTimeUtils.parse_date_or_time('13.07.2011   14:45:21.123123   +0600')
+      t.should == '2011-07-13 14:45:21.123123 +0600'
+    end
   end
 end
 
