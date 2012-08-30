@@ -3,16 +3,21 @@ require 'ruby_init_script'
 require 'etc'
 
 namespace :init do
-  init_script = RubyInitScript.new({
-    :name => 'tmc-submission-reprocessor',
-    :short_description => 'TMC submission reprocessor',
-    :executable_path => 'script/submission_reprocessor',
-    :user => Etc.getpwuid(File.stat(::Rails::root).uid).name
-  })
+  DEFAULT_NAME = 'tmc-submission-reprocessor'
 
-  desc "Install submission reprocessor init script. RVM-compatible."
-  task :install do
-    init_script.install
+  def init_script(name)
+    name ||= DEFAULT_NAME
+    RubyInitScript.new({
+      :name => name,
+      :short_description => 'TMC submission reprocessor',
+      :executable_path => 'script/submission_reprocessor',
+      :user => Etc.getpwuid(File.stat(::Rails::root).uid).name
+    })
+  end
+
+  desc "Install submission reprocessor init script. RVM-compatible. Optional arg: script name."
+  task :install, [:name] do |t, args|
+    init_script(args[:name]).install
   end
 
   desc "Preview submission reprocessor init script."
@@ -25,11 +30,11 @@ namespace :init do
     puts
   end
 
-  desc "Uninstall init script."
-  task :uninstall do
-    init_script.uninstall
+  desc "Uninstall init script. Optional arg: script name."
+  task :uninstall, :name do |t, args|
+    init_script(args[:name]).uninstall
   end
 
-  desc "Reinstall init script."
-  task :reinstall => [:uninstall, :install]
+  desc "Reinstall init script. Optional arg: script name."
+  task :reinstall, [:name] => [:uninstall, :install]
 end
