@@ -83,7 +83,10 @@ private
     return false unless file.file?
     dir = file.parent.to_s
     name = file.basename.to_s
-    name.end_with?('.java') || name == 'pom.xml' || dir.include?('/WEB-INF')
+    name.end_with?('.java') ||
+      name.end_with?('.jsp') ||
+      name == 'pom.xml' ||
+      dir.include?('/WEB-INF')
   end
 
   def self.should_skip_dir?(file)
