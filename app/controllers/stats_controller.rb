@@ -74,11 +74,10 @@ private
 
         records =
           @course.submissions.
-            select(['COUNT(*) c', "date_trunc('#{@time_unit}', created_at) t"]).
+            select(['COUNT(*) c', "date_trunc('#{@time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"]).
             group('t').
             where('created_at >= ?', @start_time).
-            where('created_at < ?', @end_time).
-            limit(100000) # for some security
+            where('created_at < ?', @end_time)
 
         date_format = "%Y-%m-%d %H:%M:%S" # query returns in this format, without timezone
 
@@ -106,7 +105,10 @@ private
     respond_to do |format|
       format.html { render :template => 'courses/stats/submission_times', :layout => 'bare' }
       format.json do
-        records = @course.submissions.select(['COUNT(*) c', "EXTRACT(HOUR FROM created_at) h"]).group('h').order('h ASC')
+        records = @course.submissions.select([
+          'COUNT(*) c',
+          "EXTRACT(HOUR FROM #{expr_for_time_in_time_zone('created_at')}) h"
+        ]).group('h').order('h ASC')
 
         lookup = {}
         for r in records
@@ -122,6 +124,11 @@ private
         render :json => result
       end
     end
+  end
+
+  def expr_for_time_in_time_zone(field)
+    connection = ActiveRecord::Base.connection
+    "((#{field} AT TIME ZONE 'UTC') AT TIME ZONE #{connection.quote(Time.zone.name)})"
   end
 
   def general_stats_show(page)
