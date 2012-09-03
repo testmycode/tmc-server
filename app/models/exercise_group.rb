@@ -31,6 +31,14 @@ class ExerciseGroup
     end
   end
 
+  def exercises(recursively)
+    if recursively
+      course.exercises.to_a.select {|e| e.exercise_group_name.start_with?(self.name) }
+    else
+      course.exercises.to_a.select {|e| e.exercise_group_name == self.name }
+    end
+  end
+
   def children
     course.exercise_groups.select {|eg| eg.name.start_with?(self.name) && eg != self }
   end
