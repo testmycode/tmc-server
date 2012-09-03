@@ -1,6 +1,4 @@
 class Exercise < ActiveRecord::Base
-  include Comparable
-
   self.include_root_in_json = false
 
   belongs_to :course
@@ -195,9 +193,5 @@ class Exercise < ActiveRecord::Base
     ensure
       results.clear
     end
-  end
-
-  def <=>(other)
-    Natcmp.natcmp(self.name, other.name)
   end
 end

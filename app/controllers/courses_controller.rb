@@ -85,7 +85,7 @@ private
 
   def assign_show_view_vars
     @course = Course.find(params[:id])
-    @exercises = @course.exercises.select {|ex| ex.visible_to?(current_user) }.sort
+    @exercises = @course.exercises.select {|ex| ex.visible_to?(current_user) }.natsort_by(&:name)
     authorize! :read, @course
 
     unless current_user.guest?

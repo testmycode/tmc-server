@@ -34,7 +34,7 @@
       <% end %>
 
       <% if @group_completion %>
-        <% group_completion_cols = @group_completion.keys.sort {|a, b| Natcmp.natcmp(a, b) } %>
+        <% group_completion_cols = @group_completion.keys.natsort %>
         <% for group in group_completion_cols %>
           <th><%= if group.blank? then '<root>' else group end %></th>
         <% end %>
