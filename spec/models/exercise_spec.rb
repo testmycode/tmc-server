@@ -68,6 +68,24 @@ describe Exercise do
     end
   end
 
+  it "knows which exercise groups it belongs to" do
+    ex = Factory.create(:exercise, :course => course, :name => 'foo-bar-baz')
+
+    ex.exercise_group_name.should == 'foo-bar'
+    ex.exercise_group.name.should == 'foo-bar'
+    ex.exercise_group.parent.name.should == 'foo'
+    ex.belongs_to_exercise_group?(ex.exercise_group).should == true
+    ex.belongs_to_exercise_group?(ex.exercise_group.parent).should == true
+
+    ex2 = Factory.create(:exercise, :course => course, :name => 'xoo-bar-baz')
+    course.reload
+    another_course = Factory.create(:course)
+    ex3 = Factory.create(:exercise, :course => another_course, :name => 'foo-bar-baz')
+
+    ex.belongs_to_exercise_group?(ex2.exercise_group).should == false
+    ex.belongs_to_exercise_group?(ex3.exercise_group).should == false
+  end
+
   it "can be hidden with a boolean 'hidden' option" do
     ex = Factory.create(:exercise, :course => course)
     ex.options = {"hidden" => true}

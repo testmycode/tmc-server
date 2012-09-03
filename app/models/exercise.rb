@@ -21,10 +21,18 @@ class Exercise < ActiveRecord::Base
     name.gsub('-', '/')
   end
 
-  def group_name
+  def exercise_group
+    self.course.exercise_group_by_name(self.exercise_group_name)
+  end
+
+  def exercise_group_name
     parts = name.split('-')
     parts.pop
     parts.join('-')
+  end
+
+  def belongs_to_exercise_group?(group)
+    group.course == self.course && self.exercise_group_name.start_with?(group.name)
   end
 
   def clone_path
