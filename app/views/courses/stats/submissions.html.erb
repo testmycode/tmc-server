@@ -13,10 +13,9 @@
   google.load("visualization", "1", {packages:["corechart"]});
   google.setOnLoadCallback(drawChart);
 
-  var chart;
   function drawChart() {
-    var startTime = new Date(Date.parse('<%= j(@start_time.to_s)%>'));
-    var endTime = new Date(Date.parse('<%= j(@end_time.to_s)%>'));
+    var startTime = new Date(<%= @start_time.to_i * 1000 %>);
+    var endTime = new Date(<%= @end_time.to_i * 1000 %>);
     var timeUnit = '<%= j(@time_unit) %>';
 
     <%
@@ -53,7 +52,7 @@
         legend: 'none'
       };
 
-      chart = new google.visualization.AreaChart(document.getElementById('chart-container'));
+      var chart = new google.visualization.AreaChart(document.getElementById('chart-container'));
 
       var timeUnitGetter = ({
         'minute': 'getMinutes',

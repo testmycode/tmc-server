@@ -7,7 +7,6 @@
   google.load("visualization", "1", {packages:["corechart"]});
   google.setOnLoadCallback(drawChart);
 
-  var chart;
   function drawChart() {
     $.getJSON('<%= raw course_stat_path(@course, 'submission_times', :format => 'json') %>', function(data) {
 
@@ -31,7 +30,7 @@
         legend: 'none'
       };
 
-      chart = new google.visualization.ColumnChart(document.getElementById('chart-container'));
+      var chart = new google.visualization.ColumnChart(document.getElementById('chart-container'));
 
       $.each(data, function (i, count) {
         dataTable.addRow([i, count, count + ' submissions between ' + i + ':00-' + (i+1) + ':00']);
