@@ -157,6 +157,12 @@ class Course < ActiveRecord::Base
     exercise_groups.find {|eg| eg.name == name }
   end
 
+  # Returns exercises in group `name`, or whose full name is `name`.
+  def exercises_by_name_or_group(name)
+    group = exercise_group_by_name(name)
+    exercises.to_a.select {|ex| ex.name == name || (group && ex.belongs_to_exercise_group?(group)) }
+  end
+
   def reload
     super
     @groups = nil

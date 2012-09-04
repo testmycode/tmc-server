@@ -32,7 +32,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def belongs_to_exercise_group?(group)
-    group.course == self.course && self.exercise_group_name.start_with?(group.name)
+    group.course == self.course && (self.exercise_group_name + '-').start_with?(group.name + '-')
   end
 
   def clone_path

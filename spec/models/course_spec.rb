@@ -110,11 +110,14 @@ describe Course do
 
   it "should know the exercise groups of its exercises" do
     c = Factory.create(:course)
-    c.exercises << Factory.build(:exercise, :course => c, :name => 'foo-ex1')
-    c.exercises << Factory.build(:exercise, :course => c, :name => 'bar-ex1')
-    c.exercises << Factory.build(:exercise, :course => c, :name => 'foo-ex2')
-    c.exercises << Factory.build(:exercise, :course => c, :name => 'zoox-zaax-ex1')
-    c.exercises << Factory.build(:exercise, :course => c, :name => 'zoox-zoox-ex1')
+    exercises = [
+      Factory.build(:exercise, :course => c, :name => 'foo-ex1'),
+      Factory.build(:exercise, :course => c, :name => 'bar-ex1'),
+      Factory.build(:exercise, :course => c, :name => 'foo-ex2'),
+      Factory.build(:exercise, :course => c, :name => 'zoox-zaax-ex1'),
+      Factory.build(:exercise, :course => c, :name => 'zoox-zoox-ex1')
+    ]
+    exercises.each {|ex| c.exercises << ex }
 
     # They should be sorted
     c.exercise_groups.size.should == 5
@@ -128,6 +131,12 @@ describe Course do
     c.exercise_group_by_name('zoox').children.size.should == 2
     c.exercise_group_by_name('zoox').children[0].should == c.exercise_group_by_name('zoox-zaax')
     c.exercise_group_by_name('zoox').children[1].should == c.exercise_group_by_name('zoox-zoox')
+
+    c.exercises_by_name_or_group('zoox-zaax').should == [exercises[3]]
+    c.exercises_by_name_or_group('zoox-zaax-ex1').should == [exercises[3]]
+    c.exercises_by_name_or_group('zoox-zaa').should == []
+    c.exercises_by_name_or_group('foo').natsort_by(&:name).should == [exercises[0], exercises[2]]
+    c.exercises_by_name_or_group('asdasd').should == []
   end
 
 
