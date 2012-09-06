@@ -43,7 +43,7 @@ class PasswordResetKeysController < ApplicationController
       redirect_to root_path
     else
       if @user.errors[:password]
-        flash.now[:alert] = 'Password ' + @user.errors[:password]
+        flash.now[:alert] = 'Password ' + @user.errors[:password].join(', ')
       else
         flash.now[:alert] = 'Failed to set password'
       end
