@@ -1,8 +1,23 @@
 #!/bin/sh -e
 # This gets passed with each submission to tmc-sandbox
 
-TMC_MAVEN_PLUGIN_VERSION=1.4
+# Source user params if any.
+# Though the variable names and content format here are limited,
+# the contents should be treated carefully, despite us being in a sandbox.
+#
+# Included variables: error_msg_locale
+#
+if [ -r .tmcparams ]; then
+  . ./.tmcparams
+fi
 
+if [ -z "$error_msg_locale" ]; then
+  error_msg_locale=en
+fi
+ERROR_MSG_LOCALE_DEF="-Dfi.helsinki.cs.tmc.edutestutils.defaultLocale=$error_msg_locale"
+
+
+TMC_MAVEN_PLUGIN_VERSION=1.4
 
 # Identify project type
 if [ -f pom.xml ]; then
@@ -72,12 +87,12 @@ case $PROJECT_TYPE in
       -Dtmc.lib_dir=`pwd`/lib
       -Dtmc.results_file=`pwd`/test_output.txt"
 
-    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
+    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
   ;;
 
   java_maven)
     # MAVEN_OPTS was set above
-    JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K"
+    JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
     TEST_RUNNER="fi.helsinki.cs.tmc:tmc-maven-plugin:$TMC_MAVEN_PLUGIN_VERSION:test"
 
     if mvn -X "$JVM_OPTS_DEF" $TEST_RUNNER > mvn_output.txt 2>&1; then

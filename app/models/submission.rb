@@ -48,6 +48,32 @@ class Submission < ActiveRecord::Base
   def result_url
     "#{SiteSetting.value(:baseurl_for_remote_sandboxes).sub(/\/+$/, '')}/submissions/#{self.id}/result"
   end
+
+  def params
+    if self.params_json
+      ActiveSupport::JSON.decode(self.params_json)
+    else
+      nil
+    end
+  end
+
+  def params=(value)
+    if value.is_a?(Hash)
+      value.each {|k, v| raise "Invalid submission param: #{k} = #{v}" if !valid_param?(k, v) }
+      self.params_json = value.to_json
+    elsif value == nil
+      self.params_json = nil
+    else
+      raise "Invalid submission params: #{value.inspect}"
+    end
+  end
+
+  def valid_param?(k, v)
+    # See also: SubmissionPackager.write_extra_params
+    k = k.to_s
+    v = v.to_s
+    k =~ /^[a-zA-Z\-_]+$/ && v =~ /^[a-zA-Z\-_]+$/
+  end
   
   def status
     if !processed?

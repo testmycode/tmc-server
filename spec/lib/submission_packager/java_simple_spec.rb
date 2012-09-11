@@ -19,8 +19,8 @@ describe SubmissionPackager::JavaSimple do
     @tar_path = Pathname.new('result.tar').expand_path.to_s
   end
 
-  def package_it
-    SubmissionPackager.get(@exercise).package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+  def package_it(extra_params = {})
+    SubmissionPackager.get(@exercise).package_submission(@exercise, @exercise_project.zip_path, @tar_path, extra_params)
   end
 
   it "packages the submission in a tar file with tests from the repo" do
@@ -188,6 +188,21 @@ describe SubmissionPackager::JavaSimple do
         `tar xf #{Shellwords.escape(@tar_path)}`
         File.should exist('foo.txt')
         File.read('foo.txt').should == "repohello"
+      end
+    end
+  end
+
+  it "writes extra parameters into .tmcparams" do
+    @exercise_project.solve_all
+    @exercise_project.make_zip(:src_only => false)
+
+    package_it(:foo => :bar)
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.should exist('.tmcparams')
+        File.read('.tmcparams').strip.should == "export foo\\=bar"
       end
     end
   end

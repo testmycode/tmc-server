@@ -97,13 +97,18 @@ class SubmissionsController < ApplicationController
     if !file_contents.start_with?('PK')
       errormsg = "The uploaded file doesn't look like a ZIP file."
     end
-    
+
+    submission_params = {
+      :error_msg_locale => params[:error_msg_locale]
+    }
+
     if !errormsg
       @submission = Submission.new(
         :user => current_user,
         :course => @course,
         :exercise => @exercise,
-        :return_file => file_contents
+        :return_file => file_contents,
+        :params_json => submission_params.to_json
       )
       
       authorize! :create, @submission
