@@ -39,7 +39,7 @@ case $PROJECT_TYPE in
     # the occasional OOM killer. We leave 48M to the sandbox.
     # Still, Java CAN spin in the GC for a long time if it runs out of memory.
     JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
-    echo "Memory allocated to tests: #{JAVA_RAM_KB}KB"
+    echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
 
     mkdir -p classes/main
     mkdir -p classes/test
