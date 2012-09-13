@@ -71,7 +71,7 @@ class RemoteSandbox
 
   def seed_maven_cache(file_path)
     File.open(file_path, 'r') do |file|
-      RestClient.post(maven_cache_populate_url, :file => file)
+      RestClient.post(maven_cache_populate_url, :file => file, :run_tests => true)
     end
   end
 
