@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120911152429) do
+ActiveRecord::Schema.define(:version => 20120913102113) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -122,6 +122,7 @@ ActiveRecord::Schema.define(:version => 20120911152429) do
     t.binary  "return_file"
     t.binary  "stdout_compressed"
     t.binary  "stderr_compressed"
+    t.binary  "vm_log_compressed"
   end
 
   create_table "submissions", :force => true do |t|

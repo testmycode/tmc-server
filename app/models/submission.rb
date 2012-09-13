@@ -128,6 +128,7 @@ class Submission < ActiveRecord::Base
   end
 
   def stdout
+    build_submission_data if !submission_data
     submission_data.stdout
   end
   def stdout=(value)
@@ -135,11 +136,20 @@ class Submission < ActiveRecord::Base
     submission_data.stdout = value
   end
   def stderr
+    build_submission_data if !submission_data
     submission_data.stderr
   end
   def stderr=(value)
     build_submission_data if !submission_data
     submission_data.stderr = value
+  end
+  def vm_log
+    build_submission_data if !submission_data
+    submission_data.vm_log
+  end
+  def vm_log=(value)
+    build_submission_data if !submission_data
+    submission_data.vm_log = value
   end
 
   def raise_pretest_error_if_any

@@ -38,4 +38,22 @@ class SubmissionData < ActiveRecord::Base
     end
     @stderr = value
   end
+
+  def vm_log
+    @vm_log ||=
+      if vm_log_compressed != nil
+        Zlib::Inflate.inflate(vm_log_compressed)
+      else
+        nil
+      end
+  end
+
+  def vm_log=(value)
+    if value != nil
+      self.vm_log_compressed = Zlib::Deflate.deflate(value)
+    else
+      self.vm_log_compressed = nil
+    end
+    @vm_log = value
+  end
 end

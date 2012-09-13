@@ -152,6 +152,13 @@
   </section>
 <% end %>
 
+<% if current_user.administrator? && !@submission.vm_log.blank? %>
+  <h2>Full sandbox log</h2>
+  <section>
+    <pre><%= @submission.vm_log %></pre>
+  </section>
+<% end %>
+
 <script type="text/javascript">
 $(document).ready(function() {
   $('.stack-trace').each(function() {
