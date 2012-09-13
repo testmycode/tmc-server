@@ -55,7 +55,7 @@ case $PROJECT_TYPE in
 
     # Sandbox: 64MB, Maven: 64MB, Java program: the rest
     JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - \( 128 \* 1024 \)`}
-    MAVEN_RAM_KB=${JAVA_RAM_KB-`expr 64 \* 1024`}
+    MAVEN_RAM_KB=${MAVEN_RAM_KB-`expr 64 \* 1024`}
 
     export MAVEN_OPTS="-Xmx${MAVEN_RAM_KB}K"
 
