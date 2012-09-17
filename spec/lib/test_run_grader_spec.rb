@@ -153,15 +153,38 @@ describe TestRunGrader do
     points.should include('1.2')
   end
 
-  it "should not award points that require a review" do
-    ap = AvailablePoint.find_by_name('1.1')
-    ap.requires_review = true
-    ap.save!
+  describe "when the exercise requires code review" do
+    it "should not award points that require review" do
+      ap = AvailablePoint.find_by_name('1.1')
+      ap.requires_review = true
+      ap.save!
 
-    TestRunGrader.grade_results(@submission, successful_results)
+      TestRunGrader.grade_results(@submission, successful_results)
 
-    points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
-    points.should_not include('1.1')
-    points.should include('1.2')
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should_not include('1.1')
+      points.should include('1.2')
+    end
+
+    it "should flag the submission as requiring review if the exercise has review points" do
+      ap = AvailablePoint.find_by_name('1.1')
+      ap.requires_review = true
+      ap.save!
+
+      TestRunGrader.grade_results(@submission, successful_results)
+
+      @submission.should require_review
+    end
+
+    it "should not flag the submission as requiring review if the user has already scored the review points" do
+      ap = AvailablePoint.find_by_name('1.1')
+      ap.requires_review = true
+      ap.save!
+      AwardedPoint.create(:course => @submission.course, :user => @submission.user, :name => '1.1')
+
+      TestRunGrader.grade_results(@submission, successful_results)
+
+      @submission.should_not require_review
+    end
   end
 end

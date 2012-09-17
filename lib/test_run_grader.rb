@@ -18,7 +18,11 @@ module TestRunGrader
   def grade_results(submission, results)
     submission.test_case_runs.destroy_all
     create_test_case_runs(submission, results)
-    award_points(submission, results)
+
+    review_points = submission.exercise.available_points.where(:requires_review => true).map(&:name)
+    award_points(submission, results, review_points)
+    submission.requires_review = true if should_flag_for_review?(submission, review_points)
+
     submission.save!
   end
   
@@ -39,16 +43,15 @@ private
     submission.all_tests_passed = all_passed
   end
 
-  def self.award_points(submission, results)
+  def self.award_points(submission, results, review_points)
     user = submission.user
     exercise = submission.exercise
     course = exercise.course
-    review_points = exercise.available_points.where(:requires_review => true).map(&:name)
     awarded_points = AwardedPoint.course_user_points(course, user).map(&:name)
 
-    all_points = []
+    points = []
     for point_name in points_from_test_results(results) - review_points
-      all_points << point_name
+      points << point_name
       unless awarded_points.include?(point_name)
         submission.awarded_points << AwardedPoint.new(
           :name => point_name,
@@ -58,7 +61,7 @@ private
       end
     end
 
-    submission.points = all_points.join(" ") unless all_points.empty?
+    submission.points = points.join(" ") unless points.empty?
   end
 
   def self.points_from_test_results(results)
@@ -81,5 +84,10 @@ private
     else
       nil
     end
+  end
+
+  def should_flag_for_review?(submission, review_points)
+    awarded_points = submission.user.awarded_points.where(:course_id => submission.course.id).map(&:name)
+    !(review_points - awarded_points).empty?
   end
 end
