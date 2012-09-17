@@ -47,6 +47,8 @@ def without_db_notices(&block)
 end
 
 RSpec.configure do |config|
+  config.treat_symbols_as_metadata_keys_with_true_values = true
+
   config.mock_with :rspec
 
   config.use_transactional_fixtures = false
