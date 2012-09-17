@@ -7,6 +7,7 @@ require 'digest/md5'
 require 'tmc_junit_runner'
 require 'course_refresher/exercise_file_filter'
 require 'maven_cache_seeder'
+require 'set'
 
 # Safely refreshes a course from a git repository
 class CourseRefresher
@@ -176,24 +177,41 @@ private
     
     def update_exercise_options
       reader = RecursiveYamlReader.new
+      @review_points = {}
       @course.exercises.each do |e|
         begin
-          e.options = reader.read_settings({
+          metadata = reader.read_settings({
             :root_dir => @course.clone_path,
             :target_dir => File.join(@course.clone_path, e.relative_path),
             :file_name => 'metadata.yml',
             :defaults => Exercise.default_options
           })
+          @review_points[e.name] = parse_review_points(metadata['review_points'])
+          e.options = metadata
           e.save!
         rescue SyntaxError
           @report.errors << "Failed to parse metadata: #{$!}"
         end
       end
     end
+
+    def parse_review_points(data)
+      if data == nil
+        []
+      elsif data.is_a?(String)
+        data.split(/\s+/).reject(&:blank?)
+      elsif data.is_a?(Array)
+        data.map(&:to_s).reject(&:blank?)
+      end
+    end
     
     def update_available_points
       @course.exercises.each do |exercise|
-        point_names = test_case_methods(exercise).map{|x| x[:points]}.flatten.uniq
+        review_points = @review_points[exercise.name]
+        point_names = Set.new
+        point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
+        point_names += review_points
+
         added = []
         removed = []
 
@@ -210,6 +228,9 @@ private
             removed << point.name
             point.destroy
             exercise.available_points.delete(point)
+          else
+            point.requires_review = review_points.include?(point.name)
+            point.save!
           end
         end
 
