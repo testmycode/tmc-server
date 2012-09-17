@@ -16,12 +16,23 @@ module TestRunGrader
   extend TestRunGrader
   
   def grade_results(submission, results)
+    raise "Exercise #{submission.exercise_name} was removed" if !submission.exercise
+
     submission.test_case_runs.destroy_all
     create_test_case_runs(submission, results)
 
     review_points = submission.exercise.available_points.where(:requires_review => true).map(&:name)
     award_points(submission, results, review_points)
-    submission.requires_review = true if should_flag_for_review?(submission, review_points)
+
+    if should_flag_for_review?(submission, review_points)
+      submission.requires_review = true
+      Submission.where(
+        :course_id => submission.course_id,
+        :exercise_name => submission.exercise_name,
+        :user_id => submission.user.id,
+        :requires_review => true
+      ).update_all(:requires_review => false)
+    end
 
     submission.save!
   end

@@ -176,6 +176,40 @@ describe TestRunGrader do
       @submission.should require_review
     end
 
+    it "should unflag all previous submissions to the same exercise" do
+      ap = AvailablePoint.find_by_name('1.1')
+      ap.requires_review = true
+      ap.save!
+
+      old_sub = Submission.create!(
+        :user => @submission.user,
+        :course => @submission.course,
+        :exercise => @submission.exercise,
+        :requires_review => true
+      )
+
+      other_exercise_sub = Submission.create!(
+        :user => @submission.user,
+        :course => @submission.course,
+        :exercise => Factory.create(:exercise, :course => @submission.course),
+        :requires_review => true
+      )
+      other_user_sub = Submission.create!(
+        :user => Factory.create(:user),
+        :course => @submission.course,
+        :exercise => @submission.exercise,
+        :requires_review => true
+      )
+
+      TestRunGrader.grade_results(@submission, successful_results)
+      [old_sub, other_exercise_sub, other_user_sub].each(&:reload)
+
+      old_sub.should_not require_review
+
+      other_exercise_sub.should require_review
+      other_user_sub.should require_review
+    end
+
     it "should not flag the submission as requiring review if the user has already scored the review points" do
       ap = AvailablePoint.find_by_name('1.1')
       ap.requires_review = true
