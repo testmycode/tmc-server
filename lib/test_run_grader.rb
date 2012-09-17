@@ -1,9 +1,9 @@
 require 'point_comparison'
 
 #
-# Stores test run results in the database.
+# Stores test run results in the database and awards points.
 # Called in a transaction from SandboxResultsSaver.
-# Expected format of results:
+# Expected format of results from sandbox:
 #   An array of hashes with the following keys:
 #     - className: the test class name
 #     - methodName: the test method name
@@ -43,10 +43,11 @@ private
     user = submission.user
     exercise = submission.exercise
     course = exercise.course
+    review_points = exercise.available_points.where(:requires_review => true).map(&:name)
     awarded_points = AwardedPoint.course_user_points(course, user).map(&:name)
 
     all_points = []
-    for point_name in points_from_test_results(results)
+    for point_name in points_from_test_results(results) - review_points
       all_points << point_name
       unless awarded_points.include?(point_name)
         submission.awarded_points << AwardedPoint.new(
@@ -64,7 +65,7 @@ private
     point_status = {}  # point -> true/false/nil i.e. ok so far/failed/unseen
     for result in results
       result['pointNames'].each do |name|
-        if (point_status[name] != false) # not already failed
+        unless point_status[name].eql?(false) # skip if already failed
           point_status[name] = (result["status"] == 'PASSED')
         end
       end
