@@ -36,4 +36,7 @@ TmcServer::Application.configure do
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
+
+  # Log to stdout. Uncomment when debugging.
+  #config.logger = Logger.new(STDOUT)
 end
