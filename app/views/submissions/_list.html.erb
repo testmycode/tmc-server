@@ -1,5 +1,8 @@
+<%
+# Use this partial through the show_submission_list helper
+%>
 
-<table class="submissions">
+<%= content_tag :table, :class => 'submissions', :id => table_id do %>
   <thead>
     <tr>
       <th>Time</th>
@@ -11,8 +14,12 @@
       <% if show_awarded_points %>
         <th>Points</th>
       <% end %>
-      <th></th>
-      <th></th>
+      <% if show_review_column %>
+        <th></th>
+      <% else %>
+        <th></th>
+        <th></th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
@@ -39,17 +46,23 @@
             <%= points_list(submission.points_list) %>
           </td>
         <% end %>
+        <% if show_review_column %>
+          <td>
+            <%= link_to 'Review', new_submission_review_path(submission) %>
+          </td>
+        <% else %>
         <td>
           <%= link_to 'Files', submission_files_path(submission) %>
         </td>
         <td>
           <%= link_to 'Details', submission_path(submission)  %>
         </td>
+        <% end %>
        </tr>
     <% end %>
   </tbody>
-</table>
+<% end %>
 
 <% if invoke_datatables %>
-  <%= use_datatables('table.submissions', :bPaginate => false) %>
+  <%= use_datatables('#' + table_id, :bPaginate => false) %>
 <% end %>

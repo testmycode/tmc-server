@@ -2,9 +2,11 @@ module SubmissionsHelper
   def show_submission_list(submissions, options = {})
     locals = {
       :submissions => submissions,
+      :table_id => 'submissions',
       :invoke_datatables => true,
       :show_exercise_column => true,
-      :show_awarded_points => false
+      :show_awarded_points => false,
+      :show_review_column => false
     }.merge(options)
     render :partial => 'submissions/list', :locals => locals
   end

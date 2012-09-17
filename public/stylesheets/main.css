@@ -50,6 +50,11 @@ a:hover { text-decoration: underline; }
   color: red !important;
 }
 
+.review-required,
+.review-requested {
+  font-weight: bold;
+}
+
 .warning {
   color: #FF8000;
 }

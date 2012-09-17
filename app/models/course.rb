@@ -174,6 +174,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def reviews_required
+    self.submissions.where(:requires_review => true)
+  end
+
+  def reviews_requested
+    self.submissions.where(:requests_review => true)
+  end
+
   # Returns a hash of exercise group => {
   #   :available_points => number of available points,
   #   :points_by_user => {user_id => number_of_points}
