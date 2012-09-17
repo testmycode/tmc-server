@@ -10,6 +10,7 @@ class Submission < ActiveRecord::Base
   after_save { submission_data.save! if submission_data }
 
   has_many :test_case_runs, :dependent => :delete_all, :order => :id
+  has_many :reviews, :dependent => :delete_all, :order => :created_at
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
   

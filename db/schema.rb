@@ -11,11 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120913102113) do
+ActiveRecord::Schema.define(:version => 20120917104257) do
 
   create_table "available_points", :force => true do |t|
-    t.integer "exercise_id", :null => false
-    t.string  "name",        :null => false
+    t.integer "exercise_id",                        :null => false
+    t.string  "name",                               :null => false
+    t.boolean "requires_review", :default => false, :null => false
   end
 
   create_table "awarded_points", :force => true do |t|
@@ -94,6 +95,17 @@ ActiveRecord::Schema.define(:version => 20120913102113) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "reviews", :force => true do |t|
+    t.integer  "submission_id", :null => false
+    t.integer  "reviewer_id"
+    t.text     "review_body",   :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "reviews", ["reviewer_id"], :name => "index_reviews_on_reviewer_id"
+  add_index "reviews", ["submission_id"], :name => "index_reviews_on_submission_id"
 
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
@@ -204,6 +216,9 @@ ActiveRecord::Schema.define(:version => 20120913102113) do
   add_foreign_key "feedback_questions", "courses", :name => "feedback_questions_course_id_fk", :dependent => :delete
 
   add_foreign_key "password_reset_keys", "users", :name => "password_reset_keys_user_id_fk", :dependent => :delete
+
+  add_foreign_key "reviews", "submissions", :name => "reviews_submission_id_fk", :dependent => :delete
+  add_foreign_key "reviews", "users", :name => "reviews_reviewer_id_fk", :column => "reviewer_id", :dependent => :nullify
 
   add_foreign_key "student_events", "courses", :name => "student_events_course_id_fk", :dependent => :delete
   add_foreign_key "student_events", "users", :name => "student_events_user_id_fk", :dependent => :delete
