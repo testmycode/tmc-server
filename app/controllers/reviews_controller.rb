@@ -9,6 +9,7 @@ class ReviewsController < ApplicationController
     fetch_submission_and_files
     @new_review = @submission.reviews.new
     authorize! :create, @review
+    @show_page_presence = true
     render 'reviews/show'
   end
 

@@ -18,7 +18,7 @@
       <div id="titles">
         <h1><%= link_to 'TestMyCode server', root_path %></h1>
         <% unless SiteSetting.value(:site_subtitle).blank? %>
-        <div class="branding"><%= raw(SiteSetting.value(:site_subtitle)) %></div>
+          <div class="branding"><%= raw(SiteSetting.value(:site_subtitle)) %></div>
         <% end %>
       </div>
 
@@ -39,6 +39,9 @@
 
     <div id="breadcrumb">
       <%= breadcrumb %>
+      <% if @show_page_presence %>
+        <%= render 'shared/page_presence_widget' %>
+      <% end %>
     </div>
 
     <div id="content-area">

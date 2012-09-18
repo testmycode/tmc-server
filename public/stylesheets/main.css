@@ -178,6 +178,10 @@ body.default {
   font-style: italic;
 }
 
+#page-presence {
+  float: right;
+}
+
 .flash {
   margin-top: 10px;
   font-weight: bold;

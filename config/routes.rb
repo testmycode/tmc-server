@@ -63,6 +63,8 @@ TmcServer::Application.routes.draw do
 
   resources :student_events, :only => [:create]
 
+  resource :page_presence, :only => [:update]
+
   root :to => "courses#index"
 
 end

@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   has_many :user_field_values, :dependent => :delete_all, :autosave => true
   has_many :student_events, :dependent => :delete_all
   has_many :reviews, :foreign_key => :reviewer_id, :inverse_of => :reviewer, :dependent => :nullify
+  has_many :page_presences, :dependent => :delete_all
 
   validates :login, :presence     => true,
                     :uniqueness   => true,

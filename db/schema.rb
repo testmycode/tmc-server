@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120917132431) do
+ActiveRecord::Schema.define(:version => 20120918101917) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -83,6 +83,15 @@ ActiveRecord::Schema.define(:version => 20120917132431) do
     t.integer  "position",   :null => false
     t.text     "title"
   end
+
+  create_table "page_presences", :force => true do |t|
+    t.string   "path",       :null => false
+    t.integer  "user_id",    :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "page_presences", ["path", "user_id"], :name => "index_page_presences_on_path_and_user_id", :unique => true
 
   create_table "password_reset_keys", :force => true do |t|
     t.integer  "user_id",    :null => false
