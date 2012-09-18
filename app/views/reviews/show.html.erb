@@ -1,23 +1,46 @@
 
 <h1>Code review, submission <%= @submission.id %></h1>
 
-<% if @new_review %>
-  <div id="review-form-dialog">
-    <div id="review-form">
-      <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
-        <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
-        <div class="buttons">
-          <%= f.submit 'Save review' %>
-        </div>
-      <% end %>
-    </div>
-  </div>
+<% if @submission.reviews.empty? %>
+  Code not reviewed yet.
+<% else %>
+  <section>
+    <% for review in @submission.reviews %>
+      <div class="code-review">
+        <% if review.reviewer %>
+          <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
+        <% end %>
+        <div class="review-body"><%= simple_format(review.review_body) %></div>
+      </div>
+    <% end %>
+  </section>
+<% end %>
 
-  <div id="review-form-reopen-handle">
-    <button>
-      <span class="ui-icon ui-icon-newwin"></span>&nbsp;Code review
-    </button>
-  </div>
+<% if @new_review %>
+  <section>
+    <div id="review-form-dialog">
+      <div id="review-form">
+        <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
+          <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
+          <div class="buttons">
+            <%= f.submit 'Save review' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @submission.reviews.count == 0 %>
+      <button id="new-review">Start code review</button>
+    <% else %>
+      <button id="new-review">Add another code review</button>
+    <% end %>
+
+    <div id="review-form-reopen-handle">
+      <button>
+        <span class="ui-icon ui-icon-newwin"></span>&nbsp;Code review
+      </button>
+    </div>
+  </section>
 <% end %>
 
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
@@ -25,8 +48,8 @@
 <script type="text/javascript">
   $(document).ready(function() {
     var firstOpen = true;
+    var $newReviewButton = $('#new-review');
     var $reopenHandle = $('#review-form-reopen-handle');
-    var $reopenHandleButton = $reopenHandle.find('button');
     var $dialog = $('#review-form-dialog');
 
     function doTransferEffect($from, $to, callback) {
@@ -38,12 +61,12 @@
         title: 'Code review',
         width: 450,
         height: 250,
+        dialogClass: 'big-drop-shadow',
         beforeClose: function() {
           $reopenHandle.show();
-          $reopenHandleButton.dropShadow();
           doTransferEffect($dialog, $reopenHandle);
         }
-      });
+      }).find('*').show();
 
       $('#ui-dialog-title-review-form-dialog').
               parent().
@@ -52,11 +75,11 @@
               addClass('ui-icon-minusthick');
 
       if (firstOpen) {
-        $reopenHandleButton.removeShadow();
-        $reopenHandle.hide();
+        doTransferEffect($newReviewButton, $dialog, function() {
+          $newReviewButton.hide();
+        });
       } else {
         doTransferEffect($reopenHandle, $dialog, function() {
-          $reopenHandleButton.removeShadow();
           $reopenHandle.hide();
         });
       }
@@ -64,8 +87,10 @@
       firstOpen = false;
     }
 
-    $reopenHandleButton.button().click(openDialog);
-
-    openDialog();
+    $newReviewButton.click(openDialog);
+    $reopenHandle.find('button').
+            addClass('medium-drop-shadow').
+            button().
+            click(openDialog);
   });
 </script>

@@ -110,6 +110,18 @@ pre {
   list-style: square;
 }
 
+.transfer-effect {
+  border: 2px dotted gray;
+}
+
+.medium-drop-shadow {
+  box-shadow: 2px 3px 4px 1px #696969;
+}
+
+.big-drop-shadow {
+  box-shadow: 3px 4px 5px 2px #696969;
+}
+
 
 /* Toplevel layout */
 
@@ -295,10 +307,22 @@ table.points > * > tr > td {
   text-align: center;
 }
 
-/* Code review form */
+/* Code reviews */
+
+.code-review {
+  border: 1px #CCCCCC solid;
+  padding: 10px;
+  margin-top: 1em;
+  margin-bottom: 2em;
+}
+
+.reviewer {
+  font-weight: bold;
+}
 
 #review-form {
   height: 95%;
+  display: none;
 }
 
 #review-form > form {
@@ -309,9 +333,11 @@ table.points > * > tr > td {
   width: 100%;
   height: 80%;
   margin: auto;
+  resize: none; /* We do our own resizing */
 }
 
 #review-form-reopen-handle {
+  display: none;
   position: fixed;
   top: 100%;
   left: 0;
@@ -326,8 +352,4 @@ table.points > * > tr > td {
 
 #review-form .buttons {
   margin-top: 0.6em;
-}
-
-.transfer-effect {
-  border: 2px dotted gray;
 }
