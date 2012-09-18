@@ -1,4 +1,71 @@
 
 <h1>Code review, submission <%= @submission.id %></h1>
 
+<% if @new_review %>
+  <div id="review-form-dialog">
+    <div id="review-form">
+      <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
+        <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
+        <div class="buttons">
+          <%= f.submit 'Save review' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div id="review-form-reopen-handle">
+    <button>
+      <span class="ui-icon ui-icon-newwin"></span>&nbsp;Code review
+    </button>
+  </div>
+<% end %>
+
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    var firstOpen = true;
+    var $reopenHandle = $('#review-form-reopen-handle');
+    var $reopenHandleButton = $reopenHandle.find('button');
+    var $dialog = $('#review-form-dialog');
+
+    function doTransferEffect($from, $to, callback) {
+      $from.effect('transfer', {to: $to, className: 'transfer-effect'}, 500, callback);
+    }
+
+    function openDialog() {
+      $dialog.dialog({
+        title: 'Code review',
+        width: 450,
+        height: 250,
+        beforeClose: function() {
+          $reopenHandle.show();
+          $reopenHandleButton.dropShadow();
+          doTransferEffect($dialog, $reopenHandle);
+        }
+      });
+
+      $('#ui-dialog-title-review-form-dialog').
+              parent().
+              find('.ui-icon-closethick').
+              removeClass('ui-icon-closethick').
+              addClass('ui-icon-minusthick');
+
+      if (firstOpen) {
+        $reopenHandleButton.removeShadow();
+        $reopenHandle.hide();
+      } else {
+        doTransferEffect($reopenHandle, $dialog, function() {
+          $reopenHandleButton.removeShadow();
+          $reopenHandle.hide();
+        });
+      }
+
+      firstOpen = false;
+    }
+
+    $reopenHandleButton.button().click(openDialog);
+
+    openDialog();
+  });
+</script>

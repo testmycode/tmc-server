@@ -291,3 +291,39 @@ table.points > * > tr > td {
   text-align: center;
 }
 
+/* Code review form */
+
+#review-form {
+  height: 95%;
+}
+
+#review-form > form {
+  height: 100%;
+}
+
+#review-form textarea {
+  width: 100%;
+  height: 80%;
+  margin: auto;
+}
+
+#review-form-reopen-handle {
+  position: fixed;
+  top: 100%;
+  left: 0;
+  margin-left: 10px;
+  margin-top: -50px;
+}
+
+#review-form-reopen-handle > button > .ui-button-text * {
+  float: left;
+  white-space: nowrap;
+}
+
+#review-form .buttons {
+  margin-top: 0.6em;
+}
+
+.transfer-effect {
+  border: 2px dotted gray;
+}
