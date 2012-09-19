@@ -16,7 +16,7 @@ class AuthsController < ApplicationController
         render :text => msg, :layout => 'bare'
       end
       format.json do
-        render :json => msg
+        render :json => {:status => msg}.to_json
       end
     end
   end
