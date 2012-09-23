@@ -1,7 +1,10 @@
 require 'pathname'
 require 'system_commands'
 require 'maven_pom_file'
+require 'fileutils'
 
+# Utility to help compile and use dependencies that are maven projects.
+# See TmcJunitRunner and TmcComet.
 class MavenProject
   def initialize(path)
     @path = Pathname(path)
@@ -56,7 +59,7 @@ class MavenProject
   def make_rake_tasks(dsl_obj, task_namespace)
     project = self
     dsl_obj.instance_eval do
-      file project.jar_path => FileList["#{project.path}/**/*.java"] do
+      file project.package_path => FileList["#{project.path}/**/*.java"] do
         puts "Compiling #{project.package_path} ..."
         begin
           project.compile!
@@ -88,7 +91,7 @@ class MavenProject
       task task_namespace => '#{task_namespace}:compile'
 
       # Have rake spec ensure this is compiled
-      task :spec => project.jar_path
+      task :spec => project.package_path
     end
   end
 
