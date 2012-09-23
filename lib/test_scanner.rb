@@ -13,7 +13,7 @@ module TestScanner
   def get_test_case_methods(course, exercise_name, exercise_path)
     hash = FileTreeHasher.hash_file_tree(exercise_path)
     TestScannerCache.get_or_update(course, exercise_name, hash) do
-      TmcJunitRunner.get_test_case_methods(exercise_path)
+      TmcJunitRunner.get.get_test_case_methods(exercise_path)
     end
   end
 end

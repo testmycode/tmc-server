@@ -269,13 +269,13 @@ private
       case exercise_type
       when :java_simple
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
-        FileUtils.cp(TmcJunitRunner.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
-        FileUtils.cp(TmcJunitRunner.lib_paths, stub_path + 'lib' + 'testrunner')
+        FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
+        FileUtils.cp(TmcJunitRunner.get.lib_paths, stub_path + 'lib' + 'testrunner')
       else
         # Until NB's Maven API is published, it's convenient to deliver the test runner in the zip like with java_simple.
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
-        FileUtils.cp(TmcJunitRunner.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
-        FileUtils.cp(TmcJunitRunner.lib_paths, stub_path + 'lib' + 'testrunner')
+        FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
+        FileUtils.cp(TmcJunitRunner.get.lib_paths, stub_path + 'lib' + 'testrunner')
       end
     end
     

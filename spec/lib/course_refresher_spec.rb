@@ -279,7 +279,7 @@ describe CourseRefresher do
     
     # Should have tmc-junit-runner.jar and its dependencies
     File.should exist(stub + '/lib/testrunner/tmc-junit-runner.jar')
-    (Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size.should == (1 + TmcJunitRunner.lib_paths.size)
+    (Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size.should == (1 + TmcJunitRunner.get.lib_paths.size)
   end
   
   it "should generate solution versions of exercises" do

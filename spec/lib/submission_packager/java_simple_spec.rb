@@ -162,8 +162,8 @@ describe SubmissionPackager::JavaSimple do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.read('lib/testrunner/tmc-junit-runner.jar').should == File.read(TmcJunitRunner.jar_path)
-        for original_path in TmcJunitRunner.lib_paths
+        File.read('lib/testrunner/tmc-junit-runner.jar').should == File.read(TmcJunitRunner.get.jar_path)
+        for original_path in TmcJunitRunner.get.lib_paths
           File.read("lib/testrunner/#{original_path.basename}").should == File.read(original_path)
         end
       end
