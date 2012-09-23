@@ -9,6 +9,10 @@ class MavenProject
 
   attr_reader :path
 
+  def name
+    pom_file.artifact_id
+  end
+
   def version
     pom_file.artifact_version
   end
@@ -46,6 +50,45 @@ class MavenProject
   def clean_compiled_files!
     Dir.chdir(path) do
       SystemCommands.sh!('mvn', '-q', 'clean')
+    end
+  end
+
+  def make_rake_tasks(dsl_obj, task_namespace)
+    project = self
+    dsl_obj.instance_eval do
+      file project.jar_path => FileList["#{project.path}/**/*.java"] do
+        puts "Compiling #{project.package_path} ..."
+        begin
+          project.compile!
+        rescue
+          puts "*** Failed to compile #{project.name} ***"
+          puts "  Have you done `git submodule update --init`?"
+          puts
+          raise
+        end
+        # In case it was already compiled and ant had nothing to do,
+        # we'll touch the jar file to make it newer than the deps.
+        FileUtils.touch(project.package_path) if File.exists?(project.package_path)
+      end
+
+      namespace task_namespace do
+        desc "Compiles #{project.package_path}"
+        task :compile => project.package_path
+
+        desc "Cleans #{project.package_path}"
+        task :clean do
+          project.clean_compiled_files!
+        end
+
+        desc "Forces a recompile of #{project.package_path}"
+        task :recompile => [:clean, :compile]
+      end
+
+      desc "Compiles #{project.package_path}"
+      task task_namespace => '#{task_namespace}:compile'
+
+      # Have rake spec ensure this is compiled
+      task :spec => project.jar_path
     end
   end
 
