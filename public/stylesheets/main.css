@@ -110,6 +110,11 @@ pre {
   list-style: square;
 }
 
+button * {
+  float: left;
+  white-space: nowrap;
+}
+
 .transfer-effect {
   border: 2px dotted gray;
 }
@@ -322,7 +327,6 @@ table.points > * > tr > td {
 
 #review-form {
   height: 95%;
-  display: none;
 }
 
 #review-form > form {
@@ -337,7 +341,6 @@ table.points > * > tr > td {
 }
 
 #review-form-reopen-handle {
-  display: none;
   position: fixed;
   top: 100%;
   left: 0;
@@ -345,11 +348,10 @@ table.points > * > tr > td {
   margin-top: -50px;
 }
 
-#review-form-reopen-handle > button > .ui-button-text * {
-  float: left;
-  white-space: nowrap;
-}
-
 #review-form .buttons {
   margin-top: 0.6em;
+}
+
+.code-review .buttons {
+  float: right;
 }
