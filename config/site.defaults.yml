@@ -35,6 +35,19 @@ baseurl_for_remote_sandboxes: http://localhost:3000/
 remote_sandboxes:
   - http://localhost:3001/
 
+# The URL and publish key to a tmc-comet server.
+# The publish key and the baseurl of this server must also be set in
+# ext/tmc-comet/config.properties (see tmc-comet's readme).
+comet_server:
+  # The URL is used to access the comet server as well as to serve
+  # javascript URLs to the web, so it must be accessible from the outside as well.
+  url: http://localhost:8080/
+  # The backend key is used to authenticate with the comet server
+  backend_key: set_me_in_site_yml
+  # Used to distinguish this server instance from others.
+  # A single tmc-comet instance can serve more than one TMC server instance.
+  my_baseurl: http://localhost:3000/
+
 # The memory limit for a submission in megabytes.
 # Currently this should be configured to be 32M lower than the
 # instance_ram setting of sandboxes. For now all this setting
