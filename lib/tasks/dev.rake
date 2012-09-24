@@ -10,8 +10,8 @@ namespace :dev do
 
       File.open(config_path, 'wb') do |f|
         comet_server_config = SiteSetting.value('comet_server')
-        f.write('fi.helsinki.cs.tmc.comet.backendKey = ' + comet_server_config['backend_key'])
-        f.write('fi.helsinki.cs.tmc.comet.allowedServers = ' + comet_server_config['my_baseurl'])
+        f.puts('fi.helsinki.cs.tmc.comet.backendKey = ' + comet_server_config['backend_key'])
+        f.puts('fi.helsinki.cs.tmc.comet.allowedServers = ' + comet_server_config['my_baseurl'])
       end
     end
 
