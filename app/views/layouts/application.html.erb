@@ -3,12 +3,30 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <%= stylesheet_link_tag 'main' %>
-  <%= javascript_include_tag 'jquery', 'jquery_ujs', 'jquery-ui', 'jquery.dataTables.min', 'naturalSort.js' %>
   <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css' %>
+
+  <%= javascript_include_tag(
+        'jquery',
+        'jquery_ujs',
+        'jquery-ui',
+        'jquery.dataTables.min',
+        'jquery.cookie',
+        'naturalSort.js',
+        comet_js_url('org/cometd.js'),
+        comet_js_url('jquery/jquery.cometd.js'),
+        'comet_notifications.js'
+      )
+  %>
+
   <% if Rails.env == 'test' %>
     <%= stylesheet_link_tag 'highlighting' %>
   <% end %>
+
   <%= csrf_meta_tag %>
+  <%= comet_server_url_meta_tag %>
+  <%= comet_tmc_baseurl_meta_tag %>
+  <%= tag :meta, :name => 'session_cookie_name', :content => SiteSetting.value(:session_cookie_key) %>
+  <%= tag :meta, :name => 'username', :content => current_user.username unless current_user.guest? %>
   <title>Test My Code server</title>
 </head>
 
@@ -39,9 +57,6 @@
 
     <div id="breadcrumb">
       <%= breadcrumb %>
-      <% if @show_page_presence %>
-        <%= render 'shared/page_presence_widget' %>
-      <% end %>
     </div>
 
     <div id="content-area">

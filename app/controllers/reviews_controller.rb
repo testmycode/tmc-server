@@ -13,7 +13,6 @@ class ReviewsController < ApplicationController
       :reviewer => current_user
     )
     authorize! :create, @review
-    @show_page_presence = true
     render 'reviews/show'
   end
 
