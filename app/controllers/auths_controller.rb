@@ -7,7 +7,7 @@ class AuthsController < ApplicationController
 
     user = User.find_by_login(params[:username])
     if user
-      if params[:password] && user.has_password?(params[:password]) != nil
+      if params[:password] && user.has_password?(params[:password])
         msg = "OK"
       elsif params[:session_id] && Session.find_by_session_id(params[:session_id]).andand.belongs_to?(user)
         msg = "OK"
