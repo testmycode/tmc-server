@@ -36,7 +36,7 @@ private
   end
 
   def clear_expired_sessions
-    ActiveRecord::SessionStore::Session.delete_all(['updated_at < ?', 1.month.ago])
+    Session.delete_expired
   end
 
 end
