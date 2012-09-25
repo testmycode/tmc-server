@@ -1,7 +1,7 @@
 require 'system_commands'
 require 'maven_project'
 
-# Interface to compiling tmc-comet.
+# Interface to compiling tmc-comet. See also: models/comet_server.rb
 class TmcComet < MavenProject
   def self.get
     @instance ||= TmcComet.new

@@ -1,0 +1,154 @@
+<h1 xmlns="http://www.w3.org/1999/html">Code review, submission <%= @submission.id %></h1>
+
+<section>
+  <% if @submission.reviews.empty? %>
+    <p>Code not reviewed yet.</p>
+  <% else %>
+    <% for review in @submission.reviews %>
+      <%= content_tag :div, :id => "code-review-#{review.id}", :class => 'code-review', :data => {:path => review_path(review)} do %>
+        <% if review.reviewer %>
+          <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
+        <% end %>
+        <div class="review-body"><%= simple_format(review.review_body) %></div>
+        <div class="buttons">
+          <% if action_name == 'new' && can?(:update, review) %>
+            <button class="edit-review"><span class="ui-icon ui-icon-pencil"></span>&nbsp;Edit</button>
+          <% end %>
+          <% if action_name == 'new' && can?(:delete, review) %>
+            <button class="delete-review"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
+            <div class="ui-helper-hidden">
+              <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => 'Really delete this review?' %>
+            </div>
+          <% end %>
+        </div>
+        <div class="ui-helper-clearfix"></div>
+      <% end %>
+    <% end %>
+  <% end %>
+</section>
+
+<% if @new_review %>
+  <section>
+    <div id="review-form-dialog" class="ui-helper-hidden">
+      <div id="review-form">
+        <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
+          <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
+
+          <%# these two are set JS when switching between editing and creating %>
+          <input name="_method" type="hidden" value="post" />
+
+          <div class="buttons">
+            <button type="submit"><span class="ui-icon ui-icon-disk"></span>&nbsp;Save review</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
+    <button id="new-review"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
+
+    <div id="review-form-reopen-handle" class="ui-helper-hidden">
+      <button>
+        <span class="ui-icon ui-icon-newwin"></span>&nbsp;Code review
+      </button>
+    </div>
+  </section>
+<% end %>
+
+<%= render :partial => 'files/files', :locals => {:files => @files} %>
+
+<% if @new_review %>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var $newReviewButton = $('#new-review');
+      var $reopenHandle = $('#review-form-reopen-handle');
+      var $dialog = $('#review-form-dialog');
+      var postAction = $dialog.find('form').attr('action');
+
+      function doTransferEffect($from, $to, callback) {
+        $from.effect('transfer', {to: $to, className: 'transfer-effect'}, 500, callback);
+      }
+
+      function openDialog($from, afterTransfer) {
+        $dialog.dialog({
+          title: 'Code review',
+          width: 450,
+          height: 250,
+          dialogClass: 'big-drop-shadow',
+          beforeClose: function() {
+            $reopenHandle.show();
+            doTransferEffect($dialog, $reopenHandle);
+          }
+        });
+
+        $('#ui-dialog-title-review-form-dialog').
+                parent().
+                find('.ui-icon-closethick').
+                removeClass('ui-icon-closethick').
+                addClass('ui-icon-minusthick');
+
+        doTransferEffect($from, $dialog, afterTransfer);
+      }
+
+      function idOfCodeReview($reviewDiv) {
+        return $reviewDiv.attr('id').replace(/^code-review-/, '');
+      }
+
+      function makeDialogView($reviewDiv) {
+        var $textarea = $dialog.find('textarea#review_review_body');
+
+        if ($reviewDiv) { // Editing
+          $textarea.val($reviewDiv.find('.review-body').text().trim());
+          $('.code-review.being-edited').removeClass('being-edited');
+          $reviewDiv.addClass('being-edited');
+
+          $dialog.find('form').attr('action', $reviewDiv.data('path'));
+          $dialog.find('input[type=hidden][name=_method]').val('put');
+        } else {
+          $textarea.val('');
+          $('.code-review.being-edited').removeClass('being-edited');
+
+          $dialog.find('form').attr('action', postAction);
+          $dialog.find('input[type=hidden][name=_method]').val('post');
+        }
+      }
+
+      $newReviewButton.click(function() {
+        makeDialogView(null);
+        openDialog($newReviewButton, function() {
+          $newReviewButton.hide();
+        });
+      });
+
+      $('button.edit-review').click(function() {
+        var $review = $(this).parents('div.code-review');
+        makeDialogView($review);
+        var id = idOfCodeReview($review);
+
+
+        openDialog($review);
+        $newReviewButton.show();
+        $reopenHandle.hide();
+      });
+
+      $('button.delete-review').click(function() {
+        $(this).parents('div.code-review').find('a[data-method=delete]').click();
+        return false;
+      });
+
+      $reopenHandle.find('button').
+              addClass('medium-drop-shadow').
+              button().
+              click(function() {
+                openDialog($reopenHandle, function() {
+                  $reopenHandle.hide();
+                });
+              });
+
+      $dialog.find('button[type=submit]').click(function() {
+        disableCometNotifications();
+        return true;
+      });
+    });
+  </script>
+<% end %>

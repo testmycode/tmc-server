@@ -6,7 +6,9 @@
   <thead>
     <tr>
       <th>Time</th>
-      <th>Student</th>
+      <% if show_student_column %>
+        <th>Student</th>
+      <% end %>
       <% if show_exercise_column %>
         <th>Exercise</th>
       <% end %>
@@ -14,7 +16,7 @@
       <% if show_awarded_points %>
         <th>Points</th>
       <% end %>
-      <% if show_review_column %>
+      <% if show_review_admin_column || show_review_column %>
         <th></th>
       <% else %>
         <th></th>
@@ -26,13 +28,15 @@
     <% submissions.each do |submission| %> 
       <tr>
         <td><%= submission.created_at.strftime("%d.%m.%Y %H:%M") %></td>
-        <td>
-          <% if can? :read, submission.user %>
-            <%= link_to submission.user.login, participant_path(submission.user) %>
-          <% else  %>
-            <%= submission.user.login %>
-          <% end %>
-        </td>
+        <% if show_student_column %>
+          <td>
+            <% if can? :read, submission.user %>
+              <%= link_to submission.user.login, participant_path(submission.user) %>
+            <% else  %>
+              <%= submission.user.login %>
+            <% end %>
+          </td>
+        <% end %>
         <% if show_exercise_column %>
           <td>
             <%= link_to_submission_exericse(submission) %>
@@ -46,17 +50,25 @@
             <%= points_list(submission.points_list) %>
           </td>
         <% end %>
-        <% if show_review_column %>
+        <% if show_review_admin_column %>
           <td>
             <%= link_to 'Review', new_submission_review_path(submission) %>
           </td>
+        <% elsif show_review_column %>
+          <td>
+            <% if submission.reviewed? %>
+              <%= link_to 'Review available', submission_reviews_path(submission, submission.reviews.latest) %>
+            <% else %>
+              Review pending
+            <% end %>
+          </td>
         <% else %>
-        <td>
-          <%= link_to 'Files', submission_files_path(submission) %>
-        </td>
-        <td>
-          <%= link_to 'Details', submission_path(submission)  %>
-        </td>
+          <td>
+            <%= link_to 'Files', submission_files_path(submission) %>
+          </td>
+          <td>
+            <%= link_to 'Details', submission_path(submission)  %>
+          </td>
         <% end %>
        </tr>
     <% end %>

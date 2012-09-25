@@ -182,6 +182,11 @@ class Course < ActiveRecord::Base
     self.submissions.where(:requests_review => true)
   end
 
+  def reviewable_submissions_for(user)
+    # TODO: (optionally) only latest from each exercise!
+    self.submissions.where(:user_id => user.id).where('requests_review OR requires_review')
+  end
+
   # Returns a hash of exercise group => {
   #   :available_points => number of available points,
   #   :points_by_user => {user_id => number_of_points}

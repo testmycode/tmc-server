@@ -35,12 +35,16 @@ section {
 }
 
 a {
-  color: #103D89;
+  color: #103D89 !important;
   text-decoration: none;
 }
-  
-a:visited { color: #103D89; }
-a:hover { text-decoration: underline; }
+
+a:visited {
+  color: #103D89 !important;
+}
+a:hover {
+  text-decoration: underline !important;
+}
 
 .error,
 .alert,
@@ -125,6 +129,13 @@ button * {
 
 .big-drop-shadow {
   box-shadow: 3px 4px 5px 2px #696969;
+}
+
+.dialog-buttons {
+  /*float: right;*/
+  position: absolute;
+  bottom: 0;
+  right: 1em;
 }
 
 
@@ -319,6 +330,10 @@ table.points > * > tr > td {
   padding: 10px;
   margin-top: 1em;
   margin-bottom: 2em;
+}
+
+.code-review.being-edited {
+  box-shadow: 0 0 4px 2px #47A6FF;
 }
 
 .reviewer {

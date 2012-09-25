@@ -1,0 +1,32 @@
+
+<% if current_user.administrator? %>
+  <section>
+    <h1>Administration</h1>
+    <% unless @course.reviews_required.empty? %>
+      <section>
+        <h2>Submissions requiring review</h2>
+        <%= show_submission_list @course.reviews_required, :table_id => 'reviews_required', :show_review_admin_column => true %>
+      </section>
+    <% end %>
+
+    <% unless @course.reviews_requested.empty? %>
+      <section>
+        <h2>Review requests</h2>
+        <%= show_submission_list @course.reviews_requested, :table_id => 'reviews_requested', :show_review_admin_column => true %>
+      </section>
+    <% end %>
+  </section>
+  <hr />
+<% end %>
+
+<%
+   my_reviews = @course.reviewable_submissions_for(current_user)
+%>
+<section>
+  <h2>My code reviews</h2>
+  <% unless my_reviews.empty? %>
+    <%= show_submission_list my_reviews, :table_id => 'my_reviews', :show_student_column => false, :show_review_column => true %>
+  <% else %>
+    <p>No code reviews yet.</p>
+  <% end %>
+</section>

@@ -11,6 +11,7 @@
         'jquery-ui',
         'jquery.dataTables.min',
         'jquery.cookie',
+        'misc.js',
         'naturalSort.js',
         comet_js_url('org/cometd.js'),
         comet_js_url('jquery/jquery.cometd.js'),
@@ -27,6 +28,8 @@
   <%= comet_tmc_baseurl_meta_tag %>
   <%= tag :meta, :name => 'session_cookie_name', :content => SiteSetting.value(:session_cookie_key) %>
   <%= tag :meta, :name => 'username', :content => current_user.username unless current_user.guest? %>
+  <%= tag :meta, :name => 'base_url', :content => root_url %>
+  <%= content_for :extra_meta_tags %>
   <title>Test My Code server</title>
 </head>
 

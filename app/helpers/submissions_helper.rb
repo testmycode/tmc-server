@@ -4,9 +4,11 @@ module SubmissionsHelper
       :submissions => submissions,
       :table_id => 'submissions',
       :invoke_datatables => true,
+      :show_student_column => true,
       :show_exercise_column => true,
       :show_awarded_points => false,
-      :show_review_column => false
+      :show_review_column => false,
+      :show_review_admin_column => false
     }.merge(options)
     render :partial => 'submissions/list', :locals => locals
   end

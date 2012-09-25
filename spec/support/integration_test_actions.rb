@@ -12,6 +12,10 @@ module IntegrationTestActions
     
     page.should have_content('Sign out')
   end
+
+  def log_out
+    click_link 'Sign out'
+  end
   
   def create_new_course(options = {})
     visit '/courses'
@@ -100,9 +104,7 @@ private
       path
     ]
     
-    # todo: could put these in the background, but Ruby 1.8 doesn't have Process.daemon :(
-    # would be better to ensure they finish too before the test finishes or
-    # this object is collected or whatever
+    # todo: put these in the background and ensure they finish before in an after :suite block
     system!(cmd)
     system!(cmd2)
   end

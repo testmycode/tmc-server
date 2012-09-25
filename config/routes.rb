@@ -7,6 +7,10 @@ TmcServer::Application.routes.draw do
 
   resource :auth, :only => [:show]
 
+  # Make POST an alternative to GET /auth.t[e]xt
+  match '/auth.text', :method => :post, :to => 'auths#show'
+  match '/auth.txt', :method => :post, :to => 'auths#show'
+
   resource :user
   
   resources :participants
@@ -50,8 +54,10 @@ TmcServer::Application.routes.draw do
     resource :result, :only => [:create]
     resources :feedback_answers, :only => [:create]
     resources :files, :only => [:index]
-    resources :reviews, :only => [:new, :show, :create, :update, :delete]
+    resources :reviews, :only => [:index, :new, :create]
   end
+
+  resources :reviews, :only => [:index, :update, :destroy]
 
   match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
   

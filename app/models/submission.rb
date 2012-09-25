@@ -10,7 +10,11 @@ class Submission < ActiveRecord::Base
   after_save { submission_data.save! if submission_data }
 
   has_many :test_case_runs, :dependent => :delete_all, :order => :id
-  has_many :reviews, :dependent => :delete_all, :order => :created_at
+  has_many :reviews, :dependent => :delete_all, :order => :created_at do
+    def latest
+      self.order('created_at DESC').limit(1).first
+    end
+  end
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
   
@@ -86,6 +90,10 @@ class Submission < ActiveRecord::Base
     else
       :error
     end
+  end
+
+  def reviewed?
+    self.reviews.any?
   end
   
   def points_list
