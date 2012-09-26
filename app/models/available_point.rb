@@ -6,6 +6,8 @@ class AvailablePoint < ActiveRecord::Base
 
   belongs_to :exercise
   has_one :course, :through => :exercise
+  validates :name, :presence => true
+  validate :name_must_not_contain_whitespace
 
   def self.course_points_of_exercises(course, exercises)
     course_points(course).where(:exercise_id => exercises.map(&:id))
@@ -19,5 +21,10 @@ class AvailablePoint < ActiveRecord::Base
   def self.course_sheet_points(course, sheet)
     joins(:exercise).
     where(:exercises => {:course_id => course.id, :gdocs_sheet => sheet})
+  end
+
+private
+  def name_must_not_contain_whitespace
+    errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
   end
 end
