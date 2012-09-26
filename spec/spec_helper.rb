@@ -40,6 +40,13 @@ Proc.new do
   Process::Sys.setreuid(user, user)
 end.call
 
+
+# Direct JS console.log to /dev/null
+# as instructed in https://github.com/thoughtbot/capybara-webkit/issues/350
+Capybara.register_driver :webkit do |app|
+  Capybara::Driver::Webkit.new(app, :stdout => File.open('/dev/null', 'w'))
+end
+
 Capybara.default_driver = :webkit
 Capybara.server_port = FreePorts.take_next
 
