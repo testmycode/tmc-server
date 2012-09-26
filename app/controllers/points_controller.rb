@@ -4,6 +4,9 @@ class PointsController < ApplicationController
 
   def index
     @course = Course.find(params[:course_id])
+    add_course_breadcrumb
+    add_breadcrumb 'Points', course_points_path(@course)
+
     exercises = @course.exercises.select {|e| e.visible_to?(current_user)}
     sheets = @course.gdocs_sheets(exercises).sort {|s1, s2| Natcmp.natcmp(s1, s2) }
     @summary = summary_hash(@course, exercises, sheets)
@@ -27,6 +30,11 @@ class PointsController < ApplicationController
   def show
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])
+
+    add_course_breadcrumb
+    add_breadcrumb 'Points', course_points_path(@course)
+    add_breadcrumb @sheetname, course_point_path(@course, @sheetname)
+
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).sort!
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
 

@@ -2,6 +2,11 @@ class SolutionsController < ApplicationController
   def show
     @exercise = Exercise.find(params[:exercise_id])
     @course = @exercise.course
+
+    add_course_breadcrumb
+    add_exercise_breadcrumb
+    add_breadcrumb 'Suggested solution', exercise_solution_path(@exercise)
+
     @solution = @exercise.solution
     begin
       authorize! :read, @solution

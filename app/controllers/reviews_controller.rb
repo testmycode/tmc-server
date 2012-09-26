@@ -4,16 +4,32 @@ class ReviewsController < ApplicationController
   def index
     if params[:course_id]
       fetch :course
+
+      add_course_breadcrumb
+      add_breadcrumb 'Code review', course_reviews_path(@course)
+
       render 'reviews/course_index'
     else
       fetch :submission, :files
-      raise "Submission's exercise has been moved or deleted" if !submission.exercise
+      raise "Submission's exercise has been moved or deleted" if !@submission.exercise
+
+      @course = @submission.course
+      add_course_breadcrumb
+      add_submission_breadcrumb
+      add_breadcrumb 'Code reviews', submission_reviews_path(@submission)
+
       render 'reviews/submission_index'
     end
   end
 
   def new
     fetch :submission, :files
+
+    @course = @submission.course
+    add_course_breadcrumb
+    add_submission_breadcrumb
+    add_breadcrumb 'Code review editor', new_submission_review_path(@submission)
+
     @new_review = Review.new(
       :submission_id => @submission.id,
       :reviewer_id => current_user.id

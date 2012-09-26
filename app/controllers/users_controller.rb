@@ -2,6 +2,8 @@ class UsersController < ApplicationController
   skip_authorization_check
   
   def new
+    add_breadcrumb 'Sign up', new_user_path
+
     authorize! :create, User
     if signed_in?
       # Logged in from this page. No need to be here, so redirect away
@@ -36,6 +38,8 @@ class UsersController < ApplicationController
   end
   
   def show
+    add_breadcrumb 'My account', user_path
+
     if current_user.guest?
       respond_access_denied
     else

@@ -1,9 +1,11 @@
 class PasswordResetKeysController < ApplicationController
   skip_authorization_check
-  
+
+  add_breadcrumb 'Forgot password', lambda {|*a| }, :only => [:new, :show]
+
   def new
   end
-  
+
   def create
     @email = params['email'].to_s.strip
     if @email.empty?

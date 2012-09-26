@@ -45,7 +45,7 @@ TmcServer::Application.routes.draw do
   end
   
   resources :exercises, :only => [:show] do
-    resources :submissions, :only => [:create, :index]
+    resources :submissions, :only => [:create]
     resource :solution, :only => [:show]
     resources :feedback_answers, :only => [:index]
   end

@@ -18,6 +18,14 @@ class FeedbackAnswersController < ApplicationController
       return respond_not_found
     end
 
+    add_course_breadcrumb
+    if @exercise
+      add_exercise_breadcrumb
+      add_breadcrumb 'Feedback', exercise_feedback_answers_path(@exercise)
+    else
+      add_breadcrumb 'Feedback', course_feedback_answers_path(@course)
+    end
+
     @numeric_questions = @course.feedback_questions.where("kind LIKE 'intrange%'").order(:position)
 
     respond_to do |format|

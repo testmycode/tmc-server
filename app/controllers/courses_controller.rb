@@ -40,6 +40,7 @@ class CoursesController < ApplicationController
     end
 
     assign_show_view_vars
+    add_course_breadcrumb
   end
 
   def refresh

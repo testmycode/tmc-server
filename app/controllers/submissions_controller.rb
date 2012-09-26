@@ -7,6 +7,9 @@ class SubmissionsController < ApplicationController
   skip_authorization_check :only => :show
 
   def index
+    add_course_breadcrumb
+    add_exercise_breadcrumb
+
     respond_to do |format|
       format.json do
         submissions = @course.submissions
@@ -41,9 +44,11 @@ class SubmissionsController < ApplicationController
     @submission = Submission.find(params[:id])
     authorize! :read, @submission
     
-    # Set the following for the breadcrumb
     @course = @submission.course
     @exercise = @submission.exercise
+    add_course_breadcrumb
+    add_exercise_breadcrumb
+    add_submission_breadcrumb
 
     respond_to do |format|
       format.html

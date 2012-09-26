@@ -3,6 +3,10 @@ class FeedbackAnswersChartsController < ApplicationController
     @course = Course.find(params[:course_id])
     authorize! :read, @course
 
+    add_course_breadcrumb
+    add_breadcrumb 'Feedback', course_feedback_answers_path(@course)
+    add_breadcrumb 'Charts', breadcrumb_no_path
+
     case params[:type]
     when 'scatterplot'
       show_scatterplot

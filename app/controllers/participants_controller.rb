@@ -2,7 +2,9 @@ require 'portable_csv'
 
 class ParticipantsController < ApplicationController
   skip_authorization_check
-  before_filter :require_administrator
+  before_filter :check_access
+
+  add_breadcrumb 'Participants', :participants_path, :only => [:index, :show], :if => lambda { current_user.administrator? }
 
   def index
     @ordinary_fields = ['username', 'email']
@@ -50,6 +52,12 @@ class ParticipantsController < ApplicationController
     @user = User.find(params[:id])
     @awarded_points = Hash[@user.awarded_points.to_a.sort!.group_by(&:course_id).map {|k, v| [k, v.map(&:name)]}]
 
+    if current_user.administrator?
+      add_breadcrumb @user.username, participant_path(@user)
+    else
+      add_breadcrumb 'My stats', participant_path(@user)
+    end
+
     @courses = []
     @missing_points = {}
     @percent_completed = {}
@@ -80,7 +88,7 @@ class ParticipantsController < ApplicationController
   end
 
 private
-  def require_administrator
+  def check_access
     respond_access_denied unless current_user.administrator? || params[:id] == current_user.id.to_s
   end
 
