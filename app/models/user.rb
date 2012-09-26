@@ -91,6 +91,10 @@ class User < ActiveRecord::Base
     return user if user.has_password?(submitted_password)
   end
 
+  def has_point?(course, point_name)
+    self.awarded_points.where(:course_id => course.id, :name => point_name).any?
+  end
+
   def <=>(other)
     self.login.downcase <=> other.login.downcase
   end

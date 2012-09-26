@@ -101,6 +101,10 @@ class Exercise < ActiveRecord::Base
     }).any?
   end
 
+  def available_review_points
+    available_points.where(:requires_review => true)
+  end
+
   def deadline=(new_value)
     super(DateAndTimeUtils.to_time(new_value, :prefer_end_of_day => true))
   end

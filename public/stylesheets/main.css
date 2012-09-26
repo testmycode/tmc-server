@@ -1,24 +1,27 @@
 
 /* Basic commons */
 
-h1 {
+h1, h2, h3, h4, h5, h6 {
   color: #09214A;
   font-family: "Arial", sans-serif;
+}
+
+h1 {
   font-size: 200%;
 }
 
 h2 {
   margin-left: 0.3em;
-  color: #09214A;
-  font-family: "Arial", sans-serif;
   font-size: 150%;
 }
 
 h3 {
   margin-left: 0.5em;
-  color: #09214A;
-  font-family: "Arial", sans-serif;
   font-size: 120%;
+}
+
+h5 {
+  margin-bottom: 0.2em;
 }
 
 .list-title {
@@ -81,6 +84,11 @@ pre {
 
 .footnote {
   font-size: 8pt;
+}
+
+.fine-print {
+  font-size: 8pt;
+  color: #444444;
 }
 
 .field_with_errors {
@@ -340,6 +348,10 @@ table.points > * > tr > td {
   font-weight: bold;
 }
 
+.points-by-review span.label {
+  font-weight: bold;
+}
+
 #review-form {
   height: 95%;
 }
@@ -350,9 +362,18 @@ table.points > * > tr > td {
 
 #review-form textarea {
   width: 100%;
-  height: 80%;
+  height: 60%;
   margin: auto;
   resize: none; /* We do our own resizing */
+}
+
+#review-form .points {
+  display: block;
+  margin-bottom: 1.5em;
+}
+
+#review-form .points .fine-print {
+  margin-top: 4pt;
 }
 
 #review-form-reopen-handle {

@@ -1,3 +1,5 @@
+require 'natsort'
+
 class ReviewsController < ApplicationController
   def index
     if params[:course_id]
@@ -5,6 +7,7 @@ class ReviewsController < ApplicationController
       render 'reviews/course_index'
     else
       fetch :submission, :files
+      raise "Submission's exercise has been moved or deleted" if !submission.exercise
       render 'reviews/submission_index'
     end
   end
@@ -27,12 +30,19 @@ class ReviewsController < ApplicationController
       :review_body => params[:review][:review_body]
     )
     authorize! :create, @review
-    if @review.save
-      flash[:success] = 'Code review added.'
-      notify_user_about_new_review(@review)
-      redirect_to new_submission_review_path(@review.submission_id)
-    else
+
+    begin
+      ActiveRecord::Base.connection.transaction do
+        award_points
+        @review.save!
+      end
+    rescue
+      ::Rails.logger.error($!)
       respond_with_error('Failed to save code review.')
+    else
+      flash[:success] = 'Code review added.'
+      notify_user_about_new_review
+      redirect_to new_submission_review_path(@review.submission_id)
     end
   end
 
@@ -40,11 +50,18 @@ class ReviewsController < ApplicationController
     fetch :review
     authorize! :update, @review
     @review.review_body = params[:review][:review_body]
-    if @review.save
+
+    begin
+      ActiveRecord::Base.connection.transaction do
+        award_points
+        @review.save!
+      end
+    rescue
+      ::Rails.logger.error($!)
+      respond_with_error('Failed to save code review.')
+    else
       flash[:success] = 'Code review edited. (No notification sent.)'
       redirect_to new_submission_review_path(@review.submission_id)
-    else
-      respond_with_error('Failed to save code review.')
     end
   end
 
@@ -52,10 +69,10 @@ class ReviewsController < ApplicationController
     fetch :review
     authorize! :delete, @review
     if @review.destroy
-      flash[:success] = 'Code review deleted. (Any points given were not redacted.)'
+      flash[:success] = 'Code review deleted.'
       redirect_to new_submission_review_path(@review.submission_id)
     else
-      respond_with_error('Failed to save code review.')
+      respond_with_error('Failed to delete code review.')
     end
   end
 
@@ -78,12 +95,38 @@ private
     end
   end
 
-  def notify_user_about_new_review(review)
-    channel = '/broadcast/user/' + review.submission.user.username + '/review-available'
+  def notify_user_about_new_review
+    channel = '/broadcast/user/' + @review.submission.user.username + '/review-available'
     data = {
-      :exercise_name => review.submission.exercise_name,
-      :url => submission_reviews_url(review.submission)
+      :exercise_name => @review.submission.exercise_name,
+      :url => submission_reviews_url(@review.submission),
+      :points => @review.points_list
     }
     CometServer.get.try_publish(channel, data)
+  end
+
+  def award_points
+    submission = @review.submission
+    exercise = submission.exercise
+    raise "Exercise of submission has been moved or deleted" if !exercise
+
+    if params[:review][:points].respond_to?(:keys)
+      points = []
+      for point_name in params[:review][:points].keys
+        unless exercise.available_points.where(:name => point_name).any?
+          raise "Point does not exist: #{point_name}"
+        end
+
+        points << point_name
+        pt = submission.awarded_points.build(
+          :course_id => submission.course_id,
+          :user_id => submission.user_id,
+          :name => point_name
+        )
+        authorize! :create, pt
+        pt.save!
+      end
+      @review.points = (@review.points_list + points).uniq.natsort.join(' ')
+    end
   end
 end

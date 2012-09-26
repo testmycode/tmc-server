@@ -9,6 +9,14 @@
         <% if review.reviewer %>
           <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
         <% end %>
+        <% unless review.points_list.empty? %>
+          <div class="points-by-review">
+            <span class="label">Points added:</span>&nbsp;
+            <% for point in review.points_list %>
+              <%= content_tag :span, raw(h(point)) + raw('&nbsp;'), :class => 'success' %>
+            <% end %>
+          </div>
+        <% end %>
         <div class="review-body"><%= simple_format(review.review_body) %></div>
         <div class="buttons">
           <% if action_name == 'new' && can?(:update, review) %>
@@ -17,7 +25,7 @@
           <% if action_name == 'new' && can?(:delete, review) %>
             <button class="delete-review"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
             <div class="ui-helper-hidden">
-              <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => 'Really delete this review?' %>
+              <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>
             </div>
           <% end %>
         </div>
@@ -34,8 +42,27 @@
         <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
           <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
 
-          <%# these two are set JS when switching between editing and creating %>
+          <%#  this is changed by JS when switching between editing and creating %>
           <input name="_method" type="hidden" value="post" />
+
+          <% unless @submission.exercise.available_review_points.empty? %>
+            <div class="points">
+              <h5>Points</h5>
+              <% for point in @submission.exercise.available_review_points %>
+                <% has_point = @submission.user.has_point?(@submission.course, point.name) %>
+                <%=
+                  check_box_tag(
+                    "review[points][#{point.name}]", 1, false, :class => 'point',
+                    :checked => has_point,
+                    :disabled => has_point,
+                    :title => has_point ? "Already awarded" : nil
+                  )
+                %>
+                <%= label_tag "review_points_#{point.name}", point.name, :title => has_point ? "Already awarded" : nil %>
+              <% end %>
+              <div class="fine-print">(note: points cannot be removed after saving)</div>
+            </div>
+          <% end %>
 
           <div class="buttons">
             <button type="submit"><span class="ui-icon ui-icon-disk"></span>&nbsp;Save review</button>
@@ -64,6 +91,7 @@
       var $reopenHandle = $('#review-form-reopen-handle');
       var $dialog = $('#review-form-dialog');
       var postAction = $dialog.find('form').attr('action');
+      <%= raw('var pointsAlreadyAwarded = ' + @submission.user.awarded_points.where(:course_id => @submission.course_id).map(&:name).to_json) + ';' %>
 
       function doTransferEffect($from, $to, callback) {
         $from.effect('transfer', {to: $to, className: 'transfer-effect'}, 500, callback);
@@ -73,7 +101,7 @@
         $dialog.dialog({
           title: 'Code review',
           width: 450,
-          height: 250,
+          height: 350,
           dialogClass: 'big-drop-shadow',
           beforeClose: function() {
             $reopenHandle.show();
@@ -111,6 +139,8 @@
           $dialog.find('form').attr('action', postAction);
           $dialog.find('input[type=hidden][name=_method]').val('post');
         }
+
+        $dialog.find(':checkbox.point:not(:disabled)').attr('checked', false);
       }
 
       $newReviewButton.click(function() {
