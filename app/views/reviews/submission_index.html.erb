@@ -1,5 +1,6 @@
 <h1>
   <% if @submission.reviews.count == 1 %>Code review<% else %>Code reviews<% end %>,
+  <%= @submission.exercise_name %>,
   submission <%= @submission.id %>
 </h1>
 
@@ -9,6 +10,19 @@
   <% else %>
     <% for review in @submission.reviews %>
       <%= content_tag :div, :id => "code-review-#{review.id}", :class => 'code-review', :data => {:path => review_path(review)} do %>
+        <% if @submission.user_id == current_user.id %>
+          <div class="status-buttons">
+            <%= form_tag review_path(review), :method => 'put' do %>
+              <% if review.marked_as_read? %>
+                <input type="hidden" name="mark_as_unread" value="1" />
+                <button type="submit">Mark as unread</button>
+              <% else %>
+                <input type="hidden" name="mark_as_read" value="1" />
+                <button type="submit">Mark as read</button>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
         <% if review.reviewer %>
           <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
         <% end %>

@@ -57,7 +57,7 @@ TmcServer::Application.routes.draw do
     resources :reviews, :only => [:index, :new, :create]
   end
 
-  resources :reviews, :only => [:index, :update, :destroy]
+  resources :reviews, :only => [:update, :destroy]
 
   match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
   

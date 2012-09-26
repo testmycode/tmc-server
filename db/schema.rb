@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120926005853) do
+ActiveRecord::Schema.define(:version => 20120926143255) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -97,12 +97,13 @@ ActiveRecord::Schema.define(:version => 20120926005853) do
   end
 
   create_table "reviews", :force => true do |t|
-    t.integer  "submission_id", :null => false
+    t.integer  "submission_id",                     :null => false
     t.integer  "reviewer_id"
-    t.text     "review_body",   :null => false
+    t.text     "review_body",                       :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "points"
+    t.boolean  "marked_as_read", :default => false, :null => false
   end
 
   add_index "reviews", ["reviewer_id"], :name => "index_reviews_on_reviewer_id"

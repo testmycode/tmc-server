@@ -352,6 +352,10 @@ table.points > * > tr > td {
   font-weight: bold;
 }
 
+.code-review .status-buttons {
+  float: right;
+}
+
 #review-form {
   height: 95%;
 }

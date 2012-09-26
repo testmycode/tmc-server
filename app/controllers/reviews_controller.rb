@@ -67,21 +67,12 @@ class ReviewsController < ApplicationController
   end
 
   def update
-    fetch :review
-    authorize! :update, @review
-    @review.review_body = params[:review][:review_body]
-
-    begin
-      ActiveRecord::Base.connection.transaction do
-        award_points
-        @review.save!
-      end
-    rescue
-      ::Rails.logger.error($!)
-      respond_with_error('Failed to save code review.')
-    else
-      flash[:success] = 'Code review edited. (No notification sent.)'
-      redirect_to new_submission_review_path(@review.submission_id)
+    if params[:review].is_a?(Hash)
+      update_review
+    elsif params[:mark_as_read]
+      mark_as_read(true)
+    elsif params[:mark_as_unread]
+      mark_as_read(false)
     end
   end
 
@@ -97,6 +88,47 @@ class ReviewsController < ApplicationController
   end
 
 private
+  def mark_as_read(read)
+    which = read ? 'read' : 'unread'
+
+    fetch :review
+    authorize! (read ? :mark_as_read : :mark_as_unread), @review
+
+    @review.marked_as_read = read
+    if @review.save
+      respond_to do |format|
+        format.html do
+          flash[:success] = "Code review marked as #{which}."
+          redirect_to submission_reviews_path(@review.submission)
+        end
+        format.json do
+          render :json => {:status => 'OK'}
+        end
+      end
+    else
+      respond_with_error("Failed to mark code review as #{which}.")
+    end
+  end
+
+  def update_review
+    fetch :review
+    authorize! :update, @review
+    @review.review_body = params[:review][:review_body]
+
+    begin
+      ActiveRecord::Base.connection.transaction do
+        award_points
+        @review.save!
+      end
+    rescue
+      ::Rails.logger.error($!)
+      respond_with_error('Failed to save code review.')
+    else
+      flash[:success] = 'Code review edited. (No notification sent).'
+      redirect_to new_submission_review_path(@review.submission_id)
+    end
+  end
+
   def fetch(*stuff)
     if stuff.include? :course
       @course = Course.find(params[:course_id])

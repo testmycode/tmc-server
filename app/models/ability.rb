@@ -44,6 +44,15 @@ class Ability
       can :read, Solution do |sol|
         sol.visible_to?(user)
       end
+
+      cannot :mark_as_read, Review
+      can :mark_as_read, Review do |r|
+        r.submission.user_id == user.id
+      end
+      cannot :mark_as_unread, Review
+      can :mark_as_unread, Review do |r|
+        r.submission.user_id == user.id
+      end
     end
   end
 end
