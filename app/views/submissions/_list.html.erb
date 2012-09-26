@@ -57,7 +57,7 @@
         <% elsif show_review_column %>
           <td>
             <% if submission.reviewed? %>
-              <%= link_to 'Review available', submission_reviews_path(submission, submission.reviews.latest) %>
+              <%= link_to 'Review available', submission_reviews_path(submission) %>
             <% else %>
               Review pending
             <% end %>

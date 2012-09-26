@@ -7,6 +7,8 @@ module BreadcrumbHelpers # Included in ApplicationController
   def add_exercise_breadcrumb
     if @exercise
       add_breadcrumb "Exercise #{@exercise.name}", exercise_path(@exercise)
+    elsif @submission && @submission.exercise
+      add_breadcrumb "Exercise #{@submission.exercise.name}", exercise_path(@submission.exercise)
     elsif @submission && @submission.exercise_name
       add_breadcrumb "(deleted exercise #{@submission.exercise_name}", breadcrumb_no_path
     else

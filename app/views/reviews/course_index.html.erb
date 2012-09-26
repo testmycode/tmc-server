@@ -24,6 +24,9 @@
 %>
 <section>
   <h2>My code reviews</h2>
+  <% if current_user.administrator? %>
+    <p class="fine-print">(this is what you would see as a non-administrator)</p>
+  <% end %>
   <% unless my_reviews.empty? %>
     <%= show_submission_list my_reviews, :table_id => 'my_reviews', :show_student_column => false, :show_review_column => true %>
   <% else %>

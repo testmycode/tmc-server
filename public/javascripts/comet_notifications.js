@@ -30,7 +30,11 @@ $(document).ready(function() {
       if (message.successful) {
         startSubscribing();
       } else {
-        log("cometd handshake failed: " + message.error);
+        if (message.error) {
+          log("cometd handshake failed: " + message.error);
+        } else {
+          log("cometd handshake failed");
+        }
       }
     });
 

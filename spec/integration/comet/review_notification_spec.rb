@@ -8,10 +8,10 @@ describe "Notifications about new code reviews via HTTP push", :integration => t
 
     @admin = Factory.create(:admin)
     @user = Factory.create(:user)
-    @submission = Factory.create(:submission, :user => @user, :requests_review => true)
+    @course = Factory.create(:course)
+    @exercise = Factory.create(:exercise, :course => @course)
+    @submission = Factory.create(:submission, :course => @course, :exercise => @exercise, :user => @user, :requests_review => true)
     Factory.create(:submission_data, :submission => @submission)
-    @exercise = @submission.exercise
-    @course = @submission.course
 
     using_session(:user) do
       visit '/'

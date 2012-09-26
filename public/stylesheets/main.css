@@ -372,10 +372,6 @@ table.points > * > tr > td {
   margin-bottom: 1.5em;
 }
 
-#review-form .points .fine-print {
-  margin-top: 4pt;
-}
-
 #review-form-reopen-handle {
   position: fixed;
   top: 100%;

@@ -1,4 +1,7 @@
-<h1 xmlns="http://www.w3.org/1999/html">Code review, submission <%= @submission.id %></h1>
+<h1>
+  <% if @submission.reviews.count == 1 %>Code review<% else %>Code reviews<% end %>,
+  submission <%= @submission.id %>
+</h1>
 
 <section>
   <% if @submission.reviews.empty? %>
@@ -60,7 +63,7 @@
                 %>
                 <%= label_tag "review_points_#{point.name}", point.name, :title => has_point ? "Already awarded" : nil %>
               <% end %>
-              <div class="fine-print">(note: points cannot be removed after saving)</div>
+              <p class="fine-print">(note: points cannot be removed after saving)</p>
             </div>
           <% end %>
 

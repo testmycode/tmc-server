@@ -6,7 +6,7 @@ class ReviewsController < ApplicationController
       fetch :course
 
       add_course_breadcrumb
-      add_breadcrumb 'Code review', course_reviews_path(@course)
+      add_breadcrumb 'Code reviews', course_reviews_path(@course)
 
       render 'reviews/course_index'
     else
@@ -15,8 +15,10 @@ class ReviewsController < ApplicationController
 
       @course = @submission.course
       add_course_breadcrumb
+      add_exercise_breadcrumb
       add_submission_breadcrumb
-      add_breadcrumb 'Code reviews', submission_reviews_path(@submission)
+      breadcrumb_label = if @submission.reviews.count == 1 then 'Code review' else 'Code reviews' end
+      add_breadcrumb breadcrumb_label, submission_reviews_path(@submission)
 
       render 'reviews/submission_index'
     end
@@ -27,6 +29,8 @@ class ReviewsController < ApplicationController
 
     @course = @submission.course
     add_course_breadcrumb
+    add_breadcrumb 'Code reviews', course_reviews_path(@course)
+    add_exercise_breadcrumb
     add_submission_breadcrumb
     add_breadcrumb 'Code review editor', new_submission_review_path(@submission)
 
