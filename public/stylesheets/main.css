@@ -189,7 +189,7 @@ body.default {
   font-weight: bold;
 }
 
-#title-area > #login > #account-details {
+#title-area > #login > div {
   font-weight: bold;
   margin-top: 5pt;
 }
