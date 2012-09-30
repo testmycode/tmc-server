@@ -14,6 +14,15 @@ private
   def course_data(course)
     exercises = course.exercises.includes(:available_points).natsort_by(&:name)
 
+    submissions_by_exercise = {}
+    Submission.where(:course_id => course.id, :user_id => @user.id).each do |sub|
+      submissions_by_exercise[sub.exercise_name] ||= []
+      submissions_by_exercise[sub.exercise_name] << sub
+    end
+    exercises.each do |ex|
+      ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
+    end
+
     {
       :id => course.id,
       :name => course.name,
@@ -26,7 +35,6 @@ private
   def exercise_data(exercise)
     return nil if !exercise.visible_to?(@user)
 
-    #TODO: optimize and/or cache parts of it
     data = {
       :id => exercise.id,
       :name => exercise.name,

@@ -64,6 +64,7 @@ private
           add_records_for_new_exercises
           delete_records_for_removed_exercises
           update_exercise_options
+          set_has_tests_flags
           update_available_points
           make_solutions
           make_stubs
@@ -160,8 +161,7 @@ private
       exercise_names.each do |name|
         if !@course.exercises.any? {|e| e.name == name }
           @report.notices << "Added exercise #{name}"
-          exercise = Exercise.new(:name => name)
-          @course.exercises << exercise
+          @course.exercises.new(:name => name)
         end
       end
     end
@@ -202,6 +202,12 @@ private
         data.split(/\s+/).reject(&:blank?)
       elsif data.is_a?(Array)
         data.map(&:to_s).reject(&:blank?)
+      end
+    end
+
+    def set_has_tests_flags
+      @course.exercises.each do |e|
+        e.has_tests = true # we don't yet detect whether an exercise includes tests
       end
     end
     

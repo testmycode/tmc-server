@@ -11,7 +11,7 @@ class Exercise < ActiveRecord::Base
   has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "feedback_answers.course_id = #{self.course_id}" }
   has_many :student_events, :foreign_key => :exercise_name, :primary_key => :name,
-      :conditions => proc { "student_events.course_id = #{self.course_id}" }
+    :conditions => proc { "student_events.course_id = #{self.course_id}" }
 
   validates :gdocs_sheet, :format => { :without => /^(MASTER|PUBLIC)$/ }
 
@@ -65,6 +65,16 @@ class Exercise < ActiveRecord::Base
     Solution.new(self)
   end
 
+  def set_submissions_by(user, value)
+    @submissions_by ||= {}
+    @submissions_by[user.id] = value
+  end
+
+  def submissions_by(user)
+    @submissions_by ||= {}
+    @submissions_by[user.id] ||= submissions.where(:user_id => user.id).to_a
+  end
+
   # Whether a user may make submissions
   def submittable_by?(user)
     returnable? && (user.administrator? || (!expired? && !hidden? && published? && !user.guest?))
@@ -87,18 +97,14 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user has made a submission for this exercise
   def attempted_by?(user)
-    submissions.where(:user_id => user.id, :processed => true).exists?
+    submissions_by(user).any?(&:processed)
   end
 
   # Whether a user has made a submission with all test cases passing
   def completed_by?(user)
-    Submission.where({
-      :course_id => self.course_id,
-      :exercise_name => self.name,
-      :user_id => user.id,
-      :pretest_error => nil,
-      :all_tests_passed => true
-    }).any?
+    submissions_by(user).any? do |s|
+      s.pretest_error == nil && s.all_tests_passed?
+    end
   end
 
   def requires_review?
@@ -107,7 +113,7 @@ class Exercise < ActiveRecord::Base
 
   # Whether a code review for this exercise exists for a submission made by 'user'.
   def reviewed_for?(user)
-    self.submissions.where(:user_id => user.id).joins(:reviews).any?
+    self.submissions_by(user).any? {|s| s.reviews.any? }
   end
 
   # Whether all of the required code review points have been given.
@@ -160,9 +166,9 @@ class Exercise < ActiveRecord::Base
   # TMC may be used to distribute exercise templates without tests.
   def returnable?
     if returnable_forced != nil
-      returnable_forced
+      returnable_forced # may be true or false
     else
-      File.exist?(clone_path) && !!try_get_exercise_dir.andand.has_tests?
+      has_tests?
     end
   end
 

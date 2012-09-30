@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120929023553) do
+ActiveRecord::Schema.define(:version => 20120930115922) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20120929023553) do
     t.boolean  "returnable_forced"
     t.string   "checksum",               :default => "",    :null => false
     t.datetime "solution_visible_after"
+    t.boolean  "has_tests",              :default => false, :null => false
   end
 
   add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name"
