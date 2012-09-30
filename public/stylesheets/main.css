@@ -382,6 +382,7 @@ table.points > * > tr > td {
   left: 0;
   margin-left: 10px;
   margin-top: -50px;
+  z-index: 1000;
 }
 
 #review-form .buttons {
