@@ -16,5 +16,5 @@ screen rake dev:comet:run
 title "comet"
 
 screen rvmsudo ext/tmc-sandbox/web/webapp.rb run
-title "webapp"
+title "sandbox"
 
