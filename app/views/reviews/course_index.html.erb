@@ -1,17 +1,17 @@
 
 <% if current_user.administrator? %>
   <section>
-    <h1>Administration</h1>
+    <h2>Administration</h2>
     <% unless @course.reviews_required.empty? %>
       <section>
-        <h2>Submissions requiring review</h2>
+        <h3>Submissions requiring review</h3>
         <%= show_submission_list @course.reviews_required, :table_id => 'reviews_required', :show_review_admin_column => true %>
       </section>
     <% end %>
 
     <% unless @course.reviews_requested.empty? %>
       <section>
-        <h2>Review requests</h2>
+        <h3>Review requests</h3>
         <%= show_submission_list @course.reviews_requested, :table_id => 'reviews_requested', :show_review_admin_column => true %>
       </section>
     <% end %>

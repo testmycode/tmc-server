@@ -101,8 +101,25 @@ class Exercise < ActiveRecord::Base
     }).any?
   end
 
+  def requires_review?
+    !available_review_points.empty?
+  end
+
+  # Whether a code review for this exercise exists for a submission made by 'user'.
+  def reviewed_for?(user)
+    self.submissions.where(:user_id => user.id).joins(:reviews).any?
+  end
+
+  # Whether all of the required code review points have been given.
+  # Returns true if the exercise doesn't require code review.
+  def all_review_points_given_for?(user)
+    return true if !requires_review? # optimization
+    user.has_points?(course, available_review_points.map(&:name))
+  end
+
   def available_review_points
-    available_points.where(:requires_review => true)
+    # use 'select' instead of 'where' to use cached value of available_points
+    available_points.to_a.select(&:requires_review)
   end
 
   def deadline=(new_value)

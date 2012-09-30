@@ -71,6 +71,12 @@ FactoryGirl.define do
     exercise
   end
 
+  factory :review do
+    submission
+    reviewer :factory => :user
+    review_body "This is a review"
+  end
+
   factory :test_case_run do
     sequence(:test_case_name) {|n| "test case #{n}" }
     submission

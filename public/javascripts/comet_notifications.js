@@ -10,7 +10,7 @@ $(document).ready(function() {
     return;
   }
 
-  var cometUrl = $('meta[name=comet_server_baseurl]').attr('content') + '/comet';
+  var cometUrl = $('meta[name=comet_server_baseurl]').attr('content');
   var tmcBaseUrl = $('meta[name=comet_tmc_baseurl]').attr('content');
   var sessionCookieName = $('meta[name=session_cookie_name]').attr('content');
   var sessionId = $.cookie(sessionCookieName);

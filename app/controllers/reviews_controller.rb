@@ -5,22 +5,32 @@ class ReviewsController < ApplicationController
     if params[:course_id]
       fetch :course
 
-      add_course_breadcrumb
-      add_breadcrumb 'Code reviews', course_reviews_path(@course)
-
-      render 'reviews/course_index'
+      respond_to do |format|
+        format.html do
+          add_course_breadcrumb
+          add_breadcrumb 'Code reviews', course_reviews_path(@course)
+          render 'reviews/course_index'
+        end
+        format.json do
+          render :json => course_reviews_json
+        end
+      end
     else
       fetch :submission, :files
       raise "Submission's exercise has been moved or deleted" if !@submission.exercise
 
       @course = @submission.course
-      add_course_breadcrumb
-      add_exercise_breadcrumb
-      add_submission_breadcrumb
-      breadcrumb_label = if @submission.reviews.count == 1 then 'Code review' else 'Code reviews' end
-      add_breadcrumb breadcrumb_label, submission_reviews_path(@submission)
 
-      render 'reviews/submission_index'
+      respond_to do |format|
+        format.html do
+          add_course_breadcrumb
+          add_exercise_breadcrumb
+          add_submission_breadcrumb
+          breadcrumb_label = if @submission.reviews.count == 1 then 'Code review' else 'Code reviews' end
+          add_breadcrumb breadcrumb_label, submission_reviews_path(@submission)
+          render 'reviews/submission_index'
+        end
+      end
     end
   end
 
@@ -88,6 +98,39 @@ class ReviewsController < ApplicationController
   end
 
 private
+  def course_reviews_json
+    submissions = @course.reviewable_submissions_for(current_user).includes(:reviews => [:reviewer, :submission])
+    exercises = Hash[@course.exercises.map {|e| [e.name, e] }]
+    reviews = submissions.map do |s|
+      s.reviews.map do |r|
+        {
+          :submission_id => s.id,
+          :exercise_name => s.exercise_name
+        }.merge(review_json(exercises, r))
+      end
+    end.flatten
+    {
+      :api_version => API_VERSION,
+      :reviews => reviews
+    }
+  end
+
+  def review_json(exercises, review)
+    available_points = exercises[review.submission.exercise_name].available_points.where(:requires_review => true).map(&:name)
+    points_not_awarded = available_points - review.points_list
+    {
+      :marked_as_read => review.marked_as_read,
+      :reviewer_name => review.reviewer.display_name,
+      :review_body => review.review_body,
+      :points => review.points_list.natsort,
+      :points_not_awarded => points_not_awarded.natsort,
+      :url => submission_reviews_url(review.submission_id),
+      :update_url => review_url(review),
+      :created_at => review.created_at,
+      :updated_at => review.updated_at
+    }
+  end
+
   def mark_as_read(read)
     which = read ? 'read' : 'unread'
 

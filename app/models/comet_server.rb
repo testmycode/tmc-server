@@ -6,20 +6,32 @@ class CometServer
     @instance ||= CometServer.new(conf['url'], conf['backend_key'], conf['my_baseurl'])
   end
 
-  def initialize(comet_baseurl, key, my_baseurl)
-    @url = comet_baseurl.gsub(/\/+$/, '') + '/synchronous/publish'
+  def initialize(comet_baseurl, key, webserver_baseurl)
+    @comet_baseurl = comet_baseurl.gsub(/\/+$/, '')
     @key = key
-    @my_baseurl = my_baseurl
+    @webserver_baseurl = webserver_baseurl
   end
 
-  attr_reader :url
+  def url
+    @comet_baseurl + '/'
+  end
+
+  def publish_url
+    @comet_baseurl + '/synchronous/publish'
+  end
+
+  def client_url
+    @comet_baseurl.gsub(/\/+$/, '') + '/comet'
+  end
+
+  attr_reader :webserver_baseurl
 
   def try_publish(channel, msg)
     begin
       publish(channel, msg)
       true
     rescue
-      ::Rails.logger.error "Failed to publish to #{@url}: #{$!}"
+      ::Rails.logger.error "Failed to publish to #{publish_url}: #{$!}"
       false
     end
   end
@@ -32,6 +44,6 @@ class CometServer
       :backendKey => @key
     }
     ::Rails.logger.info "Posting to tmc-comet: #{params.inspect}"
-    RestClient.post(@url, params)
+    RestClient.post(publish_url, params)
   end
 end

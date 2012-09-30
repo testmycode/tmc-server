@@ -36,6 +36,11 @@ class User < ActiveRecord::Base
     self.login = name
   end
 
+  # May eventually be separate from username
+  def display_name
+    username
+  end
+
   def field_value(field)
     field_value_record(field).value
   end
@@ -93,6 +98,11 @@ class User < ActiveRecord::Base
 
   def has_point?(course, point_name)
     self.awarded_points.where(:course_id => course.id, :name => point_name).any?
+  end
+
+  def has_points?(course, point_names)
+    existing = self.awarded_points.where(:course_id => course.id, :name => point_names).map(&:name)
+    point_names.all? {|pt| existing.include?(pt) }
   end
 
   def <=>(other)
