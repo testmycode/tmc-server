@@ -119,6 +119,7 @@ private
     available_points = exercises[review.submission.exercise_name].available_points.where(:requires_review => true).map(&:name)
     points_not_awarded = available_points - review.points_list
     {
+      :id => review.id,
       :marked_as_read => review.marked_as_read,
       :reviewer_name => review.reviewer.display_name,
       :review_body => review.review_body,
