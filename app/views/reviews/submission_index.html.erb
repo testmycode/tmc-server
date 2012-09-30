@@ -165,13 +165,13 @@
         openDialog($newReviewButton, function() {
           $newReviewButton.hide();
         });
+        $reopenHandle.hide();
       });
 
       $('button.edit-review').click(function() {
         var $review = $(this).parents('div.code-review');
         makeDialogView($review);
         var id = idOfCodeReview($review);
-
 
         openDialog($review);
         $newReviewButton.show();
