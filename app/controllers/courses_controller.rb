@@ -1,5 +1,6 @@
 require 'course_refresher'
 require 'natsort'
+require 'course_list'
 
 class CoursesController < ApplicationController
   def index
@@ -17,11 +18,10 @@ class CoursesController < ApplicationController
         courses = courses.select {|c| c.visible_to?(current_user) }
         authorize! :read, courses
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
-        
-        courses_data = courses.map {|c| course_data_for_json(c) }
+
         data = {
           :api_version => API_VERSION,
-          :courses => courses_data
+          :courses => CourseList.new(current_user, courses, view_context).course_list_data
         }
         render :json => data.to_json
       end
@@ -93,49 +93,5 @@ private
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end
-  end
-
-  def course_data_for_json(course)
-    exercises = course.exercises.includes(:available_points).natsort_by(&:name)
-
-    {
-      :id => course.id,
-      :name => course.name,
-      :reviews_url => course_reviews_url(course, :format => :json),
-      :comet_url => CometServer.get.client_url,
-      :exercises => exercises.map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
-    }
-  end
-
-  def exercise_data_for_json(exercise)
-    return nil if !exercise.visible_to?(current_user)
-    authorize! :read, exercise
-
-    helpers = view_context
-
-    #TODO: optimize
-    data = {
-      :id => exercise.id,
-      :name => exercise.name,
-      :deadline => exercise.deadline,
-      :checksum => exercise.checksum,
-      :return_url => exercise_return_url(exercise),
-      :zip_url => helpers.exercise_zip_url(exercise),
-      :returnable => exercise.returnable?,
-      :requires_review => exercise.requires_review?,
-      :attempted => exercise.attempted_by?(current_user),
-      :completed => exercise.completed_by?(current_user),
-      :reviewed => exercise.reviewed_for?(current_user),
-      :all_review_points_given => exercise.all_review_points_given_for?(current_user),
-      :memory_limit => exercise.memory_limit
-    }
-
-    data[:solution_zip_url] = helpers.exercise_solution_zip_url(exercise) if current_user.administrator?
-
-    data
-  end
-
-  def exercise_return_url(e)
-    "#{exercise_submissions_url(e, :format => 'json')}"
   end
 end
