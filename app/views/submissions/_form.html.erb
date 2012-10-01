@@ -3,6 +3,6 @@
   <%= render 'shared/error_messages', :target => submission %>
   
   <%= labeled_field("Zipped project", f.file_field('file')) %>
-  <%= labeled_field("Request code review", f.check_box('requests_review'), :order => :label_last) %>
+  <%= labeled_field("Request code review", check_box_tag('request_review'), :order => :label_last) %>
   <%= f.submit 'Submit'%>
 <% end %>

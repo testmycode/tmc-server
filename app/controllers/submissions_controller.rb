@@ -114,7 +114,7 @@ class SubmissionsController < ApplicationController
         :exercise => @exercise,
         :return_file => file_contents,
         :params_json => submission_params.to_json,
-        :requests_review => !!params[:submission][:requests_review]
+        :requests_review => !!params[:request_review]
       )
       
       authorize! :create, @submission
