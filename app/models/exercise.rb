@@ -75,6 +75,11 @@ class Exercise < ActiveRecord::Base
     @submissions_by[user.id] ||= submissions.where(:user_id => user.id).to_a
   end
 
+  def reload
+    super
+    @submissions_by = {}
+  end
+
   # Whether a user may make submissions
   def submittable_by?(user)
     returnable? && (user.administrator? || (!expired? && !hidden? && published? && !user.guest?))

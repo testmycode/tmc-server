@@ -125,59 +125,6 @@ describe Exercise do
     expect { ex.deadline = "2011-07-13 12:34:56:78" }.to raise_error
   end
 
-  it "should be returnable by default if there is a non-empty test dir" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    FileUtils.mkdir_p('FakeCache/test')
-    FileUtils.touch('FakeCache/test/Xoo.java')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should be_returnable
-  end
-
-  it "should be non-returnable by default if there is an empty test dir" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    FileUtils.mkdir_p('FakeCache/test')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should_not be_returnable
-  end
-
-  specify "maven project returnabilty" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache')
-    ex.stub(:clone_path => 'FakeCache')
-    FileUtils.touch('FakeCache/pom.xml')
-    FileUtils.mkdir_p('FakeCache/src/test/java')
-    ex.should_not be_returnable
-    FileUtils.touch('FakeCache/src/test/java/Xoo.java')
-    ex.should be_returnable
-  end
-
-  it "should be non-returnable by default if there is no test dir" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should_not be_returnable
-  end
-
-  it "can be forced to be returable" do
-    ex = Factory.create(:exercise, :course => course)
-    ex.should_not be_returnable
-    ex.options = { 'returnable' => true }
-    ex.should be_returnable
-  end
-
-  it "can be forced to be non-returable" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    FileUtils.mkdir_p('FakeCache/test')
-    FileUtils.touch('FakeCache/test/Xoo.java')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should be_returnable
-    ex.options = { 'returnable' => false }
-    ex.should_not be_returnable
-  end
-
   it "should always be submittable by administrators as long as it's returnable" do
     admin = Factory.create(:admin)
     ex = Factory.create(:returnable_exercise, :course => course)
@@ -190,6 +137,9 @@ describe Exercise do
 
     ex.hidden = true
     ex.should be_submittable_by(admin)
+
+    ex.options = { 'returnable' => false }
+    ex.should_not be_submittable_by(admin)
   end
 
   it "should be submittable by non-administrators only if the deadline has not passed and the exercise is not hidden and is published" do
@@ -267,6 +217,7 @@ describe Exercise do
     exercise.should_not be_attempted_by(user)
 
     Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :processed => true)
+    exercise.reload
     exercise.should be_attempted_by(user)
   end
 
@@ -300,6 +251,7 @@ describe Exercise do
     exercise.should_not be_reviewed_for(user)
     submission = Factory.create(:submission, :exercise => exercise, :course => course, :user => user)
     Factory.create(:review, :submission => submission)
+    exercise.reload
     exercise.should be_reviewed_for(user)
   end
 
