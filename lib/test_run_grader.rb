@@ -98,6 +98,7 @@ private
   end
 
   def should_flag_for_review?(submission, review_points)
+    return false if submission.requests_review
     awarded_points = submission.user.awarded_points.where(:course_id => submission.course.id).map(&:name)
     !(review_points - awarded_points).empty?
   end

@@ -154,11 +154,13 @@ describe TestRunGrader do
   end
 
   describe "when the exercise requires code review" do
-    it "should not award points that require review" do
+    before :each do
       ap = AvailablePoint.find_by_name('1.1')
       ap.requires_review = true
       ap.save!
+    end
 
+    it "should not award points that require review" do
       TestRunGrader.grade_results(@submission, successful_results)
 
       points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
@@ -167,20 +169,12 @@ describe TestRunGrader do
     end
 
     it "should flag the submission as requiring review if the exercise has review points" do
-      ap = AvailablePoint.find_by_name('1.1')
-      ap.requires_review = true
-      ap.save!
-
       TestRunGrader.grade_results(@submission, successful_results)
 
       @submission.should require_review
     end
 
     it "should unflag all previous submissions to the same exercise" do
-      ap = AvailablePoint.find_by_name('1.1')
-      ap.requires_review = true
-      ap.save!
-
       old_sub = Submission.create!(
         :user => @submission.user,
         :course => @submission.course,
@@ -211,10 +205,15 @@ describe TestRunGrader do
     end
 
     it "should not flag the submission as requiring review if the user has already scored the review points" do
-      ap = AvailablePoint.find_by_name('1.1')
-      ap.requires_review = true
-      ap.save!
       AwardedPoint.create(:course => @submission.course, :user => @submission.user, :name => '1.1')
+
+      TestRunGrader.grade_results(@submission, successful_results)
+
+      @submission.should_not require_review
+    end
+
+    it "should not flag the submission as requiring review if the submission requests review" do
+      @submission.requests_review = true
 
       TestRunGrader.grade_results(@submission, successful_results)
 
