@@ -5,6 +5,8 @@ class ReviewsController < ApplicationController
     if params[:course_id]
       fetch :course
 
+      @my_reviews = @course.submissions.where(:user_id => current_user.id).where('requests_review OR requires_review OR reviewed')
+
       respond_to do |format|
         format.html do
           add_course_breadcrumb
@@ -64,6 +66,7 @@ class ReviewsController < ApplicationController
     begin
       ActiveRecord::Base.connection.transaction do
         award_points
+        mark_as_reviewed
         @review.save!
       end
     rescue
@@ -99,7 +102,7 @@ class ReviewsController < ApplicationController
 
 private
   def course_reviews_json
-    submissions = @course.reviewable_submissions_for(current_user).includes(:reviews => [:reviewer, :submission])
+    submissions = @my_reviews.includes(:reviews => [:reviewer, :submission])
     exercises = Hash[@course.exercises.map {|e| [e.name, e] }]
     reviews = submissions.map do |s|
       s.reviews.map do |r|
@@ -160,10 +163,9 @@ private
     @review.review_body = params[:review][:review_body]
 
     begin
-      ActiveRecord::Base.connection.transaction do
-        award_points
-        @review.save!
-      end
+      mark_as_reviewed
+      award_points
+      @review.save!
     rescue
       ::Rails.logger.error($!)
       respond_with_error('Failed to save code review.')
@@ -171,6 +173,11 @@ private
       flash[:success] = 'Code review edited. (No notification sent).'
       redirect_to new_submission_review_path(@review.submission_id)
     end
+  end
+
+  def mark_as_reviewed
+    @review.submission.reviewed = true
+    @review.submission.save!
   end
 
   def fetch(*stuff)
@@ -204,16 +211,20 @@ private
   def award_points
     submission = @review.submission
     exercise = submission.exercise
+    course = exercise.course
     raise "Exercise of submission has been moved or deleted" if !exercise
 
+    available_points = exercise.available_points.where(:requires_review => true).map(&:name)
+    previous_points = course.awarded_points.where(:user_id => submission.user_id, :name => available_points).map(&:name)
+
     if params[:review][:points].respond_to?(:keys)
-      points = []
+      new_points = []
       for point_name in params[:review][:points].keys
         unless exercise.available_points.where(:name => point_name).any?
           raise "Point does not exist: #{point_name}"
         end
 
-        points << point_name
+        new_points << point_name
         pt = submission.awarded_points.build(
           :course_id => submission.course_id,
           :user_id => submission.user_id,
@@ -222,7 +233,7 @@ private
         authorize! :create, pt
         pt.save!
       end
-      @review.points = (@review.points_list + points).uniq.natsort.join(' ')
+      @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
     end
   end
 end

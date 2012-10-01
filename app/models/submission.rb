@@ -91,10 +91,6 @@ class Submission < ActiveRecord::Base
       :error
     end
   end
-
-  def reviewed?
-    self.reviews.any?
-  end
   
   def points_list
     points.to_s.split(' ')

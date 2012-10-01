@@ -174,23 +174,16 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def reviews_required
-    @reviews_required ||= self.submissions.where(:requires_review => true)
+  def reviews_required(include_reviewed = false)
+    result = self.submissions.where(:requires_review => true)
+    result = result.where(:reviewed => false) unless include_reviewed
+    result
   end
 
-  def reviews_requested
-    @reviews_requested ||= self.submissions.where(:requests_review => true)
-  end
-
-  def reload
-    super.reload
-    @reviews_required = nil
-    @reviews_requested = nil
-  end
-
-  def reviewable_submissions_for(user)
-    # TODO: (optionally) only latest from each exercise!
-    self.submissions.where(:user_id => user.id).where('requests_review OR requires_review')
+  def reviews_requested(include_reviewed = false)
+    result = self.submissions.where(:requests_review => true)
+    result = result.where(:reviewed => false) unless include_reviewed
+    result
   end
 
   # Returns a hash of exercise group => {

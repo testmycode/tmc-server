@@ -118,7 +118,7 @@ class Exercise < ActiveRecord::Base
 
   # Whether a code review for this exercise exists for a submission made by 'user'.
   def reviewed_for?(user)
-    self.submissions_by(user).any? {|s| s.reviews.any? }
+    self.submissions_by(user).any?(&:reviewed)
   end
 
   # Whether all of the required code review points have been given.
