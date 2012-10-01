@@ -175,11 +175,17 @@ class Course < ActiveRecord::Base
   end
 
   def reviews_required
-    self.submissions.where(:requires_review => true)
+    @reviews_required ||= self.submissions.where(:requires_review => true)
   end
 
   def reviews_requested
-    self.submissions.where(:requests_review => true)
+    @reviews_requested ||= self.submissions.where(:requests_review => true)
+  end
+
+  def reload
+    super.reload
+    @reviews_required = nil
+    @reviews_requested = nil
   end
 
   def reviewable_submissions_for(user)
@@ -192,7 +198,7 @@ class Course < ActiveRecord::Base
   #   :points_by_user => {user_id => number_of_points}
   # }
   def exercise_group_completion_by_user
-    #TODO: clean up exercise group discovery after merging to master branch
+    #TODO: clean up exercise group discovery
 
     groups = self.exercises.map(&:name).map {|name| if name =~ /^(.+)-[^-]+$/ then $1 else "" end }.uniq
 
