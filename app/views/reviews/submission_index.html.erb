@@ -87,7 +87,18 @@
         <% end %>
       </div>
     </div>
+  </section>
 
+  <% unless @submission.message_for_reviewer.blank? %>
+    <h3>Message from student to reviewer</h3>
+    <section>
+      <div class="message-for-reviewer">
+        <%= simple_format @submission.message_for_reviewer %>
+      </div>
+    </section>
+  <% end %>
+
+  <section>
     <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
     <button id="new-review"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
 
