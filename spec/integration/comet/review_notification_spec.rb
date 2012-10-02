@@ -29,7 +29,7 @@ describe "Notifications about new code reviews via HTTP push", :integration => t
   it "should be delivered in the web interface" do
     click_link @course.name
     click_link '1 code review requested'
-    click_link 'Review'
+    click_link 'Requested'
     click_button 'Start code review'
     fill_in 'review_review_body', :with => 'Dude, indent your code!'
     click_button 'Save review'

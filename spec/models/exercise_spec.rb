@@ -249,7 +249,7 @@ describe Exercise do
     exercise = Factory.create(:exercise, :course => course)
 
     exercise.should_not be_reviewed_for(user)
-    submission = Factory.create(:submission, :exercise => exercise, :course => course, :user => user)
+    submission = Factory.create(:submission, :exercise => exercise, :course => course, :user => user, :reviewed => true)
     Factory.create(:review, :submission => submission)
     exercise.reload
     exercise.should be_reviewed_for(user)
