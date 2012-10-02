@@ -74,7 +74,7 @@ class ReviewsController < ApplicationController
     else
       flash[:success] = 'Code review added.'
       notify_user_about_new_review
-      redirect_to submission_reviews_path(@review.submission_id)
+      redirect_to course_reviews_path(@submission.course_id)
     end
   end
 
