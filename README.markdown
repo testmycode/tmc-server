@@ -34,8 +34,8 @@ We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` w
 
 After you get the test suite to pass, you can set up start background services.
 
-1. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake reprocessor:init:install`.
-2. Recheck your comet server config in `site.yml` and then do `rvmsudo rake comet:config:update`.
+1. Recheck your comet server config in `site.yml` and then do `rvmsudo rake comet:config:update`.
+2. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake reprocessor:init:install`.
 3. Start the services: `sudo /etc/init.d/tmc-comet start`, `sudo /etc/init.d/tmc-submission-reprocessor start`.
 4. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
 
