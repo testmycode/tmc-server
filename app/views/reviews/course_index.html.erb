@@ -2,17 +2,11 @@
 <% if current_user.administrator? %>
   <section>
     <h2>Administration</h2>
-    <% unless @course.reviews_required.empty? %>
+    <% subs = @course.submissions_to_review.order('created_at ASC') %>
+    <% unless subs.empty? %>
       <section>
-        <h3>Submissions requiring review</h3>
-        <%= show_submission_list @course.reviews_required, :table_id => 'reviews_required', :show_review_admin_column => true %>
-      </section>
-    <% end %>
-
-    <% unless @course.reviews_requested.empty? %>
-      <section>
-        <h3>Review requests</h3>
-        <%= show_submission_list @course.reviews_requested, :table_id => 'reviews_requested', :show_review_admin_column => true %>
+        <h3>Submissions to review</h3>
+        <%= show_submission_list subs, :table_id => 'submissions_to-review', :show_review_column => true %>
       </section>
     <% end %>
   </section>
@@ -27,6 +21,15 @@
   <% if @my_reviews.empty? %>
     <p>No code reviews yet.</p>
   <% else %>
-      <%= show_submission_list @my_reviews, :table_id => 'my_reviews', :show_student_column => false, :show_review_column => true %>
+      <%=
+          show_submission_list(
+            @my_reviews,
+            :table_id => 'my_reviews',
+            :show_student_column => false,
+            :show_review_column => true,
+            :show_files_column => false,
+            :show_details_column => false
+          )
+      %>
   <% end %>
 </section>

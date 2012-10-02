@@ -7,8 +7,9 @@ module SubmissionsHelper
       :show_student_column => true,
       :show_exercise_column => true,
       :show_awarded_points => false,
-      :show_review_column => false,
-      :show_review_admin_column => false
+      :show_review_column => true,
+      :show_files_column => true,
+      :show_details_column => true
     }.merge(options)
     render :partial => 'submissions/list', :locals => locals
   end

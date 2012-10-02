@@ -16,10 +16,13 @@
       <% if show_awarded_points %>
         <th>Points</th>
       <% end %>
-      <% if show_review_admin_column || show_review_column %>
+      <% if show_review_column %>
+        <th>Review</th>
+      <% end %>
+      <% if show_files_column %>
         <th></th>
-      <% else %>
-        <th></th>
+      <% end %>
+      <% if show_details_column %>
         <th></th>
       <% end %>
     </tr>
@@ -50,22 +53,37 @@
             <%= points_list(submission.points_list) %>
           </td>
         <% end %>
-        <% if show_review_admin_column %>
-          <td>
-            <%= link_to 'Review', new_submission_review_path(submission) %>
-          </td>
-        <% elsif show_review_column %>
+        <% if show_review_column %>
           <td>
             <% if submission.reviewed? %>
-              <%= link_to 'Review available', submission_reviews_path(submission) %>
+              <% if can? :update, Review %>
+                <%= link_to 'Available', new_submission_review_path(submission) %>
+              <% else %>
+                <%= link_to 'Available', submission_reviews_path(submission) %>
+              <% end %>
+            <% elsif submission.requests_review? %>
+              <% if can? :create, Review %>
+                <%= link_to 'Requested', new_submission_review_path(submission) %>
+              <% else %>
+                Requested
+              <% end %>
+            <% elsif submission.requires_review? %>
+              <% if can? :create, Review %>
+                <%= link_to 'Pending', new_submission_review_path(submission) %>
+              <% else %>
+                Pending
+              <% end %>
             <% else %>
-              Review pending
+              N/A
             <% end %>
           </td>
-        <% else %>
+        <% end %>
+        <% if show_files_column %>
           <td>
             <%= link_to 'Files', submission_files_path(submission) %>
           </td>
+        <% end %>
+        <% if show_details_column %>
           <td>
             <%= link_to 'Details', submission_path(submission)  %>
           </td>

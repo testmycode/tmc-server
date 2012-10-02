@@ -41,7 +41,6 @@ class ReviewsController < ApplicationController
 
     @course = @submission.course
     add_course_breadcrumb
-    add_breadcrumb 'Code reviews', course_reviews_path(@course)
     add_exercise_breadcrumb
     add_submission_breadcrumb
     add_breadcrumb 'Code review editor', new_submission_review_path(@submission)
@@ -75,7 +74,7 @@ class ReviewsController < ApplicationController
     else
       flash[:success] = 'Code review added.'
       notify_user_about_new_review
-      redirect_to new_submission_review_path(@review.submission_id)
+      redirect_to submission_reviews_path(@review.submission_id)
     end
   end
 
@@ -191,7 +190,7 @@ private
     end
     if stuff.include? :review
       @review = Review.find(params[:id])
-      authorize! action_name.to_sym, @submission
+      authorize! :read, @review
     end
     if stuff.include? :files
       @files = SourceFileList.for_submission(@submission)

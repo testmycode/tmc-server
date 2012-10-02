@@ -186,6 +186,10 @@ class Course < ActiveRecord::Base
     result
   end
 
+  def submissions_to_review
+    self.submissions.where('(requests_review OR requires_review) AND NOT reviewed')
+  end
+
   # Returns a hash of exercise group => {
   #   :available_points => number of available points,
   #   :points_by_user => {user_id => number_of_points}
