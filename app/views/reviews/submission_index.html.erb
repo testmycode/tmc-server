@@ -9,6 +9,11 @@
     <p>Submission not reviewed yet.</p>
   <% end %>
 
+  <% newest_sub = @submission.newest_of_same_kind %>
+  <% if newest_sub %>
+    <p>NOTE: There is a <%= link_to "newer submission", new_submission_review_path(newest_sub) %>.</p>
+  <% end %>
+
   <% if @submission.exercise.reviewed_for?(@submission.user) %>
     <h3>Other reviewed submissions of this exercise</h3>
     <section>

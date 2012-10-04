@@ -95,6 +95,16 @@ class Submission < ActiveRecord::Base
   def points_list
     points.to_s.split(' ')
   end
+
+  # Returns the newest submission by the same user for the same exercise,
+  # as long as it's newer than this submission
+  def newest_of_same_kind
+    Submission.where(
+      :course_id => self.course_id,
+      :exercise_name => self.exercise_name,
+      :user_id => self.user_id
+    ).where(['created_at > ?', self.created_at]).order('created_at DESC').first
+  end
   
   def unprocessed_submissions_before_this
     if !self.processed?
