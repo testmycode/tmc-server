@@ -234,7 +234,7 @@ private
         pt.save!
       end
     end
-    
+
     @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
     submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
   end

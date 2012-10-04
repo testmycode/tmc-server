@@ -121,6 +121,11 @@ class Exercise < ActiveRecord::Base
     self.submissions_by(user).any?(&:reviewed)
   end
 
+  # Returns all reviewed submissions for this exercise for 'user'
+  def reviewed_submissions_for(user)
+    self.submissions_by(user).select(&:reviewed)
+  end
+
   # Whether all of the required code review points have been given.
   # Returns true if the exercise doesn't require code review.
   def all_review_points_given_for?(user)

@@ -6,48 +6,67 @@
 
 <section>
   <% if @submission.reviews.empty? %>
-    <p>Code not reviewed yet.</p>
-  <% else %>
-    <% for review in @submission.reviews %>
-      <%= content_tag :div, :id => "code-review-#{review.id}", :class => 'code-review', :data => {:path => review_path(review)} do %>
-        <% if @submission.user_id == current_user.id %>
-          <div class="status-buttons">
-            <%= form_tag review_path(review), :method => 'put' do %>
-              <% if review.marked_as_read? %>
-                <input type="hidden" name="mark_as_unread" value="1" />
-                <button type="submit">Mark as unread</button>
-              <% else %>
-                <input type="hidden" name="mark_as_read" value="1" />
-                <button type="submit">Mark as read</button>
-              <% end %>
+    <p>Submission not reviewed yet.</p>
+  <% end %>
+
+  <% if @submission.exercise.reviewed_for?(@submission.user) %>
+    <h3>Other reviewed submissions of this exercise</h3>
+    <section>
+      <%=
+          subs = @submission.exercise.reviewed_submissions_for(@submission.user) - [@submission]
+          options = {
+            :table_id => 'previously_reviewed',
+            :show_student_column => false,
+            :show_exercise_column => false,
+            :show_awarded_points => true,
+            :show_review_column => true,
+            :show_files_column => false,
+            :show_details_column => true
+          }
+          show_submission_list(subs, options)
+      %>
+    </section>
+  <% end %>
+
+  <% for review in @submission.reviews %>
+    <%= content_tag :div, :id => "code-review-#{review.id}", :class => 'code-review', :data => {:path => review_path(review)} do %>
+      <% if @submission.user_id == current_user.id %>
+        <div class="status-buttons">
+          <%= form_tag review_path(review), :method => 'put' do %>
+            <% if review.marked_as_read? %>
+              <input type="hidden" name="mark_as_unread" value="1" />
+              <button type="submit">Mark as unread</button>
+            <% else %>
+              <input type="hidden" name="mark_as_read" value="1" />
+              <button type="submit">Mark as read</button>
             <% end %>
-          </div>
-        <% end %>
-        <% if review.reviewer %>
-          <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
-        <% end %>
-        <% unless review.points_list.empty? %>
-          <div class="points-by-review">
-            <span class="label">Points added:</span>&nbsp;
-            <% for point in review.points_list %>
-              <%= content_tag :span, raw(h(point)) + raw('&nbsp;'), :class => 'success' %>
-            <% end %>
-          </div>
-        <% end %>
-        <div class="review-body"><%= simple_format(review.review_body) %></div>
-        <div class="buttons">
-          <% if action_name == 'new' && can?(:update, review) %>
-            <button class="edit-review"><span class="ui-icon ui-icon-pencil"></span>&nbsp;Edit</button>
-          <% end %>
-          <% if action_name == 'new' && can?(:delete, review) %>
-            <button class="delete-review"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
-            <div class="ui-helper-hidden">
-              <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>
-            </div>
           <% end %>
         </div>
-        <div class="ui-helper-clearfix"></div>
       <% end %>
+      <% if review.reviewer %>
+        <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
+      <% end %>
+      <% unless review.points_list.empty? %>
+        <div class="points-by-review">
+          <span class="label">Points added:</span>&nbsp;
+          <% for point in review.points_list %>
+            <%= content_tag :span, raw(h(point)) + raw('&nbsp;'), :class => 'success' %>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="review-body"><%= simple_format(review.review_body) %></div>
+      <div class="buttons">
+        <% if action_name == 'new' && can?(:update, review) %>
+          <button class="edit-review"><span class="ui-icon ui-icon-pencil"></span>&nbsp;Edit</button>
+        <% end %>
+        <% if action_name == 'new' && can?(:delete, review) %>
+          <button class="delete-review"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
+          <div class="ui-helper-hidden">
+            <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>
+          </div>
+        <% end %>
+      </div>
+      <div class="ui-helper-clearfix"></div>
     <% end %>
   <% end %>
 </section>
