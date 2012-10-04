@@ -119,7 +119,11 @@ class CourseRefresher
     end
 
     def filter_backends
-      @filter_backends ||= [CourseRefresher::JavaFilter.new, CourseRefresher::XmlFilter.new]
+      @filter_backends ||= [
+        CourseRefresher::JavaFilter.new,
+        CourseRefresher::XmlFilter.new,
+        CourseRefresher::PropertiesFilter.new
+      ]
     end
 
     def clean_empty_dirs_in_project(project_dir)
