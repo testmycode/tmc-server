@@ -66,6 +66,7 @@ class ReviewsController < ApplicationController
       ActiveRecord::Base.connection.transaction do
         award_points
         mark_as_reviewed
+        @review.submission.save!
         @review.save!
       end
     rescue
@@ -164,6 +165,7 @@ private
     begin
       mark_as_reviewed
       award_points
+      @review.submission.save!
       @review.save!
     rescue
       ::Rails.logger.error($!)
@@ -176,7 +178,6 @@ private
 
   def mark_as_reviewed
     @review.submission.reviewed = true
-    @review.submission.save!
   end
 
   def fetch(*stuff)
@@ -216,8 +217,8 @@ private
     available_points = exercise.available_points.where(:requires_review => true).map(&:name)
     previous_points = course.awarded_points.where(:user_id => submission.user_id, :name => available_points).map(&:name)
 
+    new_points = []
     if params[:review][:points].respond_to?(:keys)
-      new_points = []
       for point_name in params[:review][:points].keys
         unless exercise.available_points.where(:name => point_name).any?
           raise "Point does not exist: #{point_name}"
@@ -232,7 +233,9 @@ private
         authorize! :create, pt
         pt.save!
       end
-      @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
     end
+    
+    @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
+    submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
   end
 end
