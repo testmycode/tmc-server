@@ -140,6 +140,54 @@ EOF
     end
 
 
+    describe "with properties files" do
+      it "should remove solution blocks" do
+        make_file 'original/Thing.properties', <<EOF
+trol = foo
+# BEGIN SOLUTION
+lol = bar
+# END SOLUTION
+loo = xoo
+EOF
+        @filter.make_stub('stub')
+        result = File.read('stub/Thing.properties')
+        result.should == <<EOF
+trol = foo
+loo = xoo
+EOF
+      end
+
+
+      it "should uncomment stubs" do
+        make_file 'original/Thing.properties', <<EOF
+trol = foo
+# BEGIN SOLUTION
+lol = bar
+# END SOLUTION
+# STUB: loo = xoo
+EOF
+        @filter.make_stub('stub')
+        result = File.read('stub/Thing.properties')
+        result.should == <<EOF
+trol = foo
+loo = xoo
+EOF
+      end
+
+
+      it "should not include solution files" do
+        make_file 'original/Thing.properties', <<EOF
+# SOLUTION FILE
+trol = foo
+lol = bar
+loo = xoo
+EOF
+        @filter.make_stub('stub')
+        File.should_not exist('stub/Thing.properties')
+      end
+    end
+
+
 
     it "should not include directories under src/ containing only solution files" do
       FileUtils.mkdir_p 'original/src/foo/bar'
@@ -391,8 +439,59 @@ EOF
     end
 
 
+    describe "with properties files" do
+      it "should remove stubs" do
+        make_file 'original/Thing.properties', <<EOF
+trol = foo
+# STUB: lol = bar
+loo = xoo
+EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.properties')
+        result.should == <<EOF
+trol = foo
+loo = xoo
+EOF
+      end
 
-    
+
+      it "should remove solution block comments" do
+        make_file 'original/Thing.properties', <<EOF
+trol = foo
+# BEGIN SOLUTION
+lol = bar
+# END SOLUTION
+loo = xoo
+EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.properties')
+        result.should == <<EOF
+trol = foo
+lol = bar
+loo = xoo
+EOF
+      end
+
+
+      it "should remove solution file comments" do
+        make_file 'original/Thing.properties', <<EOF
+# SOLUTION FILE
+trol = foo
+lol = bar
+loo = xoo
+EOF
+        @filter.make_solution('solution')
+        result = File.read('solution/Thing.properties')
+        result.should == <<EOF
+trol = foo
+lol = bar
+loo = xoo
+EOF
+      end
+    end
+
+
+
     it "should convert end-of-lines to unix style" do
       make_file 'original/Thing.java', <<EOF
 public class Thing {\r
