@@ -124,13 +124,22 @@ class Exercise < ActiveRecord::Base
   # Whether all of the required code review points have been given.
   # Returns true if the exercise doesn't require code review.
   def all_review_points_given_for?(user)
-    return true if !requires_review? # optimization
-    user.has_points?(course, available_review_points.map(&:name))
+    arp = available_review_points
+    return true if arp.empty? # optimization
+    user.has_points?(course, arp)
   end
 
   def available_review_points
     # use 'select' instead of 'where' to use cached value of available_points
-    available_points.to_a.select(&:requires_review)
+    available_points.to_a.select(&:requires_review).map(&:name)
+  end
+
+  def points_for(user)
+    AwardedPoint.course_user_points(course, user).map(&:name)
+  end
+
+  def missing_review_points_for(user)
+    available_review_points - points_for(user)
   end
 
   def deadline=(new_value)

@@ -242,7 +242,7 @@ describe Exercise do
     pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
     pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
 
-    exercise.available_review_points.sort_by(&:name).should == [pt2, pt3].sort_by(&:name)
+    exercise.available_review_points.sort.should == [pt2, pt3].map(&:name).sort
   end
 
   it "can tell if it's been reviewed for a user" do
@@ -265,6 +265,16 @@ describe Exercise do
     exercise.should_not be_all_review_points_given_for(user)
     Factory.create(:awarded_point, :course => course, :user => user, :name => pt3.name)
     exercise.should be_all_review_points_given_for(user)
+  end
+
+  it "can tell which review point are missing for a user" do
+    exercise = Factory.create(:exercise, :course => course)
+    pt1 = Factory.create(:available_point, :exercise => exercise, :requires_review => false)
+    pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+    pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+
+    Factory.create(:awarded_point, :course => course, :user => user, :name => pt2.name)
+    exercise.missing_review_points_for(user).should == [pt3.name]
   end
 end
 

@@ -66,16 +66,16 @@
             <div class="points">
               <h5>Points</h5>
               <% for point in @submission.exercise.available_review_points %>
-                <% has_point = @submission.user.has_point?(@submission.course, point.name) %>
+                <% has_point = @submission.user.has_point?(@submission.course, point) %>
                 <%=
                   check_box_tag(
-                    "review[points][#{point.name}]", 1, false, :class => 'point',
+                    "review[points][#{point}]", 1, false, :class => 'point',
                     :checked => has_point,
                     :disabled => has_point,
                     :title => has_point ? "Already awarded" : nil
                   )
                 %>
-                <%= label_tag "review_points_#{point.name}", point.name, :title => has_point ? "Already awarded" : nil %>
+                <%= label_tag "review_points_#{point}", point, :title => has_point ? "Already awarded" : nil %>
               <% end %>
               <p class="fine-print">(note: points cannot be removed after saving)</p>
             </div>

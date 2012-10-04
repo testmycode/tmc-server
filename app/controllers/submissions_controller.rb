@@ -57,7 +57,8 @@ class SubmissionsController < ApplicationController
         output = {
           :api_version => API_VERSION,
           :status => @submission.status,
-          :points => @submission.points_list
+          :points => @submission.points_list,
+          :missing_review_points => @exercise.missing_review_points_for(@submission.user)
         }
         output = output.merge(
           case @submission.status
