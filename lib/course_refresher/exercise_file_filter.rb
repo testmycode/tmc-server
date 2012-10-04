@@ -3,6 +3,7 @@ require 'fileutils'
 require 'tmc_project_file'
 require 'course_refresher/java_filter'
 require 'course_refresher/xml_filter'
+require 'course_refresher/properties_filter'
 
 class CourseRefresher
   class ExerciseFileFilter
