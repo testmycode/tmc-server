@@ -174,20 +174,24 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def reviews_required(include_reviewed = false)
-    result = self.submissions.where(:requires_review => true)
-    result = result.where(:reviewed => false) unless include_reviewed
-    result
+  def reviews_required
+    self.submissions.where(
+      :requires_review => true,
+      :newer_submission_reviewed => false,
+      :reviewed => false
+    )
   end
 
-  def reviews_requested(include_reviewed = false)
-    result = self.submissions.where(:requests_review => true)
-    result = result.where(:reviewed => false) unless include_reviewed
-    result
+  def reviews_requested
+    self.submissions.where(
+      :requests_review => true,
+      :newer_submission_reviewed => false,
+      :reviewed => false
+    )
   end
 
   def submissions_to_review
-    self.submissions.where('(requests_review OR requires_review) AND NOT reviewed')
+    self.submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed')
   end
 
   # Returns a hash of exercise group => {

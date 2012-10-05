@@ -177,7 +177,12 @@ private
   end
 
   def mark_as_reviewed
-    @review.submission.reviewed = true
+    sub = @review.submission
+    sub.reviewed = true
+    sub.of_same_kind.
+      where('(requires_review OR requests_review) AND NOT reviewed').
+      where(['created_at < ?', sub.created_at]).
+      update_all(:newer_submission_reviewed => true)
   end
 
   def fetch(*stuff)

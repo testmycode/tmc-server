@@ -61,6 +61,12 @@
               <% else %>
                 <%= link_to 'Available', submission_reviews_path(submission) %>
               <% end %>
+            <% elsif submission.newer_submission_reviewed? %>
+              <% if can? :update, Review %>
+                <%= link_to 'Superseded', new_submission_review_path(submission) %>
+              <% else %>
+                <%= link_to 'Superseded', submission_review_path(submission) %>
+              <% end %>
             <% elsif submission.requests_review? %>
               <% if can? :create, Review %>
                 <%= link_to 'Requested', new_submission_review_path(submission) %>
