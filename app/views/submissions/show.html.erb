@@ -179,8 +179,13 @@ $(document).ready(function() {
 
 <% if can? :update, @submission %>
   <div>
-    <%= button_to 'Rerun submission', submission_path(@submission), :method => :put %>
-    (may add points; never deletes points)
+    <%= form_tag submission_path(@submission), :method => :put do %>
+      <%= hidden_field_tag('rerun', '1')  %>
+      <div>
+        <%= button_tag 'Rerun submission', :type => 'submit' %>
+      </div>
+      (may add points; never deletes points)
+    <% end %>
   </div>
 <% end %>
 

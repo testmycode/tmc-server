@@ -182,6 +182,7 @@ private
   def mark_as_reviewed
     sub = @review.submission
     sub.reviewed = true
+    sub.review_dismissed = false
     sub.of_same_kind.
       where('(requires_review OR requests_review) AND NOT reviewed').
       where(['created_at < ?', sub.created_at]).

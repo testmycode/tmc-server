@@ -153,8 +153,16 @@ class SubmissionsController < ApplicationController
   def update
     submission = Submission.find(params[:id]) || respond_not_found
     authorize! :update, submission
-    schedule_for_rerun(submission, -1)
-    redirect_to submission_path(submission), :notice => 'Rerun scheduled'
+    if params[:rerun]
+      schedule_for_rerun(submission, -1)
+      redirect_to submission_path(submission), :notice => 'Rerun scheduled'
+    elsif params[:dismiss_review]
+      submission.review_dismissed = true
+      submission.save!
+      redirect_to new_submission_review_path(submission), :notice => 'Code review dismissed'
+    else
+      respond_not_found
+    end
   end
   
   def update_by_exercise

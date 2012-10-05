@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121005102836) do
+ActiveRecord::Schema.define(:version => 20121005110310) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -163,6 +163,7 @@ ActiveRecord::Schema.define(:version => 20121005102836) do
     t.boolean  "reviewed",                       :default => false, :null => false
     t.text     "message_for_reviewer",           :default => "",    :null => false
     t.boolean  "newer_submission_reviewed",      :default => false, :null => false
+    t.boolean  "review_dismissed",               :default => false, :null => false
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"

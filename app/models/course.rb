@@ -178,7 +178,8 @@ class Course < ActiveRecord::Base
     self.submissions.where(
       :requires_review => true,
       :newer_submission_reviewed => false,
-      :reviewed => false
+      :reviewed => false,
+      :review_dismissed => false
     )
   end
 
@@ -186,12 +187,13 @@ class Course < ActiveRecord::Base
     self.submissions.where(
       :requests_review => true,
       :newer_submission_reviewed => false,
-      :reviewed => false
+      :reviewed => false,
+      :review_dismissed => false
     )
   end
 
   def submissions_to_review
-    self.submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed')
+    self.submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
   end
 
   # Returns a hash of exercise group => {

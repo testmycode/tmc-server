@@ -56,16 +56,20 @@
         <% if show_review_column %>
           <td>
             <% if submission.reviewed? %>
-              <% if can? :update, Review %>
+              <% if can? :create, Review %>
                 <%= link_to 'Available', new_submission_review_path(submission) %>
               <% else %>
                 <%= link_to 'Available', submission_reviews_path(submission) %>
               <% end %>
             <% elsif submission.newer_submission_reviewed? %>
-              <% if can? :update, Review %>
+              <% if can? :create, Review %>
                 <%= link_to 'Superseded', new_submission_review_path(submission) %>
               <% else %>
                 <%= link_to 'Superseded', submission_review_path(submission) %>
+              <% end %>
+            <% elsif submission.review_dismissed? %>
+              <% if can? :create, Review %>
+                <%= link_to 'Dismissed', new_submission_review_path(submission) %>
               <% end %>
             <% elsif submission.requests_review? %>
               <% if can? :create, Review %>

@@ -389,6 +389,10 @@ table.points > * > tr > td {
   margin-top: 0.6em;
 }
 
+#dismiss-review-form {
+  float: right;
+}
+
 .code-review .buttons {
   float: right;
 }

@@ -111,6 +111,12 @@ class Submission < ActiveRecord::Base
   def newest_of_same_kind
     of_same_kind.where(['created_at > ?', self.created_at]).order('created_at DESC').first
   end
+
+  def review_dismissable?
+    (requires_review? || requests_review?) &&
+      !review_dismissed? &&
+      !newer_submission_reviewed?
+  end
   
   def unprocessed_submissions_before_this
     if !self.processed?

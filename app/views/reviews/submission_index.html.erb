@@ -126,6 +126,16 @@
   <section>
     <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
     <button id="new-review"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
+    <% if @submission.review_dismissable? %>
+      <div id="dismiss-review-form">
+        <% if @submission.reviews.count == 0 %>
+          <%= form_tag submission_path(@submission), :method => :put do %>
+            <input type="hidden" name="dismiss_review" value="1" />
+            <button type="submit" id="dismiss-review" data-confirm="Confirm removing submission from list of pending reviews? Note that you don't need to do this manually for old submissions."><span class="ui-icon ui-icon-cancel"></span>&nbsp;Dismiss</button>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
 
     <div id="review-form-reopen-handle" class="ui-helper-hidden">
       <button>
