@@ -60,8 +60,8 @@ var CometConnection = (function() {
 
     function fireConnected() {
       isReady = true;
-      $.each(connectedCallbacks, function(i, cb) {
-        cb(cometd);
+      _.each(connectedCallbacks, function(callback) {
+        callback(cometd);
       });
     }
   });
