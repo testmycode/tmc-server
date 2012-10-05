@@ -1,7 +1,7 @@
 var CometConnection = (function() {
   var isReady = false;
   var cometd;
-  var readyCallbacks = [];
+  var connectedCallbacks = [];
 
   $(document).ready(function() {
     cometd = $.cometd;
@@ -30,7 +30,7 @@ var CometConnection = (function() {
     function startConnecting() {
       cometd.addListener('/meta/handshake', function(message) {
         if (message.successful) {
-          onReady();
+          fireConnected();
         } else {
           if (message.error) {
             log("cometd handshake failed: " + message.error);
@@ -58,21 +58,20 @@ var CometConnection = (function() {
       cometd.handshake();
     }
 
-    function onReady() {
+    function fireConnected() {
       isReady = true;
-      $.each(readyCallbacks, function(i, cb) {
+      $.each(connectedCallbacks, function(i, cb) {
         cb(cometd);
       });
-      readyCallbacks = [];
     }
   });
 
   return {
-    ready: function(callback) {
+    connected: function(callback) {
       if (isReady) {
         callback(cometd);
       } else {
-        readyCallbacks.push(callback);
+        connectedCallbacks.push(callback);
       }
     }
   };

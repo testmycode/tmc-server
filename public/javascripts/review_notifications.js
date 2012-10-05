@@ -1,7 +1,7 @@
 var ReviewNotifications = (function() {
   var notificationsEnabled = true;
 
-  CometConnection.ready(function(cometd) {
+  CometConnection.connected(function(cometd) {
     var username = getMeta('username');
     cometd.subscribe('/broadcast/user/' + username + '/review-available', onReviewAvailable);
   });

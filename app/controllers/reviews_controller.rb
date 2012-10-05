@@ -42,6 +42,8 @@ class ReviewsController < ApplicationController
   def new
     fetch :submission, :files
 
+    @show_page_presence = true
+
     @course = @submission.course
     add_course_breadcrumb
     add_exercise_breadcrumb

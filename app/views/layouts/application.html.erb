@@ -19,6 +19,9 @@
         'review_notifications.js'
       )
   %>
+  <% if @show_page_presence %>
+    <%= javascript_include_tag 'page_presence.js' %>
+  <% end %>
 
   <% if Rails.env == 'test' %>
     <%= stylesheet_link_tag 'highlighting' %>
@@ -30,6 +33,7 @@
   <%= tag :meta, :name => 'session_cookie_name', :content => SiteSetting.value(:session_cookie_key) %>
   <%= tag :meta, :name => 'username', :content => current_user.username unless current_user.guest? %>
   <%= tag :meta, :name => 'base_url', :content => root_url %>
+  <%= tag :meta, :name => 'current_path', :content => request.path %>
   <%= content_for :extra_meta_tags %>
   <title>Test My Code server</title>
 </head>
@@ -60,6 +64,9 @@
 
     <div id="breadcrumb">
       <%= render_breadcrumbs :separator => raw(' &raquo; ') %>
+      <% if @show_page_presence %>
+        <div id="page-presence"></div>
+      <% end %>
     </div>
 
     <div id="content-area">
