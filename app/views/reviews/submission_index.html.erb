@@ -242,6 +242,13 @@
         ReviewNotifications.disable();
         return true;
       });
+
+      PagePresence.initial(function(users) {
+        var otherUsers = _.without(users, getMeta('username'));
+        if (otherUsers.length > 0) {
+          alert('Note: ' + _.first(otherUsers) + ' is already on this page.');
+        }
+      });
     });
   </script>
 <% end %>
