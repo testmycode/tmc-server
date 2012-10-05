@@ -72,7 +72,10 @@ private
       end
     end
 
-    submission.points = points.join(" ") unless points.empty?
+    old_review_points = submission.points_list.select {|pt| review_points.include?(pt) }
+    points += old_review_points
+
+    submission.points = points.uniq.natsort.join(" ") unless points.empty?
   end
 
   def self.points_from_test_results(results)

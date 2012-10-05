@@ -168,6 +168,13 @@ describe TestRunGrader do
       points.should include('1.2')
     end
 
+    it "should preserve old review points" do
+      AwardedPoint.create!(:course_id => @submission.course_id, :user_id => @submission.user_id, :name => '1.1')
+      @submission.points = '1.1'
+      TestRunGrader.grade_results(@submission, successful_results)
+      @submission.points_list.should include('1.1')
+    end
+
     it "should flag the submission as requiring review if the exercise has review points" do
       TestRunGrader.grade_results(@submission, successful_results)
 
