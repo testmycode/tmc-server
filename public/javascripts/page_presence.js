@@ -1,5 +1,7 @@
 var PagePresence = (function() {
-  var callbacks = [];
+  var changeCallbacks = [];
+  var initialCallbacks = [];
+  var initial = null;
 
   CometConnection.connected(function(cometd) {
     var thisPage = getMeta('current_path');
@@ -8,14 +10,40 @@ var PagePresence = (function() {
 
   function pagePresenceUpdate(message) {
     var users = message.data.users;
-    $.each(callbacks, function(i, callback) {
+    if (initial == null) {
+      initial = users;
+      fireInitial();
+    }
+
+    fireChange(users);
+  }
+
+  function fireChange(users) {
+    _.each(changeCallbacks, function(callback) {
       callback(users);
     });
   }
 
+  function fireInitial() {
+    _.each(initialCallbacks, function(callback) {
+      callback(initial);
+    });
+    initialCallbacks = [];
+  }
+
   return {
     change: function(callback) {
-      callbacks.push(callback);
+      changeCallbacks.push(callback);
+      if (initial != null) {
+        callback(initial);
+      }
+    },
+    initial: function(callback) {
+      if (initial == null) {
+        initialCallbacks.push(callback);
+      } else {
+        callback(initial);
+      }
     }
   }
 })();
@@ -28,7 +56,7 @@ $(document).ready(function() {
     if (users.length <= 1) {
       $pp.append('<span>just you</span>');
     } else {
-      $.each(users, function(i, user) {
+      _.each(users, function(user, i) {
         var $user = $('<span class="user"></span>');
         $user.text(user);
         $pp.append($user);
