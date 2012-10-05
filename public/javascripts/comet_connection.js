@@ -21,6 +21,10 @@ var CometConnection = (function() {
 
     startConnecting();
 
+    $(window).unload(function() {
+      cometd.disconnect(true);
+    });
+
     function log(msg) {
       if (window.console && console.log) {
         console.log(msg);
