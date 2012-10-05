@@ -14,3 +14,7 @@ function escapeHtml(text) {
   // Caveat: does not preserve whitespace.
   return $('<div/>').text(text).html();
 }
+
+function getMeta(name) {
+  return $('meta[name=' + name + ']').attr('content');
+}
