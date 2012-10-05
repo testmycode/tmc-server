@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121005110310) do
+ActiveRecord::Schema.define(:version => 20121005143551) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -42,6 +42,7 @@ ActiveRecord::Schema.define(:version => 20121005110310) do
     t.string   "source_url",                                       :null => false
     t.text     "git_branch",                 :default => "master", :null => false
     t.datetime "hidden_if_registered_after"
+    t.datetime "refreshed_at"
   end
 
   create_table "exercises", :force => true do |t|

@@ -30,6 +30,9 @@
         <li>Git revision: <%= gitrev %></li>
       <% end %>
     <% end %>
+    <% if @course.refreshed_at %>
+      <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
+    <% end %>
 
     <% if @course.hidden? %>
       <li>The course is currently hidden. Unhide by editing

@@ -72,6 +72,8 @@ private
           make_zips_of_stubs
           make_zips_of_solutions
           set_permissions
+
+          @course.refreshed_at = Time.now
           @course.save!
           @course.exercises.each &:save!
           
