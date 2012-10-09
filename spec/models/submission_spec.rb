@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 require 'spec_helper'
 
 describe Submission do
@@ -107,6 +109,19 @@ describe Submission do
     s.stderr.should be_nil
     s.submission_data.stderr_compressed.should be_nil
     s.save!
+  end
+
+  it "allows utf-8 caharacters in stdout, stderr and vm_log" do
+    s = Factory.create(:submission)
+    s.stdout = "mää"
+    s.stderr = "möö"
+    s.vm_log = "måå"
+    s.save!
+
+    s = Submission.find(s.id)
+    s.stdout.should == "mää"
+    s.stderr.should == "möö"
+    s.vm_log.should == "måå"
   end
 
   it "deletes submission data when destroyed" do
