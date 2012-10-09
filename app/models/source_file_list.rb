@@ -87,13 +87,15 @@ private
     name = file.basename.to_s
     name.end_with?('.java') ||
       name.end_with?('.jsp') ||
-      name == 'pom.xml' ||
+      name.end_with?('.xml') ||
+      name.end_with?('.properties') ||
+      name.end_with?('.txt') ||
       dir.include?('/WEB-INF')
   end
 
   def self.should_skip_dir?(file)
     name = file.basename.to_s
-    name.start_with?('.') || name == 'test' || name == 'lib'
+    name.start_with?('.') || name == 'test' || name == 'lib' || name == 'nbproject'
   end
 
   def self.make_path_names_relative(root_dir, files)
@@ -107,7 +109,8 @@ private
     files.sort_by do |f|
       priority = begin
         if f.path.include?('WEB-INF/') then 1
-        elsif f.path == 'pom.xml' then 2
+        elsif f.path.start_with?('src/main/resources') then 2
+        elsif f.path == 'pom.xml' then 3
         else 0
         end
       end
