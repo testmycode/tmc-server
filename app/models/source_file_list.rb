@@ -40,6 +40,8 @@ class SourceFileList
 
       make_path_names_relative(project_dir, files)
 
+      files = sort_source_files(files)
+
       self.new(files)
     end
   end
@@ -56,7 +58,7 @@ class SourceFileList
 
     make_path_names_relative(solution.path, files)
 
-    files = sort_solution_files(files)
+    files = sort_source_files(files)
 
     self.new(files)
   end
@@ -101,7 +103,7 @@ private
     end
   end
 
-  def self.sort_solution_files(files)
+  def self.sort_source_files(files)
     files.sort_by do |f|
       priority = begin
         if f.path.include?('WEB-INF/') then 1
