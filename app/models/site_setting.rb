@@ -20,7 +20,7 @@ private
       if File.exist?(path)
         data = YAML.load_file(path)
         raise "Invalid configuration file #{path}" unless data.is_a? Hash
-        result = result.merge(data)
+        result = result.deep_merge(data)
       end
     end
     result
