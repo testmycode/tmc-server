@@ -19,6 +19,9 @@
       <% if show_review_column %>
         <th>Review</th>
       <% end %>
+      <% if show_reviewer_column %>
+        <th>Reviewed by</th>
+      <% end %>
       <% if show_files_column %>
         <th></th>
       <% end %>
@@ -57,6 +60,10 @@
           <td>
             <%= submission_review_column(submission) %>
           </td>
+        <% end %>
+        <% if show_reviewer_column %>
+          <% reviewers = submission.reviews.sort_by(&:created_at).map {|r| r.reviewer.username }.uniq.join(', ') %>
+          <td><%= link_to reviewers, submission_reviews_path(submission) %></td>
         <% end %>
         <% if show_files_column %>
           <td>

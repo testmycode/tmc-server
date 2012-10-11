@@ -38,6 +38,7 @@ TmcServer::Application.routes.draw do
     resources :stats, :only => [:index, :show]
     resources :exercises, :only => [:index]
     resources :submissions, :only => [:index]
+    resources :reviewed_submissions, :only =>[:index]
     resources :feedback_questions, :only => [:index, :new, :create]
     resources :feedback_answers, :only => [:index]
     match 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :via => :get, :as => 'feedback_answers_chart'
