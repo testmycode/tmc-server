@@ -16,5 +16,5 @@ function escapeHtml(text) {
 }
 
 function getMeta(name) {
-  return $('meta[name=' + name + ']').attr('content');
+  return PageMetadata[name];
 }

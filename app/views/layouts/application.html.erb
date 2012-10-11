@@ -2,8 +2,26 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <base href="<%= root_url %>" />
   <%= stylesheet_link_tag 'main' %>
   <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css' %>
+  <% if Rails.env == 'test' %>
+    <%= stylesheet_link_tag 'highlighting' %>
+  <% end %>
+
+  <%
+     page_metadata = {
+       :comet_server_baseurl => comet_server_baseurl,
+       :comet_tmc_baseurl => comet_tmc_baseurl,
+       :session_cookie_name => SiteSetting.value(:session_cookie_key),
+       :username => current_user.guest? ? nil : current_user.username,
+       :base_url => root_url,
+       :current_path => request.path
+     }
+  %>
+  <script type="text/javascript">
+    var PageMetadata = <%= raw(page_metadata.to_json) %>;
+  </script>
 
   <%= javascript_include_tag(
         'underscore-min.js',
@@ -24,18 +42,7 @@
     <%= javascript_include_tag 'page_presence.js' %>
   <% end %>
 
-  <% if Rails.env == 'test' %>
-    <%= stylesheet_link_tag 'highlighting' %>
-  <% end %>
-
   <%= csrf_meta_tag %>
-  <%= comet_server_url_meta_tag %>
-  <%= comet_tmc_baseurl_meta_tag %>
-  <%= tag :meta, :name => 'session_cookie_name', :content => SiteSetting.value(:session_cookie_key) %>
-  <%= tag :meta, :name => 'username', :content => current_user.username unless current_user.guest? %>
-  <%= tag :meta, :name => 'base_url', :content => root_url %>
-  <%= tag :meta, :name => 'current_path', :content => request.path %>
-  <%= content_for :extra_meta_tags %>
   <title>Test My Code server</title>
 </head>
 
