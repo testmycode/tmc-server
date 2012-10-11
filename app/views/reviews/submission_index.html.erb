@@ -5,6 +5,10 @@
 </h1>
 
 <section>
+  <% if !@new_review && can?(:create, Review) %>
+    <p><%= link_to 'Open review editor', new_submission_review_path(@submission) %></p>
+  <% end %>
+
   <% if @submission.reviews.empty? %>
     <p>Submission not reviewed yet.</p>
   <% end %>
@@ -14,11 +18,11 @@
     <p>NOTE: There is a <%= link_to "newer submission", new_submission_review_path(newest_sub) %>.</p>
   <% end %>
 
-  <% if @submission.exercise.reviewed_for?(@submission.user) %>
+  <% other_subs = @submission.exercise.reviewed_submissions_for(@submission.user) - [@submission] %>
+  <% unless other_subs.empty? %>
     <h3>Other reviewed submissions of this exercise</h3>
     <section>
       <%=
-          subs = @submission.exercise.reviewed_submissions_for(@submission.user) - [@submission]
           options = {
             :table_id => 'previously_reviewed',
             :show_student_column => false,
@@ -28,7 +32,7 @@
             :show_files_column => false,
             :show_details_column => true
           }
-          show_submission_list(subs, options)
+          show_submission_list(other_subs, options)
       %>
     </section>
   <% end %>
