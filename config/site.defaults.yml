@@ -57,9 +57,8 @@ memory_limit:
 
 ### E-mails ###
 emails:
-  reset_password:
-    baseurl: http://localhost:3000/
-    from: noreply@example.com
+  baseurl: http://localhost:3000/
+  from: noreply@example.com
 
 
 ### Enable or disable features ###
