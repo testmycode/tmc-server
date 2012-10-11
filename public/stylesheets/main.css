@@ -338,6 +338,9 @@ table.points > * > tr > td {
   padding: 10px;
   margin-top: 1em;
   margin-bottom: 2em;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
 }
 
 .code-review.being-edited {
@@ -371,9 +374,17 @@ table.points > * > tr > td {
   resize: none; /* We do our own resizing */
 }
 
-#review-form .points {
-  display: block;
+#review-form .notification-options {
   margin-bottom: 1.5em;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+#review-form form.editing-existing-review .notification-options {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 #review-form-reopen-handle {

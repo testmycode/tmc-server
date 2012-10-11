@@ -105,9 +105,15 @@
             </div>
           <% end %>
 
+          <div class="notification-options">
+            <h5>Notification</h5>
+            <%= check_box_tag :send_email, '1', SiteSetting.value('emails')['email_code_reviews_by_default'] %>
+            <label for="send_email">Notify by e-mail</label>
+            <%= check_box_tag :send_notification, '1', true, :disabled => true %>
+            <label for="send_notification">Notify in IDE</label>
+          </div>
           <div class="buttons">
             <button type="submit"><span class="ui-icon ui-icon-disk"></span>&nbsp;Save review</button>
-            <span class="fine-print">(will notify the student if online)</span>
           </div>
         <% end %>
       </div>
@@ -164,7 +170,7 @@
         $dialog.dialog({
           title: 'Code review',
           width: 450,
-          height: 350,
+          height: 520,
           dialogClass: 'big-drop-shadow',
           beforeClose: function() {
             $reopenHandle.show();
@@ -189,6 +195,8 @@
         var $textarea = $dialog.find('textarea#review_review_body');
 
         if ($reviewDiv) { // Editing
+          $dialog.find('form').removeClass('editing-new-review').addClass('editing-existing-review');
+
           $textarea.val($reviewDiv.find('.review-body').text().trim());
           $('.code-review.being-edited').removeClass('being-edited');
           $reviewDiv.addClass('being-edited');
@@ -196,6 +204,8 @@
           $dialog.find('form').attr('action', $reviewDiv.data('path'));
           $dialog.find('input[type=hidden][name=_method]').val('put');
         } else {
+          $dialog.find('form').removeClass('editing-existing-review').addClass('editing-new-review');
+
           $textarea.val('');
           $('.code-review.being-edited').removeClass('being-edited');
 

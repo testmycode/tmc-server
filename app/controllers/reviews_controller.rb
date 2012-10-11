@@ -80,6 +80,7 @@ class ReviewsController < ApplicationController
     else
       flash[:success] = 'Code review added.'
       notify_user_about_new_review
+      send_email_about_new_review if params[:send_email]
       redirect_to course_reviews_path(@submission.course_id)
     end
   end
@@ -217,6 +218,10 @@ private
       :points => @review.points_list
     }
     CometServer.get.try_publish(channel, data)
+  end
+
+  def send_email_about_new_review
+    ReviewMailer.review_email(@review).deliver
   end
 
   def award_points

@@ -75,6 +75,7 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
     SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://127.0.0.1:#{Capybara.server_port}"
+    SiteSetting.all_settings['emails']['email_code_reviews_by_default'] = false
     SiteSetting.all_settings['comet_server'] = {
       'url' => "http://localhost:#{CometSupport.port}/",
       'backend_key' => CometSupport.backend_key,

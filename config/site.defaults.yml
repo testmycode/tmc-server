@@ -59,6 +59,7 @@ memory_limit:
 emails:
   baseurl: http://localhost:3000/
   from: noreply@example.com
+  email_code_reviews_by_default: false
 
 
 ### Enable or disable features ###
