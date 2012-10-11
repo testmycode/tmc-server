@@ -8,7 +8,7 @@ class SubmissionsController < ApplicationController
 
   def index
     add_course_breadcrumb
-    add_exercise_breadcrumb
+    add_breadcrumb 'All submissions', course_submissions_path(@course)
 
     respond_to do |format|
       format.json do

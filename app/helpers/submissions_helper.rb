@@ -80,6 +80,7 @@ module SubmissionsHelper
         user_col,
         link_to_submission_exericse(sub),
         submission_status(sub),
+        submission_review_column(sub),
         link_to('Files', submission_files_path(sub)),
         link_to('Details', submission_path(sub))
       ]
