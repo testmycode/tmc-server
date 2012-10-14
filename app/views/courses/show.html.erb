@@ -9,7 +9,7 @@
 
 <ul>
   <li><%= link_to 'View points', course_points_path(@course) %></li>
-  <% if @course.submissions.where(:user_id => current_user.id, :reviewed => true).any? %>
+  <% if current_user.administrator? || @course.submissions.where(:user_id => current_user.id, :reviewed => true).any? %>
     <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
   <% end %>
 </ul>
