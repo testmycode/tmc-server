@@ -67,8 +67,6 @@ class PointsController < ApplicationController
     users = User.where(:login => per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
     users = users.where(:administrator => false) unless include_admins
 
-    sheets = [] if sheets.size == 1 # The total column will be the same as the sheet column
-
     {
       :sheets => sheets.map{|sheet| {
         :name => sheet,
