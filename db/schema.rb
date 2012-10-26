@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121005143551) do
+ActiveRecord::Schema.define(:version => 20121026060109) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(:version => 20121005143551) do
     t.datetime "happened_at",   :null => false
   end
 
+  add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
   add_index "student_events", ["user_id", "course_id", "exercise_name", "event_type", "happened_at"], :name => "index_student_events_user_course_exercise_type_time"
   add_index "student_events", ["user_id", "event_type", "happened_at"], :name => "index_student_events_user_type_time"
 
