@@ -90,6 +90,9 @@ private
       (name.end_with?('.xml') && name != 'build.xml') ||
       name.end_with?('.properties') ||
       name.end_with?('.txt') ||
+      name.end_with?('.html') ||
+      name.end_with?('.css') ||
+      name.end_with?('.js') ||
       dir.include?('/WEB-INF')
   end
 

@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'shCore', 'shThemeDefault' %>
-<%= javascript_include_tag 'shCore', 'shBrushJava', 'shBrushXml', 'shBrushPlain' %>
+<%= javascript_include_tag 'shCore', 'shBrushJava', 'shBrushXml', 'shBrushPlain', 'shBrushJScript', 'shBrushCss' %>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -23,6 +23,9 @@ $(document).ready(function() {
        when '.java' then 'java'
        when '.xml' then 'xml'
        when '.jsp' then 'xml'
+       when '.html' then 'xml'
+       when '.css' then 'css'
+       when '.js' then 'js'
        else 'plain'
        end
     %>
