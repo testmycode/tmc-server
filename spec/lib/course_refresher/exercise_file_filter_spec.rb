@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'fileutils'
 
+# TODO: clean this up. Perhaps put cases into their own files.
 describe CourseRefresher::ExerciseFileFilter do
 
   before :each do
@@ -187,6 +188,30 @@ EOF
       end
     end
 
+    describe "with CSS files" do
+      it "should not include solution files" do
+        make_file 'original/thing.css', <<EOF
+/* SOLUTION FILE */
+trol { color: red; }
+EOF
+
+        @filter.make_stub('stub')
+        File.should_not exist('stub/thing.css')
+      end
+    end
+
+    #TODO: test properly
+    describe "with JS files" do
+      it "should not include solution files" do
+        make_file 'original/thing.js', <<EOF
+// SOLUTION FILE
+function foo() {}
+EOF
+
+        @filter.make_stub('stub')
+        File.should_not exist('stub/thing.js')
+      end
+    end
 
 
     it "should not include directories under src/ containing only solution files" do
@@ -489,7 +514,6 @@ loo = xoo
 EOF
       end
     end
-
 
 
     it "should convert end-of-lines to unix style" do

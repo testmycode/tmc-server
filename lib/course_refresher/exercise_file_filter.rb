@@ -4,6 +4,8 @@ require 'tmc_project_file'
 require 'course_refresher/java_filter'
 require 'course_refresher/xml_filter'
 require 'course_refresher/properties_filter'
+require 'course_refresher/css_filter'
+require 'course_refresher/js_filter'
 
 class CourseRefresher
   class ExerciseFileFilter
@@ -123,7 +125,9 @@ class CourseRefresher
       @filter_backends ||= [
         CourseRefresher::JavaFilter.new,
         CourseRefresher::XmlFilter.new,
-        CourseRefresher::PropertiesFilter.new
+        CourseRefresher::PropertiesFilter.new,
+        CourseRefresher::CssFilter.new,
+        CourseRefresher::JsFilter.new
       ]
     end
 
