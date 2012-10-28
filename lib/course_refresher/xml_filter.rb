@@ -3,7 +3,7 @@ require 'pathname'
 class CourseRefresher
   class XmlFilter
     def applies_to?(file_path)
-      ['.xml', '.jsp'].include?(Pathname(file_path).extname)
+      ['.xml', '.jsp', '.html'].include?(Pathname(file_path).extname)
     end
 
     def filter_for_stub(text)
