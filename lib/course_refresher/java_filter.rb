@@ -1,8 +1,8 @@
 require 'pathname'
-require 'course_refresher/line_based_filter'
+require 'course_refresher/line_comment_based_filter'
 
 class CourseRefresher
-  class JavaFilter < LineBasedFilter
+  class JavaFilter < LineCommentBasedFilter
     def applies_to?(file_path)
       Pathname(file_path).extname == '.java'
     end

@@ -44,19 +44,6 @@ describe CourseRefresher::ExerciseFileFilter do
 
     make_test_cases('stub', :make_stub)
 
-    #TODO: test other stuff and solutions too
-    describe "with CSS files" do
-      it "should not include solution files" do
-        make_file 'original/thing.css', <<EOF
-/* SOLUTION FILE */
-trol { color: red; }
-EOF
-
-        @filter.make_stub('stub')
-        File.should_not exist('stub/thing.css')
-      end
-    end
-
 
     it "should not include directories under src/ containing only solution files" do
       FileUtils.mkdir_p 'original/src/foo/bar'

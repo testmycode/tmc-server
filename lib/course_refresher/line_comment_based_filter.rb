@@ -1,7 +1,7 @@
 require 'pathname'
 
 class CourseRefresher
-  class LineBasedFilter # Abstract
+  class LineCommentBasedFilter # Abstract
     def applies_to?(file_path)
       raise 'abstract method'
     end
@@ -70,23 +70,27 @@ class CourseRefresher
     end
 
     def stub_regexp
-      /^([ \t]*)#{comment_start}[ \t]*STUB:[ \t]*([^\r\n]*)$/m
+      /^([ \t]*)#{resc comment_start}[ \t]*STUB:[ \t]*([^\r\n]*)$/m
     end
 
     def begin_solution_regexp
-      /^[ \t]*#{comment_start}[ \t]*BEGIN[ \t]+SOLUTION[ \t]*$/m
+      /^[ \t]*#{resc comment_start}[ \t]*BEGIN[ \t]+SOLUTION[ \t]*$/m
     end
 
     def end_solution_regexp
-      /^[ \t]*#{comment_start}[ \t]*END[ \t]+SOLUTION[ \t]*\n/m
+      /^[ \t]*#{resc comment_start}[ \t]*END[ \t]+SOLUTION[ \t]*\n/m
     end
 
     def solution_file_regexp
-      /#{comment_start}[ \t]*SOLUTION[ \t]+FILE[ \t]*/
+      /#{resc comment_start}[ \t]*SOLUTION[ \t]+FILE[ \t]*/
     end
 
     def comment_start
       raise 'abstract method'
+    end
+
+    def resc(s)
+      Regexp.escape(s)
     end
   end
 end
