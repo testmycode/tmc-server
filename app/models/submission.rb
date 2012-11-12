@@ -125,9 +125,9 @@ class Submission < ActiveRecord::Base
         return i if s.id == self.id
         i += 1
       end
-      nil # race condition
+      0 # race condition
     else
-      nil
+      0
     end
   end
   
