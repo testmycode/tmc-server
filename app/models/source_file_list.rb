@@ -7,7 +7,8 @@ require 'tmc_dir_utils'
 class SourceFileList
   include Enumerable
 
-  MAX_SIZE = 2.megabytes
+  MAX_SIZE = 3.megabytes
+  MAX_INDIVIDUAL_FILE_SIZE = 300.kilobytes
 
   class FileRecord
     def initialize(path, contents)
@@ -70,7 +71,7 @@ private
     Pathname(root_dir).realpath.find do |file|
       Find.prune if file.directory? && should_skip_dir?(file)
 
-      if source_file?(file)
+      if source_file?(file) && file.size <= MAX_INDIVIDUAL_FILE_SIZE
         total_size += file.size
         raise "Files are too large" if total_size > MAX_SIZE
 
