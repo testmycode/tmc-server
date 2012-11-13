@@ -195,6 +195,16 @@ ActiveRecord::Schema.define(:version => 20121113223514) do
 
   add_index "test_scanner_cache_entries", ["course_id", "exercise_name"], :name => "index_test_scanner_cache_entries_on_course_id_and_exercise_name", :unique => true
 
+  create_table "unlocks", :force => true do |t|
+    t.integer  "user_id",       :null => false
+    t.integer  "course_id",     :null => false
+    t.string   "exercise_name", :null => false
+    t.datetime "valid_after"
+    t.datetime "created_at",    :null => false
+  end
+
+  add_index "unlocks", ["user_id", "course_id", "exercise_name"], :name => "index_unlocks_on_user_id_and_course_id_and_exercise_name", :unique => true
+
   create_table "user_field_values", :force => true do |t|
     t.integer  "user_id",    :null => false
     t.string   "field_name", :null => false
