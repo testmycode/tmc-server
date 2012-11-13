@@ -70,6 +70,7 @@ private
           make_zips_of_stubs
           make_zips_of_solutions
           set_permissions
+          update_unlocks
           @course.save!
           @course.exercises.each &:save!
           
@@ -336,6 +337,12 @@ private
       
       sh!('chmod', '-R', chmod, @course.cache_path) unless chmod.blank?
       sh!('chgrp', '-R', chgrp, @course.cache_path) unless chgrp.blank?
+    end
+
+    def update_unlocks
+      for user in User.all
+        Unlock.refresh_unlocks(@course, user)
+      end
     end
 
     def seed_maven_cache

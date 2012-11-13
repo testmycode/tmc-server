@@ -20,15 +20,16 @@
           <%
             notes = []
             notes << "hidden" if exercise.hidden?
-            notes << "expired" if exercise.expired?
+            notes << "expired" if exercise.expired_for?(current_user)
           %>
           <% unless notes.empty? %>
             (<%= notes.join(', ') %>)
           <% end %>
           </td>
           <td>
-            <% if exercise.deadline %>
-              <%= exercise.deadline.strftime("%d.%m.%Y %H:%M") %>
+            <% dl = exercise.deadline_for(current_user) %>
+            <% if dl %>
+              <%= dl.strftime("%d.%m.%Y %H:%M") %>
             <% end %>
           </td>
           <td>

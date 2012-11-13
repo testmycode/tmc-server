@@ -9,7 +9,9 @@ class Exercise < ActiveRecord::Base
   has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "feedback_answers.course_id = #{self.course_id}" }
   has_many :student_events, :foreign_key => :exercise_name, :primary_key => :name,
-      :conditions => proc { "student_events.course_id = #{self.course_id}" }
+    :conditions => proc { "student_events.course_id = #{self.course_id}" }
+  has_many :unlocks, :foreign_key => :exercise_name, :primary_key => :name,
+    :conditions => proc { "unlocks.course_id = #{self.course_id}" }
 
   validates :gdocs_sheet, :format => { :without => /^(MASTER|PUBLIC)$/ }
 
@@ -73,7 +75,7 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user may make submissions
   def submittable_by?(user)
-    returnable? && (user.administrator? || (!expired? && !hidden? && published? && !user.guest?))
+    returnable? && (user.administrator? || (!expired_for?(user) && !hidden? && published? && !user.guest?))
   end
 
   # Whether a user may see the exercise
@@ -89,6 +91,16 @@ class Exercise < ActiveRecord::Base
   # Whether the exercise has been published (it may still be hidden)
   def published?
     !publish_time || publish_time <= Time.now
+  end
+
+  def deadline_for(user)
+    deadline_spec_obj.deadline_for(user)
+  end
+
+  # Whether the deadline has passed
+  def expired_for?(user)
+    dl = deadline_for(user)
+    dl != nil && dl < Time.now
   end
 
   # Whether a user has made a submission for this exercise
@@ -107,38 +119,56 @@ class Exercise < ActiveRecord::Base
     }).any?
   end
 
-  def deadline=(new_value)
-    super(DateAndTimeUtils.to_time(new_value, :prefer_end_of_day => true))
+  def unlock_spec=(spec)
+    check_is_json_array_of_strings(spec)
+    super(spec)
+    @unlock_spec_obj = nil
+  end
+
+  def unlock_spec_obj
+    @unlock_spec_obj ||=
+      if self.unlock_spec
+        UnlockSpec.new(self, ActiveSupport::JSON.decode(self.unlock_spec))
+      else
+        UnlockSpec.new(self, [])
+      end
+  end
+
+  def deadline_spec=(spec)
+    check_is_json_array_of_strings(spec)
+    super(spec)
+    @deadline_spec_obj = DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
+  end
+
+  def deadline_spec_obj
+    @deadline_spec_obj ||=
+      if self.deadline_spec
+        DeadlineSpec.new(self, ActiveSupport::JSON.decode(self.deadline_spec))
+      else
+        DeadlineSpec.new(self, [])
+      end
+  end
+
+  def time_unlocked_for(user)
+    self.unlocks.where(:user_id => user).where('valid_after > ?', Time.now).first.andand.created_at
+  end
+
+  def unlocked_for?(user)
+    !!time_unlocked_for(user)
   end
 
   def solution_visible_after=(new_value)
     super(DateAndTimeUtils.to_time(new_value, :prefer_end_of_day => true))
   end
 
-  # Whether the deadline has passed
-  def expired?
-    self.deadline != nil && self.deadline < Time.now
-  end
-
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
-    self.deadline = new_options["deadline"]
+    self.deadline_spec = to_json_array(new_options["deadline"])
     self.publish_time = new_options["publish_time"]
     self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"], new_options["gdocs_sheet"])
     self.hidden = new_options["hidden"]
     self.returnable_forced = new_options["returnable"]
     self.solution_visible_after = new_options["solution_visible_after"]
-  end
-
-  def new_gdocs_sheet enabled, sheetname
-    return nil unless enabled
-    return sheetname unless sheetname.nil? or sheetname.empty?
-    return self.name2gdocs_sheet
-  end
-
-  def name2gdocs_sheet
-    sheetname = self.name.split('-')[0..-2].join('-')
-    sheetname.empty? ? "root" : sheetname
   end
 
   # Whether this exercise accepts submissions at all.
@@ -201,5 +231,32 @@ class Exercise < ActiveRecord::Base
     ensure
       results.clear
     end
+  end
+
+private
+  def new_gdocs_sheet enabled, sheetname
+    return nil unless enabled
+    return sheetname unless sheetname.nil? or sheetname.empty?
+    return name2gdocs_sheet
+  end
+
+  def name2gdocs_sheet
+    sheetname = self.name.split('-')[0..-2].join('-')
+    sheetname.empty? ? "root" : sheetname
+  end
+
+  def to_json_array(value)
+    if value != nil
+      value = [value] unless value.is_a?(Array)
+      value.to_json
+    else
+      "[]"
+    end
+  end
+
+  def check_is_json_array_of_strings(str)
+    array = ActiveSupport::JSON.decode(str)
+    raise "JSON array expected" if !array.is_a?(Array)
+    raise "JSON array of strings expected" if array.any? {|a| !a.is_a?(String) }
   end
 end

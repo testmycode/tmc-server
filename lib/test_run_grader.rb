@@ -19,6 +19,7 @@ module TestRunGrader
     submission.test_case_runs.destroy_all
     create_test_case_runs(submission, results)
     award_points(submission, results)
+    Unlock.refresh_unlocks(submission.course, submission.user)
     submission.save!
   end
   

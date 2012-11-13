@@ -92,36 +92,46 @@ describe Exercise do
     ex.should be_hidden
   end
 
+  def set_deadline(ex, t)
+    if t.is_a? Array
+      ex.deadline_spec = t.to_json
+    else
+      ex.deadline_spec = [t.to_s].to_json
+    end
+  end
+
   it "should treat date deadlines as being at 23:59:59 local time" do
     ex = Factory.create(:exercise, :course => course)
-    ex.deadline = Date.today
-    ex.deadline.should == Date.today.end_of_day
+    set_deadline(ex, Date.today)
+    ex.deadline_for(user).should == Date.today.end_of_day
   end
 
   it "should accept deadlines in either SQLish or Finnish date format" do
     ex = Factory.create(:exercise, :course => course)
 
-    ex.deadline = '2011-04-19 13:55'
-    ex.deadline.year.should == 2011
-    ex.deadline.month.should == 04
-    ex.deadline.day.should == 19
-    ex.deadline.hour.should == 13
-    ex.deadline.min.should == 55
+    set_deadline(ex, '2011-04-19 13:55')
+    dl = ex.deadline_for(user)
+    dl.year.should == 2011
+    dl.month.should == 04
+    dl.day.should == 19
+    dl.hour.should == 13
+    dl.min.should == 55
 
-    ex.deadline = '25.05.2012 14:56'
-    ex.deadline.day.should == 25
-    ex.deadline.month.should == 5
-    ex.deadline.year.should == 2012
-    ex.deadline.hour.should == 14
-    ex.deadline.min.should == 56
+    set_deadline(ex, '25.05.2012 14:56')
+    dl = ex.deadline_for(user)
+    dl.day.should == 25
+    dl.month.should == 5
+    dl.year.should == 2012
+    dl.hour.should == 14
+    dl.min.should == 56
   end
 
   it "should accept a blank deadline" do
     ex = Factory.create(:exercise, :course => course)
-    ex.deadline = nil
-    ex.deadline.should be_nil
-    ex.deadline = ""
-    ex.deadline.should be_nil
+    set_deadline(ex, nil)
+    ex.deadline_for(user).should be_nil
+    set_deadline(ex, "")
+    ex.deadline_for(user).should be_nil
   end
 
   it "should not accept certain hardcoded values for gdocs_sheet" do
@@ -139,8 +149,8 @@ describe Exercise do
 
   it "should raise an exception if trying to set a deadline in invalid format" do
     ex = Factory.create(:exercise)
-    expect { ex.deadline = "xooxers" }.to raise_error
-    expect { ex.deadline = "2011-07-13 12:34:56:78" }.to raise_error
+    expect { set_deadline(ex, "xooxers") }.to raise_error
+    expect { set_deadline(ex, "2011-07-13 12:34:56:78") }.to raise_error
   end
 
   it "should be returnable by default if there is a non-empty test dir" do
@@ -200,10 +210,10 @@ describe Exercise do
     admin = Factory.create(:admin)
     ex = Factory.create(:returnable_exercise, :course => course)
 
-    ex.deadline.should be_nil
+    ex.deadline_for(user).should be_nil
     ex.should be_submittable_by(admin)
 
-    ex.deadline = Date.today - 1.day
+    set_deadline(ex, Date.today - 1.day)
     ex.should be_submittable_by(admin)
 
     ex.hidden = true
@@ -215,7 +225,7 @@ describe Exercise do
     user = Factory.create(:user)
     ex = Factory.create(:returnable_exercise, :course => course)
 
-    ex.deadline.should be_nil
+    ex.deadline_for(user).should be_nil
     ex.publish_time.should be_nil
     ex.should be_submittable_by(user)
     
@@ -225,13 +235,13 @@ describe Exercise do
     ex.publish_time = Date.today - 1.day
     ex.should be_submittable_by(user)
 
-    ex.deadline = Date.today + 1.day
+    set_deadline(ex, Date.today + 1.day)
     ex.should be_submittable_by(user)
 
-    ex.deadline = Date.today - 1.day
+    set_deadline(ex, Date.today - 1.day)
     ex.should_not be_submittable_by(user)
 
-    ex.deadline = nil
+    set_deadline(ex, nil)
     ex.hidden = true
     ex.should_not be_submittable_by(user)
   end

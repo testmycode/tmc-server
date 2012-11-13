@@ -56,7 +56,7 @@ module DateAndTimeUtils
     end
   end
 
-  def self.looks_like_date(str)
+  def self.looks_like_date_or_time(str)
     begin
       !!parse_date_or_time(str)
     rescue

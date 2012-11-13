@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120620134550) do
+ActiveRecord::Schema.define(:version => 20120904114701) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id", :null => false
@@ -48,13 +48,14 @@ ActiveRecord::Schema.define(:version => 20120620134550) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "course_id"
-    t.datetime "deadline"
     t.datetime "publish_time"
     t.string   "gdocs_sheet"
     t.boolean  "hidden",                 :default => false, :null => false
     t.boolean  "returnable_forced"
     t.string   "checksum",               :default => "",    :null => false
     t.datetime "solution_visible_after"
+    t.text     "deadline_spec"
+    t.text     "unlock_spec"
   end
 
   add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name"
@@ -167,6 +168,16 @@ ActiveRecord::Schema.define(:version => 20120620134550) do
   end
 
   add_index "test_scanner_cache_entries", ["course_id", "exercise_name"], :name => "index_test_scanner_cache_entries_on_course_id_and_exercise_name", :unique => true
+
+  create_table "unlocks", :force => true do |t|
+    t.integer  "user_id",       :null => false
+    t.integer  "course_id",     :null => false
+    t.string   "exercise_name", :null => false
+    t.datetime "valid_after"
+    t.datetime "created_at",    :null => false
+  end
+
+  add_index "unlocks", ["user_id", "course_id", "exercise_name"], :name => "index_unlocks_on_user_id_and_course_id_and_exercise_name", :unique => true
 
   create_table "user_field_values", :force => true do |t|
     t.integer  "user_id",    :null => false

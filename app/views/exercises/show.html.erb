@@ -6,8 +6,8 @@
   <% if @exercise.hidden? %>
     <li>This exercise is currently hidden</li>
   <% end %>
-  <% if @exercise.deadline %>
-    <li>Deadline: <%= @exercise.deadline %><% if @exercise.expired? %> (expired)<% end %></li>
+  <% if @exercise.deadline_for(current_user) %>
+    <li>Deadline: <%= @exercise.deadline_for(current_user) %><% if @exercise.expired_for?(current_user) %> (expired)<% end %></li>
   <% end %>
   <% if !@exercise.returnable? %>
     <li>The exercise is not returnable.</li>

@@ -4,6 +4,8 @@ describe CourseRefresher do
   include GitTestActions
 
   before :each do
+    @user = Factory.create(:user)
+
     repo_path ="#{@test_tmp_dir}/fake_remote_repo"
     repo_url = "file://#{repo_path}"
 
@@ -114,7 +116,7 @@ describe CourseRefresher do
 
     @refresher.refresh_course(@course)
 
-    @course.exercises.first.deadline.should == Time.parse("2012-01-02 12:34")
+    @course.exercises.first.deadline_for(@user).should == Time.parse("2012-01-02 12:34")
     @course.exercises.first.gdocs_sheet.should == "xoo"
   end
 
@@ -143,7 +145,7 @@ describe CourseRefresher do
     )
     @refresher.refresh_course(@course)
 
-    @course.exercises.first.deadline.should == Time.parse("2013-01-01 00:00")
+    @course.exercises.first.deadline_for(@user).should == Time.parse("2013-01-01 00:00")
     @course.exercises.first.gdocs_sheet.should == "foo"
   end
 
