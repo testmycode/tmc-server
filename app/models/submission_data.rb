@@ -6,7 +6,7 @@ class SubmissionData < ActiveRecord::Base
   def stdout
     @stdout ||=
       if stdout_compressed != nil
-        Zlib::Inflate.inflate(stdout_compressed)
+        uncompress(stdout_compressed)
       else
         nil
       end
@@ -14,7 +14,7 @@ class SubmissionData < ActiveRecord::Base
 
   def stdout=(value)
     if value != nil
-      self.stdout_compressed = Zlib::Deflate.deflate(value)
+      self.stdout_compressed = compress(value)
     else
       self.stdout_compressed = nil
     end
@@ -24,7 +24,7 @@ class SubmissionData < ActiveRecord::Base
   def stderr
     @stderr ||=
       if stderr_compressed != nil
-        Zlib::Inflate.inflate(stderr_compressed)
+        uncompress(stderr_compressed)
       else
         nil
       end
@@ -32,10 +32,36 @@ class SubmissionData < ActiveRecord::Base
 
   def stderr=(value)
     if value != nil
-      self.stderr_compressed = Zlib::Deflate.deflate(value)
+      self.stderr_compressed = compress(value)
     else
       self.stderr_compressed = nil
     end
     @stderr = value
+  end
+
+  def vm_log
+    @vm_log ||=
+      if vm_log_compressed != nil
+        uncompress(vm_log_compressed)
+      else
+        nil
+      end
+  end
+
+  def vm_log=(value)
+    if value != nil
+      self.vm_log_compressed = compress(value)
+    else
+      self.vm_log_compressed = nil
+    end
+    @vm_log = value
+  end
+
+private
+  def compress(text)
+    Zlib::Deflate.deflate(text)
+  end
+  def uncompress(compressed_text)
+    Zlib::Inflate.inflate(compressed_text).force_encoding('UTF-8')
   end
 end

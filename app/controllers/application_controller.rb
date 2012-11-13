@@ -2,7 +2,11 @@ require 'version'
 
 class ApplicationController < ActionController::Base
   API_VERSION = 5 # To be incremented on BC-breaking changes
-  
+
+  include BreadcrumbHelpers
+
+  add_breadcrumb 'TMC', :root_path
+
   helper :all
   
   layout :select_layout

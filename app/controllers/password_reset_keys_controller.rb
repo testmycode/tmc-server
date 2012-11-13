@@ -1,9 +1,11 @@
 class PasswordResetKeysController < ApplicationController
   skip_authorization_check
-  
+
+  add_breadcrumb 'Forgot password', lambda {|*a| }, :only => [:new, :show]
+
   def new
   end
-  
+
   def create
     @email = params['email'].to_s.strip
     if @email.empty?
@@ -43,7 +45,7 @@ class PasswordResetKeysController < ApplicationController
       redirect_to root_path
     else
       if @user.errors[:password]
-        flash.now[:alert] = 'Password ' + @user.errors[:password]
+        flash.now[:alert] = 'Password ' + @user.errors[:password].join(', ')
       else
         flash.now[:alert] = 'Failed to set password'
       end

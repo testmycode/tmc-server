@@ -4,8 +4,11 @@ class StatsController < ApplicationController
   def index
     get_vars
     if @course
+      add_course_breadcrumb
+      add_breadcrumb 'Stats', course_stats_path(@course)
       course_stats_index
     else
+      add_breadcrumb 'Stats', stats_path
       general_stats_index
     end
   end
@@ -14,8 +17,12 @@ class StatsController < ApplicationController
     get_vars
     page = params[:id]
     if @course
+      add_course_breadcrumb
+      add_breadcrumb 'Stats', course_stats_path(@course)
+      add_breadcrumb page.humanize, course_stat_path(@course, page)
       course_stats_show(page)
     else
+      add_breadcrumb 'Stats', stats_path
       general_stats_show(page)
     end
   end

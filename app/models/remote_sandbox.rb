@@ -39,7 +39,7 @@ class RemoteSandbox
         zip_path = "#{tmpdir}/submission.zip"
         tar_path = "#{tmpdir}/submission.tar"
         File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
-        SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path)
+        SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params)
 
         File.open(tar_path, 'r') do |tar_file|
           begin
@@ -71,7 +71,7 @@ class RemoteSandbox
 
   def seed_maven_cache(file_path)
     File.open(file_path, 'r') do |file|
-      RestClient.post(maven_cache_populate_url, :file => file)
+      RestClient.post(maven_cache_populate_url, :file => file, :run_tests => true)
     end
   end
 

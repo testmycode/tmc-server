@@ -7,6 +7,9 @@ class SubmissionsController < ApplicationController
   skip_authorization_check :only => :show
 
   def index
+    add_course_breadcrumb
+    add_breadcrumb 'All submissions', course_submissions_path(@course)
+
     respond_to do |format|
       format.json do
         submissions = @course.submissions
@@ -41,9 +44,11 @@ class SubmissionsController < ApplicationController
     @submission = Submission.find(params[:id])
     authorize! :read, @submission
     
-    # Set the following for the breadcrumb
     @course = @submission.course
     @exercise = @submission.exercise
+    add_course_breadcrumb
+    add_exercise_breadcrumb
+    add_submission_breadcrumb
 
     respond_to do |format|
       format.html
@@ -52,7 +57,8 @@ class SubmissionsController < ApplicationController
         output = {
           :api_version => API_VERSION,
           :status => @submission.status,
-          :points => @submission.points_list
+          :points => @submission.points_list,
+          :missing_review_points => @exercise.missing_review_points_for(@submission.user)
         }
         output = output.merge(
           case @submission.status
@@ -97,13 +103,20 @@ class SubmissionsController < ApplicationController
     if !file_contents.start_with?('PK')
       errormsg = "The uploaded file doesn't look like a ZIP file."
     end
-    
+
+    submission_params = {
+      :error_msg_locale => params[:error_msg_locale]
+    }
+
     if !errormsg
       @submission = Submission.new(
         :user => current_user,
         :course => @course,
         :exercise => @exercise,
-        :return_file => file_contents
+        :return_file => file_contents,
+        :params_json => submission_params.to_json,
+        :requests_review => !!params[:request_review],
+        :message_for_reviewer => if params[:request_review] then params[:message_for_reviewer] || '' else '' end
       )
       
       authorize! :create, @submission
@@ -140,8 +153,16 @@ class SubmissionsController < ApplicationController
   def update
     submission = Submission.find(params[:id]) || respond_not_found
     authorize! :update, submission
-    schedule_for_rerun(submission, -1)
-    redirect_to submission_path(submission), :notice => 'Rerun scheduled'
+    if params[:rerun]
+      schedule_for_rerun(submission, -1)
+      redirect_to submission_path(submission), :notice => 'Rerun scheduled'
+    elsif params[:dismiss_review]
+      submission.review_dismissed = true
+      submission.save!
+      redirect_to new_submission_review_path(submission), :notice => 'Code review dismissed'
+    else
+      respond_not_found
+    end
   end
   
   def update_by_exercise

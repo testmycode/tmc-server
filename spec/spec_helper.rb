@@ -32,10 +32,20 @@ Proc.new do
   FileUtils.mkdir_p('tmp/tests')
   FileUtils.chown(user, group, 'tmp')
   FileUtils.chown(user, group, 'tmp/tests')
+  FileUtils.chown(user, group, 'log')
+  FileUtils.chown(user, group, 'log/test.log') if File.exists? 'log/test.log'
+  FileUtils.chown(user, group, 'log/test_cometd.log') if File.exists? 'log/test_cometd.log'
 
   # Drop root
   Process::Sys.setreuid(user, user)
 end.call
+
+
+# Direct JS console.log to /dev/null
+# as instructed in https://github.com/thoughtbot/capybara-webkit/issues/350
+Capybara.register_driver :webkit do |app|
+  Capybara::Driver::Webkit.new(app, :stdout => File.open('/dev/null', 'w'))
+end
 
 Capybara.default_driver = :webkit
 Capybara.server_port = FreePorts.take_next
@@ -47,6 +57,8 @@ def without_db_notices(&block)
 end
 
 RSpec.configure do |config|
+  config.treat_symbols_as_metadata_keys_with_true_values = true
+
   config.mock_with :rspec
 
   config.use_transactional_fixtures = false
@@ -63,6 +75,12 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
     SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://127.0.0.1:#{Capybara.server_port}"
+    SiteSetting.all_settings['emails']['email_code_reviews_by_default'] = false
+    SiteSetting.all_settings['comet_server'] = {
+      'url' => "http://localhost:#{CometSupport.port}/",
+      'backend_key' => CometSupport.backend_key,
+      'my_baseurl' => "http://localhost:#{Capybara.server_port}/"
+    }
   end
 
   config.after :each do

@@ -25,7 +25,7 @@ class SubmissionPackager
     def copy_libs(cloned, dest)
       FileUtils.cp_r(cloned + 'lib', dest + 'lib')
       FileUtils.mkdir_p(dest + 'lib' + 'testrunner')
-      for jar_path in TmcJunitRunner.jar_and_lib_paths
+      for jar_path in TmcJunitRunner.get.jar_and_lib_paths
         destname = jar_path.basename
         if destname.to_s.start_with?('tmc-junit-runner')
           destname = 'tmc-junit-runner.jar'

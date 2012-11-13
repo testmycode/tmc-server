@@ -5,6 +5,9 @@ describe TestRunGrader do
 
   before :each do
     @submission = Factory.create(:submission, :processed => false)
+    ['1.1', '1.2'].each do |name|
+      Factory.create(:available_point, :exercise_id => @submission.exercise.id, :name => name)
+    end
   end
   
   def half_successful_results
@@ -148,5 +151,80 @@ describe TestRunGrader do
     points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
     points.should include('1.1')
     points.should include('1.2')
+  end
+
+  describe "when the exercise requires code review" do
+    before :each do
+      ap = AvailablePoint.find_by_name('1.1')
+      ap.requires_review = true
+      ap.save!
+    end
+
+    it "should not award points that require review" do
+      TestRunGrader.grade_results(@submission, successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should_not include('1.1')
+      points.should include('1.2')
+    end
+
+    it "should preserve old review points" do
+      AwardedPoint.create!(:course_id => @submission.course_id, :user_id => @submission.user_id, :name => '1.1')
+      @submission.points = '1.1'
+      TestRunGrader.grade_results(@submission, successful_results)
+      @submission.points_list.should include('1.1')
+    end
+
+    it "should flag the submission as requiring review if the exercise has review points" do
+      TestRunGrader.grade_results(@submission, successful_results)
+
+      @submission.should require_review
+    end
+
+    it "should unflag all previous submissions to the same exercise" do
+      old_sub = Submission.create!(
+        :user => @submission.user,
+        :course => @submission.course,
+        :exercise => @submission.exercise,
+        :requires_review => true
+      )
+
+      other_exercise_sub = Submission.create!(
+        :user => @submission.user,
+        :course => @submission.course,
+        :exercise => Factory.create(:exercise, :course => @submission.course),
+        :requires_review => true
+      )
+      other_user_sub = Submission.create!(
+        :user => Factory.create(:user),
+        :course => @submission.course,
+        :exercise => @submission.exercise,
+        :requires_review => true
+      )
+
+      TestRunGrader.grade_results(@submission, successful_results)
+      [old_sub, other_exercise_sub, other_user_sub].each(&:reload)
+
+      old_sub.should_not require_review
+
+      other_exercise_sub.should require_review
+      other_user_sub.should require_review
+    end
+
+    it "should not flag the submission as requiring review if the user has already scored the review points" do
+      AwardedPoint.create(:course => @submission.course, :user => @submission.user, :name => '1.1')
+
+      TestRunGrader.grade_results(@submission, successful_results)
+
+      @submission.should_not require_review
+    end
+
+    it "should not flag the submission as requiring review if the submission requests review" do
+      @submission.requests_review = true
+
+      TestRunGrader.grade_results(@submission, successful_results)
+
+      @submission.should_not require_review
+    end
   end
 end

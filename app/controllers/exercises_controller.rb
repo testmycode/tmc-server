@@ -8,6 +8,9 @@ class ExercisesController < ApplicationController
 
     respond_to do |format|
       format.html do
+        add_course_breadcrumb
+        add_exercise_breadcrumb
+
         Course.transaction(:requires_new => true) do
           if !current_user.guest?
             @submissions = @exercise.submissions.order("submissions.created_at DESC")

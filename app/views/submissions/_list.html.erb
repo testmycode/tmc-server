@@ -1,9 +1,14 @@
+<%
+# Use this partial through the show_submission_list helper
+%>
 
-<table class="submissions">
+<%= content_tag :table, :class => 'submissions', :id => table_id do %>
   <thead>
     <tr>
       <th>Time</th>
-      <th>Student</th>
+      <% if show_student_column %>
+        <th>Student</th>
+      <% end %>
       <% if show_exercise_column %>
         <th>Exercise</th>
       <% end %>
@@ -11,21 +16,33 @@
       <% if show_awarded_points %>
         <th>Points</th>
       <% end %>
-      <th></th>
-      <th></th>
+      <% if show_review_column %>
+        <th>Review</th>
+      <% end %>
+      <% if show_reviewer_column %>
+        <th>Reviewed by</th>
+      <% end %>
+      <% if show_files_column %>
+        <th></th>
+      <% end %>
+      <% if show_details_column %>
+        <th></th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
     <% submissions.each do |submission| %> 
       <tr>
         <td><%= submission.created_at.strftime("%d.%m.%Y %H:%M") %></td>
-        <td>
-          <% if can? :read, submission.user %>
-            <%= link_to submission.user.login, participant_path(submission.user) %>
-          <% else  %>
-            <%= submission.user.login %>
-          <% end %>
-        </td>
+        <% if show_student_column %>
+          <td>
+            <% if can? :read, submission.user %>
+              <%= link_to submission.user.login, participant_path(submission.user) %>
+            <% else  %>
+              <%= submission.user.login %>
+            <% end %>
+          </td>
+        <% end %>
         <% if show_exercise_column %>
           <td>
             <%= link_to_submission_exericse(submission) %>
@@ -39,17 +56,30 @@
             <%= points_list(submission.points_list) %>
           </td>
         <% end %>
-        <td>
-          <%= link_to 'Files', submission_files_path(submission) %>
-        </td>
-        <td>
-          <%= link_to 'Details', submission_path(submission)  %>
-        </td>
+        <% if show_review_column %>
+          <td>
+            <%= submission_review_column(submission) %>
+          </td>
+        <% end %>
+        <% if show_reviewer_column %>
+          <% reviewers = submission.reviews.sort_by(&:created_at).map {|r| r.reviewer.username }.uniq.join(', ') %>
+          <td><%= link_to reviewers, submission_reviews_path(submission) %></td>
+        <% end %>
+        <% if show_files_column %>
+          <td>
+            <%= link_to 'Files', submission_files_path(submission) %>
+          </td>
+        <% end %>
+        <% if show_details_column %>
+          <td>
+            <%= link_to 'Details', submission_path(submission)  %>
+          </td>
+        <% end %>
        </tr>
     <% end %>
   </tbody>
-</table>
+<% end %>
 
 <% if invoke_datatables %>
-  <%= use_datatables('table.submissions', :bPaginate => false) %>
+  <%= use_datatables('#' + table_id, :bPaginate => false) %>
 <% end %>

@@ -1,0 +1,20 @@
+#!/usr/bin/screen -c
+caption always
+caption string "%w %=| %H %c"
+
+defscrollback 10000
+zombie qr
+verbose on
+
+screen rails s
+title "rails server"
+
+screen script/submission_reprocessor run
+title "rerunner"
+
+screen rake dev:comet:run
+title "comet"
+
+screen rvmsudo ext/tmc-sandbox/web/webapp.rb run
+title "sandbox"
+

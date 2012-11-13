@@ -7,6 +7,10 @@ TmcServer::Application.routes.draw do
 
   resource :auth, :only => [:show]
 
+  # Make POST an alternative to GET /auth.t[e]xt
+  match '/auth.text', :method => :post, :to => 'auths#show'
+  match '/auth.txt', :method => :post, :to => 'auths#show'
+
   resource :user
   
   resources :participants
@@ -34,13 +38,15 @@ TmcServer::Application.routes.draw do
     resources :stats, :only => [:index, :show]
     resources :exercises, :only => [:index]
     resources :submissions, :only => [:index]
+    resources :reviewed_submissions, :only =>[:index]
     resources :feedback_questions, :only => [:index, :new, :create]
     resources :feedback_answers, :only => [:index]
     match 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :via => :get, :as => 'feedback_answers_chart'
+    resources :reviews, :only => [:index]
   end
   
   resources :exercises, :only => [:show] do
-    resources :submissions, :only => [:create, :index]
+    resources :submissions, :only => [:create]
     resource :solution, :only => [:show]
     resources :feedback_answers, :only => [:index]
   end
@@ -49,7 +55,12 @@ TmcServer::Application.routes.draw do
     resource :result, :only => [:create]
     resources :feedback_answers, :only => [:create]
     resources :files, :only => [:index]
+    resources :reviews, :only => [:index, :new, :create]
   end
+
+  resources :reviews, :only => [:update, :destroy]
+
+  match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
   
   resources :feedback_questions, :only => [:show, :update, :destroy] do
     resource :position, :only => [:update]
@@ -58,8 +69,8 @@ TmcServer::Application.routes.draw do
   resources :feedback_answers, :only => [:show]
 
   resources :student_events, :only => [:create]
-  
-  match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
+
+  resource :page_presence, :only => [:update]
 
   root :to => "courses#index"
 

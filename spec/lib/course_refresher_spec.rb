@@ -159,6 +159,41 @@ describe CourseRefresher do
     @course.exercises.should have(0).items
   end
 
+  it "should mark available points requiring review" do
+    add_exercise('MyExercise')
+    change_metadata_file(
+      'metadata.yml',
+      {'review_points' => 'addsub reviewonly'},
+      {:commit => true}
+    )
+    @refresher.refresh_course(@course)
+
+    @course.available_points.find_by_name('addsub').should require_review
+    @course.available_points.find_by_name('reviewonly').should_not be_nil
+    @course.available_points.find_by_name('reviewonly').should require_review
+    @course.available_points.find_by_name('mul').should_not require_review
+  end
+
+  it "should change available points' requiring review state after second refresh" do
+    add_exercise('MyExercise')
+    change_metadata_file(
+      'metadata.yml',
+      {'review_points' => 'addsub reviewonly'},
+      {:commit => true}
+    )
+    @refresher.refresh_course(@course)
+    change_metadata_file(
+      'metadata.yml',
+      {'review_points' => 'mul'},
+      {:commit => true}
+    )
+    @refresher.refresh_course(@course)
+
+    @course.available_points.find_by_name('addsub').should_not require_review
+    @course.available_points.find_by_name('reviewonly').should be_nil
+    @course.available_points.find_by_name('mul').should require_review
+  end
+
   it "should ignore exercises under directories with a .tmcignore file" do
     add_exercise('MyExercise')
     @refresher.refresh_course(@course)
@@ -246,7 +281,7 @@ describe CourseRefresher do
     
     # Should have tmc-junit-runner.jar and its dependencies
     File.should exist(stub + '/lib/testrunner/tmc-junit-runner.jar')
-    (Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size.should == (1 + TmcJunitRunner.lib_paths.size)
+    (Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size.should == (1 + TmcJunitRunner.get.lib_paths.size)
   end
   
   it "should generate solution versions of exercises" do

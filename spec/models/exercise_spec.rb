@@ -153,59 +153,6 @@ describe Exercise do
     expect { set_deadline(ex, "2011-07-13 12:34:56:78") }.to raise_error
   end
 
-  it "should be returnable by default if there is a non-empty test dir" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    FileUtils.mkdir_p('FakeCache/test')
-    FileUtils.touch('FakeCache/test/Xoo.java')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should be_returnable
-  end
-
-  it "should be non-returnable by default if there is an empty test dir" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    FileUtils.mkdir_p('FakeCache/test')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should_not be_returnable
-  end
-
-  specify "maven project returnabilty" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache')
-    ex.stub(:clone_path => 'FakeCache')
-    FileUtils.touch('FakeCache/pom.xml')
-    FileUtils.mkdir_p('FakeCache/src/test/java')
-    ex.should_not be_returnable
-    FileUtils.touch('FakeCache/src/test/java/Xoo.java')
-    ex.should be_returnable
-  end
-
-  it "should be non-returnable by default if there is no test dir" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should_not be_returnable
-  end
-
-  it "can be forced to be returable" do
-    ex = Factory.create(:exercise, :course => course)
-    ex.should_not be_returnable
-    ex.options = { 'returnable' => true }
-    ex.should be_returnable
-  end
-
-  it "can be forced to be non-returable" do
-    ex = Factory.create(:exercise, :course => course)
-    FileUtils.mkdir_p('FakeCache/src')
-    FileUtils.mkdir_p('FakeCache/test')
-    FileUtils.touch('FakeCache/test/Xoo.java')
-    ex.stub(:clone_path => 'FakeCache')
-    ex.should be_returnable
-    ex.options = { 'returnable' => false }
-    ex.should_not be_returnable
-  end
-
   it "should always be submittable by administrators as long as it's returnable" do
     admin = Factory.create(:admin)
     ex = Factory.create(:returnable_exercise, :course => course)
@@ -218,6 +165,9 @@ describe Exercise do
 
     ex.hidden = true
     ex.should be_submittable_by(admin)
+
+    ex.options = { 'returnable' => false }
+    ex.should_not be_submittable_by(admin)
   end
 
   it "should be submittable by non-administrators only if the deadline has not passed and the exercise is not hidden and is published" do
@@ -295,6 +245,7 @@ describe Exercise do
     exercise.should_not be_attempted_by(user)
 
     Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :processed => true)
+    exercise.reload
     exercise.should be_attempted_by(user)
   end
 
@@ -311,6 +262,47 @@ describe Exercise do
 
     sub = Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :all_tests_passed => false)
     exercise.should_not be_completed_by(user)
+  end
+
+  it "can tell its available review points" do
+    exercise = Factory.create(:exercise, :course => course)
+    pt1 = Factory.create(:available_point, :exercise => exercise, :requires_review => false)
+    pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+    pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+
+    exercise.available_review_points.sort.should == [pt2, pt3].map(&:name).sort
+  end
+
+  it "can tell if it's been reviewed for a user" do
+    exercise = Factory.create(:exercise, :course => course)
+
+    exercise.should_not be_reviewed_for(user)
+    submission = Factory.create(:submission, :exercise => exercise, :course => course, :user => user, :reviewed => true)
+    Factory.create(:review, :submission => submission)
+    exercise.reload
+    exercise.should be_reviewed_for(user)
+  end
+
+  it "can tell if all review points have been given to a user" do
+    exercise = Factory.create(:exercise, :course => course)
+    pt1 = Factory.create(:available_point, :exercise => exercise, :requires_review => false)
+    pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+    pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+
+    Factory.create(:awarded_point, :course => course, :user => user, :name => pt2.name)
+    exercise.should_not be_all_review_points_given_for(user)
+    Factory.create(:awarded_point, :course => course, :user => user, :name => pt3.name)
+    exercise.should be_all_review_points_given_for(user)
+  end
+
+  it "can tell which review point are missing for a user" do
+    exercise = Factory.create(:exercise, :course => course)
+    pt1 = Factory.create(:available_point, :exercise => exercise, :requires_review => false)
+    pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+    pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+
+    Factory.create(:awarded_point, :course => course, :user => user, :name => pt2.name)
+    exercise.missing_review_points_for(user).should == [pt3.name]
   end
 end
 

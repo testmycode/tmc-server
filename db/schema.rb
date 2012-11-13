@@ -11,11 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120904114701) do
+ActiveRecord::Schema.define(:version => 20121113223514) do
 
   create_table "available_points", :force => true do |t|
-    t.integer "exercise_id", :null => false
-    t.string  "name",        :null => false
+    t.integer "exercise_id",                        :null => false
+    t.string  "name",                               :null => false
+    t.boolean "requires_review", :default => false, :null => false
   end
 
   create_table "awarded_points", :force => true do |t|
@@ -41,6 +42,7 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
     t.string   "source_url",                                       :null => false
     t.text     "git_branch",                 :default => "master", :null => false
     t.datetime "hidden_if_registered_after"
+    t.datetime "refreshed_at"
   end
 
   create_table "exercises", :force => true do |t|
@@ -54,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
     t.boolean  "returnable_forced"
     t.string   "checksum",               :default => "",    :null => false
     t.datetime "solution_visible_after"
+    t.boolean  "has_tests",              :default => false, :null => false
     t.text     "deadline_spec"
     t.text     "unlock_spec"
   end
@@ -96,6 +99,19 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
     t.datetime "updated_at"
   end
 
+  create_table "reviews", :force => true do |t|
+    t.integer  "submission_id",                     :null => false
+    t.integer  "reviewer_id"
+    t.text     "review_body",                       :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "points"
+    t.boolean  "marked_as_read", :default => false, :null => false
+  end
+
+  add_index "reviews", ["reviewer_id"], :name => "index_reviews_on_reviewer_id"
+  add_index "reviews", ["submission_id"], :name => "index_reviews_on_submission_id"
+
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
     t.text     "data"
@@ -115,6 +131,7 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
     t.datetime "happened_at",   :null => false
   end
 
+  add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
   add_index "student_events", ["user_id", "course_id", "exercise_name", "event_type", "happened_at"], :name => "index_student_events_user_course_exercise_type_time"
   add_index "student_events", ["user_id", "event_type", "happened_at"], :name => "index_student_events_user_type_time"
 
@@ -123,6 +140,7 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
     t.binary  "return_file"
     t.binary  "stdout_compressed"
     t.binary  "stderr_compressed"
+    t.binary  "vm_log_compressed"
   end
 
   create_table "submissions", :force => true do |t|
@@ -142,9 +160,17 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
     t.integer  "times_sent_to_sandbox",          :default => 0,     :null => false
     t.datetime "processing_attempts_started_at"
     t.integer  "processing_priority",            :default => 0,     :null => false
+    t.text     "params_json"
+    t.boolean  "requires_review",                :default => false, :null => false
+    t.boolean  "requests_review",                :default => false, :null => false
+    t.boolean  "reviewed",                       :default => false, :null => false
+    t.text     "message_for_reviewer",           :default => "",    :null => false
+    t.boolean  "newer_submission_reviewed",      :default => false, :null => false
+    t.boolean  "review_dismissed",               :default => false, :null => false
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
+  add_index "submissions", ["course_id", "user_id"], :name => "index_submissions_on_course_id_and_user_id"
   add_index "submissions", ["user_id", "exercise_name"], :name => "index_submissions_on_user_id_and_exercise_name"
 
   create_table "test_case_runs", :force => true do |t|
@@ -168,16 +194,6 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
   end
 
   add_index "test_scanner_cache_entries", ["course_id", "exercise_name"], :name => "index_test_scanner_cache_entries_on_course_id_and_exercise_name", :unique => true
-
-  create_table "unlocks", :force => true do |t|
-    t.integer  "user_id",       :null => false
-    t.integer  "course_id",     :null => false
-    t.string   "exercise_name", :null => false
-    t.datetime "valid_after"
-    t.datetime "created_at",    :null => false
-  end
-
-  add_index "unlocks", ["user_id", "course_id", "exercise_name"], :name => "index_unlocks_on_user_id_and_course_id_and_exercise_name", :unique => true
 
   create_table "user_field_values", :force => true do |t|
     t.integer  "user_id",    :null => false
@@ -214,6 +230,9 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
 
   add_foreign_key "password_reset_keys", "users", :name => "password_reset_keys_user_id_fk", :dependent => :delete
 
+  add_foreign_key "reviews", "submissions", :name => "reviews_submission_id_fk", :dependent => :delete
+  add_foreign_key "reviews", "users", :name => "reviews_reviewer_id_fk", :column => "reviewer_id", :dependent => :nullify
+
   add_foreign_key "student_events", "courses", :name => "student_events_course_id_fk", :dependent => :delete
   add_foreign_key "student_events", "users", :name => "student_events_user_id_fk", :dependent => :delete
 
@@ -229,6 +248,8 @@ ActiveRecord::Schema.define(:version => 20120904114701) do
   add_foreign_key "user_field_values", "users", :name => "user_field_values_user_id_fk", :dependent => :delete
 
   set_table_comment 'awarded_points', 'Stores points awarded to a user in a particular course. Each point is stored only once per user/course and each row refers to the first submission that awarded the point.'
+
+  set_column_comment 'reviews', 'points', 'Space-separated list of points awarded. Does not (generally) contain points already awarded in an earlier review.'
 
   set_column_comment 'submissions', 'points', 'Space-separated list of points awarded. Filled each time unlike the awarded_points table, where a point is given at most once.'
 

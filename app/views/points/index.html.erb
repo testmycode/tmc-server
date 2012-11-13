@@ -2,6 +2,10 @@
   <h1>Summary of points for <%= @course.name %></h1>
 <% end %>
 
+<%
+   show_total_column = @summary[:sheets].size > 1
+%>
+
 <%= content_tag('div', :class => if @bare_layout then nil else 'scrollable' end) do %>
   <table class="points">
     <thead>
@@ -10,7 +14,9 @@
         <% if !@summary[:sheets].empty? %>
           <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
         <% end %>
-        <th>Total</th>
+        <% if show_total_column %>
+          <th>Total</th>
+        <% end %>
       </tr>
       <tr class="table-totals">
         <% nstudents = @summary[:users].length %>
@@ -20,9 +26,11 @@
             <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
           </td>
         <% end %>
-        <td>
-          <%= "#{@summary[:total_awarded]}/#{@summary[:total_available]*nstudents}" %>
-        </td>
+        <% if show_total_column %>
+          <td>
+            <%= "#{@summary[:total_awarded]}/#{@summary[:total_available]*nstudents}" %>
+          </td>
+        <% end %>
       </tr>
       <tr>
         <th>
@@ -44,14 +52,16 @@
             <% end %>
           </th>
         <% end %>
-        <th>
-          Total<br />
-          <% unless params[:sort_by] == 'total_points' %>
-            [<%= link_to 'sort', course_points_path(@course, :sort_by => "total_points") %>]
-          <% else %>
-            [sort]
-          <% end %>
-        </th>
+        <% if show_total_column %>
+          <th>
+            Total<br />
+            <% unless params[:sort_by] == 'total_points' %>
+              [<%= link_to 'sort', course_points_path(@course, :sort_by => "total_points") %>]
+            <% else %>
+              [sort]
+            <% end %>
+          </th>
+        <% end %>
       </tr>
     </thead>
     <tbody>
@@ -72,7 +82,9 @@
               <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
             </td>
           <% end %>
-          <td><%= "#{@summary[:total_for_user][username].to_i}/#{@summary[:total_available]}" %></td>
+          <% if show_total_column %>
+            <td><%= "#{@summary[:total_for_user][username].to_i}/#{@summary[:total_available]}" %></td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>

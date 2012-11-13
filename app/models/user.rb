@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   has_many :user_field_values, :dependent => :delete_all, :autosave => true
   has_many :student_events, :dependent => :delete_all
   has_many :unlocks, :dependent => :delete_all
+  has_many :reviews, :foreign_key => :reviewer_id, :inverse_of => :reviewer, :dependent => :nullify
 
   validates :login, :presence     => true,
                     :uniqueness   => true,
@@ -34,6 +35,11 @@ class User < ActiveRecord::Base
 
   def username=(name)
     self.login = name
+  end
+
+  # May eventually be separate from username
+  def display_name
+    username
   end
 
   def field_value(field)
@@ -89,6 +95,15 @@ class User < ActiveRecord::Base
     user = find_by_login(login)
     return nil  if user.nil?
     return user if user.has_password?(submitted_password)
+  end
+
+  def has_point?(course, point_name)
+    self.awarded_points.where(:course_id => course.id, :name => point_name).any?
+  end
+
+  def has_points?(course, point_names)
+    existing = self.awarded_points.where(:course_id => course.id, :name => point_names).map(&:name)
+    point_names.all? {|pt| existing.include?(pt) }
   end
 
   def <=>(other)

@@ -1,0 +1,41 @@
+
+<% if current_user.administrator? %>
+  <h1>Code reviews for <%= @course.name %></h1>
+  <section>
+    <h2>Administration</h2>
+
+    <p><%= link_to 'View all reviewed submissions', course_reviewed_submissions_path(@course) %></p>
+
+    <% subs = @course.submissions_to_review.order('created_at DESC') %>
+    <h3>Submissions to review</h3>
+    <section>
+      <% if subs.empty? %>
+        <p>None at the moment.</p>
+      <% else%>
+        <%= show_submission_list subs, :table_id => 'submissions_to-review', :show_review_column => true %>
+      <% end %>
+    </section>
+  </section>
+  <hr />
+<% end %>
+
+<section>
+  <h2>My code reviews</h2>
+  <% if current_user.administrator? %>
+    <p class="fine-print">(this is what you would see as a non-administrator)</p>
+  <% end %>
+  <% if @my_reviews.empty? %>
+    <p>No code reviews yet.</p>
+  <% else %>
+      <%=
+          show_submission_list(
+            @my_reviews,
+            :table_id => 'my_reviews',
+            :show_student_column => false,
+            :show_review_column => true,
+            :show_files_column => false,
+            :show_details_column => false
+          )
+      %>
+  <% end %>
+</section>

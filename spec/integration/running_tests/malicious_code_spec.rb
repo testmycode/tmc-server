@@ -16,7 +16,7 @@ describe RemoteSandboxForTesting, :integration => true do
       case_names = submission.test_case_runs.map(&:test_case_name)
       case_names.sort.should == ['ATest test1', 'BTest test2']
       case_messages = submission.test_case_runs.map(&:message)
-      case_messages.should include("java.lang.RuntimeException: Failed to load test class")
+      case_messages.should include("Failed to run test.")
     end
   end
 end

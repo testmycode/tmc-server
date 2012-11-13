@@ -10,14 +10,13 @@ require 'submission_packager/java_maven'
 
 # Takes a submission zip and makes a tar file suitable for the sandbox
 class SubmissionPackager
-
   def self.get(exercise)
     cls_name = exercise.exercise_type.to_s.camelize
     cls = SubmissionPackager.const_get(cls_name)
     cls.new
   end
 
-  def package_submission(exercise, zip_path, tar_path)
+  def package_submission(exercise, zip_path, tar_path, extra_params = {})
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         FileUtils.mkdir_p('received')
@@ -34,6 +33,9 @@ class SubmissionPackager
 
         received = Pathname(find_received_project_root(Pathname('received')))
         dest = Pathname('dest')
+
+        write_extra_params(dest + '.tmcparams', extra_params) unless !extra_params || extra_params.empty?
+
         copy_files(exercise, received, dest)
 
         sh! ['tar', '-C', dest.to_s, '-cpf', tar_path, '.']
@@ -77,6 +79,14 @@ private
         FileUtils.rm(to) if File.exists?(to)
         FileUtils.mkdir_p(File.dirname(to))
         FileUtils.cp(from, to)
+      end
+    end
+  end
+
+  def write_extra_params(file, extra_params)
+    File.open(file, 'wb') do |f|
+      for k, v in extra_params
+        f.puts Shellwords.join(['export', "#{k}=#{v}"]) # Format checked in Submission.valid_param?
       end
     end
   end

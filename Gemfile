@@ -7,7 +7,7 @@ gem 'rails', '~> 3.1.0'
 gem 'rake'
 gem 'google-spreadsheet-ruby'
 gem 'pg', '~> 0.11.0'
-gem 'jquery-rails', '~> 1.0.9'
+gem 'jquery-rails'
 gem 'cancan', '~> 1.6.7'
 gem 'rest-client', '~> 1.6.7'
 gem 'daemons', '~> 1.1.4'
@@ -16,6 +16,8 @@ gem 'natcmp', '~> 1.4'
 gem 'fastercsv', :platforms => :ruby_18
 gem 'foreigner', '~> 1.1.6'
 gem 'xml-simple', '~> 1.1.1'
+gem 'transaction_isolation', '~> 1.0.3'
+gem 'breadcrumbs_on_rails', '~> 2.2.0'
 gem 'andand'
 
 group :development, :test do

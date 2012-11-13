@@ -4,6 +4,9 @@ class PointsController < ApplicationController
 
   def index
     @course = Course.find(params[:course_id])
+    add_course_breadcrumb
+    add_breadcrumb 'Points', course_points_path(@course)
+
     exercises = @course.exercises.select {|e| e.visible_to?(current_user)}
     sheets = @course.gdocs_sheets(exercises).natsort
     @summary = summary_hash(@course, exercises, sheets)
@@ -27,6 +30,11 @@ class PointsController < ApplicationController
   def show
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])
+
+    add_course_breadcrumb
+    add_breadcrumb 'Points', course_points_path(@course)
+    add_breadcrumb @sheetname, course_point_path(@course, @sheetname)
+
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).sort!
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
 
@@ -58,8 +66,6 @@ class PointsController < ApplicationController
     include_admins = current_user.administrator?
     users = User.where(:login => per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
     users = users.where(:administrator => false) unless include_admins
-
-    sheets = [] if sheets.size == 1 # The total column will be the same as the sheet column
 
     {
       :sheets => sheets.map{|sheet| {

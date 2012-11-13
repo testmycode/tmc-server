@@ -10,6 +10,11 @@ class Submission < ActiveRecord::Base
   after_save { submission_data.save! if submission_data }
 
   has_many :test_case_runs, :dependent => :delete_all, :order => :id
+  has_many :reviews, :dependent => :delete_all, :order => :created_at do
+    def latest
+      self.order('created_at DESC').limit(1).first
+    end
+  end
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
   
@@ -48,6 +53,32 @@ class Submission < ActiveRecord::Base
   def result_url
     "#{SiteSetting.value(:baseurl_for_remote_sandboxes).sub(/\/+$/, '')}/submissions/#{self.id}/result"
   end
+
+  def params
+    if self.params_json
+      ActiveSupport::JSON.decode(self.params_json)
+    else
+      nil
+    end
+  end
+
+  def params=(value)
+    if value.is_a?(Hash)
+      value.each {|k, v| raise "Invalid submission param: #{k} = #{v}" if !valid_param?(k, v) }
+      self.params_json = value.to_json
+    elsif value == nil
+      self.params_json = nil
+    else
+      raise "Invalid submission params: #{value.inspect}"
+    end
+  end
+
+  def valid_param?(k, v)
+    # See also: SubmissionPackager.write_extra_params
+    k = k.to_s
+    v = v.to_s
+    k =~ /^[a-zA-Z\-_]+$/ && v =~ /^[a-zA-Z\-_]+$/
+  end
   
   def status
     if !processed?
@@ -64,6 +95,28 @@ class Submission < ActiveRecord::Base
   def points_list
     points.to_s.split(' ')
   end
+
+  # Returns a query for all submissions (including this one) by the same user
+  # for the same course and exercise
+  def of_same_kind
+    Submission.where(
+      :course_id => self.course_id,
+      :exercise_name => self.exercise_name,
+      :user_id => self.user_id
+    )
+  end
+
+  # Returns the newest submission by the same user for the same exercise,
+  # as long as it's newer than this submission
+  def newest_of_same_kind
+    of_same_kind.where(['created_at > ?', self.created_at]).order('created_at DESC').first
+  end
+
+  def review_dismissable?
+    (requires_review? || requests_review?) &&
+      !review_dismissed? &&
+      !newer_submission_reviewed?
+  end
   
   def unprocessed_submissions_before_this
     if !self.processed?
@@ -72,9 +125,9 @@ class Submission < ActiveRecord::Base
         return i if s.id == self.id
         i += 1
       end
-      nil # race condition
+      0 # race condition
     else
-      nil
+      0
     end
   end
   
@@ -102,6 +155,7 @@ class Submission < ActiveRecord::Base
   end
 
   def stdout
+    build_submission_data if !submission_data
     submission_data.stdout
   end
   def stdout=(value)
@@ -109,11 +163,20 @@ class Submission < ActiveRecord::Base
     submission_data.stdout = value
   end
   def stderr
+    build_submission_data if !submission_data
     submission_data.stderr
   end
   def stderr=(value)
     build_submission_data if !submission_data
     submission_data.stderr = value
+  end
+  def vm_log
+    build_submission_data if !submission_data
+    submission_data.vm_log
+  end
+  def vm_log=(value)
+    build_submission_data if !submission_data
+    submission_data.vm_log = value
   end
 
   def raise_pretest_error_if_any

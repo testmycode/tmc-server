@@ -73,6 +73,21 @@ class Exercise < ActiveRecord::Base
     Solution.new(self)
   end
 
+  def set_submissions_by(user, value)
+    @submissions_by ||= {}
+    @submissions_by[user.id] = value
+  end
+
+  def submissions_by(user)
+    @submissions_by ||= {}
+    @submissions_by[user.id] ||= submissions.where(:user_id => user.id).to_a
+  end
+
+  def reload
+    super
+    @submissions_by = {}
+  end
+
   # Whether a user may make submissions
   def submittable_by?(user)
     returnable? && (user.administrator? || (!expired_for?(user) && !hidden? && published? && !user.guest?))
@@ -105,18 +120,49 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user has made a submission for this exercise
   def attempted_by?(user)
-    submissions.where(:user_id => user.id, :processed => true).exists?
+    submissions_by(user).any?(&:processed)
   end
 
   # Whether a user has made a submission with all test cases passing
   def completed_by?(user)
-    Submission.where({
-      :course_id => self.course_id,
-      :exercise_name => self.name,
-      :user_id => user.id,
-      :pretest_error => nil,
-      :all_tests_passed => true
-    }).any?
+    submissions_by(user).any? do |s|
+      s.pretest_error == nil && s.all_tests_passed?
+    end
+  end
+
+  def requires_review?
+    !available_review_points.empty?
+  end
+
+  # Whether a code review for this exercise exists for a submission made by 'user'.
+  def reviewed_for?(user)
+    self.submissions_by(user).any?(&:reviewed)
+  end
+
+  # Returns all reviewed submissions for this exercise for 'user'
+  def reviewed_submissions_for(user)
+    self.submissions_by(user).select(&:reviewed)
+  end
+
+  # Whether all of the required code review points have been given.
+  # Returns true if the exercise doesn't require code review.
+  def all_review_points_given_for?(user)
+    arp = available_review_points
+    return true if arp.empty? # optimization
+    user.has_points?(course, arp)
+  end
+
+  def available_review_points
+    # use 'select' instead of 'where' to use cached value of available_points
+    available_points.to_a.select(&:requires_review).map(&:name)
+  end
+
+  def points_for(user)
+    AwardedPoint.course_user_points(course, user).map(&:name)
+  end
+
+  def missing_review_points_for(user)
+    available_review_points - points_for(user)
   end
 
   def unlock_spec=(spec)
@@ -175,9 +221,9 @@ class Exercise < ActiveRecord::Base
   # TMC may be used to distribute exercise templates without tests.
   def returnable?
     if returnable_forced != nil
-      returnable_forced
+      returnable_forced # may be true or false
     else
-      File.exist?(clone_path) && !!try_get_exercise_dir.andand.has_tests?
+      has_tests?
     end
   end
 

@@ -1,9 +1,9 @@
 require 'point_comparison'
 
 #
-# Stores test run results in the database.
+# Stores test run results in the database and awards points.
 # Called in a transaction from SandboxResultsSaver.
-# Expected format of results:
+# Expected format of results from sandbox:
 #   An array of hashes with the following keys:
 #     - className: the test class name
 #     - methodName: the test method name
@@ -16,10 +16,25 @@ module TestRunGrader
   extend TestRunGrader
   
   def grade_results(submission, results)
+    raise "Exercise #{submission.exercise_name} was removed" if !submission.exercise
+
     submission.test_case_runs.destroy_all
     create_test_case_runs(submission, results)
-    award_points(submission, results)
+
+    review_points = submission.exercise.available_points.where(:requires_review => true).map(&:name)
+    award_points(submission, results, review_points)
     Unlock.refresh_unlocks(submission.course, submission.user)
+
+    if should_flag_for_review?(submission, review_points)
+      submission.requires_review = true
+      Submission.where(
+        :course_id => submission.course_id,
+        :exercise_name => submission.exercise_name,
+        :user_id => submission.user.id,
+        :requires_review => true
+      ).update_all(:requires_review => false)
+    end
+
     submission.save!
   end
   
@@ -40,15 +55,15 @@ private
     submission.all_tests_passed = all_passed
   end
 
-  def self.award_points(submission, results)
+  def self.award_points(submission, results, review_points)
     user = submission.user
     exercise = submission.exercise
     course = exercise.course
     awarded_points = AwardedPoint.course_user_points(course, user).map(&:name)
 
-    all_points = []
-    for point_name in points_from_test_results(results)
-      all_points << point_name
+    points = []
+    for point_name in points_from_test_results(results) - review_points
+      points << point_name
       unless awarded_points.include?(point_name)
         submission.awarded_points << AwardedPoint.new(
           :name => point_name,
@@ -58,14 +73,17 @@ private
       end
     end
 
-    submission.points = all_points.join(" ") unless all_points.empty?
+    old_review_points = submission.points_list.select {|pt| review_points.include?(pt) }
+    points += old_review_points
+
+    submission.points = points.uniq.natsort.join(" ") unless points.empty?
   end
 
   def self.points_from_test_results(results)
     point_status = {}  # point -> true/false/nil i.e. ok so far/failed/unseen
     for result in results
       result['pointNames'].each do |name|
-        if (point_status[name] != false) # not already failed
+        unless point_status[name].eql?(false) # skip if already failed
           point_status[name] = (result["status"] == 'PASSED')
         end
       end
@@ -81,5 +99,11 @@ private
     else
       nil
     end
+  end
+
+  def should_flag_for_review?(submission, review_points)
+    return false if submission.requests_review
+    awarded_points = submission.user.awarded_points.where(:course_id => submission.course.id).map(&:name)
+    !(review_points - awarded_points).empty?
   end
 end

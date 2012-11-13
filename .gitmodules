@@ -4,3 +4,6 @@
 [submodule "ext/tmc-junit-runner"]
 	path = ext/tmc-junit-runner
 	url = git@github.com:testmycode/tmc-junit-runner.git
+[submodule "ext/tmc-comet"]
+	path = ext/tmc-comet
+	url = git@github.com:testmycode/tmc-comet.git

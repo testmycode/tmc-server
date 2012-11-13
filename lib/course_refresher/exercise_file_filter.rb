@@ -3,6 +3,9 @@ require 'fileutils'
 require 'tmc_project_file'
 require 'course_refresher/java_filter'
 require 'course_refresher/xml_filter'
+require 'course_refresher/properties_filter'
+require 'course_refresher/css_filter'
+require 'course_refresher/js_filter'
 
 class CourseRefresher
   class ExerciseFileFilter
@@ -119,7 +122,13 @@ class CourseRefresher
     end
 
     def filter_backends
-      @filter_backends ||= [CourseRefresher::JavaFilter.new, CourseRefresher::XmlFilter.new]
+      @filter_backends ||= [
+        CourseRefresher::JavaFilter.new,
+        CourseRefresher::XmlFilter.new,
+        CourseRefresher::PropertiesFilter.new,
+        CourseRefresher::CssFilter.new,
+        CourseRefresher::JsFilter.new
+      ]
     end
 
     def clean_empty_dirs_in_project(project_dir)

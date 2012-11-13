@@ -1,3 +1,6 @@
+require 'fileutils'
+require 'system_commands'
+
 FactoryGirl.define do
   factory :user do
     sequence(:login) {|n| "user#{n}" }
@@ -7,7 +10,7 @@ FactoryGirl.define do
   end
 
   factory :admin, :class => User do
-    sequence(:login) {|n| 'admin#{n}' }
+    sequence(:login) {|n| "admin#{n}" }
     sequence(:password) {|n| "adminpass#{n}" }
     sequence(:email) {|n| "admin#{n}@example.com" }
     administrator true
@@ -36,6 +39,25 @@ FactoryGirl.define do
     after_build { |sub| sub.exercise.course = sub.course }
   end
 
+  factory :submission_data do
+    submission
+    return_file do |n|
+      begin
+        base_name = "fake_submission#{n}"
+        zip_name = "#{base_name}.zip"
+        FileUtils.mkdir_p "#{base_name}/src"
+        File.open("#{base_name}/src/Foo.java", 'wb') do |f|
+          f.write('public class Foo { public static void main(String[] args) {} }')
+        end
+        SystemCommands.sh!(['zip', '-q', '-r', zip_name, base_name])
+        File.read(zip_name)
+      ensure
+        FileUtils.rm_rf base_name
+        FileUtils.rm_rf zip_name
+      end
+    end
+  end
+
   factory :awarded_point do
     course
     sequence(:name) {|n| "point#{n}" }
@@ -47,6 +69,12 @@ FactoryGirl.define do
   factory :available_point do
     sequence(:name) {|n| "point#{n}" }
     exercise
+  end
+
+  factory :review do
+    submission
+    reviewer :factory => :user
+    review_body "This is a review"
   end
 
   factory :test_case_run do

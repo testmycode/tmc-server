@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe PasswordResetKeyMailer do
   before :each do
-    settings = SiteSetting.all_settings['emails']['reset_password']
+    settings = SiteSetting.all_settings['emails']
     settings['baseurl'] = 'http://example.com/foo'
     settings['from'] = 'noreply@example.com'
   end

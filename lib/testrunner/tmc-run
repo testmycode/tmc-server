@@ -1,8 +1,23 @@
-#!/bin/sh -e
+#!/bin/bash -e
 # This gets passed with each submission to tmc-sandbox
 
-TMC_MAVEN_PLUGIN_VERSION=1.3
+# Source user params if any.
+# Though the variable names and content format here are limited,
+# the contents should be treated carefully, despite us being in a sandbox.
+#
+# Included variables: error_msg_locale
+#
+if [ -r .tmcparams ]; then
+  . ./.tmcparams
+fi
 
+if [ -z "$error_msg_locale" ]; then
+  error_msg_locale=en
+fi
+ERROR_MSG_LOCALE_DEF="-Dfi.helsinki.cs.tmc.edutestutils.defaultLocale=$error_msg_locale"
+
+
+TMC_MAVEN_PLUGIN_VERSION=1.5
 
 # Identify project type
 if [ -f pom.xml ]; then
@@ -13,13 +28,18 @@ fi
 
 TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
 
+echo "Total RAM: ${TOTAL_RAM_KB}KB"
+echo "Project type: $PROJECT_TYPE"
+
 # Compile project
+echo "Compiling project..."
 case $PROJECT_TYPE in
   java_simple)
     # An explicit memory limit below the sandbox memory limit has been found to avoid
     # the occasional OOM killer. We leave 48M to the sandbox.
     # Still, Java CAN spin in the GC for a long time if it runs out of memory.
     JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
+    echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
 
     mkdir -p classes/main
     mkdir -p classes/test
@@ -40,12 +60,18 @@ case $PROJECT_TYPE in
 
     # Sandbox: 64MB, Maven: 64MB, Java program: the rest
     JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - \( 128 \* 1024 \)`}
-    MAVEN_RAM_KB=${JAVA_RAM_KB-`expr 64 \* 1024`}
+    MAVEN_RAM_KB=${MAVEN_RAM_KB-`expr 64 \* 1024`}
+    echo "Memory allocated to Maven: ${MAVEN_RAM_KB}KB"
+    echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
 
     export MAVEN_OPTS="-Xmx${MAVEN_RAM_KB}K"
 
-    mvn compiler:compile > test_output.txt 2>&1 || exit 101
-    mvn compiler:testCompile > test_output.txt 2>&1 || exit 102
+    mvn compiler:compile 2>&1 | tee test_output.txt
+    [ ${PIPESTATUS[0]} -eq 0 ] || exit 101
+
+    mvn compiler:testCompile 2>&1 | tee test_output.txt
+    [ ${PIPESTATUS[0]} -eq 0 ] || exit 102
+
     rm -f test_output.txt
   ;;
 esac
@@ -53,9 +79,11 @@ esac
 
 # Source .tmcrc if any
 if [ -f .tmcrc ]; then
+  echo "Including .tmcrc"
   . ./.tmcrc
 fi
 
+echo "Running tests..."
 case $PROJECT_TYPE in
   java_simple)
     # Discover tests
@@ -72,15 +100,16 @@ case $PROJECT_TYPE in
       -Dtmc.lib_dir=`pwd`/lib
       -Dtmc.results_file=`pwd`/test_output.txt"
 
-    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
+    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
   ;;
 
   java_maven)
     # MAVEN_OPTS was set above
-    JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K"
+    JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
     TEST_RUNNER="fi.helsinki.cs.tmc:tmc-maven-plugin:$TMC_MAVEN_PLUGIN_VERSION:test"
 
-    if mvn -X "$JVM_OPTS_DEF" $TEST_RUNNER > mvn_output.txt 2>&1; then
+    mvn -X "$JVM_OPTS_DEF" $TEST_RUNNER 2>&1 | tee mvn_output.txt
+    if [ ${PIPESTATUS[0]} -eq 0 ]; then
       rm -f mvn_output.txt
       mv target/test_output.txt ./
       mv target/stdout.txt ./
@@ -94,4 +123,5 @@ case $PROJECT_TYPE in
   ;;
 esac
 
+echo "tmc-run completed successfully"
 exit 0

@@ -7,7 +7,8 @@ require 'tmc_dir_utils'
 class SourceFileList
   include Enumerable
 
-  MAX_SIZE = 2.megabytes
+  MAX_SIZE = 3.megabytes
+  MAX_INDIVIDUAL_FILE_SIZE = 300.kilobytes
 
   class FileRecord
     def initialize(path, contents)
@@ -40,6 +41,8 @@ class SourceFileList
 
       make_path_names_relative(project_dir, files)
 
+      files = sort_source_files(files)
+
       self.new(files)
     end
   end
@@ -56,7 +59,7 @@ class SourceFileList
 
     make_path_names_relative(solution.path, files)
 
-    files = sort_solution_files(files)
+    files = sort_source_files(files)
 
     self.new(files)
   end
@@ -68,7 +71,7 @@ private
     Pathname(root_dir).realpath.find do |file|
       Find.prune if file.directory? && should_skip_dir?(file)
 
-      if source_file?(file)
+      if source_file?(file) && file.size <= MAX_INDIVIDUAL_FILE_SIZE
         total_size += file.size
         raise "Files are too large" if total_size > MAX_SIZE
 
@@ -85,13 +88,18 @@ private
     name = file.basename.to_s
     name.end_with?('.java') ||
       name.end_with?('.jsp') ||
-      name == 'pom.xml' ||
+      (name.end_with?('.xml') && name != 'build.xml') ||
+      name.end_with?('.properties') ||
+      name.end_with?('.txt') ||
+      name.end_with?('.html') ||
+      name.end_with?('.css') ||
+      name.end_with?('.js') ||
       dir.include?('/WEB-INF')
   end
 
   def self.should_skip_dir?(file)
     name = file.basename.to_s
-    name.start_with?('.') || name == 'test' || name == 'lib'
+    name.start_with?('.') || name == 'test' || name == 'lib' || name == 'nbproject'
   end
 
   def self.make_path_names_relative(root_dir, files)
@@ -101,11 +109,12 @@ private
     end
   end
 
-  def self.sort_solution_files(files)
+  def self.sort_source_files(files)
     files.sort_by do |f|
       priority = begin
         if f.path.include?('WEB-INF/') then 1
-        elsif f.path == 'pom.xml' then 2
+        elsif f.path.start_with?('src/main/resources') then 2
+        elsif f.path == 'pom.xml' then 3
         else 0
         end
       end

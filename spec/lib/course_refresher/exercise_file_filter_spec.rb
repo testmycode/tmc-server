@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'fileutils'
 
+# TODO: clean this up. Perhaps put cases into their own files.
 describe CourseRefresher::ExerciseFileFilter do
 
   before :each do
@@ -8,137 +9,40 @@ describe CourseRefresher::ExerciseFileFilter do
     @filter = CourseRefresher::ExerciseFileFilter.new('original')
   end
 
+  def self.make_test_cases(test_case_subdir, method)
+    target_dir = test_case_subdir
+    FileUtils.mkdir_p(target_dir)
+
+    test_case_dir = File.dirname(__FILE__) + "/test_cases/#{test_case_subdir}"
+    input_files = (Dir.entries(test_case_dir) - ['.', '..']).select {|f| f.include?('.in.') }
+
+    input_files.each do |input_file|
+      output_file = input_file.sub('.in.', '.out.')
+      bare_file = input_file.sub('.in.', '.')
+
+      if File.exist?("#{test_case_dir}/#{output_file}")
+        specify "#{input_file} => #{output_file}" do
+          FileUtils.cp("#{test_case_dir}/#{input_file}", "original/#{bare_file}")
+          @filter.send(method, target_dir)
+          result = File.read("#{target_dir}/#{bare_file}")
+          result.should == File.read("#{test_case_dir}/#{output_file}")
+        end
+      else
+        specify "#{input_file} should be deleted" do
+          FileUtils.cp("#{test_case_dir}/#{input_file}", "original/#{bare_file}")
+          @filter.send(method, target_dir)
+          File.should_not exist("#{target_dir}/#{bare_file}")
+        end
+      end
+    end
+  end
+
   describe "#make_stub" do
     before :each do
       FileUtils.mkdir('stub')
     end
 
-
-    describe "with java files" do
-      it "should remove solution blocks" do
-        make_file 'original/Thing.java', <<EOF
-public class Thing {
-    // BEGIN SOLUTION
-    public int foo() {
-        return 3;
-    }
-    // END SOLUTION
-
-    public void bar() {
-        // BEGIN SOLUTION
-        System.out.println("hello");
-        // END SOLUTION
-    }
-}
-EOF
-        @filter.make_stub('stub')
-        result = File.read('stub/Thing.java')
-        result.should == <<EOF
-public class Thing {
-
-    public void bar() {
-    }
-}
-EOF
-      end
-
-
-      it "should uncomment stubs" do
-        make_file 'original/Thing.java', <<EOF
-public class Thing {
-    public int foo() {
-        // BEGIN SOLUTION
-        return 3;
-        // END SOLUTION
-        // STUB: return 0;
-    }
-}
-EOF
-        @filter.make_stub('stub')
-        result = File.read('stub/Thing.java')
-        result.should == <<EOF
-public class Thing {
-    public int foo() {
-        return 0;
-    }
-}
-EOF
-      end
-
-
-      it "should not include solution files" do
-        make_file 'original/Thing.java', <<EOF
-// SOLUTION FILE
-public class Thing {
-    public int foo() {
-        return 3;
-    }
-}
-EOF
-        @filter.make_stub('stub')
-        File.should_not exist('stub/Thing.java')
-      end
-
-    end
-
-
-    describe "with XML files" do
-      it "should remove solution blocks" do
-        make_file 'original/Thing.xml', <<EOF
-<trol>
-  <lol/>
-  <!-- BEGIN SOLUTION -->
-  <loo/>
-  <!-- END SOLUTION -->
-</trol>
-EOF
-        @filter.make_stub('stub')
-        result = File.read('stub/Thing.xml')
-        result.should == <<EOF
-<trol>
-  <lol/>
-</trol>
-EOF
-      end
-
-
-      it "should uncomment stubs" do
-        make_file 'original/Thing.xml', <<EOF
-<trol>
-  <lol/>
-  <!-- BEGIN SOLUTION -->
-  <loo/>
-  <!-- END SOLUTION -->
-  <!-- STUB:
-  <foo>
-  </foo>
-  -->
-</trol>
-EOF
-        @filter.make_stub('stub')
-        result = File.read('stub/Thing.xml')
-        result.should == <<EOF
-<trol>
-  <lol/>
-  <foo>
-  </foo>
-</trol>
-EOF
-      end
-
-
-      it "should not include solution files" do
-        make_file 'original/Thing.xml', <<EOF
-<!-- SOLUTION FILE -->
-<trol>
-  <lol/>
-</trol>
-EOF
-        @filter.make_stub('stub')
-        File.should_not exist('stub/Thing.xml')
-      end
-    end
-
+    make_test_cases('stub', :make_stub)
 
 
     it "should not include directories under src/ containing only solution files" do
@@ -194,10 +98,10 @@ EOF
 
     it "should remove html comments" do
       make_file 'original/Thing.java', <<EOF
-      /*
-       * PREPEND HTML
-       * <p>foo</p>
-       */
+/*
+ * PREPEND HTML
+ * <p>foo</p>
+ */
 public class Thing {
 }
 EOF
@@ -238,12 +142,7 @@ EOF
       @filter.make_stub('stub')
       File.should_not exist('stub/.tmcrc')
     end
-    
-    it "should warn about misplaced stubs"
   end
-  
-
-
 
   
   
@@ -252,147 +151,9 @@ EOF
       FileUtils.mkdir('solution')
     end
 
-
-    describe "with java files" do
-      it "should remove stubs" do
-        make_file 'original/Thing.java', <<EOF
-public class Thing {
-    public int foo() {
-        // BEGIN SOLUTION
-        return 3;
-        // END SOLUTION
-        // STUB: return 0;
-    }
-}
-EOF
-        @filter.make_solution('solution')
-        result = File.read('solution/Thing.java')
-        result.should == <<EOF
-public class Thing {
-    public int foo() {
-        return 3;
-    }
-}
-EOF
-      end
+    make_test_cases('solution', :make_solution)
 
 
-      it "should remove solution block comments" do
-        make_file 'original/Thing.java', <<EOF
-public class Thing {
-    // BEGIN SOLUTION
-    public int foo() {
-        return 3;
-    }
-    // END SOLUTION
-
-    public void bar() {
-        // BEGIN SOLUTION
-        System.out.println("hello");
-        // END SOLUTION
-    }
-}
-EOF
-        @filter.make_solution('solution')
-        result = File.read('solution/Thing.java')
-        result.should == <<EOF
-public class Thing {
-    public int foo() {
-        return 3;
-    }
-
-    public void bar() {
-        System.out.println("hello");
-    }
-}
-EOF
-      end
-
-
-      it "should remove solution file comments" do
-        make_file 'original/Thing.java', <<EOF
-// SOLUTION FILE
-public class Thing {
-    public int foo() {
-        return 3;
-    }
-}
-EOF
-        @filter.make_solution('solution')
-        result = File.read('solution/Thing.java')
-        result.should == <<EOF
-public class Thing {
-    public int foo() {
-        return 3;
-    }
-}
-EOF
-      end
-
-    end
-
-
-    describe "with XML files" do
-      it "should remove stubs" do
-        make_file 'original/Thing.xml', <<EOF
-<trol>
-  <lol/>
-  <!-- STUB:
-  <foo>
-  </foo>
-  -->
-</trol>
-EOF
-        @filter.make_solution('solution')
-        result = File.read('solution/Thing.xml')
-        result.should == <<EOF
-<trol>
-  <lol/>
-</trol>
-EOF
-      end
-
-
-      it "should remove solution block comments" do
-        make_file 'original/Thing.xml', <<EOF
-<trol>
-  <lol/>
-  <!-- BEGIN SOLUTION -->
-  <loo/>
-  <!-- END SOLUTION -->
-</trol>
-EOF
-        @filter.make_solution('solution')
-        result = File.read('solution/Thing.xml')
-        result.should == <<EOF
-<trol>
-  <lol/>
-  <loo/>
-</trol>
-EOF
-      end
-
-
-      it "should remove solution file comments" do
-        make_file 'original/Thing.xml', <<EOF
-<!-- SOLUTION FILE -->
-<trol>
-  <lol/>
-</trol>
-EOF
-        @filter.make_solution('solution')
-        result = File.read('solution/Thing.xml')
-        result.should == <<EOF
-<trol>
-  <lol/>
-</trol>
-EOF
-      end
-    end
-
-
-
-    
     it "should convert end-of-lines to unix style" do
       make_file 'original/Thing.java', <<EOF
 public class Thing {\r
@@ -428,11 +189,11 @@ EOF
 
     it "should remove html comments and make files out of them" do
       make_file 'original/Thing.java', <<EOF
-      /*
-       * PREPEND HTML <strong>hi</strong>
-       * <p>foo</p>
-       * <p>bar</p>
-       */
+/*
+ * PREPEND HTML <strong>hi</strong>
+ * <p>foo</p>
+ * <p>bar</p>
+ */
 public class Thing {
 }
 EOF

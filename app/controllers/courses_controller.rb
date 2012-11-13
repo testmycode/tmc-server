@@ -1,4 +1,6 @@
 require 'course_refresher'
+require 'natsort'
+require 'course_list'
 
 class CoursesController < ApplicationController
   def index
@@ -16,17 +18,10 @@ class CoursesController < ApplicationController
         courses = courses.select {|c| c.visible_to?(current_user) }
         authorize! :read, courses
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
-        
-        courses_data = courses.map do |c|
-          {
-            :id => c.id,
-            :name => c.name,
-            :exercises => c.exercises.order('LOWER(name)').map {|ex| exercise_data_for_json(ex) }.reject(&:nil?)
-          }
-        end
+
         data = {
           :api_version => API_VERSION,
-          :courses => courses_data
+          :courses => CourseList.new(current_user, courses, view_context).course_list_data
         }
         render :json => data.to_json
       end
@@ -40,6 +35,7 @@ class CoursesController < ApplicationController
     end
 
     assign_show_view_vars
+    add_course_breadcrumb
   end
 
   def refresh
@@ -97,29 +93,5 @@ private
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end
-  end
-
-  def exercise_data_for_json(exercise)
-    return nil if !exercise.visible_to?(current_user)
-    authorize! :read, exercise
-
-    helpers = view_context
-
-    data = {
-      :id => exercise.id,
-      :name => exercise.name,
-      :deadline => exercise.deadline_for(current_user),
-      :checksum => exercise.checksum,
-      :return_url => helpers.exercise_return_url(exercise),
-      :zip_url => helpers.exercise_zip_url(exercise),
-      :returnable => exercise.returnable?,
-      :attempted => exercise.attempted_by?(current_user),
-      :completed => exercise.completed_by?(current_user),
-      :memory_limit => exercise.memory_limit
-    }
-
-    data[:solution_zip_url] = helpers.exercise_solution_zip_url(exercise) if current_user.administrator?
-
-    data
   end
 end

@@ -46,5 +46,13 @@ describe AvailablePoint do
       a.should_not include (ap1)
     end
   end
+
+  describe "validation" do
+    it "checks against blanks in the name" do
+      ap = Factory.build(:available_point, :name => 'foo ')
+      ap.should_not be_valid
+      ap.should have(1).error_on('name')
+    end
+  end
 end
 

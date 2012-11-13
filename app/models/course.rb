@@ -203,12 +203,34 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def reviews_required
+    self.submissions.where(
+      :requires_review => true,
+      :newer_submission_reviewed => false,
+      :reviewed => false,
+      :review_dismissed => false
+    )
+  end
+
+  def reviews_requested
+    self.submissions.where(
+      :requests_review => true,
+      :newer_submission_reviewed => false,
+      :reviewed => false,
+      :review_dismissed => false
+    )
+  end
+
+  def submissions_to_review
+    self.submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
+  end
+
   # Returns a hash of exercise group => {
   #   :available_points => number of available points,
   #   :points_by_user => {user_id => number_of_points}
   # }
   def exercise_group_completion_by_user
-    #TODO: clean up exercise group discovery after merging to master branch
+    #TODO: clean up exercise group discovery
 
     groups = self.exercises.map(&:name).map {|name| if name =~ /^(.+)-[^-]+$/ then $1 else "" end }.uniq
 

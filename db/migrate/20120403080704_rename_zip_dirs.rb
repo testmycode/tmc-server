@@ -17,8 +17,10 @@ class RenameZipDirs < ActiveRecord::Migration
 private
   def for_each_course_dir(&block)
     root = Pathname(Course.cache_root)
-    for course_dir in root.children.select(&:directory?)
-      block.call(course_dir)
+    if root.directory?
+      for course_dir in root.children.select(&:directory?)
+        block.call(course_dir)
+      end
     end
   end
 end

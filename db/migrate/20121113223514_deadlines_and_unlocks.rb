@@ -1,4 +1,4 @@
-class StructuredDeadlineAndUnlockedAfter < ActiveRecord::Migration
+class DeadlinesAndUnlocks < ActiveRecord::Migration
   def up
     deadlines = execute("SELECT id, deadline FROM exercises WHERE deadline IS NOT NULL").to_a
     remove_column :exercises, :deadline

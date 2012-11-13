@@ -2,6 +2,9 @@ class FeedbackQuestionsController < ApplicationController
   before_filter :get_course
 
   def index
+    add_course_breadcrumb
+    add_breadcrumb 'Feedback questions', breadcrumb_no_path
+
     @questions = @course.feedback_questions.order(:position)
     authorize! :show, @questions
   end

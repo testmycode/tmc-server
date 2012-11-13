@@ -1,24 +1,27 @@
 
 /* Basic commons */
 
-h1 {
+h1, h2, h3, h4, h5, h6 {
   color: #09214A;
   font-family: "Arial", sans-serif;
+}
+
+h1 {
   font-size: 200%;
 }
 
 h2 {
   margin-left: 0.3em;
-  color: #09214A;
-  font-family: "Arial", sans-serif;
   font-size: 150%;
 }
 
 h3 {
   margin-left: 0.5em;
-  color: #09214A;
-  font-family: "Arial", sans-serif;
   font-size: 120%;
+}
+
+h5 {
+  margin-bottom: 0.2em;
 }
 
 .list-title {
@@ -35,12 +38,16 @@ section {
 }
 
 a {
-  color: #103D89;
+  color: #103D89 !important;
   text-decoration: none;
 }
-  
-a:visited { color: #103D89; }
-a:hover { text-decoration: underline; }
+
+a:visited {
+  color: #103D89 !important;
+}
+a:hover {
+  text-decoration: underline !important;
+}
 
 .error,
 .alert,
@@ -48,6 +55,11 @@ a:hover { text-decoration: underline; }
 .fail,
 .dangerous {
   color: red !important;
+}
+
+.review-required,
+.review-requested {
+  font-weight: bold;
 }
 
 .warning {
@@ -72,6 +84,11 @@ pre {
 
 .footnote {
   font-size: 8pt;
+}
+
+.fine-print {
+  font-size: 8pt;
+  color: #444444;
 }
 
 .field_with_errors {
@@ -103,6 +120,30 @@ pre {
 #error_explanation ul li {
   font-size: 12px;
   list-style: square;
+}
+
+button * {
+  float: left;
+  white-space: nowrap;
+}
+
+.transfer-effect {
+  border: 2px dotted gray;
+}
+
+.medium-drop-shadow {
+  box-shadow: 2px 3px 4px 1px #696969;
+}
+
+.big-drop-shadow {
+  box-shadow: 3px 4px 5px 2px #696969;
+}
+
+.dialog-buttons {
+  /*float: right;*/
+  position: absolute;
+  bottom: 0;
+  right: 1em;
 }
 
 
@@ -156,7 +197,7 @@ body.default {
   font-weight: bold;
 }
 
-#title-area > #login > #account-details {
+#title-area > #login > div {
   font-weight: bold;
   margin-top: 5pt;
 }
@@ -171,6 +212,10 @@ body.default {
 
 #breadcrumb .breadcrumb-resource {
   font-style: italic;
+}
+
+#page-presence {
+  float: right;
 }
 
 .flash {
@@ -286,3 +331,79 @@ table.points > * > tr > td {
   text-align: center;
 }
 
+/* Code reviews */
+
+.code-review {
+  border: 1px #CCCCCC solid;
+  padding: 10px;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+.code-review.being-edited {
+  box-shadow: 0 0 4px 2px #47A6FF;
+}
+
+.reviewer {
+  font-weight: bold;
+}
+
+.points-by-review span.label {
+  font-weight: bold;
+}
+
+.code-review .status-buttons {
+  float: right;
+}
+
+#review-form {
+  height: 95%;
+}
+
+#review-form > form {
+  height: 100%;
+}
+
+#review-form textarea {
+  width: 100%;
+  height: 60%;
+  margin: auto;
+  resize: none; /* We do our own resizing */
+}
+
+#review-form .notification-options {
+  margin-bottom: 1.5em;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+#review-form form.editing-existing-review .notification-options {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#review-form-reopen-handle {
+  position: fixed;
+  top: 100%;
+  left: 0;
+  margin-left: 10px;
+  margin-top: -50px;
+  z-index: 1000;
+}
+
+#review-form .buttons {
+  margin-top: 0.6em;
+}
+
+#dismiss-review-form {
+  float: right;
+}
+
+.code-review .buttons {
+  float: right;
+}
