@@ -96,6 +96,18 @@
 <h2>Results</h2>
 
 <section>
+  <% if can? :update, @submission %>
+    <div>
+      <%= form_tag submission_path(@submission), :method => :put do %>
+        <%= hidden_field_tag('rerun', '1')  %>
+        <div>
+          <%= button_tag 'Rerun submission', :type => 'submit' %>
+        </div>
+        (may add points; never deletes points)
+      <% end %>
+    </div>
+  <% end %>
+
   <% if @submission.pretest_error %>
     <pre class="error"><%= @submission.pretest_error %></pre>
   <% end %>
@@ -176,18 +188,6 @@ $(document).ready(function() {
   });
 });
 </script>
-
-<% if can? :update, @submission %>
-  <div>
-    <%= form_tag submission_path(@submission), :method => :put do %>
-      <%= hidden_field_tag('rerun', '1')  %>
-      <div>
-        <%= button_tag 'Rerun submission', :type => 'submit' %>
-      </div>
-      (may add points; never deletes points)
-    <% end %>
-  </div>
-<% end %>
 
 <% unless @submission.feedback_answers.empty? %>
   <h2>Feedback</h2>
