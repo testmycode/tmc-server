@@ -38,7 +38,7 @@ private
     data = {
       :id => exercise.id,
       :name => exercise.name,
-      :deadline => exercise.deadline,
+      :deadline => exercise.deadline_for(@user),
       :checksum => exercise.checksum,
       :return_url => exercise_return_url(exercise),
       :zip_url => @helpers.exercise_zip_url(exercise),
