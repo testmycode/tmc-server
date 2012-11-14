@@ -7,7 +7,7 @@ class DeadlinesAndUnlocks < ActiveRecord::Migration
     for record in deadlines
       id = record['id']
       deadline = Time.zone.parse(record['deadline'] + ' UTC')
-      execute("UPDATE exercises SET deadline_spec = '[' || #{quote(deadline)} || ']' WHERE id = #{quote(id)}")
+      execute("UPDATE exercises SET deadline_spec = '[\"' || #{quote(deadline)} || '\"]' WHERE id = #{quote(id)}")
     end
 
     create_table :unlocks do |t|
