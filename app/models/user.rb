@@ -8,6 +8,8 @@ class User < ActiveRecord::Base
   has_many :student_events, :dependent => :delete_all
   has_many :unlocks, :dependent => :delete_all
   has_many :reviews, :foreign_key => :reviewer_id, :inverse_of => :reviewer, :dependent => :nullify
+  has_many :course_registrations, :dependent => :delete_all
+  has_many :courses_registered_to, :through => :course_registrations, :source => :course
 
   validates :login, :presence     => true,
                     :uniqueness   => true,
