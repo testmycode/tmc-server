@@ -244,23 +244,23 @@ class Course < ActiveRecord::Base
       # http://stackoverflow.com/questions/5709887/a-proper-way-to-escape-when-building-like-queries-in-rails-3-activerecord
       pattern = (group.gsub(/[!%_]/) {|x| '!' + x }) + '-%'
 
-      sql = <<EOS
-SELECT available_points.name
-FROM exercises, available_points
-WHERE exercises.course_id = #{conn.quote(self.id)} AND
-      exercises.name LIKE #{conn.quote(pattern)} AND
-      exercises.id = available_points.exercise_id
-EOS
+      sql = <<-EOS
+        SELECT available_points.name
+        FROM exercises, available_points
+        WHERE exercises.course_id = #{conn.quote(self.id)} AND
+              exercises.name LIKE #{conn.quote(pattern)} AND
+              exercises.id = available_points.exercise_id
+      EOS
       available_points = conn.select_values(sql)
       next if available_points.empty?
 
-      sql = <<EOS
-SELECT user_id, COUNT(*)
-FROM awarded_points
-WHERE course_id = #{conn.quote(self.id)} AND
-      name IN (#{available_points.map {|ap| conn.quote(ap)}.join(',')})
-GROUP BY user_id
-EOS
+      sql = <<-EOS
+        SELECT user_id, COUNT(*)
+        FROM awarded_points
+        WHERE course_id = #{conn.quote(self.id)} AND
+              name IN (#{available_points.map {|ap| conn.quote(ap)}.join(',')})
+        GROUP BY user_id
+      EOS
       by_user = Hash[conn.select_rows(sql).map! {|uid, count| [uid.to_i, count.to_i]}]
 
       result[group] = {
