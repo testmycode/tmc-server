@@ -10,7 +10,7 @@ several elementary programming and data structures courses with hundreds of user
 
 ## Setup ##
 
-Very rought setup instructions below.
+Very rough setup instructions below.
 
 ### System Dependencies ###
 
