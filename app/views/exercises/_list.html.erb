@@ -21,6 +21,7 @@
             notes = []
             notes << "hidden" if exercise.hidden?
             notes << "expired" if exercise.expired_for?(current_user)
+            notes << "locked" unless exercise.unlocked_for?(current_user)
           %>
           <% unless notes.empty? %>
             (<%= notes.join(', ') %>)

@@ -23,7 +23,7 @@ class UnlockSpec
 
   def description_for(user)
     descrs = @describers.map {|d| d.call(user) }.reject(&:nil?)
-    if descrs
+    if !descrs.empty?
       last = descrs.pop
       "To unlock this exercise, you must " + if descrs.empty?
         last

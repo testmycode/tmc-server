@@ -19,6 +19,7 @@ class Unlock < ActiveRecord::Base
         unlocks[u.user_id][u.exercise_name] = u
       end
 
+      unlocks.default = {}
       for user in User.all
         refresh_unlocks_impl(course, user, unlocks[user.id])
       end
