@@ -31,7 +31,7 @@ module SubmissionsHelper
       if can? :create, Review
         link_to 'Superseded', new_submission_review_path(submission)
       else
-        link_to 'Superseded', submission_review_path(submission)
+        link_to 'Superseded', submission_reviews_path(submission)
       end
     elsif submission.review_dismissed?
       if can? :create, Review
