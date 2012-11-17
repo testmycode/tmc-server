@@ -8,7 +8,7 @@ class DeadlineSpec
     for i in 0...specs.size
       begin
         spec = specs[i].to_s.strip
-        @specs << parse_spec(spec) unless spec.blank?
+        parse_spec(spec) unless spec.blank?
       rescue InvalidSyntaxError
         raise InvalidSyntaxError.new("Invalid syntax in deadline spec #{i+1} (#{specs[i]})")
       rescue
@@ -17,19 +17,50 @@ class DeadlineSpec
     end
   end
 
+  def universal_description
+    @specs.map(&:universal_description).join(' or ')
+  end
+
+  def description_for(user)
+    min_spec(user).andand.personal_describer.call(user)
+  end
+
   def deadline_for(user)
-    @specs.map {|s| s.call(user) }.reject(&:nil?).min
+    @specs.map {|s| s.timefun.call(user) }.reject(&:nil?).min
+  end
+
+  def depends_on_unlock_time?
+    !!@depends_on_unlock_time
   end
 
 private
+  def min_spec(user)
+    @specs.map { |s| [s.timefun.call(user), s] }.reject {|p| p.first.nil? }.min_by(&:first).map(&:second)
+  end
+
+  class SingleSpec
+    def initialize(timefun, univ, personal)
+      @timefun = timefun
+      @universal_description = univ
+      @personal_describer = personal
+    end
+    attr_accessor :timefun, :universal_description, :personal_describer
+  end
+
   def parse_spec(spec)
     # A spec is a proc that takes a user and returns a Time object or nil
     if DateAndTimeUtils.looks_like_date_or_time(spec)
       time = DateAndTimeUtils.to_time(spec, :prefer_end_of_day => true)
-      lambda {|user| time }
+      timefun = lambda {|user| time }
+      universal = "#{time}"
+      personal = lambda {|u| univ }
+      @specs << SingleSpec.new(timefun, universal, personal)
     elsif spec =~ /^unlock\s*[+]\s*(\d+)\s+(minutes?|hours?|days?|weeks?|months?|years?)$/
-      time_delta = $1.to_i.send($2)
-      lambda do |user|
+      time_scalar = $1
+      time_unit = $2
+      time_delta = time_scalar.to_i.send(time_unit)
+      @depends_on_unlock_time = true
+      timefun = lambda do |user|
         unlock_time = @exercise.time_unlocked_for(user)
         if unlock_time
           unlock_time + time_delta
@@ -37,6 +68,11 @@ private
           nil
         end
       end
+      universal = "#{time_scalar} #{time_unit} after unlock"
+      personal = lambda do |user|
+        "#{time_scalar} #{time_unit} after unlock"
+      end
+      @specs << SingleSpec.new(timefun, universal, personal)
     else
       raise InvalidSyntaxError.new("Invalid syntax")
     end

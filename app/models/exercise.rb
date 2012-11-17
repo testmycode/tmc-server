@@ -196,7 +196,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def time_unlocked_for(user)
-    self.unlocks.where(:user_id => user).where('valid_after > ?', Time.now).first.andand.created_at
+    self.unlocks.where(:user_id => user).where('valid_after IS NULL OR valid_after < ?', Time.now).first.andand.created_at
   end
 
   def unlocked_for?(user)
@@ -210,6 +210,7 @@ class Exercise < ActiveRecord::Base
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
     self.deadline_spec = to_json_array(new_options["deadline"])
+    self.unlock_spec = to_json_array(new_options["unlocked_after"])
     self.publish_time = new_options["publish_time"]
     self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"], new_options["gdocs_sheet"])
     self.hidden = new_options["hidden"]

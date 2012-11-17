@@ -44,6 +44,10 @@ class User < ActiveRecord::Base
     username
   end
 
+  def registered_to_course?(course)
+    self.course_registrations.exists?(:course_id => course.id)
+  end
+
   def field_value(field)
     field_value_record(field).value
   end

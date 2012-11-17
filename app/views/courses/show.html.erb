@@ -9,7 +9,7 @@
 
 <ul>
   <li><%= link_to 'View points', course_points_path(@course) %></li>
-  <% if current_user.administrator? || @course.submissions.where(:user_id => current_user.id, :reviewed => true).any? %>
+  <% if current_user.administrator? || @course.submissions.exists?(:user_id => current_user.id, :reviewed => true) %>
     <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
   <% end %>
 </ul>
@@ -44,7 +44,13 @@
     <% end %>
 
     <% if @course.hidden_if_registered_after != nil %>
-      <li>Course hidden from those registered after: <%= @course.hidden_if_registered_after %></li>
+      <li>Course hidden from user accounts created after: <%= @course.hidden_if_registered_after %></li>
+    <% end %>
+
+    <% if @course.requires_registration? %>
+      <li>Students need to explicitly register to this course</li>
+    <% else %>
+      <li>Usable without explicit registration</li>
     <% end %>
 
     <li>
@@ -86,32 +92,41 @@
   </ul>
 <% end %>
 
-<h2>All exercises</h2>
+<% if current_user.administrator? || @course.requires_registration? && current_user.registered_to_course?(@course) %>
+  <h2>All exercises</h2>
 
-<section>
-  <% if current_user.administrator? %>
-    <div class="refresh-course-button">
-      <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
-    </div>
-  <% end %>
-
-  <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises } %>
-</section>
-
-<% if @submissions %>
-  <h2>Latest submissions</h2>
-  
   <section>
-    <% if @total_submissions > @submissions.count %>
-      <p>
-        Only showing <%= @submissions.count %> of <%= @course.submissions.count %>
-        <%= link_to "(show all)", course_submissions_path(@course) %>.
-      </p>
+    <% if current_user.administrator? %>
+      <div class="refresh-course-button">
+        <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
+      </div>
     <% end %>
-    
-    <div>
-      <%= show_submission_list(@submissions) %>
-    </div>
-  </section>
-<% end %>
 
+    <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises } %>
+  </section>
+
+  <% if @submissions %>
+    <h2>Latest submissions</h2>
+
+    <section>
+      <% if @total_submissions > @submissions.count %>
+        <p>
+          Only showing <%= @submissions.count %> of <%= @course.submissions.count %>
+          <%= link_to "(show all)", course_submissions_path(@course) %>.
+        </p>
+      <% end %>
+
+      <div>
+        <%= show_submission_list(@submissions) %>
+      </div>
+    </section>
+  <% end %>
+<% else %>
+  <p>
+    You must sign up to this course to begin it.
+    <% if @course.some_deadlines_depend_directly_on_registration_time? %>
+      Please note that the course has deadlines that depend on when you
+      sign up, so don't sign up until you are really ready to begin.
+    <% end %>
+  </p>
+<% end %>

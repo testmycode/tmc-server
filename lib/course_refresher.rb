@@ -369,9 +369,7 @@ private
     end
 
     def update_unlocks
-      for user in User.all
-        Unlock.refresh_unlocks(@course, user)
-      end
+      Unlock.refresh_all_unlocks(@course)
     end
 
     def seed_maven_cache

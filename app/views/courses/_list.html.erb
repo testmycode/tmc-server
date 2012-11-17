@@ -19,30 +19,30 @@
     </tr>
   </thead>
   <tbody>
-  <% locals[:courses].each do |course| %>
-    <tr class="course <% if course.hidden? %>hidden<% end %>">
-      <td>
-        <%= link_to course.name, course_path(course) %>
-      </td>
-      <% if current_user.administrator? %>
+    <% locals[:courses].each do |course| %>
+      <tr class="course <% if course.hidden? %>hidden<% end %>">
         <td>
-          <%= course.source_backend.upcase %>
+          <%= link_to course.name, course_path(course) %>
         </td>
-        <td>
-          <span class="source-url"><%= course.source_url %></span>
-          <% if course.source_backend == 'git' %>
-            <span class="git-branch">(branch: <%= course.git_branch %>)</span>
-          <% end %>
-        </td>
-        <td>
-          <%= link_to 'Refresh', refresh_course_path(course) %>
-        </td>
-        <td>
-          <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', :confirm => 'Really truly delete this course?' %>
-        </td>
-      <% end %>
-    </tr>
-  <% end %>
+        <% if current_user.administrator? %>
+          <td>
+            <%= course.source_backend.upcase %>
+          </td>
+          <td>
+            <span class="source-url"><%= course.source_url %></span>
+            <% if course.source_backend == 'git' %>
+              <span class="git-branch">(branch: <%= course.git_branch %>)</span>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to 'Refresh', refresh_course_path(course) %>
+          </td>
+          <td>
+            <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', :confirm => 'Really truly delete this course?' %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 

@@ -5,16 +5,11 @@ class UnlockSpec
   def initialize(exercise, conditions)
     @exercise = exercise
     @conditions = []
+    @universal_descriptions = []
+    @describers = []
     for i in 0...conditions.size
       begin
-        result = parse_condition(conditions[i].to_s.strip)
-        if result.is_a?(Time)
-          @valid_after = result
-        elsif result.is_a?(Proc)
-          @conditions << result
-        else
-          raise TypeError.new(result)
-        end
+        parse_condition(conditions[i].to_s.strip)
       rescue InvalidSyntaxError
         raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i+1} (#{conditions[i]})")
       rescue
@@ -24,41 +19,94 @@ class UnlockSpec
   end
 
   attr_reader :valid_after
+  attr_reader :universal_descriptions
+
+  def description_for(user)
+    descrs = @describers.map {|d| d.call(user) }.reject(&:nil?)
+    if descrs
+      last = descrs.pop
+      "To unlock this exercise, you must " + if descrs.empty?
+        last
+      else
+        "#{descrs.join(", ")} and #{last}"
+      end + "."
+    else
+      nil
+    end
+  end
 
   def permits_unlock_for?(user)
     @conditions.all? {|c| c.call(user) }
+  end
+
+  def depends_on_other_exercises?
+    !!@depends_on_other_exercises
   end
 
 private
   def parse_condition(str) # returns either a Time or a Proc(user) -> boolean
     course = @exercise.course
     if DateAndTimeUtils.looks_like_date_or_time(str)
-      DateAndTimeUtils.to_time(str)
+      @valid_after = DateAndTimeUtils.to_time(str)
     elsif str =~ /^exercise\s+(\S+)$/
       parse_condition("100% of #{$1}")
     elsif str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
-      percentage = $1.to_f / 100.0
+      percentage_str = $1
+      percentage = percentage_str.to_f / 100.0
       group = $2
       check_group_or_exercise_exists(course, group)
-      lambda do |u|
+      @depends_on_other_exercises = true
+      @conditions << lambda do |u|
         available, awarded = available_and_awarded(course, group, u)
         awarded.count.to_f / available.count.to_f >= percentage - 0.0001
+      end
+      @universal_descriptions << "#{percentage_str}% from #{group}"
+      @describers << lambda do |u|
+        available, awarded = available_and_awarded(course, group, u)
+        remaining = ((percentage - 0.0001) * available.count.to_f).ceil - awarded.count
+        if remaining > 0
+          "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
+        else
+          nil
+        end
       end
     elsif str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/
       num_exercises = $1.to_i
       group = $2
       check_group_or_exercise_exists(course, group)
-      lambda do |u|
+      @depends_on_other_exercises = true
+      @conditions << lambda do |u|
         required_exercises = course.exercises_by_name_or_group(group)
         required_exercises.count {|ex| ex.completed_by?(u) } >= num_exercises
+      end
+      @universal_descriptions << "#{num_exercises} #{plural(num_exercises, 'exercise')} from #{group}"
+      @describers << lambda do |u|
+        required_exercises = course.exercises_by_name_or_group(group)
+        remaining = num_exercises - required_exercises.count {|ex| ex.completed_by?(u) }
+        if remaining > 0
+          "complete #{remaining} more #{plural(remaining, 'exercise')} from #{group}"
+        else
+          nil
+        end
       end
     elsif str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
       num_points = $1.to_i
       group = $2
       check_group_or_exercise_exists(course, group)
-      lambda do |u|
+      @depends_on_other_exercises = true
+      @conditions << lambda do |u|
         awarded = available_and_awarded(course, group, u)[1]
         awarded.count >= num_points
+      end
+      @universal_descriptions << "#{num_points} #{plural(num_points, 'point')} from #{group}"
+      @describers << lambda do |u|
+        awarded = available_and_awarded(course, group, u)[1]
+        remaining = num_points - awarded
+        if remaining > 0
+          "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
+        else
+          nil
+        end
       end
     else
       raise InvalidSyntaxError.new("Invalid syntax")
@@ -81,5 +129,13 @@ private
       map(&:name).
       select {|pt| available.include?(pt) }
     [available, awarded]
+  end
+
+  def plural(n, word)
+    if n == 1
+      word
+    else
+      word.pluralize
+    end
   end
 end

@@ -78,6 +78,7 @@ class Course < ActiveRecord::Base
 
     self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
+    self.requires_registration = !!new_options['requires_registration']
   end
 
   def self.default_options
@@ -225,6 +226,12 @@ class Course < ActiveRecord::Base
 
   def submissions_to_review
     self.submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
+  end
+
+  def some_deadlines_depend_directly_on_registration_time?
+    self.exercises.any? do |ex|
+      ex.deadline_spec_obj.depends_on_unlock_time? && !ex.unlock_spec_obj.depends_on_other_exercises?
+    end
   end
 
   # Returns a hash of exercise group => {

@@ -3,18 +3,51 @@
 
 <ul>
   <li><%= link_to 'Download project template (zip)', exercise_zip_url(@exercise) %></li>
+
   <% if @exercise.hidden? %>
     <li>This exercise is currently hidden</li>
   <% end %>
-  <% if @exercise.deadline_for(current_user) %>
-    <li>Deadline: <%= @exercise.deadline_for(current_user) %><% if @exercise.expired_for?(current_user) %> (expired)<% end %></li>
+
+  <% unlock_time = @exercise.time_unlocked_for(@current_user) %>
+  <% if unlock_time %>
+    <li>Was unlocked at <%= unlock_time %></li>
+  <% else %>
+    <li>
+      Not yet unlocked.
+      <%= @exercise.unlock_spec_obj.description_for(@current_user) %>
+    </li>
   <% end %>
+  <% if @current_user.administrator? && !@exercise.unlock_spec_obj.universal_descriptions.empty? %>
+    <li>
+      Unlock condition:
+      <%= @exercise.unlock_spec_obj.universal_descriptions.join(' and ') %>
+    </li>
+  <% end %>
+
+  <% if @exercise.deadline_for(current_user) %>
+    <li>
+      Deadline: <%= @exercise.deadline_for(current_user) %>
+      <% if @exercise.deadline_spec_obj.universal_description %>
+        (<%= @exercise.deadline_spec_obj.universal_description %>)
+      <% end %>
+      <% if @exercise.expired_for?(current_user) %>
+        <% if @current_user.administrator? %>
+          (expired (if you weren't an admin))
+        <% else %>
+          (expired)
+        <% end %>
+      <% end %>
+    </li>
+  <% end %>
+
   <% if !@exercise.returnable? %>
     <li>The exercise is not returnable.</li>
   <% end %>
+
   <% if @exercise.solution && @exercise.solution.visible_to?(current_user) %>
     <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
   <% end %>
+
   <% if can?(:read, FeedbackAnswer) %>
     <li><%= link_to 'View feedback', exercise_feedback_answers_path(@exercise) %></li>
   <% end %>
