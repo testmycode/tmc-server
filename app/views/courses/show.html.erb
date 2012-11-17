@@ -47,12 +47,6 @@
       <li>Course hidden from user accounts created after: <%= @course.hidden_if_registered_after %></li>
     <% end %>
 
-    <% if @course.requires_registration? %>
-      <li>Students need to explicitly register to this course</li>
-    <% else %>
-      <li>Usable without explicit registration</li>
-    <% end %>
-
     <li>
       Number of submissions: <%= @course.submissions.count %>
       (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
@@ -92,41 +86,39 @@
   </ul>
 <% end %>
 
-<% if current_user.administrator? || @course.requires_registration? && current_user.registered_to_course?(@course) %>
-  <h2>All exercises</h2>
+<% if @course.some_deadlines_depend_directly_on_registration_time? && !current_user.registered_to_course?(@course) %>
+  <p>
+    Note: this course has personalized deadlines. This means that when you
+    submit the first exercise, you get assigned deadlines for the remaining exercises.
+    When you complete enough exercises, you unlock more exercises with new deadlines.
+  </p>
+<% end %>
+
+<h2>All exercises</h2>
+
+<section>
+  <% if current_user.administrator? %>
+    <div class="refresh-course-button">
+      <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
+    </div>
+  <% end %>
+
+  <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises } %>
+</section>
+
+<% if @submissions %>
+  <h2>Latest submissions</h2>
 
   <section>
-    <% if current_user.administrator? %>
-      <div class="refresh-course-button">
-        <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
-      </div>
+    <% if @total_submissions > @submissions.count %>
+      <p>
+        Only showing <%= @submissions.count %> of <%= @course.submissions.count %>
+        <%= link_to "(show all)", course_submissions_path(@course) %>.
+      </p>
     <% end %>
 
-    <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises } %>
+    <div>
+      <%= show_submission_list(@submissions) %>
+    </div>
   </section>
-
-  <% if @submissions %>
-    <h2>Latest submissions</h2>
-
-    <section>
-      <% if @total_submissions > @submissions.count %>
-        <p>
-          Only showing <%= @submissions.count %> of <%= @course.submissions.count %>
-          <%= link_to "(show all)", course_submissions_path(@course) %>.
-        </p>
-      <% end %>
-
-      <div>
-        <%= show_submission_list(@submissions) %>
-      </div>
-    </section>
-  <% end %>
-<% else %>
-  <p>
-    You must sign up to this course to begin it.
-    <% if @course.some_deadlines_depend_directly_on_registration_time? %>
-      Please note that the course has deadlines that depend on when you
-      sign up, so don't sign up until you are really ready to begin.
-    <% end %>
-  </p>
 <% end %>
