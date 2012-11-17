@@ -1,0 +1,14 @@
+<h2>Unlock exercises</h2>
+
+<p>
+  You can unlock the following exercises. By doing so, you accept their deadlines.
+  You cannot unlock exercises one at a time.
+</p>
+
+<ul>
+  <% for ex in @exercises %>
+    <li><%= ex.name %> (deadline: <%= ex.deadline_spec_obj.universal_description %>)</li>
+  <% end %>
+</ul>
+
+<%= button_to "Unlock these exercises", course_unlock_path(@course) %>

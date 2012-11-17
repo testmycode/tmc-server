@@ -94,6 +94,13 @@
   </p>
 <% end %>
 
+<% unlockables = @course.unlockable_exercises_for(current_user) %>
+<% unless unlockables.empty? %>
+  <p>
+    You can <%= link_to "unlock #{pluralize(unlockables.count, 'new exercise')}", course_unlock_path(@course) %>.
+  </p>
+<% end %>
+
 <h2>All exercises</h2>
 
 <section>

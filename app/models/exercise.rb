@@ -90,17 +90,19 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user may make submissions
   def submittable_by?(user)
-    returnable? && (user.administrator? || (!expired_for?(user) && !hidden? && published? && !user.guest?))
+    returnable? &&
+      (user.administrator? ||
+        (!expired_for?(user) && !hidden? && published? && !user.guest? && unlocked_for?(user)))
   end
 
-  # Whether a user may see the exercise
+  # Whether a user may see all metadata about the exercise
   def visible_to?(user)
-    user.administrator? || visible_to_users?
+    user.administrator? || (!hidden? && published? && unlock_spec_obj.permits_unlock_for?(user))
   end
 
-  # Whether a non-administrator can view the exercise. Prefer to call visible_to?(user))
-  def visible_to_users?
-    (!hidden? && published?)
+  # Whether the user may download the exercise ZIP file
+  def downloadable_by?(user)
+    visible_to?(user) && unlocked_for?(user)
   end
  
   # Whether the exercise has been published (it may still be hidden)
@@ -195,12 +197,24 @@ class Exercise < ActiveRecord::Base
       end
   end
 
+  def requires_unlock?
+    !unlock_spec_obj.empty?
+  end
+
+  def requires_explicit_unlock?
+    deadline_spec_obj.depends_on_unlock_time?
+  end
+
   def time_unlocked_for(user)
     self.unlocks.where(:user_id => user).where('valid_after IS NULL OR valid_after < ?', Time.now).first.andand.created_at
   end
 
   def unlocked_for?(user)
-    !!time_unlocked_for(user)
+    !requires_unlock? || time_unlocked_for(user)
+  end
+
+  def unlockable_for?(user)
+    requires_explicit_unlock? && !unlocked_for?(user) && unlock_spec_obj.permits_unlock_for?(user)
   end
 
   def solution_visible_after=(new_value)

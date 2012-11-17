@@ -88,7 +88,7 @@ class Course < ActiveRecord::Base
   end
 
   def gdocs_sheets(exercises = nil)
-    exercises = self.exercises.select(&:visible_to_users?) unless exercises
+    exercises = self.exercises.select{|ex| !ex.hidden? && ex.published? } unless exercises
     exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
   end
 
@@ -164,6 +164,11 @@ class Course < ActiveRecord::Base
   def exercises_by_name_or_group(name)
     group = exercise_group_by_name(name)
     exercises.to_a.select {|ex| ex.name == name || (group && ex.belongs_to_exercise_group?(group)) }
+  end
+
+  def unlockable_exercises_for(user)
+    unlocked = self.unlocks.where(:user_id => user.id).map(&:exercise_name)
+    self.exercises.to_a.select {|ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
   end
 
   def reload

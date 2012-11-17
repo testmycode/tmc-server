@@ -24,6 +24,9 @@ class Ability
       can :read, Exercise do |ex|
         ex.visible_to?(user)
       end
+      can :download, Exercise do |ex|
+        ex.downloadable_by?(user)
+      end
 
       cannot :read, Submission
       can :read, Submission, :user_id => user.id

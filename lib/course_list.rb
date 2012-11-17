@@ -13,6 +13,7 @@ class CourseList
 private
   def course_data(course)
     exercises = course.exercises.includes(:available_points).natsort_by(&:name)
+    @unlocked_exercises = course.unlocks.where(:user_id => @user.id).where(['valid_after < ?', Time.now]).map(&:exercise_name)
 
     submissions_by_exercise = {}
     Submission.where(:course_id => course.id, :user_id => @user.id).each do |sub|
@@ -28,6 +29,7 @@ private
       :name => course.name,
       :reviews_url => @helpers.course_reviews_url(course, :format => :json),
       :comet_url => CometServer.get.client_url,
+      :unlockables => course.unlockable_exercises_for(@user).map(&:name).natsort,
       :exercises => exercises.map {|ex| exercise_data(ex) }.reject(&:nil?)
     }
   end
@@ -35,9 +37,13 @@ private
   def exercise_data(exercise)
     return nil if !exercise.visible_to?(@user)
 
+    # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
+    locked = exercise.requires_unlock? && !@unlocked_exercises.include?(@user)
+
     data = {
       :id => exercise.id,
       :name => exercise.name,
+      :locked => locked,
       :deadline => exercise.deadline_for(@user),
       :checksum => exercise.checksum,
       :return_url => exercise_return_url(exercise),

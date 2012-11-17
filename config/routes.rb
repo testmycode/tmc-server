@@ -43,6 +43,7 @@ TmcServer::Application.routes.draw do
     resources :feedback_answers, :only => [:index]
     match 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :via => :get, :as => 'feedback_answers_chart'
     resources :reviews, :only => [:index]
+    resource :unlock, :only => [:show, :create]
   end
   
   resources :exercises, :only => [:show] do

@@ -26,6 +26,7 @@ class ExercisesController < ApplicationController
         end
       end
       format.zip do
+        authorize! :download, @exercise
         send_file @exercise.stub_zip_file_path
       end
     end

@@ -18,6 +18,10 @@ class UnlockSpec
     end
   end
 
+  def empty? # No unlock conditions - no Unlock object required to be unlocked
+    @conditions.empty? && @valid_after == nil
+  end
+
   attr_reader :valid_after
   attr_reader :universal_descriptions
 

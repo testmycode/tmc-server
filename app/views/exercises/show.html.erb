@@ -8,20 +8,27 @@
     <li>This exercise is currently hidden</li>
   <% end %>
 
-  <% unlock_time = @exercise.time_unlocked_for(@current_user) %>
+  <% unlock_time = @exercise.time_unlocked_for(current_user) %>
   <% if unlock_time %>
     <li>Was unlocked at <%= unlock_time %></li>
+  <% elsif @exercise.unlockable_for?(current_user) %>
+    <li>
+      <%= link_to 'Waiting for unlock', course_unlock_path(@course) %>
+    </li>
   <% else %>
     <li>
       Not yet unlocked.
-      <%= @exercise.unlock_spec_obj.description_for(@current_user) %>
+      <%= @exercise.unlock_spec_obj.description_for(current_user) %>
     </li>
   <% end %>
-  <% if @current_user.administrator? && !@exercise.unlock_spec_obj.universal_descriptions.empty? %>
+  <% if current_user.administrator? && !@exercise.unlock_spec_obj.universal_descriptions.empty? %>
     <li>
       Unlock condition:
-      <%= @exercise.unlock_spec_obj.universal_descriptions.join(' and ') %>
+      <%= @exercise.unlock_spec_obj.universal_descriptions.join(' and ') %>.
     </li>
+    <% if @exercise.requires_explicit_unlock? %>
+      <li>Must be unlocked manually by the student because the deadline depends on the unlock time.</li>
+    <% end %>
   <% end %>
 
   <% if @exercise.deadline_for(current_user) %>
@@ -31,7 +38,7 @@
         (<%= @exercise.deadline_spec_obj.universal_description %>)
       <% end %>
       <% if @exercise.expired_for?(current_user) %>
-        <% if @current_user.administrator? %>
+        <% if current_user.administrator? %>
           (expired (if you weren't an admin))
         <% else %>
           (expired)

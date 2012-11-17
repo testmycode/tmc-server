@@ -11,6 +11,9 @@ class Unlock < ActiveRecord::Base
     :conditions => proc { "exercises.course_id = #{self.course_id}" }
   # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
+  # refresh_[all_]unlocks creates missing unlocks (unless explicit unlock required) and
+  # deletes unlocks that are no longer permitted due to an update in the exercise specs
+
   def self.refresh_all_unlocks(course)
     Unlock.transaction do
       unlocks = {}
@@ -34,20 +37,34 @@ class Unlock < ActiveRecord::Base
     end
   end
 
+  def self.unlock_exercises(exercises, user)
+    Unlock.transaction do
+      for ex in exercises
+        # We assume the unlocks don't yet exist and fail with a uniqueness error if they do
+        Unlock.create!(
+          :user => user,
+          :course_id => ex.course_id,
+          :exercise_name => ex.name,
+          :valid_after => ex.unlock_spec_obj.valid_after
+        )
+      end
+    end
+  end
+
 private
 
   def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
     for exercise in course.exercises
       exists = !!user_unlocks_by_exercise_name[exercise.name]
-      should_exist = exercise.unlock_spec_obj.permits_unlock_for?(user)
-      if !exists && should_exist
+      may_exist = exercise.unlock_spec_obj.permits_unlock_for?(user)
+      if !exists && may_exist && !exercise.requires_explicit_unlock?
         Unlock.create!(
           :user => user,
           :course => course,
           :exercise => exercise,
           :valid_after => exercise.unlock_spec_obj.valid_after
         )
-      elsif exists && !should_exist
+      elsif exists && !may_exist
         user_unlocks_by_exercise_name[exercise.name].destroy
       end
     end

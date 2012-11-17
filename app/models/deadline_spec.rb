@@ -22,7 +22,7 @@ class DeadlineSpec
   end
 
   def description_for(user)
-    min_spec(user).andand.personal_describer.call(user)
+    min_spec(user).andand.personal_describer.andand.call(user) || "none"
   end
 
   def deadline_for(user)
@@ -35,14 +35,14 @@ class DeadlineSpec
 
 private
   def min_spec(user)
-    @specs.map { |s| [s.timefun.call(user), s] }.reject {|p| p.first.nil? }.min_by(&:first).map(&:second)
+    @specs.map { |s| [s.timefun.call(user), s] }.reject {|p| p.first.nil? }.min_by(&:first).andand.map(&:second)
   end
 
   class SingleSpec
-    def initialize(timefun, univ, personal)
+    def initialize(timefun, universal_description, personal_describer)
       @timefun = timefun
-      @universal_description = univ
-      @personal_describer = personal
+      @universal_description = universal_description
+      @personal_describer = personal_describer
     end
     attr_accessor :timefun, :universal_description, :personal_describer
   end
@@ -53,7 +53,7 @@ private
       time = DateAndTimeUtils.to_time(spec, :prefer_end_of_day => true)
       timefun = lambda {|user| time }
       universal = "#{time}"
-      personal = lambda {|u| univ }
+      personal = lambda {|u| universal }
       @specs << SingleSpec.new(timefun, universal, personal)
     elsif spec =~ /^unlock\s*[+]\s*(\d+)\s+(minutes?|hours?|days?|weeks?|months?|years?)$/
       time_scalar = $1
