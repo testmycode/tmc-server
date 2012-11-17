@@ -11,13 +11,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121117121310) do
+ActiveRecord::Schema.define(:version => 20121117155534) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
     t.string  "name",                               :null => false
     t.boolean "requires_review", :default => false, :null => false
   end
+
+  add_index "available_points", ["exercise_id"], :name => "index_available_points_on_exercise_id"
 
   create_table "awarded_points", :force => true do |t|
     t.integer "course_id",     :null => false
