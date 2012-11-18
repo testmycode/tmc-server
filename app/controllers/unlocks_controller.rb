@@ -24,6 +24,9 @@ class UnlocksController < ApplicationController
         flash[:success] = "Exercises unlocked."
         redirect_to course_path(@course)
       end
+      format.json do
+        render :json => {:status => 'ok'}
+      end
     end
   end
 end
