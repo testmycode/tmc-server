@@ -18,7 +18,11 @@ class DeadlineSpec
   end
 
   def universal_description
-    @specs.map(&:universal_description).join(' or ')
+    if @specs.size == 1
+      @specs.first.universal_description
+    else
+      @specs.map(&:universal_description).join(' or ') + ", whichever comes first"
+    end
   end
 
   def description_for(user)

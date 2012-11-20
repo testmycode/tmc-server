@@ -45,6 +45,7 @@ private
       :id => exercise.id,
       :name => exercise.name,
       :locked => locked,
+      :deadline_description => exercise.deadline_spec_obj.universal_description,
       :deadline => exercise.deadline_for(@user),
       :checksum => exercise.checksum,
       :return_url => exercise_return_url(exercise),
