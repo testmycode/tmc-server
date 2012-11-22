@@ -18,7 +18,9 @@ class DeadlineSpec
   end
 
   def universal_description
-    if @specs.size == 1
+    if @specs.empty?
+      nil
+    elsif @specs.size == 1
       @specs.first.universal_description
     else
       @specs.map(&:universal_description).join(' or ') + ", whichever comes first"
