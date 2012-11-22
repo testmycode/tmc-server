@@ -12,7 +12,6 @@ describe "Personal deadlines", :integration => true do
     @repo.copy_simple_exercise('MyExercise2')
     File.open("#{@repo.path}/MyExercise2/metadata.yml", "wb") do |f|
       f.puts("unlocked_after: exercise MyExercise1")
-      f.puts("deadline: unlock + 1 week")
     end
     @repo.add_commit_push
 
@@ -21,7 +20,7 @@ describe "Personal deadlines", :integration => true do
     @user = Factory.create(:user, :password => 'xooxer')
 
     visit '/'
-    log_in_as(@user.login, 'xooxer')
+    log_in_as(@user.login, @user.password)
     click_link 'mycourse'
   end
 
@@ -34,10 +33,17 @@ describe "Personal deadlines", :integration => true do
     visit '/'
     click_link 'mycourse'
     page.should have_content('MyExercise2')
+    page.should_not have_content('(locked)')
   end
 
   describe "when the deadline of an unlocked exercise depends on the unlock time" do
     specify "the exercise must be unlocked manually" do
+      File.open("#{@repo.path}/MyExercise2/metadata.yml", "ab") do |f|
+        f.puts("deadline: unlock + 1 week")
+      end
+      @repo.add_commit_push
+      @course.refresh
+
       submit_correct_solution('MyExercise1')
 
       visit '/'
@@ -54,7 +60,6 @@ describe "Personal deadlines", :integration => true do
       dl = @course.exercises.find_by_name('MyExercise2').deadline_for(@user)
       dl.should be_within(10.minutes).of(Time.now + 1.week)
     end
-
   end
 
   def submit_correct_solution(exercise_on_server)
