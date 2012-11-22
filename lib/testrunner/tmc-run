@@ -100,6 +100,11 @@ case $PROJECT_TYPE in
       -Dtmc.lib_dir=`pwd`/lib
       -Dtmc.results_file=`pwd`/test_output.txt"
 
+    if [ -d "lib/endorsed" ]; then
+      DEFS="$DEFS -Djava.endorsed.dirs=`pwd`/lib/endorsed"
+    fi
+    echo "DEFS: $DEFS"
+
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
   ;;
 
