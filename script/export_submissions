@@ -35,8 +35,9 @@ end
 
 i = 1
 query.each do |sub|
-  dest_file = "#{dest_dir}/#{sub.id}.zip"
-  puts "Exporting submission id=#{sub.id}  (#{i}/#{total})"
+  puts "Exporting submission id=#{sub.id} for #{sub.exercise_name}  (#{i}/#{total})"
+  FileUtils.mkdir_p("#{dest_dir}/#{sub.exercise_name}")
+  dest_file = "#{dest_dir}/#{sub.exercise_name}/#{sub.id}.zip"
   write_file(dest_file, sub.return_file)
   i += 1
 end
