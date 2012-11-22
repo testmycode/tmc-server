@@ -23,6 +23,19 @@ class AvailablePoint < ActiveRecord::Base
     where(:exercises => {:course_id => course.id, :gdocs_sheet => sheet})
   end
 
+  def award_to(user, submission = nil)
+    begin
+      AwardedPoint.create!(
+        :course_id => exercise.course_id,
+        :name => name,
+        :user_id => user.id,
+        :submission => submission
+      )
+    rescue ActiveRecord::RecordNotUnique
+      # already awarded - ignore
+    end
+  end
+
 private
   def name_must_not_contain_whitespace
     errors.add(:name, "can't contain whitespace") if /\s+/ =~ name

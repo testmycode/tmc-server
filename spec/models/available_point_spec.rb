@@ -54,5 +54,30 @@ describe AvailablePoint do
       ap.should have(1).error_on('name')
     end
   end
+
+  describe "#award_to" do
+    it "awards the point to the given user" do
+      ap = Factory.create(:available_point)
+      user = Factory.create(:user)
+      ap.award_to(user)
+
+      user.awarded_points.size.should == 1
+      aw = user.awarded_points.first
+      aw.name.should == ap.name
+      aw.course_id.should == ap.exercise.course_id
+      aw.submission.should be_nil
+    end
+
+    it "is idempotent" do
+      ap = Factory.create(:available_point)
+      user = Factory.create(:user)
+      ap.award_to(user)
+      ap.award_to(user)
+      ap.award_to(user)
+
+      user.awarded_points.size.should == 1
+      aw = user.awarded_points.first.name.should == ap.name
+    end
+  end
 end
 
