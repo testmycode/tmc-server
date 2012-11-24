@@ -21,7 +21,7 @@ code, .java, .shell, .yaml {
   font-family: "DejaVu Sans Mono", "Consolas", monospace;
 }
 
-pre.java, div.shell, pre.yaml {
+pre, div.shell {
   margin-left: 10pt;
   margin-right: 40pt;
   margin-bottom: 3em;
