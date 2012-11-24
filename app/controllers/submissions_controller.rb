@@ -4,52 +4,21 @@ class SubmissionsController < ApplicationController
   around_filter :course_transaction
   before_filter :get_course_and_exercise
   
-  skip_authorization_check :only => :show
+  skip_authorization_check :only => [:show, :index]
 
   def index
-    add_course_breadcrumb
-    add_breadcrumb 'All submissions', course_submissions_path(@course)
-
     respond_to do |format|
       format.json do
-        submissions = @course.submissions
-
-        if current_user.administrator?
-          authorize! :read, Submission
-        else
-          submissions = submissions.where(:user_id => current_user.id)
-          authorize! :read, Submission, :user_id => current_user.id
-        end
-
         if params[:row_format] == 'datatables'
-          if params[:max_id]
-            submissions = submissions.where('id <= ?', params[:max_id])
-          end
-          submissions = submissions.includes(:user).order('id DESC')
-          remaining = submissions.count
-          submissions_limited = submissions.limit(1000)
-          Submission.eager_load_exercises(submissions_limited)
-
-          render :json => {
-            :remaining => remaining,
-            :max_id => params[:max_id].to_i,
-            :last_id => if submissions_limited.empty? then nil else submissions_limited.last.id.to_i end,
-            :rows => view_context.submissions_for_datatables(submissions_limited)
-          }
+          index_json_datatables
         else
-          if params[:user_id]
-            submissions = submissions.where(:user_id => params[:user_id])
-          end
-
-          render :json => {
-            :api_version => API_VERSION,
-            :submissions => submissions.map(&:id),
-            :json_url_schema => submission_url(:id => ':id', :format => 'json'),
-            :zip_url_schema => submission_url(:id => ':id', :format => 'zip')
-          }
+          index_json
         end
       end
-      format.html # uses AJAX
+      format.html do # uses AJAX
+        add_course_breadcrumb
+        add_breadcrumb 'All submissions', course_submissions_path(@course)
+      end
     end
   end
 
@@ -206,5 +175,44 @@ private
 
   def schedule_for_rerun(submission, priority)
     submission.set_to_be_reprocessed!(priority)
+  end
+
+  def index_json
+    return respond_access_denied unless current_user.administrator?
+
+    submissions = @course.submissions
+    if params[:user_id]
+      submissions = submissions.where(:user_id => params[:user_id])
+    end
+
+    render :json => {
+      :api_version => API_VERSION,
+      :json_url_schema => submission_url(:id => ':id', :format => 'json'),
+      :zip_url_schema => submission_url(:id => ':id', :format => 'zip'),
+      :submissions => submissions.map(&:id)
+    }
+  end
+
+  def index_json_datatables
+    submissions = @course.submissions
+
+    unless current_user.administrator?
+      submissions = submissions.where(:user_id => current_user.id)
+    end
+
+    if params[:max_id]
+      submissions = submissions.where('id <= ?', params[:max_id])
+    end
+    submissions = submissions.includes(:user).order('id DESC')
+    remaining = submissions.count
+    submissions_limited = submissions.limit(1000)
+    Submission.eager_load_exercises(submissions_limited)
+
+    render :json => {
+      :remaining => remaining,
+      :max_id => params[:max_id].to_i,
+      :last_id => if submissions_limited.empty? then nil else submissions_limited.last.id.to_i end,
+      :rows => view_context.submissions_for_datatables(submissions_limited)
+    }
   end
 end
