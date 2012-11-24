@@ -302,14 +302,15 @@ require 'cgi' # for escapeHTML
     To define when an exercise is unlocked, one must write a <code>metadata.yml</code> for the exercise
     or its parent directory. Let's write the following into <code>part02/metadata.yml</code> as an example.
     It will define that the exercises under part02 will only become visible
-    after the student has gotten all possible points under part01 and 80% of the possible points under part02.
+    after the student has gotten 80% of all possible points under part01, including all possible points from
+    part01-first.
     It also says that the exercise shall not unlock before the 12th of June.
   </p>
 
   <pre>
 unlocked_after:
+  - 80% of part01
   - 100% of part01-first
-  - 80% of part01-second
   - 2012-06-12
 </pre>
 
