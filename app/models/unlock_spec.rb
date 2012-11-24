@@ -48,12 +48,26 @@ class UnlockSpec
   end
 
 private
-  def parse_condition(str) # returns either a Time or a Proc(user) -> boolean
+  def parse_condition(str)
     course = @exercise.course
     if DateAndTimeUtils.looks_like_date_or_time(str)
       @valid_after = DateAndTimeUtils.to_time(str)
+
     elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/
       parse_condition("100% of #{$1}")
+
+    elsif str =~ /^points?\s+(\S+.*)$/
+      points = $1.split(' ').map(&:strip).reject(&:empty?)
+      @depends_on_other_exercises = true
+      @conditions << lambda do |u|
+        AwardedPoint.where(:user_id => u.id, :course_id => course.id, :name => points).count == points.count
+      end
+      @universal_descriptions << "the following points: #{points.join('  ')}"
+      @describers << lambda do |u|
+        awarded = AwardedPoint.where(:user_id => u.id, :course_id => course.id, :name => points).map(&:name)
+        "get the following points: #{(points - awarded).join('  ')}"
+      end
+
     elsif str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
       percentage_str = $1
       percentage = percentage_str.to_f / 100.0
@@ -74,6 +88,7 @@ private
           nil
         end
       end
+
     elsif str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/
       num_exercises = $1.to_i
       group = $2
@@ -93,6 +108,7 @@ private
           nil
         end
       end
+
     elsif str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
       num_points = $1.to_i
       group = $2

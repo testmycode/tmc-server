@@ -32,13 +32,15 @@ describe UnlockSpec do
   end
 
   specify "empty" do
-    UnlockSpec.new(ex1, []).valid_after.should be_nil
-    UnlockSpec.new(ex1, []).should permit_unlock_for(user)
+    spec = UnlockSpec.new(ex1, [])
+    spec.valid_after.should be_nil
+    spec.should permit_unlock_for(user)
   end
 
   specify "unlocked_after: <date>" do
-    UnlockSpec.new(ex1, ['12.12.2012']).valid_after.should == Date.parse('2012-12-12').to_time
-    UnlockSpec.new(ex1, ['12.12.2012']).should permit_unlock_for(user)
+    spec = UnlockSpec.new(ex1, ['12.12.2012'])
+    spec.valid_after.should == Date.parse('2012-12-12').to_time
+    spec.should permit_unlock_for(user)
   end
 
   specify "unlocked_after: exercise <exercise>" do
@@ -49,11 +51,28 @@ describe UnlockSpec do
   end
 
   specify "unlocked_after: exercise group <exercise>" do
-    UnlockSpec.new(ex3, ['exercise group grp']).should_not permit_unlock_for(user)
+    spec = UnlockSpec.new(ex3, ['exercise group grp'])
+    spec.should_not permit_unlock_for(user)
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt2)
-    UnlockSpec.new(ex3, ['exercise group grp']).should_not permit_unlock_for(user)
+    spec.should_not permit_unlock_for(user)
     award(:ex2_pt3)
-    UnlockSpec.new(ex3, ['exercise group grp']).should permit_unlock_for(user)
+    spec.should permit_unlock_for(user)
+  end
+
+  specify "unlocked_after: point ex1_pt2" do
+    spec = UnlockSpec.new(ex3, ['point ex1_pt2'])
+    spec.should_not permit_unlock_for(user)
+    award(:ex1_pt2)
+    spec.should permit_unlock_for(user)
+  end
+
+  specify "unlocked_after: points ex1_pt2 ex2_pt2" do
+    spec = UnlockSpec.new(ex3, ['points ex1_pt2 ex2_pt2'])
+    spec.should_not permit_unlock_for(user)
+    award(:ex1_pt2)
+    spec.should_not permit_unlock_for(user)
+    award(:ex2_pt2)
+    spec.should permit_unlock_for(user)
   end
 
   specify "unlocked_after: <n>% of <exercise>" do
