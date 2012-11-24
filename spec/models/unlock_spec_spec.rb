@@ -48,6 +48,14 @@ describe UnlockSpec do
     UnlockSpec.new(ex3, ['exercise grp-ex2']).should_not permit_unlock_for(user)
   end
 
+  specify "unlocked_after: exercise group <exercise>" do
+    UnlockSpec.new(ex3, ['exercise group grp']).should_not permit_unlock_for(user)
+    award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt2)
+    UnlockSpec.new(ex3, ['exercise group grp']).should_not permit_unlock_for(user)
+    award(:ex2_pt3)
+    UnlockSpec.new(ex3, ['exercise group grp']).should permit_unlock_for(user)
+  end
+
   specify "unlocked_after: <n>% of <exercise>" do
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt3)
 

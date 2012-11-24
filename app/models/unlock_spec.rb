@@ -52,7 +52,7 @@ private
     course = @exercise.course
     if DateAndTimeUtils.looks_like_date_or_time(str)
       @valid_after = DateAndTimeUtils.to_time(str)
-    elsif str =~ /^exercise\s+(\S+)$/
+    elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/
       parse_condition("100% of #{$1}")
     elsif str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
       percentage_str = $1
