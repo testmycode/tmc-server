@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe AuthsController do
   before :each do
-    Factory.create(:user, :login => 'foo', :password => 'bar')
+    @user = Factory.create(:user, :login => 'foo', :password => 'bar')
   end
 
   it "tells whether the given user/password is valid or not" do
@@ -31,5 +31,14 @@ describe AuthsController do
     post :show, :username => 'wrong', :password => 'bar', :format => 'text'
     response.should be_successful
     response.body.should == "FAIL"
+  end
+
+  it "should work with an existing session" do
+    Session.create!(:session_id => 'foo', :data => {'user_id' => @user.id})
+    s = Session.last
+    s.should_not be_nil
+    post :show, :username => 'foo', :session_id => s.session_id
+    response.should be_successful
+    response.body.should == "OK"
   end
 end

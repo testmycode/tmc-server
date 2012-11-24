@@ -9,7 +9,7 @@ class AuthsController < ApplicationController
     if user
       if params[:password] && user.has_password?(params[:password])
         msg = "OK"
-      elsif params[:session_id] && Session.find_by_session_id(params[:session_id]).andand.belongs_to?(user)
+      elsif params[:session_id] && find_session_by_id(params[:session_id]).andand.belongs_to?(user)
         msg = "OK"
       end
     end
@@ -22,5 +22,11 @@ class AuthsController < ApplicationController
         render :json => {:status => msg}.to_json
       end
     end
+  end
+
+private
+  def find_session_by_id(sid)
+    # Can't say Session.find_by_session_id because of a nasty metaprogramming hax in AR's superclass.
+    Session.where(:session_id => sid).first
   end
 end
