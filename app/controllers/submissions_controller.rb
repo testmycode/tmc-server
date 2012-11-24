@@ -21,20 +21,33 @@ class SubmissionsController < ApplicationController
           authorize! :read, Submission, :user_id => current_user.id
         end
 
-        if params[:max_id]
-          submissions = submissions.where('id <= ?', params[:max_id])
-        end
-        submissions = submissions.order('id DESC')
-        remaining = submissions.count
-        submissions_limited = submissions.limit(1000).includes(:user)
-        Submission.eager_load_exercises(submissions_limited)
+        if params[:row_format] == 'datatables'
+          if params[:max_id]
+            submissions = submissions.where('id <= ?', params[:max_id])
+          end
+          submissions = submissions.includes(:user).order('id DESC')
+          remaining = submissions.count
+          submissions_limited = submissions.limit(1000)
+          Submission.eager_load_exercises(submissions_limited)
 
-        render :json => {
-          :remaining => remaining,
-          :max_id => params[:max_id].to_i,
-          :last_id => if submissions_limited.empty? then nil else submissions_limited.last.id.to_i end,
-          :rows => view_context.submissions_for_datatables(submissions_limited)
-        }
+          render :json => {
+            :remaining => remaining,
+            :max_id => params[:max_id].to_i,
+            :last_id => if submissions_limited.empty? then nil else submissions_limited.last.id.to_i end,
+            :rows => view_context.submissions_for_datatables(submissions_limited)
+          }
+        else
+          if params[:user_id]
+            submissions = submissions.where(:user_id => params[:user_id])
+          end
+
+          render :json => {
+            :api_version => API_VERSION,
+            :submissions => submissions.map(&:id),
+            :json_url_schema => submission_url(:id => ':id', :format => 'json'),
+            :zip_url_schema => submission_url(:id => ':id', :format => 'zip')
+          }
+        end
       end
       format.html # uses AJAX
     end
