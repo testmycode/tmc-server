@@ -153,16 +153,16 @@ private
       :filename => action_name
     }.merge(options)
 
+    headers['Cache-Control'] = 'no-cache, must-revalidate, post-check=0, pre-check=0'
+    headers['Expires'] = "Thu, 01 Dec 1994 16:00:00 GMT"
+
     if request.env['HTTP_USER_AGENT'] =~ /msie/i
       headers['Pragma'] = 'public'
       headers["Content-type"] = "text/plain"
-      headers['Cache-Control'] = 'no-cache, must-revalidate, post-check=0, pre-check=0'
-      headers['Content-Disposition'] = "attachment; filename=\"#{options[:filename]}\""
-      headers['Expires'] = "0"
     else
       headers["Content-Type"] ||= 'text/csv'
-      headers["Content-Disposition"] = "attachment; filename=\"#{options[:filename]}\""
     end
+    headers["Content-Disposition"] = "attachment; filename=\"#{options[:filename]}\""
 
     render_options = {
       :layout => false
