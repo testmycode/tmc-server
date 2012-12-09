@@ -2,7 +2,7 @@ require 'fileutils'
 
 module FileStore
   def self.root
-    "#{::Rails.root}/tmp/cache"
+    "#{::Rails.root}/db/files"
   end
 
   def self.get(relpath)
