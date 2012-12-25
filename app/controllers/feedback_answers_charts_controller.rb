@@ -5,7 +5,7 @@ class FeedbackAnswersChartsController < ApplicationController
 
     add_course_breadcrumb
     add_breadcrumb 'Feedback', course_feedback_answers_path(@course)
-    add_breadcrumb 'Charts', breadcrumb_no_path
+    add_breadcrumb 'Charts'
 
     case params[:type]
     when 'scatterplot'
