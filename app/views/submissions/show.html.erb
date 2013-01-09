@@ -16,7 +16,7 @@
   </div>
 
   <ul>
-    <% unless @submission.points_list.empty? %>
+    <% unless @submission.points_list.empty? || @submission.exercise.nil? %>
       <li>
         <%
            awarded_points = @submission.points_list
