@@ -26,6 +26,11 @@ else
   PROJECT_TYPE=java_simple
 fi
 
+JAVA_EXE_PATH=`readlink -f \`which java\``
+JRE_DIR=`dirname \`dirname "$JAVA_EXE_PATH"\``
+JDK_DIR=`dirname "$JRE_DIR"`
+TOOLS_JAR_PATH="$JDK_DIR/lib/tools.jar"
+
 TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
 
 echo "Total RAM: ${TOTAL_RAM_KB}KB"
@@ -43,11 +48,11 @@ case $PROJECT_TYPE in
 
     mkdir -p classes/main
     mkdir -p classes/test
-    find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp lib/*:src/ > test_output.txt 2>&1 || exit 101
-    find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp lib/*:classes/main:test/ > test_output.txt 2>&1 || exit 102
+    find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp $TOOLS_JAR_PATH:lib/*:src/ > test_output.txt 2>&1 || exit 101
+    find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp $TOOLS_JAR_PATH:lib/*:classes/main:test/ > test_output.txt 2>&1 || exit 102
     rm -f test_output.txt
 
-    CLASSPATH="lib/testrunner/*:lib/*:classes/main/:classes/test/"
+    CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*:classes/main/:classes/test/"
   ;;
 
   java_maven)

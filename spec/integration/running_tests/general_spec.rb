@@ -3,17 +3,21 @@ require 'spec_helper'
 describe RemoteSandboxForTesting, :integration => true do
   include GitTestActions
 
-  describe "running tests on a new submission" do
+  def make_setup(exercise_name)
+    @setup = SubmissionTestSetup.new(:exercise_name => exercise_name)
+    @course = @setup.course
+    @repo = @setup.repo
+    @exercise_project = @setup.exercise_project
+    @exercise = @setup.exercise
+    @user = @setup.user
+    @submission = @setup.submission
+  end
+
+  describe "running tests on a submission for a simple exercise" do
     before :each do
-      @setup = SubmissionTestSetup.new(:exercise_name => 'SimpleExercise')
-      @course = @setup.course
-      @repo = @setup.repo
-      @exercise_project = @setup.exercise_project
-      @exercise = @setup.exercise
-      @user = @setup.user
-      @submission = @setup.submission
+      make_setup 'SimpleExercise'
     end
-    
+
     it "should create test results for the submission" do
       @exercise_project.solve_add
       @setup.make_zip
@@ -90,5 +94,12 @@ describe RemoteSandboxForTesting, :integration => true do
       points.should include('simpletest-all')
       points.should_not include('mul') # in SimpleHiddenTest
     end
+  end
+
+  it "should include tools.jar in the classpath for ant projects" do
+    make_setup 'UsingToolsJar'
+    @setup.make_zip
+    RemoteSandboxForTesting.run_submission(@submission)
+    @submission.status.should == :ok
   end
 end
