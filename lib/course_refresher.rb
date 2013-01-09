@@ -79,7 +79,7 @@ private
           @course.exercises.each &:save!
           
           CourseRefresher.simulate_failure! if ::Rails::env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
-        rescue
+        rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
           @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
           # Delete the new cache we were working on
           FileUtils.rm_rf(@course.cache_path)

@@ -423,13 +423,13 @@ describe CourseRefresher do
   it "should not allow dashes in exercise folders" do
     add_exercise('My-Exercise')
 
-    lambda { @refresher.refresh_course(@course) }.should raise_error
+    lambda { @refresher.refresh_course(@course) }.should raise_error(CourseRefresher::Failure)
   end
 
   it "should not allow dashes in exercise categories" do
     add_exercise('My-Category/MyExercise')
 
-    lambda { @refresher.refresh_course(@course) }.should raise_error
+    lambda { @refresher.refresh_course(@course) }.should raise_error(CourseRefresher::Failure)
   end
 
   it "should allow dashes in exercise subfolders" do
@@ -441,6 +441,11 @@ describe CourseRefresher do
     report = @refresher.refresh_course(@course)
     report.errors.should be_empty
     report.warnings.should be_empty
+  end
+
+  it "should report YAML parsing errors normally" do
+    change_course_metadata_file "foo: bar\noops :error", :raw => true
+    lambda { @refresher.refresh_course(@course) }.should raise_error(CourseRefresher::Failure)
   end
   
   describe "when done twice" do
