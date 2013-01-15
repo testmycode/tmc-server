@@ -6,7 +6,7 @@ namespace :reprocessor do
   namespace :init do
     DEFAULT_NAME = 'tmc-submission-reprocessor'
 
-    def init_script(name)
+    def init_script(name = nil)
       name ||= DEFAULT_NAME
       RubyInitScript.new({
         :name => name,
