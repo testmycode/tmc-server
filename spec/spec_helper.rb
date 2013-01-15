@@ -18,12 +18,7 @@ Dir[Rails.root.join("lib/**/*.rb")].each {|f| require f}
 Proc.new do
   raise "Please run tests under sudo (or rvmsudo)" if Process.uid != 0
 
-  if Etc.getlogin != 'root'
-    user = Etc.getpwnam(Etc.getlogin).uid
-  else
-    user = File.stat(::Rails.root).uid
-  end
-
+  user = File.stat(::Rails.root).uid
   group = Etc.getpwuid(user).gid
 
   RemoteSandboxForTesting.init_servers_as_root!(user, group)
