@@ -30,7 +30,6 @@ class RubyInitScript
     if $?.success?
       puts "Using RVM."
       rvm_current.strip!
-      rvm_info = YAML::load(`rvm info 2>/dev/null`) # Silenced rvm info complaint "RVM is not a function".
       ruby_path = rvm_info[rvm_current]['binaries']['ruby']
       env = rvm_info[rvm_current]['environment']
     else
@@ -107,5 +106,19 @@ private
     raise ":erb_path required" if !@options[:erb_path]
     raise ":working_dir required" if !@options[:working_dir]
     raise ":executable_path required" if !@options[:executable_path]
+  end
+
+  def rvm_info
+    @rvm_info ||= begin
+      output = `rvm info 2>/dev/null` # We silence the "RVM is not a function" warning on stderr.
+      # This can happen if one uses `sudo -i -u tmc` and then does `rvmsudo rvm info`.
+      potential_warning = <<EOS
+You need to change your terminal emulator preferences to allow login shell.
+Sometimes it is required to use `/bin/bash --login` as the command.
+Please visit https://rvm.io/integration/gnome-terminal/ for a example.
+EOS
+      output = output.sub(potential_warning, '')
+      YAML::load(output)
+    end
   end
 end
