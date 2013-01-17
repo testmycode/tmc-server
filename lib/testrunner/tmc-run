@@ -1,6 +1,11 @@
 #!/bin/bash -e
 # This gets passed with each submission to tmc-sandbox
 
+# This gets run under 'su', so we want to source profile mostly to get any special PATH.
+# Sourcing seems to terminate the script with -e, even when the return status is 0.
+# I have absolutely no idea why. We work around it with the '|| true'.
+. /etc/profile || true
+
 # Source user params if any.
 # Though the variable names and content format here are limited,
 # the contents should be treated carefully, despite us being in a sandbox.
