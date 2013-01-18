@@ -21,6 +21,7 @@ An X server is currently needed for tests to pass (required by [capybara-webkit]
 ### Setup ###
 
 We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` with `sudo` below.
+(note: RVM 1.17.x may have some [problems with rvmsudo](http://stackoverflow.com/questions/13765520/rvmsudo-command-not-working-properly))
 
 1. Download submodules with `git submodule update --init --recursive`
 2. Install dependencies with `gem install bundler && bundle install`
