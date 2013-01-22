@@ -46,8 +46,13 @@ The application should not be deployed into a multithreaded server! It often cha
 
 1. `rails server` or some other RoR setup.
 2. Go to `ext/tmc-sandbox/web` and do `rackup --port 3001` or some other Rack setup.
-3. `script/submission_reprocessor start`
-4. The default user account is `admin`/`admin`.
+3. `rake dev:comet:run`
+4. `script/submission_reprocessor start`
+
+Alternatively use `script/dev_env` to do all of the above in
+[screen](http://www.gnu.org/software/screen/).
+
+The default user account is `admin`/`admin`.
 
 ### Production setup ###
 
