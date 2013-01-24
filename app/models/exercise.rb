@@ -19,6 +19,8 @@ class Exercise < ActiveRecord::Base
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
   }
 
+  attr_accessor :completion_status_for_current_user
+
   def relative_path
     name.gsub('-', '/')
   end
@@ -292,6 +294,41 @@ class Exercise < ActiveRecord::Base
     ensure
       results.clear
     end
+  end
+
+  def self.completion_status_with awarded_points, submissions, course_id
+    points_of_exercise = {}
+    Exercise.where(:course_id => course_id).each{ |exercise|
+      points_of_exercise[exercise.id] = exercise.available_points.map(&:name)
+    }
+
+    completion_status = {}
+    points_of_exercise.keys.each { |exercise|
+      completion_status[exercise] = completion_status_of_exercise points_of_exercise[exercise], awarded_points
+    }
+
+    # take into account submissions with zero passing tests
+    submissions.each{ |s|
+      if not s.points or s.points.empty?
+        exercise = Exercise.find_by_course_id_and_name(course_id,s.exercise_name)
+        completion_status[exercise.id] = "incomplete 0" if completion_status[exercise.id].empty?
+      end
+    }
+
+    completion_status
+  end
+
+  def self.completion_status_of_exercise required_points, awarded_points
+    points_not_awarded = required_points - awarded_points
+
+    if points_not_awarded.empty?
+      return "completed 100"
+    elsif required_points != points_not_awarded
+      return "incomplete 50"
+    else
+      return ""
+    end
+
   end
 
 private

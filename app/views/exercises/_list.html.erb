@@ -5,6 +5,9 @@
         Exercise
       </th>
       <th>
+        Status
+      </th>
+      <th>
         Deadline
       </th>
       <th>
@@ -27,6 +30,9 @@
             (<%= notes.join(', ') %>)
           <% end %>
           </td>
+        <td class="<%= exercise.completion_status_for_current_user %>">
+          <%= exercise.completion_status_for_current_user %>
+        </td>
           <td>
             <% dl = exercise.deadline_for(current_user) %>
             <% if dl %>
@@ -43,3 +49,4 @@
 
 <%= use_datatables('table.exercise-list', :bPaginate => false) %>
 
+<h2><%= completed  %></h2>

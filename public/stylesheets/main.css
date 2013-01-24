@@ -407,3 +407,11 @@ table.points > * > tr > td {
 .code-review .buttons {
   float: right;
 }
+
+.completed {
+    background-color: #009900;
+}
+
+.incomplete {
+    background-color: #ff0000;
+}

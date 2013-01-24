@@ -14,6 +14,7 @@
   <% end %>
 </ul>
 
+
 <% if current_user.administrator? %>
   <ul>
     <li>Source type: <%= @course.source_backend.upcase %> </li>
@@ -110,7 +111,7 @@
     </div>
   <% end %>
 
-  <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises } %>
+  <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises, :completed => @completed_exercises } %>
 </section>
 
 <% if @submissions %>
