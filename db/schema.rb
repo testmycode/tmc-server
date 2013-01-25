@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121209082131) do
+ActiveRecord::Schema.define(:version => 20130125013607) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -72,7 +72,7 @@ ActiveRecord::Schema.define(:version => 20121209082131) do
     t.text     "unlock_spec"
   end
 
-  add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name"
+  add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name", :unique => true
   add_index "exercises", ["gdocs_sheet"], :name => "index_exercises_on_gdocs_sheet"
 
   create_table "feedback_answers", :force => true do |t|
