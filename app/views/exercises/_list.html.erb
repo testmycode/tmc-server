@@ -30,8 +30,8 @@
             (<%= notes.join(', ') %>)
           <% end %>
           </td>
-        <td class="<%= exercise.completion_status_for_current_user %>">
-          <%= exercise.completion_status_for_current_user %>
+        <td class='<%= "#{exercise.completion_status_for_current_user}".strip %>'>
+          <%= "completed" if exercise.completion_status_for_current_user =~ /100/ %>
         </td>
           <td>
             <% dl = exercise.deadline_for(current_user) %>
