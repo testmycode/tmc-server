@@ -44,6 +44,7 @@ end
 
 Capybara.default_driver = :webkit
 Capybara.server_port = FreePorts.take_next
+Capybara.default_wait_time = 10  # Comet messages may take longer to appear than the default 2 sec
 
 def without_db_notices(&block)
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
