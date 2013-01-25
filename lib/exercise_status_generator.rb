@@ -21,6 +21,8 @@ class ExerciseStatusGenerator
      completion_status
    end
 
+  private
+
    def self.completion_status_of_exercise required_points, awarded_points
      points_not_awarded = required_points - awarded_points
 

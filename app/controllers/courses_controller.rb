@@ -1,6 +1,7 @@
 require 'course_refresher'
 require 'natsort'
 require 'course_list'
+require 'exercise_status_generator'
 
 class CoursesController < ApplicationController
   def index
