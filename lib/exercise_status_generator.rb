@@ -1,22 +1,18 @@
 class ExerciseStatusGenerator
 
   def self.completion_status_with awarded_points, submissions, course_id
-    points_of_exercise = {}
-    Exercise.find_all_by_course_id(course_id, :include => :available_points).each { |exercise|
-      points_of_exercise[exercise.id] = exercise.available_points.map(&:name)
-    }
-
-    completion_status = {}
-    points_of_exercise.keys.each { |exercise|
-      completion_status[exercise] = completion_status_of_exercise points_of_exercise[exercise], awarded_points
+    #perhaps this should be cached?
+    exercises = Exercise.find_all_by_course_id(course_id, :include => :available_points)
+    completion_status = exercises.inject({}) { |map, exercise|
+      points_of_exercise = exercise.available_points.map(&:name)
+      map[exercise.id] = completion_status_of_exercise points_of_exercise, awarded_points
+      map
     }
 
     # take into account submissions with zero passing tests
-    submissions.each { |s|
-      if not s.points or s.points.empty?
-        exercise = Exercise.find_by_course_id_and_name(course_id, s.exercise_name)
-        completion_status[exercise.id] = "exercise p0" if completion_status[exercise.id].empty?
-      end
+    submissions.reject(&:points).each { |submission|
+      exercise = Exercise.find_by_course_id_and_name(course_id, submission.exercise_name)
+      completion_status[exercise.id] = "exercise p0" if completion_status[exercise.id].empty?
     }
 
     completion_status
