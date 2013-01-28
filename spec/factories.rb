@@ -110,4 +110,5 @@ FactoryGirl.define do
   factory :test_scanner_cache_entry do
     course
   end
+
 end

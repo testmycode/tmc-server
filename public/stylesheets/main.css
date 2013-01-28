@@ -407,3 +407,26 @@ table.points > * > tr > td {
 .code-review .buttons {
   float: right;
 }
+
+.exercise-status {
+    width: 102px;
+}
+
+.red {
+    background: #ff0000;
+    height: 25px;
+    float: left;
+}
+
+.green {
+    background: #009900;
+    height: 25px;
+    float: left;
+    text-align: center;
+}
+
+.green span {
+    color: #ffffff;
+    font-style: italic;
+    vertical-align: -4px;
+}
