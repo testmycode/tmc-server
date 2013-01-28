@@ -1,6 +1,7 @@
 require 'course_refresher'
 require 'natsort'
 require 'course_list'
+require 'exercise_status_generator'
 
 class CoursesController < ApplicationController
   def index
@@ -82,6 +83,7 @@ private
   def assign_show_view_vars
     @course = Course.find(params[:id])
     @exercises = @course.exercises.select {|ex| ex.visible_to?(current_user) }.natsort_by(&:name)
+    @exercise_completion_status = exercise_completion_status_of_current_user
     authorize! :read, @course
 
     unless current_user.guest?
@@ -93,5 +95,11 @@ private
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end
+  end
+
+  def exercise_completion_status_of_current_user
+    awarded_points = current_user.awarded_points.where(:course_id=>@course.id)
+    submissions = Submission.find_all_by_user_id_and_course_id_and_processed(current_user.id, @course.id, true)
+    ExerciseStatusGenerator.completion_status_with awarded_points.map(&:name), submissions, @course.id
   end
 end

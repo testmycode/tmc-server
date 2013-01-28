@@ -131,7 +131,7 @@ describe CoursesController do
     before :each do
       @course = Factory.create(:course)
     end
-  
+
     describe "for administrators" do
       before :each do
         @admin = Factory.create(:admin)
@@ -170,16 +170,34 @@ describe CoursesController do
       before :each do
         controller.current_user = @user
       end
-      
       it "should show only the current user's submissions" do
+        ex = Factory.create(:exercise)
+        Exercise.stub(:find_by_course_id_and_name).and_return(ex)
+
         other_user = Factory.create(:user)
-        my_sub = Factory.create(:submission, :user => @user, :course => @course)
+        my_sub = Factory.create(:submission, :user => @user, :course => @course, :exercise => ex)
         other_guys_sub = Factory.create(:submission, :user => other_user, :course => @course)
         
         get :show, :id => @course.id
         
         assigns['submissions'].should include(my_sub)
         assigns['submissions'].should_not include(other_guys_sub)
+      end
+    end
+
+    describe "for the current user" do
+      before :each do
+        controller.current_user = @user
+      end
+
+      it "should show correctly the exercise completion status" do
+        ex = Factory.create(:exercise)
+        Exercise.stub(:find_by_course_id_and_name).and_return(ex)
+        Factory.create(:submission, :user => @user, :course => @course, :exercise => ex)
+
+        get :show, :id => @course.id
+
+        assigns['exercise_completion_status'].should == {ex.id => 0}
       end
     end
   end
