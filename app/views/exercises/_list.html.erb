@@ -29,9 +29,15 @@
           <% unless notes.empty? %>
             (<%= notes.join(', ') %>)
           <% end %>
-          </td>
-        <td class='<%= "#{exercise.completion_status_for_current_user}".strip %>'>
-          <%= "completed" if exercise.completion_status_for_current_user =~ /100/ %>
+         </td>
+        <td class="exercise-status">
+          <div class="green" style='width: <%=green(completion_status[exercise.id])%>px;'>
+            <span>
+              <%= "completed" if completion_status[exercise.id] == 100 %>
+            </span>
+          </div>
+          <div class="red" style='width: <%=red(completion_status[exercise.id])%>px;'/>
+        </td>
         </td>
           <td>
             <% dl = exercise.deadline_for(current_user) %>

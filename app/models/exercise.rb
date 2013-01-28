@@ -19,8 +19,6 @@ class Exercise < ActiveRecord::Base
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
   }
 
-  attr_accessor :completion_status_for_current_user
-
   def relative_path
     name.gsub('-', '/')
   end

@@ -408,48 +408,25 @@ table.points > * > tr > td {
   float: right;
 }
 
-.exercise {
-    background: url("http://jamo.fi/kuva.png");
-    width: 100px;
-    text-align: center
+.exercise-status {
+    width: 102px;
 }
 
-.exercise.p10 {
-    background-position: -185px 0;
+.red {
+    background: #ff0000;
+    height: 25px;
+    float: left;
 }
 
-.exercise.p20 {
-    background-position: -198px 0;
+.green {
+    background: #009900;
+    height: 25px;
+    float: left;
+    text-align: center;
 }
 
-.exercise.p30 {
-    background-position: -211px 0;
-}
-
-.exercise.p40 {
-    background-position: -223px 0;
-}
-
-.exercise.p50 {
-    background-position: -236px 0;
-}
-
-.exercise.p60 {
-    background-position: -249px 0;
-}
-
-.exercise.p70 {
-    background-position: -262px 0;
-}
-
-.exercise.p80 {
-    background-position: -275px 0;
-}
-
-.exercise.p90 {
-    background-position: -287px 0;
-}
-
-.exercise.p100 {
-    background-position: -300px 0;
+.green span {
+    color: #ffffff;
+    font-style: italic;
+    vertical-align: -4px;
 }

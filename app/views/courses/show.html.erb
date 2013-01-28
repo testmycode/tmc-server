@@ -111,7 +111,7 @@
     </div>
   <% end %>
 
-  <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises, :completed => @completed_exercises } %>
+  <%= render :partial => 'exercises/list', :locals => { :course => @course, :exercises => @exercises, :completed => @completed_exercises, :completion_status => @exercise_completion_status } %>
 </section>
 
 <% if @submissions %>

@@ -83,7 +83,7 @@ private
   def assign_show_view_vars
     @course = Course.find(params[:id])
     @exercises = @course.exercises.select {|ex| ex.visible_to?(current_user) }.natsort_by(&:name)
-    set_current_user_exercise_completion_status
+    @exercise_completion_status = exercise_completion_status_of_current_user
     authorize! :read, @course
 
     unless current_user.guest?
@@ -97,13 +97,9 @@ private
     end
   end
 
-  def set_current_user_exercise_completion_status
+  def exercise_completion_status_of_current_user
     awarded_points = current_user.awarded_points.where(:course_id=>@course.id)
     submissions = Submission.find_all_by_user_id_and_course_id_and_processed(current_user.id, @course.id, true)
-    exercises_completion_status = ExerciseStatusGenerator.completion_status_with awarded_points.map(&:name), submissions, @course.id
-
-    @exercises.each do |exercise|
-      exercise.completion_status_for_current_user = exercises_completion_status[exercise.id]
-    end
+    ExerciseStatusGenerator.completion_status_with awarded_points.map(&:name), submissions, @course.id
   end
 end
