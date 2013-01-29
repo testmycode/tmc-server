@@ -152,7 +152,7 @@ button * {
 body {
   color: black;
   font-family: sans-serif;
-  font-size: 80%;
+  font-size: 9pt;
   margin-top: 0;
 }
 
@@ -408,25 +408,42 @@ table.points > * > tr > td {
   float: right;
 }
 
-.exercise-status {
-    width: 102px;
-}
-
 .red {
-    background: #ff0000;
-    height: 25px;
-    float: left;
+  background: #ff0000;
 }
 
 .green {
-    background: #009900;
-    height: 25px;
-    float: left;
-    text-align: center;
+  background: #009900;
+  text-align: center;
 }
 
-.green span {
-    color: #ffffff;
-    font-style: italic;
-    vertical-align: -4px;
+.exercise-status {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 5px;
+  padding-right: 5px;
+  width: 100px;
+}
+
+.exercise-status > * {
+  float: left;
+  height: 12pt;
+  text-align: center;
+}
+
+.exercise-status > :first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.exercise-status > :last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.exercise-status > :first-child:last-child {
+  border-radius: 6px;
+}
+
+.exercise-status .green span {
+  color: #ffffff;
+  font-style: italic;
 }

@@ -7,13 +7,11 @@ module ExercisesHelper
     "#{exercise_solution_url(e, :format => 'zip')}"
   end
 
-  def green percentage
-    return 0 if percentage==nil
-    percentage
+  def green(percentage)
+    percentage || 0
   end
 
-  def red percentage_of_green
-    return 0 if percentage_of_green==nil
-    100 - percentage_of_green
+  def red(percentage_of_green)
+    100 - (percentage_of_green || 100)
   end
 end

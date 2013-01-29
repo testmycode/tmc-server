@@ -31,12 +31,16 @@
           <% end %>
          </td>
         <td class="exercise-status">
-          <div class="green" style='width: <%=green(completion_status[exercise.id])%>px;'>
+          <% if green(completion_status[exercise.id]) > 0 %>
+          <div class="green" style="width: <%=green(completion_status[exercise.id])%>px;">
             <span>
               <%= "completed" if completion_status[exercise.id] == 100 %>
             </span>
           </div>
-          <div class="red" style='width: <%=red(completion_status[exercise.id])%>px;'/>
+          <% end %>
+          <% if red(completion_status[exercise.id]) > 0 %>
+            <div class="red" style="width: <%=red(completion_status[exercise.id])%>px"></div>
+          <% end %>
         </td>
         </td>
           <td>
@@ -54,5 +58,3 @@
 </table>
 
 <%= use_datatables('table.exercise-list', :bPaginate => false) %>
-
-<h2><%= completed  %></h2>
