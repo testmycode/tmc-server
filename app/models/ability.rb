@@ -56,6 +56,7 @@ class Ability
       can :mark_as_unread, Review do |r|
         r.submission.user_id == user.id
       end
+      cannot :reply, FeedbackAnswer
     end
   end
 end

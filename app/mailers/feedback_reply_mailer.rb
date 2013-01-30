@@ -1,10 +1,9 @@
 class FeedbackReplyMailer < ActionMailer::Base
 
-  def feedback_email(to, body)
-    settings = SiteSetting.value('emails')
-
+  def feedback_email(from, to, body)
+    from ||= SiteSetting.value('emails')
     subject = '[TMC] Reply to your feedback'
     @url = body
-    mail(:from => settings['from'], :to => to, :subject => subject)
+    mail(:from => from, :to => to, :subject => subject)
   end
 end

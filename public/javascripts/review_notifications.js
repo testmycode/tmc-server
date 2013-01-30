@@ -42,17 +42,3 @@ var ReviewNotifications = (function() {
   }
 })();
 
-$(document).ready(function() {
-    $(".feedback-reply-form").hide();
-
-    $(".feedback-reply-button").click(
-        function (e){
-            id = e.target.id
-            console.log(e.target.id);
-            $("#id"+id).toggle();
-            $("#"+id).toggle();
-        }
-    );
-});
-
-
