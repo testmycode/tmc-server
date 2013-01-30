@@ -11,7 +11,6 @@ class FeedbackReplyController < ApplicationController
     replied_answer = FeedbackAnswer.find(params["answer_id"])
     replied_answer.update_attributes( :replied => true ) unless replied_answer == nil
 
-    # or would it be better to form the url based on course_id?
-    redirect_to request.env["HTTP_REFERER"], :notice =>"Reply to a review was mailed"
+    redirect_to :back, :notice =>"Reply to a review was mailed"
   end
 end

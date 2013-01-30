@@ -26,7 +26,7 @@
         <%= text_area_tag "body" , response_body_for(answer.answer), :size => "80x10" %>
         <%= hidden_field_tag 'email', user.email %>
         <%= hidden_field_tag 'answer_id', answer.id %>
-         <br />
+        <br />
         <%= submit_tag "Send mail" %>
       <% end %>
       <%= submit_tag "Cancel", :class=>'feedback-reply-cancel-button', :id=> "cancel_#{answer.id}" %>
