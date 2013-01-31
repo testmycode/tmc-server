@@ -73,7 +73,7 @@ TmcServer::Application.routes.draw do
 
   resource :page_presence, :only => [:update]
 
-  match '/feedback_reply' => 'feedback_reply#create', :via => :post
+  resource :feedback_replies, :only => [:create]
 
   root :to => "courses#index"
 
