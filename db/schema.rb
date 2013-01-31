@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130125013607) do
+ActiveRecord::Schema.define(:version => 20130130232222) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -106,6 +106,14 @@ ActiveRecord::Schema.define(:version => 20130125013607) do
 
   create_table "points_upload_queues", :force => true do |t|
     t.integer  "point_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "reply_to_feedback_answers", :force => true do |t|
+    t.integer  "feedback_answer_id"
+    t.text     "body"
+    t.string   "from"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

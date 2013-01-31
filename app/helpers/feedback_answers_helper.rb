@@ -16,4 +16,8 @@ module FeedbackAnswersHelper
 
     # TODO
   end
+
+  def name_for action, answer
+    "#{action} #{pluralize(answer.reply_to_feedback_answers.count,'reply').sub(/\d+\s/,'')}"
+  end
 end

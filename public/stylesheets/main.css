@@ -447,3 +447,17 @@ table.points > * > tr > td {
   color: #ffffff;
   font-style: italic;
 }
+
+.reply-to-feedback {
+  border-style:solid;
+  border-spacing: 10px;
+  border-width: 1px;
+  border-radius: 4px 4px 4px 4px;
+  margin: 12px 12px 12px 12px;
+  padding: 10px 2px 2px 2px;
+}
+
+.reply-to-feedback span {
+  padding-top: 4px;
+  padding-left: 10px;
+}
