@@ -1,4 +1,4 @@
-class FeedbackReplyController < ApplicationController
+class FeedbackRepliesController < ApplicationController
   def create
     authorize! :reply, FeedbackAnswer
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FeedbackReplyController, "#create" do
+describe FeedbackRepliesController, "#create" do
   let(:student_email) { "user@mydomain.com" }
   let(:reply_body) { "A reply to an feedback answer..." }
   let(:answer) { Factory.create(:feedback_answer) }
