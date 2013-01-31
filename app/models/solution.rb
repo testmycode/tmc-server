@@ -1,5 +1,6 @@
 require 'find'
 
+# Represents a solution (files prepared by CourseRefresher).
 class Solution
   def initialize(exercise)
     @exercise = exercise

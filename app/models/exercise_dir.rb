@@ -3,7 +3,7 @@ require 'exercise_dir/java_simple'
 require 'exercise_dir/java_maven'
 
 # Holds the path to and metadata about an exercise directory.
-# Implemented by subclasses.
+# Implemented by project type -specific subclasses.
 class ExerciseDir
   def self.get(path)
     dir = try_get(path)

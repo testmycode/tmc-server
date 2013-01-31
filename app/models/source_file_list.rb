@@ -4,6 +4,7 @@ require 'find'
 require 'tmpdir'
 require 'tmc_dir_utils'
 
+# Represents a list of source code files for the web UI to display.
 class SourceFileList
   include Enumerable
 

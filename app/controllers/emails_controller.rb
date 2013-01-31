@@ -1,3 +1,5 @@
+
+# Displays the raw list of participant e-mails, useful for mass-mailing scripts.
 class EmailsController < ApplicationController
   skip_authorization_check
   

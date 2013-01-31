@@ -1,6 +1,7 @@
 require 'test_run_grader'
 require 'sandbox_results_saver'
 
+# Receives replies from tmc-sandbox.
 class ResultsController < ApplicationController
   skip_authorization_check
 

@@ -1,3 +1,4 @@
+# Returns the suggestion solution as a ZIP.
 class SolutionsController < ApplicationController
   def show
     @exercise = Exercise.find(params[:exercise_id])

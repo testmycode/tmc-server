@@ -1,3 +1,4 @@
+# Shows the various statistics under /stats.
 class StatsController < ApplicationController
   skip_authorization_check
   

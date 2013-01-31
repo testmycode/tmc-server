@@ -1,4 +1,6 @@
-# See UserFieldValue
+# An abstract base for active record classes representing values for 'ExtraField's.
+#
+# See UserFieldValue for an example.
 module ExtraFieldValue
   extend ActiveSupport::Concern
 

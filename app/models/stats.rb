@@ -1,3 +1,4 @@
+# Helpers for serving /stats.
 module Stats
   def self.all
     {

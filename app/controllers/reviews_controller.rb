@@ -1,5 +1,6 @@
 require 'natsort'
 
+# Presents the code review UI.
 class ReviewsController < ApplicationController
   def index
     if params[:course_id]

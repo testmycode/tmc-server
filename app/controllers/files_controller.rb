@@ -1,3 +1,4 @@
+# Shows the files of a submission.
 class FilesController < ApplicationController
   def index
     @submission = Submission.find(params[:submission_id])

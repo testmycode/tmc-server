@@ -1,5 +1,10 @@
 require 'securerandom'
 
+# Each user may have 0..1 password reset keys.
+#
+# The password reset key may be generated and sent by e-mail and
+# may be used once to set a new password.
+# A password reset key is valid for a limited time and may safely be left unused.
 class PasswordResetKey < ActiveRecord::Base
   belongs_to :user
   validates :user_id, :presence => true, :uniqueness => true

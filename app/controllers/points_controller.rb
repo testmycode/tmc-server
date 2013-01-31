@@ -1,3 +1,4 @@
+# Shows the points summary table and exercise group-specific tables.
 class PointsController < ApplicationController
   include PointsHelper
   skip_authorization_check :except => :refresh_gdocs

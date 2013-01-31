@@ -1,3 +1,7 @@
+
+# Handles the feedback question editing UI.
+#
+# TODO: While this is nice, I think feedback questions should live in a conf file in the repo so that the entire course is defined by the repo.
 class FeedbackQuestionsController < ApplicationController
   before_filter :get_course
 

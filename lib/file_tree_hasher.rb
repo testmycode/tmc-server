@@ -1,6 +1,11 @@
 require 'find'
 require 'digest/sha2'
 
+# Produces a combined hash of all the files and directories in a directory.
+#
+# This is currently used to cache part of the work done by CourseRefresher.
+#
+# The has depends on the files' paths as well as contents.
 class FileTreeHasher
   def self.hash_file_tree(root_path)
     paths = []

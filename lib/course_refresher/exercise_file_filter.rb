@@ -8,6 +8,9 @@ require 'course_refresher/css_filter'
 require 'course_refresher/js_filter'
 
 class CourseRefresher
+  # Filters source files into stubs and solutions.
+  #
+  # See the user manual for the special comments this processes.
   class ExerciseFileFilter
     def initialize(project_dir)
       @project_dir = Pathname(project_dir)

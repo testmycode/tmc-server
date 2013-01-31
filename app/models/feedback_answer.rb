@@ -1,3 +1,4 @@
+# Stores what the student has answered to a single feedback question (for an exercise in a course).
 class FeedbackAnswer < ActiveRecord::Base
   belongs_to :feedback_question
   belongs_to :course

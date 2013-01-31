@@ -1,6 +1,7 @@
 
 require 'natcmp'
 
+# Adds natsort methods to Ruby arrays and similar collections.
 module Enumerable
   def natsort
     self.sort {|a, b| Natcmp.natcmp(a, b) }

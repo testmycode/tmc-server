@@ -1,5 +1,11 @@
 require 'fileutils'
 
+# Provides an ad-hoc key/value store (db/files).
+#
+# This class is not used much, although the store directory is
+# used directly Course and CourseRefresher.
+#
+# Note: currently this class provides no concurrency control whatsoever!
 module FileStore
   def self.root
     "#{::Rails.root}/db/files"
@@ -25,6 +31,8 @@ module FileStore
     begin
       tmpfile.write(contents)
       tmpfile.close
+      # Note: rename is an all-or-nothing opeartion IF the source and dest are on the same filesystem
+      # (which we try to ensure here). Even so, a concurrent operation may breifly see a missing file.
       File.rename(tmpfile.path, path)
     rescue
       tmpfile.delete

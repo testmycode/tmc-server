@@ -2,6 +2,10 @@ require 'tmc_junit_runner'
 require 'file_tree_hasher'
 require 'test_scanner_cache'
 
+# Scans for test cases in an exercise directory.
+#
+# Called by CourseRefresher.
+# Currently JUnit-specific.
 module TestScanner
   extend TestScanner
 

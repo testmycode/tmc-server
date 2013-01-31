@@ -1,9 +1,16 @@
 
+# Stores whether and when an exercise has been unlocked for an user.
+#
 # An exercise is considered unlocked for a user if an unlock for
 # (user, course, exercise, valid_after < Time.now) exists.
 # The set of unlocks for a (course, user) is recomputed in the following cases:
 # - the course is refreshed (since the specs might change)
 # - the user has a submission graded
+#
+# However, if the course has deadlines based on the unlock times of exercises,
+# we require the user to explicitly unlock the next set of exercises to avoid
+# starting the timer prematurely.
+#
 class Unlock < ActiveRecord::Base
   belongs_to :user
   belongs_to :course

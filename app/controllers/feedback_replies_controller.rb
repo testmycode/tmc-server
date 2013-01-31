@@ -1,3 +1,4 @@
+# Handles replying to a feedback answer by e-mail.
 class FeedbackRepliesController < ApplicationController
   def create
     authorize! :reply, FeedbackAnswer

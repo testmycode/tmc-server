@@ -1,5 +1,8 @@
 require 'rest_client'
 
+# Represents the configured tmc-comet server.
+#
+# Provides methods for publishing comet events.
 class CometServer
   def self.get
     conf = SiteSetting.value('comet_server')

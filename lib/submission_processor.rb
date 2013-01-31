@@ -1,4 +1,7 @@
 
+# Attempts to send submissions for processing to a free tmc-sandbox.
+# Also called by the reprocessor daemon to attempt reprocessing if
+# the sandbox was previously unavailable.
 class SubmissionProcessor
 
   # Tries to send the submission to a sandbox and updates its status.
