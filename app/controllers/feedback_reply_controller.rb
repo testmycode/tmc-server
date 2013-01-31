@@ -8,8 +8,8 @@ class FeedbackReplyController < ApplicationController
         params["body"]
     ).deliver
 
-    replied_answer = FeedbackAnswer.find(params["answer_id"])
-    replied_answer.update_attributes( :replied => true ) unless replied_answer == nil
+    answer = FeedbackAnswer.find(params["answer_id"])
+    answer.reply_to_feedback_answers.create(:from=>current_user.email, :body =>params["body"])
 
     redirect_to :back, :notice =>"Reply to a review was mailed"
   end

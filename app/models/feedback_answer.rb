@@ -4,8 +4,13 @@ class FeedbackAnswer < ActiveRecord::Base
   belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "exercises.course_id = #{self.course_id}" }
   belongs_to :submission
+  has_many :reply_to_feedback_answers, :dependent => :delete_all
 
   validates_with Validators::FeedbackAnswerFormatValidator
+
+  def replied?
+    reply_to_feedback_answers.count>0
+  end
 
   def self.numeric_answer_averages(exercise)
     result = {}

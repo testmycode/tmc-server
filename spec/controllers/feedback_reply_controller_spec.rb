@@ -32,11 +32,11 @@ describe FeedbackReplyController, "#create" do
       response.should redirect_to(url)
     end
 
-    it "sets the state of the feedback_answer to replied" do
-      # for some reason the following does not work:
-      #expect { post :create, params }.to change(answer, :replied).from(false).to(true)
-      post :create, params
-      FeedbackAnswer.find( answer.id ).replied.should == true
+    it "associates a reply to feedback_answer" do
+      expect { post :create, params }.to change{answer.replied?}.from(false).to(true)
+      reply = answer.reply_to_feedback_answers.first
+      reply.from.should == admin.email
+      reply.body.should == reply_body
     end
 
     it "sends a reply email to the user who gave the feedback" do

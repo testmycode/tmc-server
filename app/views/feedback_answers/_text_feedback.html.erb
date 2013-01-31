@@ -15,11 +15,20 @@
     </div>
     <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
 
-    <%= submit_tag "Reply with mail", :class=>'feedback-reply-button', :id=> "button_#{answer.id}"  %>
-
-    <% if answer.replied %>
-        <i><span class="notice">Has already been replied!</span> </i>
+    <% if answer.replied? %>
+      <%= submit_tag "Show sent feedback", :class=>'feedback-show-button', :id=> "showfb_#{answer.id}" %>
+      <%= submit_tag "Hide feedback", :class=>'feedback-hide-button', :id=> "hidefb_#{answer.id}" %>
+      <div class='replies-to-feedback' id='<%="feedbk_#{answer.id}"%>'>
+        <% answer.reply_to_feedback_answers.each do |reply| %>
+          <div class="reply-to-feedback">
+            <span><strong>from:</strong> <%= reply.from %> </span>
+            <pre><%= reply.body %></pre>
+          </div>
+        <% end %>
+      </div>
     <% end  %>
+
+    <%= submit_tag "Reply by email", :class=>'feedback-reply-button', :id=> "button_#{answer.id}"  %>
 
     <div class='feedback-reply-form' id='<%="form_#{answer.id}"%>'>
       <%= form_tag "/feedback_reply" do %>
