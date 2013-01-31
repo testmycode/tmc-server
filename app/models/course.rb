@@ -30,8 +30,6 @@ class Course < ActiveRecord::Base
   has_many :feedback_answers  # destroyed transitively when questions are destroyed
   has_many :student_events, :dependent => :delete_all
   has_many :unlocks, :dependent => :delete_all
-  has_many :course_registrations, :dependent => :delete_all
-  has_many :registered_users, :through => :course_registrations, :source => :user
 
   def destroy
     # Optimization: delete dependent objects quickly.

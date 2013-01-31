@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130130232222) do
+ActiveRecord::Schema.define(:version => 20130131220459) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -31,15 +31,6 @@ ActiveRecord::Schema.define(:version => 20130130232222) do
   add_index "awarded_points", ["course_id", "user_id", "name"], :name => "index_awarded_points_on_course_id_and_user_id_and_name", :unique => true
   add_index "awarded_points", ["course_id", "user_id", "submission_id"], :name => "index_awarded_points_on_course_id_and_user_id_and_submission_id"
   add_index "awarded_points", ["user_id", "submission_id", "name"], :name => "index_awarded_points_on_user_id_and_submission_id_and_name", :unique => true
-
-  create_table "course_registrations", :force => true do |t|
-    t.integer  "course_id",  :null => false
-    t.integer  "user_id",    :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "course_registrations", ["course_id", "user_id"], :name => "index_course_registrations_on_course_id_and_user_id", :unique => true
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -249,9 +240,6 @@ ActiveRecord::Schema.define(:version => 20130130232222) do
   add_foreign_key "awarded_points", "courses", :name => "awarded_points_course_id_fk", :dependent => :delete
   add_foreign_key "awarded_points", "submissions", :name => "awarded_points_submission_id_fk", :dependent => :nullify
   add_foreign_key "awarded_points", "users", :name => "awarded_points_user_id_fk", :dependent => :delete
-
-  add_foreign_key "course_registrations", "courses", :name => "course_registrations_course_id_fk", :dependent => :delete
-  add_foreign_key "course_registrations", "users", :name => "course_registrations_user_id_fk", :dependent => :delete
 
   add_foreign_key "exercises", "courses", :name => "exercises_course_id_fk", :dependent => :delete
 
