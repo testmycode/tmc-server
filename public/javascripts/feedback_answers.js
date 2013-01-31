@@ -10,10 +10,10 @@ $(document).ready(function() {
     $(".feedback-reply-cancel-button").click(toggle_reply_form_and_button);
 
     var toggle_feedback_reply = function (e) {
-        var id = e.target.id.substring(7);
-        $("#feedbk_"+id).toggle();
-        $("#showfb_"+id).toggle();
-        $("#hidefb_"+id).toggle();
+        var id = e.target.id.substring(5);
+        $("#repl_"+id).toggle();
+        $("#show_"+id).toggle();
+        $("#hide_"+id).toggle();
     };
 
     $(".replies-to-feedback").hide();

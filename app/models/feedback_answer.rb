@@ -9,7 +9,7 @@ class FeedbackAnswer < ActiveRecord::Base
   validates_with Validators::FeedbackAnswerFormatValidator
 
   def replied?
-    reply_to_feedback_answers.count>0
+    reply_to_feedback_answers.count > 0
   end
 
   def self.numeric_answer_averages(exercise)

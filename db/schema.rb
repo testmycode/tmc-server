@@ -72,7 +72,7 @@ ActiveRecord::Schema.define(:version => 20130130232222) do
     t.text     "unlock_spec"
   end
 
-  add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name"
+  add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name", :unique => true
   add_index "exercises", ["gdocs_sheet"], :name => "index_exercises_on_gdocs_sheet"
 
   create_table "feedback_answers", :force => true do |t|
