@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   def index
-    ordering = 'LOWER(name)'
+    ordering = 'hidden, LOWER(name)'
 
     respond_to do |format|
       format.html do
