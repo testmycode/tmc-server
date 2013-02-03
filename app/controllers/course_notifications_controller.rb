@@ -3,21 +3,20 @@ class CourseNotificationsController < ApplicationController
   before_filter :auth
 
   def new
-    @notifier = CourseNotifications.new
+    @notifier ||= CourseNotification.new
   end
 
   def create
-    course = Course.find_by_id(params[:course_id])
+    course = Course.find(params[:course_id])
 
     participants = User.course_students(course)
-    emails = participants.map { |participant| participant.email if participant.email }
+    emails = participants.map(&:email).reject(&:nil?)
 
-
-    notifier = course.course_notifications.create(params[:course_notifications])
+    notifier = course.course_notifications.create(params[:course_notification])
     notifier.user = current_user
-    CourseNotificationMailer.update(
+    CourseNotificationMailer.notification_email(
       from: current_user.email,
-      to: emails.join(','),
+      bcc: emails.join(','),
       topic: notifier.topic,
       message: notifier.message
     ).deliver
