@@ -60,6 +60,9 @@
         "http://spreadsheets.google.com/ccc?key=#{@course.spreadsheet_key}" %>
       </li>
     <% end %>
+    <li>
+      <%= link_to 'Send message to every participant', new_course_course_notifications_path(@course) %>
+    </li>
   </ul>
 
   <%
