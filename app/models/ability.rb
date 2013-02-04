@@ -58,6 +58,7 @@ class Ability
         r.submission.user_id == user.id
       end
       cannot :reply, FeedbackAnswer
+      cannot :email, CourseNotification
     end
   end
 end
