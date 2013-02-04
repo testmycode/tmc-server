@@ -12,8 +12,8 @@ class CourseNotificationsController < ApplicationController
     participants = User.course_students(course)
     emails = participants.map(&:email).reject(&:nil?)
 
-    notifier = course.course_notifications.create(params[:course_notification])
-    notifier.user = current_user
+    notifier = course.course_notifications.create(params[:course_notification], sender_id: current_user.id)
+
     CourseNotificationMailer.notification_email(
       from: current_user.email,
       bcc: emails.join(','),

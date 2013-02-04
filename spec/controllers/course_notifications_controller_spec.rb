@@ -26,10 +26,10 @@ describe CourseNotificationsController do
     let(:url){ 'http://url.where.we.arrived.com' }
     before do
       controller.current_user = admin
-      request.env["HTTP_REFERER"] = url
     end
 
     it "redirects to the url where the request came" do
+      request.env["HTTP_REFERER"] = url
       post :create, params
       response.should redirect_to(course_path(course))
     end
@@ -46,7 +46,6 @@ describe CourseNotificationsController do
       mail.bcc.should include user.email
       mail.bcc.should include user2.email
       mail.body.encoded.should include message
-      #mail.topic.should include topic
     end
   end
 

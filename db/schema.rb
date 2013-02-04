@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130202213330) do
+ActiveRecord::Schema.define(:version => 20130204075719) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(:version => 20130202213330) do
   create_table "course_notifications", :force => true do |t|
     t.string   "topic"
     t.string   "message"
-    t.integer  "user_id"
+    t.integer  "sender_id"
     t.integer  "course_id"
     t.datetime "created_at"
     t.datetime "updated_at"
