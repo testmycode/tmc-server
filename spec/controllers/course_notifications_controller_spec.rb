@@ -23,13 +23,11 @@ describe CourseNotificationsController do
 
   describe "for an admin user " do
     let(:admin){ Factory.create(:admin, :email => "admin@mydomain.com") }
-    let(:url){ 'http://url.where.we.arrived.com' }
     before do
       controller.current_user = admin
     end
 
     it "redirects to the url where the request came" do
-      request.env["HTTP_REFERER"] = url
       post :create, params
       response.should redirect_to(course_path(course))
     end
