@@ -7,16 +7,17 @@ describe CourseNotificationsController do
   let(:course) { Factory.create(:course) }
   let(:params) {
     {
-      course_id: course.id,
-      topic: topic,
-      message: message
+      course_notification:{
+        topic: topic,
+        message: message
+      },
+      course_id: course.id
     }
   }
 
   it "should not allow a non-admin user to send email" do
     @user = Factory.create(:user)
     controller.current_user = @user
-
     expect { post :create, params }.to raise_error
   end
 
@@ -38,9 +39,14 @@ describe CourseNotificationsController do
       user2 = Factory.create(:user, email: 'std@myschool.fi')
       sub1 = Factory.create(:submission, user: user, course: course)
       sub2 = Factory.create(:submission, user: user2, course: course)
+      aw1 = Factory.create(:awarded_point, user_id: user.id, course_id: course.id)
+      aw2 = Factory.create(:awarded_point, user_id: user2.id, course_id: course.id)
       expect { post :create, params }.to change(ActionMailer::Base.deliveries,:size).by(1)
       mail = ActionMailer::Base.deliveries.last
-      mail.bcc.should
+      mail.bcc.should include user.email
+      mail.bcc.should include user2.email
+      mail.body.encoded.should include message
+      #mail.topic.should include topic
     end
   end
 
