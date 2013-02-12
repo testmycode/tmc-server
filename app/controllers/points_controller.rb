@@ -8,7 +8,7 @@ class PointsController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Points', course_points_path(@course)
 
-    exercises = @course.exercises.select {|e| e.visible_to?(current_user)}
+    exercises = @course.exercises.select {|e| e.points_visible_to?(current_user)}
     sheets = @course.gdocs_sheets(exercises).natsort
     @summary = summary_hash(@course, exercises, sheets)
     sort_summary(@summary, params[:sort_by]) if params[:sort_by]

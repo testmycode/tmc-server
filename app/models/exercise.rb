@@ -100,6 +100,16 @@ class Exercise < ActiveRecord::Base
     user.administrator? || (!hidden? && published? && unlock_spec_obj.permits_unlock_for?(user))
   end
 
+  # Whether the user may see the scoreboard for the exercise
+  def points_visible_to?(user)
+    user.administrator? ||
+      (
+        !hidden? &&
+        published? &&
+        (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user))
+      )
+  end
+
   # Whether the user may download the exercise ZIP file
   def downloadable_by?(user)
     visible_to?(user) && unlocked_for?(user)

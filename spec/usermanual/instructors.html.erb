@@ -536,12 +536,14 @@ extra_student_files:
   <pre class="yaml">
   hidden: true
   hide_after: 2010-02-15
-  hidden_if_registered_after: 2010-01-01</pre>
+  hidden_if_registered_after: 2010-01-01
+  locked_exercise_points_visible: false</pre>
 
   <ul>
     <li><code>hidden</code> hides the course from students (and their NetBeans).</li>
     <li><code>hide_after</code> hides the course after a given date from students (and their NetBeans) and refuses to accept any more submissions.</li>
     <li><code>hidden_if_registered_after</code> hides the course from students (and their NetBeans) who have registered after the given date. After the given date it will also be invisible to unregistered users.</li>
+    <li><code>locked_exercise_points_visible</code> tells whether exercises that one has not unlocked are visible on the scoreboard. Defaults to true.</li>
   </ul>
   
   <h2>ProTips</h2>

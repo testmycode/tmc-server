@@ -172,7 +172,7 @@ private
     def update_course_options
       options_file = "#{@course.clone_path}/course_options.yml"
 
-      opts = Course.default_options
+      opts = {}
 
       if FileTest.exists? options_file
         unless File.read(options_file).strip.empty?

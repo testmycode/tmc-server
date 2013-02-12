@@ -90,14 +90,6 @@
   </ul>
 <% end %>
 
-<% if @course.some_deadlines_depend_directly_on_registration_time? && !current_user.registered_to_course?(@course) %>
-  <p>
-    Note: this course has personalized deadlines. This means that when you
-    submit the first exercise, you get assigned deadlines for the remaining exercises.
-    When you complete enough exercises, you unlock more exercises with new deadlines.
-  </p>
-<% end %>
-
 <% unlockables = @course.unlockable_exercises_for(current_user) %>
 <% unless unlockables.empty? %>
   <p>
