@@ -32,5 +32,6 @@ group :development, :test do
   gem 'ruby-prof', '~> 0.10.8' # for performance tests
   gem 'launchy'  # for capybara's save_and_open_page
   gem 'railroady' # for doc/diagrams
+  gem 'ci_reporter' # for TMCee jenkins
 end
 
