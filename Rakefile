@@ -3,6 +3,5 @@
 
 require File.expand_path('../config/application', __FILE__)
 require 'rake'
-require 'ci/reporter/rake/rspec'
 
 TmcServer::Application.load_tasks
