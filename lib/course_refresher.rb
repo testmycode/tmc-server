@@ -251,6 +251,7 @@ private
       @course.exercises.each do |exercise|
         review_points = @review_points[exercise.name]
         point_names = Set.new
+        #TMCTODO
         point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
         point_names += review_points
 
@@ -282,12 +283,14 @@ private
     end
     
     def test_case_methods(exercise)
+      #TMCTODO
       path = File.join(@course.clone_path, exercise.relative_path)
       TestScanner.get_test_case_methods(@course, exercise.name, path)
     end
     
     def make_solutions
       @course.exercises.each do |e|
+        #TMCTODO
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
         FileUtils.mkdir_p(solution_path)
@@ -296,6 +299,7 @@ private
     end
     
     def make_stubs
+      #TMCTODO?
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
@@ -308,6 +312,7 @@ private
     end
 
     def add_shared_files_to_stub(exercise_type, stub_path)
+      #TMCTODO
       case exercise_type
       when :java_simple
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
