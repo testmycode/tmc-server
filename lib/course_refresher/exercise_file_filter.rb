@@ -42,7 +42,8 @@ class CourseRefresher
         to = to_dir + rel_path
         contents = filter_file_for_solution(from)
         write_file(to, contents) unless contents.nil?
-        maybe_write_html_file(File.read(from), "#{to}.html") if from.extname == '.java'
+        maybe_write_html_file(File.read(from), "#{to}.html") if %w(.java .c .h) from.extname
+        #maybe_write_html_file(File.read(from), "#{to}.html") if from.extname == '.java'
       end
 
       clean_empty_dirs_in_project(to_dir)
