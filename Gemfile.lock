@@ -152,10 +152,6 @@ GEM
       activesupport (>= 3.0)
       railties (>= 3.0)
       rspec (~> 2.8.0)
-    rspec_junit_formatter (0.1.6)
-      builder
-      rspec (~> 2.0)
-      rspec-core (!= 2.12.0)
     ruby-prof (0.10.8)
     rubyzip (0.9.9)
     selenium-webdriver (2.27.2)
@@ -163,6 +159,10 @@ GEM
       libwebsocket (~> 0.1.3)
       multi_json (~> 1.0)
       rubyzip
+    simplecov (0.7.1)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.7.1)
+    simplecov-html (0.7.1)
     sinatra (1.3.3)
       rack (~> 1.3, >= 1.3.6)
       rack-protection (~> 1.2)
@@ -212,7 +212,7 @@ DEPENDENCIES
   rspec (~> 2.8.0)
   rspec-core (~> 2.8.0)
   rspec-rails (~> 2.8.0)
-  rspec_junit_formatter
   ruby-prof (~> 0.10.8)
+  simplecov
   transaction_isolation (~> 1.0.3)
   xml-simple (~> 1.1.1)
