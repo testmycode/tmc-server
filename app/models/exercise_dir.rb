@@ -79,7 +79,7 @@ private
   def self.exercise_type_impl(path)
     if (path + 'pom.xml').exist?
       JavaMaven
-    elsif (path + 'Makefile').exist? and (path + 'test').exist?
+    elsif (path + 'Makefile').exist? and (path + 'test/').exist?
       MakefileC
     elsif (path + 'src').exist? and (path + 'test').exist?
       JavaSimple
