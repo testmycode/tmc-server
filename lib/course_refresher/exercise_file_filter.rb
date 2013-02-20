@@ -106,7 +106,7 @@ class CourseRefresher
       return true if @tmc_project_file.extra_student_files.include?(rel_path)
       return false if rel_path =~ /(?:^|\/)test(?:\/|$)/
       return false if fn.start_with?('.git')
-      return false if ['.tmcproject.yml', '.tmcrc', 'metadata.yml', 'Makefile'].include?(fn)
+      return false if ['.tmcproject.yml', '.tmcrc', 'metadata.yml'].include?(fn)
       true
     end
 
