@@ -95,6 +95,8 @@ private
       name.end_with?('.html') ||
       name.end_with?('.css') ||
       name.end_with?('.js') ||
+      name.end_with?('.c') ||
+      name.end_with?('.h') ||
       dir.include?('/WEB-INF')
   end
 
