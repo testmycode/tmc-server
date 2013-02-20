@@ -314,6 +314,8 @@ private
     def add_shared_files_to_stub(exercise_type, stub_path)
       #TMCTODO
       case exercise_type
+      when :makefile_c
+        #nothing yet
       when :java_simple
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
         FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
