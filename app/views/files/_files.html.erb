@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'shCore', 'shThemeDefault' %>
-<%= javascript_include_tag 'shCore', 'shBrushJava', 'shBrushXml', 'shBrushPlain', 'shBrushJScript', 'shBrushCss' %>
+<%= javascript_include_tag 'shCore', 'shBrushJava', 'shBrushXml', 'shBrushPlain', 'shBrushJScript', 'shBrushCpp', 'shBrushCss' %>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -19,15 +19,17 @@ $(document).ready(function() {
       <%= raw(file.html_prelude) %>
     <% end %>
     <%
-       brush = case File.extname(file.path)
-       when '.java' then 'java'
-       when '.xml' then 'xml'
-       when '.jsp' then 'xml'
-       when '.html' then 'xml'
-       when '.css' then 'css'
-       when '.js' then 'js'
-       else 'plain'
-       end
+      brush = case File.extname(file.path)
+        when '.java' then 'java'
+        when '.xml' then 'xml'
+        when '.jsp' then 'xml'
+        when '.html' then 'xml'
+        when '.css' then 'css'
+        when '.js' then 'js'
+        when '.c' then 'c'
+        when '.h' then 'c'
+        else 'plain'
+      end
     %>
     <pre class="brush: <%= brush %>"><%= file.contents %></pre>
   <% end %>
