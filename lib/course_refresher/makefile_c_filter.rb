@@ -2,7 +2,7 @@ require 'pathname'
 require 'course_refresher/line_comment_based_filter'
 
 class CourseRefresher
-  class MakefileCFilter < LineCommentBasedFilter
+  class MakefileCFilter < BlockCommentBasedFilter
     def applies_to?(file_path)
       %w(.c .h).include? Pathname(file_path).extname
     end

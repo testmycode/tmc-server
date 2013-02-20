@@ -6,6 +6,7 @@ require 'course_refresher/xml_filter'
 require 'course_refresher/properties_filter'
 require 'course_refresher/css_filter'
 require 'course_refresher/js_filter'
+require 'course_refresher/makefile_c_filter'
 
 class CourseRefresher
   # Filters source files into stubs and solutions.
@@ -72,9 +73,14 @@ class CourseRefresher
     end
     
     def files_for_solution(from_dir)
+      paths = []
+      retvals = []
       filter_relative_pathnames(from_dir) do |path|
-        should_include_in_solution(path)
+        retval = should_include_in_solution(path)
+        paths << path.to_s
+        retvals << retval
       end
+      #raise "#{paths.inspect}, #{retvals.inspect}"
     end
     
     def filter_relative_pathnames(dir, &block)
@@ -100,7 +106,7 @@ class CourseRefresher
       return true if @tmc_project_file.extra_student_files.include?(rel_path)
       return false if rel_path =~ /(?:^|\/)test(?:\/|$)/
       return false if fn.start_with?('.git')
-      return false if ['.tmcproject.yml', '.tmcrc', 'metadata.yml'].include?(fn)
+      return false if ['.tmcproject.yml', '.tmcrc', 'metadata.yml', 'Makefile'].include?(fn)
       true
     end
 
@@ -131,7 +137,8 @@ class CourseRefresher
         CourseRefresher::XmlFilter.new,
         CourseRefresher::PropertiesFilter.new,
         CourseRefresher::CssFilter.new,
-        CourseRefresher::JsFilter.new
+        CourseRefresher::JsFilter.new,
+        CourseRefresher::MakefileCFilter.new
       ]
     end
 
