@@ -73,14 +73,9 @@ class CourseRefresher
     end
     
     def files_for_solution(from_dir)
-      paths = []
-      retvals = []
       filter_relative_pathnames(from_dir) do |path|
-        retval = should_include_in_solution(path)
-        paths << path.to_s
-        retvals << retval
+        should_include_in_solution(path)
       end
-      #raise "#{paths.inspect}, #{retvals.inspect}"
     end
     
     def filter_relative_pathnames(dir, &block)
