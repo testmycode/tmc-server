@@ -4,8 +4,8 @@ class CourseNotificationMailer < ActionMailer::Base
     from = params[:from]
     subject = params[:topic]
     @mailbody = params[:message]
-    bcc = params[:bcc]
-    mail(:from => from, :bcc => bcc, :subject => subject)
+    to = params[:to]
+    mail(:from => from, :to => to, :subject => subject)
   end
 
 end

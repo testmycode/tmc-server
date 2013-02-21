@@ -14,6 +14,15 @@ class CourseNotificationsController < ApplicationController
 
     notifier = course.course_notifications.create(params[:course_notification], sender_id: current_user.id)
 
+    emails.each do |email|
+      CourseNotificationMailer.notification_email(
+        from: current_user.email,
+        to: email,
+        topic: notifier.topic,
+        message: notifier.message
+      ).deliver
+    end
+
     CourseNotificationMailer.notification_email(
       from: current_user.email,
       bcc: emails.join(','),
