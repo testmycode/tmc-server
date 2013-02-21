@@ -44,11 +44,12 @@ describe CourseNotificationsController do
       mail_first = ActionMailer::Base.deliveries[-2]
       mail_first.to.should include user.email
       mail_first.body.encoded.should include message
+      mail_first.to.should_not include user2.email
 
-      mail_last = ActionMailer::Base.deliveries.last
+      mail_last = ActionMailer::Base.deliveries[-1]
       mail_last.to.should include user2.email
       mail_last.body.encoded.should include message
-
+      mail_last.to.should_not include user.email
     end
   end
 

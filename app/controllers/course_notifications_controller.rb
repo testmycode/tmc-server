@@ -23,12 +23,6 @@ class CourseNotificationsController < ApplicationController
       ).deliver
     end
 
-    CourseNotificationMailer.notification_email(
-      from: current_user.email,
-      bcc: emails.join(','),
-      topic: notifier.topic,
-      message: notifier.message
-    ).deliver
     redirect_to course_path(course), :notice => "Mail has been sent"
   end
 
