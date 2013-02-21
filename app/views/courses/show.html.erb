@@ -60,6 +60,9 @@
         "http://spreadsheets.google.com/ccc?key=#{@course.spreadsheet_key}" %>
       </li>
     <% end %>
+    <li>
+      <%= link_to 'Send message to every participant', new_course_course_notifications_path(@course) %>
+    </li>
   </ul>
 
   <%
@@ -85,14 +88,6 @@
     <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
     <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
   </ul>
-<% end %>
-
-<% if @course.some_deadlines_depend_directly_on_registration_time? && !current_user.registered_to_course?(@course) %>
-  <p>
-    Note: this course has personalized deadlines. This means that when you
-    submit the first exercise, you get assigned deadlines for the remaining exercises.
-    When you complete enough exercises, you unlock more exercises with new deadlines.
-  </p>
 <% end %>
 
 <% unlockables = @course.unlockable_exercises_for(current_user) %>

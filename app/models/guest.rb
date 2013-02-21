@@ -1,3 +1,6 @@
+# A transient object representing a non-logged-in user (null object pattern).
+#
+# The guest is never explicitly saved in the database.
 class Guest < User
   before_save :reject_save
   

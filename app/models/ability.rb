@@ -1,10 +1,11 @@
+# CanCan ability definitions.
+#
+# See: https://github.com/ryanb/cancan/wiki/Defining-Abilities
 class Ability
   include CanCan::Ability
 
+  # About the nonstandard second session parameter: https://github.com/ryanb/cancan/issues/133
   def initialize(user, session)
-    # CanCan ability reference: https://github.com/ryanb/cancan/wiki/Defining-Abilities
-    # About the nonstandard second session parameter: https://github.com/ryanb/cancan/issues/133
-
     if user.administrator?
       can :manage, :all
       can :refresh, Course
@@ -56,6 +57,8 @@ class Ability
       can :mark_as_unread, Review do |r|
         r.submission.user_id == user.id
       end
+      cannot :reply, FeedbackAnswer
+      cannot :email, CourseNotification
     end
   end
 end

@@ -14,5 +14,32 @@
       at <%= answer.created_at.strftime("%H:%M %d.%m.%Y") %>
     </div>
     <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
+
+    <% if answer.replied? %>
+      <%= submit_tag name_for("Show", answer), :class=> 'feedback-show-button', :id=> "show_#{answer.id}" %>
+      <%= submit_tag name_for("Hide", answer), :class=> 'feedback-hide-button', :id=> "hide_#{answer.id}" %>
+
+      <div class='replies-to-feedback' id='<%= "repl_#{answer.id}" %>'>
+        <% answer.reply_to_feedback_answers.each do |reply| %>
+          <div class="reply-to-feedback">
+            <span><strong>by:</strong> <%= reply.from %></span>
+            <pre><%= reply.body %></pre>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= submit_tag "Reply by email", :class => 'feedback-reply-button', :id => "button_#{answer.id}"  %>
+
+    <div class='feedback-reply-form' id='<%= "form_#{answer.id}" %>'>
+      <%= form_tag feedback_replies_path do %>
+        <%= text_area_tag "body", response_body_for(answer.answer), :size => "80x10" %>
+        <%= hidden_field_tag 'email', user.email %>
+        <%= hidden_field_tag 'answer_id', answer.id %>
+        <br />
+        <%= submit_tag "Send mail" %>
+      <% end %>
+      <%= submit_tag "Cancel", :class => 'feedback-reply-cancel-button', :id => "cancel_#{answer.id}" %>
+    </div>
   </section>
 <% end %>

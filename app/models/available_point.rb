@@ -1,6 +1,7 @@
 # Caches points that can be awarded from an exercise.
 # Awarded points don't have a hard reference to these because
 # these are recreated every time a course is refreshed.
+# Instead they are always searched for (course_id, name).
 class AvailablePoint < ActiveRecord::Base
   include PointComparison
 

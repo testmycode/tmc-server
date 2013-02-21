@@ -1,3 +1,4 @@
+# Receives explicit unlock requests and shows a web UI for making them.
 class UnlocksController < ApplicationController
   def show
     @course = Course.find(params[:course_id])

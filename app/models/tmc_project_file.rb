@@ -1,5 +1,6 @@
 require 'pathname'
 
+# Represents a `.tmcproject.yml` file.
 class TmcProjectFile
   def initialize(data)
     @extra_student_files = []

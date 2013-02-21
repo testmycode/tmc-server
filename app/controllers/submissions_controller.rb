@@ -1,5 +1,7 @@
 require 'submission_processor'
 
+# Receives submissions and presents the full submission list and submission view.
+# Also handles rerun requests.
 class SubmissionsController < ApplicationController
   around_filter :course_transaction
   before_filter :get_course_and_exercise

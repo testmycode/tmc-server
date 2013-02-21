@@ -1,7 +1,9 @@
 require 'rest_client'
 require 'submission_packager'
 
-# A remote machine running the tmc-sandbox web service
+# Represents a connection to a remote machine running the tmc-sandbox web service.
+#
+# These are transient objects read from the configuration file.
 class RemoteSandbox
   attr_reader :baseurl
 
@@ -89,7 +91,7 @@ class RemoteSandbox
     rescue
       nil
     end
-    if @capacity then @capacity else 1 end
+    @capacity || 1
   end
 
 

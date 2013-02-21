@@ -8,8 +8,7 @@ class User < ActiveRecord::Base
   has_many :student_events, :dependent => :delete_all
   has_many :unlocks, :dependent => :delete_all
   has_many :reviews, :foreign_key => :reviewer_id, :inverse_of => :reviewer, :dependent => :nullify
-  has_many :course_registrations, :dependent => :delete_all
-  has_many :courses_registered_to, :through => :course_registrations, :source => :course
+  has_many :course_notifications
 
   validates :login, :presence     => true,
                     :uniqueness   => true,
@@ -42,10 +41,6 @@ class User < ActiveRecord::Base
   # May eventually be separate from username
   def display_name
     username
-  end
-
-  def registered_to_course?(course)
-    self.course_registrations.exists?(:course_id => course.id)
   end
 
   def field_value(field)

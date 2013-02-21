@@ -69,4 +69,5 @@ EOS
   def link_back
     raw('<div class="link-back">' + link_to('Back', :back) + '</div>')
   end
+
 end

@@ -1,3 +1,10 @@
+# Caches results from scanning for tests.
+#
+# CourseRefresher needs to find the available points in the tests.
+# This is a slow operation as it invokes the Java compiler as an annotation processor
+# in order to find the @Points annotations. For a large repo, this adds up.
+# This class stores a cache of test cases and their available points.
+# It is keyed by a hash of the relevant files in an exercise dir.
 class TestScannerCache
   def self.get_or_update(course, exercise_name, files_hash, &block)
     entries = course.test_scanner_cache_entries.where(:exercise_name => exercise_name)

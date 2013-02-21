@@ -1,5 +1,9 @@
 require 'version'
 
+# Base class for all controllers.
+#
+# Includes common parts like handling some exceptions as well as
+# various utility methods.
 class ApplicationController < ActionController::Base
   API_VERSION = 5 # To be incremented on BC-breaking changes
 

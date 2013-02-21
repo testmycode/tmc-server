@@ -30,8 +30,7 @@ class Course < ActiveRecord::Base
   has_many :feedback_answers  # destroyed transitively when questions are destroyed
   has_many :student_events, :dependent => :delete_all
   has_many :unlocks, :dependent => :delete_all
-  has_many :course_registrations, :dependent => :delete_all
-  has_many :registered_users, :through => :course_registrations, :source => :user
+  has_many :course_notifications, :dependent => :delete_all
 
   def destroy
     # Optimization: delete dependent objects quickly.
@@ -63,6 +62,7 @@ class Course < ActiveRecord::Base
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => false))
   end
 
+  # This could eventually be made a hstore
   def options=(new_options)
     if !new_options["hide_after"].blank?
       self.hide_after = new_options["hide_after"]
@@ -78,13 +78,12 @@ class Course < ActiveRecord::Base
 
     self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
-  end
 
-  def self.default_options
-    {
-      :hidden => false,
-      :hide_after => nil
-    }
+    if new_options['locked_exercise_points_visible'] != nil
+      self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']
+    else
+      self.locked_exercise_points_visible = true
+    end
   end
 
   def gdocs_sheets(exercises = nil)
@@ -230,12 +229,6 @@ class Course < ActiveRecord::Base
 
   def submissions_to_review
     self.submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
-  end
-
-  def some_deadlines_depend_directly_on_registration_time?
-    self.exercises.any? do |ex|
-      ex.deadline_spec_obj.depends_on_unlock_time? && !ex.unlock_spec_obj.depends_on_other_exercises?
-    end
   end
 
   # Returns a hash of exercise group => {

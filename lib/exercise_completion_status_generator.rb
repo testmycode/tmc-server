@@ -1,3 +1,4 @@
+# Generates a progress percentage [0..100] telling how much a user has completed of a course's exercises.
 class ExerciseCompletionStatusGenerator
 
   def self.completion_status(user, course)

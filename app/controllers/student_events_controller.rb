@@ -1,5 +1,6 @@
 require 'student_event_factory'
 
+# Receives "spyware" events from the IDE.
 class StudentEventsController < ApplicationController
   def create
     user = current_user

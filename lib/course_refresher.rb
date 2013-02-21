@@ -47,6 +47,39 @@ private
     def refresh_course(course)
       @report = Report.new
 
+      # We do the whole operation in a transaction with an exclusive lock on the Course row.
+      # We start generating a new version of the course's file cache.
+      # If we encounter an error, we roll back the transaction and delete the new cache.
+      # If we succeed, we commit and remove the old cache.
+      #
+      # This way the Course always points to a valid cache, but other opeartions should
+      # read-lock the Course row to avoid their view of the cache from disappearing from
+      # under them.
+      #
+      # FIXME: the above effectively causes a course refresh to prevent
+      # all read opeartions for a long time (several minutes). This is bad.
+      # Furthermore it's bad that we have to remember to read-lock,
+      # and no doubt it has been forgotten in many places.
+      #
+      # TODO: Suggestion 1:
+      #   Create a database cleaning operation that
+      #   removes old versions of course caches (under write lock on each Course).
+      #   By default, it does nothing if the Course has been modified in, say, the last 15 minutes.
+      #   After that, all read operations on the old course cache have no almost certainly ended
+      #   Have the cleanup run before every course refresh.
+      #   Also add it as a rake task and document that it can be (but doesn't have to be) cron'ed.
+      #   * Upsides: simple, probably quite safe enough. Cleans up old stuff left for ANY reason.
+      #   * Downsides: leaves junk lying around for a time (usually no more than 1 extra copy).
+      #
+      # TODO: Suggestion 2:
+      #   Make course cache versions database elements in addition to the field.
+      #   Have loaded course objects read-lock the current version row.
+      #   Have the course refresher write-lock the old version row before deleting it.
+      #   Upsides: no periodic runs, no extra junk, no time limit.
+      #   Downsides: need to remember to do the locking everywhere!
+      #
+      # I prefer suggestion 1.
+
       Course.transaction(:requires_new => true) do
         begin
           @course = Course.find(course.id, :lock => true)
@@ -139,7 +172,7 @@ private
     def update_course_options
       options_file = "#{@course.clone_path}/course_options.yml"
 
-      opts = Course.default_options
+      opts = {}
 
       if FileTest.exists? options_file
         unless File.read(options_file).strip.empty?

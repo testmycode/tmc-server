@@ -44,8 +44,9 @@ TmcServer::Application.routes.draw do
     match 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :via => :get, :as => 'feedback_answers_chart'
     resources :reviews, :only => [:index]
     resource :unlock, :only => [:show, :create]
+    resource :course_notifications, :only => [:create, :index, :show, :new]
   end
-  
+
   resources :exercises, :only => [:show] do
     resources :submissions, :only => [:create]
     resource :solution, :only => [:show]
@@ -62,7 +63,7 @@ TmcServer::Application.routes.draw do
   resources :reviews, :only => [:update, :destroy]
 
   match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
-  
+
   resources :feedback_questions, :only => [:show, :update, :destroy] do
     resource :position, :only => [:update]
   end
@@ -72,6 +73,8 @@ TmcServer::Application.routes.draw do
   resources :student_events, :only => [:create]
 
   resource :page_presence, :only => [:update]
+
+  resource :feedback_replies, :only => [:create]
 
   root :to => "courses#index"
 

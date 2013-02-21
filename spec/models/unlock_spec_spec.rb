@@ -107,6 +107,9 @@ describe UnlockSpec do
     UnlockSpec.new(ex3, ['3 points in grp-ex1']).should_not permit_unlock_for(user)
     UnlockSpec.new(ex3, ['2 points in grp-ex2']).should permit_unlock_for(user)
     UnlockSpec.new(ex3, ['3 points in grp-ex2']).should_not permit_unlock_for(user)
+
+    UnlockSpec.new(ex3, ['3 points in grp-ex2']).description_for(user).should ==
+      "To unlock this exercise, you must get 1 more point from grp-ex2."
   end
 
   specify "unlocked_after: <n> points in <exercise_group>" do

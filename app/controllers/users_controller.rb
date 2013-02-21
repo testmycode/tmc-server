@@ -1,3 +1,4 @@
+# Presents the "register user" and "edit profile" views.
 class UsersController < ApplicationController
   skip_authorization_check
   

@@ -1,5 +1,8 @@
 require 'natcmp'
 
+# Abstracts a subdirectory containing exercises in the repository.
+#
+# Obtainable from Course.exercise_groups and other methods there.
 class ExerciseGroup
   include Comparable
 

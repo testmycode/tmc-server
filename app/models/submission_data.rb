@@ -1,3 +1,8 @@
+# Stores large data such as the returned ZIP and compressed I/O logs for a submission.
+#
+# In addition to good old separation of concerns, it is useful to force these to be
+# loaded explicitly. If these fields were directly in Submission, a result set
+# (with default configuration) of Submission objects would easily consume quite a bit of memory.
 class SubmissionData < ActiveRecord::Base
   set_primary_key :submission_id
 

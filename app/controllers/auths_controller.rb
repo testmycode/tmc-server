@@ -1,3 +1,7 @@
+# Provides an authentication service.
+#
+# Lets external services such as tmc-comet check whether a given (username, password) or
+# (username, session_id) is valid.
 class AuthsController < ApplicationController
   skip_authorization_check
   skip_before_filter :verify_authenticity_token

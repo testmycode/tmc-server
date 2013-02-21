@@ -4,6 +4,7 @@ begin
 rescue LoadError
 end
 
+# TODO: this should be removed since we no longer support Ruby 1.8
 class PortableCSV
   def self.generate(options = {}, &block)
     csv_engine.generate(options, &block)
