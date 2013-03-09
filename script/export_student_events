@@ -29,7 +29,7 @@ events.find_each do |ev|
   puts "Exporting event id=#{ev.id}  (#{i}/#{total})"
 
   user_dir = "#{dest_dir}/#{ev.user_id}"
-  FileUtils.mkdir(user_dir) unless File.exist?(user_dir)
+  FileUtils.mkdir_p(user_dir) unless File.exist?(user_dir)
 
   record_name = ev.happened_at.strftime("%Y-%m-%d_%H-%M-%S_#{ev.id}")
   json_file = "#{user_dir}/#{record_name}.json"
