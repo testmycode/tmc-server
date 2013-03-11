@@ -162,7 +162,7 @@ case $PROJECT_TYPE in
     fi
     echo "DEFS: $DEFS"
 
-    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestunner.Main" > stdout.txt 2> stderr.txt
+    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
   ;;
 
         
