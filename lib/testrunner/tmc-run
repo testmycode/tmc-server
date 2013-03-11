@@ -152,11 +152,8 @@ case $PROJECT_TYPE in
 
   makefile_c)
     DEFS="
-      -Dtmc.exercise_dir=`pwd`
-      -Dtmc.src_class_dir=`pwd`/classes/main
-      -Dtmc.test_class_dir=`pwd`/classes/test
-      -Dtmc.lib_dir=`pwd`/lib
-      -Dtmc.results_file=`pwd`/tmc_test_output.xml"
+      -Dtmc.check_root_dir=`pwd`
+      -Dtmc.check_results_file=`pwd`/tmc_test_results.xml"
 
     if [ -d "lib/endorsed" ]; then
       DEFS="$DEFS -Djava.endorsed.dirs=`pwd`/lib/endorsed"
