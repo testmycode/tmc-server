@@ -157,15 +157,12 @@ case $PROJECT_TYPE in
       -Dtmc.check_available_points=`pwd`/tmc_available_points.txt
       -Dtmc.check_valgrind_output=`pwd`/valgrind.log"
 
-    if [ -d "lib/endorsed" ]; then
-      DEFS="$DEFS -Djava.endorsed.dirs=`pwd`/lib/endorsed"
-    fi
     echo "DEFS: $DEFS"
 
     java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestunner.Main" > stdout.txt 2> stderr.txt
   ;;
 
-        
+
 esac
 
 echo "tmc-run completed successfully"
