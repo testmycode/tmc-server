@@ -1,5 +1,5 @@
 class SubmissionPackager
-  class MakeFileC < SubmissionPackager
+  class MakefileC < SubmissionPackager
   private
     def find_received_project_root(received_root)
       src_dir_path = TmcDirUtils.find_dir_containing(received_root, "src")
