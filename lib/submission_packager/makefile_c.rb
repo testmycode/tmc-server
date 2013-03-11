@@ -11,6 +11,7 @@ class SubmissionPackager
       cloned = Pathname(exercise.clone_path)
 
       copy_libs(cloned, dest)
+      copy_tmcee_libs(cloned, dest)
       FileUtils.cp_r(received + 'src', dest + 'src')
       FileUtils.cp_r(cloned  + 'test', dest + 'test')
       copy_files_in_dir_no_recursion(cloned, dest)
@@ -22,9 +23,20 @@ class SubmissionPackager
       sh! ['chmod', 'a+x', dest + 'tmc-run']
     end
 
+    def copy_tmcee_libs(cloned, dest)
+      Dir.glob("#{c_runner_path}*.jar").each do |jar|
+        raise jar
+        if jar.include? "tmc-c-test-runner-" and jar.include? "SNAPSHOT.jar"
+          FileUtils.cp(jar, dest+ 'lib' + 'testrunner' + 'c-test-runner.jar')
+        end
+      end
+    end
+
     def copy_libs(cloned, dest)
+      #trying to get ctestrunner to sandbox
       #FileUtils.cp_r(cloned + 'lib', dest + 'lib')
       #FileUtils.mkdir_p(dest + 'lib' + 'testrunner')
+      #tonne halutaan kai meidän ctestrunner?
       #for jar_path in TmcJunitRunner.get.jar_and_lib_paths
       #  destname = jar_path.basename
       #  if destname.to_s.start_with?('tmc-junit-runner')
@@ -36,6 +48,10 @@ class SubmissionPackager
 
     def tmc_run_path
       "#{::Rails.root}/lib/testrunner/tmc-run"
+    end
+
+    def c_runner_path
+      "#{::Rails.root}/ext/c-test-runner/target/"
     end
   end
 end

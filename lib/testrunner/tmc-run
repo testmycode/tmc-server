@@ -93,10 +93,10 @@ case $PROJECT_TYPE in
     # Still, Java CAN spin in the GC for a long time if it runs out of memory.
     JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
     echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
-
+    make clean
     make all
 
-    CLASSPATH="$TOOLS_JAR_PATH:lib/ctestrunner/*:lib/*"
+    CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*"
   ;;
 esac
 
@@ -158,8 +158,11 @@ case $PROJECT_TYPE in
       -Dtmc.check_valgrind_output=`pwd`/valgrind.log"
 
     echo "DEFS: $DEFS"
-
-    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
+    echo "CLASSPATH: $CLASSPATH"
+    ls -laghR .
+    echo "next java:"
+    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" > stdout.txt 2> stderr.txt
+    echo "Java completex, makefile_c done"
   ;;
 
 
