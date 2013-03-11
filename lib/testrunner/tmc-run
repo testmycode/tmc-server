@@ -27,11 +27,14 @@ TMC_MAVEN_PLUGIN_VERSION=1.5
 # Identify project type
 if [ -f pom.xml ]; then
   PROJECT_TYPE=java_maven
+elif [ -f Makefile ]; then
+  PROJECT_TYPE=makefile_c
 else
   PROJECT_TYPE=java_simple
 fi
 
 JAVAC_EXE_PATH=`readlink -f \`which javac\``
+MAKE_EXE_PATH=`readlink -f \`which make\``
 JDK_DIR=`dirname \`dirname "$JAVAC_EXE_PATH"\``
 TOOLS_JAR_PATH="$JDK_DIR/lib/tools.jar"
 
@@ -83,6 +86,18 @@ case $PROJECT_TYPE in
 
     rm -f test_output.txt
   ;;
+
+  makefile_c)
+    # An explicit memory limit below the sandbox memory limit has been found to avoid
+    # the occasional OOM killer. We leave 48M to the sandbox.
+    # Still, Java CAN spin in the GC for a long time if it runs out of memory.
+    JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
+    echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
+
+    make all
+
+    CLASSPATH="$TOOLS_JAR_PATH:lib/ctestrunner/*:lib/*"
+  ;;
 esac
 
 
@@ -116,7 +131,6 @@ case $PROJECT_TYPE in
 
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
   ;;
-
   java_maven)
     # MAVEN_OPTS was set above
     JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
@@ -135,6 +149,23 @@ case $PROJECT_TYPE in
       exit 103
     fi
   ;;
+
+  makefile_c)
+    DEFS="
+      -Dtmc.check_root_dir=`pwd`
+      -Dtmc.check_results_file=`pwd`/tmc_test_results.xml
+      -Dtmc.check_available_points=`pwd`/tmc_available_points.txt
+      -Dtmc.check_valgrind_output=`pwd`/valgrind.log"
+
+    if [ -d "lib/endorsed" ]; then
+      DEFS="$DEFS -Djava.endorsed.dirs=`pwd`/lib/endorsed"
+    fi
+    echo "DEFS: $DEFS"
+
+    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestunner.Main" > stdout.txt 2> stderr.txt
+  ;;
+
+        
 esac
 
 echo "tmc-run completed successfully"
