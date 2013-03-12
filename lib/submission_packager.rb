@@ -13,14 +13,11 @@ require 'submission_packager/makefile_c'
 class SubmissionPackager
   def self.get(exercise)
     cls_name = exercise.exercise_type.to_s.camelize
-    cls = SubmissionPackager.const_get(cls_name)
+    cls = SubmissionPackager.const_get(cls_name) #"MakefileC")#
     cls.new
   end
 
   def package_submission(exercise, zip_path, tar_path, extra_params = {})
-    require 'socket'
-    a =  TCPSocket.new '172.16.130.1', 1337
-    a.puts "#{self.inspect}"
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         FileUtils.mkdir_p('received')

@@ -7,11 +7,11 @@ class SubmissionPackager
       Pathname(src_dir_path)
     end
 
-    def copy_filesTMC(exercise, received, dest)
+    def copy_files(exercise, received, dest)
       cloned = Pathname(exercise.clone_path)
 
       copy_tmcee_libs(cloned, dest)
-      FileUtils.mkdir "#{dest}/foobaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar"
+      copy_libs(cloned, dest)
       FileUtils.cp_r(received + 'src', dest + 'src')
       FileUtils.cp_r(cloned  + 'test', dest + 'test')
       copy_files_in_dir_no_recursion(cloned, dest)
@@ -25,10 +25,21 @@ class SubmissionPackager
 
     def copy_tmcee_libs(cloned, dest)
       Dir.glob("#{c_runner_path}*.jar").each do |jar|
-        if jar.include? "tmc-c-test-runner-" and jar.include? "SNAPSHOT.jar"
-          FileUtils.cp(jar, dest+ 'lib' + 'testrunner' + 'c-test-runner.jar')
-          
+        #if jar.include? "tmc-c-test-runner-" and jar.include? "SNAPSHOT.jar"
+        FileUtils.cp(jar, dest+ 'lib' + 'testrunner' + 'c-test-runner.jar')
+        #end
+      end
+    end
+
+    def copy_libs(cloned, dest)
+      FileUtils.cp_r(cloned + 'lib', dest + 'lib')
+      FileUtils.mkdir_p(dest + 'lib' + 'testrunner')
+      for jar_path in Dir.glob("#{c_runner_path}/*.jar")
+        destname = jar_path.basename
+        if destname.to_s.start_with?('tmc-junit-runner')
+          destname = 'tmc-junit-runner.jar'
         end
+        FileUtils.cp(jar_path, dest + 'lib' + 'testrunner' + destname)
       end
     end
 

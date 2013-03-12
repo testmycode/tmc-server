@@ -9,7 +9,6 @@ class SubmissionPackager
 
     def copy_files(exercise, received, dest)
       cloned = Pathname(exercise.clone_path)
-      FileUtils.mkdir "#{dest}/toooSimpleeeeeeeeeeeeeeeeeeeeee"
       copy_libs(cloned, dest)
       FileUtils.cp_r(received + 'src', dest + 'src')
       FileUtils.cp_r(cloned  + 'test', dest + 'test')
