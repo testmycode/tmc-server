@@ -9,30 +9,35 @@ package fi.helsinki.cs.tmc.ctestrunner;
  * @author rase
  */
 public class Test {
+    public enum Status {
+        PASSED, FAILED, RUNNING, NOT_STARTED
+    }
+    
     private String name;
-    private String result;
+    private Status status;
     private String message;
-    private String[] points;
+    private String[] pointNames;
     private String valgrindTrace;
-
-    public Test(String name, String result, String message, String[] points, String valgrindTrace) {
+    
+    public Test(String name, Status status, String message, String[] points, String valgrindTrace) {
         this(name);
-        this.result = result;
+        this.status = status;
         this.message = message;
-        this.points = points;
+        this.pointNames = points;
         this.valgrindTrace = valgrindTrace;
     }
 
-    public Test(String name, String result, String message) {
-        this(name, result, message, null, null);
+    public Test(String name, Status status, String message) {
+        this(name, status, message, null, null);
     }
 
     public Test(Test t) {
-        this(t.name, t.result, t.message, t.points.clone(), t.valgrindTrace);
+        this(t.name, t.status, t.message, t.pointNames.clone(), t.valgrindTrace);
     }
     
     public Test(String name) {
         this.name = name;
+        this.status = Status.NOT_STARTED;
     }
 
     public String serialize() {
@@ -47,12 +52,12 @@ public class Test {
         this.name = name;
     }
 
-    public String getResult() {
-        return result;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getMessage() {
@@ -64,11 +69,11 @@ public class Test {
     }
 
     public String[] getPoints() {
-        return this.points;
+        return this.pointNames;
     }
 
     public void setPoints(String[] points) {
-        this.points = points;
+        this.pointNames = points;
     }
 
     public String getValgrindTrace() {

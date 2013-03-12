@@ -9,7 +9,7 @@
 
     <name>TMC C Test Runner</name>
     <description>TMC's C test runner</description>
-    <url>https://github.com/TMCee/c-test-runner</url>
+    <url>https://github.com/TMCee/TMCeeTestRunner</url>
     
     <organization>
         <name>University of Helsinki, Department of Computer Science</name>
@@ -25,8 +25,8 @@
     </licenses>
     
     <scm>
-        <connection>scm:git:https://github.com/TMCee/c-test-runner.git</connection>
-        <developerConnection>scm:git:git@github.com:TMCee/c-test-runner.git</developerConnection>
+        <connection>scm:git:https://github.com/TMCee/TMCeeTestRunner.git</connection>
+        <developerConnection>scm:git:git@github.com:TMCee/TMCeeTestRunner.git</developerConnection>
         <url>https://github.com/TMCee/c-test-runner.git</url>
       <tag>HEAD</tag>
   </scm>

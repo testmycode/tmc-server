@@ -16,10 +16,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-
-
-
-
 /**
  * 
  * @author rase
@@ -87,7 +83,7 @@ public class Parser {
             String result = node.getAttribute("result");
             String name = node.getElementsByTagName("description").item(0).getTextContent();
             String message = node.getElementsByTagName("message").item(0).getTextContent();
-            tests.put(name, new Test(name, result, message));
+            tests.put(name, new Test(name, (result.equals("success") ? Test.Status.PASSED : Test.Status.FAILED), message));
         }
 
         return tests;
@@ -132,7 +128,7 @@ public class Parser {
 
         String line = scanner.nextLine();
         int firstPID = parsePID(line);
-        parentOutput += "\n" + line;
+        parentOutput += "<br />" + line;
         while (scanner.hasNextLine()) {
             line = scanner.nextLine();
             int pid = parsePID(line);
@@ -140,9 +136,9 @@ public class Parser {
                 continue;
             }
             if (pid == firstPID) {
-                parentOutput += "\n" + line;
+                parentOutput += "<br />" + line;
             } else {
-                outputs[findIndex(pid, pids)] += "\n" + line;
+                outputs[findIndex(pid, pids)] += "<br />" + line;
             }
         }
         scanner.close();

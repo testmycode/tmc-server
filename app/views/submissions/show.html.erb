@@ -141,6 +141,13 @@
                   <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
                 </div>
               <% end %>
+              <% if tcr.valgrind_trace != nil %>
+                <br />
+                <div class="stack-trace">
+                  <%= tcr.valgrind_trace %>
+                </div>
+              <% end %>
+              
             </td>
           <% end %>
         </tr>

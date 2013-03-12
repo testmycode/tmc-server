@@ -47,7 +47,8 @@ private
         :test_case_name => "#{test_result['className']} #{test_result['methodName']}",
         :message => test_result["message"],
         :successful => passed,
-        :exception => to_json_or_null(test_result["exception"])
+        :exception => to_json_or_null(test_result["exception"]),
+        :valgrind_trace => test_result["valgrindTrace"]
       )
       all_passed = false if not passed
       submission.test_case_runs << tcr
