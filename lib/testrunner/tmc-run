@@ -155,14 +155,16 @@ case $PROJECT_TYPE in
       -Dtmc.check_root_dir=`pwd`
       -Dtmc.check_results_file=`pwd`/tmc_test_results.xml
       -Dtmc.check_available_points=`pwd`/tmc_available_points.txt
-      -Dtmc.check_valgrind_output=`pwd`/valgrind.log"
+      -Dtmc.check_valgrind_output=`pwd`/valgrind.log
+      -Dtmc.ctestrunner_output_file=`pwd`/testrunner_output.json"
 
     echo "DEFS: $DEFS"
     echo "CLASSPATH: $CLASSPATH"
     ls -laghR .
     echo "next java:"
-    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" > stdout.txt 2> stderr.txt
-    echo "Java completex, makefile_c done"
+    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
+    #java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" > stdout.txt 2> stderr.txt
+    echo "Java completed, makefile_c done"
   ;;
 
 
