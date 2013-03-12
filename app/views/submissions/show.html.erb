@@ -144,10 +144,9 @@
               <% if tcr.valgrind_trace != nil %>
                 <br />
                 <div class="stack-trace">
-                  <%= tcr.valgrind_trace %>
+                  <%= raw( ("".html_safe + tcr.valgrind_trace).gsub("\n", "<br>") ) %>
                 </div>
               <% end %>
-              
             </td>
           <% end %>
         </tr>

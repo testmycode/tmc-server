@@ -128,7 +128,7 @@ public class Parser {
 
         String line = scanner.nextLine();
         int firstPID = parsePID(line);
-        parentOutput += "<br />" + line;
+        parentOutput += "\n" + line;
         while (scanner.hasNextLine()) {
             line = scanner.nextLine();
             int pid = parsePID(line);
@@ -136,9 +136,9 @@ public class Parser {
                 continue;
             }
             if (pid == firstPID) {
-                parentOutput += "<br />" + line;
+                parentOutput += "\n" + line;
             } else {
-                outputs[findIndex(pid, pids)] += "<br />" + line;
+                outputs[findIndex(pid, pids)] += "\n" + line;
             }
         }
         scanner.close();

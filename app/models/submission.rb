@@ -142,7 +142,7 @@ class Submission < ActiveRecord::Base
         :successful => tcr.successful?,
         :message => tcr.message,
         :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
-        :valgrind_trace => if tcr.valgrind_trace then ActiveSupport::JSON.decode(tcr.valgrind_trace) else nil end
+        :valgrind_trace => if tcr.valgrind_trace then tcr.valgrind_trace else nil end
       }
     end
   end
