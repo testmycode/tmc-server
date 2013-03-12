@@ -9,7 +9,7 @@ class SubmissionPackager
 
     def copy_files(exercise, received, dest)
       cloned = Pathname(exercise.clone_path)
-
+      FileUtils.mkdir "#{dest}/IHATEMAVENaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaargh"
       FileUtils.cp(cloned + 'pom.xml', dest)
 
       FileUtils.mkdir_p(dest + 'src')

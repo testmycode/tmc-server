@@ -161,6 +161,7 @@ case $PROJECT_TYPE in
     echo "DEFS: $DEFS"
     echo "CLASSPATH: $CLASSPATH"
     ls -laghR .
+    echo "done dir list"
     echo "next java:"
     java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
     #java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" > stdout.txt 2> stderr.txt
