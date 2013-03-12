@@ -23,11 +23,18 @@ class SubmissionPackager
     end
 
     def copy_tmcee_libs(cloned, dest)
+      FileUtils.mkdir_p(dest + 'lib')
       Dir.glob("#{c_runner_path}*.jar").each do |jar|
-        #if jar.include? "tmc-c-test-runner-" and jar.include? "SNAPSHOT.jar"
-        jarname = jar.split("/").last.split(".").first
-        FileUtils.cp(jar, dest+ 'lib' + 'testrunner' + 'c-test-runner.jar')
-        #end
+        jarname = jar.split("/").last
+        FileUtils.cp(jar, dest+ 'lib' + jarname )
+      end
+      FileUtils.mkdir_p(dest + 'lib' + 'testrunner')
+      for jar_path in TmcJunitRunner.get.jar_and_lib_paths
+        destname = jar_path.basename
+        if destname.to_s.start_with?('tmc-junit-runner')
+          destname = 'tmc-junit-runner.jar'
+        end
+        FileUtils.cp(jar_path, dest + 'lib' + 'testrunner' + destname)
       end
     end
 

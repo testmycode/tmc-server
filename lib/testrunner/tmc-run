@@ -130,6 +130,9 @@ case $PROJECT_TYPE in
     echo "DEFS: $DEFS"
 
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
+    ls -laghR .
+    echo "done dir list"
+
   ;;
   java_maven)
     # MAVEN_OPTS was set above
@@ -151,6 +154,7 @@ case $PROJECT_TYPE in
   ;;
 
   makefile_c)
+    valgrind --log-file=valgrind.log ./test/test
     DEFS="
       -Dtmc.check_root_dir=`pwd`
       -Dtmc.check_results_file=`pwd`/tmc_test_results.xml
@@ -160,11 +164,9 @@ case $PROJECT_TYPE in
 
     echo "DEFS: $DEFS"
     echo "CLASSPATH: $CLASSPATH"
-    ls -laghR .
-    echo "done dir list"
+
     echo "next java:"
     java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
-    #java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" > stdout.txt 2> stderr.txt
     echo "Java completed, makefile_c done"
   ;;
 
