@@ -156,7 +156,7 @@ case $PROJECT_TYPE in
       -Dtmc.check_results_file=`pwd`/tmc_test_results.xml
       -Dtmc.check_available_points=`pwd`/tmc_available_points.txt
       -Dtmc.check_valgrind_output=`pwd`/valgrind.log
-      -Dtmc.ctestrunner_output_file=`pwd`/testrunner_output.json
+      -Dtmc.ctestrunner_output_file=`pwd`/testrunner_output.json"
 
     echo "DEFS: $DEFS"
     echo "CLASSPATH: $CLASSPATH"
