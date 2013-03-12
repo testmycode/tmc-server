@@ -13,7 +13,7 @@ require 'submission_packager/makefile_c'
 class SubmissionPackager
   def self.get(exercise)
     cls_name = exercise.exercise_type.to_s.camelize
-    cls = SubmissionPackager.const_get(cls_name) #"MakefileC")#
+    cls = SubmissionPackager.const_get(cls_name)
     cls.new
   end
 
