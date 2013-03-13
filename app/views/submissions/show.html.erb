@@ -181,18 +181,19 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  var createButtonTo = function (buttonText) {
-    var trace = this;
-    var button = $('<button>' + buttonText + '</button>')[0];
-    $(trace).before(button);
-    $(trace).hide();
+  var createButtonTo = function() { 
+    var trace = this; 
+    var button = $("<button>" + buttonText + "</button>")[0]; 
+    $(trace).before(button); $(trace).hide(); 
     $(button).click(function() {
       $(trace).toggle();
     });
-  }
+  };
   
-  $('.stack-trace').each(createButtonTo("Show stack trace"));
-  $('.valgrind-trace').each(createButtonTo("Show valgrind trace"));
+  var buttonText = "Toggle stack trace";
+  $('.stack-trace').each(createButtonTo);
+  buttonText = "Toggle valgrind trace";
+  $('.valgrind-trace').each(createButtonTo);
 });
 </script>
 
