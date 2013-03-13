@@ -1,4 +1,3 @@
-
 <h1>Submission <%= @submission.id %></h1>
 
 <section>
@@ -143,7 +142,7 @@
               <% end %>
               <% if tcr.valgrind_trace != nil %>
                 <br />
-                <div class="stack-trace">
+                <div class="valgrind-trace">
                   <%= raw( ("".html_safe + tcr.valgrind_trace).gsub("\n", "<br>") ) %>
                 </div>
               <% end %>
@@ -182,16 +181,18 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  $('.stack-trace').each(function() {
+  function createButtonTo(buttonText) {
     var trace = this;
-    var button = $('<button>Show stack trace</button>')[0];
+    var button = $('<button>' + buttonText + '</button>')[0];
     $(trace).before(button);
     $(trace).hide();
     $(button).click(function() {
-      $(button).hide();
-      $(trace).show();
+      $(trace).toggle();
     });
-  });
+  }
+  
+  $('.stack-trace').each(createButtonTo("Show stack trace"));
+  $('.valgrind-trace').each(createButtonTo("Show valgrind trace"));
 });
 </script>
 
