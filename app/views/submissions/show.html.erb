@@ -181,7 +181,7 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  function createButtonTo(buttonText) {
+  var createButtonTo = function (buttonText) {
     var trace = this;
     var button = $('<button>' + buttonText + '</button>')[0];
     $(trace).before(button);
