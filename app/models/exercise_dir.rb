@@ -81,7 +81,7 @@ private
       JavaMaven
     elsif (path + 'Makefile').exist? and (path + 'test/').exist?
       MakefileC
-    elsif (path + 'src').exist? and (path + 'test').exist?
+    elsif (path + 'src/').exist? and (path + 'test/').exist?
       JavaSimple
     else
       nil

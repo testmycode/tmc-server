@@ -252,7 +252,8 @@ private
       @course.exercises.each do |exercise|
         review_points = @review_points[exercise.name]
         point_names = Set.new
-        exercise_type = ExerciseDir.exercise_type(exercise.clone_path)
+        path = File.join(@course.clone_path, exercise.relative_path)
+        exercise_type = ExerciseDir.exercise_type(path)
         #TMCTODO
         case exercise_type
           when :makefile_c
