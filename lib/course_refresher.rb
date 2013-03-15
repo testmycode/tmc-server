@@ -297,7 +297,6 @@ private
         `cd #{full_path} && make && make get-points > points.txt`
         f = File.open("#{full_path}/points.txt")
         output = f.readlines
-        s.puts output.inspect
         f.close
         output.pop
         available_points_content = output.drop(3)
