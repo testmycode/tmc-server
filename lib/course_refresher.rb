@@ -8,6 +8,7 @@ require 'tmc_junit_runner'
 require 'course_refresher/exercise_file_filter'
 require 'maven_cache_seeder'
 require 'set'
+require 'fileutils'
 
 # Safely refreshes a course from a git repository
 class CourseRefresher
@@ -251,8 +252,15 @@ private
       @course.exercises.each do |exercise|
         review_points = @review_points[exercise.name]
         point_names = Set.new
+        exercise_type = ExerciseDir.exercise_type(exercise.clone_path)
         #TMCTODO
-        point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
+        case exercise_type
+          when :makefile_c
+          # :points => ['exercise', 'annotation', 'values']
+            point_names += get_c_exercise_points(exercise)
+          else
+            point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
+        end
         point_names += review_points
 
         added = []
@@ -281,16 +289,37 @@ private
         @report.notices << "Removed points from exercise #{exercise.name}: #{removed.join(' ')}" unless removed.empty?
       end
     end
-    
+
+    def get_c_exercise_points(exercise)
+      full_path = File.join(@course.clone_path, exercise.relative_path)
+      hash = FileTreeHasher.hash_file_tree(full_path)
+      TestScannerCache.get_or_update(@course, exercise.name, hash) do
+        `cd #{full_path} && make && make get-points > points.txt`
+        f = File.open("#{full_path}/points.txt")
+        output = f.readlines
+        s.puts output.inspect
+        f.close
+        output.pop
+        available_points_content = output.drop(3)
+        points = Set.new
+        available_points_content.each do |line|
+          line = line.gsub(" ", "").chomp
+          points << line
+        end
+        `cd #{full_path} && make clean`
+        FileUtils.rm("#{full_path}/points.txt")
+        points
+
+      end
+    end
+
     def test_case_methods(exercise)
-      #TMCTODO
       path = File.join(@course.clone_path, exercise.relative_path)
       TestScanner.get_test_case_methods(@course, exercise.name, path)
     end
     
     def make_solutions
       @course.exercises.each do |e|
-        #TMCTODO
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
         FileUtils.mkdir_p(solution_path)
@@ -299,7 +328,6 @@ private
     end
     
     def make_stubs
-      #TMCTODO?
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
