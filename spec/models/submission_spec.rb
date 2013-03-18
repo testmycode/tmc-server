@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # -*- coding: UTF-8 -*-
 
 require 'spec_helper'
@@ -59,6 +61,8 @@ describe Submission do
       }
     ]
   end
+
+  it "can summarize makefile_c test cases" #CTODO TODO
 
   it "can tell how many unprocessed submissions are in queue before itself" do
     t = Time.now
