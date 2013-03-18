@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 3.1.10'
+gem 'rails', '~> 3.1.11'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
@@ -19,6 +19,7 @@ gem 'xml-simple', '~> 1.1.1'
 gem 'transaction_isolation', '~> 1.0.3'
 gem 'breadcrumbs_on_rails', '~> 2.3.0'
 gem 'andand'
+gem 'haml-rails'
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
@@ -29,9 +30,8 @@ group :development, :test do
   gem 'capybara-webkit', '~> 0.7.2'
   gem 'database_cleaner', '~> 0.6.7'
   gem 'mimic', '~> 0.4.3'
-  gem 'ruby-prof', '~> 0.10.8' # for performance tests
+  gem 'ruby-prof', '~> 0.12.2' # for performance tests
   gem 'launchy'  # for capybara's save_and_open_page
   gem 'railroady' # for doc/diagrams
-  gem 'simplecov', :require => false
 end
 
