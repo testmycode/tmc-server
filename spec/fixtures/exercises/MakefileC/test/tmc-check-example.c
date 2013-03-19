@@ -24,9 +24,9 @@ END_TEST
 int main(int argc, const char *argv[])
 {
     // Suite *s = suite_create("test-tmc-check");
-    Suite *s  = tmc_suite_create("test-tmc-check", "2.5 2.6 2.7");
-    tmc_register_test(s, test_foo, "1.1 1.2");
-    tmc_register_test(s, test_bar, "1.2");
-    tmc_register_test(s, test_lib_function, "1.3ftio");
+    Suite *s  = tmc_suite_create("test-tmc-check", "suitePoints");
+    tmc_register_test(s, test_foo, "point1 point1again");
+    tmc_register_test(s, test_bar, "failingTest");
+    tmc_register_test(s, test_lib_function, "zero");
     return tmc_run_tests(argc, argv, s);
 }
