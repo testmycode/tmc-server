@@ -6,7 +6,7 @@ describe RemoteSandboxForTesting, :integration => true do
     setup = SubmissionTestSetup.new(:exercise_name => 'MakefileC')
     submission = setup.submission
 
-    setup.exercise_project.solve_sub
+    setup.exercise_project.solve_all
     setup.make_zip
     RemoteSandboxForTesting.run_submission(submission)
 

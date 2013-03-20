@@ -51,13 +51,15 @@ describe Submission do
         :name => 'Moo moo()',
         :successful => false,
         :message => 'you fail',
-        :exception => {'a' => 'b'}
+        :exception => {'a' => 'b'},
+        :valgrind_trace => nil
       },
       {
         :name => 'Moo moo2()',
         :successful => true,
         :message => nil,
-        :exception => nil
+        :exception => nil,
+        :valgrind_trace => nil
       }
     ]
   end

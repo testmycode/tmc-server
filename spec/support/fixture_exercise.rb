@@ -18,6 +18,8 @@ class FixtureExercise
       FixtureExercise::SimpleExercise.new(path)
     when 'MavenExercise'
       FixtureExercise::MavenExercise.new(path)
+    when 'MakefileC'
+      FixtureExercise::MakefileCExercise.new(path)
     else
       FixtureExercise.new(fixture_name, path)
     end
