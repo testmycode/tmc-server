@@ -44,7 +44,7 @@ private
     results.each do |test_result|
       passed = test_result["status"] == 'PASSED'
       tcr = TestCaseRun.new(
-        :test_case_name => "#{test_result['className']} #{test_result['methodName']}",
+        :test_case_name => "#{test_result['className']} #{test_result['methodName']}".strip,
         :message => test_result["message"],
         :successful => passed,
         :exception => to_json_or_null(test_result["exception"]),
