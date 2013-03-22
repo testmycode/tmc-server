@@ -1,11 +1,11 @@
 MAIN_DIR = src
 TEST_DIR = test
 
-.PHONY: main test 
+.PHONY: main test
 
 all: main test
 
-main: 
+main:
 	$(MAKE) -C $(MAIN_DIR)
 
 test:
@@ -21,3 +21,6 @@ run-main:
 
 run-test:
 	$(MAKE) -C $(TEST_DIR) run
+
+get-points:
+	$(MAKE) -C $(TEST_DIR) get-points

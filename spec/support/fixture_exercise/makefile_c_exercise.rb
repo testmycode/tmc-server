@@ -67,6 +67,18 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
   end
 private
 
+  alias_method :old_copy_from_fixture, :copy_from_fixture
+
+  def copy_from_fixture
+    old_copy_from_fixture
+    copy_makefile
+  end
+
+  def copy_makefile
+    FileUtils.cp_r("#{fixture_path}/Makefile", "#{path}/Makefile")
+  end
+
+
   def replace_method_body_in_file(path, method, body)
     lines = IO.readlines(path)
     lines = lines.map do |line|

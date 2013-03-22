@@ -15,3 +15,6 @@ run: test
 	./test --print-available-points
 	# Running test. There should be one success and one failure.
 	./test
+
+get-points:
+	./test --print-available-points
