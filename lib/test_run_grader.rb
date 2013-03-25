@@ -1,4 +1,6 @@
 require 'point_comparison'
+require 'natsort'
+
 
 #
 # Stores test run results in the database and awards points.
