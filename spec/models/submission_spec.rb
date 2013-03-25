@@ -63,7 +63,7 @@ describe Submission do
       }
     ]
   end
-
+  # TODO: add valgrind test case
   it "can summarize makefile_c test cases" #CTODO TODO
 
   it "can tell how many unprocessed submissions are in queue before itself" do
