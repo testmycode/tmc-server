@@ -419,6 +419,7 @@ describe CourseRefresher do
   end
 
   it "should be able to scan maven exercises" #TODO TODO
+  it "should be able to scan makefile_c exercises" #CTODO TODO
 
   it "should not allow dashes in exercise folders" do
     add_exercise('My-Exercise')
