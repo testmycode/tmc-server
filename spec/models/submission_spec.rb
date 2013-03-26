@@ -46,6 +46,7 @@ describe Submission do
     submission = Submission.new
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :exception => '{"a": "b"}')
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :successful => true)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :valgrind_trace => 'trace')
     submission.test_case_records.should == [
       {
         :name => 'Moo moo()',
@@ -60,11 +61,16 @@ describe Submission do
         :message => nil,
         :exception => nil,
         :valgrind_trace => nil
+      },
+      {
+        :name => 'Moo moo()',
+        :successful => false,
+        :message => 'you fail',
+        :exception => nil,
+        :valgrind_trace => 'trace'
       }
     ]
   end
-  # TODO: add valgrind test case
-  it "can summarize makefile_c test cases" #CTODO TODO
 
   it "can tell how many unprocessed submissions are in queue before itself" do
     t = Time.now
