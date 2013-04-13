@@ -256,6 +256,8 @@ private
         exercise_type = ExerciseDir.exercise_type(path)
         #TMCTODO
         case exercise_type
+          when :universal
+            point_names += get_universal_exercise_points(exercise)
           when :makefile_c
           # :points => ['exercise', 'annotation', 'values']
             point_names += get_c_exercise_points(exercise)
@@ -295,7 +297,7 @@ private
       full_path = File.join(@course.clone_path, exercise.relative_path)
       hash = FileTreeHasher.hash_file_tree(full_path)
       TestScannerCache.get_or_update(@course, exercise.name, hash) do
-        `cd #{full_path} && make && make get-points > points.txt`
+        `cd #{full_path} && make && make get-points > points.txt` # FIXME
         f = File.open("#{full_path}/points.txt")
         output = f.readlines
         f.close
@@ -313,28 +315,60 @@ private
       end
     end
 
+    def get_universal_exercise_points(exercise)
+      full_path = File.join(@course.clone_path, exercise.relative_path)
+      hash = FileTreeHasher.hash_file_tree(full_path)
+      TestScannerCache.get_or_update(@course, exercise.name, hash) do
+        `cd #{full_path} && .universal/controls/get-points > points.txt`
+        f = File.open("#{full_path}/points.txt")
+        output = f.readlines
+        f.close
+        points = Set.new
+        available_points_content.each do |line|
+          line = line.gsub(" ", "").chomp
+          points << line
+        end
+        FileUtils.rm("#{full_path}/points.txt")
+        points
+      end
+    end
+
     def test_case_methods(exercise)
       path = File.join(@course.clone_path, exercise.relative_path)
       TestScanner.get_test_case_methods(@course, exercise.name, path)
     end
-    
+
     def make_solutions
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
         FileUtils.mkdir_p(solution_path)
-        ExerciseFileFilter.new(clone_path).make_solution(solution_path)
+
+        exercise_type = ExerciseDir.exercise_type(clone_path)
+        case exercise_type
+          when :universal
+            FileUtils.cp_r File.join(clone_path, ".universal", "model-solutions"), solution_path
+          else
+            ExerciseFileFilter.new(clone_path).make_solution(solution_path)
+        end
       end
     end
-    
+
     def make_stubs
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
         FileUtils.mkdir_p(stub_path)
-        ExerciseFileFilter.new(clone_path).make_stub(stub_path)
-
         exercise_type = ExerciseDir.exercise_type(clone_path)
+        case exercise_type
+          when :universal
+            FileUtils.cp_r clone_path, stub_path
+            FileUtils.cp_r File.join(clone_path, ".universal", "exercise-stubs"), stub_path
+            universal_contents = Dir.glob File.join(stub_path, ".universal")
+            universal_contents.each { |file| FileUtils.rm_rf file unless file.include? "controls" }
+          else
+            ExerciseFileFilter.new(clone_path).make_stub(stub_path)
+        end
         add_shared_files_to_stub(exercise_type, stub_path)
       end
     end
@@ -342,6 +376,8 @@ private
     def add_shared_files_to_stub(exercise_type, stub_path)
       #TMCTODO
       case exercise_type
+      when :universal
+        #nothing yet
       when :makefile_c
         #nothing yet
       when :java_simple
