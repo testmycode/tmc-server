@@ -305,13 +305,13 @@ class Exercise < ActiveRecord::Base
   end
 
 private
-  def new_gdocs_sheet enabled, sheetname
+  def new_gdocs_sheet(enabled, sheetname)
     return nil unless enabled
-    return sheetname unless sheetname.nil? or sheetname.empty?
-    return name2gdocs_sheet
+    return sheetname.to_s unless sheetname.blank?
+    return name_to_gdocs_sheet
   end
 
-  def name2gdocs_sheet
+  def name_to_gdocs_sheet
     sheetname = self.name.split('-')[0..-2].join('-')
     sheetname.empty? ? "root" : sheetname
   end
