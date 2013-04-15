@@ -253,7 +253,8 @@ private
         review_points = @review_points[exercise.name]
         point_names = Set.new
         path = File.join(@course.clone_path, exercise.relative_path)
-        exercise_type = ExerciseDir.exercise_type(path)
+        clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
+        exercise_type = ExerciseDir.exercise_type(clone_path)
         #TMCTODO
         case exercise_type
           when :universal
@@ -324,7 +325,7 @@ private
         output = f.readlines
         f.close
         points = Set.new
-        available_points_content.each do |line|
+        output.each do |line|
           line = line.gsub(" ", "").chomp
           points << line
         end
