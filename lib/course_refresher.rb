@@ -312,7 +312,6 @@ private
         `cd #{full_path} && make clean`
         FileUtils.rm("#{full_path}/points.txt")
         points
-
       end
     end
 
@@ -320,16 +319,12 @@ private
       full_path = File.join(@course.clone_path, exercise.relative_path)
       hash = FileTreeHasher.hash_file_tree(full_path)
       TestScannerCache.get_or_update(@course, exercise.name, hash) do
-        `cd #{full_path} && .universal/controls/get-points > points.txt`
-        f = File.open("#{full_path}/points.txt")
-        output = f.readlines
-        f.close
+        output = `cd #{full_path} && .universal/controls/get-points` .split("\n")
         points = Set.new
         output.each do |line|
-          line = line.gsub(" ", "").chomp
+          line = line.gsub(" ", "").chomp[0..240]
           points << line
         end
-        FileUtils.rm("#{full_path}/points.txt")
         points
       end
     end
