@@ -140,10 +140,10 @@
                   <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
                 </div>
               <% end %>
-              <% if tcr.valgrind_trace != nil %>
+              <% if tcr.backtrace != nil %>
                 <br />
-                <div class="valgrind-trace">
-                  <%= raw( ("".html_safe + tcr.valgrind_trace).gsub("\n", "<br>") ) %>
+                <div class="backtrace">
+                  <%= raw( ("".html_safe + tcr.backtrace).gsub("\n", "<br>") ) %>
                 </div>
               <% end %>
             </td>
@@ -192,8 +192,8 @@ $(document).ready(function() {
   
   var buttonText = "Toggle stack trace";
   $('.stack-trace').each(createButtonTo);
-  buttonText = "Toggle valgrind trace";
-  $('.valgrind-trace').each(createButtonTo);
+  buttonText = "Toggle backtrace";
+  $('.backtrace').each(createButtonTo);
 });
 </script>
 

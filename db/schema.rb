@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130312123338) do
+ActiveRecord::Schema.define(:version => 20130415103348) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -201,7 +201,7 @@ ActiveRecord::Schema.define(:version => 20130312123338) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "exception"
-    t.text     "valgrind_trace"
+    t.text     "backtrace"
   end
 
   add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"
