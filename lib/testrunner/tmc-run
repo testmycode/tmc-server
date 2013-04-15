@@ -98,6 +98,10 @@ case $PROJECT_TYPE in
 
     CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*"
   ;;
+  
+  universal)
+    # Do nothing, since there is no explicit compiling script for universal support
+  ;;
 esac
 
 
@@ -170,7 +174,11 @@ case $PROJECT_TYPE in
     echo "Java completed, makefile_c done"
   ;;
 
-
+  universal)
+    echo "Running tests for universal support..."
+    .universal/controls/test # This produces the proper output file, maybe this should receive output file as argument
+    echo "...Universal support tests run"
+  ;;
 esac
 
 echo "tmc-run completed successfully"
