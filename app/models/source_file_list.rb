@@ -49,8 +49,12 @@ class SourceFileList
   end
 
   def self.for_solution(solution)
-    files = find_source_files_under(solution.path)
-
+    files = case solution.exercise.exercise_type
+      when :universal
+        find_all_files_under(solution.path)
+      else
+        find_source_files_under(solution.path)
+    end
     files.each do |file|
       html_file = Pathname("#{file.path}.html")
       if html_file.exist?
@@ -83,6 +87,21 @@ private
     files.sort_by(&:path)
   end
 
+  def self.find_all_files_under(root_dir)
+    files = []
+    total_size = 0
+    Pathname(root_dir).realpath.find do |file|
+      if file.size <= MAX_INDIVIDUAL_FILE_SIZE
+        total_size += file.size
+        raise "Files are too large" if total_size > MAX_SIZE
+
+        files << FileRecord.new(file.to_s, file.read) unless file.directory?
+      end
+    end
+
+    files.sort_by(&:path)
+  end
+
   def self.source_file?(file)
     return false unless file.file?
     dir = file.parent.to_s
@@ -97,6 +116,7 @@ private
       name.end_with?('.js') ||
       name.end_with?('.c') ||
       name.end_with?('.h') ||
+      name.end_with?('.rb') ||
       dir.include?('/WEB-INF')
   end
 

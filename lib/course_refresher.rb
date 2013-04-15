@@ -359,9 +359,9 @@ private
         case exercise_type
           when :universal
             FileUtils.cp_r clone_path, stub_path
-            FileUtils.cp_r File.join(clone_path, ".universal", "exercise-stubs"), stub_path
-            universal_contents = Dir.glob File.join(stub_path, ".universal")
-            universal_contents.each { |file| FileUtils.rm_rf file unless file.include? "controls" }
+            FileUtils.cp_r File.join(clone_path, ".universal", "exercise-stubs/."), File.join(stub_path, e.name, ".")
+            universal_contents = Dir.glob(File.join(stub_path, e.name, ".universal/*"))
+            universal_contents.each { |file| FileUtils.rm_rf file unless file.to_s.include? "controls" }
           else
             ExerciseFileFilter.new(clone_path).make_stub(stub_path)
         end
