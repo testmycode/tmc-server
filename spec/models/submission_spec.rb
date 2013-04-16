@@ -46,28 +46,28 @@ describe Submission do
     submission = Submission.new
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :exception => '{"a": "b"}')
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :successful => true)
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :valgrind_trace => 'trace')
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :backtrace => 'trace')
     submission.test_case_records.should == [
       {
         :name => 'Moo moo()',
         :successful => false,
         :message => 'you fail',
         :exception => {'a' => 'b'},
-        :valgrind_trace => nil
+        :backtrace => nil
       },
       {
         :name => 'Moo moo2()',
         :successful => true,
         :message => nil,
         :exception => nil,
-        :valgrind_trace => nil
+        :backtrace => nil
       },
       {
         :name => 'Moo moo()',
         :successful => false,
         :message => 'you fail',
         :exception => nil,
-        :valgrind_trace => 'trace'
+        :backtrace => 'trace'
       }
     ]
   end

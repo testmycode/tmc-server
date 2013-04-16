@@ -20,6 +20,8 @@ class FixtureExercise
       FixtureExercise::MavenExercise.new(path)
     when 'MakefileC'
       FixtureExercise::MakefileCExercise.new(path)
+    when 'UniversalRuby'
+      FixtureExercise::UniversalRubyExercise.new(path)
     else
       FixtureExercise.new(fixture_name, path)
     end
