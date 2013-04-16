@@ -1,6 +1,6 @@
 class Library
   def returns_zero
-    0
+    0  # METHOD BODY return_zero
   end
 
   def hello_world
