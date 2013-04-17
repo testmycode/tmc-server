@@ -48,7 +48,7 @@ class SourceFileList
       make_path_names_relative(project_dir, files)
 
       files = sort_source_files(files)
-      files.delete_if { |file| file.include? ".universal" } if tmpdir == project_dir
+      files.delete_if { |file| file.to_s.include? ".universal" } if tmpdir == project_dir
       self.new(files)
     end
   end
