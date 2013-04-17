@@ -21,7 +21,13 @@ $(document).ready(function() {
       <%= raw(file.html_prelude) %>
     <% end %>
     <%
-      brush = File.extname(file.path)[1..-1]
+      brush = case File.extname(file.path)
+       when '.txt' then 'plain'
+       when '' then 'plain'
+       else File.extname(file.path)[1..-1]
+       end
+      
+      
     %>
     <pre class="brush: <%= brush %>"><%= file.contents %></pre>
   <% end %>
