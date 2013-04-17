@@ -13,6 +13,7 @@ class SubmissionPackager
 
       FileUtils.cp_r(received.realpath.to_s + '/.', dest)
       FileUtils.cp_r(cloned  + '.universal/private', dest + '.universal/')
+      FileUtils.cp_r(cloned  + '.universal/tests/.', dest)
       FileUtils.cp_r(cloned  + '.universal/controls', dest + '.universal/')
       copy_files_in_dir_no_recursion(cloned, dest)
 
