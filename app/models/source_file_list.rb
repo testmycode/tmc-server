@@ -36,7 +36,6 @@ class SourceFileList
       SystemCommands.sh!('unzip', '-qq', zip_path, '-d', tmpdir)
 
       project_dir = TmcDirUtils.find_dir_containing(tmpdir, 'src')
-      project_dir = TmcDirUtils.find_dir_containing(tmpdir, '.universal') if project_dir.nil?
       return self.new([]) if project_dir == nil
 
       files = find_source_files_under(project_dir)
