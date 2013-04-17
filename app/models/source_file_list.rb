@@ -42,9 +42,12 @@ class SourceFileList
         TmcDirUtils.find_dir_containing(tmpdir, 'src')
       end
       return self.new([]) if project_dir == nil
-
-      files = find_source_files_under(project_dir)
-
+    
+      files = if project_dir == tmpdir
+        find_all_files_under(project_dir)
+      else
+        find_source_files_under(project_dir)
+      end
       make_path_names_relative(project_dir, files)
 
       files = sort_source_files(files)
