@@ -39,7 +39,7 @@ class SourceFileList
       project_dir = if TmcDirUtils.find_dir_containing(tmpdir, '.universal') != nil
         tmpdir
       else
-        project_dir = TmcDirUtils.find_dir_containing(tmpdir, 'src')
+        TmcDirUtils.find_dir_containing(tmpdir, 'src')
       end
       return self.new([]) if project_dir == nil
 
