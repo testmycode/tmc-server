@@ -358,8 +358,8 @@ private
         exercise_type = ExerciseDir.exercise_type(clone_path)
         case exercise_type
           when :universal
-            FileUtils.cp_r clone_path, stub_path
-            FileUtils.cp_r File.join(clone_path, ".universal", "exercise-stubs/."), File.join(stub_path, e.name, ".")
+            FileUtils.cp_r(File.join(clone_path,'.'), stub_path)
+            FileUtils.cp_r(File.join(clone_path, ".universal", "exercise-stubs/."), File.join(stub_path, "."))
             universal_contents = Dir.glob(File.join(stub_path, e.name, ".universal/*"))
             universal_contents.each { |file| FileUtils.rm_rf file unless file.to_s.include? "controls" }
           else
