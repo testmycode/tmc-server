@@ -51,7 +51,6 @@ class SourceFileList
       make_path_names_relative(project_dir, files)
 
       files = sort_source_files(files)
-      files.delete_if { |file| file.to_s.include? ".universal" } if tmpdir == project_dir
       self.new(files)
     end
   end
@@ -102,8 +101,9 @@ private
       if file.size <= MAX_INDIVIDUAL_FILE_SIZE
         total_size += file.size
         raise "Files are too large" if total_size > MAX_SIZE
-
-        files << FileRecord.new(file.to_s, file.read) unless file.directory?
+        name = file.to_s
+        next if file.directory? or name.end_with?('.zip') or name.end_with?('.tar') or name.include? ".universal" or name.include? "nbproject"
+        files << FileRecord.new(file.to_s, file.read)
       end
     end
 
