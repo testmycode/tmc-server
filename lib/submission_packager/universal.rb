@@ -3,7 +3,7 @@ class SubmissionPackager
   private
     def find_received_project_root(received_root)
       src_dir_path = TmcDirUtils.find_dir_containing(received_root, ".universal")
-      raise 'No src directory' if src_dir_path == nil
+      raise 'No .universal directory' if src_dir_path == nil
       root_path = src_dir_path.to_s.split("/")[0..-1].join("/")
       Pathname(root_path)
     end
