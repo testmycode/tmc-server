@@ -17,7 +17,8 @@ class Submission < ActiveRecord::Base
   end
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
-  
+  has_many :comments, :dependent => :nullify
+
   validates :user, :presence => true
   validates :course, :presence => true
   validates :exercise_name, :presence => true
