@@ -58,6 +58,7 @@ TmcServer::Application.routes.draw do
     resources :feedback_answers, :only => [:create]
     resources :files, :only => [:index]
     resources :reviews, :only => [:index, :new, :create]
+    resources :paste, :only => [:index]
   end
 
   resources :reviews, :only => [:update, :destroy]
