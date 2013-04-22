@@ -3,6 +3,13 @@
 = javascript_include_tag "underscore-min.js"
 = javascript_include_tag "backbone-min.js"
 = javascript_include_tag "mustache.js"
+= javascript_include_tag "bootstrap.js"
+= stylesheet_link_tag "bootstrap.min.css"
+
+:css
+  #comments {
+    overflow: auto;
+  }
 
 :javascript
   var tmcPastebin = {
@@ -22,23 +29,27 @@
     el: "#left-pane",
     initialize: function() {
       this.editor = ace.edit("editor");
+      $("#editor").css("height", $("#left-pane").height());
+      $("#editor").css("width", $("#left-pane").width());
       this.chosenIndex = 0;
       this.render();
 
       // Create tabs
       for (var i = 0; i < tmcPastebin.models.files.length; i++) {
         var path = tmcPastebin.models.files[i].path;
-        $("#tabs").append($("<li data-id=" + i + ">" + path + "</li>"));
+        $("#tabs").append($("<li><a data-id=" + i + "href=\"#\">" + path + "</a></li>"));
       }
     },
     render: function() {
       this.editor.getSession().setMode("ace/mode/java");
       this.editor.getSession().setValue(tmcPastebin.models.files[this.chosenIndex].contents);
+
     },
     events: {
-      "click li": "changeFile"
+      "click li a": "changeFile"
     },
     changeFile: function(e) {
+      e.preventDefault();
       this.chosenIndex = parseInt($(e.target).data("id"));
       this.render();
     }
@@ -51,38 +62,37 @@
       this.render();
     },
     render: function () {
-      this.renderTestInfo();
       this.renderTestList();
-    },
-    renderTestInfo: function() {
-      if (this.chosenIndex != null) {
-        var model = tmcPastebin.models.tests[this.chosenIndex];
-        var details = (model.exception == null || model.exception.length == 0) ? model.backtrace : model.exception;
-        $("#test-info").html(details);
-      } else {
-        $("#test-info").html("");
-      }
     },
     renderTestList: function() {
       $("div#test-list ul").html(""); // Clearing test-list so we don't get duplicates
       for (var field in tmcPastebin.models.tests) {
         var statusMsg = (tmcPastebin.models.tests[field].successful) ? "Passed" : "Failed";
         $("div#test-list ul").append($("<li data-id=\"" + field + "\">" + tmcPastebin.models.tests[field].test_case_name + " : "  + statusMsg + "</li>"));
+      
+        var model = tmcPastebin.models.tests[field];
+        var content = (model.exception == null || model.exception.length == 0) ? model.backtrace : model.exception;
+        var data = {content: content, idx: field, testCaseName: model.test_case_name};
+        var html = Mustache.render($("#test-modal-template").html(), data);
+        $("body").append($(html));
       }
-    },
-    events: {
-      "click li": "showDetails"
-    },
-    showDetails: function(e) {
-      var clicked = parseInt($(e.target).data("id"));
-      this.chosenIndex = (clicked == this.chosenIndex) ? null : clicked;
-      this.render();
-    }
-  });
+      },
+      events: {
+        "click li": "showDetails"
+      },
+      showDetails: function(e) {
+        var targetId = $(e.target).data("id");
+        console.log("ID: " + targetId);
+        $("#modal-" + targetId).modal();
+      }
+    });
 
   tmcPastebin.views.CommentsView = Backbone.View.extend({
     el: "#comments-pane",
     initialize: function() {
+      this.scroll = false;
+      $("#comments").height($("#editor").height());
+      this.scrollDown();
       this.comments = new tmcPastebin.models.Comments();
       this.reload();
     },
@@ -97,6 +107,10 @@
       var context = this;
       this.comments.fetch({success: function() {
         context.render();
+        if (context.scroll) {
+          context.scroll = false;
+          context.scrollDown();
+        }
       }});
     },
     submitComment: function(e) {
@@ -105,11 +119,16 @@
       this.comments.create({comment: msg});
       $("#message").val("");
       this.reload();
+      this.scroll = true;
+    },
+    scrollDown: function() {
+      $("#comments").animate({scrollTop: $(document).height()}, 1000);
     }
   });
 
 :javascript
   $(document).ready(function() {
+    $('link[href*="main"]').remove(); // Tmp dirty trick to keep the main css out. That ugly thing...
     tmcPastebin.models.files = JSON.parse($("#files-template").html());
     tmcPastebin.models.tests = JSON.parse($("#tests-template").html());
     var editorView = new tmcPastebin.views.EditorView();
@@ -133,26 +152,50 @@
 -#        else File.extname(file.path)[1..-1]
 -#      end
 -#    %pre.brush:.brush{:class => "#{brush}"} #{file.contents}
-
-#left-pane
-  %ul{id: "tabs"}
-  #editor{style: "height: 300px; width: 500px;"}
-
-#right-pane
-  #comments-pane
-    #comments
-    %input{type: "text", id: "message"}
-    %input{type: "submit"}
-  #test-pane
-    #test-info
-    #test-list
-      %ul
+.container-fluid
+  .row
+    .span10
+      #left-pane.well
+        .navbar.navbar-inverse
+          .navbar-inner
+            .container
+              %button{type: "button", class: "btn btn-navbar"}
+                %span{class: "icon-bar"}
+                %span{class: "icon-bar"}
+                %span{class: "icon-bar"}
+              %ul{id: "tabs", class: "nav"}
+        #editor{style: "height: 300px; width: 500px;"}
+    .span4
+      #right-pane.well
+        #comments-pane.well
+          #comments
+          %input{type: "text", id: "message", placeholder: "Type here..."}
+          %input{type: "submit", class: "btn-small btn-primary", value: "Send"}
+        #test-pane.well
+          #test-info
+          #test-list
+            %ul
 
 - # Templates
 %script{id: "files-template", type: "text/plain"}
   = raw(@files)
 %script{id: "tests-template", type: "text/plain"}
   = raw(@tests)
+
+%script{id: "test-modal-template", type: "text/html"}
+  :plain
+    <div id="modal-{{idx}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>{{testCaseName}}</h3>
+      </div>
+      <div class="modal-body">
+        <p>{{content}}}</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</a>
+      </div>
+    </div>
 
 %script{id: "comments-list-template", type: "text/html"}
   :plain
