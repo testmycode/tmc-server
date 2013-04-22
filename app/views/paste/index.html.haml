@@ -12,10 +12,9 @@
 
   // Models
   tmcPastebin.models.Comment = Backbone.Model.extend({});
-
   tmcPastebin.models.Comments = Backbone.Collection.extend({
     model: tmcPastebin.models.Comment,
-    url: window.location + "comments.json?api_version=5"
+    url: ((("" + window.location).charAt(window.location.length - 1) == '/') ? window.location : (window.location + "/")) + "comments.json?api_version=5"
   });
 
   // Views
@@ -48,10 +47,36 @@
   tmcPastebin.views.TestView = Backbone.View.extend({
     el: "#test-pane",
     initialize: function() {
+      this.chosenIndex = null;
       this.render();
     },
     render: function () {
-      // TODO
+      this.renderTestInfo();
+      this.renderTestList();
+    },
+    renderTestInfo: function() {
+      if (this.chosenIndex != null) {
+        var model = tmcPastebin.models.tests[this.chosenIndex];
+        var details = (model.exception == null || model.exception.length == 0) ? model.backtrace : model.exception;
+        $("#test-info").html(details);
+      } else {
+        $("#test-info").html("");
+      }
+    },
+    renderTestList: function() {
+      $("div#test-list ul").html(""); // Clearing test-list so we don't get duplicates
+      for (var field in tmcPastebin.models.tests) {
+        var statusMsg = (tmcPastebin.models.tests[field].successful) ? "Passed" : "Failed";
+        $("div#test-list ul").append($("<li data-id=\"" + field + "\">" + tmcPastebin.models.tests[field].test_case_name + " : "  + statusMsg + "</li>"));
+      }
+    },
+    events: {
+      "click li": "showDetails"
+    },
+    showDetails: function(e) {
+      var clicked = parseInt($(e.target).data("id"));
+      this.chosenIndex = (clicked == this.chosenIndex) ? null : clicked;
+      this.render();
     }
   });
 
@@ -62,9 +87,8 @@
       this.reload();
     },
     render: function() {
-      var html = Mustache.render($("#comments-template").html(), {comments: this.comments.toJSON()});
-      console.log(this.comments.toJSON());
-      $("#comments-pane").html(html);
+      var html = Mustache.render($("#comments-list-template").html(), {comments: this.comments.toJSON()});
+      $("#comments-pane #comments").html(html);
     },
     events: {
       "click input:submit": "submitComment"
@@ -87,8 +111,16 @@
 :javascript
   $(document).ready(function() {
     tmcPastebin.models.files = JSON.parse($("#files-template").html());
-    new tmcPastebin.views.EditorView();
-    new tmcPastebin.views.CommentsView();
+    tmcPastebin.models.tests = JSON.parse($("#tests-template").html());
+    var editorView = new tmcPastebin.views.EditorView();
+    var commentsView = new tmcPastebin.views.CommentsView();
+    var testView = new tmcPastebin.views.TestView();
+
+    // Event delegation
+    commentsView.on("reload", commentsView.reload);
+
+    // Refreshing comments
+    setInterval(function(){commentsView.trigger("reload")}, 1000);
   });
 
 -#.solution-files
@@ -108,18 +140,24 @@
 
 #right-pane
   #comments-pane
+    #comments
+    %input{type: "text", id: "message"}
+    %input{type: "submit"}
   #test-pane
+    #test-info
+    #test-list
+      %ul
 
 - # Templates
 %script{id: "files-template", type: "text/plain"}
   = raw(@files)
+%script{id: "tests-template", type: "text/plain"}
+  = raw(@tests)
 
-%script{id: "comments-template", type: "text/html"}
+%script{id: "comments-list-template", type: "text/html"}
   :plain
     {{#comments}}
       <div class="comment">
         {{user.login}}: {{comment}}
       </div>
      {{/comments}}
-     <input type="text" id="message"></input>
-     <input type="submit"></input>

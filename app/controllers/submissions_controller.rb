@@ -27,7 +27,7 @@ class SubmissionsController < ApplicationController
   def show
     @submission = Submission.find(params[:id])
     authorize! :read, @submission
-    
+
     @course = @submission.course
     @exercise = @submission.exercise
     add_course_breadcrumb
@@ -61,7 +61,7 @@ class SubmissionsController < ApplicationController
           }
           end
         )
-        
+
         if @exercise.solution.visible_to?(current_user)
           output[:solution_url] = view_context.exercise_solution_url(@exercise)
         end
@@ -100,6 +100,8 @@ class SubmissionsController < ApplicationController
         :return_file => file_contents,
         :params_json => submission_params.to_json,
         :requests_review => !!params[:request_review],
+        :paste_available => !!params[:paste],
+        :message_for_paste => if params[:paste] then params[:message_for_paste] || '' else '' end,
         :message_for_reviewer => if params[:request_review] then params[:message_for_reviewer] || '' else '' end
       )
       
