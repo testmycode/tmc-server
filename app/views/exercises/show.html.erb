@@ -90,7 +90,7 @@
         confirm_msg = nil
       end
     %>
-    <%= button_to 'Rerun all submissions', exercise_update_submissions_path(@exercise), :method => :put, :confirm => confirm_msg %>
+    <%= button_to 'Rerun all submissions', exercise_update_submissions_path(@exercise), :method => :put, :confirm => confirm_msg, class: "btn btn-danger"%>
     (may add points; never deletes points; may take a long time)
   </section>
 <% end %>

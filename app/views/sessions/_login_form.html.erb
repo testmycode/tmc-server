@@ -1,15 +1,7 @@
-
-<% if signed_in? %>
-  <%= link_to "Sign out", signout_path, :method => :delete, :id => 'logout-link' %>
-<% else %>
-  <%= form_for(:session, :url => sessions_path) do |f| %>
-    <%= f.label :login %>
+<% if not signed_in? %>
+  <%= form_for :session, :url => sessions_path, :html => {class: "navbar-form pull-right"} do |f| %>
     <%= f.text_field :login, :size => 10 %>
-  
-    <%= f.label :password %>
     <%= f.password_field :password, :size => 10 %>
-  
     <%= f.submit "Sign in" %>
   <% end %>
 <% end %>
-

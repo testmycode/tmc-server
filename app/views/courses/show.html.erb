@@ -102,7 +102,7 @@
 <section>
   <% if current_user.administrator? %>
     <div class="refresh-course-button">
-      <%= button_to 'Refresh from repository', refresh_course_path(@course) %>
+      <%= button_to 'Refresh from repository', refresh_course_path(@course), class: "btn btn-primary" %>
     </div>
   <% end %>
 

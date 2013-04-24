@@ -101,7 +101,7 @@
       <%= form_tag submission_path(@submission), :method => :put do %>
         <%= hidden_field_tag('rerun', '1')  %>
         <div>
-          <%= button_tag 'Rerun submission', :type => 'submit' %>
+          <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
         </div>
         (may add points; never deletes points)
       <% end %>
