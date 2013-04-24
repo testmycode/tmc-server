@@ -2,6 +2,6 @@
   <%= form_for :session, :url => sessions_path, :html => {class: "navbar-form pull-right"} do |f| %>
     <%= f.text_field :login, :size => 10 %>
     <%= f.password_field :password, :size => 10 %>
-    <%= f.submit "Sign in" %>
+    <%= f.submit "Sign in", class: "btn btn-primary" %>
   <% end %>
 <% end %>

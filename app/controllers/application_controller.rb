@@ -18,7 +18,8 @@ class ApplicationController < ActionController::Base
   layout :select_layout
 
   protect_from_forgery
-
+  include BootstrapFlashHelper
+  include FlashBlockHelper
   include SessionsHelper
   include BreadcrumbHelpers
   check_authorization

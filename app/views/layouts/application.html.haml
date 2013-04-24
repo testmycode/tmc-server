@@ -39,9 +39,6 @@
         =render 'twitter-bootstrap/breadcrumbs'
         - if @show_page_presence
           #page-presence
-      #content-area
-        - for msg_type in [:success, :notice, :warning, :error, :alert]
-          - if flash[msg_type]
-            %div{:class => "flash #{msg_type}"}= raw(flash[msg_type])
-        .container.container-fluid
-          = yield
+      #content-area.container.container-fluid
+        = bootstrap_flash
+        = yield

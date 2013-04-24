@@ -49,31 +49,9 @@ a:hover {
   text-decoration: underline !important;
 }
 
-.error,
-.alert,
-.failure,
-.fail,
-.dangerous {
-  color: red !important;
-}
-
 .review-required,
 .review-requested {
   font-weight: bold;
-}
-
-.warning {
-  color: #FF8000;
-}
-
-.notice,
-.success,
-.ok {
-  color: green;
-}
-
-.minor-notice {
-  color: black;
 }
 
 pre {
@@ -149,11 +127,13 @@ button * {
 
 /* Toplevel layout */
 
-body {
+/* bootstrapping */
+body #everything {
   color: black;
   font-family: sans-serif;
   font-size: 9pt;
-  padding-top: 45px;
+  padding-top: 40px;
+  font-size: 12px;
 }
 
 body.default {
@@ -172,55 +152,8 @@ body.default {
   padding-right: 2%;
 }
 
-#title-area {
-  height: 100px;
-  padding-bottom: 24px;
-  background-color: #E9AF43;
-}
-
-#title-area > #titles {
-  float: left;
-}
-
-#title-area > #titles > .branding {
-  font-weight: bold;
-  margin-left: 12px;
-}
-
-#title-area > #login {
-  margin-top: 20px;
-  float: right;
-  text-align: right;
-}
-
-#title-area > #login > #logout-link {
-  font-weight: bold;
-}
-
-#title-area > #login > div {
-  font-weight: bold;
-  margin-top: 5pt;
-}
-
-#breadcrumb {
-  clear: both;
-  background-color: #F5F9FD;
-  font-weight: bold;
-  padding: 5px 5px 5px 5px;
-  border-top: 1px #E8EBFB solid;
-}
-
-#breadcrumb .breadcrumb-resource {
-  font-style: italic;
-}
-
 #page-presence {
   float: right;
-}
-
-.flash {
-  margin-top: 10px;
-  font-weight: bold;
 }
 
 /* Form layout */
