@@ -182,15 +182,15 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  var createButtonTo = function() { 
-    var trace = this; 
-    var button = $("<button>" + buttonText + "</button>")[0]; 
-    $(trace).before(button); $(trace).hide(); 
+  var createButtonTo = function() {
+    var trace = this;
+    var button = $('<button class="btn btn-primary">' + buttonText + "</button>")[0];
+    $(trace).before(button); $(trace).hide();
     $(button).click(function() {
       $(trace).toggle();
     });
   };
-  
+
   var buttonText = "Toggle stack trace";
   $('.stack-trace').each(createButtonTo);
   buttonText = "Toggle backtrace";

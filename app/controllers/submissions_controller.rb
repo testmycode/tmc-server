@@ -5,7 +5,7 @@ require 'submission_processor'
 class SubmissionsController < ApplicationController
   around_filter :course_transaction
   before_filter :get_course_and_exercise
-  
+
   skip_authorization_check :only => [:show, :index]
 
   def index
