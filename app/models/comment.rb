@@ -4,7 +4,7 @@ class Comment < ActiveRecord::Base
 
   def to_my_json
     hash = {
-      user: {login: self.user.login || "No User #{self.user.inspect}"},
+      user: {login: (self.user.nil? ? 'Guest' :  self.user.login)},
       comment: self.comment
     }
     hash.as_json
