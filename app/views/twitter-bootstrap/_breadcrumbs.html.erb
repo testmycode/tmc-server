@@ -1,6 +1,7 @@
+<h1>asdasd</h1>
 <% if @breadcrumbs.present? %>
   <ul class="breadcrumb">
-    <% separator = divider %>
+    <% separator = '/' %>
     <% @breadcrumbs[0..-2].each do |crumb| %>
       <li>
         <%= link_to crumb[:name], crumb[:url], crumb[:options] %>
