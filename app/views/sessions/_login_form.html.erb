@@ -1,7 +1,7 @@
 <% if not signed_in? %>
   <%= form_for :session, :url => sessions_path, :html => {class: "navbar-form pull-right"} do |f| %>
-    <%= f.text_field :login, class: 'span2' %>
-    <%= f.password_field :password, class: 'span2' %>
+    <%= f.text_field :login, class: 'span2', placeholder: 'Username' %>
+    <%= f.password_field :password, class: 'span2', placeholder: 'Password' %>
     <%= f.submit "Sign in", class: "btn btn-primary" %>
   <% end %>
 <% end %>
