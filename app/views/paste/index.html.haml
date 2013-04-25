@@ -67,7 +67,8 @@
       $("div#test-list ul").html(""); // Clearing test-list so we don't get duplicates
       for (var field in tmcPastebin.models.tests) {
         var statusMsg = (tmcPastebin.models.tests[field].successful) ? "Passed" : "Failed";
-        $("div#test-list ul").append($("<li data-id=\"" + field + "\">" + tmcPastebin.models.tests[field].test_case_name + " : "  + statusMsg + "</li>"));
+        var statusColor = (tmcPastebin.models.tests[field].successful) ? "ok" : "fail";
+        $("div#test-list ul").append($("<li data-id=\"" + field + "\" class=\"" + statusColor + "\">" + tmcPastebin.models.tests[field].test_case_name + " : "  + statusMsg + "</li>"));
 
         var model = tmcPastebin.models.tests[field];
         var content = (model.exception == null || model.exception.length == 0) ? model.backtrace : model.exception;
