@@ -20,7 +20,7 @@ class PasteController < ApplicationController
     hash[i] = {test_case_name: c.test_case_name,
               message: if c.message then c.message|| '' else '' end,
               successful: c.successful,
-              backtrace: if c.backtrace then c.backtrace || '' else '' end,
+              backtrace: if c.backtrace then c.backtrace.gsub("\n","<br/>") || '' else '' end,
               exception: if c.exception then format_exception_chain(ActiveSupport::JSON.decode(c.exception)) || '' else '' end
             }
 
