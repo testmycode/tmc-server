@@ -68,7 +68,7 @@
       for (var field in tmcPastebin.models.tests) {
         var statusMsg = (tmcPastebin.models.tests[field].successful) ? "Passed" : "Failed";
         $("div#test-list ul").append($("<li data-id=\"" + field + "\">" + tmcPastebin.models.tests[field].test_case_name + " : "  + statusMsg + "</li>"));
-      
+
         var model = tmcPastebin.models.tests[field];
         var content = (model.exception == null || model.exception.length == 0) ? model.backtrace : model.exception;
         var data = {content: content, idx: field, testCaseName: model.test_case_name};
