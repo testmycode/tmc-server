@@ -41,7 +41,7 @@
   right: auto !important;
   text-align: left !important;
   top: auto !important;
-  vertical-align: baseline !important;
+  /*vertical-align: baseline !important; dirty trick... -Jamo*/
   width: auto !important;
   box-sizing: content-box !important;
   font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
