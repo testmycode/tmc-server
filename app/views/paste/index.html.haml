@@ -100,7 +100,8 @@
       $("#comments-pane #comments").html(html);
     },
     events: {
-      "click input:submit": "submitComment"
+      "click input:submit": "submitComment",
+      "keyup input:text": "submitWithEnter"
     },
     reload: function() {
       var context = this;
@@ -115,10 +116,14 @@
     submitComment: function(e) {
       e.preventDefault();
       var msg = $("#message").val();
+      if (msg == "") return;
       this.comments.create({comment: msg});
       $("#message").val("");
       this.reload();
       this.scroll = true;
+    },
+    submitWithEnter: function(e) {
+      if (e.keyCode == 13) this.submitComment(e);
     },
     scrollDown: function() {
       $("#comments").animate({scrollTop: $(document).height()}, 1000);
@@ -127,7 +132,7 @@
 
 :javascript
   $(document).ready(function() {
-    $('link[href*="main"]').remove(); // Tmp dirty trick to keep the main css out. That ugly thing...
+    //$('link[href*="main"]').remove(); // Tmp dirty trick to keep the main css out. That ugly thing...
     tmcPastebin.models.files = JSON.parse($("#files-template").html());
     tmcPastebin.models.tests = JSON.parse($("#tests-template").html());
     var editorView = new tmcPastebin.views.EditorView();
@@ -152,7 +157,7 @@
 -#      end
 -#    %pre.brush:.brush{:class => "#{brush}"} #{file.contents}
 .row
-  .span9
+  .span8
     #left-pane.well
       .navbar.navbar-inverse
         .navbar-inner

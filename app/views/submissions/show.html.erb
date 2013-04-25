@@ -1,6 +1,6 @@
 <h1>Submission <%= @submission.id %></h1>
 
-<section>
+<section class="well">
   <div class="submission-summary">
     <% if !@submission.processed? %>
       <p>Processing...</p>
@@ -95,7 +95,7 @@
 
 <h2>Results</h2>
 
-<section>
+<section class="well">
   <% if can? :update, @submission %>
     <div>
       <%= form_tag submission_path(@submission), :method => :put do %>

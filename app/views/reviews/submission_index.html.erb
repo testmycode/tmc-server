@@ -135,7 +135,7 @@
 
   <section>
     <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
-    <button id="new-review"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
+    <button id="new-review" class="btn btn-primary"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
     <% if @submission.review_dismissable? %>
       <div id="dismiss-review-form">
         <% if @submission.reviews.count == 0 %>

@@ -1,29 +1,6 @@
 
 /* Basic commons */
 
-h1, h2, h3, h4, h5, h6 {
-  color: #09214A;
-  font-family: "Arial", sans-serif;
-}
-
-h1 {
-  font-size: 200%;
-}
-
-h2 {
-  margin-left: 0.3em;
-  font-size: 150%;
-}
-
-h3 {
-  margin-left: 0.5em;
-  font-size: 120%;
-}
-
-h5 {
-  margin-bottom: 0.2em;
-}
-
 .list-title {
   font-weight: bold;
 }
@@ -37,28 +14,12 @@ section {
   margin-bottom: 2em;
 }
 
-a {
-  color: #103D89 !important;
-  text-decoration: none;
-}
-
-a:visited {
-  color: #103D89 !important;
-}
-a:hover {
-  text-decoration: underline !important;
-}
 
 .review-required,
 .review-requested {
   font-weight: bold;
 }
 
-pre {
-  background-color: #eee;
-  padding: 10px;
-  font-size: 11px;
-}
 
 .footnote {
   font-size: 8pt;
@@ -154,29 +115,6 @@ body.default {
 
 #page-presence {
   float: right;
-}
-
-/* Form layout */
-
-.field label {
-  font-size: 90%;
-  font-weight: bold;
-}
-
-.field label.label_first {
-  display: block;
-}
-
-.field {
-  margin-bottom: 14px;
-}
-
-div.actions {
-  margin-top: 1.4em;
-}
-
-.suboption {
-  margin-left: 3em;
 }
 
 /* Miscellaneous */
