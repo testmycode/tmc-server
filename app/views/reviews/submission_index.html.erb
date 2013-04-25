@@ -44,10 +44,10 @@
           <%= form_tag review_path(review), :method => 'put' do %>
             <% if review.marked_as_read? %>
               <input type="hidden" name="mark_as_unread" value="1" />
-              <button type="submit">Mark as unread</button>
+              <button type="submit" class="btn btn-primary">Mark as unread</button>
             <% else %>
               <input type="hidden" name="mark_as_read" value="1" />
-              <button type="submit">Mark as read</button>
+              <button type="submit" class="btn btn-primary">Mark as read</button>
             <% end %>
           <% end %>
         </div>
@@ -66,10 +66,10 @@
       <div class="review-body"><%= simple_format(review.review_body) %></div>
       <div class="buttons">
         <% if action_name == 'new' && can?(:update, review) %>
-          <button class="edit-review"><span class="ui-icon ui-icon-pencil"></span>&nbsp;Edit</button>
+          <button class="edit-review btn btn-warning"><span class="ui-icon ui-icon-pencil"></span>&nbsp;Edit</button>
         <% end %>
         <% if action_name == 'new' && can?(:delete, review) %>
-          <button class="delete-review"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
+          <button class="delete-review btn btn-danger"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
           <div class="ui-helper-hidden">
             <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>
           </div>
@@ -117,7 +117,7 @@
             <label for="send_notification">Notify in IDE</label>
           </div>
           <div class="buttons">
-            <button type="submit"><span class="ui-icon ui-icon-disk"></span>&nbsp;Save review</button>
+            <button type="submit" class="btn btn-primary"><span class="ui-icon ui-icon-disk"></span>&nbsp;Save review</button>
           </div>
         <% end %>
       </div>
@@ -158,6 +158,7 @@
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
 
 <% if @new_review %>
+  <%= javascript_include_tag 'jquery-ui' %>
   <script type="text/javascript">
     $(document).ready(function() {
       var $newReviewButton = $('#new-review');
