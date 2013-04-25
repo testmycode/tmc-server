@@ -28,8 +28,7 @@
     el: "#left-pane",
     initialize: function() {
       this.editor = ace.edit("editor");
-      $("#editor").css("height", $("#left-pane").height());
-      $("#editor").css("width", $("#left-pane").width());
+      this.resizeEditor();
       this.chosenIndex = 0;
       this.render();
 
@@ -45,12 +44,17 @@
 
     },
     events: {
-      "click li a": "changeFile"
+      "click li a": "changeFile",
+      "resize div": "resizeEditor" //Why not working?
     },
     changeFile: function(e) {
       e.preventDefault();
       this.chosenIndex = parseInt($(e.target).data("id"));
       this.render();
+    },
+    resizeEditor: function(){
+      $("#editor").css("height", $("#left-pane").height());
+      $("#editor").css("width", $("#left-pane").width());
     }
   });
 
