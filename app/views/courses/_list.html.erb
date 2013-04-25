@@ -35,10 +35,10 @@
             <% end %>
           </td>
           <td>
-            <%= link_to 'Refresh', refresh_course_path(course) %>
+            <%= link_to 'Refresh', refresh_course_path(course), class: "btn btn-warning btn-mini" %>
           </td>
           <td>
-            <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', :confirm => 'Really truly delete this course?' %>
+            <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', class: "btn btn-danger btn-mini", :confirm => 'Really truly delete this course?' %>
           </td>
         <% end %>
       </tr>
