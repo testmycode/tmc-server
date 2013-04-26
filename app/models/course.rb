@@ -79,6 +79,8 @@ class Course < ActiveRecord::Base
     self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
 
+    self.description = new_options['description']
+
     if new_options['locked_exercise_points_visible'] != nil
       self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']
     else
