@@ -103,9 +103,9 @@
 </div>
 
 <div class="row">
-<h2>All exercises</h2>
-
 <section class="span11">
+  <h2>All exercises</h2>
+
   <% if current_user.administrator? %>
     <div class="refresh-course-button">
       <%= button_to 'Refresh from repository', refresh_course_path(@course), class: "btn btn-primary" %>
@@ -123,9 +123,8 @@
 </div>
 <div class="row">
 <% if @submissions %>
-  <h2>Latest submissions</h2>
-
   <div class="span11">
+  <h2>Latest submissions</h2>
     <% if @total_submissions > @submissions.count %>
       <p>
         Only showing <%= @submissions.count %> of <%= @course.submissions.count %>

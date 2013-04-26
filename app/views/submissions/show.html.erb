@@ -96,9 +96,9 @@
 
 
 <div class="row">
-<h2>Results</h2>
   <div class="span11">
-    <div class="well">
+    <h2>Results</h2>
+      <div class="well">
       <% if can? :update, @submission %>
         <div>
           <%= form_tag submission_path(@submission), :method => :put do %>
