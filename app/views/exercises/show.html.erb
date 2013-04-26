@@ -61,28 +61,31 @@
 </ul>
 
 <% if @exercise.submittable_by?(current_user) %>
+<div class="row">
   <h2>Submit answer</h2>
-
-  <section>
+  <div class="span11">
     <%= render :partial => 'submissions/form', :locals => { :submission => @new_submission } %>
-  </section>
+  </div>
+  </div>
 <% end %>
 
 
 <% if signed_in? %>
+<div class="row">
   <h2>Submissions</h2>
-
-  <section>
+  <div class="span11">
     <% if !@submissions.empty? %>
       <%= show_submission_list(@submissions, :show_exercise_column => false, :show_awarded_points => true) %>
     <% else %>
       <p>No submissions yet.</p>
     <% end %>
-  </section>
+  </div>
+</div>
 <% end %>
 
 <% if current_user.administrator? && !@submissions.empty? %>
-  <section>
+    <div class="row">
+    <div class="span10">
     <%
       if @submissions.count > 10
         confirm_msg = "Really rerun all #{@submissions.count} submissions?\nIt may take a while."
@@ -90,7 +93,9 @@
         confirm_msg = nil
       end
     %>
+    <br>
     <%= button_to 'Rerun all submissions', exercise_update_submissions_path(@exercise), :method => :put, :confirm => confirm_msg, class: "btn btn-danger"%>
     (may add points; never deletes points; may take a long time)
-  </section>
+  </div>
+  </div>
 <% end %>

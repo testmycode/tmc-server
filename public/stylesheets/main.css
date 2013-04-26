@@ -1,8 +1,15 @@
+.dataTables_filter label input[type=text]{
+  height: 0.7em;
+  margin-top: 1%;
+}
+
 /* Submissions status*/
+.failure,
 .fail {
   color: red !important;
 }
 
+.success,
 .ok {
   color: green;
 }

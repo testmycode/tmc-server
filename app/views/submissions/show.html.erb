@@ -1,6 +1,6 @@
 <h1>Submission <%= @submission.id %></h1>
-
-<section class="well">
+<div class="row">
+<div class="well span6">
   <div class="submission-summary">
     <% if !@submission.processed? %>
       <p>Processing...</p>
@@ -91,93 +91,101 @@
     });
     </script>
   <% end %>
-</section>
+</div>
+</div>
 
+
+<div class="row">
 <h2>Results</h2>
-
-<section class="well">
-  <% if can? :update, @submission %>
-    <div>
-      <%= form_tag submission_path(@submission), :method => :put do %>
-        <%= hidden_field_tag('rerun', '1')  %>
+  <div class="span11">
+    <div class="well">
+      <% if can? :update, @submission %>
         <div>
-          <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
-        </div>
-        (may add points; never deletes points)
-      <% end %>
-    </div>
-  <% end %>
-
-  <% if @submission.pretest_error %>
-    <pre class="error"><%= @submission.pretest_error %></pre>
-  <% end %>
-
-  <% if @submission.tests_ran? %>
-    <table>
-      <tr>
-        <th>Test case</th>
-        <th>Status</th>
-        <% if !@submission.all_tests_passed? %>
-          <th>Info</th>
-        <% end %>
-      </tr>
-
-      <% @submission.test_case_runs.each do |tcr| %>
-        <tr>
-          <td><%= tcr.test_case_name %></td>
-          <td>
-            <% if tcr.successful? %>
-              <span class="success">Ok</span>
-            <% else %>
-              <span class="failure">Fail</span>
-            <% end %>
-          </td>
-          <% if !@submission.all_tests_passed? %>
-            <td>
-              <%= tcr.message %>
-              <% if tcr.exception != nil %>
-                <br />
-                <div class="stack-trace">
-                  <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
-                </div>
-              <% end %>
-              <% if tcr.backtrace != nil %>
-                <br />
-                <div class="backtrace">
-                  <%= raw( ("".html_safe + tcr.backtrace).gsub("\n", "<br>") ) %>
-                </div>
-              <% end %>
-            </td>
+          <%= form_tag submission_path(@submission), :method => :put do %>
+            <%= hidden_field_tag('rerun', '1')  %>
+            <div>
+              <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
+            </div>
+            (may add points; never deletes points)
           <% end %>
-        </tr>
+        </div>
       <% end %>
-    </table>
-  <% end %>
-</section>
+
+      <% if @submission.pretest_error %>
+        <pre class="error"><%= @submission.pretest_error %></pre>
+      <% end %>
+      <% if @submission.tests_ran? %>
+        <table>
+          <tr>
+            <th>Test case</th>
+            <th>Status</th>
+            <% if !@submission.all_tests_passed? %>
+              <th>Info</th>
+            <% end %>
+          </tr>
+
+          <% @submission.test_case_runs.each do |tcr| %>
+            <tr>
+              <td><%= tcr.test_case_name %></td>
+              <td>
+                <% if tcr.successful? %>
+                  <span class="success">Ok</span>
+                <% else %>
+                  <span class="failure">Fail</span>
+                <% end %>
+              </td>
+              <% if !@submission.all_tests_passed? %>
+                <td>
+                  <%= tcr.message %>
+                  <% if tcr.exception != nil %>
+                    <br />
+                    <div class="stack-trace">
+                      <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
+                    </div>
+                  <% end %>
+                  <% if tcr.backtrace != nil %>
+                    <br />
+                    <div class="backtrace">
+                      <%= raw( ("".html_safe + tcr.backtrace).gsub("\n", "<br>") ) %>
+                    </div>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      <% end %> 
+    </div>
+</div>
 
 <% if !@submission.stdout.blank? || !@submission.stderr.blank? %>
+  <div class="row">
   <h2>Output</h2>
-  <section>
-    <p>The following was output while running the tests.</p>
-    <% if !@submission.stdout.blank? %>
-      <% if @submission.stderr.blank? %>
-        <h3>Standard output (System.out)</h3>
+    <div class="span11">
+      <p>The following was output while running the tests.</p>
+      <% if !@submission.stdout.blank? %>
+        <% if @submission.stderr.blank? %>
+          <h3>Standard output (System.out)</h3>
+        <% end %>
+        <pre><%= @submission.stdout %></pre>
       <% end %>
-      <pre><%= @submission.stdout %></pre>
-    <% end %>
 
-    <% if !@submission.stderr.blank? %>
-      <h3>Error output (System.err)</h3>
-      <pre><%= @submission.stderr %></pre>
-    <% end %>
-  </section>
+      <% if !@submission.stderr.blank? %>
+        <h3>Error output (System.err)</h3>
+        <pre><%= @submission.stderr %></pre>
+      <% end %>
+    </div>
+  </div>
 <% end %>
 
 <% if current_user.administrator? && !@submission.vm_log.blank? %>
+  <div class="row">
+  <div class="span11">
   <h2>Full sandbox log</h2>
-  <section>
     <pre><%= @submission.vm_log %></pre>
-  </section>
+  </div>
+</div>
 <% end %>
 
 <script type="text/javascript">
@@ -199,14 +207,18 @@ $(document).ready(function() {
 </script>
 
 <% unless @submission.feedback_answers.empty? %>
+  <div class="row">
   <h2>Feedback</h2>
-  <section>
+    <div class="span11">
+  <div>
     <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
     <% for answer in answers %>
       <div class="feedback-question"><%= answer.feedback_question.question %></div>
       <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
     <% end %>
-  </section>
+  </div>
+</div>
+</div>
 <% end %>
 
 <%= link_back %>

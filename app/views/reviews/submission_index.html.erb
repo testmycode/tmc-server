@@ -154,9 +154,11 @@
     </div>
   </section>
 <% end %>
-
+<div class="row">
+  <div class="span12">
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
-
+</div>
+</div>
 <% if @new_review %>
   <%= javascript_include_tag 'jquery-ui' %>
   <script type="text/javascript">
