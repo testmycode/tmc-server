@@ -24,6 +24,11 @@
             %span{class: 'icon-bar'}
             %span{class: 'icon-bar'}
           =link_to 'TestMyCode server', root_path, class: 'brand'
+          - unless SiteSetting.value(:site_subtitle).blank?
+            %br
+            %br
+            .branding
+              = raw(SiteSetting.value(:site_subtitle))
           .collapse.nav-collapse
             =render 'sessions/login_form'
             %ul.nav.pull-right
