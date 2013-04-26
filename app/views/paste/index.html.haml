@@ -9,6 +9,9 @@
   #comments {
     overflow: auto;
   }
+  #test-list{
+    word-wrap: break-word;
+  }
 
 :javascript
   var tmcPastebin = {
@@ -88,7 +91,6 @@
       },
       showDetails: function(e) {
         var targetId = $(e.target).data("id");
-        console.log("ID: " + targetId);
         $("#modal-" + targetId).modal();
       }
     });
@@ -97,9 +99,9 @@
     el: "#comments-pane",
     initialize: function() {
       this.scroll = false;
-      $("#comments").height($("#editor").height());
       this.scrollDown();
       this.comments = new tmcPastebin.models.Comments();
+      this.resize();
       this.reload();
     },
     render: function() {
@@ -119,6 +121,9 @@
           context.scrollDown();
         }
       }});
+    },
+    resize: function(){
+      $("#comments").height($(window).height()/3);
     },
     submitComment: function(e) {
       e.preventDefault();
@@ -148,26 +153,19 @@
 
     // Event delegation
     commentsView.on("reload", commentsView.reload);
-    $(window).on("resize", function() { editorView.resizeEditor(); });
+    $(window).on("resize", function() {
+      editorView.resizeEditor();
+      commentsView.resize();
+    });
 
     // Refreshing comments
     setInterval(function(){commentsView.trigger("reload")}, 1000);
   });
 
--#.solution-files
--#  - for file in @files
--#    %h2= file.path
--#    :ruby
--#      brush = case File.extname(file.path)
--#        when '.txt' then 'plain'
--#        when '' then 'plain'
--#        else File.extname(file.path)[1..-1]
--#      end
--#    %pre.brush:.brush{:class => "#{brush}"} #{file.contents}
-.row
+.row-fluid
   .span8
     %blockquote= @message
-.row
+.row-fluid
   .span8
     #left-pane.well
       .navbar.navbar-inverse
@@ -176,13 +174,12 @@
             %ul{id: "tabs", class: "nav"}
       #editor{style: "height: 300px; width: 500px;"}
   .span3
-    #right-pane
+    .right-pane
       #comments-pane.well
         #comments
         %input{type: "text", id: "message", class: "input-small", placeholder: "Type here..."}
         %input{type: "submit", class: "btn-small btn-primary btn-small", value: "Send"}
       #test-pane.well
-        #test-info
         #test-list
           %ul.nav.nav-tabs.nav-stacked
 

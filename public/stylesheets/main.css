@@ -1,9 +1,26 @@
+/*@media (min-width: 1400px) {
+  .row {
+    margin-left: -30px;
+    *zoom: 1;
+  }
+  .container,
+  .navbar-static-top .container,
+  .navbar-fixed-top .container,
+  .navbar-fixed-bottom .container {
+    width: 1370px;
+    }
+  }
+
+.container-fluid{
+   max-width: 1600px;
+}
+
 .dataTables_filter label input[type=text]{
   margin-top: 1%;
 }
 .small{
   font-size: 0.5em;
-}
+}*/
 
 /* Submissions status*/
 .failure,

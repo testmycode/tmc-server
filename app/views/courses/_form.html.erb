@@ -6,6 +6,6 @@
   <%= labeled_field("Source URL", f.text_field(:source_url)) %>
   <%= labeled_field("Git branch name", f.text_field(:git_branch, :value => 'master')) %>
   <div class="actions">
-    <%= f.submit 'Add Course'%>
+    <%= f.submit 'Add Course', class: "btn btn-rpimary"%>
   </div>
 <% end %>

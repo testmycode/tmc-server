@@ -61,7 +61,7 @@
 </ul>
 
 <% if @exercise.submittable_by?(current_user) %>
-<div class="row">
+<div class="row-fluid">
   <div class="span11">
   <h2>Submit answer</h2>
     <%= render :partial => 'submissions/form', :locals => { :submission => @new_submission } %>
@@ -71,7 +71,7 @@
 
 
 <% if signed_in? %>
-<div class="row">
+<div class="row-fluid">
   <div class="span11">
   <h2>Submissions</h2>
     <% if !@submissions.empty? %>
@@ -84,7 +84,7 @@
 <% end %>
 
 <% if current_user.administrator? && !@submissions.empty? %>
-    <div class="row">
+    <div class="row-fluid">
     <div class="span10">
     <%
       if @submissions.count > 10

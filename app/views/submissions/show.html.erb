@@ -1,5 +1,5 @@
 <h1>Submission <%= @submission.id %></h1>
-<div class="row">
+<div class="row-fluid">
 <div class="well span6">
   <div class="submission-summary">
     <% if !@submission.processed? %>
@@ -95,7 +95,7 @@
 </div>
 
 
-<div class="row">
+<div class="row-fluid">
   <div class="span11">
     <h2>Results</h2>
       <div class="well">
@@ -160,7 +160,7 @@
 </div>
 
 <% if !@submission.stdout.blank? || !@submission.stderr.blank? %>
-  <div class="row">
+  <div class="row-fluid">
   <h2>Output</h2>
     <div class="span11">
       <p>The following was output while running the tests.</p>
@@ -180,7 +180,7 @@
 <% end %>
 
 <% if current_user.administrator? && !@submission.vm_log.blank? %>
-  <div class="row">
+  <div class="row-fluid">
   <div class="span11">
   <h2>Full sandbox log</h2>
     <pre><%= @submission.vm_log %></pre>
@@ -207,7 +207,7 @@ $(document).ready(function() {
 </script>
 
 <% unless @submission.feedback_answers.empty? %>
-  <div class="row">
+  <div class="row-fluid">
   <h2>Feedback</h2>
     <div class="span11">
   <div>

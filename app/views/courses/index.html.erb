@@ -16,7 +16,7 @@
 <% if current_user.administrator? && !@expired_courses.empty? %>
   <h3>Ongoing courses</h3>
 <% end %>
-<div class="row">
+<div class="row-fluid">
     <div class="span11">
   <%= render 'list', :locals => { :courses => @ongoing_courses, :list_id => 'ongoing-courses' } %>
 </div>
@@ -24,7 +24,7 @@
 
 <% if current_user.administrator? && !@expired_courses.empty? %>
   <h3>Expired courses</h3>
-<div class="row">
+<div class="row-fluid">
     <div class="span11">
     <%= render 'list', :locals => { :courses => @expired_courses, :list_id => 'expired-courses' } %>
 </div>
