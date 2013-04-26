@@ -41,11 +41,10 @@
     render: function() {
       this.editor.getSession().setMode("ace/mode/java");
       this.editor.getSession().setValue(tmcPastebin.models.files[this.chosenIndex].contents);
-
+      this.resizeEditor();
     },
     events: {
-      "click li a": "changeFile",
-      "resize div": "resizeEditor" //Why not working?
+      "click li a": "changeFile"
     },
     changeFile: function(e) {
       e.preventDefault();
@@ -53,7 +52,10 @@
       this.render();
     },
     resizeEditor: function(){
-      $("#editor").css("height", $("#left-pane").height());
+      var newHeight = this.editor.getSession().getScreenLength() * this.editor.renderer.lineHeight + this.editor.renderer.scrollBar.getWidth();
+        $('#editor').height(newHeight.toString() + "px");
+        this.editor.resize();
+      $/*("#editor").css("height", $("#left-pane").height());*/
       $("#editor").css("width", $("#left-pane").width());
     }
   });
@@ -146,6 +148,7 @@
 
     // Event delegation
     commentsView.on("reload", commentsView.reload);
+    $(window).on("resize", function() { editorView.resizeEditor(); });
 
     // Refreshing comments
     setInterval(function(){commentsView.trigger("reload")}, 1000);
