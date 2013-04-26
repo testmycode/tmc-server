@@ -182,7 +182,9 @@ li.repo h3 {
       <li class="repo grid-1 grid <% if course.hidden? %>muted<% end %>">
         <a href="<%= course_path(course) %>" >
           <h2><%= course.name %></h2>
-          <p> <%= raw(course.description.gsub("\n",'<br>')) %> </p>
+          <% if course.description.blank? %>
+            <p> <%= raw(course.description.gsub("\n",'<br>')) %> </p>
+          <% end %>
         </a>
       </li>
       <% end %>
