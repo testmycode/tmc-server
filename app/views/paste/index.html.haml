@@ -163,22 +163,21 @@
 -#    %pre.brush:.brush{:class => "#{brush}"} #{file.contents}
 .row
   .span8
+    %footnote= @message
+.row
+  .span8
     #left-pane.well
       .navbar.navbar-inverse
         .navbar-inner
           .container
-            %button{type: "button", class: "btn btn-navbar"}
-              %span{class: "icon-bar"}
-              %span{class: "icon-bar"}
-              %span{class: "icon-bar"}
             %ul{id: "tabs", class: "nav"}
       #editor{style: "height: 300px; width: 500px;"}
-  .span4
-    #right-pane.well
+  .span3
+    #right-pane
       #comments-pane.well
         #comments
-        %input{type: "text", id: "message", placeholder: "Type here..."}
-        %input{type: "submit", class: "btn-small btn-primary", value: "Send"}
+        %input{type: "text", id: "message", class: "input-small", placeholder: "Type here..."}
+        %input{type: "submit", class: "btn-small btn-primary btn-small", value: "Send"}
       #test-pane.well
         #test-info
         #test-list
@@ -198,7 +197,7 @@
         <h3>{{testCaseName}}</h3>
       </div>
       <div class="modal-body">
-        <p>{{content}}}</p>
+        <p>{{{content}}}</p>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</a>

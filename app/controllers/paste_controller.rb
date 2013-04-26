@@ -13,6 +13,7 @@ class PasteController < ApplicationController
 
     @title = "Submission ##{@submission.id} paste"
     @files = SourceFileList.for_submission(@submission).to_json
+    @message = @submission.message_for_paste
 
     hash = {}
     i = 0
