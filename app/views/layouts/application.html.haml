@@ -23,24 +23,24 @@
             %span{class: 'icon-bar'}
             %span{class: 'icon-bar'}
             %span{class: 'icon-bar'}
-          =link_to 'TestMyCode server', root_path, class: 'brand'
-          - unless SiteSetting.value(:site_subtitle).blank?
-            %br
-            %br
-            .branding
-              = raw(SiteSetting.value(:site_subtitle))
-          .collapse.nav-collapse
-            =render 'sessions/login_form'
-            %ul.nav.pull-right
-              - if signed_in?
-                %li= link_to 'My account', user_path
-                %li= link_to 'My stats', participant_path(current_user)
-                %li= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link'
-              - elsif can? :create, User
-                %li= link_to 'Sign up', new_user_path
-                %li= link_to 'Forgot password', new_password_reset_key_path
+          .pull-left
+            - title = raw 'TestMyCode server - <span class="small">' + raw(SiteSetting.value(:site_subtitle)) + '</span>'
+            =link_to title, root_path, class: 'brand'
+          .pull-right
+            .collapse.nav-collapse
+              =render 'sessions/login_form'
+              %ul.nav.pull-right
+                - if signed_in?
+                  %li= link_to 'My account', user_path
+                  %li= link_to 'My stats', participant_path(current_user)
+                  %li= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link'
+                - elsif can? :create, User
+                  %li= link_to 'Sign up', new_user_path
+                  %li= link_to 'Forgot password', new_password_reset_key_path
     #everything
       #breadcrumb
+        %blockquote
+          =raw(SiteSetting.value(:site_subtitle).gsub("-",'<br/>'))
         =render 'twitter-bootstrap/breadcrumbs'
         - if @show_page_presence
           #page-presence
