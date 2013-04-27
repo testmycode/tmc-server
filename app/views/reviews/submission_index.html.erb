@@ -13,9 +13,13 @@
     <p>Submission not reviewed yet.</p>
   <% end %>
 
+
   <% newest_sub = @submission.newest_of_same_kind %>
   <% if newest_sub %>
-    <p>NOTE: There is a <%= link_to "newer submission", new_submission_review_path(newest_sub) %>.</p>
+    <div class="alert alert-error">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <p> NOTE: There is a <%= link_to "newer submission", new_submission_review_path(newest_sub) %>.</p>
+    </div>
   <% end %>
 
   <% other_subs = @submission.exercise.reviewed_submissions_for(@submission.user) - [@submission] %>
@@ -134,6 +138,24 @@
   <% end %>
 
   <section>
+  <div class="accordion" id="testResultsAccordion">
+    <div class="accordion-group">
+      <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#testResultsAccordion" href="#collapseOne">
+          Test results
+        </a>
+      </div>
+      <div id="collapseOne" class="accordion-body collapse out">
+        <div class="accordion-inner">
+          <%= render 'submissions/details' %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section>
     <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
     <button id="new-review" class="btn btn-primary"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
     <% if @submission.review_dismissable? %>
@@ -161,6 +183,7 @@
 </div>
 <% if @new_review %>
   <%= javascript_include_tag 'jquery-ui' %>
+  <%= javascript_include_tag('jquery.dataTables.min', ) %>
   <script type="text/javascript">
     $(document).ready(function() {
       var $newReviewButton = $('#new-review');
