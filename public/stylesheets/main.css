@@ -14,13 +14,22 @@
 .container-fluid{
    max-width: 1600px;
 }
+*/
 
+#everything .accordion-group {
+  border: none;
+}
+
+.dataTables_wrapper table.table {
+  margin-bottom: 0px;
+}
 .dataTables_filter label input[type=text]{
   margin-top: 1%;
 }
+
 .small{
   font-size: 0.5em;
-}*/
+}
 
 /* Submissions status*/
 .failure,
@@ -35,7 +44,7 @@
 
 /* Basic commons */
 
-.list-title {
+/*.list-title {
   font-weight: bold;
 }
 
@@ -47,7 +56,7 @@ section {
   margin-left: 1.5em;
   margin-bottom: 2em;
 }
-
+*/
 
 .review-required,
 .review-requested {
