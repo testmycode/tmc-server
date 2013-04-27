@@ -103,10 +103,10 @@ section {
   list-style: square;
 }
 
-button * {
+/*button * {
   float: left;
   white-space: nowrap;
-}
+}*/
 
 .transfer-effect {
   border: 2px dotted gray;
@@ -132,11 +132,12 @@ button * {
 
 /* bootstrapping */
 body #everything {
+  font-size: 9px;
+  /*padding-top: 80px;
+  font-size: 12px;
   color: black;
   font-family: sans-serif;
-  font-size: 9px;
-  padding-top: 80px;
-  font-size: 12px;
+  */
 }
 
 body.default {
