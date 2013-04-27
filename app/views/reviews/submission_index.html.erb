@@ -4,129 +4,133 @@
   submission <%= @submission.id %>
 </h1>
 
-<section>
-  <% if !@new_review && can?(:create, Review) %>
-    <p><%= link_to 'Open review editor', new_submission_review_path(@submission) %></p>
-  <% end %>
+<div class="row-fluid">
+  <div class="span10">
+    <% if !@new_review && can?(:create, Review) %>
+      <p><%= link_to 'Open review editor', new_submission_review_path(@submission) %></p>
+    <% end %>
 
-  <% if @submission.reviews.empty? %>
-    <p>Submission not reviewed yet.</p>
-  <% end %>
+    <% if @submission.reviews.empty? %>
+      <p>Submission not reviewed yet.</p>
+    <% end %>
 
 
-  <% newest_sub = @submission.newest_of_same_kind %>
-  <% if newest_sub %>
-    <div class="alert alert-error">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <p> NOTE: There is a <%= link_to "newer submission", new_submission_review_path(newest_sub) %>.</p>
-    </div>
-  <% end %>
+    <% newest_sub = @submission.newest_of_same_kind %>
+    <% if newest_sub %>
+      <div class="alert alert-error">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <p> NOTE: There is a <%= link_to "newer submission", new_submission_review_path(newest_sub) %>.</p>
+      </div>
+    <% end %>
 
-  <% other_subs = @submission.exercise.reviewed_submissions_for(@submission.user) - [@submission] %>
-  <% unless other_subs.empty? %>
-    <h3>Other reviewed submissions of this exercise</h3>
-    <section>
-      <%=
-          options = {
-            :table_id => 'previously_reviewed',
-            :show_student_column => false,
-            :show_exercise_column => false,
-            :show_awarded_points => true,
-            :show_review_column => true,
-            :show_files_column => false,
-            :show_details_column => true
-          }
-          show_submission_list(other_subs, options)
-      %>
-    </section>
-  <% end %>
+    <% other_subs = @submission.exercise.reviewed_submissions_for(@submission.user) - [@submission] %>
+    <% unless other_subs.empty? %>
+      <h3>Other reviewed submissions of this exercise</h3>
+      <section>
+        <%=
+            options = {
+              :table_id => 'previously_reviewed',
+              :show_student_column => false,
+              :show_exercise_column => false,
+              :show_awarded_points => true,
+              :show_review_column => true,
+              :show_files_column => false,
+              :show_details_column => true
+            }
+            show_submission_list(other_subs, options)
+        %>
+      </section>
+    <% end %>
 
-  <% for review in @submission.reviews %>
-    <%= content_tag :div, :id => "code-review-#{review.id}", :class => 'code-review', :data => {:path => review_path(review)} do %>
-      <% if @submission.user_id == current_user.id %>
-        <div class="status-buttons">
-          <%= form_tag review_path(review), :method => 'put' do %>
-            <% if review.marked_as_read? %>
-              <input type="hidden" name="mark_as_unread" value="1" />
-              <button type="submit" class="btn btn-primary">Mark as unread</button>
-            <% else %>
-              <input type="hidden" name="mark_as_read" value="1" />
-              <button type="submit" class="btn btn-primary">Mark as read</button>
+    <% for review in @submission.reviews %>
+      <%= content_tag :div, :id => "code-review-#{review.id}", :class => 'code-review', :data => {:path => review_path(review)} do %>
+        <% if @submission.user_id == current_user.id %>
+          <div class="status-buttons">
+            <%= form_tag review_path(review), :method => 'put' do %>
+              <% if review.marked_as_read? %>
+                <input type="hidden" name="mark_as_unread" value="1" />
+                <button type="submit" class="btn btn-primary">Mark as unread</button>
+              <% else %>
+                <input type="hidden" name="mark_as_read" value="1" />
+                <button type="submit" class="btn btn-primary">Mark as read</button>
+              <% end %>
             <% end %>
-          <% end %>
-        </div>
-      <% end %>
-      <% if review.reviewer %>
-        <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
-      <% end %>
-      <% unless review.points_list.empty? %>
-        <div class="points-by-review">
-          <span class="label">Points added:</span>&nbsp;
-          <% for point in review.points_list %>
-            <%= content_tag :span, raw(h(point)) + raw('&nbsp;'), :class => 'success' %>
-          <% end %>
-        </div>
-      <% end %>
-      <div class="review-body"><%= simple_format(review.review_body) %></div>
-      <div class="buttons">
-        <% if action_name == 'new' && can?(:update, review) %>
-          <button class="edit-review btn btn-warning"><span class="ui-icon ui-icon-pencil"></span>&nbsp;Edit</button>
-        <% end %>
-        <% if action_name == 'new' && can?(:delete, review) %>
-          <button class="delete-review btn btn-danger"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
-          <div class="ui-helper-hidden">
-            <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>
           </div>
         <% end %>
-      </div>
-      <div class="ui-helper-clearfix"></div>
-    <% end %>
-  <% end %>
-</section>
-
-<% if @new_review %>
-  <section>
-    <div id="review-form-dialog" class="ui-helper-hidden">
-      <div id="review-form">
-        <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
-          <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
-
-          <%#  this is changed by JS when switching between editing and creating %>
-          <input name="_method" type="hidden" value="post" />
-
-          <% unless @submission.exercise.available_review_points.empty? %>
-            <div class="points">
-              <h5>Points</h5>
-              <% for point in @submission.exercise.available_review_points %>
-                <% has_point = @submission.user.has_point?(@submission.course, point) %>
-                <%=
-                  check_box_tag(
-                    "review[points][#{point}]", 1, false, :class => 'point',
-                    :checked => has_point,
-                    :disabled => has_point,
-                    :title => has_point ? "Already awarded" : nil
-                  )
-                %>
-                <%= label_tag "review_points_#{point}", point, :title => has_point ? "Already awarded" : nil %>
-              <% end %>
-              <p class="fine-print">(note: points cannot be removed after saving)</p>
+        <% if review.reviewer %>
+          <div class="reviewer">Review by <span class="reviewer"><%= review.reviewer.username %></span></div>
+        <% end %>
+        <% unless review.points_list.empty? %>
+          <div class="points-by-review">
+            <span class="label">Points added:</span>&nbsp;
+            <% for point in review.points_list %>
+              <%= content_tag :span, raw(h(point)) + raw('&nbsp;'), :class => 'success' %>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="review-body"><%= simple_format(review.review_body) %></div>
+        <div class="buttons">
+          <% if action_name == 'new' && can?(:update, review) %>
+            <button class="edit-review btn btn-warning"><span class="ui-icon ui-icon-pencil"></span>&nbsp;Edit</button>
+          <% end %>
+          <% if action_name == 'new' && can?(:delete, review) %>
+            <button class="delete-review btn btn-danger"><span class="ui-icon ui-icon-close"></span>&nbsp;Delete</button>
+            <div class="ui-helper-hidden">
+              <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>
             </div>
           <% end %>
+        </div>
+        <div class="ui-helper-clearfix"></div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
 
-          <div class="notification-options">
-            <h5>Notification</h5>
-            <%= check_box_tag :send_email, '1', SiteSetting.value('emails')['email_code_reviews_by_default'] %>
-            <label for="send_email">Notify by e-mail</label>
-            <%= check_box_tag :send_notification, '1', true, :disabled => true %>
-            <label for="send_notification">Notify in IDE</label>
-          </div>
-          <div class="buttons">
-            <button type="submit" class="btn btn-primary"><span class="ui-icon ui-icon-disk"></span>&nbsp;Save review</button>
-          </div>
-        <% end %>
+<% if @new_review %>
+  <div class="row-fluid">
+    <div class="span10">
+      <div id="review-form-dialog" class="ui-helper-hidden">
+        <div id="review-form">
+          <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
+            <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
+
+            <%#  this is changed by JS when switching between editing and creating %>
+            <input name="_method" type="hidden" value="post" />
+
+            <% unless @submission.exercise.available_review_points.empty? %>
+              <div class="points">
+                <h5>Points</h5>
+                <% for point in @submission.exercise.available_review_points %>
+                  <% has_point = @submission.user.has_point?(@submission.course, point) %>
+                  <%=
+                    check_box_tag(
+                      "review[points][#{point}]", 1, false, :class => 'point',
+                      :checked => has_point,
+                      :disabled => has_point,
+                      :title => has_point ? "Already awarded" : nil
+                    )
+                  %>
+                  <%= label_tag "review_points_#{point}", point, :title => has_point ? "Already awarded" : nil %>
+                <% end %>
+                <p class="fine-print">(note: points cannot be removed after saving)</p>
+              </div>
+            <% end %>
+
+            <div class="notification-options">
+              <h5>Notification</h5>
+              <%= check_box_tag :send_email, '1', SiteSetting.value('emails')['email_code_reviews_by_default'] %>
+              <label for="send_email">Notify by e-mail</label>
+              <%= check_box_tag :send_notification, '1', true, :disabled => true %>
+              <label for="send_notification">Notify in IDE</label>
+            </div>
+            <div class="buttons">
+              <button type="submit" class="btn btn-primary"><span class="ui-icon ui-icon-disk"></span>&nbsp;Save review</button>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <% unless @submission.message_for_reviewer.blank? %>
     <h3>Message from student to reviewer</h3>
@@ -137,47 +141,50 @@
     </section>
   <% end %>
 
-  <section>
-  <div class="accordion" id="testResultsAccordion">
-    <div class="accordion-group">
-      <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#testResultsAccordion" href="#collapseOne">
-          Test results
-        </a>
-      </div>
-      <div id="collapseOne" class="accordion-body collapse out">
-        <div class="accordion-inner">
-          <%= render 'submissions/details' %>
+  <div class="row-fluid">
+    <div class="span10">
+      <div class="accordion" id="testResultsAccordion">
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#testResultsAccordion" href="#collapseOne">
+              Test results
+            </a>
+          </div>
+          <div id="collapseOne" class="accordion-body collapse out">
+            <div class="accordion-inner">
+              <%= render 'submissions/details' %>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  </section>
-
-  <section>
-    <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
-    <button id="new-review" class="btn btn-primary"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
-    <% if @submission.review_dismissable? %>
-      <div id="dismiss-review-form">
-        <% if @submission.reviews.count == 0 %>
-          <%= form_tag submission_path(@submission), :method => :put do %>
-            <input type="hidden" name="dismiss_review" value="1" />
-            <button type="submit" id="dismiss-review" data-confirm="Confirm removing submission from list of pending reviews? Note that you don't need to do this manually for old submissions."><span class="ui-icon ui-icon-cancel"></span>&nbsp;Dismiss</button>
+  <div class="row-fluid">
+    <div class="span10">
+      <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
+      <button id="new-review" class="btn btn-primary"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
+      <% if @submission.review_dismissable? %>
+        <div id="dismiss-review-form">
+          <% if @submission.reviews.count == 0 %>
+            <%= form_tag submission_path(@submission), :method => :put do %>
+              <input type="hidden" name="dismiss_review" value="1" />
+              <button type="submit" id="dismiss-review" data-confirm="Confirm removing submission from list of pending reviews? Note that you don't need to do this manually for old submissions."><span class="ui-icon ui-icon-cancel"></span>&nbsp;Dismiss</button>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
-    <% end %>
+        </div>
+      <% end %>
 
-    <div id="review-form-reopen-handle" class="ui-helper-hidden">
-      <button>
-        <span class="ui-icon ui-icon-newwin"></span>&nbsp;Code review
-      </button>
+      <div id="review-form-reopen-handle" class="ui-helper-hidden">
+        <button>
+          <span class="ui-icon ui-icon-newwin"></span>&nbsp;Code review
+        </button>
+      </div>
     </div>
-  </section>
+  </div>
 <% end %>
 <div class="row-fluid">
-  <div class="span12">
+  <div class="span10">
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
 </div>
 </div>
