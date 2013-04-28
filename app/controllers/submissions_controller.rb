@@ -68,6 +68,9 @@ class SubmissionsController < ApplicationController
 
         render :json => output
       end
+      format.zip do
+        send_file @submission.return_file, :url_based_filename => true
+      end
     end
   end
 
@@ -75,15 +78,15 @@ class SubmissionsController < ApplicationController
     if !params[:submission] || !params[:submission][:file]
       return respond_not_found('No ZIP file selected or failed to receive it')
     end
-    
+
     if !@exercise.submittable_by?(current_user)
       return respond_access_denied('Submissions for this exercise are no longer accepted.')
     end
-    
+
     file_contents = File.read(params[:submission][:file].tempfile.path)
-    
+
     errormsg = nil
-    
+
     if !file_contents.start_with?('PK')
       errormsg = "The uploaded file doesn't look like a ZIP file."
     end
