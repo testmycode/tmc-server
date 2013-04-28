@@ -4,6 +4,10 @@ class PasteController < ApplicationController
   def index
     @submission = Submission.find(params[:submission_id])
 
+    if not current_user.administrator?
+      return respond_access_denied() if @submission.all_tests_passed?
+      return respond_access_denied("Paste expired") if @submission.created_at < 2.days.ago
+    end
     @exercise = @submission.exercise
     @course = @exercise.course
     add_course_breadcrumb
@@ -30,7 +34,8 @@ class PasteController < ApplicationController
     @tests = hash.to_json
   end
 
- def format_exception_chain(exception)
+  private
+  def format_exception_chain(exception)
     return '' if exception == nil
     result = ActiveSupport::SafeBuffer.new('')
     result << exception['className'] << ": " << exception['message'] << "<br/>"
