@@ -81,6 +81,7 @@ C support was incuded in another Software Engineering Lab project at the [Univer
 Authors in this project were
 
 - Jarmo Isotalo ([jamox](https://github.com/jamox))
+- Tony Kovanen ([rase-](http://github.com/rase-))
 
 
 ## License ##
