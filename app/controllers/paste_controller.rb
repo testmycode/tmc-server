@@ -7,6 +7,7 @@ class PasteController < ApplicationController
     if not current_user.administrator?
       return respond_access_denied() if @submission.all_tests_passed?
       return respond_access_denied("Paste expired") if @submission.created_at < 2.days.ago
+      return respond_access_denied("No paste available") unless @submission.paste_available?
     end
     @exercise = @submission.exercise
     @course = @exercise.course
