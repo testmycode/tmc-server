@@ -80,7 +80,7 @@ The course instructor and current maintainer of the project is Martin Pärtel ([
 C support was incuded in another Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/)
 Authors in this project were
 
-- Jarmo Isotalo ([jamox]](https://github.com/jamox))
+- Jarmo Isotalo ([jamox](https://github.com/jamox))
 
 
 ## License ##
