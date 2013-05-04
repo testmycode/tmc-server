@@ -60,11 +60,18 @@ private
     }
 
     data[:solution_zip_url] = @helpers.exercise_solution_zip_url(exercise) if @user.administrator?
+    data[:exercise_submissions_url] = @helpers.exercise_url(exercise, format: 'json', api_version: 5)
+    last_submission = get_latest_submission(exercise)
+    data[:latest_submission_url] = @helpers.submission_url(last_submission, format: 'zip') unless last_submission.nil?
 
     data
   end
 
   def exercise_return_url(e)
     "#{@helpers.exercise_submissions_url(e, :format => 'json')}"
+  end
+
+  def get_latest_submission(exercise)
+    exercise.submissions.where(:user_id => @user.id).order("created_at DESC").first
   end
 end
