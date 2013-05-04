@@ -37,13 +37,7 @@ class ExercisesController < ApplicationController
         @submissions = @submissions.includes(:awarded_points).includes(:user).includes
         authorize! :read, @submissions
 
-
-        data = {
-          :api_version => API_VERSION,
-          :submissions => @submissions
-        }
-        render :json => data.to_json
-
+        render_for_api :submission_show, :json => @submissions, :root => :course
       end
     end
   end

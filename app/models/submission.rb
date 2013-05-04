@@ -25,6 +25,20 @@ class Submission < ActiveRecord::Base
 
   before_create :set_processing_attempts_started_at
 
+  acts_as_api
+  api_accessible :submission_show do |t|
+    t.add :exercise_name
+    t.add :id
+    t.add :course_id
+    t.add :all_tests_passed
+    t.add :points
+    t.add :submitted_zip_url
+  end
+
+  def submitted_zip_url
+    Rails.application.routes.url_helpers.submission_url(self.id, format: 'zip')
+  end
+
   def self.to_be_reprocessed
     self.unprocessed.
       where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval).
