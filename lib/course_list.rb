@@ -63,6 +63,7 @@ private
     data[:exercise_submissions_url] = @helpers.exercise_url(exercise, format: 'json', api_version: 5)
     last_submission = get_latest_submission(exercise)
     data[:latest_submission_url] = @helpers.submission_url(last_submission, format: 'zip') unless last_submission.nil?
+    data[:latest_submission_id] = last_submission.id unless last_submission.nil?
 
     data
   end
