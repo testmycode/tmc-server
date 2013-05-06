@@ -68,9 +68,6 @@ class SubmissionsController < ApplicationController
 
         render :json => output
       end
-      format.zip do
-        send_file @submission.return_file, :url_based_filename => true
-      end
     end
   end
 
