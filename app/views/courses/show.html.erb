@@ -96,7 +96,6 @@
             <% end %>
             <% if current_user.administrator? %>
               <%= link_to 'Refresh', refresh_course_path(@course), class: "btn btn-warning btn-mini" %>
-              <%= link_to 'Delete', course_path(@course), :method => :delete, :class => 'dangerous', class: "btn btn-danger btn-mini", :confirm => 'Really truly delete this course?' %>
             <% end %>
             <% unlockables = @course.unlockable_exercises_for(current_user) %>
             <% unless unlockables.empty? %>
