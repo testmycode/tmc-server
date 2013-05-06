@@ -18,6 +18,7 @@ class PointsController < ApplicationController
       format.csv do
         render_csv(:filename => "#{@course.name}_points.csv")
       end
+      format.json { render :json =>  @summary }
     end
   end
 
