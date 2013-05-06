@@ -79,6 +79,7 @@ class CoursesController < ApplicationController
   end
 
   def destroy
+    return # for now disable course removal and allow it only from rails console
     @course = Course.find(params[:id])
     authorize! :destroy, @course
     @course.destroy
