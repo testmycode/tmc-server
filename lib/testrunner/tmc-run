@@ -181,6 +181,7 @@ case $PROJECT_TYPE in
 
   universal)
     echo "Running tests for universal support..."
+    chmod +x .universal/controls/test
     .universal/controls/test # This produces the proper output file, maybe this should receive output file as argument
     echo "...Universal support tests run"
     cat test_output.txt
