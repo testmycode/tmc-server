@@ -12,9 +12,9 @@ class SubmissionPackager
       cloned = Pathname(exercise.clone_path)
 
       FileUtils.cp_r(received.realpath.to_s + '/.', dest)
-      FileUtils.cp_r(cloned  + '.universal/private', dest + '.universal/')
-      FileUtils.cp_r(cloned  + '.universal/tests/.', dest)
-      FileUtils.cp_r(cloned  + '.universal/controls', dest + '.universal/')
+      FileUtils.cp_r(cloned  + '.universal/private', dest + '.universal/', remove_destination: true)
+      FileUtils.cp_r(cloned  + '.universal/tests/.', dest, remove_destination: true)
+      FileUtils.cp_r(cloned  + '.universal/controls', dest + '.universal/', remove_destination: true)
       copy_files_in_dir_no_recursion(cloned, dest)
 
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
