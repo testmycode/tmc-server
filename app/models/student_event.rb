@@ -1,4 +1,3 @@
-
 # A logged data point from the IDE's "spyware".
 class StudentEvent < ActiveRecord::Base
   belongs_to :user
@@ -7,6 +6,6 @@ class StudentEvent < ActiveRecord::Base
       :conditions => proc { "exercises.course_id = #{self.course_id}" }
 
   def self.supported_event_types
-    ['code_snapshot', 'project_action', 'text_insert']
+    ['code_snapshot', 'project_action', 'text_insert', 'text_remove']
   end
 end

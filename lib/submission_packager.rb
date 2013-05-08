@@ -7,6 +7,8 @@ require 'tmc_junit_runner'
 require 'tmc_dir_utils'
 require 'submission_packager/java_simple'
 require 'submission_packager/java_maven'
+require 'submission_packager/makefile_c'
+require 'submission_packager/universal'
 
 # Takes a submission zip and makes a tar file suitable for the sandbox
 class SubmissionPackager

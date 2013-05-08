@@ -1,9 +1,10 @@
 TmcServer::Application.routes.draw do
-
   resources :sessions, :only => [:new, :create, :destroy]
 
   match '/signin',  :to => 'sessions#new'
   match '/signout', :to => 'sessions#destroy'
+  match '/login',  :to => 'sessions#new'
+  match '/logout', :to => 'sessions#destroy'
 
   resource :auth, :only => [:show]
 
@@ -22,6 +23,11 @@ TmcServer::Application.routes.draw do
   resources :password_reset_keys
   match '/reset_password/:code' => 'password_reset_keys#show', :via => :get, :as => 'reset_password'
   match '/reset_password/:code' => 'password_reset_keys#destroy', :via => :delete
+
+  resources :comments
+  match '/submissions/:submission_id/paste/comments/' => 'comments#index', :via => :get
+  match '/submissions/:submission_id/paste/comments/' => 'comments#create', :via => :post
+  match '/submissions/:submission_id/paste/comments/:id' => 'comments#show', :via => :get
 
   resources :courses do
     member do
@@ -58,6 +64,8 @@ TmcServer::Application.routes.draw do
     resources :feedback_answers, :only => [:create]
     resources :files, :only => [:index]
     resources :reviews, :only => [:index, :new, :create]
+    resources :paste, :only => [:index]
+      #resources :comments, :only => [:index, :create, :new]
   end
 
   resources :reviews, :only => [:update, :destroy]

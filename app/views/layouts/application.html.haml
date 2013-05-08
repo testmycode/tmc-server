@@ -1,0 +1,45 @@
+!!!
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %meta{:name => "viewport", :content => "width=device-width, initial-scale=1, maximum-scale=1"}
+    %title= content_for?(:title) ? yield(:title) : "TestMyCode"
+    %meta{:content => "", :name => "description"}
+    %meta{:content => "", :name => "author"}
+    = csrf_meta_tags
+    = stylesheet_link_tag 'main'
+    = stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css'
+    = stylesheet_link_tag "bootstrap.css"
+    - if Rails.env == 'test'
+      = stylesheet_link_tag 'highlighting'
+    = render "layouts/metadata"
+    = javascript_include_tag 'bootstrap.js'
+    = yield(:head)
+  %body.default
+    .navbar.navbar-fixed-top.navbar-inverse
+      .navbar-inner
+        .container
+          %a.btn.btn-navbar{:data => {:toggle => 'collapse', :target => '.nav-collapse'}}
+            %span{class: 'icon-bar'}
+            %span{class: 'icon-bar'}
+            %span{class: 'icon-bar'}
+          - title = raw 'TestMyCode server <span class="small"><br>' + raw(SiteSetting.value(:site_subtitle)) + '</span>'
+          =link_to title, root_path, class: 'brand'
+          .collapse.nav-collapse
+            =render 'sessions/login_form'
+            %ul.nav.pull-right
+              - if signed_in?
+                %li= link_to 'My account', user_path
+                %li= link_to 'My stats', participant_path(current_user)
+                %li= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link'
+              - elsif can? :create, User
+                %li= link_to 'Sign up', new_user_path
+                %li= link_to 'Forgot password', new_password_reset_key_path
+    #everything
+      #breadcrumb
+        =render 'twitter-bootstrap/breadcrumbs'
+        - if @show_page_presence
+          #page-presence
+      #content-area.container.container-fluid
+        = bootstrap_flash
+        = yield

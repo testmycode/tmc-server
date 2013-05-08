@@ -4,5 +4,5 @@
   
   <%= labeled_field("Zipped project", f.file_field('file')) %>
   <%= labeled_field("Request code review", check_box_tag('request_review'), :order => :label_last) %>
-  <%= f.submit 'Submit'%>
+  <%= f.submit 'Submit', class: "btn btn-primary" %>
 <% end %>

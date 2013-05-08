@@ -10,16 +10,18 @@ class CourseNotificationsController < ApplicationController
     course = Course.find(params[:course_id])
 
     participants = User.course_students(course)
-    emails = participants.map(&:email).reject(&:nil?)
+    emails = participants.map(&:email).reject(&:blank?)
 
     notifier = course.course_notifications.create(params[:course_notification], sender_id: current_user.id)
 
-    CourseNotificationMailer.notification_email(
-      from: current_user.email,
-      bcc: emails.join(','),
-      topic: notifier.topic,
-      message: notifier.message
-    ).deliver
+    emails.each do |email|
+      CourseNotificationMailer.notification_email(
+        from: current_user.email,
+        to: email,
+        topic: notifier.topic,
+        message: notifier.message
+      ).deliver
+    end
     redirect_to course_path(course), :notice => "Mail has been sent"
   end
 

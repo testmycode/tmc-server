@@ -39,11 +39,16 @@ describe CourseNotificationsController do
       sub2 = Factory.create(:submission, user: user2, course: course)
       aw1 = Factory.create(:awarded_point, user_id: user.id, course_id: course.id)
       aw2 = Factory.create(:awarded_point, user_id: user2.id, course_id: course.id)
-      expect { post :create, params }.to change(ActionMailer::Base.deliveries,:size).by(1)
-      mail = ActionMailer::Base.deliveries.last
-      mail.bcc.should include user.email
-      mail.bcc.should include user2.email
-      mail.body.encoded.should include message
+      expect { post :create, params }.to change(ActionMailer::Base.deliveries,:size).by(2)
+
+      mail_first = ActionMailer::Base.deliveries[-2]
+      mail_first.to.should include user.email
+      mail_first.body.encoded.should include message
+
+      mail_last = ActionMailer::Base.deliveries.last
+      mail_last.to.should include user2.email
+      mail_last.body.encoded.should include message
+
     end
   end
 

@@ -1,0 +1,61 @@
+<% if @submission.tests_ran? %>
+  <table>
+    <tr>
+      <th>Test case</th>
+      <th>Status</th>
+      <% if !@submission.all_tests_passed? %>
+        <th>Info</th>
+      <% end %>
+    </tr>
+
+    <% @submission.test_case_runs.each do |tcr| %>
+      <tr>
+        <td><%= tcr.test_case_name %></td>
+        <td>
+          <% if tcr.successful? %>
+            <span class="success">Ok</span>
+          <% else %>
+            <span class="failure">Fail</span>
+          <% end %>
+        </td>
+        <% if !@submission.all_tests_passed? %>
+          <td>
+            <%= tcr.message %>
+            <% if tcr.exception != nil %>
+              <br />
+              <div class="stack-trace">
+                <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
+              </div>
+            <% end %>
+            <% if tcr.backtrace != nil %>
+              <br />
+              <div class="backtrace">
+                <%= raw( ("".html_safe + tcr.backtrace).gsub("\n", "<br>") ) %>
+              </div>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+  var createButtonTo = function() {
+    var trace = this;
+    var button = $('<button class="btn btn-primary">' + buttonText + "</button>")[0];
+    $(trace).before(button); $(trace).hide();
+    $(button).click(function() {
+      $(trace).toggle();
+    });
+  };
+
+  var buttonText = "Toggle stack trace";
+  $('.stack-trace').each(createButtonTo);
+  buttonText = "Toggle backtrace";
+  $('.backtrace').each(createButtonTo);
+});
+</script>
