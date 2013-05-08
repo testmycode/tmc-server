@@ -29,7 +29,7 @@ events.find_each do |ev|
   puts "Exporting event id=#{ev.id}  (#{i}/#{total})"
 
   user_dir = "#{dest_dir}/#{ev.user_id}"
-  FileUtils.mkdir(user_dir) unless File.exist?(user_dir)
+  FileUtils.mkdir_p(user_dir) unless File.exist?(user_dir)
 
   record_name = ev.happened_at.strftime("%Y-%m-%d_%H-%M-%S_#{ev.id}")
   json_file = "#{user_dir}/#{record_name}.json"
@@ -40,14 +40,16 @@ events.find_each do |ev|
     :exercise_name => ev.exercise_name,
     :event_type => ev.event_type,
     :happened_at => ev.happened_at.to_s
-  }.to_json
-
-  write_file(json_file, json)
+  }
 
   case ev.event_type
   when 'code_snapshot'
     write_file("#{user_dir}/#{record_name}.zip", ev.data)
+  else
+    json[:data] = ev.data
   end
+
+  write_file(json_file, json.to_json)
 
   i += 1
 end
