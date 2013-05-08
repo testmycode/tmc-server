@@ -574,7 +574,6 @@ describe CourseRefresher do
         found_controls = false
         files = Dir.glob(path) + Dir.glob(File.join(stub_path, '**', '.universal', '**', '*'))
         files.each do |file|
-          puts "file: #{file.to_s}"
           file.to_s.should_not be_include 'model-solutions'
           file.to_s.should_not be_include 'exercise-stubs'
           found_controls = true if file.to_s.include? 'controls'
