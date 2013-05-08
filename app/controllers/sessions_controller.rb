@@ -1,3 +1,4 @@
+# Handles login and logout.
 class SessionsController < ApplicationController
 
   skip_authorization_check

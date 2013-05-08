@@ -1,3 +1,8 @@
+
+# Handles reordering
+#
+# This is poorly named. Also, as noted in FeedbackQuestionsController,
+# the feedback question editor probably shouldn't exist.
 class PositionsController < ApplicationController
   def update
     if params[:feedback_question_id]

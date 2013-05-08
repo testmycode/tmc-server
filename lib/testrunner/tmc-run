@@ -25,13 +25,18 @@ ERROR_MSG_LOCALE_DEF="-Dfi.helsinki.cs.tmc.edutestutils.defaultLocale=$error_msg
 TMC_MAVEN_PLUGIN_VERSION=1.5
 
 # Identify project type
-if [ -f pom.xml ]; then
+if [ -d .universal/ ]; then
+  PROJECT_TYPE=universal
+elif [ -f pom.xml ]; then
   PROJECT_TYPE=java_maven
+elif [ -f Makefile ]; then
+  PROJECT_TYPE=makefile_c
 else
   PROJECT_TYPE=java_simple
 fi
 
 JAVAC_EXE_PATH=`readlink -f \`which javac\``
+MAKE_EXE_PATH=`readlink -f \`which make\``
 JDK_DIR=`dirname \`dirname "$JAVAC_EXE_PATH"\``
 TOOLS_JAR_PATH="$JDK_DIR/lib/tools.jar"
 
@@ -40,6 +45,8 @@ TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
 echo "Total RAM: ${TOTAL_RAM_KB}KB"
 echo "Project type: $PROJECT_TYPE"
 
+ls -laR .
+
 # Compile project
 echo "Compiling project..."
 case $PROJECT_TYPE in
@@ -47,6 +54,7 @@ case $PROJECT_TYPE in
     # An explicit memory limit below the sandbox memory limit has been found to avoid
     # the occasional OOM killer. We leave 48M to the sandbox.
     # Still, Java CAN spin in the GC for a long time if it runs out of memory.
+
     JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
     echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
 
@@ -83,6 +91,22 @@ case $PROJECT_TYPE in
 
     rm -f test_output.txt
   ;;
+
+  makefile_c)
+    # An explicit memory limit below the sandbox memory limit has been found to avoid
+    # the occasional OOM killer. We leave 48M to the sandbox.
+    # Still, Java CAN spin in the GC for a long time if it runs out of memory.
+    JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
+    echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
+    make clean
+    make all
+
+    CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*"
+  ;;
+  
+  universal)
+    # Do nothing, since there is no explicit compiling script for universal support
+  ;;
 esac
 
 
@@ -115,8 +139,10 @@ case $PROJECT_TYPE in
     echo "DEFS: $DEFS"
 
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
-  ;;
+    ls -laghR .
+    echo "done dir list"
 
+  ;;
   java_maven)
     # MAVEN_OPTS was set above
     JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
@@ -134,6 +160,30 @@ case $PROJECT_TYPE in
       [ -f target/stderr.txt ] && mv target/stderr.txt ./
       exit 103
     fi
+  ;;
+
+  makefile_c)
+    valgrind --log-file=valgrind.log ./test/test
+    DEFS="
+      -Dtmc.check_root_dir=`pwd`
+      -Dtmc.check_results_file=`pwd`/tmc_test_results.xml
+      -Dtmc.check_available_points=`pwd`/tmc_available_points.txt
+      -Dtmc.check_valgrind_output=`pwd`/valgrind.log
+      -Dtmc.ctestrunner_output_file=`pwd`/test_output.txt
+      -Dtmc.memory_test_output=`pwd`/tmc_memory_test_info.txt"
+    echo "DEFS: $DEFS"
+    echo "CLASSPATH: $CLASSPATH"
+
+    echo "next java:"
+    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
+    echo "Java completed, makefile_c done"
+  ;;
+
+  universal)
+    echo "Running tests for universal support..."
+    .universal/controls/test # This produces the proper output file, maybe this should receive output file as argument
+    echo "...Universal support tests run"
+    cat test_output.txt
   ;;
 esac
 

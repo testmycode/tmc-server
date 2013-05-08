@@ -1,3 +1,7 @@
+# Provides operations for active records with a position field.
+#
+# Currently this is only used by FeedbackQuestion, and should probably
+# go away if FeedbackQuestion is ever changed to use a config file.
 module Orderable
   extend ActiveSupport::Concern
   included do

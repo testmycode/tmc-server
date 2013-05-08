@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130125013607) do
+ActiveRecord::Schema.define(:version => 20130426215042) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -32,28 +32,38 @@ ActiveRecord::Schema.define(:version => 20130125013607) do
   add_index "awarded_points", ["course_id", "user_id", "submission_id"], :name => "index_awarded_points_on_course_id_and_user_id_and_submission_id"
   add_index "awarded_points", ["user_id", "submission_id", "name"], :name => "index_awarded_points_on_user_id_and_submission_id_and_name", :unique => true
 
-  create_table "course_registrations", :force => true do |t|
-    t.integer  "course_id",  :null => false
-    t.integer  "user_id",    :null => false
+  create_table "comments", :force => true do |t|
+    t.text     "comment",       :null => false
+    t.integer  "user_id"
+    t.integer  "submission_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "course_registrations", ["course_id", "user_id"], :name => "index_course_registrations_on_course_id_and_user_id", :unique => true
+  create_table "course_notifications", :force => true do |t|
+    t.string   "topic"
+    t.string   "message"
+    t.integer  "sender_id"
+    t.integer  "course_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "courses", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "hide_after"
-    t.boolean  "hidden",                     :default => false,    :null => false
-    t.integer  "cache_version",              :default => 0,        :null => false
+    t.boolean  "hidden",                         :default => false,    :null => false
+    t.integer  "cache_version",                  :default => 0,        :null => false
     t.string   "spreadsheet_key"
-    t.string   "source_backend",                                   :null => false
-    t.string   "source_url",                                       :null => false
-    t.text     "git_branch",                 :default => "master", :null => false
+    t.string   "source_backend",                                       :null => false
+    t.string   "source_url",                                           :null => false
+    t.text     "git_branch",                     :default => "master", :null => false
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
+    t.boolean  "locked_exercise_points_visible", :default => true,     :null => false
+    t.text     "description"
   end
 
   create_table "exercises", :force => true do |t|
@@ -106,6 +116,14 @@ ActiveRecord::Schema.define(:version => 20130125013607) do
 
   create_table "points_upload_queues", :force => true do |t|
     t.integer  "point_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "reply_to_feedback_answers", :force => true do |t|
+    t.integer  "feedback_answer_id"
+    t.text     "body"
+    t.string   "from"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -178,6 +196,8 @@ ActiveRecord::Schema.define(:version => 20130125013607) do
     t.text     "message_for_reviewer",           :default => "",    :null => false
     t.boolean  "newer_submission_reviewed",      :default => false, :null => false
     t.boolean  "review_dismissed",               :default => false, :null => false
+    t.boolean  "paste_available",                :default => false, :null => false
+    t.text     "message_for_paste"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
@@ -192,6 +212,7 @@ ActiveRecord::Schema.define(:version => 20130125013607) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "exception"
+    t.text     "backtrace"
   end
 
   add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"
@@ -241,9 +262,6 @@ ActiveRecord::Schema.define(:version => 20130125013607) do
   add_foreign_key "awarded_points", "courses", :name => "awarded_points_course_id_fk", :dependent => :delete
   add_foreign_key "awarded_points", "submissions", :name => "awarded_points_submission_id_fk", :dependent => :nullify
   add_foreign_key "awarded_points", "users", :name => "awarded_points_user_id_fk", :dependent => :delete
-
-  add_foreign_key "course_registrations", "courses", :name => "course_registrations_course_id_fk", :dependent => :delete
-  add_foreign_key "course_registrations", "users", :name => "course_registrations_user_id_fk", :dependent => :delete
 
   add_foreign_key "exercises", "courses", :name => "exercises_course_id_fk", :dependent => :delete
 

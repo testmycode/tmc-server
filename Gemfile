@@ -17,9 +17,10 @@ gem 'fastercsv', :platforms => :ruby_18
 gem 'foreigner', '~> 1.1.6'
 gem 'xml-simple', '~> 1.1.1'
 gem 'transaction_isolation', '~> 1.0.3'
-gem 'breadcrumbs_on_rails', '~> 2.3.0'
 gem 'andand'
 gem 'haml-rails'
+gem 'acts_as_api'
+
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'

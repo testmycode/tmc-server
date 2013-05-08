@@ -1,4 +1,6 @@
-# See UserField
+# An abstract base for classes representing extra fields on a record.
+#
+# See UserField for an example.
 module ExtraField
   extend ActiveSupport::Concern
   included do

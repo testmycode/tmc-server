@@ -1,3 +1,7 @@
+# Stores when a point (course_id, name) has been awared to a particular user.
+#
+# There is a reference to the submission that first awarded the point, but this
+# reference can be nil if the submission has been deleted.
 class AwardedPoint < ActiveRecord::Base
   include PointComparison
 

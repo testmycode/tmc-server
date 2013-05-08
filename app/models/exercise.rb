@@ -19,6 +19,19 @@ class Exercise < ActiveRecord::Base
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
   }
 
+  acts_as_api
+
+  api_accessible :course_show_with_exercises do |t|
+    t.add :name
+    t.add :exercise_json_url
+    t.add :hidden
+    t.add :returnable_forced
+  end
+
+  def exercise_json_url
+    Rails.application.routes.url_helpers.exercise_url(self.id, format: 'json', api_version: 5)
+  end
+
   def relative_path
     name.gsub('-', '/')
   end
@@ -98,6 +111,16 @@ class Exercise < ActiveRecord::Base
   # Whether a user may see all metadata about the exercise
   def visible_to?(user)
     user.administrator? || (!hidden? && published? && unlock_spec_obj.permits_unlock_for?(user))
+  end
+
+  # Whether the user may see the scoreboard for the exercise
+  def points_visible_to?(user)
+    user.administrator? ||
+      (
+        !hidden? &&
+        published? &&
+        (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user))
+      )
   end
 
   # Whether the user may download the exercise ZIP file

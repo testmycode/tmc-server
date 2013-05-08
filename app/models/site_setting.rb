@@ -1,3 +1,4 @@
+# Represents the contents of `config/site.yml`.
 class SiteSetting
   def self.value(key)
     key = key.to_s

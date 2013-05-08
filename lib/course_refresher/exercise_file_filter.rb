@@ -6,8 +6,12 @@ require 'course_refresher/xml_filter'
 require 'course_refresher/properties_filter'
 require 'course_refresher/css_filter'
 require 'course_refresher/js_filter'
+require 'course_refresher/makefile_c_filter'
 
 class CourseRefresher
+  # Filters source files into stubs and solutions.
+  #
+  # See the user manual for the special comments this processes.
   class ExerciseFileFilter
     def initialize(project_dir)
       @project_dir = Pathname(project_dir)
@@ -39,7 +43,8 @@ class CourseRefresher
         to = to_dir + rel_path
         contents = filter_file_for_solution(from)
         write_file(to, contents) unless contents.nil?
-        maybe_write_html_file(File.read(from), "#{to}.html") if from.extname == '.java'
+        maybe_write_html_file(File.read(from), "#{to}.html") if %w(.java .c .h).include? from.extname
+        #maybe_write_html_file(File.read(from), "#{to}.html") if from.extname == '.java'
       end
 
       clean_empty_dirs_in_project(to_dir)
@@ -127,7 +132,8 @@ class CourseRefresher
         CourseRefresher::XmlFilter.new,
         CourseRefresher::PropertiesFilter.new,
         CourseRefresher::CssFilter.new,
-        CourseRefresher::JsFilter.new
+        CourseRefresher::JsFilter.new,
+        CourseRefresher::MakefileCFilter.new
       ]
     end
 

@@ -40,9 +40,9 @@
   
   <section>
     <% if @user.new_record? %>
-      <%= f.submit "Sign up" %>
+      <%= f.submit "Sign up", class: "btn btn-primary" %>
     <% else %>
-      <%= f.submit "Save" %>
+      <%= f.submit "Save", class: "btn btn-primary" %>
     <% end %>
   </section>
 <% end %>

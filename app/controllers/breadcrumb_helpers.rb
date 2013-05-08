@@ -1,4 +1,7 @@
 
+# Helper methods for making breadcrumbs.
+#
+# See https://github.com/weppos/breadcrumbs_on_rails
 module BreadcrumbHelpers # Included in ApplicationController
   def add_course_breadcrumb
     add_breadcrumb "Course #{@course.name}", course_path(@course)

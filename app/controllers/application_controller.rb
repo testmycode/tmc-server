@@ -1,21 +1,29 @@
 require 'version'
+require 'twitter-bootstrap-breadcrumbs'
 
+# Base class for all controllers.
+#
+# Includes common parts like handling some exceptions as well as
+# various utility methods.
 class ApplicationController < ActionController::Base
   API_VERSION = 5 # To be incremented on BC-breaking changes
 
-  include BreadcrumbHelpers
+  include BreadCrumbs
+
+  helper :all
 
   add_breadcrumb 'TMC', :root_path
 
-  helper :all
-  
-  layout :select_layout
-  
-  protect_from_forgery
 
+  layout :select_layout
+
+  protect_from_forgery
+  include BootstrapFlashHelper
+  include FlashBlockHelper
   include SessionsHelper
+  include BreadcrumbHelpers
   check_authorization
-  
+
   rescue_from CanCan::AccessDenied do |exception|
     respond_access_denied
   end unless Rails::env == 'test'  # for clearer error messages

@@ -1,5 +1,6 @@
 
-class UnlockSpec
+# Parses and abstracts specification in the "unlocked_after" field of a `metadata.yml` file.
+class UnlockSpec  # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
   class InvalidSyntaxError < StandardError; end
 
   def initialize(exercise, conditions)
@@ -121,7 +122,7 @@ private
       @universal_descriptions << "#{num_points} #{plural(num_points, 'point')} from #{group}"
       @describers << lambda do |u|
         awarded = available_and_awarded(course, group, u)[1]
-        remaining = num_points - awarded
+        remaining = num_points - awarded.count
         if remaining > 0
           "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
         else

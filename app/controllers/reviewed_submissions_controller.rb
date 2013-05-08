@@ -1,3 +1,4 @@
+# Shows an admin the list of submissions that have already been reviewed.
 class ReviewedSubmissionsController < ApplicationController
   skip_authorization_check
   before_filter :check_access

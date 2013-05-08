@@ -1,5 +1,9 @@
 require 'shellwords'
 
+# Provides useful methods for working with the shell.
+#
+# Ruby's standard methods "system" and the backtick operator are
+# bad at capturing output and errors.
 module SystemCommands
   extend self
 
