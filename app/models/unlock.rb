@@ -62,7 +62,8 @@ private
 
   def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
     for exercise in course.exercises
-      exists = !!user_unlocks_by_exercise_name[exercise.name]
+      existing = user_unlocks_by_exercise_name[exercise.name]
+      exists = !!existing
       may_exist = exercise.unlock_spec_obj.permits_unlock_for?(user)
       if !exists && may_exist && !exercise.requires_explicit_unlock?
         Unlock.create!(
@@ -73,6 +74,9 @@ private
         )
       elsif exists && !may_exist
         user_unlocks_by_exercise_name[exercise.name].destroy
+      elsif exists && may_exist && exercise.unlock_spec_obj.valid_after != existing.valid_after
+        existing.valid_after = exercise.unlock_spec_obj.valid_after
+        existing.save!
       end
     end
   end

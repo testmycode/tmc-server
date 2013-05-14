@@ -53,5 +53,23 @@ describe Unlock do
       Unlock.where(:exercise_name => 'ex1').should be_empty
     end
 
+    it "updates unlocks whose unlock time changes" do
+      Unlock.refresh_unlocks(@course,@user)
+
+      @ex1.unlock_spec = [(Date.today + 3.days).to_s].to_json
+      @ex1.save!
+      @course.reload
+      Unlock.refresh_unlocks(@course, @user)
+      u = Unlock.where(:exercise_name => 'ex1').first
+      u.valid_after.should > Date.today + 2.days
+
+      @ex1.unlock_spec = [].to_json
+      @ex1.save!
+      @course.reload
+      Unlock.refresh_unlocks(@course, @user)
+      u = Unlock.where(:exercise_name => 'ex1').first
+      u.valid_after.should be_nil
+    end
+
   end
 end
