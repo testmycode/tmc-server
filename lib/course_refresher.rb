@@ -11,6 +11,7 @@ require 'set'
 require 'fileutils'
 
 # Safely refreshes a course from a git repository
+# TODO: split this into submodules
 class CourseRefresher
 
   def refresh_course(course)
@@ -252,15 +253,12 @@ private
       @course.exercises.each do |exercise|
         review_points = @review_points[exercise.name]
         point_names = Set.new
-        path = File.join(@course.clone_path, exercise.relative_path)
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
         exercise_type = ExerciseDir.exercise_type(clone_path)
-        #TMCTODO
         case exercise_type
           when :universal
             point_names += get_universal_exercise_points(exercise)
           when :makefile_c
-          # :points => ['exercise', 'annotation', 'values']
             point_names += get_c_exercise_points(exercise)
           else
             point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
@@ -298,12 +296,13 @@ private
       full_path = File.join(@course.clone_path, exercise.relative_path)
       hash = FileTreeHasher.hash_file_tree(full_path)
       TestScannerCache.get_or_update(@course, exercise.name, hash) do
-        `cd #{full_path} && make && make get-points > points.txt` # FIXME
-        f = File.open("#{full_path}/points.txt")
-        output = f.readlines
-        f.close
+        `cd #{full_path} && make && make get-points > points.txt`
+        output = IO.readlines("#{full_path}/points.txt")
+
+        # drop makefile output
         output.pop
         available_points_content = output.drop(3)
+
         points = Set.new
         available_points_content.each do |line|
           line = line.gsub(" ", "").chomp
@@ -370,7 +369,6 @@ private
     end
 
     def add_shared_files_to_stub(exercise_type, stub_path)
-      #TMCTODO
       case exercise_type
       when :universal
         #nothing yet

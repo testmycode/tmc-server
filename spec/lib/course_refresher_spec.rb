@@ -552,7 +552,6 @@ describe CourseRefresher do
       end
 
       it "should copy only .universal/model-solutions/* to model solution" do
-        clone_path = Pathname("#{@course.clone_path}/#{@e.relative_path}")
         solution_path = Pathname("#{@course.solution_path}/#{@e.relative_path}")
 
         path = File.join(solution_path, '**', '*.rb')
@@ -566,7 +565,6 @@ describe CourseRefresher do
       end
 
       it "should copy only .universal/controls and not hidden contents to stubs, replacing files with contents of .universal/exercise-stubs/*" do
-        clone_path = Pathname("#{@course.clone_path}/#{@e.relative_path}")
         stub_path = Pathname("#{@course.stub_path}/#{@e.relative_path}")
 
         path = File.join(stub_path, '**', '*')
