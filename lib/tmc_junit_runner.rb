@@ -34,11 +34,19 @@ class TmcJunitRunner < MavenProject
   
   # Use TestScanner.get_test_case_methods instead.
   def get_test_case_methods(exercise_path)
+    #CTODO
+    #TMCTODO
     result = []
     ex_dir = ExerciseDir.get(exercise_path)
-    ex_cp = ex_dir.library_jars.map(&:to_s).join(':')
+
+    ex_cp = if ex_dir.respond_to? :library_jars
+      ex_dir.library_jars.map(&:to_s).join(':')
+    else
+      ""
+    end
+
     runner_cp = classpath
-    
+
     Dir.mktmpdir do |tmpdir|
       stderr_file = "#{tmpdir}/stderr"
       cmd = SystemCommands.mk_command([

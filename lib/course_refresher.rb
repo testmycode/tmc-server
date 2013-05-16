@@ -8,6 +8,7 @@ require 'tmc_junit_runner'
 require 'course_refresher/exercise_file_filter'
 require 'maven_cache_seeder'
 require 'set'
+require 'fileutils'
 
 # Safely refreshes a course from a git repository
 class CourseRefresher
@@ -251,7 +252,19 @@ private
       @course.exercises.each do |exercise|
         review_points = @review_points[exercise.name]
         point_names = Set.new
-        point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
+        path = File.join(@course.clone_path, exercise.relative_path)
+        clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
+        exercise_type = ExerciseDir.exercise_type(clone_path)
+        #TMCTODO
+        case exercise_type
+          when :universal
+            point_names += get_universal_exercise_points(exercise)
+          when :makefile_c
+          # :points => ['exercise', 'annotation', 'values']
+            point_names += get_c_exercise_points(exercise)
+          else
+            point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
+        end
         point_names += review_points
 
         added = []
@@ -280,35 +293,89 @@ private
         @report.notices << "Removed points from exercise #{exercise.name}: #{removed.join(' ')}" unless removed.empty?
       end
     end
-    
+
+    def get_c_exercise_points(exercise)
+      full_path = File.join(@course.clone_path, exercise.relative_path)
+      hash = FileTreeHasher.hash_file_tree(full_path)
+      TestScannerCache.get_or_update(@course, exercise.name, hash) do
+        `cd #{full_path} && make && make get-points > points.txt` # FIXME
+        f = File.open("#{full_path}/points.txt")
+        output = f.readlines
+        f.close
+        output.pop
+        available_points_content = output.drop(3)
+        points = Set.new
+        available_points_content.each do |line|
+          line = line.gsub(" ", "").chomp
+          points << line
+        end
+        `cd #{full_path} && make clean`
+        FileUtils.rm("#{full_path}/points.txt")
+        points
+      end
+    end
+
+    def get_universal_exercise_points(exercise)
+      full_path = File.join(@course.clone_path, exercise.relative_path)
+      hash = FileTreeHasher.hash_file_tree(full_path)
+      TestScannerCache.get_or_update(@course, exercise.name, hash) do
+        output = `cd #{full_path} && .universal/controls/get-points` .split("\n")
+        points = Set.new
+        output.each do |line|
+          line = line.gsub(" ", "").chomp[0..240]
+          points << line
+        end
+        points
+      end
+    end
+
     def test_case_methods(exercise)
       path = File.join(@course.clone_path, exercise.relative_path)
       TestScanner.get_test_case_methods(@course, exercise.name, path)
     end
-    
+
     def make_solutions
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
         FileUtils.mkdir_p(solution_path)
-        ExerciseFileFilter.new(clone_path).make_solution(solution_path)
+
+        exercise_type = ExerciseDir.exercise_type(clone_path)
+        case exercise_type
+          when :universal
+            FileUtils.cp_r File.join(clone_path, ".universal", "model-solutions"), solution_path
+          else
+            ExerciseFileFilter.new(clone_path).make_solution(solution_path)
+        end
       end
     end
-    
+
     def make_stubs
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
         stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
         FileUtils.mkdir_p(stub_path)
-        ExerciseFileFilter.new(clone_path).make_stub(stub_path)
-
         exercise_type = ExerciseDir.exercise_type(clone_path)
+        case exercise_type
+          when :universal
+            FileUtils.cp_r(File.join(clone_path,'.'), stub_path)
+            FileUtils.cp_r(File.join(clone_path, ".universal", "exercise-stubs/."), File.join(stub_path, "."))
+            universal_contents = Dir.glob(File.join(stub_path, e.name, ".universal/*"))
+            universal_contents.each { |file| FileUtils.rm_rf file unless file.to_s.include? "controls" }
+          else
+            ExerciseFileFilter.new(clone_path).make_stub(stub_path)
+        end
         add_shared_files_to_stub(exercise_type, stub_path)
       end
     end
 
     def add_shared_files_to_stub(exercise_type, stub_path)
+      #TMCTODO
       case exercise_type
+      when :universal
+        #nothing yet
+      when :makefile_c
+        #nothing yet
       when :java_simple
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
         FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')

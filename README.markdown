@@ -77,6 +77,12 @@ The course instructor and current maintainer of the project is Martin Pärtel ([
 - Arto Vihavainen
 - Jaakko Kurhila
 
+C support was incuded in another Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/)
+Authors in this project were
+
+- Jarmo Isotalo ([jamox](https://github.com/jamox))
+- Tony Kovanen ([rase-](http://github.com/rase-))
+
 
 ## License ##
 

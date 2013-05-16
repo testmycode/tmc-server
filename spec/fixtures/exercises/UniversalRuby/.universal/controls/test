@@ -1,0 +1,1 @@
+ruby .universal/controls/rspec_parser.rb specs > test_output.txt 2> /dev/null

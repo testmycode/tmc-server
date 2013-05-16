@@ -5,7 +5,7 @@ require 'submission_processor'
 class SubmissionsController < ApplicationController
   around_filter :course_transaction
   before_filter :get_course_and_exercise
-  
+
   skip_authorization_check :only => [:show, :index]
 
   def index
@@ -27,7 +27,7 @@ class SubmissionsController < ApplicationController
   def show
     @submission = Submission.find(params[:id])
     authorize! :read, @submission
-    
+
     @course = @submission.course
     @exercise = @submission.exercise
     add_course_breadcrumb
@@ -61,7 +61,7 @@ class SubmissionsController < ApplicationController
           }
           end
         )
-        
+
         if @exercise.solution.visible_to?(current_user)
           output[:solution_url] = view_context.exercise_solution_url(@exercise)
         end
@@ -75,15 +75,15 @@ class SubmissionsController < ApplicationController
     if !params[:submission] || !params[:submission][:file]
       return respond_not_found('No ZIP file selected or failed to receive it')
     end
-    
+
     if !@exercise.submittable_by?(current_user)
       return respond_access_denied('Submissions for this exercise are no longer accepted.')
     end
-    
+
     file_contents = File.read(params[:submission][:file].tempfile.path)
-    
+
     errormsg = nil
-    
+
     if !file_contents.start_with?('PK')
       errormsg = "The uploaded file doesn't look like a ZIP file."
     end
@@ -100,6 +100,8 @@ class SubmissionsController < ApplicationController
         :return_file => file_contents,
         :params_json => submission_params.to_json,
         :requests_review => !!params[:request_review],
+        :paste_available => !!params[:paste],
+        :message_for_paste => if params[:paste] then params[:message_for_paste] || '' else '' end,
         :message_for_reviewer => if params[:request_review] then params[:message_for_reviewer] || '' else '' end
       )
       
@@ -126,7 +128,8 @@ class SubmissionsController < ApplicationController
       end
       format.json do
         if !errormsg
-          render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => API_VERSION) }
+          render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => API_VERSION),
+                            :paste_url => submission_paste_index_url(@submission)}
         else
           render :json => { :error => errormsg }
         end

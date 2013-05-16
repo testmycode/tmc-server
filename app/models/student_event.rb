@@ -1,4 +1,3 @@
-
 # A logged data point from the IDE's "spyware".
 class StudentEvent < ActiveRecord::Base
   belongs_to :user

@@ -22,7 +22,6 @@ class CourseNotificationsController < ApplicationController
         message: notifier.message
       ).deliver
     end
-
     redirect_to course_path(course), :notice => "Mail has been sent"
   end
 

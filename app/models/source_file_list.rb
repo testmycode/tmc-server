@@ -34,23 +34,34 @@ class SourceFileList
       zip_path = "#{tmpdir}/submission.zip"
       File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
       SystemCommands.sh!('unzip', '-qq', zip_path, '-d', tmpdir)
-
-      project_dir = TmcDirUtils.find_dir_containing(tmpdir, 'src')
+      
+      # Universal support
+      project_dir = if TmcDirUtils.find_dir_containing(tmpdir, '.universal') != nil
+        tmpdir
+      else
+        TmcDirUtils.find_dir_containing(tmpdir, 'src')
+      end
       return self.new([]) if project_dir == nil
-
-      files = find_source_files_under(project_dir)
-
+    
+      files = if project_dir == tmpdir
+        find_all_files_under(project_dir)
+      else
+        find_source_files_under(project_dir)
+      end
       make_path_names_relative(project_dir, files)
 
       files = sort_source_files(files)
-
       self.new(files)
     end
   end
 
   def self.for_solution(solution)
-    files = find_source_files_under(solution.path)
-
+    files = case solution.exercise.exercise_type
+      when :universal
+        find_all_files_under(solution.path)
+      else
+        find_source_files_under(solution.path)
+    end
     files.each do |file|
       html_file = Pathname("#{file.path}.html")
       if html_file.exist?
@@ -83,6 +94,22 @@ private
     files.sort_by(&:path)
   end
 
+  def self.find_all_files_under(root_dir)
+    files = []
+    total_size = 0
+    Pathname(root_dir).realpath.find do |file|
+      if file.size <= MAX_INDIVIDUAL_FILE_SIZE
+        total_size += file.size
+        raise "Files are too large" if total_size > MAX_SIZE
+        name = file.to_s
+        next if file.directory? or name.end_with?('.zip') or name.end_with?('.tar') or name.include? ".universal" or name.include? "nbproject"
+        files << FileRecord.new(file.to_s, file.read)
+      end
+    end
+
+    files.sort_by(&:path)
+  end
+
   def self.source_file?(file)
     return false unless file.file?
     dir = file.parent.to_s
@@ -95,6 +122,9 @@ private
       name.end_with?('.html') ||
       name.end_with?('.css') ||
       name.end_with?('.js') ||
+      name.end_with?('.c') ||
+      name.end_with?('.h') ||
+      name.end_with?('.rb') ||
       dir.include?('/WEB-INF')
   end
 

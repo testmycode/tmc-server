@@ -1,0 +1,34 @@
+<%
+   page_metadata = {
+     :comet_server_baseurl => comet_server_baseurl,
+     :comet_tmc_baseurl => comet_tmc_baseurl,
+     :session_cookie_name => SiteSetting.value(:session_cookie_key),
+     :username => current_user.guest? ? nil : current_user.username,
+     :base_url => root_url,
+     :current_path => request.path
+   }
+%>
+<script type="text/javascript">
+  var PageMetadata = <%= raw(page_metadata.to_json) %>;
+</script>
+
+<%= javascript_include_tag(
+      'underscore-min.js',
+      'jquery',
+      'jquery_ujs',
+      'jquery-ui',
+      'jquery.dataTables.min',
+      'jquery.cookie',
+      'misc.js',
+      'naturalSort.js',
+      comet_js_url('org/cometd.js'),
+      comet_js_url('jquery/jquery.cometd.js'),
+      'comet_connection.js',
+      'review_notifications.js'
+    )
+%>
+<% if @show_page_presence %>
+  <%= javascript_include_tag 'page_presence.js' %>
+<% end %>
+
+<%= csrf_meta_tag %>

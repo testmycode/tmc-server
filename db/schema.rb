@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130212001309) do
+ActiveRecord::Schema.define(:version => 20130426215042) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -31,6 +31,14 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
   add_index "awarded_points", ["course_id", "user_id", "name"], :name => "index_awarded_points_on_course_id_and_user_id_and_name", :unique => true
   add_index "awarded_points", ["course_id", "user_id", "submission_id"], :name => "index_awarded_points_on_course_id_and_user_id_and_submission_id"
   add_index "awarded_points", ["user_id", "submission_id", "name"], :name => "index_awarded_points_on_user_id_and_submission_id_and_name", :unique => true
+
+  create_table "comments", :force => true do |t|
+    t.text     "comment",       :null => false
+    t.integer  "user_id"
+    t.integer  "submission_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "course_notifications", :force => true do |t|
     t.string   "topic"
@@ -55,6 +63,7 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
     t.boolean  "locked_exercise_points_visible", :default => true,     :null => false
+    t.text     "description"
   end
 
   create_table "exercises", :force => true do |t|
@@ -187,6 +196,8 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
     t.text     "message_for_reviewer",           :default => "",    :null => false
     t.boolean  "newer_submission_reviewed",      :default => false, :null => false
     t.boolean  "review_dismissed",               :default => false, :null => false
+    t.boolean  "paste_available",                :default => false, :null => false
+    t.text     "message_for_paste"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
@@ -201,6 +212,8 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "exception"
+    t.text     "backtrace"
+    t.text     "valgrind_trace"
   end
 
   add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"
