@@ -78,15 +78,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def destroy
-    return # for now disable course removal and allow it only from rails console
-    @course = Course.find(params[:id])
-    authorize! :destroy, @course
-    @course.destroy
-
-    redirect_to(courses_path)
-  end
-
 private
 
   def assign_show_view_vars
