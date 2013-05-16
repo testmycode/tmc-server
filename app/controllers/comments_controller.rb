@@ -1,7 +1,5 @@
 class CommentsController < ApplicationController
   skip_authorization_check
-  # GET /comments
-  # GET /comments.json
   def index
     @submission = Submission.find(params[:submission_id])
     @comments = @submission.comments
@@ -11,8 +9,6 @@ class CommentsController < ApplicationController
     end
   end
 
-  # GET /comments/1
-  # GET /comments/1.json
   def show
     @comment = Comment.find(params[:id])
 
@@ -21,18 +17,6 @@ class CommentsController < ApplicationController
     end
   end
 
-  # GET /comments/new
-  # GET /comments/new.json
-  def new
-    @comment = Comment.new
-
-    respond_to do |format|
-      format.json { render json: @comment }
-    end
-  end
-
-  # POST /comments
-  # POST /comments.json
   def create
     @comment = Comment.new()
     @comment.comment = params[:comment]
