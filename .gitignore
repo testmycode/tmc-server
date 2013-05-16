@@ -11,8 +11,7 @@
 /config/site_tailoring.rb
 /config/extra_fields/*.rb
 !/config/extra_fields/*.example.rb
-/coverage/*
-coverage
+/coverage
 .DStore
 
 # Eclipse
