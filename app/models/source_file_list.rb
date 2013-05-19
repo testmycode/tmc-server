@@ -35,12 +35,7 @@ class SourceFileList
       File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
       SystemCommands.sh!('unzip', '-qq', zip_path, '-d', tmpdir)
       
-      # Universal support
-      project_dir = if TmcDirUtils.find_dir_containing(tmpdir, '.universal') != nil
-        tmpdir
-      else
-        TmcDirUtils.find_dir_containing(tmpdir, 'src')
-      end
+      project_dir = TmcDirUtils.find_dir_containing(tmpdir, 'src')
       return self.new([]) if project_dir == nil
     
       files = if project_dir == tmpdir
@@ -56,12 +51,7 @@ class SourceFileList
   end
 
   def self.for_solution(solution)
-    files = case solution.exercise.exercise_type
-      when :universal
-        find_all_files_under(solution.path)
-      else
-        find_source_files_under(solution.path)
-    end
+    files = find_source_files_under(solution.path)
     files.each do |file|
       html_file = Pathname("#{file.path}.html")
       if html_file.exist?
@@ -102,7 +92,7 @@ private
         total_size += file.size
         raise "Files are too large" if total_size > MAX_SIZE
         name = file.to_s
-        next if file.directory? or name.end_with?('.zip') or name.end_with?('.tar') or name.include? ".universal" or name.include? "nbproject"
+        next if file.directory? or name.end_with?('.zip') or name.end_with?('.tar') or name.include? "nbproject"
         files << FileRecord.new(file.to_s, file.read)
       end
     end

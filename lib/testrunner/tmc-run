@@ -25,9 +25,7 @@ ERROR_MSG_LOCALE_DEF="-Dfi.helsinki.cs.tmc.edutestutils.defaultLocale=$error_msg
 TMC_MAVEN_PLUGIN_VERSION=1.5
 
 # Identify project type
-if [ -d .universal/ ]; then
-  PROJECT_TYPE=universal
-elif [ -f pom.xml ]; then
+if [ -f pom.xml ]; then
   PROJECT_TYPE=java_maven
 elif [ -f Makefile ]; then
   PROJECT_TYPE=makefile_c
@@ -101,10 +99,6 @@ case $PROJECT_TYPE in
 
     CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*"
   ;;
-  
-  universal)
-    # Do nothing, since there is no explicit compiling script for universal support
-  ;;
 esac
 
 
@@ -175,13 +169,6 @@ case $PROJECT_TYPE in
     echo "next java:"
     java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
     echo "Java completed, makefile_c done"
-  ;;
-
-  universal)
-    echo "Running tests for universal support..."
-    .universal/controls/test # This produces the proper output file, maybe this should receive output file as argument
-    echo "...Universal support tests run"
-    cat test_output.txt
   ;;
 esac
 

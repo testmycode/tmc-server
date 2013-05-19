@@ -521,66 +521,6 @@ describe CourseRefresher do
     end
   end
 
-  describe "for Universal (ruby) exercises" do
-    it "should scan the exercises for available points" do
-      add_exercise('UniversalRuby', :fixture_name => 'UniversalRuby')
-      @refresher.refresh_course(@course)
-
-      points = @course.exercises.where(:name => 'UniversalRuby').first.available_points
-      points.map(&:name).should include('1.1')
-    end
-
-    it "should delete previously available points that are no longer available" do
-      add_exercise('UniversalRuby', :fixture_name => 'UniversalRuby')
-      @refresher.refresh_course(@course)
-      delete_exercise('UniversalRuby')
-      @refresher.refresh_course(@course)
-
-      AvailablePoint.all.should be_empty
-    end
-
-    context "files" do
-      before :each do
-        add_exercise('UniversalRuby', fixture_name: 'UniversalRuby')
-        @refresher.refresh_course(@course)
-        @e = @course.exercises.first
-      end
-
-      after :each do
-        delete_exercise('UniversalRuby')
-        @refresher.refresh_course(@course)
-      end
-
-      it "should copy only .universal/model-solutions/* to model solution" do
-        solution_path = Pathname("#{@course.solution_path}/#{@e.relative_path}")
-
-        path = File.join(solution_path, '**', '*.rb')
-
-        files = Dir.glob(path)
-        found = files.select { |file| file.to_s.include? 'library.rb' }
-        found.count.should == 1
-
-        content = File.read(found.first)
-        content.should be_include '0  # METHOD BODY return_zero'
-      end
-
-      it "should copy only .universal/controls and not hidden contents to stubs, replacing files with contents of .universal/exercise-stubs/*" do
-        stub_path = Pathname("#{@course.stub_path}/#{@e.relative_path}")
-
-        path = File.join(stub_path, '**', '*')
-
-        found_controls = false
-        files = Dir.glob(path) + Dir.glob(File.join(stub_path, '**', '.universal', '**', '*'))
-        files.each do |file|
-          file.to_s.should_not be_include 'model-solutions'
-          file.to_s.should_not be_include 'exercise-stubs'
-          found_controls = true if file.to_s.include? 'controls'
-        end
-        found_controls.should == true
-      end
-    end
-  end
-
 
   def add_exercise(dest_name, options = {})
     options = {

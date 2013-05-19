@@ -2,7 +2,6 @@ require 'pathname'
 require 'exercise_dir/java_simple'
 require 'exercise_dir/java_maven'
 require 'exercise_dir/makefile_c'
-require 'exercise_dir/universal'
 
 # Holds the path to and metadata about an exercise directory.
 # Implemented by project type -specific subclasses.
@@ -84,8 +83,6 @@ private
       MakefileC
     elsif (path + 'src/').exist? and (path + 'test/').exist?
       JavaSimple
-    elsif (path + ".universal").exist?
-      Universal
     else
       nil
     end
