@@ -29,7 +29,7 @@ module SandboxResultsSaver
           when '103'
             "Test preparation error:\n" + results['test_output']
           when '137'
-            'Program was forcibly terminated most likely due to using too much time or memory.'
+            'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
             'Running the submission failed.'
           else
@@ -37,21 +37,11 @@ module SandboxResultsSaver
           end
         submission.pretest_error += ' (did you use an exit() command?)' unless results['exit_code'].nil?
       when 'finished'
-        begin
-          decoded_output = ActiveSupport::JSON.decode(results['test_output'])
-        rescue # Most likely because results['test_output'] was empty
-          submission.pretest_error =
-            if results['stderr'].include?("java.lang.OutOfMemoryError")
-              'Out of memory.'
-            else
-              'Unknown error while running tests.'
-            end
+        decoded_output = decode_test_output(results['test_output'], results['stderr'])
+        if decoded_output.is_a?(Enumerable)
+          TestRunGrader.grade_results(submission, decoded_output)
         else
-          if decoded_output.is_a?(Enumerable)
-            TestRunGrader.grade_results(submission, decoded_output)
-          else
-            submission.pretest_error = 'Invalid or missing test output. Did you terminate your program with an exit() command?'
-          end
+          submission.pretest_error = decoded_output.to_s
         end
       else
         raise 'Unknown status: ' + results['status']
@@ -61,6 +51,31 @@ module SandboxResultsSaver
       submission.processed = true
       submission.processing_completed_at = Time.now
       submission.save!
+    end
+  end
+
+private
+  def self.decode_test_output(test_output, stderr)
+    likely_out_of_memory = stderr.include?("java.lang.OutOfMemoryError")
+
+    if test_output.blank?
+      if likely_out_of_memory
+        return 'Out of memory.'
+      else
+        return 'Missing test output. Did you terminate your program with an exit() command?'
+      end
+    end
+
+    begin
+      result = ActiveSupport::JSON.decode(test_output)
+      raise unless result.is_a?(Enumerable)
+      result
+    rescue
+      if likely_out_of_memory
+        'Out of memory.'
+      else
+        'Unknown error while running tests.'
+      end
     end
   end
 end
