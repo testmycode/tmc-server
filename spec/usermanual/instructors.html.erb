@@ -52,8 +52,8 @@ require 'cgi' # for escapeHTML
   
   <%
     visit '/'
-    fill_in 'Login', :with => 'admin'
-    fill_in 'Password', :with => 'admin'
+    fill_in 'session_login', :with => 'admin'
+    fill_in 'session_password', :with => 'admin'
   %>
   <% highlight '[value="Sign in"]' %>
   <%= screenshot %>
@@ -257,9 +257,9 @@ require 'cgi' # for escapeHTML
   </p>
   
   <% page.visit(page.current_url) %>
-  <% highlight('[value="Refresh from repository"]') %>
+  <% highlight('[value="Refresh"]') %>
   <%= screenshot %>
-  <% click_on 'Refresh from repository' %>
+  <% click_on 'Refresh' %>
   <% course.reload %>
   
   <p>
