@@ -12,7 +12,15 @@ require 'natsort'
 #     - message: error message, if any
 #     - status: 'PASSED' or some other string
 #     - pointNames: array of point names that require this test to pass
-#     - stackTrace: a stack trace structure, if any
+#     - exception: nil, or the following structure:
+#       - className: the exception's class
+#       - message: the exception's message.
+#       - stackTrace: an array of the following structure:
+#         - declaringClass
+#         - methodName
+#         - fileName (may be nil)
+#         - lineNumber: (-1 if not available)
+#       - cause: the same exception structure again, or nil
 #
 module TestRunGrader
   extend TestRunGrader
@@ -83,7 +91,7 @@ private
   end
 
   def self.points_from_test_results(results)
-    point_status = {}  # point -> true/false/nil i.e. ok so far/failed/unseen
+    point_status = {}  # point -> true / false / nil i.e. ok so far / failed / unseen
     for result in results
       result['pointNames'].each do |name|
         unless point_status[name].eql?(false) # skip if already failed
