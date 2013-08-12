@@ -115,10 +115,9 @@ section {
 
 /* bootstrapping */
 body #everything {
-  font-size: 9px;
+  font-size: 12px;
   padding-top: 80px;
   /*
-  font-size: 12px;
   color: black;
   font-family: sans-serif;
   */
