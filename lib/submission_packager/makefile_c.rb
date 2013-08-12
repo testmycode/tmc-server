@@ -28,14 +28,6 @@ class SubmissionPackager
         jarname = jar.split("/").last
         FileUtils.cp(jar, dest+ 'lib' + jarname )
       end
-      FileUtils.mkdir_p(dest + 'lib' + 'testrunner')
-      for jar_path in TmcJunitRunner.get.jar_and_lib_paths  # wtf? this is the junit runner, not the c runner
-        destname = jar_path.basename
-        if destname.to_s.start_with?('tmc-junit-runner')
-          destname = 'tmc-junit-runner.jar'
-        end
-        FileUtils.cp(jar_path, dest + 'lib' + 'testrunner' + destname)
-      end
     end
 
     def tmc_run_path
