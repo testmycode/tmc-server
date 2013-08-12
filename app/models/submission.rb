@@ -17,7 +17,6 @@ class Submission < ActiveRecord::Base
   end
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
-  has_many :comments, :dependent => :nullify
 
   validates :user, :presence => true
   validates :course, :presence => true
@@ -157,7 +156,7 @@ class Submission < ActiveRecord::Base
         :successful => tcr.successful?,
         :message => tcr.message,
         :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
-        :backtrace => if tcr.detailed_message then tcr.detailed_message else nil end
+        :detailed_message => if tcr.detailed_message then tcr.detailed_message else nil end
       }
     end
   end

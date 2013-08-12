@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by a student)", :integration => true do
+describe "The system (used by a student)", :integration => true, :js => true do
   include IntegrationTestActions
 
   before :each do

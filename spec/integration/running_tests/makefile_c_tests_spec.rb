@@ -23,9 +23,6 @@ describe RemoteSandboxForTesting, :integration => true do
     tcr.should be_successful
 
     submission.awarded_points.count.should == 3
-    #%w(suitePoints test-tmc-check point1 point1again 
     submission.awarded_points.first.name.should == "point1"
   end
 end
-
-#failPoints %w..
