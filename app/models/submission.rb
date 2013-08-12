@@ -157,7 +157,7 @@ class Submission < ActiveRecord::Base
         :successful => tcr.successful?,
         :message => tcr.message,
         :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
-        :backtrace => if tcr.backtrace then tcr.backtrace else nil end
+        :backtrace => if tcr.detailed_message then tcr.detailed_message else nil end
       }
     end
   end

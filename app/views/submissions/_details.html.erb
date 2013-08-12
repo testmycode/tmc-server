@@ -27,10 +27,10 @@
                 <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
               </div>
             <% end %>
-            <% if tcr.backtrace != nil %>
+            <% if tcr.detailed_message != nil %>
               <br />
               <div class="backtrace">
-                <%= raw( ("".html_safe + tcr.backtrace).gsub("\n", "<br>") ) %>
+                <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
               </div>
             <% end %>
           </td>
