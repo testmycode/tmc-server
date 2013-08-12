@@ -58,7 +58,7 @@ private
         :message => test_result["message"],
         :successful => passed,
         :exception => to_json_or_null(test_result["exception"]),
-        :backtrace => test_result["valgrindTrace"] || test_result["backtrace"]
+        :detailed_message => test_result["detailed_message"] || test_result["valgrindTrace"] || test_result["backtrace"]
       )
       all_passed = false if not passed
       submission.test_case_runs << tcr

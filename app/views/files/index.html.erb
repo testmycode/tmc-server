@@ -1,10 +1,31 @@
 <h1><%= @title %></h1>
 
+
 <ul>
   <li>Download as <%= link_to @submission.downloadable_file_name, submission_path(@submission, :format => 'zip') %></li>
   <% if can? :create, Review %>
     <li><%= link_to "Start code review", new_submission_review_path(@submission) %></li>
   <% end %>
 </ul>
+
+  <div class="row-fluid">
+    <div class="span10">
+      <div class="accordion" id="testResultsAccordion">
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#testResultsAccordion" href="#collapseOne">
+              <h2 class="">Test results</h2>
+            </a>
+          </div>
+          <div id="collapseOne" class="accordion-body collapse out">
+            <div class="accordion-inner">
+              <%= render 'submissions/details' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <%= render :partial => 'files/files', :locals => {:files => @files} %>

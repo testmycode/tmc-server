@@ -29,7 +29,7 @@
             <% end %>
             <% if tcr.detailed_message != nil %>
               <br />
-              <div class="backtrace">
+              <div class="detailed-message">
                 <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
               </div>
             <% end %>
@@ -55,7 +55,7 @@ $(document).ready(function() {
 
   var buttonText = "Toggle stack trace";
   $('.stack-trace').each(createButtonTo);
-  buttonText = "Toggle backtrace";
-  $('.backtrace').each(createButtonTo);
+  buttonText = "Toggle detailed message";
+  $('.detailed-message').each(createButtonTo);
 });
 </script>
