@@ -129,7 +129,7 @@ class SubmissionsController < ApplicationController
       format.json do
         if !errormsg
           render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => API_VERSION),
-                            :paste_url => submission_paste_index_url(@submission)}
+                            :paste_url => submission_files_url(@submission)}
         else
           render :json => { :error => errormsg }
         end

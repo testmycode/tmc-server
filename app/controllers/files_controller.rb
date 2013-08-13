@@ -1,8 +1,10 @@
 # Shows the files of a submission.
 class FilesController < ApplicationController
+  skip_authorization_check
+  before_filter :check_access
+
   def index
     @submission = Submission.find(params[:submission_id])
-    authorize! :read, @submission
 
     @exercise = @submission.exercise
     @course = @exercise.course
@@ -14,4 +16,11 @@ class FilesController < ApplicationController
     @title = "Submission ##{@submission.id} files"
     @files = SourceFileList.for_submission(@submission)
   end
+
+  private
+  def check_access
+    submission = Submission.find(params[:submission_id])
+    respond_access_denied unless current_user.administrator? or submission.user_id == current_user.id.to_s or submission.public?
+  end
+
 end

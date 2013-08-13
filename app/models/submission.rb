@@ -254,6 +254,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def public?
+    self.paste_available and not self.all_tests_passed
+  end
+
 private
   def set_processing_attempts_started_at
     self.processing_attempts_started_at = Time.now
