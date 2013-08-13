@@ -11,9 +11,7 @@ clean:
 	rm -f test tmc_available_points.txt tmc_test_results.xml valgrind.log
 
 run: test
-	# Printing available points
 	./test --print-available-points
-	# Running test. There should be one success and one failure.
 	./test
 
 get-points:
