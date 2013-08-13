@@ -205,7 +205,6 @@ ActiveRecord::Schema.define(:version => 20130812070259) do
     t.datetime "updated_at"
     t.text     "exception"
     t.text     "detailed_message"
-    t.text     "valgrind_trace"
   end
 
   add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"
