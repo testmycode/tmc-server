@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by a student)", :integration => true, :js => true do
+describe "The system (used by a student)", :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -20,6 +20,7 @@ describe "The system (used by a student)", :integration => true, :js => true do
     click_link 'mycourse'
   end
 
+  # :rack_test seems to handle downloads better than :webkit/:selenium atm
   it "should offer exercises as downloadable zips", :driver => :rack_test do
     click_link('zip')
     File.open('MyExercise.zip', 'wb') {|f| f.write(page.source) }
@@ -118,6 +119,7 @@ describe "The system (used by a student)", :integration => true, :js => true do
     wait_for_submission_to_be_processed
 
     click_link 'View submitted files'
+
     page.should have_content('src/SimpleStuff.java')
     page.should have_content('public class')
     page.should have_content('oops')
