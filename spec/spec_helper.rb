@@ -44,11 +44,17 @@ Capybara.register_driver :webkit do |app|
   Capybara::Driver::Webkit.new(app, :stdout => File.open('/dev/null', 'w'))
 end
 
-Capybara.default_driver = :selenium
+# Use :selenium this if you want to see what's going on and don't feel like screenshotting
+# Otherwise :webkit is somewhat faster and doesn't pop up in your face
+#Capybara.default_driver = :selenium
+Capybara.default_driver = :webkit
+
 Capybara.server_port = FreePorts.take_next
 Capybara.default_wait_time = 10  # Comet messages may take longer to appear than the default 2 sec
 
-Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
+if Capybara.default_driver == :selenium
+  Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
+end
 
 def without_db_notices(&block)
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
