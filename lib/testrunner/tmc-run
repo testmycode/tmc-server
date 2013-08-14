@@ -155,20 +155,9 @@ case $PROJECT_TYPE in
   ;;
 
   makefile_c)
-    valgrind --log-file=valgrind.log ./test/test
-    DEFS="
-      -Dtmc.check_root_dir=`pwd`
-      -Dtmc.check_results_file=`pwd`/tmc_test_results.xml
-      -Dtmc.check_available_points=`pwd`/tmc_available_points.txt
-      -Dtmc.check_valgrind_output=`pwd`/valgrind.log
-      -Dtmc.ctestrunner_output_file=`pwd`/test_output.txt
-      -Dtmc.memory_test_output=`pwd`/tmc_memory_test_info.txt"
-    echo "DEFS: $DEFS"
-    echo "CLASSPATH: $CLASSPATH"
-
-    echo "next java:"
-    java -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.ctestrunner.Main" > stdout.txt 2> stderr.txt
-    echo "Java completed, makefile_c done"
+    valgrind --log-file=valgrind.log ./test/test > stdout.txt 2> stderr.txt
+    tmc-check-convert-results > test_output.txt
+    ls -l
   ;;
 esac
 

@@ -2,16 +2,6 @@ require 'exercise_dir'
 
 class ExerciseDir
   class MakefileC < ExerciseDir
-    #def library_jars
-    #  raise "not in C"
-    #  #CTODO
-    #  #result = []
-    #  #(@path + 'lib').find do |file|
-    #  #  result << file if file.file? && file.extname == '.jar'
-    #  #end
-    #  #result
-    #end
-    
     def clean!
       Dir.chdir @path do
         SystemCommands.sh!('make', 'clean')

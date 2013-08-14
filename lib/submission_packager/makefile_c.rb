@@ -10,9 +10,9 @@ class SubmissionPackager
     def copy_files(exercise, received, dest)
       cloned = Pathname(exercise.clone_path)
 
-      copy_tmcee_libs(cloned, dest)
       FileUtils.cp_r(received + 'src', dest + 'src')
       FileUtils.cp_r(cloned  + 'test', dest + 'test')
+      FileUtils.cp(cloned  + 'Makefile', dest + 'Makefile')
       copy_files_in_dir_no_recursion(cloned, dest)
 
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
@@ -20,14 +20,6 @@ class SubmissionPackager
 
       FileUtils.cp(tmc_run_path, dest + 'tmc-run')
       sh! ['chmod', 'a+x', dest + 'tmc-run']
-    end
-
-    def copy_tmcee_libs(cloned, dest)
-      FileUtils.mkdir_p(dest + 'lib')
-      Dir.glob("#{c_runner_path}*.jar").each do |jar|
-        jarname = jar.split("/").last
-        FileUtils.cp(jar, dest+ 'lib' + jarname )
-      end
     end
 
     def tmc_run_path
