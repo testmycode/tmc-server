@@ -20,7 +20,7 @@ class FilesController < ApplicationController
   private
   def check_access
     submission = Submission.find(params[:submission_id])
-    respond_access_denied unless current_user.administrator? or submission.user_id == current_user.id.to_s or submission.public?
+    respond_access_denied unless current_user.administrator? or submission.user_id.to_s == current_user.id.to_s or submission.public?
   end
 
 end
