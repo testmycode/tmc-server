@@ -69,30 +69,30 @@ RSpec.configure do |config|
 
   config.use_transactional_fixtures = false
 
-  config.before(:each) do
-    Tailoring.stub(:get => Tailoring.new)
-    SiteSetting.use_distribution_defaults!
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.start
-  end
-  
-  config.before(:each, :integration => true) do
-    DatabaseCleaner.clean
-    DatabaseCleaner.strategy = :truncation
-    DatabaseCleaner.start
-    SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://127.0.0.1:#{Capybara.server_port}"
-    SiteSetting.all_settings['emails']['email_code_reviews_by_default'] = false
-    SiteSetting.all_settings['comet_server'] = {
-      'url' => "http://localhost:#{CometSupport.port}/",
-      'backend_key' => CometSupport.backend_key,
-      'my_baseurl' => "http://localhost:#{Capybara.server_port}/"
-    }
-  end
-
-  config.after :each do
-    without_db_notices do # Supporess postgres notice about truncation cascade
+  config.before(:each) do |context|
+    without_db_notices do
       DatabaseCleaner.clean
     end
+
+    Tailoring.stub(:get => Tailoring.new)
+    SiteSetting.use_distribution_defaults!
+
+    if context.example.metadata[:integration]
+      # integration tests can't use transaction since the webserver must see the changes
+      DatabaseCleaner.strategy = :truncation
+
+      SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://127.0.0.1:#{Capybara.server_port}"
+      SiteSetting.all_settings['emails']['email_code_reviews_by_default'] = false
+      SiteSetting.all_settings['comet_server'] = {
+        'url' => "http://localhost:#{CometSupport.port}/",
+        'backend_key' => CometSupport.backend_key,
+        'my_baseurl' => "http://localhost:#{Capybara.server_port}/"
+      }
+    else
+      DatabaseCleaner.strategy = :transaction
+    end
+
+    DatabaseCleaner.start
   end
 
   # Override with rspec --tag ~integration --tag gdocs spec
@@ -105,3 +105,7 @@ DatabaseCleaner.start
 without_db_notices do
   DatabaseCleaner.clean
 end
+
+# Start with the transaction strategy to match the 'clean' before each test.
+DatabaseCleaner.strategy = :transaction
+DatabaseCleaner.start
