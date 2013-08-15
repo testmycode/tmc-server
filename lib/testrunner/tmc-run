@@ -157,7 +157,6 @@ case $PROJECT_TYPE in
   makefile_c)
     valgrind --log-file=valgrind.log ./test/test > stdout.txt 2> stderr.txt
     tmc-check-convert-results > test_output.txt
-    ls -l
   ;;
 esac
 
