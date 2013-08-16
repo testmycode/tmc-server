@@ -114,6 +114,10 @@ section {
 /* Toplevel layout */
 
 /* bootstrapping */
+body .well-white{
+  background-color: white;
+}
+
 body #everything {
   /*font-size: 12px;*/
   padding-top: 80px;
@@ -127,9 +131,9 @@ body.default {
   background-color: #DDDDDD;
 }
 
-#everything {
+/*#everything {
   background-color: white;
-  margin-left: 4%;
+ /* margin-left: 4%;
   margin-right: 4%;
   padding-bottom: 8%;
 }
@@ -137,7 +141,7 @@ body.default {
 #everything > div {
   padding-left: 2%;
   padding-right: 2%;
-}
+}*/
 
 #page-presence {
   float: right;

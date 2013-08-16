@@ -5,7 +5,7 @@
 </h1>
 
 <div class="row-fluid">
-  <div class="span10">
+  <div class="span12">
     <% if !@new_review && can?(:create, Review) %>
       <p><%= link_to 'Open review editor', new_submission_review_path(@submission) %></p>
     <% end %>
@@ -88,7 +88,7 @@
 
 <% if @new_review %>
   <div class="row-fluid">
-    <div class="span10">
+    <div class="span12">
       <div id="review-form-dialog" class="ui-helper-hidden">
         <div id="review-form">
           <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
@@ -142,7 +142,7 @@
   <% end %>
 
   <div class="row-fluid">
-    <div class="span10">
+    <div class="span12">
       <div class="accordion" id="testResultsAccordion">
         <div class="accordion-group">
           <div class="accordion-heading">
@@ -161,7 +161,7 @@
   </div>
 
   <div class="row-fluid">
-    <div class="span10">
+    <div class="span12">
       <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
       <button id="new-review" class="btn btn-primary"><span class="ui-icon ui-icon-document"></span>&nbsp;<%= new_button_text %></button>
       <% if @submission.review_dismissable? %>
@@ -184,7 +184,7 @@
   </div>
 <% end %>
 <div class="row-fluid">
-  <div class="span10">
+  <div class="span12">
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
 </div>
 </div>
