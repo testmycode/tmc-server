@@ -115,7 +115,7 @@ section {
 
 /* bootstrapping */
 body #everything {
-  font-size: 12px;
+  /*font-size: 12px;*/
   padding-top: 80px;
   /*
   color: black;
@@ -144,6 +144,9 @@ body.default {
 }
 
 /* Miscellaneous */
+div.repo-list{
+  padding-top: 30px;
+}
 
 div.refresh-course-button {
   margin-bottom: 20px;

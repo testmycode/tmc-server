@@ -176,7 +176,7 @@ li.repo h3 {
   overflow: hidden;
 }
 </style>
-<div class="grid clearfix">
+<div class="grid clearfix repo-list" >
   <ol id="repos">
     <% locals[:courses].each do |course| %>
       <li class="repo grid-1 grid <% if course.hidden? %>muted<% end %>">
@@ -190,53 +190,6 @@ li.repo h3 {
       <% end %>
   </ol>
 </div>
-<table class="hidden" id="<%= locals[:list_id] %>" class="course-list">
-  <thead>
-    <tr>
-      <th>
-        Course
-      </th>
-      <% if current_user.administrator? %>
-        <th>
-          Source type
-        </th>
-        <th>
-          Source URL
-        </th>
-        <th>
-        </th>
-        <th>
-        </th>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody>
-    <% locals[:courses].each do |course| %>
-      <tr class="course <% if course.hidden? %>hidden<% end %>">
-        <td>
-          <%= link_to course.name, course_path(course) %>
-        </td>
-        <% if current_user.administrator? %>
-          <td>
-            <%= course.source_backend.upcase %>
-          </td>
-          <td>
-            <span class="source-url"><%= course.source_url %></span>
-            <% if course.source_backend == 'git' %>
-              <span class="git-branch">(branch: <%= course.git_branch %>)</span>
-            <% end %>
-          </td>
-          <td>
-            <%= link_to 'Refresh', refresh_course_path(course), class: "btn btn-warning btn-mini" %>
-          </td>
-          <td>
-            <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', class: "btn btn-danger btn-mini", :confirm => 'Really truly delete this course?' %>
-          </td>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
 
 <%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false) %>
 
