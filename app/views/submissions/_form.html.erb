@@ -5,6 +5,6 @@
   <%= labeled_field("Zipped project", f.file_field('file')) %>
   <%= labeled_field("Request code review", check_box_tag('request_review'), :order => :label_last) %>
 
-  <%= labeled_field("Submit to pastebin", check_box_tag('paste_available'), :order => :label_last) %>
+  <%= labeled_field("Submit to pastebin", check_box_tag('paste'), :order => :label_last) %>
   <%= f.submit 'Submit', class: "btn btn-primary" %>
 <% end %>
