@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130812070259) do
+ActiveRecord::Schema.define(:version => 20130819104237) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -144,12 +144,13 @@ ActiveRecord::Schema.define(:version => 20130812070259) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "student_events", :force => true do |t|
-    t.integer  "user_id",       :null => false
-    t.integer  "course_id",     :null => false
-    t.string   "exercise_name", :null => false
-    t.string   "event_type",    :null => false
-    t.binary   "data",          :null => false
-    t.datetime "happened_at",   :null => false
+    t.integer  "user_id",                       :null => false
+    t.integer  "course_id",                     :null => false
+    t.string   "exercise_name",                 :null => false
+    t.string   "event_type",                    :null => false
+    t.binary   "data",                          :null => false
+    t.datetime "happened_at",                   :null => false
+    t.integer  "system_nano_time", :limit => 8
   end
 
   add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
@@ -205,6 +206,7 @@ ActiveRecord::Schema.define(:version => 20130812070259) do
     t.datetime "updated_at"
     t.text     "exception"
     t.text     "detailed_message"
+    t.text     "valgrind_trace"
   end
 
   add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"
