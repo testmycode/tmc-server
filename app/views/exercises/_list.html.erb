@@ -42,15 +42,14 @@
             <div class="red" style="width: <%=red(completion_status[exercise.id])%>px"></div>
           <% end %>
         </td>
+        <td>
+          <% dl = exercise.deadline_for(current_user) %>
+          <% if dl %>
+            <%= dl.strftime("%d.%m.%Y %H:%M") %>
+          <% end %>
         </td>
-          <td>
-            <% dl = exercise.deadline_for(current_user) %>
-            <% if dl %>
-              <%= dl.strftime("%d.%m.%Y %H:%M") %>
-            <% end %>
-          </td>
-          <td>
-            <%= link_to 'zip', exercise_zip_url(exercise) %>
+        <td>
+          <%= link_to 'zip', exercise_zip_url(exercise) %>
         </td>
       </tr>
     <% end %>
