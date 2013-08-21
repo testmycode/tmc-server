@@ -31,14 +31,15 @@ module ApplicationHelper
     cls << h(options[:class].to_s) if options[:class]
     cls = ' class="' + cls.join(' ') + '"'
     
-    label = '<label' + target + cls + '>' + h(label) + '</label>'
-    label = label.html_safe
+    label_start = ('<label' + target + cls + '>').html_safe
+    label_text = h(label)
+    label_end = '</label>'.html_safe
     
     case options[:order]
     when :label_first
-      label + tags
+      label_start + label_text + tags + label_end
     when :label_last
-      tags + label
+      label_start + tags + label_text + label_end
     else
       raise 'invalid :order option for labeled()'
     end

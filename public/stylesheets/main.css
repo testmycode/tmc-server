@@ -1,18 +1,3 @@
-#everything .accordion-group {
-  border: none;
-}
-
-.dataTables_wrapper table.table {
-  margin-bottom: 0px;
-}
-.dataTables_filter label input[type=text]{
-  margin-top: 1%;
-}
-
-.small{
-  font-size: 0.5em;
-}
-
 /* Submissions status*/
 .error,
 .failure,
@@ -40,6 +25,10 @@ section {
   margin-bottom: 2em;
 }
 */
+
+.small{
+  font-size: 0.5em;
+}
 
 .review-required,
 .review-requested {
@@ -114,7 +103,7 @@ section {
 /* Toplevel layout */
 
 /* bootstrapping */
-body .well-white{
+body .well-white {
   background-color: white;
 }
 
@@ -364,4 +353,18 @@ table.points > * > tr > td {
 .reply-to-feedback span {
   padding-top: 4px;
   padding-left: 10px;
+}
+
+/* Bootstrap adjustments */
+
+#everything .accordion-group {
+  border: none;
+}
+
+.dataTables_wrapper table.table {
+  margin-bottom: 0;
+}
+.dataTables_filter label {
+  margin-top: 4px;
+  margin-bottom: 0;
 }
