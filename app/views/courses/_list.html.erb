@@ -1,197 +1,42 @@
-<style type="text/css">
-.grid-1, .grid-2, .grid-3, .grid-4 {
-  display:inline;
-  float: left;
-  position: relative;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-/* Grid >> Children (Alpha ~ First, Omega ~ Last) */
-
-.alpha {
-  margin-left: 0;
-}
-
-.omega {
-  margin-right: 0;
-}
-
-/* Grid >> 4 Columns */
-
-.grid .grid-1 {
-  width: 220px;
-}
-
-.grid .grid-2 {
-  width: 460px;
-}
-
-.grid .grid-3 {
-  width: 700px;
-}
-
-.grid .grid-4 {
-  width: 940px;
-}
-
-/* http://nicolasgallagher.com/micro-clearfix-hack/ */
-
-.clearfix {
-  *zoom: 1;
-}
-
-.clearfix:before,
-.clearfix:after {
-  content: "";
-  display: table;
-}
-
-.clearfix:after {
-  clear: both;
-}
-
-li.repo {
-  background: white;
-  background: rgba(255, 255, 255, 0.7);
-  -moz-box-shadow:    0px 0px 5px 1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.1);
-  box-shadow:         0px 0px 5px 1px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-li.repo {
-  height: 250px;
-}
-
-li.repo > a {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-}
-
-li.repo a:hover {
-  background: #efefef;
-  background: rgba(0, 0, 0, 0.05);
-}
-
-li.repo h2, li.repo h3, li.repo p {
-  margin: 10px 15px;
-}
-
-li.repo h2 {
-  margin-bottom: 2px;
-  max-width: 160px;
-  overflow: hidden;
-  word-wrap: break-word;
-  font-size: 14px;
-  line-height: 1em;
-}
-
-li.repo h3 {
-  font-size: 11px;
-  margin-top: 2px;
-  margin-bottom: 15px;
-  color: #999;
-}
-
-.repo:after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 0;
-  height: 0;
-  border-bottom: 50px solid transparent;
-  border-left: 50px solid transparent;
-  border-right: 50px solid #0080b0;
-  pointer-events: none;
-}
-
-.repo.javascript:after {
-  border-right-color: #333;
-}
-
-.repo.scala:after {
-  border-right-color: #7ac9de;
-}
-
-.repo.ruby:after {
-  border-right-color: #cc1100;
-}
-
-.repo.java:after {
-  border-right-color: #cc8300;
-}
-
-.repo.python:after {
-  border-right-color: #6aad2d;
-}
-
-@keyframes small-swing { 0% { margin-top: 0px } 50% { margin-top: -10px } 100% { margin-top: 0px } }
-@-moz-keyframes small-swing { 0% { margin-top: 0px } 50% { margin-top: -10px } 100% { margin-top: 0px } }
-@-webkit-keyframes small-swing { 0% { margin-top: 0px } 50% { margin-top: -10px } 100% { margin-top: 0px } }
-@-ms-keyframes small-swing { 0% { margin-top: 0px } 50% { margin-top: -10px } 100% { margin-top: 0px } }
-
-@keyframes medium-swing { 0% { margin-top: 0px } 50% { margin-top: -20px } 100% { margin-top: 0px } }
-@-moz-keyframes medium-swing { 0% { margin-top: 0px } 50% { margin-top: -20px } 100% { margin-top: 0px } }
-@-webkit-keyframes medium-swing { 0% { margin-top: 0px } 50% { margin-top: -20px } 100% { margin-top: 0px } }
-@-ms-keyframes medium-swing { 0% { margin-top: 0px } 50% { margin-top: -20px } 100% { margin-top: 0px } }
-
-@keyframes large-swing { 0% { margin-top: 0px } 50% { margin-top: -40px } 100% { margin-top: 0px } }
-@-moz-keyframes large-swing { 0% { margin-top: 0px } 50% { margin-top: -40px } 100% { margin-top: 0px } }
-@-webkit-keyframes large-swing { 0% { margin-top: 0px } 50% { margin-top: -40px } 100% { margin-top: 0px } }
-@-ms-keyframes large-swing { 0% { margin-top: 0px } 50% { margin-top: -40px } 100% { margin-top: 0px } }
-
-.larry.size-smaller, .larry.size-small {
-  animation: small-swing 0.5s infinite ease-in-out;
-  -moz-animation: small-swing 0.5s infinite ease-in-out;
-  -webkit-animation: small-swing 0.5s infinite ease-in-out;
-  -ms-animation: small-swing 0.5s infinite ease-in-out;
-}
-
-.larry.size-medium, .larry.size-large {
-  animation: medium-swing 1.25s infinite ease-in-out;
-  -moz-animation: medium-swing 1.25s infinite ease-in-out;
-  -webkit-animation: medium-swing 1.25s infinite ease-in-out;
-  -ms-animation: medium-swing 1.25s infinite ease-in-out;
-}
-
-.larry.size-medium, .larry.size-fat {
-  animation: large-swing 1.5s infinite ease-in-out;
-  -moz-animation: large-swing 1.5s infinite ease-in-out;
-  -webkit-animation: large-swing 1.5s infinite ease-in-out;
-  -ms-animation: large-swing 1.5s infinite ease-in-out;
-}
-
-#flyzone {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-</style>
-<div class="grid clearfix repo-list" >
-  <ol id="repos">
-    <% locals[:courses].each do |course| %>
-      <li class="repo grid-1 grid <% if course.hidden? %>muted<% end %>">
-        <a href="<%= course_path(course) %>" >
-          <h2><%= course.name %></h2>
-          <% unless course.description.blank? %>
-            <p> <%= raw(course.description.gsub("\n",'<br>')) %> </p>
-          <% end %>
-        </a>
-      </li>
+<table id="<%= locals[:list_id] %>" class="course-list">
+  <thead>
+    <tr>
+      <th>
+        Course
+      </th>
+      <% if current_user.administrator? %>
+        <th>
+          Source type
+        </th>
+        <th>
+          Source URL
+        </th>
       <% end %>
-  </ol>
-</div>
+    </tr>
+  </thead>
+  <tbody>
+    <% locals[:courses].each do |course| %>
+      <tr class="course <% if course.hidden? %>hidden<% end %>">
+        <td>
+          <%= link_to course.name, course_path(course) %>
+        </td>
+        <% if current_user.administrator? %>
+          <td>
+            <%= course.source_backend.upcase %>
+          </td>
+          <td>
+            <span class="source-url"><%= course.source_url %></span>
+            <% if course.source_backend == 'git' %>
+              <span class="git-branch">(branch: <%= course.git_branch %>)</span>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
-<%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false) %>
+<%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false, :bFilter => false) %>
 
 <% if signed_in? %>
   <div class="alternative-format-links">[<%= link_to "json", "#{courses_path :format => :json, :api_version => ApplicationController::API_VERSION}" %>]</div>
