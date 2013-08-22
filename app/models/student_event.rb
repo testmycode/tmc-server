@@ -6,6 +6,6 @@ class StudentEvent < ActiveRecord::Base
       :conditions => proc { "exercises.course_id = #{self.course_id}" }
 
   def self.supported_event_types
-    ['code_snapshot', 'project_action', 'text_insert', 'text_remove']
+    ['code_snapshot', 'project_action', 'text_insert', 'text_remove', 'text_paste']
   end
 end
