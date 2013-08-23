@@ -23,8 +23,10 @@
             %span{class: 'icon-bar'}
             %span{class: 'icon-bar'}
             %span{class: 'icon-bar'}
-          - title = raw 'TestMyCode server <span class="small"><br>' + raw(SiteSetting.value(:site_subtitle)) + '</span>'
-          =link_to title, root_path, class: 'brand'
+          - title_extras = '<span class="small"><br>' + raw(SiteSetting.value(:site_subtitle)) + '</span>' unless SiteSetting.value(:site_subtitle).blank?
+          - title = 'TestMyCode server'
+          - title += raw(title_extras) unless title_extras.blank?
+          =link_to raw(title), root_path, class: 'brand'
           .collapse.nav-collapse
             =render 'sessions/login_form'
             %ul.nav.pull-right
