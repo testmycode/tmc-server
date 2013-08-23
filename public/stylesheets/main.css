@@ -250,6 +250,7 @@ table.points > * > tr > td {
 
 .code-review .status-buttons {
   float: right;
+  padding-right: 0.3em;
 }
 
 #review-form {

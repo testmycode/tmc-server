@@ -46,9 +46,17 @@ module ApplicationHelper
   end
   
   def labeled_field(label, tags = nil, options = {}, &block)
-    raw('<div class="field">' + labeled(label, tags, options, &block) + '</div>')
+    cls = ['field']
+    cls << options[:super_class].split(" ") if options[:super_class]
+    cls = ' class="' + cls.join(' ') + '"'
+    raw("<div #{cls} >" + labeled(label, tags, options, &block) + '</div>')
   end
-  
+
+  def bs_labeled_field(label, field)
+    str = label_tag label, nil, class: "control-label"
+    str += raw("<div class=\"controls\">" +raw(field) + "</div>")
+    raw(str)
+  end
   
   def use_datatables(table_selector, options = {})
     options = {

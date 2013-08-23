@@ -10,7 +10,7 @@
 <% if current_user.administrator? && !@expired_courses.empty? %>
   <h3>Ongoing courses</h3>
 <% end %>
-<div class="row">
+<div class="row-fluid">
   <div class="span12">
     <%= render 'list', :locals => { :courses => @ongoing_courses, :list_id => 'ongoing-courses' } %>
   </div>
@@ -18,7 +18,7 @@
 
 <% if current_user.administrator? && !@expired_courses.empty? %>
   <h3>Expired courses</h3>
-  <div class="row">
+  <div class="row-fluid">
     <div class="span12">
       <%= render 'list', :locals => { :courses => @expired_courses, :list_id => 'expired-courses' } %>
     </div>
@@ -26,7 +26,7 @@
 <% end %>
 
 <% if current_user.administrator? %>
-  <div class="row">
+  <div class="row-fluid">
     <div class="span12">
       <%= link_to 'Create New Course', new_course_path, class: "btn btn-mini btn-warning" %>
     </div>

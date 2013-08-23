@@ -2,7 +2,7 @@
   <h3>Include columns</h3>
   <div>
     <% for field_name in @ordinary_fields %>
-      <%= labeled_field(field_name.humanize, check_box_tag('column_' + field_name, '1', @visible_columns.include?(field_name)), :order => :label_last) %>
+      <%= labeled_field(field_name.humanize, check_box_tag('column_' + field_name, '1', @visible_columns.include?(field_name)), :order => :label_last, :super_class => "checkbox") %>
     <% end %>
     <% for field in @extra_fields %>
       <%= extra_field_checkbox('column_', field, @visible_columns.include?(field.name)) %>
@@ -15,7 +15,7 @@
     %>
     <%=
       checkbox = check_box_tag('show_with_no_points', '1', params['show_with_no_points'])
-      labeled_field('Show users with no points', checkbox, :order => :label_last)
+      labeled_field('Show users with no points', checkbox, :order => :label_last, :super_class => "checkbox")
     %>
 
     <script type="text/javascript">
