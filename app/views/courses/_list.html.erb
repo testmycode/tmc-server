@@ -36,8 +36,6 @@
   </tbody>
 </table>
 
-<!--%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false, :bFilter => false) %-->
-
 <% if signed_in? %>
   <div class="alternative-format-links">[<%= link_to "json", "#{courses_path :format => :json, :api_version => ApplicationController::API_VERSION}" %>]</div>
 <% end %>
