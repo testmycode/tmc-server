@@ -41,7 +41,7 @@ events.find_each do |ev|
     :event_type => ev.event_type,
     :happened_at => ev.happened_at.to_s,
     :metadata => ev.metadata,
-    :system_nano_time => ev.system_nano_time.to_s
+    :system_nano_time => ev.system_nano_time.andand(&:to_s)
   }
 
   case ev.event_type
