@@ -32,6 +32,14 @@ class Course < ActiveRecord::Base
   has_many :unlocks, :dependent => :delete_all
   has_many :course_notifications, :dependent => :delete_all
 
+  acts_as_api
+
+  api_accessible :course_show_with_exercises do |template|
+    template.add :name
+    template.add :id
+    template.add :exercises
+  end
+
   def destroy
     # Optimization: delete dependent objects quickly.
     # Rails' :dependent => :delete_all is very slow.
@@ -78,6 +86,8 @@ class Course < ActiveRecord::Base
 
     self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
+
+    self.description = new_options['description']
 
     if new_options['locked_exercise_points_visible'] != nil
       self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']

@@ -14,7 +14,7 @@ Very rought setup instructions below.
 
 ### System Dependencies ###
 
-The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`.
+The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`, `gcc`, `make`.
 
 An X server is currently needed for tests to pass (required by [capybara-webkit](https://github.com/thoughtbot/capybara-webkit)). `Xvfb` will do, but remember to set your `DISPLAY`.
 
@@ -31,7 +31,8 @@ We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` w
 6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
 7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
 8. Compile the other suff in `ext` by doing `rake compile`.
-9. Run the test suite with `rvmsudo rake spec`.
+9. Install tmc-check locally by running `rvmsudo make -C ext/tmc-check rubygems install clean`.
+10. Run the test suite with `rvmsudo rake spec`.
 
 After you get the test suite to pass, you can set up start background services.
 
@@ -76,6 +77,12 @@ The course instructor and current maintainer of the project is Martin Pärtel ([
 - Antti Laaksonen
 - Arto Vihavainen
 - Jaakko Kurhila
+
+C support was incuded in another Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/)
+Authors in this project were
+
+- Jarmo Isotalo ([jamox](https://github.com/jamox))
+- Tony Kovanen ([rase-](http://github.com/rase-))
 
 
 ## License ##

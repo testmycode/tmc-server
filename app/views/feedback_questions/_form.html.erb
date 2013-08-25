@@ -36,8 +36,20 @@ kind_disabled = !question.new_record?
   <% end %>
 
   <% if question.new_record? %>
-    <%= f.submit("Create question") %>
+    <%= f.submit("Create question", class: "btn btn-primary") %>
   <% else %>
-    <%= f.submit("Save") %>
+    <%= f.submit("Save", class: "btn btn-primary") %>
   <% end %>
 <% end %>
+
+<script type="text/javascript">
+  $(".suboption").hide();
+  var fun = function(e) {
+   if ($(e.target).attr("id") == "feedback_question_kind_intrange") { 
+      $(".suboption").show(); 
+    } else {
+      $(".suboption").hide();
+    }
+  };
+  $("input:radio").on("change", fun);
+</script>

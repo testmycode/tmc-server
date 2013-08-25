@@ -11,6 +11,8 @@
 /config/site_tailoring.rb
 /config/extra_fields/*.rb
 !/config/extra_fields/*.example.rb
+/coverage
+.DStore
 
 # Eclipse
 /.project
@@ -19,4 +21,5 @@
 
 # IntelliJ IDEA
 /.idea
+
 

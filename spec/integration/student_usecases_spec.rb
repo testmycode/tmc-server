@@ -20,6 +20,7 @@ describe "The system (used by a student)", :integration => true do
     click_link 'mycourse'
   end
 
+  # :rack_test seems to handle downloads better than :webkit/:selenium atm
   it "should offer exercises as downloadable zips", :driver => :rack_test do
     click_link('zip')
     File.open('MyExercise.zip', 'wb') {|f| f.write(page.source) }
@@ -118,6 +119,7 @@ describe "The system (used by a student)", :integration => true do
     wait_for_submission_to_be_processed
 
     click_link 'View submitted files'
+
     page.should have_content('src/SimpleStuff.java')
     page.should have_content('public class')
     page.should have_content('oops')
@@ -156,4 +158,65 @@ describe "The system (used by a student)", :integration => true do
     
     page.should_not have_content('View suggested solution')
   end
+
+  it "should not show solutions for completed exercises" do
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
+    ex.solve_all
+    ex.make_zip
+
+    click_link 'MyExercise'
+    attach_file('Zipped project', 'MyExercise.zip')
+    check('paste')
+    click_button 'Submit'
+    wait_for_submission_to_be_processed
+
+    page.should have_content('All tests successful')
+    page.should have_content('Ok')
+
+    click_link 'View submitted files'
+    # visit '/'
+    # id = Submission.last.id
+    # visit "/submissions/#{id}/files"
+    page.should have_content('src/SimpleStuff.java')
+
+    log_out
+    page.should_not have_content('src/SimpleStuff.java')
+    page.should have_content('Access denied')
+    @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
+
+    log_in_as(@other_user.login, 'xooxer')
+
+    page.should_not have_content('src/SimpleStuff.java')
+    page.should have_content('Access denied')
+  end
+
+  it "should show solutions for uncompleted exercises" do
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
+    ex.make_zip
+
+    click_link 'MyExercise'
+    attach_file('Zipped project', 'MyExercise.zip')
+    check('paste')
+    click_button 'Submit'
+    wait_for_submission_to_be_processed
+
+    page.should_not have_content('All tests successful')
+
+    click_link 'View submitted files'
+
+    page.should have_content('src/SimpleStuff.java')
+
+    log_out
+    page.should have_content('src/SimpleStuff.java')
+    page.should_not have_content('Access denied')
+    @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
+
+    log_in_as(@other_user.login, 'xooxer')
+
+    page.should have_content('src/SimpleStuff.java')
+    page.should_not have_content('Access denied')
+  end
+
+
+
 end

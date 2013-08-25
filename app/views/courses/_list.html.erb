@@ -1,21 +1,9 @@
-<table id="<%= locals[:list_id] %>" class="course-list">
+<table id="<%= locals[:list_id] %>" class="course-list table table-striped table-bordered table-hover">
   <thead>
     <tr>
       <th>
         Course
       </th>
-      <% if current_user.administrator? %>
-        <th>
-          Source type
-        </th>
-        <th>
-          Source URL
-        </th>
-        <th>
-        </th>
-        <th>
-        </th>
-      <% end %>
     </tr>
   </thead>
   <tbody>
@@ -24,29 +12,12 @@
         <td>
           <%= link_to course.name, course_path(course) %>
         </td>
-        <% if current_user.administrator? %>
-          <td>
-            <%= course.source_backend.upcase %>
-          </td>
-          <td>
-            <span class="source-url"><%= course.source_url %></span>
-            <% if course.source_backend == 'git' %>
-              <span class="git-branch">(branch: <%= course.git_branch %>)</span>
-            <% end %>
-          </td>
-          <td>
-            <%= link_to 'Refresh', refresh_course_path(course) %>
-          </td>
-          <td>
-            <%= link_to 'Delete', course_path(course), :method => :delete, :class => 'dangerous', :confirm => 'Really truly delete this course?' %>
-          </td>
-        <% end %>
       </tr>
     <% end %>
   </tbody>
 </table>
 
-<%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false) %>
+<!--%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false, :bFilter => false) %-->
 
 <% if signed_in? %>
   <div class="alternative-format-links">[<%= link_to "json", "#{courses_path :format => :json, :api_version => ApplicationController::API_VERSION}" %>]</div>

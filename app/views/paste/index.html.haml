@@ -1,0 +1,213 @@
+= javascript_include_tag "ace/ace.js"
+= javascript_include_tag "ace/mode-php.js", "ace/theme-textmate.js", "ace/keybinding-vim.js", "ace/mode-yaml.js", "ace/theme-merbivore_soft.js", "ace/theme-ambiance.js", "ace/mode-objectivec.js", "ace/mode-textile.js", "ace/mode-rhtml.js", "ace/mode-c_cpp.js", "ace/mode-velocity.js", "ace/theme-tomorrow_night.js", "ace/mode-rdoc.js", "ace/mode-livescript.js", "ace/mode-markdown.js", "ace/theme-crimson_editor.js", "ace/worker-xquery.js", "ace/mode-jsp.js", "ace/mode-json.js", "ace/theme-tomorrow_night_bright.js", "ace/mode-mushcode.js", "ace/mode-luapage.js", "ace/mode-ftl.js", "ace/mode-lucene.js", "ace/mode-liquid.js", "ace/mode-tex.js", "ace/mode-toml.js", "ace/theme-tomorrow_night_blue.js", "ace/mode-pgsql.js", "ace/theme-clouds_midnight.js", "ace/mode-django.js", "ace/mode-scala.js", "ace/theme-xcode.js", "ace/ext-emmet.js", "ace/mode-java.js", "ace/mode-html.js", "ace/worker-css.js", "ace/worker-json.js", "ace/mode-makefile.js", "ace/mode-scad.js", "ace/theme-mono_industrial.js", "ace/theme-kr.js", "ace/mode-lua.js", "ace/mode-sass.js", "ace/mode-ocaml.js", "ace/theme-tomorrow_night_eighties.js", "ace/mode-abap.js", "ace/theme-idle_fingers.js", "ace/theme-clouds.js", "ace/mode-golang.js", "ace/theme-github.js", "ace/theme-twilight.js", "ace/ext-searchbox.js", "ace/ext-spellcheck.js", "ace/theme-dreamweaver.js", "ace/ext-whitespace.js", "ace/theme-tomorrow.js", "ace/mode-perl.js", "ace/mode-scss.js", "ace/mode-mushcode_high_rules.js", "ace/theme-dawn.js", "ace/theme-merbivore.js", "ace/mode-haxe.js", "ace/mode-css.js", "ace/mode-python.js", "ace/worker-coffee.js", "ace/mode-dot.js", "ace/ext-static_highlight.js", "ace/mode-glsl.js", "ace/mode-lsl.js", "ace/mode-javascript.js", "ace/mode-r.js", "ace/mode-haml.js", "ace/theme-terminal.js", "ace/ext-elastic_tabstops_lite.js", "ace/mode-logiql.js", "ace/mode-typescript.js", "ace/theme-chrome.js", "ace/theme-solarized_light.js", "ace/mode-dart.js", "ace/mode-diff.js", "ace/mode-csharp.js", "ace/mode-coffee.js", "ace/mode-tcl.js", "ace/worker-php.js", "ace/mode-c9search.js", "ace/mode-jade.js", "ace/mode-vbscript.js", "ace/keybinding-emacs.js", "ace/mode-less.js", "ace/theme-eclipse.js", "ace/mode-xml.js", "ace/mode-stylus.js", "ace/mode-latex.js", "ace/worker-javascript.js", "ace/mode-curly.js", "ace/mode-jsx.js", "ace/mode-svg.js", "ace/mode-ruby.js", "ace/mode-xquery.js", "ace/worker-lua.js", "ace/theme-monokai.js", "ace/mode-coldfusion.js", "ace/mode-lisp.js", "ace/mode-pascal.js", "ace/mode-sh.js", "ace/theme-solarized_dark.js", "ace/theme-pastel_on_dark.js", "ace/mode-tmsnippet.js", "ace/ext-textarea.js", "ace/mode-text.js", "ace/theme-chaos.js", "ace/mode-powershell.js", "ace/mode-groovy.js", "ace/mode-clojure.js", "ace/mode-asciidoc.js", "ace/theme-vibrant_ink.js", "ace/theme-cobalt.js", "ace/mode-sql.js", "ace/mode-scheme.js"
+= javascript_include_tag "underscore-min.js"
+
+= javascript_include_tag "mustache.js"
+= javascript_include_tag "backbone-min.js"
+
+:css
+  #comments {
+    overflow: auto;
+  }
+  #test-list{
+    word-wrap: break-word;
+  }
+
+:javascript
+  var tmcPastebin = {
+    views: {},
+    models: {}
+  };
+
+  // Models
+  tmcPastebin.models.Comment = Backbone.Model.extend({});
+  tmcPastebin.models.Comments = Backbone.Collection.extend({
+    model: tmcPastebin.models.Comment,
+    url: ((("" + window.location).charAt(window.location.length - 1) == '/') ? window.location : (window.location + "/")) + "comments.json?api_version=5"
+  });
+
+  // Views
+  tmcPastebin.views.EditorView = Backbone.View.extend({
+    el: "#left-pane",
+    initialize: function() {
+      this.editor = ace.edit("editor");
+      this.resizeEditor();
+      this.chosenIndex = 0;
+      this.render();
+
+      // Create tabs
+      for (var i = 0; i < tmcPastebin.models.files.length; i++) {
+        var path = tmcPastebin.models.files[i].path;
+        $("#tabs").append($("<li><a data-id=" + i + "href=\"#\">" + path + "</a></li>"));
+      }
+    },
+    render: function() {
+      this.editor.getSession().setMode("ace/mode/java");
+      this.editor.getSession().setValue(tmcPastebin.models.files[this.chosenIndex].contents);
+      this.resizeEditor();
+    },
+    events: {
+      "click li a": "changeFile"
+    },
+    changeFile: function(e) {
+      e.preventDefault();
+      this.chosenIndex = parseInt($(e.target).data("id"));
+      this.render();
+    },
+    resizeEditor: function(){
+      var newHeight = this.editor.getSession().getScreenLength() * this.editor.renderer.lineHeight + this.editor.renderer.scrollBar.getWidth();
+        $('#editor').height(newHeight.toString() + "px");
+        this.editor.resize();
+      $/*("#editor").css("height", $("#left-pane").height());*/
+      $("#editor").css("width", $("#left-pane").width());
+    }
+  });
+
+  tmcPastebin.views.TestView = Backbone.View.extend({
+    el: "#test-pane",
+    initialize: function() {
+      this.chosenIndex = null;
+      this.render();
+    },
+    render: function () {
+      this.renderTestList();
+    },
+    renderTestList: function() {
+      $("div#test-list ul").html(""); // Clearing test-list so we don't get duplicates
+      for (var field in tmcPastebin.models.tests) {
+        var statusMsg = (tmcPastebin.models.tests[field].successful) ? "Passed" : "Failed";
+        var statusColor = (tmcPastebin.models.tests[field].successful) ? "ok" : "fail";
+        $("div#test-list ul").append($("<li data-id=\"" + field + "\" class=\"" + statusColor + "\">" + tmcPastebin.models.tests[field].test_case_name + " : "  + statusMsg + "</li>"));
+
+        var model = tmcPastebin.models.tests[field];
+        var content = (model.exception == null || model.exception.length == 0) ? model.backtrace : model.exception;
+        var data = {content: content, idx: field, testCaseName: model.test_case_name};
+        var html = Mustache.render($("#test-modal-template").html(), data);
+        $("body").append($(html));
+      }
+      },
+      events: {
+        "click li": "showDetails"
+      },
+      showDetails: function(e) {
+        var targetId = $(e.target).data("id");
+        $("#modal-" + targetId).modal();
+      }
+    });
+
+  tmcPastebin.views.CommentsView = Backbone.View.extend({
+    el: "#comments-pane",
+    initialize: function() {
+      this.scroll = false;
+      this.scrollDown();
+      this.comments = new tmcPastebin.models.Comments();
+      this.resize();
+      this.reload();
+    },
+    render: function() {
+      var html = Mustache.render($("#comments-list-template").html(), {comments: this.comments.toJSON()});
+      $("#comments-pane #comments").html(html);
+    },
+    events: {
+      "click input:submit": "submitComment",
+      "keyup input:text": "submitWithEnter"
+    },
+    reload: function() {
+      var context = this;
+      this.comments.fetch({success: function() {
+        context.render();
+        if (context.scroll) {
+          context.scroll = false;
+          context.scrollDown();
+        }
+      }});
+    },
+    resize: function(){
+      $("#comments").height($(window).height()/3);
+    },
+    submitComment: function(e) {
+      e.preventDefault();
+      var msg = $("#message").val();
+      if (msg == "") return;
+      this.comments.create({comment: msg});
+      $("#message").val("");
+      this.reload();
+      this.scroll = true;
+    },
+    submitWithEnter: function(e) {
+      if (e.keyCode == 13) this.submitComment(e);
+    },
+    scrollDown: function() {
+      $("#comments").animate({scrollTop: $(document).height()}, 1000);
+    }
+  });
+
+:javascript
+  $(document).ready(function() {
+    //$('link[href*="main"]').remove(); // Tmp dirty trick to keep the main css out. That ugly thing...
+    tmcPastebin.models.files = JSON.parse($("#files-template").html());
+    tmcPastebin.models.tests = JSON.parse($("#tests-template").html());
+    var editorView = new tmcPastebin.views.EditorView();
+    var commentsView = new tmcPastebin.views.CommentsView();
+    var testView = new tmcPastebin.views.TestView();
+
+    // Event delegation
+    commentsView.on("reload", commentsView.reload);
+    $(window).on("resize", function() {
+      editorView.resizeEditor();
+      commentsView.resize();
+    });
+
+    // Refreshing comments
+    setInterval(function(){commentsView.trigger("reload")}, 1000);
+  });
+
+.row-fluid
+  .span8
+    %blockquote= @message
+.row-fluid
+  .span8
+    #left-pane.well
+      .navbar.navbar-inverse
+        .navbar-inner
+          .container
+            %ul{id: "tabs", class: "nav"}
+      #editor{style: "height: 300px; width: 500px;"}
+  .span3
+    .right-pane
+      #comments-pane.well
+        #comments
+        %input{type: "text", id: "message", class: "input-small", placeholder: "Type here..."}
+        %input{type: "submit", class: "btn-small btn-primary btn-small", value: "Send"}
+      #test-pane.well
+        #test-list
+          %ul.nav.nav-tabs.nav-stacked
+
+- # Templates
+%script{id: "files-template", type: "text/plain"}
+  = raw(@files)
+%script{id: "tests-template", type: "text/plain"}
+  = raw(@tests)
+
+%script{id: "test-modal-template", type: "text/html"}
+  :plain
+    <div id="modal-{{idx}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>{{testCaseName}}</h3>
+      </div>
+      <div class="modal-body">
+        <p>{{{content}}}</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</a>
+      </div>
+    </div>
+
+%script{id: "comments-list-template", type: "text/html"}
+  :plain
+    {{#comments}}
+      <div class="comment">
+        {{user.login}}: {{comment}}
+      </div>
+     {{/comments}}

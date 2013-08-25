@@ -41,13 +41,13 @@
   right: auto !important;
   text-align: left !important;
   top: auto !important;
-  vertical-align: baseline !important;
+  /*vertical-align: baseline !important;  (dirty trick... -Jamo)*/
   width: auto !important;
   box-sizing: content-box !important;
   font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
   font-weight: normal !important;
   font-style: normal !important;
-  font-size: 1em !important;
+  /*font-size: 1em !important;  (fix line number misalignment)*/
   min-height: inherit !important;
   min-height: auto !important;
 }

@@ -418,7 +418,7 @@ describe CourseRefresher do
     cs2.should_not == cs3
   end
 
-  it "should be able to scan maven exercises" #TODO TODO
+  it "should be able to scan maven exercises" # TODO
 
   it "should not allow dashes in exercise folders" do
     add_exercise('My-Exercise')
@@ -502,11 +502,30 @@ describe CourseRefresher do
     end
   end
 
+  describe "for MakefileC exercises" do
+    it "should scan the exercises for available points" do
+      add_exercise('MakefileC', :fixture_name => 'MakefileC')
+      @refresher.refresh_course(@course)
+
+      points = @course.exercises.where(:name => 'MakefileC').first.available_points
+      points.map(&:name).should include('point1')
+    end
+
+    it "should delete previously available points that are no longer available" do
+      add_exercise('MakefileC', :fixture_name => 'MakefileC')
+      @refresher.refresh_course(@course)
+      delete_exercise('MakefileC')
+      @refresher.refresh_course(@course)
+
+      AvailablePoint.all.should be_empty
+    end
+  end
+
 
   def add_exercise(dest_name, options = {})
     options = {
       :commit => true,
-      :fixture_name => 'SimpleExerciseWithSolutionsAndStubs'
+      :fixture_name =>  options[:fixture_name] || 'SimpleExerciseWithSolutionsAndStubs'
     }.merge options
     @local_clone.copy_fixture_exercise(options[:fixture_name], dest_name)
     @local_clone.add_commit_push if options[:commit]

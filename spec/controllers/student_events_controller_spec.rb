@@ -34,8 +34,7 @@ describe StudentEventsController do
     post :create, params
   end
 
-  it "should store log events" do
-
+  it "should store basic student events" do
     data = 'foobar' + 'barfooxoo'
     events = [
       {:event_type => 'code_snapshot', :data_offset => 0, :data_length => 6, :happened_at => '2012-02-02 02:02'},
@@ -54,9 +53,31 @@ describe StudentEventsController do
     events.first.event_type.should == 'code_snapshot'
     events.first.data.should == 'foobar'
     events.first.happened_at.should == Time.parse('2012-02-02 02:02')
+    events.first.metadata.should == nil
     
     events.last.event_type.should == 'code_snapshot'
     events.last.data.should == 'barfooxoo'
     events.last.happened_at.should == Time.parse('2013-03-03 03:03')
+    events.last.metadata.should == nil
+  end
+
+  it "should store optional fields if given" do
+    data = 'foobar' + 'barfooxoo'
+    events = [
+      {
+        :event_type => 'code_snapshot',
+        :data_offset => 0,
+        :data_length => 6,
+        :happened_at => '2012-02-02 02:02',
+        :system_nano_time => 123456789123456789,
+        :metadata => '{"asd": "bsd"}'
+      }
+    ]
+    post_log(events, data)
+    response.should be_successful
+
+    StudentEvent.count.should == 1
+    StudentEvent.first.metadata.should == {'asd' => 'bsd'}
+    StudentEvent.first.system_nano_time.should == 123456789123456789
   end
 end

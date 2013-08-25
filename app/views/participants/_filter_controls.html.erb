@@ -1,7 +1,7 @@
 <section>
   <h3>Filter</h3>
   <div>
-    <%= labeled_field('Include administrators', check_box_tag('filter_include_administrators', '1', @filter_params['include_administrators']), :order => :label_last) %>
+    <%= labeled_field('Include administrators', check_box_tag('filter_include_administrators', '1', @filter_params['include_administrators']), :order => :label_last, :super_class => "checkbox") %>
 
     <% for field in UserField.all %>
       <%= extra_field_filter('filter_', field, @filter_params[field.name]) %>

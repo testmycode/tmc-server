@@ -37,6 +37,14 @@ class CoursesController < ApplicationController
 
     assign_show_view_vars
     add_course_breadcrumb
+
+    respond_to do |format|
+      format.html
+      format.json do
+        return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
+        render_for_api :course_show_with_exercises, :json => @course, :root => :course
+      end
+    end
   end
 
   def refresh
@@ -68,14 +76,6 @@ class CoursesController < ApplicationController
         format.html { render :action => "new" , :notice => 'Course could not be created.' }
       end
     end
-  end
-
-  def destroy
-    @course = Course.find(params[:id])
-    authorize! :destroy, @course
-    @course.destroy
-
-    redirect_to(courses_path)
   end
 
 private

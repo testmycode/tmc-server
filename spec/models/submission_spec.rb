@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # -*- coding: UTF-8 -*-
 
 require 'spec_helper'
@@ -44,18 +46,28 @@ describe Submission do
     submission = Submission.new
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :exception => '{"a": "b"}')
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :successful => true)
+    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :detailed_message => 'trace')
     submission.test_case_records.should == [
       {
         :name => 'Moo moo()',
         :successful => false,
         :message => 'you fail',
-        :exception => {'a' => 'b'}
+        :exception => {'a' => 'b'},
+        :detailed_message => nil
       },
       {
         :name => 'Moo moo2()',
         :successful => true,
         :message => nil,
-        :exception => nil
+        :exception => nil,
+        :detailed_message => nil
+      },
+      {
+        :name => 'Moo moo()',
+        :successful => false,
+        :message => 'you fail',
+        :exception => nil,
+        :detailed_message => 'trace'
       }
     ]
   end

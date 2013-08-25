@@ -31,23 +31,32 @@ module ApplicationHelper
     cls << h(options[:class].to_s) if options[:class]
     cls = ' class="' + cls.join(' ') + '"'
     
-    label = '<label' + target + cls + '>' + h(label) + '</label>'
-    label = label.html_safe
+    label_start = ('<label' + target + cls + '>').html_safe
+    label_text = h(label)
+    label_end = '</label>'.html_safe
     
     case options[:order]
     when :label_first
-      label + tags
+      label_start + label_text + tags + label_end
     when :label_last
-      tags + label
+      label_start + tags + label_text + label_end
     else
       raise 'invalid :order option for labeled()'
     end
   end
   
   def labeled_field(label, tags = nil, options = {}, &block)
-    raw('<div class="field">' + labeled(label, tags, options, &block) + '</div>')
+    cls = ['field']
+    cls << options[:super_class].split(" ") if options[:super_class]
+    cls = ' class="' + cls.join(' ') + '"'
+    raw("<div #{cls} >" + labeled(label, tags, options, &block) + '</div>')
   end
-  
+
+  def bs_labeled_field(label, field)
+    str = label_tag label, nil, class: "control-label"
+    str += raw("<div class=\"controls\">" +raw(field) + "</div>")
+    raw(str)
+  end
   
   def use_datatables(table_selector, options = {})
     options = {

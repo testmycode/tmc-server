@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe TestRunGrader do
   include GitTestActions
-
+  # TODO: ad c testcase?
   before :each do
     @submission = Factory.create(:submission, :processed => false)
     ['1.1', '1.2'].each do |name|

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130212001309) do
+ActiveRecord::Schema.define(:version => 20130825165613) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
     t.boolean  "locked_exercise_points_visible", :default => true,     :null => false
+    t.text     "description"
   end
 
   create_table "exercises", :force => true do |t|
@@ -143,12 +144,14 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "student_events", :force => true do |t|
-    t.integer  "user_id",       :null => false
-    t.integer  "course_id",     :null => false
-    t.string   "exercise_name", :null => false
-    t.string   "event_type",    :null => false
-    t.binary   "data",          :null => false
-    t.datetime "happened_at",   :null => false
+    t.integer  "user_id",                       :null => false
+    t.integer  "course_id",                     :null => false
+    t.string   "exercise_name",                 :null => false
+    t.string   "event_type",                    :null => false
+    t.binary   "data",                          :null => false
+    t.datetime "happened_at",                   :null => false
+    t.integer  "system_nano_time", :limit => 8
+    t.string   "metadata_json"
   end
 
   add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
@@ -187,6 +190,8 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
     t.text     "message_for_reviewer",           :default => "",    :null => false
     t.boolean  "newer_submission_reviewed",      :default => false, :null => false
     t.boolean  "review_dismissed",               :default => false, :null => false
+    t.boolean  "paste_available",                :default => false, :null => false
+    t.text     "message_for_paste"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
@@ -201,6 +206,7 @@ ActiveRecord::Schema.define(:version => 20130212001309) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "exception"
+    t.text     "detailed_message"
   end
 
   add_index "test_case_runs", ["submission_id"], :name => "index_test_case_runs_on_submission_id"

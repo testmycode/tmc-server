@@ -6,8 +6,8 @@ module IntegrationTestActions
   include SystemCommands
 
   def log_in_as(username, password)
-    fill_in 'Login', :with => username
-    fill_in 'Password', :with => password
+    fill_in 'session_login', :with => username
+    fill_in 'session_password', :with => password
     click_button 'Sign in'
     
     page.should have_content('Sign out')
@@ -21,7 +21,7 @@ module IntegrationTestActions
     visit '/courses'
     click_link 'Create New Course'
     fill_in 'course_name', :with => options[:name]
-    fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
+    #fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
     fill_in 'course_source_url', :with => options[:source_url] if options[:source_url]
     click_button 'Add Course'
     
@@ -32,7 +32,7 @@ module IntegrationTestActions
   def manually_refresh_course(coursename)
     visit '/courses'
     click_link coursename
-    click_button 'Refresh from repository'
+    click_on 'Refresh'
     page.should have_content('Refresh successful.')
   end
   

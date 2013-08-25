@@ -1,30 +1,18 @@
+/* Submissions status*/
+.error,
+.failure,
+.fail {
+  color: red !important;
+}
+
+.success,
+.ok {
+  color: green;
+}
 
 /* Basic commons */
 
-h1, h2, h3, h4, h5, h6 {
-  color: #09214A;
-  font-family: "Arial", sans-serif;
-}
-
-h1 {
-  font-size: 200%;
-}
-
-h2 {
-  margin-left: 0.3em;
-  font-size: 150%;
-}
-
-h3 {
-  margin-left: 0.5em;
-  font-size: 120%;
-}
-
-h5 {
-  margin-bottom: 0.2em;
-}
-
-.list-title {
+/*.list-title {
   font-weight: bold;
 }
 
@@ -36,50 +24,15 @@ section {
   margin-left: 1.5em;
   margin-bottom: 2em;
 }
+*/
 
-a {
-  color: #103D89 !important;
-  text-decoration: none;
-}
-
-a:visited {
-  color: #103D89 !important;
-}
-a:hover {
-  text-decoration: underline !important;
-}
-
-.error,
-.alert,
-.failure,
-.fail,
-.dangerous {
-  color: red !important;
+.small{
+  font-size: 0.5em;
 }
 
 .review-required,
 .review-requested {
   font-weight: bold;
-}
-
-.warning {
-  color: #FF8000;
-}
-
-.notice,
-.success,
-.ok {
-  color: green;
-}
-
-.minor-notice {
-  color: black;
-}
-
-pre {
-  background-color: #eee;
-  padding: 10px;
-  font-size: 11px;
 }
 
 .footnote {
@@ -122,10 +75,10 @@ pre {
   list-style: square;
 }
 
-button * {
+/*button * {
   float: left;
   white-space: nowrap;
-}
+}*/
 
 .transfer-effect {
   border: 2px dotted gray;
@@ -149,20 +102,27 @@ button * {
 
 /* Toplevel layout */
 
-body {
+/* bootstrapping */
+body .well-white {
+  background-color: white;
+}
+
+body #everything {
+  /*font-size: 12px;*/
+  padding-top: 80px;
+  /*
   color: black;
   font-family: sans-serif;
-  font-size: 9pt;
-  margin-top: 0;
+  */
 }
 
 body.default {
   background-color: #DDDDDD;
 }
 
-#everything {
+/*#everything {
   background-color: white;
-  margin-left: 4%;
+ /* margin-left: 4%;
   margin-right: 4%;
   padding-bottom: 8%;
 }
@@ -170,83 +130,16 @@ body.default {
 #everything > div {
   padding-left: 2%;
   padding-right: 2%;
-}
-
-#title-area {
-  height: 100px;
-  padding-bottom: 24px;
-  background-color: #E9AF43;
-}
-
-#title-area > #titles {
-  float: left;
-}
-
-#title-area > #titles > .branding {
-  font-weight: bold;
-  margin-left: 12px;
-}
-
-#title-area > #login {
-  margin-top: 20px;
-  float: right;
-  text-align: right;
-}
-
-#title-area > #login > #logout-link {
-  font-weight: bold;
-}
-
-#title-area > #login > div {
-  font-weight: bold;
-  margin-top: 5pt;
-}
-
-#breadcrumb {
-  clear: both;
-  background-color: #F5F9FD;
-  font-weight: bold;
-  padding: 5px 5px 5px 5px;
-  border-top: 1px #E8EBFB solid;
-}
-
-#breadcrumb .breadcrumb-resource {
-  font-style: italic;
-}
+}*/
 
 #page-presence {
   float: right;
 }
 
-.flash {
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-/* Form layout */
-
-.field label {
-  font-size: 90%;
-  font-weight: bold;
-}
-
-.field label.label_first {
-  display: block;
-}
-
-.field {
-  margin-bottom: 14px;
-}
-
-div.actions {
-  margin-top: 1.4em;
-}
-
-.suboption {
-  margin-left: 3em;
-}
-
 /* Miscellaneous */
+div.repo-list{
+  padding-top: 30px;
+}
 
 div.refresh-course-button {
   margin-bottom: 20px;
@@ -357,6 +250,7 @@ table.points > * > tr > td {
 
 .code-review .status-buttons {
   float: right;
+  padding-right: 0.3em;
 }
 
 #review-form {
@@ -460,4 +354,18 @@ table.points > * > tr > td {
 .reply-to-feedback span {
   padding-top: 4px;
   padding-left: 10px;
+}
+
+/* Bootstrap adjustments */
+
+#everything .accordion-group {
+  border: none;
+}
+
+.dataTables_wrapper table.table {
+  margin-bottom: 0;
+}
+.dataTables_filter label {
+  margin-top: 4px;
+  margin-bottom: 0;
 }

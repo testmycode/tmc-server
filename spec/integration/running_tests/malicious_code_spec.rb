@@ -32,7 +32,7 @@ describe RemoteSandboxForTesting, :integration => true do
       setup = setup_and_run('malicious/Exit0')
       submission = setup.submission
 
-      submission.pretest_error.should == 'Invalid or missing test output. Did you terminate your program with an exit() command?'
+      submission.pretest_error.should == 'Missing test output. Did you terminate your program with an exit() command?'
     end
   end
 

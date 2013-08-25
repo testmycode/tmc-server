@@ -1,9 +1,10 @@
 TmcServer::Application.routes.draw do
-
   resources :sessions, :only => [:new, :create, :destroy]
 
   match '/signin',  :to => 'sessions#new'
   match '/signout', :to => 'sessions#destroy'
+  match '/login',  :to => 'sessions#new'
+  match '/logout', :to => 'sessions#destroy'
 
   resource :auth, :only => [:show]
 
@@ -12,13 +13,13 @@ TmcServer::Application.routes.draw do
   match '/auth.txt', :method => :post, :to => 'auths#show'
 
   resource :user
-  
+
   resources :participants
-  
+
   resources :emails, :only => [:index]
-  
+
   resources :stats, :only => [:index]
-  
+
   resources :password_reset_keys
   match '/reset_password/:code' => 'password_reset_keys#show', :via => :get, :as => 'reset_password'
   match '/reset_password/:code' => 'password_reset_keys#destroy', :via => :delete

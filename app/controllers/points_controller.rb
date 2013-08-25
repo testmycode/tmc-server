@@ -18,6 +18,7 @@ class PointsController < ApplicationController
       format.csv do
         render_csv(:filename => "#{@course.name}_points.csv")
       end
+      format.json { render :json =>  @summary }
     end
   end
 
@@ -65,7 +66,7 @@ class PointsController < ApplicationController
     end
 
     include_admins = current_user.administrator?
-    users = User.where(:login => per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
+    users = User.select('login, id, administrator').where(:login => per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
     users = users.where(:administrator => false) unless include_admins
 
     {

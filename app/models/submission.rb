@@ -17,12 +17,26 @@ class Submission < ActiveRecord::Base
   end
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
-  
+
   validates :user, :presence => true
   validates :course, :presence => true
   validates :exercise_name, :presence => true
 
   before_create :set_processing_attempts_started_at
+
+  acts_as_api
+  api_accessible :submission_show do |t|
+    t.add :exercise_name
+    t.add :id
+    t.add :course_id
+    t.add :all_tests_passed
+    t.add :points
+    t.add :submitted_zip_url
+  end
+
+  def submitted_zip_url
+    Rails.application.routes.url_helpers.submission_url(self.id, format: 'zip')
+  end
 
   def self.to_be_reprocessed
     self.unprocessed.
@@ -141,7 +155,8 @@ class Submission < ActiveRecord::Base
         :name => tcr.test_case_name,
         :successful => tcr.successful?,
         :message => tcr.message,
-        :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end
+        :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
+        :detailed_message => if tcr.detailed_message then tcr.detailed_message else nil end
       }
     end
   end
@@ -237,6 +252,10 @@ class Submission < ActiveRecord::Base
       ex = by_key[[sub.course_id, sub.exercise_name]]
       sub.exercise = ex
     end
+  end
+
+  def public?
+    self.paste_available and not self.all_tests_passed
   end
 
 private
