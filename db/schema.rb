@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130819104237) do
+ActiveRecord::Schema.define(:version => 20130825165613) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -151,6 +151,7 @@ ActiveRecord::Schema.define(:version => 20130819104237) do
     t.binary   "data",                          :null => false
     t.datetime "happened_at",                   :null => false
     t.integer  "system_nano_time", :limit => 8
+    t.string   "metadata_json"
   end
 
   add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
