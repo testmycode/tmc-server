@@ -168,8 +168,9 @@ span.git-branch {
   padding-left: 10pt;
 }
 
-tr.hidden * {
+tr.hidden-course * {
   color: gray;
+  font-color: gray;
 }
 
 div.stack-trace {
