@@ -25,4 +25,16 @@ describe RemoteSandboxForTesting, :integration => true do
     submission.awarded_points.count.should == 3
     submission.awarded_points.first.name.should == "point1"
   end
+
+  specify "C compilation failures" do
+    setup = SubmissionTestSetup.new(:exercise_name => 'MakefileC')
+    submission = setup.submission
+
+    setup.exercise_project.introduce_compilation_error
+    setup.make_zip
+    RemoteSandboxForTesting.run_submission(submission)
+
+    submission.should be_processed
+    submission.pretest_error.should include('Compilation error')
+  end
 end

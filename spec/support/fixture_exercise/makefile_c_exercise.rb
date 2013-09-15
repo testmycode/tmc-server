@@ -31,8 +31,8 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
   #  replace_method_body_in_file(simple_stuff_path, 'emptyMethod', code)
   #end
   
-  def introduce_compilation_error(text = 'the compiler should fail here')
-    replace_method_body_in_file(simple_stuff_path, 'return_zero', "BAD INPUT #{text}")
+  def introduce_compilation_error
+    replace_method_body_in_file(simple_stuff_path, 'return_zero', "BAD INPUT")
   end
   
   def simple_stuff_path

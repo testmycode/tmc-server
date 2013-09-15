@@ -33,9 +33,8 @@ module SandboxResultsSaver
           when nil
             'Running the submission failed.'
           else
-            'Running the submission failed. Exit code: ' + results['exit_code']
+            'Running the submission failed. Exit code: ' + results['exit_code'] + ' (did you use an exit() command?)'
           end
-        submission.pretest_error += ' (did you use an exit() command?)' unless results['exit_code'].nil?
       when 'finished'
         decoded_output = decode_test_output(results['test_output'], results['stderr'])
         if decoded_output.is_a?(Enumerable)

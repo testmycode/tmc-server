@@ -94,8 +94,11 @@ case $PROJECT_TYPE in
   makefile_c)
     JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
     echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
-    make clean
-    make all
+    make clean 2>&1 | tee test_output.txt
+    [ ${PIPESTATUS[0]} -eq 0 ] || exit 101
+    make all 2>&1 | tee test_output.txt
+    [ ${PIPESTATUS[0]} -eq 0 ] || exit 101
+    rm -f test_output.txt
 
     CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*"
   ;;
