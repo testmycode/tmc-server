@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130825165613) do
+ActiveRecord::Schema.define(:version => 20130916190007) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -250,6 +250,8 @@ ActiveRecord::Schema.define(:version => 20130825165613) do
     t.boolean  "administrator", :default => false, :null => false
     t.text     "email",         :default => "",    :null => false
   end
+
+  add_index "users", ["login"], :name => "index_users_on_login", :unique => true
 
   add_foreign_key "available_points", "exercises", :name => "available_points_exercise_id_fk", :dependent => :delete
 
