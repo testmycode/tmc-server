@@ -125,6 +125,29 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('oops')
   end
 
+  it "should show the files that the student submitted" do
+    ex = FixtureExercise::SimpleExercise.new('MyExercise')
+    #ex.introduce_compilation_error('oops')
+    ex.introduce_invalid_byte_sequence
+    ex.make_zip
+
+    click_link 'MyExercise'
+    attach_file('Zipped project', 'MyExercise.zip')
+    click_button 'Submit'
+
+    wait_for_submission_to_be_processed
+    page.should_not have_content('Compilation error:')
+    page.should_not have_content('src/SimpleStuff.java:11: error: unmappable character for encoding UTF8')
+
+    page.should_not have_content('Unmappapble character')
+    click_link 'View submitted files'
+
+    page.should_not have_content('Internal Server Error')
+    page.should_not have_content('invalid byte sequence in UTF-8 ')
+
+    page.should have_content('src/SimpleStuff.java')
+  end
+
   it "should show solutions for completed exercises" do
     ex = FixtureExercise.new('SimpleExerciseWithSolutionsAndStubs', 'MyExercise')
     ex.make_zip
