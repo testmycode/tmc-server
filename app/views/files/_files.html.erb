@@ -32,12 +32,15 @@
           <%
           brush = case File.extname(file.path)
           when '.txt' then 'plain'
+          when '.jsp' then 'html'
           when '' then 'plain'
           else File.extname(file.path)[1..-1]
           end
           %>
           <div class="span12">
-            <pre class="brush: <%= brush %>"><%= file.contents %></pre>
+            <pre class="brush: <%= brush %>">
+              <%= valid_encoding!(file.contents) %>
+            </pre>
           </div>
         </div>
       </div>
