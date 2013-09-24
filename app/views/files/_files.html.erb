@@ -39,11 +39,7 @@
           %>
           <div class="span12">
             <pre class="brush: <%= brush %>">
-              <% if file.contents.valid_encoding? %>
-                <%= file.contents %>
-              <% else %>
-                <%= file.contents.force_encoding("ISO-8859-1").encode("utf-8", replace: nil) %>
-              <% end %>
+              <%= valid_encoding!(file.contents) %>
             </pre>
           </div>
         </div>

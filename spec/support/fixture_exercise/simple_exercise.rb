@@ -44,10 +44,6 @@ class FixtureExercise::SimpleExercise < FixtureExercise
       replace_method_body_in_file(simple_stuff_path, 'add', "BAD INPUT #{text}")
     end
 
-    def introduce_invalid_byte_sequence
-      replace_method_body_in_file(simple_stuff_path, 'add', "return 0; // bad: \xc3\x28 okay")
-    end
-
     def simple_stuff_path
       "#{java_src_path}/SimpleStuff.java"
     end
