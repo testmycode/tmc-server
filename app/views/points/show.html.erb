@@ -27,6 +27,7 @@
       <% if tailoring.show_exercise_names_in_points_table %>
         <tr>
           <th></th>
+          <th></th>
           <% @exercises.each do |exercise| %>
             <% points = exercise.available_points.sort! %>
             <% if points.size > 0 %>
@@ -37,6 +38,7 @@
       <% end %>
       <tr>
         <th></th>
+        <th></th>
         <% @exercises.each do |exercise| %>
           <% exercise.available_points.sort.each do |point| %>
             <th><%= point.name %></th>
@@ -46,11 +48,12 @@
     </thead>
 
     <tbody>
-      <% @users.each do |user| %>
+      <% @users.each_with_index do |user, index| %>
         <% if !user.administrator? || current_user.administrator? %>
           <% row_class = if user.administrator? then "admin" else "student" end %>
           <% user_points = @users_to_points[user.login] %>
           <tr class="<%= row_class %>">
+            <td><%= index + 1 %></td>
             <td>
               <% if can? :read, user %>
                 <%= link_to user.login, participant_path(user) %>

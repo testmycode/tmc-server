@@ -10,6 +10,7 @@
   <table class="points">
     <thead>
       <tr>
+        <th></th>
         <th>Number of students</th>
         <% if !@summary[:sheets].empty? %>
           <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
@@ -19,6 +20,7 @@
         <% end %>
       </tr>
       <tr class="table-totals">
+        <td>-</td>
         <% nstudents = @summary[:users].length %>
         <td><%= nstudents %></td>
         <% @summary[:sheets].each do |sheet| %>
@@ -33,6 +35,7 @@
         <% end %>
       </tr>
       <tr>
+        <th></th>
         <th>
           Student<br />
           <% unless params[:sort_by].blank? %>
@@ -65,10 +68,11 @@
       </tr>
     </thead>
     <tbody>
-      <% @summary[:users].each do |user| %>
+      <% @summary[:users].each_with_index do |user, index| %>
         <% username = user.login %>
         <% row_class = if user.administrator? then "admin" else "student" end %>
         <tr class="<%= row_class %>">
+          <td><%= index + 1 %></td>
           <td>
             <% if can? :read, user %>
               <%= link_to username, participant_path(user) %>
