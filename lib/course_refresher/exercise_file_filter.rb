@@ -13,6 +13,8 @@ class CourseRefresher
   #
   # See the user manual for the special comments this processes.
   class ExerciseFileFilter
+    include BadUtf8Helper
+
     def initialize(project_dir)
       @project_dir = Pathname(project_dir)
       @tmc_project_file = TmcProjectFile.for_project(@project_dir)
@@ -43,14 +45,17 @@ class CourseRefresher
         to = to_dir + rel_path
         contents = filter_file_for_solution(from)
         write_file(to, contents) unless contents.nil?
-        maybe_write_html_file(File.read(from), "#{to}.html") if %w(.java .c .h).include? from.extname
-        #maybe_write_html_file(File.read(from), "#{to}.html") if from.extname == '.java'
+        maybe_write_html_file(read_file_utf8(from), "#{to}.html") if %w(.java .c .h).include? from.extname
       end
 
       clean_empty_dirs_in_project(to_dir)
     end
     
   private
+    def read_file_utf8(path)
+      force_utf8_violently(File.read(path))
+    end
+
     def write_file(path, contents)
       File.open(path, 'wb') {|f| f.write(contents) }
     end
@@ -107,13 +112,13 @@ class CourseRefresher
 
     def filter_file_for_stub(path)
       with_filter_backend_for(path) do |backend|
-        backend.filter_for_stub(File.read(path))
+        backend.filter_for_stub(read_file_utf8(path))
       end
     end
 
     def filter_file_for_solution(path)
       with_filter_backend_for(path) do |backend|
-        backend.filter_for_solution(File.read(path))
+        backend.filter_for_solution(read_file_utf8(path))
       end
     end
 
@@ -122,7 +127,7 @@ class CourseRefresher
       if backend
         block.call(backend)
       else
-        File.read(path)
+        read_file_utf8(path)
       end
     end
 

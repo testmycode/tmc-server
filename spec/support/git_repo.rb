@@ -1,3 +1,5 @@
+require 'fileutils'
+
 class GitRepo
   include SystemCommands
   
@@ -27,6 +29,12 @@ class GitRepo
     ex = FixtureExercise.get(src_name, dest)
     ex.write_metadata(metadata) unless metadata.empty?
     ex
+  end
+
+  def copy(src, dest_name = nil)
+    dest_name ||= Pathname(src).basename
+    dest = "#{@path}/#{dest_name}"
+    FileUtils.cp_r(src, dest)
   end
   
   def set_metadata_in(dir, metadata_hash)

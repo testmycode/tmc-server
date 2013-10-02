@@ -7,7 +7,7 @@ module SandboxResultsSaver
 
   def self.save_results(submission, results)
     ActiveRecord::Base.transaction do
-      raise InvalidTokenError.new('Invalid or expired token') if results[:token] != submission.secret_token
+      raise InvalidTokenError.new('Invalid or expired token') if results['token'] != submission.secret_token
 
       submission.all_tests_passed = false
       submission.pretest_error = nil

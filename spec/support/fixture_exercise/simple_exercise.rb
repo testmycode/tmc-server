@@ -11,7 +11,7 @@ class FixtureExercise::SimpleExercise < FixtureExercise
     options = {
       :fixture_name => 'SimpleExercise'
     }.merge(options)
-    super(options[:fixture_name], path)
+    super(options[:fixture_name], path, options)
   end
 
   def solve_all

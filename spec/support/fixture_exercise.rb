@@ -1,6 +1,8 @@
 require 'find'
 require 'shellwords'
 
+# FIXME: this is a horrible mess. I'm sorry for making it.
+
 # A copy of a fixture exercise.
 # Creating an instance of this creates a copy of a fixture exercise combined 
 # with the template and with the latest tmc-junit-runner.jar added.
@@ -12,22 +14,20 @@ class FixtureExercise
   attr_reader :fixture_name
   attr_reader :path
 
-  def self.get(fixture_name, path)
+  def self.get(fixture_name, path, options = {})
     case fixture_name
     when 'SimpleExercise'
-      FixtureExercise::SimpleExercise.new(path)
+      FixtureExercise::SimpleExercise.new(path, options)
     when 'MavenExercise'
-      FixtureExercise::MavenExercise.new(path)
+      FixtureExercise::MavenExercise.new(path, options)
     when 'MakefileC'
-      FixtureExercise::MakefileCExercise.new(path)
-    when 'UniversalRuby'
-      FixtureExercise::UniversalRubyExercise.new(path)
+      FixtureExercise::MakefileCExercise.new(path, options)
     else
-      FixtureExercise.new(fixture_name, path)
+      FixtureExercise.new(fixture_name, path, options)
     end
   end
 
-  def initialize(fixture_name, path)
+  def initialize(fixture_name, path, options = {})
     @fixture_name = fixture_name
     @path = File.expand_path(path)
     

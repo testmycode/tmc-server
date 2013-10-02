@@ -37,7 +37,7 @@
           end
           %>
           <div class="span12">
-            <pre class="brush: <%= brush %>"><%= file.contents %></pre>
+            <pre class="brush: <%= brush %>"><%= force_utf8_violently(file.contents) %></pre>
           </div>
         </div>
       </div>

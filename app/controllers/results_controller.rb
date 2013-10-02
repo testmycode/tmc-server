@@ -8,7 +8,14 @@ class ResultsController < ApplicationController
   def create
     begin
       submission = Submission.find(params[:submission_id])
-      SandboxResultsSaver.save_results(submission, params)
+
+      # The sandbox output may contain broken characters e.g. if the student
+      # pointed a C char* towards some patch of interesting memory :)
+      filtered_params = Hash[params.map {|k, v|
+        [k, view_context.force_utf8_violently(v)]
+      }]
+
+      SandboxResultsSaver.save_results(submission, filtered_params)
     rescue SandboxResultsSaver::InvalidTokenError
       respond_access_denied('Invalid or expired token')
     else
