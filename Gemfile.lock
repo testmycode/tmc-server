@@ -92,6 +92,7 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.23)
+    mimemagic (0.2.1)
     mimic (0.4.3)
       json
       plist
@@ -212,6 +213,7 @@ DEPENDENCIES
   haml-rails
   jquery-rails
   launchy
+  mimemagic
   mimic (~> 0.4.3)
   natcmp (~> 1.4)
   pg (~> 0.11.0)

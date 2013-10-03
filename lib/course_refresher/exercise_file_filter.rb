@@ -1,5 +1,6 @@
 require 'pathname'
 require 'fileutils'
+require 'mimemagic'
 require 'tmc_project_file'
 require 'course_refresher/java_filter'
 require 'course_refresher/xml_filter'
@@ -45,15 +46,27 @@ class CourseRefresher
         to = to_dir + rel_path
         contents = filter_file_for_solution(from)
         write_file(to, contents) unless contents.nil?
-        maybe_write_html_file(read_file_utf8(from), "#{to}.html") if %w(.java .c .h).include? from.extname
+        maybe_write_html_file(read_file_utf8(from), "#{to}.html") if looks_like_text_file?(from)
       end
 
       clean_empty_dirs_in_project(to_dir)
     end
     
   private
+    def looks_like_text_file?(path)
+      mime = MimeMagic.by_path(path.to_s)
+      mime ||= File.open(path) do |f|
+        MimeMagic.by_magic(f)
+      end
+      mime && mime.text?
+    end
+
     def read_file_utf8(path)
-      force_utf8_violently(File.read(path))
+      if looks_like_text_file?(path)
+        force_utf8_violently(File.read(path))
+      else
+        File.read(path)
+      end
     end
 
     def write_file(path, contents)

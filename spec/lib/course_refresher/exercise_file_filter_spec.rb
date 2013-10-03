@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'fileutils'
+require 'digest/md5'
 
 # TODO: clean this up. Perhaps put cases into their own files.
 describe CourseRefresher::ExerciseFileFilter do
@@ -142,6 +143,13 @@ EOF
       @filter.make_stub('stub')
       File.should_not exist('stub/.tmcrc')
     end
+
+    it "should not mangle binary files" do
+      original = TmcJunitRunner.get.jar_path
+      FileUtils.cp(original, 'original/foo.jar')
+      @filter.make_stub('stub')
+      Digest::MD5.file('stub/foo.jar').hexdigest.should == Digest::MD5.file(original).hexdigest
+    end
   end
 
   
@@ -255,6 +263,13 @@ EOF
       File.should exist('solution/test')
       File.should exist('solution/test/Foo.java')
       File.should_not exist('solution/test/Bar.java')
+    end
+
+    it "should not mangle binary files" do
+      original = TmcJunitRunner.get.jar_path
+      FileUtils.cp(original, 'original/foo.jar')
+      @filter.make_solution('solution')
+      Digest::MD5.file('solution/foo.jar').hexdigest.should == Digest::MD5.file(original).hexdigest
     end
   end
   
