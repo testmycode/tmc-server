@@ -23,7 +23,9 @@ class CourseNotificationsController < ApplicationController
           topic: notifier.topic,
           message: notifier.message
         ).deliver
-      rescue
+      rescue=>e
+        logger.info "Error sending course notification to email #{email}"
+        logger.info e
         invalid_emails << email
       end
     end
