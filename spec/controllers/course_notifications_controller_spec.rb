@@ -34,8 +34,8 @@ describe CourseNotificationsController do
 
     it "sends a email for every participant on course" do
       user = Factory.create(:user, email: 'student@some.edu.fi')
-      user2 = Factory.create(:user, email: 'std@myschool.fi')
       sub1 = Factory.create(:submission, user: user, course: course)
+      user2 = Factory.create(:user, email: 'std@myschool.fi')
       sub2 = Factory.create(:submission, user: user2, course: course)
       aw1 = Factory.create(:awarded_point, user_id: user.id, course_id: course.id)
       aw2 = Factory.create(:awarded_point, user_id: user2.id, course_id: course.id)
@@ -49,7 +49,27 @@ describe CourseNotificationsController do
       mail_last.to.should include user2.email
       mail_last.body.encoded.should include message
 
+   end
+
+    it "doesn't crash if some email addresses are invalid" do
+      user = Factory.create(:user, email: 'student@some.edu.fi')
+      sub1 = Factory.create(:submission, user: user, course: course)
+      user2 = Factory.create(:user, email: 'std  @ myschool . fi') #The invalid address
+      sub2 = Factory.create(:submission, user: user2, course: course)
+      aw1 = Factory.create(:awarded_point, user_id: user.id, course_id: course.id)
+      aw2 = Factory.create(:awarded_point, user_id: user2.id, course_id: course.id)
+      expect { post :create, params }.to change(ActionMailer::Base.deliveries,:size).by(2)
+
+
+      mail_first = ActionMailer::Base.deliveries[-2]
+      mail_first.to.should include user.email
+      mail_first.body.encoded.should include message
+      mail_last = ActionMailer::Base.deliveries.last
+      mail_last.to.should include user2.email
+      mail_last.body.encoded.should include message
     end
+
+
   end
 
 end

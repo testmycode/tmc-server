@@ -14,15 +14,22 @@ class CourseNotificationsController < ApplicationController
 
     notifier = course.course_notifications.create(params[:course_notification], sender_id: current_user.id)
 
+    invalid_emails = []
     emails.each do |email|
-      CourseNotificationMailer.notification_email(
-        from: current_user.email,
-        to: email,
-        topic: notifier.topic,
-        message: notifier.message
-      ).deliver
+      begin
+        CourseNotificationMailer.notification_email(
+          from: current_user.email,
+          to: email,
+          topic: notifier.topic,
+          message: notifier.message
+        ).deliver
+      rescue
+        invalid_emails << email
+      end
     end
-    redirect_to course_path(course), :notice => "Mail has been sent"
+    msg = "Mail has been set succesfully"
+    msg << " to valid addresses, invalid addresses: #{invalid_emails.join(", ")}" unless invalid_emails.empty?
+    redirect_to course_path(course), :notice => msg
   end
 
 private
