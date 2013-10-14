@@ -14,23 +14,28 @@ class CourseNotificationsController < ApplicationController
 
     notifier = course.course_notifications.create(params[:course_notification], sender_id: current_user.id)
 
-    invalid_emails = []
+    if notifier.message.blank?
+      flash[:error] = 'Cannot send a blank message.'
+      return redirect_to new_course_course_notifications_path(course)
+    end
+
+    failed_emails = []
     emails.each do |email|
       begin
+        raise "Invalid e-mail" unless email =~ /\S+@\S+/
         CourseNotificationMailer.notification_email(
           from: current_user.email,
           to: email,
           topic: notifier.topic,
           message: notifier.message
         ).deliver
-      rescue=>e
-        logger.info "Error sending course notification to email #{email}"
-        logger.info e
-        invalid_emails << email
+      rescue
+        logger.info "Error sending course notification to email #{email}: #{$!}"
+        failed_emails << email
       end
     end
     msg = "Mail has been set succesfully"
-    msg << " to valid addresses, invalid addresses: #{invalid_emails.join(", ")}" unless invalid_emails.empty?
+    msg << " except for the following addresses: #{failed_emails.join(", ")}" unless failed_emails.empty?
     redirect_to course_path(course), :notice => msg
   end
 
@@ -38,6 +43,4 @@ private
   def auth
     authorize! :email, CourseNotification
   end
-
-
 end
