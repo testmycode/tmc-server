@@ -1,8 +1,8 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 3.1.11'
+gem 'rails', '~> 3.2.15'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
