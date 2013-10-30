@@ -49,5 +49,14 @@ module TmcServer
 
     config.autoload_paths += Dir["#{config.root}/lib/**/"]
 
+    config.middleware.use Rack::Cors do
+      allow do
+        origins '*.pheromones-js.com'
+        resource '*', :headers => :any, :methods => [:get]
+      end
+    end
+
+
+
     end
 end

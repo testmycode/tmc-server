@@ -1,8 +1,8 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 3.2.0'
+gem 'rails', '~> 3.2.15'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
@@ -20,6 +20,8 @@ gem 'andand'
 gem 'haml-rails'
 gem 'acts_as_api'
 gem 'mimemagic'
+
+gem 'rack-cors', :require => 'rack/cors'
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
