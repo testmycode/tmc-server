@@ -51,8 +51,8 @@ module TmcServer
 
     config.middleware.use Rack::Cors do
       allow do
-        origins '*'
-        resource '*', :headers => :any, :methods => [:any]
+        origins '*.pheromones-js.com'
+        resource '*', :headers => :any, :methods => [:get]
       end
     end
 
