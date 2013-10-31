@@ -58,7 +58,7 @@ GEM
       railties (>= 3.0.0)
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
-    ffi (1.9.2)
+    ffi (1.9.3)
     foreigner (1.1.6)
       activerecord (>= 3.0.0)
     google-spreadsheet-ruby (0.3.1)
