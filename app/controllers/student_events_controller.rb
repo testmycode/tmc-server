@@ -3,15 +3,19 @@
 class StudentEventsController < ApplicationController
   def create
     user = current_user
+    authorize! :create, StudentEvent
 
     event_records = params['events'].values
 
     File.open(params['data'].tempfile.path, 'rb') do |data_file|
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
-        for record in event_records
-          course = Course.find_by_name!(record['course_name'])
-          exercise = course.exercises.find_by_name!(record['exercise_name'])
-          authorize! :read, exercise
+        ex_map = {}
+        Exercise.includes(:course).each do |ex|
+          ex_map["#{ex.course.name} #{ex.name}"] = ex
+        end
+
+        event_records.each do |record|
+          exercise = ex_map[record['course_name'] + ' ' + record['exercise_name']]
 
           event_type = record['event_type']
           metadata = record['metadata']
@@ -37,7 +41,6 @@ class StudentEventsController < ApplicationController
             :happened_at => happened_at,
             :system_nano_time => system_nano_time
           )
-          authorize! :create, event
           event.save!
         end
       end
