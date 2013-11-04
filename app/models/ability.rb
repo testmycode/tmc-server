@@ -40,9 +40,7 @@ class Ability
         ans.submission.user_id == user.id
       end
 
-      can :create, StudentEvent do |ev|
-        ev.user_id = user.id
-      end
+      can :create, StudentEvent
       
       cannot :read, Solution
       can :read, Solution do |sol|
