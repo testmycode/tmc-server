@@ -141,6 +141,22 @@
   </div>
 <% end %>
 
+<% if @submission.valgrind.blank? %>
+<div class="row-fluid">
+  <h2>No Valgrind output!</h2>
+</div>
+<% end %>
+
+<% if !@submission.valgrind.blank? %>
+  <div class="row-fluid">
+  <h2>Valgrind output</h2>
+    <div class="span11">
+      <p>Valgrind output is shown below..</p>
+        <pre><%= @submission.valgrind %></pre>
+    </div>
+  </div>
+<% end %>
+
 <% if current_user.administrator? && !@submission.vm_log.blank? %>
   <div class="row-fluid">
   <div class="span11">

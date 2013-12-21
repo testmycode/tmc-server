@@ -193,6 +193,15 @@ class Submission < ActiveRecord::Base
     build_submission_data if !submission_data
     submission_data.vm_log = value
   end
+  def valgrind
+    build_submission_data if !submission_data
+    submission_data.valgrind
+  end
+  def valgrind=(value)
+    build_submission_data if !submission_data
+    submission_data.valgrind = value
+  end
+
 
   def raise_pretest_error_if_any
     if pretest_error != nil

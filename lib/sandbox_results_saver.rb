@@ -15,6 +15,7 @@ module SandboxResultsSaver
       submission.stdout = results['stdout']
       submission.stderr = results['stderr']
       submission.vm_log = results['vm_log']
+      submission.valgrind = results['valgrind']
 
       case results['status']
       when 'timeout'
