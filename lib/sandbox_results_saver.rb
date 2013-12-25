@@ -15,6 +15,11 @@ module SandboxResultsSaver
       submission.stdout = results['stdout']
       submission.stderr = results['stderr']
       submission.vm_log = results['vm_log']
+      submission.valgrind = results['valgrind']
+
+      if not submission.valgrind.blank?
+        submission.pretest_error = 'Errors in Valgrind check. See Valgrind log below.'
+      end
 
       case results['status']
       when 'timeout'

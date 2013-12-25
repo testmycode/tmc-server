@@ -128,12 +128,14 @@ describe Submission do
     s.stdout = "mää"
     s.stderr = "möö"
     s.vm_log = "måå"
+    s.valgrind = "måå"
     s.save!
 
     s = Submission.find(s.id)
     s.stdout.should == "mää"
     s.stderr.should == "möö"
     s.vm_log.should == "måå"
+    s.valgrind.should == "måå"
   end
 
   it "deletes submission data when destroyed" do
