@@ -22,17 +22,10 @@ describe CoursesController do
     end
     
     describe "in JSON format" do
-      before :each do
-        @course = Factory.create(:course, :name => 'Course1')
-        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise1', :course => @course)
-        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise2', :course => @course)
-        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise3', :course => @course)
-      end
-      
       def get_index_json(options = {})
         options = {
           :format => 'json',
-          :api_version => ApplicationController::API_VERSION
+          :api_version => ApiVersion::API_VERSION
         }.merge options
         @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("#{@user.login}:#{@user.password}")
         get :index, options
@@ -40,6 +33,7 @@ describe CoursesController do
       end
       
       it "renders all non-hidden courses in order by name" do
+        Factory.create(:course, :name => 'Course1')
         Factory.create(:course, :name => 'Course2', :hide_after => Time.now + 1.week)
         Factory.create(:course, :name => 'Course3')
         Factory.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week)
@@ -49,80 +43,6 @@ describe CoursesController do
         
         result['courses'].map {|c| c['name'] }.should == ['Course1', 'Course2', 'Course3']
       end
-      
-      it "should render the exercises for each course" do
-        result = get_index_json
-        
-        exs = result['courses'][0]['exercises']
-        exs[0]['name'].should == 'Exercise1'
-        exs[1]['name'].should == 'Exercise2'
-        exs[0]['zip_url'].should == exercise_url(@course.exercises[0].id, :format => 'zip')
-        exs[0]['return_url'].should == exercise_submissions_url(@course.exercises[0].id, :format => 'json')
-      end
-      
-      it "should include only visible exercises" do
-        @course.exercises[0].hidden = true
-        @course.exercises[0].save!
-        @course.exercises[1].deadline_spec = [Date.yesterday.to_s].to_json
-        @course.exercises[1].save!
-        
-        result = get_index_json
-
-        names = result['courses'][0]['exercises'].map {|ex| ex['name']}
-        names.should_not include('Exercise1')
-        names.should include('Exercise2')
-        names.should include('Exercise3')
-      end
-      
-      it "should tell each the exercise's deadline" do
-        @course.exercises[0].deadline_spec = [Time.parse('2011-11-16 23:59:59 +0200').to_s].to_json
-        @course.exercises[0].save!
-        
-        result = get_index_json
-        
-        result['courses'][0]['exercises'][0]['deadline'].should == '2011-11-16T23:59:59+02:00'
-      end
-      
-      it "should tell for each exercise whether it has been attempted" do
-        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
-        Factory.create(:test_case_run, :submission => sub, :successful => false)
-        
-        result = get_index_json
-        
-        exs = result['courses'][0]['exercises']
-        exs[0]['attempted'].should be_true
-        exs[1]['attempted'].should be_false
-      end
-      
-      it "should tell for each exercise whether it has been completed" do
-        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user, :all_tests_passed => true)
-        
-        result = get_index_json
-        
-        exs = result['courses'][0]['exercises']
-        exs[0]['completed'].should be_true
-        exs[1]['completed'].should be_false
-      end
-      
-      describe "and no user given" do
-        it "should respond with a 403" do
-          controller.current_user = Guest.new
-          get_index_json :api_username => nil, :api_password => nil
-          response.code.to_i.should == 403
-        end
-      end
-      
-      describe "and the given user does not exist" do
-        before :each do
-          @user.destroy
-        end
-        
-        it "should respond with a 403" do
-          get_index_json
-          response.code.to_i.should == 403
-        end
-      end
-      
     end
   end
   
@@ -179,6 +99,99 @@ describe CoursesController do
         
         assigns['submissions'].should include(my_sub)
         assigns['submissions'].should_not include(other_guys_sub)
+      end
+    end
+
+    describe "in JSON format" do
+      before :each do
+        @course = Factory.create(:course, :name => 'Course1')
+        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise1', :course => @course)
+        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise2', :course => @course)
+        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise3', :course => @course)
+      end
+
+      def get_show_json(options = {})
+        options = {
+          :format => 'json',
+          :api_version => ApiVersion::API_VERSION,
+          :id => @course.id.to_s
+        }.merge options
+        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("#{@user.login}:#{@user.password}")
+        get :show, options
+        JSON.parse(response.body)
+      end
+
+      it "should render the exercises for each course" do
+        result = get_show_json
+
+        exs = result['course']['exercises']
+        exs[0]['name'].should == 'Exercise1'
+        exs[1]['name'].should == 'Exercise2'
+        exs[0]['zip_url'].should == exercise_url(@course.exercises[0].id, :format => 'zip')
+        exs[0]['return_url'].should == exercise_submissions_url(@course.exercises[0].id, :format => 'json')
+      end
+
+      it "should include only visible exercises" do
+        @course.exercises[0].hidden = true
+        @course.exercises[0].save!
+        @course.exercises[1].deadline_spec = [Date.yesterday.to_s].to_json
+        @course.exercises[1].save!
+
+        result = get_show_json
+
+        names = result['course']['exercises'].map { |ex| ex['name'] }
+        names.should_not include('Exercise1')
+        names.should include('Exercise2')
+        names.should include('Exercise3')
+      end
+
+      it "should tell each the exercise's deadline" do
+        @course.exercises[0].deadline_spec = [Time.parse('2011-11-16 23:59:59 +0200').to_s].to_json
+        @course.exercises[0].save!
+
+        result = get_show_json
+
+        result['course']['exercises'][0]['deadline'].should == '2011-11-16T23:59:59+02:00'
+      end
+
+      it "should tell for each exercise whether it has been attempted" do
+        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
+        Factory.create(:test_case_run, :submission => sub, :successful => false)
+
+        result = get_show_json
+
+        exs = result['course']['exercises']
+        exs[0]['attempted'].should be_true
+        exs[1]['attempted'].should be_false
+      end
+
+      it "should tell for each exercise whether it has been completed" do
+        Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user, :all_tests_passed => true)
+
+        result = get_show_json
+
+        exs = result['course']['exercises']
+        exs[0]['completed'].should be_true
+        exs[1]['completed'].should be_false
+      end
+
+      describe "and no user given" do
+        it "should respond with a 403" do
+          controller.current_user = Guest.new
+          get_show_json :api_username => nil, :api_password => nil
+          response.code.to_i.should == 403
+        end
+      end
+
+      describe "and the given user does not exist" do
+        before :each do
+          @user.destroy
+        end
+
+        it "should respond with a 403" do
+          get_show_json
+          response.code.to_i.should == 403
+        end
       end
     end
   end

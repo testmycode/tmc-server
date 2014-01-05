@@ -120,7 +120,7 @@ private
       end
     end.flatten
     {
-      :api_version => API_VERSION,
+      :api_version => ApiVersion::API_VERSION,
       :reviews => reviews
     }
   end

@@ -116,7 +116,7 @@ private
     end
 
     {
-      :api_version => API_VERSION,
+      :api_version => ApiVersion::API_VERSION,
       :participants => result
     }
   end

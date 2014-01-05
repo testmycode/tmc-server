@@ -21,7 +21,7 @@ describe FeedbackAnswersController do
           { :question_id => @q2.id, :answer => '3' }
         ],
         :format => :json,
-        :api_version => ApplicationController::API_VERSION
+        :api_version => ApiVersion::API_VERSION
       }
     end
 

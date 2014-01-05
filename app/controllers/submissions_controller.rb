@@ -39,7 +39,7 @@ class SubmissionsController < ApplicationController
       format.zip { send_data(@submission.return_file, :filename => @submission.downloadable_file_name) }
       format.json do
         output = {
-          :api_version => API_VERSION,
+          :api_version => ApiVersion::API_VERSION,
           :status => @submission.status,
           :points => @submission.points_list,
           :missing_review_points => @exercise.missing_review_points_for(@submission.user)
@@ -128,7 +128,7 @@ class SubmissionsController < ApplicationController
       end
       format.json do
         if !errormsg
-          render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => API_VERSION),
+          render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => ApiVersion::API_VERSION),
                             :paste_url => submission_files_url(@submission)}
         else
           render :json => { :error => errormsg }
@@ -191,7 +191,7 @@ private
     end
 
     render :json => {
-      :api_version => API_VERSION,
+      :api_version => ApiVersion::API_VERSION,
       :json_url_schema => submission_url(:id => ':id', :format => 'json'),
       :zip_url_schema => submission_url(:id => ':id', :format => 'zip'),
       :submissions => submissions.map(&:id)

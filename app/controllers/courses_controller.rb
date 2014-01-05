@@ -21,8 +21,8 @@ class CoursesController < ApplicationController
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
 
         data = {
-          :api_version => API_VERSION,
-          :courses => CourseList.new(current_user, courses, view_context).course_list_data
+          :api_version => ApiVersion::API_VERSION,
+          :courses => CourseList.new(current_user, view_context).course_list_data(courses)
         }
         render :json => data.to_json
       end
@@ -42,7 +42,11 @@ class CoursesController < ApplicationController
       format.html
       format.json do
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
-        render_for_api :course_show_with_exercises, :json => @course, :root => :course
+        data = {
+          :api_version => ApiVersion::API_VERSION,
+          :course => CourseInfo.new(current_user, view_context).course_data(@course)
+        }
+        render :json => data.to_json
       end
     end
   end

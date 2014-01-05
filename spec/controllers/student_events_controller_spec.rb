@@ -26,7 +26,7 @@ describe StudentEventsController do
 
     params = {
       :format => :json,
-      :api_version => ApplicationController::API_VERSION,
+      :api_version => ApiVersion::API_VERSION,
       :events => events_hash,
       :data => file
     }.merge(params)

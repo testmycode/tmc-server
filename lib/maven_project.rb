@@ -100,7 +100,7 @@ protected
   def build_classpath
     file_path = "misc/#{pom_file.artifact_id}-build-classpath"
     begin
-      too_old = FileStore.mtime(file_path) > File.mtime(package_path)
+      too_old = FileStore.mtime(file_path) < File.mtime(package_path)
     rescue # no such file most likely
       too_old = true
     end

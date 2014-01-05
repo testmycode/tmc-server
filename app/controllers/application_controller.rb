@@ -6,8 +6,6 @@ require 'twitter-bootstrap-breadcrumbs'
 # Includes common parts like handling some exceptions as well as
 # various utility methods.
 class ApplicationController < ActionController::Base
-  API_VERSION = 5 # To be incremented on BC-breaking changes
-
   include BreadCrumbs
 
   helper :all
@@ -63,8 +61,8 @@ private
     if should_check_api_version?
       if params[:api_version].blank?
         respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
-      elsif params[:api_version].to_s != API_VERSION.to_s
-        respond_with_error("Please update the TMC client. API version #{API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
+      elsif params[:api_version].to_s != ApiVersion::API_VERSION.to_s
+        respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
       end
 
       if !params[:client].blank? # Client and client version checks are optional

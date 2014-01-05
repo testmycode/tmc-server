@@ -113,7 +113,7 @@ class FeedbackAnswersController < ApplicationController
         redirect_to submission_path(submission)
       end
       format.json do
-        render :json => {:api_version => API_VERSION, :status => 'ok'}
+        render :json => {:api_version => ApiVersion::API_VERSION, :status => 'ok'}
       end
     end
   end

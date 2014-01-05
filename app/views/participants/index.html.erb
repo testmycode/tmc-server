@@ -76,9 +76,9 @@
 </table>
 <div class="alternative-format-links">
   [
-  <%= link_to "json", "#{participants_path params.merge(:format => :json, :api_version => ApplicationController::API_VERSION)}" %>
+  <%= link_to "json", "#{participants_path params.merge(:format => :json, :api_version => ApiVersion::API_VERSION)}" %>
   |
-  <%= link_to "csv", "#{participants_path params.merge(:format => :csv, :api_version => ApplicationController::API_VERSION)}" %>
+  <%= link_to "csv", "#{participants_path params.merge(:format => :csv, :api_version => ApiVersion::API_VERSION)}" %>
   ]
 </div>
 

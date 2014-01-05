@@ -32,14 +32,6 @@ class Course < ActiveRecord::Base
   has_many :unlocks, :dependent => :delete_all
   has_many :course_notifications, :dependent => :delete_all
 
-  acts_as_api
-
-  api_accessible :course_show_with_exercises do |template|
-    template.add :name
-    template.add :id
-    template.add :exercises
-  end
-
   def destroy
     # Optimization: delete dependent objects quickly.
     # Rails' :dependent => :delete_all is very slow.
