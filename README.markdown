@@ -10,7 +10,7 @@ several elementary programming and data structures courses with hundreds of user
 
 ## Setup ##
 
-Very rought setup instructions below.
+Very rough setup instructions below.
 
 ### System Dependencies ###
 
@@ -30,11 +30,11 @@ We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` w
 5. Initialize the database with `env RAILS_ENV=production rake db:reset`
 6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
 7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
-8. Compile the other suff in `ext` by doing `rake compile`.
+8. Compile the other stuff in `ext` by doing `rake compile`.
 9. Install tmc-check locally by running `rvmsudo make -C ext/tmc-check rubygems install clean`.
 10. Run the test suite with `rvmsudo rake spec`.
 
-After you get the test suite to pass, you can set up start background services.
+After you get the test suite to pass, you can set up background services.
 
 1. Recheck your comet server config in `site.yml` and then do `rvmsudo rake comet:config:update`.
 2. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake reprocessor:init:install`.

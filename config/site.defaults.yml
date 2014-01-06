@@ -29,10 +29,17 @@ baseurl_for_remote_sandboxes: http://localhost:3000/
 # Any URL will do. Example:
 # http://user:password@sandbox.example.com:3001/path/to/the/sandbox/service
 #
-# The default points to the local instance that may be started with `rake sandbox:local:start`.
+# The default points to the local instance that may be started with
+# `rvmsudo ext/tmc-sandbox/web/webapp.rb run`.
 #
 remote_sandboxes:
   - http://localhost:3001/
+
+# List of spyware server URLs. See https://github.com/testmycode/tmc-spyware-server
+# This list will only be delivered to the client in /courses.json.
+# The server doesn't currently interact with spyware servers.
+spyware_servers:
+  - http://localhost:3101/
 
 # The URL and publish key to a tmc-comet server.
 # The publish key and the baseurl of this server must also be set in
