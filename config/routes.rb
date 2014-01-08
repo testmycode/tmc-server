@@ -61,7 +61,7 @@ TmcServer::Application.routes.draw do
     resources :reviews, :only => [:index, :new, :create]
   end
 
-  get 'paste/:id', to: 'files#index', as: 'paste'
+  get 'paste/:submission_id', to: 'files#index', as: 'paste'
   resources :reviews, :only => [:update, :destroy]
 
   match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
