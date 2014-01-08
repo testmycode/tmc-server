@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131219195546) do
+ActiveRecord::Schema.define(:version => 20140108131242) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -37,8 +37,8 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
     t.string   "message"
     t.integer  "sender_id"
     t.integer  "course_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "courses", :force => true do |t|
@@ -83,8 +83,8 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
     t.string   "exercise_name",        :null => false
     t.integer  "submission_id"
     t.text     "answer",               :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",           :null => false
+    t.datetime "updated_at",           :null => false
   end
 
   add_index "feedback_answers", ["feedback_question_id", "course_id", "exercise_name"], :name => "index_feedback_answers_question_course_exercise"
@@ -94,8 +94,8 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
     t.integer  "course_id",  :null => false
     t.text     "question",   :null => false
     t.string   "kind",       :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
     t.integer  "position",   :null => false
     t.text     "title"
   end
@@ -116,16 +116,16 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
     t.integer  "feedback_answer_id"
     t.text     "body"
     t.string   "from"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
   end
 
   create_table "reviews", :force => true do |t|
     t.integer  "submission_id",                     :null => false
     t.integer  "reviewer_id"
     t.text     "review_body",                       :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
     t.text     "points"
     t.boolean  "marked_as_read", :default => false, :null => false
   end
@@ -144,14 +144,15 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "student_events", :force => true do |t|
-    t.integer  "user_id",                       :null => false
-    t.integer  "course_id",                     :null => false
-    t.string   "exercise_name",                 :null => false
-    t.string   "event_type",                    :null => false
-    t.binary   "data",                          :null => false
-    t.datetime "happened_at",                   :null => false
+    t.integer  "user_id",                                       :null => false
+    t.integer  "course_id"
+    t.string   "exercise_name",                                 :null => false
+    t.string   "event_type",                                    :null => false
+    t.binary   "data",                                          :null => false
+    t.datetime "happened_at",                                   :null => false
     t.integer  "system_nano_time", :limit => 8
     t.string   "metadata_json"
+    t.string   "course_name",                   :default => ""
   end
 
   add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
@@ -193,6 +194,7 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
     t.boolean  "review_dismissed",               :default => false, :null => false
     t.boolean  "paste_available",                :default => false, :null => false
     t.text     "message_for_paste"
+    t.string   "paste_key"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
@@ -236,8 +238,8 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
     t.integer  "user_id",    :null => false
     t.string   "field_name", :null => false
     t.text     "value",      :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   add_index "user_field_values", ["user_id", "field_name"], :name => "index_user_field_values_on_user_id_and_field_name", :unique => true
