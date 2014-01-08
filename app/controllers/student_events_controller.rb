@@ -7,15 +7,11 @@ class StudentEventsController < ApplicationController
 
     event_records = params['events'].values
 
+    inserts = []
+    #events = []
     File.open(params['data'].tempfile.path, 'rb') do |data_file|
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
-        ex_map = {}
-        Exercise.includes(:course).each do |ex|
-          ex_map["#{ex.course.name} #{ex.name}"] = ex
-        end
-
         event_records.each do |record|
-          exercise = ex_map[record['course_name'] + ' ' + record['exercise_name']]
 
           event_type = record['event_type']
           metadata = record['metadata']
@@ -25,24 +21,38 @@ class StudentEventsController < ApplicationController
           data_file.pos = record['data_offset'].to_i
           data = data_file.read(record['data_length'].to_i)
 
-          unless StudentEvent.supported_event_types.include?(event_type)
-            raise "Invalid event type: '#{event_type}'"
-          end
-
           check_json_syntax(metadata) if metadata
+          metadata = "" if metadata.blank?
+          data = "" if data.blank?
+          # inserts << "(user.id, record['course_name'], record['exercise_name'], event_type, metadata, data, happened_at, system_nano_time)"
 
-          event = StudentEvent.new(
+          #event = StudentEvent.new(
+
+          event = {
             :user_id => user.id,
-            :course_id => exercise.course_id,
-            :exercise_name => exercise.name,
+            :course_name => record['course_name'],
+            :exercise_name => record['exercise_name'],
             :event_type => event_type,
             :metadata_json => metadata,
             :data => data,
             :happened_at => happened_at,
             :system_nano_time => system_nano_time
-          )
-          event.save!
+          }
+          inserts << "('#{event.values.join("','")}')"#.gsub('"', "'")
+          #)
+          #events << event
+          #if events.size > 30
+          #  StudentEvent.import events.shift(30)
+          #end
+          #event.save!
         end
+        #StudentEvent.import events
+        #
+        sql = "INSERT INTO student_events (user_id, course_name, exercise_name, event_type, metadata_json, data, happened_at, system_nano_time) VALUES #{inserts.join(', ')}"
+#        puts "#{'*'* 200}"
+#        puts sql
+#        puts "#{'*'* 200}"
+        StudentEvent.connection.execute sql
       end
     end
 
@@ -53,7 +63,7 @@ class StudentEventsController < ApplicationController
     end
   end
 
-private
+  private
 
   def check_json_syntax(string)
     ActiveSupport::JSON.decode(string)
