@@ -1,4 +1,5 @@
 require 'zlib'
+require 'securerandom'
 
 class Submission < ActiveRecord::Base
   belongs_to :user
@@ -21,8 +22,9 @@ class Submission < ActiveRecord::Base
   validates :user, :presence => true
   validates :course, :presence => true
   validates :exercise_name, :presence => true
-
+  validates :paste_key, uniqueness: true, presence: false
   before_create :set_processing_attempts_started_at
+  before_create :set_paste_key_if_paste_available
 
   acts_as_api
   api_accessible :submission_show do |t|
@@ -48,7 +50,7 @@ class Submission < ActiveRecord::Base
     self.where(:processed => false).
       order('processing_priority DESC, processing_tried_at ASC, id ASC')
   end
-  
+
   def self.unprocessed_count
     self.unprocessed.count
   end
@@ -57,13 +59,13 @@ class Submission < ActiveRecord::Base
   def self.max_attempts_at_processing
     3
   end
-  
+
   before_create :randomize_secret_token
-  
+
   def tests_ran?
     processed? && pretest_error == nil
   end
-  
+
   def result_url
     "#{SiteSetting.value(:baseurl_for_remote_sandboxes).sub(/\/+$/, '')}/submissions/#{self.id}/result"
   end
@@ -93,7 +95,7 @@ class Submission < ActiveRecord::Base
     v = v.to_s
     k =~ /^[a-zA-Z\-_]+$/ && v =~ /^[a-zA-Z\-_]+$/
   end
-  
+
   def status
     if !processed?
       :processing
@@ -105,7 +107,7 @@ class Submission < ActiveRecord::Base
       :error
     end
   end
-  
+
   def points_list
     points.to_s.split(' ')
   end
@@ -131,7 +133,7 @@ class Submission < ActiveRecord::Base
       !review_dismissed? &&
       !newer_submission_reviewed?
   end
-  
+
   def unprocessed_submissions_before_this
     if !self.processed?
       i = 0
@@ -144,11 +146,11 @@ class Submission < ActiveRecord::Base
       0
     end
   end
-  
+
   def downloadable_file_name
     "#{exercise_name}-#{self.id}.zip"
   end
-  
+
   def test_case_records
     test_case_runs.map do |tcr|
       {
@@ -238,7 +240,7 @@ class Submission < ActiveRecord::Base
   def randomize_secret_token
     self.secret_token = rand(10**100).to_s
   end
-  
+
   # How often we try to resend if no sandbox has received it yet
   def self.processing_retry_interval
     7.seconds
@@ -254,7 +256,7 @@ class Submission < ActiveRecord::Base
     keys = submissions.map {|s| "(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})" }
     keys.uniq!
     return if keys.empty?
-    
+
     exercises = Exercise.where('(course_id, name) IN (' + keys.join(',') + ')')
     by_key = Hash[exercises.map {|e| [[e.course_id, e.name], e] }]
     for sub in submissions
@@ -267,8 +269,17 @@ class Submission < ActiveRecord::Base
     self.paste_available and not self.all_tests_passed
   end
 
+
+  def set_paste_key_if_paste_available
+    if self.paste_available?
+      self.paste_key = SecureRandom.urlsafe_base64
+    end
+  end
+
 private
   def set_processing_attempts_started_at
     self.processing_attempts_started_at = Time.now
   end
+
+
 end
