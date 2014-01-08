@@ -48,6 +48,10 @@
     <% if can? :create, Review %>
       <li><%= link_to "Start code review", new_submission_review_path(@submission) %></li>
     <% end %>
+    <% if @submission.paste_available %>
+      <li><%= link_to "Show Paste", paste_path(@submission) %></li>
+    <% end %>
+
   </ul>
 
   <% if !@submission.processed? %>
