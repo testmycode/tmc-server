@@ -159,7 +159,7 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
   add_index "student_events", ["user_id", "event_type", "happened_at"], :name => "index_student_events_user_type_time"
 
   create_table "submission_data", :id => false, :force => true do |t|
-    t.integer "submission_id",     :null => false
+    t.integer "submission_id",       :null => false
     t.binary  "return_file"
     t.binary  "stdout_compressed"
     t.binary  "stderr_compressed"
