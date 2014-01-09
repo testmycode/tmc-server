@@ -160,11 +160,11 @@ case $PROJECT_TYPE in
   makefile_c)
     # RUN_VALGRIND and VALGRIND_OPTS can be set in .tmcrc on per exercise basis
     if [ ${RUN_VALGRIND} ]; then
-	valgrind -q ${VALGRIND_OPTS} --log-file=valgrind.log ./test/test > stdout.txt 2> stderr.txt
+      valgrind -q ${VALGRIND_OPTS} --log-file=valgrind.log ./test/test > stdout.txt 2> stderr.txt
     else
-	# valgrind.log must exist. Otherwise tar packaging fails
-	touch valgrind.log
-	./test/test > stdout.txt 2> stderr.txt
+      # valgrind.log must exist. Otherwise tar packaging fails
+      touch valgrind.log
+      ./test/test > stdout.txt 2> stderr.txt
     fi
     tmc-check-convert-results > test_output.txt
   ;;
