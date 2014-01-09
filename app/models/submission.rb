@@ -22,7 +22,6 @@ class Submission < ActiveRecord::Base
   validates :user, :presence => true
   validates :course, :presence => true
   validates :exercise_name, :presence => true
-  validates :paste_key, uniqueness: true, presence: false
   before_create :set_processing_attempts_started_at
   before_create :set_paste_key_if_paste_available
 
