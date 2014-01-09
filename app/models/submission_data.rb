@@ -62,6 +62,25 @@ class SubmissionData < ActiveRecord::Base
     @vm_log = value
   end
 
+  def valgrind
+    @valgrind ||=
+      if valgrind_compressed != nil
+        uncompress(valgrind_compressed)
+      else
+        nil
+      end
+  end
+
+  def valgrind=(value)
+    if value != nil
+      self.valgrind_compressed = compress(value)
+    else
+      self.valgrind_compressed = nil
+    end
+    @valgrind = value
+  end
+
+
 private
   def compress(text)
     Zlib::Deflate.deflate(text)
