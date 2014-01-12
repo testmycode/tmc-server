@@ -102,7 +102,10 @@ class SubmissionsController < ApplicationController
         :requests_review => !!params[:request_review],
         :paste_available => !!params[:paste],
         :message_for_paste => if params[:paste] then params[:message_for_paste] || '' else '' end,
-        :message_for_reviewer => if params[:request_review] then params[:message_for_reviewer] || '' else '' end
+        :message_for_reviewer => if params[:request_review] then params[:message_for_reviewer] || '' else '' end,
+        :client_time => if params[:client_time] then Time.at(params[:client_time].to_i) else nil end,
+        :client_nanotime => params[:client_nanotime],
+        :client_ip => request.env["HTTP_X_FORWARDED_FOR"] || request.remote_ip
       )
       
       authorize! :create, @submission
