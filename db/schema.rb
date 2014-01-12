@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131219195546) do
+ActiveRecord::Schema.define(:version => 20140112023830) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -143,21 +143,6 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
-  create_table "student_events", :force => true do |t|
-    t.integer  "user_id",                       :null => false
-    t.integer  "course_id",                     :null => false
-    t.string   "exercise_name",                 :null => false
-    t.string   "event_type",                    :null => false
-    t.binary   "data",                          :null => false
-    t.datetime "happened_at",                   :null => false
-    t.integer  "system_nano_time", :limit => 8
-    t.string   "metadata_json"
-  end
-
-  add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
-  add_index "student_events", ["user_id", "course_id", "exercise_name", "event_type", "happened_at"], :name => "index_student_events_user_course_exercise_type_time"
-  add_index "student_events", ["user_id", "event_type", "happened_at"], :name => "index_student_events_user_type_time"
-
   create_table "submission_data", :id => false, :force => true do |t|
     t.integer "submission_id",       :null => false
     t.binary  "return_file"
@@ -271,9 +256,6 @@ ActiveRecord::Schema.define(:version => 20131219195546) do
 
   add_foreign_key "reviews", "submissions", :name => "reviews_submission_id_fk", :dependent => :delete
   add_foreign_key "reviews", "users", :name => "reviews_reviewer_id_fk", :column => "reviewer_id", :dependent => :nullify
-
-  add_foreign_key "student_events", "courses", :name => "student_events_course_id_fk", :dependent => :delete
-  add_foreign_key "student_events", "users", :name => "student_events_user_id_fk", :dependent => :delete
 
   add_foreign_key "submission_data", "submissions", :name => "submission_data_submission_id_fk", :dependent => :delete
 

@@ -40,8 +40,6 @@ class Ability
         ans.submission.user_id == user.id
       end
 
-      can :create, StudentEvent
-      
       cannot :read, Solution
       can :read, Solution do |sol|
         sol.visible_to?(user)
