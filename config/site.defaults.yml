@@ -36,8 +36,13 @@ remote_sandboxes:
   - http://localhost:3001/
 
 # List of spyware server URLs. See https://github.com/testmycode/tmc-spyware-server
-# This list will only be delivered to the client in /courses.json.
-# The server doesn't currently interact with spyware servers.
+# The URLs should work from both clients and the server.
+# This list will be delivered to the client in /courses.json.
+# The server may also send some data to the spyware servers.
+#
+# The default points to the dev instance that may be started with
+# `ext/tmc-spyware-server/dev.rb`
+#
 spyware_servers:
   - http://localhost:3101/
 
