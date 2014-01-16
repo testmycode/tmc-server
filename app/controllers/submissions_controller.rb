@@ -107,18 +107,18 @@ class SubmissionsController < ApplicationController
         :client_nanotime => params[:client_nanotime],
         :client_ip => request.env["HTTP_X_FORWARDED_FOR"] || request.remote_ip
       )
-      
+
       authorize! :create, @submission
-      
+
       if !@submission.save
         errormsg = 'Failed to save submission.'
       end
     end
-    
+
     if !errormsg
       SubmissionProcessor.new.process_submission(@submission)
     end
-    
+
     respond_to do |format|
       format.html do
         if !errormsg
@@ -126,20 +126,20 @@ class SubmissionsController < ApplicationController
                       :notice => 'Submission received.')
         else
           redirect_to(exercise_path(@exercise),
-                      :alert => errormsg) 
+                      :alert => errormsg)
         end
       end
       format.json do
         if !errormsg
-          render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => ApiVersion::API_VERSION),
-                            :paste_url => submission_files_url(@submission)}
+          render :json => { :submission_url => submission_url(@submission, :format => 'json', :api_version => API_VERSION),
+                            :paste_url => paste_url(@submission.paste_key)}
         else
           render :json => { :error => errormsg }
         end
       end
     end
   end
-  
+
   def update
     submission = Submission.find(params[:id]) || respond_not_found
     authorize! :update, submission
@@ -154,7 +154,7 @@ class SubmissionsController < ApplicationController
       respond_not_found
     end
   end
-  
+
   def update_by_exercise
     for submission in @exercise.submissions
       schedule_for_rerun(submission, -2)
