@@ -128,12 +128,12 @@ describe "The system (used by a student)", :integration => true do
   it "should show solutions for completed exercises" do
     ex = FixtureExercise.new('SimpleExerciseWithSolutionsAndStubs', 'MyExercise')
     ex.make_zip
-    
+
     click_link 'MyExercise'
     attach_file('Zipped project', 'MyExercise.zip')
     click_button 'Submit'
     wait_for_submission_to_be_processed
-    
+
     visit '/'
     click_link 'mycourse'
     click_link 'MyExercise'
@@ -141,21 +141,21 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('Solution for MyExercise')
     page.should have_content('src/SimpleStuff.java')
   end
-  
+
   it "should not show solutions for uncompleted exercises" do
     ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.solve_add
     ex.make_zip
-    
+
     click_link 'MyExercise'
     attach_file('Zipped project', 'MyExercise.zip')
     click_button 'Submit'
     wait_for_submission_to_be_processed
-  
+
     visit '/'
     click_link 'mycourse'
     click_link 'MyExercise'
-    
+
     page.should_not have_content('View suggested solution')
   end
 
@@ -166,7 +166,7 @@ describe "The system (used by a student)", :integration => true do
 
     click_link 'MyExercise'
     attach_file('Zipped project', 'MyExercise.zip')
-    check('paste')
+    #check('paste')
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
@@ -189,5 +189,198 @@ describe "The system (used by a student)", :integration => true do
     page.should_not have_content('src/SimpleStuff.java')
     page.should have_content('Access denied')
   end
+
+  describe "pastes" do
+    it "By default pastes are publicly visible, if all tests are not passed" do
+
+      ex = FixtureExercise::SimpleExercise.new('MyExercise')
+      ex.make_zip
+
+      click_link 'MyExercise'
+      attach_file('Zipped project', 'MyExercise.zip')
+      check('Submit to pastebin')
+      click_button 'Submit'
+      wait_for_submission_to_be_processed
+
+      click_link 'Show Paste'
+      page.should have_content('src/SimpleStuff.java')
+
+      log_out
+
+      page.should have_content('src/SimpleStuff.java')
+
+    end
+
+    it "By default pastes are not publicly visible, if all tests passed" do
+      ex = FixtureExercise::SimpleExercise.new('MyExercise')
+      ex.solve_all
+      ex.make_zip
+
+      click_link 'MyExercise'
+      attach_file('Zipped project', 'MyExercise.zip')
+      check('Submit to pastebin')
+      click_button 'Submit'
+      wait_for_submission_to_be_processed
+
+      page.should have_content('All tests successful')
+      page.should have_content('Ok')
+
+      page.should_not have_content 'Show Paste'
+
+      click_link 'View submitted files'
+
+      page.should have_content('src/SimpleStuff.java')
+
+      log_out
+
+      page.should_not have_content('src/SimpleStuff.java')
+      page.should have_content('Access denied')
+    end
+
+
+    it "when pastes configured as protected, user should not see it unless she has already passed that exercise" do
+
+      # User1 makes submission getting it marked as done
+      # User2 makes failing submission
+      # and navigates to paste view
+      # User2 logs out
+      # and User1 logs in
+      # User1 should see the paste
+      # User 1 logs out
+      # and uset 3 logs in and should not see the paste
+      #
+
+      @course.paste_visibility = 'protected'
+      @course.save
+      ex = FixtureExercise::SimpleExercise.new('MyExercise')
+      ex.solve_all
+      ex.make_zip
+
+      click_link 'MyExercise'
+      attach_file('Zipped project', 'MyExercise.zip')
+      click_button 'Submit'
+      wait_for_submission_to_be_processed
+      page.should have_content('All tests successful')
+      page.should have_content('Ok')
+
+      visit '/'
+
+      log_out
+
+
+      @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
+
+      log_in_as(@other_user.login, 'xooxer')
+
+      ex = FixtureExercise::SimpleExercise.new('MyExercise')
+      ex.make_zip
+
+      click_link 'mycourse'
+      click_link 'MyExercise'
+      attach_file('Zipped project', 'MyExercise.zip')
+      check('Submit to pastebin')
+      click_button 'Submit'
+      wait_for_submission_to_be_processed
+
+      click_link 'Show Paste'
+      page.should have_content('src/SimpleStuff.java')
+
+      log_out
+
+      log_in_as(@user.login, 'xooxer')
+
+      page.should have_content('src/SimpleStuff.java')
+
+      log_out
+      @other_user = Factory.create(:user,:login => "uuseri2", :password => 'xooxer2')
+      log_in_as(@other_user.login, 'xooxer2')
+
+      page.should_not have_content('src/SimpleStuff.java')
+      page.should have_content('Access denied')
+
+      log_out
+
+      page.should_not have_content('src/SimpleStuff.java')
+      page.should have_content('Access denied')
+    end
+
+
+    it "when pastes configured as protected, user should never see paste if all tests passed" do
+      # User1 makes submission getting it marked as done
+      # User2 makes also a passing submission
+      # and navigates to paste view
+      # User2 logs out
+      # and User1 logs in
+      # User1 should not see the paste
+      # User 1 logs out
+      # and uset 3 logs in and should not see the paste
+
+      @course.paste_visibility = 'protected'
+      @course.save
+      ex = FixtureExercise::SimpleExercise.new('MyExercise')
+      ex.solve_all
+      ex.make_zip
+
+      click_link 'MyExercise'
+      attach_file('Zipped project', 'MyExercise.zip')
+      click_button 'Submit'
+      wait_for_submission_to_be_processed
+      page.should have_content('All tests successful')
+      page.should have_content('Ok')
+
+      visit '/'
+
+      log_out
+
+
+      @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
+
+      log_in_as(@other_user.login, 'xooxer')
+
+      ex = FixtureExercise::SimpleExercise.new('MyExercise')
+      ex.solve_all
+      ex.make_zip
+
+      click_link 'mycourse'
+      click_link 'MyExercise'
+      attach_file('Zipped project', 'MyExercise.zip')
+      check('Submit to pastebin')
+      click_button 'Submit'
+      wait_for_submission_to_be_processed
+
+      page.should_not have_content 'Show Paste'
+
+
+
+      key = Submission.last.paste_key
+      visit "/paste/#{key}"
+
+      page.should have_content('src/SimpleStuff.java')
+      page.should_not have_content('Access denied')
+
+      log_out
+
+      log_in_as(@user.login, 'xooxer')
+
+      page.should_not have_content('src/SimpleStuff.java')
+      page.should have_content('Access denied')
+
+      log_out
+      @other_user = Factory.create(:user,:login => "uuseri2", :password => 'xooxer2')
+      log_in_as(@other_user.login, 'xooxer2')
+
+      page.should_not have_content('src/SimpleStuff.java')
+      page.should have_content('Access denied')
+
+      log_out
+
+      page.should_not have_content('src/SimpleStuff.java')
+      page.should have_content('Access denied')
+    end
+
+
+
+  end
+
 
 end

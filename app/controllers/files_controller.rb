@@ -1,11 +1,11 @@
 # Shows the files of a submission.
 class FilesController < ApplicationController
   skip_authorization_check
-  before_filter :check_access
   before_filter :find_submission
+  before_filter :check_access
   def index
     @exercise = @submission.exercise
-    @course = @exercise.course
+    @course = @submission.course
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
@@ -21,7 +21,14 @@ class FilesController < ApplicationController
 
   private
   def check_access
-    respond_access_denied unless current_user.administrator? or submission.user_id.to_s == current_user.id.to_s or (submission.public? and submission.exercise.completed_by?(current_user))
+    case @course.paste_visibility
+    when "protected"
+      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or (@submission.public? and @submission.exercise.completed_by?(current_user))
+    when "open"
+      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or @submission.public?
+    else
+      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or @submission.public?
+    end
   end
 
   def find_submission
@@ -30,6 +37,7 @@ class FilesController < ApplicationController
     else
       Submission.find_by_id!(params[:submission_id])
     end
+    @course = @submission.course
   end
 
 end

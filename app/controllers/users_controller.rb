@@ -1,3 +1,5 @@
+require 'spyware_client'
+
 # Presents the "register user" and "edit profile" views.
 class UsersController < ApplicationController
   skip_authorization_check
@@ -53,7 +55,13 @@ class UsersController < ApplicationController
     
     set_email
     password_changed = maybe_update_password(@user, params[:user])
-    set_user_fields
+    user_field_changes = set_user_fields
+
+    begin
+      log_user_field_changes(user_field_changes)
+    rescue
+
+    end
 
     if @user.errors.empty? && @user.save
       if password_changed
@@ -113,10 +121,30 @@ private
 
   def set_user_fields
     return if params[:user_field] == nil
-    for field in UserField.all
+    changes = {}
+    UserField.all.select {|f| f.visible_to?(current_user) }.each do |field|
       value_record = @user.field_value_record(field)
-      new_value = params[:user_field][field.name]
-      value_record.set_from_form(new_value)
+      old_value = value_record.ruby_value
+      value_record.set_from_form(params[:user_field][field.name])
+      new_value = value_record.ruby_value
+      changes[field.name] = {from: old_value, to: new_value} unless new_value == old_value
+    end
+    changes
+  end
+
+  def log_user_field_changes(changes)
+    unless changes.empty?
+      data = {
+        eventType: 'user_fields_changed',
+        changes: changes.clone
+      }
+      Thread.new do
+        begin
+          SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
+        rescue
+          logger.warn("Failed to send user field changes to spyware: " + $!.message + "\n " + $!.backtrace.join("\n "))
+        end
+      end
     end
   end
 end

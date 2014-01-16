@@ -217,12 +217,6 @@ describe Course do
       assert_destroyed(pt)
     end
 
-    it "deletes student events" do
-      ev = Factory.create(:student_event)
-      ev.course.destroy
-      assert_destroyed(ev)
-    end
-
     it "deletes test scanner cache entries" do
       ent = Factory.create(:test_scanner_cache_entry)
       ent.course.destroy

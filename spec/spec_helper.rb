@@ -46,8 +46,8 @@ end
 
 # Use :selenium this if you want to see what's going on and don't feel like screenshotting
 # Otherwise :webkit is somewhat faster and doesn't pop up in your face
-#Capybara.default_driver = :selenium
-Capybara.default_driver = :webkit
+Capybara.default_driver = :selenium
+#Capybara.default_driver = :webkit
 
 Capybara.server_port = FreePorts.take_next
 Capybara.default_wait_time = 10  # Comet messages may take longer to appear than the default 2 sec
