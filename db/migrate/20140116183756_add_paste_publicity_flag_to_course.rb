@@ -1,4 +1,4 @@
-class AddPasteBublicityFlagToCourse < ActiveRecord::Migration
+class AddPastePublicityFlagToCourse < ActiveRecord::Migration
   def change
     add_column :courses, :paste_visibility, :string
   end
