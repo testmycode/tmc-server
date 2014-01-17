@@ -21,11 +21,10 @@ class FilesController < ApplicationController
 
   private
   def check_access
-    case @course.paste_visibility
+    paste_visibility = @course.paste_visibility || "open"
+    case paste_visibility
     when "protected"
       respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or (@submission.public? and @submission.exercise.completed_by?(current_user))
-    when "open"
-      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or @submission.public?
     else
       respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or @submission.public?
     end
