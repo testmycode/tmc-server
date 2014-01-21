@@ -30,13 +30,34 @@ class Submission < ActiveRecord::Base
     t.add :exercise_name
     t.add :id
     t.add :course_id
+    t.add :created_at
     t.add :all_tests_passed
     t.add :points
     t.add :submitted_zip_url
+    t.add :paste_url
+    t.add :processing_time
+    t.add :reviewed?
+    t.add :requests_review?
   end
 
   def submitted_zip_url
     Rails.application.routes.url_helpers.submission_url(self.id, format: 'zip')
+  end
+
+  def paste_url
+    if self.paste_key
+      Rails.application.routes.url_helpers.paste_url(self.paste_key)
+    else
+      nil
+    end
+  end
+
+  def processing_time
+    if self.processing_completed_at.nil? or self.processing_completed_at.nil?
+      nil
+    else
+      (self.processing_completed_at - self.processing_attempts_started_at).round
+    end
   end
 
   def self.to_be_reprocessed

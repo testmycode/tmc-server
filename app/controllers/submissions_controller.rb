@@ -66,6 +66,16 @@ class SubmissionsController < ApplicationController
           output[:solution_url] = view_context.exercise_solution_url(@exercise)
         end
 
+        if @submission.paste_available?
+          output[:paste_url] = paste_url(@submission.paste_key)
+        end
+
+        output[:processing_time] = @submission.processing_time
+        output[:reviewed] = @submission.reviewed?
+        output[:requests_review] = @submission.requests_review?
+        output[:submitted_at] = @submission.created_at
+
+
         render :json => output
       end
     end
