@@ -30,7 +30,7 @@ class ExercisesController < ApplicationController
         send_file @exercise.stub_zip_file_path
       end
       format.json do
-        # TODO: move to /exercises/:id/submissions.json
+        # This is used by (at least) tmc.py at the moment
         return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
 
         @submissions = @exercise.submissions.order("submissions.created_at DESC")
