@@ -30,6 +30,7 @@ class Submission < ActiveRecord::Base
     t.add :exercise_name
     t.add :id
     t.add :course_id
+    t.add :user_id
     t.add :created_at
     t.add :all_tests_passed
     t.add :points
