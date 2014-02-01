@@ -12,12 +12,12 @@ title "rails server"
 screen script/submission_reprocessor run
 title "rerunner"
 
-screen rake dev:comet:run
+screen bundle exec rake dev:comet:run
 title "comet"
 
 screen ext/tmc-spyware-server/dev.rb
 title "spyware"
 
-screen rvmsudo ext/tmc-sandbox/web/webapp.rb run
+screen ./rubysudo ext/tmc-sandbox/web/webapp.rb run
 title "sandbox"
 
