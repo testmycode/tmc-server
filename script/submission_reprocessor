@@ -9,6 +9,10 @@ log_dir = root_dir + '/log'
 FileUtils.mkdir_p(pid_dir)
 FileUtils.mkdir_p(log_dir)
 
+def exception_to_str(e)
+  e.message + "\n" + e.backtrace.join("\n        from ")
+end
+
 # for some reason, log_output doesn't seem to work. Oh well..
 Daemons.run_proc('submission_reprocessor', :dir_mode => :normal, :dir => pid_dir, :log_dir => log_dir, :log_output => false) do
   Dir.chdir root_dir
@@ -21,10 +25,14 @@ Daemons.run_proc('submission_reprocessor', :dir_mode => :normal, :dir => pid_dir
     begin
       processor.reprocess_timed_out_submissions
     rescue => e
-      puts "Exception: " + e.message
-      puts e.backtrace.join("\n        from ")
+      Rails.logger.error "Submission reprocessor exception: " + exception_to_str(e)
+
+      begin
+        ActiveRecord::Base.verify_active_connections!
+      rescue => e2
+        Rails.logger.error "Failed to verify DB connection: " + exception_to_str(e2)
+      end
     end
     sleep 5
   end
 end
-
