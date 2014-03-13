@@ -26,7 +26,7 @@ class FilesController < ApplicationController
     when "protected"
       respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or (@submission.public? and @submission.exercise.completed_by?(current_user))
     else
-      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or @submission.public?
+      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or ( @submission.public? and @submission.created_at > 2.hours.ago )
     end
   end
 
