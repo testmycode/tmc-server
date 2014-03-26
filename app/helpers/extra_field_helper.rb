@@ -32,7 +32,7 @@ module ExtraFieldHelper
         :label_first
       end
 
-    labeled_field(raw(field.label), field_tag, :order => label_order)
+    bs_labeled_field(raw(field.label), field_tag, :order => label_order, :type => field.field_type)
   end
 
   def extra_field_filter(prefix, field, value)
@@ -58,14 +58,14 @@ module ExtraFieldHelper
         :label_first
       end
 
-    labeled_field(raw(field.name.humanize), field_tag, :order => label_order)
+    bs_labeled_field(raw(field.name.humanize), field_tag, :order => label_order)
   end
 
   def extra_field_checkbox(prefix, field, value)
     return '' if field.field_type == :html
     field_name = prefix + field.name
     field_tag = check_box_tag(field_name, '1', !value.blank?)
-    labeled_field(raw(field.name.humanize), field_tag, :order => :label_last)
+    bs_labeled_field(raw(field.name.humanize), field_tag, :order => :label_last)
   end
 
   def extra_field_value(value_record)

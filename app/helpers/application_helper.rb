@@ -52,12 +52,21 @@ module ApplicationHelper
     raw("<div #{cls} >" + labeled(label, tags, options, &block) + '</div>')
   end
 
-  def bs_labeled_field(label, field)
-    str = label_tag label, nil, class: "control-label"
-    str += raw("<div class=\"controls\">" +raw(field) + "</div>")
+  def bs_labeled_field(label, field, options = {})
+    type = options[:type] || :text
+
+    case type
+    when :boolean
+      str = '<label class="checkbox">'
+      str << "  #{field}#{label}"
+      str << "</label>"
+    else
+      str = label_tag label, nil, class: "control-label"
+      str += raw("<div class=\"controls\">" +raw(field) + "</div>")
+    end
     raw(str)
   end
-  
+
   def use_datatables(table_selector, options = {})
     options = {
       :bJQueryUI => true,
