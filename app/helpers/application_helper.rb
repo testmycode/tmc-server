@@ -4,37 +4,37 @@ module ApplicationHelper
   def tailoring
     Tailoring.get
   end
-  
-  
+
+
   def labeled(label, tags = nil, options = {}, &block)
     if tags.is_a?(Hash) && options.empty?
       options = tags
       tags = nil
     end
-    
+
     options = {
       :order => :label_first,
       :class => nil
     }.merge(options)
-    
+
     tags = capture(&block) if tags == nil && block != nil
     tags = tags.html_safe
-    
+
     if tags =~ /id\s*=\s*"([^"]+)"/
       target = ' for="' + $1 + '"'
     else
       raise 'Cannot label a tag without an id'
     end
-    
+
     cls = []
     cls << options[:order].to_s
     cls << h(options[:class].to_s) if options[:class]
     cls = ' class="' + cls.join(' ') + '"'
-    
+
     label_start = ('<label' + target + cls + '>').html_safe
     label_text = h(label)
     label_end = '</label>'.html_safe
-    
+
     case options[:order]
     when :label_first
       label_start + label_text + tags + label_end
@@ -44,7 +44,7 @@ module ApplicationHelper
       raise 'invalid :order option for labeled()'
     end
   end
-  
+
   def labeled_field(label, tags = nil, options = {}, &block)
     cls = ['field']
     cls << options[:super_class].split(" ") if options[:super_class]

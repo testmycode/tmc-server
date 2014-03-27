@@ -6,7 +6,7 @@ module Stats
       :course_stats => Course.all.reduce({}) {|h, c| h.merge(c.name => for_course(c)) }
     }
   end
-  
+
   def self.for_course(course)
     keys = [
       :participants_with_submissions_count,
@@ -16,7 +16,7 @@ module Stats
       ]
     keys.reduce({}) {|h, k| h.merge(k => self.send(k, course)) }
   end
-  
+
   def self.exercise_group_stats(course)
     result = {}
     for group_name, exercises in exercise_groups(course)
@@ -28,7 +28,7 @@ module Stats
     end
     result
   end
-  
+
   def self.exercise_groups(course)
     groups = {}
     for exercise in course.exercises.where(:hidden => false)
@@ -37,7 +37,7 @@ module Stats
     end
     groups
   end
-  
+
   def self.participants_with_submissions_count(exercise_or_course = nil)
     exercises = get_exercises(exercise_or_course)
     if exercises && !exercises.empty?
@@ -48,22 +48,22 @@ module Stats
       0
     end
   end
-  
+
   def self.completed_exercise_count(exercise_or_course = nil)
     exercises = get_exercises(exercise_or_course)
     Exercise.count_completed(all_regular_users, exercises)
   end
-  
+
   def self.possible_completed_exercise_count(exercise_or_course = nil)
     exercises = get_exercises(exercise_or_course)
     participants_with_submissions_count(exercises) * exercises.size
   end
-  
+
 private
   def self.all_regular_users
     User.where(:administrator => false)
   end
-  
+
   def self.all_nonhidden_exercises
     Exercise.where(:hidden => false)
   end

@@ -11,7 +11,7 @@ class Solution
   def path
     @exercise.solution_path
   end
-  
+
   def visible_to?(user)
     if user.administrator?
       true
@@ -31,7 +31,7 @@ class Solution
         (show_when_expired && @exercise.expired_for?(user))
     end
   end
-  
+
   def files
     @files ||= SourceFileList.for_solution(self)
   end

@@ -34,10 +34,10 @@ class SourceFileList
       zip_path = "#{tmpdir}/submission.zip"
       File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
       SystemCommands.sh!('unzip', '-qq', zip_path, '-d', tmpdir)
-      
+
       project_dir = TmcDirUtils.find_dir_containing(tmpdir, 'src')
       return self.new([]) if project_dir == nil
-    
+
       files = if project_dir == tmpdir
         find_all_files_under(project_dir)
       else

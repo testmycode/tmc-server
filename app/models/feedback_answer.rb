@@ -39,7 +39,7 @@ private
   def self.numeric_answers_query(exercise)
     questions = FeedbackQuestion.arel_table
     answers = FeedbackAnswer.arel_table
-    
+
     numeric_answers_base_query(exercise).
       project(
         questions[:id].as('qid'),

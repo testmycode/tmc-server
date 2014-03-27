@@ -1,7 +1,7 @@
 module ExtraFieldHelper
   def extra_field(field_value, method_options)
     field = field_value.field
-    
+
     return '' if field.options[:hidden]
     return raw(field.label) if field.field_type == :html
 

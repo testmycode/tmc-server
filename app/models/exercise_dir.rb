@@ -32,13 +32,13 @@ class ExerciseDir
   def initialize(path)
     @path = Pathname(path).realpath
   end
-  
+
   attr_reader :path
 
   def type
     self.class.name.gsub(/^.*::/, '').underscore
   end
-  
+
   def name_based_on_path(base_path)
     @path.to_s.sub(/^#{base_path}\//, '').gsub('/', '-')
   end
@@ -51,7 +51,7 @@ class ExerciseDir
     path = Pathname(path)
 
     result = []
-    
+
     path.find do |subpath|
       Find.prune if !subpath.directory? || irrelevant_directory?(subpath)
 
@@ -64,10 +64,10 @@ class ExerciseDir
         result << cls.new(subpath)
       end
     end
-    
+
     result
   end
-  
+
 private
   def self.irrelevant_directory?(path)
     path.directory? && (

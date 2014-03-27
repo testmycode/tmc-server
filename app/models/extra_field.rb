@@ -38,11 +38,11 @@ module ExtraField
   def group
     @options[:group]
   end
-  
+
   def field_type
     @options[:field_type].to_sym
   end
-  
+
   def label
     @options[:label] || @options[:name]
   end

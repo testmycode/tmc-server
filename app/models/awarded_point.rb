@@ -73,7 +73,7 @@ class AwardedPoint < ActiveRecord::Base
   # Gets a hash of user to count of points awarded for exercises of the given sheet
   def self.count_per_user_in_course_with_sheet(course, sheetname)
     users = User.arel_table
-    
+
     sql =
       per_user_in_course_with_sheet_query(course, sheetname).
       project([users[:login].as('username'), Arel.sql('COUNT(*)').as('count')]).

@@ -55,7 +55,7 @@ module SubmissionsHelper
       end
     end
   end
-  
+
   def format_exception_chain(exception)
     return '' if exception == nil
     result = ActiveSupport::SafeBuffer.new('')

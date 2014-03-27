@@ -13,7 +13,7 @@ class RemoteSandbox
     @baseurl = baseurl
     @baseurl = @baseurl.gsub(/\/+$/, '')
   end
-  
+
   def self.try_to_send_submission_to_free_server(submission, notify_url)
     for server in self.all.shuffle # could be smarter about this
       begin
@@ -29,13 +29,13 @@ class RemoteSandbox
     Rails.logger.warn "No free server to send submission to. Leaving to reprocessor daemon."
     false
   end
-  
+
   def send_submission(submission, notify_url)
     exercise = submission.exercise
 
     raise "Submission has no secret token" if submission.secret_token.blank?
     raise "Exercise #{submission.exercise_name} for submission gone. Cannot resubmit." if exercise == nil
-    
+
     Dir.mktmpdir do |tmpdir|
       begin
         zip_path = "#{tmpdir}/submission.zip"

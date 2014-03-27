@@ -3,7 +3,7 @@ require 'natcmp'
 # Provides an ordering for AvailablePoint and AwardedPoint based on natcmp'ing their names.
 module PointComparison
   extend Comparable
-  
+
   def <=>(other)
     Natcmp.natcmp(self.name, other.name)
   end

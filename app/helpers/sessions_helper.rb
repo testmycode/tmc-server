@@ -8,7 +8,7 @@ module SessionsHelper
   def current_user
     @current_user ||= user_from_basic_auth || user_from_session || Guest.new
   end
-  
+
   def current_user=(user)
     if user.guest?
       sign_out
@@ -32,7 +32,7 @@ private
   def user_from_session
     User.find_by_id(session[:user_id])
   end
-  
+
   def user_from_basic_auth
     if request && request.authorization
       username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)

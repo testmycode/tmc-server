@@ -11,7 +11,7 @@ class Ability
       can :refresh, Course
     else
       can :read, :all
-      
+
       cannot :read, User
       can :read, User, :id => user.id
       can :create, User if SiteSetting.value(:enable_signup)

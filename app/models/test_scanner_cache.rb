@@ -15,7 +15,7 @@ class TestScannerCache
     else
       raise 'TestScannerCache has a duplicate entry. Uniqueness has not been enforced.'
     end
-    
+
     if entry.files_hash == files_hash
       decode_value(entry.value)
     else
@@ -29,7 +29,7 @@ class TestScannerCache
   def self.clear!
     TestScannerCacheEntry.delete_all
   end
-  
+
 private
   def self.try_save(entry)
     begin
@@ -41,7 +41,7 @@ private
       ActiveRecord::Base.logger.warn($!)
     end
   end
-  
+
   def self.decode_value(value)
     ActiveSupport::JSON.decode(value, :symbolize_keys => true)
   end
