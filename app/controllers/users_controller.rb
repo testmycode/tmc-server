@@ -136,7 +136,8 @@ private
     unless changes.empty?
       data = {
         eventType: 'user_fields_changed',
-        changes: changes.clone
+        changes: changes.clone,
+        happenedAt: (Time.now.to_f*1000).to_i
       }
       Thread.new do
         begin
