@@ -15,8 +15,28 @@ class FilesController < ApplicationController
       add_breadcrumb 'Files', submission_files_path(@submission)
     end
 
-    @title = "Submission ##{@submission.id} files"
-    @files = SourceFileList.for_submission(@submission)
+    respond_to do |format|
+      format.html do
+        @title = "Submission ##{@submission.id} files"
+        @files = SourceFileList.for_submission(@submission)
+      end
+      format.json do
+        data = {
+          :api_version => ApiVersion::API_VERSION,
+          :tests => @submission.test_case_runs,
+          :message => @submission.message_for_paste,
+          :all_tests_passed => @submission.all_tests_passed?,
+          :processing_time => @submission.processing_time
+        }
+        if params[:paste_key]
+          data[:paste_key] = params[:paste_key]
+        else
+          data[:id] = params[:id]
+        end
+
+        render :json => data.to_json
+      end
+    end
   end
 
   private
