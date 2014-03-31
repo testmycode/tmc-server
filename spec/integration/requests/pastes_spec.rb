@@ -100,6 +100,7 @@ describe "Paste JSON api" , :integration => true do
         response.should be_success
         json = JSON.parse(response.body)
         json.should have_key("api_version")
+        json.should have_key("exercise_name")
         json.should have_key("tests")
         json.should have_key("message")
         json.should have_key("paste_key")
@@ -117,6 +118,7 @@ describe "Paste JSON api" , :integration => true do
         response.should be_success
         json = JSON.parse(response.body)
         json.should have_key("api_version")
+        json.should have_key("exercise_name")
         json.should have_key("tests")
         json.should have_key("message")
         json.should have_key("paste_key")
@@ -133,6 +135,7 @@ describe "Paste JSON api" , :integration => true do
         response.should be_forbidden
         json = JSON.parse(response.body)
         json.should_not have_key("api_version")
+        json.should_not have_key("exercise_name")
         json.should_not have_key("tests")
         json.should_not have_key("message")
         json.should_not have_key("paste_key")
@@ -148,6 +151,7 @@ describe "Paste JSON api" , :integration => true do
         response.should be_success
         json = JSON.parse(response.body)
         json.should have_key("api_version")
+        json.should have_key("exercise_name")
         json.should have_key("tests")
         json.should have_key("message")
         json.should have_key("paste_key")
