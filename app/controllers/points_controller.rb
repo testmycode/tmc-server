@@ -1,3 +1,4 @@
+require 'natsort'
 # Shows the points summary table and exercise group-specific tables.
 class PointsController < ApplicationController
   include PointsHelper
@@ -47,6 +48,16 @@ class PointsController < ApplicationController
       end
     else
       @users.sort!
+    end
+    respond_to do |format|
+      format.html
+      format.json do
+        output = {
+          api_version: ApiVersion::API_VERSION,
+          users_to_points: @users_to_points
+        }
+        render :json => output
+      end
     end
   end
 
