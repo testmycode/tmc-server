@@ -113,7 +113,7 @@
     <section>
       <% if @total_submissions > @submissions.count %>
         <p>
-          Only showing <%= @submissions.count %> of <%= @course.submissions.count %>
+          Only showing <%= @submissions.count %> of <%= @total_submissions %>
           <%= link_to "(show all)", course_submissions_path(@course) %>.
         </p>
       <% end %>
