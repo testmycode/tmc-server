@@ -7,8 +7,9 @@ class SubmissionPackager
       Pathname(src_dir_path)
     end
 
-    def copy_files(exercise, received, dest)
+    def copy_files(exercise, received, dest, stub = nil, opts = {})
       cloned = Pathname(exercise.clone_path)
+      tests = stub || cloned
 
       FileUtils.cp(cloned + 'pom.xml', dest)
 
@@ -16,7 +17,7 @@ class SubmissionPackager
 
       FileUtils.mkdir_p(dest + 'src')
       cp_r_if_exists(received + 'src' + 'main', dest + 'src')
-      cp_r_if_exists(cloned  + 'src' + 'test', dest + 'src')
+      cp_r_if_exists(tests  + 'src' + 'test', dest + 'src')
 
       copy_files_in_dir_no_recursion(cloned, dest)
 
@@ -30,12 +31,16 @@ class SubmissionPackager
         end
         FileUtils.cp(jar_path, dest + 'checkstyle-runner' + destname)
       end
-      FileUtils.cp(tmc_run_path, dest + 'tmc-run')
-      sh! ['chmod', 'a+x', dest + 'tmc-run']
+
+      unless opts[:no_tmc_run]
+        FileUtils.cp(tmc_run_path, dest + 'tmc-run')
+        sh! ['chmod', 'a+x', dest + 'tmc-run']
+      end
     end
 
     def tmc_run_path
       "#{::Rails.root}/lib/testrunner/tmc-run"
     end
+
   end
 end

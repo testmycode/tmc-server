@@ -1,24 +1,27 @@
 class SubmissionPackager
   class JavaSimple < SubmissionPackager
-  private
+    private
     def find_received_project_root(received_root)
       src_dir_path = TmcDirUtils.find_dir_containing(received_root, "src")
       raise 'No src directory' if src_dir_path == nil
       Pathname(src_dir_path)
     end
 
-    def copy_files(exercise, received, dest)
+    def copy_files(exercise, received, dest, stub = nil, opts = {})
       cloned = Pathname(exercise.clone_path)
+      tests = stub || cloned
       copy_libs(cloned, dest)
       FileUtils.cp_r(received + 'src', dest + 'src')
-      FileUtils.cp_r(cloned  + 'test', dest + 'test')
+      FileUtils.cp_r(tests  + 'test', dest + 'test')
       copy_files_in_dir_no_recursion(cloned, dest)
 
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
       copy_extra_student_files(tmc_project_file, received, dest)
 
-      FileUtils.cp(tmc_run_path, dest + 'tmc-run')
-      sh! ['chmod', 'a+x', dest + 'tmc-run']
+      unless opts[:no_tmc_run]
+        FileUtils.cp(tmc_run_path, dest + 'tmc-run')
+        sh! ['chmod', 'a+x', dest + 'tmc-run']
+      end
     end
 
     def copy_libs(cloned, dest)

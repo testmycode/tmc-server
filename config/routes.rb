@@ -54,7 +54,9 @@ TmcServer::Application.routes.draw do
     resources :feedback_answers, :only => [:index]
   end
 
-  resources :submissions, :only => [:show, :update] do
+  get 'submissions/:id(.:format)', to: 'submissions#full_zip', constraints: {id: /(\d+_full)/, format: /zip/}
+  get 'submissions/:id(.:format)', to: 'submissions#show', constraints: {id: /\d+/, format: /zip/}
+  resources :submissions, :only => [:show, :update], constraints: {format: /(js|html|json)/} do
     resource :result, :only => [:create]
     resources :feedback_answers, :only => [:create]
     resources :files, :only => [:index]

@@ -25,6 +25,19 @@ class SubmissionsController < ApplicationController
     end
   end
 
+  def full_zip
+    submission = Submission.find(params[:id])
+    authorize! :read, submission
+    exercise = submission.exercise
+    respond_to do |format|
+      format.zip do
+        data =  SubmissionPackager.get(exercise).get_submission_with_tests(submission)
+        name = "#{submission.user.login}-#{exercise.name}-#{submission.id}_full.zip"
+        send_data(data, filename: name)
+      end
+    end
+  end
+
 
   def show
     @course ||= @submission.course
@@ -36,7 +49,7 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.zip { send_data(@submission.return_file, :filename => @submission.downloadable_file_name) }
+      format.zip { send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip") }
       format.json do
         output = {
           :api_version => ApiVersion::API_VERSION,
