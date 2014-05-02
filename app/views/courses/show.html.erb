@@ -1,125 +1,127 @@
-<div class="span12">
-  <h1><%= @course.name %></h1>
-  <p><%= @course.description %></p>
-  <div>
-    <% if @refresh_report %>
-      <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
-    <% end %>
-
-    <ul>
-      <li><%= link_to 'View points', course_points_path(@course) %></li>
-      <% if current_user.administrator? || @course.submissions.exists?(:user_id => current_user.id, :reviewed => true) %>
-        <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
+<div class="row-fluid">
+  <div class="span12">
+    <h1><%= @course.name %></h1>
+    <p><%= @course.description %></p>
+    <div>
+      <% if @refresh_report %>
+        <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
       <% end %>
-    </ul>
-    <% if current_user.administrator? %>
+
       <ul>
-        <li>Source type: <%= @course.source_backend.upcase %> </li>
-        <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
-
-        <% if @course.source_backend == 'git' %>
-          <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
-          <% if github_url %>
-            <li>Github URL: <%= link_to github_url, github_url %></li>
-          <% end %>
-          <li>Git branch: <%= @course.git_branch %></li>
-          <% gitrev = @course.git_revision %>
-          <% if gitrev %>
-            <li>Git revision: <%= gitrev %></li>
-          <% end %>
+        <li><%= link_to 'View points', course_points_path(@course) %></li>
+        <% if current_user.administrator? || @course.submissions.exists?(:user_id => current_user.id, :reviewed => true) %>
+          <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
         <% end %>
-        <% if @course.refreshed_at %>
-          <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
-        <% end %>
-
-        <% if @course.hidden? %>
-          <li>The course is currently hidden. Unhide by editing
-          <code>course_options.yml</code></li>
-        <% end %>
-
-        <% if @course.hide_after != nil %>
-          <li>Course hidden after: <%= @course.hide_after %></li>
-        <% end %>
-
-        <% if @course.hidden_if_registered_after != nil %>
-          <li>Course hidden from user accounts created after: <%= @course.hidden_if_registered_after %></li>
-        <% end %>
-
-        <li>
-          Number of submissions: <%= @course.submissions.count %>
-          (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
-           <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
-        </li>
-
-        <% if @course.spreadsheet_key %>
-          <li>
-            <%= link_to 'Points spreadsheet in Google Docs',
-            "http://spreadsheets.google.com/ccc?key=#{@course.spreadsheet_key}" %>
-          </li>
-        <% end %>
-        <li>
-          <%= link_to 'Send message to every participant', new_course_course_notifications_path(@course) %>
-        </li>
       </ul>
-
-      <%
-       reviews_required = @course.reviews_required.count
-       reviews_requested = @course.reviews_requested.count
-      %>
-      <% if reviews_required > 0 || reviews_requested > 0 %>
+      <% if current_user.administrator? %>
         <ul>
-          <% if reviews_required > 0 %>
-            <li class="review-required">
-              <%= link_to pluralize(reviews_required, "code review") + " required", course_reviews_path(@course) %>
+          <li>Source type: <%= @course.source_backend.upcase %> </li>
+          <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
+
+          <% if @course.source_backend == 'git' %>
+            <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
+            <% if github_url %>
+              <li>Github URL: <%= link_to github_url, github_url %></li>
+            <% end %>
+            <li>Git branch: <%= @course.git_branch %></li>
+            <% gitrev = @course.git_revision %>
+            <% if gitrev %>
+              <li>Git revision: <%= gitrev %></li>
+            <% end %>
+          <% end %>
+          <% if @course.refreshed_at %>
+            <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
+          <% end %>
+
+          <% if @course.hidden? %>
+            <li>The course is currently hidden. Unhide by editing
+            <code>course_options.yml</code></li>
+          <% end %>
+
+          <% if @course.hide_after != nil %>
+            <li>Course hidden after: <%= @course.hide_after %></li>
+          <% end %>
+
+          <% if @course.hidden_if_registered_after != nil %>
+            <li>Course hidden from user accounts created after: <%= @course.hidden_if_registered_after %></li>
+          <% end %>
+
+          <li>
+            Number of submissions: <%= @course.submissions.count %>
+            (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
+             <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
+          </li>
+
+          <% if @course.spreadsheet_key %>
+            <li>
+              <%= link_to 'Points spreadsheet in Google Docs',
+              "http://spreadsheets.google.com/ccc?key=#{@course.spreadsheet_key}" %>
             </li>
           <% end %>
-          <% if reviews_requested > 0 %>
-            <li class="review-requested">
-              <%= link_to pluralize(reviews_requested, "code review") + " requested", course_reviews_path(@course) %>
-            </li>
-          <% end %>
+          <li>
+            <%= link_to 'Send message to every participant', new_course_course_notifications_path(@course) %>
+          </li>
+        </ul>
+
+        <%
+         reviews_required = @course.reviews_required.count
+         reviews_requested = @course.reviews_requested.count
+        %>
+        <% if reviews_required > 0 || reviews_requested > 0 %>
+          <ul>
+            <% if reviews_required > 0 %>
+              <li class="review-required">
+                <%= link_to pluralize(reviews_required, "code review") + " required", course_reviews_path(@course) %>
+              </li>
+            <% end %>
+            <% if reviews_requested > 0 %>
+              <li class="review-requested">
+                <%= link_to pluralize(reviews_requested, "code review") + " requested", course_reviews_path(@course) %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+
+        <ul>
+          <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
+          <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
         </ul>
       <% end %>
-
-      <ul>
-        <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
-        <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
-      </ul>
-    <% end %>
-    <% if current_user.administrator? %>
-      <%= link_to 'Refresh', refresh_course_path(@course), class: "btn btn-warning btn-mini" %>
-    <% end %>
-    <% unlockables = @course.unlockable_exercises_for(current_user) %>
-    <% unless unlockables.empty? %>
-      <p>
-        You can <%= link_to "unlock #{pluralize(unlockables.count, 'new exercise')}", course_unlock_path(@course) %>.
-      </p>
-    <% end %>
-  </div>
-    
-  <h2>All exercises</h2>
-  <div>
-    <%=
-        render :partial => 'exercises/list', :locals => {
-          :course => @course,
-          :exercises => @exercises,
-          :completion_status => @exercise_completion_status
-        }
-    %>
-  </div>
-
-  <% if @submissions %>
-    <h2>Latest submissions</h2>
-    <section>
-      <% if @total_submissions > @submissions.count %>
+      <% if current_user.administrator? %>
+        <%= link_to 'Refresh', refresh_course_path(@course), class: "btn btn-warning btn-mini" %>
+      <% end %>
+      <% unlockables = @course.unlockable_exercises_for(current_user) %>
+      <% unless unlockables.empty? %>
         <p>
-          Only showing <%= @submissions.count %> of <%= @total_submissions %>
-          <%= link_to "(show all)", course_submissions_path(@course) %>.
+          You can <%= link_to "unlock #{pluralize(unlockables.count, 'new exercise')}", course_unlock_path(@course) %>.
         </p>
       <% end %>
-      <div>
-        <%= show_submission_list(@submissions) %>
-      </div>
-    </section>
-  <% end %>
+    </div>
+
+    <h2>All exercises</h2>
+    <div>
+      <%=
+          render :partial => 'exercises/list', :locals => {
+            :course => @course,
+            :exercises => @exercises,
+            :completion_status => @exercise_completion_status
+          }
+      %>
+    </div>
+
+    <% if @submissions %>
+      <h2>Latest submissions</h2>
+      <section>
+        <% if @total_submissions > @submissions.count %>
+          <p>
+            Only showing <%= @submissions.count %> of <%= @total_submissions %>
+            <%= link_to "(show all)", course_submissions_path(@course) %>.
+          </p>
+        <% end %>
+        <div>
+          <%= show_submission_list(@submissions) %>
+        </div>
+      </section>
+    <% end %>
+  </div>
 </div>
