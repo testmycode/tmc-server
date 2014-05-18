@@ -20,6 +20,7 @@ gem 'andand'
 gem 'haml-rails'
 gem 'acts_as_api'
 gem 'mimemagic'
+gem 'rack-cors'
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
