@@ -106,3 +106,9 @@ show_model_solutions_when_exercise_expired: false
 valid_clients:
   - name: netbeans_plugin
     min_version: 0.2.22
+
+## Cross Origin Requests for /auth ##
+
+# A list of allowed origins for auth api.
+cors_origins:
+  - cs.helsinki.fi

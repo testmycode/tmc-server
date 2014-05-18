@@ -51,7 +51,7 @@ module TmcServer
 
     config.middleware.use Rack::Cors do
       allow do
-        origins '*'
+        origins SiteSetting.all_settings['cors_origins']
         resource '/auth*', :headers => :any, :methods => [:get, :post]
       end
     end
