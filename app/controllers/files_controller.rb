@@ -22,11 +22,12 @@ class FilesController < ApplicationController
       end
       format.json do
         data = {
-          :api_version        => ApiVersion::API_VERSION,
-          :message            => @submission.message_for_paste,
           :all_tests_passed   => @submission.all_tests_passed?,
-          :processing_time    => @submission.processing_time,
+          :api_version        => ApiVersion::API_VERSION,
+          :course             => @submission.course.name,
           :exercise_name      => @submission.exercise.name,
+          :message            => @submission.message_for_paste,
+          :processing_time    => @submission.processing_time,
           :tests              => @submission.test_case_runs
         }
         if params[:paste_key]
