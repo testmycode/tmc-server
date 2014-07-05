@@ -225,6 +225,14 @@ class Submission < ActiveRecord::Base
     submission_data.valgrind = value
   end
 
+  def validations
+    build_submission_data if !submission_data
+    JSON.parse submission_data.validations unless submission_data.validations.blank?
+  end
+  def validations=(value)
+    build_submission_data if !submission_data
+    submission_data.validations = value
+  end
 
   def raise_pretest_error_if_any
     if pretest_error != nil

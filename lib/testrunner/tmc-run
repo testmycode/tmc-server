@@ -17,9 +17,11 @@ if [ -r .tmcparams ]; then
 fi
 
 if [ -z "$error_msg_locale" ]; then
+  echo "Setting error_msg_locale"
   error_msg_locale=en
 fi
 ERROR_MSG_LOCALE_DEF="-Dfi.helsinki.cs.tmc.edutestutils.defaultLocale=$error_msg_locale"
+STYLE_ERROR_MSG_LOCALE_DEF="-Dtmc.locale=$error_msg_locale"
 
 
 TMC_MAVEN_PLUGIN_VERSION=1.6
@@ -111,6 +113,7 @@ if [ -f .tmcrc ]; then
   . ./.tmcrc
 fi
 
+
 echo "Running tests..."
 case $PROJECT_TYPE in
   java_simple)
@@ -119,6 +122,31 @@ case $PROJECT_TYPE in
     rm -f test_output.txt
 
     TESTS=`cat tests.txt`
+
+    # Run validations
+    DEFS="
+      -Dtmc.project_dir=`pwd`
+      -Dtmc.validations_file=`pwd`/validations.json"
+
+    echo "DEFS: $DEFS"
+    echo "LANG: $STYLE_ERROR_MSG_LOCALE_DEF"
+
+    #java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.stylerunner.Main" $TESTS 2>&1 validations_out.txt || exit 103
+    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" $DEFS -jar lib/testrunner/tmc-checkstyle-runner.jar 2>&1 validations_out.txt || exit 103
+
+    if [ -f validations_out.txt ]; then
+      echo "VALIDATIONS STDOUT AND STDERR"
+      cat validations_out.txt
+    fi
+
+    echo
+    echo "VALIDATIONS ERROR MESSAGES"
+    cat validations.json
+    echo
+    echo "done"
+    echo
+
+
 
     # Run tests
     DEFS="
@@ -139,9 +167,19 @@ case $PROJECT_TYPE in
 
   ;;
   java_maven)
+
+    # Run validations
+    DEFS="
+      -Dtmc.project_dir=`pwd`
+      -Dtmc.validations_file=`pwd`/validations.json"
+
+    echo "DEFS: $DEFS"
+
+    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.stylerunner.Main" $TESTS 2>&1 validations_out.txt || exit 103
     # MAVEN_OPTS was set above
     JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
     TEST_RUNNER="fi.helsinki.cs.tmc:tmc-maven-plugin:$TMC_MAVEN_PLUGIN_VERSION:test"
+
 
     mvn -X "$JVM_OPTS_DEF" $TEST_RUNNER 2>&1 | tee mvn_output.txt
     if [ ${PIPESTATUS[0]} -eq 0 ]; then
@@ -170,5 +208,7 @@ case $PROJECT_TYPE in
   ;;
 esac
 
+# It must exist
+touch validations.json
 echo "tmc-run completed successfully"
 exit 0

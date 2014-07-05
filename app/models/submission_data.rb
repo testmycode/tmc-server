@@ -80,6 +80,24 @@ class SubmissionData < ActiveRecord::Base
     @valgrind = value
   end
 
+  def validations
+    @validations ||=
+      if validations_compressed != nil
+        uncompress(validations_compressed)
+      else
+        nil
+      end
+  end
+
+  def validations=(value)
+    if value != nil
+      self.validations_compressed = compress(value)
+    else
+      self.validations_compressed = nil
+    end
+    @validations = value
+  end
+
 
 private
   def compress(text)

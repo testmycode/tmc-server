@@ -31,6 +31,14 @@ class SubmissionPackager
         end
         FileUtils.cp(jar_path, dest + 'lib' + 'testrunner' + destname)
       end
+
+      for jar_path in TmcCheckstyleRunner.get.jar_and_lib_paths
+        destname = jar_path.basename
+        if destname.to_s.start_with?('tmc-checkstyle-runner')
+          destname = 'tmc-checkstyle-runner.jar'
+        end
+        FileUtils.cp(jar_path, dest + 'lib' + 'testrunner' + destname)
+      end
     end
 
     def tmc_run_path
