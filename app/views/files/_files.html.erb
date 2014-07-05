@@ -11,38 +11,38 @@
 
 <% just_one_html_prelude = (files.count {|f| f.html_prelude != nil } == 1) %>
 <% if just_one_html_prelude %>
-<%= raw(files.find {|f| f.html_prelude != nil }.html_prelude) %>
+  <%= raw(files.find {|f| f.html_prelude != nil }.html_prelude) %>
 <% end %>
 
 <% running_idx = 0 %>
 <div class="solution-files">
   <% for file in files %>
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <h2>
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#<%= running_idx += 1 %>">
+    <div class="accordion-group">
+      <div class="accordion-heading">
+        <h2>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#<%= running_idx += 1 %>">
           <%= file.path %></a>
         </h2>
       </div>
       <div id="<%= running_idx %>" class="accordion-body collapse in">
         <div class="accordion-inner">
           <% if !just_one_html_prelude && file.html_prelude %>
-          <%= raw(file.html_prelude) %>
+            <%= raw(file.html_prelude) %>
           <% end %>
           <%
-          brush = case File.extname(file.path)
-          when '.txt' then 'plain'
-          when '.jsp' then 'html'
-          when '.properties' then 'plain'
-          when '' then 'plain'
-          else File.extname(file.path)[1..-1]
-          end
+            brush = case File.extname(file.path)
+            when '.txt' then 'plain'
+            when '.jsp' then 'html'
+            when '.properties' then 'plain'
+            when '' then 'plain'
+            else File.extname(file.path)[1..-1]
+            end
           %>
           <div class="span12">
             <pre class="brush: <%= brush %>"><%= force_utf8_violently(file.contents) %></pre>
           </div>
         </div>
       </div>
-      <% end %>
     </div>
+  <% end %>
 </div>
