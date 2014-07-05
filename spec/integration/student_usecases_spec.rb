@@ -118,7 +118,7 @@ describe "The system (used by a student)", :integration => true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    click_link 'View submitted files'
+    click_link 'Files'
 
     page.should have_content('src/SimpleStuff.java')
     page.should have_content('public class')
@@ -173,9 +173,7 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('All tests successful')
     page.should have_content('Ok')
 
-    click_link 'View submitted files'
-    # visit '/'
-    # id = Submission.last.id
+    click_link 'Files'
     # visit "/submissions/#{id}/files"
     page.should have_content('src/SimpleStuff.java')
 
@@ -227,7 +225,7 @@ describe "The system (used by a student)", :integration => true do
 
       page.should_not have_content 'Show Paste'
 
-      click_link 'View submitted files'
+      click_link 'Files'
 
       page.should have_content('src/SimpleStuff.java')
 
