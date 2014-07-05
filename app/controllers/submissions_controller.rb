@@ -6,7 +6,8 @@ class SubmissionsController < ApplicationController
   around_filter :course_transaction
   before_filter :get_course_and_exercise
 
-  skip_authorization_check :only => [:show, :index]
+  # Manually checked for #show and index
+  skip_authorization_check only: [:show, :index]
 
   def index
     respond_to do |format|
@@ -24,12 +25,12 @@ class SubmissionsController < ApplicationController
     end
   end
 
+
   def show
-    @submission = Submission.find(params[:id])
-    authorize! :read, @submission
 
     @course = @submission.course
     @exercise = @submission.exercise
+    @files = SourceFileList.for_submission(@submission)
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
@@ -40,8 +41,11 @@ class SubmissionsController < ApplicationController
       format.json do
         output = {
           :api_version => ApiVersion::API_VERSION,
+          :all_tests_passed => @submission.all_tests_passed?,
+          :exercise_name      => @submission.exercise.name,
           :status => @submission.status,
           :points => @submission.points_list,
+          :message_for_paste  => @submission.message_for_paste,
           :missing_review_points => @exercise.missing_review_points_for(@submission.user)
         }
         output = output.merge(
@@ -57,7 +61,8 @@ class SubmissionsController < ApplicationController
           when :ok then {
             :test_cases => @submission.test_case_records,
             :feedback_questions => @course.feedback_questions.order(:position).map(&:record_for_api),
-            :feedback_answer_url => submission_feedback_answers_url(@submission, :format => :json)
+            :feedback_answer_url => submission_feedback_answers_url(@submission, :format => :json),
+            :processing_time    => @submission.processing_time,
           }
           end
         )
@@ -66,15 +71,16 @@ class SubmissionsController < ApplicationController
           output[:solution_url] = view_context.exercise_solution_url(@exercise)
         end
 
+        output[:validations] = @submission.validations
+
         if @submission.paste_available?
           output[:paste_url] = paste_url(@submission.paste_key)
+          output[:message_for_paste] = @submission.message_for_paste
         end
 
-        output[:processing_time] = @submission.processing_time
         output[:reviewed] = @submission.reviewed?
         output[:requests_review] = @submission.requests_review?
         output[:submitted_at] = @submission.created_at
-
 
         render :json => output
       end
@@ -179,15 +185,29 @@ private
     end
   end
 
+  # Ugly manyal access control :/
   def get_course_and_exercise
-    if params[:exercise_id]
+    if params[:id]
+      @submission = Submission.find(params[:id])
+      authorize! :read, @submission
+      @course = @submission.course
+      @exercise = @submission.exercise
+    elsif params[:exercise_id]
       @exercise = Exercise.find(params[:exercise_id])
       @course = Course.find(@exercise.course_id, :lock => 'FOR SHARE')
       authorize! :read, @course
       authorize! :read, @exercise
+    elsif params[:paste_key]
+      @submission = Submission.find_by_paste_key!(params[:paste_key])
+      @exercise = @submission.exercise
+      @course = @exercise.course
+      @is_paste = true
+      check_access!
     elsif params[:course_id]
       @course = Course.find(params[:course_id], :lock => 'FOR SHARE')
       authorize! :read, @course
+    else
+      respond_access_denied
     end
   end
 
@@ -232,5 +252,16 @@ private
       :last_id => if submissions_limited.empty? then nil else submissions_limited.last.id.to_i end,
       :rows => view_context.submissions_for_datatables(submissions_limited)
     }
+  end
+
+
+  def check_access!
+    paste_visibility = @course.paste_visibility || "open"
+    case paste_visibility
+    when "protected"
+      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or (@submission.public? and @submission.exercise.completed_by?(current_user))
+    else
+      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or ( @submission.public? and @submission.created_at > 2.hours.ago )
+    end
   end
 end
