@@ -1,0 +1,12 @@
+<div class="row-fluid">
+  <div class="span11">
+    <h2>Feedback</h2>
+    <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
+    <% for answer in answers %>
+      <div class="feedback-question">
+        <%= answer.feedback_question.question %>
+      </div>
+      <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
+    <% end %>
+  </div>
+</div>

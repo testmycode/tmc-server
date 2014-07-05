@@ -1,61 +1,94 @@
-<% if @submission.tests_ran? %>
-  <table>
-    <tr>
-      <th>Test case</th>
-      <th>Status</th>
-      <% if !@submission.all_tests_passed? %>
-        <th>Info</th>
-      <% end %>
-    </tr>
-
-    <% @submission.test_case_runs.each do |tcr| %>
-      <tr>
-        <td><%= tcr.test_case_name %></td>
-        <td>
-          <% if tcr.successful? %>
-            <span class="success">Ok</span>
-          <% else %>
-            <span class="failure">Fail</span>
+<div class="row-fluid">
+  <div class="span11">
+    <% if @submission.tests_ran? %>
+      <% if @submission.validations && @submission.validations['validationErrors'].any?  %>
+        <div>
+          <h3 class="text-info underlined">Validation Cases</h3>
+          <% @submission.validations['validationErrors'].each do |file, errors| %>
+            <h4><%= file %></h4>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Line</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+              <% errors.each do |error| %>
+                <tr>
+                  <td><%= error['line'] %></td>
+                  <td><%= error['message'] %></td>
+                </tr>
+              <% end %>
+              </tbody>
+            </table>
           <% end %>
-        </td>
-        <% if !@submission.all_tests_passed? %>
-          <td>
-            <%= tcr.message %>
-            <% if tcr.exception != nil %>
-              <br />
-              <div class="stack-trace">
-                <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
-              </div>
-            <% end %>
-            <% if tcr.detailed_message != nil %>
-              <br />
-              <div class="detailed-message">
-                <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
-              </div>
-            <% end %>
-          </td>
-        <% end %>
-      </tr>
-    <% end %>
-  </table>
-<% end %>
+        </div>
+      <% end %>
+      <div>
+        <h3 class="text-info underlined " id="testCases">Test Cases</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>Status</th>
+              <% if !@submission.all_tests_passed? %>
+                <th>Info</th>
+              <% end %>
+            </tr>
+          </thead>
 
+          <tbody>
+          <% @submission.test_case_runs.each do |tcr| %>
+            <tr>
+              <td><%= tcr.test_case_name %></td>
+              <td>
+                <% if tcr.successful? %>
+                  <span class="success">Ok</span>
+                <% else %>
+                  <span class="failure">Fail</span>
+                <% end %>
+              </td>
+              <% if !@submission.all_tests_passed? %>
+                <td>
+                  <%= tcr.message %>
+                  <% if tcr.exception != nil %>
+                    <div class="stack-trace">
+                      <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
+                    </div>
+                  <% end %>
+                  <% if tcr.detailed_message != nil %>
+                    <br />
+                    <div class="detailed-message">
+                      <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
+                    </div>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>
 
 
 <script type="text/javascript">
 $(document).ready(function() {
-  var createButtonTo = function() {
+    var createButtonTo = function() {
     var trace = this;
-    var button = $('<button class="btn btn-primary">' + buttonText + "</button>")[0];
+    var button = $('<button class="btn btn-small btn-primary" style="float:right;">' + buttonText + "</button>")[0];
     $(trace).before(button); $(trace).hide();
     $(button).click(function() {
       $(trace).toggle();
-    });
-  };
+      });
+    };
 
-  var buttonText = "Toggle stack trace";
-  $('.stack-trace').each(createButtonTo);
-  buttonText = "Toggle detailed message";
-  $('.detailed-message').each(createButtonTo);
-});
+    var buttonText = "Toggle stack trace";
+    $('.stack-trace').each(createButtonTo);
+    buttonText = "Toggle detailed message";
+    $('.detailed-message').each(createButtonTo);
+    });
 </script>

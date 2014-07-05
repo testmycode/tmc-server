@@ -1,108 +1,11 @@
 <h1>Submission <%= @submission.id %></h1>
-<div class="row-fluid">
-<div class="well span6">
-  <div class="submission-summary">
-    <% if !@submission.processed? %>
-      <p>Processing...</p>
-      <p class="processing-status"><!-- for JS to fill in --></p>
-    <% elsif @submission.all_tests_passed? %>
-      <p class="success">All tests successful</p>
-    <% elsif @submission.tests_ran? %>
-      <p class="failure">Some tests failed</p>
-    <% else %>
-      <p class="failure">Failed to run tests</p>
-    <% end %>
-  </div>
+<%= render 'submission_details' %>
 
-  <ul>
-    <% unless @submission.points_list.empty? || @submission.exercise.nil? %>
-      <li>
-        <%
-           awarded_points = @submission.points_list
-           available_points = @submission.exercise.available_points.to_a.sort.map(&:name)
-           nonawarded_points = available_points - awarded_points
-           all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
-           all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
-        %>
-        Got <%= awarded_points.size %> out of <%= pluralize(available_points.size, 'point') %>
-        (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
-      </li>
-    <% end %>
-    <li>
-      Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
-      <% if current_user.administrator? %>
-        <%= link_to @submission.user.login, participant_path(@submission.user) %>.
-      <% else %>
-        <%= @submission.user.login %>.
-      <% end %>
-    </li>
-    <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
-      <li>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</li>
-    <% end %>
-    <% if @submission.times_sent_to_sandbox > 1 %>
-      <li>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</li>
-    <% end %>
-
-    <li><%= link_to "View submitted files", submission_files_path(@submission) %></li>
-    <li><%= link_to "Download as zip", submission_path(@submission, :format => 'zip') %></li>
-    <% if can? :create, Review %>
-      <li><%= link_to "Start code review", new_submission_review_path(@submission) %></li>
-    <% end %>
-    <% if @submission.paste_available? and not @submission.all_tests_passed? %>
-      <li><%= link_to "Show Paste", paste_path(@submission.paste_key) %></li>
-    <% end %>
-
-  </ul>
-
-  <% if !@submission.processed? %>
-    <script type="text/javascript">
-    $(document).ready(function() {
-      // Animate the "Processing..." text
-      var dots = '...'
-      setInterval(function() {
-        if (dots == '...') {
-          dots = '';
-        } else {
-          dots += '.';
-        }
-        $('.submission-summary p:first').text('Processing' + dots);
-      }, 700);
-
-      // Refresh status until processed, then refresh page
-      var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApiVersion::API_VERSION) %>';
-      var refreshCooldown = 5000;
-      function refreshStatus() {
-        $.ajax({
-          url: url,
-          dataType: 'json',
-          success: function(data) {
-            if (data.status == 'processing') {
-              status =
-                'Place in queue: ' + (data.submissions_before_this + 1) +
-                ' / ' + data.total_unprocessed
-              $('.processing-status').text(status);
-            } else {
-              window.location.reload();
-            }
-          },
-          complete: function() {
-            setTimeout(refreshStatus, refreshCooldown);
-          }
-        });
-      }
-      refreshStatus();
-    });
-    </script>
-  <% end %>
-</div>
-</div>
-
-
-<div class="row-fluid">
-  <div class="span11">
-    <h2>Results</h2>
+<% if can? :update, @submission %>
+  <div class="row-fluid">
+    <div class="span11">
+      <h2>Rerun submission</h2>
       <div class="well">
-      <% if can? :update, @submission %>
         <div>
           <%= form_tag submission_path(@submission), :method => :put do %>
             <%= hidden_field_tag('rerun', '1')  %>
@@ -112,73 +15,105 @@
             (may add points; never deletes points)
           <% end %>
         </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<ul class="nav nav-tabs" id="myTab">
+  <% if @submission.feedback_answers.any? %>
+    <li><a href="#feedback" >Feedback</a></li>
+  <% end %>
+  <% if @submission.pretest_error %>
+    <li><a href="#compilationError" >Compilation Error</a></li>
+  <% end %>
+  <% unless @submission.pretest_error %>
+    <li><a href="#testResults" class="active">Test Results</a></li>
+  <% end %>
+  <% unless @submission.stdout.blank? %>
+    <li><a href="#stdout" >System.out</a></li>
+  <% end %>
+  <% unless @submission.stderr.blank? %>
+    <li><a href="#stderr" >System.err</a></li>
+  <% end %>
+  <% unless @submission.valgrind.blank? %>
+    <li><a href="#valgrind" >Valgrind</a></li>
+  <% end %>
+  <% if current_user.administrator? && !@submission.vm_log.blank? %>
+    <li class="<%= unless @is_paste then 'aactive' end %>"><a href="#logs">Logs</a></li>
+  <% end %>
+  <li class="<%= if @is_paste then 'aactive' end %>"><a href="#files">Files</a></li>
+</ul>
+
+<div class="row-fluid">
+  <div class="span12">
+    <div class="tab-content">
+      <% if @submission.feedback_answers.any? %>
+        <div class="tab-pane" id="feedback">
+          <%= render 'feedback_answers' %>
+        </div>
       <% end %>
 
       <% if @submission.pretest_error %>
-        <pre class="error"><%= @submission.pretest_error %></pre>
+        <div class="tab-pane" id="compilationError">
+          <%= render 'pretest_error' %>
+        </div>
       <% end %>
 
-
-        <%= render 'submissions/details' %>
-
-
-    </div>
-</div>
-
-<% if !@submission.stdout.blank? || !@submission.stderr.blank? %>
-  <div class="row-fluid">
-  <h2>Output</h2>
-    <div class="span11">
-      <p>The following was output while running the tests.</p>
-      <% if !@submission.stdout.blank? %>
-        <% if @submission.stderr.blank? %>
-          <h3>Standard output (System.out)</h3>
-        <% end %>
-        <pre><%= @submission.stdout %></pre>
+      <% unless @submission.pretest_error %>
+        <div class="tab-pane active" id="testResults">
+          <%= render 'submissions/details' %>
+        </div>
       <% end %>
 
-      <% if !@submission.stderr.blank? %>
-        <h3>Error output (System.err)</h3>
-        <pre><%= @submission.stderr %></pre>
+      <% unless @submission.stdout.blank? %>
+        <div class="tab-pane" id="stdout">
+          <%= render 'submissions/stdout' %>
+        </div>
       <% end %>
+
+      <% unless @submission.stderr.blank? %>
+        <div class="tab-pane" id="stderr">
+          <%= render 'submissions/stderr' %>
+        </div>
+      <% end %>
+
+      <% unless @submission.valgrind.blank? %>
+        <div class="tab-pane" id="valgrind">
+          <%= render 'submissions/valgrind' %>
+        </div>
+      <% end %>
+
+      <% if current_user.administrator? && !@submission.vm_log.blank? %>
+        <div class="tab-pane <%= unless @is_paste then 'aactive' end %>" id="logs">
+          <%= render 'logs' %>
+        </div>
+      <% end %>
+
+      <div class="tab-pane <%= if @is_paste then 'aactive' end %>" id="files">
+        <div class="row-fluid">
+          <div class="span11">
+            <%= render :partial => 'files/files', :locals => {:files => @files} %>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-<% end %>
-
-<% if !@submission.valgrind.blank? %>
-  <div class="row-fluid">
-  <h2>Valgrind output</h2>
-    <div class="span11">
-      <p>Valgrind output is shown below..</p>
-        <pre><%= @submission.valgrind %></pre>
-    </div>
-  </div>
-<% end %>
-
-<% if current_user.administrator? && !@submission.vm_log.blank? %>
-  <div class="row-fluid">
-  <div class="span11">
-  <h2>Full sandbox log</h2>
-    <pre><%= @submission.vm_log %></pre>
-  </div>
 </div>
-<% end %>
 
-<% unless @submission.feedback_answers.empty? %>
-  <div class="row-fluid">
-  <h2>Feedback</h2>
-    <div class="span11">
-  <div>
-    <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
-    <% for answer in answers %>
-      <div class="feedback-question"><%= answer.feedback_question.question %></div>
-      <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
-    <% end %>
-  </div>
-</div>
-</div>
-<% end %>
+<script type="text/javascript">
+  $(document).ready(function(){
+    var hash = window.location.hash;
+    hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+    $('#myTab a').click(function (e) {
+      $(this).tab('show');
+      var scrollmem = $('body').scrollTop();
+      window.location.hash = this.hash;
+      $('html,body').scrollTop(scrollmem);
+      e.preventDefault();
+      });
+    });
+</script>
 
 <%= link_back %>
-
-
