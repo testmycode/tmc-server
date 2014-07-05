@@ -7,14 +7,15 @@
     %meta{:content => "", :name => "description"}
     %meta{:content => "", :name => "author"}
     = csrf_meta_tags
-    = stylesheet_link_tag 'main'
-    = stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css'
-    = stylesheet_link_tag "bootstrap.css"
+    = javascript_include_tag('underscore-min.js', 'jquery.min.js', 'jquery_ujs', 'jquery-ui')
+    = javascript_include_tag('jquery.dataTables.min', 'jquery.cookie', 'misc.js', 'naturalSort.js')
     - if Rails.env == 'test'
       = stylesheet_link_tag 'highlighting'
     = render "layouts/metadata"
-    = javascript_include_tag 'bootstrap.js'
     = yield(:head)
+    = stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css'
+    = stylesheet_link_tag "bootstrap.min.css"
+    = stylesheet_link_tag 'main'
   %body.default
     .navbar.navbar-fixed-top.navbar-inverse
       .navbar-inner
@@ -47,3 +48,10 @@
           #page-presence
         = bootstrap_flash
         = yield
+
+
+
+    = javascript_include_tag(comet_js_url('org/cometd.js'), comet_js_url('jquery/jquery.cometd.js'))
+    = javascript_include_tag('comet_connection.js', 'review_notifications.js', 'bootstrap.min.js')
+    - if @show_page_presence
+      = javascript_include_tag 'page_presence.js'
