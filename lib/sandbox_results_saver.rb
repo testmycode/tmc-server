@@ -54,7 +54,7 @@ module SandboxResultsSaver
       else
         raise 'Unknown status: ' + results['status']
       end
-      
+
       submission.secret_token = nil
       submission.processed = true
       submission.processing_completed_at = Time.now

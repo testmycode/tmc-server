@@ -24,7 +24,7 @@ require 'natsort'
 #
 module TestRunGrader
   extend TestRunGrader
-  
+
   def grade_results(submission, results)
     raise "Exercise #{submission.exercise_name} was removed" if !submission.exercise
 
@@ -47,7 +47,7 @@ module TestRunGrader
 
     submission.save!
   end
-  
+
 private
   def self.create_test_case_runs(submission, results)
     all_passed = true
