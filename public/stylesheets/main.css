@@ -384,3 +384,7 @@ table.points > * > tr > td {
   border-bottom: 1px solid lightgrey !important;
   margin-bottom: 25px !important;
  }
+
+.no-scroll {
+  overflow: hidden;
+}

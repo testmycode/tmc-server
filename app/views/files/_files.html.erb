@@ -38,7 +38,7 @@
             else File.extname(file.path)[1..-1]
             end
           %>
-          <div class="span12">
+          <div class="span12 no-scroll">
             <pre class="brush: <%= brush %>"><%= force_utf8_violently(file.contents) %></pre>
           </div>
         </div>
