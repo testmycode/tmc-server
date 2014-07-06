@@ -170,6 +170,20 @@ describe SubmissionPackager::JavaSimple do
     end
   end
 
+  it "adds tmc-checkstyle-runner.jar to lib/testrunner/" do
+    @exercise_project.solve_all
+    @exercise_project.make_zip(:src_only => false)
+
+    package_it
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.read('lib/testrunner/tmc-checkstyle-runner.jar').should == File.read(TmcCheckstyleRunner.get.jar_path)
+      end
+    end
+  end
+
   it "includes files in the root dir from the repo" do
     @repo.write_file('SimpleExercise/foo.txt', 'repohello')
     @repo.add_commit_push
