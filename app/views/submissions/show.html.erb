@@ -1,6 +1,10 @@
 <h1>Submission <%= @submission.id %></h1>
 <%= render 'submission_details' %>
 
+<% if @submission.pretest_error %>
+  <%= render 'pretest_error' %>
+<% end %>
+
 <% if can? :update, @submission %>
   <div class="row-fluid">
     <div class="span11">
@@ -23,9 +27,6 @@
 <ul class="nav nav-tabs" id="myTab">
   <% if @submission.feedback_answers.any? %>
     <li><a href="#feedback" >Feedback</a></li>
-  <% end %>
-  <% if @submission.pretest_error %>
-    <li><a href="#compilationError" >Compilation Error</a></li>
   <% end %>
   <% unless @submission.pretest_error %>
     <li><a href="#testResults" class="active">Test Results</a></li>
@@ -54,11 +55,6 @@
         </div>
       <% end %>
 
-      <% if @submission.pretest_error %>
-        <div class="tab-pane" id="compilationError">
-          <%= render 'pretest_error' %>
-        </div>
-      <% end %>
 
       <% unless @submission.pretest_error %>
         <div class="tab-pane active" id="testResults">
