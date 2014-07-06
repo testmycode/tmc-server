@@ -28,8 +28,8 @@ class SubmissionsController < ApplicationController
 
   def show
 
-    @course = @submission.course
-    @exercise = @submission.exercise
+    @course ||= @submission.course
+    @exercise||= @submission.exercise
     @files = SourceFileList.for_submission(@submission)
     add_course_breadcrumb
     add_exercise_breadcrumb
@@ -185,7 +185,7 @@ private
     end
   end
 
-  # Ugly manyal access control :/
+  # Ugly manual access control :/
   def get_course_and_exercise
     if params[:id]
       @submission = Submission.find(params[:id])
