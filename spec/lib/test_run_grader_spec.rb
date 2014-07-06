@@ -119,38 +119,136 @@ describe TestRunGrader do
         'pointNames' => ['1.2']
       }
     ]
-    
+
     TestRunGrader.grade_results(@submission, results)
-    
+
     results[0]['status'] = 'FAILED'
     results[1]['status'] = 'PASSED'
-    
+
     @submission = Submission.new(
       :user => @submission.user,
       :course => @submission.course,
       :exercise => @submission.exercise
     )
-    
+
     TestRunGrader.grade_results(@submission, results)
-    
+
     points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
     points.should include('1.1')
     points.should include('1.2')
   end
-  
+
   it "should work when the exercise has changed name after acquiring points (bug #84)" do
     user = @submission.user
     exercise = @submission.exercise
     course = exercise.course
-    
+
     TestRunGrader.grade_results(@submission, half_successful_results)
     exercise.update_attribute(:name, 'another_name')
     new_submission = Factory.create(:submission, :user => user, :exercise_name => exercise.name, :course => course, :processed => false)
     TestRunGrader.grade_results(new_submission, successful_results)
-    
+
     points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
     points.should include('1.1')
     points.should include('1.2')
+  end
+
+  describe "when validation errors strategy is fail" do
+
+    def failing_validations
+       {"strategy"=>"fail",
+       "validationErrors"=>
+         {"SimpleStuff.java"=>
+          [{"column"=>40,
+            "line"=>6,
+            "message"=>"'{' is not preceded with whitespace.",
+            "sourceName"=>
+             "com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"},
+           {"column"=>0,
+            "line"=>12,
+            "message"=>"Indentation incorrect. Expected 8, but was 4.",
+            "sourceName"=>
+             "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"},
+           {"column"=>0,
+            "line"=>17,
+            "message"=>"Indentation incorrect. Expected 8, but was 7.",
+            "sourceName"=>
+             "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"}
+          ]
+        }
+      }
+    end
+
+    def no_failures_in_validations
+      result = failing_validations
+      result['validationErrors'] = []
+      result
+    end
+
+    def failures_but_no_fail
+      result = failing_validations
+      result['strategy'] = 'none'
+      result
+    end
+
+
+    it "should not award points for which all required tests passed but validations are failed and strategy is 'fail'" do
+      @submission.validations= failing_validations.to_json.to_s
+      TestRunGrader.grade_results(@submission, half_successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should_not include('1.1')
+      points.should_not include('1.2')
+
+      # Should not depend on result order, so let's try the same in reverse order
+
+      @submission = Factory.create(:submission, :processed => false)
+      @submission.validations= failing_validations.to_json.to_s
+      TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should_not include('1.1')
+      points.should_not include('1.2')
+    end
+
+    it "should  award points for which all required tests passed and no validations are failed and strategy is 'fail'" do
+      @submission.validations= no_failures_in_validations.to_json.to_s
+      TestRunGrader.grade_results(@submission, half_successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should include('1.1')
+      points.should_not include('1.2')
+
+      # Should not depend on result order, so let's try the same in reverse order
+
+      @submission = Factory.create(:submission, :processed => false)
+      @submission.validations= no_failures_in_validations.to_json.to_s
+      TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should include('1.1')
+      points.should_not include('1.2')
+    end
+
+    it "should award points for which all required tests passed but validations are failed and strategy is not 'fail'" do
+      @submission.validations = failures_but_no_fail.to_json.to_s
+      TestRunGrader.grade_results(@submission, half_successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should include('1.1')
+      points.should_not include('1.2')
+
+      # Should not depend on result order, so let's try the same in reverse order
+
+      @submission = Factory.create(:submission, :processed => false)
+      @submission.validations = failures_but_no_fail.to_json.to_s
+      TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should include('1.1')
+      points.should_not include('1.2')
+    end
+
   end
 
   describe "when the exercise requires code review" do
