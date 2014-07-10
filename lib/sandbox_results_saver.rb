@@ -37,6 +37,8 @@ module SandboxResultsSaver
             "Test compilation error:\n" + results['test_output']
           when '103'
             "Test preparation error:\n" + results['test_output']
+          when '104'
+            "Checkstyle runner error:\n" + results['test_output']
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
