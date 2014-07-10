@@ -29,7 +29,7 @@
     <li><a href="#feedback" >Feedback</a></li>
   <% end %>
   <% unless @submission.pretest_error %>
-    <li><a href="#testResults" class="active">Test Results</a></li>
+    <li><a href="#testResults">Test Results</a></li>
   <% end %>
   <% unless @submission.stdout.blank? %>
     <li><a href="#stdout" >System.out</a></li>
@@ -41,9 +41,9 @@
     <li><a href="#valgrind" >Valgrind</a></li>
   <% end %>
   <% if current_user.administrator? && !@submission.vm_log.blank? %>
-    <li class="<%= unless @is_paste then 'aactive' end %>"><a href="#logs">Logs</a></li>
+    <li class=""><a href="#logs">Logs</a></li>
   <% end %>
-  <li class="<%= if @is_paste then 'aactive' end %>"><a href="#files">Files</a></li>
+  <li><a href="#files">Files</a></li>
 </ul>
 
 <div class="row-fluid">
@@ -57,7 +57,7 @@
 
 
       <% unless @submission.pretest_error %>
-        <div class="tab-pane active" id="testResults">
+        <div class="tab-pane" id="testResults">
           <%= render 'submissions/details' %>
         </div>
       <% end %>
@@ -81,12 +81,12 @@
       <% end %>
 
       <% if current_user.administrator? && !@submission.vm_log.blank? %>
-        <div class="tab-pane <%= unless @is_paste then 'aactive' end %>" id="logs">
+        <div class="tab-pane" id="logs">
           <%= render 'logs' %>
         </div>
       <% end %>
 
-      <div class="tab-pane <%= if @is_paste then 'aactive' end %>" id="files">
+      <div class="tab-pane" id="files">
         <div class="row-fluid">
           <div class="span11">
             <%= render :partial => 'files/files', :locals => {:files => @files} %>
@@ -101,11 +101,18 @@
   $(document).ready(function(){
 
       var hash = window.location.hash;
-      hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
       if (!hash) {
-        window.location.hash = 'testResults';
+        if ( $('#testResults').length ) {
+          hash = 'testResults';
+        } else {
+          hash = 'files';
+        }
+
+        window.location.hash = hash;
+
       }
+      hash && $('ul.nav a[href="' + hash + '"]').tab('show');
      // add a hash to the URL when the user clicks on a tab
 
       $('#myTab a').click(function (e) {
