@@ -12,6 +12,8 @@ class SubmissionPackager
 
       FileUtils.cp(cloned + 'pom.xml', dest)
 
+      FileUtils.mkdir_p(dest + 'checkstyle-runner')
+
       FileUtils.mkdir_p(dest + 'src')
       cp_r_if_exists(received + 'src' + 'main', dest + 'src')
       cp_r_if_exists(cloned  + 'src' + 'test', dest + 'src')
@@ -21,6 +23,13 @@ class SubmissionPackager
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
       copy_extra_student_files(tmc_project_file, received, dest)
 
+      for jar_path in TmcCheckstyleRunner.get.jar_and_lib_paths
+        destname = jar_path.basename
+        if destname.to_s.start_with?('tmc-checkstyle-runner')
+          destname = 'tmc-checkstyle-runner.jar'
+        end
+        FileUtils.cp(jar_path, dest + 'checkstyle-runner' + destname)
+      end
       FileUtils.cp(tmc_run_path, dest + 'tmc-run')
       sh! ['chmod', 'a+x', dest + 'tmc-run']
     end

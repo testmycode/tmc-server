@@ -35,6 +35,9 @@ else
   PROJECT_TYPE=java_simple
 fi
 
+# It must exist - even if it fails in the middle
+touch validations.json
+
 JAVAC_EXE_PATH=`readlink -f \`which javac\``
 MAKE_EXE_PATH=`readlink -f \`which make\``
 JDK_DIR=`dirname \`dirname "$JAVAC_EXE_PATH"\``
@@ -131,8 +134,8 @@ case $PROJECT_TYPE in
     echo "DEFS: $DEFS"
     echo "LANG: $STYLE_ERROR_MSG_LOCALE_DEF"
 
-    #java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.stylerunner.Main" $TESTS 2>&1 validations_out.txt || exit 103
-    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" $DEFS -jar lib/testrunner/tmc-checkstyle-runner.jar 2>&1 validations_out.txt || exit 103
+    rm validations.json
+    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" $DEFS -jar checkstyle-runner/tmc-checkstyle-runner.jar 2>&1 validations_out.txt || exit 104
 
     if [ -f validations_out.txt ]; then
       echo "VALIDATIONS STDOUT AND STDERR"
@@ -175,7 +178,8 @@ case $PROJECT_TYPE in
 
     echo "DEFS: $DEFS"
 
-    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.stylerunner.Main" $TESTS 2>&1 validations_out.txt || exit 103
+    rm validations.json
+    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" $DEFS -jar checkstyle-runner/tmc-checkstyle-runner.jar 2>&1 validations_out.txt || exit 104
     # MAVEN_OPTS was set above
     JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
     TEST_RUNNER="fi.helsinki.cs.tmc:tmc-maven-plugin:$TMC_MAVEN_PLUGIN_VERSION:test"
