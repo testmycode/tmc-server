@@ -23,35 +23,35 @@ class FixtureExercise::SimpleExercise < FixtureExercise
     solve_add
     solve_sub
   end
-  
+
   def solve_add
     replace_method_body_in_file(simple_stuff_path, 'add', '        return a + b;')
   end
-  
+
   def solve_sub
     replace_method_body_in_file(simple_stuff_path, 'sub', '        return a - b;')
   end
-  
+
   def solve_mul
     replace_method_body_in_file(simple_stuff_path, 'mul', '        return a * b;')
   end
-  
+
   def write_empty_method_body(code)
     replace_method_body_in_file(simple_stuff_path, 'emptyMethod', code)
   end
-  
+
   def introduce_compilation_error(text = 'the compiler should fail here')
     replace_method_body_in_file(simple_stuff_path, 'add', "BAD INPUT #{text}")
   end
-  
+
   def simple_stuff_path
     "#{java_src_path}/SimpleStuff.java"
   end
-  
+
   def simple_test_path
     "#{java_test_path}/SimpleTest.java"
   end
-  
+
   def simple_hidden_test_path
     "#{java_test_path}/SimpleHiddenTest.java"
   end
@@ -63,7 +63,7 @@ class FixtureExercise::SimpleExercise < FixtureExercise
   def java_test_path
     "#{@path}/test"
   end
-  
+
 private
 
   def replace_method_body_in_file(path, method, body)

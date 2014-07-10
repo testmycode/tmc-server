@@ -9,7 +9,7 @@ describe TestRunGrader do
       Factory.create(:available_point, :exercise_id => @submission.exercise.id, :name => name)
     end
   end
-  
+
   def half_successful_results
     [
       {
@@ -27,28 +27,28 @@ describe TestRunGrader do
       }
     ]
   end
-  
+
   def successful_results
     results = half_successful_results
     results[1]['status'] = 'PASSED'
     results
   end
-  
+
   it "should create test case runs for the submission" do
     TestRunGrader.grade_results(@submission, half_successful_results)
-    
+
     @submission.test_case_runs.should_not be_empty
     tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'MyTest testSomethingEasy' }
     tcr.should_not be_nil
     tcr.should be_successful
     tcr.exception.should be_nil
-    
+
     tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'MyTest testSomethingDifficult' }
     tcr.should_not be_nil
     tcr.should_not be_successful
     ActiveSupport::JSON.decode(tcr.exception).should == {'a' => 'b'}
   end
-  
+
   it "should not create multiple test case runs for the same test method even if it is involved in multiple points" do
     results = [
       {
@@ -58,15 +58,15 @@ describe TestRunGrader do
         'pointNames' => ['1.1', '1.2']
       }
     ]
-    
+
     TestRunGrader.grade_results(@submission, results)
-    
+
     @submission.test_case_runs.count.should == 1
   end
 
   it "should award points for which all required tests passed" do
     TestRunGrader.grade_results(@submission, half_successful_results)
-    
+
     points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
     points.should include('1.1')
     points.should_not include('1.2')
@@ -75,21 +75,21 @@ describe TestRunGrader do
 
     @submission = Factory.create(:submission, :processed => false)
     TestRunGrader.grade_results(@submission, half_successful_results.reverse)
-    
+
     points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
     points.should include('1.1')
     points.should_not include('1.2')
   end
-  
+
   it "should always mark awarded points in the submission record but not create duplicate awarded_points rows" do
     TestRunGrader.grade_results(@submission, half_successful_results)
-    
+
     points = @submission.awarded_points.map(&:name)
     points.should include('1.1')
     points.should_not include('1.2')
     @submission.points.should == '1.1'
-    
-    
+
+
     @submission = Factory.create(:submission, {
       :course => @submission.course,
       :exercise => @submission.exercise,
@@ -97,13 +97,13 @@ describe TestRunGrader do
       :processed => false
     })
     TestRunGrader.grade_results(@submission, successful_results)
-    
+
     points = @submission.awarded_points.map(&:name)
     points.should_not include('1.1')
     points.should include('1.2')
     @submission.points.should == '1.1 1.2'
   end
-  
+
   it "should only ever award more points, never delete old points" do
     results = [
       {
