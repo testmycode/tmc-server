@@ -8,12 +8,6 @@
     </title>
     <meta name="description"/>
     <meta name="author"/>
-    <%= csrf_meta_tags %>
-    <%= javascript_include_tag('underscore-min.js', 'jquery.min.js', 'jquery_ujs', 'jquery-ui') %>
-    <%= javascript_include_tag('jquery.dataTables.min', 'jquery.cookie', 'misc.js', 'naturalSort.js') %>
-    <% if Rails.env == 'test' %>
-      <%= stylesheet_link_tag 'highlighting' %>
-    <% end %>
     <%= render "layouts/metadata" %>
     <%= yield(:head) %>
     <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css' %>
@@ -75,8 +69,7 @@
         <%= yield %>
       </div>
     </div>
-    <%= javascript_include_tag(comet_js_url('org/cometd.js'), comet_js_url('jquery/jquery.cometd.js')) %>
-    <%= javascript_include_tag('comet_connection.js', 'review_notifications.js', 'bootstrap.min.js') %>
+    <%= javascript_include_tag( 'bootstrap.min.js') %>
     <% if @show_page_presence %>
       <%= javascript_include_tag 'page_presence.js' %>
     <% end %>

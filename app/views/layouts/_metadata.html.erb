@@ -8,6 +8,28 @@
      :current_path => request.path
    }
 %>
+
+
+<%= javascript_include_tag(
+      'underscore-min.js',
+      'jquery',
+      'jquery_ujs',
+      'jquery-ui',
+      'jquery.dataTables.min',
+      'jquery.cookie',
+      'misc.js',
+      'naturalSort.js',
+      comet_js_url('org/cometd.js'),
+      comet_js_url('jquery/jquery.cometd.js'),
+      'comet_connection.js',
+      'review_notifications.js'
+
+    )
+%>
+
+<% if Rails.env == 'test' %>
+  <%= stylesheet_link_tag 'highlighting' %>
+<% end %>
 <script type="text/javascript">
   var PageMetadata = <%= raw(page_metadata.to_json) %>;
 </script>
