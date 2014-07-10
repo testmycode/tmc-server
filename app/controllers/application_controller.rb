@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from CanCan::AccessDenied do |exception|
     respond_access_denied
-  end
+  end unless Rails::env == 'test'  # for clearer error messages
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
     respond_with_error(exception.message, 404)
