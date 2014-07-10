@@ -179,7 +179,7 @@ describe SubmissionPackager::JavaSimple do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.read('lib/testrunner/tmc-checkstyle-runner.jar').should == File.read(TmcCheckstyleRunner.get.jar_path)
+        File.read('checkstyle-runner/tmc-checkstyle-runner.jar').should == File.read(TmcCheckstyleRunner.get.jar_path)
       end
     end
   end

@@ -174,18 +174,21 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('Ok')
 
     click_link 'Files'
-    # visit "/submissions/#{id}/files"
     page.should have_content('src/SimpleStuff.java')
+    # visit "/submissions/#{id}/files"
 
     log_out
     page.should_not have_content('src/SimpleStuff.java')
-    page.should have_content('Access denied')
+    page.should have_content('You are not authorized to access this page')
     @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
 
+    visit '/'
     log_in_as(@other_user.login, 'xooxer')
+    id = Submission.last.id
+    visit "/submissions/#{id}/files"
 
     page.should_not have_content('src/SimpleStuff.java')
-    page.should have_content('Access denied')
+    page.should have_content('You are not authorized to access this page')
   end
 
   describe "pastes" do
@@ -232,7 +235,7 @@ describe "The system (used by a student)", :integration => true do
       log_out
 
       page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('Access denied')
+      page.should have_content('You are not authorized to access this page')
     end
 
 

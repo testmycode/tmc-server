@@ -25,15 +25,15 @@ class FixtureExercise::SimpleExercise < FixtureExercise
   end
   
   def solve_add
-    replace_method_body_in_file(simple_stuff_path, 'add', 'return a + b;')
+    replace_method_body_in_file(simple_stuff_path, 'add', '        return a + b;')
   end
   
   def solve_sub
-    replace_method_body_in_file(simple_stuff_path, 'sub', 'return a - b;')
+    replace_method_body_in_file(simple_stuff_path, 'sub', '        return a - b;')
   end
   
   def solve_mul
-    replace_method_body_in_file(simple_stuff_path, 'mul', 'return a * b;')
+    replace_method_body_in_file(simple_stuff_path, 'mul', '        return a * b;')
   end
   
   def write_empty_method_body(code)
