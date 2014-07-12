@@ -40,7 +40,7 @@
   <% unless @submission.valgrind.blank? %>
     <li><a href="#valgrind" >Valgrind</a></li>
   <% end %>
-  <% if current_user.administrator? && !@submission.vm_log.blank? %>
+  <% if can? :read_vm_log, @submission %>
     <li class=""><a href="#logs">Logs</a></li>
   <% end %>
   <li><a href="#files">Files</a></li>
@@ -80,7 +80,7 @@
         </div>
       <% end %>
 
-      <% if current_user.administrator? && !@submission.vm_log.blank? %>
+      <% if can? :read_vm_log, @submission %>
         <div class="tab-pane" id="logs">
           <%= render 'logs' %>
         </div>

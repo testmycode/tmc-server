@@ -9,11 +9,11 @@
 
       <ul>
         <li><%= link_to 'View points', course_points_path(@course) %></li>
-        <% if current_user.administrator? || @course.submissions.exists?(:user_id => current_user.id, :reviewed => true) %>
+        <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
         <% end %>
       </ul>
-      <% if current_user.administrator? %>
+      <% if can? :read, :course_information %>
         <ul>
           <li>Source type: <%= @course.source_backend.upcase %> </li>
           <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
@@ -87,7 +87,7 @@
           <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
         </ul>
       <% end %>
-      <% if current_user.administrator? %>
+      <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_course_path(@course), class: "btn btn-warning btn-mini" %>
       <% end %>
       <% unlockables = @course.unlockable_exercises_for(current_user) %>

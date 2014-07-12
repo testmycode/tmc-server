@@ -8,11 +8,22 @@ class Ability
   def initialize(user, session)
     if user.administrator?
       can :manage, :all
+      can :create, Course
       can :refresh, Course
+      can :view, :participants_list
+      can :rerun, Submission
+      can :refresh_gdogs_spreadsheet, Course do |c|
+        !c.spreadsheet_key.blank?
+      end
+      can :read_vm_log, Submission do |s|
+        !s.vm_log.blank?
+      end
     else
       can :read, :all
 
       cannot :read, User
+      cannot :read, :code_reviews
+      cannot :read, :course_information
       can :read, User, :id => user.id
       can :create, User if SiteSetting.value(:enable_signup)
 
@@ -53,6 +64,11 @@ class Ability
       can :mark_as_unread, Review do |r|
         r.submission.user_id == user.id
       end
+
+      can :view_code_reviews, Course do |c|
+        c.submissions.exists?(:user_id => user.id, :reviewed => true)
+      end
+
       cannot :reply, FeedbackAnswer
       cannot :email, CourseNotification
     end
