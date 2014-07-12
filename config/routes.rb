@@ -57,7 +57,7 @@ TmcServer::Application.routes.draw do
   resources :submissions, :only => [:show, :update] do
     resource :result, :only => [:create]
     resources :feedback_answers, :only => [:create]
-    resources :files, :only => [:index], to: redirect('/submissions/%{submission_id}#files')
+    resources :files, :only => [:index]
     resources :reviews, :only => [:index, :new, :create]
   end
 

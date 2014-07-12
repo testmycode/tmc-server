@@ -31,7 +31,7 @@
     </tr>
   </thead>
   <tbody>
-    <% submissions.each do |submission| %> 
+    <% submissions.each do |submission| %>
       <tr>
         <td><%= submission.created_at.strftime("%d.%m.%Y %H:%M") %></td>
         <% if show_student_column %>
@@ -67,7 +67,7 @@
         <% end %>
         <% if show_files_column %>
           <td>
-            <%= link_to 'Files', submission_files_path(submission) %>
+            <%= link_to 'Files', submission_path(submission, anchor: 'files') %>
           </td>
         <% end %>
         <% if show_details_column %>
