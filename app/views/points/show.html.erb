@@ -14,7 +14,7 @@
       <%= link_to 'Sort by username', course_point_path(@course, @sheetname) %>
     <% end %>
   </li>
-  <% if can? :refresh_gdogs_spreadsheet, @course %>
+  <% if can? :refresh_gdocs_spreadsheet, @course %>
     <li>
       <%= link_to 'Refresh Google Docs worksheet', refresh_gdocs_course_point_path(@course, @sheetname) %>
     </li>

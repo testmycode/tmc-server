@@ -27,9 +27,8 @@ class SubmissionsController < ApplicationController
 
 
   def show
-
     @course ||= @submission.course
-    @exercise||= @submission.exercise
+    @exercise ||= @submission.exercise
     @files = SourceFileList.for_submission(@submission)
     add_course_breadcrumb
     add_exercise_breadcrumb
@@ -42,10 +41,10 @@ class SubmissionsController < ApplicationController
         output = {
           :api_version => ApiVersion::API_VERSION,
           :all_tests_passed => @submission.all_tests_passed?,
-          :exercise_name      => @submission.exercise.name,
+          :exercise_name => @submission.exercise.name,
           :status => @submission.status,
           :points => @submission.points_list,
-          :message_for_paste  => @submission.message_for_paste,
+          :message_for_paste => @submission.message_for_paste,
           :missing_review_points => @exercise.missing_review_points_for(@submission.user)
         }
         output = output.merge(
@@ -62,7 +61,7 @@ class SubmissionsController < ApplicationController
             :test_cases => @submission.test_case_records,
             :feedback_questions => @course.feedback_questions.order(:position).map(&:record_for_api),
             :feedback_answer_url => submission_feedback_answers_url(@submission, :format => :json),
-            :processing_time    => @submission.processing_time,
+            :processing_time => @submission.processing_time,
           }
           end
         )

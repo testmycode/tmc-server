@@ -3,7 +3,7 @@ class FilesController < ApplicationController
   skip_authorization_check
 
   # Should eventualy be removed
-  # This exists just to procide comapatability with old files url format
+  # This exists just to provide comapatability with old files url format
   # Cannot be redirected in routes, as rack_base_uri cannot be used for redirects.
   # - Jamox / 12.7.2014
   def index

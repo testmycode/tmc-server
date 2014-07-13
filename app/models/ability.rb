@@ -12,7 +12,7 @@ class Ability
       can :refresh, Course
       can :view, :participants_list
       can :rerun, Submission
-      can :refresh_gdogs_spreadsheet, Course do |c|
+      can :refresh_gdocs_spreadsheet, Course do |c|
         !c.spreadsheet_key.blank?
       end
       can :read_vm_log, Submission do |s|
