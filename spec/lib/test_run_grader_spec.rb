@@ -156,24 +156,33 @@ describe TestRunGrader do
   describe "when validation errors strategy is fail" do
 
     def failing_validations
-       {"strategy"=>"fail",
-       "validationErrors"=>
-         {"SimpleStuff.java"=>
-          [{"column"=>40,
-            "line"=>6,
-            "message"=>"'{' is not preceded with whitespace.",
-            "sourceName"=>
-             "com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"},
-           {"column"=>0,
-            "line"=>12,
-            "message"=>"Indentation incorrect. Expected 8, but was 4.",
-            "sourceName"=>
-             "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"},
-           {"column"=>0,
-            "line"=>17,
-            "message"=>"Indentation incorrect. Expected 8, but was 7.",
-            "sourceName"=>
-             "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"}
+      {
+        "strategy" => "fail",
+        "validationErrors" =>
+        {
+          "SimpleStuff.java" =>
+          [
+            {
+              "column" => 40,
+              "line" => 6,
+              "message" => "'{' is not preceded with whitespace.",
+              "sourceName" =>
+              "com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"
+            },
+            {
+              "column" => 0,
+              "line" => 12,
+              "message" => "Indentation incorrect. Expected 8, but was 4.",
+              "sourceName "=>
+              "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"
+            },
+            {
+              "column" => 0,
+              "line" => 17,
+              "message" => "Indentation incorrect. Expected 8, but was 7.",
+              "sourceName" =>
+              "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"
+            }
           ]
         }
       }
@@ -193,7 +202,7 @@ describe TestRunGrader do
 
 
     it "should not award points for which all required tests passed but validations are failed and strategy is 'fail'" do
-      @submission.validations= failing_validations.to_json.to_s
+      @submission.validations = failing_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
@@ -203,7 +212,7 @@ describe TestRunGrader do
       # Should not depend on result order, so let's try the same in reverse order
 
       @submission = Factory.create(:submission, :processed => false)
-      @submission.validations= failing_validations.to_json.to_s
+      @submission.validations = failing_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results.reverse)
 
       points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
@@ -212,7 +221,7 @@ describe TestRunGrader do
     end
 
     it "should  award points for which all required tests passed and no validations are failed and strategy is 'fail'" do
-      @submission.validations= no_failures_in_validations.to_json.to_s
+      @submission.validations = no_failures_in_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
@@ -222,7 +231,7 @@ describe TestRunGrader do
       # Should not depend on result order, so let's try the same in reverse order
 
       @submission = Factory.create(:submission, :processed => false)
-      @submission.validations= no_failures_in_validations.to_json.to_s
+      @submission.validations = no_failures_in_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results.reverse)
 
       points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)

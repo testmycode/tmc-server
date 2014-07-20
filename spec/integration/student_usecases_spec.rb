@@ -175,7 +175,6 @@ describe "The system (used by a student)", :integration => true do
 
     click_link 'Files'
     page.should have_content('src/SimpleStuff.java')
-    # visit "/submissions/#{id}/files"
 
     log_out
     page.should_not have_content('src/SimpleStuff.java')

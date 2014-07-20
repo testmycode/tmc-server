@@ -200,7 +200,6 @@ table {
 
 table > * > tr > td {
   padding: 6px 14px 6px 14px;
-//  border: 1px solid gray;
 }
 
 table > * > tr > th {

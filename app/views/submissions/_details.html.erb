@@ -76,19 +76,20 @@
 
 
 <script type="text/javascript">
-$(document).ready(function() {
+  $(document).ready(function() {
     var createButtonTo = function() {
-    var trace = this;
-    var button = $('<button class="btn btn-small btn-primary" style="float:right;">' + buttonText + "</button>")[0];
-    $(trace).before(button); $(trace).hide();
-    $(button).click(function() {
-      $(trace).toggle();
+      var trace = this;
+      var button = $('<button class="btn btn-small btn-primary" style="float:right;">' + buttonText + "</button>")[0];
+      $(trace).before(button);
+      $(trace).hide();
+      $(button).click(function() {
+        $(trace).toggle();
       });
-    };
+     };
 
     var buttonText = "Toggle stack trace";
     $('.stack-trace').each(createButtonTo);
     buttonText = "Toggle detailed message";
     $('.detailed-message').each(createButtonTo);
-    });
+  });
 </script>

@@ -35,9 +35,6 @@ else
   PROJECT_TYPE=java_simple
 fi
 
-# It must exist - even if it fails in the middle
-touch validations.json
-
 JAVAC_EXE_PATH=`readlink -f \`which javac\``
 MAKE_EXE_PATH=`readlink -f \`which make\``
 JDK_DIR=`dirname \`dirname "$JAVAC_EXE_PATH"\``
@@ -131,25 +128,7 @@ case $PROJECT_TYPE in
       -Dtmc.project_dir=`pwd`
       -Dtmc.validations_file=`pwd`/validations.json"
 
-    echo "DEFS: $DEFS"
-    echo "LANG: $STYLE_ERROR_MSG_LOCALE_DEF"
-
-    rm validations.json
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" $DEFS -jar checkstyle-runner/tmc-checkstyle-runner.jar 2>&1 validations_out.txt || exit 104
-
-    if [ -f validations_out.txt ]; then
-      echo "VALIDATIONS STDOUT AND STDERR"
-      cat validations_out.txt
-    fi
-
-    echo
-    echo "VALIDATIONS ERROR MESSAGES"
-    cat validations.json
-    echo
-    echo "done"
-    echo
-
-
 
     # Run tests
     DEFS="
@@ -162,11 +141,8 @@ case $PROJECT_TYPE in
     if [ -d "lib/endorsed" ]; then
       DEFS="$DEFS -Djava.endorsed.dirs=`pwd`/lib/endorsed"
     fi
-    echo "DEFS: $DEFS"
 
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
-    ls -laghR .
-    echo "done dir list"
 
   ;;
   java_maven)
@@ -176,9 +152,7 @@ case $PROJECT_TYPE in
       -Dtmc.project_dir=`pwd`
       -Dtmc.validations_file=`pwd`/validations.json"
 
-    echo "DEFS: $DEFS"
 
-    rm validations.json
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" $DEFS -jar checkstyle-runner/tmc-checkstyle-runner.jar 2>&1 validations_out.txt || exit 104
     # MAVEN_OPTS was set above
     JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
@@ -212,7 +186,5 @@ case $PROJECT_TYPE in
   ;;
 esac
 
-# It must exist
-touch validations.json
 echo "tmc-run completed successfully"
 exit 0

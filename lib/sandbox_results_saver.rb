@@ -21,9 +21,6 @@ module SandboxResultsSaver
       if not submission.valgrind.blank?
         submission.pretest_error = 'Errors in Valgrind check. See Valgrind log below.'
       end
-#      if not submission.validations.blank?
-#        submission.pretest_error = 'Errors in validations - see log below!.'
-#      end
 
       case results['status']
       when 'timeout'

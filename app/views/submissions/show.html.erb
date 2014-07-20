@@ -81,7 +81,7 @@
       <% end %>
 
       <% if can? :read_vm_log, @submission %>
-        <div class="tab-pane" id="logs">
+        <div class="tab-pane" id="submissions/logs">
           <%= render 'logs' %>
         </div>
       <% end %>
@@ -103,17 +103,15 @@
       var hash = window.location.hash;
 
       if (!hash) {
-        if ( $('#testResults').length ) {
+        if ($('#testResults').length ) {
           hash = 'testResults';
         } else {
           hash = 'files';
         }
-
         window.location.hash = hash;
-
       }
-      hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-     // add a hash to the URL when the user clicks on a tab
+
+      $('ul.nav a[href="' + hash + '"]').tab('show');
 
       $('#myTab a').click(function (e) {
         e.preventDefault();
@@ -121,6 +119,7 @@
         history.pushState(null, null, $(this).attr('href'));
         window.location.hash = this.hash;
       });
+
       // navigate to a tab when the history changes
       window.addEventListener("popstate", function(e) {
         var activeTab = $('[href=' + location.hash + ']');
@@ -131,5 +130,4 @@
         }
       });
     });
-
 </script>
