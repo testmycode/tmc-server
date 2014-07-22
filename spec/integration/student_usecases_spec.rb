@@ -190,6 +190,26 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('You are not authorized to access this page')
   end
 
+  it "should show checkstyle validation results" do
+    ex = FixtureExercise::SimpleExercise.new('SimpleExerciseWithValidationErrors')
+    ex = FixtureExercise.new('SimpleExerciseWithValidationErrors', 'MyExercise')
+    ex.make_zip
+
+    click_link 'MyExercise'
+    attach_file('Zipped project', 'MyExercise.zip')
+    click_button 'Submit'
+    wait_for_submission_to_be_processed
+
+    page.should have_content('Some tests failed')
+
+    page.should have_content('src/SimpleStuff.java')
+
+    puts Submission.last.validations
+    page.should have_content('Validation Cases')
+    page.should have_content('is not preceded with whitespace')
+    page.should have_content('Indentation incorrect. Expected 8, but was 4')
+  end
+
   describe "pastes" do
     it "By default pastes are publicly visible, if all tests are not passed" do
 
