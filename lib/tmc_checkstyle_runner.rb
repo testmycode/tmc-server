@@ -15,11 +15,5 @@ class TmcCheckstyleRunner < MavenProject
   def jar_and_lib_paths
     [jar_path] + lib_paths
   end
-
-  def parse_test_scanner_output(output)
-    JSON.parse(output).map do |item|
-      Hash[item.map {|k,v| [k.underscore.to_sym, v] }]
-    end
-  end
 end
 
