@@ -56,8 +56,6 @@ class MavenProject
     File.exists? jar_path
   end
 
-protected
-
   def compile!
     Dir.chdir(path) do
       SystemCommands.sh!('mvn', '-q', 'package')

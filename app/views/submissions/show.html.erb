@@ -81,8 +81,8 @@
       <% end %>
 
       <% if can? :read_vm_log, @submission %>
-        <div class="tab-pane" id="submissions/logs">
-          <%= render 'logs' %>
+        <div class="tab-pane" id="logs">
+          <%= render 'submissions/logs' %>
         </div>
       <% end %>
 
