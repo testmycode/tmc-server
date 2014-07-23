@@ -110,15 +110,19 @@ describe CoursesController do
         @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise3', :course => @course)
       end
 
-      def get_show_json(options = {})
+      def get_show_json(options = {}, parse_json=true)
         options = {
           :format => 'json',
           :api_version => ApiVersion::API_VERSION,
           :id => @course.id.to_s
         }.merge options
-        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("#{@user.login}:#{@user.password}")
+        @request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
         get :show, options
-        JSON.parse(response.body)
+        if parse_json
+          JSON.parse(response.body)
+        else
+          response.body
+        end
       end
 
       it "should render the exercises for each course" do
@@ -176,10 +180,10 @@ describe CoursesController do
       end
 
       describe "and no user given" do
-        it "should respond with a 403" do
+        it "should respond with a 401" do
           controller.current_user = Guest.new
-          get_show_json :api_username => nil, :api_password => nil
-          response.code.to_i.should == 403
+          get_show_json({:api_username => nil, :api_password => nil}, false)
+          response.code.to_i.should == 401
         end
       end
 
@@ -188,35 +192,35 @@ describe CoursesController do
           @user.destroy
         end
 
-        it "should respond with a 403" do
-          get_show_json
-          response.code.to_i.should == 403
+        it "should respond with a 401" do
+          get_show_json({}, false)
+          response.code.to_i.should == 401
         end
       end
     end
   end
-  
-  
+
+
   describe "POST create" do
-    
+
     before :each do
       controller.current_user = Factory.create(:admin)
     end
-    
+
     describe "with valid parameters" do
       it "creates the course" do
         post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
         Course.last.source_url.should == 'git@example.com'
       end
-    
-      it "redirects to the created course" do 
+
+      it "redirects to the created course" do
         post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
         response.should redirect_to(Course.last)
       end
     end
-    
+
     describe "with invalid parameters" do
-      it "re-renders the course creation form" do 
+      it "re-renders the course creation form" do
         post :create, :course => { :name => 'invalid name with spaces' }
         response.should render_template("new")
         assigns(:course).name.should == 'invalid name with spaces'
