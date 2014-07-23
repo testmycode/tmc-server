@@ -15,4 +15,4 @@
 	url = git@github.com:testmycode/tmc-spyware-server.git
 [submodule "ext/tmc-checkstyle-runner"]
 	path = ext/tmc-checkstyle-runner
-	url = git@github.com:kesapojat/tmc-checkstyle-runner.git
+	url = git@github.com:testmycode/tmc-checkstyle-runner.git
