@@ -183,8 +183,7 @@ describe "The system (used by a student)", :integration => true do
 
     visit '/'
     log_in_as(@other_user.login, 'xooxer')
-    id = Submission.last.id
-    visit "/submissions/#{id}/files"
+    visit submission_path(Submission.last, anchor: 'files')
 
     page.should_not have_content('src/SimpleStuff.java')
     page.should have_content('You are not authorized to access this page')
