@@ -72,7 +72,7 @@
         <% end %>
         <% if show_details_column %>
           <td>
-            <%= link_to 'Details', submission_path(submission)  %>
+            <%= link_to 'Details', submission_path(submission, anchor: 'files')  %>
           </td>
         <% end %>
        </tr>
