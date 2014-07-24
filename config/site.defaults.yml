@@ -106,6 +106,8 @@ show_model_solutions_when_exercise_expired: false
 valid_clients:
   - name: netbeans_plugin
     min_version: 0.2.22
+  - name: tmc.py
+    min_version: 0.3.0
 
 ## Cross Origin Requests for /auth ##
 
