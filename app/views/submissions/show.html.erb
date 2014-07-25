@@ -43,7 +43,7 @@
   <% if can? :read_vm_log, @submission %>
     <li class=""><a href="#logs">Logs</a></li>
   <% end %>
-  <li><a href="#files">Files</a></li>
+  <li class="active"><a href="#files">Files</a></li>
 </ul>
 
 <div class="row-fluid">
@@ -86,7 +86,7 @@
         </div>
       <% end %>
 
-      <div class="tab-pane" id="files">
+      <div class="tab-pane active" id="files">
         <div class="row-fluid">
           <div class="span11">
             <%= render :partial => 'files/files', :locals => {:files => @files} %>
@@ -102,16 +102,9 @@
 
       var hash = window.location.hash;
 
-      if (!hash) {
-        if ($('#testResults').length ) {
-          hash = 'testResults';
-        } else {
-          hash = 'files';
-        }
-        window.location.hash = hash;
+      if (hash) {
+        $('ul.nav a[href="' + hash + '"]').tab('show');
       }
-
-      $('ul.nav a[href="' + hash + '"]').tab('show');
 
       $('#myTab a').click(function (e) {
         e.preventDefault();
