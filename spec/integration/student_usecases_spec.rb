@@ -203,7 +203,6 @@ describe "The system (used by a student)", :integration => true do
 
     page.should have_content('src/SimpleStuff.java')
 
-    puts Submission.last.validations
     page.should have_content('Validation Cases')
     page.should have_content('is not preceded with whitespace')
     page.should have_content('Indentation incorrect. Expected 8, but was 4')
