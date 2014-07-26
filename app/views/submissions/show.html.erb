@@ -115,11 +115,15 @@
 
       // navigate to a tab when the history changes
       window.addEventListener("popstate", function(e) {
-        var activeTab = $('[href=' + location.hash + ']');
-        if (activeTab.length) {
-          activeTab.tab('show');
+        if (location.hash) {
+          var activeTab = $('[href=' + location.hash + ']');
+          if (activeTab.length) {
+            activeTab.tab('show');
+          } else {
+            $('.nav-tabs a:last').tab('show');
+          }
         } else {
-          $('.nav-tabs a:first').tab('show');
+          $('.nav-tabs a:last').tab('show');
         }
       });
     });
