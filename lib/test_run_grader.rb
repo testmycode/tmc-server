@@ -24,7 +24,7 @@ require 'natsort'
 #
 module TestRunGrader
   extend TestRunGrader
-  
+
   def grade_results(submission, results)
     raise "Exercise #{submission.exercise_name} was removed" if !submission.exercise
 
@@ -47,7 +47,7 @@ module TestRunGrader
 
     submission.save!
   end
-  
+
 private
   def self.create_test_case_runs(submission, results)
     all_passed = true
@@ -63,7 +63,17 @@ private
       all_passed = false if not passed
       submission.test_case_runs << tcr
     end
-    submission.all_tests_passed = all_passed
+    submission.all_tests_passed = all_passed && validations_passed?(submission.validations)
+
+  end
+
+  def validations_passed?(validations)
+    if (!validations.nil?) && validations['strategy'] && validations['strategy'] == 'fail'
+      if validations['validationErrors'] && validations['validationErrors'].any?
+        return false
+      end
+    end
+    true
   end
 
   def self.award_points(submission, results, review_points)
@@ -74,13 +84,15 @@ private
 
     points = []
     for point_name in points_from_test_results(results) - review_points
-      points << point_name
-      unless awarded_points.include?(point_name)
-        submission.awarded_points << AwardedPoint.new(
-          :name => point_name,
-          :course => course,
-          :user => user
-        )
+      if validations_passed?(submission.validations)
+        points << point_name
+        unless awarded_points.include?(point_name)
+          submission.awarded_points << AwardedPoint.new(
+            :name => point_name,
+            :course => course,
+            :user => user
+          )
+        end
       end
     end
 

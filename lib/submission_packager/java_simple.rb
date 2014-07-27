@@ -24,12 +24,21 @@ class SubmissionPackager
     def copy_libs(cloned, dest)
       FileUtils.cp_r(cloned + 'lib', dest + 'lib')
       FileUtils.mkdir_p(dest + 'lib' + 'testrunner')
+      FileUtils.mkdir_p(dest + 'checkstyle-runner')
       for jar_path in TmcJunitRunner.get.jar_and_lib_paths
         destname = jar_path.basename
         if destname.to_s.start_with?('tmc-junit-runner')
           destname = 'tmc-junit-runner.jar'
         end
         FileUtils.cp(jar_path, dest + 'lib' + 'testrunner' + destname)
+      end
+
+      for jar_path in TmcCheckstyleRunner.get.jar_and_lib_paths
+        destname = jar_path.basename
+        if destname.to_s.start_with?('tmc-checkstyle-runner')
+          destname = 'tmc-checkstyle-runner.jar'
+        end
+        FileUtils.cp(jar_path, dest + 'checkstyle-runner' + destname)
       end
     end
 

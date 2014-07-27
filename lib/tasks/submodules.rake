@@ -1,8 +1,10 @@
 require 'system_commands'
 require 'tmc_junit_runner'
+require 'tmc_checkstyle_runner'
 require 'tmc_comet'
 
 TmcJunitRunner.get.make_rake_tasks(self, 'junit_runner')
+TmcCheckstyleRunner.get.make_rake_tasks(self, 'checkstyle_runner')
 TmcComet.get.make_rake_tasks(self, 'comet')
 
 namespace :spyware_server do
@@ -18,10 +20,10 @@ namespace :spyware_server do
 end
 
 desc "Compile all dependencies except for ext/tmc-sandbox."
-task :compile => ['junit_runner:compile', 'comet:compile', 'spyware_server:compile']
+task :compile => ['junit_runner:compile','checkstyle_runner:compile', 'comet:compile', 'spyware_server:compile']
 
 desc "Recompile all dependencies except for ext/tmc-sandbox."
-task :recompile => ['junit_runner:recompile', 'comet:recompile', 'spyware_server:recompile']
+task :recompile => ['junit_runner:recompile','checkstyle_runner:recompile', 'comet:recompile', 'spyware_server:recompile']
 
 desc "Clean all dependencies except for ext/tmc-sandbox."
-task :clean => ['junit_runner:clean', 'comet:clean', 'spyware_server:clean']
+task :clean => ['junit_runner:clean', 'checkstyle_runner:clean', 'comet:clean', 'spyware_server:clean']

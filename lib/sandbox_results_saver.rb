@@ -16,6 +16,7 @@ module SandboxResultsSaver
       submission.stderr = results['stderr']
       submission.vm_log = results['vm_log']
       submission.valgrind = results['valgrind']
+      submission.validations = results['validations']
 
       if not submission.valgrind.blank?
         submission.pretest_error = 'Errors in Valgrind check. See Valgrind log below.'
@@ -33,6 +34,8 @@ module SandboxResultsSaver
             "Test compilation error:\n" + results['test_output']
           when '103'
             "Test preparation error:\n" + results['test_output']
+          when '104'
+            "Checkstyle runner error:\n" + results['test_output']
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
@@ -50,7 +53,7 @@ module SandboxResultsSaver
       else
         raise 'Unknown status: ' + results['status']
       end
-      
+
       submission.secret_token = nil
       submission.processed = true
       submission.processing_completed_at = Time.now

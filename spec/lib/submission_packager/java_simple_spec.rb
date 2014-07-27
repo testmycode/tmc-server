@@ -6,7 +6,7 @@ require 'system_commands'
 describe SubmissionPackager::JavaSimple do
   include GitTestActions
   include SystemCommands
-  
+
   before :each do
     @setup = SubmissionTestSetup.new(:exercise_name => 'SimpleExercise')
     @course = @setup.course
@@ -15,7 +15,7 @@ describe SubmissionPackager::JavaSimple do
     @exercise = @setup.exercise
     @user = @setup.user
     @submission = @setup.submission
-    
+
     @tar_path = Pathname.new('result.tar').expand_path.to_s
   end
 
@@ -26,15 +26,15 @@ describe SubmissionPackager::JavaSimple do
   it "packages the submission in a tar file with tests from the repo" do
     @exercise_project.solve_all
     @exercise_project.make_zip(:src_only => false)
-    
+
     package_it
-    
+
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
         File.should exist('src/SimpleStuff.java')
         File.read('src/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/SimpleStuff.java')
-        
+
         File.should exist('test/SimpleTest.java')
         File.should exist('test/SimpleHiddenTest.java')
       end
@@ -57,15 +57,15 @@ describe SubmissionPackager::JavaSimple do
       end
     end
   end
-  
+
   it "does not use any tests from the submission" do
     @exercise_project.solve_all
     File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
     File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
     @exercise_project.make_zip(:src_only => false)
-    
+
     package_it
-    
+
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
@@ -156,9 +156,9 @@ describe SubmissionPackager::JavaSimple do
   it "adds tmc-junit-runner.jar and its deps to lib/testrunner/" do
     @exercise_project.solve_all
     @exercise_project.make_zip(:src_only => false)
-    
+
     package_it
-    
+
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
@@ -166,6 +166,20 @@ describe SubmissionPackager::JavaSimple do
         for original_path in TmcJunitRunner.get.lib_paths
           File.read("lib/testrunner/#{original_path.basename}").should == File.read(original_path)
         end
+      end
+    end
+  end
+
+  it "adds tmc-checkstyle-runner.jar to lib/testrunner/" do
+    @exercise_project.solve_all
+    @exercise_project.make_zip(:src_only => false)
+
+    package_it
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        `tar xf #{Shellwords.escape(@tar_path)}`
+        File.read('checkstyle-runner/tmc-checkstyle-runner.jar').should == File.read(TmcCheckstyleRunner.get.jar_path)
       end
     end
   end
@@ -206,20 +220,20 @@ describe SubmissionPackager::JavaSimple do
       end
     end
   end
-  
+
   describe "tmc-run script added to the archive" do
     it "should compile and run the submission" do
       @exercise_project.solve_all
       @exercise_project.make_zip(:src_only => false)
-      
+
       package_it
-      
+
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           sh! ['tar', 'xf', @tar_path]
           File.should_not exist('classes/main/SimpleStuff.class')
           File.should_not exist('test_output.txt')
-          
+
           begin
             sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
           rescue
@@ -229,20 +243,20 @@ describe SubmissionPackager::JavaSimple do
               raise
             end
           end
-          
+
           File.should exist('classes/main/SimpleStuff.class')
           File.should exist('test_output.txt')
           File.read('test_output.txt').should include('"status":"PASSED"')
         end
       end
     end
-    
+
     it "should report compilation errors in test_output.txt with exit code 101" do
       @exercise_project.introduce_compilation_error
       @exercise_project.make_zip(:src_only => false)
-      
+
       package_it
-      
+
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           sh! ['tar', 'xf', @tar_path]
@@ -251,7 +265,7 @@ describe SubmissionPackager::JavaSimple do
           `env JAVA_RAM_KB=#{64*1024} ./tmc-run`
           $?.exitstatus.should == 101
           File.should exist('test_output.txt')
-          
+
           output = File.read('test_output.txt')
           output.should include('compiler should fail here')
         end

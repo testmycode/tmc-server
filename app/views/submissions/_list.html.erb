@@ -22,16 +22,13 @@
       <% if show_reviewer_column %>
         <th>Reviewed by</th>
       <% end %>
-      <% if show_files_column %>
-        <th></th>
-      <% end %>
       <% if show_details_column %>
         <th></th>
       <% end %>
     </tr>
   </thead>
   <tbody>
-    <% submissions.each do |submission| %> 
+    <% submissions.each do |submission| %>
       <tr>
         <td><%= submission.created_at.strftime("%d.%m.%Y %H:%M") %></td>
         <% if show_student_column %>
@@ -65,14 +62,9 @@
           <% reviewers = submission.reviews.sort_by(&:created_at).map {|r| r.reviewer.username }.uniq.join(', ') %>
           <td><%= link_to reviewers, submission_reviews_path(submission) %></td>
         <% end %>
-        <% if show_files_column %>
-          <td>
-            <%= link_to 'Files', submission_files_path(submission) %>
-          </td>
-        <% end %>
         <% if show_details_column %>
           <td>
-            <%= link_to 'Details', submission_path(submission)  %>
+            <%= link_to 'Details', submission_path(submission, anchor: 'files')  %>
           </td>
         <% end %>
        </tr>

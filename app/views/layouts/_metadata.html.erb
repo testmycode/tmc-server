@@ -8,9 +8,7 @@
      :current_path => request.path
    }
 %>
-<script type="text/javascript">
-  var PageMetadata = <%= raw(page_metadata.to_json) %>;
-</script>
+
 
 <%= javascript_include_tag(
       'underscore-min.js',
@@ -25,10 +23,15 @@
       comet_js_url('jquery/jquery.cometd.js'),
       'comet_connection.js',
       'review_notifications.js'
+
     )
 %>
-<% if @show_page_presence %>
-  <%= javascript_include_tag 'page_presence.js' %>
+
+<% if Rails.env == 'test' %>
+  <%= stylesheet_link_tag 'highlighting' %>
 <% end %>
+<script type="text/javascript">
+  var PageMetadata = <%= raw(page_metadata.to_json) %>;
+</script>
 
 <%= csrf_meta_tag %>

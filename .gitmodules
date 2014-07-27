@@ -13,3 +13,6 @@
 [submodule "ext/tmc-spyware-server"]
 	path = ext/tmc-spyware-server
 	url = git@github.com:testmycode/tmc-spyware-server.git
+[submodule "ext/tmc-checkstyle-runner"]
+	path = ext/tmc-checkstyle-runner
+	url = git@github.com:testmycode/tmc-checkstyle-runner.git

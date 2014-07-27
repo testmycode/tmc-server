@@ -3,7 +3,6 @@
 
 <p id="loading">Loading...</p>
 
-<%= show_submission_list([], :invoke_datatables => false) %>
 
 <script type="text/javascript">
   $(document).ready(function() {
@@ -47,6 +46,9 @@
     loadMoreData();
   });
 </script>
+
+
+<%= show_submission_list([], :invoke_datatables => false) %>
 
 <div class="link-back">
   <%= link_to 'Back', course_path(@course) %>

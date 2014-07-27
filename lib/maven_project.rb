@@ -40,8 +40,20 @@ class MavenProject
     "#{pom_file.artifact_id}-#{pom_file.artifact_version}.#{pom_file.packaging}"
   end
 
+  def package
+    pom_file.artifact_group_id
+  end
+
+  def jar_path
+    package_path
+  end
+
+  def classpath
+    "#{jar_path}:#{lib_paths.join(':')}"
+  end
+
   def compiled?
-    File.exists? package_path
+    File.exists? jar_path
   end
 
   def compile!

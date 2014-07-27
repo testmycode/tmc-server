@@ -41,7 +41,7 @@ describe "The system, receiving submissions with UTF-8 special characters", :int
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    click_link 'View submitted files'
+    click_link 'Files'
     page.should have_content('here are some special characters: mää möö blöö')
   end
 end

@@ -1,7 +1,7 @@
 <%= form_for(submission, :url => exercise_submissions_path(@exercise), :action => @form_action,
             :html => {:multipart => true, class: "form-horizontal"} ) do |f| %>
   <%= render 'shared/error_messages', :target => submission %>
-  
+
   <%= labeled_field("Zipped project ", f.file_field('file')) %>
   <%= labeled_field("Request code review", check_box_tag('request_review'), :order => :label_last, :super_class => "checkbox") %>
 

@@ -56,11 +56,9 @@ describe "Paste JSON api" , :integration => true do
         response.should be_success
         json = JSON.parse(response.body)
         json.should have_key("api_version")
-        json.should have_key("tests")
-        json.should have_key("message")
-        json.should have_key("paste_key")
+        json.should have_key("test_cases")
+        json.should have_key("message_for_paste")
         json.should have_key("all_tests_passed")
-        json.should have_key("processing_time")
       end
     end
 
@@ -72,9 +70,8 @@ describe "Paste JSON api" , :integration => true do
         response.should be_forbidden
         json = JSON.parse(response.body)
         json.should_not have_key("api_version")
-        json.should_not have_key("tests")
-        json.should_not have_key("message")
-        json.should_not have_key("paste_key")
+        json.should_not have_key("test_cases")
+        json.should_not have_key("message_for_paste")
         json.should_not have_key("all_tests_passed")
         json.should_not have_key("processing_time")
       end
@@ -85,11 +82,9 @@ describe "Paste JSON api" , :integration => true do
         response.should_not be_forbidden
         json = JSON.parse(response.body)
         json.should have_key("api_version")
-        json.should have_key("tests")
-        json.should have_key("message")
-        json.should have_key("paste_key")
+        json.should have_key("test_cases")
+        json.should have_key("message_for_paste")
         json.should have_key("all_tests_passed")
-        json.should have_key("processing_time")
       end
     end
 
@@ -101,9 +96,8 @@ describe "Paste JSON api" , :integration => true do
         json = JSON.parse(response.body)
         json.should have_key("api_version")
         json.should have_key("exercise_name")
-        json.should have_key("tests")
-        json.should have_key("message")
-        json.should have_key("paste_key")
+        json.should have_key("test_cases")
+        json.should have_key("message_for_paste")
         json.should have_key("all_tests_passed")
         json.should have_key("processing_time")
       end
@@ -119,9 +113,8 @@ describe "Paste JSON api" , :integration => true do
         json = JSON.parse(response.body)
         json.should have_key("api_version")
         json.should have_key("exercise_name")
-        json.should have_key("tests")
-        json.should have_key("message")
-        json.should have_key("paste_key")
+        json.should have_key("test_cases")
+        json.should have_key("message_for_paste")
         json.should have_key("all_tests_passed")
         json.should have_key("processing_time")
       end
@@ -136,9 +129,8 @@ describe "Paste JSON api" , :integration => true do
         json = JSON.parse(response.body)
         json.should_not have_key("api_version")
         json.should_not have_key("exercise_name")
-        json.should_not have_key("tests")
-        json.should_not have_key("message")
-        json.should_not have_key("paste_key")
+        json.should_not have_key("test_cases")
+        json.should_not have_key("message_for_paste")
         json.should_not have_key("all_tests_passed")
         json.should_not have_key("processing_time")
       end
@@ -152,11 +144,9 @@ describe "Paste JSON api" , :integration => true do
         json = JSON.parse(response.body)
         json.should have_key("api_version")
         json.should have_key("exercise_name")
-        json.should have_key("tests")
-        json.should have_key("message")
-        json.should have_key("paste_key")
+        json.should have_key("test_cases")
+        json.should have_key("message_for_paste")
         json.should have_key("all_tests_passed")
-        json.should have_key("processing_time")
       end
     end
   end

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+    <title>
+      <%= content_for?(:title) ? yield(:title) : "TestMyCode" %>
+    </title>
+    <meta name="description"/>
+    <meta name="author"/>
+    <%= render "layouts/metadata" %>
+    <%= yield(:head) %>
+    <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css' %>
+    <%= stylesheet_link_tag "bootstrap.min.css" %>
+    <%= stylesheet_link_tag 'main' %>
+  </head>
+  <body class="default">
+    <div class="navbar navbar-inverse">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" id="collapse-toggle" data-toggle='collapse' data-target='.nav-collapse'>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <% title_extras = '<span class="small"><br>' + raw(SiteSetting.value(:site_subtitle)) + '</span>' unless SiteSetting.value(:site_subtitle).blank? %>
+          <% title = 'TestMyCode server' %>
+          <% title += raw(title_extras) unless title_extras.blank? %>
+          <%= link_to raw(title), root_path, class: 'brand' %>
+          <div class="collapse nav-collapse">
+            <%= render 'sessions/login_form' %>
+            <ul class="nav pull-right">
+              <% if signed_in? %>
+                <li>
+                  <%= link_to 'My account', user_path %>
+                </li>
+                <li>
+                  <%= link_to 'My stats', participant_path(current_user) %>
+                </li>
+                <li>
+                  <%= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link' %>
+                </li>
+              <% elsif can? :create, User %>
+                <li>
+                  <%= link_to 'Sign up', new_user_path %>
+                </li>
+                <li>
+                  <%= link_to 'Forgot password', new_password_reset_key_path %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="everything">
+      <div class="container container-fluid well-large well well-white" id="content-area">
+        <div id="breadcrumb">
+          <div class="row-fluid">
+            <div class="span12">
+              <%= render 'twitter-bootstrap/breadcrumbs' %>
+            </div>
+          </div>
+        </div>
+        <% if @show_page_presence %>
+          <div id="page-presence"></div>
+        <% end %>
+        <%= bootstrap_flash %>
+        <%= yield %>
+      </div>
+    </div>
+    <%= javascript_include_tag( 'bootstrap.min.js') %>
+    <% if @show_page_presence %>
+      <%= javascript_include_tag 'page_presence.js' %>
+    <% end %>
+  </body>
+</html>
+

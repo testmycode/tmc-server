@@ -12,20 +12,6 @@
 
 /* Basic commons */
 
-/*.list-title {
-  font-weight: bold;
-}
-
-#content-area h2 {
-  margin-top: 1.6em;
-}
-
-section {
-  margin-left: 1.5em;
-  margin-bottom: 2em;
-}
-*/
-
 .small{
   font-size: 0.5em;
 }
@@ -75,11 +61,6 @@ section {
   list-style: square;
 }
 
-/*button * {
-  float: left;
-  white-space: nowrap;
-}*/
-
 .transfer-effect {
   border: 2px dotted gray;
 }
@@ -93,44 +74,21 @@ section {
 }
 
 .dialog-buttons {
-  /*float: right;*/
   position: absolute;
   bottom: 0;
   right: 1em;
 }
 
 
-/* Toplevel layout */
 
 /* bootstrapping */
 body .well-white {
   background-color: white;
 }
 
-body #everything {
-  /*font-size: 12px;*/
-  padding-top: 80px;
-  /*
-  color: black;
-  font-family: sans-serif;
-  */
-}
-
 body.default {
   background-color: #DDDDDD;
 }
-
-/*#everything {
-  background-color: white;
- /* margin-left: 4%;
-  margin-right: 4%;
-  padding-bottom: 8%;
-}
-
-#everything > div {
-  padding-left: 2%;
-  padding-right: 2%;
-}*/
 
 #page-presence {
   float: right;
@@ -174,6 +132,7 @@ tr.hidden-course * {
 }
 
 div.stack-trace {
+  margin-top: 10px;
   font-family: monospace;
 }
 
@@ -199,7 +158,6 @@ table {
 
 table > * > tr > td {
   padding: 6px 14px 6px 14px;
-  border: 1px solid gray;
 }
 
 table > * > tr > th {
@@ -370,3 +328,21 @@ table.points > * > tr > td {
   margin-top: 4px;
   margin-bottom: 0;
 }
+
+/* Make things tight - used in submission view */
+.dl-compact.dl-horizontal dd {
+  margin-left: 80px;
+}
+
+.dl-compact.dl-horizontal dt {
+  width: 70px;
+}
+.underlined {
+  border-bottom: 1px solid lightgrey !important;
+  margin-bottom: 25px !important;
+ }
+
+.no-scroll {
+  overflow: hidden;
+}
+

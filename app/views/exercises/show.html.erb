@@ -83,19 +83,19 @@
 </div>
 <% end %>
 
-<% if current_user.administrator? && !@submissions.empty? %>
-    <div class="row-fluid">
+<% if can? :rerun, @submissions and @submissions.any? %>
+  <div class="row-fluid">
     <div class="span12">
-    <%
-      if @submissions.count > 10
-        confirm_msg = "Really rerun all #{@submissions.count} submissions?\nIt may take a while."
-      else
-        confirm_msg = nil
-      end
-    %>
-    <br>
-    <%= button_to 'Rerun all submissions', exercise_update_submissions_path(@exercise), :method => :put, :confirm => confirm_msg, class: "btn btn-danger"%>
-    (may add points; never deletes points; may take a long time)
-  </div>
+      <%
+        if @submissions.count > 10
+          confirm_msg = "Really rerun all #{@submissions.count} submissions?\nIt may take a while."
+        else
+          confirm_msg = nil
+        end
+      %>
+      <br>
+      <%= button_to 'Rerun all submissions', exercise_update_submissions_path(@exercise), :method => :put, :confirm => confirm_msg, class: "btn btn-danger"%>
+      (may add points; never deletes points; may take a long time)
+    </div>
   </div>
 <% end %>

@@ -118,7 +118,7 @@ describe "The system (used by a student)", :integration => true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    click_link 'View submitted files'
+    click_link 'Files'
 
     page.should have_content('src/SimpleStuff.java')
     page.should have_content('public class')
@@ -173,21 +173,39 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('All tests successful')
     page.should have_content('Ok')
 
-    click_link 'View submitted files'
-    # visit '/'
-    # id = Submission.last.id
-    # visit "/submissions/#{id}/files"
+    click_link 'Files'
     page.should have_content('src/SimpleStuff.java')
 
     log_out
     page.should_not have_content('src/SimpleStuff.java')
-    page.should have_content('Access denied')
+    page.should have_content('You are not authorized to access this page')
     @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
 
+    visit '/'
     log_in_as(@other_user.login, 'xooxer')
+    visit submission_path(Submission.last, anchor: 'files')
 
     page.should_not have_content('src/SimpleStuff.java')
-    page.should have_content('Access denied')
+    page.should have_content('You are not authorized to access this page')
+  end
+
+  it "should show checkstyle validation results" do
+    ex = FixtureExercise::SimpleExercise.new('SimpleExerciseWithValidationErrors')
+    ex = FixtureExercise.new('SimpleExerciseWithValidationErrors', 'MyExercise')
+    ex.make_zip
+
+    click_link 'MyExercise'
+    attach_file('Zipped project', 'MyExercise.zip')
+    click_button 'Submit'
+    wait_for_submission_to_be_processed
+
+    page.should have_content('Some tests failed')
+
+    page.should have_content('src/SimpleStuff.java')
+
+    page.should have_content('Validation Cases')
+    page.should have_content('is not preceded with whitespace')
+    page.should have_content('Indentation incorrect. Expected 8, but was 4')
   end
 
   describe "pastes" do
@@ -227,14 +245,14 @@ describe "The system (used by a student)", :integration => true do
 
       page.should_not have_content 'Show Paste'
 
-      click_link 'View submitted files'
+      click_link 'Files'
 
       page.should have_content('src/SimpleStuff.java')
 
       log_out
 
       page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('Access denied')
+      page.should have_content('You are not authorized to access this page')
     end
 
 
