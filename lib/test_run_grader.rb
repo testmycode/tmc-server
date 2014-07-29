@@ -68,7 +68,7 @@ private
   end
 
   def validations_passed?(validations)
-    if (!validations.nil?) && validations['strategy'] && validations['strategy'] == 'fail'
+    if (!validations.nil?) && validations['strategy'] && validations['strategy'] == 'FAIL'
       if validations['validationErrors'] && validations['validationErrors'].any?
         return false
       end
