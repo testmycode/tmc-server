@@ -157,7 +157,7 @@ describe TestRunGrader do
 
     def failing_validations
       {
-        "strategy" => "fail",
+        "strategy" => "FAIL",
         "validationErrors" =>
         {
           "SimpleStuff.java" =>
