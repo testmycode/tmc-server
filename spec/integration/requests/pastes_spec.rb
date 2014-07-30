@@ -67,7 +67,7 @@ describe "Paste JSON api" , :integration => true do
         submission = create_paste_submission(true, @user)
         get_paste(submission.paste_key, @viewer)
         response.should_not be_success
-        response.should be_forbidden
+        response.response_code.should == 401
         json = JSON.parse(response.body)
         json.should_not have_key("api_version")
         json.should_not have_key("test_cases")
@@ -125,7 +125,7 @@ describe "Paste JSON api" , :integration => true do
         submission = create_paste_submission(false, @user, 1.day.ago)
         get_paste(submission.paste_key, @viewer)
         response.should_not be_success
-        response.should be_forbidden
+        response.response_code.should == 401
         json = JSON.parse(response.body)
         json.should_not have_key("api_version")
         json.should_not have_key("exercise_name")

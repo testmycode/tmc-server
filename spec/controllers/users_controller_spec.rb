@@ -6,31 +6,31 @@ describe UsersController do
       before :each do
         controller.current_user.should be_guest
       end
-      
+
       it "should not deny access" do
         get :show
-        response.status.should == 403
+        response.status.should == 401
       end
 
       it "should deny access if signup is disabled in site settings" do
         SiteSetting.all_settings['enable_signup'] = false
         get :show
-        response.status.should == 403
+        response.status.should == 401
       end
     end
-    
+
     describe "when accessed as a logged in user" do
       before :each do
         controller.current_user = Factory.create(:user)
       end
-      
+
       it "should show the profile page" do
         get :show
         response.should be_success
       end
     end
   end
-  
+
   describe "POST create" do
     before :each do
       @valid_attrs = {
