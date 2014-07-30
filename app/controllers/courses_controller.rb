@@ -18,7 +18,7 @@ class CoursesController < ApplicationController
         courses = Course.ongoing.order(ordering)
         courses = courses.select {|c| c.visible_to?(current_user) }
         authorize! :read, courses
-        return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
+        return respond_access_denied('Authentication required') if current_user.guest?
 
         data = {
           :api_version => ApiVersion::API_VERSION,
@@ -41,7 +41,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        return render :json => { :error => 'Authentication required' }, :status => 403 if current_user.guest?
+        return respond_access_denied('Authentication required') if current_user.guest?
         data = {
           :api_version => ApiVersion::API_VERSION,
           :course => CourseInfo.new(current_user, view_context).course_data(@course)

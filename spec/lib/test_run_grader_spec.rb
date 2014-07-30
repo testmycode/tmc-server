@@ -200,6 +200,11 @@ describe TestRunGrader do
       result
     end
 
+    def failures_but_no_strategy
+      result = failing_validations
+      result.delete('strategy')
+      result
+    end
 
     it "should not award points for which all required tests passed but validations are failed and strategy is 'fail'" do
       @submission.validations = failing_validations.to_json.to_s
@@ -231,6 +236,15 @@ describe TestRunGrader do
 
     it "should award points for which all required tests passed but validations are failed and strategy is not 'fail'" do
       @submission.validations = failures_but_no_fail.to_json.to_s
+      TestRunGrader.grade_results(@submission, half_successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should include('1.1')
+      points.should_not include('1.2')
+    end
+
+    it "should award points for which all required tests passed but validations are failed and strategy is not set" do
+      @submission.validations = failures_but_no_strategy.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)

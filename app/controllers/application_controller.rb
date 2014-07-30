@@ -116,16 +116,39 @@ private
   end
 
   def respond_access_denied(msg = 'Access denied')
-    respond_with_error(msg, 403)
+    respond_with_error(msg, 401)
   end
 
   def respond_with_error(msg, code = 500, extra_json_keys = {})
     respond_to do |format|
       format.html { render :text => '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', :layout => true, :status => code }
-      format.json { render :json => { :error => msg }.merge(extra_json_keys), :status => code }
+      format.json do
+        if code == 401
+          # To support older TmcNetBeans versions using faulty http basic auth
+          if client_supports_http_basic_auth?
+            response.headers['WWW-Authenticate'] = "Basic realm=\"#{msg}\""
+            render :json => { :error => msg }.merge(extra_json_keys), :status => code
+          else
+            render :json => { :error => msg }.merge(extra_json_keys), :status => 403
+          end
+        else
+          render :json => { :error => msg }.merge(extra_json_keys), :status => code
+        end
+      end
       format.text { render :text => 'ERROR: ' + msg, :status => code }
       format.zip { render :text => msg, :status => code, :content_type => 'text/plain' }
     end
+  end
+
+  # To Support older versions of tmc-netbeans-plugin
+  def client_supports_http_basic_auth?
+    return true if params[:client].blank?
+    client = params[:client]
+    client_version = begin
+      Version.new(params['client_version']) unless params['client_version'].blank?
+    rescue
+    end
+    !(client != 'netbeans_plugin' && client_version <= Version.new('0.7.0'))
   end
 
   def select_layout
