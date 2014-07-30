@@ -21,6 +21,7 @@ gem 'haml-rails'
 gem 'acts_as_api'
 gem 'mimemagic'
 gem 'rack-cors'
+gem 'newrelic_rpm'
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
