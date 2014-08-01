@@ -15,9 +15,7 @@ class Ability
       can :refresh_gdocs_spreadsheet, Course do |c|
         !c.spreadsheet_key.blank?
       end
-      can :read_vm_log, Submission do |s|
-        !s.vm_log.blank?
-      end
+      can :read_vm_log, Submission
     else
       can :read, :all
 

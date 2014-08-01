@@ -56,7 +56,5 @@ module TmcServer
         resource '/courses/*/points*', :headers => :any, :methods => [:get]
       end
     end
-
-
-    end
+  end
 end

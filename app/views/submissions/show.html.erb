@@ -28,7 +28,7 @@
   <% if @submission.feedback_answers.any? %>
     <li><a href="#feedback" >Feedback</a></li>
   <% end %>
-  <% unless @submission.pretest_error %>
+  <% if @submission.tests_ran? %>
     <li><a href="#testResults">Test Results</a></li>
   <% end %>
   <% unless @submission.stdout.blank? %>
@@ -40,7 +40,7 @@
   <% unless @submission.valgrind.blank? %>
     <li><a href="#valgrind" >Valgrind</a></li>
   <% end %>
-  <% if can? :read_vm_log, @submission %>
+  <% if can?(:read_vm_log, @submission) && !@submission.vm_log.blank? %>
     <li class=""><a href="#logs">Logs</a></li>
   <% end %>
   <li class="active"><a href="#files">Files</a></li>
@@ -56,7 +56,7 @@
       <% end %>
 
 
-      <% unless @submission.pretest_error %>
+      <% if @submission.tests_ran? %>
         <div class="tab-pane" id="testResults">
           <%= render 'submissions/details' %>
         </div>
@@ -80,7 +80,7 @@
         </div>
       <% end %>
 
-      <% if can? :read_vm_log, @submission %>
+      <% if can?(:read_vm_log, @submission) && !@submission.vm_log.blank? %>
         <div class="tab-pane" id="logs">
           <%= render 'submissions/logs' %>
         </div>
