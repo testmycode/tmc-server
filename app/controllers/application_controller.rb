@@ -140,7 +140,7 @@ private
     end
   end
 
-  # To Support older versions of tmc-netbeans-plugin
+  # To support older versions of tmc-netbeans-plugin
   def client_supports_http_basic_auth?
     return true if params[:client].blank?
     client = params[:client]
@@ -148,7 +148,7 @@ private
       Version.new(params['client_version']) unless params['client_version'].blank?
     rescue
     end
-    !(client != 'netbeans_plugin' && client_version <= Version.new('0.7.0'))
+    !(client == 'netbeans_plugin' && client_version <= Version.new('0.7.0'))
   end
 
   def select_layout
