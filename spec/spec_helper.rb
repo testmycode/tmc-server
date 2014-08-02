@@ -45,9 +45,15 @@ Capybara.register_driver :webkit do |app|
 end
 
 # Use :selenium this if you want to see what's going on and don't feel like screenshotting
-# Otherwise :webkit is somewhat faster and doesn't pop up in your face
-#Capybara.default_driver = :selenium
-Capybara.default_driver = :webkit
+# Otherwise :webkit is somewhat faster and doesn't pop up in your face.
+#
+# Currently the code does not work with :webkit. Capybara-webkit needs to be updated,
+# and then capybara needs to be updated, and then test code needs to be changed to conform
+# to the new API. Recommendation: run tests under Xvfb:
+# In console 1: Xvfb :99
+# In console 2: env DISPLAY=:99 rvmsudo rake spec
+Capybara.default_driver = :selenium
+#Capybara.default_driver = :webkit
 
 Capybara.server_port = FreePorts.take_next
 Capybara.default_wait_time = 10  # Comet messages may take longer to appear than the default 2 sec
