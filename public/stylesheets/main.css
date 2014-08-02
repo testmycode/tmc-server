@@ -346,3 +346,9 @@ table.points > * > tr > td {
   overflow: hidden;
 }
 
+tr>.align-right {
+  text-align: right;
+}
+.borderless td {
+  border: none;
+}

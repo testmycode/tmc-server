@@ -1,36 +1,63 @@
-<% if report.successful? %>
-  <p class="success">Refresh successful.</p>
-<% else %>
-  <div class="alert alert-error">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <h4>Refresh failed and rolled back.</h4>
-  </div>
-<% end %>
+  <% if report.successful? %>
+    <p class="success">Refresh successful.</p>
+  <% else %>
+    <div class="alert alert-error">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>Refresh failed and rolled back.</h4>
+    </div>
+  <% end %>
 
-<ul>
-  <% if report.errors.any? %>
-    <div class="alert alert-error alert-block">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <% for error in report.errors %>
-        <li><%= simple_format error %></li>
-      <% end %>
-    </div>
-  <% end %>
-  <% if report.warnings.any? %>
-    <div class="alert alert-block">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <% for warning in report.warnings %>
-        <li><%= simple_format warning %></li>
-      <% end %>
-    </div>
-  <% end %>
-  <% if report.notices.any? %>
-    <div class="alert alert-info alert-block">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <% for notice in report.notices %>
-        <li><%= simple_format notice %></li>
-      <% end %>
-    </div>
+  <ul>
+    <% if report.errors.any? %>
+      <div class="alert alert-error alert-block">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <% for error in report.errors %>
+          <li><%= simple_format error %></li>
+        <% end %>
+      </div>
+    <% end %>
+    <% if report.warnings.any? %>
+      <div class="alert alert-block">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <% for warning in report.warnings %>
+          <li><%= simple_format warning %></li>
+        <% end %>
+      </div>
+    <% end %>
+    <% if report.notices.any? %>
+      <div class="alert alert-info alert-block">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <% for notice in report.notices %>
+          <li><%= simple_format notice %></li>
+        <% end %>
+      </div>
+    <% end %>
+    <% if report.timings.any? %>
+      <div class="alert alert-info alert-block">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Time used by each phase</h4>
+        <table class="table borderless">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="align-right">user</th>
+              <th class="align-right">system</th>
+              <th class="align-right">total</th>
+              <th class="align-right">real</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% report.timings.each do |k,v| %>
+              <tr>
+                <td><%=k%></td>
+                <td class="align-right"><%= "%.3f" % v.cutime %></td>
+                <td class="align-right"><%= "%.3f" % v.cstime %></td>
+                <td class="align-right"><%= "%.3f" % v.total%></td>
+                <td class="align-right"><%= "%.3f" % v.real%></td>
+              <% end %>
+            </tbody>
+          </table>
+      </div>
   <% end %>
 </ul>
 
