@@ -9,6 +9,18 @@ class TmcComet < MavenProject
 
   # Get instances via .get instead
   def initialize
-    super("#{::Rails.root}/ext/tmc-comet")
+    super("#{::Rails.root}/ext/tmc-comet/tmc-comet-server")
+  end
+
+  def compile!
+    # This needs to be mvn install'ed as opposed to merely packaged because
+    # the WAR file is loaded dynamically.
+    Dir.chdir(path.parent) do
+      SystemCommands.sh!('mvn', '-q', 'install')
+    end
+  end
+
+  def package_file_name
+    super.sub(/\.#{pom_file.packaging}/, "-all.#{pom_file.packaging}")
   end
 end

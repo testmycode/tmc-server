@@ -19,7 +19,7 @@ namespace :dev do
     task :run => :configure do
       abs_config_path = File.absolute_path(config_path)
       Dir.chdir('ext/tmc-comet') do
-        system("mvn -Dfi.helsinki.cs.tmc.comet.configFile=#{abs_config_path} jetty:deploy-war")
+        system("./tmc-comet-server.sh #{abs_config_path}")
       end
     end
   end
