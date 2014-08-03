@@ -78,7 +78,7 @@
         <% else %>
             var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApiVersion::API_VERSION) %>';
         <% end %>
-        var refreshCooldown = 5000;
+        var refreshCooldown = 2500;
         function refreshStatus() {
           $.ajax({
             url: url,
