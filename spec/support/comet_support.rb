@@ -26,19 +26,20 @@ module CometSupport
 private
   def self.start!
     write_config_file
-    run_goal('jetty:stop jetty:deploy-war', false)
+    raise "Already running" if @started
+    Dir.chdir TmcComet.get.path.parent do
+      @pid = spawn("./tmc-comet-server.sh #{config_file_path} > #{log_file} 2>&1")
+    end
     @started = true
     wait_for_http_access
   end
 
   def self.stop!
-    run_goal('jetty:stop', true)
-  end
-
-  def self.run_goal(goal, log_append)
-    log_redir = log_append ? '>>' : '>'
-    Dir.chdir TmcComet.get.path do
-      SystemCommands.system! "mvn -Dfi.helsinki.cs.tmc.comet.configFile=#{config_file_path} -Djetty.port=#{port} #{goal} #{log_redir} #{log_file} 2>&1 &"
+    if @pid
+      Process.kill("TERM", @pid)
+      Process.waitpid(@pid)
+      @pid = nil
+      @started = false
     end
   end
 
@@ -46,6 +47,7 @@ private
     File.open(config_file_path, 'wb') do |f|
       f.puts "fi.helsinki.cs.tmc.comet.backendKey = #{backend_key}"
       f.puts "fi.helsinki.cs.tmc.comet.allowedServers = http://localhost:#{Capybara.server_port}/"
+      f.puts "fi.helsinki.cs.tmc.comet.server.httpPort = #{port}"
     end
   end
 
