@@ -23,8 +23,6 @@ describe "Paste JSON api" , :integration => true do
     get "/paste/#{id}.json", {api_version: ApiVersion::API_VERSION}, { "Accept" => "application/json", 'HTTP_AUTHORIZATION' =>  basic_auth(user) }
   end
 
-
-
   def basic_auth(user)
     ActionController::HttpAuthentication::Basic.encode_credentials(user.login, 'xooxer')
   end
@@ -63,7 +61,7 @@ describe "Paste JSON api" , :integration => true do
     end
 
     describe "for non admins and not the author" do
-      it "it should give access_denied if all_tests_passed" do
+      it "it should give access_denied if all tests passed" do
         submission = create_paste_submission(true, @user)
         get_paste(submission.paste_key, @viewer)
         response.should_not be_success
@@ -75,7 +73,8 @@ describe "Paste JSON api" , :integration => true do
         json.should_not have_key("all_tests_passed")
         json.should_not have_key("processing_time")
       end
-      it "it should give show results if all tests didn't pass" do
+
+      it "it should show results if some tests failed" do
         submission = create_paste_submission(false, @user)
         get_paste(submission.paste_key, @viewer)
         response.should be_success
@@ -89,7 +88,7 @@ describe "Paste JSON api" , :integration => true do
     end
 
     describe "for the author" do
-      it "it should return results if all_tests_passed" do
+      it "it should return results if all tests passed" do
         submission = create_paste_submission(true, @user)
         get_paste(submission.paste_key, @user)
         response.should be_success
