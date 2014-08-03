@@ -20,7 +20,7 @@ describe Unlock do
       unlocks = Unlock.order('exercise_name ASC').to_a
       unlocks.size.should == 1
 
-      unlocks.first.valid_after.should == Date.parse('2011-11-11').to_time
+      unlocks.first.valid_after.should == Date.parse('2011-11-11').to_time_in_current_zone
       unlocks.first.exercise_name.should == 'ex1'
 
       AwardedPoint.create!(:user_id => @user.id, :course_id => @course.id, :name => @available_point.name)
@@ -29,7 +29,7 @@ describe Unlock do
       unlocks = Unlock.order('exercise_name ASC').to_a
       unlocks.size.should == 2
 
-      unlocks.second.valid_after.should == Date.parse('2011-11-22').to_time
+      unlocks.second.valid_after.should == Date.parse('2011-11-22').to_time_in_current_zone
       unlocks.second.exercise_name.should == 'ex2'
     end
 

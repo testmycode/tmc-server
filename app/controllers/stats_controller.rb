@@ -65,13 +65,13 @@ private
 
     @start_time =
       if params[:start_time]
-      then Time.parse(params[:start_time])
-      else @course.time_of_first_submission.to_date.to_time
+      then Time.zone.parse(params[:start_time])
+      else @course.time_of_first_submission.to_date.to_time_in_current_zone
       end
     @end_time =
       if params[:end_time]
-      then Time.parse(params[:end_time])
-      else @course.time_of_last_submission.to_date.to_time
+      then Time.zone.parse(params[:end_time])
+      else @course.time_of_last_submission.to_date.to_time_in_current_zone
       end
     @time_unit = param_as_one_of(:time_unit, [nil, 'minute', 'hour', 'day'])
     @time_unit = 'day' if @time_unit == nil

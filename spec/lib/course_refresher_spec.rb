@@ -76,7 +76,7 @@ describe CourseRefresher do
 
     change_course_metadata_file 'hide_after' => "2011-07-01 13:00"
     @refresher.refresh_course(@course)
-    @course.hide_after.should == Time.parse("2011-07-01 13:00") # local time zone
+    @course.hide_after.should == Time.zone.parse("2011-07-01 13:00") # local time zone
 
     change_course_metadata_file 'hide_after' => nil
     @refresher.refresh_course(@course)
@@ -116,7 +116,7 @@ describe CourseRefresher do
 
     @refresher.refresh_course(@course)
 
-    @course.exercises.first.deadline_for(@user).should == Time.parse("2012-01-02 12:34")
+    @course.exercises.first.deadline_for(@user).should == Time.zone.parse("2012-01-02 12:34")
     @course.exercises.first.gdocs_sheet.should == "xoo"
   end
 
@@ -145,7 +145,7 @@ describe CourseRefresher do
     )
     @refresher.refresh_course(@course)
 
-    @course.exercises.first.deadline_for(@user).should == Time.parse("2013-01-01 00:00")
+    @course.exercises.first.deadline_for(@user).should == Time.zone.parse("2013-01-01 00:00")
     @course.exercises.first.gdocs_sheet.should == "foo"
   end
 

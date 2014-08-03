@@ -75,16 +75,16 @@ describe Course do
   end
 
   it "should be visible if user has registered before the hidden_if_registered_after setting" do
-    user.created_at = Time.parse('2010-01-02')
+    user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = Factory.create(:course, :hidden_if_registered_after => Time.parse('2010-01-03'))
+    c = Factory.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-03'))
     c.should be_visible_to(user)
   end
 
   it "should not be visible if user has registered after the hidden_if_registered_after setting" do
-    user.created_at = Time.parse('2010-01-02')
+    user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = Factory.create(:course, :hidden_if_registered_after => Time.parse('2010-01-01'))
+    c = Factory.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-01'))
     c.should_not be_visible_to(user)
   end
 

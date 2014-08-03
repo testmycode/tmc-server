@@ -150,7 +150,7 @@ describe CoursesController do
       end
 
       it "should tell each the exercise's deadline" do
-        @course.exercises[0].deadline_spec = [Time.parse('2011-11-16 23:59:59 +0200').to_s].to_json
+        @course.exercises[0].deadline_spec = [Time.zone.parse('2011-11-16 23:59:59 +0200').to_s].to_json
         @course.exercises[0].save!
 
         result = get_show_json

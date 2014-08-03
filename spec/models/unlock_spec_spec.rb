@@ -39,7 +39,7 @@ describe UnlockSpec do
 
   specify "unlocked_after: <date>" do
     spec = UnlockSpec.new(ex1, ['12.12.2012'])
-    spec.valid_after.should == Date.parse('2012-12-12').to_time
+    spec.valid_after.should == Date.parse('2012-12-12').to_time_in_current_zone
     spec.should permit_unlock_for(user)
   end
 
