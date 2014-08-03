@@ -9,15 +9,18 @@ TmcComet.get.make_rake_tasks(self, 'comet')
 
 namespace :spyware_server do
   spyware_dir = 'ext/tmc-spyware-server'
-  task :compile do
+  binary = "#{spyware_dir}/cgi-bin/tmc-spyware-server-cgi"
+  file binary => FileList["#{spyware_dir}/*.[ch]", "#{spyware_dir}/Makefile"] do
     puts "Compiling #{spyware_dir}"
     SystemCommands.sh!('make', '-C', spyware_dir)
   end
+  task :compile => binary
   task :recompile => ['spyware_server:clean', 'spyware_server:compile']
   task :clean do
     SystemCommands.sh!('make', '-C', spyware_dir, 'clean')
   end
 end
+task :spec => 'spyware_server:compile'
 
 desc "Compile all dependencies except for ext/tmc-sandbox."
 task :compile => ['junit_runner:compile','checkstyle_runner:compile', 'comet:compile', 'spyware_server:compile']
