@@ -82,6 +82,7 @@ private
     copy_gitignore
     copy_src
     copy_tests
+    copy_tmcproject
   end
 
   def common_files_path
@@ -111,6 +112,15 @@ private
 
   def copy_tests
     FileUtils.cp_r("#{fixture_path}/test", "#{path}/test")
+  end
+
+  def copy_tmcproject
+    copy_if_exists("#{fixture_path}/.tmcproject.json", "#{path}/.tmcproject.json")
+    copy_if_exists("#{fixture_path}/.tmcproject.yml", "#{path}/.tmcproject.yml")
+  end
+
+  def copy_if_exists(from, to)
+    FileUtils.cp(from, to) if File.exists?(from)
   end
 
   def ensure_fixture_clean

@@ -179,7 +179,7 @@ describe "The system (used by a student)", :integration => true do
     log_out
     page.should_not have_content('src/SimpleStuff.java')
     page.should have_content('You are not authorized to access this page')
-    @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
+    @other_user = Factory.create(:user, :login => "uuseri", :password => 'xooxer')
 
     visit '/'
     log_in_as(@other_user.login, 'xooxer')
@@ -190,12 +190,16 @@ describe "The system (used by a student)", :integration => true do
   end
 
   it "should show checkstyle validation results" do
-    ex = FixtureExercise::SimpleExercise.new('SimpleExerciseWithValidationErrors')
-    ex = FixtureExercise.new('SimpleExerciseWithValidationErrors', 'MyExercise')
+    @repo.copy_fixture_exercise('SimpleExerciseWithValidationErrors', 'MyValidationExercise')
+    @repo.add_commit_push
+    @course.refresh
+    visit current_path
+
+    ex = FixtureExercise.new('SimpleExerciseWithValidationErrors', 'MyValidationExercise')
     ex.make_zip
 
-    click_link 'MyExercise'
-    attach_file('Zipped project', 'MyExercise.zip')
+    click_link 'MyValidationExercise'
+    attach_file('Zipped project', 'MyValidationExercise.zip')
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
