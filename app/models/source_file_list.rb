@@ -106,7 +106,7 @@ private
     name = file.basename.to_s
     name.end_with?('.java') ||
       name.end_with?('.jsp') ||
-      (name.end_with?('.xml') && name != 'build.xml') ||
+      (name.end_with?('.xml') && name != 'build.xml' && !name.end_with?('checkstyle.xml')) ||
       name.end_with?('.properties') ||
       name.end_with?('.txt') ||
       name.end_with?('.html') ||
