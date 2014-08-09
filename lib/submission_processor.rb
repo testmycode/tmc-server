@@ -1,6 +1,6 @@
 
 # Attempts to send submissions for processing to a free tmc-sandbox.
-# Also called by the reprocessor daemon to attempt reprocessing if
+# Also called by the reprocessor background task to attempt reprocessing if
 # the sandbox was previously unavailable.
 class SubmissionProcessor
 
@@ -17,7 +17,7 @@ class SubmissionProcessor
     end
   end
 
-  # Called periodically by script/submission_reprocessor.
+  # Called periodically by script/background_daemon.
   # It tries to resend submissions to a sandbox if enough time has passed
   # since the last attempt.
   def reprocess_timed_out_submissions

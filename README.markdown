@@ -37,8 +37,8 @@ We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` w
 After you get the test suite to pass, you can set up background services.
 
 1. Recheck your comet server config in `site.yml` and then do `rvmsudo rake comet:config:update`.
-2. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake reprocessor:init:install`.
-3. Start the services: `sudo /etc/init.d/tmc-comet start`, `sudo /etc/init.d/tmc-submission-reprocessor start`.
+2. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake background_daemon:init:install`.
+3. Start the services: `sudo /etc/init.d/tmc-comet start`, `sudo /etc/init.d/tmc-background-daemon start`.
 4. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
 
 The application should not be deployed into a multithreaded server! It often changes the current working directory, which is a process-specific attribute. Each request should have its process all to itself. If you use Apache with, say, Passenger, then use the prefork MPM.
@@ -48,7 +48,7 @@ The application should not be deployed into a multithreaded server! It often cha
 1. `rails server` or some other RoR setup.
 2. Go to `ext/tmc-sandbox/web` and do `rackup --port 3001` or some other Rack setup.
 3. `rake dev:comet:run`
-4. `script/submission_reprocessor start`
+4. `script/background_daemon start`
 
 Alternatively use `script/dev_env` to do all of the above in
 [screen](http://www.gnu.org/software/screen/).

@@ -9,8 +9,8 @@ verbose on
 screen rails s
 title "rails server"
 
-screen script/submission_reprocessor run
-title "rerunner"
+screen script/background_daemon run
+title "background"
 
 screen bundle exec rake dev:comet:run
 title "comet"
