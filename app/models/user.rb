@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   has_one :password_reset_key, :dependent => :delete
   has_many :user_field_values, :dependent => :delete_all, :autosave => true
   has_many :unlocks, :dependent => :delete_all
+  has_many :uncomputed_unlocks, :dependent => :delete_all
   has_many :reviews, :foreign_key => :reviewer_id, :inverse_of => :reviewer, :dependent => :nullify
   has_many :course_notifications
   has_many :comments

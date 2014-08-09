@@ -218,6 +218,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def time_unlocked_for(user)
+    UncomputedUnlock.resolve(course, user)
     self.unlocks.where(:user_id => user).where('valid_after IS NULL OR valid_after < ?', Time.now).first.andand.created_at
   end
 

@@ -16,12 +16,12 @@ describe Exercise do
     specify "unlock after another exercise is 30% complete" do
       @ex2.options = { 'unlocked_after' => "30% of ex1" }
       @ex2.save!
-      refresh_unlocks
+      invalidate_unlocks
       @ex2.should_not be_unlocked_for(@user)
 
       @points[0].award_to(@user)
       @course.reload
-      refresh_unlocks
+      invalidate_unlocks
       @ex2.should be_unlocked_for(@user)
     end
 
@@ -29,15 +29,15 @@ describe Exercise do
       @ex2.options = { 'unlocked_after' => "70% of ex1" }
       @ex2.save!
       @ex2.requires_explicit_unlock?.should == false
-      refresh_unlocks
+      invalidate_unlocks
       @ex2.should_not be_unlocked_for(@user)
 
       @points[0].award_to(@user)
-      refresh_unlocks
+      invalidate_unlocks
       @ex2.should_not be_unlocked_for(@user)
 
       @points[1].award_to(@user)
-      refresh_unlocks
+      invalidate_unlocks
       @ex2.should be_unlocked_for(@user)
     end
 
@@ -45,7 +45,7 @@ describe Exercise do
       @ex2.options = { 'unlocked_after' => "exercise ex1", 'deadline' => "unlock + 5 days" }
       @ex2.save!
       @points.each {|pt| pt.award_to(@user) }
-      refresh_unlocks
+      invalidate_unlocks
 
       @ex2.reload
       @ex2.requires_explicit_unlock?.should == true
@@ -58,9 +58,9 @@ describe Exercise do
       @ex2.deadline_for(@user).should be_within(5.minutes).of(Time.now + 5.days)
     end
 
-    def refresh_unlocks
+    def invalidate_unlocks
       @course.reload
-      Unlock.refresh_all_unlocks(@course)
+      UncomputedUnlock.create_all_for_course(@course)
     end
   end
 end
