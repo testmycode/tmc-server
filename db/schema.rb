@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140809195619) do
+ActiveRecord::Schema.define(:version => 20140810120233) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -219,6 +219,8 @@ ActiveRecord::Schema.define(:version => 20140809195619) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  add_index "uncomputed_unlocks", ["course_id", "user_id"], :name => "index_uncomputed_unlocks_on_course_id_and_user_id"
 
   create_table "unlocks", :force => true do |t|
     t.integer  "user_id",       :null => false
