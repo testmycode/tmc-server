@@ -45,6 +45,7 @@ class SubmissionsController < ApplicationController
           :exercise_name => @submission.exercise.name,
           :status => @submission.status,
           :points => @submission.points_list,
+          :processing_time => @submission.processing_time,
           :message_for_paste => @submission.message_for_paste,
           :missing_review_points => @exercise.missing_review_points_for(@submission.user)
         }
