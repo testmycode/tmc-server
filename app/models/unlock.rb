@@ -47,7 +47,7 @@ private
     for exercise in course.exercises
       existing = user_unlocks_by_exercise_name[exercise.name]
       exists = !!existing
-      may_exist = exercise.unlock_spec_obj.permits_unlock_for?(user)
+      may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
       if !exists && may_exist && !exercise.requires_explicit_unlock?
         Unlock.create!(
           :user => user,
