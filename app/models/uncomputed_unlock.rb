@@ -1,3 +1,5 @@
+require 'set'
+
 # Keeps track of whether a (course, user)'s unlocks have yet to be computed, enabling lazy computation.
 # A course refresh populates this table and the UnlockComputerTask background task
 # consumes it by calling Unlock.refresh_unlocks on the entries. All code that accesses
@@ -7,15 +9,15 @@ class UncomputedUnlock < ActiveRecord::Base
   belongs_to :user
 
   def self.create_all_for_course(course)
-    user_ids = User.course_students(course).pluck(:id)
     transaction do
-      user_ids.each do |uid|
-        # The obvious race condition here may result in a duplicate being inserted.
-        # This is fine since Unlock.refresh_unlocks does a corresponding delete_all.
-        unless UncomputedUnlock.where(:course_id => course.id, :user_id => uid).exists?
-          UncomputedUnlock.create!(:course_id => course.id, :user_id => uid)
-        end
-      end
+      course_users = User.course_students(course).pluck(:id)
+      existing_users = Set.new(UncomputedUnlock.where(:course_id => course.id, :user_id => course_users).pluck(:user_id))
+      new_users = Set.new(course_users).difference(existing_users)
+
+      rows_to_insert = new_users.map {|uid| {:course_id => course.id, :user_id => uid} }
+      # The obvious race condition here may result in a duplicate being inserted.
+      # This is fine since Unlock.refresh_unlocks does a corresponding delete_all.
+      UncomputedUnlock.create!(rows_to_insert)
     end
   end
 
