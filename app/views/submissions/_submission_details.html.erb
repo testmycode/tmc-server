@@ -55,8 +55,20 @@
       <% if @submission.paste_available? and not @submission.all_tests_passed? and not @is_paste %>
         <li><%= link_to "Show Paste", paste_path(@submission.paste_key) %></li>
       <% end %>
-
     </ul>
+
+    <% if can? :update, @submission %>
+      <br/>
+      <div>
+        <%= form_tag submission_path(@submission), :method => :put, :class => 'single-button' do %>
+          <%= hidden_field_tag('rerun', '1')  %>
+          <div>
+            <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
+          </div>
+          (may add points; never deletes points)
+        <% end %>
+      </div>
+    <% end %>
 
     <% if !@submission.processed? %>
       <script type="text/javascript">
