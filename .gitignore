@@ -7,6 +7,7 @@
 /doc/usermanual/pages
 /doc/usermanual/screenshots
 /config/site.yml
+/config/newrelic.yml
 /config/database.local.yml
 /config/site_tailoring.rb
 /config/extra_fields/*.rb
