@@ -29,6 +29,7 @@ class Course < ActiveRecord::Base
   has_many :feedback_questions, :dependent => :delete_all
   has_many :feedback_answers  # destroyed transitively when questions are destroyed
   has_many :unlocks, :dependent => :delete_all
+  has_many :uncomputed_unlocks, :dependent => :delete_all
   has_many :course_notifications, :dependent => :delete_all
 
   def destroy
@@ -171,7 +172,8 @@ class Course < ActiveRecord::Base
   end
 
   def unlockable_exercises_for(user)
-    unlocked = self.unlocks.where(:user_id => user.id).map(&:exercise_name)
+    UncomputedUnlock.resolve(self, user)
+    unlocked = self.unlocks.where(:user_id => user.id).pluck(:exercise_name)
     self.exercises.to_a.select {|ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
   end
 

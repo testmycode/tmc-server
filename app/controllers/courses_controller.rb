@@ -35,11 +35,15 @@ class CoursesController < ApplicationController
       session.delete(:refresh_report)
     end
 
-    assign_show_view_vars
-    add_course_breadcrumb
+    @course = Course.find(params[:id])
+    authorize! :read, @course
+    UncomputedUnlock.resolve(@course, current_user)
 
     respond_to do |format|
-      format.html
+      format.html do
+        assign_show_view_vars
+        add_course_breadcrumb
+      end
       format.json do
         return respond_access_denied('Authentication required') if current_user.guest?
         data = {
@@ -85,10 +89,11 @@ class CoursesController < ApplicationController
 private
 
   def assign_show_view_vars
-    @course = Course.find(params[:id])
-    @exercises = @course.exercises.select {|ex| ex.visible_to?(current_user) }.natsort_by(&:name)
+    @exercises = @course.
+      exercises.
+      includes(:course).
+      select {|ex| ex.visible_to?(current_user) }.natsort_by(&:name)
     @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
-    authorize! :read, @course
 
     unless current_user.guest?
       max_submissions = 100

@@ -123,7 +123,7 @@ private
           measure_and_log :make_zips_of_stubs
           measure_and_log :make_zips_of_solutions
           measure_and_log :set_permissions
-          measure_and_log :update_unlocks
+          measure_and_log :invalidate_unlocks
 
           @course.refreshed_at = Time.now
           @course.save!
@@ -450,8 +450,8 @@ private
       sh!('chgrp', '-R', chgrp, @course.cache_path) unless chgrp.blank?
     end
 
-    def update_unlocks
-      Unlock.refresh_all_unlocks(@course)
+    def invalidate_unlocks
+      UncomputedUnlock.create_all_for_course(@course)
     end
 
     def seed_maven_cache

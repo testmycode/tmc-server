@@ -149,6 +149,10 @@ div.feedback-source {
   font-style: italic;
 }
 
+form.single-button {
+  margin-bottom: 0px;  /* overrides bootstrap's 20px */
+}
+
 /* Lists and tables */
 
 table {

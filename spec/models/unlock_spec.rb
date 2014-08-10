@@ -13,6 +13,7 @@ describe Unlock do
 
       @user = Factory.create(:user)
       @available_point = Factory.create(:available_point, :exercise_id => @ex1.id)
+      @available_point2 = Factory.create(:available_point, :exercise_id => @ex2.id)
     end
 
     it "creates unlocks as specified" do
@@ -63,9 +64,10 @@ describe Unlock do
       u = Unlock.where(:exercise_name => 'ex1').first
       u.valid_after.should > Date.today + 2.days
 
-      @ex1.unlock_spec = [].to_json
+      @ex1.unlock_spec = ["exercise ex2"].to_json
       @ex1.save!
       @course.reload
+      AwardedPoint.create!(:user_id => @user.id, :course_id => @course.id, :name => @available_point2.name)
       Unlock.refresh_unlocks(@course, @user)
       u = Unlock.where(:exercise_name => 'ex1').first
       u.valid_after.should be_nil

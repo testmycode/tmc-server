@@ -18,29 +18,12 @@ class Unlock < ActiveRecord::Base
     :conditions => proc { "exercises.course_id = #{self.course_id}" }
   # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
-  # refresh_[all_]unlocks creates missing unlocks (unless explicit unlock required) and
-  # deletes unlocks that are no longer permitted due to an update in the exercise specs
-
-  def self.refresh_all_unlocks(course)
-    Unlock.transaction do
-      unlocks = {}
-      course.unlocks.each do |u|
-        unlocks[u.user_id] ||= {}
-        unlocks[u.user_id][u.exercise_name] = u
-      end
-
-      unlocks.default = {}
-      for user in User.all
-        refresh_unlocks_impl(course, user, unlocks[user.id])
-      end
-    end
-  end
-
   def self.refresh_unlocks(course, user)
     Unlock.transaction do
       unlocks = course.unlocks.where(:user_id => user.id)
       by_exercise_name = Hash[unlocks.map {|u| [u.exercise_name, u]}]
       refresh_unlocks_impl(course, user, by_exercise_name)
+      UncomputedUnlock.where(:course_id => course.id, :user_id => user.id).delete_all
     end
   end
 
@@ -64,7 +47,7 @@ private
     for exercise in course.exercises
       existing = user_unlocks_by_exercise_name[exercise.name]
       exists = !!existing
-      may_exist = exercise.unlock_spec_obj.permits_unlock_for?(user)
+      may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
       if !exists && may_exist && !exercise.requires_explicit_unlock?
         Unlock.create!(
           :user => user,

@@ -8,8 +8,13 @@ class CourseInfo
   end
 
   def course_data(course)
-    exercises = course.exercises.includes(:available_points).natsort_by(&:name)
-    @unlocked_exercises = course.unlocks.where(:user_id => @user.id).where(['valid_after IS NULL OR valid_after < ?', Time.now]).map(&:exercise_name)
+    exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
+
+    @unlocked_exercises = course.
+      unlocks.
+      where(:user_id => @user.id).
+      where(['valid_after IS NULL OR valid_after < ?', Time.now]).
+      pluck(:exercise_name)
 
     submissions_by_exercise = {}
     Submission.where(:course_id => course.id, :user_id => @user.id).each do |sub|
@@ -67,6 +72,6 @@ private
   end
 
   def get_latest_submission(exercise)
-    exercise.submissions.where(:user_id => @user.id).order("created_at DESC").first
+    exercise.submissions_by(@user).min_by(&:created_at)
   end
 end

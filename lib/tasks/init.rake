@@ -2,26 +2,26 @@
 require 'ruby_init_script'
 require 'etc'
 
-namespace :reprocessor do
+namespace :background_daemon do
   namespace :init do
-    DEFAULT_NAME = 'tmc-submission-reprocessor'
+    DEFAULT_NAME = 'tmc-background-daemon'
 
     def init_script(name = nil)
       name ||= DEFAULT_NAME
       RubyInitScript.new({
         :name => name,
-        :short_description => 'TMC submission reprocessor',
-        :executable_path => 'script/submission_reprocessor',
+        :short_description => 'TMC background daemon',
+        :executable_path => 'script/background_daemon',
         :user => Etc.getpwuid(File.stat(::Rails::root).uid).name
       })
     end
 
-    desc "Install submission reprocessor init script. RVM-compatible. Optional arg: script name."
+    desc "Install background daemon init script. RVM-compatible. Optional arg: script name."
     task :install, [:name] do |t, args|
       init_script(args[:name]).install
     end
 
-    desc "Preview submission reprocessor init script."
+    desc "Preview background daemon init script."
     task :preview do
       script = init_script.script_source
       puts
@@ -61,7 +61,7 @@ namespace :comet do
 end
 
 namespace :init do
-  initables = [:reprocessor, :comet]
+  initables = [:background_daemon, :comet]
   desc "Installs all initscripts"
   task :install => initables.map {|initable| "#{initable}:init:install" }
   desc "Uninstalls all initscripts"
