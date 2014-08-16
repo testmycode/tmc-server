@@ -32,10 +32,7 @@ class SubmissionPackager
         FileUtils.cp(jar_path, dest + 'checkstyle-runner' + destname)
       end
 
-      unless opts[:no_tmc_run]
-        FileUtils.cp(tmc_run_path, dest + 'tmc-run')
-        sh! ['chmod', 'a+x', dest + 'tmc-run']
-      end
+      copy_and_chmod_tmcrun(dest) unless opts[:no_tmc_run]
     end
 
     def tmc_run_path

@@ -19,10 +19,7 @@ class SubmissionPackager
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
       copy_extra_student_files(tmc_project_file, received, dest)
 
-      unless opts[:no_tmc_run]
-        FileUtils.cp(tmc_run_path, dest + 'tmc-run')
-        sh! ['chmod', 'a+x', dest + 'tmc-run']
-      end
+      copy_and_chmod_tmcrun(dest) unless opts[:no_tmc_run]
     end
 
     def tmc_run_path

@@ -115,6 +115,11 @@ private
     end
   end
 
+  def copy_and_chmod_tmcrun(dest)
+    FileUtils.cp(tmc_run_path, dest + 'tmc-run')
+    sh! ['chmod', 'a+x', dest + 'tmc-run']
+  end
+
   def copy_extra_student_files(tmc_project_file, received, dest)
     tmc_project_file.extra_student_files.each do |rel_path|
       from = "#{received}/#{rel_path}"
