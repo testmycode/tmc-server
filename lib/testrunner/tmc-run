@@ -113,6 +113,10 @@ if [ -f .tmcrc ]; then
   . ./.tmcrc
 fi
 
+if [ -z "$JVM_OPTIONS" ]; then
+  JVM_OPTIONS="-Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K"
+fi
+
 
 echo "Running tests..."
 case $PROJECT_TYPE in
@@ -142,7 +146,7 @@ case $PROJECT_TYPE in
       DEFS="$DEFS -Djava.endorsed.dirs=`pwd`/lib/endorsed"
     fi
 
-    java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
+    java $JVM_OPTIONS "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
 
   ;;
   java_maven)
@@ -154,7 +158,7 @@ case $PROJECT_TYPE in
 
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$STYLE_ERROR_MSG_LOCALE_DEF" $DEFS -jar checkstyle-runner/tmc-checkstyle-runner.jar 2>&1 validations_out.txt || exit 104
     # MAVEN_OPTS was set above
-    JVM_OPTS_DEF="-Dtmc.test.jvm_opts=-Xms"${JAVA_RAM_KB}"K -Xmx"${JAVA_RAM_KB}"K $ERROR_MSG_LOCALE_DEF"
+    JVM_OPTS_DEF="-Dtmc.test.jvm_opts=$JVM_OPTIONS $ERROR_MSG_LOCALE_DEF"
     TEST_RUNNER="fi.helsinki.cs.tmc:tmc-maven-plugin:$TMC_MAVEN_PLUGIN_VERSION:test"
 
 
