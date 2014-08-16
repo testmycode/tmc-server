@@ -17,7 +17,18 @@ class SubmissionPackager
     cls.new
   end
 
-  def package_submission(exercise, zip_path, tar_path, extra_params = {})
+  # Packages a submitted ZIP of the given exercise into a TAR or a ZIP with tests
+  # added from the clone (to ensure they haven't been tampered with).
+  #
+  # - zip_path must be the path to the submitted zip.
+  # - return_file_path is the path to the file to be generated.
+  # - extra_params are written as shell export statements into into .tmcparams.
+  # - config options:
+  #   - tests_from_stub: includes tests from the stub instead of the clone.
+  #                      This effectively excludes hidden tests.
+  #   - no_tmc_run: does not include the tmc-run file
+  #   - format: may be set to :zip to get a zip file. Defaults to :tar.
+  def package_submission(exercise, zip_path, return_file_path, extra_params = {}, config = {})
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         FileUtils.mkdir_p('received')
@@ -25,11 +36,7 @@ class SubmissionPackager
 
         Dir.chdir('received') do
           sh! ['unzip', zip_path]
-          # Stupid OS X default zipper puts useless crap into zip files :[
-          # Delete them or they might be mistaken for the actual source files later
-          FileUtils.rm_rf '__MACOSX'
-          # Let's clean up other similarly useless files while we're at it
-          FileUtils.rm_f ['.DS_Store', 'desktop.ini', 'Thumbs.db', '.directory']
+          remove_trash_files!
         end
 
         received = Pathname(find_received_project_root(Pathname('received')))
@@ -37,10 +44,39 @@ class SubmissionPackager
 
         write_extra_params(dest + '.tmcparams', extra_params) unless !extra_params || extra_params.empty?
 
-        copy_files(exercise, received, dest)
+        # To get hidden tests etc, gsub stub with clone path...
+        if config[:tests_from_stub]
+          FileUtils.mkdir_p('stub')
+          Dir.chdir('stub') do
+            sh! ['unzip', exercise.stub_zip_file_path]
+            remove_trash_files!
+          end
+          stub = Pathname(find_received_project_root(Pathname('stub')))
 
-        sh! ['tar', '-C', dest.to_s, '-cpf', tar_path, '.']
+          copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run])
+        else
+          copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run])
+        end
+
+        if config[:format] == :zip
+          Dir.chdir(dest) do
+            sh! ['zip', '-r', return_file_path, '.']
+          end
+        else
+          sh! ['tar', '-C', dest.to_s, '-cpf', return_file_path, '.']
+        end
       end
+    end
+  end
+
+  def get_submission_with_tests(submission)
+    exercise = submission.exercise
+    Dir.mktmpdir do |tmpdir|
+      zip_path = "#{tmpdir}/submission.zip"
+      return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
+      File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
+      SubmissionPackager.get(exercise).package_submission(exercise, zip_path, return_zip_path, submission.params, {tests_from_stub: true, format: :zip, no_tmc_run: true})
+      File.read(return_zip_path)
     end
   end
 
@@ -51,8 +87,15 @@ private
     raise "Implemented by subclass"
   end
 
+  # Stupid OS X default zipper puts useless crap into zip files :[
+  # Delete them or they might be mistaken for the actual source files later
+  # Let's clean up other similarly useless files while we're at it
+  def remove_trash_files!
+    FileUtils.rm_f %w(.DS_Store desktop.ini Thumbs.db .directory __MACOSX)
+  end
+
   # All parameters are pathname objects
-  def copy_files(received, cloned, dest)
+  def copy_files(exercise, received, dest, stub = nil, opts = {})
     raise "Implemented by subclass"
   end
 
@@ -70,6 +113,11 @@ private
     if File.exist?(src)
       FileUtils.cp_r(src, dest)
     end
+  end
+
+  def copy_and_chmod_tmcrun(dest)
+    FileUtils.cp(tmc_run_path, dest + 'tmc-run')
+    sh! ['chmod', 'a+x', dest + 'tmc-run']
   end
 
   def copy_extra_student_files(tmc_project_file, received, dest)

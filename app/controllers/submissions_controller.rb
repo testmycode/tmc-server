@@ -25,7 +25,6 @@ class SubmissionsController < ApplicationController
     end
   end
 
-
   def show
     @course ||= @submission.course
     @exercise ||= @submission.exercise
@@ -36,7 +35,7 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.zip { send_data(@submission.return_file, :filename => @submission.downloadable_file_name) }
+      format.zip { send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip") }
       format.json do
         output = {
           :api_version => ApiVersion::API_VERSION,

@@ -59,6 +59,7 @@ TmcServer::Application.routes.draw do
     resources :feedback_answers, :only => [:create]
     resources :files, :only => [:index]
     resources :reviews, :only => [:index, :new, :create]
+    resources :full_zip, :only  => [:index]
   end
 
   get 'paste/:paste_key', to: 'submissions#show', as: 'paste'

@@ -7,19 +7,19 @@ class SubmissionPackager
       Pathname(src_dir_path)
     end
 
-    def copy_files(exercise, received, dest)
+    def copy_files(exercise, received, dest, stub = nil, opts = {})
       cloned = Pathname(exercise.clone_path)
+      tests = stub || cloned
 
       FileUtils.cp_r(received + 'src', dest + 'src')
-      FileUtils.cp_r(cloned  + 'test', dest + 'test')
-      FileUtils.cp(cloned  + 'Makefile', dest + 'Makefile')
+      FileUtils.cp_r(tests + 'test', dest + 'test')
+      FileUtils.cp(tests + 'Makefile', dest + 'Makefile')
       copy_files_in_dir_no_recursion(cloned, dest)
 
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
       copy_extra_student_files(tmc_project_file, received, dest)
 
-      FileUtils.cp(tmc_run_path, dest + 'tmc-run')
-      sh! ['chmod', 'a+x', dest + 'tmc-run']
+      copy_and_chmod_tmcrun(dest) unless opts[:no_tmc_run]
     end
 
     def tmc_run_path
