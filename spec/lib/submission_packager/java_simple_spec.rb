@@ -312,8 +312,6 @@ describe SubmissionPackager::JavaSimple do
     end
   end
 
-  # TODO
-
   describe 'zip' do
     it "packages the submission in a zip file with tests from the repo" do
       @exercise_project.solve_all

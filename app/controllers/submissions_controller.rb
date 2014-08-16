@@ -25,20 +25,6 @@ class SubmissionsController < ApplicationController
     end
   end
 
-  def full_zip
-    submission = Submission.find(params[:id])
-    authorize! :read, submission
-    exercise = submission.exercise
-    respond_to do |format|
-      format.zip do
-        data =  SubmissionPackager.get(exercise).get_submission_with_tests(submission)
-        name = "#{submission.user.login}-#{exercise.name}-#{submission.id}_full.zip"
-        send_data(data, filename: name)
-      end
-    end
-  end
-
-
   def show
     @course ||= @submission.course
     @exercise ||= @submission.exercise

@@ -45,7 +45,7 @@
       <% end %>
 
       <% if can? :read, @submission %>
-        <li><%= link_to "Download as zip", submission_path("#{@submission.id}_full", :format => 'zip') %></li>
+        <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
       <% end %>
 
       <% if can? :create, Review %>

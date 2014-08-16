@@ -17,9 +17,18 @@ class SubmissionPackager
     cls.new
   end
 
+  # Packages a submitted ZIP of the given exercise into a TAR or a ZIP with tests
+  # added from the clone (to ensure they haven't been tampered with).
+  #
+  # - zip_path must be the path to the submitted zip.
+  # - return_file_path is the path to the file to be generated.
+  # - extra_params are written as shell export statements into into .tmcparams.
+  # - config options:
+  #   - tests_from_stub: includes tests from the stub instead of the clone.
+  #                      This effectively excludes hidden tests.
+  #   - no_tmc_run: does not include the tmc-run file
+  #   - format: may be set to :zip to get a zip file. Defaults to :tar.
   def package_submission(exercise, zip_path, return_file_path, extra_params = {}, config = {})
-    # When :tests_from_stub no hidden tests are included in zip
-    tests_from_stub = config[:tests_from_stub]
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         FileUtils.mkdir_p('received')
@@ -30,22 +39,20 @@ class SubmissionPackager
           remove_trash_files!
         end
 
-        if tests_from_stub
+        received = Pathname(find_received_project_root(Pathname('received')))
+        dest = Pathname('dest')
+
+        write_extra_params(dest + '.tmcparams', extra_params) unless !extra_params || extra_params.empty?
+
+        # To get hidden tests etc, gsub stub with clone path...
+        if config[:tests_from_stub]
           FileUtils.mkdir_p('stub')
           Dir.chdir('stub') do
             sh! ['unzip', exercise.stub_zip_file_path]
             remove_trash_files!
           end
           stub = Pathname(find_received_project_root(Pathname('stub')))
-        end
 
-        received = Pathname(find_received_project_root(Pathname('received')))
-        dest = Pathname('dest')
-
-        write_extra_params(dest + '.tmcparams', extra_params) unless !extra_params || extra_params.empty?
-
-        # to get hidden tests etc, gsub stub with clone path...
-        if tests_from_stub
           copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run])
         else
           copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run])
@@ -66,7 +73,7 @@ class SubmissionPackager
     exercise = submission.exercise
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
-      return_zip_path ||= "#{tmpdir}/submission_to_be_returned.zip"
+      return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
       File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
       SubmissionPackager.get(exercise).package_submission(exercise, zip_path, return_zip_path, submission.params, {tests_from_stub: true, format: :zip, no_tmc_run: true})
       File.read(return_zip_path)

@@ -12,7 +12,7 @@ class SubmissionPackager
       tests = stub || cloned
       copy_libs(cloned, dest)
       FileUtils.cp_r(received + 'src', dest + 'src')
-      FileUtils.cp_r(tests  + 'test', dest + 'test')
+      FileUtils.cp_r(tests + 'test', dest + 'test')
       copy_files_in_dir_no_recursion(cloned, dest)
 
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
