@@ -47,4 +47,8 @@ module SystemCommands
     cmd_parts = args.flatten
     cmd_parts.map {|arg| Shellwords.escape(arg.to_s) }.join(' ')
   end
+
+  def make_bash_array(*args)
+    '(' + mk_command(args) + ')'
+  end
 end

@@ -224,7 +224,23 @@ describe SubmissionPackager::JavaSimple do
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
           File.should exist('.tmcparams')
-          File.read('.tmcparams').strip.should == "export foo\\=bar"
+          File.readlines('.tmcparams').map(&:strip).should include "export foo=bar"
+        end
+      end
+    end
+
+    it "writes runtime params into .tmcparams" do
+      @exercise.runtime_params = ActiveSupport::JSON.encode(["-Xss8M", "-verbose:gc"])
+      @exercise_project.solve_all
+      @exercise_project.make_zip(:src_only => false)
+
+      package_it
+
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          `tar xf #{Shellwords.escape(@tar_path)}`
+          File.should exist('.tmcparams')
+          File.readlines('.tmcparams').map(&:strip).should include "export runtime_params=(-Xss8M -verbose:gc)"
         end
       end
     end

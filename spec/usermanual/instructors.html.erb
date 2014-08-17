@@ -416,7 +416,7 @@ public class AnotherExample {
     <li><code>.tmcrc</code> - used to prepare the server side execution environment</li>
   </ul>
   
-  <h3><code>metadata.yml</code></h3>
+  <h3 id="metadata_yml"><code>metadata.yml</code></h3>
   
   <p>
     <code>metadata.yml</code> may be placed in an exercise directory
@@ -438,6 +438,7 @@ publish_time: 2010-02-01
 returnable: false
 gdocs_sheet: week1
 solution_visible_after: 2010-02-15
+runtime_options: ["-Xss8M"]
 </pre>
   
   <ul>
@@ -448,6 +449,7 @@ solution_visible_after: 2010-02-15
     <li><code>returnable</code> tells whether to accept submissions for the exercise. By default if the exercise has a non-empty <code>test/</code> directory then it is considered returnable.</li>
     <li><code>gdocs_sheet</code> names the GDocs sheet to which the exercise's points are exported.</li>
     <li><code>solution_visible_after</code> sets when the suggested solution becomes visible to everyone (including those who didn't complete the exercise). Often set to the same value as the deadline.</li>
+    <li><code>runtime_options</code> allows you to specify extra JVM options, such as increased stack size</li>
   </ul>
 
 
@@ -524,11 +526,6 @@ extra_student_files:
     It is run (actually, sourced) in the sandbox just before the test suite is run.
     Use it e.g. to start <code>Xvfb</code> for GUI tests or set environment variables.
     Note that it is NOT run on the student's machine.
-  </p>
-
-  <p>
-    In .tmcrc, You may export JVM_OPTIONS to set the JVM options, such as memory limits, yourself.
-    If not specified, JVM_OPTIONS will include memory limits derived from the sandbox memory size.
   </p>
 
   <h3><code>course_options.yml</code></h3>
