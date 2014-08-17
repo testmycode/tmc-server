@@ -137,6 +137,7 @@ private
   def write_extra_params(file, extra_params)
     File.open(file, 'wb') do |f|
       extra_params.each do |k, v|
+        v = "" if v == nil
         escaped_v = if v.is_a?(Array) then SystemCommands.make_bash_array(v) else Shellwords.escape(v) end
         f.puts 'export ' + Shellwords.escape(k) + '=' + escaped_v
       end
