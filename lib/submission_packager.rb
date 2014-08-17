@@ -36,20 +36,22 @@ class SubmissionPackager
 
         Dir.chdir('received') do
           sh! ['unzip', zip_path]
-          remove_trash_files!
+          remove_os_rubbish_files!
         end
 
         received = Pathname(find_received_project_root(Pathname('received')))
         dest = Pathname('dest')
 
-        write_extra_params(dest + '.tmcparams', extra_params) unless !extra_params || extra_params.empty?
+        extra_params = if extra_params then extra_params.clone else {} end
+        extra_params['runtime_params'] = exercise.runtime_params_array
+        write_extra_params(dest + '.tmcparams', extra_params)
 
         # To get hidden tests etc, gsub stub with clone path...
         if config[:tests_from_stub]
           FileUtils.mkdir_p('stub')
           Dir.chdir('stub') do
             sh! ['unzip', exercise.stub_zip_file_path]
-            remove_trash_files!
+            remove_os_rubbish_files!
           end
           stub = Pathname(find_received_project_root(Pathname('stub')))
 
@@ -88,9 +90,9 @@ private
   end
 
   # Stupid OS X default zipper puts useless crap into zip files :[
-  # Delete them or they might be mistaken for the actual source files later
-  # Let's clean up other similarly useless files while we're at it
-  def remove_trash_files!
+  # Delete them or they might be mistaken for the actual source files later.
+  # Let's clean up other similarly useless files while we're at it.
+  def remove_os_rubbish_files!
     FileUtils.rm_f %w(.DS_Store desktop.ini Thumbs.db .directory __MACOSX)
   end
 
@@ -134,8 +136,9 @@ private
 
   def write_extra_params(file, extra_params)
     File.open(file, 'wb') do |f|
-      for k, v in extra_params
-        f.puts Shellwords.join(['export', "#{k}=#{v}"]) # Format checked in Submission.valid_param?
+      extra_params.each do |k, v|
+        escaped_v = if v.is_a?(Array) then SystemCommands.make_bash_array(v) else Shellwords.escape(v) end
+        f.puts 'export ' + Shellwords.escape(k) + '=' + escaped_v
       end
     end
   end

@@ -3,6 +3,7 @@ require 'tmpdir'
 require 'shellwords'
 require 'system_commands'
 
+# There is some functionality in common with JavaSimple. We mostly only test that in java_simple_spec.rb.
 describe SubmissionPackager::JavaMaven do
   include GitTestActions
   include SystemCommands
@@ -19,8 +20,8 @@ describe SubmissionPackager::JavaMaven do
     @tar_path = Pathname.new('result.tar').expand_path.to_s
   end
 
-  def package_it(extra_params = {})
-    SubmissionPackager.get(@exercise).package_submission(@exercise, @exercise_project.zip_path, @tar_path, extra_params)
+  def package_it
+    SubmissionPackager.get(@exercise).package_submission(@exercise, @exercise_project.zip_path, @tar_path)
   end
 
   it "should package the submission in a tar file with tests from the repo" do
@@ -176,21 +177,6 @@ describe SubmissionPackager::JavaMaven do
     end
   end
 
-  it "writes extra parameters into .tmcparams" do
-    @exercise_project.solve_all
-    @exercise_project.make_zip(:src_only => false)
-
-    package_it(:foo => :bar)
-
-    Dir.mktmpdir do |dir|
-      Dir.chdir(dir) do
-        `tar xf #{Shellwords.escape(@tar_path)}`
-        File.should exist('.tmcparams')
-        File.read('.tmcparams').strip.should == "export foo\\=bar"
-      end
-    end
-  end
-
   describe "tmc-run script added to the archive" do
     it "should run mvn tmc:test" do
       @exercise_project.solve_all
@@ -236,36 +222,6 @@ describe SubmissionPackager::JavaMaven do
           output = File.read('test_output.txt')
           output.should include('COMPILATION ERROR')
           output.should include('BUILD FAILURE')
-        end
-      end
-    end
-
-    it "should source .tmcrc" do
-      File.open("#{@exercise.clone_path}/.tmcrc", 'w') do |f|
-        f.write("echo $PROJECT_TYPE > lol.txt")
-      end
-
-      @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
-
-      package_it
-
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          sh! ['tar', 'xf', @tar_path]
-
-          begin
-            sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
-          rescue
-            if File.exist?('test_output.txt')
-              raise($!.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
-            else
-              raise
-            end
-          end
-
-          File.should exist('lol.txt')
-          File.read('lol.txt').strip.should == 'java_maven'
         end
       end
     end

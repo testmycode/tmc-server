@@ -1,3 +1,5 @@
+require 'shellwords'
+
 class Exercise < ActiveRecord::Base
   self.include_root_in_json = false
 
@@ -16,10 +18,6 @@ class Exercise < ActiveRecord::Base
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
   }
-
-  def exercise_json_url
-    Rails.application.routes.url_helpers.exercise_url(self.id, format: 'json', api_version: 5)
-  end
 
   def relative_path
     name.gsub('-', '/')
@@ -243,6 +241,7 @@ class Exercise < ActiveRecord::Base
     self.hidden = new_options["hidden"]
     self.returnable_forced = new_options["returnable"]
     self.solution_visible_after = new_options["solution_visible_after"]
+    self.runtime_params = parse_runtime_params(new_options["runtime_params"])
   end
 
   # Whether this exercise accepts submissions at all.
@@ -267,6 +266,10 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  def runtime_params_array
+    ActiveSupport::JSON.decode(runtime_params)
+  end
+
   def self.default_options
     {
       "deadline" => nil,
@@ -275,7 +278,8 @@ class Exercise < ActiveRecord::Base
       "points_visible" => true,
       "hidden" => false,
       "returnable" => nil,
-      "solution_visible_after" => nil
+      "solution_visible_after" => nil,
+      "runtime_params" => nil
     }
   end
 
@@ -332,5 +336,17 @@ private
     array = ActiveSupport::JSON.decode(str)
     raise "JSON array expected" if !array.is_a?(Array)
     raise "JSON array of strings expected" if array.any? {|a| !a.is_a?(String) }
+  end
+
+  def parse_runtime_params(raw_params)
+    if raw_params == nil
+      "[]"
+    elsif raw_params.is_a?(String)
+      to_json_array(Shellwords::shellwords(raw_params))
+    elsif raw_params.is_a?(Array)
+      to_json_array(raw_params)
+    else
+      raise "Invalid runtime_params: #{raw_params.inspect}"
+    end
   end
 end

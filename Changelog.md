@@ -1,3 +1,8 @@
+### 2014-08-17
+
+* `metadata.yml` now accepts a `runtime_params` option that allows setting arbitrary JVM parameters.
+  These are served to the NB plugin and used in the sandbox.
+
 ### 2014-08-14
 
 * Added option to download submissions with test/ and nbproject/ folders
@@ -5,9 +10,10 @@
 
 ### 2014-08-03
 
-* Optimized course refresher, started to calculate unlock conditions lazily
-  and more optimized. Thus course refresh should happen in just a few
-  minutes. Also Course#show is much faster
+* Optimized course refresher. Unlock conditions are now only calculated on demand,
+  so the course refreshed doesn't spend any time on them any more.
+  Course refresh should now take just a few minutes.
+* Optimized Course#show.
 
 ### 2014-07-30
 

@@ -53,7 +53,8 @@ private
       :completed => exercise.completed_by?(@user),
       :reviewed => exercise.reviewed_for?(@user),
       :all_review_points_given => exercise.all_review_points_given_for?(@user),
-      :memory_limit => exercise.memory_limit
+      :memory_limit => exercise.memory_limit,
+      :runtime_params => exercise.runtime_params_array
     }
 
     data[:solution_zip_url] = @helpers.exercise_solution_zip_url(exercise) if @user.administrator?
