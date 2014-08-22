@@ -7,9 +7,6 @@
 [submodule "ext/tmc-comet"]
 	path = ext/tmc-comet
 	url = git@github.com:testmycode/tmc-comet.git
-[submodule "ext/tmc-check"]
-	path = ext/tmc-check
-	url = git@github.com:testmycode/tmc-check.git
 [submodule "ext/tmc-spyware-server"]
 	path = ext/tmc-spyware-server
 	url = git@github.com:testmycode/tmc-spyware-server.git
