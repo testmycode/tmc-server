@@ -15,7 +15,7 @@
     <li>
       <%= link_to 'Waiting for unlock', course_unlock_path(@course) %>
     </li>
-  <% else %>
+  <% elsif @exercise.requires_unlock? %>
     <li>
       Not yet unlocked.
       <%= @exercise.unlock_spec_obj.description_for(current_user) %>
