@@ -4,8 +4,19 @@ require 'securerandom'
 class Submission < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
+
+  # We need to do this because confition is not always evaluated in the context of this class
+  # but in the context of AREL, thus includes(:submissions) did not work.
+  # i.e. we got NoMethodError for course id.
+  # This seems to be fixed in rails 4
   belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "exercises.course_id = #{self.course_id}" } # TODO: self.course_id not available when doing includes(:exercise))
+    :conditions => proc {
+    if self.respond_to?(:course_id)
+      "exercises.course_id = #{self.course_id}"
+    else
+      "exercises.course_id = submissions.course_id"
+    end
+  }
 
   has_one :submission_data, :dependent => :delete
   after_save { submission_data.save! if submission_data }
