@@ -1,8 +1,7 @@
 ### 2014-08-30
 
-* Added api courses/:coursename/exercise_status/:username to get
-  individual details for course completion status
-
+* Added API courses/:coursename/exercise_status/:username.json to get
+  individual details for course completion status.
 
 ### 2014-08-17
 

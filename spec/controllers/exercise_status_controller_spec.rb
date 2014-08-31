@@ -5,6 +5,7 @@ describe ExerciseStatusController do
     @course = Factory.create(:course)
     @exercise = Factory.create(:exercise, :course => @course)
     @exercise2 = Factory.create(:exercise, :course => @course)
+    @exercise3 = Factory.create(:exercise, :course => @course)
   end
 
   describe "GET show" do
@@ -37,24 +38,30 @@ describe ExerciseStatusController do
 
       end
 
+      def do_get
+        get :show, :course_id => @course.id, :id => @user.id, :format => :json, :api_version => ApiVersion::API_VERSION
+      end
+
       it "should show completition status for submitted exercises" do
-        get :show, :course_id => @course.id, :id => @user.id
+        do_get
         response.should be_success
         json = JSON.parse response.body
         json.should have_key @exercise.name
         json.should have_key @exercise2.name
         json[@exercise.name].should == "completed"
-        json[@exercise2.name].should == "started"
+        json[@exercise2.name].should == "attempted"
+        json[@exercise3.name].should == "not_attempted"
       end
 
       it "should work when using course and user name instrad of id:s" do
-        get :show, :course_id => @course.name, :id => @user.login
+        do_get
         response.should be_success
         json = JSON.parse response.body
         json.should have_key @exercise.name
         json.should have_key @exercise2.name
         json[@exercise.name].should == "completed"
-        json[@exercise2.name].should == "started"
+        json[@exercise2.name].should == "attempted"
+        json[@exercise3.name].should == "not_attempted"
       end
     end
   end
