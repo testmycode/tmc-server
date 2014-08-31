@@ -6,8 +6,18 @@ class Exercise < ActiveRecord::Base
   belongs_to :course
 
   has_many :available_points, :dependent => :delete_all
+  # We need to do this because confition is not always evaluated in the context of this class
+  # but in the context of AREL, thus includes(:submissions) did not work.
+  # i.e. we got NoMethodError for course id.
+  # This seems to be fixed in rails 4
   has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "submissions.course_id = #{self.course_id}" }
+    :conditions => proc {
+    if self.respond_to?(:course_id)
+      "submissions.course_id = #{self.course_id}"
+    else
+      'submissions.course_id = exercises.course_id'
+    end
+  }
   has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,
     :conditions => proc { "feedback_answers.course_id = #{self.course_id}" }
   has_many :unlocks, :foreign_key => :exercise_name, :primary_key => :name,

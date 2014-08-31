@@ -1,3 +1,9 @@
+### 2014-08-30
+
+* Added api courses/:coursename/exercise_status/:username to get
+  individual details for course completion status
+
+
 ### 2014-08-17
 
 * `metadata.yml` now accepts a `runtime_params` option that allows setting arbitrary JVM parameters.
