@@ -241,8 +241,25 @@ class Exercise < ActiveRecord::Base
     super(DateAndTimeUtils.to_time(new_value, :prefer_end_of_day => true))
   end
 
+  def maybe_get_course_spesific_options(options)
+    p SELF: self
+    p OPTIONS: options
+    return options unless options['courses']
+    course_options = options['courses'][self.course.name]
+    if course_options
+      course_options =course_options.dup
+      options.delete('courses')
+      p COURSE_OPTIONS: course_options
+    p OPTIONS: options
+      options.merge!(course_options)
+      p MERGED: options
+    end
+    options
+  end
+
   def options=(new_options)
-    new_options = self.class.default_options.merge(new_options)
+
+    new_options = self.class.default_options.merge(maybe_get_course_spesific_options(new_options))
     self.deadline_spec = to_json_array(new_options["deadline"])
     self.unlock_spec = to_json_array(new_options["unlocked_after"])
     self.publish_time = new_options["publish_time"]

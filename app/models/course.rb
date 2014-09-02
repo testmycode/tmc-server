@@ -66,8 +66,21 @@ class Course < ActiveRecord::Base
     super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => false))
   end
 
+
+  def maybe_get_course_spesific_options(options)
+    return options unless options['courses']
+    course_options = options['courses'][self.name]
+    if course_options
+      course_options = course_options.dup
+      options.delete('courses')
+      options.merge!(course_options)
+    end
+    options
+  end
+
   # This could eventually be made a hstore
   def options=(new_options)
+    new_options = maybe_get_course_spesific_options(new_options)
     if !new_options["hide_after"].blank?
       self.hide_after = new_options["hide_after"]
     else
