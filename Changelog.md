@@ -1,3 +1,8 @@
+### 2014-09-04
+
+* Made it possible to set course-specific options in metadata.yml and course_options.yml,
+  enabling running multiple courses with different configs from the same repo.
+
 ### 2014-08-30
 
 * Added API courses/:coursename/exercise_status/:username.json to get

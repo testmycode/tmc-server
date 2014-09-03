@@ -70,33 +70,32 @@ describe CourseRefresher do
     uniq_points.should == points1
   end
 
-
-  it "should reload course metadata" do
+  it "should reload course options" do
     @course.hide_after.should be_nil
 
-    change_course_metadata_file 'hide_after' => "2011-07-01 13:00"
+    change_course_options_file 'hide_after' => "2011-07-01 13:00"
     @refresher.refresh_course(@course)
     @course.hide_after.should == Time.zone.parse("2011-07-01 13:00") # local time zone
 
-    change_course_metadata_file 'hide_after' => nil
+    change_course_options_file 'hide_after' => nil
     @refresher.refresh_course(@course)
     @course.hide_after.should == nil
 
-    change_course_metadata_file 'hidden' => true
+    change_course_options_file 'hidden' => true
     @refresher.refresh_course(@course)
     @course.should be_hidden
 
-    change_course_metadata_file 'spreadsheet_key' => 'qwerty'
+    change_course_options_file 'spreadsheet_key' => 'qwerty'
     @refresher.refresh_course(@course)
     @course.spreadsheet_key.should == 'qwerty'
   end
 
-  it "should work with an empty course metadata file" do
-    change_course_metadata_file "", :raw => true
+  it "should work with an empty course options file" do
+    change_course_options_file "", :raw => true
     @refresher.refresh_course(@course)
     @course.hide_after.should == nil
 
-    change_course_metadata_file "---", :raw => true
+    change_course_options_file "---", :raw => true
     @refresher.refresh_course(@course)
     @course.hide_after.should == nil
   end
@@ -147,6 +146,107 @@ describe CourseRefresher do
 
     @course.exercises.first.deadline_for(@user).should == Time.zone.parse("2013-01-01 00:00")
     @course.exercises.first.gdocs_sheet.should == "foo"
+  end
+
+  it "should allow course-specific overrides in course options" do
+    @course.hide_after.should be_nil
+
+    change_course_options_file({
+      'hide_after' => "2001-01-01 00:00",
+      'courses' => {
+        @course.name => {
+          'hide_after' => "2002-01-01 00:00",
+        },
+        'other-course' => {
+          'hide_after' => "2003-01-01 00:00",
+        }
+      }
+    })
+    @refresher.refresh_course(@course)
+
+    @course.hide_after.should == Time.zone.parse("2002-01-01 00:00")
+  end
+
+  it "should allow course-specific overrides in metadata settings" do
+    add_exercise('MyExercise', :commit => false)
+    change_metadata_file(
+      'metadata.yml',
+      {
+        'deadline' => "2001-01-01 00:00",
+        'courses' => {
+          @course.name => {
+            'deadline' => "2002-01-01 00:00"
+          },
+          'other-course' => {
+            'deadline' => "2003-01-01 00:00"
+          }
+        }
+      },
+      {:commit => true}
+    )
+    @refresher.refresh_course(@course)
+
+    @course.exercises.first.deadline_for(@user).should == Time.zone.parse("2002-01-01 00:00")
+  end
+
+  it "should apply course-specific overrides before merging subdirectory settings" do
+    add_exercise('MyExercise', :commit => false)
+    change_metadata_file(
+      'metadata.yml',
+      {
+        'deadline' => "2002-01-01 00:00",
+        'courses' => {
+          @course.name => {
+            'deadline' => "2003-01-01 00:00"
+          },
+        }
+      },
+      {:commit => false}
+    )
+    change_metadata_file(
+      'MyExercise/metadata.yml',
+      {'deadline' => "2001-01-01 00:00"},
+      {:commit => true}
+    )
+    @refresher.refresh_course(@course)
+
+    @course.exercises.first.deadline_for(@user).should == Time.zone.parse("2001-01-01 00:00")
+  end
+
+  it "should allow overriding a setting with a course-specific nil setting" do
+    add_exercise('MyExercise', :commit => false)
+    change_metadata_file(
+      'MyExercise/metadata.yml',
+      {
+        'deadline' => "2002-01-01 00:00",
+        'courses' => {
+          @course.name => {
+            'deadline' => nil
+          },
+        }
+      },
+      {:commit => true}
+    )
+    @refresher.refresh_course(@course)
+
+    @course.exercises.first.deadline_for(@user).should be_nil
+  end
+
+  it "should allow overriding a setting with a nil setting in a subdirectory" do
+    add_exercise('MyExercise', :commit => false)
+    change_metadata_file(
+      'metadata.yml',
+      {'deadline' => "2001-01-01 00:00"},
+      {:commit => false}
+    )
+    change_metadata_file(
+      'MyExercise/metadata.yml',
+      {'deadline' => nil},
+      {:commit => true}
+    )
+    @refresher.refresh_course(@course)
+
+    @course.exercises.first.deadline_for(@user).should be_nil
   end
 
   it "should delete removed exercises from the database" do
@@ -444,7 +544,7 @@ describe CourseRefresher do
   end
 
   it "should report YAML parsing errors normally" do
-    change_course_metadata_file "foo: bar\noops :error", :raw => true
+    change_course_options_file "foo: bar\noops :error", :raw => true
     lambda { @refresher.refresh_course(@course) }.should raise_error(CourseRefresher::Failure)
   end
   
@@ -537,7 +637,7 @@ describe CourseRefresher do
     @local_clone.add_commit_push
   end
 
-  def change_course_metadata_file(data, options = {})
+  def change_course_options_file(data, options = {})
     change_metadata_file('course_options.yml', data, options)
   end
 
