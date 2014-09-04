@@ -547,6 +547,33 @@ extra_student_files:
     <li><code>hidden_if_registered_after</code> hides the course from students (and their NetBeans) who have registered after the given date. After the given date it will also be invisible to unregistered users.</li>
     <li><code>locked_exercise_points_visible</code> tells whether exercises that one has not unlocked are visible on the scoreboard. Defaults to true.</li>
   </ul>
+
+  <h2>Course-specific configuration</h2>
+
+  <p>
+    It is sometimes useful to keep multiple courses in the same repository and have
+    the courses only differ in configuration. This can be accomplished by specifying
+    course-specific configuration in a 'courses' section, like this:
+  </p>
+  <pre class="yaml">
+courses:
+  my-course-no-deadline:
+    deadline: nil
+deadline: 2010-02-15</pre>
+
+  <p>
+    The 'courses' section works in both <code>metadata.yml</code> and
+    <code>course_options.yml</code> files.
+  </p>
+  <p>
+    A course-specific option always overrides a general option in the same file.
+  </p>
+  <p>
+    Subdirectory options are applied after course-specific options in the parent
+    directory have been applied. That means that if <code>parent-dir/metadata.yml</code>
+    specifies a course-specific deadline, <code>parent-dir/subdir/metadata.yml</code>
+    can still override it with a general non-course-specific setting.
+  </p>
   
   <h2>ProTips</h2>
   

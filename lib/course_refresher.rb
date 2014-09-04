@@ -196,7 +196,8 @@ private
         unless File.read(options_file).strip.empty?
           yaml_data = YAML.load_file(options_file)
           if yaml_data.is_a?(Hash)
-            opts = opts.merge(YAML.load_file(options_file))
+            opts = YAML.load_file(options_file)
+            opts = merge_course_specific_suboptions(opts)
           end
         end
       end
@@ -238,7 +239,10 @@ private
             :root_dir => @course.clone_path,
             :target_dir => File.join(@course.clone_path, e.relative_path),
             :file_name => 'metadata.yml',
-            :defaults => Exercise.default_options
+            :defaults => Exercise.default_options,
+            :file_preprocessor => Proc.new do |opts|
+              merge_course_specific_suboptions(opts)
+            end
           })
           @review_points[e.name] = parse_review_points(metadata['review_points'])
           e.options = metadata
@@ -257,6 +261,14 @@ private
       elsif data.is_a?(Array)
         data.map(&:to_s).reject(&:blank?)
       end
+    end
+
+    def merge_course_specific_suboptions(opts)
+      if opts['courses'].is_a?(Hash) && opts['courses'][@course.name].is_a?(Hash)
+        opts = opts.merge(opts['courses'][@course.name])
+      end
+      opts.delete 'courses'
+      opts
     end
 
     def set_has_tests_flags
