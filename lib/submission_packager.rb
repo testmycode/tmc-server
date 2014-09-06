@@ -31,11 +31,14 @@ class SubmissionPackager
   #                        (as is usually the case).
   #   - no_tmc_run: does not include the tmc-run file
   #   - format: may be set to :zip to get a zip file. Defaults to :tar.
+  #   - toplevel_dir_name: if present, the zip or tar is made such that
+  #                        there is a toplevel directory with this name
   def package_submission(exercise, zip_path, return_file_path, extra_params = {}, config = {})
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
+        dest_name = config[:toplevel_dir_name] || 'dest'
         FileUtils.mkdir_p('received')
-        FileUtils.mkdir_p('dest')
+        FileUtils.mkdir_p(dest_name)
 
         Dir.chdir('received') do
           sh! ['unzip', zip_path]
@@ -43,7 +46,7 @@ class SubmissionPackager
         end
 
         received = Pathname(find_received_project_root(Pathname('received')))
-        dest = Pathname('dest')
+        dest = Pathname(dest_name)
 
         extra_params = if extra_params then extra_params.clone else {} end
         extra_params['runtime_params'] = exercise.runtime_params_array
@@ -67,18 +70,12 @@ class SubmissionPackager
           copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run])
         end
 
-        if config[:format] == :zip
-          Dir.chdir(dest) do
-            sh! ['zip', '-r', return_file_path, '.']
-          end
-        else
-          sh! ['tar', '-C', dest.to_s, '-cpf', return_file_path, '.']
-        end
+        create_archive(dest, return_file_path, config[:format], !!config[:toplevel_dir_name])
       end
     end
   end
 
-  def get_full_zip(submission)
+  def get_full_zip(submission, toplevel_dir_name)
     exercise = submission.exercise
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
@@ -88,6 +85,7 @@ class SubmissionPackager
         tests_from_stub: true,
         include_ide_files: true,
         format: :zip,
+        toplevel_dir_name: toplevel_dir_name,
         no_tmc_run: true
       )
       File.read(return_zip_path)
@@ -165,6 +163,25 @@ private
         v = "" if v == nil
         escaped_v = if v.is_a?(Array) then SystemCommands.make_bash_array(v) else Shellwords.escape(v) end
         f.puts 'export ' + Shellwords.escape(k) + '=' + escaped_v
+      end
+    end
+  end
+
+  # May modify the contents of `srcdir`.
+  def create_archive(srcdir, archive_path, format, include_toplevel = false)
+    if include_toplevel
+      chdir = srcdir.parent
+      contents = srcdir.basename
+    else
+      chdir = srcdir
+      contents = '.'
+    end
+
+    Dir.chdir(chdir) do
+      if format == :zip
+        sh! ['zip', '-r', archive_path, contents]
+      else
+        sh! ['tar', '-cpf', archive_path, contents]
       end
     end
   end
