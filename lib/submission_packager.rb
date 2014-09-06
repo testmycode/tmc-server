@@ -26,6 +26,9 @@ class SubmissionPackager
   # - config options:
   #   - tests_from_stub: includes tests from the stub instead of the clone.
   #                      This effectively excludes hidden tests.
+  #   - include_ide_files: includes IDE settings from the submission,
+  #                        or from the clone if none in the submission
+  #                        (as is usually the case).
   #   - no_tmc_run: does not include the tmc-run file
   #   - format: may be set to :zip to get a zip file. Defaults to :tar.
   def package_submission(exercise, zip_path, return_file_path, extra_params = {}, config = {})
@@ -45,6 +48,10 @@ class SubmissionPackager
         extra_params = if extra_params then extra_params.clone else {} end
         extra_params['runtime_params'] = exercise.runtime_params_array
         write_extra_params(dest + '.tmcparams', extra_params)
+
+        if config[:include_ide_files]
+          copy_ide_files(Pathname(exercise.clone_path), received, dest)
+        end
 
         # To get hidden tests etc, gsub stub with clone path...
         if config[:tests_from_stub]
@@ -71,13 +78,18 @@ class SubmissionPackager
     end
   end
 
-  def get_submission_with_tests(submission)
+  def get_full_zip(submission)
     exercise = submission.exercise
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
       return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
       File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
-      SubmissionPackager.get(exercise).package_submission(exercise, zip_path, return_zip_path, submission.params, {tests_from_stub: true, format: :zip, no_tmc_run: true})
+      package_submission(exercise, zip_path, return_zip_path, submission.params,
+        tests_from_stub: true,
+        include_ide_files: true,
+        format: :zip,
+        no_tmc_run: true
+      )
       File.read(return_zip_path)
     end
   end
@@ -101,6 +113,19 @@ private
     raise "Implemented by subclass"
   end
 
+  def copy_ide_files(clone, received, dest)
+    # NetBeans
+    cp_r_if_exists([received + 'nbproject', clone + 'nbproject'].find(&:exist?), dest)
+
+    # Eclipse
+    cp_r_if_exists([received + '.classpath', clone + '.classpath'].find(&:exist?), dest)
+    cp_r_if_exists([received + '.project', clone + '.project'].find(&:exist?), dest)
+    cp_r_if_exists([received + '.settings', clone + '.settings'].find(&:exist?), dest)
+
+    # IDEA
+    cp_r_if_exists([received + '.idea', clone + '.idea'].find(&:exist?), dest)
+  end
+
   # Some utilities
   def copy_files_in_dir_no_recursion(src, dest)
     src = Pathname(src)
@@ -112,7 +137,7 @@ private
   end
 
   def cp_r_if_exists(src, dest)
-    if File.exist?(src)
+    if src != nil && File.exist?(src)
       FileUtils.cp_r(src, dest)
     end
   end
