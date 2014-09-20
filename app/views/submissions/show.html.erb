@@ -13,10 +13,10 @@
     <li><a href="#testResults">Test Results</a></li>
   <% end %>
   <% unless @submission.stdout.blank? %>
-    <li><a href="#stdout" >System.out</a></li>
+    <li><a href="#stdout" >Stdout</a></li>
   <% end %>
   <% unless @submission.stderr.blank? %>
-    <li><a href="#stderr" >System.err</a></li>
+    <li><a href="#stderr" >Stderr</a></li>
   <% end %>
   <% unless @submission.valgrind.blank? %>
     <li><a href="#valgrind" >Valgrind</a></li>
