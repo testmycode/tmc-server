@@ -15,10 +15,12 @@ class Ability
       can :refresh_gdocs_spreadsheet, Course do |c|
         !c.spreadsheet_key.blank?
       end
+      can :access_pghero
       can :read_vm_log, Submission
     else
       can :read, :all
 
+      cannot :access_pghero
       cannot :read, User
       cannot :read, :code_reviews
       cannot :read, :course_information
