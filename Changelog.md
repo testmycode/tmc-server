@@ -1,3 +1,17 @@
+### 2014-09-21
+
+* Added pghero to get stats from database
+
+    Add following lines to postgresql.conf to enable
+    ```
+    shared_preload_libraries = 'pg_stat_statements'
+    pg_stat_statements.track = all
+    ```
+    Requires postgresql 9.2 or newer
+
+    pghero stats can be accessed from /pghero
+
+
 ### 2014-09-04
 
 * Made it possible to set course-specific options in metadata.yml and course_options.yml,

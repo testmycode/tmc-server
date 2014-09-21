@@ -96,6 +96,9 @@ show_model_solutions_when_exercise_completed: true
 # Whether to show the model solution when the exercise has expired.
 show_model_solutions_when_exercise_expired: false
 
+# Allow authorized people to access pghero
+pghero_enabled: true
+
 ### IDE integration ###
 
 # A list of valid clients. Leave empty to not check.

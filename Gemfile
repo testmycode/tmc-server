@@ -23,6 +23,8 @@ gem 'mimemagic'
 gem 'rack-cors'
 gem 'newrelic_rpm'
 
+gem 'pghero'
+
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
   gem 'rspec-core', '~> 2.8.0'
