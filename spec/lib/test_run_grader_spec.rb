@@ -254,6 +254,33 @@ describe TestRunGrader do
 
   end
 
+  describe "when valgrind strategy is fail" do
+
+    def valgrind_errors
+      "Error" # Checked only if its blank, no deeper analysis of its contents is done
+    end
+
+    it "should not award points for which all required tests passed but valgrind has errors and strategy is 'fail'" do
+      @submission.valgrind = valgrind_errors
+      @submission.exercise.valgrind_strategy = 'fail'
+      TestRunGrader.grade_results(@submission, half_successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should_not include('1.1')
+      points.should_not include('1.2')
+    end
+
+    it "should award points for which all required tests passed but valgrind has errors and strategy is ''" do
+      @submission.valgrind = valgrind_errors
+      @submission.exercise.valgrind_strategy = ''
+      TestRunGrader.grade_results(@submission, half_successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should include('1.1')
+      points.should_not include('1.2')
+    end
+  end
+
   describe "when the exercise requires code review" do
     before :each do
       ap = AvailablePoint.find_by_name('1.1')

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140816195048) do
+ActiveRecord::Schema.define(:version => 20140921155940) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -74,6 +74,7 @@ ActiveRecord::Schema.define(:version => 20140816195048) do
     t.text     "deadline_spec"
     t.text     "unlock_spec"
     t.string   "runtime_params",         :default => "[]",  :null => false
+    t.string   "valgrind_strategy"
   end
 
   add_index "exercises", ["course_id", "name"], :name => "index_exercises_on_course_id_and_name", :unique => true

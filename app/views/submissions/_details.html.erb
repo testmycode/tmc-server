@@ -1,6 +1,9 @@
 <div class="row-fluid">
   <div class="span11">
     <% if @submission.tests_ran? %>
+      <% unless @submission.valgrind.blank?%>
+        <p>Errors in Valgrind check. See <a href="#valgrind">Valgrind log</a>.</p>
+      <% end %>
       <% if @submission.validations && @submission.validations['validationErrors'].any?  %>
         <div>
           <h3 class="text-info underlined">Validation Cases</h3>
@@ -14,12 +17,12 @@
                 </tr>
               </thead>
               <tbody>
-              <% errors.each do |error| %>
-                <tr>
-                  <td><%= error['line'] %></td>
-                  <td><%= error['message'] %></td>
-                </tr>
-              <% end %>
+                <% errors.each do |error| %>
+                  <tr>
+                    <td><%= error['line'] %></td>
+                    <td><%= error['message'] %></td>
+                  </tr>
+                <% end %>
               </tbody>
             </table>
           <% end %>
@@ -39,34 +42,34 @@
           </thead>
 
           <tbody>
-          <% @submission.test_case_runs.each do |tcr| %>
-            <tr>
-              <td><%= tcr.test_case_name %></td>
-              <td>
-                <% if tcr.successful? %>
-                  <span class="success">Ok</span>
-                <% else %>
-                  <span class="failure">Fail</span>
-                <% end %>
-              </td>
-              <% if !@submission.all_tests_passed? %>
+            <% @submission.test_case_runs.each do |tcr| %>
+              <tr>
+                <td><%= tcr.test_case_name %></td>
                 <td>
-                  <%= tcr.message %>
-                  <% if tcr.exception != nil %>
-                    <div class="stack-trace">
-                      <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
-                    </div>
-                  <% end %>
-                  <% if tcr.detailed_message != nil %>
-                    <br />
-                    <div class="detailed-message">
-                      <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
-                    </div>
+                  <% if tcr.successful? %>
+                    <span class="success">Ok</span>
+                  <% else %>
+                    <span class="failure">Fail</span>
                   <% end %>
                 </td>
-              <% end %>
-            </tr>
-          <% end %>
+                <% if !@submission.all_tests_passed? %>
+                  <td>
+                    <%= tcr.message %>
+                    <% if tcr.exception != nil %>
+                      <div class="stack-trace">
+                        <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
+                      </div>
+                    <% end %>
+                    <% if tcr.detailed_message != nil %>
+                      <br />
+                      <div class="detailed-message">
+                        <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
+                      </div>
+                    <% end %>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
           </tbody>
         </table>
       </div>
@@ -85,7 +88,7 @@
       $(button).click(function() {
         $(trace).toggle();
       });
-     };
+    };
 
     var buttonText = "Toggle stack trace";
     $('.stack-trace').each(createButtonTo);

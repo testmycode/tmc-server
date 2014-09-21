@@ -11,6 +11,8 @@
 
     pghero stats can be accessed from /pghero
 
+* Made valgrind fails configurable with `valgrind_strategy` in
+  metadata.yml
 
 ### 2014-09-04
 
