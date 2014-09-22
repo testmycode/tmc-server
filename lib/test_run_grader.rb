@@ -63,7 +63,7 @@ private
       all_passed = false if not passed
       submission.test_case_runs << tcr
     end
-    submission.all_tests_passed = all_passed && validations_passed?(submission.validations)
+    submission.all_tests_passed = all_passed && validations_passed?(submission.validations) && valgrind_passed?(submission)
 
   end
 
@@ -76,6 +76,14 @@ private
     true
   end
 
+  def valgrind_passed?(submission)
+    if submission.exercise.valgrind_strategy == "fail"
+      submission.valgrind.blank?
+    else
+      true
+    end
+  end
+
   def self.award_points(submission, results, review_points)
     user = submission.user
     exercise = submission.exercise
@@ -84,7 +92,7 @@ private
 
     points = []
     for point_name in points_from_test_results(results) - review_points
-      if validations_passed?(submission.validations)
+      if validations_passed?(submission.validations) && valgrind_passed?(submission)
         points << point_name
         unless awarded_points.include?(point_name)
           submission.awarded_points << AwardedPoint.new(
@@ -115,7 +123,7 @@ private
     point_names = point_status.keys.select {|name| point_status[name] == true }
     PointComparison.sort_point_names(point_names)
   end
-  
+
   def self.to_json_or_null(obj)
     if obj != nil
       ActiveSupport::JSON.encode(obj)

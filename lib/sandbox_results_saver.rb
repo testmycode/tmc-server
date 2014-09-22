@@ -18,10 +18,6 @@ module SandboxResultsSaver
       submission.valgrind = results['valgrind']
       submission.validations = results['validations']
 
-      if not submission.valgrind.blank?
-        submission.pretest_error = 'Errors in Valgrind check. See Valgrind log below.'
-      end
-
       case results['status']
       when 'timeout'
         submission.pretest_error = 'Timed out. Check your program for infinite loops.'

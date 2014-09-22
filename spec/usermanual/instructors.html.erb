@@ -7,15 +7,15 @@
   %>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>How to create exercises with TMC</title>
-  
+
   <link rel="stylesheet" type="text/css" href="../css/usermanual.css" />
   <link rel="stylesheet" type="text/css" href="../lib/shjs/sh_style.css" />
-  
+
   <script type="text/javascript" src="../lib/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="../lib/shjs/sh_main.min.js"></script>
   <script type="text/javascript" src="../lib/shjs/sh_java.min.js"></script>
   <script type="text/javascript" src="../js/toc.js"></script>
-  
+
   <script type="text/javascript">
     $(document).ready(function() {
       sh_highlightDocument();
@@ -33,13 +33,13 @@ require 'cgi' # for escapeHTML
   <%
     Factory.create(:admin, :login => 'admin', :password => 'admin')
   %>
-  
+
   <h1>Tutorial</h1>
-  
+
   <div id="toc"></div>
-  
+
   <h2>Creating a course</h2>
-  
+
   <p>
     TMC exercises are stored in a <a href="http://git-scm.com/">git</a>
     repository. Although we'll cover the basics here, we highly recommend
@@ -47,9 +47,9 @@ require 'cgi' # for escapeHTML
     other course instructors. We chose it because it's a supremely useful tool
     that saves time and frustration even when working alone.
   </p>
-  
+
   <p>Let's log in as an administrator.</p>
-  
+
   <%
     visit '/'
     fill_in 'session_login', :with => 'admin'
@@ -60,35 +60,35 @@ require 'cgi' # for escapeHTML
   <%
     click_on 'Sign in'
   %>
-  
+
   <p>
     Now we can create a new course.
   </p>
-  
+
   <% highlight('a:contains("Create New Course")') %>
   <%= screenshot %>
   <% click_on 'Create New Course' %>
-  
+
   <% course_name = 'programming101' %>
   <p>
     We'll name our course "<%= course_name %>", and we'll also have to give the address
     of the git repository where we'll store the exercises.
   </p>
-  
+
   <%
     fill_in 'course_name', :with => course_name
     highlight '#course_name'
-    
+
     repo_path = ENV['TMC_USERMANUAL_REPO_PATH'] || (ENV['HOME'] + '/tmc-example-repo')
     FileUtils.rm_rf(repo_path)
     FileUtils.mkdir_p(repo_path)
     system(mk_command('git', 'init', '--bare', '-q', repo_path))
     repo_url = 'file://' + repo_path
-    
+
     fill_in 'course_source_url', :with => repo_url
     highlight '#course_source_url'
   %>
-  
+
   <p>
     You need to give a remote GIT repository address.
     If you have an existing repository, say on <a href="https://github.com/">GitHub</a>,
@@ -96,7 +96,7 @@ require 'cgi' # for escapeHTML
     In this example we'll pretend the remote repo is at
     <code><%= CGI::escapeHTML(repo_url) %></code>.
   </p>
-  
+
   <%= screenshot %>
   <%
     click_on 'Add Course'
@@ -106,81 +106,81 @@ require 'cgi' # for escapeHTML
     course = Course.last
     course.should_not be_nil
   %>
-  
+
   <p>
     The course was created successfully.
   </p>
-  
+
   <%= screenshot %>
-  
+
   <% workdir = 'tmc-courses/prog101' %>
   <p>
     Now we'll need to add some exercises.
     To do that, we'll need to clone the remote repository, make our changes and push them back,
     as usual with git.
   </p>
-  
+
   <%
     shell_session = DocGen::ShellSession.new
   %>
-  
+
   <%
     course_template_homepage = 'https://github.com/testmycode/tmc-course-template'
     course_template_repo = 'git://github.com/testmycode/tmc-course-template.git'
   %>
-  
+
   <h3>Starting from a template</h3>
   <p>
     We start by cloning the <a href="<%= course_template_homepage %>">course template</a>,
     which has some useful scripts. We'll name the template repo as the 'template' remote,
     since won't be pushing back to the template. The actual course repo will be the 'origin' remote.
   </p>
-  
+
   <%=
     shell_session.example do |sh|
       sh.run "git clone --origin template #{course_template_repo} #{workdir}"
       sh.blank_line
-      
+
       sh.run "cd #{workdir}"
       shell_session.working_dir = workdir
       sh.run "ls"
-      
+
       sh.blank_line
       sh.run "git remote add origin #{course.source_url}"
     end
   %>
-  
+
   <p>
     Now we'll push everything we got from the template into 'origin'.
     The <code>-u</code> flag makes the master branch <em>track</em>
     the master branch in 'origin'. This means that whenever we commit to master and push,
     it'll push to 'origin' by default (and not to 'template').
   </p>
-  
+
   <%=
     shell_session.example do |sh|
       sh.run "git push -u origin master"
     end
   %>
-  
+
   <p>
     An exercise is just a NetBeans project with some unit tests and
     at least the JUnit and edu-test-utils libraries included.
     We pulled a handy template exercise into <code>private/template_project</code> from the course template.
   </p>
-  
+
   <%=
     File.should be_directory(shell_session.working_dir + '/private/template_project')
     shell_session.example do |sh|
       sh.run "cd private/template_project; find ."
     end
   %>
-  
+
   <p>
     It's not advised to copy the template directly but instead use <code>scripts/create-project</code>
     as it automatically also renames the exercise in all relevant NetBeans settings files.
   </p>
-  
+
   <%=
     shell_session.example do |sh|
       sh.run "scripts/create-project factorial"
@@ -191,39 +191,39 @@ require 'cgi' # for escapeHTML
   <% File.should be_directory("#{workdir}/factorial/src") %>
   <% File.should be_directory("#{workdir}/factorial/test") %>
   <% File.should be_directory("#{workdir}/factorial/nbproject") %>
-  
-  
+
+
   <h3>Writing the exercise</h3>
-  
+
   <p>
     Now that we have a blank project, we can finally write our test cases and stub class. Open the project in NetBeans and write the following files.
   </p>
-  
+
   <%
     spec_dir = "#{Rails.root}/spec/usermanual"
     code = {}
     code['Factorial.java'] = File.read("#{spec_dir}/Factorial.java")
     code['FactorialTest.java'] = File.read("#{spec_dir}/FactorialTest.java")
   %>
-  
+
   <div class="file-name">factorial/src/Factorial.java</div>
   <pre class="java sh_java"><%= CGI::escapeHTML(code['Factorial.java']) %></pre>
-  
+
   <div class="file-name">factorial/test/FactorialTest.java</div>
   <pre class="java sh_java"><%= CGI::escapeHTML(code['FactorialTest.java']) %></pre>
-  
+
   <%
     File.open("#{workdir}/factorial/src/Factorial.java", "wb") {|f| f.write(code['Factorial.java']) }
     File.open("#{workdir}/factorial/test/FactorialTest.java", "wb") {|f| f.write(code['FactorialTest.java']) }
   %>
-  
+
   <p>
     We marked solution code we don't want the student to see with special comments.
     TMC will automatically make two versions of each exercise: a <em>stub</em> version
     that will be given to students and a <em>solution</em> version that will be shown as
     the model solution.
   </p>
-  
+
   <p>
     The stub version has the parts in begin/end solution tags removed
     and lines starting with <code>// STUB:</code> uncommented. The stub comments are
@@ -231,14 +231,14 @@ require 'cgi' # for escapeHTML
     The solution version is effectively the same as the original but has stub and solution
     comments removed.
   </p>
-  
+
   <p>
     The tmc-netbeans-author plugin is recommended as it provides syntax highlighting
     for all these comments.
   </p>
-  
+
   <p>Let's commit and push our changes.</p>
-  
+
   <%=
     shell_session.example do |sh|
       sh.run "git status"
@@ -250,26 +250,26 @@ require 'cgi' # for escapeHTML
       sh.run "git push"
     end
   %>
-  
+
   <p>
     The webapp won't react to changes in the repository before you 'refresh' the course.
     This may be inconvenient, but it also somewhat protects against mistakes.
   </p>
-  
+
   <% page.visit(page.current_url) %>
   <% highlight('[value="Refresh"]') %>
   <%= screenshot %>
   <% click_on 'Refresh' %>
   <% course.reload %>
-  
+
   <p>
     The system now reloads all exercises from the repository and rebuilds its
     internal caches. Any submissions made to previous exercises will survive this process,
     even if the exercise is deleted in the push.
   </p>
-  
+
   <%= screenshot %>
-  
+
   <p>
     The exercise should now be available for download and accept submissions either
     from the webapp or from the NetBeans plugin.
@@ -345,24 +345,24 @@ deadline:
     The full syntax of unlock conditions and deadlines is documented in the
     <a href="#metadata_yml">metadata.yml reference</a>.
   </p>
-  
-  
+
+
   <h1>Reference</h1>
-  
+
   <h2>Special comments</h2>
-  
+
   <p>
     Solution code can be demarcated with special comments so it will be removed from
     the version the student gets (the "<em>stub</em>" version).
   </p>
-  
+
   <ul>
     <li><code>// BEGIN SOLUTION</code> ... <code>// END SOLUTION</code> - will be removed from the stub.</li>
     <li><code>// STUB: </code> ... - will be uncommented in the stub version.</li>
     <li><code>// SOLUTION FILE</code> - files containing this line will be removed from the stub.</li>
     <li><code>/* PREPEND HTML </code> ... <code>*/</code> - puts arbitrary HTML on the solution page. Removed from stub.</li>
   </ul>
-  
+
   <pre class="java sh_java">
 public class Example {
     public int sampleMethod(int a, int b) {
@@ -399,8 +399,8 @@ public class AnotherExample {
     The tmc-netbeans-author plugin is recommended as it provides syntax highlighting
     for the special comments (though XML highlighting is not yet supported).
   </p>
-  
-  
+
+
   <h2>Configuration files</h2>
 
   <p>
@@ -408,16 +408,16 @@ public class AnotherExample {
     There are four kinds of configuration files as listed below, but mostly you only need
     <code>metadata.yml</code> files.
   </p>
-  
+
   <ul>
     <li><code>metadata.yml</code> - used to configure exercises and groups of exercises</li>
     <li><code>course_options.yml</code> - used to configure the course as a whole</li>
     <li><code>.tmcproject.yml</code> - used to configure the client side IDE plugin</li>
     <li><code>.tmcrc</code> - used to prepare the server side execution environment</li>
   </ul>
-  
+
   <h3 id="metadata_yml"><code>metadata.yml</code></h3>
-  
+
   <p>
     <code>metadata.yml</code> may be placed in an exercise directory
     or any other directory, which will cause it to be applied to all
@@ -425,11 +425,11 @@ public class AnotherExample {
     in a parent directory's <code>metadata.yml</code> and override them
     selectively in subdirectories.
   </p>
-  
+
   <p>
     <code>metadata.yml</code> may contain directives as in the following example:
   </p>
-  
+
   <pre class="yaml">
 hidden: false
 unlocked_after: 80% of exercise1
@@ -439,8 +439,9 @@ returnable: false
 gdocs_sheet: week1
 solution_visible_after: 2010-02-15
 runtime_options: ["-Xss8M"]
+valgrind_strategy: fail
 </pre>
-  
+
   <ul>
     <li><code>hidden</code> hides the exercise from students (and NetBeans).</li>
     <li><code>unlocked_after</code> hides the exercise from a student until the given condition is met. See below for more.</li>
@@ -450,6 +451,7 @@ runtime_options: ["-Xss8M"]
     <li><code>gdocs_sheet</code> names the GDocs sheet to which the exercise's points are exported.</li>
     <li><code>solution_visible_after</code> sets when the suggested solution becomes visible to everyone (including those who didn't complete the exercise). Often set to the same value as the deadline.</li>
     <li><code>runtime_options</code> allows you to specify extra JVM options, such as increased stack size</li>
+    <li><code>valgrind_strategy</code> allows you to set if valgrind_log will effect points awarded. With <code>fail</code> no points are given if valgrind shows any errors. With anything else valgrind is shown but it doesn't effect points given. Defaults to <code>fail</code>.</li>
   </ul>
 
 
@@ -499,21 +501,21 @@ deadline:
     <li><code>&lt;date-or-datetime&gt;</code></li>
     <li><code>unlock + &lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code></li>
   </ul>
-  
+
   <h3><code>.tmcproject.yml</code></h3>
-  
+
   <p>
     An exercise directory may contain a <code>.tmcproject.yml</code>. It currently supports one setting,
     <code>extra_student_files</code>, which is a list of (relative paths to) files to be treated roughly as if
     they were in <code>src/</code>. It can be used e.g. to mark test files as meant to be implemented by students.
   </p>
-  
+
   <p>Example:</p>
-  
+
   <pre class="yaml">
 extra_student_files:
   - test/StudentTest.java</pre>
-  
+
   <p>
     This causes <code>test/StudentTest.java</code> to be shown as part of the solution.
     Also, the NetBeans plugin would not overwrite the file when the exercise is updated.
@@ -574,9 +576,9 @@ deadline: 2010-02-15</pre>
     specifies a course-specific deadline, <code>parent-dir/subdir/metadata.yml</code>
     can still override it with a general non-course-specific setting.
   </p>
-  
+
   <h2>ProTips</h2>
-  
+
   <ul>
     <li>
       Don't use a dash ("-") in exercise names. There is a bug related to
@@ -592,13 +594,13 @@ deadline: 2010-02-15</pre>
       <a href="https://github.com/testmycode/edu-test-utils">contribute</a>.
     </li>
   </ul>
-  
-  
+
+
   <footer>
     This page was automatically generated from an acceptance test at <%= Time.now %>.
     <!-- How cool is that? -->
   </footer>
-  
+
   <%
     # Clean up the fake remote repo
     FileUtils.rm_rf(repo_path)
