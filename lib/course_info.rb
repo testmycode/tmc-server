@@ -54,7 +54,8 @@ private
       :reviewed => exercise.reviewed_for?(@user),
       :all_review_points_given => exercise.all_review_points_given_for?(@user),
       :memory_limit => exercise.memory_limit,
-      :runtime_params => exercise.runtime_params_array
+      :runtime_params => exercise.runtime_params_array,
+      :valgrind_strategy => exercise.valgrind_strategy
     }
 
     data[:solution_zip_url] = @helpers.exercise_solution_zip_url(exercise) if @user.administrator?
