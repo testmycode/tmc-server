@@ -108,10 +108,18 @@ describe "The system (used by a student)", :integration => true do
 
   it "should not show the submission form for unreturnable exercises"
 
-  it "should show the files that the student submitted" do
+  it "should show the files that the student submitted including extra student files" do
     ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.introduce_compilation_error('oops')
-    ex.make_zip
+    @repo = clone_course_repo(@course)
+    exx = @repo.copy_simple_exercise('MyExercise')
+    exx.write_file(".tmcproject.yml", "extra_student_files:\n  - test/extraFile.java\n")
+    @repo.add_commit_push
+
+    @course.refresh
+
+    ex.write_file("test/extraFile.java", "extra_file")
+    ex.make_zip(src_only: false)
 
     click_link 'MyExercise'
     attach_file('Zipped project', 'MyExercise.zip')
@@ -123,6 +131,11 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('src/SimpleStuff.java')
     page.should have_content('public class')
     page.should have_content('oops')
+
+    page.should have_content('test/extraFile.java')
+    page.should have_content('extra_file')
+
+    page.should_not have_content('test/SimpleTest.java')
   end
 
   it "should show solutions for completed exercises" do

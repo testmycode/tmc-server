@@ -1,3 +1,7 @@
+### 2014-09-24
+
+* Extra student files also shown in the submitted files view
+
 ### 2014-09-21
 
 * Added pghero to get stats from database
