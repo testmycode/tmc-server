@@ -49,6 +49,10 @@ class FixtureExercise
     File.open(dest, "wb") { |f| f.write(metadata_hash.to_yaml) }
   end
 
+  def write_file(rel_path, contents)
+    File.open(File.join(@path, rel_path), "wb") {|f| f.write(contents) }
+  end
+
   def make_zip(options = {})
     options = {
       :src_only => true

@@ -43,8 +43,19 @@ class SourceFileList
       else
         find_source_files_under(project_dir)
       end
-      make_path_names_relative(project_dir, files)
 
+      project_file = TmcProjectFile.for_project(submission.exercise.clone_path)
+
+      if project_file
+        project_file.extra_student_files.each do |f|
+          file = Pathname.new(File.join(project_dir, f))
+          if source_file?(file) && file.size <= MAX_INDIVIDUAL_FILE_SIZE
+            files << FileRecord.new(file.to_s, file.read)
+          end
+        end
+      end
+
+      make_path_names_relative(project_dir, files)
       files = sort_source_files(files)
       self.new(files)
     end
