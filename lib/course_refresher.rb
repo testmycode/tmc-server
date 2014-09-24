@@ -135,14 +135,15 @@ private
           # Delete the new cache we were working on
           FileUtils.rm_rf(@course.cache_path)
           raise ActiveRecord::Rollback
-        else
-          FileUtils.rm_rf(@old_cache_path)
-          seed_maven_cache
         end
       end
 
-      course.reload # reload the record given as parameter
+      if @report.errors.empty?
+        FileUtils.rm_rf(@old_cache_path)
+        seed_maven_cache
+      end
 
+      course.reload  # reload the record given as parameter
       raise Failure.new(@report) unless @report.errors.empty?
       @report
     end
