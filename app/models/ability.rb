@@ -43,7 +43,7 @@ class Ability
       cannot :read, Submission
       can :read, Submission, :user_id => user.id
       can :create, Submission do |sub|
-        sub.exercise.submittable_by?(user)
+        sub.exercise.submittable_by?(user) || sub.paste_available?
       end
 
       cannot :read, FeedbackAnswer

@@ -1,3 +1,8 @@
+### 2014-09-25
+
+* Pastes are allowed after deadline, note that no points are given when
+  submitting after deadline
+
 ### 2014-09-24
 
 * Extra student files also shown in the submitted files view

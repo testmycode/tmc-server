@@ -11,6 +11,9 @@
       <% else %>
         <p class="failure">Failed to run tests</p>
       <% end %>
+      <% if @submission.submitted_late? && !@submission.can_get_points? %>
+        <p class="failure">Submitted late, cant get points</p>
+      <% end %>
     </div>
 
     <ul>

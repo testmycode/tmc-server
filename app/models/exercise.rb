@@ -134,9 +134,9 @@ class Exercise < ActiveRecord::Base
   end
 
   # Whether the deadline has passed
-  def expired_for?(user)
+  def expired_for?(user, time = Time.now)
     dl = deadline_for(user)
-    dl != nil && dl < Time.now
+    dl != nil && dl < time
   end
 
   # Whether a user has made a submission for this exercise

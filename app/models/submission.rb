@@ -50,6 +50,14 @@ class Submission < ActiveRecord::Base
     t.add :requests_review?
   end
 
+  def can_get_points?
+    !submitted_late?
+  end
+
+  def submitted_late?
+    exercise.expired_for?(user, self.created_at)
+  end
+
   def submitted_zip_url
     Rails.application.routes.url_helpers.submission_url(self.id, format: 'zip')
   end
