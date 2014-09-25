@@ -153,6 +153,19 @@ describe TestRunGrader do
     points.should include('1.2')
   end
 
+  describe 'paste when deadline has passed' do
+
+    it "should award points for which all required tests passed" do
+      @submission.exercise.should_receive(:deadline_for).and_return(1.day.ago)
+      TestRunGrader.grade_results(@submission, half_successful_results)
+
+      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points.should_not include('1.1')
+      points.should_not include('1.2')
+    end
+
+  end
+
   describe "when validation errors strategy is fail" do
 
     def failing_validations

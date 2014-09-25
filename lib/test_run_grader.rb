@@ -32,7 +32,7 @@ module TestRunGrader
     create_test_case_runs(submission, results)
 
     review_points = submission.exercise.available_points.where(:requires_review => true).map(&:name)
-    award_points(submission, results, review_points)
+    award_points(submission, results, review_points) if submission.can_get_points?
     Unlock.refresh_unlocks(submission.course, submission.user)
 
     if should_flag_for_review?(submission, review_points)

@@ -93,7 +93,7 @@ class SubmissionsController < ApplicationController
       return respond_not_found('No ZIP file selected or failed to receive it')
     end
 
-    if !@exercise.submittable_by?(current_user)
+    if !@exercise.submittable_by?(current_user) && !params['paste']
       return respond_access_denied('Submissions for this exercise are no longer accepted.')
     end
 

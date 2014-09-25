@@ -85,7 +85,7 @@ describe "The system (used by a student)", :integration => true do
     page.should_not have_content('MyExercise')
   end
 
-  it "should show exercises whose deadline has passed but without a submission form" do
+  it "should show exercises whose deadline has passed with a submission form with note that it can only be used for pastebin and no points are given after deadline" do
     @repo.set_metadata_in('MyExercise', 'deadline' => Date.yesterday.to_s)
     @repo.add_commit_push
     @course.refresh
@@ -98,8 +98,9 @@ describe "The system (used by a student)", :integration => true do
 
     click_link 'MyExercise'
     page.should have_content('(expired)')
-    page.should_not have_content('Submit answer')
-    page.should_not have_content('Zipped project')
+    page.should have_content('pastebin can be used')
+    page.should have_content('points are given')
+    page.should have_content('Submit answer')
   end
 
   it "should not accept submissions for exercises whose deadline has passed"
@@ -272,6 +273,31 @@ describe "The system (used by a student)", :integration => true do
       page.should have_content('You are not authorized to access this page')
     end
 
+    it "By default pastes are allowedafter deadline and visible, if all tests passed" do
+      @repo.set_metadata_in('MyExercise', 'deadline' => Date.yesterday.to_s)
+      @repo.add_commit_push
+      @course.refresh
+      ex = FixtureExercise::SimpleExercise.new('MyExercise')
+
+      ex.make_zip
+
+      click_link 'MyExercise'
+      attach_file('Zipped project', 'MyExercise.zip')
+      check('Submit to pastebin')
+      click_button 'Submit'
+      wait_for_submission_to_be_processed
+
+      click_link 'Show Paste'
+      page.should have_content('Submitted late')
+
+      click_link 'Files'
+
+      page.should have_content('src/SimpleStuff.java')
+
+      log_out
+
+      page.should have_content('src/SimpleStuff.java')
+    end
 
     it "when pastes configured as protected, user should not see it unless she has already passed that exercise" do
 
