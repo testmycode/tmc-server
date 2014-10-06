@@ -47,7 +47,7 @@
           <% end %>
 
           <li>
-            Number of submissions: <%= @course.submissions.count %>
+            Number of submissions: <%= @total_submissions %>
             (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
              <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
           </li>

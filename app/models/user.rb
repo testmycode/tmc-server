@@ -18,6 +18,9 @@ class User < ActiveRecord::Base
   validates :email, :presence => true,
                     :uniqueness => true
 
+  scope :legitimate_student, -> { where(legitimate_student: true) }
+  scope :non_legitimate_student, -> { where(legitimate_student: false) }
+
   attr_accessor :password
   before_save :encrypt_password
 

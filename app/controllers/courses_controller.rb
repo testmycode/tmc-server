@@ -100,7 +100,7 @@ private
       @submissions = @course.submissions
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
       @submissions = @submissions.order('created_at DESC').includes(:user)
-      @total_submissions = @submissions.count
+      @total_submissions = @submissions.where('user_id in (?)', User.legitimate_student).count
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end
