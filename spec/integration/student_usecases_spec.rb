@@ -178,20 +178,10 @@ describe "The system (used by a student)", :integration => true do
     visit '/'
     log_in_as(@fake_user.login, 'xooxer')
 
-    ex = FixtureExercise::SimpleExercise.new('MyExercise')
-    ex.solve_all
-    ex.make_zip
+    FixtureExercise::SimpleExercise.new('MyExercise')
+    Submission.create!(exercise_name: 'MyExercise', course_id: 1, processed: true, secret_token: nil, all_tests_passed: true, points: "addsub both-test-files justsub mul simpletest-all", user: @fake_user)
 
     click_link 'mycourse'
-    click_link 'MyExercise'
-    attach_file('Zipped project', 'MyExercise.zip')
-    click_button 'Submit'
-    wait_for_submission_to_be_processed
-
-    page.should have_content('All tests successful')
-    page.should have_content('Ok')
-
-    click_link 'Course'
     page.should have_content('Number of submissions (from actual users): 0')
   end
 
