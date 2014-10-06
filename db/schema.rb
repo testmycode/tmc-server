@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140921155940) do
+ActiveRecord::Schema.define(:version => 20141006185055) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -238,20 +238,21 @@ ActiveRecord::Schema.define(:version => 20140921155940) do
     t.integer  "user_id",    :null => false
     t.string   "field_name", :null => false
     t.text     "value",      :null => false
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "user_field_values", ["user_id", "field_name"], :name => "index_user_field_values_on_user_id_and_field_name", :unique => true
 
   create_table "users", :force => true do |t|
-    t.string   "login",                            :null => false
+    t.string   "login",                                 :null => false
     t.text     "password_hash"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "salt"
-    t.boolean  "administrator", :default => false, :null => false
-    t.text     "email",         :default => "",    :null => false
+    t.boolean  "administrator",      :default => false, :null => false
+    t.text     "email",              :default => "",    :null => false
+    t.boolean  "legitimate_student", :default => true,  :null => false
   end
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true

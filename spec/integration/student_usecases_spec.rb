@@ -172,6 +172,19 @@ describe "The system (used by a student)", :integration => true do
     page.should_not have_content('View suggested solution')
   end
 
+  it "should not count submissions made by non legitimate_students in submission counts" do
+    @fake_user = Factory.create(:admin, :login => "uuseri", :password => 'xooxer', legitimate_student: false)
+    log_out
+    visit '/'
+    log_in_as(@fake_user.login, 'xooxer')
+
+    FixtureExercise::SimpleExercise.new('MyExercise')
+    Submission.create!(exercise_name: 'MyExercise', course_id: 1, processed: true, secret_token: nil, all_tests_passed: true, points: "addsub both-test-files justsub mul simpletest-all", user: @fake_user)
+
+    click_link 'mycourse'
+    page.should have_content('Number of submissions (from actual users): 0')
+  end
+
   it "should not show submission files to other users" do
     ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.solve_all
