@@ -1,3 +1,9 @@
+### 2014-10-07
+
+* Cleaned up how stats are aggregated, admin or test users are no longer
+  includes to stats. Thus making stats more realistic.
+
+
 ### 2014-09-24
 
 * Extra student files also shown in the submitted files view
