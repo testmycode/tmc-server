@@ -47,7 +47,7 @@
           <% end %>
 
           <li>
-            Number of submissions: <%= @total_submissions %>
+            Number of submissions (from <span title="administrators and specially marked test user accounts are excluded">actual users</span>): <%= @total_submissions %>
             (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
              <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
           </li>
