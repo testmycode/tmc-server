@@ -87,6 +87,12 @@ The system was improved and C language support was added in another SE lab proje
 - Tony Kovanen ([rase-](https://github.com/rase-))
 - Kalle Viiri ([Kviiri](https://github.com/Kviiri))
 
+Checkstyle-support was integrated by
+
+- Kenny Heinonen ([kennyhei](https://github.com/kennyhei/))
+- Kasper Hirvikoski ([kasper](https://github.com/kasper/))
+- Jarmo Isotalo ([jamox](https://github.com/jamox/))
+- Joni Salmi ([josalmi](https://github.com/josalmi/))
 
 ## License ##
 
