@@ -65,6 +65,10 @@ The default user account is `admin`/`admin`.
 
 ## Credits ##
 
+Current maintainers of the project are
+- Martin Pärtel ([mpartel](https://github.com/mpartel))
+- Jarmo Isotalo ([jamox](https://github.com/jamox))
+
 The project started as a Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) but has since been gradually almost completely rewritten. The original authors of the server component were
 
 - Patrik Marjanen
