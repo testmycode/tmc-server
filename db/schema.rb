@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141007203417) do
+ActiveRecord::Schema.define(:version => 20141008212356) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -102,6 +102,8 @@ ActiveRecord::Schema.define(:version => 20141007203417) do
     t.integer  "position",   :null => false
     t.text     "title"
   end
+
+  add_index "feedback_questions", ["id"], :name => "index_feedback_questions_on_id"
 
   create_table "password_reset_keys", :force => true do |t|
     t.integer  "user_id",    :null => false
