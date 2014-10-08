@@ -97,7 +97,7 @@ class FeedbackAnswersController < ApplicationController
       })
     end
     answer_records.each {|record| authorize! :create, record }
-    
+
     begin
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
         answer_records.each(&:save!)

@@ -1,4 +1,3 @@
-
 # Saves results from a remote sandbox to the database.
 #
 # See also: TestRunGrader

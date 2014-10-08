@@ -15,7 +15,7 @@ class TmcJunitRunner < MavenProject
   def jar_and_lib_paths
     [jar_path] + lib_paths
   end
-  
+
   def package
     pom_file.artifact_group_id
   end
@@ -23,15 +23,15 @@ class TmcJunitRunner < MavenProject
   def jar_path
     package_path
   end
-  
+
   def classpath
     "#{jar_path}:#{lib_paths.join(':')}"
   end
-  
+
   def compiled?
     File.exists? jar_path
   end
-  
+
   # Use TestScanner.get_test_case_methods instead.
   def get_test_case_methods(exercise_path)
     #CTODO
@@ -56,18 +56,18 @@ class TmcJunitRunner < MavenProject
         "#{package}.testscanner.TestScanner",
         ex_dir.path.to_s
       ])
-      
+
       output = `#{cmd} 2>#{Shellwords.escape(stderr_file)}`
-      
+
       if !$?.success?
         raise File.read(stderr_file)
       end
-      
+
       result += parse_test_scanner_output(output)
     end
     result
   end
-  
+
 protected
 
   def parse_test_scanner_output(output)

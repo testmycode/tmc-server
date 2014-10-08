@@ -69,7 +69,7 @@ class PointsController < ApplicationController
         per_user_and_sheet[username][sheet] = count
       end
     end
-    
+
     user_totals = {}
     for username, per_sheet in per_user_and_sheet
       user_totals[username] ||= 0
@@ -93,7 +93,7 @@ class PointsController < ApplicationController
       :users => users
     }
   end
-  
+
   def sort_summary(summary, sorting)
     if sorting == 'total_points'
       summary[:users] = summary[:users].sort_by {|user| [-summary[:total_for_user][user.login].to_i, user.login] }

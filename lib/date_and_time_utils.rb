@@ -4,14 +4,14 @@ module DateAndTimeUtils
     options = {
       :prefer_end_of_day => false
     }.merge options
-    
+
     d = input
     if d.blank?
       return nil
     end
-    
+
     d = self.parse_date_or_time(d) if d.is_a?(String)
-    
+
     if d.is_a? Date
       if options[:prefer_end_of_day]
         d = d.end_of_day
@@ -26,11 +26,11 @@ module DateAndTimeUtils
 
   def self.parse_date_or_time(input)
     s = input.strip
-    
+
     if s =~ /^(\d+)\.(\d+)\.(\d+)(.*)$/
       s = "#{$3}-#{$2}-#{$1}#{$4}"
     end
-    
+
     result = nil
     begin
       if s =~ /^\d+-\d+-\d+$/
@@ -41,9 +41,9 @@ module DateAndTimeUtils
     rescue
       raise "Invalid date/time: #{input}"
     end
-    
+
     raise "Cannot parse date/time: #{input}" if !result
-    
+
     result
   end
 

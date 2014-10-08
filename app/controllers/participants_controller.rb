@@ -79,7 +79,7 @@ class ParticipantsController < ApplicationController
     @submissions = @user.submissions.order('id DESC').includes(:user)
     Submission.eager_load_exercises(@submissions)
   end
-  
+
   def destroy
     user = User.find(params[:id])
     user.destroy

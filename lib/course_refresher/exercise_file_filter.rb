@@ -24,7 +24,7 @@ class CourseRefresher
     def make_stub(to_dir)
       from_dir = Pathname(@project_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
-      
+
       paths = files_for_stub(from_dir)
       while_copying(from_dir, to_dir, paths) do |rel_path|
         from = from_dir + rel_path
@@ -35,11 +35,11 @@ class CourseRefresher
 
       clean_empty_dirs_in_project(to_dir)
     end
-    
+
     def make_solution(to_dir)
       from_dir = Pathname(@project_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
-      
+
       paths = files_for_solution(from_dir)
       while_copying(from_dir, to_dir, paths) do |rel_path|
         from = from_dir + rel_path
@@ -51,7 +51,7 @@ class CourseRefresher
 
       clean_empty_dirs_in_project(to_dir)
     end
-    
+
   private
     def looks_like_text_file?(path)
       mime = MimeMagic.by_path(path.to_s)
@@ -72,7 +72,7 @@ class CourseRefresher
     def write_file(path, contents)
       File.open(path, 'wb') {|f| f.write(contents) }
     end
-    
+
     def while_copying(from_dir, to_dir, paths, &block)
       for path in paths
         if (from_dir + path).directory?
@@ -82,20 +82,20 @@ class CourseRefresher
         end
       end
     end
-  
+
     # Returns a sorted list of relative pathnames to files that should be in the stub
     def files_for_stub(from_dir)
       filter_relative_pathnames(from_dir) do |path|
         should_include_in_stub(path)
       end
     end
-    
+
     def files_for_solution(from_dir)
       filter_relative_pathnames(from_dir) do |path|
         should_include_in_solution(path)
       end
     end
-    
+
     def filter_relative_pathnames(dir, &block)
       result = []
       Dir.chdir(dir) do
@@ -107,12 +107,12 @@ class CourseRefresher
       end
       result.sort
     end
-    
+
     def should_include_in_stub(path)
       fn = path.basename.to_s
       !(fn.include?('Hidden') || fn.start_with?('.git') || fn == 'metadata.yml' || fn == '.tmcrc')
     end
-    
+
     def should_include_in_solution(path)
       fn = path.basename.to_s
       rel_path = path.to_s

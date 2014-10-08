@@ -1,8 +1,6 @@
 require 'point_comparison'
 require 'natsort'
 
-
-#
 # Stores test run results in the database and awards points.
 # Called in a transaction from SandboxResultsSaver.
 # Expected format of results from sandbox:

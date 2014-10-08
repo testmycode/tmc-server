@@ -13,9 +13,9 @@ class FileTreeHasher
     Find.find(root_path) do |path|
       paths << path unless File.directory?(path)
     end
-    
+
     paths.sort!
-    
+
     digest = Digest::SHA2.new
     paths.each do |path|
       begin

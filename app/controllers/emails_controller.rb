@@ -2,7 +2,7 @@
 # Displays the raw list of participant e-mails, useful for mass-mailing scripts.
 class EmailsController < ApplicationController
   skip_authorization_check
-  
+
   def index
     return respond_access_denied unless current_user.administrator?
     filter_params = params_starting_with('filter_', :all, :remove_prefix => true)

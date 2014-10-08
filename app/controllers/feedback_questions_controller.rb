@@ -12,7 +12,7 @@ class FeedbackQuestionsController < ApplicationController
     @questions = @course.feedback_questions.order(:position)
     authorize! :show, @questions
   end
-  
+
   def new
     @question = FeedbackQuestion.new(:course => @course)
     authorize! :create, @question
@@ -24,7 +24,7 @@ class FeedbackQuestionsController < ApplicationController
     authorize! :create, @question
 
     fix_question_kind(@question)
-    
+
     if @question.save
       flash[:success] = 'Question created.'
       redirect_to course_feedback_questions_path(@question.course)
@@ -74,7 +74,7 @@ class FeedbackQuestionsController < ApplicationController
       redirect_to course_feedback_questions_path(@course)
     end
   end
-  
+
 private
   def get_course
     @course = Course.find(params[:course_id]) if params[:course_id]

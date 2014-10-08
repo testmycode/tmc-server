@@ -1,4 +1,3 @@
-
 namespace :dev do
   namespace :comet do
     config_path = 'tmp/development/tmc-comet-config.properties'

@@ -3,7 +3,7 @@ require 'spyware_client'
 # Presents the "register user" and "edit profile" views.
 class UsersController < ApplicationController
   skip_authorization_check
-  
+
   def new
     add_breadcrumb 'Sign up', new_user_path
 
@@ -15,12 +15,12 @@ class UsersController < ApplicationController
       @user = User.new
     end
   end
-  
+
   def create
     authorize! :create, User
 
     @user = User.new
-    
+
     @user.login = params[:user][:login].to_s.strip
 
     set_email
@@ -39,7 +39,7 @@ class UsersController < ApplicationController
       render :action => :show, :status => 403
     end
   end
-  
+
   def show
     add_breadcrumb 'My account', user_path
 
@@ -49,10 +49,10 @@ class UsersController < ApplicationController
       @user = current_user
     end
   end
-  
+
   def update
     @user = current_user
-    
+
     set_email
     password_changed = maybe_update_password(@user, params[:user])
     user_field_changes = set_user_fields
@@ -75,7 +75,7 @@ class UsersController < ApplicationController
       render :action => :show, :status => 403
     end
   end
-  
+
 private
   def set_email
     user_params = params[:user]

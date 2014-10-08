@@ -1,4 +1,3 @@
-
 module BreadCrumbs
   def self.included(base)
     base.extend(ClassMethods)

@@ -1,4 +1,3 @@
-
 require 'natcmp'
 
 # Adds natsort methods to Ruby arrays and similar collections.

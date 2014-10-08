@@ -1,4 +1,3 @@
-
 require 'ruby_init_script'
 require 'etc'
 

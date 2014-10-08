@@ -1,4 +1,3 @@
-
 # Attempts to send submissions for processing to a free tmc-sandbox.
 # Also called by the reprocessor background task to attempt reprocessing if
 # the sandbox was previously unavailable.
