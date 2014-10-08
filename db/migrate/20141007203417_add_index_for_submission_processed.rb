@@ -1,5 +1,5 @@
 class AddIndexForSubmissionProcessed < ActiveRecord::Migration
-  def up
+  def change
     add_index :submissions, [:processed]
   end
 end
