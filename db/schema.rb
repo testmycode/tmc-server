@@ -241,8 +241,8 @@ ActiveRecord::Schema.define(:version => 20141008212356) do
     t.integer  "user_id",    :null => false
     t.string   "field_name", :null => false
     t.text     "value",      :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   add_index "user_field_values", ["user_id", "field_name"], :name => "index_user_field_values_on_user_id_and_field_name", :unique => true
