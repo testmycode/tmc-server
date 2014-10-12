@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
