@@ -23,6 +23,9 @@ fi
 ERROR_MSG_LOCALE_DEF="-Dfi.helsinki.cs.tmc.edutestutils.defaultLocale=$error_msg_locale"
 STYLE_ERROR_MSG_LOCALE_DEF="-Dtmc.locale=$error_msg_locale"
 
+ramdisk_usage_kb() {
+  df / | tail -n 1 | awk '{ print $3 }'
+}
 
 TMC_MAVEN_PLUGIN_VERSION=1.6
 
@@ -41,8 +44,10 @@ JDK_DIR=`dirname \`dirname "$JAVAC_EXE_PATH"\``
 TOOLS_JAR_PATH="$JDK_DIR/lib/tools.jar"
 
 TOTAL_RAM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
+SANDBOX_RAM_KB=$(expr 32 \* 1024)
 
 echo "Total RAM: ${TOTAL_RAM_KB}KB"
+echo "RAM used by ramdisk initially: $(ramdisk_usage_kb) KB"
 echo "Project type: $PROJECT_TYPE"
 
 echo "Files in `pwd`:"
@@ -56,8 +61,10 @@ case $PROJECT_TYPE in
     # the occasional OOM killer. We leave 48M to the sandbox.
     # Still, Java CAN spin in the GC for a long time if it runs out of memory.
 
-    JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
-    echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
+    JAVA_RAM_KB=${JAVA_RAM_KB-$(expr $TOTAL_RAM_KB - $SANDBOX_RAM_KB - $(ramdisk_usage_kb))}
+    echo "RAM used by ramdisk: $(ramdisk_usage_kb) KB"
+    echo "RAM for sandbox: $SANDBOX_RAM_KB KB"
+    echo "RAM for program: $JAVA_RAM_KB KB"
 
     mkdir -p classes/main
     mkdir -p classes/test
@@ -76,8 +83,10 @@ case $PROJECT_TYPE in
       ln -s /ubdd/maven/repository $HOME/.m2/repository
     fi
 
-    # Sandbox: 64MB, Maven: 64MB, Java program: the rest
-    JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - \( 128 \* 1024 \)`}
+    # RAM allocation plan:
+    # Sandbox: 32MB
+    # Maven: 64MB
+    # Java program: the rest minus room used by ramdisk due to maven downloads
     MAVEN_RAM_KB=${MAVEN_RAM_KB-`expr 64 \* 1024`}
     echo "Memory allocated to Maven: ${MAVEN_RAM_KB}KB"
     echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
@@ -89,6 +98,12 @@ case $PROJECT_TYPE in
 
     mvn compiler:testCompile 2>&1 | tee test_output.txt
     [ ${PIPESTATUS[0]} -eq 0 ] || exit 102
+
+    JAVA_RAM_KB=${JAVA_RAM_KB-$(expr $TOTAL_RAM_KB - $SANDBOX_RAM_KB - $MAVEN_RAM_KB - $(ramdisk_usage_kb))}
+    echo "RAM used by ramdisk: $(ramdisk_usage_kb) KB"
+    echo "RAM for maven: $MAVEN_RAM_KB KB"
+    echo "RAM for sandbox: $SANDBOX_RAM_KB KB"
+    echo "RAM for program: $JAVA_RAM_KB KB"
 
     rm -f test_output.txt
   ;;
