@@ -12,6 +12,7 @@ class SubmissionList
     {
       exercise_name: submission.exercise_name,
       id: submission.id,
+      user_id: submission.user_id,
       course_id: submission.course_id,
       created_at: submission.created_at,
       all_tests_passed: submission.all_tests_passed,
