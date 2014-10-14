@@ -38,15 +38,16 @@ class ExercisesController < ApplicationController
         @submissions = @submissions.includes(:awarded_points).includes(:user).includes
         authorize! :read, @submissions
 
-        meta_data = {
+        data = {
           course_name:   @course.name,
           course_id:     @course.id,
           exercise_name: @exercise.name,
           exercise_id:   @exercise.id,
           unlocked_at:   @exercise.time_unlocked_for(current_user),
-          deadline:      @exercise.deadline_for(current_user)
+          deadline:      @exercise.deadline_for(current_user),
+          submissions:   SubmissionList.new(current_user, view_context).submission_list_data(@submissions),
         }
-        render_for_api :submission_show, :json => @submissions, :root => :submissions, meta: meta_data
+        render :json => data.to_json
       end
     end
   end
