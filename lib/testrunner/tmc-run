@@ -195,9 +195,11 @@ case $PROJECT_TYPE in
     else
       # valgrind.log must exist. Otherwise tar packaging fails
       touch valgrind.log
-      ./test/test > stdout.txt 2> stderr.txt
+      make run-test > stdout.txt 2> stderr.txt
     fi
-    tmc-check-convert-results > test_output.txt
+    if [ ! -f test_output.txt ]; then
+      tmc-check-convert-results > test_output.txt
+    fi
   ;;
 esac
 
