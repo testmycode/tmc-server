@@ -36,6 +36,7 @@ TmcServer::Application.routes.draw do
       end
     end
 
+    resources :participants, :only => [:index]
     resources :stats, :only => [:index, :show]
     resources :exercise_status, only: [:show]
     resources :exercises, :only => [:index]

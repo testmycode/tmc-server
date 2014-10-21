@@ -7,6 +7,8 @@ class ParticipantsController < ApplicationController
   add_breadcrumb 'Participants', :participants_path, :only => [:index, :show], :if => lambda { current_user.administrator? }
 
   def index
+    return course_participants(params) if params[:course_id]
+
     @ordinary_fields = ['username', 'email']
     @extra_fields = UserField.all
     valid_fields = @ordinary_fields + @extra_fields.map(&:name) + ['include_administrators']
@@ -157,6 +159,28 @@ private
 
         csv << row
       end
+    end
+  end
+
+  def course_participants(params)
+
+    # Find course
+    course = Course.find(params[:course_id])
+
+    respond_to do |format|
+
+      format.json do
+        authorize! :read, course
+        return respond_access_denied('Authentication required') if current_user.guest?
+
+        data = {
+          :api_version => ApiVersion::API_VERSION,
+          :course => CourseInfo.new(current_user, view_context).course_participants_data(course)
+        }
+
+        render :json => data.to_json
+      end
+
     end
   end
 end

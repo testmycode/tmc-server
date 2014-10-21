@@ -21,6 +21,7 @@ class CourseInfo
       submissions_by_exercise[sub.exercise_name] ||= []
       submissions_by_exercise[sub.exercise_name] << sub
     end
+
     exercises.each do |ex|
       ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
     end
@@ -28,6 +29,15 @@ class CourseInfo
     @course_list.course_data(course).merge({
       :unlockables => course.unlockable_exercises_for(@user).map(&:name).natsort,
       :exercises => exercises.map {|ex| exercise_data(ex) }.reject(&:nil?)
+    })
+  end
+
+  # Course JSON with participants
+  def course_participants_data(course)
+    participants = course.users
+
+    @course_list.course_data(course).merge({
+      :participants => participants.map {|participant| participant_data(participant, course) }.reject(&:nil?),
     })
   end
 
@@ -67,6 +77,35 @@ private
     data
   end
 
+  def participant_data(participant, course)
+
+    participant_subs = participant.submissions.where(:course_id => course.id).to_a.group_by(&:exercise_name)
+    participant_subs.default = []
+
+    statuses = []
+    
+    results = {}
+    course.exercises.each do |ex|
+      ex.set_submissions_by(participant, participant_subs[ex.name])  # used by completed_by? and attempted_by?
+      if ex.completed_by?(participant)
+        results[ex.name] = 'completed'
+      elsif ex.attempted_by?(participant)
+        results[ex.name] = 'attempted'
+      else
+        results[ex.name] = 'not_attempted'
+      end
+    end
+
+    statuses << results unless results.empty?
+
+    data = {
+      :id => participant.id,
+      :username => participant.login,
+      :exercise_status => statuses
+    }
+
+    data
+  end
 
 private
   def exercise_return_url(e)

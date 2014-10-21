@@ -1,6 +1,8 @@
 class User < ActiveRecord::Base
   include Comparable
 
+  belongs_to :course
+
   has_many :submissions, :dependent => :delete_all
   has_many :awarded_points, :dependent => :delete_all
   has_one :password_reset_key, :dependent => :delete

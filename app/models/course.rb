@@ -21,6 +21,7 @@ class Course < ActiveRecord::Base
   validate :check_source_backend
   after_initialize :set_default_source_backend
 
+  has_many :users
   has_many :exercises, :dependent => :delete_all
   has_many :submissions, :dependent => :delete_all
   has_many :available_points, :through => :exercises

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141008212356) do
+ActiveRecord::Schema.define(:version => 20141021140315) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -256,6 +256,7 @@ ActiveRecord::Schema.define(:version => 20141008212356) do
     t.boolean  "administrator",      :default => false, :null => false
     t.text     "email",              :default => "",    :null => false
     t.boolean  "legitimate_student", :default => true,  :null => false
+    t.integer  "course_id"
   end
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
