@@ -36,9 +36,11 @@ class CourseInfo
   def course_participants_data(course)
     participants = course.users
 
-    @course_list.course_data(course).merge({
-      :participants => participants.map {|participant| participant_data(participant, course) }.reject(&:nil?),
-    })
+    data = {
+      :id => course.id,
+      :name => course.name,
+      :participants => participants.map {|participant| participant_data(participant, course) }.reject(&:nil?)
+    }
   end
 
 private
@@ -83,16 +85,16 @@ private
     participant_subs.default = []
 
     statuses = []
-    
     results = {}
-    course.exercises.each do |ex|
-      ex.set_submissions_by(participant, participant_subs[ex.name])  # used by completed_by? and attempted_by?
-      if ex.completed_by?(participant)
-        results[ex.name] = 'completed'
-      elsif ex.attempted_by?(participant)
-        results[ex.name] = 'attempted'
+
+    course.exercises.each do |exercise|
+      exercise.set_submissions_by(participant, participant_subs[exercise.name])
+      if exercise.completed_by?(participant)
+        results[exercise.name] = 'completed'
+      elsif exercise.attempted_by?(participant)
+        results[exercise.name] = 'attempted'
       else
-        results[ex.name] = 'not_attempted'
+        results[exercise.name] = 'not_attempted'
       end
     end
 
