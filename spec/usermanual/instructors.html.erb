@@ -550,6 +550,15 @@ extra_student_files:
     <li><code>locked_exercise_points_visible</code> tells whether exercises that one has not unlocked are visible on the scoreboard. Defaults to true.</li>
   </ul>
 
+  <h3><code>.tmcnosubmit</code> & <code>.tmcnosnapshot</code></h3>
+
+  <p>
+    If <code>.tmcnosubmit</code> is placed in a directory, that directory's contents (recursively)
+    will never be submitted to the server nor to snapshots. The file <code>.tmcnosnapshot</code> does
+    the same but only for snapshots. Note that these files are not necessary for directories like
+    <code>lib/</code> and <code>test/</code>, which are ordinarily not submitted anyway.
+  </p>
+
   <h2>Course-specific configuration</h2>
 
   <p>
