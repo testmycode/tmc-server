@@ -110,7 +110,7 @@ class CourseRefresher
 
     def should_include_in_stub(path)
       fn = path.basename.to_s
-      !(fn.include?('Hidden') || fn.start_with?('.git') || fn == 'metadata.yml' || fn == '.tmcrc')
+      !(fn.include?('hidden') || fn.include?('Hidden') || fn.start_with?('.git') || fn == 'metadata.yml' || fn == '.tmcrc')
     end
 
     def should_include_in_solution(path)
