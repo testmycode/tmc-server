@@ -90,11 +90,11 @@ private
     course.exercises.each do |exercise|
       exercise.set_submissions_by(participant, participant_subs[exercise.name])
       if exercise.completed_by?(participant)
-        results[exercise.name] = 'completed'
+        results[exercise.name] = :completed
       elsif exercise.attempted_by?(participant)
-        results[exercise.name] = 'attempted'
+        results[exercise.name] = :attempted
       else
-        results[exercise.name] = 'not_attempted'
+        results[exercise.name] = :not_attempted
       end
     end
 
