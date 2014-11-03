@@ -80,11 +80,9 @@ private
   end
 
   def participant_data(participant, course)
-
     participant_subs = participant.submissions.where(:course_id => course.id).to_a.group_by(&:exercise_name)
     participant_subs.default = []
 
-    statuses = []
     results = {}
 
     course.exercises.each do |exercise|
@@ -98,15 +96,11 @@ private
       end
     end
 
-    statuses << results unless results.empty?
-
     data = {
       :id => participant.id,
       :username => participant.login,
-      :exercise_status => statuses
+      :exercise_status => results
     }
-
-    data
   end
 
 private
