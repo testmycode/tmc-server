@@ -14,6 +14,9 @@ describe "Notifications about new code reviews via HTTP push", :integration => t
     Factory.create(:submission_data, :submission => @submission)
 
     using_session(:user) do
+      if Capybara.default_driver == :selenium
+        Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
+      end
       visit '/'
       log_in_as @user.username, @user.password
     end
