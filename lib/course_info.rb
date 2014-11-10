@@ -80,13 +80,13 @@ private
   end
 
   def participant_data(participant, course)
-    participant_subs = participant.submissions.where(:course_id => course.id).to_a.group_by(&:exercise_name)
-    participant_subs.default = []
+    submissions = participant.submissions.where(:course_id => course.id, :submission_status_id => SubmissionStatus.maximum(:number)).to_a.group_by(&:exercise_name)
+    submissions.default = []
 
     results = {}
 
     course.exercises.each do |exercise|
-      exercise.set_submissions_by(participant, participant_subs[exercise.name])
+      exercise.set_submissions_by(participant, submissions[exercise.name])
       if exercise.completed_by?(participant)
         results[exercise.name] = :completed
       elsif exercise.attempted_by?(participant)
