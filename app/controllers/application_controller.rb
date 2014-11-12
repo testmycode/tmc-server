@@ -57,17 +57,36 @@ private
     Rails.application.routes.default_url_options[:host] = request.host_with_port
   end
 
+  def get_api_version
+    @api_version ||= get_first_non_blank(request.headers['X-Tmc-Api-Version'], params[:api_version])
+    @api_version
+  end
+
+  def get_client
+    @client ||= get_first_non_blank(request.headers['X-Tmc-Client-Name'], params[:client])
+  end
+
+  def get_client_version
+    @client_version ||= get_first_non_blank(request.headers['X-Tmc-Client-Version'], params[:client_version])
+  end
+
+  def get_first_non_blank(*values)
+    values.each do |value|
+      return value unless value.blank?
+    end
+  end
+
   def check_api_version
     if should_check_api_version?
-      if params[:api_version].blank?
+      if get_api_version.blank?
         return respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
-      elsif params[:api_version].to_s != ApiVersion::API_VERSION.to_s
-        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
+      elsif get_api_version.to_s != ApiVersion::API_VERSION.to_s
+        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{get_api_version}", 404, :obsolete_client => true)
       end
 
-      if !params[:client].blank? # Client and client version checks are optional
+      if get_client.blank? # Client and client version checks are optional
         begin
-          check_client_version(params[:client], params[:client_version])
+          check_client_version(get_client, get_client_version)
         rescue
           return respond_with_error($!.message, 404, :obsolete_client => true)
         end
@@ -84,7 +103,7 @@ private
 
     valid_clients = SiteSetting.value('valid_clients')
     if valid_clients.is_a?(Enumerable)
-      vc = valid_clients.find {|c| c['name'] == client_name }
+      vc = valid_clients.find {|c| c['name'] == get_client }
       raise "Invalid TMC client." if vc == nil
 
       if client_version != nil && !vc['min_version'].blank?
@@ -142,10 +161,10 @@ private
 
   # To support older versions of tmc-netbeans-plugin
   def client_supports_http_basic_auth?
-    return true if params[:client].blank?
-    client = params[:client]
+    return true if get_client.blank?
+    client = get_client
     client_version = begin
-      Version.new(params['client_version']) unless params['client_version'].blank?
+      Version.new(get_client_version) unless get_client_version.blank?
     rescue
     end
     !(client == 'netbeans_plugin' && client_version < Version.new('0.8.0'))

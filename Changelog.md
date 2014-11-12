@@ -1,3 +1,8 @@
+### 2014-10-14
+
+* Client name and version as well as api version can be send as headers
+  or as query params
+
 ### 2014-10-07
 
 * Cleaned up how stats are aggregated, admin or test users are no longer
