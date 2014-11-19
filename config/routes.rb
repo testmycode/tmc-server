@@ -36,6 +36,7 @@ TmcServer::Application.routes.draw do
       end
     end
 
+    resources :exercise_completions, :only => [:index]
     resources :stats, :only => [:index, :show]
     resources :exercise_status, only: [:show]
     resources :exercises, :only => [:index]
@@ -62,8 +63,6 @@ TmcServer::Application.routes.draw do
     resources :reviews, :only => [:index, :new, :create]
     resources :full_zip, :only  => [:index]
   end
-
-  get '/courses/:course_id/participants', to: 'participants#course_participants'
 
   get 'paste/:paste_key', to: 'submissions#show', as: 'paste'
   resources :reviews, :only => [:update, :destroy]

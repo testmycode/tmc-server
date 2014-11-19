@@ -62,7 +62,7 @@ private
       submission.test_case_runs << tcr
     end
     submission.all_tests_passed = all_passed && validations_passed?(submission.validations) && valgrind_passed?(submission)
-    submission.submission_status = SubmissionStatus.find 2 if submission.all_tests_passed
+    submission.submission_status = SubmissionStatus.find(2) if submission.all_tests_passed
 
   end
 
