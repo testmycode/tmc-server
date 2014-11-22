@@ -48,6 +48,10 @@
         <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
       <% end %>
 
+      <% if @exercise.solution && @exercise.solution.visible_to?(current_user) %>
+        <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
+      <% end %>
+
       <% if can? :create, Review %>
         <li><%= link_to "Start code review", new_submission_review_path(@submission) %></li>
       <% end %>
