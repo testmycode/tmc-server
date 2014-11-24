@@ -2,8 +2,7 @@
 class FeedbackAnswer < ActiveRecord::Base
   belongs_to :feedback_question
   belongs_to :course
-  belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "exercises.course_id = #{self.course_id}" }
+  belongs_to :exercise, -> { where("exercises.course_id = #{self.course_id}") }, :foreign_key => :exercise_name, :primary_key => :name
   belongs_to :submission
   has_many :reply_to_feedback_answers, :dependent => :delete_all
 

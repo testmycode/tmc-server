@@ -5,22 +5,13 @@ class Submission < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
 
-  belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc {
-    if self.respond_to?(:course_id)
-      # Used when doing submission.exercise
-      "exercises.course_id = #{self.course_id}"
-    else
-      # Used when doing submissions.include(:exercises)
-      "exercises.course_id = submissions.course_id"
-    end  # TODO: apparently there is a nicer way to do this in Rails 4
-  }
+  belongs_to :exercise, -> { where("exercises.course_id = #{self.course_id}") }, :foreign_key => :exercise_name, :primary_key => :name
 
   has_one :submission_data, :dependent => :delete
   after_save { submission_data.save! if submission_data }
 
-  has_many :test_case_runs, :dependent => :delete_all, :order => :id
-  has_many :reviews, :dependent => :delete_all, :order => :created_at do
+  has_many :test_case_runs, -> { order(:id) }, :dependent => :delete_all
+  has_many :reviews, -> { order(:created_at) }, :dependent => :delete_all do
     def latest
       self.order('created_at DESC').limit(1).first
     end
