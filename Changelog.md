@@ -11,6 +11,7 @@
 
 ### 2014-11-24
 
+* Upgraded gems, rails to 4.1.0 and rspec to 3.1.0. Removed act_as_api (#197) and jquery-rails.
 * Removed pg_comment for Rails 4 support.
 
 ### 2014-10-07
