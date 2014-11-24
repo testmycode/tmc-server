@@ -1,3 +1,7 @@
+### 2014-11-24
+
+* Removed pg_comment for Rails 4 support.
+
 ### 2014-10-07
 
 * Cleaned up how stats are aggregated, admin or test users are no longer
