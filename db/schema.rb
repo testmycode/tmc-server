@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141008212356) do
+ActiveRecord::Schema.define(:version => 20141124122855) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -288,11 +288,5 @@ ActiveRecord::Schema.define(:version => 20141008212356) do
   add_foreign_key "test_scanner_cache_entries", "courses", :name => "test_scanner_cache_entries_course_id_fk", :dependent => :delete
 
   add_foreign_key "user_field_values", "users", :name => "user_field_values_user_id_fk", :dependent => :delete
-
-  set_table_comment 'awarded_points', 'Stores points awarded to a user in a particular course. Each point is stored only once per user/course and each row refers to the first submission that awarded the point.'
-
-  set_column_comment 'reviews', 'points', 'Space-separated list of points awarded. Does not (generally) contain points already awarded in an earlier review.'
-
-  set_column_comment 'submissions', 'points', 'Space-separated list of points awarded. Filled each time unlike the awarded_points table, where a point is given at most once.'
 
 end
