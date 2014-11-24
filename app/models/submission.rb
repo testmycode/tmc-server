@@ -17,6 +17,7 @@ class Submission < ActiveRecord::Base
   }
 
   has_one :submission_data, :dependent => :delete
+  belongs_to :submission_status
   after_save { submission_data.save! if submission_data }
 
   has_many :test_case_runs, :dependent => :delete_all, :order => :id

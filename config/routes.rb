@@ -36,6 +36,7 @@ TmcServer::Application.routes.draw do
       end
     end
 
+    resources :exercise_completions, :only => [:index]
     resources :stats, :only => [:index, :show]
     resources :exercise_status, only: [:show]
     resources :exercises, :only => [:index]
@@ -83,7 +84,6 @@ TmcServer::Application.routes.draw do
       mount PgHero::Engine, at: "pghero"
     end
   end
-
 
   root :to => "courses#index"
 

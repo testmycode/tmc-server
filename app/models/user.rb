@@ -2,6 +2,7 @@ class User < ActiveRecord::Base
   include Comparable
 
   has_many :submissions, :dependent => :delete_all
+  has_many :courses, :through => :submissions, :uniq => true
   has_many :awarded_points, :dependent => :delete_all
   has_one :password_reset_key, :dependent => :delete
   has_many :user_field_values, :dependent => :delete_all, :autosave => true

@@ -114,6 +114,7 @@ class SubmissionsController < ApplicationController
         :user => current_user,
         :course => @course,
         :exercise => @exercise,
+        :submission_status => SubmissionStatus.find(1),
         :return_file => file_contents,
         :params_json => submission_params.to_json,
         :requests_review => !!params[:request_review],

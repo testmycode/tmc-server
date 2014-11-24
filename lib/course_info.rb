@@ -21,6 +21,7 @@ class CourseInfo
       submissions_by_exercise[sub.exercise_name] ||= []
       submissions_by_exercise[sub.exercise_name] << sub
     end
+
     exercises.each do |ex|
       ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
     end
@@ -29,6 +30,17 @@ class CourseInfo
       :unlockables => course.unlockable_exercises_for(@user).map(&:name).natsort,
       :exercises => exercises.map {|ex| exercise_data(ex) }.reject(&:nil?)
     })
+  end
+
+  # Course JSON with participants
+  def course_participants_data(course)
+    participants = course.users
+
+    data = {
+      :id => course.id,
+      :name => course.name,
+      :participants => participants.map {|participant| participant_data(participant, course) }.reject(&:nil?)
+    }
   end
 
 private
@@ -67,6 +79,29 @@ private
     data
   end
 
+  def participant_data(participant, course)
+    submissions = participant.submissions.where(:course_id => course.id, :submission_status_id => SubmissionStatus.maximum(:number)).to_a.group_by(&:exercise_name)
+    submissions.default = []
+
+    results = {}
+
+    course.exercises.each do |exercise|
+      exercise.set_submissions_by(participant, submissions[exercise.name])
+      if exercise.completed_by?(participant)
+        results[exercise.name] = :completed
+      elsif exercise.attempted_by?(participant)
+        results[exercise.name] = :attempted
+      else
+        results[exercise.name] = :not_attempted
+      end
+    end
+
+    data = {
+      :id => participant.id,
+      :username => participant.login,
+      :exercise_status => results
+    }
+  end
 
 private
   def exercise_return_url(e)

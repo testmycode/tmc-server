@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141008212356) do
+ActiveRecord::Schema.define(:version => 20141110102413) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -148,6 +148,13 @@ ActiveRecord::Schema.define(:version => 20141008212356) do
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
+  create_table "statuses", :force => true do |t|
+    t.string   "value"
+    t.integer  "number"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "submission_data", :id => false, :force => true do |t|
     t.integer "submission_id",          :null => false
     t.binary  "return_file"
@@ -158,42 +165,54 @@ ActiveRecord::Schema.define(:version => 20141008212356) do
     t.binary  "validations_compressed"
   end
 
+  create_table "submission_statuses", :force => true do |t|
+    t.string   "value"
+    t.integer  "number"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "submissions", :force => true do |t|
     t.integer  "user_id"
     t.text     "pretest_error"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "exercise_name",                                                  :null => false
-    t.integer  "course_id",                                                      :null => false
-    t.boolean  "processed",                                   :default => false, :null => false
+    t.string   "exercise_name",                                                        :null => false
+    t.integer  "course_id",                                                            :null => false
+    t.boolean  "processed",                                   :default => false,       :null => false
     t.string   "secret_token"
-    t.boolean  "all_tests_passed",                            :default => false, :null => false
+    t.boolean  "all_tests_passed",                            :default => false,       :null => false
     t.text     "points"
     t.datetime "processing_tried_at"
     t.datetime "processing_began_at"
     t.datetime "processing_completed_at"
-    t.integer  "times_sent_to_sandbox",                       :default => 0,     :null => false
+    t.integer  "times_sent_to_sandbox",                       :default => 0,           :null => false
     t.datetime "processing_attempts_started_at"
-    t.integer  "processing_priority",                         :default => 0,     :null => false
+    t.integer  "processing_priority",                         :default => 0,           :null => false
     t.text     "params_json"
-    t.boolean  "requires_review",                             :default => false, :null => false
-    t.boolean  "requests_review",                             :default => false, :null => false
-    t.boolean  "reviewed",                                    :default => false, :null => false
-    t.text     "message_for_reviewer",                        :default => "",    :null => false
-    t.boolean  "newer_submission_reviewed",                   :default => false, :null => false
-    t.boolean  "review_dismissed",                            :default => false, :null => false
-    t.boolean  "paste_available",                             :default => false, :null => false
+    t.boolean  "requires_review",                             :default => false,       :null => false
+    t.boolean  "requests_review",                             :default => false,       :null => false
+    t.boolean  "reviewed",                                    :default => false,       :null => false
+    t.text     "message_for_reviewer",                        :default => "",          :null => false
+    t.boolean  "newer_submission_reviewed",                   :default => false,       :null => false
+    t.boolean  "review_dismissed",                            :default => false,       :null => false
+    t.boolean  "paste_available",                             :default => false,       :null => false
     t.text     "message_for_paste"
     t.string   "paste_key"
     t.datetime "client_time"
     t.integer  "client_nanotime",                :limit => 8
     t.text     "client_ip"
+    t.string   "status",                                      :default => "attempted"
+    t.integer  "status_id"
+    t.integer  "submission_status_id"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
   add_index "submissions", ["course_id", "user_id"], :name => "index_submissions_on_course_id_and_user_id"
   add_index "submissions", ["processed"], :name => "index_submissions_on_processed"
+  add_index "submissions", ["submission_status_id"], :name => "index_submissions_on_submission_status_id"
   add_index "submissions", ["user_id", "exercise_name"], :name => "index_submissions_on_user_id_and_exercise_name"
+  add_index "submissions", ["user_id"], :name => "index_submissions_on_user_id"
 
   create_table "test_case_runs", :force => true do |t|
     t.integer  "submission_id"
