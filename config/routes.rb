@@ -1,16 +1,16 @@
 TmcServer::Application.routes.draw do
   resources :sessions, :only => [:new, :create, :destroy]
 
-  match '/signin',  :to => 'sessions#new'
-  match '/signout', :to => 'sessions#destroy'
-  match '/login',  :to => 'sessions#new'
-  match '/logout', :to => 'sessions#destroy'
+  get '/signin',  :to => 'sessions#new'
+  get '/signout', :to => 'sessions#destroy'
+  get '/login',  :to => 'sessions#new'
+  get '/logout', :to => 'sessions#destroy'
 
   resource :auth, :only => [:show]
 
   # Make POST an alternative to GET /auth.t[e]xt
-  match '/auth.text', :method => :post, :to => 'auths#show'
-  match '/auth.txt', :method => :post, :to => 'auths#show'
+  post '/auth.text', :to => 'auths#show'
+  post '/auth.txt', :to => 'auths#show'
 
   resource :user
 
@@ -21,8 +21,8 @@ TmcServer::Application.routes.draw do
   resources :stats, :only => [:index]
 
   resources :password_reset_keys
-  match '/reset_password/:code' => 'password_reset_keys#show', :via => :get, :as => 'reset_password'
-  match '/reset_password/:code' => 'password_reset_keys#destroy', :via => :delete
+  get '/reset_password/:code' => 'password_reset_keys#show', :as => 'reset_password'
+  delete '/reset_password/:code' => 'password_reset_keys#destroy'
 
   resources :courses do
     member do
@@ -43,7 +43,7 @@ TmcServer::Application.routes.draw do
     resources :reviewed_submissions, :only =>[:index]
     resources :feedback_questions, :only => [:index, :new, :create]
     resources :feedback_answers, :only => [:index]
-    match 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :via => :get, :as => 'feedback_answers_chart'
+    get 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :as => 'feedback_answers_chart'
     resources :reviews, :only => [:index]
     resource :unlock, :only => [:show, :create]
     resource :course_notifications, :only => [:create, :index, :show, :new]
@@ -66,7 +66,7 @@ TmcServer::Application.routes.draw do
   get 'paste/:paste_key', to: 'submissions#show', as: 'paste'
   resources :reviews, :only => [:update, :destroy]
 
-  match '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :via => :put, :as => 'exercise_update_submissions'
+  put '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :as => 'exercise_update_submissions'
 
   resources :feedback_questions, :only => [:show, :update, :destroy] do
     resource :position, :only => [:update]
