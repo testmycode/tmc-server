@@ -18,6 +18,7 @@ gem 'andand'
 gem 'mimemagic'
 gem 'rack-cors'
 gem 'newrelic_rpm'
+gem 'activerecord-session_store', '~> 0.1.0'
 
 gem 'pghero'
 
