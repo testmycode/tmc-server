@@ -6,7 +6,7 @@ class Submission < ActiveRecord::Base
   belongs_to :course
 
   belongs_to :exercise,
-    lambda {|submission|
+    -> (submission) {
       if submission.respond_to?(:course_id)
         # Used when doing submission.exercise
         where(course: submission.course)

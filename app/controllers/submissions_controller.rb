@@ -195,7 +195,7 @@ private
       @exercise = @submission.exercise
     elsif params[:exercise_id]
       @exercise = Exercise.find(params[:exercise_id])
-      @course = Course.find(@exercise.course_id, :lock => 'FOR SHARE')
+      @course = Course.lock('FOR SHARE').find(@exercise.course_id)
       authorize! :read, @course
       authorize! :read, @exercise
     elsif params[:paste_key]
@@ -205,7 +205,7 @@ private
       @is_paste = true
       check_access!
     elsif params[:course_id]
-      @course = Course.find(params[:course_id], :lock => 'FOR SHARE')
+      @course = Course.lock('FOR SHARE').find(params[:course_id])
       authorize! :read, @course
     else
       respond_access_denied
