@@ -66,12 +66,12 @@ private
     @start_time =
       if params[:start_time]
       then Time.zone.parse(params[:start_time])
-      else @course.time_of_first_submission.to_date.to_time_in_current_zone
+      else @course.time_of_first_submission.to_date.in_time_zone
       end
     @end_time =
       if params[:end_time]
       then Time.zone.parse(params[:end_time])
-      else @course.time_of_last_submission.to_date.to_time_in_current_zone
+      else @course.time_of_last_submission.to_date.in_time_zone
       end
     @time_unit = param_as_one_of(:time_unit, [nil, 'minute', 'hour', 'day'])
     @time_unit = 'day' if @time_unit == nil
@@ -85,7 +85,7 @@ private
             select(['COUNT(*) c', "date_trunc('#{@time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"]).
             group('t').
             where('created_at >= ?', @start_time).
-            where('user_id in (?)', User.legitimate_students).
+            where(user_id: User.legitimate_students).
             where('created_at < ?', @end_time)
 
         date_format = "%Y-%m-%d %H:%M:%S" # query returns in this format, without timezone
@@ -114,7 +114,7 @@ private
     respond_to do |format|
       format.html { render :template => 'courses/stats/submission_times', :layout => 'bare' }
       format.json do
-        records = @course.submissions.where('user_id in (?)', User.legitimate_students).select([
+        records = @course.submissions.where(user_id: User.legitimate_students).select([
           'COUNT(*) c',
           "EXTRACT(HOUR FROM #{expr_for_time_in_time_zone('created_at')}) h"
         ]).group('h').order('h ASC')
