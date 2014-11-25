@@ -74,7 +74,7 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = Course.new(params[:course])
+    @course = Course.new(course_params[:course])
     authorize! :create, @course
 
     respond_to do |format|
@@ -88,6 +88,10 @@ class CoursesController < ApplicationController
 
 private
 
+  def course_params
+    params.permit(course: [:name, :source_url, :git_branch])
+  end
+
   def assign_show_view_vars
     @exercises = @course.
       exercises.
@@ -100,7 +104,7 @@ private
       @submissions = @course.submissions
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
       @submissions = @submissions.order('created_at DESC').includes(:user)
-      @total_submissions = @submissions.where('user_id in (?)', User.legitimate_students).count
+      @total_submissions = @submissions.where(user_id: User.legitimate_students).count
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end

@@ -19,7 +19,7 @@ class TestScannerCache
     if entry.files_hash == files_hash
       decode_value(entry.value)
     else
-      entry.value = ActiveSupport::JSON.encode(block.call)
+      entry.value = block.call.to_json
       entry.files_hash = files_hash
       try_save(entry)
       decode_value(entry.value)
@@ -43,6 +43,6 @@ private
   end
 
   def self.decode_value(value)
-    ActiveSupport::JSON.decode(value, :symbolize_keys => true)
+    JSON.parse(value).each{|element| element.symbolize_keys! }
   end
 end

@@ -7,10 +7,19 @@ class Exercise < ActiveRecord::Base
 
   has_many :available_points, :dependent => :delete_all
 
-  has_many :submissions, -> { where("submissions.course_id = #{self.course_id}") }, :foreign_key => :exercise_name, :primary_key => :name
+  has_many :submissions,
+    lambda {|exercise| 
+      if exercise.respond_to?(:course_id)
+        # Used when doing exercise.submissions
+        where(course: exercise.course)
+      else
+        # Used when doing exercises.includes(:submissions)
+        Submission.joins(:exercise)
+      end
+    }, :foreign_key => :exercise_name, :primary_key => :name
 
-  has_many :feedback_answers, -> { where("feedback_answers.course_id = #{self.course_id}") }, :foreign_key => :exercise_name, :primary_key => :name
-  has_many :unlocks, -> { where("unlocks.course_id = #{self.course_id}") }, :foreign_key => :exercise_name, :primary_key => :name
+  has_many :feedback_answers, lambda {|exercise| where(course: exercise.course) }, :foreign_key => :exercise_name, :primary_key => :name
+  has_many :unlocks, lambda {|exercise| where(course: exercise.course) }, :foreign_key => :exercise_name, :primary_key => :name
 
   validates :gdocs_sheet, :format => { :without => /\A(MASTER|PUBLIC)\z/ }
 

@@ -5,7 +5,16 @@ class Submission < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
 
-  belongs_to :exercise, -> { where("exercises.course_id = #{self.course_id}") }, :foreign_key => :exercise_name, :primary_key => :name
+  belongs_to :exercise,
+    lambda {|submission|
+      if submission.respond_to?(:course_id)
+        # Used when doing submission.exercise
+        where(course: submission.course)
+      else
+        # Used when doing submissions.include(:exercises)
+        Exercise.joins(:submission)
+      end
+    }, :foreign_key => :exercise_name, :primary_key => :name
 
   has_one :submission_data, :dependent => :delete
   after_save { submission_data.save! if submission_data }
