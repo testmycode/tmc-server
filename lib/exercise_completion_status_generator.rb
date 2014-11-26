@@ -3,7 +3,7 @@ class ExerciseCompletionStatusGenerator
 
   def self.completion_status(user, course)
     awarded_points = user.awarded_points.where(:course_id => course.id).map(&:name)
-    all_exercises = Exercise.where(course_id: course.id).includes(:available_points)
+    all_exercises = Exercise.where(course: course).includes(:available_points)
     attempted_exercise_names = Submission.where(
       :course_id => course.id,
       :user_id => user.id,

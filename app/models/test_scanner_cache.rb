@@ -43,6 +43,6 @@ private
   end
 
   def self.decode_value(value)
-    JSON.parse(value).each{|element| element.symbolize_keys! }
+    JSON.parse(value, symbolize_names: true)
   end
 end

@@ -87,7 +87,6 @@ class CoursesController < ApplicationController
   end
 
 private
-
   def course_params
     params.permit(course: [:name, :source_url, :git_branch])
   end
@@ -104,7 +103,7 @@ private
       @submissions = @course.submissions
       @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
       @submissions = @submissions.order('created_at DESC').includes(:user)
-      @total_submissions = @submissions.where(user_id: User.legitimate_students).count
+      @total_submissions = @submissions.where(user: User.legitimate_students).count
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end

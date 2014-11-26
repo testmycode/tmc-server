@@ -25,9 +25,6 @@ module TmcServer
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password, :api_password, :submission_file, :return_file]
 
-    # Version of your assets, change this if you want to expire all your assets
-    config.assets.version = '1.0'
-
     config.autoload_paths << Rails.root.join('lib')
 
     config.middleware.use Rack::Cors do
