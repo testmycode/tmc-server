@@ -13,10 +13,10 @@
 
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= stylesheet_link_tag 'application-test', media: 'all' if Rails.env == 'test' %>
-    <%= stylesheet_link_tag params[:controller] %>
+    <%= stylesheet_link_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.css") %>
 
     <%= javascript_include_tag 'application' %>
-    <%= javascript_include_tag params[:controller] %>
+    <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>
 
     <%= javascript_include_tag(
           comet_js_url('org/cometd.js'),
