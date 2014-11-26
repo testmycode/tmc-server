@@ -1,6 +1,7 @@
 ### 2014-XX-XX
 
-* Upgraded capybara to 2.2.0.
+* Upgraded to Rails 4.1.
+* Enabled asset pipeline with sprockets-rails.
 * Upgraded rails to 4.1.0, jquery-rails to 3.1.2, rspec to 3.1.0 and capybara to 2.2.0. Removed act_as_api (#197).
 
 ### 2014-12-09

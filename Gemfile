@@ -22,6 +22,11 @@ gem 'activerecord-session_store', '~> 0.1.0'
 
 gem 'pghero'
 
+group :assets do
+  gem 'sprockets-rails', require: 'sprockets/railtie'
+  gem 'jquery-rails', '~> 3.1.2'
+end
+
 group :development, :test do
   gem 'rspec', '~> 3.1.0'
   gem 'rspec-core', '~> 3.1.0'

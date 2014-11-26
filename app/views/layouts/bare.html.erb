@@ -2,12 +2,9 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <%= stylesheet_link_tag 'main' %>
-  <%= javascript_include_tag 'jquery', 'jquery_ujs', 'jquery.dataTables.min', 'naturalSort.js' %>
-  <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css' %>
-  <% if Rails.env == 'test' %>
-    <%= stylesheet_link_tag 'highlighting' %>
-  <% end %>
+  <%= stylesheet_link_tag 'application-bare', media: 'all' %>
+  <%= javascript_include_tag 'application-bare' %>
+  <%= stylesheet_link_tag 'application-test', media: 'all' if Rails.env == 'test' %>
   <%= csrf_meta_tag %>
   <title>Test My Code server</title>
 </head>
