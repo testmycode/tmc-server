@@ -38,4 +38,3 @@ group :development, :test do
   gem 'railroady' # for doc/diagrams
   gem 'simplecov'
 end
-
