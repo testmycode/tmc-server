@@ -24,9 +24,9 @@ gem 'newrelic_rpm'
 gem 'pghero'
 
 group :development, :test do
-  gem 'rspec', '~> 2.99'
-  gem 'rspec-core', '~> 2.99'
-  gem 'rspec-rails', '~> 2.99'
+  gem 'rspec', '~> 3.1.0'
+  gem 'rspec-core', '~> 3.1.0'
+  gem 'rspec-rails', '~> 3.1.0'
   gem 'factory_girl_rails', '~> 1.1.0'
   gem 'capybara', '~> 1.1.2'
   #gem 'capybara-webkit', '~> 0.7.2'  # Broken with modern QTs
