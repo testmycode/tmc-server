@@ -28,7 +28,8 @@ group :development, :test do
   gem 'rspec-core', '~> 3.1.0'
   gem 'rspec-rails', '~> 3.1.0'
   gem 'factory_girl_rails', '~> 1.1.0'
-  gem 'capybara', '~> 1.1.2'
+  gem 'capybara', '~> 2.2.0'
+  gem 'selenium-webdriver', '~> 2.44.0'
   #gem 'capybara-webkit', '~> 0.7.2'  # Broken with modern QTs
   gem 'database_cleaner', '~> 0.6.7'
   gem 'mimic', '~> 0.4.3'
