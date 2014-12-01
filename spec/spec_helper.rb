@@ -69,11 +69,10 @@ def without_db_notices(&block)
 end
 
 RSpec.configure do |config|
-  config.treat_symbols_as_metadata_keys_with_true_values = true
-
   config.mock_with :rspec
 
   config.use_transactional_fixtures = false
+  config.include Capybara::DSL
 
   config.before(:each) do |context|
     without_db_notices do
@@ -83,7 +82,7 @@ RSpec.configure do |config|
     allow(Tailoring).to receive_messages(:get => Tailoring.new)
     SiteSetting.use_distribution_defaults!
 
-    if context.example.metadata[:integration]
+    if context.metadata[:integration]
       # integration tests can't use transaction since the webserver must see the changes
       DatabaseCleaner.strategy = :truncation
 
