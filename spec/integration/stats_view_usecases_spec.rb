@@ -22,7 +22,7 @@ describe "The system (used by an instructor for viewing statistics)", :type => :
     submit_exercise('EasyExercise', :solve => false)
     submit_exercise('EasyExercise', :compilation_error => true)
     
-    visit_exericse 'EasyExercise'
+    visit_exercise 'EasyExercise'
     
     expect(page).to have_content('Ok')
     expect(page).to have_content('Fail')
@@ -35,7 +35,7 @@ describe "The system (used by an instructor for viewing statistics)", :type => :
     log_in_as(user.login, 'xooxer')
   end
   
-  def visit_exericse(exercise_name)
+  def visit_exercise(exercise_name)
     visit '/'
     click_link 'mycourse'
     click_link exercise_name
