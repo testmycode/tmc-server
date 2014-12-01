@@ -49,7 +49,7 @@ module IntegrationTestActions
   
   def wait_for_submission_to_be_processed
     wait_for_with_timeout(true, 60) do
-      if page.has_content?('Processing...')
+      if page.has_content?('Processing')
         sleep 1
         false
       else
