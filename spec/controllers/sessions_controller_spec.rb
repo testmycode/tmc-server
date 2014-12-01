@@ -39,7 +39,7 @@ describe SessionsController, :type => :controller do
     
     describe "when authentication fails" do
       before :each do
-        User.stub(:authenticate => nil)
+        allow(User).to receive_messages(:authenticate => nil)
       end
       
       it "should not set current_user" do

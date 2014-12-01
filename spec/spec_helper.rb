@@ -80,7 +80,7 @@ RSpec.configure do |config|
       DatabaseCleaner.clean
     end
 
-    Tailoring.stub(:get => Tailoring.new)
+    allow(Tailoring).to receive_messages(:get => Tailoring.new)
     SiteSetting.use_distribution_defaults!
 
     if context.example.metadata[:integration]

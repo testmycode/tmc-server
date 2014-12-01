@@ -6,7 +6,7 @@ describe ExtraField, :type => :model do
     File.open('./user_fields.rb', 'wb') do |f|
       f.write config_text
     end
-    ExtraField.stub(:config_files => ['./user_fields.rb'])
+    allow(ExtraField).to receive_messages(:config_files => ['./user_fields.rb'])
   end
 
   def use_default_config
