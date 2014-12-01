@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ### 2014-XX-XX
 
 * Upgraded to Rails 4.1.
@@ -17,6 +18,13 @@
 
 ### 2014-11-24
 
+=======
+### 2014-11-24 – 2014-12-01
+
+* Upgraded to Rails 4.1.
+* Enabled asset pipeline with sprockets-rails.
+* Upgraded rails to 4.1.0, jquery-rails to 3.1.2, rspec to 3.1.0, database_cleaner to 1.3.0 and capybara to 2.2.0. Removed act_as_api (#197).
+>>>>>>> Upgrade database_cleaner to 1.3.0
 * Removed pg_comment for Rails 4 support.
 
 ### 2014-10-07
