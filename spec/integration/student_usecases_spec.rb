@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by a student)", :integration => true do
+describe "The system (used by a student)", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -26,10 +26,10 @@ describe "The system (used by a student)", :integration => true do
     File.open('MyExercise.zip', 'wb') {|f| f.write(page.source) }
     system!("unzip -qq MyExercise.zip")
 
-    File.should be_a_directory('MyExercise')
-    File.should exist('MyExercise/src/SimpleStuff.java')
-    File.should exist('MyExercise/test/SimpleTest.java')
-    File.should_not exist('MyExercise/test/SimpleHiddenTest.java')
+    expect(File).to be_a_directory('MyExercise')
+    expect(File).to exist('MyExercise/src/SimpleStuff.java')
+    expect(File).to exist('MyExercise/test/SimpleTest.java')
+    expect(File).not_to exist('MyExercise/test/SimpleHiddenTest.java')
   end
 
   it "should show successful test results for correct solutions" do
@@ -42,9 +42,9 @@ describe "The system (used by a student)", :integration => true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    page.should have_content('All tests successful')
-    page.should have_content('Ok')
-    page.should_not have_content('Fail')
+    expect(page).to have_content('All tests successful')
+    expect(page).to have_content('Ok')
+    expect(page).not_to have_content('Fail')
   end
 
   it "should show unsuccessful test results for incorrect solutions" do
@@ -56,8 +56,8 @@ describe "The system (used by a student)", :integration => true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    page.should have_content('Some tests failed')
-    page.should have_content('Fail')
+    expect(page).to have_content('Some tests failed')
+    expect(page).to have_content('Fail')
   end
 
   it "should show compilation error for uncompilable solutions" do
@@ -70,8 +70,8 @@ describe "The system (used by a student)", :integration => true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    page.should have_content('Compilation error')
-    page.should have_content('oops')
+    expect(page).to have_content('Compilation error')
+    expect(page).to have_content('oops')
   end
 
   it "should not show exercises that have been explicitly hidden" do
@@ -82,7 +82,7 @@ describe "The system (used by a student)", :integration => true do
     visit '/'
     click_link 'mycourse'
 
-    page.should_not have_content('MyExercise')
+    expect(page).not_to have_content('MyExercise')
   end
 
   it "should show exercises whose deadline has passed but without a submission form" do
@@ -93,13 +93,13 @@ describe "The system (used by a student)", :integration => true do
     visit '/'
     click_link 'mycourse'
 
-    page.should have_content('MyExercise')
-    page.should have_content('(expired)')
+    expect(page).to have_content('MyExercise')
+    expect(page).to have_content('(expired)')
 
     click_link 'MyExercise'
-    page.should have_content('(expired)')
-    page.should_not have_content('Submit answer')
-    page.should_not have_content('Zipped project')
+    expect(page).to have_content('(expired)')
+    expect(page).not_to have_content('Submit answer')
+    expect(page).not_to have_content('Zipped project')
   end
 
   it "should not accept submissions for exercises whose deadline has passed"
@@ -128,14 +128,14 @@ describe "The system (used by a student)", :integration => true do
 
     click_link 'Files'
 
-    page.should have_content('src/SimpleStuff.java')
-    page.should have_content('public class')
-    page.should have_content('oops')
+    expect(page).to have_content('src/SimpleStuff.java')
+    expect(page).to have_content('public class')
+    expect(page).to have_content('oops')
 
-    page.should have_content('test/extraFile.java')
-    page.should have_content('extra_file')
+    expect(page).to have_content('test/extraFile.java')
+    expect(page).to have_content('extra_file')
 
-    page.should_not have_content('test/SimpleTest.java')
+    expect(page).not_to have_content('test/SimpleTest.java')
   end
 
   it "should show solutions for completed exercises" do
@@ -151,8 +151,8 @@ describe "The system (used by a student)", :integration => true do
     click_link 'mycourse'
     click_link 'MyExercise'
     click_link 'View suggested solution'
-    page.should have_content('Solution for MyExercise')
-    page.should have_content('src/SimpleStuff.java')
+    expect(page).to have_content('Solution for MyExercise')
+    expect(page).to have_content('src/SimpleStuff.java')
   end
 
   it "should not show solutions for uncompleted exercises" do
@@ -169,7 +169,7 @@ describe "The system (used by a student)", :integration => true do
     click_link 'mycourse'
     click_link 'MyExercise'
 
-    page.should_not have_content('View suggested solution')
+    expect(page).not_to have_content('View suggested solution')
   end
 
   it "should not count submissions made by non legitimate_students in submission counts" do
@@ -182,7 +182,7 @@ describe "The system (used by a student)", :integration => true do
     Submission.create!(exercise_name: 'MyExercise', course_id: 1, processed: true, secret_token: nil, all_tests_passed: true, points: "addsub both-test-files justsub mul simpletest-all", user: @fake_user)
 
     click_link 'mycourse'
-    page.should have_content('Number of submissions (from actual users): 0')
+    expect(page).to have_content('Number of submissions (from actual users): 0')
   end
 
   it "should not show submission files to other users" do
@@ -196,23 +196,23 @@ describe "The system (used by a student)", :integration => true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    page.should have_content('All tests successful')
-    page.should have_content('Ok')
+    expect(page).to have_content('All tests successful')
+    expect(page).to have_content('Ok')
 
     click_link 'Files'
-    page.should have_content('src/SimpleStuff.java')
+    expect(page).to have_content('src/SimpleStuff.java')
 
     log_out
-    page.should_not have_content('src/SimpleStuff.java')
-    page.should have_content('You are not authorized to access this page')
+    expect(page).not_to have_content('src/SimpleStuff.java')
+    expect(page).to have_content('You are not authorized to access this page')
     @other_user = Factory.create(:user, :login => "uuseri", :password => 'xooxer')
 
     visit '/'
     log_in_as(@other_user.login, 'xooxer')
     visit submission_path(Submission.last, anchor: 'files')
 
-    page.should_not have_content('src/SimpleStuff.java')
-    page.should have_content('You are not authorized to access this page')
+    expect(page).not_to have_content('src/SimpleStuff.java')
+    expect(page).to have_content('You are not authorized to access this page')
   end
 
   it "should show checkstyle validation results" do
@@ -229,13 +229,13 @@ describe "The system (used by a student)", :integration => true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    page.should have_content('Some tests failed')
+    expect(page).to have_content('Some tests failed')
 
-    page.should have_content('src/SimpleStuff.java')
+    expect(page).to have_content('src/SimpleStuff.java')
 
-    page.should have_content('Validation Cases')
-    page.should have_content('is not preceded with whitespace')
-    page.should have_content('Indentation incorrect. Expected 8, but was 4')
+    expect(page).to have_content('Validation Cases')
+    expect(page).to have_content('is not preceded with whitespace')
+    expect(page).to have_content('Indentation incorrect. Expected 8, but was 4')
   end
 
   describe "pastes" do
@@ -251,11 +251,11 @@ describe "The system (used by a student)", :integration => true do
       wait_for_submission_to_be_processed
 
       click_link 'Show Paste'
-      page.should have_content('src/SimpleStuff.java')
+      expect(page).to have_content('src/SimpleStuff.java')
 
       log_out
 
-      page.should have_content('src/SimpleStuff.java')
+      expect(page).to have_content('src/SimpleStuff.java')
 
     end
 
@@ -270,19 +270,19 @@ describe "The system (used by a student)", :integration => true do
       click_button 'Submit'
       wait_for_submission_to_be_processed
 
-      page.should have_content('All tests successful')
-      page.should have_content('Ok')
+      expect(page).to have_content('All tests successful')
+      expect(page).to have_content('Ok')
 
-      page.should_not have_content 'Show Paste'
+      expect(page).not_to have_content 'Show Paste'
 
       click_link 'Files'
 
-      page.should have_content('src/SimpleStuff.java')
+      expect(page).to have_content('src/SimpleStuff.java')
 
       log_out
 
-      page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('You are not authorized to access this page')
+      expect(page).not_to have_content('src/SimpleStuff.java')
+      expect(page).to have_content('You are not authorized to access this page')
     end
 
 
@@ -308,8 +308,8 @@ describe "The system (used by a student)", :integration => true do
       attach_file('Zipped project', 'MyExercise.zip')
       click_button 'Submit'
       wait_for_submission_to_be_processed
-      page.should have_content('All tests successful')
-      page.should have_content('Ok')
+      expect(page).to have_content('All tests successful')
+      expect(page).to have_content('Ok')
 
       visit '/'
 
@@ -331,25 +331,25 @@ describe "The system (used by a student)", :integration => true do
       wait_for_submission_to_be_processed
 
       click_link 'Show Paste'
-      page.should have_content('src/SimpleStuff.java')
+      expect(page).to have_content('src/SimpleStuff.java')
 
       log_out
 
       log_in_as(@user.login, 'xooxer')
 
-      page.should have_content('src/SimpleStuff.java')
+      expect(page).to have_content('src/SimpleStuff.java')
 
       log_out
       @other_user = Factory.create(:user,:login => "uuseri2", :password => 'xooxer2')
       log_in_as(@other_user.login, 'xooxer2')
 
-      page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('Access denied')
+      expect(page).not_to have_content('src/SimpleStuff.java')
+      expect(page).to have_content('Access denied')
 
       log_out
 
-      page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('Access denied')
+      expect(page).not_to have_content('src/SimpleStuff.java')
+      expect(page).to have_content('Access denied')
     end
 
 
@@ -373,8 +373,8 @@ describe "The system (used by a student)", :integration => true do
       attach_file('Zipped project', 'MyExercise.zip')
       click_button 'Submit'
       wait_for_submission_to_be_processed
-      page.should have_content('All tests successful')
-      page.should have_content('Ok')
+      expect(page).to have_content('All tests successful')
+      expect(page).to have_content('Ok')
 
       visit '/'
 
@@ -396,34 +396,34 @@ describe "The system (used by a student)", :integration => true do
       click_button 'Submit'
       wait_for_submission_to_be_processed
 
-      page.should_not have_content 'Show Paste'
+      expect(page).not_to have_content 'Show Paste'
 
 
 
       key = Submission.last.paste_key
       visit "/paste/#{key}"
 
-      page.should have_content('src/SimpleStuff.java')
-      page.should_not have_content('Access denied')
+      expect(page).to have_content('src/SimpleStuff.java')
+      expect(page).not_to have_content('Access denied')
 
       log_out
 
       log_in_as(@user.login, 'xooxer')
 
-      page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('Access denied')
+      expect(page).not_to have_content('src/SimpleStuff.java')
+      expect(page).to have_content('Access denied')
 
       log_out
       @other_user = Factory.create(:user,:login => "uuseri2", :password => 'xooxer2')
       log_in_as(@other_user.login, 'xooxer2')
 
-      page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('Access denied')
+      expect(page).not_to have_content('src/SimpleStuff.java')
+      expect(page).to have_content('Access denied')
 
       log_out
 
-      page.should_not have_content('src/SimpleStuff.java')
-      page.should have_content('Access denied')
+      expect(page).not_to have_content('src/SimpleStuff.java')
+      expect(page).to have_content('Access denied')
     end
 
 

@@ -16,7 +16,7 @@ describe FileTreeHasher do
     FileUtils.touch('foo')
     hash2 = FileTreeHasher.hash_file_tree('.')
     
-    hash1.should == hash2
+    expect(hash1).to eq(hash2)
   end
   
   it "should give a different hash if a file's contents are changed" do
@@ -25,7 +25,7 @@ describe FileTreeHasher do
     write_file('foo', 'changed contents')
     hash2 = FileTreeHasher.hash_file_tree('.')
     
-    hash1.should_not == hash2
+    expect(hash1).not_to eq(hash2)
   end
   
   it "should give a different hash if a file is moved" do
@@ -42,9 +42,9 @@ describe FileTreeHasher do
     
     hash3 = FileTreeHasher.hash_file_tree('.')
     
-    hash1.should_not == hash2
-    hash2.should_not == hash3
-    hash3.should_not == hash1
+    expect(hash1).not_to eq(hash2)
+    expect(hash2).not_to eq(hash3)
+    expect(hash3).not_to eq(hash1)
   end
   
   it "should give the same hash for the same file tree in another subdirectory" do
@@ -56,7 +56,7 @@ describe FileTreeHasher do
     hash1 = FileTreeHasher.hash_file_tree('a')
     hash2 = FileTreeHasher.hash_file_tree('b')
     
-    hash1.should == hash2
+    expect(hash1).to eq(hash2)
   end
 end
 

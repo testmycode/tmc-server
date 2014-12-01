@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Viewing feedback", :integration => true do
+describe "Viewing feedback", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -20,7 +20,7 @@ describe "Viewing feedback", :integration => true do
 
     click_link @course.name
     click_link 'View feedback'
-    page.should have_content('this is the answer')
+    expect(page).to have_content('this is the answer')
   end
 
   it "should be possible per-exercise" do
@@ -31,12 +31,12 @@ describe "Viewing feedback", :integration => true do
     click_link @course.name
     click_link @ex1.name
     click_link 'View feedback'
-    page.should have_content('this is the answer')
+    expect(page).to have_content('this is the answer')
 
     visit '/'
     click_link @course.name
     click_link @ex2.name
     click_link 'View feedback'
-    page.should_not have_content('this is the answer')
+    expect(page).not_to have_content('this is the answer')
   end
 end

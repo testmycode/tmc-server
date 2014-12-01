@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Personal deadlines", :integration => true do
+describe "Personal deadlines", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -25,15 +25,15 @@ describe "Personal deadlines", :integration => true do
   end
 
   specify "doing one exercise should unlock the other" do
-    page.should have_content('MyExercise1')
-    page.should_not have_content('MyExercise2')
+    expect(page).to have_content('MyExercise1')
+    expect(page).not_to have_content('MyExercise2')
 
     submit_correct_solution('MyExercise1')
 
     visit '/'
     click_link 'mycourse'
-    page.should have_content('MyExercise2')
-    page.should_not have_content('(locked)')
+    expect(page).to have_content('MyExercise2')
+    expect(page).not_to have_content('(locked)')
   end
 
   describe "when the deadline of an unlocked exercise depends on the unlock time" do
@@ -48,17 +48,17 @@ describe "Personal deadlines", :integration => true do
 
       visit '/'
       click_link 'mycourse'
-      page.should have_content('MyExercise2 (locked)')
-      page.should have_content('unlock 1 new exercise')
+      expect(page).to have_content('MyExercise2 (locked)')
+      expect(page).to have_content('unlock 1 new exercise')
 
       click_link 'unlock 1 new exercise'
       click_button 'Unlock these exercises'
 
-      page.should have_content('MyExercise2')
-      page.should_not have_content('(locked)')
+      expect(page).to have_content('MyExercise2')
+      expect(page).not_to have_content('(locked)')
 
       dl = @course.exercises.find_by_name('MyExercise2').deadline_for(@user)
-      dl.should be_within(10.minutes).of(Time.now + 1.week)
+      expect(dl).to be_within(10.minutes).of(Time.now + 1.week)
     end
   end
 

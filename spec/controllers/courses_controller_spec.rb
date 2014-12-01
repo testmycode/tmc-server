@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CoursesController do
+describe CoursesController, :type => :controller do
 
   before(:each) do
     @user = Factory.create(:user)
@@ -17,8 +17,8 @@ describe CoursesController do
       
       get :index
       
-      assigns(:ongoing_courses).map(&:name).should == ['AnotherTestCourse', 'SomeTestCourse']
-      assigns(:expired_courses).map(&:name).should == ['ExpiredCourse']
+      expect(assigns(:ongoing_courses).map(&:name)).to eq(['AnotherTestCourse', 'SomeTestCourse'])
+      expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
     end
     
     describe "in JSON format" do
@@ -41,7 +41,7 @@ describe CoursesController do
         
         result = get_index_json
         
-        result['courses'].map {|c| c['name'] }.should == ['Course1', 'Course2', 'Course3']
+        expect(result['courses'].map {|c| c['name'] }).to eq(['Course1', 'Course2', 'Course3'])
       end
     end
   end
@@ -66,8 +66,8 @@ describe CoursesController do
         
         get :show, :id => @course.id
         
-        assigns['submissions'].should include(sub1)
-        assigns['submissions'].should include(sub2)
+        expect(assigns['submissions']).to include(sub1)
+        expect(assigns['submissions']).to include(sub2)
       end
     end
     
@@ -82,7 +82,7 @@ describe CoursesController do
         
         get :show, :id => @course.id
         
-        assigns['submissions'].should be_nil
+        expect(assigns['submissions']).to be_nil
       end
     end
     
@@ -97,8 +97,8 @@ describe CoursesController do
         
         get :show, :id => @course.id
         
-        assigns['submissions'].should include(my_sub)
-        assigns['submissions'].should_not include(other_guys_sub)
+        expect(assigns['submissions']).to include(my_sub)
+        expect(assigns['submissions']).not_to include(other_guys_sub)
       end
     end
 
@@ -129,10 +129,10 @@ describe CoursesController do
         result = get_show_json
 
         exs = result['course']['exercises']
-        exs[0]['name'].should == 'Exercise1'
-        exs[1]['name'].should == 'Exercise2'
-        exs[0]['zip_url'].should == exercise_url(@course.exercises[0].id, :format => 'zip')
-        exs[0]['return_url'].should == exercise_submissions_url(@course.exercises[0].id, :format => 'json')
+        expect(exs[0]['name']).to eq('Exercise1')
+        expect(exs[1]['name']).to eq('Exercise2')
+        expect(exs[0]['zip_url']).to eq(exercise_url(@course.exercises[0].id, :format => 'zip'))
+        expect(exs[0]['return_url']).to eq(exercise_submissions_url(@course.exercises[0].id, :format => 'json'))
       end
 
       it "should include only visible exercises" do
@@ -144,9 +144,9 @@ describe CoursesController do
         result = get_show_json
 
         names = result['course']['exercises'].map { |ex| ex['name'] }
-        names.should_not include('Exercise1')
-        names.should include('Exercise2')
-        names.should include('Exercise3')
+        expect(names).not_to include('Exercise1')
+        expect(names).to include('Exercise2')
+        expect(names).to include('Exercise3')
       end
 
       it "should tell each the exercise's deadline" do
@@ -155,7 +155,7 @@ describe CoursesController do
 
         result = get_show_json
 
-        result['course']['exercises'][0]['deadline'].should == '2011-11-16T23:59:59+02:00'
+        expect(result['course']['exercises'][0]['deadline']).to eq('2011-11-16T23:59:59+02:00')
       end
 
       it "should tell for each exercise whether it has been attempted" do
@@ -165,8 +165,8 @@ describe CoursesController do
         result = get_show_json
 
         exs = result['course']['exercises']
-        exs[0]['attempted'].should be_true
-        exs[1]['attempted'].should be_false
+        expect(exs[0]['attempted']).to be_truthy
+        expect(exs[1]['attempted']).to be_falsey
       end
 
       it "should tell for each exercise whether it has been completed" do
@@ -175,15 +175,15 @@ describe CoursesController do
         result = get_show_json
 
         exs = result['course']['exercises']
-        exs[0]['completed'].should be_true
-        exs[1]['completed'].should be_false
+        expect(exs[0]['completed']).to be_truthy
+        expect(exs[1]['completed']).to be_falsey
       end
 
       describe "and no user given" do
         it "should respond with a 401" do
           controller.current_user = Guest.new
           get_show_json({:api_username => nil, :api_password => nil}, false)
-          response.code.to_i.should == 401
+          expect(response.code.to_i).to eq(401)
         end
       end
 
@@ -194,7 +194,7 @@ describe CoursesController do
 
         it "should respond with a 401" do
           get_show_json({}, false)
-          response.code.to_i.should == 401
+          expect(response.code.to_i).to eq(401)
         end
       end
     end
@@ -210,20 +210,20 @@ describe CoursesController do
     describe "with valid parameters" do
       it "creates the course" do
         post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
-        Course.last.source_url.should == 'git@example.com'
+        expect(Course.last.source_url).to eq('git@example.com')
       end
 
       it "redirects to the created course" do
         post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
-        response.should redirect_to(Course.last)
+        expect(response).to redirect_to(Course.last)
       end
     end
 
     describe "with invalid parameters" do
       it "re-renders the course creation form" do
         post :create, :course => { :name => 'invalid name with spaces' }
-        response.should render_template("new")
-        assigns(:course).name.should == 'invalid name with spaces'
+        expect(response).to render_template("new")
+        expect(assigns(:course).name).to eq('invalid name with spaces')
       end
     end
   end

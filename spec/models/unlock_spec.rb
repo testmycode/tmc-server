@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Unlock do
+describe Unlock, :type => :model do
   describe "#refresh_unlocks" do
     before :each do
       @course = Factory.create(:course)
@@ -19,19 +19,19 @@ describe Unlock do
     it "creates unlocks as specified" do
       Unlock.refresh_unlocks(@course, @user)
       unlocks = Unlock.order('exercise_name ASC').to_a
-      unlocks.size.should == 1
+      expect(unlocks.size).to eq(1)
 
-      unlocks.first.valid_after.should == Date.parse('2011-11-11').to_time_in_current_zone
-      unlocks.first.exercise_name.should == 'ex1'
+      expect(unlocks.first.valid_after).to eq(Date.parse('2011-11-11').to_time_in_current_zone)
+      expect(unlocks.first.exercise_name).to eq('ex1')
 
       AwardedPoint.create!(:user_id => @user.id, :course_id => @course.id, :name => @available_point.name)
       Unlock.refresh_unlocks(@course, @user)
 
       unlocks = Unlock.order('exercise_name ASC').to_a
-      unlocks.size.should == 2
+      expect(unlocks.size).to eq(2)
 
-      unlocks.second.valid_after.should == Date.parse('2011-11-22').to_time_in_current_zone
-      unlocks.second.exercise_name.should == 'ex2'
+      expect(unlocks.second.valid_after).to eq(Date.parse('2011-11-22').to_time_in_current_zone)
+      expect(unlocks.second.exercise_name).to eq('ex2')
     end
 
     it "doesn't recreate old unlocks" do
@@ -41,8 +41,8 @@ describe Unlock do
 
       Unlock.refresh_unlocks(@course, @user)
       u = Unlock.where(:exercise_name => 'ex1').first
-      u.id.should == id
-      u.created_at.should == created_at
+      expect(u.id).to eq(id)
+      expect(u.created_at).to eq(created_at)
     end
 
     it "deletes unlocks whose conditions changed" do
@@ -51,7 +51,7 @@ describe Unlock do
       @ex1.save!
       @course.reload
       Unlock.refresh_unlocks(@course, @user)
-      Unlock.where(:exercise_name => 'ex1').should be_empty
+      expect(Unlock.where(:exercise_name => 'ex1')).to be_empty
     end
 
     it "updates unlocks whose unlock time changes" do
@@ -62,7 +62,7 @@ describe Unlock do
       @course.reload
       Unlock.refresh_unlocks(@course, @user)
       u = Unlock.where(:exercise_name => 'ex1').first
-      u.valid_after.should > Date.today + 2.days
+      expect(u.valid_after).to be > Date.today + 2.days
 
       @ex1.unlock_spec = ["exercise ex2"].to_json
       @ex1.save!
@@ -70,7 +70,7 @@ describe Unlock do
       AwardedPoint.create!(:user_id => @user.id, :course_id => @course.id, :name => @available_point2.name)
       Unlock.refresh_unlocks(@course, @user)
       u = Unlock.where(:exercise_name => 'ex1').first
-      u.valid_after.should be_nil
+      expect(u.valid_after).to be_nil
     end
 
   end

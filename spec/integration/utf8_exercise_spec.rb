@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 require 'spec_helper'
 
-describe "The system, receiving submissions with UTF-8 special characters", :integration => true do
+describe "The system, receiving submissions with UTF-8 special characters", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -30,9 +30,9 @@ describe "The system, receiving submissions with UTF-8 special characters", :int
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    page.should have_content('mää')
-    page.should have_content('möö')
-    page.should have_content('müü')
+    expect(page).to have_content('mää')
+    expect(page).to have_content('möö')
+    expect(page).to have_content('müü')
   end
 
   it "should correctly show UTF-8 in files" do
@@ -42,6 +42,6 @@ describe "The system, receiving submissions with UTF-8 special characters", :int
     wait_for_submission_to_be_processed
 
     click_link 'Files'
-    page.should have_content('here are some special characters: mää möö blöö')
+    expect(page).to have_content('here are some special characters: mää möö blöö')
   end
 end

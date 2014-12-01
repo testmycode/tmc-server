@@ -1,31 +1,31 @@
 require 'spec_helper'
 
-describe Validators::FeedbackAnswerFormatValidator do
+describe Validators::FeedbackAnswerFormatValidator, :type => :model do
   it "should validate integer ranges" do
     answer = Factory.create(:feedback_answer)
     answer.feedback_question.kind = 'intrange[-5..5]'
     
     answer.answer = '3'
-    answer.should be_valid
+    expect(answer).to be_valid
     answer.answer = '1'
-    answer.should be_valid
+    expect(answer).to be_valid
     answer.answer = '-1'
-    answer.should be_valid
+    expect(answer).to be_valid
     answer.answer = '5'
-    answer.should be_valid
+    expect(answer).to be_valid
     answer.answer = '-5'
-    answer.should be_valid
+    expect(answer).to be_valid
     
     answer.answer = '-6'
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
     answer.answer = '6'
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
     answer.answer = '1.1'
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
     answer.answer = 'foo'
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
     answer.answer = ''
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
   end
   
   it "should accept non-empty text answers" do
@@ -33,12 +33,12 @@ describe Validators::FeedbackAnswerFormatValidator do
     answer.feedback_question.kind = 'text'
     
     answer.answer = 'foo'
-    answer.should be_valid
+    expect(answer).to be_valid
     
     answer.answer = ''
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
     answer.answer = ' '
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
   end
   
   it "should not anything when question kind is invalid" do
@@ -46,6 +46,6 @@ describe Validators::FeedbackAnswerFormatValidator do
     answer.feedback_question.kind = 'an invalid kind'
     
     answer.answer = 'foo'
-    answer.should_not be_valid
+    expect(answer).not_to be_valid
   end
 end

@@ -17,8 +17,8 @@ shared_examples_for "an Orderable" do
     second.save!
     third.save!
 
-    first.position.should < second.position
-    second.position.should < third.position
+    expect(first.position).to be < second.position
+    expect(second.position).to be < third.position
   end
 
   it "should validate uniqueness of position" do
@@ -26,7 +26,7 @@ shared_examples_for "an Orderable" do
     first.save!
     second = new_record
     second.position = first.position
-    second.should have(1).error_on(:position)
+    expect(second.error_on(:position).size).to eq(1)
   end
 
   describe "#move_forward!" do
@@ -35,12 +35,12 @@ shared_examples_for "an Orderable" do
       records[7].move_forward!
       records.each(&:reload)
       
-      records[7].position.should > records[8].position
-      records[7].position.should < records[9].position
+      expect(records[7].position).to be > records[8].position
+      expect(records[7].position).to be < records[9].position
       
       records.delete_at(7)
       positions = records.map(&:position)
-      positions.should == positions.sort
+      expect(positions).to eq(positions.sort)
     end
 
     context "when there is no next record" do
@@ -51,7 +51,7 @@ shared_examples_for "an Orderable" do
         records.last.move_forward!
 
         records.last.reload
-        records.last.position.should == position_before
+        expect(records.last.position).to eq(position_before)
       end
     end
   end
@@ -62,12 +62,12 @@ shared_examples_for "an Orderable" do
       records[7].move_backward!
       records.each(&:reload)
 
-      records[7].position.should < records[6].position
-      records[7].position.should > records[5].position
+      expect(records[7].position).to be < records[6].position
+      expect(records[7].position).to be > records[5].position
 
       records.delete_at(7)
       positions = records.map(&:position)
-      positions.should == positions.sort
+      expect(positions).to eq(positions.sort)
     end
 
     context "when there is no previous record" do
@@ -78,7 +78,7 @@ shared_examples_for "an Orderable" do
         records.first.move_backward!
 
         records.first.reload
-        records.first.position.should == position_before
+        expect(records.first.position).to eq(position_before)
       end
     end
   end
@@ -91,8 +91,8 @@ shared_examples_for "an Orderable" do
       records[1].move_before!(records[3])
       records.each(&:reload)
 
-      records[7].position.should < records[1].position
-      records[1].position.should < records[3].position
+      expect(records[7].position).to be < records[1].position
+      expect(records[1].position).to be < records[3].position
     end
   end
 
@@ -104,8 +104,8 @@ shared_examples_for "an Orderable" do
       records[1].move_after!(records[3])
       records.each(&:reload)
 
-      records[7].position.should > records[1].position
-      records[1].position.should > records[3].position
+      expect(records[7].position).to be > records[1].position
+      expect(records[1].position).to be > records[3].position
     end
   end
 end

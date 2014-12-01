@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Review do
+describe Review, :type => :model do
   before :each do
     @course = Factory.create(:course)
     @admin = Factory.create(:admin)
@@ -19,25 +19,25 @@ describe Review do
   describe "associations" do
     specify "to reviewer" do
       review = mk_review
-      review.reviewer.should == @admin
-      @admin.reviews.should == [review]
+      expect(review.reviewer).to eq(@admin)
+      expect(@admin.reviews).to eq([review])
     end
     specify "to submission" do
       review = mk_review
-      review.submission.should == @sub
-      @sub.reviews.should == [review]
+      expect(review.submission).to eq(@sub)
+      expect(@sub.reviews).to eq([review])
     end
   end
 
   it "is not deleted when the reviewing user is destroyed" do
     review = mk_review
     @admin.destroy
-    Review.find_by_id(review.id).should_not be_nil
+    expect(Review.find_by_id(review.id)).not_to be_nil
   end
 
   it "is deleted when the submission is destroyed" do
     review = mk_review
     @sub.destroy
-    Review.find_by_id(review.id).should be_nil
+    expect(Review.find_by_id(review.id)).to be_nil
   end
 end

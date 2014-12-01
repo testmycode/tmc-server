@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Exercise do
+describe Exercise, :type => :model do
   describe "unlocks and deadlines" do
     before :each do
       @user = Factory.create(:user)
@@ -17,28 +17,28 @@ describe Exercise do
       @ex2.options = { 'unlocked_after' => "30% of ex1" }
       @ex2.save!
       invalidate_unlocks
-      @ex2.should_not be_unlocked_for(@user)
+      expect(@ex2).not_to be_unlocked_for(@user)
 
       @points[0].award_to(@user)
       @course.reload
       invalidate_unlocks
-      @ex2.should be_unlocked_for(@user)
+      expect(@ex2).to be_unlocked_for(@user)
     end
 
     specify "unlock after another exercise is 70% complete" do
       @ex2.options = { 'unlocked_after' => "70% of ex1" }
       @ex2.save!
-      @ex2.requires_explicit_unlock?.should == false
+      expect(@ex2.requires_explicit_unlock?).to eq(false)
       invalidate_unlocks
-      @ex2.should_not be_unlocked_for(@user)
+      expect(@ex2).not_to be_unlocked_for(@user)
 
       @points[0].award_to(@user)
       invalidate_unlocks
-      @ex2.should_not be_unlocked_for(@user)
+      expect(@ex2).not_to be_unlocked_for(@user)
 
       @points[1].award_to(@user)
       invalidate_unlocks
-      @ex2.should be_unlocked_for(@user)
+      expect(@ex2).to be_unlocked_for(@user)
     end
 
     specify "deadline depending on unlock" do
@@ -48,14 +48,14 @@ describe Exercise do
       invalidate_unlocks
 
       @ex2.reload
-      @ex2.requires_explicit_unlock?.should == true
-      @ex2.should_not be_unlocked_for(@user)
-      @ex2.deadline_for(@user).should be_nil
+      expect(@ex2.requires_explicit_unlock?).to eq(true)
+      expect(@ex2).not_to be_unlocked_for(@user)
+      expect(@ex2.deadline_for(@user)).to be_nil
 
       Unlock.unlock_exercises([@ex2], @user)
       @ex2.reload
-      @ex2.should be_unlocked_for(@user)
-      @ex2.deadline_for(@user).should be_within(5.minutes).of(Time.now + 5.days)
+      expect(@ex2).to be_unlocked_for(@user)
+      expect(@ex2.deadline_for(@user)).to be_within(5.minutes).of(Time.now + 5.days)
     end
 
     def invalidate_unlocks

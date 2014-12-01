@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe AvailablePoint do
+describe AvailablePoint, :type => :model do
   describe "sorting" do
     it "should use natural sorting" do
       a = [ Factory.create(:available_point, :name => "1.2"),
             Factory.create(:available_point, :name => "1.20"),
             Factory.create(:available_point, :name => "1.3")].sort!
 
-      a.first.name.should == "1.2"
-      a.last.name.should == "1.20"
+      expect(a.first.name).to eq("1.2")
+      expect(a.last.name).to eq("1.20")
     end
   end
 
@@ -22,12 +22,12 @@ describe AvailablePoint do
       ap2 = Factory.create(:available_point, :exercise => ex2)
 
       a = AvailablePoint.course_sheet_points(course, "s1")
-      a.size.should == 1
-      a.should include(ap1)
+      expect(a.size).to eq(1)
+      expect(a).to include(ap1)
 
       a = AvailablePoint.course_sheet_points(course, "s2")
-      a.size.should == 1
-      a.should include(ap2)
+      expect(a.size).to eq(1)
+      expect(a).to include(ap2)
     end
 
     specify "course_points_of_exercises" do
@@ -41,17 +41,17 @@ describe AvailablePoint do
       Factory.create(:exercise, :gdocs_sheet => "s2") # gets wrong course
 
       a = AvailablePoint.course_points_of_exercises(course, [ex2])
-      a.size.should == 1
-      a.should include (ap2)
-      a.should_not include (ap1)
+      expect(a.size).to eq(1)
+      expect(a).to include (ap2)
+      expect(a).not_to include (ap1)
     end
   end
 
   describe "validation" do
     it "checks against blanks in the name" do
       ap = Factory.build(:available_point, :name => 'foo ')
-      ap.should_not be_valid
-      ap.should have(1).error_on('name')
+      expect(ap).not_to be_valid
+      expect(ap.error_on('name').size).to eq(1)
     end
   end
 
@@ -61,11 +61,11 @@ describe AvailablePoint do
       user = Factory.create(:user)
       ap.award_to(user)
 
-      user.awarded_points.size.should == 1
+      expect(user.awarded_points.size).to eq(1)
       aw = user.awarded_points.first
-      aw.name.should == ap.name
-      aw.course_id.should == ap.exercise.course_id
-      aw.submission.should be_nil
+      expect(aw.name).to eq(ap.name)
+      expect(aw.course_id).to eq(ap.exercise.course_id)
+      expect(aw.submission).to be_nil
     end
 
     it "is idempotent" do
@@ -75,8 +75,8 @@ describe AvailablePoint do
       ap.award_to(user)
       ap.award_to(user)
 
-      user.awarded_points.size.should == 1
-      aw = user.awarded_points.first.name.should == ap.name
+      expect(user.awarded_points.size).to eq(1)
+      aw = expect(user.awarded_points.first.name).to eq(ap.name)
     end
   end
 end

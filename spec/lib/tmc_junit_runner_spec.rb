@@ -6,7 +6,7 @@ describe TmcJunitRunner do
       it "should find all exercise methods" do
         FixtureExercise::SimpleExercise.new('MyExercise')
         methods = TmcJunitRunner.get.get_test_case_methods('MyExercise')
-        methods.should include({
+        expect(methods).to include({
           :class_name => 'SimpleTest',
           :method_name => 'testAdd',
           :points => ['simpletest-all', 'both-test-files', 'addsub']
@@ -18,7 +18,7 @@ describe TmcJunitRunner do
       it "should find all exercise methods" do
         FixtureExercise::MavenExercise.new('MyExercise')
         methods = TmcJunitRunner.get.get_test_case_methods('MyExercise')
-        methods.should include({
+        expect(methods).to include({
           :class_name => 'SimpleTest',
           :method_name => 'testAdd',
           :points => ['simpletest-all', 'both-test-files', 'addsub']

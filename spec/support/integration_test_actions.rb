@@ -10,7 +10,7 @@ module IntegrationTestActions
     fill_in 'session_password', :with => password
     click_button 'Sign in'
     
-    page.should have_content('Sign out')
+    expect(page).to have_content('Sign out')
   end
 
   def log_out
@@ -25,15 +25,15 @@ module IntegrationTestActions
     fill_in 'course_source_url', :with => options[:source_url] if options[:source_url]
     click_button 'Add Course'
     
-    page.should have_content('Course was successfully created.')
-    page.should have_content(options[:name])
+    expect(page).to have_content('Course was successfully created.')
+    expect(page).to have_content(options[:name])
   end
   
   def manually_refresh_course(coursename)
     visit '/courses'
     click_link coursename
     click_on 'Refresh'
-    page.should have_content('Refresh successful.')
+    expect(page).to have_content('Refresh successful.')
   end
   
   # Evil override fix for Capybara 1.1.2 + Selenium + Firefox 7.

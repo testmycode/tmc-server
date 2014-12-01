@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe Solution do
+describe Solution, :type => :model do
   it "should be visible if solution_visible_after has passed" do
     user = Factory.create(:user)
     ex = Factory.create(:exercise)
     sol = ex.solution
     
     ex.solution_visible_after = Time.now - 5.days
-    sol.should be_visible_to(user)
+    expect(sol).to be_visible_to(user)
   end
 
   it "should never be visible if exercise is still submittable and uncompleted by a non-admin user" do
@@ -18,8 +18,8 @@ describe Solution do
     ex = Factory.create(:exercise)
     sol = ex.solution
     
-    ex.stub(:submittable_by?).and_return(true)
-    sol.should_not be_visible_to(user)
+    allow(ex).to receive(:submittable_by?).and_return(true)
+    expect(sol).not_to be_visible_to(user)
   end
 
   it "should not be visible if the exercise is not visible to the user" do
@@ -31,10 +31,10 @@ describe Solution do
     sol = ex.solution
 
     ex.solution_visible_after = Time.now - 5.days
-    sol.should be_visible_to(user)
+    expect(sol).to be_visible_to(user)
 
-    ex.stub("visible_to?").and_return(false)
-    sol.should_not be_visible_to(user)
+    allow(ex).to receive("visible_to?").and_return(false)
+    expect(sol).not_to be_visible_to(user)
   end
 
   def show_when_completed(setting)

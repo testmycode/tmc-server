@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by an instructor for viewing statistics)", :integration => true do
+describe "The system (used by an instructor for viewing statistics)", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -24,9 +24,9 @@ describe "The system (used by an instructor for viewing statistics)", :integrati
     
     visit_exericse 'EasyExercise'
     
-    page.should have_content('Ok')
-    page.should have_content('Fail')
-    page.should have_content('Error')
+    expect(page).to have_content('Ok')
+    expect(page).to have_content('Fail')
+    expect(page).to have_content('Error')
   end
 
   def log_in_as_instructor

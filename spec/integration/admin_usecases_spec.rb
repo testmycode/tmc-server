@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by an instructor for administration)", :integration => true do
+describe "The system (used by an instructor for administration)", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -28,7 +28,7 @@ describe "The system (used by an instructor for administration)", :integration =
     
     visit '/courses'
     click_link 'mycourse'
-    page.should have_content('MyExercise')
+    expect(page).to have_content('MyExercise')
   end
   
   it "should allow rerunning individual submissions" do
@@ -43,15 +43,15 @@ describe "The system (used by an instructor for administration)", :integration =
     setup.submission.save!
     
     visit submission_path(setup.submission)
-    page.should_not have_content('All tests successful')
+    expect(page).not_to have_content('All tests successful')
     
     click_button 'Rerun submission'
-    page.should have_content('Rerun scheduled')
+    expect(page).to have_content('Rerun scheduled')
     SubmissionProcessor.new.reprocess_timed_out_submissions
     wait_for_submission_to_be_processed
     
-    page.should_not have_content('some funny error')
-    page.should have_content('All tests successful')
+    expect(page).not_to have_content('some funny error')
+    expect(page).to have_content('All tests successful')
   end
 end
 

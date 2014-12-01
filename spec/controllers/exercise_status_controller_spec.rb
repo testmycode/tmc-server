@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ExerciseStatusController do
+describe ExerciseStatusController, :type => :controller do
   before :each do
     @course = Factory.create(:course)
     @exercise = Factory.create(:exercise, :course => @course)
@@ -44,24 +44,24 @@ describe ExerciseStatusController do
 
       it "should show completition status for submitted exercises" do
         do_get
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse response.body
-        json.should have_key @exercise.name
-        json.should have_key @exercise2.name
-        json[@exercise.name].should == "completed"
-        json[@exercise2.name].should == "attempted"
-        json[@exercise3.name].should == "not_attempted"
+        expect(json).to have_key @exercise.name
+        expect(json).to have_key @exercise2.name
+        expect(json[@exercise.name]).to eq("completed")
+        expect(json[@exercise2.name]).to eq("attempted")
+        expect(json[@exercise3.name]).to eq("not_attempted")
       end
 
       it "should work when using course and user name instrad of id:s" do
         do_get
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse response.body
-        json.should have_key @exercise.name
-        json.should have_key @exercise2.name
-        json[@exercise.name].should == "completed"
-        json[@exercise2.name].should == "attempted"
-        json[@exercise3.name].should == "not_attempted"
+        expect(json).to have_key @exercise.name
+        expect(json).to have_key @exercise2.name
+        expect(json[@exercise.name]).to eq("completed")
+        expect(json[@exercise2.name]).to eq("attempted")
+        expect(json[@exercise3.name]).to eq("not_attempted")
       end
     end
   end

@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe PointsController do
+describe PointsController, :type => :controller do
   render_views
   before :each do
     @course = Factory.create(:course)
@@ -32,22 +32,22 @@ describe PointsController do
 
       it "should show a page" do
         get :show, :course_id => @course.id, :id => @sheetname
-        response.should be_success
+        expect(response).to be_success
       end
 
       it "should contain @user login" do
         get :show, :course_id => @course.id, :id => @sheetname
-        response.body.should have_content(@user.login)
+        expect(response.body).to have_content(@user.login)
       end
 
       it "should contain available point name" do
         get :show, :course_id => @course.id, :id => @sheetname
-        response.body.should have_content(@available_point.name)
+        expect(response.body).to have_content(@available_point.name)
       end
 
       it "should contain a success marker" do
         get :show, :course_id => @course.id, :id => @sheetname
-        response.body.should have_content("✔")
+        expect(response.body).to have_content("✔")
       end
     end
   end

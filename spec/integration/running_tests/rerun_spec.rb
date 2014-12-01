@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RemoteSandboxForTesting, :integration => true do
+describe RemoteSandboxForTesting, :type => :request, :integration => true do
   include GitTestActions
 
   describe "rerunning an old submission" do
@@ -26,15 +26,15 @@ describe RemoteSandboxForTesting, :integration => true do
       
       RemoteSandboxForTesting.run_submission(@submission)
       
-      @submission.test_case_runs.should_not be_empty
-      @submission.test_case_runs.should_not include(old_tcr)
+      expect(@submission.test_case_runs).not_to be_empty
+      expect(@submission.test_case_runs).not_to include(old_tcr)
     end
     
     it "should award new points" do
       @setup.exercise_project.solve_all
       RemoteSandboxForTesting.run_submission(@submission)
       
-      @submission.awarded_points.should_not be_empty
+      expect(@submission.awarded_points).not_to be_empty
     end
     
     it "should not delete previously awarded points" do
@@ -48,7 +48,7 @@ describe RemoteSandboxForTesting, :integration => true do
       
       RemoteSandboxForTesting.run_submission(@submission)
       
-      @submission.awarded_points.should include(old_point)
+      expect(@submission.awarded_points).to include(old_point)
     end
   end
 end

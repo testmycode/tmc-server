@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ExerciseGroup do
+describe ExerciseGroup, :type => :model do
   let(:course) { Factory.create(:course) }
 
   specify "#exercises" do
@@ -10,17 +10,17 @@ describe ExerciseGroup do
     another_course = Factory.create(:course)
     ex4 = Factory.create(:exercise, :course => another_course, :name => 'foo-bar-baz')
 
-    ex.exercise_group.exercises(false).should include(ex)
-    ex.exercise_group.exercises(true).should include(ex)
-    ex.exercise_group.parent.exercises(true).should include(ex)
-    ex.exercise_group.parent.exercises(false).should_not include(ex)
+    expect(ex.exercise_group.exercises(false)).to include(ex)
+    expect(ex.exercise_group.exercises(true)).to include(ex)
+    expect(ex.exercise_group.parent.exercises(true)).to include(ex)
+    expect(ex.exercise_group.parent.exercises(false)).not_to include(ex)
 
-    ex.exercise_group.exercises(false).should include(ex2)
-    ex.exercise_group.exercises(false).should_not include(ex3)
-    ex.exercise_group.exercises(false).should_not include(ex4)
+    expect(ex.exercise_group.exercises(false)).to include(ex2)
+    expect(ex.exercise_group.exercises(false)).not_to include(ex3)
+    expect(ex.exercise_group.exercises(false)).not_to include(ex4)
 
-    ex.exercise_group.parent.exercises(true).should include(ex2)
-    ex.exercise_group.parent.exercises(true).should_not include(ex3)
-    ex.exercise_group.parent.exercises(true).should_not include(ex4)
+    expect(ex.exercise_group.parent.exercises(true)).to include(ex2)
+    expect(ex.exercise_group.parent.exercises(true)).not_to include(ex3)
+    expect(ex.exercise_group.parent.exercises(true)).not_to include(ex4)
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RemoteSandboxForTesting, :integration => true do
+describe RemoteSandboxForTesting, :type => :request, :integration => true do
   specify "running maven tests" do
     setup = SubmissionTestSetup.new(:exercise_name => 'MavenExercise')
     submission = setup.submission
@@ -9,19 +9,19 @@ describe RemoteSandboxForTesting, :integration => true do
     setup.make_zip
     RemoteSandboxForTesting.run_submission(submission)
 
-    submission.should be_processed
+    expect(submission).to be_processed
     submission.raise_pretest_error_if_any
 
     tcr = submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testSubtract' }
-    tcr.should_not be_nil
-    tcr.should be_successful
+    expect(tcr).not_to be_nil
+    expect(tcr).to be_successful
 
-    submission.test_case_runs.should_not be_empty
+    expect(submission.test_case_runs).not_to be_empty
     tcr = submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testAdd' }
-    tcr.should_not be_nil
-    tcr.should_not be_successful
+    expect(tcr).not_to be_nil
+    expect(tcr).not_to be_successful
 
-    submission.awarded_points.count.should == 1
-    submission.awarded_points.first.name.should == 'justsub'
+    expect(submission.awarded_points.count).to eq(1)
+    expect(submission.awarded_points.first.name).to eq('justsub')
   end
 end
