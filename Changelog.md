@@ -1,3 +1,8 @@
+### 2014-12-02
+
+* Upgraded RSpec to version 3 and CanCan to CanCanCan.
+* Switched Selenium to Poltergeist (PhantomJS) for headless browser testing.
+
 ### 2014-11-24
 
 * Removed pg_comment for Rails 4 support.
@@ -6,7 +11,6 @@
 
 * Cleaned up how stats are aggregated, admin or test users are no longer
   includes to stats. Thus making stats more realistic.
-
 
 ### 2014-09-24
 
