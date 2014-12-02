@@ -30,8 +30,8 @@ group :development, :test do
   gem 'rspec-activemodel-mocks', '~> 1.0.0'
   gem 'factory_girl_rails', '~> 1.1.0'
   gem 'capybara', '~> 2.4.0'
-  gem 'selenium-webdriver', '~> 2.44.0'
-  #gem 'capybara-webkit', '~> 0.7.2'  # Broken with modern QTs
+  gem 'poltergeist', '~> 1.5.0'
+  #gem 'selenium-webdriver', '~> 2.44.0'
   gem 'database_cleaner', '~> 1.3.0'
   gem 'mimic', '~> 0.4.3'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests

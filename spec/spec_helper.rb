@@ -6,6 +6,7 @@ require 'database_cleaner'
 require 'etc'
 require 'fileutils'
 require 'simplecov'
+require 'capybara/poltergeist'
 SimpleCov.start 'rails'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
@@ -37,30 +38,20 @@ Proc.new do
   Process::Sys.setreuid(user, user)
 end.call
 
-
-# Direct JS console.log to /dev/null
-# as instructed in https://github.com/thoughtbot/capybara-webkit/issues/350
-Capybara.register_driver :webkit do |app|
-  Capybara::Driver::Webkit.new(app, :stdout => File.open('/dev/null', 'w'))
-end
-
 # Use :selenium this if you want to see what's going on and don't feel like screenshotting
-# Otherwise :webkit is somewhat faster and doesn't pop up in your face.
+# Otherwise :poltergeist with PhantomJS is somewhat faster and doesn't pop up in your face.
 #
-# Currently the code does not work with :webkit. Capybara-webkit needs to be updated,
-# and then capybara needs to be updated, and then test code needs to be changed to conform
-# to the new API. Recommendation: run tests under Xvfb:
+# Recommendation for Selenium: run tests under Xvfb:
 # In console 1: Xvfb :99
 # In console 2: env DISPLAY=:99 rvmsudo rake spec
-Capybara.default_driver = :selenium
-#Capybara.default_driver = :webkit
+Capybara.default_driver = :poltergeist
 
 Capybara.server_port = FreePorts.take_next
 Capybara.default_wait_time = 10  # Comet messages may take longer to appear than the default 2 sec
 
-if Capybara.default_driver == :selenium
-  Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
-end
+#if Capybara.default_driver == :selenium
+#  Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
+#end
 
 def without_db_notices(&block)
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
