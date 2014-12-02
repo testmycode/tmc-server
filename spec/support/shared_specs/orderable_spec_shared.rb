@@ -26,7 +26,8 @@ shared_examples_for "an Orderable" do
     first.save!
     second = new_record
     second.position = first.position
-    expect(second.error_on(:position).size).to eq(1)
+    expect(second).not_to be_valid
+    expect(second.errors[:position].size).to eq(1)
   end
 
   describe "#move_forward!" do

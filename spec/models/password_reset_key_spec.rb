@@ -16,7 +16,10 @@ describe PasswordResetKey, :type => :model do
 
   it "should only exist at most once per user" do
     PasswordResetKey.create!(:user => @user)
-    expect(PasswordResetKey.new(:user => @user).error_on(:user_id).size).to eq(1)
+    
+    password_reset_key = PasswordResetKey.new(:user => @user)
+    expect(password_reset_key).not_to be_valid
+    expect(password_reset_key.errors[:user_id].size).to eq(1)
   end
   
   it "should be destroyed when the user is destroyed" do

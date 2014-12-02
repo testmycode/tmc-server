@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from CanCan::AccessDenied do |exception|
     respond_access_denied
-  end unless Rails::env == 'test'  # for clearer error messages
+  end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
     respond_with_error(exception.message, 404)
@@ -50,7 +50,7 @@ class ApplicationController < ActionController::Base
 private
 
   def current_ability
-    @current_ability ||= ::Ability.new(current_user, session)
+    @current_ability ||= ::Ability.new(current_user)
   end
 
   def set_default_url_options

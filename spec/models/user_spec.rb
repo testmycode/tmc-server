@@ -75,39 +75,57 @@ describe User, :type => :model do
     end
   
     it "should succeed given a valid login, password and email" do
-      expect(User.new(@params).errors_on(:login).size).to eq(0)
+      expect(User.new(@params).errors[:login].size).to eq(0)
     end
 
     it "should fail without login" do
       @params.delete(:login)
-      expect(User.new(@params).errors_on(:login).size).to eq(2)
+
+      user = User.new(@params)
+      expect(user).not_to be_valid
+      expect(user.errors[:login].size).to eq(2)
     end
     
     it "should fail with a duplicate login" do
       User.create!(@params)
       @params[:email] = 'another@example.com'
-      expect(User.new(@params).errors_on(:login).size).to eq(1)
+
+      user = User.new(@params)
+      expect(user).not_to be_valid
+      expect(user.errors[:login].size).to eq(1)
     end
     
     it "should fail without email" do
       @params.delete(:email)
-      expect(User.new(@params).error_on(:email).size).to eq(1)
+
+      user = User.new(@params)
+      expect(user).not_to be_valid
+      expect(user.errors[:email].size).to eq(1)
     end
     
     it "should fail with duplicate email" do
       User.create!(@params)
       @params[:login] = 'another'
-      expect(User.new(@params).errors_on(:email).size).to eq(1)
+
+      user = User.new(@params)
+      expect(user).not_to be_valid
+      expect(user.errors[:email].size).to eq(1)
     end
 
     it "should fail with too short a login" do
       @params[:login] = 'a'
-      expect(User.new(@params).error_on(:login).size).to eq(1)
+
+      user = User.new(@params)
+      expect(user).not_to be_valid
+      expect(user.errors[:login].size).to eq(1)
     end
 
     it "should fail with too long a login" do
       @params[:login] = 'a'*21
-      expect(User.new(@params).error_on(:login).size).to eq(1)
+
+      user = User.new(@params)
+      expect(user).not_to be_valid
+      expect(user.errors[:login].size).to eq(1)
     end
 
     it "should succeed without a password for new records" do

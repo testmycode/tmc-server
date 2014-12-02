@@ -20,12 +20,18 @@ describe Submission, :type => :model do
     
     it "should require a user" do
       @params.delete :user
-      expect(Submission.new(@params).error_on(:user).size).to eq(1)
+      
+      submission = Submission.new(@params)
+      expect(submission).not_to be_valid
+      expect(submission.errors[:user].size).to eq(1)
     end
     
     it "should require an exercise name" do
       @params.delete :exercise_name
-      expect(Submission.new(@params).error_on(:exercise_name).size).to eq(1)
+
+      submission = Submission.new(@params)
+      expect(submission).not_to be_valid
+      expect(submission.errors[:exercise_name].size).to eq(1)
     end
     
     it "should take exercise name from given exercise object" do
@@ -38,7 +44,10 @@ describe Submission, :type => :model do
     
     it "should require a course" do
       @params.delete :course
-      expect(Submission.new(@params).error_on(:course).size).to eq(1)
+
+      submission = Submission.new(@params)
+      expect(submission).not_to be_valid
+      expect(submission.errors[:course].size).to eq(1)
     end
   end
   

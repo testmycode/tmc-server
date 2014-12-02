@@ -51,7 +51,7 @@ describe AvailablePoint, :type => :model do
     it "checks against blanks in the name" do
       ap = Factory.build(:available_point, :name => 'foo ')
       expect(ap).not_to be_valid
-      expect(ap.error_on('name').size).to eq(1)
+      expect(ap.errors[:name].size).to eq(1)
     end
   end
 

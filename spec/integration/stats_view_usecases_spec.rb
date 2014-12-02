@@ -38,7 +38,7 @@ describe "The system (used by an instructor for viewing statistics)", :type => :
   def visit_exercise(exercise_name)
     visit '/'
     click_link 'mycourse'
-    click_link exercise_name
+    first('.exercise-list').click_link exercise_name
   end
 
   def submit_exercise(exercise_name, options = {})
@@ -55,7 +55,7 @@ describe "The system (used by an instructor for viewing statistics)", :type => :
 
     visit '/'
     click_link 'mycourse'
-    click_link exercise_name
+    first('.exercise-list').click_link exercise_name
     attach_file('Zipped project', "#{exercise_name}.zip")
     click_button 'Submit'
     wait_for_submission_to_be_processed

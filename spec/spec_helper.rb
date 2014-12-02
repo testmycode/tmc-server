@@ -5,8 +5,8 @@ require 'rspec/rails'
 require 'database_cleaner'
 require 'etc'
 require 'fileutils'
-require 'simplecov'
 require 'capybara/poltergeist'
+require 'simplecov'
 SimpleCov.start 'rails'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
@@ -48,10 +48,11 @@ Capybara.default_driver = :poltergeist
 
 Capybara.server_port = FreePorts.take_next
 Capybara.default_wait_time = 10  # Comet messages may take longer to appear than the default 2 sec
+Capybara.ignore_hidden_elements = false
 
-#if Capybara.default_driver == :selenium
-#  Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
-#end
+if Capybara.default_driver == :selenium
+  Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
+end
 
 def without_db_notices(&block)
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")

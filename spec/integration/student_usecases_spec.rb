@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'cancan/matchers'
 
 describe "The system (used by a student)", :type => :request, :integration => true do
   include IntegrationTestActions
@@ -14,6 +15,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
     @course.refresh
 
     @user = Factory.create(:user, :password => 'xooxer')
+    @ability = Ability.new(@user)
 
     visit '/'
     log_in_as(@user.login, 'xooxer')
@@ -149,7 +151,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
     visit '/'
     click_link 'mycourse'
-    click_link 'MyExercise'
+    first('.exercise-list').click_link 'MyExercise'
     click_link 'View suggested solution'
     expect(page).to have_content('Solution for MyExercise')
     expect(page).to have_content('src/SimpleStuff.java')
@@ -167,7 +169,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
     visit '/'
     click_link 'mycourse'
-    click_link 'MyExercise'
+    first('.exercise-list').click_link 'MyExercise'
 
     expect(page).not_to have_content('View suggested solution')
   end
@@ -195,6 +197,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
     #check('paste')
     click_button 'Submit'
     wait_for_submission_to_be_processed
+    @ability.should be_able_to(:read, Submission.last)
 
     expect(page).to have_content('All tests successful')
     expect(page).to have_content('Ok')
@@ -204,15 +207,19 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
     log_out
     expect(page).not_to have_content('src/SimpleStuff.java')
-    expect(page).to have_content('You are not authorized to access this page')
+    expect(page).to have_content('Goodbye')
     @other_user = Factory.create(:user, :login => "uuseri", :password => 'xooxer')
 
     visit '/'
     log_in_as(@other_user.login, 'xooxer')
+
+    @ability = Ability.new(@other_user)
+    @ability.should_not be_able_to(:read, Submission.last)
+    
     visit submission_path(Submission.last, anchor: 'files')
 
     expect(page).not_to have_content('src/SimpleStuff.java')
-    expect(page).to have_content('You are not authorized to access this page')
+    expect(page).to have_content('Access denied')
   end
 
   it "should show checkstyle validation results" do
@@ -282,9 +289,8 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       log_out
 
       expect(page).not_to have_content('src/SimpleStuff.java')
-      expect(page).to have_content('You are not authorized to access this page')
+      expect(page).to have_content('Goodbye')
     end
-
 
     it "when pastes configured as protected, user should not see it unless she has already passed that exercise" do
 
@@ -315,7 +321,6 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
       log_out
 
-
       @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
 
       log_in_as(@other_user.login, 'xooxer')
@@ -324,7 +329,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       ex.make_zip
 
       click_link 'mycourse'
-      click_link 'MyExercise'
+      first('.exercise-list').click_link 'MyExercise'
       attach_file('Zipped project', 'MyExercise.zip')
       check('Submit to pastebin')
       click_button 'Submit'
@@ -351,7 +356,6 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       expect(page).not_to have_content('src/SimpleStuff.java')
       expect(page).to have_content('Access denied')
     end
-
 
     it "when pastes configured as protected, user should never see paste if all tests passed" do
       # User1 makes submission getting it marked as done
@@ -380,7 +384,6 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
       log_out
 
-
       @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
 
       log_in_as(@other_user.login, 'xooxer')
@@ -390,15 +393,13 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       ex.make_zip
 
       click_link 'mycourse'
-      click_link 'MyExercise'
+      first('.exercise-list').click_link 'MyExercise'
       attach_file('Zipped project', 'MyExercise.zip')
       check('Submit to pastebin')
       click_button 'Submit'
       wait_for_submission_to_be_processed
 
       expect(page).not_to have_content 'Show Paste'
-
-
 
       key = Submission.last.paste_key
       visit "/paste/#{key}"
@@ -425,10 +426,5 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       expect(page).not_to have_content('src/SimpleStuff.java')
       expect(page).to have_content('Access denied')
     end
-
-
-
   end
-
-
 end
