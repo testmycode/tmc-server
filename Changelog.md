@@ -1,7 +1,8 @@
-### 2014-12-02
+### 2014-12-03
 
-* Upgraded RSpec to version 3 and CanCan to CanCanCan.
+* Upgraded RSpec to 3.1 and converted existing specs from should-syntax to new expectation-syntax.
 * Switched Selenium to Poltergeist (PhantomJS) for headless browser testing.
+* Switched CanCan to CanCanCan for Rails 4 support.
 
 ### 2014-11-24
 
