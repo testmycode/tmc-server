@@ -150,12 +150,12 @@ describe CoursesController, :type => :controller do
       end
 
       it "should tell each the exercise's deadline" do
-        @course.exercises[0].deadline_spec = [Time.zone.parse('2011-11-16 23:59:59 +0200').to_s].to_json
+        @course.exercises[0].deadline_spec = [Time.zone.parse('2011-11-16 23:59:59+0200').to_s].to_json
         @course.exercises[0].save!
 
         result = get_show_json
 
-        expect(result['course']['exercises'][0]['deadline']).to eq('2011-11-16T23:59:59+02:00')
+        expect(result['course']['exercises'][0]['deadline']).to eq('2011-11-16T23:59:59.000+02:00')
       end
 
       it "should tell for each exercise whether it has been attempted" do
