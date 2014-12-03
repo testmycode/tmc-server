@@ -23,8 +23,8 @@ describe CourseNotificationsController, :type => :controller do
     controller.current_user = @user
 
     ability = Ability.new(controller.current_user)
-    ability.should_not be_able_to(:email, CourseNotification)
 
+    expect(ability).not_to be_able_to(:email, CourseNotification)
     expect { post :create, params }.to raise_error
   end
 

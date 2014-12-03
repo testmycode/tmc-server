@@ -75,7 +75,7 @@ describe FeedbackAnswersController, :type => :controller do
       ability.should be_able_to(:read, another_submission)
 
       # Check if user can create FeedbackAnswer to submission
-      answer_records.each {|record| ability.should_not be_able_to(:create, record) }
+      answer_records.each {|record| expect(ability).not_to be_able_to(:create, record) }
 
       expect { post :create, params }.to raise_error
     end

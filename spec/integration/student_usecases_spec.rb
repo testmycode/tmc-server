@@ -197,8 +197,8 @@ describe "The system (used by a student)", :type => :request, :integration => tr
     #check('paste')
     click_button 'Submit'
     wait_for_submission_to_be_processed
-    @ability.should be_able_to(:read, Submission.last)
 
+    expect(@ability).to be_able_to(:read, Submission.last)
     expect(page).to have_content('All tests successful')
     expect(page).to have_content('Ok')
 
@@ -214,8 +214,9 @@ describe "The system (used by a student)", :type => :request, :integration => tr
     log_in_as(@other_user.login, 'xooxer')
 
     @ability = Ability.new(@other_user)
-    @ability.should_not be_able_to(:read, Submission.last)
-    
+
+    expect(@ability).not_to be_able_to(:read, Submission.last)
+
     visit submission_path(Submission.last, anchor: 'files')
 
     expect(page).not_to have_content('src/SimpleStuff.java')

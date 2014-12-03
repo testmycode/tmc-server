@@ -20,8 +20,8 @@ describe FeedbackRepliesController, "#create", :type => :controller do
     controller.current_user = @user
 
     ability = Ability.new(controller.current_user)
-    ability.should_not be_able_to(:reply, answer)
 
+    expect(ability).not_to be_able_to(:reply, answer)
     expect { post :create, params }.to raise_error
   end
 
