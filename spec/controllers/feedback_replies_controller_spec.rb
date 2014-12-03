@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'cancan/matchers'
 
 describe FeedbackRepliesController, "#create", :type => :controller do
   let(:student_email) { "user@mydomain.com" }
@@ -13,8 +14,13 @@ describe FeedbackRepliesController, "#create", :type => :controller do
   }
 
   it "should not allow a non-admin user to send a reply" do
+    bypass_rescue
+
     @user = Factory.create(:user)
     controller.current_user = @user
+
+    ability = Ability.new(controller.current_user)
+    ability.should_not be_able_to(:reply, answer)
 
     expect { post :create, params }.to raise_error
   end

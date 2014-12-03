@@ -110,6 +110,8 @@ describe UsersController, :type => :controller do
     end
 
     it "should fail if signup is disabled in site settings" do
+      bypass_rescue
+
       SiteSetting.all_settings['enable_signup'] = false
       expect { post :create, :user => @valid_attrs }.to raise_error(CanCan::AccessDenied)
       expect(User.count).to eq(0)

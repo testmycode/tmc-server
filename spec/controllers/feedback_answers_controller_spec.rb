@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'cancan/matchers'
 
 describe FeedbackAnswersController, :type => :controller do
   before :each do
@@ -49,10 +50,32 @@ describe FeedbackAnswersController, :type => :controller do
     end
 
     it "should not allow answering on behalf of another user" do
+      bypass_rescue
+
       another_user = Factory.create(:user)
       another_submission = Factory.create(:submission, :course => @course, :exercise => @exercise, :user => another_user)
       params = @valid_params.clone
       params[:submission_id] = another_submission.id
+
+      # Convert params to FeedbackAnswers
+      answer_params = params[:answers]
+      answer_params = answer_params.values if answer_params.respond_to?(:values)
+
+      answer_records = answer_params.map do |answer_hash|
+        FeedbackAnswer.new({
+          :submission => @submission,
+          :course_id => @submission.course_id,
+          :exercise_name => @submission.exercise_name,
+          :feedback_question_id => answer_hash[:question_id],
+         :answer => answer_hash[:answer]
+       })
+      end
+
+      ability = Ability.new(another_user)
+      ability.should be_able_to(:read, another_submission)
+
+      # Check if user can create FeedbackAnswer to submission
+      answer_records.each {|record| ability.should_not be_able_to(:create, record) }
 
       expect { post :create, params }.to raise_error
     end

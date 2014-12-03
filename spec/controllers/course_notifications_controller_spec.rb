@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'cancan/matchers'
 
 describe CourseNotificationsController, :type => :controller do
 
@@ -16,8 +17,14 @@ describe CourseNotificationsController, :type => :controller do
   }
 
   it "should not allow a non-admin user to send email" do
+    bypass_rescue
+
     @user = Factory.create(:user)
     controller.current_user = @user
+
+    ability = Ability.new(controller.current_user)
+    ability.should_not be_able_to(:email, CourseNotification)
+
     expect { post :create, params }.to raise_error
   end
 
