@@ -66,7 +66,7 @@ class ParticipantsController < ApplicationController
       @courses << course
 
       awarded = @awarded_points[course.id]
-      missing = AvailablePoint.course_points(course).to_a.sort!.map(&:name) - awarded
+      missing = AvailablePoint.course_points(course).order!.map(&:name) - awarded
       @missing_points[course_id] = missing
 
       if awarded.size + missing.size > 0
