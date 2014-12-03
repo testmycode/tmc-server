@@ -29,7 +29,7 @@
           <th></th>
           <th></th>
           <% @exercises.each do |exercise| %>
-            <% points = exercise.available_points.sort! %>
+            <% points = exercise.available_points.order! %>
             <% if points.size > 0 %>
               <th colspan="<%= points.size %>"><%= tailoring.exercise_name_for_points_table(exercise) %></th>
             <% end %>
