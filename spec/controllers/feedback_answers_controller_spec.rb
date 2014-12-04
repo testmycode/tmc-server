@@ -72,7 +72,7 @@ describe FeedbackAnswersController, :type => :controller do
       end
 
       ability = Ability.new(another_user)
-      ability.should be_able_to(:read, another_submission)
+      expect(ability).to be_able_to(:read, another_submission)
 
       # Check if user can create FeedbackAnswer to submission
       answer_records.each {|record| expect(ability).not_to be_able_to(:create, record) }
