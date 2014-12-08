@@ -21,7 +21,7 @@ describe Unlock, :type => :model do
       unlocks = Unlock.order('exercise_name ASC').to_a
       expect(unlocks.size).to eq(1)
 
-      expect(unlocks.first.valid_after).to eq(Date.parse('2011-11-11').to_time_in_current_zone)
+      expect(unlocks.first.valid_after).to eq(Date.parse('2011-11-11').in_time_zone)
       expect(unlocks.first.exercise_name).to eq('ex1')
 
       AwardedPoint.create!(:user_id => @user.id, :course_id => @course.id, :name => @available_point.name)
@@ -30,7 +30,7 @@ describe Unlock, :type => :model do
       unlocks = Unlock.order('exercise_name ASC').to_a
       expect(unlocks.size).to eq(2)
 
-      expect(unlocks.second.valid_after).to eq(Date.parse('2011-11-22').to_time_in_current_zone)
+      expect(unlocks.second.valid_after).to eq(Date.parse('2011-11-22').in_time_zone)
       expect(unlocks.second.exercise_name).to eq('ex2')
     end
 

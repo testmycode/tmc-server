@@ -39,7 +39,7 @@ describe UnlockSpec, :type => :model do
 
   specify "unlocked_after: <date>" do
     spec = UnlockSpec.new(ex1, ['12.12.2012'])
-    expect(spec.valid_after).to eq(Date.parse('2012-12-12').to_time_in_current_zone)
+    expect(spec.valid_after).to eq(Date.parse('2012-12-12').in_time_zone)
     expect(spec).to permit_unlock_for(user)
   end
 
