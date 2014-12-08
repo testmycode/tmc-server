@@ -19,7 +19,7 @@ EOS
   end
 
   before :each do
-    @user = Factory.create(:user)
+    @user = FactoryGirl.create(:user)
   end
 
   after :each do

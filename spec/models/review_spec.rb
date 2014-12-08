@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe Review, :type => :model do
   before :each do
-    @course = Factory.create(:course)
-    @admin = Factory.create(:admin)
-    @user = Factory.create(:user)
-    @ex = Factory.create(:exercise, :course => @course)
+    @course = FactoryGirl.create(:course)
+    @admin = FactoryGirl.create(:admin)
+    @user = FactoryGirl.create(:user)
+    @ex = FactoryGirl.create(:exercise, :course => @course)
     AvailablePoint.create(:course => @course, :exercise => @ex, :name => '1')
     AvailablePoint.create(:course => @course, :exercise => @ex, :name => '2')
     @ex.save!
-    @sub = Factory.create(:submission, :course => @course, :exercise_name => @ex.name, :user => @user)
+    @sub = FactoryGirl.create(:submission, :course => @course, :exercise_name => @ex.name, :user => @user)
   end
 
   def mk_review(body = 'This is a review. Of your code.')

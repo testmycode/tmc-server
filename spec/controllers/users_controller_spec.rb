@@ -21,7 +21,7 @@ describe UsersController, :type => :controller do
 
     describe "when accessed as a logged in user" do
       before :each do
-        controller.current_user = Factory.create(:user)
+        controller.current_user = FactoryGirl.create(:user)
       end
 
       it "should show the profile page" do
@@ -41,37 +41,37 @@ describe UsersController, :type => :controller do
         :password_repeat => 'xoox'
       }
     end
-  
+
     it "should create a new user account" do
       post :create, :user => @valid_attrs
-      
+
       expect(response).to redirect_to(root_path)
       user = User.find_by_login(@valid_attrs[:login])
       expect(user).not_to be_nil
       expect(user.email).to eq(@valid_attrs[:email])
       expect(user).to have_password(@valid_attrs[:password])
     end
-  
+
     it "should require a username" do
       @valid_attrs.delete :login
       post :create, :user => @valid_attrs
       expect(User.count).to eq(0)
     end
-    
+
     it "should require the username to be unique" do
       post :create, :user => @valid_attrs
       @valid_attrs[:email] = @valid_attrs[:email_repeat] = 'bsd@example.com'
       post :create, :user => @valid_attrs
       expect(User.count).to eq(1)
     end
-    
+
     it "should require an email" do
       @valid_attrs.delete :email
       @valid_attrs.delete :email_repeat
       post :create, :user => @valid_attrs
       expect(User.count).to eq(0)
     end
-    
+
     it "should require an email confirmation" do
       @valid_attrs.delete :email_repeat
       post :create, :user => @valid_attrs
@@ -84,7 +84,7 @@ describe UsersController, :type => :controller do
       post :create, :user => @valid_attrs
       expect(User.count).to eq(0)
     end
-    
+
     it "should require a password confirmation" do
       @valid_attrs.delete :password_repeat
       post :create, :user => @valid_attrs
@@ -117,19 +117,19 @@ describe UsersController, :type => :controller do
       expect(User.count).to eq(0)
     end
   end
-  
+
   describe "PUT update" do
     before :each do
-      @user = Factory.create(:user, :email => 'oldemail')
+      @user = FactoryGirl.create(:user, :email => 'oldemail')
       controller.current_user = @user
     end
-    
+
     it "should save the email field" do
       put :update, :user => { :email => 'newemail', :email_repeat => 'newemail' }
       expect(response).to redirect_to(user_path)
       expect(@user.reload.email).to eq('newemail')
     end
-    
+
     it "should not allow changing the login" do
       old_login = @user.login
       put :update, :user => { :email => 'newemail', :login => 'newlogin' }
@@ -152,22 +152,22 @@ describe UsersController, :type => :controller do
       expect(@user.field_value_record(fields[1]).value).not_to be_blank
       expect(@user.field_value_record(fields[2]).value).to be_blank
     end
-    
+
     describe "changing the password" do
       let(:params) { { :email => 'newemail' } }
-      
+
       before :each do
         @user.password = 'oldpassword'
         @user.save!
         expect(@user.reload).to have_password('oldpassword')
       end
-      
+
       it "should not try to change the password unless specified" do
         put :update, :user => params
         expect(response).to redirect_to(user_path)
         expect(@user.reload).to have_password('oldpassword')
       end
-      
+
       it "should change the password if the old password matched and both new password fields were the same" do
         put :update, :user => params.merge({
           :old_password => 'oldpassword',
@@ -177,7 +177,7 @@ describe UsersController, :type => :controller do
         expect(response).to redirect_to(user_path)
         expect(@user.reload).to have_password('newpassword')
       end
-      
+
       it "should not change the password if the old password was wrong" do
         put :update, :user => params.merge({
           :old_password => 'wrongpassword',
@@ -187,7 +187,7 @@ describe UsersController, :type => :controller do
         expect(response.status).to eq(403)
         expect(@user.reload).to have_password('oldpassword')
       end
-      
+
       it "should not change the password if the new password fields were not the same" do
         put :update, :user => params.merge({
           :old_password => 'oldpassword',
@@ -197,7 +197,7 @@ describe UsersController, :type => :controller do
         expect(response.status).to eq(403)
         expect(@user.reload).to have_password('oldpassword')
       end
-      
+
       it "should not allow changing to a blank password" do
         put :update, :user => params.merge({
           :old_password => 'oldpassword',

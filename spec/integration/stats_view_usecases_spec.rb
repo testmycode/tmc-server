@@ -17,13 +17,13 @@ describe "The system (used by an instructor for viewing statistics)", :type => :
 
   it "should show recent submissions for an exercise" do
     log_in_as_instructor
-    
+
     submit_exercise('EasyExercise', :solve => true)
     submit_exercise('EasyExercise', :solve => false)
     submit_exercise('EasyExercise', :compilation_error => true)
-    
+
     visit_exercise 'EasyExercise'
-    
+
     expect(page).to have_content('Ok')
     expect(page).to have_content('Fail')
     expect(page).to have_content('Error')
@@ -31,10 +31,10 @@ describe "The system (used by an instructor for viewing statistics)", :type => :
 
   def log_in_as_instructor
     visit '/'
-    user = Factory.create(:admin, :password => 'xooxer')
+    user = FactoryGirl.create(:admin, :password => 'xooxer')
     log_in_as(user.login, 'xooxer')
   end
-  
+
   def visit_exercise(exercise_name)
     visit '/'
     click_link 'mycourse'

@@ -4,9 +4,9 @@ describe User, :type => :model do
 
   describe "sorting" do
     it "should sort by name" do
-      a = [ Factory.create(:user, :login => "aa"),
-            Factory.create(:user, :login => "cc"),
-            Factory.create(:user, :login => "bb") ].sort!
+      a = [ FactoryGirl.create(:user, :login => "aa"),
+            FactoryGirl.create(:user, :login => "cc"),
+            FactoryGirl.create(:user, :login => "bb") ].sort!
       expect(a.first.login).to eq("aa")
       expect(a.last.login).to eq("cc")
     end
@@ -14,26 +14,26 @@ describe User, :type => :model do
 
   describe "scopes" do
     before :each do
-      @user1 = Factory.create(:user)
-      @user2 = Factory.create(:user)
-      @course1 = Factory.create(:course)
-      @course2 = Factory.create(:course)
-      @ex1 = Factory.create(:exercise, :course => @course1,
+      @user1 = FactoryGirl.create(:user)
+      @user2 = FactoryGirl.create(:user)
+      @course1 = FactoryGirl.create(:course)
+      @course2 = FactoryGirl.create(:course)
+      @ex1 = FactoryGirl.create(:exercise, :course => @course1,
                             :gdocs_sheet => "s1")
-      @ex2 = Factory.create(:exercise, :course => @course2,
+      @ex2 = FactoryGirl.create(:exercise, :course => @course2,
                             :gdocs_sheet => "s2")
-      @sub1 = Factory.create(:submission, :user => @user1,
+      @sub1 = FactoryGirl.create(:submission, :user => @user1,
                             :course => @course1, :exercise => @ex1)
-      @sub2 = Factory.create(:submission, :user => @user2,
+      @sub2 = FactoryGirl.create(:submission, :user => @user2,
                             :course => @course2, :exercise => @ex2)
-      @avp1 = Factory.create(:available_point, :course => @course1,
+      @avp1 = FactoryGirl.create(:available_point, :course => @course1,
                              :exercise => @ex1, :name => 'p1')
-      @avp2 = Factory.create(:available_point, :course => @course2,
+      @avp2 = FactoryGirl.create(:available_point, :course => @course2,
                              :exercise => @ex2, :name => 'p2')
-      @awp1 = Factory.create(:awarded_point, :course => @course1,
+      @awp1 = FactoryGirl.create(:awarded_point, :course => @course1,
                              :submission => @sub1, :user => @user1,
                              :name => 'p1')
-      @awp2 = Factory.create(:awarded_point, :course => @course2,
+      @awp2 = FactoryGirl.create(:awarded_point, :course => @course2,
                              :submission => @sub2, :user => @user2,
                              :name => 'p2')
     end
@@ -73,7 +73,7 @@ describe User, :type => :model do
         :email => 'matt@example.com'
       }
     end
-  
+
     it "should succeed given a valid login, password and email" do
       expect(User.new(@params).errors[:login].size).to eq(0)
     end
@@ -85,7 +85,7 @@ describe User, :type => :model do
       expect(user).not_to be_valid
       expect(user.errors[:login].size).to eq(2)
     end
-    
+
     it "should fail with a duplicate login" do
       User.create!(@params)
       @params[:email] = 'another@example.com'
@@ -94,7 +94,7 @@ describe User, :type => :model do
       expect(user).not_to be_valid
       expect(user.errors[:login].size).to eq(1)
     end
-    
+
     it "should fail without email" do
       @params.delete(:email)
 
@@ -102,7 +102,7 @@ describe User, :type => :model do
       expect(user).not_to be_valid
       expect(user.errors[:email].size).to eq(1)
     end
-    
+
     it "should fail with duplicate email" do
       User.create!(@params)
       @params[:login] = 'another'
@@ -141,29 +141,29 @@ describe User, :type => :model do
       user.save!
     end
   end
-  
+
   describe "destruction" do
     it "should destroy its submissions" do
-      sub = Factory.create(:submission)
+      sub = FactoryGirl.create(:submission)
       sub.user.destroy
       expect(Submission.find_by_id(sub.id)).to be_nil
     end
-    
+
     it "should destory its points" do
-      point = Factory.create(:awarded_point)
+      point = FactoryGirl.create(:awarded_point)
       point.user.destroy
       expect(AwardedPoint.find_by_id(point.id)).to be_nil
     end
-    
+
     it "should destroy any password reset key it has" do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       key = PasswordResetKey.create!(:user => user)
       user.destroy
       expect(PasswordResetKey.find_by_id(key.id)).to be_nil
     end
-    
+
     it "should destroy any user field values" do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       value = UserFieldValue.create!(:field_name => 'foo', :user => user, :value => '')
       user.destroy
       expect(UserFieldValue.find_by_id(value.id)).to be_nil

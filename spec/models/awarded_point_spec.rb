@@ -4,45 +4,45 @@ describe AwardedPoint, :type => :model do
 
   describe "scopes" do
     before :each do
-      @course = Factory.create(:course)
+      @course = FactoryGirl.create(:course)
 
-      @user = Factory.create(:user)
-      @user2 = Factory.create(:user)
-      @admin = Factory.create(:admin)
+      @user = FactoryGirl.create(:user)
+      @user2 = FactoryGirl.create(:user)
+      @admin = FactoryGirl.create(:admin)
 
       @sheet1 = "sheet1"
       @sheet2 = "sheet2"
 
-      @ex1 = Factory.create(:exercise, :course => @course,
+      @ex1 = FactoryGirl.create(:exercise, :course => @course,
                                  :gdocs_sheet => @sheet1)
-      @ex2 = Factory.create(:exercise, :course => @course,
+      @ex2 = FactoryGirl.create(:exercise, :course => @course,
                                  :gdocs_sheet => @sheet2)
 
-      @sub1 = Factory.create(:submission, :course => @course,
+      @sub1 = FactoryGirl.create(:submission, :course => @course,
                                    :user => @user,
                                    :exercise => @ex1)
-      @sub2 = Factory.create(:submission, :course => @course,
+      @sub2 = FactoryGirl.create(:submission, :course => @course,
                                    :user => @user2,
                                    :exercise => @ex2)
-      @sub_admin = Factory.create(:submission, :course => @course,
+      @sub_admin = FactoryGirl.create(:submission, :course => @course,
                                          :user => @admin,
                                          :exercise => @ex1)
 
-      Factory.create(:available_point, :exercise => @ex1, :name => "ap")
-      Factory.create(:available_point, :exercise => @ex2, :name => "ap2")
-      Factory.create(:available_point, :exercise => @ex1, :name => "ap3")
-      Factory.create(:available_point, :exercise => @ex1, :name => "ap_admin")
+      FactoryGirl.create(:available_point, :exercise => @ex1, :name => "ap")
+      FactoryGirl.create(:available_point, :exercise => @ex2, :name => "ap2")
+      FactoryGirl.create(:available_point, :exercise => @ex1, :name => "ap3")
+      FactoryGirl.create(:available_point, :exercise => @ex1, :name => "ap_admin")
 
-      @ap = Factory.create(:awarded_point, :course => @course,
+      @ap = FactoryGirl.create(:awarded_point, :course => @course,
                            :user => @user, :name => "ap",
                            :submission => @sub1)
-      @ap2 = Factory.create(:awarded_point, :course => @course,
+      @ap2 = FactoryGirl.create(:awarded_point, :course => @course,
                            :user => @user2, :name => "ap2",
                            :submission => @sub2)
-      @ap3 = Factory.create(:awarded_point, :course => @course,
+      @ap3 = FactoryGirl.create(:awarded_point, :course => @course,
                             :user => @user, :name => "ap3",
                             :submission => @sub1)
-      @ap_admin = Factory.create(:awarded_point, :course => @course,
+      @ap_admin = FactoryGirl.create(:awarded_point, :course => @course,
                                   :user => @admin, :name => "ap_admin",
                                   :submission => @sub_admin)
     end

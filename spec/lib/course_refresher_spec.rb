@@ -4,17 +4,17 @@ describe CourseRefresher do
   include GitTestActions
 
   before :each do
-    @user = Factory.create(:user)
+    @user = FactoryGirl.create(:user)
 
     repo_path ="#{@test_tmp_dir}/fake_remote_repo"
     repo_url = "file://#{repo_path}"
 
     @course = Course.create!(:name => 'TestCourse', :source_backend => 'git', :source_url => repo_url)
-    
+
     create_bare_repo(repo_path)
-    
+
     @local_clone = clone_course_repo(@course)
-    
+
     @refresher = CourseRefresher.new
   end
 
@@ -24,7 +24,7 @@ describe CourseRefresher do
     expect(@course.exercises.size).to eq(1)
     expect(@course.exercises[0].name).to eq('MyExercise')
   end
-  
+
   it "clones the given git branch" do
     @local_clone.chdir do
       system!("git checkout -b foo >/dev/null 2>&1")
@@ -32,7 +32,7 @@ describe CourseRefresher do
     @local_clone.active_branch = 'foo'
     @course.git_branch = 'foo'
     @course.save!
-    
+
     add_exercise('MyExercise')
     @refresher.refresh_course(@course)
     expect(@course.exercises.size).to eq(1)
@@ -350,7 +350,7 @@ describe CourseRefresher do
     @refresher.refresh_course(@course)
 
     exercise = @course.exercises.first
-    sub = Factory.create(:submission, :course => @course, :exercise_name => exercise.name)
+    sub = FactoryGirl.create(:submission, :course => @course, :exercise_name => exercise.name)
     awarded_point = AwardedPoint.create!({
       :course => @course,
       :user => sub.user,
@@ -369,54 +369,54 @@ describe CourseRefresher do
     add_exercise('MyExercise')
 
     @refresher.refresh_course(@course)
-    
+
     stub = Exercise.find_by_name('MyExercise').stub_path
-    
+
     simple_stuff = File.read(stub + '/src/SimpleStuff.java')
     expect(simple_stuff).not_to include('return a + b;')
     expect(simple_stuff).to include('return 0;')
     expect(simple_stuff).not_to include('STUB:')
-    
+
     expect(File).not_to exist(stub + '/test/SimpleHiddenTest.java')
-    
+
     # Should have tmc-junit-runner.jar and its dependencies
     expect(File).to exist(stub + '/lib/testrunner/tmc-junit-runner.jar')
     expect((Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size).to eq(1 + TmcJunitRunner.get.lib_paths.size)
   end
-  
+
   it "should generate solution versions of exercises" do
     # Tested more thoroughly in lib/course_@refresher/exercise_file_filter_spec.rb
     add_exercise('MyExercise')
 
     @refresher.refresh_course(@course)
-    
+
     solution = Exercise.find_by_name('MyExercise').solution_path
-    
+
     simple_stuff = File.read(solution + '/src/SimpleStuff.java')
     expect(simple_stuff).to include('return a + b;')
     expect(simple_stuff).not_to include('BEGIN SOLUTION')
     expect(simple_stuff).not_to include('return 0;')
-    
+
     expect(File).not_to exist(solution + '/test/SimpleHiddenTest.java')
   end
-  
+
   it "should regenerate changed solutions" do
     add_exercise('MyExercise')
     @refresher.refresh_course(@course)
-    
+
     @local_clone.chdir do
       new_file = File.read('MyExercise/src/SimpleStuff.java').gsub('return a + b;', 'return b + a;')
       File.open('MyExercise/src/SimpleStuff.java', 'wb') {|f| f.write(new_file) }
     end
     @local_clone.add_commit_push
-    
+
     @refresher.refresh_course(@course)
-    
+
     solution = Exercise.find_by_name('MyExercise').solution_path
     simple_stuff = File.read(solution + '/src/SimpleStuff.java')
     expect(simple_stuff).to include('return b + a;')
   end
-  
+
   it "should generate zips from the stubs" do
     add_exercise('MyExercise')
     add_exercise('MyCategory/MyExercise')
@@ -491,28 +491,28 @@ describe CourseRefresher do
     expect(@course.cache_path).to eq(expected_path)
     expect(File).not_to exist(expected_path + '/foo.txt')
   end
-  
+
   it "should store the checksum of each exercise's files in the database" do
     local_repo = add_exercise('MyExercise')
     local_repo.write_file('MyExercise/foo.txt', 'something')
     local_repo.add_commit_push
-    
+
     @refresher.refresh_course(@course)
     cs1 = @course.exercises.first.checksum
-    
+
     local_repo.write_file('MyExercise/foo.txt', 'something else')
     local_repo.add_commit_push
     local_repo.write_file('MyExercise/foo.txt', 'something')
     local_repo.add_commit_push
-    
+
     @refresher.refresh_course(@course)
     cs2 = @course.exercises.first.checksum
-    
+
     local_repo.write_file('MyExercise/foo.txt', 'something else')
     local_repo.add_commit_push
     @refresher.refresh_course(@course)
     cs3 = @course.exercises.first.checksum
-    
+
     [cs1, cs2, cs3].each {|cs| expect(cs).not_to be_blank }
     expect(cs1).to eq(cs2) # Only file contents should be checksummed, not metadata
     expect(cs2).not_to eq(cs3)
@@ -547,20 +547,20 @@ describe CourseRefresher do
     change_course_options_file "foo: bar\noops :error", :raw => true
     expect { @refresher.refresh_course(@course) }.to raise_error(CourseRefresher::Failure)
   end
-  
+
   describe "when done twice" do
     it "should be able to use a different repo" do
       @refresher.refresh_course(@course)
-      
+
       repo_path ="#{@test_tmp_dir}/another_fake_remote_repo"
       @course.source_url = "file://#{repo_path}"
       @course.save!
       create_bare_repo(repo_path)
       @local_clone = clone_course_repo(@course)
-      
+
       add_exercise('NewEx')
       @refresher.refresh_course(@course)
-      
+
       expect(@course.exercises.size).to eq(1)
       expect(@course.exercises.first.name).to eq('NewEx')
     end
@@ -586,15 +586,15 @@ describe CourseRefresher do
 
       expect(File).to exist(old_path)
     end
-    
+
     it "should roll back any database changes" do
       old_cache_version = @course.cache_version
       old_exercises = Exercise.order(:id).to_a
       old_points = AvailablePoint.order(:id).to_a
-      
+
       sabotage
       expect { @refresher.refresh_course(@course) }.to raise_error
-      
+
       @course.reload
       expect(@course.cache_version).to eq(old_cache_version)
       expect(Exercise.order(:id).to_a).to eq(old_exercises)

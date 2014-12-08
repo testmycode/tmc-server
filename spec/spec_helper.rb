@@ -64,6 +64,7 @@ RSpec.configure do |config|
   config.mock_with :rspec
 
   config.use_transactional_fixtures = false
+  config.include FactoryGirl::Syntax::Methods
   config.include Capybara::DSL
 
   config.before(:each) do |context|

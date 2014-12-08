@@ -3,17 +3,17 @@ require 'spec_helper'
 describe Unlock, :type => :model do
   describe "#refresh_unlocks" do
     before :each do
-      @course = Factory.create(:course)
-      @ex1 = Factory.create(:exercise, :course => @course, :name => 'ex1')
-      @ex2 = Factory.create(:exercise, :course => @course, :name => 'ex2')
+      @course = FactoryGirl.create(:course)
+      @ex1 = FactoryGirl.create(:exercise, :course => @course, :name => 'ex1')
+      @ex2 = FactoryGirl.create(:exercise, :course => @course, :name => 'ex2')
       @ex1.unlock_spec = ['11.11.2011'].to_json
       @ex2.unlock_spec = ['2011-11-22', 'exercise ex1'].to_json
       @ex1.save!
       @ex2.save!
 
-      @user = Factory.create(:user)
-      @available_point = Factory.create(:available_point, :exercise_id => @ex1.id)
-      @available_point2 = Factory.create(:available_point, :exercise_id => @ex2.id)
+      @user = FactoryGirl.create(:user)
+      @available_point = FactoryGirl.create(:available_point, :exercise_id => @ex1.id)
+      @available_point2 = FactoryGirl.create(:available_point, :exercise_id => @ex2.id)
     end
 
     it "creates unlocks as specified" do

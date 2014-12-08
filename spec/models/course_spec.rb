@@ -4,18 +4,18 @@ describe Course, :type => :model do
 
   let(:source_path) { "#{@test_tmp_dir}/fake_source" }
   let(:source_url) { "file://#{source_path}" }
-  let(:user) { Factory.create(:user) }
+  let(:user) { FactoryGirl.create(:user) }
 
   describe "gdocs_sheets" do
     it "should list all unique gdocs_sheets of a course" do
-      course = Factory.create(:course)
-      ex1 = Factory.create(:exercise, :course => course,
+      course = FactoryGirl.create(:course)
+      ex1 = FactoryGirl.create(:exercise, :course => course,
                            :gdocs_sheet => "sheet1")
-      ex2 = Factory.create(:exercise, :course => course,
+      ex2 = FactoryGirl.create(:exercise, :course => course,
                            :gdocs_sheet => "sheet1")
-      ex3 = Factory.create(:exercise, :course => course,
+      ex3 = FactoryGirl.create(:exercise, :course => course,
                            :gdocs_sheet => "sheet2")
-      ex4 = Factory.create(:exercise, :course => course,
+      ex4 = FactoryGirl.create(:exercise, :course => course,
                            :gdocs_sheet => nil)
       worksheets = course.gdocs_sheets
 
@@ -49,47 +49,47 @@ describe Course, :type => :model do
   end
 
   it "should be visible if not hidden and hide_after is nil" do
-    c = Factory.create(:course, :hidden => false, :hide_after => nil)
+    c = FactoryGirl.create(:course, :hidden => false, :hide_after => nil)
     expect(c).to be_visible_to(user)
   end
 
   it "should be visible if not hidden and hide_after has not passed" do
-    c = Factory.create(:course, :hidden => false, :hide_after => Time.now + 2.minutes)
+    c = FactoryGirl.create(:course, :hidden => false, :hide_after => Time.now + 2.minutes)
     expect(c).to be_visible_to(user)
   end
 
   it "should not be visible if hidden" do
-    c = Factory.create(:course, :hidden => true, :hide_after => nil)
+    c = FactoryGirl.create(:course, :hidden => true, :hide_after => nil)
     expect(c).not_to be_visible_to(user)
   end
 
   it "should not be visible if hide_after has passed" do
-    c = Factory.create(:course, :hidden => false, :hide_after => Time.now - 2.minutes)
+    c = FactoryGirl.create(:course, :hidden => false, :hide_after => Time.now - 2.minutes)
     expect(c).not_to be_visible_to(user)
   end
 
   it "should always be visible to administrators" do
-    admin = Factory.create(:admin)
-    c = Factory.create(:course, :hidden => true, :hide_after => Time.now - 2.minutes)
+    admin = FactoryGirl.create(:admin)
+    c = FactoryGirl.create(:course, :hidden => true, :hide_after => Time.now - 2.minutes)
     expect(c).to be_visible_to(admin)
   end
 
   it "should be visible if user has registered before the hidden_if_registered_after setting" do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = Factory.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-03'))
+    c = FactoryGirl.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-03'))
     expect(c).to be_visible_to(user)
   end
 
   it "should not be visible if user has registered after the hidden_if_registered_after setting" do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = Factory.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-01'))
+    c = FactoryGirl.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-01'))
     expect(c).not_to be_visible_to(user)
   end
 
   it "should accept Finnish dates and datetimes for hide_after" do
-    c = Factory.create(:course)
+    c = FactoryGirl.create(:course)
     c.hide_after = "19.8.2012"
     expect(c.hide_after.day).to eq(19)
     expect(c.hide_after.month).to eq(8)
@@ -103,19 +103,19 @@ describe Course, :type => :model do
   end
 
   it "should consider a hide_after date without time to mean the end of that day" do
-    c = Factory.create(:course, :hide_after => "18.11.2013")
+    c = FactoryGirl.create(:course, :hide_after => "18.11.2013")
     expect(c.hide_after.hour).to eq(23)
     expect(c.hide_after.min).to eq(59)
   end
 
   it "should know the exercise groups of its exercises" do
-    c = Factory.create(:course)
+    c = FactoryGirl.create(:course)
     exercises = [
-      Factory.build(:exercise, :course => c, :name => 'foo-ex1'),
-      Factory.build(:exercise, :course => c, :name => 'bar-ex1'),
-      Factory.build(:exercise, :course => c, :name => 'foo-ex2'),
-      Factory.build(:exercise, :course => c, :name => 'zoox-zaax-ex1'),
-      Factory.build(:exercise, :course => c, :name => 'zoox-zoox-ex1')
+      FactoryGirl.build(:exercise, :course => c, :name => 'foo-ex1'),
+      FactoryGirl.build(:exercise, :course => c, :name => 'bar-ex1'),
+      FactoryGirl.build(:exercise, :course => c, :name => 'foo-ex2'),
+      FactoryGirl.build(:exercise, :course => c, :name => 'zoox-zaax-ex1'),
+      FactoryGirl.build(:exercise, :course => c, :name => 'zoox-zoox-ex1')
     ]
     exercises.each {|ex| c.exercises << ex }
 
@@ -147,7 +147,7 @@ describe Course, :type => :model do
         :source_url => 'git@example.com'
       }
     end
-    
+
     it "requires a name" do
       should_be_invalid_params(valid_params.merge(:name => nil))
     end
@@ -164,7 +164,7 @@ describe Course, :type => :model do
     it "forbids spaces in the name" do # this could eventually be lifted as long as everything else is made to tolerate spaces
       should_be_invalid_params(valid_params.merge(:name => 'Test Course'))
     end
-    
+
     it "requires a remote repo url" do
       should_be_invalid_params(valid_params.merge(:source_url => nil))
       should_be_invalid_params(valid_params.merge(:source_url => ''))
@@ -186,19 +186,19 @@ describe Course, :type => :model do
     end
 
     it "deletes dependent exercises" do
-      ex = Factory.create(:exercise)
+      ex = FactoryGirl.create(:exercise)
       ex.course.destroy
       assert_destroyed(ex)
     end
 
     it "deletes dependent submissions" do
-      sub = Factory.create(:submission)
+      sub = FactoryGirl.create(:submission)
       sub.course.destroy
       assert_destroyed(sub)
     end
 
     it "deletes dependent feedback questions and answers" do
-      a = Factory.create(:feedback_answer)
+      a = FactoryGirl.create(:feedback_answer)
       q = a.feedback_question
       q.course.destroy
       assert_destroyed(a)
@@ -206,19 +206,19 @@ describe Course, :type => :model do
     end
 
     it "deletes available points" do
-      pt = Factory.create(:available_point)
+      pt = FactoryGirl.create(:available_point)
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it "deletes awarded points" do
-      pt = Factory.create(:awarded_point)
+      pt = FactoryGirl.create(:awarded_point)
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it "deletes test scanner cache entries" do
-      ent = Factory.create(:test_scanner_cache_entry)
+      ent = FactoryGirl.create(:test_scanner_cache_entry)
       ent.course.destroy
       assert_destroyed(ent)
     end

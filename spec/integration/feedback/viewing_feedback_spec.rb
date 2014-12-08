@@ -4,19 +4,19 @@ describe "Viewing feedback", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
-    @user = Factory.create(:admin, :password => 'xooxer')
+    @user = FactoryGirl.create(:admin, :password => 'xooxer')
     visit '/'
     log_in_as(@user.login, 'xooxer')
 
-    @course = Factory.create(:course)
-    @question = Factory.create(:feedback_question, :course => @course)
+    @course = FactoryGirl.create(:course)
+    @question = FactoryGirl.create(:feedback_question, :course => @course)
 
     visit '/'
   end
 
   it "should be possible per-course" do
-    @exercise = Factory.create(:exercise, :course => @course)
-    @answer = Factory.create(:feedback_answer, :feedback_question => @question, :course => @course, :exercise => @exercise, :answer => 'this is the answer')
+    @exercise = FactoryGirl.create(:exercise, :course => @course)
+    @answer = FactoryGirl.create(:feedback_answer, :feedback_question => @question, :course => @course, :exercise => @exercise, :answer => 'this is the answer')
 
     click_link @course.name
     click_link 'View feedback'
@@ -24,9 +24,9 @@ describe "Viewing feedback", :type => :request, :integration => true do
   end
 
   it "should be possible per-exercise" do
-    @ex1 = Factory.create(:exercise, :course => @course)
-    @ex2 = Factory.create(:exercise, :course => @course)
-    @answer = Factory.create(:feedback_answer, :course => @course, :exercise => @ex1, :answer => 'this is the answer')
+    @ex1 = FactoryGirl.create(:exercise, :course => @course)
+    @ex2 = FactoryGirl.create(:exercise, :course => @course)
+    @answer = FactoryGirl.create(:feedback_answer, :course => @course, :exercise => @ex1, :answer => 'this is the answer')
 
     click_link @course.name
     click_link @ex1.name

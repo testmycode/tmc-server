@@ -13,19 +13,19 @@ describe Submission, :type => :model do
         :user => mock_model(User)
       }
     end
-    
+
     it "should succeed given valid parameters" do
       expect(Submission.new(@params)).to be_valid
     end
-    
+
     it "should require a user" do
       @params.delete :user
-      
+
       submission = Submission.new(@params)
       expect(submission).not_to be_valid
       expect(submission.errors[:user].size).to eq(1)
     end
-    
+
     it "should require an exercise name" do
       @params.delete :exercise_name
 
@@ -33,7 +33,7 @@ describe Submission, :type => :model do
       expect(submission).not_to be_valid
       expect(submission.errors[:exercise_name].size).to eq(1)
     end
-    
+
     it "should take exercise name from given exercise object" do
       @params.delete :exercise_name
       @params[:exercise] = mock_model(Exercise, :name => 'MyExercise123')
@@ -41,7 +41,7 @@ describe Submission, :type => :model do
       expect(sub).to be_valid
       expect(sub.exercise_name).to eq('MyExercise123')
     end
-    
+
     it "should require a course" do
       @params.delete :course
 
@@ -50,7 +50,7 @@ describe Submission, :type => :model do
       expect(submission.errors[:course].size).to eq(1)
     end
   end
-  
+
   it "can summarize test cases" do
     submission = Submission.new
     submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :exception => '{"a": "b"}')
@@ -83,23 +83,23 @@ describe Submission, :type => :model do
 
   it "can tell how many unprocessed submissions are in queue before itself" do
     t = Time.now
-    Factory.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
-    Factory.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds)
-    Factory.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds, :processing_priority => -2)
-    Factory.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
-    s = Factory.create(:submission, :processed => false, :processing_tried_at => t - 6.seconds)
-    Factory.create(:submission, :processed => false, :processing_tried_at => t - 5.seconds)
-    Factory.create(:submission, :processed => false, :processing_tried_at => t - 4.seconds)
-    
+    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
+    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds)
+    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds, :processing_priority => -2)
+    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
+    s = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 6.seconds)
+    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 5.seconds)
+    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 4.seconds)
+
     expect(s.unprocessed_submissions_before_this).to eq(3)
   end
 
   it "orders unprocessed submissions by priority, then by last processing attempt time" do
     t = Time.now
-    s1 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
-    s2 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds)
-    s3 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds, :processing_priority => 1)
-    s4 = Factory.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
+    s1 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
+    s2 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds)
+    s3 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds, :processing_priority => 1)
+    s4 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
 
     expected_order = [s3, s4, s2, s1]
 
@@ -107,7 +107,7 @@ describe Submission, :type => :model do
   end
 
   it "stores stdout and stderr compressed" do
-    s = Factory.create(:submission)
+    s = FactoryGirl.create(:submission)
     s.stdout = "hello"
     expect(s.submission_data.stdout_compressed).not_to be_empty
     s.stderr = "world"
@@ -120,7 +120,7 @@ describe Submission, :type => :model do
   end
 
   it "can have null stdout and stderr" do
-    s = Factory.create(:submission)
+    s = FactoryGirl.create(:submission)
     s.stdout = "hello"
     s.stderr = "world"
     s.stdout = nil
@@ -133,7 +133,7 @@ describe Submission, :type => :model do
   end
 
   it "allows utf-8 caharacters in stdout, stderr and vm_log" do
-    s = Factory.create(:submission)
+    s = FactoryGirl.create(:submission)
     s.stdout = "mää"
     s.stderr = "möö"
     s.vm_log = "måå"
@@ -148,7 +148,7 @@ describe Submission, :type => :model do
   end
 
   it "deletes submission data when destroyed" do
-    s = Factory.create(:submission)
+    s = FactoryGirl.create(:submission)
     s.stdout = "hello"
     s.save!
 

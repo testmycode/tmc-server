@@ -31,7 +31,7 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
-    Factory.create(:admin, :login => 'admin', :password => 'admin')
+    FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
   %>
 
   <h1>Tutorial</h1>

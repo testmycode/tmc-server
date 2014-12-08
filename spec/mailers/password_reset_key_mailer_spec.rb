@@ -6,8 +6,8 @@ describe PasswordResetKeyMailer, :type => :mailer do
     settings['baseurl'] = 'http://example.com/foo'
     settings['from'] = 'noreply@example.com'
   end
-  
-  let(:user) { Factory.create(:user) }
+
+  let(:user) { FactoryGirl.create(:user) }
   let(:key) { PasswordResetKey.create!(:user => user) }
 
   it "should e-mail a password reset key" do
@@ -16,7 +16,7 @@ describe PasswordResetKeyMailer, :type => :mailer do
     expect(mail.to).to include(user.email)
     expect(mail.from).to include('noreply@example.com')
     expect(mail.encoded).to include('http://example.com/foo/reset_password/' + key.code)
-    
+
     mail.deliver
     expect(ActionMailer::Base.deliveries).not_to be_empty
   end
