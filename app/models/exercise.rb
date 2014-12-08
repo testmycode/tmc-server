@@ -303,7 +303,7 @@ class Exercise < ActiveRecord::Base
     s = Submission.arel_table
 
     user_ids = users.map(&:id)
-    exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name)})" }
+    exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name, nil)})" }
 
     query =
       s.
