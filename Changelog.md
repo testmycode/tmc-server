@@ -1,3 +1,7 @@
+### 2014-12-09
+
+* Upgraded FactoryGirl to 4.5 and converted to new syntax.
+
 ### 2014-12-03
 
 * Upgraded RSpec to 3.1 and converted existing specs from should-syntax to new expectation-syntax.
