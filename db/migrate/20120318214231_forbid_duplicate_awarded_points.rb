@@ -8,7 +8,7 @@ WHERE id NOT IN (
   GROUP BY course_id, user_id, name
 )
 EOS
-    add_index :awarded_points, [:course_id, :user_id, :name], :unique => true
+    add_index :awarded_points, [:course_id, :user_id, :name], unique: true
   end
 
   def down

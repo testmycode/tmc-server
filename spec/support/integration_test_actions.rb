@@ -6,8 +6,8 @@ module IntegrationTestActions
   include SystemCommands
 
   def log_in_as(username, password)
-    fill_in 'session_login', :with => username
-    fill_in 'session_password', :with => password
+    fill_in 'session_login', with: username
+    fill_in 'session_password', with: password
     click_button 'Sign in'
     
     expect(page).to have_content('Sign out')
@@ -20,9 +20,9 @@ module IntegrationTestActions
   def create_new_course(options = {})
     visit '/courses'
     click_link 'Create New Course'
-    fill_in 'course_name', :with => options[:name]
+    fill_in 'course_name', with: options[:name]
     #fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
-    fill_in 'course_source_url', :with => options[:source_url] if options[:source_url]
+    fill_in 'course_source_url', with: options[:source_url] if options[:source_url]
     click_button 'Add Course'
     
     expect(page).to have_content('Course was successfully created.')
@@ -60,15 +60,15 @@ module IntegrationTestActions
   
   # :deprecated:
   def wait_for_with_timeout(expected, timeout, &block)
-    wait_until(:timeout => timeout) {
+    wait_until(timeout: timeout) {
       block.call == expected
     }
   end
   
   def wait_until(options = {}, &block)
     options = {
-      :timeout => 15,
-      :sleep_time => 0.1
+      timeout: 15,
+      sleep_time: 0.1
     }.merge(options)
     start_time = Time.now
     while !block.call

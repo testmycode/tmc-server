@@ -8,7 +8,7 @@ class CourseNotificationMailer < ActionMailer::Base
     @text_mailbody = strip_tags(params[:message])
 
     to = params[:to]
-    mail(:from => from, :to => to, :subject => subject)
+    mail(from: from, to: to, subject: subject)
   end
 
 end

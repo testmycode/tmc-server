@@ -21,10 +21,10 @@ class CoursesController < ApplicationController
         return respond_access_denied('Authentication required') if current_user.guest?
 
         data = {
-          :api_version => ApiVersion::API_VERSION,
-          :courses => CourseList.new(current_user, view_context).course_list_data(courses)
+          api_version: ApiVersion::API_VERSION,
+          courses: CourseList.new(current_user, view_context).course_list_data(courses)
         }
-        render :json => data.to_json
+        render json: data.to_json
       end
     end
   end
@@ -47,10 +47,10 @@ class CoursesController < ApplicationController
       format.json do
         return respond_access_denied('Authentication required') if current_user.guest?
         data = {
-          :api_version => ApiVersion::API_VERSION,
-          :course => CourseInfo.new(current_user, view_context).course_data(@course)
+          api_version: ApiVersion::API_VERSION,
+          course: CourseInfo.new(current_user, view_context).course_data(@course)
         }
-        render :json => data.to_json
+        render json: data.to_json
       end
     end
   end
@@ -79,9 +79,9 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       if @course.save
-        format.html { redirect_to(@course, :notice => 'Course was successfully created.') }
+        format.html { redirect_to(@course, notice: 'Course was successfully created.') }
       else
-        format.html { render :action => "new" , :notice => 'Course could not be created.' }
+        format.html { render action: "new" , notice: 'Course could not be created.' }
       end
     end
   end
@@ -101,7 +101,7 @@ private
     unless current_user.guest?
       max_submissions = 100
       @submissions = @course.submissions
-      @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
+      @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @total_submissions = @submissions.where(user: User.legitimate_students).count
       @submissions = @submissions.limit(max_submissions)

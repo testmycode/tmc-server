@@ -7,11 +7,11 @@
 # It is keyed by a hash of the relevant files in an exercise dir.
 class TestScannerCache
   def self.get_or_update(course, exercise_name, files_hash, &block)
-    entries = course.test_scanner_cache_entries.where(:exercise_name => exercise_name)
+    entries = course.test_scanner_cache_entries.where(exercise_name: exercise_name)
     if entries.size == 1
       entry = entries.first
     elsif entries.size == 0
-      entry = TestScannerCacheEntry.new(:course => course, :exercise_name => exercise_name)
+      entry = TestScannerCacheEntry.new(course: course, exercise_name: exercise_name)
     else
       raise 'TestScannerCache has a duplicate entry. Uniqueness has not been enforced.'
     end

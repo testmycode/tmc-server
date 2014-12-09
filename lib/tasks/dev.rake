@@ -3,7 +3,7 @@ namespace :dev do
     config_path = 'tmp/development/tmc-comet-config.properties'
 
     desc "Compiles and configures ext/tmc-comet for development."
-    task :configure => ['comet:compile'] do
+    task configure: ['comet:compile'] do
       require './config/environment'
       FileUtils.mkdir_p('tmp/development')
 
@@ -15,7 +15,7 @@ namespace :dev do
     end
 
     desc "Starts tmc-comet in this terminal"
-    task :run => :configure do
+    task run: :configure do
       abs_config_path = File.absolute_path(config_path)
       Dir.chdir('ext/tmc-comet') do
         system("./tmc-comet-server.sh #{abs_config_path}")

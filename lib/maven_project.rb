@@ -88,7 +88,7 @@ class MavenProject
 
       namespace task_namespace do
         desc "Compiles #{project.package_path}"
-        task :compile => project.package_path
+        task compile: project.package_path
 
         desc "Cleans #{project.package_path}"
         task :clean do
@@ -96,14 +96,14 @@ class MavenProject
         end
 
         desc "Forces a recompile of #{project.package_path}"
-        task :recompile => [:clean, :compile]
+        task recompile: [:clean, :compile]
       end
 
       desc "Compiles #{project.package_path}"
       task task_namespace => '#{task_namespace}:compile'
 
       # Have rake spec ensure this is compiled
-      task :spec => project.package_path
+      task spec: project.package_path
     end
   end
 

@@ -69,19 +69,19 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
   end
 
   def submission(exercise, points = '')
-    FactoryGirl.create(:submission, :course_id => @course.id, :exercise_name => exercise.name, :user_id => @user.id, :points => points)
+    FactoryGirl.create(:submission, course_id: @course.id, exercise_name: exercise.name, user_id: @user.id, points: points)
   end
 
   def exercise(name, points)
-    FactoryGirl.create(:exercise, :course_id => @course.id, :name => name, :available_points => point_objects(points))
+    FactoryGirl.create(:exercise, course_id: @course.id, name: name, available_points: point_objects(points))
   end
 
   def point_objects(point_names)
-    point_names.map {|name| AvailablePoint.new(:name => name) }
+    point_names.map {|name| AvailablePoint.new(name: name) }
   end
 
   def award_points(names)
-    names.map {|name| AwardedPoint.create(:name => name, :course_id => @course.id, :user_id => @user.id) }
+    names.map {|name| AwardedPoint.create(name: name, course_id: @course.id, user_id: @user.id) }
   end
 end
 

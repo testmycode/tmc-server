@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe ExercisesController, :type => :controller do
+describe ExercisesController, type: :controller do
   describe "GET show" do
 
     let!(:course) { FactoryGirl.create(:course) }
-    let!(:exercise) { FactoryGirl.create(:exercise, :course => course) }
+    let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
 
     def get_show
-      get :show, :id => exercise.id
+      get :show, id: exercise.id
     end
 
     describe "for guests" do
@@ -23,8 +23,8 @@ describe ExercisesController, :type => :controller do
         controller.current_user = user
       end
       it "should not show the user's submissions" do
-        s1 = FactoryGirl.create(:submission, :course => course, :exercise => exercise, :user => user)
-        s2 = FactoryGirl.create(:submission, :course => course, :exercise => exercise)
+        s1 = FactoryGirl.create(:submission, course: course, exercise: exercise, user: user)
+        s2 = FactoryGirl.create(:submission, course: course, exercise: exercise)
 
         get_show
 
@@ -39,8 +39,8 @@ describe ExercisesController, :type => :controller do
         controller.current_user = FactoryGirl.create(:admin)
       end
       it "should show all submissions" do
-        s1 = FactoryGirl.create(:submission, :course => course, :exercise => exercise)
-        s2 = FactoryGirl.create(:submission, :course => course, :exercise => exercise)
+        s1 = FactoryGirl.create(:submission, course: course, exercise: exercise)
+        s2 = FactoryGirl.create(:submission, course: course, exercise: exercise)
         irrelevant = FactoryGirl.create(:submission)
 
         get_show

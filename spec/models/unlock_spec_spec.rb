@@ -1,16 +1,16 @@
 require 'spec_helper'
 
-describe UnlockSpec, :type => :model do
+describe UnlockSpec, type: :model do
 
   let!(:course) { FactoryGirl.create(:course) }
-  let!(:ex1) { FactoryGirl.create(:exercise, :course => course, :name => 'grp-ex1') }
-  let!(:ex2) { FactoryGirl.create(:exercise, :course => course, :name => 'grp-ex2') }
-  let!(:ex3) { FactoryGirl.create(:exercise, :course => course, :name => 'ex3') }
-  let!(:ex1_pt1) { FactoryGirl.create(:available_point, :course => course, :exercise => ex1, :name => 'ex1_pt1') }
-  let!(:ex1_pt2) { FactoryGirl.create(:available_point, :course => course, :exercise => ex1, :name => 'ex1_pt2') }
-  let!(:ex2_pt1) { FactoryGirl.create(:available_point, :course => course, :exercise => ex2, :name => 'ex2_pt1') }
-  let!(:ex2_pt2) { FactoryGirl.create(:available_point, :course => course, :exercise => ex2, :name => 'ex2_pt2') }
-  let!(:ex2_pt3) { FactoryGirl.create(:available_point, :course => course, :exercise => ex2, :name => 'ex2_pt3') }
+  let!(:ex1) { FactoryGirl.create(:exercise, course: course, name: 'grp-ex1') }
+  let!(:ex2) { FactoryGirl.create(:exercise, course: course, name: 'grp-ex2') }
+  let!(:ex3) { FactoryGirl.create(:exercise, course: course, name: 'ex3') }
+  let!(:ex1_pt1) { FactoryGirl.create(:available_point, course: course, exercise: ex1, name: 'ex1_pt1') }
+  let!(:ex1_pt2) { FactoryGirl.create(:available_point, course: course, exercise: ex1, name: 'ex1_pt2') }
+  let!(:ex2_pt1) { FactoryGirl.create(:available_point, course: course, exercise: ex2, name: 'ex2_pt1') }
+  let!(:ex2_pt2) { FactoryGirl.create(:available_point, course: course, exercise: ex2, name: 'ex2_pt2') }
+  let!(:ex2_pt3) { FactoryGirl.create(:available_point, course: course, exercise: ex2, name: 'ex2_pt3') }
   let!(:user) { FactoryGirl.create(:user) }
 
   def award(*pts)
@@ -18,9 +18,9 @@ describe UnlockSpec, :type => :model do
       available = self.send(pt)
       FactoryGirl.create(
         :awarded_point,
-        :course => available.course,
-        :name => available.name,
-        :user => user
+        course: available.course,
+        name: available.name,
+        user: user
       )
     end
   end
@@ -92,8 +92,8 @@ describe UnlockSpec, :type => :model do
   end
 
   specify "unlocked_after: <n> exercises in <exercise_group>" do
-    FactoryGirl.create(:submission, :user => user, :course => course, :exercise => ex1, :all_tests_passed => true)
-    FactoryGirl.create(:submission, :user => user, :course => course, :exercise => ex2, :all_tests_passed => false)
+    FactoryGirl.create(:submission, user: user, course: course, exercise: ex1, all_tests_passed: true)
+    FactoryGirl.create(:submission, user: user, course: course, exercise: ex2, all_tests_passed: false)
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1)
 
     expect(UnlockSpec.new(ex3, ['1 exercise in grp'])).to permit_unlock_for(user)
@@ -123,7 +123,7 @@ describe UnlockSpec, :type => :model do
   describe "unlocked_after: <multiple conditions>" do
     it "should require all to be true" do
       award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt3)
-      FactoryGirl.create(:submission, :user => user, :course => course, :exercise => ex1, :all_tests_passed => true)
+      FactoryGirl.create(:submission, user: user, course: course, exercise: ex1, all_tests_passed: true)
 
       expect(UnlockSpec.new(ex3, ['2 points in grp-ex1', '1 exercise in grp'])).to permit_unlock_for(user)
       expect(UnlockSpec.new(ex3, ['3 points in grp-ex1', '1 exercise in grp'])).not_to permit_unlock_for(user)

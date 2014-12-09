@@ -9,14 +9,14 @@ FactoryGirl.define do
     administrator false
   end
 
-  factory :admin, :class => User do
+  factory :admin, class: User do
     sequence(:login) {|n| "admin#{n}" }
     sequence(:password) {|n| "adminpass#{n}" }
     sequence(:email) {|n| "admin#{n}@example.com" }
     administrator true
   end
 
-  factory :course, :class => Course do
+  factory :course, class: Course do
     sequence(:name) {|n| "course#{n}" }
     source_url 'git@example.com'
   end
@@ -27,7 +27,7 @@ FactoryGirl.define do
     sequence(:gdocs_sheet) {|n| "exercise#{n}" }
   end
 
-  factory :returnable_exercise, :parent => :exercise do
+  factory :returnable_exercise, parent: :exercise do
     returnable_forced true
   end
 
@@ -73,7 +73,7 @@ FactoryGirl.define do
 
   factory :review do
     submission
-    reviewer :factory => :user
+    reviewer factory: :user
     review_body "This is a review"
   end
 

@@ -1,20 +1,20 @@
 require 'spec_helper'
 require 'cancan/matchers'
 
-describe "The system (used by a student)", :type => :request, :integration => true do
+describe "The system (used by a student)", type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = Course.create!(:name => 'mycourse', :source_backend => 'git', :source_url => repo_path)
+    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
     @course.refresh
 
-    @user = FactoryGirl.create(:user, :password => 'xooxer')
+    @user = FactoryGirl.create(:user, password: 'xooxer')
     @ability = Ability.new(@user)
 
     visit '/'
@@ -23,7 +23,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
   end
 
   # :rack_test seems to handle downloads better than :webkit/:selenium atm
-  it "should offer exercises as downloadable zips", :driver => :rack_test do
+  it "should offer exercises as downloadable zips", driver: :rack_test do
     click_link('zip')
     File.open('MyExercise.zip', 'wb') {|f| f.write(page.source) }
     system!("unzip -qq MyExercise.zip")
@@ -175,7 +175,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
   end
 
   it "should not count submissions made by non legitimate_students in submission counts" do
-    @fake_user = FactoryGirl.create(:admin, :login => "uuseri", :password => 'xooxer', legitimate_student: false)
+    @fake_user = FactoryGirl.create(:admin, login: "uuseri", password: 'xooxer', legitimate_student: false)
     log_out
     visit '/'
     log_in_as(@fake_user.login, 'xooxer')
@@ -208,7 +208,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
     log_out
     expect(page).not_to have_content('src/SimpleStuff.java')
     expect(page).to have_content('Goodbye')
-    @other_user = FactoryGirl.create(:user, :login => "uuseri", :password => 'xooxer')
+    @other_user = FactoryGirl.create(:user, login: "uuseri", password: 'xooxer')
 
     visit '/'
     log_in_as(@other_user.login, 'xooxer')
@@ -322,7 +322,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
       log_out
 
-      @other_user = FactoryGirl.create(:user,:login => "uuseri", :password => 'xooxer')
+      @other_user = FactoryGirl.create(:user,login: "uuseri", password: 'xooxer')
 
       log_in_as(@other_user.login, 'xooxer')
 
@@ -346,7 +346,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       expect(page).to have_content('src/SimpleStuff.java')
 
       log_out
-      @other_user = FactoryGirl.create(:user,:login => "uuseri2", :password => 'xooxer2')
+      @other_user = FactoryGirl.create(:user,login: "uuseri2", password: 'xooxer2')
       log_in_as(@other_user.login, 'xooxer2')
 
       expect(page).not_to have_content('src/SimpleStuff.java')
@@ -385,7 +385,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
       log_out
 
-      @other_user = FactoryGirl.create(:user,:login => "uuseri", :password => 'xooxer')
+      @other_user = FactoryGirl.create(:user,login: "uuseri", password: 'xooxer')
 
       log_in_as(@other_user.login, 'xooxer')
 
@@ -416,7 +416,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       expect(page).to have_content('Access denied')
 
       log_out
-      @other_user = FactoryGirl.create(:user,:login => "uuseri2", :password => 'xooxer2')
+      @other_user = FactoryGirl.create(:user,login: "uuseri2", password: 'xooxer2')
       log_in_as(@other_user.login, 'xooxer2')
 
       expect(page).not_to have_content('src/SimpleStuff.java')

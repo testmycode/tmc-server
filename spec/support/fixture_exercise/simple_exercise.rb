@@ -9,7 +9,7 @@ require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise')
 class FixtureExercise::SimpleExercise < FixtureExercise
   def initialize(path = 'SimpleExercise', options = {})
     options = {
-      :fixture_name => 'SimpleExercise'
+      fixture_name: 'SimpleExercise'
     }.merge(options)
     super(options[:fixture_name], path, options)
   end

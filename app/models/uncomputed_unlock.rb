@@ -11,10 +11,10 @@ class UncomputedUnlock < ActiveRecord::Base
   def self.create_all_for_course(course)
     transaction do
       course_users = User.course_students(course).pluck(:id)
-      existing_users = Set.new(UncomputedUnlock.where(:course_id => course.id, :user_id => course_users).pluck(:user_id))
+      existing_users = Set.new(UncomputedUnlock.where(course_id: course.id, user_id: course_users).pluck(:user_id))
       new_users = Set.new(course_users).difference(existing_users)
 
-      rows_to_insert = new_users.map {|uid| {:course_id => course.id, :user_id => uid} }
+      rows_to_insert = new_users.map {|uid| {course_id: course.id, user_id: uid} }
       # The obvious race condition here may result in a duplicate being inserted.
       # This is fine since Unlock.refresh_unlocks does a corresponding delete_all.
       UncomputedUnlock.create!(rows_to_insert)

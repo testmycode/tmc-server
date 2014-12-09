@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'cancan/matchers'
 
-describe CourseNotificationsController, :type => :controller do
+describe CourseNotificationsController, type: :controller do
 
   let(:topic) { "Hi all" }
   let(:message) { "A long message to every participant on some course..." }
@@ -29,7 +29,7 @@ describe CourseNotificationsController, :type => :controller do
   end
 
   describe "for an admin user " do
-    let(:admin){ FactoryGirl.create(:admin, :email => "admin@mydomain.com") }
+    let(:admin){ FactoryGirl.create(:admin, email: "admin@mydomain.com") }
     before do
       controller.current_user = admin
     end

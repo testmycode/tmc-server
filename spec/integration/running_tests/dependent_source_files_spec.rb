@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe RemoteSandboxForTesting, :type => :request, :integration => true do
+describe RemoteSandboxForTesting, type: :request, integration: true do
   it "should not have problems compiling a project with source files that depend on each other" do
-    setup = SubmissionTestSetup.new(:exercise_name => 'DependentSourceFiles')
+    setup = SubmissionTestSetup.new(exercise_name: 'DependentSourceFiles')
     submission = setup.submission
     
     setup.make_zip

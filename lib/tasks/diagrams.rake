@@ -8,5 +8,5 @@ namespace :doc do
   end
 
   desc "Generates model diagram into doc/diagrams/"
-  task :diagrams => %w(diagram:models)
+  task diagrams: %w(diagram:models)
 end

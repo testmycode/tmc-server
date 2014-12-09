@@ -5,7 +5,7 @@ require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise', 'sim
 class FixtureExercise::MavenExercise < FixtureExercise::SimpleExercise
   def initialize(path = 'MavenExercise', options = {})
     options = {
-      :fixture_name => 'MavenExercise'
+      fixture_name: 'MavenExercise'
     }.merge(options)
     super(path, options)
   end

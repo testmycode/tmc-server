@@ -9,7 +9,7 @@ module BadUtf8Helper
         str.encode('UTF-8')
       else
         str.force_encoding('UTF-8')
-        str.encode('UTF-8', 'ASCII-8BIT', :invalid => :replace, :undef => :replace)
+        str.encode('UTF-8', 'ASCII-8BIT', invalid: :replace, undef: :replace)
       end
     end
   end

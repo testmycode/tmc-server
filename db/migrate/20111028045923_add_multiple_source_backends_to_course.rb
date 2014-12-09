@@ -5,8 +5,8 @@ class AddMultipleSourceBackendsToCourse < ActiveRecord::Migration
     execute "UPDATE courses SET source_backend = 'git', source_url = remote_repo_url"
     remove_column :courses, :remote_repo_url
     
-    change_column :courses, :source_backend, :string, :null => false
-    change_column :courses, :source_url, :string, :null => false
+    change_column :courses, :source_backend, :string, null: false
+    change_column :courses, :source_url, :string, null: false
   end
   
   def down

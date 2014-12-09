@@ -23,7 +23,7 @@ class Ability
       cannot :read, User
       cannot :read, :code_reviews
       cannot :read, :course_information
-      can :read, User, :id => user.id
+      can :read, User, id: user.id
       can :create, User if SiteSetting.value(:enable_signup)
 
       cannot :read, Course
@@ -40,7 +40,7 @@ class Ability
       end
 
       cannot :read, Submission
-      can :read, Submission, :user_id => user.id
+      can :read, Submission, user_id: user.id
       can :create, Submission do |sub|
         sub.exercise.submittable_by?(user)
       end
@@ -65,7 +65,7 @@ class Ability
       end
 
       can :view_code_reviews, Course do |c|
-        c.submissions.exists?(:user_id => user.id, :reviewed => true)
+        c.submissions.exists?(user_id: user.id, reviewed: true)
       end
 
       cannot :reply, FeedbackAnswer

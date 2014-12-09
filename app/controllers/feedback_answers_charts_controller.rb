@@ -23,7 +23,7 @@ private
   def show_scatterplot
     @questions = @course.feedback_questions.select {|q| q.intrange? }.sort_by(&:position)
     if @questions.size == 2
-      render :action => 'show_scatterplot', :layout => 'bare'
+      render action: 'show_scatterplot', layout: 'bare'
     else
       respond_with_error("Scatterplot only available if there are exactly two numeric questions")
     end

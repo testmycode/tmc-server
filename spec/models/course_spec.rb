@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Course, :type => :model do
+describe Course, type: :model do
 
   let(:source_path) { "#{@test_tmp_dir}/fake_source" }
   let(:source_url) { "file://#{source_path}" }
@@ -9,14 +9,14 @@ describe Course, :type => :model do
   describe "gdocs_sheets" do
     it "should list all unique gdocs_sheets of a course" do
       course = FactoryGirl.create(:course)
-      ex1 = FactoryGirl.create(:exercise, :course => course,
-                           :gdocs_sheet => "sheet1")
-      ex2 = FactoryGirl.create(:exercise, :course => course,
-                           :gdocs_sheet => "sheet1")
-      ex3 = FactoryGirl.create(:exercise, :course => course,
-                           :gdocs_sheet => "sheet2")
-      ex4 = FactoryGirl.create(:exercise, :course => course,
-                           :gdocs_sheet => nil)
+      ex1 = FactoryGirl.create(:exercise, course: course,
+                           gdocs_sheet: "sheet1")
+      ex2 = FactoryGirl.create(:exercise, course: course,
+                           gdocs_sheet: "sheet1")
+      ex3 = FactoryGirl.create(:exercise, course: course,
+                           gdocs_sheet: "sheet2")
+      ex4 = FactoryGirl.create(:exercise, course: course,
+                           gdocs_sheet: nil)
       worksheets = course.gdocs_sheets
 
       expect(worksheets.size).to eq(2)
@@ -49,42 +49,42 @@ describe Course, :type => :model do
   end
 
   it "should be visible if not hidden and hide_after is nil" do
-    c = FactoryGirl.create(:course, :hidden => false, :hide_after => nil)
+    c = FactoryGirl.create(:course, hidden: false, hide_after: nil)
     expect(c).to be_visible_to(user)
   end
 
   it "should be visible if not hidden and hide_after has not passed" do
-    c = FactoryGirl.create(:course, :hidden => false, :hide_after => Time.now + 2.minutes)
+    c = FactoryGirl.create(:course, hidden: false, hide_after: Time.now + 2.minutes)
     expect(c).to be_visible_to(user)
   end
 
   it "should not be visible if hidden" do
-    c = FactoryGirl.create(:course, :hidden => true, :hide_after => nil)
+    c = FactoryGirl.create(:course, hidden: true, hide_after: nil)
     expect(c).not_to be_visible_to(user)
   end
 
   it "should not be visible if hide_after has passed" do
-    c = FactoryGirl.create(:course, :hidden => false, :hide_after => Time.now - 2.minutes)
+    c = FactoryGirl.create(:course, hidden: false, hide_after: Time.now - 2.minutes)
     expect(c).not_to be_visible_to(user)
   end
 
   it "should always be visible to administrators" do
     admin = FactoryGirl.create(:admin)
-    c = FactoryGirl.create(:course, :hidden => true, :hide_after => Time.now - 2.minutes)
+    c = FactoryGirl.create(:course, hidden: true, hide_after: Time.now - 2.minutes)
     expect(c).to be_visible_to(admin)
   end
 
   it "should be visible if user has registered before the hidden_if_registered_after setting" do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = FactoryGirl.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-03'))
+    c = FactoryGirl.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-03'))
     expect(c).to be_visible_to(user)
   end
 
   it "should not be visible if user has registered after the hidden_if_registered_after setting" do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = FactoryGirl.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-01'))
+    c = FactoryGirl.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-01'))
     expect(c).not_to be_visible_to(user)
   end
 
@@ -103,7 +103,7 @@ describe Course, :type => :model do
   end
 
   it "should consider a hide_after date without time to mean the end of that day" do
-    c = FactoryGirl.create(:course, :hide_after => "18.11.2013")
+    c = FactoryGirl.create(:course, hide_after: "18.11.2013")
     expect(c.hide_after.hour).to eq(23)
     expect(c.hide_after.min).to eq(59)
   end
@@ -111,11 +111,11 @@ describe Course, :type => :model do
   it "should know the exercise groups of its exercises" do
     c = FactoryGirl.create(:course)
     exercises = [
-      FactoryGirl.build(:exercise, :course => c, :name => 'foo-ex1'),
-      FactoryGirl.build(:exercise, :course => c, :name => 'bar-ex1'),
-      FactoryGirl.build(:exercise, :course => c, :name => 'foo-ex2'),
-      FactoryGirl.build(:exercise, :course => c, :name => 'zoox-zaax-ex1'),
-      FactoryGirl.build(:exercise, :course => c, :name => 'zoox-zoox-ex1')
+      FactoryGirl.build(:exercise, course: c, name: 'foo-ex1'),
+      FactoryGirl.build(:exercise, course: c, name: 'bar-ex1'),
+      FactoryGirl.build(:exercise, course: c, name: 'foo-ex2'),
+      FactoryGirl.build(:exercise, course: c, name: 'zoox-zaax-ex1'),
+      FactoryGirl.build(:exercise, course: c, name: 'zoox-zoox-ex1')
     ]
     exercises.each {|ex| c.exercises << ex }
 
@@ -143,17 +143,17 @@ describe Course, :type => :model do
   describe "validation" do
     let(:valid_params) do
       {
-        :name => 'TestCourse',
-        :source_url => 'git@example.com'
+        name: 'TestCourse',
+        source_url: 'git@example.com'
       }
     end
 
     it "requires a name" do
-      should_be_invalid_params(valid_params.merge(:name => nil))
+      should_be_invalid_params(valid_params.merge(name: nil))
     end
 
     it "requires name to be reasonably short" do
-      should_be_invalid_params(valid_params.merge(:name => 'a'*41))
+      should_be_invalid_params(valid_params.merge(name: 'a'*41))
     end
 
     it "requires name to be non-unique" do
@@ -162,12 +162,12 @@ describe Course, :type => :model do
     end
 
     it "forbids spaces in the name" do # this could eventually be lifted as long as everything else is made to tolerate spaces
-      should_be_invalid_params(valid_params.merge(:name => 'Test Course'))
+      should_be_invalid_params(valid_params.merge(name: 'Test Course'))
     end
 
     it "requires a remote repo url" do
-      should_be_invalid_params(valid_params.merge(:source_url => nil))
-      should_be_invalid_params(valid_params.merge(:source_url => ''))
+      should_be_invalid_params(valid_params.merge(source_url: nil))
+      should_be_invalid_params(valid_params.merge(source_url: ''))
     end
 
     def should_be_invalid_params(params)
@@ -177,7 +177,7 @@ describe Course, :type => :model do
 
   describe "destruction" do
     it "deletes its cache directory" do
-      c = Course.create!(:name => 'MyCourse', :source_url => source_url)
+      c = Course.create!(name: 'MyCourse', source_url: source_url)
       FileUtils.mkdir_p(c.cache_path)
       FileUtils.touch("#{c.cache_path}/foo.txt")
 

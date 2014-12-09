@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe DeadlineSpec, :type => :model do
+describe DeadlineSpec, type: :model do
   let(:ex) { mock_model(Exercise) }
   let(:user) { mock_model(User) }
 

@@ -20,10 +20,10 @@ class AuthsController < ApplicationController
 
     respond_to do |format|
       format.any(:html, :text) do # Work around bug in HTTP library used by tmc-comet and accept HTML mime type
-        render :text => msg
+        render text: msg
       end
       format.json do
-        render :json => {:status => msg}.to_json
+        render json: {status: msg}.to_json
       end
     end
   end
@@ -31,6 +31,6 @@ class AuthsController < ApplicationController
 private
   def find_session_by_id(sid)
     # Can't say Session.find_by_session_id because of a nasty metaprogramming hax in AR's superclass.
-    Session.where(:session_id => sid).first
+    Session.where(session_id: sid).first
   end
 end

@@ -37,7 +37,7 @@ private
 
   def course_stats_index
     respond_to do |format|
-      format.html { render :template => 'courses/stats/index' }
+      format.html { render template: 'courses/stats/index' }
     end
   end
 
@@ -45,7 +45,7 @@ private
     @stats = Stats.all
     respond_to do |format|
       format.html { render }
-      format.json { render :json => @stats, :callback => params[:jsonp] }
+      format.json { render json: @stats, callback: params[:jsonp] }
     end
   end
 
@@ -77,7 +77,7 @@ private
     @time_unit = 'day' if @time_unit == nil
 
     respond_to do |format|
-      format.html { render :template => 'courses/stats/submissions', :layout => 'bare' }
+      format.html { render template: 'courses/stats/submissions', layout: 'bare' }
       format.json do
 
         records =
@@ -103,7 +103,7 @@ private
           time += 1.send(@time_unit)
         end
 
-        render :json => result
+        render json: result
       end
     end
   end
@@ -112,7 +112,7 @@ private
     return respond_not_found("No submissions yet") if @course.submissions.empty?
 
     respond_to do |format|
-      format.html { render :template => 'courses/stats/submission_times', :layout => 'bare' }
+      format.html { render template: 'courses/stats/submission_times', layout: 'bare' }
       format.json do
         records = @course.submissions.where(user: User.legitimate_students).select([
           'COUNT(*) c',
@@ -130,7 +130,7 @@ private
           result << lookup[h]
         end
 
-        render :json => result
+        render json: result
       end
     end
   end

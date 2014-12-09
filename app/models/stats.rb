@@ -2,8 +2,8 @@
 module Stats
   def self.all
     {
-      :registered_users => all_regular_users.count,
-      :course_stats => Course.all.reduce({}) {|h, c| h.merge(c.name => for_course(c)) }
+      registered_users: all_regular_users.count,
+      course_stats: Course.all.reduce({}) {|h, c| h.merge(c.name => for_course(c)) }
     }
   end
 
@@ -21,9 +21,9 @@ module Stats
     result = {}
     for group_name, exercises in exercise_groups(course)
       result[group_name] = {
-        :participants_with_submissions_count => participants_with_submissions_count(exercises),
-        :completed_exercise_count => completed_exercise_count(exercises),
-        :possible_completed_exercise_count => possible_completed_exercise_count(exercises)
+        participants_with_submissions_count: participants_with_submissions_count(exercises),
+        completed_exercise_count: completed_exercise_count(exercises),
+        possible_completed_exercise_count: possible_completed_exercise_count(exercises)
       }
     end
     result
@@ -31,7 +31,7 @@ module Stats
 
   def self.exercise_groups(course)
     groups = {}
-    for exercise in course.exercises.where(:hidden => false)
+    for exercise in course.exercises.where(hidden: false)
       groups[exercise.exercise_group_name] ||= []
       groups[exercise.exercise_group_name] << exercise
     end
@@ -61,18 +61,18 @@ module Stats
 
 private
   def self.all_regular_users
-    User.where(:administrator => false)
+    User.where(administrator: false)
   end
 
   def self.all_nonhidden_exercises
-    Exercise.where(:hidden => false)
+    Exercise.where(hidden: false)
   end
 
   def self.get_exercises(exercise_or_course = nil)
     if exercise_or_course == nil
       all_nonhidden_exercises
     elsif exercise_or_course.is_a?(Course)
-      exercise_or_course.exercises.where(:hidden => false)
+      exercise_or_course.exercises.where(hidden: false)
     else
       exercise_or_course
     end

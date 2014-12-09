@@ -2,9 +2,9 @@
 class FeedbackAnswer < ActiveRecord::Base
   belongs_to :feedback_question
   belongs_to :course
-  belongs_to :exercise, -> (exercise) { where(course: exercise.course) }, :foreign_key => :exercise_name, :primary_key => :name
+  belongs_to :exercise, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
   belongs_to :submission
-  has_many :reply_to_feedback_answers, :dependent => :delete_all
+  has_many :reply_to_feedback_answers, dependent: :delete_all
 
   validates_with Validators::FeedbackAnswerFormatValidator
 

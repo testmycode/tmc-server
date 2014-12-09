@@ -4,7 +4,7 @@ class FeedbackAnswersController < ApplicationController
     if params[:course_id]
       @course = Course.find(params[:course_id])
       @parent = @course
-      @numeric_stats = @course.exercises.where(:hidden => false).sort.map do |ex|
+      @numeric_stats = @course.exercises.where(hidden: false).sort.map do |ex|
         [ex, FeedbackAnswer.numeric_answer_averages(ex), ex.submissions_having_feedback.count]
       end
       @title = @course.name
@@ -37,9 +37,9 @@ class FeedbackAnswersController < ApplicationController
         @text_answers = @parent.feedback_answers.
           joins(:feedback_question).
           joins(:submission).
-          joins(:submission => :user).
+          joins(submission: :user).
           #joins(:exercise). # fails due to :conditions of belongs_to receiving incorrect self :(
-          where(:feedback_questions => { :kind => 'text' }).
+          where(feedback_questions: { kind: 'text' }).
           order('created_at DESC').
           all
       end
@@ -47,27 +47,27 @@ class FeedbackAnswersController < ApplicationController
         authorize! :read, @parent
         # We only deliver public statistics so no authorization required
 
-        render :json => {
-          :numeric_questions => @numeric_questions.map {|q|
+        render json: {
+          numeric_questions: @numeric_questions.map {|q|
             {
-              :id => q.id,
-              :title => q.title,
-              :question => q.question,
-              :position => q.position
+              id: q.id,
+              title: q.title,
+              question: q.question,
+              position: q.position
             }
           },
-          :numeric_stats => @numeric_stats.map {|ex, averages, answer_count|
+          numeric_stats: @numeric_stats.map {|ex, averages, answer_count|
             {
-              :exercise => {
-                :id => ex.id,
-                :name => ex.name,
+              exercise: {
+                id: ex.id,
+                name: ex.name,
               },
-              :averages => averages,
-              :answer_count => answer_count,
-              :answers => FeedbackAnswer.anonymous_numeric_answers(ex)
+              averages: averages,
+              answer_count: answer_count,
+              answers: FeedbackAnswer.anonymous_numeric_answers(ex)
             }
           }
-        }, :callback => params[:jsonp]
+        }, callback: params[:jsonp]
       end
     end
   end
@@ -89,17 +89,17 @@ class FeedbackAnswersController < ApplicationController
 
     answer_records = answer_params.map do |answer_hash|
       FeedbackAnswer.new({
-        :submission => submission,
-        :course_id => submission.course_id,
-        :exercise_name => submission.exercise_name,
-        :feedback_question_id => answer_hash[:question_id],
-        :answer => answer_hash[:answer]
+        submission: submission,
+        course_id: submission.course_id,
+        exercise_name: submission.exercise_name,
+        feedback_question_id: answer_hash[:question_id],
+        answer: answer_hash[:answer]
       })
     end
     answer_records.each {|record| authorize! :create, record }
 
     begin
-      ActiveRecord::Base.connection.transaction(:requires_new => true) do
+      ActiveRecord::Base.connection.transaction(requires_new: true) do
         answer_records.each(&:save!)
       end
     rescue
@@ -113,7 +113,7 @@ class FeedbackAnswersController < ApplicationController
         redirect_to submission_path(submission)
       end
       format.json do
-        render :json => {:api_version => ApiVersion::API_VERSION, :status => 'ok'}
+        render json: {api_version: ApiVersion::API_VERSION, status: 'ok'}
       end
     end
   end

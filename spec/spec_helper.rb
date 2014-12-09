@@ -72,7 +72,7 @@ RSpec.configure do |config|
       DatabaseCleaner.clean
     end
 
-    allow(Tailoring).to receive_messages(:get => Tailoring.new)
+    allow(Tailoring).to receive_messages(get: Tailoring.new)
     SiteSetting.use_distribution_defaults!
 
     if context.metadata[:integration]
@@ -94,7 +94,7 @@ RSpec.configure do |config|
   end
 
   # Override with rspec --tag ~integration --tag gdocs spec
-  config.filter_run_excluding :gdocs => true
+  config.filter_run_excluding gdocs: true
 end
 
 # Ensure the DB is clean

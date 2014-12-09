@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe RemoteSandboxForTesting, :type => :request, :integration => true do
+describe RemoteSandboxForTesting, type: :request, integration: true do
   def setup_and_run(exercise_name)
-    setup = SubmissionTestSetup.new(:exercise_name => exercise_name)
+    setup = SubmissionTestSetup.new(exercise_name: exercise_name)
     submission = setup.submission
 
     setup.make_zip

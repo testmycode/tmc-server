@@ -30,7 +30,7 @@ private
   
   def start_mimic_server!
     queue = @queue # put in closure, blocks below have different `self`
-    Mimic.mimic(:port => receiver_port, :fork => true) do
+    Mimic.mimic(port: receiver_port, fork: true) do
       post("/results") do
         queue << params
         [200, {}, ["OK"]]

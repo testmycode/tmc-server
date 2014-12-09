@@ -15,8 +15,8 @@ module SystemCommands
 
   def sh!(*args)
     options = {
-      :assert_silent => false,
-      :escape => true
+      assert_silent: false,
+      escape: true
     }
     if args.last.is_a?(Hash)
       options = args.pop.merge(options)
@@ -38,8 +38,8 @@ module SystemCommands
     raise "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 
     {
-      :status => status,
-      :output => output
+      status: status,
+      output: output
     }
   end
 

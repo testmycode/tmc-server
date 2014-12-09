@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe PasswordResetKeyMailer, :type => :mailer do
+describe PasswordResetKeyMailer, type: :mailer do
   before :each do
     settings = SiteSetting.all_settings['emails']
     settings['baseurl'] = 'http://example.com/foo'
@@ -8,7 +8,7 @@ describe PasswordResetKeyMailer, :type => :mailer do
   end
 
   let(:user) { FactoryGirl.create(:user) }
-  let(:key) { PasswordResetKey.create!(:user => user) }
+  let(:key) { PasswordResetKey.create!(user: user) }
 
   it "should e-mail a password reset key" do
     mail = PasswordResetKeyMailer.reset_link_email(user, key)

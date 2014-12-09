@@ -2,12 +2,12 @@
 class ExerciseCompletionStatusGenerator
 
   def self.completion_status(user, course)
-    awarded_points = user.awarded_points.where(:course_id => course.id).map(&:name)
+    awarded_points = user.awarded_points.where(course_id: course.id).map(&:name)
     all_exercises = Exercise.where(course: course).includes(:available_points)
     attempted_exercise_names = Submission.where(
-      :course_id => course.id,
-      :user_id => user.id,
-      :processed => true
+      course_id: course.id,
+      user_id: user.id,
+      processed: true
     ).map(&:exercise_name)
 
     completion_status = all_exercises.inject({}) { |map, exercise|

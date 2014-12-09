@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
 
     redirect_params = {}
     if user.nil?
-      redirect_params = {:alert => "Login or password incorrect. Try again."}
+      redirect_params = {alert: "Login or password incorrect. Try again."}
     else
       sign_in user
     end
@@ -24,7 +24,7 @@ class SessionsController < ApplicationController
 
   def destroy
     sign_out
-    try_to_redirect_back(:notice => 'Goodbye')
+    try_to_redirect_back(notice: 'Goodbye')
   end
 
 private

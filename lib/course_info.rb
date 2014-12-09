@@ -12,12 +12,12 @@ class CourseInfo
 
     @unlocked_exercises = course.
       unlocks.
-      where(:user_id => @user.id).
+      where(user_id: @user.id).
       where(['valid_after IS NULL OR valid_after < ?', Time.now]).
       pluck(:exercise_name)
 
     submissions_by_exercise = {}
-    Submission.where(:course_id => course.id, :user_id => @user.id).each do |sub|
+    Submission.where(course_id: course.id, user_id: @user.id).each do |sub|
       submissions_by_exercise[sub.exercise_name] ||= []
       submissions_by_exercise[sub.exercise_name] << sub
     end
@@ -26,8 +26,8 @@ class CourseInfo
     end
 
     @course_list.course_data(course).merge({
-      :unlockables => course.unlockable_exercises_for(@user).map(&:name).natsort,
-      :exercises => exercises.map {|ex| exercise_data(ex) }.reject(&:nil?)
+      unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
+      exercises: exercises.map {|ex| exercise_data(ex) }.reject(&:nil?)
     })
   end
 
@@ -39,23 +39,23 @@ private
     locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
 
     data = {
-      :id => exercise.id,
-      :name => exercise.name,
-      :locked => locked,
-      :deadline_description => exercise.deadline_spec_obj.universal_description,
-      :deadline => exercise.deadline_for(@user),
-      :checksum => exercise.checksum,
-      :return_url => exercise_return_url(exercise),
-      :zip_url => @helpers.exercise_zip_url(exercise),
-      :returnable => exercise.returnable?,
-      :requires_review => exercise.requires_review?,
-      :attempted => exercise.attempted_by?(@user),
-      :completed => exercise.completed_by?(@user),
-      :reviewed => exercise.reviewed_for?(@user),
-      :all_review_points_given => exercise.all_review_points_given_for?(@user),
-      :memory_limit => exercise.memory_limit,
-      :runtime_params => exercise.runtime_params_array,
-      :valgrind_strategy => exercise.valgrind_strategy
+      id: exercise.id,
+      name: exercise.name,
+      locked: locked,
+      deadline_description: exercise.deadline_spec_obj.universal_description,
+      deadline: exercise.deadline_for(@user),
+      checksum: exercise.checksum,
+      return_url: exercise_return_url(exercise),
+      zip_url: @helpers.exercise_zip_url(exercise),
+      returnable: exercise.returnable?,
+      requires_review: exercise.requires_review?,
+      attempted: exercise.attempted_by?(@user),
+      completed: exercise.completed_by?(@user),
+      reviewed: exercise.reviewed_for?(@user),
+      all_review_points_given: exercise.all_review_points_given_for?(@user),
+      memory_limit: exercise.memory_limit,
+      runtime_params: exercise.runtime_params_array,
+      valgrind_strategy: exercise.valgrind_strategy
     }
 
     data[:solution_zip_url] = @helpers.exercise_solution_zip_url(exercise) if @user.administrator?
@@ -70,7 +70,7 @@ private
 
 private
   def exercise_return_url(e)
-    "#{@helpers.exercise_submissions_url(e, :format => 'json')}"
+    "#{@helpers.exercise_submissions_url(e, format: 'json')}"
   end
 
   def get_latest_submission(exercise)

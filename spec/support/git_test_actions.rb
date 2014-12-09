@@ -2,7 +2,7 @@ module GitTestActions
   include SystemCommands
 
   def create_bare_repo(path, options = {})
-    options = {:initial_commit => true}.merge(options)
+    options = {initial_commit: true}.merge(options)
     abs_path = File.expand_path(path)
     system!("git init -q --bare #{path}")
     

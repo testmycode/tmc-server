@@ -13,7 +13,7 @@ describe SubmissionProcessor do
   describe "reprocessing submissions" do
 
     before :each do
-      @sub = FactoryGirl.create(:submission, :processed => false)
+      @sub = FactoryGirl.create(:submission, processed: false)
     end
 
     it "should reprocess when no sandbox was available a short while ago" do

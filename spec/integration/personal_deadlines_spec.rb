@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe "Personal deadlines", :type => :request, :integration => true do
+describe "Personal deadlines", type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = Course.create!(:name => 'mycourse', :source_backend => 'git', :source_url => repo_path)
+    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise1')
     @repo.copy_simple_exercise('MyExercise2')
@@ -17,7 +17,7 @@ describe "Personal deadlines", :type => :request, :integration => true do
 
     @course.refresh
 
-    @user = FactoryGirl.create(:user, :password => 'xooxer')
+    @user = FactoryGirl.create(:user, password: 'xooxer')
 
     visit '/'
     log_in_as(@user.login, @user.password)

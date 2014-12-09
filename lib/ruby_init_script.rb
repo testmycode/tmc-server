@@ -14,13 +14,13 @@ class RubyInitScript
 
   def default_options
     {
-      :name => nil,
-      :erb_path => File.dirname(File.realpath(__FILE__)) + '/ruby_init_script/initscript.erb',
-      :rails_env => 'production',
-      :working_dir => ::Rails::root,
-      :executable_path => nil,
-      :short_description => nil,
-      :user => 'root'
+      name: nil,
+      erb_path: File.dirname(File.realpath(__FILE__)) + '/ruby_init_script/initscript.erb',
+      rails_env: 'production',
+      working_dir: ::Rails::root,
+      executable_path: nil,
+      short_description: nil,
+      user: 'root'
     }
   end
 

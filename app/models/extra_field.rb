@@ -54,7 +54,7 @@ module ExtraField
   attr_reader :value_class
 
   def values
-    value_class.where(:kind => kind)
+    value_class.where(kind: kind)
   end
 
   def kind
@@ -63,9 +63,9 @@ module ExtraField
 
   def default_options
     {
-      :hidden => false,
-      :disabled => false,
-      :field_type => :text
+      hidden: false,
+      disabled: false,
+      field_type: :text
     }
   end
 
@@ -110,16 +110,16 @@ private
       end
 
       def field(options)
-        @fields << @cls.new({:group => @group}.merge(options))
+        @fields << @cls.new({group: @group}.merge(options))
       end
 
       def html(text, options = {})
         @html_count += 1
         @fields << @cls.new({
-          :name => "html#{@html_count}",
-          :group => @group,
-          :field_type => :html,
-          :label => text
+          name: "html#{@html_count}",
+          group: @group,
+          field_type: :html,
+          label: text
         }.merge(options))
       end
     end

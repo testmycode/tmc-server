@@ -4,18 +4,18 @@ class ParticipantsController < ApplicationController
   skip_authorization_check
   before_filter :check_access
 
-  add_breadcrumb 'Participants', :participants_path, :only => [:index, :show], :if => lambda { current_user.administrator? }
+  add_breadcrumb 'Participants', :participants_path, only: [:index, :show], if: lambda { current_user.administrator? }
 
   def index
     @ordinary_fields = ['username', 'email']
     @extra_fields = UserField.all
     valid_fields = @ordinary_fields + @extra_fields.map(&:name) + ['include_administrators']
 
-    @filter_params = params_starting_with('filter_', valid_fields, :remove_prefix => true)
-    @raw_filter_params = params_starting_with('filter_', valid_fields, :remove_prefix => false)
+    @filter_params = params_starting_with('filter_', valid_fields, remove_prefix: true)
+    @raw_filter_params = params_starting_with('filter_', valid_fields, remove_prefix: false)
 
-    @column_params = params_starting_with('column_', valid_fields, :remove_prefix => true)
-    @raw_column_params = params_starting_with('column_', valid_fields, :remove_prefix => false)
+    @column_params = params_starting_with('column_', valid_fields, remove_prefix: true)
+    @raw_column_params = params_starting_with('column_', valid_fields, remove_prefix: false)
     @visible_columns =
       if @column_params.empty?
         @ordinary_fields + @extra_fields.select(&:show_in_participant_list?).map(&:name)
@@ -40,10 +40,10 @@ class ParticipantsController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render :json => index_json_data
+        render json: index_json_data
       end
       format.csv do
-        render_csv(:text => index_csv, :filename => 'participants.csv')
+        render_csv(text: index_csv, filename: 'participants.csv')
       end
     end
   end
@@ -95,7 +95,7 @@ private
   def index_json_data
     result = []
     @participants.each do |user|
-      record = { :id => user.id, :username => user.login, :email => user.email }
+      record = { id: user.id, username: user.login, email: user.email }
       @extra_fields.each do |field|
         if @visible_columns.include?(field.name)
           record[field.name] = user.field_ruby_value(field)
@@ -106,8 +106,8 @@ private
         record[:groups] = {}
         for group, group_data in @group_completion
           record[:groups][group] = {
-            :points => group_data[:points_by_user][user.id] || 0,
-            :total => group_data[:available_points]
+            points: group_data[:points_by_user][user.id] || 0,
+            total: group_data[:available_points]
           }
         end
       end
@@ -116,13 +116,13 @@ private
     end
 
     {
-      :api_version => ApiVersion::API_VERSION,
-      :participants => result
+      api_version: ApiVersion::API_VERSION,
+      participants: result
     }
   end
 
   def index_csv
-    PortableCSV.generate(:force_quotes => true) do |csv|
+    PortableCSV.generate(force_quotes: true) do |csv|
       title_row = (@ordinary_fields + @extra_fields.map(&:name)).select {|f| @visible_columns.include?(f) }.map(&:humanize)
 
       if @group_completion

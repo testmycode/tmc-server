@@ -1,14 +1,14 @@
 require 'spec_helper'
 require 'cancan/matchers'
 
-describe FeedbackAnswersController, :type => :controller do
+describe FeedbackAnswersController, type: :controller do
   before :each do
     @exercise = FactoryGirl.create(:exercise)
     @course = @exercise.course
     @user = FactoryGirl.create(:user)
-    @submission = FactoryGirl.create(:submission, :course => @course, :exercise => @exercise, :user => @user)
-    @q1 = FactoryGirl.create(:feedback_question, :kind => 'text', :course => @course)
-    @q2 = FactoryGirl.create(:feedback_question, :kind => 'intrange[1..5]', :course => @course)
+    @submission = FactoryGirl.create(:submission, course: @course, exercise: @exercise, user: @user)
+    @q1 = FactoryGirl.create(:feedback_question, kind: 'text', course: @course)
+    @q2 = FactoryGirl.create(:feedback_question, kind: 'intrange[1..5]', course: @course)
 
     controller.current_user = @submission.user
   end
@@ -16,13 +16,13 @@ describe FeedbackAnswersController, :type => :controller do
   describe "#create" do
     before :each do
       @valid_params = {
-        :submission_id => @submission.id,
-        :answers => [
-          { :question_id => @q1.id, :answer => 'foobar' },
-          { :question_id => @q2.id, :answer => '3' }
+        submission_id: @submission.id,
+        answers: [
+          { question_id: @q1.id, answer: 'foobar' },
+          { question_id: @q2.id, answer: '3' }
         ],
-        :format => :json,
-        :api_version => ApiVersion::API_VERSION
+        format: :json,
+        api_version: ApiVersion::API_VERSION
       }
     end
 
@@ -53,7 +53,7 @@ describe FeedbackAnswersController, :type => :controller do
       bypass_rescue
 
       another_user = FactoryGirl.create(:user)
-      another_submission = FactoryGirl.create(:submission, :course => @course, :exercise => @exercise, :user => another_user)
+      another_submission = FactoryGirl.create(:submission, course: @course, exercise: @exercise, user: another_user)
       params = @valid_params.clone
       params[:submission_id] = another_submission.id
 
@@ -63,11 +63,11 @@ describe FeedbackAnswersController, :type => :controller do
 
       answer_records = answer_params.map do |answer_hash|
         FeedbackAnswer.new({
-          :submission => @submission,
-          :course_id => @submission.course_id,
-          :exercise_name => @submission.exercise_name,
-          :feedback_question_id => answer_hash[:question_id],
-         :answer => answer_hash[:answer]
+          submission: @submission,
+          course_id: @submission.course_id,
+          exercise_name: @submission.exercise_name,
+          feedback_question_id: answer_hash[:question_id],
+         answer: answer_hash[:answer]
        })
       end
 

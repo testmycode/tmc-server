@@ -2,7 +2,7 @@ require 'natsort'
 # Shows the points summary table and exercise group-specific tables.
 class PointsController < ApplicationController
   include PointsHelper
-  skip_authorization_check :except => :refresh_gdocs
+  skip_authorization_check except: :refresh_gdocs
 
   def index
     @course = Course.find(params[:course_id])
@@ -17,9 +17,9 @@ class PointsController < ApplicationController
     respond_to do |format|
       format.html
       format.csv do
-        render_csv(:filename => "#{@course.name}_points.csv")
+        render_csv(filename: "#{@course.name}_points.csv")
       end
-      format.json { render :json =>  @summary }
+      format.json { render json: @summary }
     end
   end
 
@@ -56,7 +56,7 @@ class PointsController < ApplicationController
           api_version: ApiVersion::API_VERSION,
           users_to_points: @users_to_points
         }
-        render :json => output
+        render json: output
       end
     end
   end
@@ -77,20 +77,20 @@ class PointsController < ApplicationController
     end
 
     include_admins = current_user.administrator?
-    users = User.select('login, id, administrator').where(:login => per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
-    users = users.where(:administrator => false) unless include_admins
+    users = User.select('login, id, administrator').where(login: per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
+    users = users.where(administrator: false) unless include_admins
 
     {
-      :sheets => sheets.map{|sheet| {
-        :name => sheet,
-        :total_awarded => AwardedPoint.course_sheet_points(course, sheet, include_admins).length,
-        :total_available => AvailablePoint.course_sheet_points(course, sheet).length
+      sheets: sheets.map{|sheet| {
+        name: sheet,
+        total_awarded: AwardedPoint.course_sheet_points(course, sheet, include_admins).length,
+        total_available: AvailablePoint.course_sheet_points(course, sheet).length
       }},
-      :total_awarded => AwardedPoint.course_points(course, include_admins).length,
-      :total_available => AvailablePoint.course_points_of_exercises(course, visible_exercises).length,
-      :awarded_for_user_and_sheet => per_user_and_sheet,
-      :total_for_user => user_totals,
-      :users => users
+      total_awarded: AwardedPoint.course_points(course, include_admins).length,
+      total_available: AvailablePoint.course_points_of_exercises(course, visible_exercises).length,
+      awarded_for_user_and_sheet: per_user_and_sheet,
+      total_for_user: user_totals,
+      users: users
     }
   end
 

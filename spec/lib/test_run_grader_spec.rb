@@ -4,9 +4,9 @@ describe TestRunGrader do
   include GitTestActions
   # TODO: ad c testcase?
   before :each do
-    @submission = FactoryGirl.create(:submission, :processed => false)
+    @submission = FactoryGirl.create(:submission, processed: false)
     ['1.1', '1.2'].each do |name|
-      FactoryGirl.create(:available_point, :exercise_id => @submission.exercise.id, :name => name)
+      FactoryGirl.create(:available_point, exercise_id: @submission.exercise.id, name: name)
     end
   end
 
@@ -67,16 +67,16 @@ describe TestRunGrader do
   it "should award points for which all required tests passed" do
     TestRunGrader.grade_results(@submission, half_successful_results)
 
-    points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+    points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
     expect(points).to include('1.1')
     expect(points).not_to include('1.2')
 
     # Should not depend on result order, so let's try the same in reverse order
 
-    @submission = FactoryGirl.create(:submission, :processed => false)
+    @submission = FactoryGirl.create(:submission, processed: false)
     TestRunGrader.grade_results(@submission, half_successful_results.reverse)
 
-    points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+    points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
     expect(points).to include('1.1')
     expect(points).not_to include('1.2')
   end
@@ -91,10 +91,10 @@ describe TestRunGrader do
 
 
     @submission = FactoryGirl.create(:submission, {
-      :course => @submission.course,
-      :exercise => @submission.exercise,
-      :user => @submission.user,
-      :processed => false
+      course: @submission.course,
+      exercise: @submission.exercise,
+      user: @submission.user,
+      processed: false
     })
     TestRunGrader.grade_results(@submission, successful_results)
 
@@ -126,14 +126,14 @@ describe TestRunGrader do
     results[1]['status'] = 'PASSED'
 
     @submission = Submission.new(
-      :user => @submission.user,
-      :course => @submission.course,
-      :exercise => @submission.exercise
+      user: @submission.user,
+      course: @submission.course,
+      exercise: @submission.exercise
     )
 
     TestRunGrader.grade_results(@submission, results)
 
-    points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+    points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
     expect(points).to include('1.1')
     expect(points).to include('1.2')
   end
@@ -145,10 +145,10 @@ describe TestRunGrader do
 
     TestRunGrader.grade_results(@submission, half_successful_results)
     exercise.update_attribute(:name, 'another_name')
-    new_submission = FactoryGirl.create(:submission, :user => user, :exercise_name => exercise.name, :course => course, :processed => false)
+    new_submission = FactoryGirl.create(:submission, user: user, exercise_name: exercise.name, course: course, processed: false)
     TestRunGrader.grade_results(new_submission, successful_results)
 
-    points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+    points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
     expect(points).to include('1.1')
     expect(points).to include('1.2')
   end
@@ -210,17 +210,17 @@ describe TestRunGrader do
       @submission.validations = failing_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).not_to include('1.1')
       expect(points).not_to include('1.2')
 
       # Should not depend on result order, so let's try the same in reverse order
 
-      @submission = FactoryGirl.create(:submission, :processed => false)
+      @submission = FactoryGirl.create(:submission, processed: false)
       @submission.validations = failing_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results.reverse)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).not_to include('1.1')
       expect(points).not_to include('1.2')
     end
@@ -229,7 +229,7 @@ describe TestRunGrader do
       @submission.validations = no_failures_in_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).to include('1.1')
       expect(points).not_to include('1.2')
     end
@@ -238,7 +238,7 @@ describe TestRunGrader do
       @submission.validations = failures_but_no_fail.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).to include('1.1')
       expect(points).not_to include('1.2')
     end
@@ -247,7 +247,7 @@ describe TestRunGrader do
       @submission.validations = failures_but_no_strategy.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).to include('1.1')
       expect(points).not_to include('1.2')
     end
@@ -265,7 +265,7 @@ describe TestRunGrader do
       @submission.exercise.valgrind_strategy = 'fail'
       TestRunGrader.grade_results(@submission, half_successful_results)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).not_to include('1.1')
       expect(points).not_to include('1.2')
     end
@@ -275,7 +275,7 @@ describe TestRunGrader do
       @submission.exercise.valgrind_strategy = ''
       TestRunGrader.grade_results(@submission, half_successful_results)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).to include('1.1')
       expect(points).not_to include('1.2')
     end
@@ -291,13 +291,13 @@ describe TestRunGrader do
     it "should not award points that require review" do
       TestRunGrader.grade_results(@submission, successful_results)
 
-      points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
+      points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).not_to include('1.1')
       expect(points).to include('1.2')
     end
 
     it "should preserve old review points" do
-      AwardedPoint.create!(:course_id => @submission.course_id, :user_id => @submission.user_id, :name => '1.1')
+      AwardedPoint.create!(course_id: @submission.course_id, user_id: @submission.user_id, name: '1.1')
       @submission.points = '1.1'
       TestRunGrader.grade_results(@submission, successful_results)
       expect(@submission.points_list).to include('1.1')
@@ -311,23 +311,23 @@ describe TestRunGrader do
 
     it "should unflag all previous submissions to the same exercise" do
       old_sub = Submission.create!(
-        :user => @submission.user,
-        :course => @submission.course,
-        :exercise => @submission.exercise,
-        :requires_review => true
+        user: @submission.user,
+        course: @submission.course,
+        exercise: @submission.exercise,
+        requires_review: true
       )
 
       other_exercise_sub = Submission.create!(
-        :user => @submission.user,
-        :course => @submission.course,
-        :exercise => FactoryGirl.create(:exercise, :course => @submission.course),
-        :requires_review => true
+        user: @submission.user,
+        course: @submission.course,
+        exercise: FactoryGirl.create(:exercise, course: @submission.course),
+        requires_review: true
       )
       other_user_sub = Submission.create!(
-        :user => FactoryGirl.create(:user),
-        :course => @submission.course,
-        :exercise => @submission.exercise,
-        :requires_review => true
+        user: FactoryGirl.create(:user),
+        course: @submission.course,
+        exercise: @submission.exercise,
+        requires_review: true
       )
 
       TestRunGrader.grade_results(@submission, successful_results)
@@ -340,7 +340,7 @@ describe TestRunGrader do
     end
 
     it "should not flag the submission as requiring review if the user has already scored the review points" do
-      AwardedPoint.create(:course => @submission.course, :user => @submission.user, :name => '1.1')
+      AwardedPoint.create(course: @submission.course, user: @submission.user, name: '1.1')
 
       TestRunGrader.grade_results(@submission, successful_results)
 

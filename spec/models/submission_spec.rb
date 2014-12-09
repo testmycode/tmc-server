@@ -4,13 +4,13 @@
 
 require 'spec_helper'
 
-describe Submission, :type => :model do
+describe Submission, type: :model do
   describe "validation" do
     before :each do
       @params = {
-        :course => mock_model(Course),
-        :exercise_name => 'MyExerciseThatDoesntNecessarilyExist',
-        :user => mock_model(User)
+        course: mock_model(Course),
+        exercise_name: 'MyExerciseThatDoesntNecessarilyExist',
+        user: mock_model(User)
       }
     end
 
@@ -36,7 +36,7 @@ describe Submission, :type => :model do
 
     it "should take exercise name from given exercise object" do
       @params.delete :exercise_name
-      @params[:exercise] = mock_model(Exercise, :name => 'MyExercise123')
+      @params[:exercise] = mock_model(Exercise, name: 'MyExercise123')
       sub = Submission.new(@params)
       expect(sub).to be_valid
       expect(sub.exercise_name).to eq('MyExercise123')
@@ -53,53 +53,53 @@ describe Submission, :type => :model do
 
   it "can summarize test cases" do
     submission = Submission.new
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :exception => '{"a": "b"}')
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo2()', :successful => true)
-    submission.test_case_runs << TestCaseRun.new(:test_case_name => 'Moo moo()', :message => 'you fail', :successful => false, :detailed_message => 'trace')
+    submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo()', message: 'you fail', successful: false, exception: '{"a": "b"}')
+    submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo2()', successful: true)
+    submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo()', message: 'you fail', successful: false, detailed_message: 'trace')
     expect(submission.test_case_records).to eq([
       {
-        :name => 'Moo moo()',
-        :successful => false,
-        :message => 'you fail',
-        :exception => {'a' => 'b'},
-        :detailed_message => nil
+        name: 'Moo moo()',
+        successful: false,
+        message: 'you fail',
+        exception: {'a' => 'b'},
+        detailed_message: nil
       },
       {
-        :name => 'Moo moo2()',
-        :successful => true,
-        :message => nil,
-        :exception => nil,
-        :detailed_message => nil
+        name: 'Moo moo2()',
+        successful: true,
+        message: nil,
+        exception: nil,
+        detailed_message: nil
       },
       {
-        :name => 'Moo moo()',
-        :successful => false,
-        :message => 'you fail',
-        :exception => nil,
-        :detailed_message => 'trace'
+        name: 'Moo moo()',
+        successful: false,
+        message: 'you fail',
+        exception: nil,
+        detailed_message: 'trace'
       }
     ])
   end
 
   it "can tell how many unprocessed submissions are in queue before itself" do
     t = Time.now
-    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
-    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds)
-    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds, :processing_priority => -2)
-    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
-    s = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 6.seconds)
-    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 5.seconds)
-    FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 4.seconds)
+    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 10.seconds)
+    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 9.seconds)
+    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 8.seconds, processing_priority: -2)
+    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 7.seconds)
+    s = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 6.seconds)
+    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 5.seconds)
+    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 4.seconds)
 
     expect(s.unprocessed_submissions_before_this).to eq(3)
   end
 
   it "orders unprocessed submissions by priority, then by last processing attempt time" do
     t = Time.now
-    s1 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 7.seconds)
-    s2 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 8.seconds)
-    s3 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 9.seconds, :processing_priority => 1)
-    s4 = FactoryGirl.create(:submission, :processed => false, :processing_tried_at => t - 10.seconds)
+    s1 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 7.seconds)
+    s2 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 8.seconds)
+    s3 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 9.seconds, processing_priority: 1)
+    s4 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 10.seconds)
 
     expected_order = [s3, s4, s2, s1]
 

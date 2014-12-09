@@ -14,7 +14,7 @@ class FeedbackQuestionsController < ApplicationController
   end
 
   def new
-    @question = FeedbackQuestion.new(:course => @course)
+    @question = FeedbackQuestion.new(course: @course)
     authorize! :create, @question
   end
 

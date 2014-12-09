@@ -1,6 +1,6 @@
 class AddAllTestsSuccessfulToSubmissions < ActiveRecord::Migration
   def up
-    add_column :submissions, :all_tests_passed, :boolean, :null => false, :default => false
+    add_column :submissions, :all_tests_passed, :boolean, null: false, default: false
     execute <<SQL
 UPDATE submissions sub
 SET all_tests_passed =

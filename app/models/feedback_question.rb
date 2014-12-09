@@ -2,11 +2,11 @@ class FeedbackQuestion < ActiveRecord::Base
   include Orderable
 
   belongs_to :course
-  has_many :feedback_answers, :dependent => :delete_all
+  has_many :feedback_answers, dependent: :delete_all
 
-  validates :course, :presence => true
-  validates :kind, :presence => true do validate_kind end
-  validates :question, :presence => true
+  validates :course, presence: true
+  validates :kind, presence: true do validate_kind end
+  validates :question, presence: true
 
   def title_or_question
     title || question
@@ -26,9 +26,9 @@ class FeedbackQuestion < ActiveRecord::Base
 
   def record_for_api
     {
-      :id => id,
-      :question => question,
-      :kind => kind
+      id: id,
+      question: question,
+      kind: kind
     }
   end
 

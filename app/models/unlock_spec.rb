@@ -61,11 +61,11 @@ private
       points = $1.split(' ').map(&:strip).reject(&:empty?)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
-        AwardedPoint.where(:user_id => u.id, :course_id => course.id, :name => points).count == points.count
+        AwardedPoint.where(user_id: u.id, course_id: course.id, name: points).count == points.count
       end
       @universal_descriptions << "the following points: #{points.join('  ')}"
       @describers << lambda do |u|
-        awarded = AwardedPoint.where(:user_id => u.id, :course_id => course.id, :name => points).map(&:name)
+        awarded = AwardedPoint.where(user_id: u.id, course_id: course.id, name: points).map(&:name)
         "get the following points: #{(points - awarded).join('  ')}"
       end
 

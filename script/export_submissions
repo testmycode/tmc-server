@@ -23,7 +23,7 @@ if ARGV[1]
     puts "Couldn't find course: #{ARGV[1]}"
     exit(false)
   end
-  query = query.where(:course_id => course.id)
+  query = query.where(course_id: course.id)
 end
 
 total = query.count

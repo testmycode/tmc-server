@@ -11,7 +11,7 @@ class ExerciseStatusController < ApplicationController
 
     return respond_access_denied unless course.visible_to?(Guest.new) || current_user.administrator?
 
-    user_subs = user.submissions.where(:course_id => course.id).to_a.group_by(&:exercise_name)
+    user_subs = user.submissions.where(course_id: course.id).to_a.group_by(&:exercise_name)
     user_subs.default = []
 
     results = {}

@@ -14,23 +14,23 @@ class Submission < ActiveRecord::Base
         # Used when doing submissions.include(:exercises)
         Exercise.joins(:submission)
       end
-    }, :foreign_key => :exercise_name, :primary_key => :name
+    }, foreign_key: :exercise_name, primary_key: :name
 
-  has_one :submission_data, :dependent => :delete
+  has_one :submission_data, dependent: :delete
   after_save { submission_data.save! if submission_data }
 
-  has_many :test_case_runs, -> { order(:id) }, :dependent => :delete_all
-  has_many :reviews, -> { order(:created_at) }, :dependent => :delete_all do
+  has_many :test_case_runs, -> { order(:id) }, dependent: :delete_all
+  has_many :reviews, -> { order(:created_at) }, dependent: :delete_all do
     def latest
       self.order('created_at DESC').limit(1).first
     end
   end
-  has_many :awarded_points, :dependent => :nullify
-  has_many :feedback_answers, :dependent => :nullify
+  has_many :awarded_points, dependent: :nullify
+  has_many :feedback_answers, dependent: :nullify
 
-  validates :user, :presence => true
-  validates :course, :presence => true
-  validates :exercise_name, :presence => true
+  validates :user, presence: true
+  validates :course, presence: true
+  validates :exercise_name, presence: true
   before_create :set_processing_attempts_started_at
   before_create :set_paste_key_if_paste_available
 
@@ -49,7 +49,7 @@ class Submission < ActiveRecord::Base
   end
 
   def self.unprocessed
-    self.where(:processed => false).
+    self.where(processed: false).
       order('processing_priority DESC, processing_tried_at ASC, id ASC')
   end
 
@@ -118,9 +118,9 @@ class Submission < ActiveRecord::Base
   # for the same course and exercise
   def of_same_kind
     Submission.where(
-      :course_id => self.course_id,
-      :exercise_name => self.exercise_name,
-      :user_id => self.user_id
+      course_id: self.course_id,
+      exercise_name: self.exercise_name,
+      user_id: self.user_id
     )
   end
 
@@ -156,11 +156,11 @@ class Submission < ActiveRecord::Base
   def test_case_records
     test_case_runs.map do |tcr|
       {
-        :name => tcr.test_case_name,
-        :successful => tcr.successful?,
-        :message => tcr.message,
-        :exception => if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
-        :detailed_message => if tcr.detailed_message then tcr.detailed_message else nil end
+        name: tcr.test_case_name,
+        successful: tcr.successful?,
+        message: tcr.message,
+        exception: if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
+        detailed_message: if tcr.detailed_message then tcr.detailed_message else nil end
       }
     end
   end

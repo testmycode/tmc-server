@@ -5,7 +5,7 @@ class Exercise < ActiveRecord::Base
 
   belongs_to :course
 
-  has_many :available_points, :dependent => :delete_all
+  has_many :available_points, dependent: :delete_all
 
   has_many :submissions,
     -> (exercise) {
@@ -16,15 +16,15 @@ class Exercise < ActiveRecord::Base
         # Used when doing exercises.includes(:submissions)
         Submission.joins(:exercise)
       end
-    }, :foreign_key => :exercise_name, :primary_key => :name
+    }, foreign_key: :exercise_name, primary_key: :name
 
-  has_many :feedback_answers, -> (exercise) { where(course: exercise.course) }, :foreign_key => :exercise_name, :primary_key => :name
-  has_many :unlocks, -> (exercise) { where(course: exercise.course) }, :foreign_key => :exercise_name, :primary_key => :name
+  has_many :feedback_answers, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
+  has_many :unlocks, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
 
-  validates :gdocs_sheet, :format => { :without => /\A(MASTER|PUBLIC)\z/ }
+  validates :gdocs_sheet, format: { without: /\A(MASTER|PUBLIC)\z/ }
 
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
-    where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
+    where(course_id: course.id, gdocs_sheet: gdocs_sheet)
   }
 
   def relative_path
@@ -88,7 +88,7 @@ class Exercise < ActiveRecord::Base
 
   def submissions_by(user)
     @submissions_by ||= {}
-    @submissions_by[user.id] ||= submissions.where(:user_id => user.id).to_a
+    @submissions_by[user.id] ||= submissions.where(user_id: user.id).to_a
   end
 
   def reload
@@ -225,7 +225,7 @@ class Exercise < ActiveRecord::Base
 
   def time_unlocked_for(user)
     UncomputedUnlock.resolve(course, user)
-    self.unlocks.where(:user_id => user).where('valid_after IS NULL OR valid_after < ?', Time.now).first.andand.created_at
+    self.unlocks.where(user_id: user).where('valid_after IS NULL OR valid_after < ?', Time.now).first.andand.created_at
   end
 
   def unlocked_for?(user)
@@ -237,7 +237,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def solution_visible_after=(new_value)
-    super(DateAndTimeUtils.to_time(new_value, :prefer_end_of_day => true))
+    super(DateAndTimeUtils.to_time(new_value, prefer_end_of_day: true))
   end
 
   def options=(new_options)

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe RemoteSandboxForTesting, :type => :request, :integration => true do
+describe RemoteSandboxForTesting, type: :request, integration: true do
   specify "running maven tests" do
-    setup = SubmissionTestSetup.new(:exercise_name => 'MavenExercise')
+    setup = SubmissionTestSetup.new(exercise_name: 'MavenExercise')
     submission = setup.submission
 
     setup.exercise_project.solve_sub

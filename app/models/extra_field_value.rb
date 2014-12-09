@@ -5,7 +5,7 @@ module ExtraFieldValue
   extend ActiveSupport::Concern
 
   included do
-    validates :field_name, :uniqueness => {:scope => :user_id}
+    validates :field_name, uniqueness: {scope: :user_id}
   end
 
   def field

@@ -18,13 +18,13 @@ describe DateAndTimeUtils do
     end
     
     it "should can convert dates to local end of day time" do
-      t = DateAndTimeUtils.to_time("15.07.2011", :prefer_end_of_day => true)
+      t = DateAndTimeUtils.to_time("15.07.2011", prefer_end_of_day: true)
       expect(t).to be_a(Time)
       expect(t.day).to eq(15)
       expect(t.hour).to eq(23)
       expect(t.min).to eq(59)
       
-      t = DateAndTimeUtils.to_time("15.07.2011 13:14", :prefer_end_of_day => true)
+      t = DateAndTimeUtils.to_time("15.07.2011 13:14", prefer_end_of_day: true)
       expect(t.hour).to eq(13)
       expect(t.min).to eq(14)
     end

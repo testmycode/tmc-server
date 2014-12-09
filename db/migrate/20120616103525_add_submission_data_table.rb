@@ -1,13 +1,13 @@
 class AddSubmissionDataTable < ActiveRecord::Migration
   def up
-    create_table :submission_data, :id => false do |t|
-      t.integer :submission_id, :null => false
+    create_table :submission_data, id: false do |t|
+      t.integer :submission_id, null: false
       t.binary :return_file
       t.binary :stdout_compressed
       t.binary :stderr_compressed
     end
     execute 'ALTER TABLE submission_data ADD PRIMARY KEY (submission_id)'
-    add_foreign_key :submission_data, :submissions, :dependent => :delete
+    add_foreign_key :submission_data, :submissions, dependent: :delete
     execute <<EOS
       INSERT INTO submission_data (submission_id, return_file, stdout_compressed, stderr_compressed)
       SELECT id, return_file, stdout_compressed, stderr_compressed FROM submissions

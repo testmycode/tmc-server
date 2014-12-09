@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe RemoteSandboxForTesting, :type => :request, :integration => true do
+describe RemoteSandboxForTesting, type: :request, integration: true do
   include GitTestActions
 
   def make_setup(exercise_name)
-    @setup = SubmissionTestSetup.new(:exercise_name => exercise_name)
+    @setup = SubmissionTestSetup.new(exercise_name: exercise_name)
     @course = @setup.course
     @repo = @setup.repo
     @exercise_project = @setup.exercise_project
@@ -52,7 +52,7 @@ describe RemoteSandboxForTesting, :type => :request, :integration => true do
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
       
-      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('justsub')
       expect(points).not_to include('addsub')
       expect(points).not_to include('mul')
@@ -64,7 +64,7 @@ describe RemoteSandboxForTesting, :type => :request, :integration => true do
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
       
-      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('simpletest-all')
       expect(points).not_to include('both-test-files')
     end
@@ -74,7 +74,7 @@ describe RemoteSandboxForTesting, :type => :request, :integration => true do
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
       
-      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('simpletest-all')
       expect(points).to include('both-test-files')
     end
@@ -88,7 +88,7 @@ describe RemoteSandboxForTesting, :type => :request, :integration => true do
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
       
-      points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
+      points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('justsub')
       expect(points).to include('addsub')
       expect(points).to include('simpletest-all')

@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe "The system (used by an instructor for administration)", :type => :request, :integration => true do
+describe "The system (used by an instructor for administration)", type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
     visit '/'
-    @user = FactoryGirl.create(:admin, :password => 'xooxer')
+    @user = FactoryGirl.create(:admin, password: 'xooxer')
     log_in_as(@user.login, 'xooxer')
 
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
@@ -13,15 +13,15 @@ describe "The system (used by an instructor for administration)", :type => :requ
   end
 
   it "should allow using a git repo as a source for a new course" do
-    create_new_course(:name => 'mycourse', :source_backend => 'git', :source_url => @repo_path)
+    create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path)
   end
 
   it "should show all exercises pushed to the course's git repo" do
-    create_new_course(:name => 'mycourse', :source_backend => 'git', :source_url => @repo_path)
+    create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path)
     course = Course.find_by_name!('mycourse')
 
     repo = clone_course_repo(course)
-    repo.copy_simple_exercise('MyExercise', :deadline => (Date.today - 1.day).to_s)
+    repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)
     repo.add_commit_push
 
     manually_refresh_course('mycourse')
@@ -32,7 +32,7 @@ describe "The system (used by an instructor for administration)", :type => :requ
   end
 
   it "should allow rerunning individual submissions" do
-    setup = SubmissionTestSetup.new(:solve => true, :save => true)
+    setup = SubmissionTestSetup.new(solve: true, save: true)
     setup.make_zip
     setup.submission.processed = true
     setup.submission.pretest_error = "some funny error"
