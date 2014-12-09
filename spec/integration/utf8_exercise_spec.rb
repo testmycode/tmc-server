@@ -14,7 +14,7 @@ describe "The system, receiving submissions with UTF-8 special characters", :typ
 
     @course.refresh
 
-    @user = Factory.create(:user, :password => 'xooxer')
+    @user = FactoryGirl.create(:user, :password => 'xooxer')
 
     visit '/'
     log_in_as(@user.login, 'xooxer')

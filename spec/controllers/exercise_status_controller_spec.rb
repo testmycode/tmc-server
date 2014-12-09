@@ -2,38 +2,38 @@ require 'spec_helper'
 
 describe ExerciseStatusController, :type => :controller do
   before :each do
-    @course = Factory.create(:course)
-    @exercise = Factory.create(:exercise, :course => @course)
-    @exercise2 = Factory.create(:exercise, :course => @course)
-    @exercise3 = Factory.create(:exercise, :course => @course)
+    @course = FactoryGirl.create(:course)
+    @exercise = FactoryGirl.create(:exercise, :course => @course)
+    @exercise2 = FactoryGirl.create(:exercise, :course => @course)
+    @exercise3 = FactoryGirl.create(:exercise, :course => @course)
   end
 
   describe "GET show" do
     describe "when user has participated in a course" do
       before :each do
-        @user = Factory.create(:user)
-        @submission = Factory.create(:submission,
+        @user = FactoryGirl.create(:user)
+        @submission = FactoryGirl.create(:submission,
                                      :course => @course,
                                      :user => @user,
                                      :exercise => @exercise,
                                      :all_tests_passed => true)
-        @available_point = Factory.create(:available_point,
+        @available_point = FactoryGirl.create(:available_point,
                                           :exercise => @exercise)
 
-        @awarded_point = Factory.create(:awarded_point,
+        @awarded_point = FactoryGirl.create(:awarded_point,
                                         :course => @course,
                                         :name => @available_point.name,
                                         :submission => @submission,
                                         :user => @user)
 
-        @submission2 = Factory.create(:submission,
+        @submission2 = FactoryGirl.create(:submission,
                                      :course => @course,
                                      :user => @user,
                                      :exercise => @exercise2,
                                      :all_tests_passed => false)
-        @available_point2 = Factory.create(:available_point,
+        @available_point2 = FactoryGirl.create(:available_point,
                                           :exercise => @exercise2)
-        @available_point22 = Factory.create(:available_point,
+        @available_point22 = FactoryGirl.create(:available_point,
                                           :exercise => @exercise2)
 
       end

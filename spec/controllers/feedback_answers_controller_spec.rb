@@ -3,12 +3,12 @@ require 'cancan/matchers'
 
 describe FeedbackAnswersController, :type => :controller do
   before :each do
-    @exercise = Factory.create(:exercise)
+    @exercise = FactoryGirl.create(:exercise)
     @course = @exercise.course
-    @user = Factory.create(:user)
-    @submission = Factory.create(:submission, :course => @course, :exercise => @exercise, :user => @user)
-    @q1 = Factory.create(:feedback_question, :kind => 'text', :course => @course)
-    @q2 = Factory.create(:feedback_question, :kind => 'intrange[1..5]', :course => @course)
+    @user = FactoryGirl.create(:user)
+    @submission = FactoryGirl.create(:submission, :course => @course, :exercise => @exercise, :user => @user)
+    @q1 = FactoryGirl.create(:feedback_question, :kind => 'text', :course => @course)
+    @q2 = FactoryGirl.create(:feedback_question, :kind => 'intrange[1..5]', :course => @course)
 
     controller.current_user = @submission.user
   end
@@ -52,8 +52,8 @@ describe FeedbackAnswersController, :type => :controller do
     it "should not allow answering on behalf of another user" do
       bypass_rescue
 
-      another_user = Factory.create(:user)
-      another_submission = Factory.create(:submission, :course => @course, :exercise => @exercise, :user => another_user)
+      another_user = FactoryGirl.create(:user)
+      another_submission = FactoryGirl.create(:submission, :course => @course, :exercise => @exercise, :user => another_user)
       params = @valid_params.clone
       params[:submission_id] = another_submission.id
 

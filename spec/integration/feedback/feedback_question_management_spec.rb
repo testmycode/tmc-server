@@ -4,7 +4,7 @@ describe "Feedback question management", :type => :request, :integration => true
   include IntegrationTestActions
 
   before :each do
-    @user = Factory.create(:admin, :password => 'xooxer')
+    @user = FactoryGirl.create(:admin, :password => 'xooxer')
     visit '/'
     log_in_as(@user.login, 'xooxer')
 

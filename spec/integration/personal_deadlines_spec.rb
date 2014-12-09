@@ -17,7 +17,7 @@ describe "Personal deadlines", :type => :request, :integration => true do
 
     @course.refresh
 
-    @user = Factory.create(:user, :password => 'xooxer')
+    @user = FactoryGirl.create(:user, :password => 'xooxer')
 
     visit '/'
     log_in_as(@user.login, @user.password)

@@ -14,7 +14,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
     @course.refresh
 
-    @user = Factory.create(:user, :password => 'xooxer')
+    @user = FactoryGirl.create(:user, :password => 'xooxer')
     @ability = Ability.new(@user)
 
     visit '/'
@@ -175,7 +175,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
   end
 
   it "should not count submissions made by non legitimate_students in submission counts" do
-    @fake_user = Factory.create(:admin, :login => "uuseri", :password => 'xooxer', legitimate_student: false)
+    @fake_user = FactoryGirl.create(:admin, :login => "uuseri", :password => 'xooxer', legitimate_student: false)
     log_out
     visit '/'
     log_in_as(@fake_user.login, 'xooxer')
@@ -208,7 +208,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
     log_out
     expect(page).not_to have_content('src/SimpleStuff.java')
     expect(page).to have_content('Goodbye')
-    @other_user = Factory.create(:user, :login => "uuseri", :password => 'xooxer')
+    @other_user = FactoryGirl.create(:user, :login => "uuseri", :password => 'xooxer')
 
     visit '/'
     log_in_as(@other_user.login, 'xooxer')
@@ -322,7 +322,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
       log_out
 
-      @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
+      @other_user = FactoryGirl.create(:user,:login => "uuseri", :password => 'xooxer')
 
       log_in_as(@other_user.login, 'xooxer')
 
@@ -346,7 +346,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       expect(page).to have_content('src/SimpleStuff.java')
 
       log_out
-      @other_user = Factory.create(:user,:login => "uuseri2", :password => 'xooxer2')
+      @other_user = FactoryGirl.create(:user,:login => "uuseri2", :password => 'xooxer2')
       log_in_as(@other_user.login, 'xooxer2')
 
       expect(page).not_to have_content('src/SimpleStuff.java')
@@ -385,7 +385,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
 
       log_out
 
-      @other_user = Factory.create(:user,:login => "uuseri", :password => 'xooxer')
+      @other_user = FactoryGirl.create(:user,:login => "uuseri", :password => 'xooxer')
 
       log_in_as(@other_user.login, 'xooxer')
 
@@ -416,7 +416,7 @@ describe "The system (used by a student)", :type => :request, :integration => tr
       expect(page).to have_content('Access denied')
 
       log_out
-      @other_user = Factory.create(:user,:login => "uuseri2", :password => 'xooxer2')
+      @other_user = FactoryGirl.create(:user,:login => "uuseri2", :password => 'xooxer2')
       log_in_as(@other_user.login, 'xooxer2')
 
       expect(page).not_to have_content('src/SimpleStuff.java')

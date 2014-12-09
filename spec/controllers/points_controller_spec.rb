@@ -4,26 +4,26 @@ require 'spec_helper'
 describe PointsController, :type => :controller do
   render_views
   before :each do
-    @course = Factory.create(:course)
+    @course = FactoryGirl.create(:course)
     @sheetname = "testsheet"
-    @exercise = Factory.create(:exercise, :course => @course,
+    @exercise = FactoryGirl.create(:exercise, :course => @course,
                                :gdocs_sheet => @sheetname)
-    @admin = Factory.create(:admin)
+    @admin = FactoryGirl.create(:admin)
   end
 
   describe "GET show" do
     describe "when user has participated in a course" do
       before :each do
         controller.current_user = @admin
-        @user = Factory.create(:user)
-        @submission = Factory.create(:submission,
+        @user = FactoryGirl.create(:user)
+        @submission = FactoryGirl.create(:submission,
                                      :course => @course,
                                      :user => @user,
                                      :exercise => @exercise)
-        @available_point = Factory.create(:available_point,
+        @available_point = FactoryGirl.create(:available_point,
                                          :exercise => @exercise)
 
-        @awarded_point = Factory.create(:awarded_point,
+        @awarded_point = FactoryGirl.create(:awarded_point,
                                         :course => @course,
                                         :name => @available_point.name,
                                         :submission => @submission,

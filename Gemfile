@@ -28,7 +28,7 @@ group :development, :test do
   gem 'rspec-core', '~> 3.1.0'
   gem 'rspec-rails', '~> 3.1.0'
   gem 'rspec-activemodel-mocks', '~> 1.0.0'
-  gem 'factory_girl_rails', '~> 1.1.0'
+  gem 'factory_girl_rails', '~> 4.5.0'
   gem 'capybara', '~> 2.4.0'
   gem 'poltergeist', '~> 1.5.0'
   #gem 'selenium-webdriver', '~> 2.44.0'

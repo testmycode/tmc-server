@@ -3,24 +3,24 @@ require 'spec_helper'
 describe CoursesController, :type => :controller do
 
   before(:each) do
-    @user = Factory.create(:user)
+    @user = FactoryGirl.create(:user)
   end
-  
+
   describe "GET index" do
     it "shows visible courses in order by name, split into ongoing and expired" do
-      controller.current_user = Factory.create(:admin)
+      controller.current_user = FactoryGirl.create(:admin)
       @courses = [
-        Factory.create(:course, :name => 'SomeTestCourse'),
-        Factory.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week),
-        Factory.create(:course, :name => 'AnotherTestCourse')
+        FactoryGirl.create(:course, :name => 'SomeTestCourse'),
+        FactoryGirl.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week),
+        FactoryGirl.create(:course, :name => 'AnotherTestCourse')
       ]
-      
+
       get :index
-      
+
       expect(assigns(:ongoing_courses).map(&:name)).to eq(['AnotherTestCourse', 'SomeTestCourse'])
       expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
     end
-    
+
     describe "in JSON format" do
       def get_index_json(options = {})
         options = {
@@ -31,72 +31,72 @@ describe CoursesController, :type => :controller do
         get :index, options
         JSON.parse(response.body)
       end
-      
+
       it "renders all non-hidden courses in order by name" do
-        Factory.create(:course, :name => 'Course1')
-        Factory.create(:course, :name => 'Course2', :hide_after => Time.now + 1.week)
-        Factory.create(:course, :name => 'Course3')
-        Factory.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week)
-        Factory.create(:course, :name => 'HiddenCourse', :hidden => true)
-        
+        FactoryGirl.create(:course, :name => 'Course1')
+        FactoryGirl.create(:course, :name => 'Course2', :hide_after => Time.now + 1.week)
+        FactoryGirl.create(:course, :name => 'Course3')
+        FactoryGirl.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week)
+        FactoryGirl.create(:course, :name => 'HiddenCourse', :hidden => true)
+
         result = get_index_json
-        
+
         expect(result['courses'].map {|c| c['name'] }).to eq(['Course1', 'Course2', 'Course3'])
       end
     end
   end
-  
-  
+
+
   describe "GET show" do
     before :each do
-      @course = Factory.create(:course)
+      @course = FactoryGirl.create(:course)
     end
 
     describe "for administrators" do
       before :each do
-        @admin = Factory.create(:admin)
+        @admin = FactoryGirl.create(:admin)
         controller.current_user = @admin
       end
-    
+
       it "should show everyone's submissions" do
-        user1 = Factory.create(:user)
-        user2 = Factory.create(:user)
-        sub1 = Factory.create(:submission, :user => user1, :course => @course)
-        sub2 = Factory.create(:submission, :user => user2, :course => @course)
-        
+        user1 = FactoryGirl.create(:user)
+        user2 = FactoryGirl.create(:user)
+        sub1 = FactoryGirl.create(:submission, :user => user1, :course => @course)
+        sub2 = FactoryGirl.create(:submission, :user => user2, :course => @course)
+
         get :show, :id => @course.id
-        
+
         expect(assigns['submissions']).to include(sub1)
         expect(assigns['submissions']).to include(sub2)
       end
     end
-    
+
     describe "for guests" do
       before :each do
         controller.current_user = Guest.new
       end
-      
+
       it "should show no submissions" do
-        Factory.create(:submission, :course => @course)
-        Factory.create(:submission, :course => @course)
-        
+        FactoryGirl.create(:submission, :course => @course)
+        FactoryGirl.create(:submission, :course => @course)
+
         get :show, :id => @course.id
-        
+
         expect(assigns['submissions']).to be_nil
       end
     end
-    
+
     describe "for regular users" do
       before :each do
         controller.current_user = @user
       end
       it "should show only the current user's submissions" do
-        other_user = Factory.create(:user)
-        my_sub = Factory.create(:submission, :user => @user, :course => @course)
-        other_guys_sub = Factory.create(:submission, :user => other_user, :course => @course)
-        
+        other_user = FactoryGirl.create(:user)
+        my_sub = FactoryGirl.create(:submission, :user => @user, :course => @course)
+        other_guys_sub = FactoryGirl.create(:submission, :user => other_user, :course => @course)
+
         get :show, :id => @course.id
-        
+
         expect(assigns['submissions']).to include(my_sub)
         expect(assigns['submissions']).not_to include(other_guys_sub)
       end
@@ -104,10 +104,10 @@ describe CoursesController, :type => :controller do
 
     describe "in JSON format" do
       before :each do
-        @course = Factory.create(:course, :name => 'Course1')
-        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise1', :course => @course)
-        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise2', :course => @course)
-        @course.exercises << Factory.create(:returnable_exercise, :name => 'Exercise3', :course => @course)
+        @course = FactoryGirl.create(:course, :name => 'Course1')
+        @course.exercises << FactoryGirl.create(:returnable_exercise, :name => 'Exercise1', :course => @course)
+        @course.exercises << FactoryGirl.create(:returnable_exercise, :name => 'Exercise2', :course => @course)
+        @course.exercises << FactoryGirl.create(:returnable_exercise, :name => 'Exercise3', :course => @course)
       end
 
       def get_show_json(options = {}, parse_json=true)
@@ -159,8 +159,8 @@ describe CoursesController, :type => :controller do
       end
 
       it "should tell for each exercise whether it has been attempted" do
-        sub = Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
-        Factory.create(:test_case_run, :submission => sub, :successful => false)
+        sub = FactoryGirl.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
+        FactoryGirl.create(:test_case_run, :submission => sub, :successful => false)
 
         result = get_show_json
 
@@ -170,7 +170,7 @@ describe CoursesController, :type => :controller do
       end
 
       it "should tell for each exercise whether it has been completed" do
-        Factory.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user, :all_tests_passed => true)
+        FactoryGirl.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user, :all_tests_passed => true)
 
         result = get_show_json
 
@@ -204,7 +204,7 @@ describe CoursesController, :type => :controller do
   describe "POST create" do
 
     before :each do
-      controller.current_user = Factory.create(:admin)
+      controller.current_user = FactoryGirl.create(:admin)
     end
 
     describe "with valid parameters" do

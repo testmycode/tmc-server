@@ -3,8 +3,8 @@ require 'exercise_completion_status_generator'
 
 describe ExerciseCompletionStatusGenerator, "completion status" do
   before do
-    @user = Factory.create(:user)
-    @course = Factory.create(:course)
+    @user = FactoryGirl.create(:user)
+    @course = FactoryGirl.create(:course)
     @ex1 = exercise("ex1", ["1.1", "1.2"])
     @ex2 = exercise("ex2", ["2"])
     @ex3 = exercise("ex3", ["3.1", "3.2", "3.3", "3.4"])
@@ -70,11 +70,11 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
 
 
   def submission(exercise, points = [])
-    Factory.create(:submission, :course_id => @course.id, :exercise_name => exercise.name, :user_id => @user.id, :points => points)
+    FactoryGirl.create(:submission, :course_id => @course.id, :exercise_name => exercise.name, :user_id => @user.id, :points => points)
   end
 
   def exercise(name, points)
-    Factory.create(:exercise, :course_id => @course.id, :name => name, :available_points => point_objects(points))
+    FactoryGirl.create(:exercise, :course_id => @course.id, :name => name, :available_points => point_objects(points))
   end
 
   def point_objects(point_names)

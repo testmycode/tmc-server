@@ -6,12 +6,12 @@ describe "Notifications about new code reviews via HTTP push", :type => :request
   before :each do
     CometSupport.ensure_started!
 
-    @admin = Factory.create(:admin)
-    @user = Factory.create(:user)
-    @course = Factory.create(:course)
-    @exercise = Factory.create(:exercise, :course => @course)
-    @submission = Factory.create(:submission, :course => @course, :exercise => @exercise, :user => @user, :requests_review => true)
-    Factory.create(:submission_data, :submission => @submission)
+    @admin = FactoryGirl.create(:admin)
+    @user = FactoryGirl.create(:user)
+    @course = FactoryGirl.create(:course)
+    @exercise = FactoryGirl.create(:exercise, :course => @course)
+    @submission = FactoryGirl.create(:submission, :course => @course, :exercise => @exercise, :user => @user, :requests_review => true)
+    FactoryGirl.create(:submission_data, :submission => @submission)
 
     using_session(:user) do
       if Capybara.default_driver == :selenium

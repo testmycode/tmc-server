@@ -4,7 +4,7 @@ require 'cancan/matchers'
 describe FeedbackRepliesController, "#create", :type => :controller do
   let(:student_email) { "user@mydomain.com" }
   let(:reply_body) { "A reply to an feedback answer..." }
-  let(:answer) { Factory.create(:feedback_answer) }
+  let(:answer) { FactoryGirl.create(:feedback_answer) }
   let(:params) {
     {
       :email => student_email,
@@ -16,7 +16,7 @@ describe FeedbackRepliesController, "#create", :type => :controller do
   it "should not allow a non-admin user to send a reply" do
     bypass_rescue
 
-    @user = Factory.create(:user)
+    @user = FactoryGirl.create(:user)
     controller.current_user = @user
 
     ability = Ability.new(controller.current_user)
@@ -26,7 +26,7 @@ describe FeedbackRepliesController, "#create", :type => :controller do
   end
 
   describe "for an admin user " do
-    let(:admin){ Factory.create(:admin, :email => "admin@mydomain.com") }
+    let(:admin){ FactoryGirl.create(:admin, :email => "admin@mydomain.com") }
     let(:url){ 'http://url.where.we.arrived.com' }
     before do
       controller.current_user = admin

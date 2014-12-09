@@ -3,10 +3,10 @@ require 'spec_helper'
 describe Exercise, :type => :model do
   describe "unlocks and deadlines" do
     before :each do
-      @user = Factory.create(:user)
-      @course = Factory.create(:course)
-      @ex1 = Factory.create(:exercise, :course => @course, :name => 'ex1')
-      @ex2 = Factory.create(:exercise, :course => @course, :name => 'ex2')
+      @user = FactoryGirl.create(:user)
+      @course = FactoryGirl.create(:course)
+      @ex1 = FactoryGirl.create(:exercise, :course => @course, :name => 'ex1')
+      @ex2 = FactoryGirl.create(:exercise, :course => @course, :name => 'ex2')
       @points = [
         AvailablePoint.create!(:exercise_id => @ex1.id, :name => 'ap1'),
         AvailablePoint.create!(:exercise_id => @ex1.id, :name => 'ap2')

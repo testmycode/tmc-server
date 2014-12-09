@@ -7,9 +7,9 @@ describe GDocsExport, :gdocs => true do
     expect(@session).not_to be_nil
     @fixture1 = "0AnEpZul37faOdE1rc3lib0RLdjc5UXk2bk56a1lyWlE"
   end
-  
+
   before :each do
-    @course = Factory.create(:course)
+    @course = FactoryGirl.create(:course)
   end
 
   describe "finding stuff" do

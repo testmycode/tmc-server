@@ -13,9 +13,9 @@ describe "Paste JSON api", :type => :request , :integration => true do
 
     @course.refresh
 
-    @admin = Factory.create(:admin, :password => 'xooxer')
-    @user = Factory.create(:user, :login => 'user',  :password => 'xooxer')
-    @viewer = Factory.create(:user, :login => 'viewer', :password => 'xooxer')
+    @admin = FactoryGirl.create(:admin, :password => 'xooxer')
+    @user = FactoryGirl.create(:user, :login => 'user',  :password => 'xooxer')
+    @viewer = FactoryGirl.create(:user, :login => 'viewer', :password => 'xooxer')
 
   end
 

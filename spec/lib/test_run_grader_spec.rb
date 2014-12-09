@@ -4,9 +4,9 @@ describe TestRunGrader do
   include GitTestActions
   # TODO: ad c testcase?
   before :each do
-    @submission = Factory.create(:submission, :processed => false)
+    @submission = FactoryGirl.create(:submission, :processed => false)
     ['1.1', '1.2'].each do |name|
-      Factory.create(:available_point, :exercise_id => @submission.exercise.id, :name => name)
+      FactoryGirl.create(:available_point, :exercise_id => @submission.exercise.id, :name => name)
     end
   end
 
@@ -73,7 +73,7 @@ describe TestRunGrader do
 
     # Should not depend on result order, so let's try the same in reverse order
 
-    @submission = Factory.create(:submission, :processed => false)
+    @submission = FactoryGirl.create(:submission, :processed => false)
     TestRunGrader.grade_results(@submission, half_successful_results.reverse)
 
     points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
@@ -90,7 +90,7 @@ describe TestRunGrader do
     expect(@submission.points).to eq('1.1')
 
 
-    @submission = Factory.create(:submission, {
+    @submission = FactoryGirl.create(:submission, {
       :course => @submission.course,
       :exercise => @submission.exercise,
       :user => @submission.user,
@@ -145,7 +145,7 @@ describe TestRunGrader do
 
     TestRunGrader.grade_results(@submission, half_successful_results)
     exercise.update_attribute(:name, 'another_name')
-    new_submission = Factory.create(:submission, :user => user, :exercise_name => exercise.name, :course => course, :processed => false)
+    new_submission = FactoryGirl.create(:submission, :user => user, :exercise_name => exercise.name, :course => course, :processed => false)
     TestRunGrader.grade_results(new_submission, successful_results)
 
     points = AwardedPoint.where(:course_id => @submission.course_id, :user_id => @submission.user_id).map(&:name)
@@ -216,7 +216,7 @@ describe TestRunGrader do
 
       # Should not depend on result order, so let's try the same in reverse order
 
-      @submission = Factory.create(:submission, :processed => false)
+      @submission = FactoryGirl.create(:submission, :processed => false)
       @submission.validations = failing_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results.reverse)
 
@@ -320,11 +320,11 @@ describe TestRunGrader do
       other_exercise_sub = Submission.create!(
         :user => @submission.user,
         :course => @submission.course,
-        :exercise => Factory.create(:exercise, :course => @submission.course),
+        :exercise => FactoryGirl.create(:exercise, :course => @submission.course),
         :requires_review => true
       )
       other_user_sub = Submission.create!(
-        :user => Factory.create(:user),
+        :user => FactoryGirl.create(:user),
         :course => @submission.course,
         :exercise => @submission.exercise,
         :requires_review => true

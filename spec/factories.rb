@@ -26,7 +26,7 @@ FactoryGirl.define do
     sequence(:name) {|n| "exercise#{n}" }
     sequence(:gdocs_sheet) {|n| "exercise#{n}" }
   end
-  
+
   factory :returnable_exercise, :parent => :exercise do
     returnable_forced true
   end
@@ -36,7 +36,7 @@ FactoryGirl.define do
     user
     exercise
     processed true
-    after_build { |sub| sub.exercise.course = sub.course  if sub.course}
+    after(:build) { |sub| sub.exercise.course = sub.course  if sub.course}
   end
 
   factory :submission_data do
@@ -63,7 +63,7 @@ FactoryGirl.define do
     sequence(:name) {|n| "point#{n}" }
     submission
     user
-    after_build { |pt| pt.submission.course = pt.course }
+    after(:build) { |pt| pt.submission.course = pt.course }
   end
 
   factory :available_point do
@@ -82,13 +82,13 @@ FactoryGirl.define do
     submission
     successful false
   end
-  
+
   factory :feedback_question do
     course
     sequence(:question) {|n| "feedback question #{n}" }
     kind 'text'
   end
-  
+
   factory :feedback_answer do
     feedback_question
     course

@@ -5,32 +5,32 @@ describe "The system (used by an instructor for administration)", :type => :requ
 
   before :each do
     visit '/'
-    @user = Factory.create(:admin, :password => 'xooxer')
+    @user = FactoryGirl.create(:admin, :password => 'xooxer')
     log_in_as(@user.login, 'xooxer')
-    
+
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
   end
-  
+
   it "should allow using a git repo as a source for a new course" do
     create_new_course(:name => 'mycourse', :source_backend => 'git', :source_url => @repo_path)
   end
-  
+
   it "should show all exercises pushed to the course's git repo" do
     create_new_course(:name => 'mycourse', :source_backend => 'git', :source_url => @repo_path)
     course = Course.find_by_name!('mycourse')
-    
+
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('MyExercise', :deadline => (Date.today - 1.day).to_s)
     repo.add_commit_push
-    
+
     manually_refresh_course('mycourse')
-    
+
     visit '/courses'
     click_link 'mycourse'
     expect(page).to have_content('MyExercise')
   end
-  
+
   it "should allow rerunning individual submissions" do
     setup = SubmissionTestSetup.new(:solve => true, :save => true)
     setup.make_zip
@@ -41,15 +41,15 @@ describe "The system (used by an instructor for administration)", :type => :requ
       tcr.save!
     end
     setup.submission.save!
-    
+
     visit submission_path(setup.submission)
     expect(page).not_to have_content('All tests successful')
-    
+
     click_button 'Rerun submission'
     expect(page).to have_content('Rerun scheduled')
     SubmissionProcessor.new.reprocess_timed_out_submissions
     wait_for_submission_to_be_processed
-    
+
     expect(page).not_to have_content('some funny error')
     expect(page).to have_content('All tests successful')
   end

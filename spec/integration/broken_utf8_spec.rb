@@ -13,7 +13,7 @@ describe "The system, receiving submissions with broken UTF-8", :type => :reques
 
     @course.refresh
 
-    @user = Factory.create(:user, :password => 'xooxer')
+    @user = FactoryGirl.create(:user, :password => 'xooxer')
 
     visit '/'
     log_in_as(@user.login, 'xooxer')

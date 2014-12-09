@@ -3,24 +3,24 @@ require 'spec_helper'
 describe Exercise, :type => :model do
   include GitTestActions
 
-  let(:user) { Factory.create(:user) }
-  let(:course) { Factory.create(:course) }
+  let(:user) { FactoryGirl.create(:user) }
+  let(:course) { FactoryGirl.create(:course) }
 
   describe "gdocs_sheet" do
     it "should deduce gdocs_sheet from exercise name" do
-      ex1 = Factory.create(:exercise, :name => "ex")
+      ex1 = FactoryGirl.create(:exercise, :name => "ex")
       ex1.options = {}
       expect(ex1.gdocs_sheet).to eq("root")
 
-      ex2 = Factory.create(:exercise, :name => "wtf-ex")
+      ex2 = FactoryGirl.create(:exercise, :name => "wtf-ex")
       ex2.options = {}
       expect(ex2.gdocs_sheet).to eq("wtf")
 
-      ex3 = Factory.create(:exercise, :name => "omg-wtf-ex")
+      ex3 = FactoryGirl.create(:exercise, :name => "omg-wtf-ex")
       ex3.options = {}
       expect(ex3.gdocs_sheet).to eq("omg-wtf")
 
-      ex4 = Factory.create(:exercise, :name => "omg-wtf-ex")
+      ex4 = FactoryGirl.create(:exercise, :name => "omg-wtf-ex")
       ex4.options = { "points_visible" => false }
       expect(ex4.gdocs_sheet).to eq(nil)
     end
@@ -29,12 +29,12 @@ describe Exercise, :type => :model do
   describe "course_gdocs_sheet_exercises scope" do
     it "should find all the exercises that belong to the gdocs_sheet" do
       sheetname = "lolwat"
-      course = Factory.create(:course)
-      ex1 = Factory.create(:exercise, :course => course,
+      course = FactoryGirl.create(:course)
+      ex1 = FactoryGirl.create(:exercise, :course => course,
                            :gdocs_sheet => sheetname)
-      ex2 = Factory.create(:exercise, :course => course,
+      ex2 = FactoryGirl.create(:exercise, :course => course,
                            :gdocs_sheet => sheetname)
-      ex3 = Factory.create(:exercise, :course => course,
+      ex3 = FactoryGirl.create(:exercise, :course => course,
                            :gdocs_sheet => "not#{sheetname}")
       exercises = Exercise.course_gdocs_sheet_exercises(course, sheetname)
 
@@ -48,7 +48,7 @@ describe Exercise, :type => :model do
 
   describe "associated submissions" do
     before :each do
-      @exercise = Factory.create(:exercise, :course => course, :name => 'MyExercise')
+      @exercise = FactoryGirl.create(:exercise, :course => course, :name => 'MyExercise')
       @submission_attrs = {
         :course => course,
         :exercise_name => 'MyExercise',
@@ -69,7 +69,7 @@ describe Exercise, :type => :model do
   end
 
   it "knows which exercise groups it belongs to" do
-    ex = Factory.create(:exercise, :course => course, :name => 'foo-bar-baz')
+    ex = FactoryGirl.create(:exercise, :course => course, :name => 'foo-bar-baz')
 
     expect(ex.exercise_group_name).to eq('foo-bar')
     expect(ex.exercise_group.name).to eq('foo-bar')
@@ -77,17 +77,17 @@ describe Exercise, :type => :model do
     expect(ex.belongs_to_exercise_group?(ex.exercise_group)).to eq(true)
     expect(ex.belongs_to_exercise_group?(ex.exercise_group.parent)).to eq(true)
 
-    ex2 = Factory.create(:exercise, :course => course, :name => 'xoo-bar-baz')
+    ex2 = FactoryGirl.create(:exercise, :course => course, :name => 'xoo-bar-baz')
     course.reload
-    another_course = Factory.create(:course)
-    ex3 = Factory.create(:exercise, :course => another_course, :name => 'foo-bar-baz')
+    another_course = FactoryGirl.create(:course)
+    ex3 = FactoryGirl.create(:exercise, :course => another_course, :name => 'foo-bar-baz')
 
     expect(ex.belongs_to_exercise_group?(ex2.exercise_group)).to eq(false)
     expect(ex.belongs_to_exercise_group?(ex3.exercise_group)).to eq(false)
   end
 
   it "can be hidden with a boolean 'hidden' option" do
-    ex = Factory.create(:exercise, :course => course)
+    ex = FactoryGirl.create(:exercise, :course => course)
     ex.options = {"hidden" => true}
     expect(ex).to be_hidden
   end
@@ -101,13 +101,13 @@ describe Exercise, :type => :model do
   end
 
   it "should treat date deadlines as being at 23:59:59 local time" do
-    ex = Factory.create(:exercise, :course => course)
+    ex = FactoryGirl.create(:exercise, :course => course)
     set_deadline(ex, Date.today)
     expect(ex.deadline_for(user)).to eq(Date.today.end_of_day)
   end
 
   it "should accept deadlines in either SQLish or Finnish date format" do
-    ex = Factory.create(:exercise, :course => course)
+    ex = FactoryGirl.create(:exercise, :course => course)
 
     set_deadline(ex, '2011-04-19 13:55')
     dl = ex.deadline_for(user)
@@ -127,7 +127,7 @@ describe Exercise, :type => :model do
   end
 
   it "should accept a blank deadline" do
-    ex = Factory.create(:exercise, :course => course)
+    ex = FactoryGirl.create(:exercise, :course => course)
     set_deadline(ex, nil)
     expect(ex.deadline_for(user)).to be_nil
     set_deadline(ex, "")
@@ -135,7 +135,7 @@ describe Exercise, :type => :model do
   end
 
   it "should not accept certain hardcoded values for gdocs_sheet" do
-    ex = Factory.create(:exercise, :course => course)
+    ex = FactoryGirl.create(:exercise, :course => course)
     expect(ex.valid?).to be_truthy
     ex.gdocs_sheet = 'MASTER'
     expect(ex.valid?).to be_falsey
@@ -148,14 +148,14 @@ describe Exercise, :type => :model do
   end
 
   it "should raise an exception if trying to set a deadline in invalid format" do
-    ex = Factory.create(:exercise)
+    ex = FactoryGirl.create(:exercise)
     expect { set_deadline(ex, "xooxers") }.to raise_error
     expect { set_deadline(ex, "2011-07-13 12:34:56:78") }.to raise_error
   end
 
   it "should always be submittable by administrators as long as it's returnable" do
-    admin = Factory.create(:admin)
-    ex = Factory.create(:returnable_exercise, :course => course)
+    admin = FactoryGirl.create(:admin)
+    ex = FactoryGirl.create(:returnable_exercise, :course => course)
 
     expect(ex.deadline_for(user)).to be_nil
     expect(ex).to be_submittable_by(admin)
@@ -172,16 +172,16 @@ describe Exercise, :type => :model do
 
   it "should be submittable by non-administrators only if the deadline has not passed and the exercise is not hidden and is published" do
     #TODO: publish_time too!
-    user = Factory.create(:user)
-    ex = Factory.create(:returnable_exercise, :course => course)
+    user = FactoryGirl.create(:user)
+    ex = FactoryGirl.create(:returnable_exercise, :course => course)
 
     expect(ex.deadline_for(user)).to be_nil
     expect(ex.publish_time).to be_nil
     expect(ex).to be_submittable_by(user)
-    
+
     ex.publish_time = Date.today + 1.day
     expect(ex).not_to be_submittable_by(user)
-    
+
     ex.publish_time = Date.today - 1.day
     expect(ex).to be_submittable_by(user)
 
@@ -195,50 +195,50 @@ describe Exercise, :type => :model do
     ex.hidden = true
     expect(ex).not_to be_submittable_by(user)
   end
-  
+
   it "should never be submittable by guests" do
-    ex = Factory.create(:returnable_exercise, :course => course)
-    
+    ex = FactoryGirl.create(:returnable_exercise, :course => course)
+
     expect(ex).not_to be_submittable_by(Guest.new)
   end
-  
+
   it "should be visible to regular users by default" do
-    user = Factory.create(:user)
-    ex = Factory.create(:exercise, :course => course)
-    
+    user = FactoryGirl.create(:user)
+    ex = FactoryGirl.create(:exercise, :course => course)
+
     expect(ex).to be_visible_to(user)
   end
-  
+
   it "should not be visible to regular users if explicitly hidden" do
-    user = Factory.create(:user)
-    ex = Factory.create(:exercise, :course => course, :hidden => true)
-    
+    user = FactoryGirl.create(:user)
+    ex = FactoryGirl.create(:exercise, :course => course, :hidden => true)
+
     expect(ex).not_to be_visible_to(user)
   end
-  
+
   it "should not be visible to regular users if the publish time has not passed" do
-    user = Factory.create(:user)
-    ex = Factory.create(:exercise, :course => course, :publish_time => Time.now + 10.hours)
-    
+    user = FactoryGirl.create(:user)
+    ex = FactoryGirl.create(:exercise, :course => course, :publish_time => Time.now + 10.hours)
+
     expect(ex).not_to be_visible_to(user)
   end
-  
+
   it "should be visible to administrators even if publish time is in the future" do
-    admin = Factory.create(:admin)
-    ex = Factory.create(:exercise, :course => course, :publish_time => Time.now + 10.hours, :hidden => false)
-    
+    admin = FactoryGirl.create(:admin)
+    ex = FactoryGirl.create(:exercise, :course => course, :publish_time => Time.now + 10.hours, :hidden => false)
+
     expect(ex).to be_visible_to(admin)
   end
-  
+
   it "should be visible to administrators even if hidden" do
-    admin = Factory.create(:admin)
-    ex = Factory.create(:exercise, :course => course, :publish_time => Time.now - 10.hours, :hidden => true)
-    
+    admin = FactoryGirl.create(:admin)
+    ex = FactoryGirl.create(:exercise, :course => course, :publish_time => Time.now - 10.hours, :hidden => true)
+
     expect(ex).to be_visible_to(admin)
   end
 
   it "can tell whether a user has ever attempted an exercise" do
-    exercise = Factory.create(:exercise, :course => course)
+    exercise = FactoryGirl.create(:exercise, :course => course)
     expect(exercise).not_to be_attempted_by(user)
 
     Submission.create!(:user => user, :course => course, :exercise_name => exercise.name, :processed => false)
@@ -250,10 +250,10 @@ describe Exercise, :type => :model do
   end
 
   it "can tell whether a user has completed an exercise" do
-    exercise = Factory.create(:exercise, :course => course)
+    exercise = FactoryGirl.create(:exercise, :course => course)
     expect(exercise).not_to be_completed_by(user)
 
-    other_user = Factory.create(:user)
+    other_user = FactoryGirl.create(:user)
     other_user_sub = Submission.create!(:user => other_user, :course => course, :exercise_name => exercise.name, :all_tests_passed => true)
     expect(exercise).not_to be_completed_by(user)
 
@@ -265,43 +265,43 @@ describe Exercise, :type => :model do
   end
 
   it "can tell its available review points" do
-    exercise = Factory.create(:exercise, :course => course)
-    pt1 = Factory.create(:available_point, :exercise => exercise, :requires_review => false)
-    pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
-    pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+    exercise = FactoryGirl.create(:exercise, :course => course)
+    pt1 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => false)
+    pt2 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => true)
+    pt3 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => true)
 
     expect(exercise.available_review_points.sort).to eq([pt2, pt3].map(&:name).sort)
   end
 
   it "can tell if it's been reviewed for a user" do
-    exercise = Factory.create(:exercise, :course => course)
+    exercise = FactoryGirl.create(:exercise, :course => course)
 
     expect(exercise).not_to be_reviewed_for(user)
-    submission = Factory.create(:submission, :exercise => exercise, :course => course, :user => user, :reviewed => true)
-    Factory.create(:review, :submission => submission)
+    submission = FactoryGirl.create(:submission, :exercise => exercise, :course => course, :user => user, :reviewed => true)
+    FactoryGirl.create(:review, :submission => submission)
     exercise.reload
     expect(exercise).to be_reviewed_for(user)
   end
 
   it "can tell if all review points have been given to a user" do
-    exercise = Factory.create(:exercise, :course => course)
-    pt1 = Factory.create(:available_point, :exercise => exercise, :requires_review => false)
-    pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
-    pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+    exercise = FactoryGirl.create(:exercise, :course => course)
+    pt1 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => false)
+    pt2 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => true)
+    pt3 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => true)
 
-    Factory.create(:awarded_point, :course => course, :user => user, :name => pt2.name)
+    FactoryGirl.create(:awarded_point, :course => course, :user => user, :name => pt2.name)
     expect(exercise).not_to be_all_review_points_given_for(user)
-    Factory.create(:awarded_point, :course => course, :user => user, :name => pt3.name)
+    FactoryGirl.create(:awarded_point, :course => course, :user => user, :name => pt3.name)
     expect(exercise).to be_all_review_points_given_for(user)
   end
 
   it "can tell which review point are missing for a user" do
-    exercise = Factory.create(:exercise, :course => course)
-    pt1 = Factory.create(:available_point, :exercise => exercise, :requires_review => false)
-    pt2 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
-    pt3 = Factory.create(:available_point, :exercise => exercise, :requires_review => true)
+    exercise = FactoryGirl.create(:exercise, :course => course)
+    pt1 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => false)
+    pt2 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => true)
+    pt3 = FactoryGirl.create(:available_point, :exercise => exercise, :requires_review => true)
 
-    Factory.create(:awarded_point, :course => course, :user => user, :name => pt2.name)
+    FactoryGirl.create(:awarded_point, :course => course, :user => user, :name => pt2.name)
     expect(exercise.missing_review_points_for(user)).to eq([pt3.name])
   end
 end
