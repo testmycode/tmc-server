@@ -14,7 +14,9 @@ Very rough setup instructions below.
 
 ### System Dependencies ###
 
-The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`, `gcc`, `make`, `bc`, `phantomjs`.
+The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`, `gcc`, `make` and `bc`.
+
+For the testing environment you need the following: `phantomjs`.
 
 PhantomJS (at least version 1.8.1) is required by Poltergeist gem to run headless browser tests. See [poltergeist](https://github.com/teampoltergeist/poltergeist) for documentation. For installing PhantomJS, see http://phantomjs.org.
 

@@ -2,6 +2,7 @@
 
 * Upgraded RSpec to 3.1 and converted existing specs from should-syntax to new expectation-syntax.
 * Switched Selenium to Poltergeist (PhantomJS) for headless browser testing. You need to install PhantomJS (at least version 1.8.1) to your path, see http://phantomjs.org.
+* Upgraded Capybara to 2.4.
 * Switched CanCan to CanCanCan for Rails 4 support.
 
 ### 2014-11-24
