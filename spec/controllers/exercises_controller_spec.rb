@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ExercisesController do
+describe ExercisesController, :type => :controller do
   describe "GET show" do
   
     let!(:course) { Factory.create(:course) }
@@ -13,7 +13,7 @@ describe ExercisesController do
     describe "for guests" do
       it "should not show submissions" do
         get_show
-        assigns[:submissions].should be_nil
+        expect(assigns[:submissions]).to be_nil
       end
     end
     
@@ -28,9 +28,9 @@ describe ExercisesController do
         
         get_show
         
-        assigns[:submissions].should_not be_nil
-        assigns[:submissions].should include(s1)
-        assigns[:submissions].should_not include(s2)
+        expect(assigns[:submissions]).not_to be_nil
+        expect(assigns[:submissions]).to include(s1)
+        expect(assigns[:submissions]).not_to include(s2)
       end
     end
     
@@ -45,10 +45,10 @@ describe ExercisesController do
         
         get_show
         
-        assigns[:submissions].should_not be_nil
-        assigns[:submissions].should include(s1)
-        assigns[:submissions].should include(s2)
-        assigns[:submissions].should_not include(irrelevant)
+        expect(assigns[:submissions]).not_to be_nil
+        expect(assigns[:submissions]).to include(s1)
+        expect(assigns[:submissions]).to include(s2)
+        expect(assigns[:submissions]).not_to include(irrelevant)
       end
     end
   end

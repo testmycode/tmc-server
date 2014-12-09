@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe AwardedPoint do
+describe AwardedPoint, :type => :model do
 
   describe "scopes" do
     before :each do
@@ -49,71 +49,71 @@ describe AwardedPoint do
 
     specify "course_points" do
       points = AwardedPoint.course_points(@course)
-      points.length.should == 3
-      points.should include(@ap)
-      points.should include(@ap2)
-      points.should include(@ap3)
+      expect(points.length).to eq(3)
+      expect(points).to include(@ap)
+      expect(points).to include(@ap2)
+      expect(points).to include(@ap3)
 
       points = AwardedPoint.course_points(@course, true)
-      points.length.should == 4
-      points.should include(@ap)
-      points.should include(@ap2)
-      points.should include(@ap3)
-      points.should include(@ap_admin)
+      expect(points.length).to eq(4)
+      expect(points).to include(@ap)
+      expect(points).to include(@ap2)
+      expect(points).to include(@ap3)
+      expect(points).to include(@ap_admin)
     end
 
     specify "course_user_points" do
       p = AwardedPoint.course_user_points(@course, @user)
-      p.length.should == 2
-      p.should include(@ap)
-      p.should include(@ap3)
+      expect(p.length).to eq(2)
+      expect(p).to include(@ap)
+      expect(p).to include(@ap3)
 
       p = AwardedPoint.course_user_points(@course, @user2)
-      p.length.should == 1
-      p.should include(@ap2)
+      expect(p.length).to eq(1)
+      expect(p).to include(@ap2)
     end
 
     specify "course_sheet_points" do
       points = AwardedPoint.course_sheet_points(@course, @sheet1)
-      points.length.should == 2
-      points.should include(@ap)
-      points.should include(@ap3)
+      expect(points.length).to eq(2)
+      expect(points).to include(@ap)
+      expect(points).to include(@ap3)
 
       points = AwardedPoint.course_sheet_points(@course, @sheet1, true)
-      points.length.should == 3
-      points.should include(@ap)
-      points.should include(@ap3)
-      points.should include(@ap_admin)
+      expect(points.length).to eq(3)
+      expect(points).to include(@ap)
+      expect(points).to include(@ap3)
+      expect(points).to include(@ap_admin)
 
       points = AwardedPoint.course_sheet_points(@course, @sheet2)
-      points.length.should == 1
-      points.should include(@ap2)
+      expect(points.length).to eq(1)
+      expect(points).to include(@ap2)
     end
 
     specify "course_user_sheet_points" do
       points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet1)
-      points.length.should == 0
+      expect(points.length).to eq(0)
 
       points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet2)
-      points.length.should == 1
-      points.first.should == @ap2
+      expect(points.length).to eq(1)
+      expect(points.first).to eq(@ap2)
 
       points = AwardedPoint.course_user_sheet_points(@course, @user, @sheet2)
-      points.length.should == 0
+      expect(points.length).to eq(0)
 
       points = AwardedPoint.course_user_sheet_points(@course, @user, @sheet1)
-      points.length.should == 2
-      points.should include(@ap)
+      expect(points.length).to eq(2)
+      expect(points).to include(@ap)
     end
 
     specify "count_per_user_in_course_with_sheet" do
       counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet1)
-      Hash[counts][@user.login].should == 2
-      Hash[counts][@user2.login].should be_nil
+      expect(Hash[counts][@user.login]).to eq(2)
+      expect(Hash[counts][@user2.login]).to be_nil
 
       counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
-      Hash[counts][@user.login].should be_nil
-      Hash[counts][@user2.login].should == 1
+      expect(Hash[counts][@user.login]).to be_nil
+      expect(Hash[counts][@user2.login]).to eq(1)
     end
 
     describe "with change in exercise name" do
@@ -123,20 +123,20 @@ describe AwardedPoint do
 
       specify "course_sheet_points" do
         points = AwardedPoint.course_sheet_points(@course, @sheet2)
-        points.length.should == 1
-        points.should include(@ap2)
+        expect(points.length).to eq(1)
+        expect(points).to include(@ap2)
       end
 
       specify "course_user_sheet_points" do
         points = AwardedPoint.course_user_sheet_points(@course, @user2, @sheet2)
-        points.length.should == 1
-        points.first.should == @ap2
+        expect(points.length).to eq(1)
+        expect(points.first).to eq(@ap2)
       end
 
       specify "count_per_user_in_course_with_sheet" do
         counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
-        Hash[counts][@user.login].should be_nil
-        Hash[counts][@user2.login].should == 1
+        expect(Hash[counts][@user.login]).to be_nil
+        expect(Hash[counts][@user2.login]).to eq(1)
       end
     end
   end

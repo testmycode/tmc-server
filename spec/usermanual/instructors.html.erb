@@ -104,7 +104,7 @@ require 'cgi' # for escapeHTML
       Course.count > 0
     end
     course = Course.last
-    course.should_not be_nil
+    expect(course).not_to be_nil
   %>
 
   <p>
@@ -170,7 +170,7 @@ require 'cgi' # for escapeHTML
   </p>
 
   <%=
-    File.should be_directory(shell_session.working_dir + '/private/template_project')
+    expect(File).to be_directory(shell_session.working_dir + '/private/template_project')
     shell_session.example do |sh|
       sh.run "cd private/template_project; find ."
     end
@@ -187,10 +187,10 @@ require 'cgi' # for escapeHTML
       sh.run "ls"
     end
   %>
-  <% File.should be_directory("#{workdir}/factorial") %>
-  <% File.should be_directory("#{workdir}/factorial/src") %>
-  <% File.should be_directory("#{workdir}/factorial/test") %>
-  <% File.should be_directory("#{workdir}/factorial/nbproject") %>
+  <% expect(File).to be_directory("#{workdir}/factorial") %>
+  <% expect(File).to be_directory("#{workdir}/factorial/src") %>
+  <% expect(File).to be_directory("#{workdir}/factorial/test") %>
+  <% expect(File).to be_directory("#{workdir}/factorial/nbproject") %>
 
 
   <h3>Writing the exercise</h3>

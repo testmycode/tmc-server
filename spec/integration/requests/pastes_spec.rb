@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Paste JSON api" , :integration => true do
+describe "Paste JSON api", :type => :request , :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -51,12 +51,12 @@ describe "Paste JSON api" , :integration => true do
       it "it should show test results for " do
         submission = create_paste_submission(false, @admin)
         get_paste(submission.paste_key, @admin)
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse(response.body)
-        json.should have_key("api_version")
-        json.should have_key("test_cases")
-        json.should have_key("message_for_paste")
-        json.should have_key("all_tests_passed")
+        expect(json).to have_key("api_version")
+        expect(json).to have_key("test_cases")
+        expect(json).to have_key("message_for_paste")
+        expect(json).to have_key("all_tests_passed")
       end
     end
 
@@ -64,26 +64,26 @@ describe "Paste JSON api" , :integration => true do
       it "it should give access_denied if all tests passed" do
         submission = create_paste_submission(true, @user)
         get_paste(submission.paste_key, @viewer)
-        response.should_not be_success
-        response.response_code.should == 401
+        expect(response).not_to be_success
+        expect(response.response_code).to eq(401)
         json = JSON.parse(response.body)
-        json.should_not have_key("api_version")
-        json.should_not have_key("test_cases")
-        json.should_not have_key("message_for_paste")
-        json.should_not have_key("all_tests_passed")
-        json.should_not have_key("processing_time")
+        expect(json).not_to have_key("api_version")
+        expect(json).not_to have_key("test_cases")
+        expect(json).not_to have_key("message_for_paste")
+        expect(json).not_to have_key("all_tests_passed")
+        expect(json).not_to have_key("processing_time")
       end
 
       it "it should show results if some tests failed" do
         submission = create_paste_submission(false, @user)
         get_paste(submission.paste_key, @viewer)
-        response.should be_success
-        response.should_not be_forbidden
+        expect(response).to be_success
+        expect(response).not_to be_forbidden
         json = JSON.parse(response.body)
-        json.should have_key("api_version")
-        json.should have_key("test_cases")
-        json.should have_key("message_for_paste")
-        json.should have_key("all_tests_passed")
+        expect(json).to have_key("api_version")
+        expect(json).to have_key("test_cases")
+        expect(json).to have_key("message_for_paste")
+        expect(json).to have_key("all_tests_passed")
       end
     end
 
@@ -91,14 +91,14 @@ describe "Paste JSON api" , :integration => true do
       it "it should return results if all tests passed" do
         submission = create_paste_submission(true, @user)
         get_paste(submission.paste_key, @user)
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse(response.body)
-        json.should have_key("api_version")
-        json.should have_key("exercise_name")
-        json.should have_key("test_cases")
-        json.should have_key("message_for_paste")
-        json.should have_key("all_tests_passed")
-        json.should have_key("processing_time")
+        expect(json).to have_key("api_version")
+        expect(json).to have_key("exercise_name")
+        expect(json).to have_key("test_cases")
+        expect(json).to have_key("message_for_paste")
+        expect(json).to have_key("all_tests_passed")
+        expect(json).to have_key("processing_time")
       end
     end
   end
@@ -108,14 +108,14 @@ describe "Paste JSON api" , :integration => true do
       it "it should show test results" do
         submission = create_paste_submission(true, @admin, 1.day.ago)
         get_paste(submission.paste_key, @admin)
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse(response.body)
-        json.should have_key("api_version")
-        json.should have_key("exercise_name")
-        json.should have_key("test_cases")
-        json.should have_key("message_for_paste")
-        json.should have_key("all_tests_passed")
-        json.should have_key("processing_time")
+        expect(json).to have_key("api_version")
+        expect(json).to have_key("exercise_name")
+        expect(json).to have_key("test_cases")
+        expect(json).to have_key("message_for_paste")
+        expect(json).to have_key("all_tests_passed")
+        expect(json).to have_key("processing_time")
       end
     end
 
@@ -123,15 +123,15 @@ describe "Paste JSON api" , :integration => true do
       it "it should give access_denied when visiting old paste link" do
         submission = create_paste_submission(false, @user, 1.day.ago)
         get_paste(submission.paste_key, @viewer)
-        response.should_not be_success
-        response.response_code.should == 401
+        expect(response).not_to be_success
+        expect(response.response_code).to eq(401)
         json = JSON.parse(response.body)
-        json.should_not have_key("api_version")
-        json.should_not have_key("exercise_name")
-        json.should_not have_key("test_cases")
-        json.should_not have_key("message_for_paste")
-        json.should_not have_key("all_tests_passed")
-        json.should_not have_key("processing_time")
+        expect(json).not_to have_key("api_version")
+        expect(json).not_to have_key("exercise_name")
+        expect(json).not_to have_key("test_cases")
+        expect(json).not_to have_key("message_for_paste")
+        expect(json).not_to have_key("all_tests_passed")
+        expect(json).not_to have_key("processing_time")
       end
     end
 
@@ -139,13 +139,13 @@ describe "Paste JSON api" , :integration => true do
       it "it should return results when visiting an old paste" do
         submission = create_paste_submission(false, @user, 1.day.ago)
         get_paste(submission.paste_key, @user)
-        response.should be_success
+        expect(response).to be_success
         json = JSON.parse(response.body)
-        json.should have_key("api_version")
-        json.should have_key("exercise_name")
-        json.should have_key("test_cases")
-        json.should have_key("message_for_paste")
-        json.should have_key("all_tests_passed")
+        expect(json).to have_key("api_version")
+        expect(json).to have_key("exercise_name")
+        expect(json).to have_key("test_cases")
+        expect(json).to have_key("message_for_paste")
+        expect(json).to have_key("all_tests_passed")
       end
     end
   end

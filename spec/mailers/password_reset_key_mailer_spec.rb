@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe PasswordResetKeyMailer do
+describe PasswordResetKeyMailer, :type => :mailer do
   before :each do
     settings = SiteSetting.all_settings['emails']
     settings['baseurl'] = 'http://example.com/foo'
@@ -13,11 +13,11 @@ describe PasswordResetKeyMailer do
   it "should e-mail a password reset key" do
     mail = PasswordResetKeyMailer.reset_link_email(user, key)
 
-    mail.to.should include(user.email)
-    mail.from.should include('noreply@example.com')
-    mail.encoded.should include('http://example.com/foo/reset_password/' + key.code)
+    expect(mail.to).to include(user.email)
+    expect(mail.from).to include('noreply@example.com')
+    expect(mail.encoded).to include('http://example.com/foo/reset_password/' + key.code)
     
     mail.deliver
-    ActionMailer::Base.deliveries.should_not be_empty
+    expect(ActionMailer::Base.deliveries).not_to be_empty
   end
 end

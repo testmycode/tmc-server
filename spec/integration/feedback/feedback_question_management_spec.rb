@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Feedback question management", :integration => true do
+describe "Feedback question management", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -26,8 +26,8 @@ describe "Feedback question management", :integration => true do
     choose 'Text area'
     click_button 'Create question'
 
-    page.should have_content("How's it going?")
-    page.should have_content("What's the weather like?")
+    expect(page).to have_content("How's it going?")
+    expect(page).to have_content("What's the weather like?")
   end
 
   it "should permit changing the question text" do
@@ -40,6 +40,6 @@ describe "Feedback question management", :integration => true do
     fill_in 'Question', :with => "How are you doing?"
     click_button 'Save'
 
-    page.should have_content("How are you doing?")
+    expect(page).to have_content("How are you doing?")
   end
 end

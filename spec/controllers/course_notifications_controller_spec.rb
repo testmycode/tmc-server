@@ -1,6 +1,7 @@
 require 'spec_helper'
+require 'cancan/matchers'
 
-describe CourseNotificationsController do
+describe CourseNotificationsController, :type => :controller do
 
   let(:topic) { "Hi all" }
   let(:message) { "A long message to every participant on some course..." }
@@ -16,8 +17,14 @@ describe CourseNotificationsController do
   }
 
   it "should not allow a non-admin user to send email" do
+    bypass_rescue
+
     @user = Factory.create(:user)
     controller.current_user = @user
+
+    ability = Ability.new(controller.current_user)
+
+    expect(ability).not_to be_able_to(:email, CourseNotification)
     expect { post :create, params }.to raise_error
   end
 
@@ -29,7 +36,7 @@ describe CourseNotificationsController do
 
     it "redirects to the course page" do
       post :create, params
-      response.should redirect_to(course_path(course))
+      expect(response).to redirect_to(course_path(course))
     end
 
     it "sends a email for every participant on course" do
@@ -44,12 +51,12 @@ describe CourseNotificationsController do
       expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size).by(2)
 
       mail_first = ActionMailer::Base.deliveries[-2]
-      mail_first.to.should include user.email
-      mail_first.body.encoded.should include message
+      expect(mail_first.to).to include user.email
+      expect(mail_first.body.encoded).to include message
 
       mail_last = ActionMailer::Base.deliveries.last
-      mail_last.to.should include user2.email
-      mail_last.body.encoded.should include message
+      expect(mail_last.to).to include user2.email
+      expect(mail_last.body.encoded).to include message
     end
 
     it "doesn't crash if some email addresses are invalid" do
@@ -63,15 +70,15 @@ describe CourseNotificationsController do
       expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size).by(1)
 
       mail_first = ActionMailer::Base.deliveries.last
-      mail_first.to.should include user.email
-      mail_first.body.encoded.should include message
+      expect(mail_first.to).to include user.email
+      expect(mail_first.body.encoded).to include message
     end
 
     it "refuses to send a blank message" do
       params[:course_notification][:message] = ''
       post :create, params
-      response.should redirect_to(new_course_course_notifications_path(course))
-      flash[:error].should_not be_empty
+      expect(response).to redirect_to(new_course_course_notifications_path(course))
+      expect(flash[:error]).not_to be_empty
     end
 
   end

@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe ExtraField do
+describe ExtraField, :type => :model do
 
   def use_config(config_text)
     File.open('./user_fields.rb', 'wb') do |f|
       f.write config_text
     end
-    ExtraField.stub(:config_files => ['./user_fields.rb'])
+    allow(ExtraField).to receive_messages(:config_files => ['./user_fields.rb'])
   end
 
   def use_default_config
@@ -31,18 +31,18 @@ EOS
     use_default_config
 
     fields = ExtraField.by_kind(:user)
-    fields.size.should == 2
-    fields[0].group.should == 'Grp'
-    fields[0].kind.should == :user
-    fields[0].name.should == 'one'
-    fields[0].field_type.should == :text
-    fields[0].label.should == 'Field One'
+    expect(fields.size).to eq(2)
+    expect(fields[0].group).to eq('Grp')
+    expect(fields[0].kind).to eq(:user)
+    expect(fields[0].name).to eq('one')
+    expect(fields[0].field_type).to eq(:text)
+    expect(fields[0].label).to eq('Field One')
 
-    fields[1].group.should == 'Grp'
-    fields[1].kind.should == :user
-    fields[1].name.should == 'two'
-    fields[1].field_type.should == :boolean
-    fields[1].label.should == 'two'
+    expect(fields[1].group).to eq('Grp')
+    expect(fields[1].kind).to eq(:user)
+    expect(fields[1].name).to eq('two')
+    expect(fields[1].field_type).to eq(:boolean)
+    expect(fields[1].label).to eq('two')
   end
 
   describe "values" do
@@ -51,10 +51,10 @@ EOS
 
       field = ExtraField.by_kind(:user)[0]
       rec = @user.field_value_record(field)
-      rec.should_not be_nil
+      expect(rec).not_to be_nil
       rec.value = 'asdasd'
       rec.save!
-      @user.reload.field_value_record(field).value.should == 'asdasd'
+      expect(@user.reload.field_value_record(field).value).to eq('asdasd')
     end
 
     it "can take their values from forms" do
@@ -72,8 +72,8 @@ EOS
       boolrec.set_from_form('1')
       boolrec.save!
 
-      @user.reload.field_value_record(textfield).value.should == 'foo'
-      @user.reload.field_value_record(boolfield).value.should == '1'
+      expect(@user.reload.field_value_record(textfield).value).to eq('foo')
+      expect(@user.reload.field_value_record(boolfield).value).to eq('1')
     end
 
     it "won't take their values from forms if disabled or hidden" do
@@ -96,8 +96,8 @@ EOS
       boolrec.set_from_form('1')
       boolrec.save!
 
-      @user.reload.field_value_record(textfield).value.should be_blank
-      @user.reload.field_value_record(boolfield).value.should be_blank
+      expect(@user.reload.field_value_record(textfield).value).to be_blank
+      expect(@user.reload.field_value_record(boolfield).value).to be_blank
     end
 
     context "of boolean fields" do
@@ -108,7 +108,7 @@ EOS
         boolrec.set_from_form('1')
         boolrec.set_from_form(nil)
         boolrec.save!
-        @user.reload.field_value_record(boolfield).value.should be_blank
+        expect(@user.reload.field_value_record(boolfield).value).to be_blank
       end
     end
   end

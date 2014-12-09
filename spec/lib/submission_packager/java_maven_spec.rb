@@ -33,12 +33,12 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.should exist('src/main/java/SimpleStuff.java')
-        File.read('src/main/java/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/main/java/SimpleStuff.java')
+        expect(File).to exist('src/main/java/SimpleStuff.java')
+        expect(File.read('src/main/java/SimpleStuff.java')).to eq(File.read(@exercise_project.path + '/src/main/java/SimpleStuff.java'))
 
-        File.should exist('pom.xml')
-        File.should exist('src/test/java/SimpleTest.java')
-        File.should exist('src/test/java/SimpleHiddenTest.java')
+        expect(File).to exist('pom.xml')
+        expect(File).to exist('src/test/java/SimpleTest.java')
+        expect(File).to exist('src/test/java/SimpleHiddenTest.java')
       end
     end
   end
@@ -54,8 +54,8 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.should exist('src/main/java/SimpleStuff.java')
-        File.read('src/main/java/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/main/java/SimpleStuff.java')
+        expect(File).to exist('src/main/java/SimpleStuff.java')
+        expect(File.read('src/main/java/SimpleStuff.java')).to eq(File.read(@exercise_project.path + '/src/main/java/SimpleStuff.java'))
       end
     end
   end
@@ -71,8 +71,8 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.read('src/test/java/SimpleTest.java').should == File.read(@exercise.clone_path + '/src/test/java/SimpleTest.java')
-        File.should_not exist('src/test/java/NewTest.java')
+        expect(File.read('src/test/java/SimpleTest.java')).to eq(File.read(@exercise.clone_path + '/src/test/java/SimpleTest.java'))
+        expect(File).not_to exist('src/test/java/NewTest.java')
       end
     end
   end
@@ -92,8 +92,8 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.read('src/test/java/SimpleTest.java').should == 'foo'
-        File.read('src/test/java/NewTest.java').should == 'bar'
+        expect(File.read('src/test/java/SimpleTest.java')).to eq('foo')
+        expect(File.read('src/test/java/NewTest.java')).to eq('bar')
       end
     end
   end
@@ -112,9 +112,9 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.read('src/test/java/SimpleTest.java').should == File.read(@exercise.clone_path + '/src/test/java/SimpleTest.java')
-        File.should_not exist('src/test/java/NewTest.java')
-        File.should_not exist('.tmcproject.yml')
+        expect(File.read('src/test/java/SimpleTest.java')).to eq(File.read(@exercise.clone_path + '/src/test/java/SimpleTest.java'))
+        expect(File).not_to exist('src/test/java/NewTest.java')
+        expect(File).not_to exist('.tmcproject.yml')
       end
     end
   end
@@ -132,8 +132,8 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.should exist('.tmcrc')
-        File.read('.tmcrc').should == 'hello'
+        expect(File).to exist('.tmcrc')
+        expect(File.read('.tmcrc')).to eq('hello')
       end
     end
   end
@@ -150,7 +150,7 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.should_not exist('.tmcrc')
+        expect(File).not_to exist('.tmcrc')
       end
     end
   end
@@ -171,8 +171,8 @@ describe SubmissionPackager::JavaMaven do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         `tar xf #{Shellwords.escape(@tar_path)}`
-        File.should exist('foo.txt')
-        File.read('foo.txt').should == "repohello"
+        expect(File).to exist('foo.txt')
+        expect(File.read('foo.txt')).to eq("repohello")
       end
     end
   end
@@ -198,10 +198,10 @@ describe SubmissionPackager::JavaMaven do
             end
           end
 
-          File.should exist('target/classes/SimpleStuff.class')
-          File.should exist('target/test-classes/SimpleTest.class')
-          File.should exist('test_output.txt')
-          File.read('test_output.txt').should include('"status":"PASSED"')
+          expect(File).to exist('target/classes/SimpleStuff.class')
+          expect(File).to exist('target/test-classes/SimpleTest.class')
+          expect(File).to exist('test_output.txt')
+          expect(File.read('test_output.txt')).to include('"status":"PASSED"')
         end
       end
     end
@@ -216,12 +216,12 @@ describe SubmissionPackager::JavaMaven do
         Dir.chdir(dir) do
           sh! ['tar', 'xf', @tar_path]
           `env JAVA_RAM_KB=#{64*1024} ./tmc-run`
-          $?.exitstatus.should == 101
-          File.should exist('test_output.txt')
+          expect($?.exitstatus).to eq(101)
+          expect(File).to exist('test_output.txt')
 
           output = File.read('test_output.txt')
-          output.should include('COMPILATION ERROR')
-          output.should include('BUILD FAILURE')
+          expect(output).to include('COMPILATION ERROR')
+          expect(output).to include('BUILD FAILURE')
         end
       end
     end

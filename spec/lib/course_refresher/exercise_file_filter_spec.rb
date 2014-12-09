@@ -26,13 +26,13 @@ describe CourseRefresher::ExerciseFileFilter do
           FileUtils.cp("#{test_case_dir}/#{input_file}", "original/#{bare_file}")
           @filter.send(method, target_dir)
           result = File.read("#{target_dir}/#{bare_file}")
-          result.should == File.read("#{test_case_dir}/#{output_file}")
+          expect(result).to eq(File.read("#{test_case_dir}/#{output_file}"))
         end
       else
         specify "#{input_file} should be deleted" do
           FileUtils.cp("#{test_case_dir}/#{input_file}", "original/#{bare_file}")
           @filter.send(method, target_dir)
-          File.should_not exist("#{target_dir}/#{bare_file}")
+          expect(File).not_to exist("#{target_dir}/#{bare_file}")
         end
       end
     end
@@ -52,11 +52,11 @@ describe CourseRefresher::ExerciseFileFilter do
       make_file 'original/src/foo/Remaining.java', '//This file should remain'
       @filter.make_stub('stub')
 
-      File.should exist('stub/src')
-      File.should exist('stub/src/foo')
-      File.should exist('stub/src/foo/Remaining.java')
-      File.should_not exist('stub/src/foo/bar/Thing.java')
-      File.should_not exist('stub/src/foo/bar')
+      expect(File).to exist('stub/src')
+      expect(File).to exist('stub/src/foo')
+      expect(File).to exist('stub/src/foo/Remaining.java')
+      expect(File).not_to exist('stub/src/foo/bar/Thing.java')
+      expect(File).not_to exist('stub/src/foo/bar')
     end
 
     it "should still include src/ even if it contains only solution files" do
@@ -64,8 +64,8 @@ describe CourseRefresher::ExerciseFileFilter do
       make_file 'original/src/Thing.java', '//SOLUTION FILE'
       @filter.make_stub('stub')
 
-      File.should_not exist('stub/src/Thing.java')
-      File.should exist('stub/src')
+      expect(File).not_to exist('stub/src/Thing.java')
+      expect(File).to exist('stub/src')
     end
     
     it "should convert end-of-lines to unix style" do
@@ -87,7 +87,7 @@ public class Thing {\r
 EOF
       @filter.make_stub('stub')
       result = File.read('stub/Thing.java')
-      result.should == <<EOF
+      expect(result).to eq <<EOF
 public class Thing {
     
     public void bar() {
@@ -108,7 +108,7 @@ public class Thing {
 EOF
       @filter.make_stub('stub')
       result = File.read('stub/Thing.java')
-      result.should == <<EOF
+      expect(result).to eq <<EOF
 public class Thing {
 }
 EOF
@@ -117,38 +117,38 @@ EOF
     it "should not include hidden tests" do
       make_file('original/HiddenThing.java', '...')
       @filter.make_stub('stub')
-      File.should_not exist('stub/HiddenThing.java')
+      expect(File).not_to exist('stub/HiddenThing.java')
     end
     
     it "should not include metadata files" do
       make_file('original/metadata.yml', '...')
       @filter.make_stub('stub')
-      File.should_not exist('stub/metadata.yml')
+      expect(File).not_to exist('stub/metadata.yml')
     end
     
     it "should not include git files" do
       make_file('original/.gitignore', '...')
       @filter.make_stub('stub')
-      File.should_not exist('stub/.gitignore')
+      expect(File).not_to exist('stub/.gitignore')
     end
 
     it "should include .tmcproject.yml" do
       make_file('original/.tmcproject.yml', '---')
       @filter.make_stub('stub')
-      File.should exist('stub/.tmcproject.yml')
+      expect(File).to exist('stub/.tmcproject.yml')
     end
 
     it "should not include .tmcrc" do
       make_file('original/.tmcrc', '---')
       @filter.make_stub('stub')
-      File.should_not exist('stub/.tmcrc')
+      expect(File).not_to exist('stub/.tmcrc')
     end
 
     it "should not mangle binary files" do
       original = TmcJunitRunner.get.jar_path
       FileUtils.cp(original, 'original/foo.jar')
       @filter.make_stub('stub')
-      Digest::MD5.file('stub/foo.jar').hexdigest.should == Digest::MD5.file(original).hexdigest
+      expect(Digest::MD5.file('stub/foo.jar').hexdigest).to eq(Digest::MD5.file(original).hexdigest)
     end
   end
 
@@ -181,7 +181,7 @@ public class Thing {\r
 EOF
       @filter.make_solution('solution')
       result = File.read('solution/Thing.java')
-      result.should == <<EOF
+      expect(result).to eq <<EOF
 public class Thing {
     public int foo() {
         return 3;
@@ -207,13 +207,13 @@ public class Thing {
 EOF
       @filter.make_solution('solution')
       result = File.read('solution/Thing.java')
-      result.should == <<EOF
+      expect(result).to eq <<EOF
 public class Thing {
 }
 EOF
 
       html_file = File.read('solution/Thing.java.html')
-      html_file.should == <<EOF
+      expect(html_file).to eq <<EOF
 <strong>hi</strong>
 <p>foo</p>
 <p>bar</p>
@@ -224,31 +224,31 @@ EOF
       FileUtils.mkdir_p('original/test')
       make_file('original/test/Foo.java', '...')
       @filter.make_solution('solution')
-      File.should_not exist('solution/test/Foo.java')
+      expect(File).not_to exist('solution/test/Foo.java')
     end
     
     it "should not include metadata files" do
       make_file('original/metadata.yml', '...')
       @filter.make_solution('solution')
-      File.should_not exist('solution/metadata.yml')
+      expect(File).not_to exist('solution/metadata.yml')
     end
     
     it "should not include git files" do
       make_file('original/.gitignore', '...')
       @filter.make_solution('solution')
-      File.should_not exist('solution/.gitignore')
+      expect(File).not_to exist('solution/.gitignore')
     end
 
     it "should not include .tmcproject.yml" do
       make_file('original/.tmcproject.yml', '---')
       @filter.make_solution('solution')
-      File.should_not exist('solution/.tmcproject.yml')
+      expect(File).not_to exist('solution/.tmcproject.yml')
     end
 
     it "should not include .tmcrc" do
       make_file('original/.tmcrc', '---')
       @filter.make_stub('solution')
-      File.should_not exist('solution/.tmcrc')
+      expect(File).not_to exist('solution/.tmcrc')
     end
 
     it "should include extra student files specified in .tmcproject.yml" do
@@ -260,16 +260,16 @@ EOF
       @filter = CourseRefresher::ExerciseFileFilter.new('original')
       @filter.make_solution('solution')
 
-      File.should exist('solution/test')
-      File.should exist('solution/test/Foo.java')
-      File.should_not exist('solution/test/Bar.java')
+      expect(File).to exist('solution/test')
+      expect(File).to exist('solution/test/Foo.java')
+      expect(File).not_to exist('solution/test/Bar.java')
     end
 
     it "should not mangle binary files" do
       original = TmcJunitRunner.get.jar_path
       FileUtils.cp(original, 'original/foo.jar')
       @filter.make_solution('solution')
-      Digest::MD5.file('solution/foo.jar').hexdigest.should == Digest::MD5.file(original).hexdigest
+      expect(Digest::MD5.file('solution/foo.jar').hexdigest).to eq(Digest::MD5.file(original).hexdigest)
     end
   end
   

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RemoteSandboxForTesting, :integration => true do
+describe RemoteSandboxForTesting, :type => :request, :integration => true do
   include GitTestActions
 
   def make_setup(exercise_name)
@@ -23,16 +23,16 @@ describe RemoteSandboxForTesting, :integration => true do
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
       
-      @submission.should be_processed
+      expect(@submission).to be_processed
       
-      @submission.test_case_runs.should_not be_empty
+      expect(@submission.test_case_runs).not_to be_empty
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testAdd' }
-      tcr.should_not be_nil
-      tcr.should be_successful
+      expect(tcr).not_to be_nil
+      expect(tcr).to be_successful
       
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testSubtract' }
-      tcr.should_not be_nil
-      tcr.should_not be_successful
+      expect(tcr).not_to be_nil
+      expect(tcr).not_to be_successful
     end
     
     it "should not create multiple test results for the same test method even if it is involved in multiple points"
@@ -43,8 +43,8 @@ describe RemoteSandboxForTesting, :integration => true do
       
       RemoteSandboxForTesting.run_submission(@submission)
       
-      @submission.status.should == :error
-      @submission.pretest_error.should match(/Compilation error/)
+      expect(@submission.status).to eq(:error)
+      expect(@submission.pretest_error).to match(/Compilation error/)
     end
     
     it "should award points for successful exercises" do
@@ -53,10 +53,10 @@ describe RemoteSandboxForTesting, :integration => true do
       RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
-      points.should include('justsub')
-      points.should_not include('addsub')
-      points.should_not include('mul')
-      points.should_not include('simpletest-all')
+      expect(points).to include('justsub')
+      expect(points).not_to include('addsub')
+      expect(points).not_to include('mul')
+      expect(points).not_to include('simpletest-all')
     end
     
     it "should not award a point if all tests (potentially in multiple files) required for it don't pass" do
@@ -65,8 +65,8 @@ describe RemoteSandboxForTesting, :integration => true do
       RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
-      points.should include('simpletest-all')
-      points.should_not include('both-test-files')
+      expect(points).to include('simpletest-all')
+      expect(points).not_to include('both-test-files')
     end
     
     it "should award a point if all tests (potentially in multiple files) required for it pass" do
@@ -75,8 +75,8 @@ describe RemoteSandboxForTesting, :integration => true do
       RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
-      points.should include('simpletest-all')
-      points.should include('both-test-files')
+      expect(points).to include('simpletest-all')
+      expect(points).to include('both-test-files')
     end
     
     it "should only ever award more points, never delete old points" do
@@ -89,10 +89,10 @@ describe RemoteSandboxForTesting, :integration => true do
       RemoteSandboxForTesting.run_submission(@submission)
       
       points = AwardedPoint.where(:course_id => @course.id, :user_id => @user.id).map(&:name)
-      points.should include('justsub')
-      points.should include('addsub')
-      points.should include('simpletest-all')
-      points.should_not include('mul') # in SimpleHiddenTest
+      expect(points).to include('justsub')
+      expect(points).to include('addsub')
+      expect(points).to include('simpletest-all')
+      expect(points).not_to include('mul') # in SimpleHiddenTest
     end
   end
 
@@ -100,6 +100,6 @@ describe RemoteSandboxForTesting, :integration => true do
     make_setup 'UsingToolsJar'
     @setup.make_zip
     RemoteSandboxForTesting.run_submission(@submission)
-    @submission.status.should == :ok
+    expect(@submission.status).to eq(:ok)
   end
 end

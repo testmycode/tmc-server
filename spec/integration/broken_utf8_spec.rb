@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system, receiving submissions with broken UTF-8", :integration => true do
+describe "The system, receiving submissions with broken UTF-8", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -30,8 +30,8 @@ describe "The system, receiving submissions with broken UTF-8", :integration => 
     wait_for_submission_to_be_processed
 
     # The text around the messy characters should be visible
-    page.should have_content('trol')
-    page.should have_content('lol')
+    expect(page).to have_content('trol')
+    expect(page).to have_content('lol')
   end
 
   it "should tolerate broken UTF-8 in files" do
@@ -41,6 +41,6 @@ describe "The system, receiving submissions with broken UTF-8", :integration => 
     wait_for_submission_to_be_processed
 
     click_link 'Files'
-    page.should have_content('here are some latin1 characters:')
+    expect(page).to have_content('here are some latin1 characters:')
   end
 end

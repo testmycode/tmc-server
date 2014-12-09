@@ -20,11 +20,11 @@ RSpec.configure do |config|
     FileUtils.rm_rf @git_backend_cache_dir
     FileUtils.mkdir_p @git_backend_cache_dir
 
-    Course.stub!(:cache_root).and_return(@git_backend_cache_dir)
+    allow(Course).to receive(:cache_root).and_return(@git_backend_cache_dir)
   end
 
   config.after(:each) do
-    FileUtils.pwd.should == @test_tmp_dir
+    expect(FileUtils.pwd).to eq(@test_tmp_dir)
     # We don't clean up @test_tmp_dir here because in some cases
     # Capybara may leave a file handle to a downloadable repo cache resource open.
     # On NFS, the deletion will be deferred, causing problems.

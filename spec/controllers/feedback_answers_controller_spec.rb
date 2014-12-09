@@ -1,6 +1,7 @@
 require 'spec_helper'
+require 'cancan/matchers'
 
-describe FeedbackAnswersController do
+describe FeedbackAnswersController, :type => :controller do
   before :each do
     @exercise = Factory.create(:exercise)
     @course = @exercise.course
@@ -28,14 +29,14 @@ describe FeedbackAnswersController do
     it "should accept answers to all questions associated to the submission's course at once" do
       post :create, @valid_params
 
-      response.should be_successful
+      expect(response).to be_successful
 
       answers = FeedbackAnswer.order(:feedback_question_id)
-      answers.count.should == 2
-      answers[0].feedback_question_id.should == @q1.id
-      answers[1].feedback_question_id.should == @q2.id
-      answers[0].answer.should == 'foobar'
-      answers[1].answer.should == '3'
+      expect(answers.count).to eq(2)
+      expect(answers[0].feedback_question_id).to eq(@q1.id)
+      expect(answers[1].feedback_question_id).to eq(@q2.id)
+      expect(answers[0].answer).to eq('foobar')
+      expect(answers[1].answer).to eq('3')
     end
 
     it "should not save any answers and return withan error if even one answer is invalid" do
@@ -44,15 +45,37 @@ describe FeedbackAnswersController do
 
       post :create, params
 
-      response.should_not be_successful
-      FeedbackAnswer.all.count.should == 0
+      expect(response).not_to be_successful
+      expect(FeedbackAnswer.all.count).to eq(0)
     end
 
     it "should not allow answering on behalf of another user" do
+      bypass_rescue
+
       another_user = Factory.create(:user)
       another_submission = Factory.create(:submission, :course => @course, :exercise => @exercise, :user => another_user)
       params = @valid_params.clone
       params[:submission_id] = another_submission.id
+
+      # Convert params to FeedbackAnswers
+      answer_params = params[:answers]
+      answer_params = answer_params.values if answer_params.respond_to?(:values)
+
+      answer_records = answer_params.map do |answer_hash|
+        FeedbackAnswer.new({
+          :submission => @submission,
+          :course_id => @submission.course_id,
+          :exercise_name => @submission.exercise_name,
+          :feedback_question_id => answer_hash[:question_id],
+         :answer => answer_hash[:answer]
+       })
+      end
+
+      ability = Ability.new(another_user)
+      expect(ability).to be_able_to(:read, another_submission)
+
+      # Check if user can create FeedbackAnswer to submission
+      answer_records.each {|record| expect(ability).not_to be_able_to(:create, record) }
 
       expect { post :create, params }.to raise_error
     end

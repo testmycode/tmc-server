@@ -1,6 +1,7 @@
 require 'spec_helper'
+require 'cancan/matchers'
 
-describe FeedbackRepliesController, "#create" do
+describe FeedbackRepliesController, "#create", :type => :controller do
   let(:student_email) { "user@mydomain.com" }
   let(:reply_body) { "A reply to an feedback answer..." }
   let(:answer) { Factory.create(:feedback_answer) }
@@ -13,9 +14,14 @@ describe FeedbackRepliesController, "#create" do
   }
 
   it "should not allow a non-admin user to send a reply" do
+    bypass_rescue
+
     @user = Factory.create(:user)
     controller.current_user = @user
 
+    ability = Ability.new(controller.current_user)
+
+    expect(ability).not_to be_able_to(:reply, answer)
     expect { post :create, params }.to raise_error
   end
 
@@ -29,22 +35,22 @@ describe FeedbackRepliesController, "#create" do
 
     it "redirects to the url where the request came" do
       post :create, params
-      response.should redirect_to(url)
+      expect(response).to redirect_to(url)
     end
 
     it "associates a reply to feedback_answer" do
       expect { post :create, params }.to change{answer.replied?}.from(false).to(true)
       reply = answer.reply_to_feedback_answers.first
-      reply.from.should == admin.email
-      reply.body.should == reply_body
+      expect(reply.from).to eq(admin.email)
+      expect(reply.body).to eq(reply_body)
     end
 
     it "sends a reply email to the user who gave the feedback" do
       expect { post :create, params }.to change(ActionMailer::Base.deliveries,:size).by(1)
       mail = ActionMailer::Base.deliveries.last
-      mail.from.should include(admin.email)
-      mail.to.should include(student_email)
-      mail.body.encoded.should include reply_body
+      expect(mail.from).to include(admin.email)
+      expect(mail.to).to include(student_email)
+      expect(mail.body.encoded).to include reply_body
     end
   end
 

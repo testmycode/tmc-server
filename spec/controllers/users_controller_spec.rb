@@ -1,21 +1,21 @@
 require 'spec_helper'
 
-describe UsersController do
+describe UsersController, :type => :controller do
   describe "GET show" do
     describe "when accessed as a guest" do
       before :each do
-        controller.current_user.should be_guest
+        expect(controller.current_user).to be_guest
       end
 
       it "should not deny access" do
         get :show
-        response.status.should == 401
+        expect(response.status).to eq(401)
       end
 
       it "should deny access if signup is disabled in site settings" do
         SiteSetting.all_settings['enable_signup'] = false
         get :show
-        response.status.should == 401
+        expect(response.status).to eq(401)
       end
     end
 
@@ -26,7 +26,7 @@ describe UsersController do
 
       it "should show the profile page" do
         get :show
-        response.should be_success
+        expect(response).to be_success
       end
     end
   end
@@ -45,50 +45,50 @@ describe UsersController do
     it "should create a new user account" do
       post :create, :user => @valid_attrs
       
-      response.should redirect_to(root_path)
+      expect(response).to redirect_to(root_path)
       user = User.find_by_login(@valid_attrs[:login])
-      user.should_not be_nil
-      user.email.should == @valid_attrs[:email]
-      user.should have_password(@valid_attrs[:password])
+      expect(user).not_to be_nil
+      expect(user.email).to eq(@valid_attrs[:email])
+      expect(user).to have_password(@valid_attrs[:password])
     end
   
     it "should require a username" do
       @valid_attrs.delete :login
       post :create, :user => @valid_attrs
-      User.count.should == 0
+      expect(User.count).to eq(0)
     end
     
     it "should require the username to be unique" do
       post :create, :user => @valid_attrs
       @valid_attrs[:email] = @valid_attrs[:email_repeat] = 'bsd@example.com'
       post :create, :user => @valid_attrs
-      User.count.should == 1
+      expect(User.count).to eq(1)
     end
     
     it "should require an email" do
       @valid_attrs.delete :email
       @valid_attrs.delete :email_repeat
       post :create, :user => @valid_attrs
-      User.count.should == 0
+      expect(User.count).to eq(0)
     end
     
     it "should require an email confirmation" do
       @valid_attrs.delete :email_repeat
       post :create, :user => @valid_attrs
-      User.count.should == 0
+      expect(User.count).to eq(0)
     end
 
     it "should require a password" do
       @valid_attrs.delete :password
       @valid_attrs.delete :password_repeat
       post :create, :user => @valid_attrs
-      User.count.should == 0
+      expect(User.count).to eq(0)
     end
     
     it "should require a password confirmation" do
       @valid_attrs.delete :password_repeat
       post :create, :user => @valid_attrs
-      User.count.should == 0
+      expect(User.count).to eq(0)
     end
 
     it "should save extra fields" do
@@ -97,22 +97,24 @@ describe UsersController do
         UserField.new(:name => 'field2', :field_type => 'boolean'),
         UserField.new(:name => 'field3', :field_type => 'boolean')
       ]
-      UserField.stub(:all => fields)
-      ExtraField.stub(:by_kind).with(:user).and_return(fields)
+      allow(UserField).to receive_messages(:all => fields)
+      allow(ExtraField).to receive(:by_kind).with(:user).and_return(fields)
 
       post :create, :user => @valid_attrs, :user_field => {'field1' => 'foo', 'field2' => '1'}
-      User.count.should == 1
+      expect(User.count).to eq(1)
 
       user = User.find_by_login(@valid_attrs[:login])
-      user.field_value_record(fields[0]).value.should == 'foo'
-      user.field_value_record(fields[1]).value.should_not be_blank
-      user.field_value_record(fields[2]).value.should be_blank
+      expect(user.field_value_record(fields[0]).value).to eq('foo')
+      expect(user.field_value_record(fields[1]).value).not_to be_blank
+      expect(user.field_value_record(fields[2]).value).to be_blank
     end
 
     it "should fail if signup is disabled in site settings" do
+      bypass_rescue
+
       SiteSetting.all_settings['enable_signup'] = false
-      lambda { post :create, :user => @valid_attrs }.should raise_error(CanCan::AccessDenied)
-      User.count.should == 0
+      expect { post :create, :user => @valid_attrs }.to raise_error(CanCan::AccessDenied)
+      expect(User.count).to eq(0)
     end
   end
   
@@ -124,15 +126,15 @@ describe UsersController do
     
     it "should save the email field" do
       put :update, :user => { :email => 'newemail', :email_repeat => 'newemail' }
-      response.should redirect_to(user_path)
-      @user.reload.email.should == 'newemail'
+      expect(response).to redirect_to(user_path)
+      expect(@user.reload.email).to eq('newemail')
     end
     
     it "should not allow changing the login" do
       old_login = @user.login
       put :update, :user => { :email => 'newemail', :login => 'newlogin' }
-      response.should redirect_to(user_path)
-      @user.reload.login.should == old_login
+      expect(response).to redirect_to(user_path)
+      expect(@user.reload.login).to eq(old_login)
     end
 
     it "should save extra fields" do
@@ -141,14 +143,14 @@ describe UsersController do
         UserField.new(:name => 'field2', :field_type => 'boolean'),
         UserField.new(:name => 'field3', :field_type => 'boolean')
       ]
-      UserField.stub(:all => fields)
-      ExtraField.stub(:by_kind).with(:user).and_return(fields)
+      allow(UserField).to receive_messages(:all => fields)
+      allow(ExtraField).to receive(:by_kind).with(:user).and_return(fields)
 
       put :update, :user => {:email => @user.email}, :user_field => {'field1' => 'foo', 'field2' => '1'}
 
-      @user.field_value_record(fields[0]).value.should == 'foo'
-      @user.field_value_record(fields[1]).value.should_not be_blank
-      @user.field_value_record(fields[2]).value.should be_blank
+      expect(@user.field_value_record(fields[0]).value).to eq('foo')
+      expect(@user.field_value_record(fields[1]).value).not_to be_blank
+      expect(@user.field_value_record(fields[2]).value).to be_blank
     end
     
     describe "changing the password" do
@@ -157,13 +159,13 @@ describe UsersController do
       before :each do
         @user.password = 'oldpassword'
         @user.save!
-        @user.reload.should have_password('oldpassword')
+        expect(@user.reload).to have_password('oldpassword')
       end
       
       it "should not try to change the password unless specified" do
         put :update, :user => params
-        response.should redirect_to(user_path)
-        @user.reload.should have_password('oldpassword')
+        expect(response).to redirect_to(user_path)
+        expect(@user.reload).to have_password('oldpassword')
       end
       
       it "should change the password if the old password matched and both new password fields were the same" do
@@ -172,8 +174,8 @@ describe UsersController do
           :password => 'newpassword',
           :password_repeat => 'newpassword'
         })
-        response.should redirect_to(user_path)
-        @user.reload.should have_password('newpassword')
+        expect(response).to redirect_to(user_path)
+        expect(@user.reload).to have_password('newpassword')
       end
       
       it "should not change the password if the old password was wrong" do
@@ -182,8 +184,8 @@ describe UsersController do
           :password => 'newpassword',
           :password_repeat => 'newpassword'
         })
-        response.status.should == 403
-        @user.reload.should have_password('oldpassword')
+        expect(response.status).to eq(403)
+        expect(@user.reload).to have_password('oldpassword')
       end
       
       it "should not change the password if the new password fields were not the same" do
@@ -192,8 +194,8 @@ describe UsersController do
           :password => 'newpassword',
           :password_repeat => 'foo'
         })
-        response.status.should == 403
-        @user.reload.should have_password('oldpassword')
+        expect(response.status).to eq(403)
+        expect(@user.reload).to have_password('oldpassword')
       end
       
       it "should not allow changing to a blank password" do
@@ -202,8 +204,8 @@ describe UsersController do
           :password => '',
           :password_repeat => ''
         })
-        response.status.should == 403
-        @user.reload.should have_password('oldpassword')
+        expect(response.status).to eq(403)
+        expect(@user.reload).to have_password('oldpassword')
       end
     end
   end

@@ -39,11 +39,11 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.should exist('src/SimpleStuff.java')
-          File.read('src/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/SimpleStuff.java')
+          expect(File).to exist('src/SimpleStuff.java')
+          expect(File.read('src/SimpleStuff.java')).to eq(File.read(@exercise_project.path + '/src/SimpleStuff.java'))
 
-          File.should exist('test/SimpleTest.java')
-          File.should exist('test/SimpleHiddenTest.java')
+          expect(File).to exist('test/SimpleTest.java')
+          expect(File).to exist('test/SimpleHiddenTest.java')
         end
       end
     end
@@ -59,8 +59,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.should exist('src/SimpleStuff.java')
-          File.read('src/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/SimpleStuff.java')
+          expect(File).to exist('src/SimpleStuff.java')
+          expect(File.read('src/SimpleStuff.java')).to eq(File.read(@exercise_project.path + '/src/SimpleStuff.java'))
         end
       end
     end
@@ -76,8 +76,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.read('test/SimpleTest.java').should == File.read(@exercise.clone_path + '/test/SimpleTest.java')
-          File.should_not exist('test/NewTest.java')
+          expect(File.read('test/SimpleTest.java')).to eq(File.read(@exercise.clone_path + '/test/SimpleTest.java'))
+          expect(File).not_to exist('test/NewTest.java')
         end
       end
     end
@@ -97,8 +97,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.read('test/SimpleTest.java').should == 'foo'
-          File.read('test/NewTest.java').should == 'bar'
+          expect(File.read('test/SimpleTest.java')).to eq('foo')
+          expect(File.read('test/NewTest.java')).to eq('bar')
         end
       end
     end
@@ -117,9 +117,9 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.read('test/SimpleTest.java').should == File.read(@exercise.clone_path + '/test/SimpleTest.java')
-          File.should_not exist('test/NewTest.java')
-          File.should_not exist('.tmcproject.yml')
+          expect(File.read('test/SimpleTest.java')).to eq(File.read(@exercise.clone_path + '/test/SimpleTest.java'))
+          expect(File).not_to exist('test/NewTest.java')
+          expect(File).not_to exist('.tmcproject.yml')
         end
       end
     end
@@ -137,8 +137,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.should exist('.tmcrc')
-          File.read('.tmcrc').should == 'hello'
+          expect(File).to exist('.tmcrc')
+          expect(File.read('.tmcrc')).to eq('hello')
         end
       end
     end
@@ -155,7 +155,7 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.should_not exist('.tmcrc')
+          expect(File).not_to exist('.tmcrc')
         end
       end
     end
@@ -169,9 +169,9 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.read('lib/testrunner/tmc-junit-runner.jar').should == File.read(TmcJunitRunner.get.jar_path)
+          expect(File.read('lib/testrunner/tmc-junit-runner.jar')).to eq(File.read(TmcJunitRunner.get.jar_path))
           for original_path in TmcJunitRunner.get.lib_paths
-            File.read("lib/testrunner/#{original_path.basename}").should == File.read(original_path)
+            expect(File.read("lib/testrunner/#{original_path.basename}")).to eq(File.read(original_path))
           end
         end
       end
@@ -187,7 +187,7 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.read('checkstyle-runner/tmc-checkstyle-runner.jar').should == File.read(TmcCheckstyleRunner.get.jar_path)
+          expect(File.read('checkstyle-runner/tmc-checkstyle-runner.jar')).to eq(File.read(TmcCheckstyleRunner.get.jar_path))
         end
       end
     end
@@ -208,8 +208,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.should exist('foo.txt')
-          File.read('foo.txt').should == "repohello"
+          expect(File).to exist('foo.txt')
+          expect(File.read('foo.txt')).to eq("repohello")
         end
       end
     end
@@ -223,8 +223,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.should exist('.tmcparams')
-          File.readlines('.tmcparams').map(&:strip).should include "export foo=bar"
+          expect(File).to exist('.tmcparams')
+          expect(File.readlines('.tmcparams').map(&:strip)).to include "export foo=bar"
         end
       end
     end
@@ -239,8 +239,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `tar xf #{Shellwords.escape(@tar_path)}`
-          File.should exist('.tmcparams')
-          File.readlines('.tmcparams').map(&:strip).should include "export runtime_params=(-Xss8M -verbose:gc)"
+          expect(File).to exist('.tmcparams')
+          expect(File.readlines('.tmcparams').map(&:strip)).to include "export runtime_params=(-Xss8M -verbose:gc)"
         end
       end
     end
@@ -255,8 +255,8 @@ describe SubmissionPackager::JavaSimple do
         Dir.mktmpdir do |dir|
           Dir.chdir(dir) do
             sh! ['tar', 'xf', @tar_path]
-            File.should_not exist('classes/main/SimpleStuff.class')
-            File.should_not exist('test_output.txt')
+            expect(File).not_to exist('classes/main/SimpleStuff.class')
+            expect(File).not_to exist('test_output.txt')
 
             begin
               sh! ["env", "JAVA_RAM_KB=#{64*1024}", "./tmc-run"]
@@ -268,9 +268,9 @@ describe SubmissionPackager::JavaSimple do
               end
             end
 
-            File.should exist('classes/main/SimpleStuff.class')
-            File.should exist('test_output.txt')
-            File.read('test_output.txt').should include('"status":"PASSED"')
+            expect(File).to exist('classes/main/SimpleStuff.class')
+            expect(File).to exist('test_output.txt')
+            expect(File.read('test_output.txt')).to include('"status":"PASSED"')
           end
         end
       end
@@ -284,14 +284,14 @@ describe SubmissionPackager::JavaSimple do
         Dir.mktmpdir do |dir|
           Dir.chdir(dir) do
             sh! ['tar', 'xf', @tar_path]
-            File.should_not exist('classes/main/SimpleStuff.class')
-            File.should_not exist('test_output.txt')
+            expect(File).not_to exist('classes/main/SimpleStuff.class')
+            expect(File).not_to exist('test_output.txt')
             `env JAVA_RAM_KB=#{64*1024} ./tmc-run`
-            $?.exitstatus.should == 101
-            File.should exist('test_output.txt')
+            expect($?.exitstatus).to eq(101)
+            expect(File).to exist('test_output.txt')
 
             output = File.read('test_output.txt')
-            output.should include('compiler should fail here')
+            expect(output).to include('compiler should fail here')
           end
         end
       end
@@ -320,8 +320,8 @@ describe SubmissionPackager::JavaSimple do
               end
             end
 
-            File.should exist('lol.txt')
-            File.read('lol.txt').strip.should == 'java_simple'
+            expect(File).to exist('lol.txt')
+            expect(File.read('lol.txt').strip).to eq('java_simple')
           end
         end
       end
@@ -338,11 +338,11 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `unzip #{Shellwords.escape(@zip_path)}`
-          File.should exist('src/SimpleStuff.java')
-          File.read('src/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/SimpleStuff.java')
+          expect(File).to exist('src/SimpleStuff.java')
+          expect(File.read('src/SimpleStuff.java')).to eq(File.read(@exercise_project.path + '/src/SimpleStuff.java'))
 
-          File.should exist('test/SimpleTest.java')
-          File.should_not exist('test/SimpleHiddenTest.java')
+          expect(File).to exist('test/SimpleTest.java')
+          expect(File).not_to exist('test/SimpleHiddenTest.java')
         end
       end
     end
@@ -358,8 +358,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `unzip #{Shellwords.escape(@zip_path)}`
-          File.should exist('src/SimpleStuff.java')
-          File.read('src/SimpleStuff.java').should == File.read(@exercise_project.path + '/src/SimpleStuff.java')
+          expect(File).to exist('src/SimpleStuff.java')
+          expect(File.read('src/SimpleStuff.java')).to eq(File.read(@exercise_project.path + '/src/SimpleStuff.java'))
         end
       end
     end
@@ -379,8 +379,8 @@ describe SubmissionPackager::JavaSimple do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           `unzip #{Shellwords.escape(@zip_path)}`
-          File.read('test/SimpleTest.java').should == 'foo'
-          File.read('test/NewTest.java').should == 'bar'
+          expect(File.read('test/SimpleTest.java')).to eq('foo')
+          expect(File.read('test/NewTest.java')).to eq('bar')
         end
       end
     end

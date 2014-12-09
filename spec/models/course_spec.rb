@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Course do
+describe Course, :type => :model do
 
   let(:source_path) { "#{@test_tmp_dir}/fake_source" }
   let(:source_url) { "file://#{source_path}" }
@@ -19,10 +19,10 @@ describe Course do
                            :gdocs_sheet => nil)
       worksheets = course.gdocs_sheets
 
-      worksheets.size.should == 2
-      worksheets.should include("sheet1")
-      worksheets.should include("sheet2")
-      worksheets.should_not include(nil)
+      expect(worksheets.size).to eq(2)
+      expect(worksheets).to include("sheet1")
+      expect(worksheets).to include("sheet2")
+      expect(worksheets).not_to include(nil)
     end
   end
 
@@ -32,7 +32,7 @@ describe Course do
         :cache_root
       ]
       for path in class_paths
-        Course.send(path).should match(/^\//)
+        expect(Course.send(path)).to match(/^\//)
       end
 
       object_paths = [
@@ -43,69 +43,69 @@ describe Course do
       ]
 
       for path in object_paths
-        Course.new.send(path).should match(/^\//)
+        expect(Course.new.send(path)).to match(/^\//)
       end
     end
   end
 
   it "should be visible if not hidden and hide_after is nil" do
     c = Factory.create(:course, :hidden => false, :hide_after => nil)
-    c.should be_visible_to(user)
+    expect(c).to be_visible_to(user)
   end
 
   it "should be visible if not hidden and hide_after has not passed" do
     c = Factory.create(:course, :hidden => false, :hide_after => Time.now + 2.minutes)
-    c.should be_visible_to(user)
+    expect(c).to be_visible_to(user)
   end
 
   it "should not be visible if hidden" do
     c = Factory.create(:course, :hidden => true, :hide_after => nil)
-    c.should_not be_visible_to(user)
+    expect(c).not_to be_visible_to(user)
   end
 
   it "should not be visible if hide_after has passed" do
     c = Factory.create(:course, :hidden => false, :hide_after => Time.now - 2.minutes)
-    c.should_not be_visible_to(user)
+    expect(c).not_to be_visible_to(user)
   end
 
   it "should always be visible to administrators" do
     admin = Factory.create(:admin)
     c = Factory.create(:course, :hidden => true, :hide_after => Time.now - 2.minutes)
-    c.should be_visible_to(admin)
+    expect(c).to be_visible_to(admin)
   end
 
   it "should be visible if user has registered before the hidden_if_registered_after setting" do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
     c = Factory.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-03'))
-    c.should be_visible_to(user)
+    expect(c).to be_visible_to(user)
   end
 
   it "should not be visible if user has registered after the hidden_if_registered_after setting" do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
     c = Factory.create(:course, :hidden_if_registered_after => Time.zone.parse('2010-01-01'))
-    c.should_not be_visible_to(user)
+    expect(c).not_to be_visible_to(user)
   end
 
   it "should accept Finnish dates and datetimes for hide_after" do
     c = Factory.create(:course)
     c.hide_after = "19.8.2012"
-    c.hide_after.day.should == 19
-    c.hide_after.month.should == 8
-    c.hide_after.year.should == 2012
+    expect(c.hide_after.day).to eq(19)
+    expect(c.hide_after.month).to eq(8)
+    expect(c.hide_after.year).to eq(2012)
 
     c.hide_after = "15.9.2011 19:15"
-    c.hide_after.day.should == 15
-    c.hide_after.month.should == 9
-    c.hide_after.hour.should == 19
-    c.hide_after.year.should == 2011
+    expect(c.hide_after.day).to eq(15)
+    expect(c.hide_after.month).to eq(9)
+    expect(c.hide_after.hour).to eq(19)
+    expect(c.hide_after.year).to eq(2011)
   end
 
   it "should consider a hide_after date without time to mean the end of that day" do
     c = Factory.create(:course, :hide_after => "18.11.2013")
-    c.hide_after.hour.should == 23
-    c.hide_after.min.should == 59
+    expect(c.hide_after.hour).to eq(23)
+    expect(c.hide_after.min).to eq(59)
   end
 
   it "should know the exercise groups of its exercises" do
@@ -120,23 +120,23 @@ describe Course do
     exercises.each {|ex| c.exercises << ex }
 
     # They should be sorted
-    c.exercise_groups.size.should == 5
-    c.exercise_groups[0].name.should == 'bar'
-    c.exercise_groups[1].name.should == 'foo'
-    c.exercise_groups[2].name.should == 'zoox'
-    c.exercise_groups[3].name.should == 'zoox-zaax'
-    c.exercise_groups[4].name.should == 'zoox-zoox'
+    expect(c.exercise_groups.size).to eq(5)
+    expect(c.exercise_groups[0].name).to eq('bar')
+    expect(c.exercise_groups[1].name).to eq('foo')
+    expect(c.exercise_groups[2].name).to eq('zoox')
+    expect(c.exercise_groups[3].name).to eq('zoox-zaax')
+    expect(c.exercise_groups[4].name).to eq('zoox-zoox')
 
-    c.exercise_group_by_name('zoox-zaax').parent.should == c.exercise_group_by_name('zoox')
-    c.exercise_group_by_name('zoox').children.size.should == 2
-    c.exercise_group_by_name('zoox').children[0].should == c.exercise_group_by_name('zoox-zaax')
-    c.exercise_group_by_name('zoox').children[1].should == c.exercise_group_by_name('zoox-zoox')
+    expect(c.exercise_group_by_name('zoox-zaax').parent).to eq(c.exercise_group_by_name('zoox'))
+    expect(c.exercise_group_by_name('zoox').children.size).to eq(2)
+    expect(c.exercise_group_by_name('zoox').children[0]).to eq(c.exercise_group_by_name('zoox-zaax'))
+    expect(c.exercise_group_by_name('zoox').children[1]).to eq(c.exercise_group_by_name('zoox-zoox'))
 
-    c.exercises_by_name_or_group('zoox-zaax').should == [exercises[3]]
-    c.exercises_by_name_or_group('zoox-zaax-ex1').should == [exercises[3]]
-    c.exercises_by_name_or_group('zoox-zaa').should == []
-    c.exercises_by_name_or_group('foo').natsort_by(&:name).should == [exercises[0], exercises[2]]
-    c.exercises_by_name_or_group('asdasd').should == []
+    expect(c.exercises_by_name_or_group('zoox-zaax')).to eq([exercises[3]])
+    expect(c.exercises_by_name_or_group('zoox-zaax-ex1')).to eq([exercises[3]])
+    expect(c.exercises_by_name_or_group('zoox-zaa')).to eq([])
+    expect(c.exercises_by_name_or_group('foo').natsort_by(&:name)).to eq([exercises[0], exercises[2]])
+    expect(c.exercises_by_name_or_group('asdasd')).to eq([])
   end
 
 
@@ -182,7 +182,7 @@ describe Course do
       FileUtils.touch("#{c.cache_path}/foo.txt")
 
       c.destroy
-      File.should_not exist(c.cache_path)
+      expect(File).not_to exist(c.cache_path)
     end
 
     it "deletes dependent exercises" do
@@ -224,7 +224,7 @@ describe Course do
     end
 
     def assert_destroyed(obj)
-      obj.class.find_by_id(obj.id).should be_nil
+      expect(obj.class.find_by_id(obj.id)).to be_nil
     end
   end
 

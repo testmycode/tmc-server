@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Resetting one's password by e-mail", :integration => true do
+describe "Resetting one's password by e-mail", :type => :request, :integration => true do
   include IntegrationTestActions
   
   it "should be possible" do
@@ -20,7 +20,7 @@ describe "Resetting one's password by e-mail", :integration => true do
     
     visit '/reset_password/' + user.password_reset_key.code
 
-    page.should have_content('Resetting password for theuser')
+    expect(page).to have_content('Resetting password for theuser')
     fill_in 'New password', :with => 'new_password'
     fill_in 'Confirm new password', :with => 'new_password'
     click_button 'Set password'

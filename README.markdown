@@ -14,9 +14,13 @@ Very rough setup instructions below.
 
 ### System Dependencies ###
 
-The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`, `gcc`, `make`, `bc`.
+The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`, `gcc`, `make` and `bc`.
 
-An X server is currently needed for tests to pass (required by [capybara-webkit](https://github.com/thoughtbot/capybara-webkit)). `Xvfb` will do, but remember to set your `DISPLAY`.
+For the testing environment you need the following: `phantomjs`.
+
+PhantomJS (at least version 1.8.1) is required by Poltergeist gem to run headless browser tests. See [poltergeist](https://github.com/teampoltergeist/poltergeist) for documentation. For installing PhantomJS, see http://phantomjs.org.
+
+An X server is currently needed for browser tests to pass when using Selenium. `Xvfb` will do, but remember to set your `DISPLAY`.
 
 ### Setup ###
 

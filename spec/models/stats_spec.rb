@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Stats do
+describe Stats, :type => :model do
   it "should give interesting statistics about the system" do
     course1 = Factory.create(:course, :name => 'course1')
     course2 = Factory.create(:course, :name => 'course2')
@@ -21,29 +21,29 @@ describe Stats do
     
     stats = Stats.all
     
-    stats[:registered_users].should == 3
+    expect(stats[:registered_users]).to eq(3)
     
     cs = stats[:course_stats]
-    cs['course1'][:participants_with_submissions_count].should == 2
-    cs['course1'][:completed_exercise_count].should == 4
-    cs['course1'][:possible_completed_exercise_count].should == 6 # 2 users with subs and 3 exercises
-    cs['course2'][:participants_with_submissions_count].should == 1
-    cs['course2'][:completed_exercise_count].should == 1
-    cs['course2'][:possible_completed_exercise_count].should == 1 # 1 user with subs and 1 exercise
+    expect(cs['course1'][:participants_with_submissions_count]).to eq(2)
+    expect(cs['course1'][:completed_exercise_count]).to eq(4)
+    expect(cs['course1'][:possible_completed_exercise_count]).to eq(6) # 2 users with subs and 3 exercises
+    expect(cs['course2'][:participants_with_submissions_count]).to eq(1)
+    expect(cs['course2'][:completed_exercise_count]).to eq(1)
+    expect(cs['course2'][:possible_completed_exercise_count]).to eq(1) # 1 user with subs and 1 exercise
     
     egs = cs['course1'][:exercise_group_stats]
-    egs['cat1'][:participants_with_submissions_count].should == 2
-    egs['cat1'][:completed_exercise_count].should == 3
-    egs['cat1'][:possible_completed_exercise_count].should == 4
-    egs['cat2'][:participants_with_submissions_count].should == 1
-    egs['cat2'][:completed_exercise_count].should == 1
-    egs['cat2'][:possible_completed_exercise_count].should == 1
+    expect(egs['cat1'][:participants_with_submissions_count]).to eq(2)
+    expect(egs['cat1'][:completed_exercise_count]).to eq(3)
+    expect(egs['cat1'][:possible_completed_exercise_count]).to eq(4)
+    expect(egs['cat2'][:participants_with_submissions_count]).to eq(1)
+    expect(egs['cat2'][:completed_exercise_count]).to eq(1)
+    expect(egs['cat2'][:possible_completed_exercise_count]).to eq(1)
   end
   
   def create_successful_submission(opts)
     sub = Factory.create(:submission, opts.merge(:all_tests_passed => true))
     Factory.create(:test_case_run, :submission => sub, :successful => true)
-    sub.status.should == :ok
+    expect(sub.status).to eq(:ok)
     sub
   end
 end

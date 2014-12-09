@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Notifications about new code reviews via HTTP push", :integration => true do
+describe "Notifications about new code reviews via HTTP push", :type => :request, :integration => true do
   include IntegrationTestActions
 
   before :each do
@@ -38,7 +38,7 @@ describe "Notifications about new code reviews via HTTP push", :integration => t
     click_button 'Save review'
 
     using_session(:user) do
-      page.should have_content("Your submission for #{@exercise.name} was reviewed.")
+      expect(page).to have_content("Your submission for #{@exercise.name} was reviewed.")
     end
   end
 end
