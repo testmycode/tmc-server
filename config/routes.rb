@@ -1,9 +1,9 @@
 TmcServer::Application.routes.draw do
   resources :sessions, only: [:new, :create, :destroy]
 
-  get '/signin',  to: 'sessions#new'
+  get '/signin', to: 'sessions#new'
   delete '/signout', to: 'sessions#destroy'
-  get '/login',  to: 'sessions#new'
+  get '/login', to: 'sessions#new'
   get '/logout', to: 'sessions#destroy'
 
   resource :auth, only: [:show]
