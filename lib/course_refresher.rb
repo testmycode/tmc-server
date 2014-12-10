@@ -141,7 +141,7 @@ private
         seed_maven_cache
       end
 
-      course.reload  # reload the record given as parameter
+      course.reload # reload the record given as parameter
       raise Failure.new(@report) unless @report.errors.empty?
       @report
     end

@@ -68,7 +68,7 @@ case $PROJECT_TYPE in
 
     mkdir -p classes/main
     mkdir -p classes/test
-    find src  -name '*.java' -print0 | xargs -0 javac -d classes/main -cp $TOOLS_JAR_PATH:lib/*:src/ > test_output.txt 2>&1 || exit 101
+    find src -name '*.java' -print0 | xargs -0 javac -d classes/main -cp $TOOLS_JAR_PATH:lib/*:src/ > test_output.txt 2>&1 || exit 101
     find test -name '*.java' -print0 | xargs -0 javac -d classes/test -cp $TOOLS_JAR_PATH:lib/*:classes/main:test/ > test_output.txt 2>&1 || exit 102
     rm -f test_output.txt
 

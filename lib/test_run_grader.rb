@@ -109,7 +109,7 @@ private
   end
 
   def self.points_from_test_results(results)
-    point_status = {}  # point -> true / false / nil i.e. ok so far / failed / unseen
+    point_status = {} # point -> true / false / nil i.e. ok so far / failed / unseen
     for result in results
       result['pointNames'].each do |name|
         unless point_status[name].eql?(false) # skip if already failed
