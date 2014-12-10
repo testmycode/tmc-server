@@ -1,4 +1,3 @@
-
 window.pathToUrl = (function() {
   var base = null;
   return function(path) {

@@ -41,7 +41,7 @@ module Stats
   def self.participants_with_submissions_count(exercise_or_course = nil)
     exercises = get_exercises(exercise_or_course)
     if exercises && !exercises.empty?
-      exercise_keys = exercises.map {|e| "(#{e.course_id}, #{ActiveRecord::Base.quote_value(e.name)})" }
+      exercise_keys = exercises.map {|e| "(#{e.course_id}, #{ActiveRecord::Base.quote_value(e.name, nil)})" }
       exercises_clause = "AND (course_id, exercise_name) IN (#{exercise_keys.join(',')})"
       all_regular_users.where("EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{exercises_clause})").count
     else

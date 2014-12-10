@@ -7,22 +7,21 @@ class Exercise < ActiveRecord::Base
 
   has_many :available_points, :dependent => :delete_all
 
-  has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc {
-    if self.respond_to?(:course_id)
-      # Used when doing exercise.submissions
-      "submissions.course_id = #{self.course_id}"
-    else
-      # Used when doing exercises.includes(:submissions)
-      'submissions.course_id = exercises.course_id'
-    end  # TODO: apparently there is a nicer way to do this in Rails 4
-  }
-  has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "feedback_answers.course_id = #{self.course_id}" }
-  has_many :unlocks, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "unlocks.course_id = #{self.course_id}" }
+  has_many :submissions,
+    -> (exercise) {
+      if exercise.respond_to?(:course_id)
+        # Used when doing exercise.submissions
+        where(course: exercise.course)
+      else
+        # Used when doing exercises.includes(:submissions)
+        Submission.joins(:exercise)
+      end
+    }, :foreign_key => :exercise_name, :primary_key => :name
 
-  validates :gdocs_sheet, :format => { :without => /^(MASTER|PUBLIC)$/ }
+  has_many :feedback_answers, -> (exercise) { where(course: exercise.course) }, :foreign_key => :exercise_name, :primary_key => :name
+  has_many :unlocks, -> (exercise) { where(course: exercise.course) }, :foreign_key => :exercise_name, :primary_key => :name
+
+  validates :gdocs_sheet, :format => { :without => /\A(MASTER|PUBLIC)\z/ }
 
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)
@@ -304,7 +303,7 @@ class Exercise < ActiveRecord::Base
     s = Submission.arel_table
 
     user_ids = users.map(&:id)
-    exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name)})" }
+    exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name, nil)})" }
 
     query =
       s.

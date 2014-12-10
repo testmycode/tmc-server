@@ -10,32 +10,19 @@
     <meta name="author"/>
     <%= render "layouts/metadata" %>
     <%= yield(:head) %>
-    <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css' %>
-    <%= stylesheet_link_tag "bootstrap.min.css" %>
-    <%= stylesheet_link_tag 'main' %>
+
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_link_tag 'application-test', media: 'all' if Rails.env == 'test' %>
+    <%= stylesheet_link_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.css") %>
+
+    <%= javascript_include_tag 'application' %>
+    <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>
 
     <%= javascript_include_tag(
-          'underscore-min.js',
-          'jquery',
-          'jquery_ujs',
-          'jquery-ui',
-          'jquery.dataTables.min',
-          'jquery.cookie',
-          'bootstrap.min.js',
-          'misc.js',
-          'naturalSort.js',
           comet_js_url('org/cometd.js'),
-          comet_js_url('jquery/jquery.cometd.js'),
-          'comet_connection.js',
-          'review_notifications.js'
+          comet_js_url('jquery/jquery.cometd.js')
         )
     %>
-    <% if Rails.env == 'test' %>
-      <%= stylesheet_link_tag 'highlighting' %>
-    <% end %>
-    <% if @show_page_presence %>
-      <%= javascript_include_tag 'page_presence.js' %>
-    <% end %>
   </head>
   <body class="default">
     <div class="navbar navbar-inverse navbar-static-top">

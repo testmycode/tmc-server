@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <%= stylesheet_link_tag 'main' %>
-  <%= javascript_include_tag 'jquery', 'jquery_ujs', 'jquery.dataTables.min', 'naturalSort.js' %>
-  <%= stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css' %>
-  <% if Rails.env == 'test' %>
-    <%= stylesheet_link_tag 'highlighting' %>
-  <% end %>
-  <%= csrf_meta_tag %>
-  <title>Test My Code server</title>
-</head>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<body class="bare">
-  <div id="content-area">
-    <% for msg_type in [:notice, :warning, :error, :alert] %>
-      <% if flash[msg_type] %>
-        <div class="flash <%= msg_type %>"><%= raw(flash[msg_type]) %></div>
+    <%= stylesheet_link_tag 'application-bare', media: 'all' %>
+    <%= stylesheet_link_tag 'application-test', media: 'all' if Rails.env == 'test' %>
+    <%= stylesheet_link_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.css") %>
+
+    <%= javascript_include_tag 'application-bare' %>
+    <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>
+
+    <%= csrf_meta_tag %>
+    <title>Test My Code server</title>
+  </head>
+  <body class="bare">
+    <div id="content-area">
+      <% for msg_type in [:notice, :warning, :error, :alert] %>
+        <% if flash[msg_type] %>
+          <div class="flash <%= msg_type %>"><%= raw(flash[msg_type]) %></div>
+        <% end %>
       <% end %>
-    <% end %>
 
-    <%= yield %>
-  </div>
-</body>
+      <%= yield %>
+    </div>
+  </body>
 </html>
-
