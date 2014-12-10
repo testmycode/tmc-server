@@ -1,8 +1,9 @@
-require 'system_commands'
-require 'pathname'
 require 'find'
-require 'tmpdir'
+require 'pathname'
+require 'safe_unzipper'
+require 'system_commands'
 require 'tmc_dir_utils'
+require 'tmpdir'
 
 # Represents a list of source code files for the web UI to display.
 class SourceFileList
@@ -33,7 +34,7 @@ class SourceFileList
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
       File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
-      SystemCommands.sh!('unzip', '-qq', zip_path, '-d', tmpdir)
+      SafeUnzipper.new.unzip(zip_path, tmpdir)
 
       project_dir = TmcDirUtils.find_dir_containing(tmpdir, 'src')
       return self.new([]) if project_dir == nil

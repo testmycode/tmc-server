@@ -1,6 +1,7 @@
 require 'tmpdir'
 require 'fileutils'
 require 'pathname'
+require 'safe_unzipper'
 require 'shellwords'
 require 'system_commands'
 require 'tmc_junit_runner'
@@ -41,7 +42,7 @@ class SubmissionPackager
         FileUtils.mkdir_p(dest_name)
 
         Dir.chdir('received') do
-          sh! ['unzip', zip_path]
+          SafeUnzipper.new.unzip(zip_path, '.')
           remove_os_rubbish_files!
         end
 
@@ -60,7 +61,7 @@ class SubmissionPackager
         if config[:tests_from_stub]
           FileUtils.mkdir_p('stub')
           Dir.chdir('stub') do
-            sh! ['unzip', exercise.stub_zip_file_path]
+            SafeUnzipper.new.unzip(exercise.stub_zip_file_path, '.')
             remove_os_rubbish_files!
           end
           stub = Pathname(find_received_project_root(Pathname('stub')))

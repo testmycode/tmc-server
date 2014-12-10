@@ -1,3 +1,7 @@
+### 2014-12-10
+
+* [SECURITY] Fixed vulnerability where symlinks in zips could be used to read any file on the server where the server had read access.
+
 ### 2014-12-09
 
 * Upgraded FactoryGirl to 4.5 and converted to new syntax.
