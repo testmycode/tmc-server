@@ -35,7 +35,7 @@
           <td>
             <% if can? :read, submission.user %>
               <%= link_to submission.user.login, participant_path(submission.user) %>
-            <% else  %>
+            <% else %>
               <%= submission.user.login %>
             <% end %>
           </td>
@@ -64,7 +64,7 @@
         <% end %>
         <% if show_details_column %>
           <td>
-            <%= link_to 'Details', submission_path(submission, anchor: 'files')  %>
+            <%= link_to 'Details', submission_path(submission, anchor: 'files') %>
           </td>
         <% end %>
        </tr>

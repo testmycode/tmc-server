@@ -27,7 +27,7 @@ class Course < ActiveRecord::Base
   has_many :awarded_points, dependent: :delete_all
   has_many :test_scanner_cache_entries, dependent: :delete_all
   has_many :feedback_questions, dependent: :delete_all
-  has_many :feedback_answers  # destroyed transitively when questions are destroyed
+  has_many :feedback_answers # destroyed transitively when questions are destroyed
   has_many :unlocks, dependent: :delete_all
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :course_notifications, dependent: :delete_all

@@ -37,14 +37,14 @@ class FeedbackQuestionsController < ApplicationController
   def show
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read,  @question
-    authorize! :read,  @course
+    authorize! :read, @question
+    authorize! :read, @course
   end
 
   def update
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read,  @course
+    authorize! :read, @course
     authorize! :update, @question
 
     @question.question = params[:feedback_question][:question]
@@ -62,7 +62,7 @@ class FeedbackQuestionsController < ApplicationController
   def destroy
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read,  @course
+    authorize! :read, @course
     authorize! :delete, @question
 
     begin

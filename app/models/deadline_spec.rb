@@ -1,6 +1,5 @@
-
 # Parses and abstracts specification in the "deadline" field of a `metadata.yml` file.
-class DeadlineSpec  # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
+class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
   class InvalidSyntaxError < StandardError; end
 
   def initialize(exercise, specs)

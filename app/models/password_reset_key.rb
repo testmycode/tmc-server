@@ -8,7 +8,7 @@ require 'securerandom'
 class PasswordResetKey < ActiveRecord::Base
   belongs_to :user
   validates :user_id, presence: true, uniqueness: true
-  validates :code, uniqueness: true  # this going wrong should be extremely unlikely
+  validates :code, uniqueness: true # this going wrong should be extremely unlikely
 
   before_create :randomize_code
 

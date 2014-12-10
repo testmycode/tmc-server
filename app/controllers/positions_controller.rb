@@ -1,4 +1,3 @@
-
 # Handles reordering
 #
 # This is poorly named. Also, as noted in FeedbackQuestionsController,
@@ -6,7 +5,7 @@
 class PositionsController < ApplicationController
   def update
     if params[:feedback_question_id]
-      record =  FeedbackQuestion.find(params[:feedback_question_id])
+      record = FeedbackQuestion.find(params[:feedback_question_id])
       authorize! record, :update
       redirect_dest = course_feedback_questions_path(record.course)
     else

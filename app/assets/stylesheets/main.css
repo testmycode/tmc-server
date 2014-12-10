@@ -150,7 +150,7 @@ div.feedback-source {
 }
 
 form.single-button {
-  margin-bottom: 0px;  /* overrides bootstrap's 20px */
+  margin-bottom: 0px; /* overrides bootstrap's 20px */
 }
 
 /* Lists and tables */

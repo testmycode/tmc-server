@@ -35,7 +35,7 @@ class User < ActiveRecord::Base
   end
 
   def username
-    login  # 'login' is a legacy name that ought to be refactored out some day
+    login # 'login' is a legacy name that ought to be refactored out some day
   end
 
   def username=(name)
@@ -98,7 +98,7 @@ class User < ActiveRecord::Base
 
   def self.authenticate(login, submitted_password)
     user = find_by_login(login)
-    return nil  if user.nil?
+    return nil if user.nil?
     return user if user.has_password?(submitted_password)
   end
 

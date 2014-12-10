@@ -40,7 +40,7 @@ class SpywareClient
     request['X-Tmc-Session-Id'] = session_id
     request.body = compressed_data
     response = http.request(request)
-    response.value  # raise if not successful
+    response.value # raise if not successful
     nil
   end
 end
