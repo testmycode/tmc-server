@@ -102,4 +102,3 @@ RSpec.configure do |config|
     RemoteSandboxForTesting.cleanup_after_all_tests!
   end
 end
-

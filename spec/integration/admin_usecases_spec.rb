@@ -54,4 +54,3 @@ describe "The system (used by an instructor for administration)", type: :request
     expect(page).to have_content('All tests successful')
   end
 end
-

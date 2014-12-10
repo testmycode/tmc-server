@@ -14,4 +14,3 @@ namespace :doc do
     end
   end
 end
-

@@ -2,4 +2,3 @@
 # override methods defined in lib/tailoring.rb here.
 class SiteTailoring < Tailoring
 end
-

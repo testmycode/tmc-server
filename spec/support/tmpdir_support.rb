@@ -32,4 +32,3 @@ RSpec.configure do |config|
     # be done in the before :each above.
   end
 end
-

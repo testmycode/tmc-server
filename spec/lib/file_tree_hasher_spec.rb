@@ -59,4 +59,3 @@ describe FileTreeHasher do
     expect(hash1).to eq(hash2)
   end
 end
-

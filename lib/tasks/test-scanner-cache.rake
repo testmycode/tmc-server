@@ -4,4 +4,3 @@ namespace :test_scanner_cache do
     TestScannerCache.clear!
   end
 end
-

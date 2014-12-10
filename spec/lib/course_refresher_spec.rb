@@ -650,4 +650,3 @@ describe CourseRefresher do
   end
 
 end
-

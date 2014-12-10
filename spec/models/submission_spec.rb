@@ -157,4 +157,3 @@ describe Submission, type: :model do
     expect(SubmissionData.find_by_submission_id(id)).to be_nil
   end
 end
-

@@ -80,4 +80,3 @@ describe AvailablePoint, type: :model do
     end
   end
 end
-

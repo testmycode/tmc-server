@@ -293,4 +293,3 @@ private
     self.source_backend ||= Course.default_source_backend
   end
 end
-

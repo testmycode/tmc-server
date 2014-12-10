@@ -274,4 +274,3 @@ EOF
     File.open(name, 'wb') {|f| f.write(contents) }
   end
 end
-

@@ -141,4 +141,3 @@ describe AwardedPoint, type: :model do
     end
   end
 end
-

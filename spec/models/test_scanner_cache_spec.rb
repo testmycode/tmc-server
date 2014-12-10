@@ -48,4 +48,3 @@ describe TestScannerCache, type: :model do
     end).to eq({c: 'd'})
   end
 end
-

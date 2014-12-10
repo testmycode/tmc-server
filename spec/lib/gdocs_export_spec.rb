@@ -41,4 +41,3 @@ describe GDocsExport, gdocs: true do
     end
   end
 end
-

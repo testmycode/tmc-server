@@ -35,4 +35,3 @@ class SubmissionProcessor
     end
   end
 end
-

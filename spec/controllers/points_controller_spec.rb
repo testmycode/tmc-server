@@ -52,4 +52,3 @@ describe PointsController, type: :controller do
     end
   end
 end
-

@@ -60,4 +60,3 @@ private
     File.open(path, "wb") {|f| f.write(lines.join) }
   end
 end
-

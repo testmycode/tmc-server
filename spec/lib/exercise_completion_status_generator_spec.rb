@@ -84,4 +84,3 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
     names.map {|name| AwardedPoint.create(name: name, course_id: @course.id, user_id: @user.id) }
   end
 end
-

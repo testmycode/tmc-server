@@ -304,4 +304,3 @@ describe Exercise, type: :model do
     expect(exercise.missing_review_points_for(user)).to eq([pt3.name])
   end
 end
-

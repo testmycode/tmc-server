@@ -47,4 +47,3 @@ describe Stats, type: :model do
     sub
   end
 end
-

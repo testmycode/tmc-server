@@ -10,4 +10,3 @@ describe "User manual", type: :request, usermanual: true, integration: true do
     make_page 'instructors'
   end
 end
-
