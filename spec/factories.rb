@@ -36,7 +36,7 @@ FactoryGirl.define do
     user
     exercise
     processed true
-    after(:build) { |sub| sub.exercise.course = sub.course  if sub.course}
+    after(:build) { |sub| sub.exercise.course = sub.course if sub.course}
   end
 
   factory :submission_data do

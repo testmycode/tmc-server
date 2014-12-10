@@ -224,7 +224,7 @@ describe TestRunGrader do
       expect(points).not_to include('1.2')
     end
 
-    it "should  award points for which all required tests passed and no validations are failed and strategy is 'fail'" do
+    it "should award points for which all required tests passed and no validations are failed and strategy is 'fail'" do
       @submission.validations = no_failures_in_validations.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 

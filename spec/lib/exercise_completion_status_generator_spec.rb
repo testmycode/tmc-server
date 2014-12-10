@@ -18,7 +18,7 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
   it "is empty for each exercise without submissions and awarded points" do
     completion_status = ExerciseCompletionStatusGenerator.completion_status @user, @course
     completion_status.keys.each { |exercise|
-      expect(completion_status[exercise]).to  eq(nil)
+      expect(completion_status[exercise]).to eq(nil)
     }
   end
 
@@ -27,18 +27,18 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
       award_points ["2", "3.1", "3.2", "3.3"]
       completion_status = ExerciseCompletionStatusGenerator.completion_status @user, @course
 
-      expect(completion_status[@ex1.id]).to  eq(nil)
-      expect(completion_status[@ex2.id]).to  eq(100)
-      expect(completion_status[@ex3.id]).to  eq(75)
+      expect(completion_status[@ex1.id]).to eq(nil)
+      expect(completion_status[@ex2.id]).to eq(100)
+      expect(completion_status[@ex3.id]).to eq(75)
     end
 
     it "is correctly generated in case 2" do
       award_points ["1.1", "1.2", "3.1"]
       completion_status = ExerciseCompletionStatusGenerator.completion_status @user, @course
 
-      expect(completion_status[@ex1.id]).to  eq(100)
-      expect(completion_status[@ex2.id]).to  eq(nil)
-      expect(completion_status[@ex3.id]).to  eq(25)
+      expect(completion_status[@ex1.id]).to eq(100)
+      expect(completion_status[@ex2.id]).to eq(nil)
+      expect(completion_status[@ex3.id]).to eq(25)
     end
   end
 
@@ -48,9 +48,9 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
       submission(@ex2)
       completion_status = ExerciseCompletionStatusGenerator.completion_status @user, @course
 
-      expect(completion_status[@ex1.id]).to  eq(0)
-      expect(completion_status[@ex2.id]).to  eq(0)
-      expect(completion_status[@ex3.id]).to  eq(nil)
+      expect(completion_status[@ex1.id]).to eq(0)
+      expect(completion_status[@ex2.id]).to eq(0)
+      expect(completion_status[@ex3.id]).to eq(nil)
     end
   end
 
@@ -62,9 +62,9 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
 
       award_points ["2", "3.1", "3.3"]
       completion_status = ExerciseCompletionStatusGenerator.completion_status @user, @course
-      expect(completion_status[@ex1.id]).to  eq(0)
-      expect(completion_status[@ex2.id]).to  eq(100)
-      expect(completion_status[@ex3.id]).to  eq(50)
+      expect(completion_status[@ex1.id]).to eq(0)
+      expect(completion_status[@ex2.id]).to eq(100)
+      expect(completion_status[@ex3.id]).to eq(50)
     end
   end
 
