@@ -22,72 +22,72 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
       @exercise_project.solve_add
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
-      
+
       expect(@submission).to be_processed
-      
+
       expect(@submission.test_case_runs).not_to be_empty
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testAdd' }
       expect(tcr).not_to be_nil
       expect(tcr).to be_successful
-      
+
       tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testSubtract' }
       expect(tcr).not_to be_nil
       expect(tcr).not_to be_successful
     end
-    
+
     it "should not create multiple test results for the same test method even if it is involved in multiple points"
-    
+
     it "should raise an error if compilation of a test fails" do
       @exercise_project.introduce_compilation_error
       @setup.make_zip
-      
+
       RemoteSandboxForTesting.run_submission(@submission)
-      
+
       expect(@submission.status).to eq(:error)
       expect(@submission.pretest_error).to match(/Compilation error/)
     end
-    
+
     it "should award points for successful exercises" do
       @exercise_project.solve_sub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
-      
+
       points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('justsub')
       expect(points).not_to include('addsub')
       expect(points).not_to include('mul')
       expect(points).not_to include('simpletest-all')
     end
-    
+
     it "should not award a point if all tests (potentially in multiple files) required for it don't pass" do
       @exercise_project.solve_addsub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
-      
+
       points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('simpletest-all')
       expect(points).not_to include('both-test-files')
     end
-    
+
     it "should award a point if all tests (potentially in multiple files) required for it pass" do
       @exercise_project.solve_all
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
-      
+
       points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('simpletest-all')
       expect(points).to include('both-test-files')
     end
-    
+
     it "should only ever award more points, never delete old points" do
       @exercise_project.solve_sub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
-      
+
       @exercise_project.solve_add
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
-      
+
       points = AwardedPoint.where(course_id: @course.id, user_id: @user.id).map(&:name)
       expect(points).to include('justsub')
       expect(points).to include('addsub')

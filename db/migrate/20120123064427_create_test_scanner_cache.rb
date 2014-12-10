@@ -7,7 +7,7 @@ class CreateTestScannerCache < ActiveRecord::Migration
       t.text :value
       t.datetime :created_at
     end
-    
+
     add_index :test_scanner_cache_entries, [:course_id, :exercise_name], unique: true
   end
 

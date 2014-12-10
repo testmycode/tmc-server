@@ -18,7 +18,7 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
   Dir.chdir root_dir
   require root_dir + '/config/environment'
   Rails.logger.auto_flushing = true
-  
+
 
   loop do
     BackgroundTaskRegistry.all_tasks.each do |task|

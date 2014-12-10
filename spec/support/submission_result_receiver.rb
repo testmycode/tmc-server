@@ -8,26 +8,26 @@ class SubmissionResultReceiver
     @port = FreePorts.take_next
     start_mimic_server!
   end
-  
+
   def pop
     @queue.pop
   end
-  
+
   def cleanup!
     Mimic.cleanup!
     @queue = nil
   end
-  
+
   def receiver_port
     @port
   end
-  
+
   def receiver_url
     "http://localhost:#{receiver_port}/results"
   end
-  
+
 private
-  
+
   def start_mimic_server!
     queue = @queue # put in closure, blocks below have different `self`
     Mimic.mimic(port: receiver_port, fork: true) do

@@ -6,7 +6,7 @@ class AddUserFields < ActiveRecord::Migration
       t.text :value, null: false
       t.timestamps
     end
-    
+
     add_index :user_field_values, [:user_id, :field_name], unique: true
   end
 end

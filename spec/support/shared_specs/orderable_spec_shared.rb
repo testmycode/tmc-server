@@ -35,10 +35,10 @@ shared_examples_for "an Orderable" do
       records = some_existing_records
       records[7].move_forward!
       records.each(&:reload)
-      
+
       expect(records[7].position).to be > records[8].position
       expect(records[7].position).to be < records[9].position
-      
+
       records.delete_at(7)
       positions = records.map(&:position)
       expect(positions).to eq(positions.sort)
