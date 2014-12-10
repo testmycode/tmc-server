@@ -60,8 +60,6 @@ private
       @report.timings[method_name] = result
     end
 
-
-
     def refresh_course(course)
       @report = Report.new
 

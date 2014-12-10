@@ -139,7 +139,6 @@ describe Course, type: :model do
     expect(c.exercises_by_name_or_group('asdasd')).to eq([])
   end
 
-
   describe "validation" do
     let(:valid_params) do
       {

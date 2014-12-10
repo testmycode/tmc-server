@@ -98,7 +98,6 @@ class SubmissionData < ActiveRecord::Base
     @validations = value
   end
 
-
 private
   def compress(text)
     Zlib::Deflate.deflate(text)

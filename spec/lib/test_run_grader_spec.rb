@@ -89,7 +89,6 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
     expect(@submission.points).to eq('1.1')
 
-
     @submission = FactoryGirl.create(:submission, {
       course: @submission.course,
       exercise: @submission.exercise,

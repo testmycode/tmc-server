@@ -45,7 +45,6 @@ describe Exercise, type: :model do
     end
   end
 
-
   describe "associated submissions" do
     before :each do
       @exercise = FactoryGirl.create(:exercise, course: course, name: 'MyExercise')

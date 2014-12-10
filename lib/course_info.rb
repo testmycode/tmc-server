@@ -67,7 +67,6 @@ private
     data
   end
 
-
 private
   def exercise_return_url(e)
     "#{@helpers.exercise_submissions_url(e, format: 'json')}"

@@ -5,7 +5,6 @@ module ApplicationHelper
     Tailoring.get
   end
 
-
   def labeled(label, tags = nil, options = {}, &block)
     if tags.is_a?(Hash) && options.empty?
       options = tags

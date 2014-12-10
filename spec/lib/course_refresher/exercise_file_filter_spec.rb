@@ -45,7 +45,6 @@ describe CourseRefresher::ExerciseFileFilter do
 
     make_test_cases('stub', :make_stub)
 
-
     it "should not include directories under src/ containing only solution files" do
       FileUtils.mkdir_p 'original/src/foo/bar'
       make_file 'original/src/foo/bar/Thing.java', '//SOLUTION FILE'
@@ -161,7 +160,6 @@ EOF
 
     make_test_cases('solution', :make_solution)
 
-
     it "should convert end-of-lines to unix style" do
       make_file 'original/Thing.java', <<EOF
 public class Thing {\r
@@ -193,7 +191,6 @@ public class Thing {
 }
 EOF
     end 
-
 
     it "should remove html comments and make files out of them" do
       make_file 'original/Thing.java', <<EOF

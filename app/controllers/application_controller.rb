@@ -12,7 +12,6 @@ class ApplicationController < ActionController::Base
 
   add_breadcrumb 'TMC', :root_path
 
-
   layout :select_layout
 
   protect_from_forgery

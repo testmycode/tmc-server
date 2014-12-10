@@ -2,7 +2,7 @@
 
 * Upgraded Rails to 4.1.
 * Enabled asset pipeline (see app/assets/ and vendor/assets/).
-* Code style improvement: converted HashStyle from hash rocket to JSON-style.
+* Code style improvements: converted HashStyle from hash rocket to JSON-style and removed extra blank lines.
 * Upgraded jquery-rails to 3.1 and database_cleaner to 1.3.
 * Removed act_as_api (#197).
 

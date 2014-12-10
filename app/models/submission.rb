@@ -279,7 +279,6 @@ class Submission < ActiveRecord::Base
     self.paste_available and not self.all_tests_passed
   end
 
-
   def set_paste_key_if_paste_available
     if self.paste_available?
       self.paste_key = SecureRandom.urlsafe_base64
@@ -290,6 +289,5 @@ private
   def set_processing_attempts_started_at
     self.processing_attempts_started_at = Time.now
   end
-
 
 end

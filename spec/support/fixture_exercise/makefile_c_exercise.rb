@@ -48,7 +48,6 @@ private
     FileUtils.cp_r("#{fixture_path}/Makefile", "#{path}/Makefile")
   end
 
-
   def replace_method_body_in_file(path, method, body)
     lines = IO.readlines(path)
     lines = lines.map do |line|

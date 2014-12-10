@@ -255,7 +255,6 @@ private
     }
   end
 
-
   def check_access!
     paste_visibility = @course.paste_visibility || "open"
     case paste_visibility

@@ -94,7 +94,6 @@ class RemoteSandbox
     @capacity || 1
   end
 
-
 private
   def get_status
     ActiveSupport::JSON.decode(RestClient.get(status_url))

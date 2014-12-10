@@ -621,7 +621,6 @@ describe CourseRefresher do
     end
   end
 
-
   def add_exercise(dest_name, options = {})
     options = {
       commit: true,

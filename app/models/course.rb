@@ -282,7 +282,6 @@ class Course < ActiveRecord::Base
     result
   end
 
-
 private
   def check_source_backend
     unless Course.valid_source_backends.include?(source_backend)

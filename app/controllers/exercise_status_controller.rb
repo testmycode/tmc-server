@@ -36,6 +36,5 @@ class ExerciseStatusController < ApplicationController
     end
   end
 
-
 end
 

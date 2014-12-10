@@ -46,7 +46,6 @@ describe CoursesController, type: :controller do
     end
   end
 
-
   describe "GET show" do
     before :each do
       @course = FactoryGirl.create(:course)
@@ -199,7 +198,6 @@ describe CoursesController, type: :controller do
       end
     end
   end
-
 
   describe "POST create" do
 
