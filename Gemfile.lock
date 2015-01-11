@@ -52,6 +52,7 @@ GEM
     diff-lcs (1.2.5)
     docile (1.1.5)
     erubis (2.7.0)
+    execjs (2.2.2)
     extlib (0.9.16)
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
@@ -208,6 +209,9 @@ GEM
       activerecord (>= 3.0.11)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    uglifier (2.7.0)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
     uuidtools (2.1.5)
     websocket-driver (0.4.0)
     xml-simple (1.1.4)
@@ -249,4 +253,5 @@ DEPENDENCIES
   simplecov
   sprockets-rails
   transaction_isolation (~> 1.0.3)
+  uglifier (~> 2.7.0)
   xml-simple (~> 1.1.1)
