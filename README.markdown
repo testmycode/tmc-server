@@ -32,12 +32,13 @@ We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` w
 3. Edit `config/site.yml` based on `config/site.defaults.yml`.
 4. Install PostgreSQL 9.2+. See `config/database.yml` for database settings.
 5. Initialize the database with `env RAILS_ENV=production rake db:reset`
-6. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
-7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
-8. Compile the other stuff in `ext` by doing `rake compile`.
-9. Install [tmc-check](https://github.com/testmycode/tmc-check) by running `rvmsudo make rubygems install clean` in its directory.
-10. Run the test suite with `rvmsudo rake spec`.
-11. Get pghero stats enabled, add to postgresql.conf following lines
+6. Precompile assets with `env RAILS_ENV=production rake assets:precompile`
+7. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
+8. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
+9. Compile the other stuff in `ext` by doing `rake compile`.
+10. Install [tmc-check](https://github.com/testmycode/tmc-check) by running `rvmsudo make rubygems install clean` in its directory.
+11. Run the test suite with `rvmsudo rake spec`.
+12. Get pghero stats enabled, add to postgresql.conf following lines
     `shared_preload_libraries = 'pg_stat_statements'`
     `pg_stat_statements.track = all`
 
