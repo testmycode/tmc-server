@@ -100,7 +100,7 @@ private
 
       Course.transaction(:requires_new => true) do
         begin
-          @course = Course.find(course.id, :lock => true)
+          @course = Course.lock(true).find(course.id)
 
           @old_cache_path = @course.cache_path
 

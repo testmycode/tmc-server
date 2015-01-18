@@ -2,12 +2,11 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 3.2.0'
+gem 'rails', '~> 4.1.0'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
 gem 'pg', '~> 0.17.0'
-gem 'jquery-rails'
 gem 'cancancan', '~> 1.9.0'
 gem 'rest-client', '~> 1.6.7'
 gem 'daemons', '~> 1.1.9'
@@ -16,12 +15,18 @@ gem 'foreigner', '~> 1.1.6'
 gem 'xml-simple', '~> 1.1.1'
 gem 'transaction_isolation', '~> 1.0.3'
 gem 'andand'
-gem 'acts_as_api'
 gem 'mimemagic'
 gem 'rack-cors'
 gem 'newrelic_rpm'
+gem 'activerecord-session_store', '~> 0.1.0'
 
 gem 'pghero'
+
+group :assets do
+  gem 'sprockets-rails', require: 'sprockets/railtie'
+  gem 'jquery-rails', '~> 3.1.2'
+  gem 'uglifier', '~> 2.7.0'
+end
 
 group :development, :test do
   gem 'rspec', '~> 3.1.0'
@@ -39,4 +44,3 @@ group :development, :test do
   gem 'railroady' # for doc/diagrams
   gem 'simplecov'
 end
-

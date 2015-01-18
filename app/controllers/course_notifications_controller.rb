@@ -7,12 +7,12 @@ class CourseNotificationsController < ApplicationController
   end
 
   def create
-    course = Course.find(params[:course_id])
+    course = Course.find(course_notification_params[:course_id])
 
     participants = User.course_students(course)
     emails = participants.map(&:email).reject(&:blank?)
 
-    notifier = course.course_notifications.create(params[:course_notification], sender_id: current_user.id)
+    notifier = course.course_notifications.create(course_notification_params[:course_notification].merge(sender_id: current_user.id))
 
     if notifier.message.blank?
       flash[:error] = 'Cannot send a blank message.'
@@ -40,6 +40,10 @@ class CourseNotificationsController < ApplicationController
   end
 
 private
+  def course_notification_params
+    params.permit(:commit, :course_id, { course_notification: [:topic, :message] })
+  end
+
   def auth
     authorize! :email, CourseNotification
   end

@@ -1,3 +1,10 @@
+// ...
+//= require jquery-ui
+//= require jquery.dataTables.min
+//= require sh
+//= require comet_connection
+//= require review_notifications
+
 var PagePresence = (function() {
   var changeCallbacks = [];
   var initialCallbacks = [];

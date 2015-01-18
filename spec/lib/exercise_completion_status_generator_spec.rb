@@ -68,8 +68,7 @@ describe ExerciseCompletionStatusGenerator, "completion status" do
     end
   end
 
-
-  def submission(exercise, points = [])
+  def submission(exercise, points = '')
     FactoryGirl.create(:submission, :course_id => @course.id, :exercise_name => exercise.name, :user_id => @user.id, :points => points)
   end
 

@@ -19,7 +19,7 @@ class FeedbackQuestionsController < ApplicationController
   end
 
   def create
-    @question = FeedbackQuestion.new(params[:feedback_question])
+    @question = FeedbackQuestion.new(feedback_question_params[:feedback_question])
     @question.course = @course
     authorize! :create, @question
 
@@ -76,6 +76,10 @@ class FeedbackQuestionsController < ApplicationController
   end
 
 private
+  def feedback_question_params
+    params.permit({ feedback_question: [:question, :title, :kind] }, :intrange_min, :intrange_max, :commit, :course_id)
+  end
+
   def get_course
     @course = Course.find(params[:course_id]) if params[:course_id]
     authorize! :read, @course

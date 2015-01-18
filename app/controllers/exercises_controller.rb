@@ -2,7 +2,7 @@ class ExercisesController < ApplicationController
 
   def show
     @exercise = Exercise.find(params[:id])
-    @course = Course.find(@exercise.course_id, :lock => 'FOR SHARE')
+    @course = Course.lock('FOR SHARE').find(@exercise.course_id)
     authorize! :read, @course
     authorize! :read, @exercise
 
@@ -35,7 +35,7 @@ class ExercisesController < ApplicationController
 
         @submissions = @exercise.submissions.order("submissions.created_at DESC")
         @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
-        @submissions = @submissions.includes(:awarded_points).includes(:user).includes
+        @submissions = @submissions.includes(:awarded_points).includes(:user)
         authorize! :read, @submissions
 
         data = {

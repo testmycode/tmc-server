@@ -14,8 +14,7 @@
 class Unlock < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
-  belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "exercises.course_id = #{self.course_id}" }
+  belongs_to :exercise, -> (unlock) { where(course: unlock.course) }, :foreign_key => :exercise_name, :primary_key => :name
   # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
   def self.refresh_unlocks(course, user)

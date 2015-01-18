@@ -1,3 +1,10 @@
+### 2014-01-18
+
+* Upgraded Rails to 4.1.
+* Enabled asset pipeline (see app/assets/ and vendor/assets/).
+* Upgraded jquery-rails to 3.1 and database_cleaner to 1.3.
+* Removed act_as_api (#197).
+
 ### 2014-12-10
 
 * [SECURITY] Fixed vulnerability where symlinks in zips could be used to read any file on the server where the server had read access.

@@ -40,7 +40,7 @@ module Orderable
 private
   def move!(other, op, delta)
     tbl = self.class.quoted_table_name
-    conn = self.connection
+    conn = ActiveRecord::Base.connection
     conn.transaction(:requires_new => true) do
       conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE")
 
@@ -60,7 +60,7 @@ private
   def set_default_position
     if self.position == nil
       tbl = self.class.quoted_table_name
-      conn = self.connection
+      conn = ActiveRecord::Base.connection
       conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE") # applies to the rest of this transaction
       max = conn.select_value("SELECT MAX(position) FROM #{tbl}").to_i
       self.position = max + 1

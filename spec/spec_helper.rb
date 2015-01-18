@@ -68,9 +68,6 @@ RSpec.configure do |config|
   config.include Capybara::DSL
 
   config.before(:each) do |context|
-    without_db_notices do
-      DatabaseCleaner.clean
-    end
 
     allow(Tailoring).to receive_messages(:get => Tailoring.new)
     SiteSetting.use_distribution_defaults!
@@ -93,6 +90,12 @@ RSpec.configure do |config|
     DatabaseCleaner.start
   end
 
+  config.after(:each) do |context|
+    without_db_notices do
+      DatabaseCleaner.clean
+    end
+  end
+
   # Override with rspec --tag ~integration --tag gdocs spec
   config.filter_run_excluding :gdocs => true
 end
@@ -104,6 +107,3 @@ without_db_notices do
   DatabaseCleaner.clean
 end
 
-# Start with the transaction strategy to match the 'clean' before each test.
-DatabaseCleaner.strategy = :transaction
-DatabaseCleaner.start

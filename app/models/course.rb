@@ -37,7 +37,7 @@ class Course < ActiveRecord::Base
     # Rails' :dependent => :delete_all is very slow.
     # Even self.association.delete_all first does a SELECT.
     # This relies on the database to cascade deletes.
-    self.connection.execute("DELETE FROM courses WHERE id = #{self.id}")
+    ActiveRecord::Base.connection.execute("DELETE FROM courses WHERE id = #{self.id}")
 
     # Delete cache.
     delete_cache # Would be an after_destroy callback normally
@@ -249,7 +249,7 @@ class Course < ActiveRecord::Base
 
     result = {}
     for group in groups
-      conn = self.connection
+      conn = ActiveRecord::Base.connection
 
       # FIXME: this bit is duplicated in MetadataValue in master branch.
       # http://stackoverflow.com/questions/5709887/a-proper-way-to-escape-when-building-like-queries-in-rails-3-activerecord
