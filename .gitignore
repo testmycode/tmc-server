@@ -3,6 +3,7 @@
 /db/*.sqlite3-journal
 /db/files
 /log/
+/public/assets/
 /tmp/
 /doc/usermanual/pages
 /doc/usermanual/screenshots
