@@ -7,14 +7,19 @@ require 'spec_helper'
 # http://stackoverflow.com/questions/18888055/testing-pusher-with-capybara-poltergeist suggests that
 # Poltergeist/PhantomJS may have problems with WebSockets.
 #
-# This test is commented out for now as of 2015-01-18. It should be retried with a newer (> 1.5.1)
+# This test is marked as pending for now as of 2015-01-18. It should be retried with a newer (> 1.5.1)
 # Poltergeist when available.
 #
 # The functionality was last tested manually on 2015-01-18.
-#
-=begin
+
 describe "Notifications about new code reviews via HTTP push", :type => :request, :integration => true do
   include IntegrationTestActions
+
+  before do
+    if Capybara.default_driver == :poltergeist
+      pending("Websockets doesn't work correctly with poltergeist, try enabling this once poltgreist > 1.5.1  is released")
+    end
+  end
 
   before :each do
     CometSupport.ensure_started!
@@ -55,4 +60,3 @@ describe "Notifications about new code reviews via HTTP push", :type => :request
     end
   end
 end
-=end
