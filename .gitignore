@@ -2,7 +2,7 @@
 /db/*.sqlite3
 /db/*.sqlite3-journal
 /db/files
-/log/*.log
+/log/
 /tmp/
 /doc/usermanual/pages
 /doc/usermanual/screenshots
