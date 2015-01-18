@@ -1,5 +1,18 @@
 require 'spec_helper'
 
+# TODO: cometd gives warnings like the following during this test:
+# WARN:oejws.WebSocketServerFactory:qtp466002798-26: Client 127.0.0.1 (:46822) User Agent: [unset] requested WebSocket version [-1], Jetty supports version: [13]
+# WARN:oejh.HttpParser:qtp466002798-19: badMessage: 400 Illegal character 0x93 in state=METHOD in 'GET /comet HTTP/1...4 \\ 8\r\n\r\n$<[m>\x93<<<\x06\xAb>>>n/json;charset=UT...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' for HttpChannelOverHttp@5dd3a532{r=1,c=false,a=IDLE,uri=-}
+#
+# http://stackoverflow.com/questions/18888055/testing-pusher-with-capybara-poltergeist suggests that
+# Poltergeist/PhantomJS may have problems with WebSockets.
+#
+# This test is commented out for now as of 2015-01-18. It should be retried with a newer (> 1.5.1)
+# Poltergeist when available.
+#
+# The functionality was last tested manually on 2015-01-18.
+#
+=begin
 describe "Notifications about new code reviews via HTTP push", :type => :request, :integration => true do
   include IntegrationTestActions
 
@@ -42,3 +55,4 @@ describe "Notifications about new code reviews via HTTP push", :type => :request
     end
   end
 end
+=end
