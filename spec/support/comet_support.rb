@@ -28,7 +28,7 @@ private
     write_config_file
     raise "Already running" if @started
     Dir.chdir TmcComet.get.path.parent do
-      @pid = spawn("./tmc-comet-server.sh #{config_file_path} > #{log_file} 2>&1")
+      @pid = Process.spawn("./tmc-comet-server.sh #{config_file_path} > #{log_file} 2>&1", :pgroup => true)
     end
     @started = true
     wait_for_http_access
@@ -36,7 +36,8 @@ private
 
   def self.stop!
     if @pid
-      Process.kill("TERM", @pid)
+      # We started tmc-comet in a new process group. Kill entire process group.
+      Process.kill("TERM", -@pid)
       Process.waitpid(@pid)
       @pid = nil
       @started = false

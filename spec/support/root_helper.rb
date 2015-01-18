@@ -86,7 +86,7 @@ private
   end
 
   def stop_all_servers
-    debug("Starting stopping all servers (pids #{@server_pids.join(',')}")
+    debug("Starting stopping all servers (pids #{@server_pids.join(',')})")
     for server_pid in @server_pids
       Process.kill("TERM", server_pid)
       Process.waitpid(server_pid)
