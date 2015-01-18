@@ -1,4 +1,5 @@
 require File.expand_path('../boot', __FILE__)
+require File.expand_path('../../app/models/site_setting.rb', __FILE__)
 
 require 'rails/all'
 
@@ -26,6 +27,8 @@ module TmcServer
     config.filter_parameters += [:password, :api_password, :submission_file, :return_file]
 
     config.autoload_paths << Rails.root.join('lib')
+
+    config.relative_url_root = SiteSetting.value('base_path')
 
     config.middleware.use Rack::Cors do
       allow do

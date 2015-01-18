@@ -20,6 +20,10 @@ session_cookie_key: _session_id
 git_repos_chmod: a+rX
 git_repos_chgrp:
 
+# The base deployment path, e.g. if you are deploying to "http://my.site.com/tmc"
+# then this should be "/tmc".
+base_path: /
+
 # A remote sandbox will need to contact the web server when it's done processing.
 # Enter the baseurl of the webapp with which the sandboxes will find the web server.
 baseurl_for_remote_sandboxes: http://localhost:3000/
