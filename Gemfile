@@ -26,6 +26,7 @@ group :assets do
   gem 'sprockets-rails', require: 'sprockets/railtie'
   gem 'jquery-rails', '~> 3.1.2'
   gem 'uglifier', '~> 2.7.0'
+  gem 'sass', '~> 3.4.10'
 end
 
 group :development, :test do
