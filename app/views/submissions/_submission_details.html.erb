@@ -65,7 +65,7 @@
       <br/>
       <div>
         <%= form_tag submission_path(@submission), :method => :put, :class => 'single-button' do %>
-          <%= hidden_field_tag('rerun', '1')  %>
+          <%= hidden_field_tag('rerun', '1') %>
           <div>
             <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
           </div>

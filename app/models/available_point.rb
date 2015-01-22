@@ -6,31 +6,31 @@ class AvailablePoint < ActiveRecord::Base
   include PointComparison
 
   belongs_to :exercise
-  has_one :course, :through => :exercise
-  validates :name, :presence => true
+  has_one :course, through: :exercise
+  validates :name, presence: true
   validate :name_must_not_contain_whitespace
 
   def self.course_points_of_exercises(course, exercises)
-    course_points(course).where(:exercise_id => exercises.map(&:id))
+    course_points(course).where(exercise_id: exercises.map(&:id))
   end
 
   def self.course_points(course)
     joins(:exercise).
-    where(:exercises => {:course_id => course.id})
+    where(exercises: {course_id: course.id})
   end
 
   def self.course_sheet_points(course, sheet)
     joins(:exercise).
-    where(:exercises => {:course_id => course.id, :gdocs_sheet => sheet})
+    where(exercises: {course_id: course.id, gdocs_sheet: sheet})
   end
 
   def award_to(user, submission = nil)
     begin
       AwardedPoint.create!(
-        :course_id => exercise.course_id,
-        :name => name,
-        :user_id => user.id,
-        :submission => submission
+        course_id: exercise.course_id,
+        name: name,
+        user_id: user.id,
+        submission: submission
       )
     rescue ActiveRecord::RecordNotUnique
       # already awarded - ignore

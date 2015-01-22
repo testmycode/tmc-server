@@ -16,4 +16,3 @@ class TmcCheckstyleRunner < MavenProject
     [jar_path] + lib_paths
   end
 end
-

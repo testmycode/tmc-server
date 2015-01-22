@@ -186,4 +186,3 @@ class CourseRefresher
     end
   end
 end
-

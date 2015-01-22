@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Solution, :type => :model do
+describe Solution, type: :model do
   it "should be visible if solution_visible_after has passed" do
     user = FactoryGirl.create(:user)
     ex = FactoryGirl.create(:exercise)

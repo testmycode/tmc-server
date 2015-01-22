@@ -4,7 +4,7 @@ require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise')
 class FixtureExercise::MakefileCExercise < FixtureExercise
   def initialize(path = 'MakefileC', options = {})
     options = {
-      :fixture_name => 'MakefileC'
+      fixture_name: 'MakefileC'
     }.merge(options)
     super(options[:fixture_name], path, options)
   end
@@ -48,7 +48,6 @@ private
     FileUtils.cp_r("#{fixture_path}/Makefile", "#{path}/Makefile")
   end
 
-
   def replace_method_body_in_file(path, method, body)
     lines = IO.readlines(path)
     lines = lines.map do |line|
@@ -61,4 +60,3 @@ private
     File.open(path, "wb") {|f| f.write(lines.join) }
   end
 end
-

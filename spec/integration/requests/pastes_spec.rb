@@ -1,26 +1,26 @@
 require 'spec_helper'
 
-describe "Paste JSON api", :type => :request , :integration => true do
+describe "Paste JSON api", type: :request , integration: true do
   include IntegrationTestActions
 
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = Course.create!(:name => 'mycourse', :source_backend => 'git', :source_url => repo_path)
+    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
     @course.refresh
 
-    @admin = FactoryGirl.create(:admin, :password => 'xooxer')
-    @user = FactoryGirl.create(:user, :login => 'user',  :password => 'xooxer')
-    @viewer = FactoryGirl.create(:user, :login => 'viewer', :password => 'xooxer')
+    @admin = FactoryGirl.create(:admin, password: 'xooxer')
+    @user = FactoryGirl.create(:user, login: 'user', password: 'xooxer')
+    @viewer = FactoryGirl.create(:user, login: 'viewer', password: 'xooxer')
 
   end
 
   def get_paste(id, user)
-    get "/paste/#{id}.json", {api_version: ApiVersion::API_VERSION}, { "Accept" => "application/json", 'HTTP_AUTHORIZATION' =>  basic_auth(user) }
+    get "/paste/#{id}.json", { api_version: ApiVersion::API_VERSION}, { "Accept" => "application/json", 'HTTP_AUTHORIZATION' => basic_auth(user) }
   end
 
   def basic_auth(user)

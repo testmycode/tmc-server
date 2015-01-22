@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CoursesController, :type => :controller do
+describe CoursesController, type: :controller do
 
   before(:each) do
     @user = FactoryGirl.create(:user)
@@ -10,9 +10,9 @@ describe CoursesController, :type => :controller do
     it "shows visible courses in order by name, split into ongoing and expired" do
       controller.current_user = FactoryGirl.create(:admin)
       @courses = [
-        FactoryGirl.create(:course, :name => 'SomeTestCourse'),
-        FactoryGirl.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week),
-        FactoryGirl.create(:course, :name => 'AnotherTestCourse')
+        FactoryGirl.create(:course, name: 'SomeTestCourse'),
+        FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week),
+        FactoryGirl.create(:course, name: 'AnotherTestCourse')
       ]
 
       get :index
@@ -24,8 +24,8 @@ describe CoursesController, :type => :controller do
     describe "in JSON format" do
       def get_index_json(options = {})
         options = {
-          :format => 'json',
-          :api_version => ApiVersion::API_VERSION
+          format: 'json',
+          api_version: ApiVersion::API_VERSION
         }.merge options
         @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("#{@user.login}:#{@user.password}")
         get :index, options
@@ -33,11 +33,11 @@ describe CoursesController, :type => :controller do
       end
 
       it "renders all non-hidden courses in order by name" do
-        FactoryGirl.create(:course, :name => 'Course1')
-        FactoryGirl.create(:course, :name => 'Course2', :hide_after => Time.now + 1.week)
-        FactoryGirl.create(:course, :name => 'Course3')
-        FactoryGirl.create(:course, :name => 'ExpiredCourse', :hide_after => Time.now - 1.week)
-        FactoryGirl.create(:course, :name => 'HiddenCourse', :hidden => true)
+        FactoryGirl.create(:course, name: 'Course1')
+        FactoryGirl.create(:course, name: 'Course2', hide_after: Time.now + 1.week)
+        FactoryGirl.create(:course, name: 'Course3')
+        FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
+        FactoryGirl.create(:course, name: 'HiddenCourse', hidden: true)
 
         result = get_index_json
 
@@ -45,7 +45,6 @@ describe CoursesController, :type => :controller do
       end
     end
   end
-
 
   describe "GET show" do
     before :each do
@@ -61,10 +60,10 @@ describe CoursesController, :type => :controller do
       it "should show everyone's submissions" do
         user1 = FactoryGirl.create(:user)
         user2 = FactoryGirl.create(:user)
-        sub1 = FactoryGirl.create(:submission, :user => user1, :course => @course)
-        sub2 = FactoryGirl.create(:submission, :user => user2, :course => @course)
+        sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
+        sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
 
-        get :show, :id => @course.id
+        get :show, id: @course.id
 
         expect(assigns['submissions']).to include(sub1)
         expect(assigns['submissions']).to include(sub2)
@@ -77,10 +76,10 @@ describe CoursesController, :type => :controller do
       end
 
       it "should show no submissions" do
-        FactoryGirl.create(:submission, :course => @course)
-        FactoryGirl.create(:submission, :course => @course)
+        FactoryGirl.create(:submission, course: @course)
+        FactoryGirl.create(:submission, course: @course)
 
-        get :show, :id => @course.id
+        get :show, id: @course.id
 
         expect(assigns['submissions']).to be_nil
       end
@@ -92,10 +91,10 @@ describe CoursesController, :type => :controller do
       end
       it "should show only the current user's submissions" do
         other_user = FactoryGirl.create(:user)
-        my_sub = FactoryGirl.create(:submission, :user => @user, :course => @course)
-        other_guys_sub = FactoryGirl.create(:submission, :user => other_user, :course => @course)
+        my_sub = FactoryGirl.create(:submission, user: @user, course: @course)
+        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
 
-        get :show, :id => @course.id
+        get :show, id: @course.id
 
         expect(assigns['submissions']).to include(my_sub)
         expect(assigns['submissions']).not_to include(other_guys_sub)
@@ -104,17 +103,17 @@ describe CoursesController, :type => :controller do
 
     describe "in JSON format" do
       before :each do
-        @course = FactoryGirl.create(:course, :name => 'Course1')
-        @course.exercises << FactoryGirl.create(:returnable_exercise, :name => 'Exercise1', :course => @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, :name => 'Exercise2', :course => @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, :name => 'Exercise3', :course => @course)
+        @course = FactoryGirl.create(:course, name: 'Course1')
+        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: @course)
+        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: @course)
+        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: @course)
       end
 
       def get_show_json(options = {}, parse_json=true)
         options = {
-          :format => 'json',
-          :api_version => ApiVersion::API_VERSION,
-          :id => @course.id.to_s
+          format: 'json',
+          api_version: ApiVersion::API_VERSION,
+          id: @course.id.to_s
         }.merge options
         @request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
         get :show, options
@@ -131,8 +130,8 @@ describe CoursesController, :type => :controller do
         exs = result['course']['exercises']
         expect(exs[0]['name']).to eq('Exercise1')
         expect(exs[1]['name']).to eq('Exercise2')
-        expect(exs[0]['zip_url']).to eq(exercise_url(@course.exercises[0].id, :format => 'zip'))
-        expect(exs[0]['return_url']).to eq(exercise_submissions_url(@course.exercises[0].id, :format => 'json'))
+        expect(exs[0]['zip_url']).to eq(exercise_url(@course.exercises[0].id, format: 'zip'))
+        expect(exs[0]['return_url']).to eq(exercise_submissions_url(@course.exercises[0].id, format: 'json'))
       end
 
       it "should include only visible exercises" do
@@ -159,8 +158,8 @@ describe CoursesController, :type => :controller do
       end
 
       it "should tell for each exercise whether it has been attempted" do
-        sub = FactoryGirl.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user)
-        FactoryGirl.create(:test_case_run, :submission => sub, :successful => false)
+        sub = FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user)
+        FactoryGirl.create(:test_case_run, submission: sub, successful: false)
 
         result = get_show_json
 
@@ -170,7 +169,7 @@ describe CoursesController, :type => :controller do
       end
 
       it "should tell for each exercise whether it has been completed" do
-        FactoryGirl.create(:submission, :course => @course, :exercise => @course.exercises[0], :user => @user, :all_tests_passed => true)
+        FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user, all_tests_passed: true)
 
         result = get_show_json
 
@@ -182,7 +181,7 @@ describe CoursesController, :type => :controller do
       describe "and no user given" do
         it "should respond with a 401" do
           controller.current_user = Guest.new
-          get_show_json({:api_username => nil, :api_password => nil}, false)
+          get_show_json({api_username: nil, api_password: nil}, false)
           expect(response.code.to_i).to eq(401)
         end
       end
@@ -200,7 +199,6 @@ describe CoursesController, :type => :controller do
     end
   end
 
-
   describe "POST create" do
 
     before :each do
@@ -209,24 +207,22 @@ describe CoursesController, :type => :controller do
 
     describe "with valid parameters" do
       it "creates the course" do
-        post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
+        post :create, course: { name: 'NewCourse', source_url: 'git@example.com' }
         expect(Course.last.source_url).to eq('git@example.com')
       end
 
       it "redirects to the created course" do
-        post :create, :course => { :name => 'NewCourse', :source_url => 'git@example.com' }
+        post :create, course: { name: 'NewCourse', source_url: 'git@example.com' }
         expect(response).to redirect_to(Course.last)
       end
     end
 
     describe "with invalid parameters" do
       it "re-renders the course creation form" do
-        post :create, :course => { :name => 'invalid name with spaces' }
+        post :create, course: { name: 'invalid name with spaces' }
         expect(response).to render_template("new")
         expect(assigns(:course).name).to eq('invalid name with spaces')
       end
     end
   end
 end
-
-

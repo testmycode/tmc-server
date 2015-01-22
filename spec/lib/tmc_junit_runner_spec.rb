@@ -7,9 +7,9 @@ describe TmcJunitRunner do
         FixtureExercise::SimpleExercise.new('MyExercise')
         methods = TmcJunitRunner.get.get_test_case_methods('MyExercise')
         expect(methods).to include({
-          :class_name => 'SimpleTest',
-          :method_name => 'testAdd',
-          :points => ['simpletest-all', 'both-test-files', 'addsub']
+          class_name: 'SimpleTest',
+          method_name: 'testAdd',
+          points: ['simpletest-all', 'both-test-files', 'addsub']
         })
       end
     end
@@ -19,9 +19,9 @@ describe TmcJunitRunner do
         FixtureExercise::MavenExercise.new('MyExercise')
         methods = TmcJunitRunner.get.get_test_case_methods('MyExercise')
         expect(methods).to include({
-          :class_name => 'SimpleTest',
-          :method_name => 'testAdd',
-          :points => ['simpletest-all', 'both-test-files', 'addsub']
+          class_name: 'SimpleTest',
+          method_name: 'testAdd',
+          points: ['simpletest-all', 'both-test-files', 'addsub']
         })
       end
     end

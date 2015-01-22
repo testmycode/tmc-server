@@ -9,7 +9,7 @@ describe CourseRefresher do
     repo_path ="#{@test_tmp_dir}/fake_remote_repo"
     repo_url = "file://#{repo_path}"
 
-    @course = Course.create!(:name => 'TestCourse', :source_backend => 'git', :source_url => repo_url)
+    @course = Course.create!(name: 'TestCourse', source_backend: 'git', source_url: repo_url)
 
     create_bare_repo(repo_path)
 
@@ -91,26 +91,26 @@ describe CourseRefresher do
   end
 
   it "should work with an empty course options file" do
-    change_course_options_file "", :raw => true
+    change_course_options_file "", raw: true
     @refresher.refresh_course(@course)
     expect(@course.hide_after).to eq(nil)
 
-    change_course_options_file "---", :raw => true
+    change_course_options_file "---", raw: true
     @refresher.refresh_course(@course)
     expect(@course.hide_after).to eq(nil)
   end
 
   it "should load exercise metadata with defaults from superdirs" do
-    add_exercise('MyExercise', :commit => false)
+    add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'metadata.yml',
       {'deadline' => "2000-01-01 00:00", 'gdocs_sheet' => 'xoo'},
-      {:commit => false}
+      {commit: false}
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       {'deadline' => "2012-01-02 12:34"},
-      {:commit => true}
+      {commit: true}
     )
 
     @refresher.refresh_course(@course)
@@ -120,27 +120,27 @@ describe CourseRefresher do
   end
 
   it "should load changed exercise metadata" do
-    add_exercise('MyExercise', :commit => false)
+    add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'metadata.yml',
       {'deadline' => "2000-01-01 00:00", 'gdocs_sheet' => 'xoo'},
-      {:commit => false}
+      {commit: false}
     )
     change_metadata_file('MyExercise/metadata.yml',
       {'deadline' => "2012-01-02 12:34"},
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
     change_metadata_file(
       'metadata.yml',
       {'deadline' => "2013-01-01 00:00", 'gdocs_sheet' => 'xoo'},
-      {:commit => false}
+      {commit: false}
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       {'gdocs_sheet' => "foo"},
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
@@ -168,7 +168,7 @@ describe CourseRefresher do
   end
 
   it "should allow course-specific overrides in metadata settings" do
-    add_exercise('MyExercise', :commit => false)
+    add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'metadata.yml',
       {
@@ -182,7 +182,7 @@ describe CourseRefresher do
           }
         }
       },
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
@@ -190,7 +190,7 @@ describe CourseRefresher do
   end
 
   it "should apply course-specific overrides before merging subdirectory settings" do
-    add_exercise('MyExercise', :commit => false)
+    add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'metadata.yml',
       {
@@ -201,12 +201,12 @@ describe CourseRefresher do
           },
         }
       },
-      {:commit => false}
+      {commit: false}
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       {'deadline' => "2001-01-01 00:00"},
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
@@ -214,7 +214,7 @@ describe CourseRefresher do
   end
 
   it "should allow overriding a setting with a course-specific nil setting" do
-    add_exercise('MyExercise', :commit => false)
+    add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'MyExercise/metadata.yml',
       {
@@ -225,7 +225,7 @@ describe CourseRefresher do
           },
         }
       },
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
@@ -233,16 +233,16 @@ describe CourseRefresher do
   end
 
   it "should allow overriding a setting with a nil setting in a subdirectory" do
-    add_exercise('MyExercise', :commit => false)
+    add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'metadata.yml',
       {'deadline' => "2001-01-01 00:00"},
-      {:commit => false}
+      {commit: false}
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       {'deadline' => nil},
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
@@ -264,7 +264,7 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       {'review_points' => 'addsub reviewonly'},
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
@@ -279,13 +279,13 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       {'review_points' => 'addsub reviewonly'},
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
     change_metadata_file(
       'metadata.yml',
       {'review_points' => 'mul'},
-      {:commit => true}
+      {commit: true}
     )
     @refresher.refresh_course(@course)
 
@@ -319,7 +319,7 @@ describe CourseRefresher do
   end
 
   it "should cope with exercises that use Java packages" do
-    add_exercise('MyExercise', :fixture_name => 'ExerciseWithPackages')
+    add_exercise('MyExercise', fixture_name: 'ExerciseWithPackages')
     @refresher.refresh_course(@course)
 
     expect(@course.exercises.size).to eq(1)
@@ -332,7 +332,7 @@ describe CourseRefresher do
     add_exercise('MyExercise')
     @refresher.refresh_course(@course)
 
-    points = @course.exercises.where(:name => 'MyExercise').first.available_points
+    points = @course.exercises.where(name: 'MyExercise').first.available_points
     expect(points.map(&:name)).to include('addsub')
   end
 
@@ -350,12 +350,12 @@ describe CourseRefresher do
     @refresher.refresh_course(@course)
 
     exercise = @course.exercises.first
-    sub = FactoryGirl.create(:submission, :course => @course, :exercise_name => exercise.name)
+    sub = FactoryGirl.create(:submission, course: @course, exercise_name: exercise.name)
     awarded_point = AwardedPoint.create!({
-      :course => @course,
-      :user => sub.user,
-      :submission => sub,
-      :name => AvailablePoint.first.name
+      course: @course,
+      user: sub.user,
+      submission: sub,
+      name: AvailablePoint.first.name
     })
 
     delete_exercise('MyExercise')
@@ -544,7 +544,7 @@ describe CourseRefresher do
   end
 
   it "should report YAML parsing errors normally" do
-    change_course_options_file "foo: bar\noops :error", :raw => true
+    change_course_options_file "foo: bar\noops :error", raw: true
     expect { @refresher.refresh_course(@course) }.to raise_error(CourseRefresher::Failure)
   end
 
@@ -604,15 +604,15 @@ describe CourseRefresher do
 
   describe "for MakefileC exercises" do
     it "should scan the exercises for available points" do
-      add_exercise('MakefileC', :fixture_name => 'MakefileC')
+      add_exercise('MakefileC', fixture_name: 'MakefileC')
       @refresher.refresh_course(@course)
 
-      points = @course.exercises.where(:name => 'MakefileC').first.available_points
+      points = @course.exercises.where(name: 'MakefileC').first.available_points
       expect(points.map(&:name)).to include('point1')
     end
 
     it "should delete previously available points that are no longer available" do
-      add_exercise('MakefileC', :fixture_name => 'MakefileC')
+      add_exercise('MakefileC', fixture_name: 'MakefileC')
       @refresher.refresh_course(@course)
       delete_exercise('MakefileC')
       @refresher.refresh_course(@course)
@@ -621,11 +621,10 @@ describe CourseRefresher do
     end
   end
 
-
   def add_exercise(dest_name, options = {})
     options = {
-      :commit => true,
-      :fixture_name =>  options[:fixture_name] || 'SimpleExerciseWithSolutionsAndStubs'
+      commit: true,
+      fixture_name: options[:fixture_name] || 'SimpleExerciseWithSolutionsAndStubs'
     }.merge options
     @local_clone.copy_fixture_exercise(options[:fixture_name], dest_name)
     @local_clone.add_commit_push if options[:commit]
@@ -642,7 +641,7 @@ describe CourseRefresher do
   end
 
   def change_metadata_file(filename, data, options = {})
-    options = { :raw => false, :commit => true }.merge options
+    options = { raw: false, commit: true }.merge options
     Dir.chdir @local_clone.path do
       data = YAML.dump(data) unless options[:raw]
       File.open(filename, 'wb') {|f| f.write(data) }
@@ -651,4 +650,3 @@ describe CourseRefresher do
   end
 
 end
-

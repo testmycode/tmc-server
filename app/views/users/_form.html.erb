@@ -7,7 +7,7 @@
     <%= bs_labeled_field('E-mail:', f.text_field(:email)) %>
     <%= bs_labeled_field('Confirm e-mail:', f.text_field(:email_repeat, :value => '')) %>
   </section>
-  
+
   <% if @user.new_record? %>
     <section>
       <h2>Password</h2>
@@ -30,14 +30,14 @@
           <h2><%= group %></h2>
           <% for field in UserField.by_group(group) %>
             <% if field.visible_to?(@user) %>
-              <%= extra_field(@user.field_value_record(field), :form_scope => 'user_field')  %>
+              <%= extra_field(@user.field_value_record(field), :form_scope => 'user_field') %>
             <% end %>
           <% end %>
         <% end %>
       <% end %>
     </section>
   <% end %>
-  
+
   <section>
     <% if @user.new_record? %>
       <%= f.submit "Sign up", class: "btn btn-primary" %>

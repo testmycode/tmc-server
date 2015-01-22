@@ -8,7 +8,7 @@ describe SubmissionPackager::JavaSimple do
   include SystemCommands
 
   before :each do
-    @setup = SubmissionTestSetup.new(:exercise_name => 'SimpleExercise')
+    @setup = SubmissionTestSetup.new(exercise_name: 'SimpleExercise')
     @course = @setup.course
     @repo = @setup.repo
     @exercise_project = @setup.exercise_project
@@ -32,7 +32,7 @@ describe SubmissionPackager::JavaSimple do
   describe 'tar' do
     it "packages the submission in a tar file with tests from the repo" do
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -69,7 +69,7 @@ describe SubmissionPackager::JavaSimple do
       @exercise_project.solve_all
       File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
       File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -90,7 +90,7 @@ describe SubmissionPackager::JavaSimple do
       @exercise_project.solve_all
       File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
       File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -110,7 +110,7 @@ describe SubmissionPackager::JavaSimple do
       end
       File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
       File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -130,7 +130,7 @@ describe SubmissionPackager::JavaSimple do
       end
 
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -148,7 +148,7 @@ describe SubmissionPackager::JavaSimple do
       File.open("#{@exercise_project.path}/.tmcrc", 'w') do |f|
         f.write("hello")
       end
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -162,7 +162,7 @@ describe SubmissionPackager::JavaSimple do
 
     it "adds tmc-junit-runner.jar and its deps to lib/testrunner/" do
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -180,7 +180,7 @@ describe SubmissionPackager::JavaSimple do
     # TODO(jamo) it doesn't really test for the deps
     it "adds tmc-checkstyle-runner.jar to lib/testrunner/" do
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -201,7 +201,7 @@ describe SubmissionPackager::JavaSimple do
       File.open("#{@exercise_project.path}/foo.txt", 'w') do |f|
         f.write("submissionhello")
       end
-      @exercise_project.make_zip(:src_only => true)
+      @exercise_project.make_zip(src_only: true)
 
       package_it
 
@@ -216,9 +216,9 @@ describe SubmissionPackager::JavaSimple do
 
     it "writes extra parameters into .tmcparams" do
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
-      package_it(:foo => :bar)
+      package_it(foo: :bar)
 
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
@@ -232,7 +232,7 @@ describe SubmissionPackager::JavaSimple do
     it "writes runtime params into .tmcparams" do
       @exercise.runtime_params = ActiveSupport::JSON.encode(["-Xss8M", "-verbose:gc"])
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -248,7 +248,7 @@ describe SubmissionPackager::JavaSimple do
     describe "tmc-run script added to the archive" do
       it "should compile and run the submission" do
         @exercise_project.solve_all
-        @exercise_project.make_zip(:src_only => false)
+        @exercise_project.make_zip(src_only: false)
 
         package_it
 
@@ -277,7 +277,7 @@ describe SubmissionPackager::JavaSimple do
 
       it "sould report compilation errors in test_output.txt with exit code 101" do
         @exercise_project.introduce_compilation_error
-        @exercise_project.make_zip(:src_only => false)
+        @exercise_project.make_zip(src_only: false)
 
         package_it
 
@@ -302,7 +302,7 @@ describe SubmissionPackager::JavaSimple do
         end
 
         @exercise_project.solve_all
-        @exercise_project.make_zip(:src_only => false)
+        @exercise_project.make_zip(src_only: false)
 
         package_it
 
@@ -331,7 +331,7 @@ describe SubmissionPackager::JavaSimple do
   describe 'zip' do
     it "packages the submission in a zip file with tests from the repo" do
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it_for_download
 
@@ -372,7 +372,7 @@ describe SubmissionPackager::JavaSimple do
       @exercise_project.solve_all
       File.open(@exercise_project.path + '/test/SimpleTest.java', 'w') {|f| f.write('foo') }
       File.open(@exercise_project.path + '/test/NewTest.java', 'w') {|f| f.write('bar') }
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it_for_download
 

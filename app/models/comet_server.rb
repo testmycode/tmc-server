@@ -41,10 +41,10 @@ class CometServer
 
   def publish(channel, msg)
     params = {
-      :channel => channel,
-      :data => msg.to_json,
-      :serverBaseUrl => @my_baseurl,
-      :backendKey => @key
+      channel: channel,
+      data: msg.to_json,
+      serverBaseUrl: @my_baseurl,
+      backendKey: @key
     }
     ::Rails.logger.info "Posting to tmc-comet: #{params.inspect}"
     RestClient.post(publish_url, params)

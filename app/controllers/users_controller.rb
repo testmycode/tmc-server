@@ -29,14 +29,14 @@ class UsersController < ApplicationController
 
     if @user.errors.empty? && @user.save
       if @bare_layout
-        render :text => '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', :layout => true
+        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', layout: true
       else
         flash[:notice] = 'User account created. You can now log in.'
         redirect_to root_path
       end
     else
       flash.now[:error] = 'Failed'
-      render :action => :show, :status => 403
+      render action: :show, status: 403
     end
   end
 
@@ -72,7 +72,7 @@ class UsersController < ApplicationController
       redirect_to user_path
     else
       flash.now[:error] = 'Failed to save profile'
-      render :action => :show, :status => 403
+      render action: :show, status: 403
     end
   end
 

@@ -2,10 +2,10 @@ module GitTestActions
   include SystemCommands
 
   def create_bare_repo(path, options = {})
-    options = {:initial_commit => true}.merge(options)
+    options = {initial_commit: true}.merge(options)
     abs_path = File.expand_path(path)
     system!("git init -q --bare #{path}")
-    
+
     if options[:initial_commit] # To avoid pesky warning about cloning empty repos
       Dir.mktmpdir do |tmpdir|
         system!("git init -q #{tmpdir}")
@@ -27,24 +27,24 @@ module GitTestActions
     else
       course = Course.find_by_name(course_or_course_name)
     end
-    
+
     raise 'Course not using git but ' + course.source_backend if course.source_backend != 'git'
-    
+
     repo_path = pick_free_file_name("#{course.name}-wc")
     clone_repo(course.source_url, repo_path)
-    
+
     GitRepo.new(repo_path)
   end
-  
+
   def clone_repo(from, to)
     # silencing warning about cloning empty repo
     system!("git clone -q #{from} #{to} >/dev/null 2>&1")
   end
-  
+
 private
   def pick_free_file_name(base_name)
     return base_name if !File.exist?(base_name)
-    
+
     n = 1
     begin
       n += 1

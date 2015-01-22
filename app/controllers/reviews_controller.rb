@@ -7,7 +7,7 @@ class ReviewsController < ApplicationController
       fetch :course
 
       @my_reviews = @course.submissions.
-        where(:user_id => current_user.id).
+        where(user_id: current_user.id).
         where('requests_review OR requires_review OR reviewed').
         order('created_at DESC')
 
@@ -18,7 +18,7 @@ class ReviewsController < ApplicationController
           render 'reviews/course_index'
         end
         format.json do
-          render :json => course_reviews_json
+          render json: course_reviews_json
         end
       end
     else
@@ -52,8 +52,8 @@ class ReviewsController < ApplicationController
     add_breadcrumb 'Code review editor', new_submission_review_path(@submission)
 
     @new_review = Review.new(
-      :submission_id => @submission.id,
-      :reviewer_id => current_user.id
+      submission_id: @submission.id,
+      reviewer_id: current_user.id
     )
     authorize! :create, @new_review
     render 'reviews/submission_index'
@@ -62,9 +62,9 @@ class ReviewsController < ApplicationController
   def create
     fetch :submission
     @review = Review.new(
-      :submission_id => @submission.id,
-      :reviewer_id => current_user.id,
-      :review_body => params[:review][:review_body]
+      submission_id: @submission.id,
+      reviewer_id: current_user.id,
+      review_body: params[:review][:review_body]
     )
     authorize! :create, @review
 
@@ -109,36 +109,36 @@ class ReviewsController < ApplicationController
 
 private
   def course_reviews_json
-    submissions = @my_reviews.includes(:reviews => [:reviewer, :submission])
+    submissions = @my_reviews.includes(reviews: [:reviewer, :submission])
     exercises = Hash[@course.exercises.map {|e| [e.name, e] }]
     reviews = submissions.map do |s|
       s.reviews.map do |r|
         {
-          :submission_id => s.id,
-          :exercise_name => s.exercise_name
+          submission_id: s.id,
+          exercise_name: s.exercise_name
         }.merge(review_json(exercises, r))
       end
     end.flatten
     {
-      :api_version => ApiVersion::API_VERSION,
-      :reviews => reviews
+      api_version: ApiVersion::API_VERSION,
+      reviews: reviews
     }
   end
 
   def review_json(exercises, review)
-    available_points = exercises[review.submission.exercise_name].available_points.where(:requires_review => true).map(&:name)
+    available_points = exercises[review.submission.exercise_name].available_points.where(requires_review: true).map(&:name)
     points_not_awarded = available_points - review.points_list
     {
-      :id => review.id,
-      :marked_as_read => review.marked_as_read,
-      :reviewer_name => review.reviewer.display_name,
-      :review_body => review.review_body,
-      :points => review.points_list.natsort,
-      :points_not_awarded => points_not_awarded.natsort,
-      :url => submission_reviews_url(review.submission_id),
-      :update_url => review_url(review),
-      :created_at => review.created_at,
-      :updated_at => review.updated_at
+      id: review.id,
+      marked_as_read: review.marked_as_read,
+      reviewer_name: review.reviewer.display_name,
+      review_body: review.review_body,
+      points: review.points_list.natsort,
+      points_not_awarded: points_not_awarded.natsort,
+      url: submission_reviews_url(review.submission_id),
+      update_url: review_url(review),
+      created_at: review.created_at,
+      updated_at: review.updated_at
     }
   end
 
@@ -156,7 +156,7 @@ private
           redirect_to submission_reviews_path(@review.submission)
         end
         format.json do
-          render :json => {:status => 'OK'}
+          render json: {status: 'OK'}
         end
       end
     else
@@ -190,7 +190,7 @@ private
     sub.of_same_kind.
       where('(requires_review OR requests_review) AND NOT reviewed').
       where(['created_at < ?', sub.created_at]).
-      update_all(:newer_submission_reviewed => true)
+      update_all(newer_submission_reviewed: true)
   end
 
   def fetch(*stuff)
@@ -214,9 +214,9 @@ private
   def notify_user_about_new_review
     channel = '/broadcast/user/' + @review.submission.user.username + '/review-available'
     data = {
-      :exercise_name => @review.submission.exercise_name,
-      :url => submission_reviews_url(@review.submission),
-      :points => @review.points_list
+      exercise_name: @review.submission.exercise_name,
+      url: submission_reviews_url(@review.submission),
+      points: @review.points_list
     }
     CometServer.get.try_publish(channel, data)
   end
@@ -231,21 +231,21 @@ private
     course = exercise.course
     raise "Exercise of submission has been moved or deleted" if !exercise
 
-    available_points = exercise.available_points.where(:requires_review => true).map(&:name)
-    previous_points = course.awarded_points.where(:user_id => submission.user_id, :name => available_points).map(&:name)
+    available_points = exercise.available_points.where(requires_review: true).map(&:name)
+    previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
 
     new_points = []
     if params[:review][:points].respond_to?(:keys)
       for point_name in params[:review][:points].keys
-        unless exercise.available_points.where(:name => point_name).any?
+        unless exercise.available_points.where(name: point_name).any?
           raise "Point does not exist: #{point_name}"
         end
 
         new_points << point_name
         pt = submission.awarded_points.build(
-          :course_id => submission.course_id,
-          :user_id => submission.user_id,
-          :name => point_name
+          course_id: submission.course_id,
+          user_id: submission.user_id,
+          name: point_name
         )
         authorize! :create, pt
         pt.save!

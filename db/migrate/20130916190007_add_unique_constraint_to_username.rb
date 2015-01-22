@@ -1,6 +1,6 @@
 class AddUniqueConstraintToUsername < ActiveRecord::Migration
   def up
-    add_index :users, [:login], :name => "index_users_on_login", :unique => true
+    add_index :users, [:login], name: "index_users_on_login", unique: true
   end
 
   def down

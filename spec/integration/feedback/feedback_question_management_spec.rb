@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe "Feedback question management", :type => :request, :integration => true do
+describe "Feedback question management", type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
-    @user = FactoryGirl.create(:admin, :password => 'xooxer')
+    @user = FactoryGirl.create(:admin, password: 'xooxer')
     visit '/'
     log_in_as(@user.login, 'xooxer')
 
-    create_new_course :name => 'TheCourse', :source_url => Dir.pwd + '/unused'
+    create_new_course name: 'TheCourse', source_url: Dir.pwd + '/unused'
 
     visit '/'
     click_link 'TheCourse'
@@ -17,12 +17,12 @@ describe "Feedback question management", :type => :request, :integration => true
 
   it "should permit creating questions" do
     click_link 'Add question'
-    fill_in 'Question', :with => "How's it going?"
+    fill_in 'Question', with: "How's it going?"
     choose 'Text area'
     click_button 'Create question'
 
     click_link 'Add question'
-    fill_in 'Question', :with => "What's the weather like?"
+    fill_in 'Question', with: "What's the weather like?"
     choose 'Text area'
     click_button 'Create question'
 
@@ -32,12 +32,12 @@ describe "Feedback question management", :type => :request, :integration => true
 
   it "should permit changing the question text" do
     click_link 'Add question'
-    fill_in 'Question', :with => "How's it going?"
+    fill_in 'Question', with: "How's it going?"
     choose 'Text area'
     click_button 'Create question'
 
     click_link "How's it going?"
-    fill_in 'Question', :with => "How are you doing?"
+    fill_in 'Question', with: "How are you doing?"
     click_button 'Save'
 
     expect(page).to have_content("How are you doing?")

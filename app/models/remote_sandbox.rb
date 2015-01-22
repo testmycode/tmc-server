@@ -45,7 +45,7 @@ class RemoteSandbox
 
         File.open(tar_path, 'r') do |tar_file|
           begin
-            RestClient.post post_url, :file => tar_file, :notify => notify_url, :token => submission.secret_token
+            RestClient.post post_url, file: tar_file, notify: notify_url, token: submission.secret_token
           rescue
             raise SandboxUnavailableError.new
           end
@@ -73,7 +73,7 @@ class RemoteSandbox
 
   def seed_maven_cache(file_path)
     File.open(file_path, 'r') do |file|
-      RestClient.post(maven_cache_populate_url, :file => file, :run_tests => true)
+      RestClient.post(maven_cache_populate_url, file: file, run_tests: true)
     end
   end
 
@@ -93,7 +93,6 @@ class RemoteSandbox
     end
     @capacity || 1
   end
-
 
 private
   def get_status

@@ -24,7 +24,7 @@ class SubmissionTestSetup
     @repo_path = 'remote_repo'
     create_bare_repo(@repo_path)
 
-    @course = Course.create!(:name => course_name, :source_backend => 'git', :source_url => @repo_path)
+    @course = Course.create!(name: course_name, source_backend: 'git', source_url: @repo_path)
     @repo = clone_course_repo(@course)
     @repo.copy_fixture_exercise(exercise_name, exercise_dest)
     @repo.add_commit_push
@@ -38,9 +38,9 @@ class SubmissionTestSetup
     @exercise_project = FixtureExercise.get(exercise_name, exercise_dest)
 
     @submission = Submission.new(
-      :user => @user,
-      :course => @course,
-      :exercise => @exercise
+      user: @user,
+      course: @course,
+      exercise: @exercise
     )
 
     if should_solve
@@ -61,17 +61,17 @@ class SubmissionTestSetup
 
   def default_options
     {
-      :course_name => 'MyCourse',
-      :exercise_name => nil,
-      :exercise_dest => nil,
-      :user => nil,
-      :solve => false,
-      :save => false
+      course_name: 'MyCourse',
+      exercise_name: nil,
+      exercise_dest: nil,
+      user: nil,
+      solve: false,
+      save: false
     }
   end
 
 private
   def create_user
-    FactoryGirl.create(:user, :login => 'student', :password => 'student')
+    FactoryGirl.create(:user, login: 'student', password: 'student')
   end
 end

@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe ExerciseStatusController, :type => :controller do
+describe ExerciseStatusController, type: :controller do
   before :each do
     @course = FactoryGirl.create(:course)
-    @exercise = FactoryGirl.create(:exercise, :course => @course)
-    @exercise2 = FactoryGirl.create(:exercise, :course => @course)
-    @exercise3 = FactoryGirl.create(:exercise, :course => @course)
+    @exercise = FactoryGirl.create(:exercise, course: @course)
+    @exercise2 = FactoryGirl.create(:exercise, course: @course)
+    @exercise3 = FactoryGirl.create(:exercise, course: @course)
   end
 
   describe "GET show" do
@@ -13,33 +13,33 @@ describe ExerciseStatusController, :type => :controller do
       before :each do
         @user = FactoryGirl.create(:user)
         @submission = FactoryGirl.create(:submission,
-                                     :course => @course,
-                                     :user => @user,
-                                     :exercise => @exercise,
-                                     :all_tests_passed => true)
+                                     course: @course,
+                                     user: @user,
+                                     exercise: @exercise,
+                                     all_tests_passed: true)
         @available_point = FactoryGirl.create(:available_point,
-                                          :exercise => @exercise)
+                                          exercise: @exercise)
 
         @awarded_point = FactoryGirl.create(:awarded_point,
-                                        :course => @course,
-                                        :name => @available_point.name,
-                                        :submission => @submission,
-                                        :user => @user)
+                                        course: @course,
+                                        name: @available_point.name,
+                                        submission: @submission,
+                                        user: @user)
 
         @submission2 = FactoryGirl.create(:submission,
-                                     :course => @course,
-                                     :user => @user,
-                                     :exercise => @exercise2,
-                                     :all_tests_passed => false)
+                                     course: @course,
+                                     user: @user,
+                                     exercise: @exercise2,
+                                     all_tests_passed: false)
         @available_point2 = FactoryGirl.create(:available_point,
-                                          :exercise => @exercise2)
+                                          exercise: @exercise2)
         @available_point22 = FactoryGirl.create(:available_point,
-                                          :exercise => @exercise2)
+                                          exercise: @exercise2)
 
       end
 
       def do_get
-        get :show, :course_id => @course.id, :id => @user.id, :format => :json, :api_version => ApiVersion::API_VERSION
+        get :show, course_id: @course.id, id: @user.id, format: :json, api_version: ApiVersion::API_VERSION
       end
 
       it "should show completition status for submitted exercises" do

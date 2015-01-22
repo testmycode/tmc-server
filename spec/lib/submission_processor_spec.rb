@@ -13,7 +13,7 @@ describe SubmissionProcessor do
   describe "reprocessing submissions" do
 
     before :each do
-      @sub = FactoryGirl.create(:submission, :processed => false)
+      @sub = FactoryGirl.create(:submission, processed: false)
     end
 
     it "should reprocess when no sandbox was available a short while ago" do
@@ -49,7 +49,7 @@ describe SubmissionProcessor do
 
     context "when the submission has been reprocessed too many times" do
       before :each do
-        @sub.times_sent_to_sandbox =  Submission.max_attempts_at_processing
+        @sub.times_sent_to_sandbox = Submission.max_attempts_at_processing
         @sub.save!
       end
 

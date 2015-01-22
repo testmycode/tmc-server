@@ -5,7 +5,7 @@
 module Orderable
   extend ActiveSupport::Concern
   included do
-    validates :position, :uniqueness => true
+    validates :position, uniqueness: true
     before_create :set_default_position
   end
 
@@ -41,7 +41,7 @@ private
   def move!(other, op, delta)
     tbl = self.class.quoted_table_name
     conn = ActiveRecord::Base.connection
-    conn.transaction(:requires_new => true) do
+    conn.transaction(requires_new: true) do
       conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE")
 
       other_pos = conn.select_value("SELECT position FROM #{tbl} WHERE id = #{other.id}")

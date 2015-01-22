@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SessionsController, :type => :controller do
+describe SessionsController, type: :controller do
 
   before :each do
     @user = mock_model(User, :administrator? => true)
@@ -11,10 +11,10 @@ describe SessionsController, :type => :controller do
 
   def post_create
     session_attrs = {
-      :login    => 'instructor',
-      :password => 'correct_password'
+      login: 'instructor',
+      password: 'correct_password'
     }
-    post :create, :session => session_attrs
+    post :create, session: session_attrs
   end
 
   describe "POST create" do
@@ -39,7 +39,7 @@ describe SessionsController, :type => :controller do
 
     describe "when authentication fails" do
       before :each do
-        allow(User).to receive_messages(:authenticate => nil)
+        allow(User).to receive_messages(authenticate: nil)
       end
 
       it "should not set current_user" do

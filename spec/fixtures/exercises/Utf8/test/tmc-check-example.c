@@ -16,7 +16,7 @@ END_TEST
 
 int main(int argc, const char *argv[])
 {
-    Suite *s  = tmc_suite_create("my-suite", "suitePoints");
+    Suite *s = tmc_suite_create("my-suite", "suitePoints");
     tmc_register_test(s, test_foo, "point1");
     return tmc_run_tests(argc, argv, s);
 }

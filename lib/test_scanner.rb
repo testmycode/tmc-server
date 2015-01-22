@@ -21,4 +21,3 @@ module TestScanner
     end
   end
 end
-

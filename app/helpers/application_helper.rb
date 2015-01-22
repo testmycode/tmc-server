@@ -5,7 +5,6 @@ module ApplicationHelper
     Tailoring.get
   end
 
-
   def labeled(label, tags = nil, options = {}, &block)
     if tags.is_a?(Hash) && options.empty?
       options = tags
@@ -13,8 +12,8 @@ module ApplicationHelper
     end
 
     options = {
-      :order => :label_first,
-      :class => nil
+      order: :label_first,
+      class: nil
     }.merge(options)
 
     tags = capture(&block) if tags == nil && block != nil
@@ -69,8 +68,8 @@ module ApplicationHelper
 
   def use_datatables(table_selector, options = {})
     options = {
-      :bJQueryUI => true,
-      :bSort => false
+      bJQueryUI: true,
+      bSort: false
     }.merge options
     script =<<EOS
 <script type="text/javascript">

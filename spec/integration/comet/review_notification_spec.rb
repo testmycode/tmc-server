@@ -13,7 +13,7 @@ require 'spec_helper'
 # The functionality was last tested manually on 2015-01-18.
 #
 =begin
-describe "Notifications about new code reviews via HTTP push", :type => :request, :integration => true do
+describe "Notifications about new code reviews via HTTP push", type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
@@ -22,9 +22,9 @@ describe "Notifications about new code reviews via HTTP push", :type => :request
     @admin = FactoryGirl.create(:admin)
     @user = FactoryGirl.create(:user)
     @course = FactoryGirl.create(:course)
-    @exercise = FactoryGirl.create(:exercise, :course => @course)
-    @submission = FactoryGirl.create(:submission, :course => @course, :exercise => @exercise, :user => @user, :requests_review => true)
-    FactoryGirl.create(:submission_data, :submission => @submission)
+    @exercise = FactoryGirl.create(:exercise, course: @course)
+    @submission = FactoryGirl.create(:submission, course: @course, exercise: @exercise, user: @user, requests_review: true)
+    FactoryGirl.create(:submission_data, submission: @submission)
 
     using_session(:user) do
       if Capybara.default_driver == :selenium
@@ -47,7 +47,7 @@ describe "Notifications about new code reviews via HTTP push", :type => :request
     click_link '1 code review requested'
     click_link 'Requested'
     click_button 'Start code review'
-    fill_in 'review_review_body', :with => 'Dude, indent your code!'
+    fill_in 'review_review_body', with: 'Dude, indent your code!'
     click_button 'Save review'
 
     using_session(:user) do

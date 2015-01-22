@@ -23,4 +23,3 @@ class Tailoring
     end
   end
 end
-

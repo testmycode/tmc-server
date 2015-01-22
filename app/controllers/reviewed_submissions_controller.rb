@@ -9,8 +9,8 @@ class ReviewedSubmissionsController < ApplicationController
     add_breadcrumb "Reviewed submissions", course_reviewed_submissions_path(@course)
 
     @submissions = @course.submissions.
-      where(:reviewed => true).
-      includes(:reviews => :reviewer).
+      where(reviewed: true).
+      includes(reviews: :reviewer).
       includes(:user).
       order('created_at DESC')
   end

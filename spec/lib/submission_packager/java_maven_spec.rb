@@ -9,7 +9,7 @@ describe SubmissionPackager::JavaMaven do
   include SystemCommands
 
   before :each do
-    @setup = SubmissionTestSetup.new(:exercise_name => 'MavenExercise')
+    @setup = SubmissionTestSetup.new(exercise_name: 'MavenExercise')
     @course = @setup.course
     @repo = @setup.repo
     @exercise_project = @setup.exercise_project
@@ -26,7 +26,7 @@ describe SubmissionPackager::JavaMaven do
 
   it "should package the submission in a tar file with tests from the repo" do
     @exercise_project.solve_all
-    @exercise_project.make_zip(:src_only => false)
+    @exercise_project.make_zip(src_only: false)
 
     package_it
 
@@ -64,7 +64,7 @@ describe SubmissionPackager::JavaMaven do
     @exercise_project.solve_all
     File.open(@exercise_project.path + '/src/test/java/SimpleTest.java', 'w') {|f| f.write('foo') }
     File.open(@exercise_project.path + '/src/test/java/NewTest.java', 'w') {|f| f.write('bar') }
-    @exercise_project.make_zip(:src_only => false)
+    @exercise_project.make_zip(src_only: false)
 
     package_it
 
@@ -85,7 +85,7 @@ describe SubmissionPackager::JavaMaven do
     @exercise_project.solve_all
     File.open(@exercise_project.path + '/src/test/java/SimpleTest.java', 'w') {|f| f.write('foo') }
     File.open(@exercise_project.path + '/src/test/java/NewTest.java', 'w') {|f| f.write('bar') }
-    @exercise_project.make_zip(:src_only => false)
+    @exercise_project.make_zip(src_only: false)
 
     package_it
 
@@ -105,7 +105,7 @@ describe SubmissionPackager::JavaMaven do
     end
     File.open(@exercise_project.path + '/src/test/java/SimpleTest.java', 'w') {|f| f.write('foo') }
     File.open(@exercise_project.path + '/src/test/java/NewTest.java', 'w') {|f| f.write('bar') }
-    @exercise_project.make_zip(:src_only => false)
+    @exercise_project.make_zip(src_only: false)
 
     package_it
 
@@ -125,7 +125,7 @@ describe SubmissionPackager::JavaMaven do
     end
 
     @exercise_project.solve_all
-    @exercise_project.make_zip(:src_only => false)
+    @exercise_project.make_zip(src_only: false)
 
     package_it
 
@@ -143,7 +143,7 @@ describe SubmissionPackager::JavaMaven do
     File.open("#{@exercise_project.path}/.tmcrc", 'w') do |f|
       f.write("hello")
     end
-    @exercise_project.make_zip(:src_only => false)
+    @exercise_project.make_zip(src_only: false)
 
     package_it
 
@@ -164,7 +164,7 @@ describe SubmissionPackager::JavaMaven do
     File.open("#{@exercise_project.path}/foo.txt", 'w') do |f|
       f.write("submissionhello")
     end
-    @exercise_project.make_zip(:src_only => true)
+    @exercise_project.make_zip(src_only: true)
 
     package_it
 
@@ -180,7 +180,7 @@ describe SubmissionPackager::JavaMaven do
   describe "tmc-run script added to the archive" do
     it "should run mvn tmc:test" do
       @exercise_project.solve_all
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 
@@ -208,7 +208,7 @@ describe SubmissionPackager::JavaMaven do
 
     it "should report compilation errors in test_output.txt with exit code 101" do
       @exercise_project.introduce_compilation_error
-      @exercise_project.make_zip(:src_only => false)
+      @exercise_project.make_zip(src_only: false)
 
       package_it
 

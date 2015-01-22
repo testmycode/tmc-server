@@ -14,7 +14,7 @@ def exception_to_str(e)
 end
 
 # for some reason, log_output doesn't seem to work. Oh well..
-Daemons.run_proc('background_daemon', :dir_mode => :normal, :dir => pid_dir, :log_dir => log_dir, :log_output => false) do
+Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: log_dir, log_output: false) do
   Dir.chdir root_dir
   require root_dir + '/config/environment'
   if Rails.logger.respond_to? :auto_flushing=

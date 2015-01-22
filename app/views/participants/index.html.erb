@@ -64,7 +64,7 @@
             <%
                points = @group_completion[group][:points_by_user][user.id] || 0
                total = @group_completion[group][:available_points]
-               percentage =  sprintf("%.0f%%", ((points.to_f / total) * 100).ceil)
+               percentage = sprintf("%.0f%%", ((points.to_f / total) * 100).ceil)
             %>
             <td><%= percentage %></td>
           <% end %>

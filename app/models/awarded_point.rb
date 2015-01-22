@@ -10,11 +10,11 @@ class AwardedPoint < ActiveRecord::Base
   belongs_to :submission
 
   def self.course_user_points(course, user)
-    where(:course_id => course.id, :user_id => user.id)
+    where(course_id: course.id, user_id: user.id)
   end
 
   def self.course_points(course, include_admins = false)
-    result = where(:course_id => course.id)
+    result = where(course_id: course.id)
     result = without_admins(result) unless include_admins
     result
   end
@@ -23,16 +23,16 @@ class AwardedPoint < ActiveRecord::Base
     course_user_points(course, user).
     joins("INNER JOIN available_points ON available_points.name = awarded_points.name").
     joins("INNER JOIN exercises ON available_points.exercise_id = exercises.id").
-    where(:exercises => { :gdocs_sheet => sheetname, :course_id => course.id }).
+    where(exercises: { gdocs_sheet: sheetname, course_id: course.id }).
     group("awarded_points.id")
   end
 
   def self.course_sheet_points(course, sheetname, include_admins = false)
     result =
-      where(:course_id => course.id).
+      where(course_id: course.id).
       joins("INNER JOIN available_points ON available_points.name = awarded_points.name").
       joins("INNER JOIN exercises ON available_points.exercise_id = exercises.id").
-      where(:exercises => { :gdocs_sheet => sheetname, :course_id => course.id }).
+      where(exercises: { gdocs_sheet: sheetname, course_id: course.id }).
       group("awarded_points.id")
     result = without_admins(result) unless include_admins
     result
@@ -48,7 +48,7 @@ class AwardedPoint < ActiveRecord::Base
       to_sql
 
     uids = ActiveRecord::Base.connection.execute(sql).map {|record| record['uid'] }
-    User.where(:id => uids)
+    User.where(id: uids)
   end
 
   # Gets a hash of user to array of point names awarded for exercises of the given sheet
@@ -90,7 +90,7 @@ class AwardedPoint < ActiveRecord::Base
 
 private
   def self.without_admins(query)
-    query.joins("INNER JOIN users ON users.id = awarded_points.user_id").where(:users => { :administrator => false })
+    query.joins("INNER JOIN users ON users.id = awarded_points.user_id").where(users: { administrator: false })
   end
 
   def self.per_user_in_course_with_sheet_query(course, sheetname)

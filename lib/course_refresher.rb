@@ -60,8 +60,6 @@ private
       @report.timings[method_name] = result
     end
 
-
-
     def refresh_course(course)
       @report = Report.new
 
@@ -98,7 +96,7 @@ private
       #
       # I prefer suggestion 1.
 
-      Course.transaction(:requires_new => true) do
+      Course.transaction(requires_new: true) do
         begin
           @course = Course.lock(true).find(course.id)
 
@@ -143,7 +141,7 @@ private
         seed_maven_cache
       end
 
-      course.reload  # reload the record given as parameter
+      course.reload # reload the record given as parameter
       raise Failure.new(@report) unless @report.errors.empty?
       @report
     end
@@ -217,7 +215,7 @@ private
       exercise_names.each do |name|
         if !@course.exercises.any? {|e| e.name == name }
           @report.notices << "Added exercise #{name}"
-          @course.exercises.new(:name => name)
+          @course.exercises.new(name: name)
         end
       end
     end
@@ -237,11 +235,11 @@ private
       @course.exercises.each do |e|
         begin
           metadata = reader.read_settings({
-            :root_dir => @course.clone_path,
-            :target_dir => File.join(@course.clone_path, e.relative_path),
-            :file_name => 'metadata.yml',
-            :defaults => Exercise.default_options,
-            :file_preprocessor => Proc.new do |opts|
+            root_dir: @course.clone_path,
+            target_dir: File.join(@course.clone_path, e.relative_path),
+            file_name: 'metadata.yml',
+            defaults: Exercise.default_options,
+            file_preprocessor: Proc.new do |opts|
               merge_course_specific_suboptions(opts)
             end
           })
@@ -298,7 +296,7 @@ private
         point_names.each do |name|
           if exercise.available_points.none? {|point| point.name == name}
             added << name
-            point = AvailablePoint.create(:name => name, :exercise => exercise)
+            point = AvailablePoint.create(name: name, exercise: exercise)
             exercise.available_points << point
           end
         end
@@ -474,4 +472,3 @@ private
   end
 
 end
-

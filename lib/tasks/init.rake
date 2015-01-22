@@ -8,10 +8,10 @@ namespace :background_daemon do
     def init_script(name = nil)
       name ||= DEFAULT_NAME
       RubyInitScript.new({
-        :name => name,
-        :short_description => 'TMC background daemon',
-        :executable_path => 'script/background_daemon',
-        :user => Etc.getpwuid(File.stat(::Rails::root).uid).name
+        name: name,
+        short_description: 'TMC background daemon',
+        executable_path: 'script/background_daemon',
+        user: Etc.getpwuid(File.stat(::Rails::root).uid).name
       })
     end
 
@@ -55,16 +55,16 @@ namespace :comet do
       system('ext/tmc-comet/initscripts/uninstall.sh')
     end
 
-    task :reinstall => [:uninstall, :install]
+    task reinstall: [:uninstall, :install]
   end
 end
 
 namespace :init do
   initables = [:background_daemon, :comet]
   desc "Installs all initscripts"
-  task :install => initables.map {|initable| "#{initable}:init:install" }
+  task install: initables.map {|initable| "#{initable}:init:install" }
   desc "Uninstalls all initscripts"
-  task :uninstall => initables.map {|initable| "#{initable}:init:uninstall" }
+  task uninstall: initables.map {|initable| "#{initable}:init:uninstall" }
   desc "Reinstalls all initscripts"
-  task :reinstall => initables.map {|initable| "#{initable}:init:reinstall" }
+  task reinstall: initables.map {|initable| "#{initable}:init:reinstall" }
 end

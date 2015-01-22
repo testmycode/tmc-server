@@ -1,6 +1,5 @@
-
 # Parses and abstracts specification in the "deadline" field of a `metadata.yml` file.
-class DeadlineSpec  # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
+class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
   class InvalidSyntaxError < StandardError; end
 
   def initialize(exercise, specs)
@@ -57,7 +56,7 @@ private
   def parse_spec(spec)
     # A spec is a proc that takes a user and returns a Time object or nil
     if DateAndTimeUtils.looks_like_date_or_time(spec)
-      time = DateAndTimeUtils.to_time(spec, :prefer_end_of_day => true)
+      time = DateAndTimeUtils.to_time(spec, prefer_end_of_day: true)
       timefun = lambda {|user| time }
       universal = "#{time}"
       personal = lambda {|u| universal }

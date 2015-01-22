@@ -29,4 +29,3 @@ class FileTreeHasher
     digest.hexdigest
   end
 end
-

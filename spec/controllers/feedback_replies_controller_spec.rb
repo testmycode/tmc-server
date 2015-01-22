@@ -1,15 +1,15 @@
 require 'spec_helper'
 require 'cancan/matchers'
 
-describe FeedbackRepliesController, "#create", :type => :controller do
+describe FeedbackRepliesController, "#create", type: :controller do
   let(:student_email) { "user@mydomain.com" }
   let(:reply_body) { "A reply to an feedback answer..." }
   let(:answer) { FactoryGirl.create(:feedback_answer) }
   let(:params) {
     {
-      :email => student_email,
-      :body => reply_body,
-      :answer_id => answer.id
+      email: student_email,
+      body: reply_body,
+      answer_id: answer.id
     }
   }
 
@@ -26,7 +26,7 @@ describe FeedbackRepliesController, "#create", :type => :controller do
   end
 
   describe "for an admin user " do
-    let(:admin){ FactoryGirl.create(:admin, :email => "admin@mydomain.com") }
+    let(:admin){ FactoryGirl.create(:admin, email: "admin@mydomain.com") }
     let(:url){ 'http://url.where.we.arrived.com' }
     before do
       controller.current_user = admin

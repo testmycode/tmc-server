@@ -17,7 +17,7 @@ class SubmissionPackager
 
       FileUtils.mkdir_p(dest + 'src')
       cp_r_if_exists(received + 'src' + 'main', dest + 'src')
-      cp_r_if_exists(tests  + 'src' + 'test', dest + 'src')
+      cp_r_if_exists(tests + 'src' + 'test', dest + 'src')
 
       copy_files_in_dir_no_recursion(cloned, dest)
 

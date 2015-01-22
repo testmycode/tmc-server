@@ -36,7 +36,7 @@ class CourseNotificationsController < ApplicationController
     end
     msg = "Mail has been set succesfully"
     msg << " except for the following addresses: #{failed_emails.join(", ")}" unless failed_emails.empty?
-    redirect_to course_path(course), :notice => msg
+    redirect_to course_path(course), notice: msg
   end
 
 private

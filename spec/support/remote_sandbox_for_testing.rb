@@ -12,7 +12,7 @@ class RemoteSandboxForTesting
     # Conflicting Squid files and ports etc.
     @server_ports ||= [FreePorts.take_next]
   end
-  
+
   # Runs a submission and asserts the run succeeded, then calls SandboxResultsSaver.
   def self.run_submission(submission)
     submission.randomize_secret_token if submission.secret_token == nil
@@ -53,7 +53,7 @@ private
   def self.result_queue
     @result_queue ||= SubmissionResultReceiver.new
   end
-  
+
   def self.copy_server_instance(port, actual_user, actual_group)
     instance_dir = "#{::Rails.root}/tmp/test-sandbox-server/#{port}"
     maven_cache_dir = "#{::Rails.root}/tmp/test-maven-cache" # This we won't delete each time
@@ -102,4 +102,3 @@ RSpec.configure do |config|
     RemoteSandboxForTesting.cleanup_after_all_tests!
   end
 end
-

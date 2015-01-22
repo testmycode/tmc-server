@@ -6,16 +6,16 @@ RSpec.configure do |config|
   config.before(:each) do
     @test_tmp_dir = "#{::Rails.root}/tmp/tests"
     FileUtils.mkdir_p @test_tmp_dir
-    
+
     # Deleting the tmp dir (the cwd) as well would mess up Capybara.
     (Dir.entries(@test_tmp_dir) - ['.', '..']).each do |entry|
       FileUtils.rm_rf "#{@test_tmp_dir}/#{entry}"
     end
-    
+
     FileUtils.cd @test_tmp_dir
-    
+
     @testdata_dir = "#{::Rails.root}/testdata"
-    
+
     @git_backend_cache_dir = "#{::Rails.root}/tmp/tests/cache/git_repos"
     FileUtils.rm_rf @git_backend_cache_dir
     FileUtils.mkdir_p @git_backend_cache_dir
@@ -32,4 +32,3 @@ RSpec.configure do |config|
     # be done in the before :each above.
   end
 end
-

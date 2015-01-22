@@ -96,7 +96,7 @@
           <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
             <%= f.text_area :review_body, :rows => nil, :cols => nil, :placeholder => 'Write a code review here' %>
 
-            <%#  this is changed by JS when switching between editing and creating %>
+            <%# this is changed by JS when switching between editing and creating %>
             <input name="_method" type="hidden" value="post" />
 
             <% unless @submission.exercise.available_review_points.empty? %>

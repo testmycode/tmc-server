@@ -14,15 +14,15 @@
 class Unlock < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
-  belongs_to :exercise, -> (unlock) { where(course: unlock.course) }, :foreign_key => :exercise_name, :primary_key => :name
+  belongs_to :exercise, -> (unlock) { where(course: unlock.course) }, foreign_key: :exercise_name, primary_key: :name
   # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
   def self.refresh_unlocks(course, user)
     Unlock.transaction do
-      unlocks = course.unlocks.where(:user_id => user.id)
+      unlocks = course.unlocks.where(user_id: user.id)
       by_exercise_name = Hash[unlocks.map {|u| [u.exercise_name, u]}]
       refresh_unlocks_impl(course, user, by_exercise_name)
-      UncomputedUnlock.where(:course_id => course.id, :user_id => user.id).delete_all
+      UncomputedUnlock.where(course_id: course.id, user_id: user.id).delete_all
     end
   end
 
@@ -31,10 +31,10 @@ class Unlock < ActiveRecord::Base
       for ex in exercises
         # We assume the unlocks don't yet exist and fail with a uniqueness error if they do
         Unlock.create!(
-          :user => user,
-          :course_id => ex.course_id,
-          :exercise_name => ex.name,
-          :valid_after => ex.unlock_spec_obj.valid_after
+          user: user,
+          course_id: ex.course_id,
+          exercise_name: ex.name,
+          valid_after: ex.unlock_spec_obj.valid_after
         )
       end
     end
@@ -49,10 +49,10 @@ private
       may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
       if !exists && may_exist && !exercise.requires_explicit_unlock?
         Unlock.create!(
-          :user => user,
-          :course => course,
-          :exercise => exercise,
-          :valid_after => exercise.unlock_spec_obj.valid_after
+          user: user,
+          course: course,
+          exercise: exercise,
+          valid_after: exercise.unlock_spec_obj.valid_after
         )
       elsif exists && !may_exist
         user_unlocks_by_exercise_name[exercise.name].destroy

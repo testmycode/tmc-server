@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SessionsHelper, :type => :helper do
+describe SessionsHelper, type: :helper do
 
   let!(:user) { FactoryGirl.create(:user) }
 

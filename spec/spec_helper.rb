@@ -47,7 +47,7 @@ end.call
 Capybara.default_driver = :poltergeist
 
 Capybara.server_port = FreePorts.take_next
-Capybara.default_wait_time = 10  # Comet messages may take longer to appear than the default 2 sec
+Capybara.default_wait_time = 10 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
 
 if Capybara.default_driver == :selenium
@@ -69,7 +69,7 @@ RSpec.configure do |config|
 
   config.before(:each) do |context|
 
-    allow(Tailoring).to receive_messages(:get => Tailoring.new)
+    allow(Tailoring).to receive_messages(get: Tailoring.new)
     SiteSetting.use_distribution_defaults!
 
     if context.metadata[:integration]
@@ -97,7 +97,7 @@ RSpec.configure do |config|
   end
 
   # Override with rspec --tag ~integration --tag gdocs spec
-  config.filter_run_excluding :gdocs => true
+  config.filter_run_excluding gdocs: true
 end
 
 # Ensure the DB is clean

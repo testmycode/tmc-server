@@ -9,28 +9,28 @@ class Course < ActiveRecord::Base
   self.include_root_in_json = false
 
   validates :name,
-            :presence   => true,
-            :uniqueness => true,
-            :length     => { :within => 1..40 },
-            :format     => {
-              :without => / /,
-              :message  => 'should not contain white spaces'
+            presence: true,
+            uniqueness: true,
+            length: { within: 1..40 },
+            format: {
+              without: / /,
+              message: 'should not contain white spaces'
             }
 
-  validates :source_url, :presence => true
+  validates :source_url, presence: true
   validate :check_source_backend
   after_initialize :set_default_source_backend
 
-  has_many :exercises, :dependent => :delete_all
-  has_many :submissions, :dependent => :delete_all
-  has_many :available_points, :through => :exercises
-  has_many :awarded_points, :dependent => :delete_all
-  has_many :test_scanner_cache_entries, :dependent => :delete_all
-  has_many :feedback_questions, :dependent => :delete_all
-  has_many :feedback_answers  # destroyed transitively when questions are destroyed
-  has_many :unlocks, :dependent => :delete_all
-  has_many :uncomputed_unlocks, :dependent => :delete_all
-  has_many :course_notifications, :dependent => :delete_all
+  has_many :exercises, dependent: :delete_all
+  has_many :submissions, dependent: :delete_all
+  has_many :available_points, through: :exercises
+  has_many :awarded_points, dependent: :delete_all
+  has_many :test_scanner_cache_entries, dependent: :delete_all
+  has_many :feedback_questions, dependent: :delete_all
+  has_many :feedback_answers # destroyed transitively when questions are destroyed
+  has_many :unlocks, dependent: :delete_all
+  has_many :uncomputed_unlocks, dependent: :delete_all
+  has_many :course_notifications, dependent: :delete_all
 
   def destroy
     # Optimization: delete dependent objects quickly.
@@ -59,11 +59,11 @@ class Course < ActiveRecord::Base
   end
 
   def hide_after=(x)
-    super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => true))
+    super(DateAndTimeUtils.to_time(x, prefer_end_of_day: true))
   end
 
   def hidden_if_registered_after=(x)
-    super(DateAndTimeUtils.to_time(x, :prefer_end_of_day => false))
+    super(DateAndTimeUtils.to_time(x, prefer_end_of_day: false))
   end
 
   # This could eventually be made a hstore
@@ -173,7 +173,7 @@ class Course < ActiveRecord::Base
 
   def unlockable_exercises_for(user)
     UncomputedUnlock.resolve(self, user)
-    unlocked = self.unlocks.where(:user_id => user.id).pluck(:exercise_name)
+    unlocked = self.unlocks.where(user_id: user.id).pluck(:exercise_name)
     self.exercises.to_a.select {|ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
   end
 
@@ -218,19 +218,19 @@ class Course < ActiveRecord::Base
 
   def reviews_required
     self.submissions.where(
-      :requires_review => true,
-      :newer_submission_reviewed => false,
-      :reviewed => false,
-      :review_dismissed => false
+      requires_review: true,
+      newer_submission_reviewed: false,
+      reviewed: false,
+      review_dismissed: false
     )
   end
 
   def reviews_requested
     self.submissions.where(
-      :requests_review => true,
-      :newer_submission_reviewed => false,
-      :reviewed => false,
-      :review_dismissed => false
+      requests_review: true,
+      newer_submission_reviewed: false,
+      reviewed: false,
+      review_dismissed: false
     )
   end
 
@@ -275,13 +275,12 @@ class Course < ActiveRecord::Base
       by_user = Hash[conn.select_rows(sql).map! {|uid, count| [uid.to_i, count.to_i]}]
 
       result[group] = {
-        :available_points => available_points.size,
-        :points_by_user => by_user
+        available_points: available_points.size,
+        points_by_user: by_user
       }
     end
     result
   end
-
 
 private
   def check_source_backend
@@ -294,4 +293,3 @@ private
     self.source_backend ||= Course.default_source_backend
   end
 end
-

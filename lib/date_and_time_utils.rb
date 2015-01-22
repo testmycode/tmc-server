@@ -2,7 +2,7 @@
 module DateAndTimeUtils
   def self.to_time(input, options = {})
     options = {
-      :prefer_end_of_day => false
+      prefer_end_of_day: false
     }.merge options
 
     d = input
@@ -64,4 +64,3 @@ module DateAndTimeUtils
     end
   end
 end
-

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FeedbackAnswer, :type => :model do
+describe FeedbackAnswer, type: :model do
   it "should not be destroyed when its submission is destroyed" do
     answer = FactoryGirl.create(:feedback_answer)
     answer.submission.destroy

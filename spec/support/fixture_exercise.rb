@@ -55,7 +55,7 @@ class FixtureExercise
 
   def make_zip(options = {})
     options = {
-      :src_only => true
+      src_only: true
     }.merge options
 
     name = File.basename(@path)
@@ -145,4 +145,3 @@ private
     false
   end
 end
-

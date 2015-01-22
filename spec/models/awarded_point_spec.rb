@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe AwardedPoint, :type => :model do
+describe AwardedPoint, type: :model do
 
   describe "scopes" do
     before :each do
@@ -13,38 +13,38 @@ describe AwardedPoint, :type => :model do
       @sheet1 = "sheet1"
       @sheet2 = "sheet2"
 
-      @ex1 = FactoryGirl.create(:exercise, :course => @course,
-                                 :gdocs_sheet => @sheet1)
-      @ex2 = FactoryGirl.create(:exercise, :course => @course,
-                                 :gdocs_sheet => @sheet2)
+      @ex1 = FactoryGirl.create(:exercise, course: @course,
+                                 gdocs_sheet: @sheet1)
+      @ex2 = FactoryGirl.create(:exercise, course: @course,
+                                 gdocs_sheet: @sheet2)
 
-      @sub1 = FactoryGirl.create(:submission, :course => @course,
-                                   :user => @user,
-                                   :exercise => @ex1)
-      @sub2 = FactoryGirl.create(:submission, :course => @course,
-                                   :user => @user2,
-                                   :exercise => @ex2)
-      @sub_admin = FactoryGirl.create(:submission, :course => @course,
-                                         :user => @admin,
-                                         :exercise => @ex1)
+      @sub1 = FactoryGirl.create(:submission, course: @course,
+                                   user: @user,
+                                   exercise: @ex1)
+      @sub2 = FactoryGirl.create(:submission, course: @course,
+                                   user: @user2,
+                                   exercise: @ex2)
+      @sub_admin = FactoryGirl.create(:submission, course: @course,
+                                         user: @admin,
+                                         exercise: @ex1)
 
-      FactoryGirl.create(:available_point, :exercise => @ex1, :name => "ap")
-      FactoryGirl.create(:available_point, :exercise => @ex2, :name => "ap2")
-      FactoryGirl.create(:available_point, :exercise => @ex1, :name => "ap3")
-      FactoryGirl.create(:available_point, :exercise => @ex1, :name => "ap_admin")
+      FactoryGirl.create(:available_point, exercise: @ex1, name: "ap")
+      FactoryGirl.create(:available_point, exercise: @ex2, name: "ap2")
+      FactoryGirl.create(:available_point, exercise: @ex1, name: "ap3")
+      FactoryGirl.create(:available_point, exercise: @ex1, name: "ap_admin")
 
-      @ap = FactoryGirl.create(:awarded_point, :course => @course,
-                           :user => @user, :name => "ap",
-                           :submission => @sub1)
-      @ap2 = FactoryGirl.create(:awarded_point, :course => @course,
-                           :user => @user2, :name => "ap2",
-                           :submission => @sub2)
-      @ap3 = FactoryGirl.create(:awarded_point, :course => @course,
-                            :user => @user, :name => "ap3",
-                            :submission => @sub1)
-      @ap_admin = FactoryGirl.create(:awarded_point, :course => @course,
-                                  :user => @admin, :name => "ap_admin",
-                                  :submission => @sub_admin)
+      @ap = FactoryGirl.create(:awarded_point, course: @course,
+                           user: @user, name: "ap",
+                           submission: @sub1)
+      @ap2 = FactoryGirl.create(:awarded_point, course: @course,
+                           user: @user2, name: "ap2",
+                           submission: @sub2)
+      @ap3 = FactoryGirl.create(:awarded_point, course: @course,
+                            user: @user, name: "ap3",
+                            submission: @sub1)
+      @ap_admin = FactoryGirl.create(:awarded_point, course: @course,
+                                  user: @admin, name: "ap_admin",
+                                  submission: @sub_admin)
     end
 
     specify "course_points" do
@@ -141,4 +141,3 @@ describe AwardedPoint, :type => :model do
     end
   end
 end
-

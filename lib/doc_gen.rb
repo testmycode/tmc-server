@@ -53,4 +53,3 @@ private
     "#{@doc_name}-#{@img_counter}.png"
   end
 end
-

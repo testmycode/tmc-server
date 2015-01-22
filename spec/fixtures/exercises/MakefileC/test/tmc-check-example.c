@@ -23,7 +23,7 @@ END_TEST
 
 int main(int argc, const char *argv[])
 {
-    Suite *s  = tmc_suite_create("my-suite", "suitePoints");
+    Suite *s = tmc_suite_create("my-suite", "suitePoints");
     tmc_register_test(s, test_foo, "point1 point1again");
     tmc_register_test(s, test_bar, "failingTest");
     tmc_register_test(s, test_lib_function, "zero");

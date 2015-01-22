@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'gdocs_export'
 
-describe GDocsExport, :gdocs => true do
+describe GDocsExport, gdocs: true do
   before :all do
     @session = GDocsExport.authenticate []
     expect(@session).not_to be_nil
@@ -41,4 +41,3 @@ describe GDocsExport, :gdocs => true do
     end
   end
 end
-

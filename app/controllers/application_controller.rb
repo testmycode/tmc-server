@@ -12,7 +12,6 @@ class ApplicationController < ActionController::Base
 
   add_breadcrumb 'TMC', :root_path
 
-
   layout :select_layout
 
   protect_from_forgery
@@ -41,7 +40,7 @@ class ApplicationController < ActionController::Base
 
   def url_options
     if @bare_layout
-      {:bare_layout => '1'}.merge(super)
+      {bare_layout: '1'}.merge(super)
     else
       super
     end
@@ -60,16 +59,16 @@ private
   def check_api_version
     if should_check_api_version?
       if params[:api_version].blank?
-        return respond_with_error("Please update the TMC client. No API version received from client.", 404, :obsolete_client => true)
+        return respond_with_error("Please update the TMC client. No API version received from client.", 404, obsolete_client: true)
       elsif params[:api_version].to_s != ApiVersion::API_VERSION.to_s
-        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, :obsolete_client => true)
+        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, obsolete_client: true)
       end
 
       if !params[:client].blank? # Client and client version checks are optional
         begin
           check_client_version(params[:client], params[:client_version])
         rescue
-          return respond_with_error($!.message, 404, :obsolete_client => true)
+          return respond_with_error($!.message, 404, obsolete_client: true)
         end
       end
     end
@@ -121,22 +120,22 @@ private
 
   def respond_with_error(msg, code = 500, extra_json_keys = {})
     respond_to do |format|
-      format.html { render :text => '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', :layout => true, :status => code }
+      format.html { render text: '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', layout: true, status: code }
       format.json do
         if code == 401
           # To support older TmcNetBeans versions using faulty http basic auth
           if client_supports_http_basic_auth?
             response.headers['WWW-Authenticate'] = "Basic realm=\"#{msg}\""
-            render :json => { :error => msg }.merge(extra_json_keys), :status => code
+            render json: { error: msg }.merge(extra_json_keys), status: code
           else
-            render :json => { :error => msg }.merge(extra_json_keys), :status => 403
+            render json: { error: msg }.merge(extra_json_keys), status: 403
           end
         else
-          render :json => { :error => msg }.merge(extra_json_keys), :status => code
+          render json: { error: msg }.merge(extra_json_keys), status: code
         end
       end
-      format.text { render :text => 'ERROR: ' + msg, :status => code }
-      format.zip { render :text => msg, :status => code, :content_type => 'text/plain' }
+      format.text { render text: 'ERROR: ' + msg, status: code }
+      format.zip { render text: msg, status: code, content_type: 'text/plain' }
     end
   end
 
@@ -161,7 +160,7 @@ private
 
   def params_starting_with(prefix, permitted, options = {})
     options = {
-      :remove_prefix => false
+      remove_prefix: false
     }.merge(options)
 
     permitted = permitted.map {|f| prefix + f } unless permitted == :all
@@ -179,7 +178,7 @@ private
   # http://stackoverflow.com/questions/94502/in-rails-how-to-return-records-as-a-csv-file
   def render_csv(options = {})
     options = {
-      :filename => action_name
+      filename: action_name
     }.merge(options)
 
     headers['Cache-Control'] = 'no-cache, must-revalidate, post-check=0, pre-check=0'
@@ -194,7 +193,7 @@ private
     headers["Content-Disposition"] = "attachment; filename=\"#{options[:filename]}\""
 
     render_options = {
-      :layout => false
+      layout: false
     }.merge(options)
     render_options.delete(:filename)
 

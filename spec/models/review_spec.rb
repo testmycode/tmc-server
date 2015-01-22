@@ -1,19 +1,19 @@
 require 'spec_helper'
 
-describe Review, :type => :model do
+describe Review, type: :model do
   before :each do
     @course = FactoryGirl.create(:course)
     @admin = FactoryGirl.create(:admin)
     @user = FactoryGirl.create(:user)
-    @ex = FactoryGirl.create(:exercise, :course => @course)
-    AvailablePoint.create(:course => @course, :exercise => @ex, :name => '1')
-    AvailablePoint.create(:course => @course, :exercise => @ex, :name => '2')
+    @ex = FactoryGirl.create(:exercise, course: @course)
+    AvailablePoint.create(course: @course, exercise: @ex, name: '1')
+    AvailablePoint.create(course: @course, exercise: @ex, name: '2')
     @ex.save!
-    @sub = FactoryGirl.create(:submission, :course => @course, :exercise_name => @ex.name, :user => @user)
+    @sub = FactoryGirl.create(:submission, course: @course, exercise_name: @ex.name, user: @user)
   end
 
   def mk_review(body = 'This is a review. Of your code.')
-    Review.create(:reviewer => @admin, :submission => @sub, :review_body => body)
+    Review.create(reviewer: @admin, submission: @sub, review_body: body)
   end
 
   describe "associations" do

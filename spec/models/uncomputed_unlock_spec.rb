@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe UncomputedUnlock, :type => :model do
+describe UncomputedUnlock, type: :model do
   describe "#create_all_for_course" do
     before :each do
       @course = FactoryGirl.create(:course)
       @user = FactoryGirl.create(:user)
 
       # make the user a course participant
-      FactoryGirl.create(:awarded_point, :course => @course, :user => @user)
+      FactoryGirl.create(:awarded_point, course: @course, user: @user)
       expect(User.course_students(@course)).to include(@user)
 
       # Create irrelevant course and user

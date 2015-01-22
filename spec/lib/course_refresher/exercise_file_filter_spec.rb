@@ -45,7 +45,6 @@ describe CourseRefresher::ExerciseFileFilter do
 
     make_test_cases('stub', :make_stub)
 
-
     it "should not include directories under src/ containing only solution files" do
       FileUtils.mkdir_p 'original/src/foo/bar'
       make_file 'original/src/foo/bar/Thing.java', '//SOLUTION FILE'
@@ -67,7 +66,7 @@ describe CourseRefresher::ExerciseFileFilter do
       expect(File).not_to exist('stub/src/Thing.java')
       expect(File).to exist('stub/src')
     end
-    
+
     it "should convert end-of-lines to unix style" do
       make_file 'original/Thing.java', <<EOF
 public class Thing {\r
@@ -89,7 +88,7 @@ EOF
       result = File.read('stub/Thing.java')
       expect(result).to eq <<EOF
 public class Thing {
-    
+
     public void bar() {
         // code here
     }
@@ -113,19 +112,19 @@ public class Thing {
 }
 EOF
     end
-    
+
     it "should not include hidden tests" do
       make_file('original/HiddenThing.java', '...')
       @filter.make_stub('stub')
       expect(File).not_to exist('stub/HiddenThing.java')
     end
-    
+
     it "should not include metadata files" do
       make_file('original/metadata.yml', '...')
       @filter.make_stub('stub')
       expect(File).not_to exist('stub/metadata.yml')
     end
-    
+
     it "should not include git files" do
       make_file('original/.gitignore', '...')
       @filter.make_stub('stub')
@@ -152,15 +151,14 @@ EOF
     end
   end
 
-  
-  
+
+
   describe "#make_solution" do
     before :each do
       FileUtils.mkdir('solution')
     end
 
     make_test_cases('solution', :make_solution)
-
 
     it "should convert end-of-lines to unix style" do
       make_file 'original/Thing.java', <<EOF
@@ -186,14 +184,13 @@ public class Thing {
     public int foo() {
         return 3;
     }
-    
+
     public void bar() {
         System.out.println("hello");
     }
 }
 EOF
-    end 
-
+    end
 
     it "should remove html comments and make files out of them" do
       make_file 'original/Thing.java', <<EOF
@@ -219,20 +216,20 @@ EOF
 <p>bar</p>
 EOF
     end
-    
+
     it "should not include any tests" do
       FileUtils.mkdir_p('original/test')
       make_file('original/test/Foo.java', '...')
       @filter.make_solution('solution')
       expect(File).not_to exist('solution/test/Foo.java')
     end
-    
+
     it "should not include metadata files" do
       make_file('original/metadata.yml', '...')
       @filter.make_solution('solution')
       expect(File).not_to exist('solution/metadata.yml')
     end
-    
+
     it "should not include git files" do
       make_file('original/.gitignore', '...')
       @filter.make_solution('solution')
@@ -272,9 +269,8 @@ EOF
       expect(Digest::MD5.file('solution/foo.jar').hexdigest).to eq(Digest::MD5.file(original).hexdigest)
     end
   end
-  
+
   def make_file(name, contents)
     File.open(name, 'wb') {|f| f.write(contents) }
   end
 end
-

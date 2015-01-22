@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe ExtraField, :type => :model do
+describe ExtraField, type: :model do
 
   def use_config(config_text)
     File.open('./user_fields.rb', 'wb') do |f|
       f.write config_text
     end
-    allow(ExtraField).to receive_messages(:config_files => ['./user_fields.rb'])
+    allow(ExtraField).to receive_messages(config_files: ['./user_fields.rb'])
   end
 
   def use_default_config

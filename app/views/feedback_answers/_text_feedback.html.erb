@@ -29,7 +29,7 @@
       </div>
     <% end %>
 
-    <%= submit_tag "Reply by email", :class => 'feedback-reply-button', :id => "button_#{answer.id}"  %>
+    <%= submit_tag "Reply by email", :class => 'feedback-reply-button', :id => "button_#{answer.id}" %>
 
     <div class='feedback-reply-form' id='<%= "form_#{answer.id}" %>'>
       <%= form_tag feedback_replies_path do %>
