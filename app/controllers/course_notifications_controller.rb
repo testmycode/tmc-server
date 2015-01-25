@@ -24,7 +24,7 @@ class CourseNotificationsController < ApplicationController
       begin
         raise "Invalid e-mail" unless email =~ /\S+@\S+/
         CourseNotificationMailer.notification_email(
-          from: current_user.email,
+          reply_to: current_user.email,
           to: email,
           topic: notifier.topic,
           message: notifier.message

@@ -75,7 +75,6 @@ emails:
   baseurl: http://localhost:3000/
   from: noreply@example.com
   email_code_reviews_by_default: false
-  reviews_from_reviewer: true
 
 
 ### Enable or disable features ###

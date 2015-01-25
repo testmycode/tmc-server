@@ -25,7 +25,7 @@ describe FeedbackRepliesController, "#create", type: :controller do
     expect { post :create, params }.to raise_error
   end
 
-  describe "for an admin user " do
+  describe "for an admin user" do
     let(:admin){ FactoryGirl.create(:admin, email: "admin@mydomain.com") }
     let(:url){ 'http://url.where.we.arrived.com' }
     before do
@@ -48,7 +48,7 @@ describe FeedbackRepliesController, "#create", type: :controller do
     it "sends a reply email to the user who gave the feedback" do
       expect { post :create, params }.to change(ActionMailer::Base.deliveries,:size).by(1)
       mail = ActionMailer::Base.deliveries.last
-      expect(mail.from).to include(admin.email)
+      expect(mail.reply_to).to include(admin.email)
       expect(mail.to).to include(student_email)
       expect(mail.body.encoded).to include reply_body
     end
