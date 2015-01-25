@@ -75,7 +75,7 @@ public class Thing {\r
         return 3;\r
     }\r
     // END SOLUTION\r
-    \r
+\r
     public void bar() {\r
         // BEGIN SOLUTION\r
         System.out.println("hello");\r
@@ -168,7 +168,7 @@ public class Thing {\r
         return 3;\r
     }\r
     // END SOLUTION\r
-    \r
+\r
     public void bar() {\r
         // BEGIN SOLUTION\r
         System.out.println("hello");\r
