@@ -14,7 +14,7 @@
 /config/extra_fields/*.rb
 !/config/extra_fields/*.example.rb
 /coverage
-.DStore
+.DS_Store
 
 # Eclipse
 /.project
