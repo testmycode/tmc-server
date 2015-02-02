@@ -1,4 +1,4 @@
-### 2014-01-18
+### 2015-01-18
 
 * Upgraded Rails to 4.1.
 * Enabled asset pipeline (see app/assets/ and vendor/assets/).
