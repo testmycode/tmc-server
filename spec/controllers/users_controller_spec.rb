@@ -16,6 +16,15 @@ describe UsersController, type: :controller do
         SiteSetting.all_settings['enable_signup'] = false
         get :show
         expect(response.status).to eq(401)
+        expect(response.headers).to include 'X-Frame-Options'
+      end
+
+      describe "when using bare layout" do
+        it "should " do
+          get :new, bare_layout: 1
+          expect(response.headers).not_to include 'X-Frame-Options'
+        expect(response.status).to eq(200)
+        end
       end
     end
 
