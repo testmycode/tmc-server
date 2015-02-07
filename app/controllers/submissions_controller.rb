@@ -73,6 +73,7 @@ class SubmissionsController < ApplicationController
 
         output[:validations] = @submission.validations
         output[:valgrind] = @submission.valgrind
+        output[:code_review_requests_enabled] = @submission.code_review_requests_enabled?
 
         if @submission.paste_available?
           output[:paste_url] = paste_url(@submission.paste_key)
