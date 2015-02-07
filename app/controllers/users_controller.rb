@@ -3,6 +3,13 @@ require 'spyware_client'
 # Presents the "register user" and "edit profile" views.
 class UsersController < ApplicationController
   skip_authorization_check
+  after_action :remove_headers_for_bare, only: [:new, :create, :show]
+
+  def remove_headers_for_bare
+    if @bare_layout
+      response.headers.except! 'X-Frame-Options'
+    end
+  end
 
   def new
     add_breadcrumb 'Sign up', new_user_path
