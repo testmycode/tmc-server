@@ -1,3 +1,7 @@
+## 2015-02-07
+
+* Added option to disable code review request action from clients.
+
 ### 2015-01-18
 
 * Upgraded Rails to 4.1.
