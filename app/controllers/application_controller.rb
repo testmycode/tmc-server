@@ -19,6 +19,7 @@ class ApplicationController < ActionController::Base
   include FlashBlockHelper
   include SessionsHelper
   include BreadcrumbHelpers
+  include EmbeddableHelper
   check_authorization
 
   rescue_from CanCan::AccessDenied do |exception|

@@ -4,6 +4,8 @@ require 'spyware_client'
 class UsersController < ApplicationController
   skip_authorization_check
 
+  after_action :remove_x_frame_options_header_when_bare_layout, only: [:new, :create, :show]
+
   def new
     add_breadcrumb 'Sign up', new_user_path
 
