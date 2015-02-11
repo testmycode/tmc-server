@@ -54,7 +54,9 @@
                 </td>
                 <% if !@submission.all_tests_passed? %>
                   <td>
-                    <%= tcr.message %>
+                    <pre>
+                      <%= tcr.message %>
+                    </pre>
                     <% if tcr.exception != nil %>
                       <div class="stack-trace">
                         <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
