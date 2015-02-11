@@ -9,7 +9,7 @@ several elementary programming and data structures courses with hundreds of user
 
 ## Setup ##
 
-For setup and startup instruction see [installation guide](Installation.md).
+For setup and startup instructions, please see the [installation guide](Installation.md).
 
 ## Credits ##
 
