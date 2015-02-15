@@ -7,66 +7,9 @@ This allows for lots of small exercises without the need for course instructors 
 The system has been used with great success by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in
 several elementary programming and data structures courses with hundreds of users.
 
-
 ## Setup ##
 
-Very rough setup instructions below.
-
-### System Dependencies ###
-
-The following programs should be installed first: `git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`, `gcc`, `make` and `bc`.
-
-For the testing environment you need the following: `phantomjs`.
-
-PhantomJS (at least version 1.8.1) is required by Poltergeist gem to run headless browser tests. See [poltergeist](https://github.com/teampoltergeist/poltergeist) for documentation. For installing PhantomJS, see http://phantomjs.org.
-
-An X server is currently needed for browser tests to pass when using Selenium. `Xvfb` will do, but remember to set your `DISPLAY`.
-
-### Setup ###
-
-We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` with `sudo` below.
-(note: RVM 1.17.x may have some [problems with rvmsudo](http://stackoverflow.com/questions/13765520/rvmsudo-command-not-working-properly))
-
-1. Download submodules with `git submodule update --init --recursive`
-2. Install dependencies with `gem install bundler && bundle install`
-3. Edit `config/site.yml` based on `config/site.defaults.yml`.
-4. Install PostgreSQL 9.2+. See `config/database.yml` for database settings.
-5. Initialize the database with `env RAILS_ENV=production rake db:reset`
-6. Precompile assets with `env RAILS_ENV=production rake assets:precompile`
-7. Go to `ext/tmc-sandbox` and compile it with `sudo make`. See its readme for dependencies.
-8. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
-9. Compile the other stuff in `ext` by doing `rake compile`.
-10. Install [tmc-check](https://github.com/testmycode/tmc-check) by running `rvmsudo make rubygems install clean` in its directory.
-11. Run the test suite with `rvmsudo rake spec`.
-12. Get pghero stats enabled, add to postgresql.conf following lines
-    `shared_preload_libraries = 'pg_stat_statements'`
-    `pg_stat_statements.track = all`
-
-After you get the test suite to pass, you can set up background services.
-
-1. Recheck your comet server config in `site.yml` and then do `rvmsudo rake comet:config:update`.
-2. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake background_daemon:init:install`.
-3. Start the services: `sudo /etc/init.d/tmc-comet start`, `sudo /etc/init.d/tmc-background-daemon start`.
-4. If you use Apache, then make sure `public/` and `tmp/` are readable and install [mod_xsendfile](https://tn123.org/mod_xsendfile/). Configure XSendFilePath to the `tmp/cache` directory of the application.
-
-The application should not be deployed into a multithreaded server! It often changes the current working directory, which is a process-specific attribute. Each request should have its process all to itself. If you use Apache with, say, Passenger, then use the prefork MPM.
-
-### Startup ###
-
-1. `rails server` or some other RoR setup.
-2. Go to `ext/tmc-sandbox/web` and do `rackup --port 3001` or some other Rack setup.
-3. `rake dev:comet:run`
-4. `script/background_daemon start`
-
-Alternatively use `script/dev_env` to do all of the above in
-[screen](http://www.gnu.org/software/screen/).
-
-The default user account is `admin`/`admin`.
-
-### Production setup ###
-
-1. Run `rvmsudo rake init:install` to install the init script for the submission rerunner.
-2. Do the same in `ext/tmc-sandbox/web` to install the init script for the sandbox.
+For setup and startup instructions, please see the [installation guide](Installation.md).
 
 ## Credits ##
 
