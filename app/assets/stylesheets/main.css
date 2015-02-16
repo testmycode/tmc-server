@@ -5,6 +5,11 @@
   color: red !important;
 }
 
+pre.no-style {
+  border: none;
+  background: inherit;
+}
+
 .success,
 .ok {
   color: green;
