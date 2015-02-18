@@ -1,9 +1,10 @@
 class SubmissionPackager
   class JavaMaven < SubmissionPackager
-  private
+    private
+
     def find_received_project_root(received_root)
-      src_dir_path = TmcDirUtils.find_dir_containing(received_root, "src")
-      raise 'No src directory' if src_dir_path == nil
+      src_dir_path = TmcDirUtils.find_dir_containing(received_root, 'src')
+      fail 'No src directory' if src_dir_path.nil?
       Pathname(src_dir_path)
     end
 
@@ -38,6 +39,5 @@ class SubmissionPackager
     def tmc_run_path
       "#{::Rails.root}/lib/testrunner/tmc-run"
     end
-
   end
 end

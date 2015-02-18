@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system, receiving submissions with broken UTF-8", type: :request, integration: true do
+describe 'The system, receiving submissions with broken UTF-8', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
@@ -23,7 +23,7 @@ describe "The system, receiving submissions with broken UTF-8", type: :request, 
     ex.make_zip src_only: false
   end
 
-  it "should tolerate broken UTF-8 in an assertion message" do
+  it 'should tolerate broken UTF-8 in an assertion message' do
     click_link 'BrokenUtf8'
     attach_file('Zipped project', 'BrokenUtf8.zip')
     click_button 'Submit'
@@ -34,7 +34,7 @@ describe "The system, receiving submissions with broken UTF-8", type: :request, 
     expect(page).to have_content('lol')
   end
 
-  it "should tolerate broken UTF-8 in files" do
+  it 'should tolerate broken UTF-8 in files' do
     click_link 'BrokenUtf8'
     attach_file('Zipped project', 'BrokenUtf8.zip')
     click_button 'Submit'

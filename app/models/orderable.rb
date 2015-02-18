@@ -12,7 +12,7 @@ module Orderable
   include Comparable
 
   def <=>(other)
-    self.position <=> other.position
+    position <=> other.position
   end
 
   # Note on move commands:
@@ -20,12 +20,12 @@ module Orderable
   # - any records that are not self and other may have a stale position afterwards
 
   def move_forward!
-    other = self.class.where("position > #{quote(self.position)}").order('position ASC').first
+    other = self.class.where("position > #{quote(position)}").order('position ASC').first
     self.move_after!(other) if other
   end
 
   def move_backward!
-    other = self.class.where("position < #{quote(self.position)}").order('position DESC').first
+    other = self.class.where("position < #{quote(position)}").order('position DESC').first
     self.move_before!(other) if other
   end
 
@@ -37,7 +37,8 @@ module Orderable
     move!(other, '>=', 1)
   end
 
-private
+  private
+
   def move!(other, op, delta)
     tbl = self.class.quoted_table_name
     conn = ActiveRecord::Base.connection
@@ -45,20 +46,20 @@ private
       conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE")
 
       other_pos = conn.select_value("SELECT position FROM #{tbl} WHERE id = #{other.id}")
-      raise 'Move target not found in database' if other_pos == nil
+      fail 'Move target not found in database' if other_pos.nil?
       new_position = other_pos.to_i + delta
 
       if conn.select_value("SELECT 1 FROM #{tbl} WHERE position = #{new_position}")
         conn.execute("UPDATE #{tbl} SET position = position + (#{delta}) WHERE position #{op} #{new_position}")
       end
 
-      conn.execute("UPDATE #{tbl} SET position = #{new_position} WHERE id = #{self.id}")
+      conn.execute("UPDATE #{tbl} SET position = #{new_position} WHERE id = #{id}")
       self.position = new_position
     end
   end
 
   def set_default_position
-    if self.position == nil
+    if position.nil?
       tbl = self.class.quoted_table_name
       conn = ActiveRecord::Base.connection
       conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE") # applies to the rest of this transaction

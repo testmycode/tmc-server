@@ -13,7 +13,7 @@ class SafeUnzipper
   def clean_up(root_dir_abs, file)
     if File.symlink?(file)
       dest = File.absolute_path(File.readlink(file), File.dirname(file))
-      if !dest.start_with?(root_dir_abs)
+      unless dest.start_with?(root_dir_abs)
         ::Rails.logger.warn("Cleaning up external symlink to: #{dest}")
         File.unlink(file)
       end

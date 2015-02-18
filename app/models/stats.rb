@@ -3,7 +3,7 @@ module Stats
   def self.all
     {
       registered_users: all_regular_users.count,
-      course_stats: Course.all.reduce({}) {|h, c| h.merge(c.name => for_course(c)) }
+      course_stats: Course.all.reduce({}) { |h, c| h.merge(c.name => for_course(c)) }
     }
   end
 
@@ -13,8 +13,8 @@ module Stats
       :completed_exercise_count,
       :possible_completed_exercise_count,
       :exercise_group_stats
-      ]
-    keys.reduce({}) {|h, k| h.merge(k => self.send(k, course)) }
+    ]
+    keys.reduce({}) { |h, k| h.merge(k => send(k, course)) }
   end
 
   def self.exercise_group_stats(course)
@@ -41,7 +41,7 @@ module Stats
   def self.participants_with_submissions_count(exercise_or_course = nil)
     exercises = get_exercises(exercise_or_course)
     if exercises && !exercises.empty?
-      exercise_keys = exercises.map {|e| "(#{e.course_id}, #{ActiveRecord::Base.quote_value(e.name, nil)})" }
+      exercise_keys = exercises.map { |e| "(#{e.course_id}, #{ActiveRecord::Base.quote_value(e.name, nil)})" }
       exercises_clause = "AND (course_id, exercise_name) IN (#{exercise_keys.join(',')})"
       all_regular_users.where("EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{exercises_clause})").count
     else
@@ -59,7 +59,8 @@ module Stats
     participants_with_submissions_count(exercises) * exercises.size
   end
 
-private
+  private
+
   def self.all_regular_users
     User.where(administrator: false)
   end
@@ -69,7 +70,7 @@ private
   end
 
   def self.get_exercises(exercise_or_course = nil)
-    if exercise_or_course == nil
+    if exercise_or_course.nil?
       all_nonhidden_exercises
     elsif exercise_or_course.is_a?(Course)
       exercise_or_course.exercises.where(hidden: false)

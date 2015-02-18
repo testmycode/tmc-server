@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Unlock, type: :model do
-  describe "#refresh_unlocks" do
+  describe '#refresh_unlocks' do
     before :each do
       @course = FactoryGirl.create(:course)
       @ex1 = FactoryGirl.create(:exercise, course: @course, name: 'ex1')
@@ -16,7 +16,7 @@ describe Unlock, type: :model do
       @available_point2 = FactoryGirl.create(:available_point, exercise_id: @ex2.id)
     end
 
-    it "creates unlocks as specified" do
+    it 'creates unlocks as specified' do
       Unlock.refresh_unlocks(@course, @user)
       unlocks = Unlock.order('exercise_name ASC').to_a
       expect(unlocks.size).to eq(1)
@@ -45,7 +45,7 @@ describe Unlock, type: :model do
       expect(u.created_at).to eq(created_at)
     end
 
-    it "deletes unlocks whose conditions changed" do
+    it 'deletes unlocks whose conditions changed' do
       Unlock.refresh_unlocks(@course, @user)
       @ex1.unlock_spec = ['exercise ex2'].to_json
       @ex1.save!
@@ -54,8 +54,8 @@ describe Unlock, type: :model do
       expect(Unlock.where(exercise_name: 'ex1')).to be_empty
     end
 
-    it "updates unlocks whose unlock time changes" do
-      Unlock.refresh_unlocks(@course,@user)
+    it 'updates unlocks whose unlock time changes' do
+      Unlock.refresh_unlocks(@course, @user)
 
       @ex1.unlock_spec = [(Date.today + 3.days).to_s].to_json
       @ex1.save!
@@ -64,7 +64,7 @@ describe Unlock, type: :model do
       u = Unlock.where(exercise_name: 'ex1').first
       expect(u.valid_after).to be > Date.today + 2.days
 
-      @ex1.unlock_spec = ["exercise ex2"].to_json
+      @ex1.unlock_spec = ['exercise ex2'].to_json
       @ex1.save!
       @course.reload
       AwardedPoint.create!(user_id: @user.id, course_id: @course.id, name: @available_point2.name)
@@ -72,6 +72,5 @@ describe Unlock, type: :model do
       u = Unlock.where(exercise_name: 'ex1').first
       expect(u.valid_after).to be_nil
     end
-
   end
 end

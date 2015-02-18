@@ -3,10 +3,10 @@ require 'fileutils'
 
 describe FileTreeHasher do
   def write_file(path, content)
-    File.open(path, 'wb') {|f| f.write(content) }
+    File.open(path, 'wb') { |f| f.write(content) }
   end
 
-  it "should give the same hash for the files with the same names and content" do
+  it 'should give the same hash for the files with the same names and content' do
     FileUtils.mkdir('subdir')
     write_file('foo', 'contents of file 1')
     write_file('subdir/foo', 'contents of file 2')
@@ -28,7 +28,7 @@ describe FileTreeHasher do
     expect(hash1).not_to eq(hash2)
   end
 
-  it "should give a different hash if a file is moved" do
+  it 'should give a different hash if a file is moved' do
     write_file('one', 'first file')
 
     hash1 = FileTreeHasher.hash_file_tree('.')
@@ -47,7 +47,7 @@ describe FileTreeHasher do
     expect(hash3).not_to eq(hash1)
   end
 
-  it "should give the same hash for the same file tree in another subdirectory" do
+  it 'should give the same hash for the same file tree in another subdirectory' do
     FileUtils.mkdir('a')
     FileUtils.mkdir('b')
     write_file('a/file', 'the contents')

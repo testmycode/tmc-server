@@ -28,7 +28,8 @@ class StatsController < ApplicationController
     end
   end
 
-private
+  private
+
   def get_vars
     if params[:course_id]
       @course = Course.find(params[:course_id])
@@ -56,12 +57,12 @@ private
     when 'submission_times'
       course_stats_show_submission_times
     else
-      respond_not_found("No such stats page")
+      respond_not_found('No such stats page')
     end
   end
 
   def course_stats_show_submissions
-    return respond_not_found("No submissions yet") if @course.submissions.empty?
+    return respond_not_found('No submissions yet') if @course.submissions.empty?
 
     @start_time =
       if params[:start_time]
@@ -74,21 +75,20 @@ private
       else @course.time_of_last_submission.to_date.in_time_zone
       end
     @time_unit = param_as_one_of(:time_unit, [nil, 'minute', 'hour', 'day'])
-    @time_unit = 'day' if @time_unit == nil
+    @time_unit = 'day' if @time_unit.nil?
 
     respond_to do |format|
       format.html { render template: 'courses/stats/submissions', layout: 'bare' }
       format.json do
-
         records =
-          @course.submissions.
-            select(['COUNT(*) c', "date_trunc('#{@time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"]).
-            group('t').
-            where('created_at >= ?', @start_time).
-            where(user: User.legitimate_students).
-            where('created_at < ?', @end_time)
+          @course.submissions
+          .select(['COUNT(*) c', "date_trunc('#{@time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"])
+          .group('t')
+          .where('created_at >= ?', @start_time)
+          .where(user: User.legitimate_students)
+          .where('created_at < ?', @end_time)
 
-        date_format = "%Y-%m-%d %H:%M:%S" # query returns in this format, without timezone
+        date_format = '%Y-%m-%d %H:%M:%S' # query returns in this format, without timezone
 
         lookup = {}
         for r in records
@@ -109,7 +109,7 @@ private
   end
 
   def course_stats_show_submission_times
-    return respond_not_found("No submissions yet") if @course.submissions.empty?
+    return respond_not_found('No submissions yet') if @course.submissions.empty?
 
     respond_to do |format|
       format.html { render template: 'courses/stats/submission_times', layout: 'bare' }
@@ -140,15 +140,15 @@ private
     "((#{field} AT TIME ZONE 'UTC') AT TIME ZONE #{connection.quote(Time.zone.name)})"
   end
 
-  def general_stats_show(page)
-    respond_not_found("No such stats page")
+  def general_stats_show(_page)
+    respond_not_found('No such stats page')
   end
 
   def param_as_one_of(name, valid_values)
     if valid_values.include?(params[name])
       params[name]
     else
-      raise "Invalid value for parameter #{name}"
+      fail "Invalid value for parameter #{name}"
     end
   end
 end

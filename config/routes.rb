@@ -78,12 +78,11 @@ TmcServer::Application.routes.draw do
 
   resource :feedback_replies, only: [:create]
 
-  if SiteSetting.value("pghero_enabled")
+  if SiteSetting.value('pghero_enabled')
     constraints CanAccessPgHero do
-      mount PgHero::Engine, at: "pghero"
+      mount PgHero::Engine, at: 'pghero'
     end
   end
 
-  root to: "courses#index"
-
+  root to: 'courses#index'
 end

@@ -13,7 +13,7 @@ class TestScannerCache
     elsif entries.size == 0
       entry = TestScannerCacheEntry.new(course: course, exercise_name: exercise_name)
     else
-      raise 'TestScannerCache has a duplicate entry. Uniqueness has not been enforced.'
+      fail 'TestScannerCache has a duplicate entry. Uniqueness has not been enforced.'
     end
 
     if entry.files_hash == files_hash
@@ -30,16 +30,15 @@ class TestScannerCache
     TestScannerCacheEntry.delete_all
   end
 
-private
+  private
+
   def self.try_save(entry)
-    begin
-      entry.save!
-    rescue ActiveRecord::RecordNotUnique
-      result
-    rescue
-      ActiveRecord::Base.logger.warn("Failed to add entry to TestScannerCache.")
-      ActiveRecord::Base.logger.warn($!)
-    end
+    entry.save!
+  rescue ActiveRecord::RecordNotUnique
+    result
+  rescue
+    ActiveRecord::Base.logger.warn('Failed to add entry to TestScannerCache.')
+    ActiveRecord::Base.logger.warn($ERROR_INFO)
   end
 
   def self.decode_value(value)

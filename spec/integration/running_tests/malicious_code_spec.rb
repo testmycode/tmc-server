@@ -12,7 +12,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
   end
 
   describe "when the student's code attempts to delete tests" do
-    it "should not leave tests unrun" do
+    it 'should not leave tests unrun' do
       setup = setup_and_run('malicious/TestDeleter')
       submission = setup.submission
 
@@ -23,12 +23,12 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
       case_names = submission.test_case_runs.map(&:test_case_name)
       expect(case_names.sort).to eq(['ATest test1', 'BTest test2'])
       case_messages = submission.test_case_runs.map(&:message)
-      expect(case_messages).to include("Failed to run test.")
+      expect(case_messages).to include('Failed to run test.')
     end
   end
 
   describe "when the student's code does System.exit(0)" do
-    it "should report this as a likely cause for missing test results" do
+    it 'should report this as a likely cause for missing test results' do
       setup = setup_and_run('malicious/Exit0')
       submission = setup.submission
 
@@ -37,7 +37,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
   end
 
   describe "when the student's code does System.exit(1)" do
-    it "should report this as a likely cause for missing test results" do
+    it 'should report this as a likely cause for missing test results' do
       setup = setup_and_run('malicious/Exit1')
       submission = setup.submission
 

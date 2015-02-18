@@ -20,7 +20,7 @@ class Unlock < ActiveRecord::Base
   def self.refresh_unlocks(course, user)
     Unlock.transaction do
       unlocks = course.unlocks.where(user_id: user.id)
-      by_exercise_name = Hash[unlocks.map {|u| [u.exercise_name, u]}]
+      by_exercise_name = Hash[unlocks.map { |u| [u.exercise_name, u] }]
       refresh_unlocks_impl(course, user, by_exercise_name)
       UncomputedUnlock.where(course_id: course.id, user_id: user.id).delete_all
     end
@@ -40,7 +40,7 @@ class Unlock < ActiveRecord::Base
     end
   end
 
-private
+  private
 
   def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
     for exercise in course.exercises

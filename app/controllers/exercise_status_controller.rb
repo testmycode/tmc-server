@@ -1,5 +1,4 @@
 class ExerciseStatusController < ApplicationController
-
   skip_authorization_check
 
   def show
@@ -31,9 +30,8 @@ class ExerciseStatusController < ApplicationController
         render json: results
       end
       format.html do
-        respond_not_found("Please add .json to the URL")
+        respond_not_found('Please add .json to the URL')
       end
     end
   end
-
 end

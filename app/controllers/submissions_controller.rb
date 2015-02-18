@@ -3,8 +3,8 @@ require 'submission_processor'
 # Receives submissions and presents the full submission list and submission view.
 # Also handles rerun requests.
 class SubmissionsController < ApplicationController
-  around_filter :course_transaction
-  before_filter :get_course_and_exercise
+  around_action :course_transaction
+  before_action :get_course_and_exercise
 
   # Manually checked for #show and index
   skip_authorization_check only: [:show, :index]
@@ -62,7 +62,7 @@ class SubmissionsController < ApplicationController
             test_cases: @submission.test_case_records,
             feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
             feedback_answer_url: submission_feedback_answers_url(@submission, format: :json),
-            processing_time: @submission.processing_time,
+            processing_time: @submission.processing_time
           }
           end
         )
@@ -93,7 +93,7 @@ class SubmissionsController < ApplicationController
       return respond_not_found('No ZIP file selected or failed to receive it')
     end
 
-    if !@exercise.submittable_by?(current_user)
+    unless @exercise.submittable_by?(current_user)
       return respond_access_denied('Submissions for this exercise are no longer accepted.')
     end
 
@@ -101,7 +101,7 @@ class SubmissionsController < ApplicationController
 
     errormsg = nil
 
-    if !file_contents.start_with?('PK')
+    unless file_contents.start_with?('PK')
       errormsg = "The uploaded file doesn't look like a ZIP file."
     end
 
@@ -109,7 +109,7 @@ class SubmissionsController < ApplicationController
       error_msg_locale: params[:error_msg_locale]
     }
 
-    if !errormsg
+    unless errormsg
       @submission = Submission.new(
         user: current_user,
         course: @course,
@@ -122,17 +122,17 @@ class SubmissionsController < ApplicationController
         message_for_reviewer: if params[:request_review] then params[:message_for_reviewer] || '' else '' end,
         client_time: if params[:client_time] then Time.at(params[:client_time].to_i) else nil end,
         client_nanotime: params[:client_nanotime],
-        client_ip: request.env["HTTP_X_FORWARDED_FOR"] || request.remote_ip
+        client_ip: request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip
       )
 
       authorize! :create, @submission
 
-      if !@submission.save
+      unless @submission.save
         errormsg = 'Failed to save submission.'
       end
     end
 
-    if !errormsg
+    unless errormsg
       SubmissionProcessor.new.process_submission(@submission)
     end
 
@@ -149,7 +149,7 @@ class SubmissionsController < ApplicationController
       format.json do
         if !errormsg
           render json: { submission_url: submission_url(@submission, format: 'json', api_version: ApiVersion::API_VERSION),
-                            paste_url: if @submission.paste_key then paste_url(@submission.paste_key) else '' end}
+                         paste_url: if @submission.paste_key then paste_url(@submission.paste_key) else '' end }
         else
           render json: { error: errormsg }
         end
@@ -179,7 +179,8 @@ class SubmissionsController < ApplicationController
     redirect_to exercise_path(@exercise), notice: 'Reruns scheduled'
   end
 
-private
+  private
+
   def course_transaction
     Course.transaction(requires_new: true) do
       yield
@@ -256,12 +257,12 @@ private
   end
 
   def check_access!
-    paste_visibility = @course.paste_visibility || "open"
+    paste_visibility = @course.paste_visibility || 'open'
     case paste_visibility
-    when "protected"
-      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or (@submission.public? and @submission.exercise.completed_by?(current_user))
+    when 'protected'
+      respond_access_denied unless current_user.administrator? || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
     else
-      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or ( @submission.public? and @submission.created_at > 2.hours.ago )
+      respond_access_denied unless current_user.administrator? || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
     end
   end
 end

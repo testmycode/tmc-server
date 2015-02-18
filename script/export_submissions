@@ -4,7 +4,7 @@ require root_dir + '/config/environment'
 require 'fileutils'
 
 if ![1, 2].include?(ARGV.length) || ['-h', '--help'].include?(ARGV[0])
-  puts "Usage: script/export_submissions dest_dir [course_name]"
+  puts 'Usage: script/export_submissions dest_dir [course_name]'
   puts
   exit(false)
 end
@@ -12,7 +12,7 @@ end
 dest_dir = ARGV[0]
 
 def write_file(filename, data)
-  File.open(filename, 'wb') {|f| f.write(data) }
+  File.open(filename, 'wb') { |f| f.write(data) }
 end
 
 query = Submission.order(:id)
@@ -29,7 +29,7 @@ end
 total = query.count
 
 if total == 0
-  puts "0 submissions found"
+  puts '0 submissions found'
   exit(true)
 end
 

@@ -5,7 +5,7 @@
 require 'spec_helper'
 
 describe Submission, type: :model do
-  describe "validation" do
+  describe 'validation' do
     before :each do
       @params = {
         course: mock_model(Course),
@@ -14,11 +14,11 @@ describe Submission, type: :model do
       }
     end
 
-    it "should succeed given valid parameters" do
+    it 'should succeed given valid parameters' do
       expect(Submission.new(@params)).to be_valid
     end
 
-    it "should require a user" do
+    it 'should require a user' do
       @params.delete :user
 
       submission = Submission.new(@params)
@@ -26,7 +26,7 @@ describe Submission, type: :model do
       expect(submission.errors[:user].size).to eq(1)
     end
 
-    it "should require an exercise name" do
+    it 'should require an exercise name' do
       @params.delete :exercise_name
 
       submission = Submission.new(@params)
@@ -34,7 +34,7 @@ describe Submission, type: :model do
       expect(submission.errors[:exercise_name].size).to eq(1)
     end
 
-    it "should take exercise name from given exercise object" do
+    it 'should take exercise name from given exercise object' do
       @params.delete :exercise_name
       @params[:exercise] = mock_model(Exercise, name: 'MyExercise123')
       sub = Submission.new(@params)
@@ -42,7 +42,7 @@ describe Submission, type: :model do
       expect(sub.exercise_name).to eq('MyExercise123')
     end
 
-    it "should require a course" do
+    it 'should require a course' do
       @params.delete :course
 
       submission = Submission.new(@params)
@@ -51,7 +51,7 @@ describe Submission, type: :model do
     end
   end
 
-  it "can summarize test cases" do
+  it 'can summarize test cases' do
     submission = Submission.new
     submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo()', message: 'you fail', successful: false, exception: '{"a": "b"}')
     submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo2()', successful: true)
@@ -61,7 +61,7 @@ describe Submission, type: :model do
         name: 'Moo moo()',
         successful: false,
         message: 'you fail',
-        exception: {'a' => 'b'},
+        exception: { 'a' => 'b' },
         detailed_message: nil
       },
       {
@@ -81,7 +81,7 @@ describe Submission, type: :model do
     ])
   end
 
-  it "can tell how many unprocessed submissions are in queue before itself" do
+  it 'can tell how many unprocessed submissions are in queue before itself' do
     t = Time.now
     FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 10.seconds)
     FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 9.seconds)
@@ -94,7 +94,7 @@ describe Submission, type: :model do
     expect(s.unprocessed_submissions_before_this).to eq(3)
   end
 
-  it "orders unprocessed submissions by priority, then by last processing attempt time" do
+  it 'orders unprocessed submissions by priority, then by last processing attempt time' do
     t = Time.now
     s1 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 7.seconds)
     s2 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 8.seconds)
@@ -106,23 +106,23 @@ describe Submission, type: :model do
     expect(Submission.to_be_reprocessed.map(&:id)).to eq(expected_order.map(&:id))
   end
 
-  it "stores stdout and stderr compressed" do
+  it 'stores stdout and stderr compressed' do
     s = FactoryGirl.create(:submission)
-    s.stdout = "hello"
+    s.stdout = 'hello'
     expect(s.submission_data.stdout_compressed).not_to be_empty
-    s.stderr = "world"
+    s.stderr = 'world'
     expect(s.submission_data.stderr_compressed).not_to be_empty
     s.save!
 
     s = Submission.find(s.id)
-    expect(s.stdout).to eq("hello")
-    expect(s.stderr).to eq("world")
+    expect(s.stdout).to eq('hello')
+    expect(s.stderr).to eq('world')
   end
 
-  it "can have null stdout and stderr" do
+  it 'can have null stdout and stderr' do
     s = FactoryGirl.create(:submission)
-    s.stdout = "hello"
-    s.stderr = "world"
+    s.stdout = 'hello'
+    s.stderr = 'world'
     s.stdout = nil
     expect(s.stdout).to be_nil
     expect(s.submission_data.stdout_compressed).to be_nil
@@ -132,24 +132,24 @@ describe Submission, type: :model do
     s.save!
   end
 
-  it "allows utf-8 caharacters in stdout, stderr and vm_log" do
+  it 'allows utf-8 caharacters in stdout, stderr and vm_log' do
     s = FactoryGirl.create(:submission)
-    s.stdout = "mää"
-    s.stderr = "möö"
-    s.vm_log = "måå"
-    s.valgrind = "måå"
+    s.stdout = 'mää'
+    s.stderr = 'möö'
+    s.vm_log = 'måå'
+    s.valgrind = 'måå'
     s.save!
 
     s = Submission.find(s.id)
-    expect(s.stdout).to eq("mää")
-    expect(s.stderr).to eq("möö")
-    expect(s.vm_log).to eq("måå")
-    expect(s.valgrind).to eq("måå")
+    expect(s.stdout).to eq('mää')
+    expect(s.stderr).to eq('möö')
+    expect(s.vm_log).to eq('måå')
+    expect(s.valgrind).to eq('måå')
   end
 
-  it "deletes submission data when destroyed" do
+  it 'deletes submission data when destroyed' do
     s = FactoryGirl.create(:submission)
-    s.stdout = "hello"
+    s.stdout = 'hello'
     s.save!
 
     id = s.id

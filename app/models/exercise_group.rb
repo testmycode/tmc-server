@@ -36,18 +36,18 @@ class ExerciseGroup
 
   def exercises(recursively)
     if recursively
-      course.exercises.to_a.select {|e| e.exercise_group_name.start_with?(self.name) }
+      course.exercises.to_a.select { |e| e.exercise_group_name.start_with?(name) }
     else
-      course.exercises.to_a.select {|e| e.exercise_group_name == self.name }
+      course.exercises.to_a.select { |e| e.exercise_group_name == name }
     end
   end
 
   def children
-    course.exercise_groups.select {|eg| eg.name.start_with?(self.name) && eg != self }
+    course.exercise_groups.select { |eg| eg.name.start_with?(name) && eg != self }
   end
 
   def <=>(other)
-    Natcmp.natcmp(self.name, other.name)
+    Natcmp.natcmp(name, other.name)
   end
 
   def inspect

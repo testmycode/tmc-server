@@ -5,7 +5,7 @@ class SubmissionList
   end
 
   def submission_list_data(submissions)
-    submissions.map {|s| submission_data(s) }
+    submissions.map { |s| submission_data(s) }
   end
 
   def submission_data(submission)
@@ -21,7 +21,7 @@ class SubmissionList
       paste_url: paste_url(submission),
       processing_time: submission.processing_time,
       reviewed: submission.reviewed?,
-      requests_review: submission.requests_review?,
+      requests_review: submission.requests_review?
     }
   end
 

@@ -5,7 +5,7 @@ require 'zlib'
 
 class SpywareClient
   def self.send_data_to_any(data, username, session_id)
-    client = self.open
+    client = open
     if client
       client.send_data(data, username, session_id)
     end
@@ -24,7 +24,7 @@ class SpywareClient
   end
 
   def send_data(data, username, session_id)
-    compressed_data = ""
+    compressed_data = ''
     gz = Zlib::GzipWriter.new(StringIO.new(compressed_data), Zlib::DEFAULT_COMPRESSION, Zlib::DEFAULT_STRATEGY)
     begin
       gz.write(data.to_s)

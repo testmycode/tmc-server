@@ -2,12 +2,12 @@ require 'portable_csv'
 
 class ParticipantsController < ApplicationController
   skip_authorization_check
-  before_filter :check_access
+  before_action :check_access
 
-  add_breadcrumb 'Participants', :participants_path, only: [:index, :show], if: lambda { current_user.administrator? }
+  add_breadcrumb 'Participants', :participants_path, only: [:index, :show], if: -> { current_user.administrator? }
 
   def index
-    @ordinary_fields = ['username', 'email']
+    @ordinary_fields = %w(username email)
     @extra_fields = UserField.all
     valid_fields = @ordinary_fields + @extra_fields.map(&:name) + ['include_administrators']
 
@@ -24,7 +24,7 @@ class ParticipantsController < ApplicationController
       end
 
     @courses = Course.order(:name).to_a
-    if !params['group_completion_course_id'].blank?
+    unless params['group_completion_course_id'].blank?
       @group_completion_course = Course.find(params['group_completion_course_id'])
       @group_completion = @group_completion_course.exercise_group_completion_by_user
     end
@@ -33,7 +33,7 @@ class ParticipantsController < ApplicationController
 
     if @group_completion && params['show_with_no_points'].blank?
       @participants = @participants.includes(:awarded_points).to_a.select do |user|
-        user.awarded_points.to_a.any? {|ap| ap.course_id == @group_completion_course.id }
+        user.awarded_points.to_a.any? { |ap| ap.course_id == @group_completion_course.id }
       end
     end
 
@@ -50,7 +50,7 @@ class ParticipantsController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    @awarded_points = Hash[@user.awarded_points.to_a.sort!.group_by(&:course_id).map {|k, v| [k, v.map(&:name)]}]
+    @awarded_points = Hash[@user.awarded_points.to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
 
     if current_user.administrator?
       add_breadcrumb @user.username, participant_path(@user)
@@ -87,7 +87,8 @@ class ParticipantsController < ApplicationController
     redirect_to root_path
   end
 
-private
+  private
+
   def check_access
     respond_access_denied unless current_user.administrator? || params[:id] == current_user.id.to_s
   end
@@ -123,10 +124,10 @@ private
 
   def index_csv
     PortableCSV.generate(force_quotes: true) do |csv|
-      title_row = (@ordinary_fields + @extra_fields.map(&:name)).select {|f| @visible_columns.include?(f) }.map(&:humanize)
+      title_row = (@ordinary_fields + @extra_fields.map(&:name)).select { |f| @visible_columns.include?(f) }.map(&:humanize)
 
       if @group_completion
-        completion_cols = @group_completion.keys.sort {|a, b| Natcmp.natcmp(a, b) }
+        completion_cols = @group_completion.keys.sort { |a, b| Natcmp.natcmp(a, b) }
         title_row += completion_cols
       end
 
@@ -150,7 +151,7 @@ private
             group_data = @group_completion[group]
             points = group_data[:points_by_user][user.id] || 0
             total = group_data[:available_points]
-            percentage = sprintf("%.3f%%", (points.to_f / total.to_f) * 100)
+            percentage = sprintf('%.3f%%', (points.to_f / total.to_f) * 100)
             row << percentage
           end
         end

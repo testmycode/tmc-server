@@ -2,21 +2,20 @@ require 'spec_helper'
 require 'cancan/matchers'
 
 describe CourseNotificationsController, type: :controller do
-
-  let(:topic) { "Hi all" }
-  let(:message) { "A long message to every participant on some course..." }
+  let(:topic) { 'Hi all' }
+  let(:message) { 'A long message to every participant on some course...' }
   let(:course) { FactoryGirl.create(:course) }
-  let(:params) {
+  let(:params) do
     {
-      course_notification:{
+      course_notification: {
         topic: topic,
         message: message
       },
       course_id: course.id
     }
-  }
+  end
 
-  it "should not allow a non-admin user to send email" do
+  it 'should not allow a non-admin user to send email' do
     bypass_rescue
 
     @user = FactoryGirl.create(:user)
@@ -28,18 +27,18 @@ describe CourseNotificationsController, type: :controller do
     expect { post :create, params }.to raise_error
   end
 
-  describe "for an admin user " do
-    let(:admin){ FactoryGirl.create(:admin, email: "admin@mydomain.com") }
+  describe 'for an admin user ' do
+    let(:admin) { FactoryGirl.create(:admin, email: 'admin@mydomain.com') }
     before do
       controller.current_user = admin
     end
 
-    it "redirects to the course page" do
+    it 'redirects to the course page' do
       post :create, params
       expect(response).to redirect_to(course_path(course))
     end
 
-    it "sends a email for every participant on course" do
+    it 'sends a email for every participant on course' do
       # submissions and points are added so that the user is considered to be on the course
       user = FactoryGirl.create(:user, email: 'student@some.edu.fi')
       sub1 = FactoryGirl.create(:submission, user: user, course: course)
@@ -62,7 +61,7 @@ describe CourseNotificationsController, type: :controller do
     it "doesn't crash if some email addresses are invalid" do
       user = FactoryGirl.create(:user, email: 'student@some.edu.fi')
       sub1 = FactoryGirl.create(:submission, user: user, course: course)
-      user2 = FactoryGirl.create(:user, email: 'std  @ myschool . fi') #The invalid address
+      user2 = FactoryGirl.create(:user, email: 'std  @ myschool . fi') # The invalid address
       sub2 = FactoryGirl.create(:submission, user: user2, course: course)
       aw1 = FactoryGirl.create(:awarded_point, user_id: user.id, course_id: course.id)
       aw2 = FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: course.id)
@@ -74,13 +73,11 @@ describe CourseNotificationsController, type: :controller do
       expect(mail_first.body.encoded).to include message
     end
 
-    it "refuses to send a blank message" do
+    it 'refuses to send a blank message' do
       params[:course_notification][:message] = ''
       post :create, params
       expect(response).to redirect_to(new_course_course_notifications_path(course))
       expect(flash[:error]).not_to be_empty
     end
-
   end
-
 end

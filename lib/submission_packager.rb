@@ -81,23 +81,24 @@ class SubmissionPackager
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
       return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
-      File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
+      File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
       package_submission(exercise, zip_path, return_zip_path, submission.params,
-        tests_from_stub: true,
-        include_ide_files: true,
-        format: :zip,
-        toplevel_dir_name: toplevel_dir_name,
-        no_tmc_run: true
+                         tests_from_stub: true,
+                         include_ide_files: true,
+                         format: :zip,
+                         toplevel_dir_name: toplevel_dir_name,
+                         no_tmc_run: true
       )
       File.read(return_zip_path)
     end
   end
 
-private
+  private
+
   include SystemCommands
 
-  def find_received_project_root(received_root)
-    raise "Implemented by subclass"
+  def find_received_project_root(_received_root)
+    fail 'Implemented by subclass'
   end
 
   # Stupid OS X default zipper puts useless crap into zip files :[
@@ -108,8 +109,8 @@ private
   end
 
   # All parameters are pathname objects
-  def copy_files(exercise, received, dest, stub = nil, opts = {})
-    raise "Implemented by subclass"
+  def copy_files(_exercise, _received, _dest, _stub = nil, _opts = {})
+    fail 'Implemented by subclass'
   end
 
   def copy_ide_files(clone, received, dest)
@@ -136,7 +137,7 @@ private
   end
 
   def cp_r_if_exists(src, dest)
-    if src != nil && File.exist?(src)
+    if !src.nil? && File.exist?(src)
       FileUtils.cp_r(src, dest)
     end
   end
@@ -150,8 +151,8 @@ private
     tmc_project_file.extra_student_files.each do |rel_path|
       from = "#{received}/#{rel_path}"
       to = "#{dest}/#{rel_path}"
-      if File.exists?(from)
-        FileUtils.rm(to) if File.exists?(to)
+      if File.exist?(from)
+        FileUtils.rm(to) if File.exist?(to)
         FileUtils.mkdir_p(File.dirname(to))
         FileUtils.cp(from, to)
       end
@@ -161,7 +162,7 @@ private
   def write_extra_params(file, extra_params)
     File.open(file, 'wb') do |f|
       extra_params.each do |k, v|
-        v = "" if v == nil
+        v = '' if v.nil?
         escaped_v = if v.is_a?(Array) then SystemCommands.make_bash_array(v) else Shellwords.escape(v) end
         f.puts 'export ' + Shellwords.escape(k) + '=' + escaped_v
       end

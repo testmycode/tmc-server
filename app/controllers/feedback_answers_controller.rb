@@ -34,29 +34,29 @@ class FeedbackAnswersController < ApplicationController
         authorize! :read, FeedbackQuestion
         authorize! :read, FeedbackAnswer
 
-        @text_answers = @parent.feedback_answers.
-          joins(:feedback_question).
-          joins(:submission).
-          joins(submission: :user).
+        @text_answers = @parent.feedback_answers
+          .joins(:feedback_question)
+          .joins(:submission)
+          .joins(submission: :user)
           #joins(:exercise). # fails due to :conditions of belongs_to receiving incorrect self :(
-          where(feedback_questions: { kind: 'text' }).
-          order('created_at DESC').
-          all
+          .where(feedback_questions: { kind: 'text' })
+          .order('created_at DESC')
+          .all
       end
       format.json do
         authorize! :read, @parent
         # We only deliver public statistics so no authorization required
 
         render json: {
-          numeric_questions: @numeric_questions.map {|q|
+          numeric_questions: @numeric_questions.map do|q|
             {
               id: q.id,
               title: q.title,
               question: q.question,
               position: q.position
             }
-          },
-          numeric_stats: @numeric_stats.map {|ex, averages, answer_count|
+          end,
+          numeric_stats: @numeric_stats.map do|ex, averages, answer_count|
             {
               exercise: {
                 id: ex.id,
@@ -66,7 +66,7 @@ class FeedbackAnswersController < ApplicationController
               answer_count: answer_count,
               answers: FeedbackAnswer.anonymous_numeric_answers(ex)
             }
-          }
+          end
         }, callback: params[:jsonp]
       end
     end
@@ -88,13 +88,11 @@ class FeedbackAnswersController < ApplicationController
     answer_params = answer_params.values if answer_params.respond_to?(:values)
 
     answer_records = answer_params.map do |answer_hash|
-      FeedbackAnswer.new({
-        submission: submission,
-        course_id: submission.course_id,
-        exercise_name: submission.exercise_name,
-        feedback_question_id: answer_hash[:question_id],
-        answer: answer_hash[:answer]
-      })
+      FeedbackAnswer.new(        submission: submission,
+                                 course_id: submission.course_id,
+                                 exercise_name: submission.exercise_name,
+                                 feedback_question_id: answer_hash[:question_id],
+                                 answer: answer_hash[:answer])
     end
     answer_records.each {|record| authorize! :create, record }
 

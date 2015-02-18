@@ -5,25 +5,25 @@ module ExtraField
   extend ActiveSupport::Concern
   included do
     def self.extra_field_kind
-      self.name.underscore.gsub(/_field$/, '').to_sym
+      name.underscore.gsub(/_field$/, '').to_sym
     end
 
     def self.all
-      @all ||= ExtraField.by_kind(self.extra_field_kind)
+      @all ||= ExtraField.by_kind(extra_field_kind)
     end
 
     def self.groups
-      self.all.map(&:group).uniq
+      all.map(&:group).uniq
     end
 
     def self.by_group(group)
-      all.select {|field| field.group == group}
+      all.select { |field| field.group == group }
     end
   end
 
   def initialize(options = {})
     @options = default_options.merge(options)
-    raise 'Name missing' unless @options[:name]
+    fail 'Name missing' unless @options[:name]
     @value_class = Object.const_get(self.class.name + 'Value')
   end
 
@@ -70,14 +70,15 @@ module ExtraField
   end
 
   def self.by_kind(kind)
-    if !@fields
-      kinds = config_files.map {|file| File.basename(file, '_fields.rb')}
-      @fields = Hash[kinds.zip(config_files).map {|k, f| [k.to_sym, load_fields(k, f)] }]
+    unless @fields
+      kinds = config_files.map { |file| File.basename(file, '_fields.rb') }
+      @fields = Hash[kinds.zip(config_files).map { |k, f| [k.to_sym, load_fields(k, f)] }]
     end
     @fields[kind.to_sym] || []
   end
 
-private
+  private
+
   def self.config_files
     Dir.glob("#{::Rails.root}/config/extra_fields/*_fields.rb")
   end
@@ -91,7 +92,7 @@ private
     cls_name = "#{kind.camelize}Field"
 
     cls = Object.const_get(cls_name)
-    raise "Field class not found: #{cls}" if cls == nil
+    fail "Field class not found: #{cls}" if cls.nil?
 
     dsl = Object.new
     dsl.instance_variable_set('@cls', cls)
@@ -100,7 +101,7 @@ private
 
     class << dsl
       def group(group_name, &block)
-        raise "Don't nest groups" if @group
+        fail "Don't nest groups" if @group
         @group = group_name
         begin
           block.call
@@ -110,7 +111,7 @@ private
       end
 
       def field(options)
-        @fields << @cls.new({group: @group}.merge(options))
+        @fields << @cls.new({ group: @group }.merge(options))
       end
 
       def html(text, options = {})

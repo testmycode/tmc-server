@@ -22,10 +22,11 @@ class PasswordResetKey < ActiveRecord::Base
   end
 
   def expired?
-    self.created_at < Time.now - 24.hours
+    created_at < Time.now - 24.hours
   end
 
-private
+  private
+
   def randomize_code
     self.code = SecureRandom.hex(32)
   end

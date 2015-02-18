@@ -13,12 +13,12 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     @submission = @setup.submission
   end
 
-  describe "running tests on a submission for a simple exercise" do
+  describe 'running tests on a submission for a simple exercise' do
     before :each do
       make_setup 'SimpleExercise'
     end
 
-    it "should create test results for the submission" do
+    it 'should create test results for the submission' do
       @exercise_project.solve_add
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -26,18 +26,18 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
       expect(@submission).to be_processed
 
       expect(@submission.test_case_runs).not_to be_empty
-      tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testAdd' }
+      tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'SimpleTest testAdd' }
       expect(tcr).not_to be_nil
       expect(tcr).to be_successful
 
-      tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'SimpleTest testSubtract' }
+      tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'SimpleTest testSubtract' }
       expect(tcr).not_to be_nil
       expect(tcr).not_to be_successful
     end
 
-    it "should not create multiple test results for the same test method even if it is involved in multiple points"
+    it 'should not create multiple test results for the same test method even if it is involved in multiple points'
 
-    it "should raise an error if compilation of a test fails" do
+    it 'should raise an error if compilation of a test fails' do
       @exercise_project.introduce_compilation_error
       @setup.make_zip
 
@@ -47,7 +47,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
       expect(@submission.pretest_error).to match(/Compilation error/)
     end
 
-    it "should award points for successful exercises" do
+    it 'should award points for successful exercises' do
       @exercise_project.solve_sub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -69,7 +69,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
       expect(points).not_to include('both-test-files')
     end
 
-    it "should award a point if all tests (potentially in multiple files) required for it pass" do
+    it 'should award a point if all tests (potentially in multiple files) required for it pass' do
       @exercise_project.solve_all
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -79,7 +79,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
       expect(points).to include('both-test-files')
     end
 
-    it "should only ever award more points, never delete old points" do
+    it 'should only ever award more points, never delete old points' do
       @exercise_project.solve_sub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -96,7 +96,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     end
   end
 
-  it "should include tools.jar in the classpath for ant projects" do
+  it 'should include tools.jar in the classpath for ant projects' do
     make_setup 'UsingToolsJar'
     @setup.make_zip
     RemoteSandboxForTesting.run_submission(@submission)

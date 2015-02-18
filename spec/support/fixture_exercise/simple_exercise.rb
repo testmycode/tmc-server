@@ -64,7 +64,7 @@ class FixtureExercise::SimpleExercise < FixtureExercise
     "#{@path}/test"
   end
 
-private
+  private
 
   def replace_method_body_in_file(path, method, body)
     lines = IO.readlines(path)
@@ -75,6 +75,6 @@ private
         line
       end
     end
-    File.open(path, "wb") {|f| f.write(lines.join) }
+    File.open(path, 'wb') { |f| f.write(lines.join) }
   end
 end

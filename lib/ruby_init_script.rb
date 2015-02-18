@@ -17,7 +17,7 @@ class RubyInitScript
       name: nil,
       erb_path: File.dirname(File.realpath(__FILE__)) + '/ruby_init_script/initscript.erb',
       rails_env: 'production',
-      working_dir: ::Rails::root,
+      working_dir: ::Rails.root,
       executable_path: nil,
       short_description: nil,
       user: 'root'
@@ -26,8 +26,8 @@ class RubyInitScript
 
   def script_source
     rvm_current = `rvm current`
-    if $?.success?
-      puts "Using RVM."
+    if $CHILD_STATUS.success?
+      puts 'Using RVM.'
       rvm_current.strip!
       ruby_path = rvm_info[rvm_current]['binaries']['ruby']
       env = rvm_info[rvm_current]['environment']
@@ -41,7 +41,7 @@ class RubyInitScript
       env['RAILS_ENV'] = @options[:rails_env]
     end
 
-    def get_binding(name, working_dir, executable_path, ruby_path, user, env)
+    def get_binding(_name, _working_dir, _executable_path, _ruby_path, _user, _env)
       binding
     end
 
@@ -63,10 +63,10 @@ class RubyInitScript
     script = script_source
 
     puts "Installing into #{init_script_path}"
-    File.open(init_script_path, 'w') {|f| f.write(script) }
+    File.open(init_script_path, 'w') { |f| f.write(script) }
     system("chmod a+x #{Shellwords.escape(init_script_path)}")
 
-    puts "Setting to start/stop by default"
+    puts 'Setting to start/stop by default'
     system("update-rc.d #{init_script_full_name} defaults 90 10")
   end
 
@@ -91,7 +91,8 @@ class RubyInitScript
     @options[:short_description] || init_script_full_name
   end
 
-private
+  private
+
   def preprocess_options
     @options.each_key do |k|
       if @options[k].is_a? Pathname
@@ -101,10 +102,10 @@ private
   end
 
   def check_options
-    raise ":name required" if !@options[:name]
-    raise ":erb_path required" if !@options[:erb_path]
-    raise ":working_dir required" if !@options[:working_dir]
-    raise ":executable_path required" if !@options[:executable_path]
+    fail ':name required' unless @options[:name]
+    fail ':erb_path required' unless @options[:erb_path]
+    fail ':working_dir required' unless @options[:working_dir]
+    fail ':executable_path required' unless @options[:executable_path]
   end
 
   def rvm_info
@@ -117,7 +118,7 @@ Sometimes it is required to use `/bin/bash --login` as the command.
 Please visit https://rvm.io/integration/gnome-terminal/ for a example.
 EOS
       output = output.sub(potential_warning, '')
-      YAML::load(output)
+      YAML.load(output)
     end
   end
 end

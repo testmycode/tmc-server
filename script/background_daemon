@@ -31,7 +31,7 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
         begin
           ActiveRecord::Base.verify_active_connections!
         rescue => e2
-          Rails.logger.error "Failed to verify DB connection: " + exception_to_str(e2)
+          Rails.logger.error 'Failed to verify DB connection: ' + exception_to_str(e2)
         end
       end
     end

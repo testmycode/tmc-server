@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
   include EmbeddableHelper
   check_authorization
 
-  rescue_from CanCan::AccessDenied do |exception|
+  rescue_from CanCan::AccessDenied do |_exception|
     respond_access_denied
   end
 
@@ -31,23 +31,23 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from ActionController::MissingFile do
-    respond_with_error("File not found", 404)
+    respond_with_error('File not found', 404)
   end
 
-  before_filter :set_default_url_options
-  before_filter :check_api_version
-  before_filter :set_bare_layout
-  before_filter :set_controller_and_action_name
+  before_action :set_default_url_options
+  before_action :check_api_version
+  before_action :set_bare_layout
+  before_action :set_controller_and_action_name
 
   def url_options
     if @bare_layout
-      {bare_layout: '1'}.merge(super)
+      { bare_layout: '1' }.merge(super)
     else
       super
     end
   end
 
-private
+  private
 
   def current_ability
     @current_ability ||= ::Ability.new(current_user)
@@ -60,16 +60,16 @@ private
   def check_api_version
     if should_check_api_version?
       if params[:api_version].blank?
-        return respond_with_error("Please update the TMC client. No API version received from client.", 404, obsolete_client: true)
+        return respond_with_error('Please update the TMC client. No API version received from client.', 404, obsolete_client: true)
       elsif params[:api_version].to_s != ApiVersion::API_VERSION.to_s
         return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, obsolete_client: true)
       end
 
-      if !params[:client].blank? # Client and client version checks are optional
+      unless params[:client].blank? # Client and client version checks are optional
         begin
           check_client_version(params[:client], params[:client_version])
         rescue
-          return respond_with_error($!.message, 404, obsolete_client: true)
+          return respond_with_error($ERROR_INFO.message, 404, obsolete_client: true)
         end
       end
     end
@@ -77,18 +77,18 @@ private
 
   def check_client_version(client_name, client_version)
     begin
-      client_version = Version.new(client_version) if client_version != nil
+      client_version = Version.new(client_version) unless client_version.nil?
     rescue
       raise "Invalid version string: #{client_version}"
     end
 
     valid_clients = SiteSetting.value('valid_clients')
     if valid_clients.is_a?(Enumerable)
-      vc = valid_clients.find {|c| c['name'] == client_name }
-      raise "Invalid TMC client." if vc == nil
+      vc = valid_clients.find { |c| c['name'] == client_name }
+      fail 'Invalid TMC client.' if vc.nil?
 
-      if client_version != nil && !vc['min_version'].blank?
-        raise "Please update the TMC client." if client_version < Version.new(vc['min_version'])
+      if !client_version.nil? && !vc['min_version'].blank?
+        fail 'Please update the TMC client.' if client_version < Version.new(vc['min_version'])
       else
         return # without version check
       end
@@ -153,9 +153,9 @@ private
 
   def select_layout
     if params[:bare_layout]
-      "bare"
+      'bare'
     else
-      "application"
+      'application'
     end
   end
 
@@ -164,13 +164,13 @@ private
       remove_prefix: false
     }.merge(options)
 
-    permitted = permitted.map {|f| prefix + f } unless permitted == :all
+    permitted = permitted.map { |f| prefix + f } unless permitted == :all
 
-    result = Hash[params.select {|k, v|
+    result = Hash[params.select do|k, v|
       k.start_with?(prefix) && !v.blank? && (permitted == :all || permitted.include?(k))
-    }]
+    end]
     if options[:remove_prefix]
-      result = Hash[result.map {|k, v| [k.sub(/^#{prefix}/, ''), v] }]
+      result = Hash[result.map { |k, v| [k.sub(/^#{prefix}/, ''), v] }]
     end
     result
   end
@@ -183,15 +183,15 @@ private
     }.merge(options)
 
     headers['Cache-Control'] = 'no-cache, must-revalidate, post-check=0, pre-check=0'
-    headers['Expires'] = "Thu, 01 Dec 1994 16:00:00 GMT"
+    headers['Expires'] = 'Thu, 01 Dec 1994 16:00:00 GMT'
 
     if request.env['HTTP_USER_AGENT'] =~ /msie/i
       headers['Pragma'] = 'public'
-      headers["Content-type"] = "text/plain"
+      headers['Content-type'] = 'text/plain'
     else
-      headers["Content-Type"] ||= 'text/csv'
+      headers['Content-Type'] ||= 'text/csv'
     end
-    headers["Content-Disposition"] = "attachment; filename=\"#{options[:filename]}\""
+    headers['Content-Disposition'] = "attachment; filename=\"#{options[:filename]}\""
 
     render_options = {
       layout: false
@@ -200,5 +200,4 @@ private
 
     render render_options
   end
-
 end

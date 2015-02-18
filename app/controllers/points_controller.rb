@@ -9,7 +9,7 @@ class PointsController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Points', course_points_path(@course)
 
-    exercises = @course.exercises.select {|e| e.points_visible_to?(current_user)}
+    exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
     sheets = @course.gdocs_sheets(exercises).natsort
     @summary = summary_hash(@course, exercises, sheets)
     sort_summary(@summary, params[:sort_by]) if params[:sort_by]
@@ -81,11 +81,13 @@ class PointsController < ApplicationController
     users = users.where(administrator: false) unless include_admins
 
     {
-      sheets: sheets.map{|sheet| {
-        name: sheet,
-        total_awarded: AwardedPoint.course_sheet_points(course, sheet, include_admins).length,
-        total_available: AvailablePoint.course_sheet_points(course, sheet).length
-      }},
+      sheets: sheets.map do|sheet|
+        {
+          name: sheet,
+          total_awarded: AwardedPoint.course_sheet_points(course, sheet, include_admins).length,
+          total_available: AvailablePoint.course_sheet_points(course, sheet).length
+        }
+      end,
       total_awarded: AwardedPoint.course_points(course, include_admins).length,
       total_available: AvailablePoint.course_points_of_exercises(course, visible_exercises).length,
       awarded_for_user_and_sheet: per_user_and_sheet,
@@ -96,10 +98,10 @@ class PointsController < ApplicationController
 
   def sort_summary(summary, sorting)
     if sorting == 'total_points'
-      summary[:users] = summary[:users].sort_by {|user| [-summary[:total_for_user][user.login].to_i, user.login] }
+      summary[:users] = summary[:users].sort_by { |user| [-summary[:total_for_user][user.login].to_i, user.login] }
     elsif sorting =~ /(.*)_points$/
-      sheet = $1
-      summary[:users] = summary[:users].sort_by {|user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
+      sheet = Regexp.last_match(1)
+      summary[:users] = summary[:users].sort_by { |user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
     end
   end
 end

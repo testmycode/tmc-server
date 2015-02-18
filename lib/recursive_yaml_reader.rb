@@ -16,14 +16,14 @@ class RecursiveYamlReader
     require_option(:target_dir)
     require_option(:file_name)
 
-    raise ':target_dir must start with :root_dir' unless @opts[:target_dir].start_with?(@opts[:root_dir])
+    fail ':target_dir must start with :root_dir' unless @opts[:target_dir].start_with?(@opts[:root_dir])
 
     root_dir = @opts[:root_dir]
     target_dir = @opts[:target_dir]
     file_name = @opts[:file_name]
-    preprocessor = @opts[:file_preprocessor] || Proc.new {}
+    preprocessor = @opts[:file_preprocessor] || proc {}
 
-    subdirs = target_dir.gsub(/^#{@opts[:root_dir]}\//, '').split("/")
+    subdirs = target_dir.gsub(/^#{@opts[:root_dir]}\//, '').split('/')
 
     @result = @opts[:defaults] || {}
     merge_file("#{root_dir}/#{file_name}", &preprocessor)
@@ -32,16 +32,17 @@ class RecursiveYamlReader
       begin
         merge_file("#{root_dir}/#{rel_path}", &preprocessor)
       rescue
-        raise "error while reading #{rel_path}: #{$!}"
+        raise "error while reading #{rel_path}: #{$ERROR_INFO}"
       end
     end
 
     @result
   end
 
-private
+  private
+
   def require_option(name)
-    raise "option :#{name} is required" if @opts[name].nil?
+    fail "option :#{name} is required" if @opts[name].nil?
   end
 
   def merge_file(path, &preprocessor)

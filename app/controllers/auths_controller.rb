@@ -4,17 +4,17 @@
 # (username, session_id) is valid.
 class AuthsController < ApplicationController
   skip_authorization_check
-  skip_before_filter :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
 
   def show
-    msg = "FAIL"
+    msg = 'FAIL'
 
     user = User.find_by_login(params[:username])
     if user
       if !params[:password].blank? && user.has_password?(params[:password])
-        msg = "OK"
+        msg = 'OK'
       elsif !params[:session_id].blank? && find_session_by_id(params[:session_id]).andand.belongs_to?(user)
-        msg = "OK"
+        msg = 'OK'
       end
     end
 
@@ -23,12 +23,13 @@ class AuthsController < ApplicationController
         render text: msg
       end
       format.json do
-        render json: {status: msg}.to_json
+        render json: { status: msg }.to_json
       end
     end
   end
 
-private
+  private
+
   def find_session_by_id(sid)
     # Can't say Session.find_by_session_id because of a nasty metaprogramming hax in AR's superclass.
     Session.where(session_id: sid).first

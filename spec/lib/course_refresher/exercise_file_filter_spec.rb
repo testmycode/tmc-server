@@ -4,7 +4,6 @@ require 'digest/md5'
 
 # TODO: clean this up. Perhaps put cases into their own files.
 describe CourseRefresher::ExerciseFileFilter do
-
   before :each do
     FileUtils.mkdir('original')
     @filter = CourseRefresher::ExerciseFileFilter.new('original')
@@ -15,7 +14,7 @@ describe CourseRefresher::ExerciseFileFilter do
     FileUtils.mkdir_p(target_dir)
 
     test_case_dir = File.dirname(__FILE__) + "/test_cases/#{test_case_subdir}"
-    input_files = (Dir.entries(test_case_dir) - ['.', '..']).select {|f| f.include?('.in.') }
+    input_files = (Dir.entries(test_case_dir) - ['.', '..']).select { |f| f.include?('.in.') }
 
     input_files.each do |input_file|
       output_file = input_file.sub('.in.', '.out.')
@@ -38,14 +37,14 @@ describe CourseRefresher::ExerciseFileFilter do
     end
   end
 
-  describe "#make_stub" do
+  describe '#make_stub' do
     before :each do
       FileUtils.mkdir('stub')
     end
 
     make_test_cases('stub', :make_stub)
 
-    it "should not include directories under src/ containing only solution files" do
+    it 'should not include directories under src/ containing only solution files' do
       FileUtils.mkdir_p 'original/src/foo/bar'
       make_file 'original/src/foo/bar/Thing.java', '//SOLUTION FILE'
       make_file 'original/src/foo/Remaining.java', '//This file should remain'
@@ -58,7 +57,7 @@ describe CourseRefresher::ExerciseFileFilter do
       expect(File).not_to exist('stub/src/foo/bar')
     end
 
-    it "should still include src/ even if it contains only solution files" do
+    it 'should still include src/ even if it contains only solution files' do
       FileUtils.mkdir_p 'original/src'
       make_file 'original/src/Thing.java', '//SOLUTION FILE'
       @filter.make_stub('stub')
@@ -67,7 +66,7 @@ describe CourseRefresher::ExerciseFileFilter do
       expect(File).to exist('stub/src')
     end
 
-    it "should convert end-of-lines to unix style" do
+    it 'should convert end-of-lines to unix style' do
       make_file 'original/Thing.java', <<EOF
 public class Thing {\r
     // BEGIN SOLUTION\r
@@ -96,7 +95,7 @@ public class Thing {
 EOF
     end
 
-    it "should remove html comments" do
+    it 'should remove html comments' do
       make_file 'original/Thing.java', <<EOF
 /*
  * PREPEND HTML
@@ -113,37 +112,37 @@ public class Thing {
 EOF
     end
 
-    it "should not include hidden tests" do
+    it 'should not include hidden tests' do
       make_file('original/HiddenThing.java', '...')
       @filter.make_stub('stub')
       expect(File).not_to exist('stub/HiddenThing.java')
     end
 
-    it "should not include metadata files" do
+    it 'should not include metadata files' do
       make_file('original/metadata.yml', '...')
       @filter.make_stub('stub')
       expect(File).not_to exist('stub/metadata.yml')
     end
 
-    it "should not include git files" do
+    it 'should not include git files' do
       make_file('original/.gitignore', '...')
       @filter.make_stub('stub')
       expect(File).not_to exist('stub/.gitignore')
     end
 
-    it "should include .tmcproject.yml" do
+    it 'should include .tmcproject.yml' do
       make_file('original/.tmcproject.yml', '---')
       @filter.make_stub('stub')
       expect(File).to exist('stub/.tmcproject.yml')
     end
 
-    it "should not include .tmcrc" do
+    it 'should not include .tmcrc' do
       make_file('original/.tmcrc', '---')
       @filter.make_stub('stub')
       expect(File).not_to exist('stub/.tmcrc')
     end
 
-    it "should not mangle binary files" do
+    it 'should not mangle binary files' do
       original = TmcJunitRunner.get.jar_path
       FileUtils.cp(original, 'original/foo.jar')
       @filter.make_stub('stub')
@@ -151,16 +150,14 @@ EOF
     end
   end
 
-
-
-  describe "#make_solution" do
+  describe '#make_solution' do
     before :each do
       FileUtils.mkdir('solution')
     end
 
     make_test_cases('solution', :make_solution)
 
-    it "should convert end-of-lines to unix style" do
+    it 'should convert end-of-lines to unix style' do
       make_file 'original/Thing.java', <<EOF
 public class Thing {\r
     // BEGIN SOLUTION\r
@@ -192,7 +189,7 @@ public class Thing {
 EOF
     end
 
-    it "should remove html comments and make files out of them" do
+    it 'should remove html comments and make files out of them' do
       make_file 'original/Thing.java', <<EOF
 /*
  * PREPEND HTML <strong>hi</strong>
@@ -217,42 +214,42 @@ EOF
 EOF
     end
 
-    it "should not include any tests" do
+    it 'should not include any tests' do
       FileUtils.mkdir_p('original/test')
       make_file('original/test/Foo.java', '...')
       @filter.make_solution('solution')
       expect(File).not_to exist('solution/test/Foo.java')
     end
 
-    it "should not include metadata files" do
+    it 'should not include metadata files' do
       make_file('original/metadata.yml', '...')
       @filter.make_solution('solution')
       expect(File).not_to exist('solution/metadata.yml')
     end
 
-    it "should not include git files" do
+    it 'should not include git files' do
       make_file('original/.gitignore', '...')
       @filter.make_solution('solution')
       expect(File).not_to exist('solution/.gitignore')
     end
 
-    it "should not include .tmcproject.yml" do
+    it 'should not include .tmcproject.yml' do
       make_file('original/.tmcproject.yml', '---')
       @filter.make_solution('solution')
       expect(File).not_to exist('solution/.tmcproject.yml')
     end
 
-    it "should not include .tmcrc" do
+    it 'should not include .tmcrc' do
       make_file('original/.tmcrc', '---')
       @filter.make_stub('solution')
       expect(File).not_to exist('solution/.tmcrc')
     end
 
-    it "should include extra student files specified in .tmcproject.yml" do
+    it 'should include extra student files specified in .tmcproject.yml' do
       make_file('original/.tmcproject.yml', "extra_student_files:\n  - test/Foo.java")
       FileUtils.mkdir('original/test')
-      make_file('original/test/Foo.java', "// This should be in the solution")
-      make_file('original/test/Bar.java', "// This should not be in the solution")
+      make_file('original/test/Foo.java', '// This should be in the solution')
+      make_file('original/test/Bar.java', '// This should not be in the solution')
 
       @filter = CourseRefresher::ExerciseFileFilter.new('original')
       @filter.make_solution('solution')
@@ -262,7 +259,7 @@ EOF
       expect(File).not_to exist('solution/test/Bar.java')
     end
 
-    it "should not mangle binary files" do
+    it 'should not mangle binary files' do
       original = TmcJunitRunner.get.jar_path
       FileUtils.cp(original, 'original/foo.jar')
       @filter.make_solution('solution')
@@ -271,6 +268,6 @@ EOF
   end
 
   def make_file(name, contents)
-    File.open(name, 'wb') {|f| f.write(contents) }
+    File.open(name, 'wb') { |f| f.write(contents) }
   end
 end

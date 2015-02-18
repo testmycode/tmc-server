@@ -10,7 +10,7 @@ module DateAndTimeUtils
       return nil
     end
 
-    d = self.parse_date_or_time(d) if d.is_a?(String)
+    d = parse_date_or_time(d) if d.is_a?(String)
 
     if d.is_a? Date
       if options[:prefer_end_of_day]
@@ -19,7 +19,7 @@ module DateAndTimeUtils
         d = d.beginning_of_day
       end
     elsif !d.is_a?(Time)
-      raise "Invalid date or time: #{input}"
+      fail "Invalid date or time: #{input}"
     end
     d
   end
@@ -28,7 +28,7 @@ module DateAndTimeUtils
     s = input.strip
 
     if s =~ /^(\d+)\.(\d+)\.(\d+)(.*)$/
-      s = "#{$3}-#{$2}-#{$1}#{$4}"
+      s = "#{Regexp.last_match(3)}-#{Regexp.last_match(2)}-#{Regexp.last_match(1)}#{Regexp.last_match(4)}"
     end
 
     result = nil
@@ -42,14 +42,14 @@ module DateAndTimeUtils
       raise "Invalid date/time: #{input}"
     end
 
-    raise "Cannot parse date/time: #{input}" if !result
+    fail "Cannot parse date/time: #{input}" unless result
 
     result
   end
 
   def self.to_utc_str(time, options = {})
     t = to_time(time, options)
-    if t != nil
+    if !t.nil?
       t.utc.strftime('%Y-%m-%d %H:%M:%S.%6N %Z')
     else
       t
@@ -57,10 +57,8 @@ module DateAndTimeUtils
   end
 
   def self.looks_like_date_or_time(str)
-    begin
-      !!parse_date_or_time(str)
-    rescue
-      false
-    end
+    !!parse_date_or_time(str)
+  rescue
+    false
   end
 end

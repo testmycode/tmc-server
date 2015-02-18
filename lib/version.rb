@@ -10,7 +10,7 @@ class Version
     elsif version.is_a?(Numeric)
       @parts = [version]
     else
-      raise "Invalid version number: #{version.inspect}"
+      fail "Invalid version number: #{version.inspect}"
     end
   end
 
@@ -18,7 +18,7 @@ class Version
 
   def <=>(other)
     if other.is_a?(Version)
-      p1 = self.parts.clone
+      p1 = parts.clone
       p2 = other.parts.clone
       p1 << 0 while p1.length < p2.length
       p2 << 0 while p2.length < p1.length
@@ -31,7 +31,7 @@ class Version
       end
       0
     else
-      raise ArgumentError.new("cannot compare Version with #{other.class}")
+      fail ArgumentError.new("cannot compare Version with #{other.class}")
     end
   end
 

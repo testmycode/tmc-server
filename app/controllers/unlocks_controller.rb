@@ -8,7 +8,7 @@ class UnlocksController < ApplicationController
     respond_to do |format|
       format.html do
         add_course_breadcrumb
-        add_breadcrumb "Unlock exercises", course_unlock_path(@course)
+        add_breadcrumb 'Unlock exercises', course_unlock_path(@course)
       end
     end
   end
@@ -22,11 +22,11 @@ class UnlocksController < ApplicationController
 
     respond_to do |format|
       format.html do
-        flash[:success] = "Exercises unlocked."
+        flash[:success] = 'Exercises unlocked.'
         redirect_to course_path(@course)
       end
       format.json do
-        render json: {status: 'ok'}
+        render json: { status: 'ok' }
       end
     end
   end

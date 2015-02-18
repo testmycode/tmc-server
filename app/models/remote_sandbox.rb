@@ -15,7 +15,7 @@ class RemoteSandbox
   end
 
   def self.try_to_send_submission_to_free_server(submission, notify_url)
-    for server in self.all.shuffle # could be smarter about this
+    for server in all.shuffle # could be smarter about this
       begin
         server.send_submission(submission, notify_url)
       rescue SandboxUnavailableError
@@ -26,21 +26,21 @@ class RemoteSandbox
         return true
       end
     end
-    Rails.logger.warn "No free server to send submission to. Leaving to reprocessor daemon."
+    Rails.logger.warn 'No free server to send submission to. Leaving to reprocessor daemon.'
     false
   end
 
   def send_submission(submission, notify_url)
     exercise = submission.exercise
 
-    raise "Submission has no secret token" if submission.secret_token.blank?
-    raise "Exercise #{submission.exercise_name} for submission gone. Cannot resubmit." if exercise == nil
+    fail 'Submission has no secret token' if submission.secret_token.blank?
+    fail "Exercise #{submission.exercise_name} for submission gone. Cannot resubmit." if exercise.nil?
 
     Dir.mktmpdir do |tmpdir|
       begin
         zip_path = "#{tmpdir}/submission.zip"
         tar_path = "#{tmpdir}/submission.tar"
-        File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
+        File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
         SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params)
 
         File.open(tar_path, 'r') do |tar_file|
@@ -53,9 +53,9 @@ class RemoteSandbox
       rescue SandboxUnavailableError
         raise
       rescue
-        Rails.logger.info "Submission #{submission.id} could not be packaged: #{$1}"
+        Rails.logger.info "Submission #{submission.id} could not be packaged: #{Regexp.last_match(1)}"
         Rails.logger.info "Marking submission #{submission.id} as failed."
-        submission.pretest_error = "Failed to process submission. Likely sent in incorrect format."
+        submission.pretest_error = 'Failed to process submission. Likely sent in incorrect format.'
         submission.processed = true
         submission.save!
         raise
@@ -64,11 +64,9 @@ class RemoteSandbox
   end
 
   def try_to_seed_maven_cache(file_path)
-    begin
-      seed_maven_cache(file_path)
-    rescue
-      Rails.logger.warn "Failed to seed maven cache: #{$!}"
-    end
+    seed_maven_cache(file_path)
+  rescue
+    Rails.logger.warn "Failed to seed maven cache: #{$ERROR_INFO}"
   end
 
   def seed_maven_cache(file_path)
@@ -78,7 +76,7 @@ class RemoteSandbox
   end
 
   def self.all
-    @all ||= SiteSetting.value('remote_sandboxes').map {|url| RemoteSandbox.new(url)}
+    @all ||= SiteSetting.value('remote_sandboxes').map { |url| RemoteSandbox.new(url) }
   end
 
   def self.total_capacity
@@ -94,7 +92,8 @@ class RemoteSandbox
     @capacity || 1
   end
 
-private
+  private
+
   def get_status
     ActiveSupport::JSON.decode(RestClient.get(status_url))
   end

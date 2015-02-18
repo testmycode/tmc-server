@@ -16,14 +16,14 @@ class DocGen
 
   def render_template(template_path)
     template = File.read(template_path)
-    b = self.send(:binding)
+    b = send(:binding)
     text = ERB.new(template).result(b)
 
     FileUtils.mkdir_p(File.dirname(output_path))
-    File.open(output_path, "wb") {|f| f.write(text) }
+    File.open(output_path, 'wb') { |f| f.write(text) }
   end
 
-  def screenshot(options = {})
+  def screenshot(_options = {})
     name = next_screenshot_name
     screenshot_to_file("#{root_path}/screenshots/#{name}")
     '<img src="../screenshots/' + name + '" alt="(screenshot)" class="screenshot" />'
@@ -37,10 +37,10 @@ class DocGen
     @test_case.send(name, *args, &block)
   end
 
-private
+  private
 
   def root_path
-    "#{Rails::root}/doc/usermanual"
+    "#{Rails.root}/doc/usermanual"
   end
 
   def output_path

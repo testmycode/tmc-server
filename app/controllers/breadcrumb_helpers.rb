@@ -15,7 +15,7 @@ module BreadcrumbHelpers # Included in ApplicationController
     elsif @submission && @submission.exercise_name
       add_breadcrumb "(deleted exercise #{@submission.exercise_name}"
     else
-      raise 'Neither @exercise nor @submission.exercise_name set'
+      fail 'Neither @exercise nor @submission.exercise_name set'
     end
   end
 

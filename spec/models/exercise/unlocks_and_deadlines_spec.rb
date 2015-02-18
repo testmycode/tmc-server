@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Exercise, type: :model do
-  describe "unlocks and deadlines" do
+  describe 'unlocks and deadlines' do
     before :each do
       @user = FactoryGirl.create(:user)
       @course = FactoryGirl.create(:course)
@@ -13,8 +13,8 @@ describe Exercise, type: :model do
       ]
     end
 
-    specify "unlock after another exercise is 30% complete" do
-      @ex2.options = { 'unlocked_after' => "30% of ex1" }
+    specify 'unlock after another exercise is 30% complete' do
+      @ex2.options = { 'unlocked_after' => '30% of ex1' }
       @ex2.save!
       invalidate_unlocks
       expect(@ex2).not_to be_unlocked_for(@user)
@@ -25,8 +25,8 @@ describe Exercise, type: :model do
       expect(@ex2).to be_unlocked_for(@user)
     end
 
-    specify "unlock after another exercise is 70% complete" do
-      @ex2.options = { 'unlocked_after' => "70% of ex1" }
+    specify 'unlock after another exercise is 70% complete' do
+      @ex2.options = { 'unlocked_after' => '70% of ex1' }
       @ex2.save!
       expect(@ex2.requires_explicit_unlock?).to eq(false)
       invalidate_unlocks
@@ -41,10 +41,10 @@ describe Exercise, type: :model do
       expect(@ex2).to be_unlocked_for(@user)
     end
 
-    specify "deadline depending on unlock" do
-      @ex2.options = { 'unlocked_after' => "exercise ex1", 'deadline' => "unlock + 5 days" }
+    specify 'deadline depending on unlock' do
+      @ex2.options = { 'unlocked_after' => 'exercise ex1', 'deadline' => 'unlock + 5 days' }
       @ex2.save!
-      @points.each {|pt| pt.award_to(@user) }
+      @points.each { |pt| pt.award_to(@user) }
       invalidate_unlocks
 
       @ex2.reload

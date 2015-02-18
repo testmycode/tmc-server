@@ -1,5 +1,4 @@
 class ExercisesController < ApplicationController
-
   def show
     @exercise = Exercise.find(params[:id])
     @course = Course.lock('FOR SHARE').find(@exercise.course_id)
@@ -13,7 +12,7 @@ class ExercisesController < ApplicationController
 
         Course.transaction(requires_new: true) do
           if !current_user.guest?
-            @submissions = @exercise.submissions.order("submissions.created_at DESC")
+            @submissions = @exercise.submissions.order('submissions.created_at DESC')
             @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
             @submissions = @submissions.includes(:awarded_points).includes(:user)
           else
@@ -33,7 +32,7 @@ class ExercisesController < ApplicationController
         # This is used by (at least) tmc.py at the moment
         return render json: { error: 'Authentication required' }, status: 403 if current_user.guest?
 
-        @submissions = @exercise.submissions.order("submissions.created_at DESC")
+        @submissions = @exercise.submissions.order('submissions.created_at DESC')
         @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
         @submissions = @submissions.includes(:awarded_points).includes(:user)
         authorize! :read, @submissions
@@ -45,7 +44,7 @@ class ExercisesController < ApplicationController
           exercise_id:   @exercise.id,
           unlocked_at:   @exercise.time_unlocked_for(current_user),
           deadline:      @exercise.deadline_for(current_user),
-          submissions:   SubmissionList.new(current_user, view_context).submission_list_data(@submissions),
+          submissions:   SubmissionList.new(current_user, view_context).submission_list_data(@submissions)
         }
         render json: data.to_json
       end

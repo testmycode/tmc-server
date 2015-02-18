@@ -12,7 +12,7 @@ module ExtraFieldHelper
     common_attrs[:disabled] = 'disabled' if field.options[:disabled]
 
     existing_value = field_value.value
-    existing_value = field.default if existing_value == nil
+    existing_value = field.default if existing_value.nil?
 
     field_tag =
       case field.field_type
@@ -21,7 +21,7 @@ module ExtraFieldHelper
       when :boolean
         check_box_tag(field_name, '1', !existing_value.blank?, common_attrs)
       else
-        raise "Unknown extra field type: #{field.field_type}"
+        fail "Unknown extra field type: #{field.field_type}"
       end
 
     label_order =
@@ -47,7 +47,7 @@ module ExtraFieldHelper
       when :boolean
         check_box_tag(field_name, '1', !value.blank?)
       else
-        raise "Unknown extra field type: #{field.field_type}"
+        fail "Unknown extra field type: #{field.field_type}"
       end
 
     label_order =

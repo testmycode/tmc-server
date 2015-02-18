@@ -18,9 +18,9 @@ class FeedbackQuestion < ActiveRecord::Base
 
   def intrange
     if kind =~ intrange_regex
-      ($1.to_i)..($2.to_i)
+      (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
     else
-      raise 'not an intrange question'
+      fail 'not an intrange question'
     end
   end
 
@@ -32,7 +32,8 @@ class FeedbackQuestion < ActiveRecord::Base
     }
   end
 
-private
+  private
+
   def intrange_regex
     self.class.intrange_regex
   end
@@ -43,7 +44,7 @@ private
 
   def validate_kind
     unless kind == 'text' || kind =~ intrange_regex
-      errors[:kind] << "invalid"
+      errors[:kind] << 'invalid'
     end
   end
 end

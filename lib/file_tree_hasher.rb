@@ -19,11 +19,11 @@ class FileTreeHasher
     digest = Digest::SHA2.new
     paths.each do |path|
       begin
-        raise "Find didn't work as expected." unless path.start_with?(root_path)
-        relative_path = path[(root_path.length+1)...path.length]
+        fail "Find didn't work as expected." unless path.start_with?(root_path)
+        relative_path = path[(root_path.length + 1)...path.length]
         digest << relative_path << File.read(path)
       rescue
-        raise "Failed to hash file #{path}: #{$!.message}"
+        raise "Failed to hash file #{path}: #{$ERROR_INFO.message}"
       end
     end
     digest.hexdigest

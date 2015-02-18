@@ -9,7 +9,7 @@ class PositionsController < ApplicationController
       authorize! record, :update
       redirect_dest = course_feedback_questions_path(record.course)
     else
-      return respond_not_found("Unknown resource to move")
+      return respond_not_found('Unknown resource to move')
     end
 
     case params[:direction]

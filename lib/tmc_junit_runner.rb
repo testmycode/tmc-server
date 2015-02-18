@@ -29,20 +29,20 @@ class TmcJunitRunner < MavenProject
   end
 
   def compiled?
-    File.exists? jar_path
+    File.exist? jar_path
   end
 
   # Use TestScanner.get_test_case_methods instead.
   def get_test_case_methods(exercise_path)
-    #CTODO
-    #TMCTODO
+    # CTODO
+    # TMCTODO
     result = []
     ex_dir = ExerciseDir.get(exercise_path)
 
     ex_cp = if ex_dir.respond_to? :library_jars
-      ex_dir.library_jars.map(&:to_s).join(':')
-    else
-      ""
+              ex_dir.library_jars.map(&:to_s).join(':')
+            else
+              ''
     end
 
     runner_cp = classpath
@@ -59,8 +59,8 @@ class TmcJunitRunner < MavenProject
 
       output = `#{cmd} 2>#{Shellwords.escape(stderr_file)}`
 
-      if !$?.success?
-        raise File.read(stderr_file)
+      unless $CHILD_STATUS.success?
+        fail File.read(stderr_file)
       end
 
       result += parse_test_scanner_output(output)
@@ -68,11 +68,11 @@ class TmcJunitRunner < MavenProject
     result
   end
 
-protected
+  protected
 
   def parse_test_scanner_output(output)
     JSON.parse(output).map do |item|
-      Hash[item.map {|k,v| [k.underscore.to_sym, v] }]
+      Hash[item.map { |k, v| [k.underscore.to_sym, v] }]
     end
   end
 end

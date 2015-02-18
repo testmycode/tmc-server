@@ -4,13 +4,13 @@ require 'tempfile'
 class ExerciseDir
   class JavaMaven < ExerciseDir
     def library_jars
-      if !@jars
+      unless @jars
         Tempfile.open('classpath') do |tmpfile|
           Dir.chdir @path do
             SystemCommands.sh!('mvn', 'dependency:build-classpath', "-Dmdep.outputFile=#{tmpfile.path}")
           end
           classpath = tmpfile.read.strip
-          @jars = classpath.split(":")
+          @jars = classpath.split(':')
         end
       end
       @jars

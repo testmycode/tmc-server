@@ -12,6 +12,6 @@ module BackgroundTaskRegistry
   end
 end
 
-Dir.glob(Rails::root.to_s + '/app/background_tasks/*.rb').each do |f|
+Dir.glob(Rails.root.to_s + '/app/background_tasks/*.rb').each do |f|
   BackgroundTaskRegistry.register File.basename(f, '.rb').classify.constantize
 end

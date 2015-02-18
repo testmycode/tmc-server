@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-shared_examples_for "an Orderable" do
+shared_examples_for 'an Orderable' do
   # requires a context with a method `new_record` defined to make a new record that's otherwise valid but missing a position
 
-  let(:some_existing_records) {
+  let(:some_existing_records) do
     records = (1..10).map { new_record }
     records.each(&:save!)
     records
-  }
+  end
 
-  it "should default a nil position to the end of the list" do
+  it 'should default a nil position to the end of the list' do
     first = new_record
     third = new_record
     second = new_record
@@ -21,7 +21,7 @@ shared_examples_for "an Orderable" do
     expect(second.position).to be < third.position
   end
 
-  it "should validate uniqueness of position" do
+  it 'should validate uniqueness of position' do
     first = new_record
     first.save!
     second = new_record
@@ -30,8 +30,8 @@ shared_examples_for "an Orderable" do
     expect(second.errors[:position].size).to eq(1)
   end
 
-  describe "#move_forward!" do
-    it "should move the record after the next record" do
+  describe '#move_forward!' do
+    it 'should move the record after the next record' do
       records = some_existing_records
       records[7].move_forward!
       records.each(&:reload)
@@ -44,8 +44,8 @@ shared_examples_for "an Orderable" do
       expect(positions).to eq(positions.sort)
     end
 
-    context "when there is no next record" do
-      it "should do nothing" do
+    context 'when there is no next record' do
+      it 'should do nothing' do
         records = some_existing_records
         position_before = records.last.position
 
@@ -57,8 +57,8 @@ shared_examples_for "an Orderable" do
     end
   end
 
-  describe "#move_backward!" do
-    it "should move the record before the previous record" do
+  describe '#move_backward!' do
+    it 'should move the record before the previous record' do
       records = some_existing_records
       records[7].move_backward!
       records.each(&:reload)
@@ -71,8 +71,8 @@ shared_examples_for "an Orderable" do
       expect(positions).to eq(positions.sort)
     end
 
-    context "when there is no previous record" do
-      it "should do nothing" do
+    context 'when there is no previous record' do
+      it 'should do nothing' do
         records = some_existing_records
         position_before = records.first.position
 
@@ -84,8 +84,8 @@ shared_examples_for "an Orderable" do
     end
   end
 
-  describe "#move_before!" do
-    it "should move the record before another record" do
+  describe '#move_before!' do
+    it 'should move the record before another record' do
       records = some_existing_records
       records[7].move_before!(records[3])
       records.each(&:reload)
@@ -97,8 +97,8 @@ shared_examples_for "an Orderable" do
     end
   end
 
-  describe "#move_after!" do
-    it "should move the record before another record" do
+  describe '#move_after!' do
+    it 'should move the record before another record' do
       records = some_existing_records
       records[7].move_after!(records[3])
       records.each(&:reload)

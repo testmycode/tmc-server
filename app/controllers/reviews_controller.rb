@@ -6,10 +6,10 @@ class ReviewsController < ApplicationController
     if params[:course_id]
       fetch :course
 
-      @my_reviews = @course.submissions.
-        where(user_id: current_user.id).
-        where('requests_review OR requires_review OR reviewed').
-        order('created_at DESC')
+      @my_reviews = @course.submissions
+                    .where(user_id: current_user.id)
+                    .where('requests_review OR requires_review OR reviewed')
+                    .order('created_at DESC')
 
       respond_to do |format|
         format.html do
@@ -23,7 +23,7 @@ class ReviewsController < ApplicationController
       end
     else
       fetch :submission, :files
-      raise "Submission's exercise has been moved or deleted" if !@submission.exercise
+      fail "Submission's exercise has been moved or deleted" unless @submission.exercise
 
       @course = @submission.course
 
@@ -76,7 +76,7 @@ class ReviewsController < ApplicationController
         @review.save!
       end
     rescue
-      ::Rails.logger.error($!)
+      ::Rails.logger.error($ERROR_INFO)
       respond_with_error('Failed to save code review.')
     else
       flash[:success] = 'Code review added.'
@@ -107,10 +107,11 @@ class ReviewsController < ApplicationController
     end
   end
 
-private
+  private
+
   def course_reviews_json
     submissions = @my_reviews.includes(reviews: [:reviewer, :submission])
-    exercises = Hash[@course.exercises.map {|e| [e.name, e] }]
+    exercises = Hash[@course.exercises.map { |e| [e.name, e] }]
     reviews = submissions.map do |s|
       s.reviews.map do |r|
         {
@@ -156,7 +157,7 @@ private
           redirect_to submission_reviews_path(@review.submission)
         end
         format.json do
-          render json: {status: 'OK'}
+          render json: { status: 'OK' }
         end
       end
     else
@@ -175,7 +176,7 @@ private
       @review.submission.save!
       @review.save!
     rescue
-      ::Rails.logger.error($!)
+      ::Rails.logger.error($ERROR_INFO)
       respond_with_error('Failed to save code review.')
     else
       flash[:success] = 'Code review edited. (No notification sent).'
@@ -187,10 +188,10 @@ private
     sub = @review.submission
     sub.reviewed = true
     sub.review_dismissed = false
-    sub.of_same_kind.
-      where('(requires_review OR requests_review) AND NOT reviewed').
-      where(['created_at < ?', sub.created_at]).
-      update_all(newer_submission_reviewed: true)
+    sub.of_same_kind
+      .where('(requires_review OR requests_review) AND NOT reviewed')
+      .where(['created_at < ?', sub.created_at])
+      .update_all(newer_submission_reviewed: true)
   end
 
   def fetch(*stuff)
@@ -229,7 +230,7 @@ private
     submission = @review.submission
     exercise = submission.exercise
     course = exercise.course
-    raise "Exercise of submission has been moved or deleted" if !exercise
+    fail 'Exercise of submission has been moved or deleted' unless exercise
 
     available_points = exercise.available_points.where(requires_review: true).map(&:name)
     previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
@@ -238,7 +239,7 @@ private
     if params[:review][:points].respond_to?(:keys)
       for point_name in params[:review][:points].keys
         unless exercise.available_points.where(name: point_name).any?
-          raise "Point does not exist: #{point_name}"
+          fail "Point does not exist: #{point_name}"
         end
 
         new_points << point_name

@@ -13,7 +13,7 @@ class SolutionsController < ApplicationController
       authorize! :read, @solution
     rescue CanCan::AccessDenied
       if current_user.guest?
-        return respond_access_denied("Please log in to view the model solution.")
+        return respond_access_denied('Please log in to view the model solution.')
       else
         return respond_access_denied("It seems you haven't solved the exercise yourself yet.")
       end

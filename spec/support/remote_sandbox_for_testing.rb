@@ -2,7 +2,6 @@ require 'fileutils'
 require 'system_commands'
 
 class RemoteSandboxForTesting
-
   @server_pids = nil
   @result_queue = nil
   @server_ports = nil
@@ -15,7 +14,7 @@ class RemoteSandboxForTesting
 
   # Runs a submission and asserts the run succeeded, then calls SandboxResultsSaver.
   def self.run_submission(submission)
-    submission.randomize_secret_token if submission.secret_token == nil
+    submission.randomize_secret_token if submission.secret_token.nil?
 
     sandbox = RemoteSandbox.all.first
     sandbox.send_submission(submission, result_queue.receiver_url)
@@ -24,20 +23,20 @@ class RemoteSandboxForTesting
   end
 
   def self.init_servers_as_root!(actual_user, actual_group)
-    raise "Root helper already started" if @root_helper
-    raise "init_servers_as_root! should be called as root" if Process::Sys.geteuid != 0
+    fail 'Root helper already started' if @root_helper
+    fail 'init_servers_as_root! should be called as root' if Process::Sys.geteuid != 0
 
     server_ports.each do |port|
       copy_server_instance(port, actual_user, actual_group)
     end
 
     @root_helper = RootHelper.new
-    @root_helper.send_command("START SERVER " + server_ports.join(","))
+    @root_helper.send_command('START SERVER ' + server_ports.join(','))
   end
 
   def self.init_stubs!
     RemoteSandbox.stub(:all) do
-      server_ports.map {|port| RemoteSandbox.new("http://localhost:#{port}/") }
+      server_ports.map { |port| RemoteSandbox.new("http://localhost:#{port}/") }
     end
   end
 
@@ -49,7 +48,8 @@ class RemoteSandboxForTesting
     @result_queue = nil
   end
 
-private
+  private
+
   def self.result_queue
     @result_queue ||= SubmissionResultReceiver.new
   end
@@ -77,20 +77,19 @@ private
     FileUtils.rm_rf "#{instance_dir}/web/lock"
     FileUtils.mkdir_p "#{instance_dir}/web/lock"
 
-    File.open("#{instance_dir}/web/site.yml", "w") do |f|
+    File.open("#{instance_dir}/web/site.yml", 'w') do |f|
       f.puts "tmc_user: #{actual_user}"
       f.puts "tmc_group: #{actual_group}"
       f.puts "http_port: #{port}"
 
       # Enable maven cache. It makes tests go faster when we run them often,
       # and the cache gets some more testing too.
-      f.puts "plugins:"
-      f.puts "  maven_cache:"
-      f.puts "    enabled: true"
+      f.puts 'plugins:'
+      f.puts '  maven_cache:'
+      f.puts '    enabled: true'
       f.puts "    alternate_work_dir: #{maven_cache_dir}"
     end
   end
-
 end
 
 RSpec.configure do |config|

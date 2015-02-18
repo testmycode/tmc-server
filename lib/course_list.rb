@@ -6,7 +6,7 @@ class CourseList
   end
 
   def course_list_data(courses)
-    courses.map {|c| course_data(c) }
+    courses.map { |c| course_data(c) }
   end
 
   def course_data(course)

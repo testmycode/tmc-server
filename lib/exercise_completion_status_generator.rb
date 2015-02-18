@@ -1,6 +1,5 @@
 # Generates a progress percentage [0..100] telling how much a user has completed of a course's exercises.
 class ExerciseCompletionStatusGenerator
-
   def self.completion_status(user, course)
     awarded_points = user.awarded_points.where(course_id: course.id).map(&:name)
     all_exercises = Exercise.where(course: course).includes(:available_points)
@@ -10,12 +9,12 @@ class ExerciseCompletionStatusGenerator
       processed: true
     ).map(&:exercise_name)
 
-    completion_status = all_exercises.inject({}) { |map, exercise|
+    completion_status = all_exercises.inject({}) do |map, exercise|
       points_of_exercise = exercise.available_points.map(&:name)
       attempted = attempted_exercise_names.include?(exercise.name)
       map[exercise.id] = completion_status_of_exercise(points_of_exercise, awarded_points, attempted)
       map
-    }
+    end
 
     completion_status
   end
@@ -30,7 +29,6 @@ class ExerciseCompletionStatusGenerator
 
   def self.percentage_of_completed_exercises(not_awarded, required)
     return 100 if not_awarded.empty?
-    (100*(required.size-not_awarded.size))/required.size
+    (100 * (required.size - not_awarded.size)) / required.size
   end
-
 end

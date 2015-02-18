@@ -10,7 +10,7 @@ module SystemCommands
   # Prefer sh! instead
   def system!(cmd)
     ok = system(cmd)
-    raise "Command `#{cmd}` failed with status #{$?.inspect}" if !ok
+    fail "Command `#{cmd}` failed with status #{$CHILD_STATUS.inspect}" unless ok
   end
 
   def sh!(*args)
@@ -28,14 +28,14 @@ module SystemCommands
       if args.length == 1
         cmd = args[0]
       else
-        raise 'Expected a single string argument when :escape => true'
+        fail 'Expected a single string argument when :escape => true'
       end
     end
 
     output = `#{cmd} 2>&1`
-    status = $?
-    raise "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
-    raise "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
+    status = $CHILD_STATUS
+    fail "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
+    fail "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 
     {
       status: status,
@@ -45,7 +45,7 @@ module SystemCommands
 
   def mk_command(*args)
     cmd_parts = args.flatten
-    cmd_parts.map {|arg| Shellwords.escape(arg.to_s) }.join(' ')
+    cmd_parts.map { |arg| Shellwords.escape(arg.to_s) }.join(' ')
   end
 
   def make_bash_array(*args)

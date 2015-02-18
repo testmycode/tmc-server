@@ -37,21 +37,21 @@ class Course < ActiveRecord::Base
     # Rails' :dependent => :delete_all is very slow.
     # Even self.association.delete_all first does a SELECT.
     # This relies on the database to cascade deletes.
-    ActiveRecord::Base.connection.execute("DELETE FROM courses WHERE id = #{self.id}")
+    ActiveRecord::Base.connection.execute("DELETE FROM courses WHERE id = #{id}")
 
     # Delete cache.
     delete_cache # Would be an after_destroy callback normally
   end
 
-  scope :ongoing, lambda { where(["hide_after IS NULL OR hide_after > ?", Time.now]) }
-  scope :expired, lambda { where(["hide_after IS NOT NULL AND hide_after <= ?", Time.now]) }
+  scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
+  scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
 
   def visible_to?(user)
     user.administrator? || (
       !hidden &&
-      (hide_after == nil || hide_after > Time.now) &&
+      (hide_after.nil? || hide_after > Time.now) &&
       (
-        hidden_if_registered_after == nil ||
+        hidden_if_registered_after.nil? ||
         hidden_if_registered_after > Time.now ||
         (!user.guest? && hidden_if_registered_after > user.created_at)
       )
@@ -68,14 +68,14 @@ class Course < ActiveRecord::Base
 
   # This could eventually be made a hstore
   def options=(new_options)
-    if !new_options["hide_after"].blank?
-      self.hide_after = new_options["hide_after"]
+    if !new_options['hide_after'].blank?
+      self.hide_after = new_options['hide_after']
     else
       self.hide_after = nil
     end
 
-    if !new_options["hidden_if_registered_after"].blank?
-      self.hidden_if_registered_after = new_options["hidden_if_registered_after"]
+    if !new_options['hidden_if_registered_after'].blank?
+      self.hidden_if_registered_after = new_options['hidden_if_registered_after']
     else
       self.hidden_if_registered_after = nil
     end
@@ -85,7 +85,7 @@ class Course < ActiveRecord::Base
 
     self.description = new_options['description']
     self.paste_visibility = new_options['paste_visibility']
-    if new_options['locked_exercise_points_visible'] != nil
+    if !new_options['locked_exercise_points_visible'].nil?
       self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']
     else
       self.locked_exercise_points_visible = true
@@ -93,11 +93,11 @@ class Course < ActiveRecord::Base
   end
 
   def gdocs_sheets(exercises = nil)
-    exercises = self.exercises.select{|ex| !ex.hidden? && ex.published? } unless exercises
+    exercises = self.exercises.select { |ex| !ex.hidden? && ex.published? } unless exercises
     exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
   end
 
-  def refresh_gdocs_worksheet sheetname
+  def refresh_gdocs_worksheet(sheetname)
     GDocsExport.refresh_course_worksheet_points self, sheetname
   end
 
@@ -106,7 +106,7 @@ class Course < ActiveRecord::Base
   end
 
   def cache_path
-    "#{Course.cache_root}/#{self.name}-#{self.cache_version}"
+    "#{Course.cache_root}/#{name}-#{cache_version}"
   end
 
   # Holds a clone of the course repository
@@ -115,18 +115,16 @@ class Course < ActiveRecord::Base
   end
 
   def git_revision
-    begin
-      Dir.chdir clone_path do
-        output = `git rev-parse --verify HEAD`
-        if $?.success?
-          output.strip
-        else
-          nil
-        end
+    Dir.chdir clone_path do
+      output = `git rev-parse --verify HEAD`
+      if $CHILD_STATUS.success?
+        output.strip
+      else
+        nil
       end
-    rescue
-      nil
     end
+  rescue
+    nil
   end
 
   def solution_path
@@ -147,14 +145,14 @@ class Course < ActiveRecord::Base
 
   def exercise_groups
     @groups ||= begin
-      result = exercises.all.map {|e| e.exercise_group_name }.uniq.
-        map {|gname| ExerciseGroup.new(self, gname) }
+      result = exercises.all.map(&:exercise_group_name).uniq
+               .map { |gname| ExerciseGroup.new(self, gname) }
 
       new_parents = []
       begin
-        all_parents = result.map {|eg| eg.parent_name }.reject(&:nil?)
-        new_parents = all_parents.reject {|pn| result.any? {|eg| eg.name == pn } }.uniq
-        result += new_parents.map {|pn| ExerciseGroup.new(self, pn) }
+        all_parents = result.map(&:parent_name).reject(&:nil?)
+        new_parents = all_parents.reject { |pn| result.any? { |eg| eg.name == pn } }.uniq
+        result += new_parents.map { |pn| ExerciseGroup.new(self, pn) }
       end until new_parents.empty?
 
       result.sort
@@ -162,19 +160,19 @@ class Course < ActiveRecord::Base
   end
 
   def exercise_group_by_name(name)
-    exercise_groups.find {|eg| eg.name == name }
+    exercise_groups.find { |eg| eg.name == name }
   end
 
   # Returns exercises in group `name`, or whose full name is `name`.
   def exercises_by_name_or_group(name)
     group = exercise_group_by_name(name)
-    exercises.to_a.select {|ex| ex.name == name || (group && ex.belongs_to_exercise_group?(group)) }
+    exercises.to_a.select { |ex| ex.name == name || (group && ex.belongs_to_exercise_group?(group)) }
   end
 
   def unlockable_exercises_for(user)
     UncomputedUnlock.resolve(self, user)
-    unlocked = self.unlocks.where(user_id: user.id).pluck(:exercise_name)
-    self.exercises.to_a.select {|ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
+    unlocked = unlocks.where(user_id: user.id).pluck(:exercise_name)
+    exercises.to_a.select { |ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
   end
 
   def reload
@@ -199,7 +197,7 @@ class Course < ActiveRecord::Base
   end
 
   def time_of_first_submission
-    sub = self.submissions.order('created_at ASC').limit(1).first
+    sub = submissions.order('created_at ASC').limit(1).first
     if sub
       sub.created_at
     else
@@ -208,7 +206,7 @@ class Course < ActiveRecord::Base
   end
 
   def time_of_last_submission
-    sub = self.submissions.order('created_at DESC').limit(1).first
+    sub = submissions.order('created_at DESC').limit(1).first
     if sub
       sub.created_at
     else
@@ -217,7 +215,7 @@ class Course < ActiveRecord::Base
   end
 
   def reviews_required
-    self.submissions.where(
+    submissions.where(
       requires_review: true,
       newer_submission_reviewed: false,
       reviewed: false,
@@ -226,7 +224,7 @@ class Course < ActiveRecord::Base
   end
 
   def reviews_requested
-    self.submissions.where(
+    submissions.where(
       requests_review: true,
       newer_submission_reviewed: false,
       reviewed: false,
@@ -235,7 +233,7 @@ class Course < ActiveRecord::Base
   end
 
   def submissions_to_review
-    self.submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
+    submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
   end
 
   # Returns a hash of exercise group => {
@@ -243,9 +241,9 @@ class Course < ActiveRecord::Base
   #   :points_by_user => {user_id => number_of_points}
   # }
   def exercise_group_completion_by_user
-    #TODO: clean up exercise group discovery
+    # TODO: clean up exercise group discovery
 
-    groups = self.exercises.map(&:name).map {|name| if name =~ /^(.+)-[^-]+$/ then $1 else "" end }.uniq
+    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then Regexp.last_match(1) else '' end }.uniq
 
     result = {}
     for group in groups
@@ -253,12 +251,12 @@ class Course < ActiveRecord::Base
 
       # FIXME: this bit is duplicated in MetadataValue in master branch.
       # http://stackoverflow.com/questions/5709887/a-proper-way-to-escape-when-building-like-queries-in-rails-3-activerecord
-      pattern = (group.gsub(/[!%_]/) {|x| '!' + x }) + '-%'
+      pattern = (group.gsub(/[!%_]/) { |x| '!' + x }) + '-%'
 
       sql = <<-EOS
         SELECT available_points.name
         FROM exercises, available_points
-        WHERE exercises.course_id = #{conn.quote(self.id)} AND
+        WHERE exercises.course_id = #{conn.quote(id)} AND
               exercises.name LIKE #{conn.quote(pattern)} AND
               exercises.id = available_points.exercise_id
       EOS
@@ -268,11 +266,11 @@ class Course < ActiveRecord::Base
       sql = <<-EOS
         SELECT user_id, COUNT(*)
         FROM awarded_points
-        WHERE course_id = #{conn.quote(self.id)} AND
-              name IN (#{available_points.map {|ap| conn.quote(ap)}.join(',')})
+        WHERE course_id = #{conn.quote(id)} AND
+              name IN (#{available_points.map { |ap| conn.quote(ap) }.join(',')})
         GROUP BY user_id
       EOS
-      by_user = Hash[conn.select_rows(sql).map! {|uid, count| [uid.to_i, count.to_i]}]
+      by_user = Hash[conn.select_rows(sql).map! { |uid, count| [uid.to_i, count.to_i] }]
 
       result[group] = {
         available_points: available_points.size,
@@ -282,10 +280,11 @@ class Course < ActiveRecord::Base
     result
   end
 
-private
+  private
+
   def check_source_backend
     unless Course.valid_source_backends.include?(source_backend)
-      errors.add(:source_backend, 'must be one of [' + Course.valid_source_backends.join(', ') + "]")
+      errors.add(:source_backend, 'must be one of [' + Course.valid_source_backends.join(', ') + ']')
     end
   end
 

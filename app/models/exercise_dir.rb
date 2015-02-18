@@ -11,14 +11,14 @@ class ExerciseDir
     if dir
       dir
     else
-      raise "Not a valid exercise directory: #{path}"
+      fail "Not a valid exercise directory: #{path}"
     end
   end
 
   def self.try_get(path)
     path = Pathname(path)
     cls = exercise_type_impl(path)
-    if cls != nil
+    if !cls.nil?
       cls.new(path)
     else
       nil
@@ -56,9 +56,9 @@ class ExerciseDir
       Find.prune if !subpath.directory? || irrelevant_directory?(subpath)
 
       cls = exercise_type_impl(subpath)
-      if cls != nil
+      unless cls.nil?
         if subpath.basename.to_s.include?('-')
-          raise "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
+          fail "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
         end
 
         result << cls.new(subpath)
@@ -68,7 +68,8 @@ class ExerciseDir
     result
   end
 
-private
+  private
+
   def self.irrelevant_directory?(path)
     path.directory? && (
       path.children.map(&:basename).map(&:to_s).include?('.tmcignore') ||
@@ -79,9 +80,9 @@ private
   def self.exercise_type_impl(path)
     if (path + 'pom.xml').exist?
       JavaMaven
-    elsif (path + 'Makefile').exist? and (path + 'test/').exist?
+    elsif (path + 'Makefile').exist? && (path + 'test/').exist?
       MakefileC
-    elsif (path + 'src/').exist? and (path + 'test/').exist?
+    elsif (path + 'src/').exist? && (path + 'test/').exist?
       JavaSimple
     else
       nil
