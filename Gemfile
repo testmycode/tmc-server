@@ -43,4 +43,5 @@ group :development, :test do
   gem 'launchy'  # for capybara's save_and_open_page
   gem 'railroady' # for doc/diagrams
   gem 'simplecov'
+  gem 'rubocop', '~> 0.29.1', require: false
 end

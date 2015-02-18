@@ -10,6 +10,9 @@ It may take some time to run whole test suite, thus while developing one
 may find beneficial to run just single test cases or tests from one
 file.
 
+##### To run all code style validations
+`bundle exec rubocop`
+
 ##### To run all tests
 `rvmsudo rake spec`
 
