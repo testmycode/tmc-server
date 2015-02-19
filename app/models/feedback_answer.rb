@@ -63,8 +63,7 @@ class FeedbackAnswer < ActiveRecord::Base
     answers = FeedbackAnswer.arel_table
     questions = FeedbackQuestion.arel_table
 
-    answers
-      .join(questions).on(answers[:feedback_question_id].eq(questions[:id]))
+    answers.join(questions).on(answers[:feedback_question_id].eq(questions[:id]))
       .where(questions[:kind].matches('intrange%'))
       .where(answers[:course_id].eq(exercise.course_id))
       .where(answers[:exercise_name].eq(exercise.name))

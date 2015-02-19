@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
     begin
       client_version = Version.new(client_version) unless client_version.nil?
     rescue
-      raise "Invalid version string: #{client_version}"
+      fail "Invalid version string: #{client_version}"
     end
 
     valid_clients = SiteSetting.value('valid_clients')
@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
 
     permitted = permitted.map { |f| prefix + f } unless permitted == :all
 
-    result = Hash[params.select do|k, v|
+    result = Hash[params.select do |k, v|
       k.start_with?(prefix) && !v.blank? && (permitted == :all || permitted.include?(k))
     end]
     if options[:remove_prefix]

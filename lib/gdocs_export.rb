@@ -71,8 +71,7 @@ module GDocsExport
     students.each do |student|
       row = student_row ws, student.login
       fail "student #{student.login} not found" if row < 0
-      awarded = AwardedPoint
-                .course_user_sheet_points(course, student, ws.title).map(&:name)
+      awarded = AwardedPoint.course_user_sheet_points(course, student, ws.title).map(&:name)
       points.each do |point|
         next unless awarded.include? point
         col = point_col ws, point

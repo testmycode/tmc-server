@@ -81,7 +81,7 @@ class PointsController < ApplicationController
     users = users.where(administrator: false) unless include_admins
 
     {
-      sheets: sheets.map do|sheet|
+      sheets: sheets.map do |sheet|
         {
           name: sheet,
           total_awarded: AwardedPoint.course_sheet_points(course, sheet, include_admins).length,

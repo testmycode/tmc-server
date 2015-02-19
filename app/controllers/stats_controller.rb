@@ -80,8 +80,7 @@ class StatsController < ApplicationController
     respond_to do |format|
       format.html { render template: 'courses/stats/submissions', layout: 'bare' }
       format.json do
-        records =
-          @course.submissions
+        records = @course.submissions
           .select(['COUNT(*) c', "date_trunc('#{@time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"])
           .group('t')
           .where('created_at >= ?', @start_time)

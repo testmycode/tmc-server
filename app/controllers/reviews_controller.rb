@@ -7,9 +7,9 @@ class ReviewsController < ApplicationController
       fetch :course
 
       @my_reviews = @course.submissions
-                    .where(user_id: current_user.id)
-                    .where('requests_review OR requires_review OR reviewed')
-                    .order('created_at DESC')
+        .where(user_id: current_user.id)
+        .where('requests_review OR requires_review OR reviewed')
+        .order('created_at DESC')
 
       respond_to do |format|
         format.html do

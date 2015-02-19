@@ -146,7 +146,7 @@ class Course < ActiveRecord::Base
   def exercise_groups
     @groups ||= begin
       result = exercises.all.map(&:exercise_group_name).uniq
-               .map { |gname| ExerciseGroup.new(self, gname) }
+        .map { |gname| ExerciseGroup.new(self, gname) }
 
       new_parents = []
       begin

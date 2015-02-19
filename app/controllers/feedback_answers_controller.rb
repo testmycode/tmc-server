@@ -48,7 +48,7 @@ class FeedbackAnswersController < ApplicationController
         # We only deliver public statistics so no authorization required
 
         render json: {
-          numeric_questions: @numeric_questions.map do|q|
+          numeric_questions: @numeric_questions.map do |q|
             {
               id: q.id,
               title: q.title,
@@ -56,7 +56,7 @@ class FeedbackAnswersController < ApplicationController
               position: q.position
             }
           end,
-          numeric_stats: @numeric_stats.map do|ex, averages, answer_count|
+          numeric_stats: @numeric_stats.map do |ex, averages, answer_count|
             {
               exercise: {
                 id: ex.id,
@@ -88,11 +88,11 @@ class FeedbackAnswersController < ApplicationController
     answer_params = answer_params.values if answer_params.respond_to?(:values)
 
     answer_records = answer_params.map do |answer_hash|
-      FeedbackAnswer.new(        submission: submission,
-                                 course_id: submission.course_id,
-                                 exercise_name: submission.exercise_name,
-                                 feedback_question_id: answer_hash[:question_id],
-                                 answer: answer_hash[:answer])
+      FeedbackAnswer.new(submission: submission,
+                         course_id: submission.course_id,
+                         exercise_name: submission.exercise_name,
+                         feedback_question_id: answer_hash[:question_id],
+                         answer: answer_hash[:answer])
     end
     answer_records.each {|record| authorize! :create, record }
 

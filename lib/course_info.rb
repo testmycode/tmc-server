@@ -10,11 +10,10 @@ class CourseInfo
   def course_data(course)
     exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
 
-    @unlocked_exercises = course
-                          .unlocks
-                          .where(user_id: @user.id)
-                          .where(['valid_after IS NULL OR valid_after < ?', Time.now])
-                          .pluck(:exercise_name)
+    @unlocked_exercises = course.unlocks
+      .where(user_id: @user.id)
+      .where(['valid_after IS NULL OR valid_after < ?', Time.now])
+      .pluck(:exercise_name)
 
     submissions_by_exercise = {}
     Submission.where(course_id: course.id, user_id: @user.id).each do |sub|

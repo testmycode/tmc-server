@@ -8,15 +8,15 @@ class Exercise < ActiveRecord::Base
   has_many :available_points, dependent: :delete_all
 
   has_many :submissions,
-           lambda  do |exercise|
-             if exercise.respond_to?(:course_id)
-               # Used when doing exercise.submissions
-               where(course: exercise.course)
-             else
-               # Used when doing exercises.includes(:submissions)
-               Submission.joins(:exercise)
-             end
-           end, foreign_key: :exercise_name, primary_key: :name
+    lambda do |exercise|
+      if exercise.respond_to?(:course_id)
+        # Used when doing exercise.submissions
+        where(course: exercise.course)
+      else
+        # Used when doing exercises.includes(:submissions)
+        Submission.joins(:exercise)
+      end
+    end, foreign_key: :exercise_name, primary_key: :name
 
   has_many :feedback_answers, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
   has_many :unlocks, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
@@ -305,9 +305,7 @@ class Exercise < ActiveRecord::Base
     user_ids = users.map(&:id)
     exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name, nil)})" }
 
-    query =
-      s
-      .project(Arel.sql('COUNT(DISTINCT (course_id, exercise_name, user_id))').as('count'))
+    query = s.project(Arel.sql('COUNT(DISTINCT (course_id, exercise_name, user_id))').as('count'))
       .where(s[:user_id].in(user_ids))
       .where(Arel.sql("(course_id, exercise_name) IN (#{exercise_keys.join(',')})"))
       .where(s[:pretest_error].eq(nil))

@@ -28,8 +28,7 @@ class AwardedPoint < ActiveRecord::Base
   end
 
   def self.course_sheet_points(course, sheetname, include_admins = false)
-    result =
-      where(course_id: course.id)
+    result = where(course_id: course.id)
       .joins('INNER JOIN available_points ON available_points.name = awarded_points.name')
       .joins('INNER JOIN exercises ON available_points.exercise_id = exercises.id')
       .where(exercises: { gdocs_sheet: sheetname, course_id: course.id })
@@ -42,8 +41,7 @@ class AwardedPoint < ActiveRecord::Base
   def self.users_in_course_with_sheet(course, sheetname)
     users = User.arel_table
 
-    sql =
-      per_user_in_course_with_sheet_query(course, sheetname)
+    sql = per_user_in_course_with_sheet_query(course, sheetname)
       .project(users[:id].as('uid'))
       .to_sql
 
@@ -56,8 +54,7 @@ class AwardedPoint < ActiveRecord::Base
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
 
-    sql =
-      per_user_in_course_with_sheet_query(course, sheetname)
+    sql = per_user_in_course_with_sheet_query(course, sheetname)
       .project([users[:login].as('username'), awarded_points[:name].as('name')])
       .to_sql
 
@@ -74,8 +71,7 @@ class AwardedPoint < ActiveRecord::Base
   def self.count_per_user_in_course_with_sheet(course, sheetname)
     users = User.arel_table
 
-    sql =
-      per_user_in_course_with_sheet_query(course, sheetname)
+    sql = per_user_in_course_with_sheet_query(course, sheetname)
       .project([users[:login].as('username'), Arel.sql('COUNT(*)').as('count')])
       .group(users[:login])
       .to_sql

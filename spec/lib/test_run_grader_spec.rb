@@ -89,10 +89,10 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
     expect(@submission.points).to eq('1.1')
 
-    @submission = FactoryGirl.create(:submission,       course: @submission.course,
-                                                        exercise: @submission.exercise,
-                                                        user: @submission.user,
-                                                        processed: false)
+    @submission = FactoryGirl.create(:submission, course: @submission.course,
+                                                  exercise: @submission.exercise,
+                                                  user: @submission.user,
+                                                  processed: false)
     TestRunGrader.grade_results(@submission, successful_results)
 
     points = @submission.awarded_points.map(&:name)

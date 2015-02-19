@@ -93,10 +93,10 @@ class CoursesController < ApplicationController
   end
 
   def assign_show_view_vars
-    @exercises = @course
-                 .exercises
-                 .includes(:course)
-                 .select { |ex| ex.visible_to?(current_user) }.natsort_by(&:name)
+    @exercises = @course.exercises
+      .includes(:course)
+      .select { |ex| ex.visible_to?(current_user) }
+      .natsort_by(&:name)
     @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
 
     unless current_user.guest?
