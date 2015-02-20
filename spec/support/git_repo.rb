@@ -13,9 +13,7 @@ class GitRepo
 
   attr_reader :active_branch
 
-  def active_branch=(branch)
-    @active_branch = branch
-  end
+  attr_writer :active_branch
 
   def copy_simple_exercise(dest_name = nil, metadata = {})
     copy_fixture_exercise('SimpleExercise', dest_name, metadata)
@@ -42,13 +40,13 @@ class GitRepo
   end
 
   def mkdir(name)
-    raise 'Expected relative path' if name.start_with?('/')
+    fail 'Expected relative path' if name.start_with?('/')
     FileUtils.mkdir_p("#{@path}/#{name}")
   end
 
   def write_file(name, content)
-    raise 'Expected relative path' if name.start_with?('/')
-    File.open("#{@path}/#{name}", "wb") {|f| f.write(content) }
+    fail 'Expected relative path' if name.start_with?('/')
+    File.open("#{@path}/#{name}", 'wb') { |f| f.write(content) }
   end
 
   def debug_list_files
@@ -63,7 +61,7 @@ class GitRepo
 
   def add
     chdir do
-      system!("git add -A")
+      system!('git add -A')
     end
   end
 

@@ -18,7 +18,7 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
   end
 
   def introduce_compilation_error
-    replace_method_body_in_file(lib_c_path, 'return_zero', "BAD INPUT")
+    replace_method_body_in_file(lib_c_path, 'return_zero', 'BAD INPUT')
   end
 
   def lib_c_path
@@ -32,10 +32,11 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
   # Overriding from fixture_exercise
   def ensure_fixture_clean
     Dir.chdir fixture_path do
-      system!("make clean > /dev/null 2>&1")
+      system!('make clean > /dev/null 2>&1')
     end
   end
-private
+
+  private
 
   alias_method :old_copy_from_fixture, :copy_from_fixture
 
@@ -57,6 +58,6 @@ private
         line
       end
     end
-    File.open(path, "wb") {|f| f.write(lines.join) }
+    File.open(path, 'wb') { |f| f.write(lines.join) }
   end
 end

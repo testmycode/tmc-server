@@ -27,13 +27,13 @@ class FixtureExercise
     end
   end
 
-  def initialize(fixture_name, path, options = {})
+  def initialize(fixture_name, path, _options = {})
     @fixture_name = fixture_name
     @path = File.expand_path(path)
-    FileUtils.rm_rf @path if File.exists? @path
+    FileUtils.rm_rf @path if File.exist? @path
 
     if @path.include?(self.class.fixture_exercises_root)
-      raise "Don't create #{self.class} to refer to the fixture. Give it a nonexistent path where it'll create a copy."
+      fail "Don't create #{self.class} to refer to the fixture. Give it a nonexistent path where it'll create a copy."
     end
 
     ensure_fixture_clean
@@ -46,11 +46,11 @@ class FixtureExercise
 
   def write_metadata(metadata_hash)
     dest = "#{path}/metadata.yml"
-    File.open(dest, "wb") { |f| f.write(metadata_hash.to_yaml) }
+    File.open(dest, 'wb') { |f| f.write(metadata_hash.to_yaml) }
   end
 
   def write_file(rel_path, contents)
-    File.open(File.join(@path, rel_path), "wb") {|f| f.write(contents) }
+    File.open(File.join(@path, rel_path), 'wb') { |f| f.write(contents) }
   end
 
   def make_zip(options = {})
@@ -65,7 +65,7 @@ class FixtureExercise
       zip_options << '--include ' + Shellwords.escape("#{name}/src/*")
     end
 
-    Dir.chdir(File.dirname(@path)) do |dir|
+    Dir.chdir(File.dirname(@path)) do |_dir|
       system!("zip -q -0 -r #{zip_path} #{name} #{zip_options.join(' ')}")
     end
   end
@@ -78,7 +78,8 @@ class FixtureExercise
     "#{::Rails.root}/spec/fixtures/exercises"
   end
 
-private
+  private
+
   def copy_from_fixture
     FileUtils.mkdir_p(path)
 
@@ -106,7 +107,7 @@ private
 
   def copy_gitignore
     gitignore = File.join path, '.gitignore'
-    FileUtils.rm_rf gitignore if File.exists? gitignore
+    FileUtils.rm_rf gitignore if File.exist? gitignore
     FileUtils.ln("#{common_files_path}/.gitignore", gitignore)
   end
 
@@ -124,12 +125,12 @@ private
   end
 
   def copy_if_exists(from, to)
-    FileUtils.cp(from, to) if File.exists?(from)
+    FileUtils.cp(from, to) if File.exist?(from)
   end
 
   def ensure_fixture_clean
     Dir.chdir fixture_path do
-      system!("ant clean > /dev/null 2>&1")
+      system!('ant clean > /dev/null 2>&1')
     end unless fixture_clean?
   end
 

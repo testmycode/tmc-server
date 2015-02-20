@@ -8,7 +8,7 @@ class Exercise < ActiveRecord::Base
   has_many :available_points, dependent: :delete_all
 
   has_many :submissions,
-    -> (exercise) {
+    lambda do |exercise|
       if exercise.respond_to?(:course_id)
         # Used when doing exercise.submissions
         where(course: exercise.course)
@@ -16,7 +16,7 @@ class Exercise < ActiveRecord::Base
         # Used when doing exercises.includes(:submissions)
         Submission.joins(:exercise)
       end
-    }, foreign_key: :exercise_name, primary_key: :name
+    end, foreign_key: :exercise_name, primary_key: :name
 
   has_many :feedback_answers, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
   has_many :unlocks, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
@@ -305,13 +305,11 @@ class Exercise < ActiveRecord::Base
     user_ids = users.map(&:id)
     exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name, nil)})" }
 
-    query =
-      s.
-      project(Arel.sql('COUNT(DISTINCT (course_id, exercise_name, user_id))').as('count')).
-      where(s[:user_id].in(user_ids)).
-      where(Arel.sql("(course_id, exercise_name) IN (#{exercise_keys.join(',')})")).
-      where(s[:pretest_error].eq(nil)).
-      where(s[:all_tests_passed].eq(true))
+    query = s.project(Arel.sql('COUNT(DISTINCT (course_id, exercise_name, user_id))').as('count'))
+      .where(s[:user_id].in(user_ids))
+      .where(Arel.sql("(course_id, exercise_name) IN (#{exercise_keys.join(',')})"))
+      .where(s[:pretest_error].eq(nil))
+      .where(s[:all_tests_passed].eq(true))
 
     results = connection.execute(query.to_sql)
     begin
@@ -321,7 +319,8 @@ class Exercise < ActiveRecord::Base
     end
   end
 
-private
+  private
+
   def new_gdocs_sheet(enabled, sheetname)
     return nil unless enabled
     return sheetname.to_s unless sheetname.blank?
@@ -352,7 +351,7 @@ private
     if raw_params == nil
       "[]"
     elsif raw_params.is_a?(String)
-      to_json_array(Shellwords::shellwords(raw_params))
+      to_json_array(Shellwords.shellwords(raw_params))
     elsif raw_params.is_a?(Array)
       to_json_array(raw_params)
     else

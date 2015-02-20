@@ -1,6 +1,6 @@
 # Handles emailing notification to every participant
 class CourseNotificationsController < ApplicationController
-  before_filter :auth
+  before_action :auth
 
   def new
     @notifier ||= CourseNotification.new
@@ -22,7 +22,7 @@ class CourseNotificationsController < ApplicationController
     failed_emails = []
     emails.each do |email|
       begin
-        raise "Invalid e-mail" unless email =~ /\S+@\S+/
+        fail 'Invalid e-mail' unless email =~ /\S+@\S+/
         CourseNotificationMailer.notification_email(
           reply_to: current_user.email,
           to: email,
@@ -30,18 +30,19 @@ class CourseNotificationsController < ApplicationController
           message: notifier.message
         ).deliver
       rescue
-        logger.info "Error sending course notification to email #{email}: #{$!}"
+        logger.info "Error sending course notification to email #{email}: #{$ERROR_INFO}"
         failed_emails << email
       end
     end
-    msg = "Mail has been set succesfully"
-    msg << " except for the following addresses: #{failed_emails.join(", ")}" unless failed_emails.empty?
+    msg = 'Mail has been set succesfully'
+    msg << " except for the following addresses: #{failed_emails.join(', ')}" unless failed_emails.empty?
     redirect_to course_path(course), notice: msg
   end
 
-private
+  private
+
   def course_notification_params
-    params.permit(:commit, :course_id, { course_notification: [:topic, :message] })
+    params.permit(:commit, :course_id, course_notification: [:topic, :message])
   end
 
   def auth

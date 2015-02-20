@@ -78,7 +78,8 @@ class UsersController < ApplicationController
     end
   end
 
-private
+  private
+
   def set_email
     user_params = params[:user]
 
@@ -122,14 +123,14 @@ private
   end
 
   def set_user_fields
-    return if params[:user_field] == nil
+    return if params[:user_field].nil?
     changes = {}
-    UserField.all.select {|f| f.visible_to?(current_user) }.each do |field|
+    UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
       value_record = @user.field_value_record(field)
       old_value = value_record.ruby_value
       value_record.set_from_form(params[:user_field][field.name])
       new_value = value_record.ruby_value
-      changes[field.name] = {from: old_value, to: new_value} unless new_value == old_value
+      changes[field.name] = { from: old_value, to: new_value } unless new_value == old_value
     end
     changes
   end
@@ -139,13 +140,13 @@ private
       data = {
         eventType: 'user_fields_changed',
         changes: changes.clone,
-        happenedAt: (Time.now.to_f*1000).to_i
+        happenedAt: (Time.now.to_f * 1000).to_i
       }
       Thread.new do
         begin
           SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
         rescue
-          logger.warn("Failed to send user field changes to spyware: " + $!.message + "\n " + $!.backtrace.join("\n "))
+          logger.warn('Failed to send user field changes to spyware: ' + $ERROR_INFO.message + "\n " + $ERROR_INFO.backtrace.join("\n "))
         end
       end
     end

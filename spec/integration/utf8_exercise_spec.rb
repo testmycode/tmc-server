@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 require 'spec_helper'
 
-describe "The system, receiving submissions with UTF-8 special characters", type: :request, integration: true do
+describe 'The system, receiving submissions with UTF-8 special characters', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
@@ -24,7 +24,7 @@ describe "The system, receiving submissions with UTF-8 special characters", type
     ex.make_zip src_only: false
   end
 
-  it "should correctly show UTF-8 in an assertion message" do
+  it 'should correctly show UTF-8 in an assertion message' do
     click_link 'Utf8'
     attach_file('Zipped project', 'Utf8.zip')
     click_button 'Submit'
@@ -35,7 +35,7 @@ describe "The system, receiving submissions with UTF-8 special characters", type
     expect(page).to have_content('müü')
   end
 
-  it "should correctly show UTF-8 in files" do
+  it 'should correctly show UTF-8 in files' do
     click_link 'Utf8'
     attach_file('Zipped project', 'Utf8.zip')
     click_button 'Submit'

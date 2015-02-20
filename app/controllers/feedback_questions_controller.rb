@@ -3,7 +3,7 @@
 #
 # TODO: While this is nice, I think feedback questions should live in a conf file in the repo so that the entire course is defined by the repo.
 class FeedbackQuestionsController < ApplicationController
-  before_filter :get_course
+  before_action :get_course
 
   def index
     add_course_breadcrumb
@@ -70,12 +70,13 @@ class FeedbackQuestionsController < ApplicationController
       flash[:success] = 'Question deleted.'
       redirect_to course_feedback_questions_path(@course)
     rescue
-      flash[:error] = "Failed to delete question: #{$!}"
+      flash[:error] = "Failed to delete question: #{$ERROR_INFO}"
       redirect_to course_feedback_questions_path(@course)
     end
   end
 
-private
+  private
+
   def feedback_question_params
     params.permit({ feedback_question: [:question, :title, :kind] }, :intrange_min, :intrange_max, :commit, :course_id)
   end

@@ -2,7 +2,6 @@
 # Also called by the reprocessor background task to attempt reprocessing if
 # the sandbox was previously unavailable.
 class SubmissionProcessor
-
   # Tries to send the submission to a sandbox and updates its status.
   # If not sandboxes are available, then the submission is left to the reprocessor daemon.
   def process_submission(submission)

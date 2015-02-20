@@ -24,7 +24,7 @@ module TestRunGrader
   extend TestRunGrader
 
   def grade_results(submission, results)
-    raise "Exercise #{submission.exercise_name} was removed" if !submission.exercise
+    fail "Exercise #{submission.exercise_name} was removed" unless submission.exercise
 
     submission.test_case_runs.destroy_all
     create_test_case_runs(submission, results)
@@ -46,23 +46,23 @@ module TestRunGrader
     submission.save!
   end
 
-private
+  private
+
   def self.create_test_case_runs(submission, results)
     all_passed = true
     results.each do |test_result|
-      passed = test_result["status"] == 'PASSED'
+      passed = test_result['status'] == 'PASSED'
       tcr = TestCaseRun.new(
         test_case_name: "#{test_result['className']} #{test_result['methodName']}".strip,
-        message: test_result["message"],
+        message: test_result['message'],
         successful: passed,
-        exception: to_json_or_null(test_result["exception"]),
-        detailed_message: test_result["detailed_message"] || test_result["valgrindTrace"] || test_result["backtrace"]
+        exception: to_json_or_null(test_result['exception']),
+        detailed_message: test_result['detailed_message'] || test_result['valgrindTrace'] || test_result['backtrace']
       )
-      all_passed = false if not passed
+      all_passed = false unless passed
       submission.test_case_runs << tcr
     end
     submission.all_tests_passed = all_passed && validations_passed?(submission.validations) && valgrind_passed?(submission)
-
   end
 
   def validations_passed?(validations)
@@ -75,7 +75,7 @@ private
   end
 
   def valgrind_passed?(submission)
-    if submission.exercise.valgrind_strategy == "fail"
+    if submission.exercise.valgrind_strategy == 'fail'
       submission.valgrind.blank?
     else
       true
@@ -102,10 +102,10 @@ private
       end
     end
 
-    old_review_points = submission.points_list.select {|pt| review_points.include?(pt) }
+    old_review_points = submission.points_list.select { |pt| review_points.include?(pt) }
     points += old_review_points
 
-    submission.points = points.uniq.natsort.join(" ") unless points.empty?
+    submission.points = points.uniq.natsort.join(' ') unless points.empty?
   end
 
   def self.points_from_test_results(results)
@@ -113,17 +113,17 @@ private
     for result in results
       result['pointNames'].each do |name|
         unless point_status[name].eql?(false) # skip if already failed
-          point_status[name] = (result["status"] == 'PASSED')
+          point_status[name] = (result['status'] == 'PASSED')
         end
       end
     end
 
-    point_names = point_status.keys.select {|name| point_status[name] == true }
+    point_names = point_status.keys.select { |name| point_status[name] == true }
     PointComparison.sort_point_names(point_names)
   end
 
   def self.to_json_or_null(obj)
-    if obj != nil
+    if !obj.nil?
       ActiveSupport::JSON.encode(obj)
     else
       nil

@@ -1,5 +1,4 @@
 class FeedbackReplyMailer < ActionMailer::Base
-
   def feedback_email(reply_to, to, body, exercise_name)
     from = SiteSetting.value('emails')['from']
     subject = "[TMC] Reply to your feedback for exercise #{exercise_name}"

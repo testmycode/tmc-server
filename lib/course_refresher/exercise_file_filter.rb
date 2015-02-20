@@ -52,7 +52,8 @@ class CourseRefresher
       clean_empty_dirs_in_project(to_dir)
     end
 
-  private
+    private
+
     def looks_like_text_file?(path)
       mime = MimeMagic.by_path(path.to_s)
       mime ||= File.open(path) do |f|
@@ -70,7 +71,7 @@ class CourseRefresher
     end
 
     def write_file(path, contents)
-      File.open(path, 'wb') {|f| f.write(contents) }
+      File.open(path, 'wb') { |f| f.write(contents) }
     end
 
     def while_copying(from_dir, to_dir, paths, &block)
@@ -136,7 +137,7 @@ class CourseRefresher
     end
 
     def with_filter_backend_for(path, &block)
-      backend = filter_backends.find {|b| b.applies_to?(path) }
+      backend = filter_backends.find { |b| b.applies_to?(path) }
       if backend
         block.call(backend)
       else
@@ -161,7 +162,7 @@ class CourseRefresher
     end
 
     def clean_empty_dirs_under(dir)
-      dir.children.each {|c| clean_empty_dirs(c) if c.directory? }
+      dir.children.each { |c| clean_empty_dirs(c) if c.directory? }
     end
 
     def clean_empty_dirs(dir)
@@ -173,7 +174,7 @@ class CourseRefresher
 
     def maybe_write_html_file(text, dest_path)
       if text =~ prepended_html_regexp
-        html = $1
+        html = Regexp.last_match(1)
         html.gsub!(/^[ \t*]*/, '')
         File.open(dest_path, 'wb') do |f|
           f.write(html)

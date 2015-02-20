@@ -10,7 +10,8 @@ class PortableCSV
     csv_engine.generate(options, &block)
   end
 
-private
+  private
+
   def self.csv_engine
     if const_defined?(:CSV) && !CSV.const_defined?(:Reader)
       CSV # Ruby 1.9

@@ -10,6 +10,6 @@ module TmcDirUtils
       next unless (path + to_find).directory?
       return path
     end
-    return nil
+    nil
   end
 end

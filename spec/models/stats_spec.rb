@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Stats, type: :model do
-  it "should give interesting statistics about the system" do
+  it 'should give interesting statistics about the system' do
     course1 = FactoryGirl.create(:course, name: 'course1')
     course2 = FactoryGirl.create(:course, name: 'course2')
     cat1ex1 = FactoryGirl.create(:exercise, course: course1, name: 'cat1-ex1')

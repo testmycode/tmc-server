@@ -21,7 +21,7 @@ module IntegrationTestActions
     visit '/courses'
     click_link 'Create New Course'
     fill_in 'course_name', with: options[:name]
-    #fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
+    # fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
     fill_in 'course_source_url', with: options[:source_url] if options[:source_url]
     click_button 'Add Course'
 
@@ -71,9 +71,9 @@ module IntegrationTestActions
       sleep_time: 0.1
     }.merge(options)
     start_time = Time.now
-    while !block.call
+    until block.call
       if Time.now - start_time > options[:timeout]
-        raise 'timeout'
+        fail 'timeout'
       end
       sleep options[:sleep_time]
     end
@@ -89,18 +89,19 @@ module IntegrationTestActions
     trim_image_edges(path)
   end
 
-private
+  private
+
   def trim_image_edges(path)
     cmd = mk_command [
       'convert',
       '-trim',
       path,
-      path + ".tmp"
+      path + '.tmp'
     ]
     cmd2 = mk_command [
       'mv',
       '-f',
-      path + ".tmp",
+      path + '.tmp',
       path
     ]
 

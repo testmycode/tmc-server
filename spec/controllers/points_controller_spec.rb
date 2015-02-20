@@ -5,49 +5,49 @@ describe PointsController, type: :controller do
   render_views
   before :each do
     @course = FactoryGirl.create(:course)
-    @sheetname = "testsheet"
+    @sheetname = 'testsheet'
     @exercise = FactoryGirl.create(:exercise, course: @course,
-                               gdocs_sheet: @sheetname)
+                                              gdocs_sheet: @sheetname)
     @admin = FactoryGirl.create(:admin)
   end
 
-  describe "GET show" do
-    describe "when user has participated in a course" do
+  describe 'GET show' do
+    describe 'when user has participated in a course' do
       before :each do
         controller.current_user = @admin
         @user = FactoryGirl.create(:user)
         @submission = FactoryGirl.create(:submission,
-                                     course: @course,
-                                     user: @user,
-                                     exercise: @exercise)
-        @available_point = FactoryGirl.create(:available_point,
+                                         course: @course,
+                                         user: @user,
                                          exercise: @exercise)
+        @available_point = FactoryGirl.create(:available_point,
+                                              exercise: @exercise)
 
         @awarded_point = FactoryGirl.create(:awarded_point,
-                                        course: @course,
-                                        name: @available_point.name,
-                                        submission: @submission,
-                                        user: @user)
+                                            course: @course,
+                                            name: @available_point.name,
+                                            submission: @submission,
+                                            user: @user)
       end
 
-      it "should show a page" do
+      it 'should show a page' do
         get :show, course_id: @course.id, id: @sheetname
         expect(response).to be_success
       end
 
-      it "should contain @user login" do
+      it 'should contain @user login' do
         get :show, course_id: @course.id, id: @sheetname
         expect(response.body).to have_content(@user.login)
       end
 
-      it "should contain available point name" do
+      it 'should contain available point name' do
         get :show, course_id: @course.id, id: @sheetname
         expect(response.body).to have_content(@available_point.name)
       end
 
-      it "should contain a success marker" do
+      it 'should contain a success marker' do
         get :show, course_id: @course.id, id: @sheetname
-        expect(response.body).to have_content("✔")
+        expect(response.body).to have_content('✔')
       end
     end
   end

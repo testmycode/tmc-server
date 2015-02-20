@@ -10,7 +10,7 @@ describe PasswordResetKeyMailer, type: :mailer do
   let(:user) { FactoryGirl.create(:user) }
   let(:key) { PasswordResetKey.create!(user: user) }
 
-  it "should e-mail a password reset key" do
+  it 'should e-mail a password reset key' do
     mail = PasswordResetKeyMailer.reset_link_email(user, key)
 
     expect(mail.to).to include(user.email)

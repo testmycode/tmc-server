@@ -25,9 +25,9 @@ class User < ActiveRecord::Base
   before_save :encrypt_password
 
   def self.course_students(course)
-    joins(:awarded_points).
-    where(awarded_points: { course_id: course.id }).
-    group('users.id')
+    joins(:awarded_points)
+      .where(awarded_points: { course_id: course.id })
+      .group('users.id')
   end
 
   def self.course_sheet_students(course, sheetname)
@@ -56,21 +56,21 @@ class User < ActiveRecord::Base
   end
 
   def field_value_record(field)
-    value = self.user_field_values.to_a.select {|v| v.field_name == field.name }.first
-    if !value
-      value = UserFieldValue.new(field_name: field.name, user_id: self.id, value: '')
-      self.user_field_values << value
+    value = user_field_values.to_a.select { |v| v.field_name == field.name }.first
+    unless value
+      value = UserFieldValue.new(field_name: field.name, user_id: id, value: '')
+      user_field_values << value
     end
     value
   end
 
   def self.filter_by(filter_params)
-    users = self.includes(:user_field_values)
+    users = includes(:user_field_values)
 
     users = users.where(administrator: false) unless filter_params['include_administrators']
 
     for field in UserField.all
-      if !filter_params[field.name].blank?
+      unless filter_params[field.name].blank?
         expected_value =
           case field.field_type
           when :boolean
@@ -103,19 +103,19 @@ class User < ActiveRecord::Base
   end
 
   def has_point?(course, point_name)
-    self.awarded_points.where(course_id: course.id, name: point_name).any?
+    awarded_points.where(course_id: course.id, name: point_name).any?
   end
 
   def has_points?(course, point_names)
-    existing = self.awarded_points.where(course_id: course.id, name: point_names).map(&:name)
-    point_names.all? {|pt| existing.include?(pt) }
+    existing = awarded_points.where(course_id: course.id, name: point_names).map(&:name)
+    point_names.all? { |pt| existing.include?(pt) }
   end
 
   def <=>(other)
-    self.login.downcase <=> other.login.downcase
+    login.downcase <=> other.login.downcase
   end
 
-private
+  private
 
   def encrypt_password
     self.salt = make_salt if new_record?

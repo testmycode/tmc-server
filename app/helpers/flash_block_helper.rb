@@ -10,7 +10,7 @@ module FlashBlockHelper
 
   def flash_container(type, message)
     raw(content_tag(:div, class: "alert alert-#{type}") do
-      content_tag(:a, raw("&times;"),class: 'close', data: {dismiss: 'alert'}) +
+      content_tag(:a, raw('&times;'), class: 'close', data: { dismiss: 'alert' }) +
       message
     end)
   end

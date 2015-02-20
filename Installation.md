@@ -22,7 +22,8 @@ The following programs should be installed first: `ruby` (and `bundler` gem), `P
 7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
 8. Compile the other stuff in `ext` by doing `rake compile`
 9. Install [tmc-check](https://github.com/testmycode/tmc-check) by running `rvmsudo make rubygems install clean` in `ext/tmc-sandbox/uml/output/tmc-check`.
-10. Run the test suite with `rvmsudo rake spec`.
+10. Verify code style with `bundle exec rubocop`.
+11. Run the test suite with `rvmsudo rake spec`.
 
 After you get the test suite to pass see [post-install instructions](#post-install-instructions).
 
@@ -185,6 +186,11 @@ $ rake compile
 $ sudo apt-get install check
 $ cd tmc-sandbox/uml/output/tmc-check
 $ rvmsudo make rubygems install clean
+```
+
+#### Verify code style
+```bash
+$ bundle exec rubocop
 ```
 
 #### Run the test suite

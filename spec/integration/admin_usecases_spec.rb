@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by an instructor for administration)", type: :request, integration: true do
+describe 'The system (used by an instructor for administration)', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
@@ -12,7 +12,7 @@ describe "The system (used by an instructor for administration)", type: :request
     create_bare_repo(@repo_path)
   end
 
-  it "should allow using a git repo as a source for a new course" do
+  it 'should allow using a git repo as a source for a new course' do
     create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path)
   end
 
@@ -31,11 +31,11 @@ describe "The system (used by an instructor for administration)", type: :request
     expect(page).to have_content('MyExercise')
   end
 
-  it "should allow rerunning individual submissions" do
+  it 'should allow rerunning individual submissions' do
     setup = SubmissionTestSetup.new(solve: true, save: true)
     setup.make_zip
     setup.submission.processed = true
-    setup.submission.pretest_error = "some funny error"
+    setup.submission.pretest_error = 'some funny error'
     setup.submission.test_case_runs.each do |tcr|
       tcr.successful = false
       tcr.save!

@@ -6,7 +6,7 @@ module SandboxResultsSaver
 
   def self.save_results(submission, results)
     ActiveRecord::Base.transaction do
-      raise InvalidTokenError.new('Invalid or expired token') if results['token'] != submission.secret_token
+      fail InvalidTokenError.new('Invalid or expired token') if results['token'] != submission.secret_token
 
       submission.all_tests_passed = false
       submission.pretest_error = nil
@@ -46,7 +46,7 @@ module SandboxResultsSaver
           submission.pretest_error = decoded_output.to_s
         end
       else
-        raise 'Unknown status: ' + results['status']
+        fail 'Unknown status: ' + results['status']
       end
 
       submission.secret_token = nil
@@ -56,9 +56,10 @@ module SandboxResultsSaver
     end
   end
 
-private
+  private
+
   def self.decode_test_output(test_output, stderr)
-    likely_out_of_memory = stderr.include?("java.lang.OutOfMemoryError")
+    likely_out_of_memory = stderr.include?('java.lang.OutOfMemoryError')
 
     if test_output.blank?
       if likely_out_of_memory
@@ -70,7 +71,7 @@ private
 
     begin
       result = ActiveSupport::JSON.decode(test_output)
-      raise unless result.is_a?(Enumerable)
+      fail unless result.is_a?(Enumerable)
       result
     rescue
       if likely_out_of_memory

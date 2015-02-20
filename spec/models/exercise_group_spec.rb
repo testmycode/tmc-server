@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ExerciseGroup, type: :model do
   let(:course) { FactoryGirl.create(:course) }
 
-  specify "#exercises" do
+  specify '#exercises' do
     ex = FactoryGirl.create(:exercise, course: course, name: 'foo-bar-baz')
     ex2 = FactoryGirl.create(:exercise, course: course, name: 'foo-bar-xaz')
     ex3 = FactoryGirl.create(:exercise, course: course, name: 'xoo-bar-baz')

@@ -19,7 +19,7 @@ module BreadCrumbs
     @breadcrumbs ||= []
     name = translate_breadcrumb(name, self.class.name) if name.is_a?(Symbol)
     url = eval(url.to_s) if url =~ /_path|_url|@/
-      @breadcrumbs << {name: name, url: url, options: options}
+    @breadcrumbs << { name: name, url: url, options: options }
   end
 
   def translate_breadcrumb(name, class_name)
@@ -32,7 +32,7 @@ module BreadCrumbs
   end
 
   def render_breadcrumbs(divider = '/')
-    s = render partial: 'twitter-bootstrap/breadcrumbs', locals: {divider: divider}
+    s = render partial: 'twitter-bootstrap/breadcrumbs', locals: { divider: divider }
     s.first
   end
 end

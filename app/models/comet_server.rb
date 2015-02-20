@@ -30,13 +30,11 @@ class CometServer
   attr_reader :webserver_baseurl
 
   def try_publish(channel, msg)
-    begin
-      publish(channel, msg)
-      true
-    rescue
-      ::Rails.logger.error "Failed to publish to #{publish_url}: #{$!}"
-      false
-    end
+    publish(channel, msg)
+    true
+  rescue
+    ::Rails.logger.error "Failed to publish to #{publish_url}: #{$ERROR_INFO}"
+    false
   end
 
   def publish(channel, msg)

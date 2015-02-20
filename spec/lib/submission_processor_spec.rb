@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe SubmissionProcessor do
-
   def expect_processing
     expect(RemoteSandbox).to receive(:try_to_send_submission_to_free_server).with(@sub, @sub.result_url)
   end
@@ -10,27 +9,26 @@ describe SubmissionProcessor do
     expect(RemoteSandbox).not_to receive(:try_to_send_submission_to_free_server)
   end
 
-  describe "reprocessing submissions" do
-
+  describe 'reprocessing submissions' do
     before :each do
       @sub = FactoryGirl.create(:submission, processed: false)
     end
 
-    it "should reprocess when no sandbox was available a short while ago" do
+    it 'should reprocess when no sandbox was available a short while ago' do
       @sub.processing_tried_at = Time.now - Submission.processing_retry_interval - 1.second
       @sub.save!
       expect_processing
       SubmissionProcessor.new.reprocess_timed_out_submissions
     end
 
-    it "should not reprocess when processing was just attempted" do
+    it 'should not reprocess when processing was just attempted' do
       @sub.processing_tried_at = Time.now
       @sub.save!
       expect_no_processing
       SubmissionProcessor.new.reprocess_timed_out_submissions
     end
 
-    it "should reprocess even if a sandbox has received the job a long time ago" do
+    it 'should reprocess even if a sandbox has received the job a long time ago' do
       @sub.processing_tried_at = Time.now - Submission.processing_retry_interval - 1.second
       @sub.processing_began_at = Time.now - Submission.processing_resend_interval - 1.second
       @sub.save!
@@ -38,7 +36,7 @@ describe SubmissionProcessor do
       SubmissionProcessor.new.reprocess_timed_out_submissions
     end
 
-    it "should not reprocess when a sandbox has received the job a reasonable time ago" do
+    it 'should not reprocess when a sandbox has received the job a reasonable time ago' do
       @sub.processing_tried_at = Time.now - Submission.processing_retry_interval - 1.second
       @sub.processing_began_at = Time.now - Submission.processing_resend_interval + 5.seconds
       expect(@sub.processing_began_at).to be < @sub.processing_tried_at
@@ -47,17 +45,17 @@ describe SubmissionProcessor do
       SubmissionProcessor.new.reprocess_timed_out_submissions
     end
 
-    context "when the submission has been reprocessed too many times" do
+    context 'when the submission has been reprocessed too many times' do
       before :each do
         @sub.times_sent_to_sandbox = Submission.max_attempts_at_processing
         @sub.save!
       end
 
-      it "should not reprocess it any more" do
+      it 'should not reprocess it any more' do
         expect_no_processing
         SubmissionProcessor.new.reprocess_timed_out_submissions
       end
-      it "should mark it as processed and having an error" do
+      it 'should mark it as processed and having an error' do
         SubmissionProcessor.new.reprocess_timed_out_submissions
         @sub.reload
         expect(@sub).to be_processed
@@ -67,12 +65,12 @@ describe SubmissionProcessor do
       end
     end
 
-    context "when a sandbox receives the job" do
+    context 'when a sandbox receives the job' do
       before :each do
         expect(RemoteSandbox).to receive(:try_to_send_submission_to_free_server).and_return(true)
       end
 
-      it "should increment the times-sent-to-sandbox counter" do
+      it 'should increment the times-sent-to-sandbox counter' do
         original_count = Submission.max_attempts_at_processing - 1
         @sub.times_sent_to_sandbox = original_count
         @sub.save!
@@ -81,7 +79,7 @@ describe SubmissionProcessor do
         expect(@sub.times_sent_to_sandbox).to eq(original_count + 1)
       end
 
-      it "should update the processing_tried_at and processing_began_at timestamps" do
+      it 'should update the processing_tried_at and processing_began_at timestamps' do
         SubmissionProcessor.new.reprocess_timed_out_submissions
         @sub.reload
         expect(@sub.processing_tried_at).to be > Time.now - 5.seconds
@@ -89,12 +87,12 @@ describe SubmissionProcessor do
       end
     end
 
-    context "when no sandbox receives the job" do
+    context 'when no sandbox receives the job' do
       before :each do
         expect(RemoteSandbox).to receive(:try_to_send_submission_to_free_server).and_return(false)
       end
 
-      it "should not increment the times-sent-to-sandbox counter" do
+      it 'should not increment the times-sent-to-sandbox counter' do
         original_count = Submission.max_attempts_at_processing - 1
         @sub.times_sent_to_sandbox = original_count
         @sub.save!
@@ -103,7 +101,7 @@ describe SubmissionProcessor do
         expect(@sub.times_sent_to_sandbox).to eq(original_count)
       end
 
-      it "should update the processing_tried_at timestamp but not processing_began_at" do
+      it 'should update the processing_tried_at timestamp but not processing_began_at' do
         SubmissionProcessor.new.reprocess_timed_out_submissions
         @sub.reload
         expect(@sub.processing_tried_at).to be > Time.now - 5.seconds

@@ -7,6 +7,6 @@
 # This file should be removed once everyone is using NB plugin 0.4.1+, which sends events in smaller batches.
 #
 
-if Rack::Utils.respond_to?("key_space_limit=")
-  Rack::Utils.key_space_limit = 262144 * 100
+if Rack::Utils.respond_to?('key_space_limit=')
+  Rack::Utils.key_space_limit = 262_144 * 100
 end

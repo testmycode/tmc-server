@@ -10,9 +10,7 @@ class UserField
   end
 
   def default_options
-    super.merge({
-      show_in_participant_list: false,
-      visible_to_if: lambda {|user| true }
-    })
+    super.merge(show_in_participant_list: false,
+                visible_to_if: ->(_user) { true })
   end
 end

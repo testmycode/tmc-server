@@ -33,16 +33,16 @@ class SourceFileList
   def self.for_submission(submission)
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
-      File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
+      File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
       SafeUnzipper.new.unzip(zip_path, tmpdir)
 
       project_dir = TmcDirUtils.find_dir_containing(tmpdir, 'src')
-      return self.new([]) if project_dir == nil
+      return new([]) if project_dir.nil?
 
       files = if project_dir == tmpdir
-        find_all_files_under(project_dir)
-      else
-        find_source_files_under(project_dir)
+                find_all_files_under(project_dir)
+              else
+                find_source_files_under(project_dir)
       end
 
       project_file = TmcProjectFile.for_project(submission.exercise.clone_path)
@@ -58,7 +58,7 @@ class SourceFileList
 
       make_path_names_relative(project_dir, files)
       files = sort_source_files(files)
-      self.new(files)
+      new(files)
     end
   end
 
@@ -75,10 +75,11 @@ class SourceFileList
 
     files = sort_source_files(files)
 
-    self.new(files)
+    new(files)
   end
 
-private
+  private
+
   def self.find_source_files_under(root_dir)
     files = []
     total_size = 0
@@ -87,7 +88,7 @@ private
 
       if source_file?(file) && file.size <= MAX_INDIVIDUAL_FILE_SIZE
         total_size += file.size
-        raise "Files are too large" if total_size > MAX_SIZE
+        fail 'Files are too large' if total_size > MAX_SIZE
 
         files << FileRecord.new(file.to_s, file.read)
       end
@@ -102,9 +103,9 @@ private
     Pathname(root_dir).realpath.find do |file|
       if file.size <= MAX_INDIVIDUAL_FILE_SIZE
         total_size += file.size
-        raise "Files are too large" if total_size > MAX_SIZE
+        fail 'Files are too large' if total_size > MAX_SIZE
         name = file.to_s
-        next if file.directory? or name.end_with?('.zip') or name.end_with?('.tar') or name.include? "nbproject"
+        next if file.directory? || name.end_with?('.zip') || name.end_with?('.tar') || name.include?('nbproject')
         files << FileRecord.new(file.to_s, file.read)
       end
     end
@@ -138,7 +139,7 @@ private
   def self.make_path_names_relative(root_dir, files)
     root_dir = root_dir.to_s
     for file in files
-      file.path = file.path[(root_dir.size+1)...file.path.length] if file.path.start_with?(root_dir)
+      file.path = file.path[(root_dir.size + 1)...file.path.length] if file.path.start_with?(root_dir)
     end
   end
 

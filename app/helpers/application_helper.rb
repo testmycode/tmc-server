@@ -16,13 +16,13 @@ module ApplicationHelper
       class: nil
     }.merge(options)
 
-    tags = capture(&block) if tags == nil && block != nil
+    tags = capture(&block) if tags.nil? && !block.nil?
     tags = tags.html_safe
 
     if tags =~ /id\s*=\s*"([^"]+)"/
-      target = ' for="' + $1 + '"'
+      target = ' for="' + Regexp.last_match(1) + '"'
     else
-      raise 'Cannot label a tag without an id'
+      fail 'Cannot label a tag without an id'
     end
 
     cls = []
@@ -40,13 +40,13 @@ module ApplicationHelper
     when :label_last
       label_start + tags + label_text + label_end
     else
-      raise 'invalid :order option for labeled()'
+      fail 'invalid :order option for labeled()'
     end
   end
 
   def labeled_field(label, tags = nil, options = {}, &block)
     cls = ['field']
-    cls << options[:super_class].split(" ") if options[:super_class]
+    cls << options[:super_class].split(' ') if options[:super_class]
     cls = ' class="' + cls.join(' ') + '"'
     raw("<div #{cls} >" + labeled(label, tags, options, &block) + '</div>')
   end
@@ -58,10 +58,10 @@ module ApplicationHelper
     when :boolean
       str = '<label class="checkbox">'
       str << "  #{field}#{label}"
-      str << "</label>"
+      str << '</label>'
     else
-      str = label_tag label, nil, class: "control-label"
-      str += raw("<div class=\"controls\">" +raw(field) + "</div>")
+      str = label_tag label, nil, class: 'control-label'
+      str += raw("<div class=\"controls\">" + raw(field) + '</div>')
     end
     raw(str)
   end
@@ -71,7 +71,7 @@ module ApplicationHelper
       bJQueryUI: true,
       bSort: false
     }.merge options
-    script =<<EOS
+    script = <<EOS
 <script type="text/javascript">
 <!--
 $(document).ready(function() {
@@ -86,5 +86,4 @@ EOS
   def link_back
     raw('<div class="link-back">' + link_to('Back', :back) + '</div>')
   end
-
 end

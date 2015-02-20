@@ -1,7 +1,7 @@
 class PasswordResetKeysController < ApplicationController
   skip_authorization_check
 
-  add_breadcrumb 'Forgot password', lambda {|*a| }, only: [:new, :show]
+  add_breadcrumb 'Forgot password', ->(*_a) {}, only: [:new, :show]
 
   def new
   end
@@ -13,7 +13,7 @@ class PasswordResetKeysController < ApplicationController
     end
 
     user = User.find_by_email(@email)
-    if !user
+    unless user
       return redirect_to(new_password_reset_key_path, alert: 'No such e-mail address registered')
     end
 
@@ -53,11 +53,12 @@ class PasswordResetKeysController < ApplicationController
     end
   end
 
-private
+  private
+
   def find_key_and_user
     code = params['code']
     @key = PasswordResetKey.find_by_code(code)
-    raise ActiveRecord::RecordNotFound.new('Invalid password reset code') if @key.nil? || @key.expired?
+    fail ActiveRecord::RecordNotFound.new('Invalid password reset code') if @key.nil? || @key.expired?
     @user = @key.user
   end
 end

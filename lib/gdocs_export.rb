@@ -1,11 +1,10 @@
 require 'google_spreadsheet'
 
 module GDocsExport
-
-  def self.authenticate notifications
-    notifications << "gdocs_username undefined" and return nil unless
+  def self.authenticate(notifications)
+    notifications << 'gdocs_username undefined' and return nil unless
       TmcServer::Application.config.gdocs_username
-    notifications << "gdocs_password undefined" and return nil unless
+    notifications << 'gdocs_password undefined' and return nil unless
       TmcServer::Application.config.gdocs_password
 
     GoogleSpreadsheet.login(
@@ -13,26 +12,24 @@ module GDocsExport
       TmcServer::Application.config.gdocs_password)
   end
 
-  def self.refresh_course_worksheet_points course, sheetname
+  def self.refresh_course_worksheet_points(course, sheetname)
     return ["sheetname #{sheetname} not found"] unless
       course.gdocs_sheets.include?(sheetname)
 
     notifications = []
     gsession = authenticate notifications
     refresh_course_worksheet notifications, gsession, course, sheetname
-    return notifications
+    notifications
   end
 
-  def self.refresh_course_worksheet notifications, gsession, course, sheetname
-    begin
-      ss = find_course_spreadsheet gsession, course
-      update_worksheet notifications, ss, course, sheetname
-    rescue Exception => e
-      notifications << "exception: #{e.message}"
-    end
+  def self.refresh_course_worksheet(notifications, gsession, course, sheetname)
+    ss = find_course_spreadsheet gsession, course
+    update_worksheet notifications, ss, course, sheetname
+  rescue Exception => e
+    notifications << "exception: #{e.message}"
   end
 
-  def self.worksheet_points notifications, ws, course, sheetname
+  def self.worksheet_points(notifications, ws, course, sheetname)
     points = AvailablePoint.course_sheet_points(course, sheetname).map(&:name)
     points.reduce([]) do |result, point|
       if point_col(ws, point) < 0
@@ -44,7 +41,7 @@ module GDocsExport
     end
   end
 
-  def self.worksheet_students notifications, ws, course, sheetname
+  def self.worksheet_students(notifications, ws, course, sheetname)
     students = User.course_sheet_students(course, sheetname)
     students.reduce([]) do |result, student|
       if student_row(ws, student.login) < 0
@@ -57,9 +54,9 @@ module GDocsExport
     end
   end
 
-  def self.update_worksheet notifications, ss, course, sheetname
-    ws = ss.worksheets.find {|w| w.title == sheetname}
-    notifications << ["worksheet #{sheetname} not found"] and return unless ws
+  def self.update_worksheet(notifications, ss, course, sheetname)
+    ws = ss.worksheets.find { |w| w.title == sheetname }
+    notifications << ["worksheet #{sheetname} not found"] && return unless ws
 
     students = worksheet_students notifications, ws, course, sheetname
     points = worksheet_points notifications, ws, course, sheetname
@@ -67,53 +64,52 @@ module GDocsExport
     write_points(ws, course, students, points)
     ws.save
 
-    return notifications
+    notifications
   end
 
-  def self.write_points ws, course, students, points
+  def self.write_points(ws, course, students, points)
     students.each do |student|
       row = student_row ws, student.login
-      raise "student #{student.login} not found" if row < 0
-      awarded = AwardedPoint.
-        course_user_sheet_points(course, student, ws.title).map(&:name)
+      fail "student #{student.login} not found" if row < 0
+      awarded = AwardedPoint.course_user_sheet_points(course, student, ws.title).map(&:name)
       points.each do |point|
         next unless awarded.include? point
         col = point_col ws, point
-        raise "point #{point.name} not found" if col < 0
-        ws[row,col] = "1" if ws[row,col] != "1"
+        fail "point #{point.name} not found" if col < 0
+        ws[row, col] = '1' if ws[row, col] != '1'
       end
     end
   end
 
-  def self.point_col ws, point_name
-    (points_begin .. ws.num_cols).each do |col|
+  def self.point_col(ws, point_name)
+    (points_begin..ws.num_cols).each do |col|
       return col if ws[header_row, col] == point_name
       return col if ws[header_row, col] == "'#{point_name}"
     end
-    return -1
+    -1
   end
 
-  def self.student_row ws, student_name
+  def self.student_row(ws, student_name)
     stripped = strip_leading_zeroes(student_name)
     return -1 if stripped.empty?
 
-    (header_row+1 .. ws.num_rows).each do |row|
+    (header_row + 1..ws.num_rows).each do |row|
       cell = ws[row, student_col]
       break if cell =~ /^=counta/
-      return row if cell == student_name or cell == stripped
+      return row if cell == student_name || cell == stripped
     end
-    return -1
+    -1
   end
 
-  def self.strip_leading_zeroes s
+  def self.strip_leading_zeroes(s)
     s.gsub(/^0*/, '')
   end
 
-  def self.find_course_spreadsheet gsession, course
-    raise "spreadsheet_key undefined" unless course.spreadsheet_key
+  def self.find_course_spreadsheet(gsession, course)
+    fail 'spreadsheet_key undefined' unless course.spreadsheet_key
     ss = gsession.spreadsheet_by_key course.spreadsheet_key
-    raise "spreadsheet not found" unless ss
-    return ss
+    fail 'spreadsheet not found' unless ss
+    ss
   end
 
   def self.student_col

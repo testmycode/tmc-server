@@ -22,7 +22,8 @@ class FixtureExercise::MavenExercise < FixtureExercise::SimpleExercise
     "#{@path}/src/test/java"
   end
 
-private
+  private
+
   def copy_from_fixture
     super
     copy_pom_xml

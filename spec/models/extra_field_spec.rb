@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe ExtraField, type: :model do
-
   def use_config(config_text)
     File.open('./user_fields.rb', 'wb') do |f|
       f.write config_text
@@ -27,7 +26,7 @@ EOS
     ExtraField.instance_variable_set('@fields', nil)
   end
 
-  it "can load all extra fields from configuration files" do
+  it 'can load all extra fields from configuration files' do
     use_default_config
 
     fields = ExtraField.by_kind(:user)
@@ -45,8 +44,8 @@ EOS
     expect(fields[1].label).to eq('two')
   end
 
-  describe "values" do
-    it "can be saved" do
+  describe 'values' do
+    it 'can be saved' do
       use_default_config
 
       field = ExtraField.by_kind(:user)[0]
@@ -57,7 +56,7 @@ EOS
       expect(@user.reload.field_value_record(field).value).to eq('asdasd')
     end
 
-    it "can take their values from forms" do
+    it 'can take their values from forms' do
       use_default_config
 
       textfield = ExtraField.by_kind(:user)[0]
@@ -100,8 +99,8 @@ EOS
       expect(@user.reload.field_value_record(boolfield).value).to be_blank
     end
 
-    context "of boolean fields" do
-      it "take a blank form value to mean false" do
+    context 'of boolean fields' do
+      it 'take a blank form value to mean false' do
         use_default_config
         boolfield = ExtraField.by_kind(:user)[1]
         boolrec = @user.field_value_record(boolfield)

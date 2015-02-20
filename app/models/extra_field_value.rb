@@ -5,11 +5,11 @@ module ExtraFieldValue
   extend ActiveSupport::Concern
 
   included do
-    validates :field_name, uniqueness: {scope: :user_id}
+    validates :field_name, uniqueness: { scope: :user_id }
   end
 
   def field
-    @field ||= ExtraField.by_kind(field_kind).find {|f| f.name == self.field_name }
+    @field ||= ExtraField.by_kind(field_kind).find { |f| f.name == field_name }
   end
 
   def field_kind
@@ -28,7 +28,7 @@ module ExtraFieldValue
   end
 
   def set_from_form(new_value)
-    if self.field.should_save?
+    if field.should_save?
       self.value =
         case field_kind
         when :boolean
@@ -38,5 +38,4 @@ module ExtraFieldValue
         end
     end
   end
-
 end

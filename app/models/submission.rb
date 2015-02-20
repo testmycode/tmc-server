@@ -6,7 +6,7 @@ class Submission < ActiveRecord::Base
   belongs_to :course
 
   belongs_to :exercise,
-    -> (submission) {
+    lambda do |submission|
       if submission.respond_to?(:course_id)
         # Used when doing submission.exercise
         where(course: submission.course)
@@ -14,7 +14,7 @@ class Submission < ActiveRecord::Base
         # Used when doing submissions.include(:exercises)
         Exercise.joins(:submission)
       end
-    }, foreign_key: :exercise_name, primary_key: :name
+    end, foreign_key: :exercise_name, primary_key: :name
 
   has_one :submission_data, dependent: :delete
   after_save { submission_data.save! if submission_data }
@@ -35,7 +35,7 @@ class Submission < ActiveRecord::Base
   before_create :set_paste_key_if_paste_available
 
   def processing_time
-    if self.processing_completed_at.nil? or self.processing_completed_at.nil?
+    if self.processing_completed_at.nil? || self.processing_completed_at.nil?
       nil
     else
       (self.processing_completed_at - self.processing_attempts_started_at).round
@@ -43,14 +43,14 @@ class Submission < ActiveRecord::Base
   end
 
   def self.to_be_reprocessed
-    self.unprocessed.
-      where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval).
-      where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval)
+    self.unprocessed
+      .where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval)
+      .where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval)
   end
 
   def self.unprocessed
-    self.where(processed: false).
-      order('processing_priority DESC, processing_tried_at ASC, id ASC')
+    self.where(processed: false)
+      .order('processing_priority DESC, processing_tried_at ASC, id ASC')
   end
 
   def self.unprocessed_count
@@ -168,6 +168,7 @@ class Submission < ActiveRecord::Base
   def return_file
     submission_data.return_file
   end
+
   def return_file=(value)
     build_submission_data if !submission_data
     submission_data.return_file = value
@@ -177,30 +178,37 @@ class Submission < ActiveRecord::Base
     build_submission_data if !submission_data
     submission_data.stdout
   end
+
   def stdout=(value)
     build_submission_data if !submission_data
     submission_data.stdout = value
   end
+
   def stderr
     build_submission_data if !submission_data
     submission_data.stderr
   end
+
   def stderr=(value)
     build_submission_data if !submission_data
     submission_data.stderr = value
   end
+
   def vm_log
     build_submission_data if !submission_data
     submission_data.vm_log
   end
+
   def vm_log=(value)
     build_submission_data if !submission_data
     submission_data.vm_log = value
   end
+
   def valgrind
     build_submission_data if !submission_data
     submission_data.valgrind
   end
+
   def valgrind=(value)
     build_submission_data if !submission_data
     submission_data.valgrind = value
@@ -210,6 +218,7 @@ class Submission < ActiveRecord::Base
     build_submission_data if !submission_data
     JSON.parse submission_data.validations unless submission_data.validations.blank?
   end
+
   def validations=(value)
     build_submission_data if !submission_data
     submission_data.validations = value
@@ -285,9 +294,9 @@ class Submission < ActiveRecord::Base
     end
   end
 
-private
+  private
+
   def set_processing_attempts_started_at
     self.processing_attempts_started_at = Time.now
   end
-
 end

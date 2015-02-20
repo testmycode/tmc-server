@@ -8,11 +8,11 @@ class CourseRefresher
     end
 
     def comment_begin
-      "<!--"
+      '<!--'
     end
 
     def comment_end
-      "-->"
+      '-->'
     end
   end
 end

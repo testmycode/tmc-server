@@ -1,6 +1,5 @@
 # Handles login and logout.
 class SessionsController < ApplicationController
-
   skip_authorization_check
 
   def create
@@ -14,7 +13,7 @@ class SessionsController < ApplicationController
 
     redirect_params = {}
     if user.nil?
-      redirect_params = {alert: "Login or password incorrect. Try again."}
+      redirect_params = { alert: 'Login or password incorrect. Try again.' }
     else
       sign_in user
     end
@@ -27,9 +26,10 @@ class SessionsController < ApplicationController
     try_to_redirect_back(notice: 'Goodbye')
   end
 
-private
+  private
+
   def try_to_redirect_back(redirect_params = {})
-    if not request.env['HTTP_REFERER'].blank?
+    if !request.env['HTTP_REFERER'].blank?
       redirect_to :back, redirect_params
     else
       redirect_to root_path, redirect_params
@@ -39,5 +39,4 @@ private
   def clear_expired_sessions
     Session.delete_expired
   end
-
 end

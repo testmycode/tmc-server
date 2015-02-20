@@ -34,13 +34,14 @@ class FeedbackAnswer < ActiveRecord::Base
     by_submission.values.shuffle! # shuffled to minimize user identifiability
   end
 
-private
+  private
+
   def self.numeric_answers_query(exercise)
     questions = FeedbackQuestion.arel_table
     answers = FeedbackAnswer.arel_table
 
-    numeric_answers_base_query(exercise).
-      project(
+    numeric_answers_base_query(exercise)
+      .project(
         questions[:id].as('qid'),
         answers[:submission_id].as('sid'),
         Arel.sql('CAST(answer AS int)').as('answer')
@@ -50,9 +51,9 @@ private
   def self.numeric_answer_averages_query(exercise)
     questions = FeedbackQuestion.arel_table
 
-    numeric_answers_base_query(exercise).
-      group(questions[:id]).
-      project(
+    numeric_answers_base_query(exercise)
+      .group(questions[:id])
+      .project(
         questions[:id].as('qid'),
         Arel.sql('AVG(CAST(answer AS int))').as('avg')
       )
@@ -62,10 +63,9 @@ private
     answers = FeedbackAnswer.arel_table
     questions = FeedbackQuestion.arel_table
 
-    answers.
-      join(questions).on(answers[:feedback_question_id].eq(questions[:id])).
-      where(questions[:kind].matches('intrange%')).
-      where(answers[:course_id].eq(exercise.course_id)).
-      where(answers[:exercise_name].eq(exercise.name))
+    answers.join(questions).on(answers[:feedback_question_id].eq(questions[:id]))
+      .where(questions[:kind].matches('intrange%'))
+      .where(answers[:course_id].eq(exercise.course_id))
+      .where(answers[:exercise_name].eq(exercise.name))
   end
 end

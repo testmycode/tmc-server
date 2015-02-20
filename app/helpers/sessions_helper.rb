@@ -1,5 +1,4 @@
 module SessionsHelper
-
   def sign_in(user)
     session[:user_id] = user.id
     @current_user = user
@@ -27,7 +26,7 @@ module SessionsHelper
     reset_session
   end
 
-private
+  private
 
   def user_from_session
     User.find_by_id(session[:user_id])
@@ -43,5 +42,4 @@ private
       end
     end
   end
-
 end

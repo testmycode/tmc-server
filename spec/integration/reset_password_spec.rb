@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "Resetting one's password by e-mail", type: :request, integration: true do
   include IntegrationTestActions
 
-  it "should be possible" do
+  it 'should be possible' do
     user = User.create!(login: 'theuser', password: 'forgot_this', email: 'theuser@example.com')
 
     visit '/'
@@ -13,10 +13,10 @@ describe "Resetting one's password by e-mail", type: :request, integration: true
 
     # Pretend we got the e-mail. Too much trouble to extract it from capybara's server process.
 
-    wait_until {
+    wait_until do
       user.reload
-      user.password_reset_key != nil
-    }
+      !user.password_reset_key.nil?
+    end
 
     visit '/reset_password/' + user.password_reset_key.code
 

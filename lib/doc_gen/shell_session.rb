@@ -21,34 +21,35 @@ class DocGen
       '<div class="shell">' + example.transcript + '</div>'
     end
 
-  private
+    private
+
     class ExampleBlock
       attr_reader :transcript
 
       def initialize(session)
         @session = session
-        @transcript = ""
+        @transcript = ''
       end
 
       def blank_line
-        @transcript << "<br />"
+        @transcript << '<br />'
       end
 
       def run(command)
         output = nil
         Dir.chdir @session.working_dir do
           output = `#{command} 2>&1`
-          if !$?.success?
-            error_msg = "Command `#{command}` failed with status #{$?}."
+          unless $CHILD_STATUS.success?
+            error_msg = "Command `#{command}` failed with status #{$CHILD_STATUS}."
             error_msg << " The output was:\n#{output}" unless output.strip.empty?
-            raise error_msg
+            fail error_msg
           end
         end
 
-        prompt_html = CGI::escapeHTML(@session.prompt)
-        command_html = CGI::escapeHTML(command)
+        prompt_html = CGI.escapeHTML(@session.prompt)
+        command_html = CGI.escapeHTML(command)
         output_lines = output.split("\n", -1) # -1 to get empty fields after trailing newlines
-        output_html = output_lines.map {|line| CGI::escapeHTML(line) }.join("<br />\n")
+        output_html = output_lines.map { |line| CGI.escapeHTML(line) }.join("<br />\n")
 
         @transcript << "<span class=\"prompt\">#{prompt_html}</span>"
         @transcript << "<span class=\"command\">#{command_html}</span><br />\n"

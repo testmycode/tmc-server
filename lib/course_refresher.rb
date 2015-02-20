@@ -14,7 +14,6 @@ require 'benchmark'
 # Safely refreshes a course from a git repository
 # TODO: split this into submodules
 class CourseRefresher
-
   def refresh_course(course)
     Impl.new.refresh_course(course)
   end
@@ -35,7 +34,6 @@ class CourseRefresher
     def successful?
       @errors.empty?
     end
-
   end
 
   class Failure < StandardError
@@ -46,13 +44,13 @@ class CourseRefresher
     attr_reader :report
   end
 
-private
+  private
 
   class Impl
     include SystemCommands
 
     def measure_and_log(method_name)
-      log(method_name, Benchmark.measure {send(method_name)})
+      log(method_name, Benchmark.measure { send(method_name) })
     end
 
     def log(method_name, result)
@@ -127,9 +125,9 @@ private
           @course.save!
           @course.exercises.each &:save!
 
-          CourseRefresher.simulate_failure! if ::Rails::env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
+          CourseRefresher.simulate_failure! if ::Rails.env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
         rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
-          @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
+          @report.errors << $ERROR_INFO.message + "\n" + $ERROR_INFO.backtrace.join("\n")
           # Delete the new cache we were working on
           FileUtils.rm_rf(@course.cache_path)
           raise ActiveRecord::Rollback
@@ -142,14 +140,14 @@ private
       end
 
       course.reload # reload the record given as parameter
-      raise Failure.new(@report) unless @report.errors.empty?
+      fail Failure.new(@report) unless @report.errors.empty?
       @report
     end
 
     def update_or_clone_repository
-      raise 'Source types other than git not yet implemented' if @course.source_backend != 'git'
+      fail 'Source types other than git not yet implemented' if @course.source_backend != 'git'
 
-      if File.exists?("#{@old_cache_path}/clone/.git")
+      if File.exist?("#{@old_cache_path}/clone/.git")
         begin
           # Try a fast path: copy old clone and git fetch new stuff
           copy_and_update_repository
@@ -176,12 +174,12 @@ private
     end
 
     def check_directory_names
-      exdirs = exercise_dirs.map {|exdir| Pathname(exdir.path).realpath.to_s }
+      exdirs = exercise_dirs.map { |exdir| Pathname(exdir.path).realpath.to_s }
 
       Find.find(@course.clone_path) do |path|
         relpath = path[@course.clone_path.length..-1]
-        if File.directory?(path) && exdirs.any? {|exdir| exdir.start_with?(path) } && relpath.include?('-')
-          raise "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
+        if File.directory?(path) && exdirs.any? { |exdir| exdir.start_with?(path) } && relpath.include?('-')
+          fail "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
         end
       end
     end
@@ -213,7 +211,7 @@ private
 
     def add_records_for_new_exercises
       exercise_names.each do |name|
-        if !@course.exercises.any? {|e| e.name == name }
+        unless @course.exercises.any? { |e| e.name == name }
           @report.notices << "Added exercise #{name}"
           @course.exercises.new(name: name)
         end
@@ -221,7 +219,7 @@ private
     end
 
     def delete_records_for_removed_exercises
-      removed_exercises = @course.exercises.reject {|e| exercise_names.include?(e.name) }
+      removed_exercises = @course.exercises.reject { |e| exercise_names.include?(e.name) }
       removed_exercises.each do |e|
         @report.notices << "Removed exercise #{e.name}"
         @course.exercises.delete(e)
@@ -234,26 +232,24 @@ private
       @review_points = {}
       @course.exercises.each do |e|
         begin
-          metadata = reader.read_settings({
-            root_dir: @course.clone_path,
-            target_dir: File.join(@course.clone_path, e.relative_path),
-            file_name: 'metadata.yml',
-            defaults: Exercise.default_options,
-            file_preprocessor: Proc.new do |opts|
-              merge_course_specific_suboptions(opts)
-            end
-          })
+          metadata = reader.read_settings(root_dir: @course.clone_path,
+                                          target_dir: File.join(@course.clone_path, e.relative_path),
+                                          file_name: 'metadata.yml',
+                                          defaults: Exercise.default_options,
+                                          file_preprocessor: proc do |opts|
+                                            merge_course_specific_suboptions(opts)
+                                          end)
           @review_points[e.name] = parse_review_points(metadata['review_points'])
           e.options = metadata
           e.save!
         rescue SyntaxError
-          @report.errors << "Failed to parse metadata: #{$!}"
+          @report.errors << "Failed to parse metadata: #{$ERROR_INFO}"
         end
       end
     end
 
     def parse_review_points(data)
-      if data == nil
+      if data.nil?
         []
       elsif data.is_a?(String)
         data.split(/\s+/).reject(&:blank?)
@@ -286,7 +282,7 @@ private
           when :makefile_c
             point_names += get_c_exercise_points(exercise)
           else
-            point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
+            point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
         end
         point_names += review_points
 
@@ -294,7 +290,7 @@ private
         removed = []
 
         point_names.each do |name|
-          if exercise.available_points.none? {|point| point.name == name}
+          if exercise.available_points.none? { |point| point.name == name }
             added << name
             point = AvailablePoint.create(name: name, exercise: exercise)
             exercise.available_points << point
@@ -302,7 +298,7 @@ private
         end
 
         exercise.available_points.to_a.clone.each do |point|
-          if point_names.none? {|name| name == point.name}
+          if point_names.none? { |name| name == point.name }
             removed << point.name
             point.destroy
             exercise.available_points.delete(point)
@@ -330,7 +326,7 @@ private
 
         points = Set.new
         available_points_content.each do |line|
-          line = line.gsub(" ", "").chomp
+          line = line.gsub(' ', '').chomp
           points << line
         end
         `cd #{full_path} && make clean`
@@ -368,7 +364,7 @@ private
     def add_shared_files_to_stub(exercise_type, stub_path)
       case exercise_type
       when :makefile_c
-        #nothing yet
+        # nothing yet
       when :java_simple
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
         FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
@@ -468,7 +464,5 @@ private
     def seed_maven_cache
       MavenCacheSeeder.start(@course.clone_path, RemoteSandbox.all)
     end
-
   end
-
 end

@@ -57,14 +57,14 @@ module SubmissionsHelper
   end
 
   def format_exception_chain(exception)
-    return '' if exception == nil
+    return '' if exception.nil?
     result = ActiveSupport::SafeBuffer.new('')
-    result << exception['className'] << ": " << exception['message'] << tag(:br)
+    result << exception['className'] << ': ' << exception['message'] << tag(:br)
     exception['stackTrace'].each do |line|
       result << "#{line['fileName']}:#{line['lineNumber']}: #{line['declaringClass']}.#{line['methodName']}"
       result << tag(:br)
     end
-    result << "Caused by: " << format_exception_chain(exception['cause']) if exception['cause']
+    result << 'Caused by: ' << format_exception_chain(exception['cause']) if exception['cause']
     result
   end
 
@@ -76,7 +76,7 @@ module SubmissionsHelper
         user_col = sub.user.login
       end
       [
-        sub.created_at.strftime("%Y-%m-%d %H:%M"),
+        sub.created_at.strftime('%Y-%m-%d %H:%M'),
         user_col,
         link_to_submission_exericse(sub),
         submission_status(sub),
@@ -89,7 +89,7 @@ module SubmissionsHelper
 
   def link_to_submission_exericse(submission, text = nil, missing_text = '')
     if submission.exercise
-      text = submission.exercise.name if text == nil
+      text = submission.exercise.name if text.nil?
       link_to text, exercise_path(submission.exercise)
     else
       missing_text

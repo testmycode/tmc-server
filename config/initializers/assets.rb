@@ -8,7 +8,7 @@ Rails.application.config.assets.version = '1.0'
 Rails.application.config.assets.precompile += %w( application-bare.css application-bare.js application-test.css courses.js solutions.css solutions.js submissions.css submissions.js reviews.css reviews.js )
 
 # Include vendor images
-Rails.application.config.assets.precompile << Proc.new do |path|
+Rails.application.config.assets.precompile << proc do |path|
   full_path = Rails.application.assets.resolve(path).to_s
   full_path.include?('vendor/assets/images/')
 end

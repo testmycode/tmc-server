@@ -16,19 +16,20 @@ module CometSupport
   end
 
   def self.backend_key
-    "backend_key_for_tests"
+    'backend_key_for_tests'
   end
 
   def self.url
     "http://localhost:#{@port}/"
   end
 
-private
+  private
+
   def self.start!
     write_config_file
-    raise "Already running" if @started
+    fail 'Already running' if @started
     Dir.chdir TmcComet.get.path.parent do
-      @pid = Process.spawn("./tmc-comet-server.sh #{config_file_path} > #{log_file} 2>&1", :pgroup => true)
+      @pid = Process.spawn("./tmc-comet-server.sh #{config_file_path} > #{log_file} 2>&1", pgroup: true)
     end
     @started = true
     wait_for_http_access
@@ -37,7 +38,7 @@ private
   def self.stop!
     if @pid
       # We started tmc-comet in a new process group. Kill entire process group.
-      Process.kill("TERM", -@pid)
+      Process.kill('TERM', -@pid)
       Process.waitpid(@pid)
       @pid = nil
       @started = false
@@ -53,11 +54,11 @@ private
   end
 
   def self.config_file_path
-    "#{::Rails::root}/tmp/tests/tmc-comet-config"
+    "#{::Rails.root}/tmp/tests/tmc-comet-config"
   end
 
   def self.log_file
-    "#{::Rails::root}/log/test_comet.log"
+    "#{::Rails.root}/log/test_comet.log"
   end
 
   def self.wait_for_http_access
@@ -70,7 +71,7 @@ private
         sleep 0.5
       end
     end
-    raise "Failed to access tmc-comet. Please check #{log_file}."
+    fail "Failed to access tmc-comet. Please check #{log_file}."
   end
 end
 

@@ -26,7 +26,7 @@ class Solution
     else
       show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')
       show_when_expired = SiteSetting.value('show_model_solutions_when_exercise_expired')
-      (@exercise.solution_visible_after != nil && @exercise.solution_visible_after < Time.now) ||
+      (!@exercise.solution_visible_after.nil? && @exercise.solution_visible_after < Time.now) ||
         (show_when_completed && @exercise.completed_by?(user)) ||
         (show_when_expired && @exercise.expired_for?(user))
     end

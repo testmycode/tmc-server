@@ -16,26 +16,26 @@ describe Review, type: :model do
     Review.create(reviewer: @admin, submission: @sub, review_body: body)
   end
 
-  describe "associations" do
-    specify "to reviewer" do
+  describe 'associations' do
+    specify 'to reviewer' do
       review = mk_review
       expect(review.reviewer).to eq(@admin)
       expect(@admin.reviews).to eq([review])
     end
-    specify "to submission" do
+    specify 'to submission' do
       review = mk_review
       expect(review.submission).to eq(@sub)
       expect(@sub.reviews).to eq([review])
     end
   end
 
-  it "is not deleted when the reviewing user is destroyed" do
+  it 'is not deleted when the reviewing user is destroyed' do
     review = mk_review
     @admin.destroy
     expect(Review.find_by_id(review.id)).not_to be_nil
   end
 
-  it "is deleted when the submission is destroyed" do
+  it 'is deleted when the submission is destroyed' do
     review = mk_review
     @sub.destroy
     expect(Review.find_by_id(review.id)).to be_nil

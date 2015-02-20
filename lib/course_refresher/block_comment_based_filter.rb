@@ -2,8 +2,8 @@ require 'pathname'
 
 class CourseRefresher
   class BlockCommentBasedFilter # Abstract
-    def applies_to?(file_path)
-      raise 'abstract method'
+    def applies_to?(_file_path)
+      fail 'abstract method'
     end
 
     def filter_for_stub(text)
@@ -21,7 +21,7 @@ class CourseRefresher
     end
 
     def fix_line_endings(text)
-      text.gsub("\r", "")
+      text.gsub("\r", '')
     end
 
     def remove_solution_blocks(text)
@@ -31,11 +31,11 @@ class CourseRefresher
 
       while remaining
         if !in_block && remaining =~ begin_solution_regexp
-          result += $~.pre_match
-          remaining = $~.post_match
+          result += $LAST_MATCH_INFO.pre_match
+          remaining = $LAST_MATCH_INFO.post_match
           in_block = true
         elsif in_block && remaining =~ end_solution_regexp
-          remaining = $~.post_match
+          remaining = $LAST_MATCH_INFO.post_match
           in_block = false
         else
           if !in_block
@@ -52,8 +52,8 @@ class CourseRefresher
 
     def uncomment_stubs(text)
       text.gsub(stub_regexp) do
-        before = $1
-        after = $2
+        before = Regexp.last_match(1)
+        after = Regexp.last_match(2)
         before + after
       end
     end
@@ -61,7 +61,7 @@ class CourseRefresher
     def remove_stub_and_solution_comments(text)
       for regex in [stub_regexp, begin_solution_regexp, end_solution_regexp, solution_file_regexp]
         while text =~ regex
-          text = $~.pre_match + $~.post_match
+          text = $LAST_MATCH_INFO.pre_match + $LAST_MATCH_INFO.post_match
         end
       end
       text
@@ -84,11 +84,11 @@ class CourseRefresher
     end
 
     def comment_begin
-      raise "abstract method"
+      fail 'abstract method'
     end
 
     def comment_end
-      raise "abstract method"
+      fail 'abstract method'
     end
 
     def resc(s)

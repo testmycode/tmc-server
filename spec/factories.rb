@@ -3,28 +3,28 @@ require 'system_commands'
 
 FactoryGirl.define do
   factory :user do
-    sequence(:login) {|n| "user#{n}" }
-    sequence(:password) {|n| "userpass#{n}" }
-    sequence(:email) {|n| "user#{n}@example.com" }
+    sequence(:login) { |n| "user#{n}" }
+    sequence(:password) { |n| "userpass#{n}" }
+    sequence(:email) { |n| "user#{n}@example.com" }
     administrator false
   end
 
   factory :admin, class: User do
-    sequence(:login) {|n| "admin#{n}" }
-    sequence(:password) {|n| "adminpass#{n}" }
-    sequence(:email) {|n| "admin#{n}@example.com" }
+    sequence(:login) { |n| "admin#{n}" }
+    sequence(:password) { |n| "adminpass#{n}" }
+    sequence(:email) { |n| "admin#{n}@example.com" }
     administrator true
   end
 
   factory :course, class: Course do
-    sequence(:name) {|n| "course#{n}" }
+    sequence(:name) { |n| "course#{n}" }
     source_url 'git@example.com'
   end
 
   factory :exercise do
     course
-    sequence(:name) {|n| "exercise#{n}" }
-    sequence(:gdocs_sheet) {|n| "exercise#{n}" }
+    sequence(:name) { |n| "exercise#{n}" }
+    sequence(:gdocs_sheet) { |n| "exercise#{n}" }
   end
 
   factory :returnable_exercise, parent: :exercise do
@@ -36,7 +36,7 @@ FactoryGirl.define do
     user
     exercise
     processed true
-    after(:build) { |sub| sub.exercise.course = sub.course if sub.course}
+    after(:build) { |sub| sub.exercise.course = sub.course if sub.course }
   end
 
   factory :submission_data do
@@ -60,32 +60,32 @@ FactoryGirl.define do
 
   factory :awarded_point do
     course
-    sequence(:name) {|n| "point#{n}" }
+    sequence(:name) { |n| "point#{n}" }
     submission
     user
     after(:build) { |pt| pt.submission.course = pt.course }
   end
 
   factory :available_point do
-    sequence(:name) {|n| "point#{n}" }
+    sequence(:name) { |n| "point#{n}" }
     exercise
   end
 
   factory :review do
     submission
     reviewer factory: :user
-    review_body "This is a review"
+    review_body 'This is a review'
   end
 
   factory :test_case_run do
-    sequence(:test_case_name) {|n| "test case #{n}" }
+    sequence(:test_case_name) { |n| "test case #{n}" }
     submission
     successful false
   end
 
   factory :feedback_question do
     course
-    sequence(:question) {|n| "feedback question #{n}" }
+    sequence(:question) { |n| "feedback question #{n}" }
     kind 'text'
   end
 
@@ -94,21 +94,20 @@ FactoryGirl.define do
     course
     exercise
     submission
-    sequence(:answer) {|n| "feedback answer #{n}" }
+    sequence(:answer) { |n| "feedback answer #{n}" }
   end
 
   factory :student_event do
     user
     course
     exercise
-    event_type "test_event"
-    sequence(:data) {|n| "testdata#{n}" }
-    happened_at {|| Time.now }
-    after_build {|ev| ev.exercise.course = ev.course }
+    event_type 'test_event'
+    sequence(:data) { |n| "testdata#{n}" }
+    happened_at { || Time.now }
+    after_build { |ev| ev.exercise.course = ev.course }
   end
 
   factory :test_scanner_cache_entry do
     course
   end
-
 end

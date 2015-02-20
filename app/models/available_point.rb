@@ -15,29 +15,27 @@ class AvailablePoint < ActiveRecord::Base
   end
 
   def self.course_points(course)
-    joins(:exercise).
-    where(exercises: {course_id: course.id})
+    joins(:exercise)
+      .where(exercises: { course_id: course.id })
   end
 
   def self.course_sheet_points(course, sheet)
-    joins(:exercise).
-    where(exercises: {course_id: course.id, gdocs_sheet: sheet})
+    joins(:exercise)
+      .where(exercises: { course_id: course.id, gdocs_sheet: sheet })
   end
 
   def award_to(user, submission = nil)
-    begin
-      AwardedPoint.create!(
-        course_id: exercise.course_id,
-        name: name,
-        user_id: user.id,
-        submission: submission
-      )
-    rescue ActiveRecord::RecordNotUnique
-      # already awarded - ignore
-    end
+    AwardedPoint.create!(
+      course_id: exercise.course_id,
+      name: name,
+      user_id: user.id,
+      submission: submission
+    )
+  rescue ActiveRecord::RecordNotUnique
   end
 
-private
+  private
+
   def name_must_not_contain_whitespace
     errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
   end

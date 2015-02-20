@@ -10,7 +10,7 @@ class SubmissionData < ActiveRecord::Base
 
   def stdout
     @stdout ||=
-      if stdout_compressed != nil
+      if !stdout_compressed.nil?
         uncompress(stdout_compressed)
       else
         nil
@@ -18,7 +18,7 @@ class SubmissionData < ActiveRecord::Base
   end
 
   def stdout=(value)
-    if value != nil
+    if !value.nil?
       self.stdout_compressed = compress(value)
     else
       self.stdout_compressed = nil
@@ -28,7 +28,7 @@ class SubmissionData < ActiveRecord::Base
 
   def stderr
     @stderr ||=
-      if stderr_compressed != nil
+      if !stderr_compressed.nil?
         uncompress(stderr_compressed)
       else
         nil
@@ -36,7 +36,7 @@ class SubmissionData < ActiveRecord::Base
   end
 
   def stderr=(value)
-    if value != nil
+    if !value.nil?
       self.stderr_compressed = compress(value)
     else
       self.stderr_compressed = nil
@@ -46,7 +46,7 @@ class SubmissionData < ActiveRecord::Base
 
   def vm_log
     @vm_log ||=
-      if vm_log_compressed != nil
+      if !vm_log_compressed.nil?
         uncompress(vm_log_compressed)
       else
         nil
@@ -54,7 +54,7 @@ class SubmissionData < ActiveRecord::Base
   end
 
   def vm_log=(value)
-    if value != nil
+    if !value.nil?
       self.vm_log_compressed = compress(value)
     else
       self.vm_log_compressed = nil
@@ -64,7 +64,7 @@ class SubmissionData < ActiveRecord::Base
 
   def valgrind
     @valgrind ||=
-      if valgrind_compressed != nil
+      if !valgrind_compressed.nil?
         uncompress(valgrind_compressed)
       else
         nil
@@ -72,7 +72,7 @@ class SubmissionData < ActiveRecord::Base
   end
 
   def valgrind=(value)
-    if value != nil
+    if !value.nil?
       self.valgrind_compressed = compress(value)
     else
       self.valgrind_compressed = nil
@@ -82,7 +82,7 @@ class SubmissionData < ActiveRecord::Base
 
   def validations
     @validations ||=
-      if validations_compressed != nil
+      if !validations_compressed.nil?
         uncompress(validations_compressed)
       else
         nil
@@ -90,7 +90,7 @@ class SubmissionData < ActiveRecord::Base
   end
 
   def validations=(value)
-    if value != nil
+    if !value.nil?
       self.validations_compressed = compress(value)
     else
       self.validations_compressed = nil
@@ -98,10 +98,12 @@ class SubmissionData < ActiveRecord::Base
     @validations = value
   end
 
-private
+  private
+
   def compress(text)
     Zlib::Deflate.deflate(text)
   end
+
   def uncompress(compressed_text)
     Zlib::Inflate.inflate(compressed_text).force_encoding('UTF-8')
   end

@@ -31,8 +31,8 @@ class SubmissionTestSetup
     @course.refresh
 
     @exercise = @course.exercises.first
-    if !@exercise
-      raise "Exercise created from fixture was not recognized by course refresher"
+    unless @exercise
+      fail 'Exercise created from fixture was not recognized by course refresher'
     end
 
     @exercise_project = FixtureExercise.get(exercise_name, exercise_dest)
@@ -70,7 +70,8 @@ class SubmissionTestSetup
     }
   end
 
-private
+  private
+
   def create_user
     FactoryGirl.create(:user, login: 'student', password: 'student')
   end

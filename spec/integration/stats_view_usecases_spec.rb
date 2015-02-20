@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "The system (used by an instructor for viewing statistics)", type: :request, integration: true do
+describe 'The system (used by an instructor for viewing statistics)', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
@@ -15,7 +15,7 @@ describe "The system (used by an instructor for viewing statistics)", type: :req
     course.refresh
   end
 
-  it "should show recent submissions for an exercise" do
+  it 'should show recent submissions for an exercise' do
     log_in_as_instructor
 
     submit_exercise('EasyExercise', solve: true)
@@ -60,5 +60,4 @@ describe "The system (used by an instructor for viewing statistics)", type: :req
     click_button 'Submit'
     wait_for_submission_to_be_processed
   end
-
 end

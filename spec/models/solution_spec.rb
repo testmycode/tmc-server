@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Solution, type: :model do
-  it "should be visible if solution_visible_after has passed" do
+  it 'should be visible if solution_visible_after has passed' do
     user = FactoryGirl.create(:user)
     ex = FactoryGirl.create(:exercise)
     sol = ex.solution
@@ -10,7 +10,7 @@ describe Solution, type: :model do
     expect(sol).to be_visible_to(user)
   end
 
-  it "should never be visible if exercise is still submittable and uncompleted by a non-admin user" do
+  it 'should never be visible if exercise is still submittable and uncompleted by a non-admin user' do
     show_when_completed(true)
     show_when_expired(true)
 
@@ -22,7 +22,7 @@ describe Solution, type: :model do
     expect(sol).not_to be_visible_to(user)
   end
 
-  it "should not be visible if the exercise is not visible to the user" do
+  it 'should not be visible if the exercise is not visible to the user' do
     show_when_completed(true)
     show_when_expired(true)
 
@@ -33,7 +33,7 @@ describe Solution, type: :model do
     ex.solution_visible_after = Time.now - 5.days
     expect(sol).to be_visible_to(user)
 
-    allow(ex).to receive("visible_to?").and_return(false)
+    allow(ex).to receive('visible_to?').and_return(false)
     expect(sol).not_to be_visible_to(user)
   end
 

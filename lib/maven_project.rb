@@ -21,7 +21,7 @@ class MavenProject
   end
 
   def lib_paths
-    @lib_paths ||= build_classpath.split(':').map {|path| Pathname(path) }
+    @lib_paths ||= build_classpath.split(':').map { |path| Pathname(path) }
   end
 
   def pom_file
@@ -53,7 +53,7 @@ class MavenProject
   end
 
   def compiled?
-    File.exists? jar_path
+    File.exist? jar_path
   end
 
   def compile!
@@ -77,13 +77,13 @@ class MavenProject
           project.compile!
         rescue
           puts "*** Failed to compile #{project.name} ***"
-          puts "  Have you done `git submodule update --init`?"
+          puts '  Have you done `git submodule update --init`?'
           puts
           raise
         end
         # In case it was already compiled and ant had nothing to do,
         # we'll touch the jar file to make it newer than the deps.
-        FileUtils.touch(project.package_path) if File.exists?(project.package_path)
+        FileUtils.touch(project.package_path) if File.exist?(project.package_path)
       end
 
       namespace task_namespace do
@@ -107,7 +107,7 @@ class MavenProject
     end
   end
 
-protected
+  protected
 
   def build_classpath
     file_path = "misc/#{pom_file.artifact_id}-build-classpath"
@@ -123,16 +123,16 @@ protected
       result = nil
     end
 
-    if !result
+    unless result
       output = nil
       Dir.chdir(path) do
         output = `mvn org.apache.maven.plugins:maven-dependency-plugin:2.4:build-classpath`
       end
       if output =~ /\[INFO\] Dependencies classpath:\n(.*)\n/
-        result = $1.strip
+        result = Regexp.last_match(1).strip
         FileStore.put(file_path, result)
       else
-        raise "Failed to get build classpath of tmc-junit-runner."
+        fail 'Failed to get build classpath of tmc-junit-runner.'
       end
     end
     result

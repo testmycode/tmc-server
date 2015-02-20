@@ -23,7 +23,7 @@ describe TestRunGrader do
         'methodName' => 'testSomethingDifficult',
         'status' => 'FAILED',
         'pointNames' => ['1.2'],
-        'exception' => {'a' => 'b'}
+        'exception' => { 'a' => 'b' }
       }
     ]
   end
@@ -34,22 +34,22 @@ describe TestRunGrader do
     results
   end
 
-  it "should create test case runs for the submission" do
+  it 'should create test case runs for the submission' do
     TestRunGrader.grade_results(@submission, half_successful_results)
 
     expect(@submission.test_case_runs).not_to be_empty
-    tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'MyTest testSomethingEasy' }
+    tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'MyTest testSomethingEasy' }
     expect(tcr).not_to be_nil
     expect(tcr).to be_successful
     expect(tcr.exception).to be_nil
 
-    tcr = @submission.test_case_runs.to_a.find {|tcr| tcr.test_case_name == 'MyTest testSomethingDifficult' }
+    tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'MyTest testSomethingDifficult' }
     expect(tcr).not_to be_nil
     expect(tcr).not_to be_successful
-    expect(ActiveSupport::JSON.decode(tcr.exception)).to eq({'a' => 'b'})
+    expect(ActiveSupport::JSON.decode(tcr.exception)).to eq('a' => 'b')
   end
 
-  it "should not create multiple test case runs for the same test method even if it is involved in multiple points" do
+  it 'should not create multiple test case runs for the same test method even if it is involved in multiple points' do
     results = [
       {
         'className' => 'MyTest',
@@ -64,7 +64,7 @@ describe TestRunGrader do
     expect(@submission.test_case_runs.count).to eq(1)
   end
 
-  it "should award points for which all required tests passed" do
+  it 'should award points for which all required tests passed' do
     TestRunGrader.grade_results(@submission, half_successful_results)
 
     points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
@@ -81,7 +81,7 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
   end
 
-  it "should always mark awarded points in the submission record but not create duplicate awarded_points rows" do
+  it 'should always mark awarded points in the submission record but not create duplicate awarded_points rows' do
     TestRunGrader.grade_results(@submission, half_successful_results)
 
     points = @submission.awarded_points.map(&:name)
@@ -89,12 +89,10 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
     expect(@submission.points).to eq('1.1')
 
-    @submission = FactoryGirl.create(:submission, {
-      course: @submission.course,
-      exercise: @submission.exercise,
-      user: @submission.user,
-      processed: false
-    })
+    @submission = FactoryGirl.create(:submission, course: @submission.course,
+                                                  exercise: @submission.exercise,
+                                                  user: @submission.user,
+                                                  processed: false)
     TestRunGrader.grade_results(@submission, successful_results)
 
     points = @submission.awarded_points.map(&:name)
@@ -103,7 +101,7 @@ describe TestRunGrader do
     expect(@submission.points).to eq('1.1 1.2')
   end
 
-  it "should only ever award more points, never delete old points" do
+  it 'should only ever award more points, never delete old points' do
     results = [
       {
         'className' => 'MyTest',
@@ -137,7 +135,7 @@ describe TestRunGrader do
     expect(points).to include('1.2')
   end
 
-  it "should work when the exercise has changed name after acquiring points (bug #84)" do
+  it 'should work when the exercise has changed name after acquiring points (bug #84)' do
     user = @submission.user
     exercise = @submission.exercise
     course = exercise.course
@@ -152,35 +150,33 @@ describe TestRunGrader do
     expect(points).to include('1.2')
   end
 
-  describe "when validation errors strategy is fail" do
-
+  describe 'when validation errors strategy is fail' do
     def failing_validations
       {
-        "strategy" => "FAIL",
-        "validationErrors" =>
+        'strategy' => 'FAIL',
+        'validationErrors' =>
         {
-          "SimpleStuff.java" =>
+          'SimpleStuff.java' =>
           [
             {
-              "column" => 40,
-              "line" => 6,
-              "message" => "'{' is not preceded with whitespace.",
-              "sourceName" =>
-              "com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"
+              'column' => 40,
+              'line' => 6,
+              'message' => "'{' is not preceded with whitespace.",
+              'sourceName' =>
+              'com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck'
             },
             {
-              "column" => 0,
-              "line" => 12,
-              "message" => "Indentation incorrect. Expected 8, but was 4.",
-              "sourceName "=>
-              "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"
+              'column' => 0,
+              'line' => 12,
+              'message' => 'Indentation incorrect. Expected 8, but was 4.',
+              'sourceName ' =>               'com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck'
             },
             {
-              "column" => 0,
-              "line" => 17,
-              "message" => "Indentation incorrect. Expected 8, but was 7.",
-              "sourceName" =>
-              "com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"
+              'column' => 0,
+              'line' => 17,
+              'message' => 'Indentation incorrect. Expected 8, but was 7.',
+              'sourceName' =>
+              'com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck'
             }
           ]
         }
@@ -242,7 +238,7 @@ describe TestRunGrader do
       expect(points).not_to include('1.2')
     end
 
-    it "should award points for which all required tests passed but validations are failed and strategy is not set" do
+    it 'should award points for which all required tests passed but validations are failed and strategy is not set' do
       @submission.validations = failures_but_no_strategy.to_json.to_s
       TestRunGrader.grade_results(@submission, half_successful_results)
 
@@ -250,13 +246,11 @@ describe TestRunGrader do
       expect(points).to include('1.1')
       expect(points).not_to include('1.2')
     end
-
   end
 
-  describe "when valgrind strategy is fail" do
-
+  describe 'when valgrind strategy is fail' do
     def valgrind_errors
-      "Error" # Checked only if its blank, no deeper analysis of its contents is done
+      'Error' # Checked only if its blank, no deeper analysis of its contents is done
     end
 
     it "should not award points for which all required tests passed but valgrind has errors and strategy is 'fail'" do
@@ -280,14 +274,14 @@ describe TestRunGrader do
     end
   end
 
-  describe "when the exercise requires code review" do
+  describe 'when the exercise requires code review' do
     before :each do
       ap = AvailablePoint.find_by_name('1.1')
       ap.requires_review = true
       ap.save!
     end
 
-    it "should not award points that require review" do
+    it 'should not award points that require review' do
       TestRunGrader.grade_results(@submission, successful_results)
 
       points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
@@ -295,20 +289,20 @@ describe TestRunGrader do
       expect(points).to include('1.2')
     end
 
-    it "should preserve old review points" do
+    it 'should preserve old review points' do
       AwardedPoint.create!(course_id: @submission.course_id, user_id: @submission.user_id, name: '1.1')
       @submission.points = '1.1'
       TestRunGrader.grade_results(@submission, successful_results)
       expect(@submission.points_list).to include('1.1')
     end
 
-    it "should flag the submission as requiring review if the exercise has review points" do
+    it 'should flag the submission as requiring review if the exercise has review points' do
       TestRunGrader.grade_results(@submission, successful_results)
 
       expect(@submission).to require_review
     end
 
-    it "should unflag all previous submissions to the same exercise" do
+    it 'should unflag all previous submissions to the same exercise' do
       old_sub = Submission.create!(
         user: @submission.user,
         course: @submission.course,
@@ -338,7 +332,7 @@ describe TestRunGrader do
       expect(other_user_sub).to require_review
     end
 
-    it "should not flag the submission as requiring review if the user has already scored the review points" do
+    it 'should not flag the submission as requiring review if the user has already scored the review points' do
       AwardedPoint.create(course: @submission.course, user: @submission.user, name: '1.1')
 
       TestRunGrader.grade_results(@submission, successful_results)
@@ -346,7 +340,7 @@ describe TestRunGrader do
       expect(@submission).not_to require_review
     end
 
-    it "should not flag the submission as requiring review if the submission requests review" do
+    it 'should not flag the submission as requiring review if the submission requests review' do
       @submission.requests_review = true
 
       TestRunGrader.grade_results(@submission, successful_results)

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Viewing feedback", type: :request, integration: true do
+describe 'Viewing feedback', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
@@ -14,7 +14,7 @@ describe "Viewing feedback", type: :request, integration: true do
     visit '/'
   end
 
-  it "should be possible per-course" do
+  it 'should be possible per-course' do
     @exercise = FactoryGirl.create(:exercise, course: @course)
     @answer = FactoryGirl.create(:feedback_answer, feedback_question: @question, course: @course, exercise: @exercise, answer: 'this is the answer')
 
@@ -23,7 +23,7 @@ describe "Viewing feedback", type: :request, integration: true do
     expect(page).to have_content('this is the answer')
   end
 
-  it "should be possible per-exercise" do
+  it 'should be possible per-exercise' do
     @ex1 = FactoryGirl.create(:exercise, course: @course)
     @ex2 = FactoryGirl.create(:exercise, course: @course)
     @answer = FactoryGirl.create(:feedback_answer, course: @course, exercise: @ex1, answer: 'this is the answer')

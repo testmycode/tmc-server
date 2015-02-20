@@ -9,14 +9,14 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @ongoing_courses = Course.ongoing.order(ordering).select {|c| c.visible_to?(current_user) }
-        @expired_courses = Course.expired.order(ordering).select {|c| c.visible_to?(current_user) }
+        @ongoing_courses = Course.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
+        @expired_courses = Course.expired.order(ordering).select { |c| c.visible_to?(current_user) }
         authorize! :read, @ongoing_courses
         authorize! :read, @expired_courses
       end
       format.json do
         courses = Course.ongoing.order(ordering)
-        courses = courses.select {|c| c.visible_to?(current_user) }
+        courses = courses.select { |c| c.visible_to?(current_user) }
         authorize! :read, courses
         return respond_access_denied('Authentication required') if current_user.guest?
 
@@ -81,21 +81,22 @@ class CoursesController < ApplicationController
       if @course.save
         format.html { redirect_to(@course, notice: 'Course was successfully created.') }
       else
-        format.html { render action: "new" , notice: 'Course could not be created.' }
+        format.html { render action: 'new', notice: 'Course could not be created.' }
       end
     end
   end
 
-private
+  private
+
   def course_params
     params.permit(course: [:name, :source_url, :git_branch])
   end
 
   def assign_show_view_vars
-    @exercises = @course.
-      exercises.
-      includes(:course).
-      select {|ex| ex.visible_to?(current_user) }.natsort_by(&:name)
+    @exercises = @course.exercises
+      .includes(:course)
+      .select { |ex| ex.visible_to?(current_user) }
+      .natsort_by(&:name)
     @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
 
     unless current_user.guest?

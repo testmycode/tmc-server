@@ -1,44 +1,44 @@
 require 'spec_helper'
 
 describe AvailablePoint, type: :model do
-  describe "sorting" do
-    it "should use natural sorting" do
-      a = [ FactoryGirl.create(:available_point, name: "1.2"),
-            FactoryGirl.create(:available_point, name: "1.20"),
-            FactoryGirl.create(:available_point, name: "1.3")].sort!
+  describe 'sorting' do
+    it 'should use natural sorting' do
+      a = [FactoryGirl.create(:available_point, name: '1.2'),
+           FactoryGirl.create(:available_point, name: '1.20'),
+           FactoryGirl.create(:available_point, name: '1.3')].sort!
 
-      expect(a.first.name).to eq("1.2")
-      expect(a.last.name).to eq("1.20")
+      expect(a.first.name).to eq('1.2')
+      expect(a.last.name).to eq('1.20')
     end
   end
 
-  describe "scopes" do
-    specify "course_sheet_points" do
+  describe 'scopes' do
+    specify 'course_sheet_points' do
       course = FactoryGirl.create(:course)
-      ex1 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: "s1")
-      ex2 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: "s2")
+      ex1 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: 's1')
+      ex2 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: 's2')
 
       ap1 = FactoryGirl.create(:available_point, exercise: ex1)
       ap2 = FactoryGirl.create(:available_point, exercise: ex2)
 
-      a = AvailablePoint.course_sheet_points(course, "s1")
+      a = AvailablePoint.course_sheet_points(course, 's1')
       expect(a.size).to eq(1)
       expect(a).to include(ap1)
 
-      a = AvailablePoint.course_sheet_points(course, "s2")
+      a = AvailablePoint.course_sheet_points(course, 's2')
       expect(a.size).to eq(1)
       expect(a).to include(ap2)
     end
 
-    specify "course_points_of_exercises" do
+    specify 'course_points_of_exercises' do
       course = FactoryGirl.create(:course)
-      ex1 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: "s1")
-      ex2 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: "s2")
+      ex1 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: 's1')
+      ex2 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: 's2')
 
       ap1 = FactoryGirl.create(:available_point, exercise: ex1)
       ap2 = FactoryGirl.create(:available_point, exercise: ex2)
 
-      FactoryGirl.create(:exercise, gdocs_sheet: "s2") # gets wrong course
+      FactoryGirl.create(:exercise, gdocs_sheet: 's2') # gets wrong course
 
       a = AvailablePoint.course_points_of_exercises(course, [ex2])
       expect(a.size).to eq(1)
@@ -47,16 +47,16 @@ describe AvailablePoint, type: :model do
     end
   end
 
-  describe "validation" do
-    it "checks against blanks in the name" do
+  describe 'validation' do
+    it 'checks against blanks in the name' do
       ap = FactoryGirl.build(:available_point, name: 'foo ')
       expect(ap).not_to be_valid
       expect(ap.errors[:name].size).to eq(1)
     end
   end
 
-  describe "#award_to" do
-    it "awards the point to the given user" do
+  describe '#award_to' do
+    it 'awards the point to the given user' do
       ap = FactoryGirl.create(:available_point)
       user = FactoryGirl.create(:user)
       ap.award_to(user)
@@ -68,7 +68,7 @@ describe AvailablePoint, type: :model do
       expect(aw.submission).to be_nil
     end
 
-    it "is idempotent" do
+    it 'is idempotent' do
       ap = FactoryGirl.create(:available_point)
       user = FactoryGirl.create(:user)
       ap.award_to(user)

@@ -29,16 +29,16 @@ class CourseRefresher
       text.gsub(prepended_html_regexp, '')
     end
 
-    def prepended_html_regexp #needed?
+    def prepended_html_regexp # needed?
       /^[ \t]*\/\*[ t*\r\n]*PREPEND[ \t]+HTML[ \t]*((?:[*][^\/]|[^*])*)\*\/[ \t]*\n/m
     end
 
     def comment_begin
-      "/*"
+      '/*'
     end
 
     def comment_end
-      "*/"
+      '*/'
     end
   end
 end

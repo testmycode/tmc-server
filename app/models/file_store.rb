@@ -16,11 +16,9 @@ module FileStore
   end
 
   def self.try_get(relpath)
-    begin
-      get(relpath)
-    rescue
-      nil
-    end
+    get(relpath)
+  rescue
+    nil
   end
 
   def self.put(relpath, contents)
@@ -47,7 +45,8 @@ module FileStore
     "#{root}/#{relpath}"
   end
 
-private
+  private
+
   def self.tmpdir
     "#{root}/tmp"
   end

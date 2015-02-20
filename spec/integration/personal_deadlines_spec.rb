@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Personal deadlines", type: :request, integration: true do
+describe 'Personal deadlines', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
@@ -10,8 +10,8 @@ describe "Personal deadlines", type: :request, integration: true do
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise1')
     @repo.copy_simple_exercise('MyExercise2')
-    File.open("#{@repo.path}/MyExercise2/metadata.yml", "wb") do |f|
-      f.puts("unlocked_after: exercise MyExercise1")
+    File.open("#{@repo.path}/MyExercise2/metadata.yml", 'wb') do |f|
+      f.puts('unlocked_after: exercise MyExercise1')
     end
     @repo.add_commit_push
 
@@ -24,7 +24,7 @@ describe "Personal deadlines", type: :request, integration: true do
     click_link 'mycourse'
   end
 
-  specify "doing one exercise should unlock the other" do
+  specify 'doing one exercise should unlock the other' do
     expect(page).to have_content('MyExercise1')
     expect(page).not_to have_content('MyExercise2')
 
@@ -36,10 +36,10 @@ describe "Personal deadlines", type: :request, integration: true do
     expect(page).not_to have_content('(locked)')
   end
 
-  describe "when the deadline of an unlocked exercise depends on the unlock time" do
-    specify "the exercise must be unlocked manually" do
-      File.open("#{@repo.path}/MyExercise2/metadata.yml", "ab") do |f|
-        f.puts("deadline: unlock + 1 week")
+  describe 'when the deadline of an unlocked exercise depends on the unlock time' do
+    specify 'the exercise must be unlocked manually' do
+      File.open("#{@repo.path}/MyExercise2/metadata.yml", 'ab') do |f|
+        f.puts('deadline: unlock + 1 week')
       end
       @repo.add_commit_push
       @course.refresh
@@ -72,5 +72,4 @@ describe "Personal deadlines", type: :request, integration: true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
   end
-
 end
