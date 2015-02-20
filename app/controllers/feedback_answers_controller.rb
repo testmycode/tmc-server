@@ -37,8 +37,7 @@ class FeedbackAnswersController < ApplicationController
         @text_answers = @parent.feedback_answers
           .joins(:feedback_question)
           .joins(:submission)
-          .joins(submission: :user)
-          #joins(:exercise). # fails due to :conditions of belongs_to receiving incorrect self :(
+          .joins(submission: :user) #.joins(:exercise) # fails due to :conditions of belongs_to receiving incorrect self :(
           .where(feedback_questions: { kind: 'text' })
           .order('created_at DESC')
           .all

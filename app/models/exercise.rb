@@ -8,7 +8,7 @@ class Exercise < ActiveRecord::Base
   has_many :available_points, dependent: :delete_all
 
   has_many :submissions,
-    lambda do |exercise|
+    (lambda do |exercise|
       if exercise.respond_to?(:course_id)
         # Used when doing exercise.submissions
         where(course: exercise.course)
@@ -16,7 +16,7 @@ class Exercise < ActiveRecord::Base
         # Used when doing exercises.includes(:submissions)
         Submission.joins(:exercise)
       end
-    end, foreign_key: :exercise_name, primary_key: :name
+    end), foreign_key: :exercise_name, primary_key: :name
 
   has_many :feedback_answers, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
   has_many :unlocks, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
