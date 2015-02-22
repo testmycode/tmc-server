@@ -252,6 +252,7 @@ class Exercise < ActiveRecord::Base
     self.runtime_params = parse_runtime_params(new_options["runtime_params"])
     self.valgrind_strategy = new_options["valgrind_strategy"]
     self.code_review_requests_enabled = new_options["code_review_requests_enabled"]
+    self.run_tests_locally_action_enabled = new_options["run_tests_locally_action_enabled"]
   end
 
   # Whether this exercise accepts submissions at all.
@@ -292,6 +293,7 @@ class Exercise < ActiveRecord::Base
       "valgrind_strategy" => "fail".freeze,
       "runtime_params" => nil,
       "code_review_requests_enabled" => true,
+      "run_tests_locally_action_enabled" => true,
     }
   end
 
