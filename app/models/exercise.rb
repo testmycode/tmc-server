@@ -251,6 +251,7 @@ class Exercise < ActiveRecord::Base
     self.solution_visible_after = new_options["solution_visible_after"]
     self.runtime_params = parse_runtime_params(new_options["runtime_params"])
     self.valgrind_strategy = new_options["valgrind_strategy"]
+    self.code_review_requests_enabled = new_options["code_review_requests_enabled"]
   end
 
   # Whether this exercise accepts submissions at all.
@@ -289,7 +290,8 @@ class Exercise < ActiveRecord::Base
       "returnable" => nil,
       "solution_visible_after" => nil,
       "valgrind_strategy" => "fail".freeze,
-      "runtime_params" => nil
+      "runtime_params" => nil,
+      "code_review_requests_enabled" => true,
     }
   end
 

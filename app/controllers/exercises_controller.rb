@@ -38,13 +38,14 @@ class ExercisesController < ApplicationController
         authorize! :read, @submissions
 
         data = {
-          course_name:   @course.name,
-          course_id:     @course.id,
-          exercise_name: @exercise.name,
-          exercise_id:   @exercise.id,
-          unlocked_at:   @exercise.time_unlocked_for(current_user),
-          deadline:      @exercise.deadline_for(current_user),
-          submissions:   SubmissionList.new(current_user, view_context).submission_list_data(@submissions)
+          course_name:                  @course.name,
+          course_id:                    @course.id,
+          code_review_requests_enabled: @exercise.code_review_requests_enabled?,
+          exercise_name:                @exercise.name,
+          exercise_id:                  @exercise.id,
+          unlocked_at:                  @exercise.time_unlocked_for(current_user),
+          deadline:                     @exercise.deadline_for(current_user),
+          submissions:                  SubmissionList.new(current_user, view_context).submission_list_data(@submissions),
         }
         render json: data.to_json
       end
