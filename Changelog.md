@@ -1,6 +1,7 @@
 ## 2015-02-22
 
 * Added option to disable code review request action from clients.
+* Added option to disable run tests locally action from clients.
 
 ### 2015-01-18
 

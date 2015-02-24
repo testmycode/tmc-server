@@ -55,6 +55,7 @@ class CourseInfo
       runtime_params: exercise.runtime_params_array,
       valgrind_strategy: exercise.valgrind_strategy,
       code_review_requests_enabled: exercise.code_review_requests_enabled?,
+      run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled?,
     }
 
     data[:solution_zip_url] = @helpers.exercise_solution_zip_url(exercise) if @user.administrator?

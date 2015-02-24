@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150207223237) do
+ActiveRecord::Schema.define(version: 20150222171258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,16 +69,17 @@ ActiveRecord::Schema.define(version: 20150207223237) do
     t.integer  "course_id"
     t.datetime "publish_time"
     t.string   "gdocs_sheet"
-    t.boolean  "hidden",                       default: false, null: false
+    t.boolean  "hidden",                           default: false, null: false
     t.boolean  "returnable_forced"
-    t.string   "checksum",                     default: "",    null: false
+    t.string   "checksum",                         default: "",    null: false
     t.datetime "solution_visible_after"
-    t.boolean  "has_tests",                    default: false, null: false
+    t.boolean  "has_tests",                        default: false, null: false
     t.text     "deadline_spec"
     t.text     "unlock_spec"
-    t.string   "runtime_params",               default: "[]",  null: false
+    t.string   "runtime_params",                   default: "[]",  null: false
     t.string   "valgrind_strategy"
-    t.boolean  "code_review_requests_enabled", default: false, null: false
+    t.boolean  "code_review_requests_enabled",     default: false, null: false
+    t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
