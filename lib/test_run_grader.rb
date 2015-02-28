@@ -89,8 +89,8 @@ module TestRunGrader
     awarded_points = AwardedPoint.course_user_points(course, user).map(&:name)
 
     points = []
-    for point_name in (exercise.available_points & points_from_test_results(results)) - review_points
-      if validations_passed?(submission.validations) && valgrind_passed?(submission) 
+    for point_name in points_from_test_results(results) - review_points
+      if validations_passed?(submission.validations) && valgrind_passed?(submission)
         points << point_name
         unless awarded_points.include?(point_name)
           submission.awarded_points << AwardedPoint.new(
