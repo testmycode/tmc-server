@@ -32,7 +32,7 @@ class RecursiveYamlReader
       begin
         merge_file("#{root_dir}/#{rel_path}", &preprocessor)
       rescue
-        raise "error while reading #{rel_path}: #{$ERROR_INFO}"
+        raise "error while reading #{rel_path}: #{$!}"
       end
     end
 

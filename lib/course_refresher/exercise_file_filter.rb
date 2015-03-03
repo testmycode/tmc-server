@@ -174,7 +174,7 @@ class CourseRefresher
 
     def maybe_write_html_file(text, dest_path)
       if text =~ prepended_html_regexp
-        html = Regexp.last_match(1)
+        html = $1
         html.gsub!(/^[ \t*]*/, '')
         File.open(dest_path, 'wb') do |f|
           f.write(html)

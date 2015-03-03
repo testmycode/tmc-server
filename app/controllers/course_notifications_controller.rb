@@ -30,7 +30,7 @@ class CourseNotificationsController < ApplicationController
           message: notifier.message
         ).deliver
       rescue
-        logger.info "Error sending course notification to email #{email}: #{$ERROR_INFO}"
+        logger.info "Error sending course notification to email #{email}: #{$!}"
         failed_emails << email
       end
     end

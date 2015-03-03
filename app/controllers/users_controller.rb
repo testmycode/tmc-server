@@ -146,7 +146,7 @@ class UsersController < ApplicationController
         begin
           SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
         rescue
-          logger.warn('Failed to send user field changes to spyware: ' + $ERROR_INFO.message + "\n " + $ERROR_INFO.backtrace.join("\n "))
+          logger.warn('Failed to send user field changes to spyware: ' + $!.message + "\n " + $!.backtrace.join("\n "))
         end
       end
     end

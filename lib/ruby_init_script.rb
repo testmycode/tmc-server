@@ -26,7 +26,7 @@ class RubyInitScript
 
   def script_source
     rvm_current = `rvm current`
-    if $CHILD_STATUS.success?
+    if $?.success?
       puts 'Using RVM.'
       rvm_current.strip!
       ruby_path = rvm_info[rvm_current]['binaries']['ruby']

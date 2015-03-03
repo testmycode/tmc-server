@@ -38,7 +38,7 @@ class TestScannerCache
     result
   rescue
     ActiveRecord::Base.logger.warn('Failed to add entry to TestScannerCache.')
-    ActiveRecord::Base.logger.warn($ERROR_INFO)
+    ActiveRecord::Base.logger.warn($!)
   end
 
   def self.decode_value(value)

@@ -100,7 +100,7 @@ class PointsController < ApplicationController
     if sorting == 'total_points'
       summary[:users] = summary[:users].sort_by { |user| [-summary[:total_for_user][user.login].to_i, user.login] }
     elsif sorting =~ /(.*)_points$/
-      sheet = Regexp.last_match(1)
+      sheet = $1
       summary[:users] = summary[:users].sort_by { |user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
     end
   end

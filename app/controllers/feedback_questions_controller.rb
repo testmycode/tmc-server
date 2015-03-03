@@ -70,7 +70,7 @@ class FeedbackQuestionsController < ApplicationController
       flash[:success] = 'Question deleted.'
       redirect_to course_feedback_questions_path(@course)
     rescue
-      flash[:error] = "Failed to delete question: #{$ERROR_INFO}"
+      flash[:error] = "Failed to delete question: #{$!}"
       redirect_to course_feedback_questions_path(@course)
     end
   end

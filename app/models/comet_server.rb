@@ -33,7 +33,7 @@ class CometServer
     publish(channel, msg)
     true
   rescue
-    ::Rails.logger.error "Failed to publish to #{publish_url}: #{$ERROR_INFO}"
+    ::Rails.logger.error "Failed to publish to #{publish_url}: #{$!}"
     false
   end
 

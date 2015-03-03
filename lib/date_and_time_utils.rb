@@ -28,7 +28,7 @@ module DateAndTimeUtils
     s = input.strip
 
     if s =~ /^(\d+)\.(\d+)\.(\d+)(.*)$/
-      s = "#{Regexp.last_match(3)}-#{Regexp.last_match(2)}-#{Regexp.last_match(1)}#{Regexp.last_match(4)}"
+      s = "#{$3}-#{$2}-#{$1}#{$4}"
     end
 
     result = nil

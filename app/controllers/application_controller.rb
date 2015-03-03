@@ -69,7 +69,7 @@ class ApplicationController < ActionController::Base
         begin
           check_client_version(params[:client], params[:client_version])
         rescue
-          return respond_with_error($ERROR_INFO.message, 404, obsolete_client: true)
+          return respond_with_error($!.message, 404, obsolete_client: true)
         end
       end
     end

@@ -76,7 +76,7 @@ class ReviewsController < ApplicationController
         @review.save!
       end
     rescue
-      ::Rails.logger.error($ERROR_INFO)
+      ::Rails.logger.error($!)
       respond_with_error('Failed to save code review.')
     else
       flash[:success] = 'Code review added.'
@@ -176,7 +176,7 @@ class ReviewsController < ApplicationController
       @review.submission.save!
       @review.save!
     rescue
-      ::Rails.logger.error($ERROR_INFO)
+      ::Rails.logger.error($!)
       respond_with_error('Failed to save code review.')
     else
       flash[:success] = 'Code review edited. (No notification sent).'

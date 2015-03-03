@@ -127,7 +127,7 @@ class CourseRefresher
 
           CourseRefresher.simulate_failure! if ::Rails.env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
         rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
-          @report.errors << $ERROR_INFO.message + "\n" + $ERROR_INFO.backtrace.join("\n")
+          @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
           # Delete the new cache we were working on
           FileUtils.rm_rf(@course.cache_path)
           raise ActiveRecord::Rollback
@@ -243,7 +243,7 @@ class CourseRefresher
           e.options = metadata
           e.save!
         rescue SyntaxError
-          @report.errors << "Failed to parse metadata: #{$ERROR_INFO}"
+          @report.errors << "Failed to parse metadata: #{$!}"
         end
       end
     end

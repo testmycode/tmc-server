@@ -12,7 +12,7 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
       rescue InvalidSyntaxError
         raise InvalidSyntaxError.new("Invalid syntax in deadline spec #{i + 1} (#{specs[i]})")
       rescue
-        raise "Problem with unlock spec #{i + 1} (#{specs[i]}): #{$ERROR_INFO.message}"
+        raise "Problem with unlock spec #{i + 1} (#{specs[i]}): #{$!.message}"
       end
     end
   end
@@ -63,8 +63,8 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
       personal = ->(_u) { universal }
       @specs << SingleSpec.new(timefun, universal, personal)
     elsif spec =~ /^unlock\s*[+]\s*(\d+)\s+(minutes?|hours?|days?|weeks?|months?|years?)$/
-      time_scalar = Regexp.last_match(1)
-      time_unit = Regexp.last_match(2)
+      time_scalar = $1
+      time_unit = $2
       time_delta = time_scalar.to_i.send(time_unit)
       @depends_on_unlock_time = true
       timefun = lambda do |user|

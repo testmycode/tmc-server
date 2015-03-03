@@ -18,7 +18,7 @@ class FeedbackQuestion < ActiveRecord::Base
 
   def intrange
     if kind =~ intrange_regex
-      (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
+      ($1.to_i)..($2.to_i)
     else
       fail 'not an intrange question'
     end

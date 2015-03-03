@@ -10,7 +10,7 @@ module SystemCommands
   # Prefer sh! instead
   def system!(cmd)
     ok = system(cmd)
-    fail "Command `#{cmd}` failed with status #{$CHILD_STATUS.inspect}" unless ok
+    fail "Command `#{cmd}` failed with status #{$?.inspect}" unless ok
   end
 
   def sh!(*args)
@@ -33,7 +33,7 @@ module SystemCommands
     end
 
     output = `#{cmd} 2>&1`
-    status = $CHILD_STATUS
+    status = $?
     fail "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
     fail "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 

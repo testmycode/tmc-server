@@ -59,7 +59,7 @@ class TmcJunitRunner < MavenProject
 
       output = `#{cmd} 2>#{Shellwords.escape(stderr_file)}`
 
-      unless $CHILD_STATUS.success?
+      unless $?.success?
         fail File.read(stderr_file)
       end
 

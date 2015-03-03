@@ -262,7 +262,7 @@ describe SubmissionPackager::JavaSimple do
               sh! ['env', "JAVA_RAM_KB=#{64 * 1024}", './tmc-run']
             rescue
               if File.exist?('test_output.txt')
-                raise($ERROR_INFO.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
+                raise($!.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
               else
                 raise
               end
@@ -287,7 +287,7 @@ describe SubmissionPackager::JavaSimple do
             expect(File).not_to exist('classes/main/SimpleStuff.class')
             expect(File).not_to exist('test_output.txt')
             `env JAVA_RAM_KB=#{64 * 1024} ./tmc-run`
-            expect($CHILD_STATUS.exitstatus).to eq(101)
+            expect($?.exitstatus).to eq(101)
             expect(File).to exist('test_output.txt')
 
             output = File.read('test_output.txt')
@@ -314,7 +314,7 @@ describe SubmissionPackager::JavaSimple do
               sh! ['env', "JAVA_RAM_KB=#{64 * 1024}", './tmc-run']
             rescue
               if File.exist?('test_output.txt')
-                raise($ERROR_INFO.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
+                raise($!.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
               else
                 raise
               end

@@ -47,7 +47,7 @@ class RootHelper
     @pipe_out.write("#{command}\n")
     response = @pipe_in.readline.strip
     if response =~ /^FAIL (.*)$/
-      fail "#{Regexp.last_match(1)} (from RootHelper)"
+      fail "#{$1} (from RootHelper)"
     end
     response
   end
@@ -60,7 +60,7 @@ class RootHelper
       begin
         response = execute_command(command)
       rescue
-        response = "FAIL: #{$ERROR_INFO.message.gsub("\n", ' ')}"
+        response = "FAIL: #{$!.message.gsub("\n", ' ')}"
         debug(response)
       end
       @pipe_out.write("#{response}\n") unless response.blank?
@@ -70,7 +70,7 @@ class RootHelper
   def execute_command(command)
     if command =~ /^START SERVERS? (\d+(?:\s*,\s*\d+)*)$/
       fail 'Servers already started' unless @server_pids.empty?
-      ports = Regexp.last_match(1).split(',').map(&:strip).map(&:to_i)
+      ports = $1.split(',').map(&:strip).map(&:to_i)
       start_servers(ports)
       'OK'
     elsif command == 'STOP'

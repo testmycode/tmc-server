@@ -53,7 +53,7 @@ class RemoteSandbox
       rescue SandboxUnavailableError
         raise
       rescue
-        Rails.logger.info "Submission #{submission.id} could not be packaged: #{Regexp.last_match(1)}"
+        Rails.logger.info "Submission #{submission.id} could not be packaged: #{$1}"
         Rails.logger.info "Marking submission #{submission.id} as failed."
         submission.pretest_error = 'Failed to process submission. Likely sent in incorrect format.'
         submission.processed = true
@@ -66,7 +66,7 @@ class RemoteSandbox
   def try_to_seed_maven_cache(file_path)
     seed_maven_cache(file_path)
   rescue
-    Rails.logger.warn "Failed to seed maven cache: #{$ERROR_INFO}"
+    Rails.logger.warn "Failed to seed maven cache: #{$!}"
   end
 
   def seed_maven_cache(file_path)

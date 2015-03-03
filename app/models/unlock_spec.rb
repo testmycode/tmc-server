@@ -13,7 +13,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       rescue InvalidSyntaxError
         raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
       rescue
-        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$ERROR_INFO.message}"
+        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$!.message}"
       end
     end
   end
@@ -55,10 +55,10 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       @valid_after = DateAndTimeUtils.to_time(str)
 
     elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/
-      parse_condition("100% of #{Regexp.last_match(1)}")
+      parse_condition("100% of #{$1}")
 
     elsif str =~ /^points?\s+(\S+.*)$/
-      points = Regexp.last_match(1).split(' ').map(&:strip).reject(&:empty?)
+      points = $1.split(' ').map(&:strip).reject(&:empty?)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
         AwardedPoint.where(user_id: u.id, course_id: course.id, name: points).count == points.count
@@ -70,9 +70,9 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       end
 
     elsif str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
-      percentage_str = Regexp.last_match(1)
+      percentage_str = $1
       percentage = percentage_str.to_f / 100.0
-      group = Regexp.last_match(2)
+      group = $2
       check_group_or_exercise_exists(course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
@@ -91,8 +91,8 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       end
 
     elsif str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/
-      num_exercises = Regexp.last_match(1).to_i
-      group = Regexp.last_match(2)
+      num_exercises = $1.to_i
+      group = $2
       check_group_or_exercise_exists(course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
@@ -111,8 +111,8 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       end
 
     elsif str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
-      num_points = Regexp.last_match(1).to_i
-      group = Regexp.last_match(2)
+      num_points = $1.to_i
+      group = $2
       check_group_or_exercise_exists(course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|

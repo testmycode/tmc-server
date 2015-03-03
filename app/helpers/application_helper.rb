@@ -20,7 +20,7 @@ module ApplicationHelper
     tags = tags.html_safe
 
     if tags =~ /id\s*=\s*"([^"]+)"/
-      target = ' for="' + Regexp.last_match(1) + '"'
+      target = ' for="' + $1 + '"'
     else
       fail 'Cannot label a tag without an id'
     end

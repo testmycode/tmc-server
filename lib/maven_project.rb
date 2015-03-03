@@ -129,7 +129,7 @@ class MavenProject
         output = `mvn org.apache.maven.plugins:maven-dependency-plugin:2.4:build-classpath`
       end
       if output =~ /\[INFO\] Dependencies classpath:\n(.*)\n/
-        result = Regexp.last_match(1).strip
+        result = $1.strip
         FileStore.put(file_path, result)
       else
         fail 'Failed to get build classpath of tmc-junit-runner.'

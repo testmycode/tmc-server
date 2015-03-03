@@ -1,7 +1,7 @@
 module PointsHelper
   def github_repo_url_to_project_page_url(url)
     if url =~ /github.com[:\/]([^\/]*)\/([^\/]*)\.git/
-      "https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}"
+      "https://github.com/#{$1}/#{$2}"
     end
   end
 

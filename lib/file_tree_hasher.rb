@@ -23,7 +23,7 @@ class FileTreeHasher
         relative_path = path[(root_path.length + 1)...path.length]
         digest << relative_path << File.read(path)
       rescue
-        raise "Failed to hash file #{path}: #{$ERROR_INFO.message}"
+        raise "Failed to hash file #{path}: #{$!.message}"
       end
     end
     digest.hexdigest

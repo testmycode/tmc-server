@@ -31,11 +31,11 @@ class CourseRefresher
 
       while remaining
         if !in_block && remaining =~ begin_solution_regexp
-          result += $LAST_MATCH_INFO.pre_match
-          remaining = $LAST_MATCH_INFO.post_match
+          result += $~.pre_match
+          remaining = $~.post_match
           in_block = true
         elsif in_block && remaining =~ end_solution_regexp
-          remaining = $LAST_MATCH_INFO.post_match
+          remaining = $~.post_match
           in_block = false
         else
           if !in_block
@@ -52,8 +52,8 @@ class CourseRefresher
 
     def uncomment_stubs(text)
       text.gsub(stub_regexp) do
-        before = Regexp.last_match(1)
-        after = Regexp.last_match(2)
+        before = $1
+        after = $2
         before + after
       end
     end
@@ -61,7 +61,7 @@ class CourseRefresher
     def remove_stub_and_solution_comments(text)
       for regex in [stub_regexp, begin_solution_regexp, end_solution_regexp, solution_file_regexp]
         while text =~ regex
-          text = $LAST_MATCH_INFO.pre_match + $LAST_MATCH_INFO.post_match
+          text = $~.pre_match + $~.post_match
         end
       end
       text

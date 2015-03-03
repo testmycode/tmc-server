@@ -39,8 +39,8 @@ class DocGen
         output = nil
         Dir.chdir @session.working_dir do
           output = `#{command} 2>&1`
-          unless $CHILD_STATUS.success?
-            error_msg = "Command `#{command}` failed with status #{$CHILD_STATUS}."
+          unless $?.success?
+            error_msg = "Command `#{command}` failed with status #{$?}."
             error_msg << " The output was:\n#{output}" unless output.strip.empty?
             fail error_msg
           end

@@ -117,7 +117,7 @@ class Course < ActiveRecord::Base
   def git_revision
     Dir.chdir clone_path do
       output = `git rev-parse --verify HEAD`
-      if $CHILD_STATUS.success?
+      if $?.success?
         output.strip
       else
         nil
@@ -243,7 +243,7 @@ class Course < ActiveRecord::Base
   def exercise_group_completion_by_user
     # TODO: clean up exercise group discovery
 
-    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then Regexp.last_match(1) else '' end }.uniq
+    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }.uniq
 
     result = {}
     for group in groups
