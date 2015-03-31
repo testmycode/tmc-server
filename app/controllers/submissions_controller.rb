@@ -261,6 +261,8 @@ class SubmissionsController < ApplicationController
     case paste_visibility
     when 'protected'
       respond_access_denied unless current_user.administrator? || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
+    when 'no-tests-public'
+      respond_access_denied unless @submission.created_at > 2.hours.ago
     else
       respond_access_denied unless current_user.administrator? || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
     end
