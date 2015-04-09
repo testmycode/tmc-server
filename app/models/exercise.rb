@@ -194,9 +194,9 @@ class Exercise < ActiveRecord::Base
   def unlock_spec_obj
     @unlock_spec_obj ||=
       if self.unlock_spec
-        UnlockSpec.new(self, ActiveSupport::JSON.decode(self.unlock_spec))
+        UnlockSpec.new(course, ActiveSupport::JSON.decode(self.unlock_spec))
       else
-        UnlockSpec.new(self, [])
+        UnlockSpec.new(course, [])
       end
   end
 

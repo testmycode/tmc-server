@@ -1,0 +1,10 @@
+<%= form_for(@certificate) do |f| %>
+  <%= render 'shared/error_messages', target: @certificate %>
+
+  <%= f.hidden_field :user_id %>
+  <%= bs_labeled_field("Course", f.collection_select(:course_id, @courses, :id, :name)) %>
+  <%= bs_labeled_field("Full name", f.text_field(:name)) %>
+  <div class="actions">
+    <%= f.submit 'Create', class: "btn btn-primary"%>
+  </div>
+<% end %>

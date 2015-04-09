@@ -8,6 +8,7 @@
         <li><%= raw(field.name.humanize) %>: <%= extra_field_value(@user.field_value_record(field)) %></li>
       <% end %>
     <% end %>
+    <li><%= link_to "Certificates", participant_certificates_path(@user) %></li>
   </ul>
 </section>
 
