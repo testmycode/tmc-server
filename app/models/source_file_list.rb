@@ -133,7 +133,7 @@ class SourceFileList
 
   def self.should_skip_dir?(file)
     name = file.basename.to_s
-    name.start_with?('.') || name == 'test' || name == 'lib' || name == 'nbproject'
+    name.start_with?('.') || name == 'test' || name == 'lib' || name == 'nbproject' || name == 'bower_components'
   end
 
   def self.make_path_names_relative(root_dir, files)
