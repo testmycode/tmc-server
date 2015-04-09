@@ -9,6 +9,9 @@
       <% end %>
     <% end %>
   </ul>
+  <ul>
+    <li><%= link_to "View certificates", participant_certificates_path(@user) %></li>
+  </ul>
 </section>
 
 <section>
@@ -20,6 +23,17 @@
       <li>Awarded points: <%= points_list(@awarded_points[course.id]) %></li>
       <li>Missing points: <%= points_list(@missing_points[course.id]) %></li>
     </ul>
+    <% certificate = Certificate.new(user: @user, course: course) %>
+    <% if can? :create, certificate %>
+      <a data-toggle="collapse" href="#<%= "certificate-#{course.id}" %>" aria-expanded="false" aria-controls="collapseExample">
+        Download certificate
+      </a>
+      <div class="collapse" id="<%= "certificate-#{course.id}" %>">
+        <div class="well">
+          <%= render partial: 'certificates/form', locals: {certificate: certificate} %>
+        </div>
+      </div>
+    <% end %>
   <% end %>
 </section>
 

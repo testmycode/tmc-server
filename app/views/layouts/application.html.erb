@@ -48,6 +48,9 @@
                   <%= link_to 'My stats', participant_path(current_user) %>
                 </li>
                 <li>
+                  <%= link_to 'My Certificates', participant_certificates_path(current_user) %>
+                </li>
+                <li>
                   <%= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link' %>
                 </li>
               <% elsif can? :create, User %>

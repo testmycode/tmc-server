@@ -98,6 +98,11 @@
       <% end %>
     </div>
 
+    <% if can? :create, @certificate %>
+      <h2>Certificate</h2>
+      <%= render partial: 'certificates/form', locals: {certificate: @certificate} %>
+    <% end %>
+
     <h2>All exercises</h2>
     <div>
       <%=

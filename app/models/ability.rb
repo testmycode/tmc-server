@@ -68,6 +68,14 @@ class Ability
         c.submissions.exists?(user_id: user.id, reviewed: true)
       end
 
+      cannot :read, Certificate
+      can :read, Certificate do |c|
+        c.user == user
+      end
+      can :create, Certificate do |c|
+        c.course.certificate_downloadable_for? user
+      end
+
       cannot :reply, FeedbackAnswer
       cannot :email, CourseNotification
     end
