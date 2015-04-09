@@ -15,6 +15,8 @@ TmcServer::Application.routes.draw do
   resource :user
 
   resources :participants
+  resources :certificates, only: [:show, :create]
+  get 'participants/:participant_id/courses/:course_id/certificates/new', to: 'certificates#new', as: 'new_certificates'
 
   resources :emails, only: [:index]
 

@@ -544,13 +544,37 @@ extra_student_files:
   hidden: true
   hide_after: 2010-02-15
   hidden_if_registered_after: 2010-01-01
-  locked_exercise_points_visible: false</pre>
+  locked_exercise_points_visible: false
+  formal_name: "Object Oriented Programming – part 1"
+  certificate_downloadable: true
+  certificate_unlock_spec: 80% of week1
+  </pre>
 
   <ul>
     <li><code>hidden</code> hides the course from students (and their NetBeans).</li>
     <li><code>hide_after</code> hides the course after a given date from students (and their NetBeans) and refuses to accept any more submissions.</li>
     <li><code>hidden_if_registered_after</code> hides the course from students (and their NetBeans) who have registered after the given date. After the given date it will also be invisible to unregistered users.</li>
     <li><code>locked_exercise_points_visible</code> tells whether exercises that one has not unlocked are visible on the scoreboard. Defaults to true.</li>
+    <li><code>formal_name</code> course formal name to be used in certificates. Makes it easier to use same template and repository for multiple courses.</li>
+    <li><code>certificate_downloadable</code> makes certificate downloadble. Defaults to false.</li>
+    <li><code>certificate_unlock_spec</code> makes certificate downloadable only after the given condition is met. If certificate_downloadable is false then it overrides this. See below for more.</li>
+  </ul>
+
+  <p>
+    If there are multiple unlock conditions, then all of them must be met for the exercise to be unlocked.
+  </p>
+
+  <p>
+    The full syntax of an <code>certificate_unlocked_spec</code> condition is as follows.
+  </p>
+
+  <ul>
+    <li><code>exercise [group] &lt;exercise-or-group&gt;</code></li>
+    <li><code>point[s] &lt;list-of-point-names&gt;</code></li>
+    <li><code>&lt;N&gt;% [in|of|from] &lt;exercise-or-group&gt;</code></li>
+    <li><code>&lt;N&gt; point[s] &lt;exercise-or-group&gt;</code></li>
+    <li><code>&lt;N&gt; exercise[s] [in|of|from] &lt;exercise-or-group&gt;</code></li>
+    <li><code>&lt;date-or-datetime&gt;</code></li>
   </ul>
 
   <h3><code>.tmcnosubmit</code> & <code>.tmcnosnapshot</code></h3>

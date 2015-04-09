@@ -31,6 +31,7 @@ class Course < ActiveRecord::Base
   has_many :unlocks, dependent: :delete_all
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :course_notifications, dependent: :delete_all
+  has_many :certificates
 
   def destroy
     # Optimization: delete dependent objects quickly.
@@ -89,6 +90,20 @@ class Course < ActiveRecord::Base
       self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']
     else
       self.locked_exercise_points_visible = true
+    end
+
+    if !new_options['formal_name'].blank?
+      self.formal_name = new_options['formal_name']
+    else
+      self.formal_name = nil
+    end
+
+    self.certificate_downloadable = !!new_options['certificate_downloadable']
+
+    if !new_options['certificate_unlock_spec'].blank?
+      self.certificate_unlock_spec = new_options['certificate_unlock_spec']
+    else
+      self.certificate_unlock_spec = nil
     end
   end
 
@@ -234,6 +249,14 @@ class Course < ActiveRecord::Base
 
   def submissions_to_review
     submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
+  end
+
+  def certificate_downloadable_for?(user)
+    user.administrator? ||
+      (!user.guest? &&
+       certificate_downloadable &&
+       (certificate_unlock_spec.nil? ||
+        UnlockSpec.new(exercises.first, ActiveSupport::JSON.decode(certificate_unlock_spec)).permits_unlock_for?(user)))
   end
 
   # Returns a hash of exercise group => {
