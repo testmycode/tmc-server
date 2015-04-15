@@ -1,12 +1,10 @@
 require 'portable_csv'
 
 class ParticipantsController < ApplicationController
-  skip_authorization_check
-  before_action :check_access
-
   add_breadcrumb 'Participants', :participants_path, only: [:index, :show], if: -> { current_user.administrator? }
 
   def index
+    authorize! :view, :participants_list
     @ordinary_fields = %w(username email)
     @extra_fields = UserField.all
     valid_fields = @ordinary_fields + @extra_fields.map(&:name) + ['include_administrators']
@@ -50,6 +48,7 @@ class ParticipantsController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    authorize! :read, @user
     @awarded_points = Hash[@user.awarded_points.to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
 
     if current_user.administrator?
@@ -88,10 +87,6 @@ class ParticipantsController < ApplicationController
   end
 
   private
-
-  def check_access
-    respond_access_denied unless current_user.administrator? || params[:id] == current_user.id.to_s
-  end
 
   def index_json_data
     result = []
