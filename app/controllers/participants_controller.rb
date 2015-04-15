@@ -79,13 +79,6 @@ class ParticipantsController < ApplicationController
     Submission.eager_load_exercises(@submissions)
   end
 
-  def destroy
-    user = User.find(params[:id])
-    user.destroy
-    flash[:success] = 'User account deleted'
-    redirect_to root_path
-  end
-
   private
 
   def index_json_data
