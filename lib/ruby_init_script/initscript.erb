@@ -4,7 +4,7 @@ require 'shellwords'
 %>
 
 ### BEGIN INIT INFO
-# Provides:             <%= name %>
+# Provides:             <%= _name %>
 # Required-Start:       $local_fs $remote_fs $network $syslog
 # Required-Stop:        $local_fs $remote_fs $network $syslog
 # Default-Start:        2 3 4 5
@@ -12,20 +12,20 @@ require 'shellwords'
 # Short-Description:    <%= short_description %>
 ### END INIT INFO
 
-<% for key, value in env %>
+<% for key, value in _env %>
 export <%= key %>=<%= Shellwords.escape(value) %>
 <% end %>
 
 <%
-   command = [Shellwords.escape(ruby_path), Shellwords.escape(executable_path), "$1"].join(' ')
-   if user != 'root'
-     command = "su -c \"#{command}\" #{user}"
+   command = [Shellwords.escape(_ruby_path), Shellwords.escape(_executable_path), "$1"].join(' ')
+   if _user != 'root'
+     command = "su -c \"#{command}\" #{_user}"
    end
 %>
 
 case "$1" in
   start|stop|restart|status)
-    cd <%= Shellwords.escape(working_dir) %>
+    cd <%= Shellwords.escape(_working_dir) %>
     <%= command %>
     ;;
   *)
