@@ -28,6 +28,7 @@ The following programs should be installed first: `ruby` (and `bundler` gem), `P
 After you get the test suite to pass see [post-install instructions](#post-install-instructions).
 
 ### Installation instructions for Ubuntu 14.04
+We expect the user to be using account which name is tmc.  
 #### Set Java and Ruby versions
 
 ```bash
@@ -61,9 +62,9 @@ $ sudo apt-get install squashfs-tools multistrap e2fsprogs e2tools
 
 #### Java installation
 
-To install OpenJDK 7 run
+To install OpenJDK run
 ```bash
-$ sudo apt-get install openjdk-7-jdk
+$ sudo apt-get install openjdk-$JAVA_VERSION-jdk
 ```
 If you want to install the official Oracle JDK, you need to add a ppa repository. You can install Oracle JDK with the following commands
 ```bash
@@ -86,7 +87,7 @@ $ source /etc/profile.d/rvm.sh
 Add yourself to RVM group and install Ruby
 
 ```bash
-$ sudo usermod -a -G rvm <your username>
+$ sudo usermod -a -G rvm tmc
 ```
 
 Quote from [https://rvm.io/support/troubleshooting#sudo](https://rvm.io/support/troubleshooting#sudo)
@@ -97,19 +98,7 @@ Install ruby
 ```bash
 $ rvm install $RUBY_VERSION
 $ rvm use $RUBY_VERSION --default
-```
-
-Create new user tmc, and add it to rvm group 
-
-```bash
-$ sudo useradd -G rvm tmc
-$ sudo passwd tmc
-```
-
-#### Switch to tmc user
-
-```bash
-$ sudo -i -u tmc
+$ gem install bundler
 ```
 
 ### PostgreSQL
@@ -118,13 +107,15 @@ $ sudo -i -u tmc
 Run following command and when prompted give **tmc** as a password, if you want to use another username or stronger password change them into **config/database.local.yml**.
 
 ```bash
+$ sudo su postgres
 $ createuser tmc -s -P
 ```
 
 If you cannot run the above command, you can also create the user manually
 
 ```bash
-$ sudo -u postgres psql -c "CREATE USER tmc WITH SUPERUSER CREATEUSER CREATEDB PASSWORD 'tmc';"
+$ sudo -u postgres
+$ psql -c "CREATE USER tmc WITH SUPERUSER CREATEUSER CREATEDB PASSWORD 'tmc';"
 ```
 :exclamation: Superuser access is useful for dev environment, but discouraged for production.
 
@@ -145,17 +136,22 @@ local   all             all                                     md5
 #### Clone the TMC repository
 
 ```bash
-$ cd tmc-server
 $ git clone https://github.com/testmycode/tmc-server.git
+$ cd tmc-server
 ```
+
+```bash
+$ bundle install
+```
+
 :exclamation: If you are not using a github account, replace the repository submodule URLs with a HTTPS URL in .git/config e.g. `https://github.com/testmycode/tmc-checkstyle-runner.git`
 ```bash
 $ git submodule update --init --recursive
-$ gem install bundler && bundle install
 ```
+
 You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there (notice: you do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`).
 
-Initialize the database with `rake db:reset`
+Initialize the database with `rake db:create && rake db:schema:load`
 
 #### Build sandbox
 
@@ -176,7 +172,7 @@ $ rvmsudo rake test
 #### Compile rest of the externals
 
 ```bash
-$ cd ../..
+$ cd -
 $ rake compile
 ```
 
