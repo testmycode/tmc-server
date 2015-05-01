@@ -124,6 +124,8 @@ class SourceFileList
       name.end_with?('.txt') ||
       name.end_with?('.html') ||
       name.end_with?('.css') ||
+      name.end_with?('.less') ||
+      name.end_with?('.sass') ||
       name.end_with?('.js') ||
       name.end_with?('.c') ||
       name.end_with?('.h') ||
