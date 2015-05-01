@@ -28,6 +28,8 @@
             brush = case File.extname(file.path)
             when '.txt' then 'plain'
             when '.jsp' then 'html'
+            when '.less' then 'css'
+            when '.sass' then 'css'
             when '.properties' then 'plain'
             when '' then 'plain'
             else File.extname(file.path)[1..-1]
