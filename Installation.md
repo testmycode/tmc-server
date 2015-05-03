@@ -131,6 +131,11 @@ to
 # "local" is for Unix domain socket connections only
 local   all             all                                     md5
 ```
+**important** run 
+```bash
+service postgresql restart
+```
+after to implement changes
 
 ### TMC-server installation
 #### Clone the TMC repository
