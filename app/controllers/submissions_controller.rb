@@ -40,6 +40,7 @@ class SubmissionsController < ApplicationController
         output = {
           api_version: ApiVersion::API_VERSION,
           all_tests_passed: @submission.all_tests_passed?,
+          user_id: @submission.user_id,
           course: @course.name,
           exercise_name: @submission.exercise.name,
           status: @submission.status,
