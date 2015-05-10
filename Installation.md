@@ -156,7 +156,8 @@ $ git submodule update --init --recursive
 
 You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there (notice: you do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`).
 
-Initialize the database with `rake db:create && rake db:schema:load`
+Initialize the database with `rake db:create && rake db:schema:load` 
+Note: run `rake db:seed` to initialize admin account
 
 #### Build sandbox
 
