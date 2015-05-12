@@ -1,0 +1,48 @@
+<h1><%= @user.login %></h1>
+<% if @user.certificates.any? %>
+<section>
+  <p>Following names have been used to generate certificates for this account:</p>
+  <ul>
+    <% @names.each do |name| %>
+      <li><%= name %></li>
+    <% end %>
+  </ul>
+</section>
+<section>
+  <h2>Certificates</h2>
+  <%= content_tag :table, :class => 'certificates table table-bordered table-striped table-hover' do %>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Course</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @user.certificates.each do |cert| %>
+        <tr>
+          <td><%= cert.name %></td>
+          <% if can? :read, cert.course %>
+            <td><%= link_to cert.course.name, cert.course %></td>
+          <% else %>
+            <td><%= cert.course.name %></td>
+          <% end %>
+          <td>
+            <%= link_to 'View certificate', cert %>
+          </td>
+         </tr>
+      <% end %>
+    </tbody>
+  <% end %>
+
+</section>
+<% else %>
+  <p> No certificates</p>
+<% end %>
+<% if @user == current_user %>
+  <div class="row-fluid">
+    <div class="span12">
+      <%= link_to 'Create New Certificate', new_certificate_path, class: "btn btn-mini btn-warning" %>
+    </div>
+  </div>
+<% end %>

@@ -39,6 +39,8 @@ class CoursesController < ApplicationController
     authorize! :read, @course
     UncomputedUnlock.resolve(@course, current_user)
 
+    @certificate = Certificate.new(user: current_user, course: @course)
+
     respond_to do |format|
       format.html do
         assign_show_view_vars

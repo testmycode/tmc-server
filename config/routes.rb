@@ -14,7 +14,11 @@ TmcServer::Application.routes.draw do
 
   resource :user
 
-  resources :participants
+  resources :participants do
+    resources :certificates, only: [:index, :new]
+  end
+
+  resources :certificates, only: [:show, :create]
 
   resources :emails, only: [:index]
 
