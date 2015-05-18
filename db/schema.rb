@@ -61,7 +61,17 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-  
+
+  create_table "course_templates", force: true do |t|
+    t.string   "name"
+    t.string   "title"
+    t.string   "description"
+    t.string   "material_url"
+    t.string   "source_url"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "courses", force: true do |t|
     t.string   "name"
     t.datetime "created_at"
