@@ -2,6 +2,15 @@ require 'fileutils'
 require 'system_commands'
 
 FactoryGirl.define do
+
+  factory :course_template do
+    sequence(:name) { |n| "template#{n}" }
+    sequence(:title) { |n| "template title#{n}" }
+    sequence(:description) { |n| "course descriptiong#{n}" }
+    sequence(:material_url) { |n| "http://www.material#{n}.com" }
+    sequence(:source_url) { |n| "git@example#{n}.com" }
+  end
+
   factory :user do
     sequence(:login) { |n| "user#{n}" }
     sequence(:password) { |n| "userpass#{n}" }
