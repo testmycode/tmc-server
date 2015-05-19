@@ -13,4 +13,16 @@ class Organization < ActiveRecord::Base
             },
             uniqueness: true
   validates :acceptance_pending, inclusion: [true, false]
+
+  has_many :teacherships
+  has_many :users, through: :teacherships
+
+  scope :accepted_organizations, -> { where(acceptance_pending: false) }
+  scope :pending_organizations, -> { where(acceptance_pending: true) }
+
+  def self.init(params, initial_user)
+    org = Organization.new(params.merge({ acceptance_pending: true }))
+    Teachership.create!({ user: initial_user, organization: org })
+    return org
+  end
 end
