@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150518100837) do
+ActiveRecord::Schema.define(version: 20150519110114) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -218,6 +218,16 @@ ActiveRecord::Schema.define(version: 20150518100837) do
   add_index "submissions", ["course_id", "user_id"], name: "index_submissions_on_course_id_and_user_id", using: :btree
   add_index "submissions", ["processed"], name: "index_submissions_on_processed", using: :btree
   add_index "submissions", ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name", using: :btree
+
+  create_table "teacherships", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "organization_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "teacherships", ["organization_id"], name: "index_teacherships_on_organization_id", using: :btree
+  add_index "teacherships", ["user_id"], name: "index_teacherships_on_user_id", using: :btree
 
   create_table "test_case_runs", force: true do |t|
     t.integer  "submission_id"

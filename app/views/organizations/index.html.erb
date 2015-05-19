@@ -1,0 +1,34 @@
+<h1>Listing organizations</h1>
+
+<% if current_user.administrator? %>
+  
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Information</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @organizations.each do |organization| %>
+      <tr>
+        <td><%= organization.name %></td>
+        <td><%= organization.information %></td>
+
+        <% if current_user.administrator? %>
+            <td><%= link_to 'Show', organization %></td>
+            <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
+            <td><%= link_to 'Destroy', organization, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
