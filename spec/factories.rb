@@ -119,4 +119,19 @@ FactoryGirl.define do
   factory :test_scanner_cache_entry do
     course
   end
+
+  factory :organization do
+    sequence(:name) { |n| "organization#{n}" }
+    sequence(:information) { |n| "information#{n}" }
+    sequence(:slug) { |n| "organization#{n}" }
+    acceptance_pending true
+  end
+
+  factory :accepted_organization, class: Organization do
+    sequence(:name) { |n| "organization#{n}" }
+    sequence(:information) { |n| "information#{n}" }
+    sequence(:slug) { |n| "organization#{n}" }
+    acceptance_pending false
+  end
+
 end
