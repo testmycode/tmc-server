@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @organization.name %>
+</p>
+
+<p>
+  <strong>Information:</strong>
+  <%= @organization.information %>
+</p>
+
+<p>
+  <strong>Slug:</strong>
+  <%= @organization.slug %>
+</p>
+
+<p>
+  <strong>Created at:</strong>
+  <%= @organization.created_at %>
+</p>
+
+<p>
+  <strong>Accepted at:</strong>
+  <%= @organization.accepted_at %>
+</p>
+
+<p>
+  <strong>pending:</strong>
+  <%= @organization.acceptance_pending %>
+</p>
+
+<%= link_to 'Edit', edit_organization_path(@organization) %> |
+<%= link_to 'Back', organizations_path %>
