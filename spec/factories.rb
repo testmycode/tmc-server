@@ -118,4 +118,18 @@ FactoryGirl.define do
 
     after(:build) { |cert| cert.class.skip_callback(:save, :generate) }
   end
+
+  factory :organization do
+    sequence(:name) { |n| "organization#{n}" }
+    sequence(:information) { |n| "information#{n}" }
+    sequence(:slug) { |n| "organization#{n}" }
+    acceptance_pending true
+  end
+
+  factory :accepted_organization, class: Organization do
+    sequence(:name) { |n| "organization#{n}" }
+    sequence(:information) { |n| "information#{n}" }
+    sequence(:slug) { |n| "organization#{n}" }
+    acceptance_pending false
+  end
 end
