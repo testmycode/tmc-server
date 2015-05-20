@@ -56,6 +56,8 @@ TmcServer::Application.routes.draw do
     end
   end
 
+  resources :course_templates
+
   resources :sessions, only: [:new, :create, :destroy]
 
   get '/signin', to: 'sessions#new'

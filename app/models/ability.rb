@@ -196,6 +196,9 @@ class Ability
       can :toggle_visibility, Organization do |o|
         can? :teach, o
       end
+
+      cannot :email, CourseNotification
+      cannot :read, CourseTemplate
     end
   end
 end
