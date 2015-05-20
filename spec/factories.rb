@@ -127,9 +127,9 @@ FactoryGirl.define do
   end
 
   factory :accepted_organization, class: Organization do
-    sequence(:name) { |n| "organization#{n}" }
-    sequence(:information) { |n| "information#{n}" }
-    sequence(:slug) { |n| "organization#{n}" }
+    sequence(:name) { |n| "a_organization#{n}" }
+    sequence(:information) { |n| "a_information#{n}" }
+    sequence(:slug) { |n| "a_organization#{n}" }
     acceptance_pending false
   end
 end

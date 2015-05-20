@@ -1,16 +1,15 @@
 require 'spec_helper'
 
 describe Organization, type: :model do
+  let(:valid_params) do
+    {
+      name: 'TestOrganization',
+      information: 'TestInformation',
+      slug: 'test-organization',
+      acceptance_pending: false
+    }
+  end
   describe 'validation' do
-    let(:valid_params) do
-      {
-        name: 'TestOrganization',
-        information: 'TestInformation',
-        slug: 'test-organization',
-        acceptance_pending: false
-      }
-    end
-
     it 'accepts valid parameters' do
       expect { Organization.create!(valid_params).to_not raise_error }
     end
@@ -46,8 +45,26 @@ describe Organization, type: :model do
       should_be_invalid_params(valid_params.merge(acceptance_pending: nil))
     end
 
+    it 'requires slug to be a non-reserved url' do
+      should_be_invalid_params(valid_params.merge(slug: 'new'))
+    end
+
     def should_be_invalid_params(params)
       expect { Organization.create!(params) }.to raise_error
+    end
+  end
+
+  describe 'initialization' do
+    it 'creates a pending organization' do
+      @user = FactoryGirl.create(:user)
+      @org = Organization.init(valid_params, @user)
+      expect(@org.acceptance_pending).to be(true)
+    end
+
+    it 'grants the requesting user teachership to the organization' do
+      @user = FactoryGirl.create(:user)
+      @org = Organization.init(valid_params, @user)
+      expect(@org.teachers.include? @user)
     end
   end
 end

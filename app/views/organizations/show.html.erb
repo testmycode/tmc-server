@@ -1,34 +1,36 @@
-<p id="notice"><%= notice %></p>
+<h1><%= @organization.name %></h1>
 
-<p>
-  <strong>Name:</strong>
-  <%= @organization.name %>
-</p>
+<% if current_user.administrator? %>
+  <p>
+    <strong>Organization URL:</strong>
+    <%= @organization.slug %>
+  </p>
 
-<p>
-  <strong>Information:</strong>
-  <%= @organization.information %>
-</p>
+  <p>
+    <strong>Requested by:</strong>
+    <%= @organization.users.first.username %>
+  </p>
 
-<p>
-  <strong>Slug:</strong>
-  <%= @organization.slug %>
-</p>
+  <p>
+    <strong>Created at:</strong>
+    <%= @organization.created_at %>
+  </p>
 
-<p>
-  <strong>Created at:</strong>
-  <%= @organization.created_at %>
-</p>
+  <p>
+    <strong>Accepted at:</strong>
+    <%= @organization.accepted_at %>
+  </p>
 
-<p>
-  <strong>Accepted at:</strong>
-  <%= @organization.accepted_at %>
-</p>
+  <p>
+    <strong>Information:</strong>
+    <%= @organization.information %>
+  </p>
 
-<p>
-  <strong>pending:</strong>
-  <%= @organization.acceptance_pending %>
-</p>
+  <%= link_to 'Edit organization', edit_organization_path(@organization) %>
+<% end %>
 
-<%= link_to 'Edit', edit_organization_path(@organization) %> |
-<%= link_to 'Back', organizations_path %>
+<% if @organization.acceptance_pending %>
+  <p>
+    <strong>This organization needs to be accepted by an administrator.</strong>
+  </p>
+<% end %>
