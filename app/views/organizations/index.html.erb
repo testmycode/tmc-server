@@ -1,31 +1,38 @@
-<h1>Listing organizations</h1>
+<h1>Organizations</h1>
 
-<% if current_user.administrator? %>
-  
+<% if current_user.administrator? && !Organization.pending_organizations.empty? %>
+  <% pending_count = Organization.pending_organizations.size %>
+
+  <div class="alert alert-warning" role="alert">
+    There
+    <%= pending_count == 1 ? 'is' : 'are' %>
+    <%= pluralize(pending_count, 'new organization request') %>.
+    <%= link_to 'Click here to review them.', list_requests_organizations_path %>
+  </div>
 <% end %>
 
 <table>
   <thead>
-    <tr>
-      <th>Name</th>
-      <th>Information</th>
-      <th colspan="3"></th>
-    </tr>
+  <tr>
+    <th>Name</th>
+    <th>Information</th>
+    <th colspan="3"></th>
+  </tr>
   </thead>
 
   <tbody>
-    <% @organizations.each do |organization| %>
-      <tr>
-        <td><%= organization.name %></td>
-        <td><%= organization.information %></td>
+  <% @organizations.each do |organization| %>
+    <tr>
+      <td><%= organization.name %></td>
+      <td><%= organization.information %></td>
 
-        <% if current_user.administrator? %>
-            <td><%= link_to 'Show', organization %></td>
-            <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
-            <td><%= link_to 'Destroy', organization, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <% if current_user.administrator? %>
+        <td><%= link_to 'Show', organization %></td>
+        <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
+        <td><%= link_to 'Destroy', organization, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       <% end %>
-      </tr>
-    <% end %>
+    </tr>
+  <% end %>
   </tbody>
 </table>
 
