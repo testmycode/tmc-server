@@ -49,14 +49,15 @@ class CourseTemplatesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_course_template
-      authorize! params[:action].to_sym, CourseTemplate
-      @course_template = CourseTemplate.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def course_template_params
-      params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_course_template
+    authorize! params[:action].to_sym, CourseTemplate
+    @course_template = CourseTemplate.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def course_template_params
+    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url)
+  end
 end
