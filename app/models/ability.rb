@@ -70,6 +70,8 @@ class Ability
 
       cannot :reply, FeedbackAnswer
       cannot :email, CourseNotification
+
+      cannot :read, CourseTemplate
     end
   end
 end

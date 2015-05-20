@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @course_template.name %>
+</p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @course_template.title %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @course_template.description %>
+</p>
+
+<p>
+  <strong>Material url:</strong>
+  <%= @course_template.material_url %>
+</p>
+
+<p>
+  <strong>Source url:</strong>
+  <%= @course_template.source_url %>
+</p>
+
+<%= link_to 'Edit', edit_course_template_path(@course_template) %> |
+<%= link_to 'Back', course_templates_path %>
