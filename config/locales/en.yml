@@ -21,3 +21,7 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      organization:
+        slug: "Organization URL"
