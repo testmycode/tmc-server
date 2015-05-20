@@ -1,6 +1,21 @@
 <h1>Editing organization</h1>
 
-<%= render 'form' %>
+<%= form_for(@organization) do |f| %>
+  <%= render 'shared/error_messages', target: @organization %>
 
-<%= link_to 'Show', @organization %> |
-<%= link_to 'Back', organizations_path %>
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :information %><br>
+    <%= f.text_area :information %>
+  </div>
+  <div class="field">
+    <%= f.label :slug %><br>
+    <%= f.text_field :slug %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

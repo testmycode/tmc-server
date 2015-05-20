@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
   has_many :reviews, foreign_key: :reviewer_id, inverse_of: :reviewer, dependent: :nullify
   has_many :course_notifications
   has_many :comments
-  has_many :teacherships
+  has_many :teacherships, dependent: :destroy
   has_many :organizations, through: :teacherships
 
   validates :login, presence: true,
@@ -20,8 +20,8 @@ class User < ActiveRecord::Base
   validates :email, presence: true,
                     uniqueness: true
 
-    scope :legitimate_students, -> { where(legitimate_student: true) }
-    scope :non_legitimate_students, -> { where(legitimate_student: false) }
+  scope :legitimate_students, -> { where(legitimate_student: true) }
+  scope :non_legitimate_students, -> { where(legitimate_student: false) }
 
   attr_accessor :password
   before_save :encrypt_password
