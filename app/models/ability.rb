@@ -72,6 +72,11 @@ class Ability
       cannot :email, CourseNotification
 
       cannot :read, CourseTemplate
+
+      cannot :manage_teachers, Organization
+      can :manage_teachers, Organization do |o|
+        o.teacher?(user)
+      end
     end
   end
 end
