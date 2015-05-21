@@ -134,6 +134,9 @@ ActiveRecord::Schema.define(version: 20150526082930) do
     t.string   "rejected_reason"
   end
 
+  add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
+  add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
+
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false
     t.text     "code",       null: false
