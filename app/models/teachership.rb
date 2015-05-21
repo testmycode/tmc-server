@@ -4,7 +4,5 @@ class Teachership < ActiveRecord::Base
 
   validates :user, presence: { message: 'does not exist' }
   validates :organization, presence: true
-  validates_uniqueness_of :user_id,
-                          scope: [:organization_id],
-                          message: 'is already in this organization'
+  validates :user, uniqueness: { scope: :organization, message: 'is already in this organization' }
 end
