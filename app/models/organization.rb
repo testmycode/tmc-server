@@ -1,3 +1,5 @@
+# Organisations (schools etc.) have teachers and their own customized courses.
+
 class Organization < ActiveRecord::Base
   validates :name,
             presence: true,

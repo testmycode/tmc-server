@@ -40,13 +40,13 @@ describe CourseTemplatesController, type: :controller do
       end
     end
 
-    describe 'GET show' do
+    describe 'GET edit' do
       before :each do
         @course_template = FactoryGirl.create :course_template, name: 'template'
       end
 
       it 'should show course template' do
-        get :show, id: @course_template.to_param
+        get :edit, id: @course_template.to_param
         expect(assigns(:course_template).name).to eq('template')
       end
     end
@@ -140,13 +140,13 @@ describe CourseTemplatesController, type: :controller do
       end
     end
 
-    describe 'GET show' do
+    describe 'GET edit' do
       before :each do
         @course_template = FactoryGirl.create :course_template
       end
 
       it 'should respond with a 401' do
-        get :show, id: @course_template.to_param
+        get :edit, id: @course_template.to_param
         expect(response.code.to_i).to eq(401)
       end
     end
@@ -228,13 +228,13 @@ describe CourseTemplatesController, type: :controller do
       end
     end
 
-    describe 'GET show' do
+    describe 'GET edit' do
       before :each do
         @course_template = FactoryGirl.create :course_template
       end
 
       it 'should respond with a 401' do
-        get :show, id: @course_template.to_param
+        get :edit, id: @course_template.to_param
         expect(response.code.to_i).to eq(401)
       end
     end
