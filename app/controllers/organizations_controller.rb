@@ -57,16 +57,24 @@ class OrganizationsController < ApplicationController
 
   def accept
     authorize! :accept, :organization_requests
-    @organization.acceptance_pending = false
-    @organization.accepted_at = DateTime.now.to_date
-    @organization.save
-    redirect_to list_requests_organizations_path, notice: 'Organization request was succesfully accepted.'
+    if @organization.acceptance_pending
+      @organization.acceptance_pending = false
+      @organization.accepted_at = DateTime.now.to_date
+      @organization.save
+      redirect_to list_requests_organizations_path, notice: 'Organization request was successfully accepted.'
+    else
+      redirect_to organizations_path
+    end
   end
 
   def decline
     authorize! :decline, :organization_requests
-    @organization.delete
-    redirect_to list_requests_organizations_path, notice: 'Organization request was succesfully rejected.'
+    if @organization.acceptance_pending
+      @organization.delete
+      redirect_to list_requests_organizations_path, notice: 'Organization request was successfully rejected.'
+    else
+      redirect_to organizations_path
+    end
   end
 
   private
