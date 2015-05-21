@@ -1,0 +1,19 @@
+<h1>Teachers in <%= @organization.name %></h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @teachers.each do |teacher| %>
+    <tr>
+      <td><%= teacher.username %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'Add a new teacher', new_organization_teacher_path(@organization), class: "btn btn-mini btn-warning" %>

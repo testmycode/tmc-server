@@ -8,6 +8,8 @@ TmcServer::Application.routes.draw do
     collection do
       get 'list_requests'
     end
+
+    resources :teachers, only: [:index, :new, :create, :destroy]
   end
 
   resources :course_templates, except: :show
