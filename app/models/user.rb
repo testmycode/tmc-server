@@ -117,6 +117,10 @@ class User < ActiveRecord::Base
     login.downcase <=> other.login.downcase
   end
 
+  def teacher?(organization)
+    organizations.include? organization
+  end
+
   private
 
   def encrypt_password
