@@ -37,4 +37,6 @@
 
 <br>
 
-<%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
+<% if !current_user.guest? %>
+    <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
+<% end %>

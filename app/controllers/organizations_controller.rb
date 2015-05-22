@@ -1,7 +1,7 @@
 class OrganizationsController < ApplicationController
   before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :decline]
 
-  skip_authorization_check only: [:index, :show, :new, :create]
+  skip_authorization_check only: [:index, :show]
 
   # GET /organizations
   def index
@@ -14,6 +14,7 @@ class OrganizationsController < ApplicationController
 
   # GET /organizations/new
   def new
+    authorize! :create, :organization
     @organization = Organization.new
   end
 
@@ -24,9 +25,10 @@ class OrganizationsController < ApplicationController
 
   # POST /organizations
   def create
+    authorize! :create, :organization
     @organization = Organization.init(organization_params, current_user)
 
-    if @organization.save
+    if !@organization.errors.any?
       redirect_to @organization, notice: 'Organization was successfully requested.'
     else
       render :new
@@ -59,7 +61,7 @@ class OrganizationsController < ApplicationController
     authorize! :accept, :organization_requests
     if @organization.acceptance_pending
       @organization.acceptance_pending = false
-      @organization.accepted_at = DateTime.now.to_date
+      @organization.accepted_at = DateTime.now
       @organization.save
       redirect_to list_requests_organizations_path, notice: 'Organization request was successfully accepted.'
     else
