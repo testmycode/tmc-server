@@ -22,9 +22,13 @@ class Organization < ActiveRecord::Base
   scope :pending_organizations, -> { where(acceptance_pending: true) }
 
   def self.init(params, initial_user)
-    org = Organization.new(params.merge(acceptance_pending: true))
-    Teachership.create!(user: initial_user, organization: org)
-    org
+    organization = Organization.new(params.merge(acceptance_pending: true))
+    teachership = Teachership.new(user: initial_user, organization: organization)
+    if !organization.save || !teachership.save
+      organization.destroy
+      teachership.destroy
+    end
+    organization
   end
 
   def teachers

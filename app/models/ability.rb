@@ -79,6 +79,9 @@ class Ability
       cannot :reply, FeedbackAnswer
       cannot :email, CourseNotification
 
+      can :create, :organization
+      cannot :create, :organization if user.guest?
+
       cannot :manage_teachers, Organization
       can :manage_teachers, Organization do |o|
         o.teacher?(user)
