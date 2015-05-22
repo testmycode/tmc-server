@@ -3,6 +3,7 @@ TmcServer::Application.routes.draw do
     member do
       post 'accept'
       post 'decline'
+      get 'course_templates', to: 'course_templates#list_for_teachers'
     end
 
     collection do
