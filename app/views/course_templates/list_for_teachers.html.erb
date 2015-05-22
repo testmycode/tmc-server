@@ -1,0 +1,23 @@
+<h1>Listing course templates</h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Material url</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @course_templates.each do |course_template| %>
+      <tr>
+        <td><%= course_template.name %></td>
+        <td><%= course_template.title %></td>
+        <td><%= course_template.description %></td>
+        <td><%= course_template.material_url %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
