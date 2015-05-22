@@ -44,6 +44,13 @@ class CourseTemplatesController < ApplicationController
     redirect_to course_templates_url, notice: 'Course template was successfully destroyed.'
   end
 
+  def list_for_teachers
+    organization_slug = params[:id] #change :id to :organization_id
+    puts Organization.find_by_slug(organization_slug)
+    authorize! :teach, Organization.find_by_slug(organization_slug)
+    @course_templates = CourseTemplate.all
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
