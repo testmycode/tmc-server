@@ -5,6 +5,7 @@ TmcServer::Application.routes.draw do
       post 'reject'
       get 'reject_reason_input'
       post 'toggle_visibility'
+      get 'course_templates', to: 'course_templates#list_for_teachers'
     end
 
     collection do
