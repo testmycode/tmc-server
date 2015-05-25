@@ -45,7 +45,7 @@ class CourseTemplatesController < ApplicationController
   end
 
   def list_for_teachers
-    organization_slug = params[:id] #change :id to :organization_id
+    organization_slug = params[:id]
     authorize! :teach, Organization.find_by_slug(organization_slug)
     @course_templates = CourseTemplate.all
   end
