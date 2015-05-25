@@ -303,4 +303,38 @@ describe CourseTemplatesController, type: :controller do
       end
     end
   end
+
+  describe "when teacher" do
+    before :each do
+      controller.current_user = @user
+      @organization = FactoryGirl.create(:accepted_organization)
+      Teachership.create!(user: @user, organization: @organization)
+      FactoryGirl.create :course_template, name: 'template1'
+      FactoryGirl.create :course_template, name: 'template2'
+      FactoryGirl.create :course_template, name: 'template3'
+    end
+
+    describe "GET course_templates" do
+
+      it "should show course templates" do
+        get :list_for_teachers, id: @organization.slug
+        expect(assigns(:course_templates).map(&:name)).to eq(%w(template1 template2 template3))
+      end
+    end
+  end
+
+  describe "when non-teacher" do
+    before :each do
+      controller.current_user = @user
+      @organization = FactoryGirl.create(:accepted_organization)
+    end
+
+    describe "GET course_templates" do
+
+      it 'should respond with a 401' do
+        get :list_for_teachers, id: @organization.slug
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+  end
 end
