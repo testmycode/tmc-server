@@ -71,7 +71,7 @@ RSpec.configure do |config|
     allow(Tailoring).to receive_messages(get: Tailoring.new)
     SiteSetting.use_distribution_defaults!
 
-    if context.metadata[:integration]
+    if context.metadata[:integration] || context.metadata[:feature]
       # integration tests can't use transaction since the webserver must see the changes
       DatabaseCleaner.strategy = :truncation
 
