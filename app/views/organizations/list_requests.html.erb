@@ -13,10 +13,11 @@
 
   <tbody>
   <% @requested_organizations.each do |organization| %>
+    <% requested_by = organization.users.first %>
     <tr>
       <td><%= organization.name %></td>
       <td><%= organization.information %></td>
-      <td><%= organization.users.first.username %></td>
+      <td><%= link_to requested_by.username, participant_path(requested_by) %></td>
       <td><%= organization.created_at %></td>
       <td><%= link_to 'Show information', organization %></td>
       <td><%= link_to 'Accept', accept_organization_path(organization), method: :post, class: 'btn btn-success' %></td>
