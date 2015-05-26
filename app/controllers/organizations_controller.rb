@@ -3,27 +3,22 @@ class OrganizationsController < ApplicationController
 
   skip_authorization_check only: [:index, :show]
 
-  # GET /organizations
   def index
     @organizations = Organization.accepted_organizations
   end
 
-  # GET /organizations/1
   def show
   end
 
-  # GET /organizations/new
   def new
     authorize! :create, :organization
     @organization = Organization.new
   end
 
-  # GET /organizations/1/edit
   def edit
     authorize! :edit, @organization
   end
 
-  # POST /organizations
   def create
     authorize! :create, :organization
     @organization = Organization.init(organization_params, current_user)
@@ -35,7 +30,6 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /organizations/1
   def update
     authorize! :edit, @organization
     if @organization.update(organization_params)
@@ -45,7 +39,6 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  # DELETE /organizations/1
   def destroy
     authorize! :destroy, @organization
     @organization.destroy
@@ -81,12 +74,10 @@ class OrganizationsController < ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_organization
     @organization = Organization.find_by_slug(params[:id])
   end
 
-  # Only allow a trusted parameter "white list" through.
   def organization_params
     params.require(:organization).permit(:name, :information, :slug)
   end
