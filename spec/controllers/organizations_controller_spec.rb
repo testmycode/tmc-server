@@ -107,13 +107,12 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'POST decline' do
-      it 'destroys the organization' do
+    describe 'POST reject' do
+      it 'sets the organization rejected flag to true' do
         org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
-        post :decline, id: org.to_param
-        expect do
-          org.reload
-        end.to raise_error
+        post :reject, id: org.to_param, organization: { rejected_reason: 'reason' }
+        org.reload
+        expect(org.rejected).to eq(true)
       end
     end
   end
@@ -218,10 +217,10 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'POST decline' do
+    describe 'POST reject' do
       it 'denies access' do
         org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
-        post :decline, id: org.to_param
+        post :reject, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
     end

@@ -2,7 +2,8 @@ TmcServer::Application.routes.draw do
   resources :organizations, path: 'org' do
     member do
       post 'accept'
-      post 'decline'
+      post 'reject'
+      get 'reject_reason_input'
     end
 
     collection do
