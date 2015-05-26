@@ -82,7 +82,8 @@ class OrganizationsController < ApplicationController
   private
 
   def set_organization
-    @organization = Organization.find_by_slug(params[:id])
+    @organization = Organization.find_by(slug: params[:id])
+    fail ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
   end
 
   def organization_params
