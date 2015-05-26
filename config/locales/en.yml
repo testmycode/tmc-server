@@ -24,4 +24,4 @@ en:
   activerecord:
     attributes:
       organization:
-        slug: "Organization URL"
+        slug: "Organization ID"

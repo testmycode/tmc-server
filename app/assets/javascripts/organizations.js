@@ -1,2 +1,10 @@
-// Place all the behaviors and hooks related to the matching controller here.
-// All this logic will automatically be available in application.js.
+var Organizations = (function() {
+    return {
+        updateSlugPreview: function(value) {
+            if (value.length > 0) {
+                value += '/';
+            }
+            $("#organization-id-preview-slug").text(value);
+        }
+    }
+})();
