@@ -3,17 +3,17 @@ class TeachersController < ApplicationController
   before_action :set_organization
 
   def index
-    authorize! :manage_teachers, @organization
+    authorize! :teach, @organization
     @teachers = @organization.teachers
   end
 
   def new
-    authorize! :manage_teachers, @organization
+    authorize! :teach, @organization
     @teachership = Teachership.new
   end
 
   def create
-    authorize! :manage_teachers, @organization
+    authorize! :teach, @organization
 
     user = User.find_by_login(teacher_params[:username])
     @teachership = Teachership.new(user: user, organization: @organization)
@@ -26,7 +26,7 @@ class TeachersController < ApplicationController
   end
 
   def destroy
-    authorize! :manage_teachers, @organization
+    authorize! :teach, @organization
   end
 
   private

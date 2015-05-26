@@ -21,7 +21,7 @@
       <td><%= organization.created_at %></td>
       <td><%= link_to 'Show information', organization %></td>
       <td><%= link_to 'Accept', accept_organization_path(organization), method: :post, class: 'btn btn-success' %></td>
-      <td><%= link_to 'Reject', decline_organization_path(organization), method: :post, class: 'btn btn-danger', data: { confirm: 'Are you sure?' } %></td>
+      <td><%= link_to 'Reject', reject_reason_input_organization_path(organization), class: 'btn btn-danger' %></td>
     </tr>
   <% end %>
   </tbody>
