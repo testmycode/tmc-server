@@ -12,8 +12,13 @@
     <%= f.text_area :information %>
   </div>
   <div class="field">
-    <%= f.label :slug %><br>
-    <%= f.text_field :slug %>
+    <%= f.label :slug %>
+    Preview:
+    <span id="organization-id-preview-url">
+       <%= organizations_url %>/<span id="organization-id-preview-slug"></span>
+    </span>
+    <br/>
+    <%= f.text_field :slug, onkeyup: 'Organizations.updateSlugPreview(this.value)' %>
   </div>
   <div class="actions">
     <%= f.submit 'Request organization' %>
