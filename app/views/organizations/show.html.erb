@@ -2,17 +2,18 @@
 
 <% if current_user.administrator? %>
   <p>
-    <strong>Organization URL:</strong>
+    <strong>Organization ID:</strong>
     <%= @organization.slug %>
   </p>
 
   <p>
     <strong>Requested by:</strong>
-    <%= @organization.users.first.username %>
+    <% requested_by = @organization.users.first %>
+    <%= link_to requested_by.username, participant_path(requested_by) %>
   </p>
 
   <p>
-    <strong>Created at:</strong>
+    <strong>Requested at:</strong>
     <%= @organization.created_at %>
   </p>
 
