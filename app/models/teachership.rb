@@ -6,9 +6,4 @@ class Teachership < ActiveRecord::Base
             presence: { message: 'does not exist' },
             uniqueness: { scope: :organization, message: 'is already in this organization' }
   validates :organization, presence: true
-  validate :not_guest?, on: :create
-
-  def not_guest?
-    errors.add(:user, 'cannot be a guest') if user.guest?
-  end
 end
