@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150521092056) do
+ActiveRecord::Schema.define(version: 20150526082930) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,6 +130,8 @@ ActiveRecord::Schema.define(version: 20150521092056) do
     t.boolean  "acceptance_pending"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "rejected",           default: false, null: false
+    t.string   "rejected_reason"
   end
 
   add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
