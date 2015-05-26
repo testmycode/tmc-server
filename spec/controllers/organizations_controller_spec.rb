@@ -119,6 +119,10 @@ describe OrganizationsController, type: :controller do
   end
 
   describe 'As a normal user' do
+    before :each do
+      controller.current_user = @user
+    end
+
     describe 'GET index' do
       it 'assigns all organizations as @organizations' do
         organization = Organization.create! valid_attributes
