@@ -29,6 +29,25 @@ feature 'Admin edits course templates', feature: true do
     expect(page).to have_content('dontchange')
   end
 
+  scenario 'Admin doesnt succeed if parameters are invalid' do
+    log_in_as(@admin.login, 'xooxer')
+    visit '/course_templates'
+
+    find('table').find('tr:nth-child(2)').click_link('Edit')
+    fill_in 'course_template_name', with: 'name with w h i t e s p a c e s'
+    fill_in 'course_template_title', with: 'a' * 41
+    fill_in 'course_template_source_url', with: ''
+    click_button 'Update Course template'
+
+    expect(page).to have_content('Name should not contain white spaces')
+    expect(page).to have_content("Source url can't be blank")
+    expect(page).to have_content("Title is too long")
+
+    visit '/course_templates'
+    expect(page).to have_content('oldtitle')
+    expect(page).to have_content('dontchange')
+  end
+
   scenario 'Non-admin doesnt succeed' do
     log_in_as(@user.login, 'foobar')
     visit '/course_templates'
