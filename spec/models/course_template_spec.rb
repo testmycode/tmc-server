@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe CourseTemplate, type: :model do
-
   describe 'validation' do
     let(:valid_params) do
       {
@@ -55,5 +54,4 @@ describe CourseTemplate, type: :model do
       expect { CourseTemplate.create!(params) }.to raise_error
     end
   end
-
 end
