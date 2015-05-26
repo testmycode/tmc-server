@@ -23,7 +23,7 @@ class CourseTemplatesController < ApplicationController
     @course_template = CourseTemplate.new(course_template_params)
 
     if @course_template.save
-      redirect_to @course_template, notice: 'Course template was successfully created.'
+      redirect_to course_templates_path, notice: 'Course template was successfully created.'
     else
       render :new
     end
