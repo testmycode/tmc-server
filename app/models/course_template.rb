@@ -1,4 +1,4 @@
-#Course stub to be copied by teachers for their own organisations
+# Course stub to be copied by teachers for their own organisations
 
 class CourseTemplate < ActiveRecord::Base
   validates :name,
