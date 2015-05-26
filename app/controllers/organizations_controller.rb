@@ -1,5 +1,5 @@
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :decline]
+  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input]
 
   skip_authorization_check only: [:index, :show]
 
@@ -62,10 +62,17 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  def decline
-    authorize! :decline, :organization_requests
+  def reject_reason_input
+    authorize! :reject, :organization_requests
+  end
+
+  def reject
+    authorize! :reject, :organization_requests
     if @organization.acceptance_pending
-      @organization.delete
+      @organization.acceptance_pending = false
+      @organization.rejected = true
+      @organization.rejected_reason = organization_params[:rejected_reason]
+      @organization.save
       redirect_to list_requests_organizations_path, notice: 'Organization request was successfully rejected.'
     else
       redirect_to organizations_path
@@ -79,6 +86,6 @@ class OrganizationsController < ApplicationController
   end
 
   def organization_params
-    params.require(:organization).permit(:name, :information, :slug)
+    params.require(:organization).permit(:name, :information, :slug, :rejected_reason)
   end
 end

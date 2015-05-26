@@ -20,7 +20,7 @@ class Organization < ActiveRecord::Base
   has_many :teacherships, dependent: :destroy
   has_many :users, through: :teacherships
 
-  scope :accepted_organizations, -> { where(acceptance_pending: false) }
+  scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
   scope :pending_organizations, -> { where(acceptance_pending: true) }
 
   def self.init(params, initial_user)
