@@ -1,13 +1,9 @@
 <h1>Organizations</h1>
 
 <% if current_user.administrator? && !Organization.pending_organizations.empty? %>
-  <% pending_count = Organization.pending_organizations.size %>
-
   <div class="alert alert-warning" role="alert">
-    There
-    <%= pending_count == 1 ? 'is' : 'are' %>
-    <%= pluralize(pending_count, 'new organization request') %>.
-    <%= link_to 'Click here to review them.', list_requests_organizations_path %>
+    <%= pluralize(Organization.pending_organizations.size, 'new organization request') %>.
+    <%= link_to 'Show', list_requests_organizations_path %>
   </div>
 <% end %>
 
