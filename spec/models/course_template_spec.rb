@@ -15,6 +15,7 @@ describe CourseTemplate, type: :model do
         source_url: @repo_path,
         source_backend: 'git',
         git_branch: 'master',
+        source_url: 'http://example.com',
         title: 'Test Template Title'
       }
     end
