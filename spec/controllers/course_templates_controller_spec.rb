@@ -10,7 +10,7 @@ describe CourseTemplatesController, type: :controller do
   let(:valid_attributes) do
     {
       name: 'TestTemplateCourse',
-      source_url: 'git@example.com',
+      source_url: 'http://example.com',
       title: 'Test Template Title'
     }
   end

@@ -1,4 +1,6 @@
 class ExercisesController < ApplicationController
+  before_action :set_organization
+
   def show
     @exercise = Exercise.find(params[:id])
     @course = Course.lock('FOR SHARE').find(@exercise.course_id)
@@ -51,5 +53,11 @@ class ExercisesController < ApplicationController
         render json: data.to_json
       end
     end
+  end
+
+  private
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

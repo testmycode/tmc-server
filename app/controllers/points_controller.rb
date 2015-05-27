@@ -3,11 +3,12 @@ require 'natsort'
 class PointsController < ApplicationController
   include PointsHelper
   skip_authorization_check except: :refresh_gdocs
+  before_action :set_organization
 
   def index
     @course = Course.find(params[:course_id])
     add_course_breadcrumb
-    add_breadcrumb 'Points', course_points_path(@course)
+    add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
 
     exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
     sheets = @course.gdocs_sheets(exercises).natsort
@@ -35,8 +36,8 @@ class PointsController < ApplicationController
     @course = Course.find(params[:course_id])
 
     add_course_breadcrumb
-    add_breadcrumb 'Points', course_points_path(@course)
-    add_breadcrumb @sheetname, course_point_path(@course, @sheetname)
+    add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
+    add_breadcrumb @sheetname, organization_course_point_path(@organization, @course, @sheetname)
 
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).order!
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
@@ -103,5 +104,11 @@ class PointsController < ApplicationController
       sheet = $1
       summary[:users] = summary[:users].sort_by { |user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
     end
+  end
+
+  private
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

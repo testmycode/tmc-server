@@ -28,6 +28,7 @@ FactoryGirl.define do
   factory :course, class: Course do
     sequence(:name) { |n| "course#{n}" }
     source_url 'git@example.com'
+    organization
   end
 
   factory :exercise do

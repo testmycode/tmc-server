@@ -23,7 +23,7 @@ class UnlocksController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:success] = 'Exercises unlocked.'
-        redirect_to course_path(@course)
+        redirect_to organization_course_path(@course)
       end
       format.json do
         render json: { status: 'ok' }
