@@ -62,7 +62,7 @@ describe CourseTemplatesController, type: :controller do
 
         it 'redirects to the created course_template' do
           post :create, course_template: valid_attributes
-          expect(response).to redirect_to(CourseTemplate.last)
+          expect(response).to redirect_to(course_templates_url)
         end
       end
 
