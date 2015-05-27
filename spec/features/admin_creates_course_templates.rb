@@ -37,7 +37,7 @@ feature 'Admin creates course templates', feature: true do
 
     expect(page).to have_content('Name should not contain white spaces')
     expect(page).to have_content("Source url can't be blank")
-    expect(page).to have_content("Title is too long")
+    expect(page).to have_content('Title is too long')
 
     visit '/course_templates'
     expect(page).not_to have_content('name with w h i t e s p a c e s')
