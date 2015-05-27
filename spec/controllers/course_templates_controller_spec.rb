@@ -60,7 +60,7 @@ describe CourseTemplatesController, type: :controller do
           expect(CourseTemplate.last.name).to eq('TestTemplateCourse')
         end
 
-        it 'redirects to the created course_template' do
+        it 'redirects to the course templates list' do
           post :create, course_template: valid_attributes
           expect(response).to redirect_to(course_templates_url)
         end
@@ -91,7 +91,7 @@ describe CourseTemplatesController, type: :controller do
           expect(CourseTemplate.last.name).to eq('TestTemplateCourse')
         end
 
-        it 'redirects to the updated course template' do
+        it 'redirects to the course templates list' do
           put :update, id: @course_template.to_param, course_template: valid_attributes
           expect(response).to redirect_to(course_templates_url)
         end
@@ -121,7 +121,7 @@ describe CourseTemplatesController, type: :controller do
         end.to change(CourseTemplate, :count).by(-1)
       end
 
-      it 'redirects to the course_templates list' do
+      it 'redirects to the course templates list' do
         delete :destroy, id: @course_template.to_param
         expect(response).to redirect_to(course_templates_url)
       end
