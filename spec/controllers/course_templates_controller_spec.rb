@@ -93,7 +93,7 @@ describe CourseTemplatesController, type: :controller do
 
         it 'redirects to the updated course template' do
           put :update, id: @course_template.to_param, course_template: valid_attributes
-          expect(response).to redirect_to(CourseTemplate.last)
+          expect(response).to redirect_to(course_templates_url)
         end
       end
 
