@@ -5,9 +5,15 @@ describe CourseTemplate, type: :model do
     let(:valid_params) do
       {
         name: 'TestTemplateCourse',
-        source_url: 'git@example.com',
+        source_url: 'http://example.com',
         title: 'Test Template Title'
       }
+    end
+
+    it 'accepts valid parameters' do
+      expect do
+        CourseTemplate.create!(valid_params)
+      end.to_not raise_error
     end
 
     it 'requires a name' do
