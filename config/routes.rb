@@ -11,6 +11,32 @@ TmcServer::Application.routes.draw do
     end
 
     resources :teachers, only: [:index, :new, :create, :destroy]
+
+    resources :courses do
+      member do
+        get 'refresh'
+        post 'refresh'
+      end
+
+      resources :points, only: [:index, :show] do
+        member do
+          get 'refresh_gdocs'
+        end
+      end
+
+      resources :stats, only: [:index, :show]
+      resources :exercise_status, only: [:show]
+      resources :exercises, only: [:index]
+      resources :submissions, only: [:index]
+      resources :reviewed_submissions, only: [:index]
+      resources :feedback_questions, only: [:index, :new, :create]
+      resources :feedback_answers, only: [:index]
+      get 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :as => 'feedback_answers_chart'
+      resources :reviews, only: [:index]
+      resource :unlock, only: [:show, :create]
+      resource :course_notifications, only: [:create, :index, :show, :new]
+    end
+
   end
 
   resources :sessions, only: [:new, :create, :destroy]
@@ -41,31 +67,6 @@ TmcServer::Application.routes.draw do
   resources :password_reset_keys
   get '/reset_password/:code' => 'password_reset_keys#show', :as => 'reset_password'
   delete '/reset_password/:code' => 'password_reset_keys#destroy'
-
-  resources :courses do
-    member do
-      get 'refresh'
-      post 'refresh'
-    end
-
-    resources :points, only: [:index, :show] do
-      member do
-        get 'refresh_gdocs'
-      end
-    end
-
-    resources :stats, only: [:index, :show]
-    resources :exercise_status, only: [:show]
-    resources :exercises, only: [:index]
-    resources :submissions, only: [:index]
-    resources :reviewed_submissions, only: [:index]
-    resources :feedback_questions, only: [:index, :new, :create]
-    resources :feedback_answers, only: [:index]
-    get 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :as => 'feedback_answers_chart'
-    resources :reviews, only: [:index]
-    resource :unlock, only: [:show, :create]
-    resource :course_notifications, only: [:create, :index, :show, :new]
-  end
 
   resources :exercises, only: [:show] do
     resources :submissions, only: [:create]

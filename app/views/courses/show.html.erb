@@ -8,9 +8,9 @@
       <% end %>
 
       <ul>
-        <li><%= link_to 'View points', course_points_path(@course) %></li>
+        <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
         <% if can? :view_code_reviews, @course %>
-          <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
+          <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
       </ul>
       <% if can? :read, :course_information %>
@@ -48,8 +48,8 @@
 
           <li>
             Number of submissions (from <span title="administrators and specially marked test user accounts are excluded">actual users</span>): <%= @total_submissions %>
-            (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
-             <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
+            (stats <%= link_to 'over time', organization_course_stat_path(@organization, @course, 'submissions') %>,
+             <%= link_to 'by hour', organization_course_stat_path(@organization, @course, 'submission_times') %>)
           </li>
 
           <% if @course.spreadsheet_key %>
@@ -59,7 +59,7 @@
             </li>
           <% end %>
           <li>
-            <%= link_to 'Send message to every participant', new_course_course_notifications_path(@course) %>
+            <%= link_to 'Send message to every participant', new_organization_course_course_notifications_path(@organization, @course) %>
           </li>
         </ul>
 
@@ -83,17 +83,17 @@
         <% end %>
 
         <ul>
-          <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
-          <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
+          <li><%= link_to 'View feedback', organization_course_feedback_answers_path(@organization, @course)%></li>
+          <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
       <% end %>
       <% if can? :refresh, @course %>
-        <%= link_to 'Refresh', refresh_course_path(@course), class: "btn btn-warning btn-mini" %>
+        <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
       <% end %>
       <% unlockables = @course.unlockable_exercises_for(current_user) %>
       <% unless unlockables.empty? %>
         <p>
-          You can <%= link_to "unlock #{pluralize(unlockables.count, 'new exercise')}", course_unlock_path(@course) %>.
+          You can <%= link_to "unlock #{pluralize(unlockables.count, 'new exercise')}", organization_course_unlock_path(@organization, @course) %>.
         </p>
       <% end %>
     </div>
@@ -115,7 +115,7 @@
         <% if @total_submissions > @submissions.count %>
           <p>
             Only showing <%= @submissions.count %> of <%= @total_submissions %>
-            <%= link_to "(show all)", course_submissions_path(@course) %>.
+            <%= link_to "(show all)", organization_course_submissions_path(@organization, @course) %>.
           </p>
         <% end %>
         <div>

@@ -5,18 +5,18 @@
 
 <ul>
   <li>
-    <%= link_to 'Back to summary', course_points_path(@course) %>
+    <%= link_to 'Back to summary', organization_course_points_path(@organization, @course) %>
   </li>
   <li>
     <% if params[:sort_by].blank? %>
-      <%= link_to 'Sort by points', course_point_path(@course, @sheetname, :sort_by => 'points') %>
+      <%= link_to 'Sort by points', organization_course_point_path(@organization, @course, @sheetname, :sort_by => 'points') %>
     <% else %>
-      <%= link_to 'Sort by username', course_point_path(@course, @sheetname) %>
+      <%= link_to 'Sort by username', organization_course_point_path(@organization, @course, @sheetname) %>
     <% end %>
   </li>
   <% if can? :refresh_gdocs_spreadsheet, @course %>
     <li>
-      <%= link_to 'Refresh Google Docs worksheet', refresh_gdocs_course_point_path(@course, @sheetname) %>
+      <%= link_to 'Refresh Google Docs worksheet', refresh_gdocs_organization_course_point_path(@organization, @course, @sheetname) %>
     </li>
   <% end %>
 </ul>

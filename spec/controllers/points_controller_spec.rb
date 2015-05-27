@@ -4,7 +4,9 @@ require 'spec_helper'
 describe PointsController, type: :controller do
   render_views
   before :each do
+    @organization = FactoryGirl.create(:accepted_organization)
     @course = FactoryGirl.create(:course)
+    @course.organization = @organization
     @sheetname = 'testsheet'
     @exercise = FactoryGirl.create(:exercise, course: @course,
                                               gdocs_sheet: @sheetname)
@@ -31,22 +33,23 @@ describe PointsController, type: :controller do
       end
 
       it 'should show a page' do
-        get :show, course_id: @course.id, id: @sheetname
+        get :show, organization_id: @organization.slug,
+            course_id: @course.id, id: @sheetname
         expect(response).to be_success
       end
 
       it 'should contain @user login' do
-        get :show, course_id: @course.id, id: @sheetname
+        get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
         expect(response.body).to have_content(@user.login)
       end
 
       it 'should contain available point name' do
-        get :show, course_id: @course.id, id: @sheetname
+        get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
         expect(response.body).to have_content(@available_point.name)
       end
 
       it 'should contain a success marker' do
-        get :show, course_id: @course.id, id: @sheetname
+        get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
         expect(response.body).to have_content('✔')
       end
     end
