@@ -19,6 +19,7 @@ class Organization < ActiveRecord::Base
 
   has_many :teacherships, dependent: :destroy
   has_many :teachers, through: :teacherships, source: :user
+  has_many :courses, dependent: :nullify
 
   scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
   scope :pending_organizations, -> { where(acceptance_pending: true) }

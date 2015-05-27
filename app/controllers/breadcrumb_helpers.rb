@@ -4,7 +4,7 @@
 # See https://github.com/weppos/breadcrumbs_on_rails
 module BreadcrumbHelpers # Included in ApplicationController
   def add_course_breadcrumb
-    add_breadcrumb "Course #{@course.name}", course_path(@course)
+    add_breadcrumb "Course #{@course.name}", organization_course_path(@organization, @course)
   end
 
   def add_exercise_breadcrumb

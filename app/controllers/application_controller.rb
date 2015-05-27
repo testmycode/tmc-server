@@ -1,4 +1,5 @@
 require 'version'
+require 'version'
 require 'twitter-bootstrap-breadcrumbs'
 
 # Base class for all controllers.
