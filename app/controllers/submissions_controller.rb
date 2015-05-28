@@ -29,6 +29,7 @@ class SubmissionsController < ApplicationController
     @course ||= @submission.course
     @exercise ||= @submission.exercise
     @files = SourceFileList.for_submission(@submission)
+    @organization = @course.organization
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb

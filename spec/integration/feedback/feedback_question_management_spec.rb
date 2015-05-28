@@ -4,13 +4,14 @@ describe 'Feedback question management', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
+    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
     @user = FactoryGirl.create(:admin, password: 'xooxer')
     visit '/'
     log_in_as(@user.login, 'xooxer')
 
-    create_new_course name: 'TheCourse', source_url: Dir.pwd + '/unused'
+    create_new_course name: 'TheCourse', source_url: Dir.pwd + '/unused', organization_slug: @organization.slug
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'TheCourse'
     click_link 'Manage feedback questions'
   end

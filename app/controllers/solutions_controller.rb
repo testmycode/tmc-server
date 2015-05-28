@@ -3,6 +3,7 @@ class SolutionsController < ApplicationController
   def show
     @exercise = Exercise.find(params[:exercise_id])
     @course = @exercise.course
+    @organization = @course.organization
 
     add_course_breadcrumb
     add_exercise_breadcrumb

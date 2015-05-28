@@ -18,7 +18,8 @@ module IntegrationTestActions
   end
 
   def create_new_course(options = {})
-    visit '/courses'
+    visit "/org/#{options[:organization_slug]}/courses"
+    #save_and_open_page
     click_link 'Create New Course'
     fill_in 'course_name', with: options[:name]
     # fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
@@ -29,8 +30,8 @@ module IntegrationTestActions
     expect(page).to have_content(options[:name])
   end
 
-  def manually_refresh_course(coursename)
-    visit '/courses'
+  def manually_refresh_course(coursename, organization_slug)
+    visit "/org/#{organization_slug}/courses"
     click_link coursename
     click_on 'Refresh'
     expect(page).to have_content('Refresh successful.')
