@@ -67,7 +67,7 @@ class CoursesController < ApplicationController
       session[:refresh_report] = e.report
     end
 
-    redirect_to organization_course_path(@course)
+    redirect_to organization_course_path
   end
 
   def new
