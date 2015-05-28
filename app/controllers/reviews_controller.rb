@@ -2,6 +2,8 @@ require 'natsort'
 
 # Presents the code review UI.
 class ReviewsController < ApplicationController
+  before_action :set_organization
+
   def index
     if params[:course_id]
       fetch :course
@@ -14,7 +16,7 @@ class ReviewsController < ApplicationController
       respond_to do |format|
         format.html do
           add_course_breadcrumb
-          add_breadcrumb 'Code reviews', course_reviews_path(@course)
+          add_breadcrumb 'Code reviews', organization_course_reviews_path
           render 'reviews/course_index'
         end
         format.json do
@@ -255,5 +257,11 @@ class ReviewsController < ApplicationController
 
     @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
     submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
+  end
+
+  private
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

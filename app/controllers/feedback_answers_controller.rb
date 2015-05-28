@@ -1,4 +1,5 @@
 class FeedbackAnswersController < ApplicationController
+  before_action :set_organization
 
   def index
     if params[:course_id]
@@ -23,7 +24,7 @@ class FeedbackAnswersController < ApplicationController
       add_exercise_breadcrumb
       add_breadcrumb 'Feedback', exercise_feedback_answers_path(@exercise)
     else
-      add_breadcrumb 'Feedback', course_feedback_answers_path(@course)
+      add_breadcrumb 'Feedback', organization_course_feedback_answers_path
     end
 
     @numeric_questions = @course.feedback_questions.where("kind LIKE 'intrange%'").order(:position)
@@ -113,5 +114,11 @@ class FeedbackAnswersController < ApplicationController
         render json: {api_version: ApiVersion::API_VERSION, status: 'ok'}
       end
     end
+  end
+
+  private
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

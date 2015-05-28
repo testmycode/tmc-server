@@ -95,4 +95,4 @@
   </table>
 <% end %>
 
-<div class="alternative-format-links">[<%= link_to('csv', course_points_path(@course, :sort_by => params[:sort_by], :format => 'csv')) %>]</div>
+<div class="alternative-format-links">[<%= link_to('csv', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv')) %>]</div>

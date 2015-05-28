@@ -12,7 +12,7 @@
 <% end %>
 <div class="row-fluid">
   <div class="span12">
-    <%= render 'list', :locals => { :courses => @ongoing_courses, :list_id => 'ongoing-courses' } %>
+    <%= render 'list', :locals => { organization_id: @organization.slug, courses: @ongoing_courses, list_id: 'ongoing-courses' } %>
   </div>
 </div>
 
@@ -20,7 +20,7 @@
   <h3>Expired courses</h3>
   <div class="row-fluid">
     <div class="span12">
-      <%= render 'list', :locals => { :courses => @expired_courses, :list_id => 'expired-courses' } %>
+      <%= render 'list', :locals => { organization_id: @organization.slug, courses: @expired_courses, list_id: 'expired-courses' } %>
     </div>
   </div>
 <% end %>
@@ -28,7 +28,7 @@
 <% if can? :create, Course %>
   <div class="row-fluid">
     <div class="span12">
-      <%= link_to 'Create New Course', new_organization_course_path, class: "btn btn-mini btn-warning" %>
+      <%= link_to 'Create New Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
     </div>
   </div>
 <% end %>
