@@ -6,7 +6,8 @@ describe 'Personal deadlines', type: :request, integration: true do
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path)
+    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
+    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise1')
     @repo.copy_simple_exercise('MyExercise2')
@@ -19,7 +20,7 @@ describe 'Personal deadlines', type: :request, integration: true do
 
     @user = FactoryGirl.create(:user, password: 'xooxer')
 
-    visit '/'
+    visit '/org/slug/courses'
     log_in_as(@user.login, @user.password)
     click_link 'mycourse'
   end
@@ -30,7 +31,7 @@ describe 'Personal deadlines', type: :request, integration: true do
 
     submit_correct_solution('MyExercise1')
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'mycourse'
     expect(page).to have_content('MyExercise2')
     expect(page).not_to have_content('(locked)')
@@ -46,7 +47,7 @@ describe 'Personal deadlines', type: :request, integration: true do
 
       submit_correct_solution('MyExercise1')
 
-      visit '/'
+      visit '/org/slug/courses'
       click_link 'mycourse'
       expect(page).to have_content('MyExercise2 (locked)')
       expect(page).to have_content('unlock 1 new exercise')
