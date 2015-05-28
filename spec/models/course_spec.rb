@@ -73,6 +73,13 @@ describe Course, type: :model do
     expect(c).to be_visible_to(admin)
   end
 
+  it 'should always be visible to organization teachers' do
+    organization = FactoryGirl.create(:accepted_organization)
+    Teachership.create!(user: user, organization: organization)
+    c = FactoryGirl.create(:course, hidden: true, hide_after: Time.now - 2.minutes, organization: organization)
+    expect(c).to be_visible_to(user)
+  end
+
   it 'should be visible if user has registered before the hidden_if_registered_after setting' do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
