@@ -1,6 +1,4 @@
 class FeedbackAnswersController < ApplicationController
-  before_action :set_organization
-
   def index
     if params[:course_id]
       @course = Course.find(params[:course_id])
@@ -19,6 +17,7 @@ class FeedbackAnswersController < ApplicationController
       return respond_not_found
     end
 
+    @organization = @course.organization
     add_course_breadcrumb
     if @exercise
       add_exercise_breadcrumb
@@ -114,11 +113,5 @@ class FeedbackAnswersController < ApplicationController
         render json: {api_version: ApiVersion::API_VERSION, status: 'ok'}
       end
     end
-  end
-
-  private
-
-  def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

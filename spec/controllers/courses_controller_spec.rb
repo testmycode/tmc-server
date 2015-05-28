@@ -15,7 +15,7 @@ describe CoursesController, type: :controller do
         FactoryGirl.create(:course, name: 'AnotherTestCourse')
       ]
 
-      get :index
+      get :index, organization_id: @organization.slug
 
       expect(assigns(:ongoing_courses).map(&:name)).to eq(%w(AnotherTestCourse SomeTestCourse))
       expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
