@@ -4,6 +4,7 @@
 # TODO: While this is nice, I think feedback questions should live in a conf file in the repo so that the entire course is defined by the repo.
 class FeedbackQuestionsController < ApplicationController
   before_action :get_course
+  before_action :set_organization
 
   def index
     add_course_breadcrumb
@@ -90,5 +91,9 @@ class FeedbackQuestionsController < ApplicationController
     if question.kind == 'intrange'
       question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
     end
+  end
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end
