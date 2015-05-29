@@ -1,11 +1,13 @@
 TmcServer::Application.routes.draw do
-  resources :organizations, except: :destory, path: 'org' do
+  get 'org/:organization_id/course_templates', to: 'course_templates#list_for_teachers', as: 'list_course_templates'
+  get 'org/:organization_id/course_templates/:id', to: 'course_templates#prepare_course', as: 'prepare_course'
+
+resources :organizations, except: :destory, path: 'org' do
     member do
       post 'accept'
       post 'reject'
       get 'reject_reason_input'
       post 'toggle_visibility'
-      get 'course_templates', to: 'course_templates#list_for_teachers'
     end
 
     collection do

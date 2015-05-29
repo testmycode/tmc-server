@@ -70,14 +70,7 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-    authorize! :refresh, @course
-
-    begin
-      session[:refresh_report] = @course.refresh
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
-    end
-
+    refresh_course(@course)
     redirect_to organization_course_path
   end
 
@@ -95,6 +88,7 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       if @course.save
+        refresh_course(@course)
         format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
@@ -219,5 +213,14 @@ class CoursesController < ApplicationController
     empty_group = sliced[:empty_group] || {}
     groups[''] = empty_group unless empty_group.empty?
     groups
+  end
+
+  def refresh_course(course)
+    authorize! :refresh, course
+    begin
+      session[:refresh_report] = course.refresh
+    rescue CourseRefresher::Failure => e
+      session[:refresh_report] = e.report
+    end
   end
 end

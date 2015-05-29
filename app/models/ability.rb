@@ -40,6 +40,10 @@ class Ability
         can? :teach, c.organization
       end
 
+      can :refresh, Course do |c|
+        c.taught_by?(user)
+      end
+
       cannot :read, Exercise
       can :read, Exercise do |ex|
         ex.visible_to?(user) || (can? :teach, ex.course)
@@ -166,6 +170,9 @@ class Ability
         can? :teach, c.organization
       end
 
+      cannot :read, CourseTemplate
+      can :prepare_course, CourseTemplate
+
       can :request, :organization
       cannot :request, :organization if user.guest?
 
@@ -198,7 +205,6 @@ class Ability
       end
 
       cannot :email, CourseNotification
-      cannot :read, CourseTemplate
     end
   end
 end
