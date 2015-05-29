@@ -290,6 +290,10 @@ class Course < ActiveRecord::Base
     refreshed_at.nil?
   end
 
+  def taught_by?(user)
+    user.teacher?(self.organization)
+  end
+
   private
 
   def check_source_backend
