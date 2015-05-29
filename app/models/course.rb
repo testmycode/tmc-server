@@ -10,7 +10,7 @@ class Course < ActiveRecord::Base
 
   validates :name,
             presence: true,
-            uniqueness: true,
+            uniqueness: { scope: :organization },
             length: { within: 1..40 },
             format: {
               without: / /,
