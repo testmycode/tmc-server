@@ -1,0 +1,23 @@
+sudo: true
+
+language: ruby
+rvm:
+  - 2.2.0
+
+git:
+  submodules: false
+
+before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
+
+services:
+  - postgresql
+
+before_script:
+  - createuser -U postgres -s tmc
+
+script:
+  - bundle exec rake db:reset
+  - export rvmsudo_secure_path=1
+  - rvmsudo bundle exec rake spec SPEC="spec/controllers spec/models spec/helpers spec/mailers"
