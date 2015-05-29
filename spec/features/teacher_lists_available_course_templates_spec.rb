@@ -20,7 +20,7 @@ feature 'Teacher lists available course templates', feature: true do
     log_in_as(@teacher.login, 'xooxer')
 
     visit '/org/slug'
-    click_link 'Create course from template'
+    click_link 'Create New Course from template'
     expect(page).to have_content('template1')
     expect(page).to have_content('template2')
     expect(page).to have_content('template3')
@@ -30,6 +30,6 @@ feature 'Teacher lists available course templates', feature: true do
     log_in_as(@user.login, 'foobar')
 
     visit '/org/slug'
-    expect(page).not_to have_content('Create course from template')
+    expect(page).not_to have_content('Create New Course from template')
   end
 end
