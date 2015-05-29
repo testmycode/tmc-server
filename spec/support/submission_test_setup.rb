@@ -14,7 +14,7 @@ class SubmissionTestSetup
   def initialize(options = {})
     options = default_options.merge(options)
 
-    organization_id = options[:organization].id || 1
+    organization = options[:organization] || Organization.create!(name: 'name', information: 'info', slug: 'slug', acceptance_pending: false)
     course_name = options[:course_name]
     exercise_name = options[:exercise_name] || 'SimpleExercise'
     exercise_dest = options[:exercise_dest] || exercise_name
@@ -25,7 +25,7 @@ class SubmissionTestSetup
     @repo_path = 'remote_repo'
     create_bare_repo(@repo_path)
 
-    @course = Course.create!(name: course_name, source_backend: 'git', source_url: @repo_path, organization_id: organization_id)
+    @course = Course.create!(name: course_name, source_backend: 'git', source_url: @repo_path, organization: organization)
     @repo = clone_course_repo(@course)
     @repo.copy_fixture_exercise(exercise_name, exercise_dest)
     @repo.add_commit_push
