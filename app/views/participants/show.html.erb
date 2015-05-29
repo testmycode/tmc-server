@@ -20,6 +20,9 @@
       <li>Awarded points: <%= points_list(@awarded_points[course.id]) %></li>
       <li>Missing points: <%= points_list(@missing_points[course.id]) %></li>
     </ul>
+    <% if course.certificate_downloadable_for? @user %>
+      <%= link_to 'Download certificate', new_certificates_path(@user, course) %>
+    <% end %>
   <% end %>
 </section>
 

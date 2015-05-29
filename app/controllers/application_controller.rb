@@ -137,6 +137,7 @@ class ApplicationController < ActionController::Base
       end
       format.text { render text: 'ERROR: ' + msg, status: code }
       format.zip { render text: msg, status: code, content_type: 'text/plain' }
+      format.pdf { render text: msg, status: code, content_type: 'text/plain' }
     end
   end
 
