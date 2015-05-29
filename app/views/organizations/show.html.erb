@@ -1,5 +1,9 @@
 <h1><%= @organization.name %></h1>
 
+<div>
+  <%= render template: 'courses/index'  %>
+</div>
+
 <% if current_user.administrator? %>
   <p>
     <strong>Organization ID:</strong>

@@ -10,9 +10,9 @@ describe CoursesController, type: :controller do
     it 'shows visible courses in order by name, split into ongoing and expired' do
       controller.current_user = FactoryGirl.create(:admin)
       @courses = [
-        FactoryGirl.create(:course, name: 'SomeTestCourse'),
-        FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week),
-        FactoryGirl.create(:course, name: 'AnotherTestCourse')
+        FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
+        FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
+        FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
       ]
 
       get :index, organization_id: @organization.slug
