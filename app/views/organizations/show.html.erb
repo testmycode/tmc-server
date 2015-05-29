@@ -71,3 +71,8 @@
 <div>
   <%= render template: 'courses/index'  %>
 </div>
+
+<% if can? :teach, @organization %>
+  <br/><br/>
+  <%= link_to 'Create New Course from template', list_course_templates_path(@organization), class: "btn btn-mini btn-warning" %>
+<% end %>
