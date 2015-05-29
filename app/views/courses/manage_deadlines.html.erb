@@ -1,0 +1,37 @@
+<h1>Edit deadlines</h1>
+<table class="exercise-list table table-hover table-condensed">
+  <thead>
+  <tr>
+    <th>
+      Exercise
+    </th>
+    <th colspan="2"></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @exercises.each do |exercise| %>
+    <tr>
+      <td>
+        <%= link_to exercise.name, exercise %>
+        <%
+           notes = []
+           notes << "hidden" if exercise.hidden?
+           notes << "expired" if exercise.expired_for?(current_user)
+           notes << "locked" unless exercise.unlocked_for?(current_user)
+        %>
+        <% unless notes.empty? %>
+          (<%= notes.join(', ') %>)
+        <% end %>
+      </td>
+      <td>
+        Deadline: <input type="datetime-local" />
+      </td>
+      <td>
+        Dynamic deadline: <input type="text" />
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'Save', '/', class: "btn btn-info" %>

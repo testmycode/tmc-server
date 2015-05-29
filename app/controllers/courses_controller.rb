@@ -89,6 +89,12 @@ class CoursesController < ApplicationController
     end
   end
 
+  def manage_deadlines
+    authorize! :teach, @organization
+    @course = Course.find(params[:id])
+    assign_show_view_vars
+  end
+
   private
 
   def course_params
