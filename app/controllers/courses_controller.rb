@@ -59,14 +59,7 @@ class CoursesController < ApplicationController
 
   def refresh
     @course = Course.find(params[:id])
-    authorize! :refresh, @course
-
-    begin
-      session[:refresh_report] = @course.refresh
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
-    end
-
+    refresh_course(@course)
     redirect_to organization_course_path
   end
 
@@ -82,6 +75,7 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       if @course.save
+        refresh_course(@course)
         format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
@@ -115,5 +109,14 @@ class CoursesController < ApplicationController
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])
+  end
+
+  def refresh_course(course)
+    authorize! :refresh, course
+    begin
+      session[:refresh_report] = course.refresh
+    rescue CourseRefresher::Failure => e
+      session[:refresh_report] = e.report
+    end
   end
 end

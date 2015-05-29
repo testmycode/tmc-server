@@ -282,6 +282,10 @@ class Course < ActiveRecord::Base
     result
   end
 
+  def taught_by?(user)
+    user.teacher?(self.organization)
+  end
+
   private
 
   def check_source_backend
