@@ -54,6 +54,7 @@ class Course < ActiveRecord::Base
   def visible_to?(user)
     user.administrator? ||
     user.teacher?(organization) || (
+      !disabled &&
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
       (

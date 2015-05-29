@@ -7,7 +7,7 @@ class CoursesController < ApplicationController
   before_action :set_organization
 
   def index
-    ordering = 'hidden, LOWER(name)'
+    ordering = 'hidden, disabled DESC, LOWER(name)'
 
     respond_to do |format|
       format.html do
@@ -102,6 +102,16 @@ class CoursesController < ApplicationController
     end
   end
 
+  def enable
+    authorize! :teach, @organization
+    disable_course(false)
+  end
+
+  def disable
+    authorize! :teach, @organization
+    disable_course(true)
+  end
+
   private
 
   def course_params
@@ -128,5 +138,13 @@ class CoursesController < ApplicationController
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])
+  end
+
+  def disable_course(disabled)
+    @course = Course.find(params[:id])
+    @course.disabled = disabled
+    notice_action = disabled ? 'disabled' : 'enabled'
+    notice_message = (@course.save ? 'Course was successfully' : 'Course could not be') + " #{notice_action}."
+    redirect_to(organization_course_path(@organization, @course), notice: notice_message)
   end
 end
