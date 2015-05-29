@@ -105,7 +105,8 @@ class Exercise < ActiveRecord::Base
 
   # Whether a user may see all metadata about the exercise
   def visible_to?(user)
-    user.administrator? || (!hidden? && published? && unlock_spec_obj.permits_unlock_for?(user))
+    user.administrator? || user.teacher?(course.organization) ||
+      (!hidden? && published? && unlock_spec_obj.permits_unlock_for?(user))
   end
 
   # Whether the user may see the scoreboard for the exercise

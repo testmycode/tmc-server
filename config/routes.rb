@@ -17,6 +17,8 @@ TmcServer::Application.routes.draw do
       member do
         get 'refresh'
         post 'refresh'
+        post 'enable'
+        post 'disable'
       end
 
       resources :points, only: [:index, :show] do

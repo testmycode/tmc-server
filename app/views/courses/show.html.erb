@@ -13,7 +13,7 @@
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
       </ul>
-      <% if can? :read, :course_information %>
+      <% if can? :teach, @organization %>
         <ul>
           <li>Source type: <%= @course.source_backend.upcase %> </li>
           <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
@@ -31,6 +31,10 @@
           <% end %>
           <% if @course.refreshed_at %>
             <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
+          <% end %>
+
+          <% if @course.disabled? %>
+            <li>The course is currently <strong>disabled</strong>.</li>
           <% end %>
 
           <% if @course.hidden? %>
@@ -89,6 +93,14 @@
       <% end %>
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
+      <% end %>
+
+      <% if can? :teach, @organization %>
+        <% if @course.disabled? %>
+          <%= link_to 'Enable Course', enable_organization_course_path(@organization, @course), method: :post, class: "btn btn-info btn-mini" %>
+        <% else %>
+          <%= link_to 'Disable Course', disable_organization_course_path(@organization, @course), method: :post, class: "btn btn-danger btn-mini" %>
+        <% end %>
       <% end %>
       <% unlockables = @course.unlockable_exercises_for(current_user) %>
       <% unless unlockables.empty? %>

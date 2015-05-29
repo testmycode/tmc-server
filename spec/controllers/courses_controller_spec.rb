@@ -3,7 +3,9 @@ require 'spec_helper'
 describe CoursesController, type: :controller do
   before(:each) do
     @user = FactoryGirl.create(:user)
+    @teacher = FactoryGirl.create(:user)
     @organization = FactoryGirl.create(:accepted_organization)
+    Teachership.create(user: @teacher, organization: @organization)
   end
 
   describe 'GET index' do
@@ -223,6 +225,50 @@ describe CoursesController, type: :controller do
         post :create, organization_id: @organization.slug, course: { name: 'invalid name with spaces' }
         expect(response).to render_template('new')
         expect(assigns(:course).name).to eq('invalid name with spaces')
+      end
+    end
+  end
+
+  describe 'POST disable' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+    end
+
+    describe 'As a teacher' do
+      it 'disables the course' do
+        controller.current_user = @teacher
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(assigns(:course).disabled).to eq(true)
+      end
+    end
+
+    describe 'As a student' do
+      it 'denies access' do
+        controller.current_user = @user
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+  end
+
+  describe 'POST enable' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+    end
+
+    describe 'As a teacher' do
+      it 'enables the course' do
+        controller.current_user = @teacher
+        post :enable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(assigns(:course).disabled).to eq(false)
+      end
+    end
+
+    describe 'As a student' do
+      it 'denies access' do
+        controller.current_user = @user
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(response.code.to_i).to eq(401)
       end
     end
   end
