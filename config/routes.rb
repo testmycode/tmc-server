@@ -17,6 +17,7 @@ TmcServer::Application.routes.draw do
       member do
         get 'refresh'
         post 'refresh'
+        get 'manage_deadlines'
       end
 
       resources :points, only: [:index, :show] do

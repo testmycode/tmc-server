@@ -87,6 +87,9 @@
           <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
       <% end %>
+      <% if can? :teach, @organization %>
+        <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
+      <% end %>
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
       <% end %>
