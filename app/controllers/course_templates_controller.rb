@@ -1,5 +1,5 @@
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, only: [:edit, :update, :destroy]
+  before_action :set_course_template, only: [:edit, :update, :destroy, :prepare_course]
 
   def index
     authorize! :read, CourseTemplate
@@ -35,13 +35,19 @@ class CourseTemplatesController < ApplicationController
 
   def destroy
     @course_template.destroy
-    redirect_to course_templates_url, notice: 'Course template was successfully destroyed.'
+    redirect_to course_templates_path, notice: 'Course template was successfully destroyed.'
   end
 
   def list_for_teachers
-    organization_slug = params[:id]
-    authorize! :teach, Organization.find_by_slug(organization_slug)
+    @organization = Organization.find_by(slug: params[:organization_id])
+    authorize! :teach, @organization
     @course_templates = CourseTemplate.all
+  end
+
+  def prepare_course
+    @organization = Organization.find_by(slug: params[:organization_id])
+    authorize! :teach, @organization
+    @course = Course.new name: @course_template.name, source_url: @course_template.source_url
   end
 
   private
