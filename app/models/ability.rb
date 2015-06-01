@@ -73,8 +73,8 @@ class Ability
 
       cannot :read, CourseTemplate
 
-      can :create, :organization
-      cannot :create, :organization if user.guest?
+      can :request, :organization
+      cannot :request, :organization if user.guest?
 
       cannot :teach, Organization
       can :teach, Organization do |o|
