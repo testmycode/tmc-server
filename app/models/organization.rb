@@ -16,7 +16,7 @@ class Organization < ActiveRecord::Base
   validate :valid_slug?, on: :create
 
   has_many :teacherships, dependent: :destroy
-  has_many :users, through: :teacherships
+  has_many :teachers, through: :teacherships, source: :user
 
   scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
   scope :pending_organizations, -> { where(acceptance_pending: true) }
@@ -29,10 +29,6 @@ class Organization < ActiveRecord::Base
       teachership.destroy
     end
     organization
-  end
-
-  def teachers
-    users
   end
 
   def teacher?(user)
@@ -48,7 +44,8 @@ class Organization < ActiveRecord::Base
   end
 
   def valid_slug? # slug must not be an existing route (/org/new etc)
-    errors.add(:slug, 'is a system reserved word') if
-      %w(new list_requests).include? slug
+    if %w(new list_requests).include? slug
+      errors.add(:slug, 'is a system reserved word')
+    end
   end
 end

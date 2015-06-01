@@ -82,6 +82,9 @@ class Ability
       can :create, :organization
       cannot :create, :organization if user.guest?
 
+      can :request, :organization
+      cannot :request, :organization if user.guest?
+
       cannot :manage_teachers, Organization
       can :manage_teachers, Organization do |o|
         o.teacher?(user)

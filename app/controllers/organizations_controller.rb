@@ -11,7 +11,7 @@ class OrganizationsController < ApplicationController
   end
 
   def new
-    authorize! :create, :organization
+    authorize! :request, :organization
     @organization = Organization.new
   end
 
@@ -20,7 +20,7 @@ class OrganizationsController < ApplicationController
   end
 
   def create
-    authorize! :create, :organization
+    authorize! :request, :organization
     @organization = Organization.init(organization_params, current_user)
 
     if !@organization.errors.any?
