@@ -1,4 +1,21 @@
 TmcServer::Application.routes.draw do
+  resources :organizations, path: 'org' do
+    member do
+      post 'accept'
+      post 'reject'
+      get 'reject_reason_input'
+      get 'course_templates', to: 'course_templates#list_for_teachers'
+    end
+
+    collection do
+      get 'list_requests'
+    end
+
+    resources :teachers, only: [:index, :new, :create, :destroy]
+  end
+
+  resources :course_templates, except: :show
+
   resources :sessions, only: [:new, :create, :destroy]
 
   get '/signin', to: 'sessions#new'

@@ -1,0 +1,38 @@
+<h1>Organizations</h1>
+
+<% if current_user.administrator? && !Organization.pending_organizations.empty? %>
+  <div class="alert alert-warning" role="alert">
+    <%= pluralize(Organization.pending_organizations.size, 'new organization request') %>.
+    <%= link_to 'Show', list_requests_organizations_path %>
+  </div>
+<% end %>
+
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Information</th>
+    <th colspan="2"></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @organizations.each do |organization| %>
+    <tr>
+      <td><%= link_to organization.name, organization %></td>
+      <td><%= organization.information %></td>
+
+      <% if current_user.administrator? %>
+        <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
+        <td><%= link_to 'Destroy', organization, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<% if !current_user.guest? %>
+    <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
+<% end %>

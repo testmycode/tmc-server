@@ -70,6 +70,16 @@ class Ability
 
       cannot :reply, FeedbackAnswer
       cannot :email, CourseNotification
+
+      cannot :read, CourseTemplate
+
+      can :request, :organization
+      cannot :request, :organization if user.guest?
+
+      cannot :teach, Organization
+      can :teach, Organization do |o|
+        o.teacher?(user) && !o.rejected?
+      end
     end
   end
 end

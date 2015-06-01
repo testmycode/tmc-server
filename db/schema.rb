@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150222171258) do
+ActiveRecord::Schema.define(version: 20150526082930) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,6 +43,18 @@ ActiveRecord::Schema.define(version: 20150222171258) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "course_templates", force: true do |t|
+    t.string   "name"
+    t.string   "title"
+    t.string   "description"
+    t.string   "material_url"
+    t.string   "source_url"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "course_templates", ["name"], name: "index_course_templates_on_name", unique: true, using: :btree
 
   create_table "courses", force: true do |t|
     t.string   "name"
@@ -109,6 +121,21 @@ ActiveRecord::Schema.define(version: 20150222171258) do
   end
 
   add_index "feedback_questions", ["id"], name: "index_feedback_questions_on_id", using: :btree
+
+  create_table "organizations", force: true do |t|
+    t.string   "name"
+    t.string   "information"
+    t.string   "slug"
+    t.datetime "accepted_at"
+    t.boolean  "acceptance_pending"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "rejected",           default: false, null: false
+    t.string   "rejected_reason"
+  end
+
+  add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
+  add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
 
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false
@@ -198,6 +225,16 @@ ActiveRecord::Schema.define(version: 20150222171258) do
   add_index "submissions", ["course_id", "user_id"], name: "index_submissions_on_course_id_and_user_id", using: :btree
   add_index "submissions", ["processed"], name: "index_submissions_on_processed", using: :btree
   add_index "submissions", ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name", using: :btree
+
+  create_table "teacherships", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "organization_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "teacherships", ["organization_id"], name: "index_teacherships_on_organization_id", using: :btree
+  add_index "teacherships", ["user_id"], name: "index_teacherships_on_user_id", using: :btree
 
   create_table "test_case_runs", force: true do |t|
     t.integer  "submission_id"
