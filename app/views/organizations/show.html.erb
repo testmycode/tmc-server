@@ -8,7 +8,7 @@
 
   <p>
     <strong>Requested by:</strong>
-    <% requested_by = @organization.users.first %>
+    <% requested_by = @organization.teachers.first %>
     <%= link_to requested_by.username, participant_path(requested_by) %>
   </p>
 
