@@ -139,8 +139,8 @@ class Ability
 
       cannot :reply, FeedbackAnswer
 
-      can :create, :organization
-      cannot :create, :organization if user.guest?
+      can :request, :organization
+      cannot :request, :organization if user.guest?
 
       can :list_user_emails, Course do |c|
         can? :teach, c
