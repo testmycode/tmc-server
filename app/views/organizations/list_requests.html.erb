@@ -13,7 +13,7 @@
 
   <tbody>
   <% @requested_organizations.each do |organization| %>
-    <% requested_by = organization.users.first %>
+    <% requested_by = organization.teachers.first %>
     <tr>
       <td><%= organization.name %></td>
       <td><%= organization.information %></td>
