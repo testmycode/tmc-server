@@ -8,7 +8,7 @@ FactoryGirl.define do
     sequence(:title) { |n| "template title#{n}" }
     sequence(:description) { |n| "course descriptiong#{n}" }
     sequence(:material_url) { |n| "http://www.material#{n}.com" }
-    sequence(:source_url) { |n| "git@example#{n}.com" }
+    source_url 'https://github.com/testmycode/tmc-testcourse.git'
   end
 
   factory :user do
