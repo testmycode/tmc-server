@@ -21,21 +21,11 @@ class CourseTemplate < ActiveRecord::Base
   validate :valid_source_url?
 
   def valid_source_url?
-    FileUtils.rm_rf(clone_validation_path)
-    FileUtils.mkdir_p(clone_validation_path)
-    sh!('git', 'clone', '-q', '-b', 'master', self.source_url, clone_validation_path)
-    if File.exist?("#{clone_validation_path}/.git")
-      FileUtils.rm_rf(clone_validation_path)
-      return true
+    Dir.mktmpdir do |dir|
+      sh!('git', 'clone', '-q', '-b', 'master', self.source_url, dir)
+      File.exist?("#{dir}/.git")
     end
-    FileUtils.rm_rf(clone_validation_path)
-    errors.add(:source_url, 'is invalid: Could not clone git repo')
   rescue StandardError => e
-    FileUtils.rm_rf(clone_validation_path)
     errors.add(:source_url, 'is invalid: ' + e.to_s)
-  end
-
-  def clone_validation_path
-    "#{FileStore.root}/validation"
   end
 end
