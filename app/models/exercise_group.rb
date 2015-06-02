@@ -53,4 +53,15 @@ class ExerciseGroup
   def inspect
     "<ExerciseGroup #{@course.name}:#{@name}>"
   end
+
+  def group_deadline
+    exercises(false).map { |n| n.deadline_spec_obj }.first
+  end
+
+  def group_deadline=(deadline)
+    exercises(false).each do |e|
+      e.deadline_spec=(deadline)
+      e.save
+    end
+  end
 end

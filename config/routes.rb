@@ -23,6 +23,7 @@ TmcServer::Application.routes.draw do
         get 'students', to: 'courses#student_emails'
         resources :emails, only: [:index]
         get 'manage_deadlines'
+        post 'save_deadlines'
       end
 
       resources :assistants, only: [:index, :create, :destroy]
