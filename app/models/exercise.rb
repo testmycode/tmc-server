@@ -215,6 +215,14 @@ class Exercise < ActiveRecord::Base
       end
   end
 
+  def static_deadline
+    deadline_spec_obj.static_deadline_spec
+  end
+
+  def personal_deadline
+    deadline_spec_obj.personal_deadline_spec
+  end
+
   def requires_unlock?
     !unlock_spec_obj.empty?
   end
