@@ -98,6 +98,10 @@
       <% end %>
     </div>
 
+    <% if signed_in? %>
+        <div class="alternative-format-links">[<%= link_to 'json', "#{json_organization_course_path organization_id: @organization.slug, id: @course.id, api_version: ApiVersion::API_VERSION}" %>]</div>
+    <% end %>
+
     <h2>All exercises</h2>
     <div>
       <%=
