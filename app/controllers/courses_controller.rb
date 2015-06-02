@@ -17,7 +17,7 @@ class CoursesController < ApplicationController
         authorize! :read, @expired_courses
       end
       format.json do
-        courses = Course.ongoing.order(ordering)
+        courses = @organization.courses.ongoing.order(ordering)
         courses = courses.select { |c| c.visible_to?(current_user) }
         authorize! :read, courses
         return respond_access_denied('Authentication required') if current_user.guest?
