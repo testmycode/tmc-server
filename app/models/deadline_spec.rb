@@ -40,11 +40,11 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
   end
 
   def static_deadline_spec
-    @specs.select { |n| !n.nil? || DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
+    @specs.select { |n| !n.nil? && DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
   end
 
   def personal_deadline_spec
-    @specs.select { |n| !n.nil? || !DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
+    @specs.select { |n| !n.nil? && !DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
   end
 
   private
