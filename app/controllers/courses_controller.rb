@@ -65,7 +65,7 @@ class CoursesController < ApplicationController
 
   def new
     @course = Course.new
-    authorize! :create, @exercises
+    authorize! :teach, @organization
   end
 
   def create
