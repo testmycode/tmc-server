@@ -5,7 +5,7 @@ describe CourseTemplate, type: :model do
     let(:valid_params) do
       {
         name: 'TestTemplateCourse',
-        source_url: 'http://example.com',
+        source_url: 'https://github.com/testmycode/tmc-testcourse.git',
         title: 'Test Template Title'
       }
     end
