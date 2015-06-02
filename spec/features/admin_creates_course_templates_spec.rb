@@ -19,7 +19,7 @@ feature 'Admin creates course templates', feature: true do
     fill_in 'course_template_title', with: 'title'
     fill_in 'course_template_description', with: 'description'
     fill_in 'course_template_material_url', with: 'material'
-    fill_in 'course_template_source_url', with: 'source'
+    fill_in 'course_template_source_url', with: 'https://github.com/testmycode/tmc-testcourse.git'
     click_button 'Create Course template'
 
     expect(page).to have_content('title')
