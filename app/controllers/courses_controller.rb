@@ -57,6 +57,19 @@ class CoursesController < ApplicationController
     end
   end
 
+  # Method for teacher to give a single course for students to select.
+  def show_json
+    course = [Course.find(params[:id])]
+    authorize! :read, course
+    return respond_access_denied('Authentication required') if current_user.guest?
+
+    data = {
+        api_version: ApiVersion::API_VERSION,
+        courses: CourseList.new(current_user, view_context).course_list_data(@organization, course)
+    }
+    render json: data.to_json
+  end
+
   def refresh
     authorize! :refresh, @course
 
