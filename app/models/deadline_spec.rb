@@ -39,6 +39,14 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
     !!@depends_on_unlock_time
   end
 
+  def static_deadline_spec
+    @specs.select { |n| !n.nil? || DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
+  end
+
+  def personal_deadline_spec
+    @specs.select { |n| !n.nil? || !DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
+  end
+
   private
 
   def min_spec(user)
@@ -46,12 +54,13 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
   end
 
   class SingleSpec
-    def initialize(timefun, universal_description, personal_describer)
+    def initialize(spec, timefun, universal_description, personal_describer)
+      @raw_spec = spec
       @timefun = timefun
       @universal_description = universal_description
       @personal_describer = personal_describer
     end
-    attr_accessor :timefun, :universal_description, :personal_describer
+    attr_accessor :raw_spec, :timefun, :universal_description, :personal_describer
   end
 
   def parse_spec(spec)
@@ -61,7 +70,7 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
       timefun = ->(_user) { time }
       universal = "#{time}"
       personal = ->(_u) { universal }
-      @specs << SingleSpec.new(timefun, universal, personal)
+      @specs << SingleSpec.new(spec, timefun, universal, personal)
     elsif spec =~ /^unlock\s*[+]\s*(\d+)\s+(minutes?|hours?|days?|weeks?|months?|years?)$/
       time_scalar = $1
       time_unit = $2
@@ -79,7 +88,7 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
       personal = lambda do |_user|
         "#{time_scalar} #{time_unit} after unlock"
       end
-      @specs << SingleSpec.new(timefun, universal, personal)
+      @specs << SingleSpec.new(spec, timefun, universal, personal)
     else
       fail InvalidSyntaxError.new('Invalid syntax')
     end

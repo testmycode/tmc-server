@@ -3,12 +3,37 @@
   <thead>
   <tr>
     <th>
+      Exercise group
+    </th>
+    <th>
       Exercise
     </th>
-    <th colspan="2"></th>
+    <th>
+      Group attributes
+    </th>
   </tr>
   </thead>
   <tbody>
+  <%= form_tag '/test', method: :post do %>
+    <% @course.exercise_groups.each do |group| %>
+      <tr>
+        <td>
+          <%= group.name %><br/>
+        </td>
+        <td>
+          <% group.exercises(true).each do |exercise| %>
+            <%= exercise.name %><br/>
+          <% end %>
+        </td>
+        <td>
+          <%= label_tag group.name, 'Deadline' %>
+          <%= text_field_tag group.name %>
+        </td>
+      </tr>
+    <% end %>
+  <% end %>
+
+  <!--
   <% @exercises.each do |exercise| %>
     <tr>
       <td>
@@ -24,13 +49,14 @@
         <% end %>
       </td>
       <td>
-        Deadline: <input type="datetime-local" />
+        Deadline: <input type="datetime-local" /><br/>
       </td>
       <td>
         Dynamic deadline: <input type="text" />
       </td>
     </tr>
   <% end %>
+  -->
   </tbody>
 </table>
 
