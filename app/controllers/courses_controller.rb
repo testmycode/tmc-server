@@ -5,6 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
+  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines]
 
   def index
     ordering = 'hidden, LOWER(name)'
@@ -37,7 +38,6 @@ class CoursesController < ApplicationController
       session.delete(:refresh_report)
     end
 
-    @course = Course.find(params[:id])
     authorize! :read, @course
     UncomputedUnlock.resolve(@course, current_user)
 
@@ -58,7 +58,6 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-    @course = Course.find(params[:id])
     authorize! :refresh, @course
 
     begin
@@ -91,8 +90,24 @@ class CoursesController < ApplicationController
 
   def manage_deadlines
     authorize! :teach, @organization
-    @course = Course.find(params[:id])
     assign_show_view_vars
+  end
+
+  def save_deadlines
+    authorize! :teach, @organization
+
+    groups = deadline_params[:group] || {}
+    empty_group = deadline_params[:empty_group] || {}
+    groups[''] = empty_group unless empty_group.empty?
+
+    groups.each do |name, deadlines|
+      json_array = [deadlines[:static], deadlines[:unlock]].to_json
+      @course.exercise_group_by_name(name).group_deadline=(json_array)
+    end
+
+    redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
+  rescue DeadlineSpec::InvalidSyntaxError => e
+    redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s
   end
 
   private
@@ -121,5 +136,13 @@ class CoursesController < ApplicationController
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])
+  end
+
+  def set_course
+    @course = Course.find(params[:id])
+  end
+
+  def deadline_params
+    params.slice(:group, :empty_group)
   end
 end
