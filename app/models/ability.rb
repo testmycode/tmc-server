@@ -205,6 +205,11 @@ class Ability
       end
 
       cannot :email, CourseNotification
+
+      cannot :clone, CourseTemplate
+      can :clone, CourseTemplate do |ct|
+        ct.clonable?
+      end
     end
   end
 end
