@@ -80,17 +80,17 @@ class Ability
       cannot :read, CourseTemplate
       can :prepare_course, CourseTemplate
 
+      cannot :clone, CourseTemplate
+      can :clone, CourseTemplate do |ct|
+        ct.clonable?
+      end
+
       can :request, :organization
       cannot :request, :organization if user.guest?
 
       cannot :teach, Organization
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected?
-      end
-
-      cannot :clone, CourseTemplate
-      can :clone, CourseTemplate do |ct|
-        ct.clonable?
       end
 
     end
