@@ -19,6 +19,8 @@ TmcServer::Application.routes.draw do
         post 'refresh'
         get 'manage_deadlines'
         post 'save_deadlines'
+        get 'manage_unlocks'
+        post 'save_unlocks'
       end
 
       resources :points, only: [:index, :show] do
