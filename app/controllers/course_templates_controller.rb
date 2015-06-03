@@ -41,12 +41,13 @@ class CourseTemplatesController < ApplicationController
   def list_for_teachers
     @organization = Organization.find_by(slug: params[:organization_id])
     authorize! :teach, @organization
-    @course_templates = CourseTemplate.all
+    @course_templates = CourseTemplate.not_expired
   end
 
   def prepare_course
     @organization = Organization.find_by(slug: params[:organization_id])
     authorize! :teach, @organization
+    authorize! :clone, @course_template
     @course = Course.new name: @course_template.name, source_url: @course_template.source_url
   end
 
@@ -58,6 +59,6 @@ class CourseTemplatesController < ApplicationController
   end
 
   def course_template_params
-    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url)
+    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at)
   end
 end
