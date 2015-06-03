@@ -87,6 +87,12 @@ class Ability
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected?
       end
+
+      cannot :clone, CourseTemplate
+      can :clone, CourseTemplate do |ct|
+        ct.clonable?
+      end
+
     end
   end
 end

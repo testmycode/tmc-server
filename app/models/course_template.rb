@@ -20,13 +20,19 @@ class CourseTemplate < ActiveRecord::Base
   validates :description, length: { maximum: 512 }
   validate :valid_source_url?
 
+  scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
+
   def valid_source_url?
     return true unless source_url_changed? # don't attempt repo cloning if source url wasn't even changed
     Dir.mktmpdir do |dir|
-      sh!('git', 'clone', '-q', '-b', 'master', self.source_url, dir)
+      sh!('git', 'clone', '-q', '-b', 'master', source_url, dir)
       File.exist?("#{dir}/.git")
     end
   rescue StandardError => e
     errors.add(:source_url, 'is invalid: ' + e.to_s)
+  end
+
+  def clonable?
+    expires_at.nil? || expires_at > Time.now
   end
 end
