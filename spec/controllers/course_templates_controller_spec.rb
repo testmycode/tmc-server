@@ -126,6 +126,14 @@ describe CourseTemplatesController, type: :controller do
         expect(response).to redirect_to(course_templates_url)
       end
     end
+
+    describe 'POST toggle_hidden' do
+      it 'changes course templates visibility' do
+        @course_template = FactoryGirl.create :course_template, name: 'template', hidden: false
+        post :toggle_hidden, id: @course_template.to_param
+        expect(CourseTemplate.last.hidden).to be(true)
+      end
+    end
   end
 
   describe 'when non admin' do

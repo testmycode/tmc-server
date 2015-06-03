@@ -59,7 +59,11 @@ resources :organizations, except: :destory, path: 'org' do
     end
   end
 
-  resources :course_templates, except: :show
+  resources :course_templates, except: :show do
+    member do
+      post 'toggle_hidden', to: 'course_templates#toggle_hidden'
+    end
+  end
 
   resources :sessions, only: [:new, :create, :destroy]
 
