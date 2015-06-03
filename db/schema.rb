@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.string   "source_url"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "expires_at"
   end
 
   add_index "course_templates", ["name"], name: "index_course_templates_on_name", unique: true, using: :btree
