@@ -12,7 +12,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     @describers = []
     for i in 0...conditions.size
       begin
-        parse_condition(conditions[i].to_s.strip)
+        parse_condition(conditions[i].to_s.strip) unless conditions[i].to_s.blank?
       rescue InvalidSyntaxError
         raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
       rescue

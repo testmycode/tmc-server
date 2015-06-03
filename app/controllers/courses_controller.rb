@@ -141,8 +141,10 @@ class CoursesController < ApplicationController
     authorize! :teach, @organization
 
     groups = group_params
-    groups.each do |name, unlock_date|
-      @course.exercise_group_by_name(name).group_unlock_date=([unlock_date].to_json)
+    groups.each do |name, conditions|
+      array = []
+      conditions.each { |k, v| array << v }
+      @course.exercise_group_by_name(name).group_unlock_date=(array.to_json)
     end
 
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
