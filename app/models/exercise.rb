@@ -190,7 +190,7 @@ class Exercise < ActiveRecord::Base
   def unlock_spec=(spec)
     check_is_json_array_of_strings(spec)
     super(spec)
-    @unlock_spec_obj = nil
+    @unlock_spec_obj = UnlockSpec.new(self, ActiveSupport::JSON.decode(spec))
   end
 
   def unlock_spec_obj
@@ -200,6 +200,10 @@ class Exercise < ActiveRecord::Base
       else
         UnlockSpec.new(course, [])
       end
+  end
+
+  def unlock_conditions
+    unlock_spec_obj.raw_spec
   end
 
   def deadline_spec=(spec)

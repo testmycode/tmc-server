@@ -24,6 +24,8 @@ TmcServer::Application.routes.draw do
         resources :emails, only: [:index]
         get 'manage_deadlines'
         post 'save_deadlines'
+        get 'manage_unlocks'
+        post 'save_unlocks'
       end
 
       resources :assistants, only: [:index, :create, :destroy]
