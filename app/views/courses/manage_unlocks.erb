@@ -41,8 +41,8 @@
                    param_array = "group[#{group.name}]"
                  end
               %>
-              <%= label_tag "#{param_array}", 'Unlock date' %>
-              <%= text_field_tag "#{param_array}", group.group_unlock_conditions[0] %>
+              <%= label_tag "#{param_array}[0]", 'Unlock date' %>
+              <%= text_field_tag "#{param_array}[0]", group.group_unlock_conditions[0] %>
             </td>
           </tr>
       <% end %>
