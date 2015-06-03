@@ -226,4 +226,39 @@ describe CoursesController, type: :controller do
       end
     end
   end
+
+  describe 'POST save_deadlines' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+      @course.organization = @organization
+
+      Teachership.create(user: @user, organization: @organization)
+      controller.current_user = @user
+    end
+
+    it 'saves deadlines for courses in empty group (name: "")' do
+      @course.exercises.create(name: 'e1')
+      @course.exercises.create(name: 'e2')
+      @course.exercises.create(name: 'e3')
+
+      post :save_deadlines, organization_id: @organization.slug, id: @course.id, empty_group: { static: '1.1.2000', unlock: '' }
+
+      @course.exercise_group_by_name('').exercises(false).each do |e|
+        expect(e.static_deadline).to eq('1.1.2000')
+      end
+    end
+
+    it 'saves deadlines for courses in a group' do
+      @course.exercises.create(name: 'group1-e1')
+      @course.exercises.create(name: 'group1-e2')
+      @course.exercises.create(name: 'group1-e3')
+
+      post :save_deadlines, organization_id: @organization.slug, id: @course.id, group: { 'group1': { static: '1.1.2000', unlock: 'unlock + 7 days' } }
+
+      @course.exercise_group_by_name('group1').exercises(false).each do |e|
+        expect(e.static_deadline).to eq('1.1.2000')
+        expect(e.unlock_deadline).to eq('unlock + 7 days')
+      end
+    end
+  end
 end
