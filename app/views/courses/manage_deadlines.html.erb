@@ -45,7 +45,7 @@
           <%= label_tag "#{param_array}[static]", 'Deadline' %>
           <%= text_field_tag "#{param_array}[static]", deadline.static_deadline_spec %>
           <%= label_tag "#{param_array}[unlock]", 'Unlock-based deadline' %>
-          <%= text_field_tag "#{param_array}[unlock]", deadline.personal_deadline_spec %>
+          <%= text_field_tag "#{param_array}[unlock]", deadline.unlock_deadline_spec %>
         </td>
       </tr>
     <% end %>
