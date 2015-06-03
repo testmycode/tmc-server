@@ -21,6 +21,8 @@ class CourseTemplate < ActiveRecord::Base
   validate :valid_source_url?
 
   scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
+  scope :not_hidden, -> { where(hidden: false) }
+  scope :available, -> { not_expired.not_hidden }
 
   def valid_source_url?
     Dir.mktmpdir do |dir|
@@ -32,6 +34,6 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def clonable?
-    expires_at.nil? || expires_at > Time.now
+    !hidden && (expires_at.nil? || expires_at > Time.now)
   end
 end
