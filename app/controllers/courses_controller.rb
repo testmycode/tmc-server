@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :maange_unlocks, :save_unlocks]
+  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :manage_unlocks, :save_unlocks]
 
   def index
     ordering = 'hidden, LOWER(name)'
@@ -109,7 +109,6 @@ class CoursesController < ApplicationController
 
   def manage_unlocks
     authorize! :teach, @organization
-    @course = Course.find(params[:id])
     assign_show_view_vars
   end
 
@@ -120,7 +119,8 @@ class CoursesController < ApplicationController
     groups.each do |name, conditions|
       array = []
       conditions.each { |k, v| array << v }
-      @course.exercise_group_by_name(name).group_unlock_date=(array.to_json)
+      @course.exercise_group_by_name(name).group_unlock_date = array.to_json
+      UncomputedUnlock.resolve @course, current_user
     end
 
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
