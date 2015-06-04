@@ -1,5 +1,4 @@
 class FeedbackAnswersController < ApplicationController
-
   def index
     if params[:course_id]
       @course = Course.find(params[:course_id])
@@ -18,12 +17,13 @@ class FeedbackAnswersController < ApplicationController
       return respond_not_found
     end
 
+    @organization = @course.organization
     add_course_breadcrumb
     if @exercise
       add_exercise_breadcrumb
       add_breadcrumb 'Feedback', exercise_feedback_answers_path(@exercise)
     else
-      add_breadcrumb 'Feedback', course_feedback_answers_path(@course)
+      add_breadcrumb 'Feedback', organization_course_feedback_answers_path
     end
 
     @numeric_questions = @course.feedback_questions.where("kind LIKE 'intrange%'").order(:position)

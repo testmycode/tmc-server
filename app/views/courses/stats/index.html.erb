@@ -1,5 +1,5 @@
 <h1>Course stats</h1>
 <ul>
-  <li><%= link_to "Submissions over time", course_stat_path(@course, 'submissions') %></li>
-  <li><%= link_to "Submissions per hour", course_stat_path(@course, 'submission_times') %></li>
+  <li><%= link_to "Submissions over time", organization_course_stat_path(@organization, @course, 'submissions') %></li>
+  <li><%= link_to "Submissions per hour", organization_course_stat_path(@organization, @course, 'submission_times') %></li>
 </ul>

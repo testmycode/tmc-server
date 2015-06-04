@@ -4,14 +4,15 @@ describe 'Viewing feedback', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
+    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
     @user = FactoryGirl.create(:admin, password: 'xooxer')
     visit '/'
     log_in_as(@user.login, 'xooxer')
 
-    @course = FactoryGirl.create(:course)
+    @course = FactoryGirl.create(:course, organization: @organization)
     @question = FactoryGirl.create(:feedback_question, course: @course)
 
-    visit '/'
+    visit '/org/slug/courses'
   end
 
   it 'should be possible per-course' do
@@ -33,7 +34,7 @@ describe 'Viewing feedback', type: :request, integration: true do
     click_link 'View feedback'
     expect(page).to have_content('this is the answer')
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link @course.name
     click_link @ex2.name
     click_link 'View feedback'

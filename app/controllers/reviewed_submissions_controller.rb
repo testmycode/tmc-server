@@ -2,11 +2,12 @@
 class ReviewedSubmissionsController < ApplicationController
   skip_authorization_check
   before_action :check_access
+  before_action :set_organization
 
   def index
     @course = Course.find(params[:course_id])
     add_course_breadcrumb
-    add_breadcrumb 'Reviewed submissions', course_reviewed_submissions_path(@course)
+    add_breadcrumb 'Reviewed submissions', organization_course_reviewed_submissions_path
 
     @submissions = @course.submissions
       .where(reviewed: true)
@@ -19,5 +20,9 @@ class ReviewedSubmissionsController < ApplicationController
 
   def check_access
     respond_access_denied unless current_user.administrator?
+  end
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

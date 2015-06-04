@@ -7,7 +7,7 @@ class CourseInfo
     @course_list = CourseList.new(user, helpers)
   end
 
-  def course_data(course)
+  def course_data(organization, course)
     exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
 
     @unlocked_exercises = course.unlocks
@@ -24,8 +24,8 @@ class CourseInfo
       ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
     end
 
-    @course_list.course_data(course).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
-                                           exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
+    @course_list.course_data(organization, course).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
+                                                         exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
   end
 
   private

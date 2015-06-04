@@ -5,17 +5,17 @@ class CourseList
     @helpers = helpers
   end
 
-  def course_list_data(courses)
-    courses.map { |c| course_data(c) }
+  def course_list_data(organization, courses)
+    courses.map { |c| course_data(organization, c) }
   end
 
-  def course_data(course)
+  def course_data(organization, course)
     {
       id: course.id,
       name: course.name,
-      details_url: @helpers.course_url(course, format: :json),
-      unlock_url: @helpers.course_unlock_url(course, format: :json),
-      reviews_url: @helpers.course_reviews_url(course, format: :json),
+      details_url: @helpers.organization_course_url(organization, course, format: :json),
+      unlock_url: @helpers.organization_course_unlock_url(organization, course, format: :json),
+      reviews_url: @helpers.organization_course_reviews_url(organization, course, format: :json),
       comet_url: CometServer.get.client_url,
       spyware_urls: SiteSetting.value('spyware_servers')
     }

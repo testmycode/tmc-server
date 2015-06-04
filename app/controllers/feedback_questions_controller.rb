@@ -4,6 +4,7 @@
 # TODO: While this is nice, I think feedback questions should live in a conf file in the repo so that the entire course is defined by the repo.
 class FeedbackQuestionsController < ApplicationController
   before_action :get_course
+  before_action :set_organization
 
   def index
     add_course_breadcrumb
@@ -27,7 +28,7 @@ class FeedbackQuestionsController < ApplicationController
 
     if @question.save
       flash[:success] = 'Question created.'
-      redirect_to course_feedback_questions_path(@question.course)
+      redirect_to organization_course_feedback_questions_path(@organization, @question.course)
     else
       flash.now[:error] = 'Failed to create question.'
       render :new
@@ -44,6 +45,7 @@ class FeedbackQuestionsController < ApplicationController
   def update
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
+    @organization = @course.organization
     authorize! :read, @course
     authorize! :update, @question
 
@@ -52,7 +54,7 @@ class FeedbackQuestionsController < ApplicationController
 
     if @question.save
       flash[:success] = 'Question updated.'
-      redirect_to course_feedback_questions_path(@question.course)
+      redirect_to organization_course_feedback_questions_path(@organization, @question.course)
     else
       flash.now[:error] = 'Failed to update question.'
       render :new
@@ -62,16 +64,17 @@ class FeedbackQuestionsController < ApplicationController
   def destroy
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
+    @organization = @course.organization
     authorize! :read, @course
     authorize! :delete, @question
 
     begin
       @question.destroy
       flash[:success] = 'Question deleted.'
-      redirect_to course_feedback_questions_path(@course)
+      redirect_to organization_course_feedback_questions_path(@organization, @course)
     rescue
       flash[:error] = "Failed to delete question: #{$!}"
-      redirect_to course_feedback_questions_path(@course)
+      redirect_to organization_course_feedback_questions_path(@organization, @course)
     end
   end
 
@@ -90,5 +93,9 @@ class FeedbackQuestionsController < ApplicationController
     if question.kind == 'intrange'
       question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
     end
+  end
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

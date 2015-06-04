@@ -4,6 +4,8 @@ describe 'The system (used by an instructor for administration)', type: :request
   include IntegrationTestActions
 
   before :each do
+    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
+
     visit '/'
     @user = FactoryGirl.create(:admin, password: 'xooxer')
     log_in_as(@user.login, 'xooxer')
@@ -13,26 +15,26 @@ describe 'The system (used by an instructor for administration)', type: :request
   end
 
   it 'should allow using a git repo as a source for a new course' do
-    create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path)
+    create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path, organization_slug: @organization.slug)
   end
 
   it "should show all exercises pushed to the course's git repo" do
-    create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path)
+    create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path, organization_slug: @organization.slug)
     course = Course.find_by_name!('mycourse')
 
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)
     repo.add_commit_push
 
-    manually_refresh_course('mycourse')
+    manually_refresh_course('mycourse', @organization.slug)
 
-    visit '/courses'
+    visit "/org/#{@organization.slug}/courses"
     click_link 'mycourse'
     expect(page).to have_content('MyExercise')
   end
 
   it 'should allow rerunning individual submissions' do
-    setup = SubmissionTestSetup.new(solve: true, save: true)
+    setup = SubmissionTestSetup.new(solve: true, save: true, organization: @organization)
     setup.make_zip
     setup.submission.processed = true
     setup.submission.pretest_error = 'some funny error'
