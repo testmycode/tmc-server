@@ -133,7 +133,6 @@ class CoursesController < ApplicationController
 
   def manage_unlocks
     authorize! :teach, @organization
-    @course = Course.find(params[:id])
     assign_show_view_vars
   end
 
@@ -144,7 +143,8 @@ class CoursesController < ApplicationController
     groups.each do |name, conditions|
       array = []
       conditions.each { |k, v| array << v }
-      @course.exercise_group_by_name(name).group_unlock_date=(array.to_json)
+      @course.exercise_group_by_name(name).group_unlock_date = array.to_json
+      UncomputedUnlock.resolve @course, current_user
     end
 
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
