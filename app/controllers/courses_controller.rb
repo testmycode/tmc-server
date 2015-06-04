@@ -143,12 +143,12 @@ class CoursesController < ApplicationController
     groups.each do |name, conditions|
       array = []
       conditions.each { |k, v| array << v }
-      @course.exercise_group_by_name(name).group_unlock_date = array.to_json
-      UncomputedUnlock.resolve @course, current_user
+      @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
+      UncomputedUnlock.create_all_for_course_eager(@course)
     end
 
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
-  rescue UnlockSpec::InvalidSyntaxError => e
+  rescue Exercise::InvalidSyntaxError => e
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
   end
 
