@@ -6,7 +6,8 @@ describe 'The system (used by an instructor for viewing statistics)', type: :req
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path)
+    organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
+    course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path, organization: organization)
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('EasyExercise')
     repo.copy_simple_exercise('HardExercise')
@@ -36,7 +37,7 @@ describe 'The system (used by an instructor for viewing statistics)', type: :req
   end
 
   def visit_exercise(exercise_name)
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'mycourse'
     first('.exercise-list').click_link exercise_name
   end
@@ -53,7 +54,7 @@ describe 'The system (used by an instructor for viewing statistics)', type: :req
     ex.introduce_compilation_error('oops') if options[:compilation_error]
     ex.make_zip
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'mycourse'
     first('.exercise-list').click_link exercise_name
     attach_file('Zipped project', "#{exercise_name}.zip")

@@ -4,6 +4,8 @@ require 'course_list'
 require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
+  before_action :set_organization
+
   def index
     ordering = 'hidden, LOWER(name)'
 
@@ -22,7 +24,7 @@ class CoursesController < ApplicationController
 
         data = {
           api_version: ApiVersion::API_VERSION,
-          courses: CourseList.new(current_user, view_context).course_list_data(courses)
+          courses: CourseList.new(current_user, view_context).course_list_data(@organization, courses)
         }
         render json: data.to_json
       end
@@ -48,7 +50,7 @@ class CoursesController < ApplicationController
         return respond_access_denied('Authentication required') if current_user.guest?
         data = {
           api_version: ApiVersion::API_VERSION,
-          course: CourseInfo.new(current_user, view_context).course_data(@course)
+          course: CourseInfo.new(current_user, view_context).course_data(@organization, @course)
         }
         render json: data.to_json
       end
@@ -65,7 +67,7 @@ class CoursesController < ApplicationController
       session[:refresh_report] = e.report
     end
 
-    redirect_to course_path(@course)
+    redirect_to organization_course_path
   end
 
   def new
@@ -75,11 +77,12 @@ class CoursesController < ApplicationController
 
   def create
     @course = Course.new(course_params[:course])
+    @course.organization = @organization
     authorize! :create, @course
 
     respond_to do |format|
       if @course.save
-        format.html { redirect_to(@course, notice: 'Course was successfully created.') }
+        format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
@@ -108,5 +111,9 @@ class CoursesController < ApplicationController
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end
+  end
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

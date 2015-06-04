@@ -3,6 +3,7 @@ require 'spec_helper'
 describe CoursesController, type: :controller do
   before(:each) do
     @user = FactoryGirl.create(:user)
+    @organization = FactoryGirl.create(:accepted_organization)
   end
 
   describe 'GET index' do
@@ -14,7 +15,7 @@ describe CoursesController, type: :controller do
         FactoryGirl.create(:course, name: 'AnotherTestCourse')
       ]
 
-      get :index
+      get :index, organization_id: @organization.slug
 
       expect(assigns(:ongoing_courses).map(&:name)).to eq(%w(AnotherTestCourse SomeTestCourse))
       expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
@@ -24,7 +25,8 @@ describe CoursesController, type: :controller do
       def get_index_json(options = {})
         options = {
           format: 'json',
-          api_version: ApiVersion::API_VERSION
+          api_version: ApiVersion::API_VERSION,
+          organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = 'Basic ' + Base64.encode64("#{@user.login}:#{@user.password}")
         get :index, options
@@ -62,7 +64,7 @@ describe CoursesController, type: :controller do
         sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
         sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
 
-        get :show, id: @course.id
+        get :show, organization_id: @organization.slug, id: @course.id
 
         expect(assigns['submissions']).to include(sub1)
         expect(assigns['submissions']).to include(sub2)
@@ -78,7 +80,7 @@ describe CoursesController, type: :controller do
         FactoryGirl.create(:submission, course: @course)
         FactoryGirl.create(:submission, course: @course)
 
-        get :show, id: @course.id
+        get :show, organization_id: @organization.slug, id: @course.id
 
         expect(assigns['submissions']).to be_nil
       end
@@ -93,7 +95,7 @@ describe CoursesController, type: :controller do
         my_sub = FactoryGirl.create(:submission, user: @user, course: @course)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
 
-        get :show, id: @course.id
+        get :show, organization_id: @organization.slug, id: @course.id
 
         expect(assigns['submissions']).to include(my_sub)
         expect(assigns['submissions']).not_to include(other_guys_sub)
@@ -112,7 +114,8 @@ describe CoursesController, type: :controller do
         options = {
           format: 'json',
           api_version: ApiVersion::API_VERSION,
-          id: @course.id.to_s
+          id: @course.id.to_s,
+          organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
         get :show, options
@@ -205,19 +208,19 @@ describe CoursesController, type: :controller do
 
     describe 'with valid parameters' do
       it 'creates the course' do
-        post :create, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
         expect(Course.last.source_url).to eq('git@example.com')
       end
 
       it 'redirects to the created course' do
-        post :create, course: { name: 'NewCourse', source_url: 'git@example.com' }
-        expect(response).to redirect_to(Course.last)
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
       end
     end
 
     describe 'with invalid parameters' do
       it 're-renders the course creation form' do
-        post :create, course: { name: 'invalid name with spaces' }
+        post :create, organization_id: @organization.slug, course: { name: 'invalid name with spaces' }
         expect(response).to render_template('new')
         expect(assigns(:course).name).to eq('invalid name with spaces')
       end

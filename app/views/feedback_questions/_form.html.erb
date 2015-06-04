@@ -7,7 +7,7 @@ else
 end
 
 if question.new_record?
-  url = course_feedback_questions_path(question.course)
+  url = organization_course_feedback_questions_path(@organization, question.course)
 else
   url = feedback_question_path(question)
 end

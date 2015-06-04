@@ -32,6 +32,8 @@ class Course < ActiveRecord::Base
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :course_notifications, dependent: :delete_all
 
+  belongs_to :organization
+
   def destroy
     # Optimization: delete dependent objects quickly.
     # Rails' :dependent => :delete_all is very slow.
