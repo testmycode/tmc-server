@@ -17,7 +17,7 @@ feature 'Teacher lists json for courses', feature: true do
   end
 
   scenario 'Page returns organizations courses as json' do
-    visit "/org/slug/courses/#{@course.id}/json?api_version=7"
+    visit "/org/slug/courses/#{@course.id}/courses.json?api_version=7"
 
     expect(page).to have_content('course_1')
     expect(page).not_to have_content('course_2')
