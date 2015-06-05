@@ -471,12 +471,7 @@ class CourseRefresher
     def preserve_exercise_deadlines(e, metadata) # Do not update deadlines from repo, read them from database
       static_deadline = e.static_deadline || ''
       unlock_deadline = e.unlock_deadline || ''
-      if metadata['deadline'].nil?
-        metadata['deadline'] = [static_deadline, unlock_deadline]
-      else
-        metadata['deadline'][0] = static_deadline
-        metadata['deadline'][1] = unlock_deadline
-      end
+      metadata['deadline'] = [static_deadline, unlock_deadline]
     end
   end
 end
