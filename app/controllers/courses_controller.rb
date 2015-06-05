@@ -88,7 +88,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       if @course.save
         refresh_course(@course)
-        format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
+        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
@@ -115,6 +115,11 @@ class CoursesController < ApplicationController
     redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
   rescue DeadlineSpec::InvalidSyntaxError => e
     redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s
+  end
+
+  def help
+    @course = Course.find(params[:course_id])
+    authorize! :read, @course
   end
 
   private

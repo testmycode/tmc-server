@@ -12,6 +12,7 @@
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
+        <li><%= link_to 'View help page', organization_course_help_path(@organization, @course)%></li>
       </ul>
       <% if can? :read, :course_information %>
         <ul>
