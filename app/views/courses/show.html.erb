@@ -15,6 +15,7 @@
         <% if can? :list_user_emails, @course %>
           <li><%= link_to 'View student emails', organization_emails_path %></li>
         <% end %>
+        <li><%= link_to 'View help page', organization_course_help_path(@organization, @course)%></li>
       </ul>
       <% if can? :teach, @course %>
         <ul>

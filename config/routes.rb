@@ -46,6 +46,8 @@ resources :organizations, except: :destory, path: 'org' do
         end
       end
 
+      get 'help'
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
       resources :submissions, only: [:index]
