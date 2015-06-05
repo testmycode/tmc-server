@@ -7,8 +7,8 @@ feature 'Admin edits course templates', feature: true do
     @admin = FactoryGirl.create :admin, password: 'xooxer'
     @user = FactoryGirl.create :user, password: 'foobar'
 
-    FactoryGirl.create :course_template, name: 'dontchange', title: 'dontchange', description: 'dontchange', material_url: 'dontchange', source_url: 'dontchange'
-    FactoryGirl.create :course_template, name: 'oldname', title: 'oldtitle', description: 'olddescription', material_url: 'oldmaterial', source_url: 'oldsource'
+    FactoryGirl.create :course_template, name: 'dontchange', title: 'dontchange', description: 'dontchange', material_url: 'dontchange'
+    FactoryGirl.create :course_template, name: 'oldname', title: 'oldtitle', description: 'olddescription', material_url: 'oldmaterial'
 
     visit '/'
   end
@@ -22,7 +22,7 @@ feature 'Admin edits course templates', feature: true do
     fill_in 'course_template_title', with: 'newtitle'
     fill_in 'course_template_description', with: 'newdescription'
     fill_in 'course_template_material_url', with: 'newmaterial'
-    fill_in 'course_template_source_url', with: 'newsource'
+    fill_in 'course_template_source_url', with: 'https://github.com/testmycode/tmc-testcourse.git'
     click_button 'Update Course template'
 
     expect(page).to have_content('newtitle')

@@ -42,7 +42,7 @@
             <ul class="nav pull-right">
               <% if signed_in? %>
                 <li>
-                  <%= link_to 'My account', user_path %>
+                  <%= link_to "My account (#{current_user.username})", user_path %>
                 </li>
                 <li>
                   <%= link_to 'My stats', participant_path(current_user) %>
