@@ -299,4 +299,76 @@ describe CoursesController, type: :controller do
       end
     end
   end
+
+  describe 'GET manage_unlocks' do
+    it 'when non-teacher should respond with a 401' do
+      @course = FactoryGirl.create :course
+      @course.organization = @organization
+      controller.current_user = @user
+      get :manage_unlocks, organization_id: @organization.slug, id: @course.id
+      expect(response.code.to_i).to eq(401)
+    end
+  end
+
+  describe 'POST save_unlocks' do
+    before :each do
+      @course = FactoryGirl.create :course
+      @course.organization = @organization
+      controller.current_user = @user
+    end
+
+    describe 'when teacher' do
+      before :each do
+        Teachership.create(user: @user, organization: @organization)
+      end
+
+      it 'saves unlock dates for exercises in group named ""' do
+        @course.exercises.create(name: 'e1')
+        @course.exercises.create(name: 'e2')
+        @course.exercises.create(name: 'e3')
+
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '1.2.2000' }
+
+        @course.exercise_group_by_name('').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to eq(Time.new(2000, 2, 1))
+        end
+      end
+
+      it 'saves unlock dates for exercises in group named something else' do
+        @course.exercises.create(name: 'group1-e1')
+        @course.exercises.create(name: 'group1-e2')
+        @course.exercises.create(name: 'group1-e3')
+        @course.exercises.create(name: 'group2-e1')
+
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, group: { 'group1': { '0': '1.2.2000' } }
+
+        @course.exercise_group_by_name('group1').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to eq(Time.new(2000, 2, 1))
+        end
+        @course.exercise_group_by_name('group2').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to be_nil
+        end
+      end
+
+      it 'empty unlock date is acceptable' do
+        @course.exercises.create(name: 'e1')
+        @course.exercises.create(name: 'e2')
+        @course.exercises.create(name: 'e3')
+
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '1.2.2000' }
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '' }
+
+        @course.exercise_group_by_name('').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to be_nil
+        end
+      end
+    end
+
+    it 'when non-teacher should respond with a 401' do
+      @course.exercises.create(name: 'e')
+      post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '1.2.2000' }
+      expect(response.code.to_i).to eq(401)
+    end
+  end
+
 end
