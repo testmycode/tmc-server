@@ -141,10 +141,10 @@ class CoursesController < ApplicationController
   end
 
   def disable_course(disabled)
-    @course = Course.find(params[:id])
-    @course.disabled = disabled
+    course = Course.find(params[:id])
+    course.disabled = disabled
     notice_action = disabled ? 'disabled' : 'enabled'
-    notice_message = (@course.save ? 'Course was successfully' : 'Course could not be') + " #{notice_action}."
-    redirect_to(organization_course_path(@organization, @course), notice: notice_message)
+    notice_message = (course.save ? 'Course was successfully' : 'Course could not be') + " #{notice_action}."
+    redirect_to(organization_course_path(@organization, course), notice: notice_message)
   end
 end

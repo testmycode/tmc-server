@@ -238,7 +238,7 @@ describe CoursesController, type: :controller do
       it 'disables the course' do
         controller.current_user = @teacher
         post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(assigns(:course).disabled).to eq(true)
+        expect(Course.find(@course.id).disabled).to eq(true)
       end
     end
 
@@ -260,7 +260,7 @@ describe CoursesController, type: :controller do
       it 'enables the course' do
         controller.current_user = @teacher
         post :enable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(assigns(:course).disabled).to eq(false)
+        expect(Course.find(@course.id).disabled).to eq(false)
       end
     end
 
