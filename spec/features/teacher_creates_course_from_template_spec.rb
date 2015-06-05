@@ -23,7 +23,11 @@ feature 'Teacher creates course from course template', feature: true do
     fill_in 'course_name', with: 'customname'
     click_button 'Add Course'
 
+    expect(page).to have_content('Course was successfully created')
     expect(page).to have_content('customname')
+    expect(page).to have_content('help page')
+
+    click_link 'View status page'
     expect(page).to have_content('arith_funcs')
     expect(page).to have_content('maven_exercise')
 

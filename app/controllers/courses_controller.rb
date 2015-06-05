@@ -88,7 +88,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       if @course.save
         refresh_course(@course)
-        format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
+        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
@@ -127,6 +127,11 @@ class CoursesController < ApplicationController
     authorize! :teach, @organization
     @course.disabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
+  end
+
+  def help
+    @course = Course.find(params[:course_id])
+    authorize! :read, @course
   end
 
   private
