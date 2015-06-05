@@ -18,16 +18,17 @@ describe 'Personal deadlines', type: :request, integration: true do
     end
     @repo.add_commit_push
 
-    @course.refresh
-
     @user = FactoryGirl.create(:user, password: 'xooxer')
 
-    visit '/org/slug/courses'
+    visit '/'
     log_in_as(@user.login, @user.password)
-    click_link 'mycourse'
   end
 
   specify 'doing one exercise should unlock the other' do
+    @course.refresh
+    visit '/org/slug/courses'
+    click_link 'mycourse'
+
     expect(page).to have_content('MyExercise1')
     expect(page).not_to have_content('MyExercise2')
 
@@ -46,6 +47,9 @@ describe 'Personal deadlines', type: :request, integration: true do
       end
       @repo.add_commit_push
       @course.refresh
+
+      visit '/org/slug/courses'
+      click_link 'mycourse'
 
       submit_correct_solution('MyExercise1')
 
