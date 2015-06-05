@@ -34,9 +34,9 @@ describe CoursesController, type: :controller do
       end
 
       it 'renders all non-hidden courses in order by name' do
-        FactoryGirl.create(:course, name: 'Course1')
-        FactoryGirl.create(:course, name: 'Course2', hide_after: Time.now + 1.week)
-        FactoryGirl.create(:course, name: 'Course3')
+        FactoryGirl.create(:course, name: 'Course1', organization: @organization)
+        FactoryGirl.create(:course, name: 'Course2', organization: @organization, hide_after: Time.now + 1.week)
+        FactoryGirl.create(:course, name: 'Course3', organization: @organization)
         FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
         FactoryGirl.create(:course, name: 'HiddenCourse', hidden: true)
 
