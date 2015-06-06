@@ -32,7 +32,7 @@ class Certificate < ActiveRecord::Base
                           margin_bottom: '0.20in',
                           margin_left: '0.20in',
                           image_quality: 100,
-                          image_dpi: 300
+                          image_dpi: 300,
                          ).to_pdf
   end
 

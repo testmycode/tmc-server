@@ -1,13 +1,5 @@
-<h1><%= @user.login %></h1>
+<h1>My Certificates</h1>
 <% if @certificates.any? %>
-  <section>
-    <p>Following names have been used to generate certificates for this account:</p>
-    <ul>
-      <% @names.each do |name| %>
-        <li><%= name %></li>
-      <% end %>
-    </ul>
-  </section>
   <section>
     <h2>Certificates</h2>
     <%= content_tag :table, :class => 'certificates table table-bordered table-striped table-hover' do %>
@@ -40,10 +32,10 @@
 <% else %>
   <p> No certificates</p>
 <% end %>
-<% if @courses %>
+<% if @courses.any? %>
   <div class="row-fluid">
     <div class="span12">
-      <h2>New certificate</h2>
+      <h2>Request certificate</h2>
       <%= render partial: 'form' %>
     </div>
   </div>
