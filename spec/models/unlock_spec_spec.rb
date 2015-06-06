@@ -31,13 +31,13 @@ describe UnlockSpec, type: :model do
   end
 
   specify 'empty' do
-    spec = UnlockSpec.new(ex1, [])
+    spec = UnlockSpec.new(course, [])
     expect(spec.valid_after).to be_nil
     expect(spec).to permit_unlock_for(user)
   end
 
   specify 'unlocked_after: <date>' do
-    spec = UnlockSpec.new(ex1, ['12.12.2012'])
+    spec = UnlockSpec.new(course, ['12.12.2012'])
     expect(spec.valid_after).to eq(Date.parse('2012-12-12').in_time_zone)
     expect(spec).to permit_unlock_for(user)
   end
@@ -45,12 +45,12 @@ describe UnlockSpec, type: :model do
   specify 'unlocked_after: exercise <exercise>' do
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt3)
 
-    expect(UnlockSpec.new(ex3, ['exercise grp-ex1'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['exercise grp-ex2'])).not_to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['exercise grp-ex1'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['exercise grp-ex2'])).not_to permit_unlock_for(user)
   end
 
   specify 'unlocked_after: exercise group <exercise>' do
-    spec = UnlockSpec.new(ex3, ['exercise group grp'])
+    spec = UnlockSpec.new(course, ['exercise group grp'])
     expect(spec).not_to permit_unlock_for(user)
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt2)
     expect(spec).not_to permit_unlock_for(user)
@@ -59,14 +59,14 @@ describe UnlockSpec, type: :model do
   end
 
   specify 'unlocked_after: point ex1_pt2' do
-    spec = UnlockSpec.new(ex3, ['point ex1_pt2'])
+    spec = UnlockSpec.new(course, ['point ex1_pt2'])
     expect(spec).not_to permit_unlock_for(user)
     award(:ex1_pt2)
     expect(spec).to permit_unlock_for(user)
   end
 
   specify 'unlocked_after: points ex1_pt2 ex2_pt2' do
-    spec = UnlockSpec.new(ex3, ['points ex1_pt2 ex2_pt2'])
+    spec = UnlockSpec.new(course, ['points ex1_pt2 ex2_pt2'])
     expect(spec).not_to permit_unlock_for(user)
     award(:ex1_pt2)
     expect(spec).not_to permit_unlock_for(user)
@@ -77,17 +77,17 @@ describe UnlockSpec, type: :model do
   specify 'unlocked_after: <n>% of <exercise>' do
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt3)
 
-    expect(UnlockSpec.new(ex3, ['50% of grp-ex1'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['100% of grp-ex1'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['100% of grp-ex2'])).not_to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['60% of grp-ex2'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['50% of grp-ex1'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['100% of grp-ex1'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['100% of grp-ex2'])).not_to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['60% of grp-ex2'])).to permit_unlock_for(user)
   end
 
   specify 'unlocked_after: <n>% of <exercise_group>' do
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1)
 
-    expect(UnlockSpec.new(ex3, ['50% of grp'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['70% of grp'])).not_to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['50% of grp'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['70% of grp'])).not_to permit_unlock_for(user)
   end
 
   specify 'unlocked_after: <n> exercises in <exercise_group>' do
@@ -95,19 +95,19 @@ describe UnlockSpec, type: :model do
     FactoryGirl.create(:submission, user: user, course: course, exercise: ex2, all_tests_passed: false)
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1)
 
-    expect(UnlockSpec.new(ex3, ['1 exercise in grp'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['2 exercises in grp'])).not_to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['1 exercise in grp'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['2 exercises in grp'])).not_to permit_unlock_for(user)
   end
 
   specify 'unlocked_after: <n> points in <exercise>' do
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt3)
 
-    expect(UnlockSpec.new(ex3, ['2 points in grp-ex1'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['3 points in grp-ex1'])).not_to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['2 points in grp-ex2'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['3 points in grp-ex2'])).not_to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['2 points in grp-ex1'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['3 points in grp-ex1'])).not_to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['2 points in grp-ex2'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['3 points in grp-ex2'])).not_to permit_unlock_for(user)
 
-    expect(UnlockSpec.new(ex3, ['3 points in grp-ex2']).description_for(user)).to eq(
+    expect(UnlockSpec.new(course, ['3 points in grp-ex2']).description_for(user)).to eq(
       'To unlock this exercise, you must get 1 more point from grp-ex2.'
     )
   end
@@ -115,8 +115,8 @@ describe UnlockSpec, type: :model do
   specify 'unlocked_after: <n> points in <exercise_group>' do
     award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt3)
 
-    expect(UnlockSpec.new(ex3, ['4 points in grp'])).to permit_unlock_for(user)
-    expect(UnlockSpec.new(ex3, ['5 points in grp'])).not_to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['4 points in grp'])).to permit_unlock_for(user)
+    expect(UnlockSpec.new(course, ['5 points in grp'])).not_to permit_unlock_for(user)
   end
 
   describe 'unlocked_after: <multiple conditions>' do
@@ -124,9 +124,9 @@ describe UnlockSpec, type: :model do
       award(:ex1_pt1, :ex1_pt2, :ex2_pt1, :ex2_pt3)
       FactoryGirl.create(:submission, user: user, course: course, exercise: ex1, all_tests_passed: true)
 
-      expect(UnlockSpec.new(ex3, ['2 points in grp-ex1', '1 exercise in grp'])).to permit_unlock_for(user)
-      expect(UnlockSpec.new(ex3, ['3 points in grp-ex1', '1 exercise in grp'])).not_to permit_unlock_for(user)
-      expect(UnlockSpec.new(ex3, ['2 points in grp-ex1', '2 exercise in grp'])).not_to permit_unlock_for(user)
+      expect(UnlockSpec.new(course, ['2 points in grp-ex1', '1 exercise in grp'])).to permit_unlock_for(user)
+      expect(UnlockSpec.new(course, ['3 points in grp-ex1', '1 exercise in grp'])).not_to permit_unlock_for(user)
+      expect(UnlockSpec.new(course, ['2 points in grp-ex1', '2 exercise in grp'])).not_to permit_unlock_for(user)
     end
   end
 end

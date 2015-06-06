@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150222171258) do
+ActiveRecord::Schema.define(version: 20150408121203) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,6 +34,15 @@ ActiveRecord::Schema.define(version: 20150222171258) do
   add_index "awarded_points", ["course_id", "user_id", "name"], name: "index_awarded_points_on_course_id_and_user_id_and_name", unique: true, using: :btree
   add_index "awarded_points", ["course_id", "user_id", "submission_id"], name: "index_awarded_points_on_course_id_and_user_id_and_submission_id", using: :btree
   add_index "awarded_points", ["user_id", "submission_id", "name"], name: "index_awarded_points_on_user_id_and_submission_id_and_name", unique: true, using: :btree
+
+  create_table "certificates", force: true do |t|
+    t.string   "name"
+    t.binary   "pdf"
+    t.integer  "user_id"
+    t.integer  "course_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "course_notifications", force: true do |t|
     t.string   "topic"
@@ -60,6 +69,9 @@ ActiveRecord::Schema.define(version: 20150222171258) do
     t.boolean  "locked_exercise_points_visible", default: true,     null: false
     t.text     "description"
     t.string   "paste_visibility"
+    t.string   "formal_name"
+    t.boolean  "certificate_downloadable",       default: false,    null: false
+    t.string   "certificate_unlock_spec"
   end
 
   create_table "exercises", force: true do |t|
@@ -153,13 +165,14 @@ ActiveRecord::Schema.define(version: 20150222171258) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
-  create_table "submission_data", primary_key: "submission_id", force: true do |t|
-    t.binary "return_file"
-    t.binary "stdout_compressed"
-    t.binary "stderr_compressed"
-    t.binary "vm_log_compressed"
-    t.binary "valgrind_compressed"
-    t.binary "validations_compressed"
+  create_table "submission_data", id: false, force: true do |t|
+    t.integer "submission_id",          null: false
+    t.binary  "return_file"
+    t.binary  "stdout_compressed"
+    t.binary  "stderr_compressed"
+    t.binary  "vm_log_compressed"
+    t.binary  "valgrind_compressed"
+    t.binary  "validations_compressed"
   end
 
   create_table "submissions", force: true do |t|

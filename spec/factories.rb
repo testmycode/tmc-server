@@ -110,4 +110,12 @@ FactoryGirl.define do
   factory :test_scanner_cache_entry do
     course
   end
+
+  factory :certificate do
+    user
+    course
+    sequence(:name) { |n| "certificate#{n}" }
+
+    after(:build) { |cert| cert.class.skip_callback(:save, :generate) }
+  end
 end

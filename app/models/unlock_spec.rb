@@ -2,8 +2,8 @@
 class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
   class InvalidSyntaxError < StandardError; end
 
-  def initialize(exercise, conditions)
-    @exercise = exercise
+  def initialize(course, conditions)
+    @course = course
     @conditions = []
     @universal_descriptions = []
     @describers = []
@@ -50,7 +50,6 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   private
 
   def parse_condition(str)
-    course = @exercise.course
     if DateAndTimeUtils.looks_like_date_or_time(str)
       @valid_after = DateAndTimeUtils.to_time(str)
 
@@ -61,11 +60,11 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       points = $1.split(' ').map(&:strip).reject(&:empty?)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
-        AwardedPoint.where(user_id: u.id, course_id: course.id, name: points).count == points.count
+        AwardedPoint.where(user_id: u.id, course_id: @course.id, name: points).count == points.count
       end
       @universal_descriptions << "the following points: #{points.join('  ')}"
       @describers << lambda do |u|
-        awarded = AwardedPoint.where(user_id: u.id, course_id: course.id, name: points).map(&:name)
+        awarded = AwardedPoint.where(user_id: u.id, course_id: @course.id, name: points).map(&:name)
         "get the following points: #{(points - awarded).join('  ')}"
       end
 
@@ -73,15 +72,15 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       percentage_str = $1
       percentage = percentage_str.to_f / 100.0
       group = $2
-      check_group_or_exercise_exists(course, group)
+      check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
-        available, awarded = available_and_awarded(course, group, u)
+        available, awarded = available_and_awarded(@course, group, u)
         awarded.count.to_f / available.count.to_f >= percentage - 0.0001
       end
       @universal_descriptions << "#{percentage_str}% from #{group}"
       @describers << lambda do |u|
-        available, awarded = available_and_awarded(course, group, u)
+        available, awarded = available_and_awarded(@course, group, u)
         remaining = ((percentage - 0.0001) * available.count.to_f).ceil - awarded.count
         if remaining > 0
           "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
@@ -93,15 +92,15 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     elsif str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/
       num_exercises = $1.to_i
       group = $2
-      check_group_or_exercise_exists(course, group)
+      check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
-        required_exercises = course.exercises_by_name_or_group(group)
+        required_exercises = @course.exercises_by_name_or_group(group)
         required_exercises.count { |ex| ex.completed_by?(u) } >= num_exercises
       end
       @universal_descriptions << "#{num_exercises} #{plural(num_exercises, 'exercise')} from #{group}"
       @describers << lambda do |u|
-        required_exercises = course.exercises_by_name_or_group(group)
+        required_exercises = @course.exercises_by_name_or_group(group)
         remaining = num_exercises - required_exercises.count { |ex| ex.completed_by?(u) }
         if remaining > 0
           "complete #{remaining} more #{plural(remaining, 'exercise')} from #{group}"
@@ -113,15 +112,15 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     elsif str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
       num_points = $1.to_i
       group = $2
-      check_group_or_exercise_exists(course, group)
+      check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
-        awarded = available_and_awarded(course, group, u)[1]
+        awarded = available_and_awarded(@course, group, u)[1]
         awarded.count >= num_points
       end
       @universal_descriptions << "#{num_points} #{plural(num_points, 'point')} from #{group}"
       @describers << lambda do |u|
-        awarded = available_and_awarded(course, group, u)[1]
+        awarded = available_and_awarded(@course, group, u)[1]
         remaining = num_points - awarded.count
         if remaining > 0
           "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
