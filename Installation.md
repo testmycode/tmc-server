@@ -11,7 +11,7 @@ Below is a quick summary of the setup procedure. It is followed by detailed inst
 
 ### Quick summary
 
-The following programs should be installed first: `ruby` (and `bundler` gem), `PostgreSQL 9.2+`, `screen`,`git`, `zip`, `unzip`, `convert` (from ImageMagick), `javac`, `java`, `ant`, `mvn`, `gcc`, `make` and `bc`. Additionally, tmc-sandbox requires: `squashfs-tools`, `multistrap` `e2fsprogs`, `e2tools` and `build-essential`.
+The following programs should be installed first: `ruby` (and `bundler` gem), `PostgreSQL 9.2+`, `screen`,`git`, `zip`, `unzip`, `convert` (from ImageMagick), `xfonts-75dpi`, `javac`, `java`, `ant`, `mvn`, `gcc`, `make` and `bc`. Additionally, tmc-sandbox requires: `squashfs-tools`, `multistrap` `e2fsprogs`, `e2tools` and `build-essential`.
 
 1. Download submodules with `git submodule update --init --recursive`
 2. Install dependencies with `bundle install`
@@ -24,11 +24,11 @@ The following programs should be installed first: `ruby` (and `bundler` gem), `P
 9. Install [tmc-check](https://github.com/testmycode/tmc-check) by running `rvmsudo make rubygems install clean` in `ext/tmc-sandbox/uml/output/tmc-check`.
 10. Run the test suite with `rvmsudo rake spec`.
 11. Verify code style with `bundle exec rubocop`.
- 
+
 After you get the test suite to pass see [post-install instructions](#post-install-instructions).
 
 ### Installation instructions for Ubuntu 14.04
-We expect the user to be using account which name is tmc.  
+We expect the user to be using account which name is tmc.
 #### Set Java and Ruby versions
 
 ```bash
@@ -45,11 +45,11 @@ $ sudo apt-get update
 
 TMC-server dependencies
 ```bash
-$ sudo apt-get install git build-essential zip unzip imagemagick maven make phantomjs bc postgresql postgresql-contrib chrpath libssl-dev libxft-dev libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev
+$ sudo apt-get install git build-essential zip unzip imagemagick maven make phantomjs bc postgresql postgresql-contrib chrpath libssl-dev libxft-dev libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev xfonts-75dpi
 ```
 Ruby dependencies
 ```bash
-$ sudo apt-get install git-core curl zlib1g-dev libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev 
+$ sudo apt-get install git-core curl zlib1g-dev libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev
 ```
 RVM dependencies
 ```bash
@@ -59,6 +59,8 @@ TMC-sandbox dependencies
 ```bash
 $ sudo apt-get install squashfs-tools multistrap e2fsprogs e2tools
 ```
+
+Install [wkhtmltopdf](https://github.com/pdfkit/PDFKit/wiki/Installing-WKHTMLTOPDF) for course certificate generation.
 
 #### Java installation
 
@@ -131,7 +133,7 @@ to
 # "local" is for Unix domain socket connections only
 local   all             all                                     md5
 ```
-**important** run 
+**important** run
 ```bash
 service postgresql restart
 ```
@@ -156,7 +158,7 @@ $ git submodule update --init --recursive
 
 You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there (notice: you do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`).
 
-Initialize the database with `rake db:create && rake db:schema:load` 
+Initialize the database with `rake db:create && rake db:schema:load`
 Note: run `rake db:seed` to initialize admin account
 
 #### Build sandbox
