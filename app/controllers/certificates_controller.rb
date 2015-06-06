@@ -32,6 +32,8 @@ class CertificatesController < ApplicationController
     else
       render action: :new
     end
+    rescue Errno::ENOENT
+      redirect_to participant_certificates_path(@user), alert: "Cannot create certificate for this course."
   end
 
   private
