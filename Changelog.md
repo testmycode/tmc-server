@@ -1,3 +1,8 @@
+## 2015-06-06
+
+* Added support for students to generate certificates for accomplished courses. Note, this requires installation of
+  [wkhtmltopdf](https://github.com/pdfkit/PDFKit/wiki/Installing-WKHTMLTOPDF) use the first option to install (for ubuntu 10.04 lts version from apt is too old).
+
 ## 2015-02-22
 
 * Added option to disable code review request action from clients.
