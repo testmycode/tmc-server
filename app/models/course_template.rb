@@ -21,6 +21,7 @@ class CourseTemplate < ActiveRecord::Base
   validate :valid_source_url?
 
   def valid_source_url?
+    return true unless source_url_changed? # don't attempt repo cloning if source url wasn't even changed
     Dir.mktmpdir do |dir|
       sh!('git', 'clone', '-q', '-b', 'master', self.source_url, dir)
       File.exist?("#{dir}/.git")
