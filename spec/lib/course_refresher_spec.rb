@@ -119,7 +119,7 @@ describe CourseRefresher do
     expect(@course.exercises.first.gdocs_sheet).to eq('xoo')
   end
 
-  it 'should load changed exercise metadata' do
+  it 'should load changed exercise metadata except for deadlines' do
     add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'metadata.yml',
@@ -143,8 +143,7 @@ describe CourseRefresher do
       commit: true
     )
     @refresher.refresh_course(@course)
-
-    expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2013-01-01 00:00'))
+    expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
     expect(@course.exercises.first.gdocs_sheet).to eq('foo')
   end
 

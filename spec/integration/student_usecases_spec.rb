@@ -89,9 +89,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
   end
 
   it 'should show exercises whose deadline has passed but without a submission form' do
-    @repo.set_metadata_in('MyExercise', 'deadline' => Date.yesterday.to_s)
-    @repo.add_commit_push
-    @course.refresh
+    @course.exercise_group_by_name('').group_deadline = [Date.yesterday.to_s].to_json
 
     visit '/org/slug/courses'
     click_link 'mycourse'
