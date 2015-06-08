@@ -99,6 +99,14 @@ describe Exercise, type: :model do
     end
   end
 
+  def set_soft_deadline(ex, t)
+    if t.is_a? Array
+      ex.soft_deadline_spec = t.to_json
+    else
+      ex.soft_deadline_spec = [t.to_s].to_json
+    end
+  end
+
   it 'should treat date deadlines as being at 23:59:59 local time' do
     ex = FactoryGirl.create(:exercise, course: course)
     set_deadline(ex, Date.today)
@@ -109,20 +117,24 @@ describe Exercise, type: :model do
     ex = FactoryGirl.create(:exercise, course: course)
 
     set_deadline(ex, '2011-04-19 13:55')
-    dl = ex.deadline_for(user)
-    expect(dl.year).to eq(2011)
-    expect(dl.month).to eq(04)
-    expect(dl.day).to eq(19)
-    expect(dl.hour).to eq(13)
-    expect(dl.min).to eq(55)
+    set_soft_deadline(ex, '2011-04-19 13:55')
+    [ex.deadline_for(user), ex.soft_deadline_for(user)].each do |dl|
+      expect(dl.year).to eq(2011)
+      expect(dl.month).to eq(04)
+      expect(dl.day).to eq(19)
+      expect(dl.hour).to eq(13)
+      expect(dl.min).to eq(55)
+    end
 
     set_deadline(ex, '25.05.2012 14:56')
-    dl = ex.deadline_for(user)
-    expect(dl.day).to eq(25)
-    expect(dl.month).to eq(5)
-    expect(dl.year).to eq(2012)
-    expect(dl.hour).to eq(14)
-    expect(dl.min).to eq(56)
+    set_soft_deadline(ex, '25.05.2012 14:56')
+    [ex.deadline_for(user), ex.soft_deadline_for(user)].each do |dl|
+      expect(dl.day).to eq(25)
+      expect(dl.month).to eq(5)
+      expect(dl.year).to eq(2012)
+      expect(dl.hour).to eq(14)
+      expect(dl.min).to eq(56)
+    end
   end
 
   it 'should accept a blank deadline' do
@@ -131,6 +143,11 @@ describe Exercise, type: :model do
     expect(ex.deadline_for(user)).to be_nil
     set_deadline(ex, '')
     expect(ex.deadline_for(user)).to be_nil
+
+    set_soft_deadline(ex, nil)
+    expect(ex.soft_deadline_for(user)).to be_nil
+    set_soft_deadline(ex, '')
+    expect(ex.soft_deadline_for(user)).to be_nil
   end
 
   it 'should not accept certain hardcoded values for gdocs_sheet' do

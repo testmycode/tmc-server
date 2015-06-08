@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150527103134) do
+ActiveRecord::Schema.define(version: 20150608100828) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,6 +52,8 @@ ActiveRecord::Schema.define(version: 20150527103134) do
     t.string   "source_url"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "expires_at"
+    t.boolean  "hidden",       default: false
   end
 
   add_index "course_templates", ["name"], name: "index_course_templates_on_name", unique: true, using: :btree
@@ -73,6 +75,7 @@ ActiveRecord::Schema.define(version: 20150527103134) do
     t.text     "description"
     t.string   "paste_visibility"
     t.integer  "organization_id"
+    t.boolean  "disabled"
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
@@ -95,6 +98,7 @@ ActiveRecord::Schema.define(version: 20150527103134) do
     t.string   "valgrind_strategy"
     t.boolean  "code_review_requests_enabled",     default: false, null: false
     t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
+    t.text     "soft_deadline_spec"
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
