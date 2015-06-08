@@ -16,9 +16,9 @@ TmcServer::Application.routes.draw do
       member do
         get 'refresh'
         post 'refresh'
-        get 'courses.json', to: 'courses#show_json', format: 'json', as: 'one_course_json'
         post 'enable'
         post 'disable'
+        get 'courses', to: 'courses#show_json', format: 'json', as: 'one_course_json'
       end
 
       resources :points, only: [:index, :show] do
