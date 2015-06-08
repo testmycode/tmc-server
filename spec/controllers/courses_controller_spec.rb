@@ -253,7 +253,7 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'group1-e2')
       @course.exercises.create(name: 'group1-e3')
 
-      post :save_deadlines, organization_id: @organization.slug, id: @course.id, group: { 'group1': { static: '1.1.2000', unlock: 'unlock + 7 days' } }
+      post :save_deadlines, organization_id: @organization.slug, id: @course.id, group: { group1: { static: '1.1.2000', unlock: 'unlock + 7 days' } }
 
       @course.exercise_group_by_name('group1').exercises(false).each do |e|
         expect(e.static_deadline).to eq('1.1.2000')
