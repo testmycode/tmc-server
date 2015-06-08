@@ -1,0 +1,20 @@
+<h1><%= @course.name %> - course help page</h1>
+
+<ul>
+  <li><%= link_to 'View status page', organization_course_path(@organization, @course) %></li>
+</ul>
+
+<h2>Description:</h2>
+
+<p>
+  <% if !@course.description.nil? %>
+      <%= @course.description %>
+  <% else %>
+      -
+  <% end %>
+</p>
+
+<h2>Course url for students:</h2>
+
+<p><%= link_to organization_course_url(@organization, @course), organization_course_url(@organization, @course) %></p>
+<p>This url can be used with Netbeans plugin.</p>

@@ -214,7 +214,7 @@ describe CoursesController, type: :controller do
 
       it 'redirects to the created course' do
         post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
-        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
+        expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
       end
     end
 
