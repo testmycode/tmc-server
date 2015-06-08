@@ -19,7 +19,7 @@ TmcServer::Application.routes.draw do
         post 'refresh'
         get 'manage_deadlines'
         post 'save_deadlines'
-        get 'courses.json', to: 'courses#show_json', format: 'json', as: 'one_course_json'
+        get 'courses', to: 'courses#show_json', format: 'json', as: 'one_course_json'
       end
 
       resources :points, only: [:index, :show] do
