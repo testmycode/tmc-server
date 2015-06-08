@@ -1,0 +1,11 @@
+<%
+   if group.name.empty?
+     param_array = "empty_group[#{deadline_type}]"
+   else
+     param_array = "group[#{group.name}][#{deadline_type}]"
+   end
+%>
+<%= label_tag "#{param_array}[static]", 'Deadline' %>
+<%= text_field_tag "#{param_array}[static]", deadline.static_deadline_spec %><br/>
+<%= label_tag "#{param_array}[unlock]", 'Unlock-based deadline' %>
+<%= text_field_tag "#{param_array}[unlock]", deadline.unlock_deadline_spec %>
