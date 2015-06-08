@@ -49,7 +49,8 @@ class Course < ActiveRecord::Base
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
 
   def visible_to?(user)
-    user.administrator? || (
+    user.administrator? ||
+    user.teacher?(organization) || (
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
       (

@@ -11,13 +11,13 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @ongoing_courses = Course.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
-        @expired_courses = Course.expired.order(ordering).select { |c| c.visible_to?(current_user) }
+        @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
+        @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
         authorize! :read, @ongoing_courses
         authorize! :read, @expired_courses
       end
       format.json do
-        courses = Course.ongoing.order(ordering)
+        courses = @organization.courses.ongoing.order(ordering)
         courses = courses.select { |c| c.visible_to?(current_user) }
         authorize! :read, courses
         return respond_access_denied('Authentication required') if current_user.guest?
@@ -55,6 +55,19 @@ class CoursesController < ApplicationController
         render json: data.to_json
       end
     end
+  end
+
+  # Method for teacher to give a single course for students to select.
+  def show_json
+    course = [Course.find(params[:id])]
+    authorize! :read, course
+    return respond_access_denied('Authentication required') if current_user.guest?
+
+    data = {
+        api_version: ApiVersion::API_VERSION,
+        courses: CourseList.new(current_user, view_context).course_list_data(@organization, course)
+    }
+    render json: data.to_json
   end
 
   def refresh
