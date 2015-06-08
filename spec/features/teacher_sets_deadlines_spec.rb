@@ -20,18 +20,22 @@ feature 'Teacher sets deadlines', feature: true do
     log_in_as(@teacher.login, '1234')
     visit '/org/slug/courses/1'
     click_link 'Manage deadlines'
-    fill_in 'empty_group_static', with: '1.1.2000'
+    fill_in 'empty_group_soft_static', with: '1.1.2000'
+    fill_in 'empty_group_hard_static', with: '2.2.2000'
+    fill_in 'empty_group_hard_unlock', with: 'unlock + 5 weeks'
     click_button 'Save changes'
 
     expect(page).to have_content('Successfully saved deadlines.')
-    expect(page).to have_field('empty_group_static', with: '1.1.2000')
+    expect(page).to have_field('empty_group_soft_static', with: '1.1.2000')
+    expect(page).to have_field('empty_group_hard_static', with: '2.2.2000')
+    expect(page).to have_field('empty_group_hard_unlock', with: 'unlock + 5 weeks')
   end
 
   scenario 'Error message is displayed with incorrect syntax inputs' do
     log_in_as(@teacher.login, '1234')
     visit '/org/slug/courses/1'
     click_link 'Manage deadlines'
-    fill_in 'empty_group_static', with: 'a.b.cccc'
+    fill_in 'empty_group_soft_static', with: 'a.b.cccc'
     click_button 'Save changes'
 
     expect(page).to_not have_content('Successfully saved deadlines.')
@@ -42,10 +46,11 @@ feature 'Teacher sets deadlines', feature: true do
     log_in_as(@admin.login, '1234') # Teachers will have the ability to refresh in the future, for now test as admin
     visit '/org/slug/courses/1'
     click_link 'Manage deadlines'
-    fill_in 'empty_group_static', with: '1.1.2000'
+    fill_in 'empty_group_hard_static', with: '1.1.2000'
     click_button 'Save changes'
     visit '/org/slug/courses/1'
     click_link 'Refresh'
-    expect(page).to have_content('01.01.2000')
+    click_link 'Manage deadlines'
+    expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
   end
 end

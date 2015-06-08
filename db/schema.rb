@@ -60,8 +60,6 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.integer  "course_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "expires_at"
-    t.boolean  "hidden",       default: false
   end
   
   create_table "courses", force: true do |t|

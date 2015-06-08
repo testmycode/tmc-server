@@ -279,10 +279,19 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'e2')
       @course.exercises.create(name: 'e3')
 
-      post :save_deadlines, organization_id: @organization.slug, id: @course.id, empty_group: { static: '1.1.2000', unlock: '' }
+      post :save_deadlines,
+           organization_id: @organization.slug,
+           id: @course.id,
+           empty_group: {
+               soft: { static: '1.1.2000', unlock: '' },
+               hard: { static: '', unlock: 'unlock + 2 weeks' }
+           }
 
       @course.exercise_group_by_name('').exercises(false).each do |e|
-        expect(e.static_deadline).to eq('1.1.2000')
+        expect(e.soft_static_deadline).to eq('1.1.2000')
+        expect(e.soft_unlock_deadline).to be_nil
+        expect(e.static_deadline).to be_nil
+        expect(e.unlock_deadline).to eq('unlock + 2 weeks')
       end
     end
 
@@ -290,12 +299,35 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'group1-e1')
       @course.exercises.create(name: 'group1-e2')
       @course.exercises.create(name: 'group1-e3')
+      @course.exercises.create(name: 'group2-e1')
+      @course.exercises.create(name: 'group2-e2')
 
-      post :save_deadlines, organization_id: @organization.slug, id: @course.id, group: { group1: { static: '1.1.2000', unlock: 'unlock + 7 days' } }
+      post :save_deadlines,
+           organization_id: @organization.slug,
+           id: @course.id,
+           group: {
+               group1: {
+                   soft: { static: '1.1.2000', unlock: 'unlock + 7 days' },
+                   hard: { static: '', unlock: 'unlock + 2 months' }
+               },
+               group2: {
+                   soft: { static: '2.2.2000', unlock: '' },
+                   hard: { static: '3.3.2000', unlock: '' }
+               }
+           }
 
       @course.exercise_group_by_name('group1').exercises(false).each do |e|
-        expect(e.static_deadline).to eq('1.1.2000')
-        expect(e.unlock_deadline).to eq('unlock + 7 days')
+        expect(e.soft_static_deadline).to eq('1.1.2000')
+        expect(e.soft_unlock_deadline).to eq('unlock + 7 days')
+        expect(e.static_deadline).to be_nil
+        expect(e.unlock_deadline).to eq('unlock + 2 months')
+      end
+
+      @course.exercise_group_by_name('group2').exercises(false).each do |e|
+        expect(e.soft_static_deadline).to eq('2.2.2000')
+        expect(e.soft_unlock_deadline).to be_nil
+        expect(e.static_deadline).to eq('3.3.2000')
+        expect(e.unlock_deadline).to be_nil
       end
     end
   end
