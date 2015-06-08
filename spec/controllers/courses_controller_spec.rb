@@ -330,7 +330,7 @@ describe CoursesController, type: :controller do
         post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '1.2.2000' }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
-          expect(e.unlock_spec_obj.valid_after).to eq(Time.new(2000, 2, 1))
+          expect(e.unlock_spec_obj.valid_after).to be_within(1.second).of Time.new(2000, 2, 1)
         end
       end
 
@@ -343,7 +343,7 @@ describe CoursesController, type: :controller do
         post :save_unlocks, organization_id: @organization.slug, id: @course.id, group: { 'group1': { '0': '1.2.2000' } }
 
         @course.exercise_group_by_name('group1').exercises(false).each do |e|
-          expect(e.unlock_spec_obj.valid_after).to eq(Time.new(2000, 2, 1))
+          expect(e.unlock_spec_obj.valid_after).to be_within(1.second).of Time.new(2000, 2, 1)
         end
         @course.exercise_group_by_name('group2').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_nil
