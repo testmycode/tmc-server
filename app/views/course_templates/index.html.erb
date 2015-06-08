@@ -24,11 +24,12 @@
         <td><%= course_template.expires_at %></td>
         <td><%= link_to 'Edit', edit_course_template_path(course_template) %></td>
         <td><%= link_to 'Destroy', course_template, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-        <td><% if course_template.hidden %>
-              <%= link_to 'unhide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-mini btn-danger" %>
-            <% else %>
-              <%= link_to 'hide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-mini btn-success" %>
-            <% end %>
+        <td>
+          <% if course_template.hidden %>
+            <%= link_to 'unhide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-mini btn-danger" %>
+          <% else %>
+            <%= link_to 'hide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-mini btn-success" %>
+          <% end %>
         </td>
       </tr>
     <% end %>
