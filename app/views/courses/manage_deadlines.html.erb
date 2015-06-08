@@ -1,0 +1,55 @@
+<h1>Edit deadlines</h1>
+<%= form_tag save_deadlines_organization_course_url(@organization, @course), method: :post do %>
+  <table class="exercise-list table table-hover table-condensed">
+    <thead>
+    <tr>
+      <th>
+        Exercise group
+      </th>
+      <th>
+        Exercise
+      </th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @course.exercise_groups.each do |group| %>
+      <tr>
+        <td>
+          <%= group.name %><br/>
+        </td>
+        <td>
+          <% group.exercises(false).each do |exercise| %>
+            <%= exercise.name %>
+            <%
+               notes = []
+               notes << 'hidden' if exercise.hidden?
+               notes << 'expired' if exercise.expired_for?(current_user)
+               notes << 'locked' unless exercise.unlocked_for?(current_user)
+            %>
+            <% unless notes.empty? %>
+              (<%= notes.join(', ') %>)
+            <% end %>
+            <br/>
+          <% end %>
+        </td>
+        <td>
+          <% deadline = group.group_deadline %>
+          <%
+             if group.name.empty?
+               param_array = 'empty_group'
+             else
+               param_array = "group[#{group.name}]"
+             end
+          %>
+          <%= label_tag "#{param_array}[static]", 'Deadline' %>
+          <%= text_field_tag "#{param_array}[static]", deadline.static_deadline_spec %>
+          <%= label_tag "#{param_array}[unlock]", 'Unlock-based deadline' %>
+          <%= text_field_tag "#{param_array}[unlock]", deadline.unlock_deadline_spec %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= submit_tag 'Save changes', class: "btn btn-info" %>
+<% end %>

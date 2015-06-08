@@ -283,6 +283,10 @@ class Course < ActiveRecord::Base
     result
   end
 
+  def initially_refreshed?
+    refreshed_at.nil?
+  end
+
   private
 
   def check_source_backend
