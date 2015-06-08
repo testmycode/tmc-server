@@ -60,6 +60,8 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.integer  "course_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "expires_at"
+    t.boolean  "hidden",       default: false
   end
   
   create_table "courses", force: true do |t|
@@ -105,6 +107,7 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.string   "valgrind_strategy"
     t.boolean  "code_review_requests_enabled",     default: false, null: false
     t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
+    t.text     "soft_deadline_spec"
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
