@@ -5,9 +5,10 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
+  before_action :set_course, only: [ :show, :refresh, :enable, :disable ]
 
   def index
-    ordering = 'hidden, disabled DESC, LOWER(name)'
+    ordering = 'hidden, disabled_status, LOWER(name)'
 
     respond_to do |format|
       format.html do
@@ -37,7 +38,6 @@ class CoursesController < ApplicationController
       session.delete(:refresh_report)
     end
 
-    @course = Course.find(params[:id])
     authorize! :read, @course
     UncomputedUnlock.resolve(@course, current_user)
 
@@ -58,7 +58,6 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-    @course = Course.find(params[:id])
     authorize! :refresh, @course
 
     begin
@@ -91,12 +90,14 @@ class CoursesController < ApplicationController
 
   def enable
     authorize! :teach, @organization
-    disable_course(false)
+    @course.enabled!
+    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
   end
 
   def disable
     authorize! :teach, @organization
-    disable_course(true)
+    @course.disabled!
+    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
   end
 
   private
@@ -127,11 +128,7 @@ class CoursesController < ApplicationController
     @organization = Organization.find_by(slug: params[:organization_id])
   end
 
-  def disable_course(disabled)
-    course = Course.find(params[:id])
-    course.disabled = disabled
-    notice_action = disabled ? 'disabled' : 'enabled'
-    notice_message = (course.save ? 'Course was successfully' : 'Course could not be') + " #{notice_action}."
-    redirect_to(organization_course_path(@organization, course), notice: notice_message)
+  def set_course
+    @course = Course.find(params[:id])
   end
 end

@@ -99,7 +99,10 @@
         <% if @course.disabled? %>
           <%= link_to 'Enable Course', enable_organization_course_path(@organization, @course), method: :post, class: "btn btn-info btn-mini" %>
         <% else %>
-          <%= link_to 'Disable Course', disable_organization_course_path(@organization, @course), method: :post, class: "btn btn-danger btn-mini" %>
+          <%=
+              link_to 'Disable Course', disable_organization_course_path(@organization, @course), method: :post,
+                      data: { confirm: "Are you sure you want to disable the course?" }, class: "btn btn-danger btn-mini"
+          %>
         <% end %>
       <% end %>
       <% unlockables = @course.unlockable_exercises_for(current_user) %>

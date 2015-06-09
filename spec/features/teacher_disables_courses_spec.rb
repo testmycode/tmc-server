@@ -26,8 +26,7 @@ feature 'Teacher disables courses', feature: true do
 
   scenario 'Teacher enables a course' do
     log_in_as(@teacher.login, '1234')
-    @course.disabled = true
-    @course.save
+    @course.disabled!
     visit '/org/slug/courses'
 
     click_link 'test-course-1'
@@ -48,8 +47,7 @@ feature 'Teacher disables courses', feature: true do
 
   scenario 'Non-teacher can\'t access a disabled course' do
     log_in_as(@user.login, '1234')
-    @course.disabled = true
-    @course.save
+    @course.disabled!
 
     visit '/org/slug/courses'
 

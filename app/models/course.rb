@@ -34,6 +34,8 @@ class Course < ActiveRecord::Base
 
   belongs_to :organization
 
+  enum disabled_status: [ :enabled, :disabled ]
+
   def destroy
     # Optimization: delete dependent objects quickly.
     # Rails' :dependent => :delete_all is very slow.
@@ -51,7 +53,7 @@ class Course < ActiveRecord::Base
   def visible_to?(user)
     user.administrator? ||
     user.teacher?(organization) || (
-      !disabled &&
+      !disabled? &&
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
       (
