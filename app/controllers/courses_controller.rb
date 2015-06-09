@@ -150,7 +150,7 @@ class CoursesController < ApplicationController
     end
 
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
-  rescue Exercise::InvalidSyntaxError => e
+  rescue UnlockSpec::InvalidSyntaxError => e
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
   end
 

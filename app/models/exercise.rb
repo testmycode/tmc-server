@@ -196,7 +196,7 @@ class Exercise < ActiveRecord::Base
 
   def unlock_spec=(spec)
     check_is_json_array_of_strings(spec)
-    parsable_for_unlock_spec? spec
+    UnlockSpec.parsable_for_unlock_spec?(spec)
     super(spec)
     @unlock_spec_obj = nil
   end
@@ -409,30 +409,6 @@ class Exercise < ActiveRecord::Base
       to_json_array(raw_params)
     else
       raise "Invalid runtime_params: #{raw_params.inspect}"
-    end
-  end
-
-  class InvalidSyntaxError < StandardError; end
-
-  def parsable_for_unlock_spec?(spec)
-    conditions = ActiveSupport::JSON.decode(spec)
-    for i in 0...conditions.size
-      begin
-        str = conditions[i].to_s.strip
-        next if str.blank?
-        unless  DateAndTimeUtils.looks_like_date_or_time(str) ||
-                str =~ /^exercise\s+(?:group\s+)?(\S+)$/ ||
-                str =~ /^points?\s+(\S+.*)$/ ||
-                str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/ ||
-                str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/ ||
-                str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
-          fail InvalidSyntaxError.new('Invalid syntax')
-        end
-      rescue InvalidSyntaxError
-        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
-      rescue
-        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$!.message}"
-      end
     end
   end
 end
