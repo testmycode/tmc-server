@@ -53,4 +53,14 @@ feature 'Teacher sets deadlines', feature: true do
     click_link 'Manage deadlines'
     expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
   end
+
+  scenario 'Course page shows soft deadlines to users' do
+    log_in_as(@admin.login, '1234')
+    visit '/org/slug/courses/1'
+    click_link 'Manage deadlines'
+    fill_in 'empty_group_soft_static', with: '5.5.2000'
+    click_button 'Save changes'
+    visit '/org/slug/courses/1'
+    expect(page).to have_content('05.05.2000')
+  end
 end
