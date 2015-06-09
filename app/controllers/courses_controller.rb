@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable ]
+  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable ]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -98,6 +98,19 @@ class CoursesController < ApplicationController
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
+    end
+  end
+
+  def edit
+    authorize! :teach, @organization
+  end
+
+  def update
+    authorize! :teach, @organization
+    if @course.update(course_params[:course])
+      redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
+    else
+      render :edit
     end
   end
 
