@@ -5,10 +5,10 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines]
+  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable ]
 
   def index
-    ordering = 'hidden, LOWER(name)'
+    ordering = 'hidden, disabled_status, LOWER(name)'
 
     respond_to do |format|
       format.html do
@@ -121,6 +121,18 @@ class CoursesController < ApplicationController
     redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
   rescue DeadlineSpec::InvalidSyntaxError => e
     redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s
+  end
+
+  def enable
+    authorize! :teach, @organization
+    @course.enabled!
+    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
+  end
+
+  def disable
+    authorize! :teach, @organization
+    @course.disabled!
+    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
   end
 
   private
