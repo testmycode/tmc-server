@@ -96,6 +96,19 @@ class CoursesController < ApplicationController
     end
   end
 
+  def edit
+    authorize! :teach, @organization
+  end
+
+  def update
+    authorize! :teach, @organization
+    if @course.update(course_params[:course])
+      redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
+    else
+      render :edit
+    end
+  end
+
   def enable
     authorize! :teach, @organization # should assistants be able to enable/disable?
     @course.enabled!

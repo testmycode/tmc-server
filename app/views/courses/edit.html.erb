@@ -1,12 +1,12 @@
 <h1>Edit course</h1>
 
-<%= form_for(@course, url: organization_courses_path) do |f| %>
+<%= form_for(@course, url: organization_course_path) do |f| %>
   <%= render 'shared/error_messages', :target => @course %>
 
   <%= labeled_field("Course title", f.text_field(:title)) %>
-  <%= labeled_field("Course description (Optional)", f.text_area(:title)) %>
+  <%= labeled_field("Course description (Optional)", f.text_area(:description)) %>
   <%= labeled_field("Material URL (Optional)", f.text_field(:material_url)) %>
   <div class="actions">
-    <%= f.submit 'Add Course', class: "btn btn-primary"%>
+    <%= f.submit 'Update Course', class: "btn btn-primary"%>
   </div>
 <% end %>
