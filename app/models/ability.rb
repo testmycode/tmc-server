@@ -46,7 +46,10 @@ class Ability
       end
 
       cannot :read, Submission
-      can :read, Submission, user_id: user.id
+      can :read, Submission do |sub|
+        sub.readable_by?(user)
+      end
+
       can :create, Submission do |sub|
         sub.exercise.submittable_by?(user)
       end
