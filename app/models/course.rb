@@ -17,6 +17,10 @@ class Course < ActiveRecord::Base
               message: 'should not contain white spaces'
             }
 
+  validates :title,
+            presence: true,
+            length: { within: 1..40 }
+
   validates :source_url, presence: true
   validate :check_source_backend
   after_initialize :set_default_source_backend

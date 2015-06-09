@@ -202,12 +202,12 @@ describe CoursesController, type: :controller do
 
     describe 'with valid parameters' do
       it 'creates the course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
         expect(Course.last.source_url).to eq('git@example.com')
       end
 
       it 'redirects to the created course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
         expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
       end
     end

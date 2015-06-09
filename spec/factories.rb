@@ -27,6 +27,7 @@ FactoryGirl.define do
 
   factory :course, class: Course do
     sequence(:name) { |n| "course#{n}" }
+    sequence(:title) { |n| "Course #{n}"}
     source_url 'git@example.com'
     organization
   end

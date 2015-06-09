@@ -149,6 +149,7 @@ describe Course, type: :model do
     let(:valid_params) do
       {
         name: 'TestCourse',
+        title: 'Test Course',
         source_url: 'git@example.com'
       }
     end
@@ -178,6 +179,15 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(name: 'Test Course'))
     end
 
+    it 'requires a title' do
+      should_be_invalid_params(valid_params.merge(title: nil))
+      should_be_invalid_params(valid_params.merge(title: ''))
+    end
+
+    it 'requires title to be reasonably short' do
+      should_be_invalid_params(valid_params.merge(title: 'a' * 41))
+    end
+
     it 'requires a remote repo url' do
       should_be_invalid_params(valid_params.merge(source_url: nil))
       should_be_invalid_params(valid_params.merge(source_url: ''))
@@ -190,7 +200,7 @@ describe Course, type: :model do
 
   describe 'destruction' do
     it 'deletes its cache directory' do
-      c = Course.create!(name: 'MyCourse', source_url: source_url)
+      c = Course.create!(name: 'MyCourse', title: 'My Course', source_url: source_url)
       FileUtils.mkdir_p(c.cache_path)
       FileUtils.touch("#{c.cache_path}/foo.txt")
 

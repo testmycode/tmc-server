@@ -97,6 +97,8 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.string   "certificate_unlock_spec"
     t.integer  "organization_id"
     t.integer  "disabled_status",                default: 0
+    t.string   "title"
+    t.string   "material_url"
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
