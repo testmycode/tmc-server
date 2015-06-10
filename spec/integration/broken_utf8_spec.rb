@@ -9,7 +9,7 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
     @teacher = FactoryGirl.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path, organization_id: @organization.id)
+    @course = Course.create!(name: 'mycourse', title: 'mycourse', source_backend: 'git', source_url: repo_path, organization_id: @organization.id)
     @repo = clone_course_repo(@course)
     @repo.copy(FixtureExercise.fixture_exercises_root + '/BrokenUtf8')
     @repo.add_commit_push

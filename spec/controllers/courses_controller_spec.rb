@@ -220,7 +220,7 @@ describe CoursesController, type: :controller do
       end
     end
   end
-  
+
   describe 'PUT update' do
     before :each do
       @course = FactoryGirl.create :course, title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial', organization: @organization
