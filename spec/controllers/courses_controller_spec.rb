@@ -229,6 +229,56 @@ describe CoursesController, type: :controller do
     end
   end
 
+  describe 'PUT update' do
+    before :each do
+      @course = FactoryGirl.create :course, title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial', organization: @organization
+      controller.current_user = @user
+    end
+
+    describe 'with valid parameters' do
+      before :each do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'newMaterial'}
+      end
+
+      it 'updates the course' do
+        course = Course.last
+        expect(course.title).to eq('newTitle')
+        expect(course.description).to eq('newDescription')
+        expect(course.material_url).to eq('newMaterial')
+      end
+
+      it 'redirects to updated course' do
+        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
+      end
+    end
+
+    describe 'with invalid parameters' do
+      it 're-renders course update form' do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {material_url: 'colons : galore'}
+        expect(response).to render_template('edit')
+      end
+    end
+
+    describe 'when non-teacher attemps to update' do
+      before :each do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'newMaterial'}
+      end
+
+      it 'should respomd with 401' do
+        expect(response.code.to_i).to eq(401)
+      end
+
+      it 'shouldnt update' do
+        course = Course.last
+        expect(course.title).to eq('oldTitle')
+        expect(course.description).to eq('oldDescription')
+        expect(course.material_url).to eq('oldMaterial')
+      end
+    end
+  end
+
   describe 'POST save_deadlines' do
     before :each do
       @course = FactoryGirl.create(:course)
