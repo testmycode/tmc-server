@@ -6,6 +6,7 @@
   <%= labeled_field("Course title", f.text_field(:title)) %>
   <%= labeled_field("Course description (Optional)", f.text_area(:description)) %>
   <%= labeled_field("Material URL (Optional)", f.text_field(:material_url)) %>
+  <%= labeled_field("Course name", f.text_field(:name, disabled: true)) %>
   <div class="actions">
     <%= f.submit 'Update Course', class: "btn btn-primary"%>
   </div>
