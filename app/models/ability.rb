@@ -78,7 +78,7 @@ class Ability
 
       cannot :teach, Organization
       can :teach, Organization do |o|
-        o.teacher?(user) && !o.rejected?
+        o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
       end
     end
   end
