@@ -17,7 +17,7 @@ feature 'Teacher can add new teacher to an organization', feature: true do
     click_link 'Add a new teacher'
     fill_in 'username', with: @new_teacher.username
     click_button 'Add a new teacher'
-    expect(page).to have_content 'User added successfully'
+    expect(page).to have_content 'Teacher added to organization'
     expect(page).to have_content @new_teacher.username
   end
 
