@@ -9,9 +9,9 @@ feature 'Teacher lists own organization courses', feature: true do
     @user = FactoryGirl.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create :course, name: 'course_1', organization: @organization
-    FactoryGirl.create :course, name: 'course_2', organization: @organization
-    FactoryGirl.create :course, name: 'course_old', organization: @organization, hide_after: Time.now - 2.minutes
+    FactoryGirl.create :course, name: 'course_1', title: 'course_1', organization: @organization
+    FactoryGirl.create :course, name: 'course_2', title: 'course_2', organization: @organization
+    FactoryGirl.create :course, name: 'course_old', title: 'course_old', organization: @organization, hide_after: Time.now - 2.minutes
 
     visit '/'
   end
