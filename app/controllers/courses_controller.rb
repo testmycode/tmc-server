@@ -90,7 +90,7 @@ class CoursesController < ApplicationController
   def create
     @course = Course.new(course_params[:course])
     @course.organization = @organization
-    authorize! :create, @course
+    authorize! :teach, @organization
 
     respond_to do |format|
       if @course.save
