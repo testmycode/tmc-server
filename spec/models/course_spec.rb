@@ -193,6 +193,11 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(source_url: ''))
     end
 
+    it 'doesnt allow colon in material url' do
+      should_be_invalid_params(valid_params.merge(material_url: 'http://google.fi'))
+      should_be_invalid_params(valid_params.merge(material_url: ':::'))
+    end
+
     def should_be_invalid_params(params)
       expect { Course.create!(params) }.to raise_error
     end
