@@ -19,6 +19,7 @@ TmcServer::Application.routes.draw do
         post 'enable'
         post 'disable'
         get 'courses', to: 'courses#show_json', format: 'json', as: 'one_course_json'
+        get 'students', to: 'courses#student_emails'
       end
 
       resources :assistants, only: [:index, :new, :create]

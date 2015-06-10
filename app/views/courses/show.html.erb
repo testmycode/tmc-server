@@ -12,6 +12,9 @@
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
+        <% if can? :teach, @organization %>
+          <li><%= link_to 'View student emails', students_organization_course_path(@organization, @course) %></li>
+        <% end %>
       </ul>
       <% if can? :teach, @course %>
         <ul>

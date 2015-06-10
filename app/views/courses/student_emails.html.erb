@@ -1,0 +1,22 @@
+<h1>Students in <%= @course.name %></h1>
+
+<table class="table table-striped">
+  <tr>
+    <th>
+      Username
+    </th>
+    <th>
+      Email
+    </th>
+  </tr>
+  <% @students.each do |student| %>
+    <tr>
+      <td>
+        <%= student.username %>
+      </td>
+      <td>
+        <a href="mailto:<%= student.email %>"><%= student.email %></a>
+      </td>
+    </tr>
+  <% end %>
+</table>

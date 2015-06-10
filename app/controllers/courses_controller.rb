@@ -5,7 +5,8 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [ :show, :refresh, :enable, :disable ]
+  before_action :set_course, only: [:show, :refresh, :enable, :disable, :student_emails]
+
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -111,6 +112,16 @@ class CoursesController < ApplicationController
     authorize! :teach, @organization
     @course.disabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
+  end
+
+  def student_emails
+    authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb('Students', students_organization_course_path(@organization, @course))
+    @students = []
+    @course.submissions.each do |s|
+      @students << s.user unless @students.include? s.user
+    end
   end
 
   private
