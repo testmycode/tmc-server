@@ -21,6 +21,12 @@ class Course < ActiveRecord::Base
             presence: true,
             length: { within: 1..40 }
 
+  validates :material_url,
+            format: {
+                without: /:/,
+                message: 'should not contain colon (:). Remove "http://" from the beginning if you have it'
+            }
+
   validates :source_url, presence: true
   validate :check_source_backend
   after_initialize :set_default_source_backend
