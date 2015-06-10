@@ -25,6 +25,7 @@ TmcServer::Application.routes.draw do
         post 'disable'
         get 'manage_unlocks'
         post 'save_unlocks'
+        get 'students', to: 'courses#student_emails'
       end
 
       resources :points, only: [:index, :show] do
