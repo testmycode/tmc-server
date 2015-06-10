@@ -8,7 +8,7 @@ feature 'Teacher disables courses', feature: true do
     @teacher = FactoryGirl.create :user, password: '1234'
     @user = FactoryGirl.create :user, password: '1234'
     @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @course = FactoryGirl.create :course, name: 'test-course-1', organization: @organization
+    @course = FactoryGirl.create :course, name: 'test-course-1', title: 'test-course-1', organization: @organization
     Teachership.create!(user: @teacher, organization: @organization)
 
     visit '/'
