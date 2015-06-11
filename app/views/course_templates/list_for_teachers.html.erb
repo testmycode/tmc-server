@@ -18,7 +18,7 @@
         <td><%= course_template.title %></td>
         <td><%= course_template.description %></td>
         <td><%= course_template.material_url %></td>
-        <td><%= link_to 'Create course', prepare_course_path(@organization, course_template), class: "btn btn-mini btn-primary" %></td>
+        <td><%= link_to 'Create course', organization_prepare_course_path(@organization, course_template), class: "btn btn-mini btn-primary" %></td>
       </tr>
   <% end %>
   </tbody>
