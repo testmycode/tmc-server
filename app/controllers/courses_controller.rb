@@ -126,7 +126,6 @@ class CoursesController < ApplicationController
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
   end
 
-
   def help
     @course = Course.find(params[:course_id])
     authorize! :read, @course
