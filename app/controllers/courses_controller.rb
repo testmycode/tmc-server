@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable ]
+  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -103,10 +103,7 @@ class CoursesController < ApplicationController
   def save_deadlines
     authorize! :teach, @organization
 
-    groups = deadline_params[:group] || {}
-    empty_group = deadline_params[:empty_group] || {}
-    groups[''] = empty_group unless empty_group.empty?
-
+    groups = group_params
     groups.each do |name, deadlines|
       json_array = [deadlines[:static], deadlines[:unlock]].to_json
       @course.exercise_group_by_name(name).group_deadline=(json_array)
@@ -129,9 +126,31 @@ class CoursesController < ApplicationController
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
   end
 
+
   def help
     @course = Course.find(params[:course_id])
     authorize! :read, @course
+  end
+
+  def manage_unlocks
+    authorize! :teach, @organization
+    assign_show_view_vars
+  end
+
+  def save_unlocks
+    authorize! :teach, @organization
+
+    groups = group_params
+    groups.each do |name, conditions|
+      array = []
+      conditions.each { |k, v| array << v }
+      @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
+      UncomputedUnlock.create_all_for_course_eager(@course)
+    end
+
+    redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
+  rescue UnlockSpec::InvalidSyntaxError => e
+    redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
   end
 
   private
@@ -166,8 +185,12 @@ class CoursesController < ApplicationController
     @course = Course.find(params[:id])
   end
 
-  def deadline_params
-    params.slice(:group, :empty_group)
+  def group_params
+    sliced = params.slice(:group, :empty_group)
+    groups = sliced[:group] || {}
+    empty_group = sliced[:empty_group] || {}
+    groups[''] = empty_group unless empty_group.empty?
+    groups
   end
 
   def refresh_course(course)

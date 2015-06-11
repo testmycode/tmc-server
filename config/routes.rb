@@ -23,6 +23,8 @@ TmcServer::Application.routes.draw do
         post 'save_deadlines'
         post 'enable'
         post 'disable'
+        get 'manage_unlocks'
+        post 'save_unlocks'
       end
 
       resources :points, only: [:index, :show] do
