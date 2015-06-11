@@ -23,7 +23,9 @@ class Ability
       cannot :read, User
       cannot :read, :code_reviews
       cannot :read, :course_information
-      can :read, User, id: user.id
+      can :read, User do |u|
+        u.readable_by?(user)
+      end
       can :create, User if SiteSetting.value(:enable_signup)
 
       cannot :read, Course

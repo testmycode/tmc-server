@@ -47,9 +47,9 @@
         <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
           <th>
             <%= sheet %><br />
-            [<%= link_to 'open', course_point_path(@course, sheet) %>]
+            [<%= link_to 'open', organization_course_point_path(@organization, @course, sheet) %>]
             <% unless params[:sort_by] == "#{sheet}_points" %>
-              [<%= link_to 'sort', course_points_path(@course, :sort_by => "#{sheet}_points") %>]
+              [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "#{sheet}_points") %>]
             <% else %>
               [sort]
             <% end %>
@@ -70,7 +70,7 @@
     <tbody>
       <% @summary[:users].each_with_index do |user, index| %>
         <% username = user.login %>
-        <% row_class = if user.administrator? then "admin" else "student" end %>
+        <% row_class = if user.administrator? || user.teacher?(@organization) then "admin" else "student" end %>
         <tr class="<%= row_class %>">
           <td><%= index + 1 %></td>
           <td>
