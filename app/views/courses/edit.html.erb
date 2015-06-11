@@ -1,7 +1,7 @@
 <h1>Edit course</h1>
 
 <%= form_for(@course, url: organization_course_path) do |f| %>
-  <%= render 'shared/error_messages', :target => @course %>
+  <%= render 'shared/error_messages', target: @course %>
 
   <%= labeled_field("Course title", f.text_field(:title)) %>
   <%= labeled_field("Course description (Optional)", f.text_area(:description)) %>

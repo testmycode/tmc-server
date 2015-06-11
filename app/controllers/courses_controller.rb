@@ -88,7 +88,7 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = Course.new(course_params[:course])
+    @course = Course.new(course_params)
     @course.organization = @organization
     authorize! :create, @course
 
@@ -107,7 +107,7 @@ class CoursesController < ApplicationController
 
   def update
     authorize! :teach, @organization
-    if @course.update(course_params[:course])
+    if @course.update(course_params)
       redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
     else
       render :edit
@@ -151,7 +151,7 @@ class CoursesController < ApplicationController
   private
 
   def course_params
-    params.permit(course: [:name, :title, :description, :material_url, :source_url, :git_branch])
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
   end
 
   def assign_show_view_vars
