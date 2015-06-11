@@ -335,7 +335,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '1.2.2000' }
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0' => '1.2.2000' }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -348,7 +348,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'group1-e3')
         @course.exercises.create(name: 'group2-e1')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, group: { 'group1': { '0': '1.2.2000' } }
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, group: { group1: { '0' => '1.2.2000' } }
 
         @course.exercise_group_by_name('group1').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -363,8 +363,8 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '1.2.2000' }
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '' }
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '' }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_nil
@@ -374,7 +374,7 @@ describe CoursesController, type: :controller do
 
     it 'when non-teacher should respond with a 401' do
       @course.exercises.create(name: 'e')
-      post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0': '1.2.2000' }
+      post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
       expect(response.code.to_i).to eq(401)
     end
   end
