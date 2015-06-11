@@ -64,4 +64,15 @@ class ExerciseGroup
       e.save
     end
   end
+
+  def group_unlock_conditions
+    exercises(false).map { |n| n.unlock_conditions }.first
+  end
+
+  def group_unlock_conditions=(unlock_conditions)
+    exercises(false).each do |e|
+      e.unlock_spec = unlock_conditions
+      e.save
+    end
+  end
 end
