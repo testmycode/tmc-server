@@ -44,4 +44,5 @@ group :development, :test do
   gem 'railroady' # for doc/diagrams
   gem 'simplecov'
   gem 'rubocop', '~> 0.29.1', require: false
+  gem 'byebug'
 end

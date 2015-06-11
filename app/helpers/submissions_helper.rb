@@ -22,35 +22,35 @@ module SubmissionsHelper
 
   def submission_review_column(submission)
     if submission.reviewed?
-      if can? :create, Review
+      if can? :create_review, submission
         link_to 'Available', new_submission_review_path(submission)
       else
         link_to 'Available', submission_reviews_path(submission)
       end
     elsif submission.newer_submission_reviewed?
-      if can? :create, Review
+      if can? :create_review, submission
         link_to 'Superseded', new_submission_review_path(submission)
       else
         link_to 'Superseded', submission_reviews_path(submission)
       end
     elsif submission.review_dismissed?
-      if can? :create, Review
+      if can? :create_review, submission
         link_to 'Dismissed', new_submission_review_path(submission)
       end
     elsif submission.requests_review?
-      if can? :create, Review
+      if can? :create_review, submission
         link_to 'Requested', new_submission_review_path(submission)
       else
         'Requested'
       end
     elsif submission.requires_review?
-      if can? :create, Review
+      if can? :create_review, submission
         link_to 'Required', new_submission_review_path(submission)
       else
         'Pending'
       end
     else
-      if can? :create, Review
+      if can? :create_review, submission
         link_to 'Not required', new_submission_review_path(submission)
       end
     end

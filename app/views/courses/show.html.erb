@@ -76,12 +76,12 @@
           <ul>
             <% if reviews_required > 0 %>
               <li class="review-required">
-                <%= link_to pluralize(reviews_required, "code review") + " required", organization_course_reviews_path(@course, @organization) %>
+                <%= link_to pluralize(reviews_required, "code review") + " required", organization_course_reviews_path(@organization, @course) %>
               </li>
             <% end %>
             <% if reviews_requested > 0 %>
               <li class="review-requested">
-                <%= link_to pluralize(reviews_requested, "code review") + " requested", course_reviews_path(@course) %>
+                <%= link_to pluralize(reviews_requested, "code review") + " requested", organization_course_reviews_path(@organization, @course) %>
               </li>
             <% end %>
           </ul>
