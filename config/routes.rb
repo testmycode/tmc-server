@@ -1,7 +1,4 @@
 TmcServer::Application.routes.draw do
-  get 'org/:organization_id/course_templates', to: 'course_templates#list_for_teachers', as: 'list_course_templates'
-  get 'org/:organization_id/course_templates/:id', to: 'course_templates#prepare_course', as: 'prepare_course'
-
   resources :organizations, path: 'org' do
     member do
       post 'accept'
@@ -14,6 +11,8 @@ TmcServer::Application.routes.draw do
     end
 
     resources :teachers, only: [:index, :new, :create, :destroy]
+    get 'course_templates', to: 'course_templates#list_for_teachers'
+    get 'course_templates/:id', to: 'course_templates#prepare_course', as: 'prepare_course'
 
     resources :courses do
       member do
