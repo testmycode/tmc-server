@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   has_many :certificates
   has_many :teacherships, dependent: :destroy
   has_many :organizations, through: :teacherships
+  has_many :assistantships, dependent: :destroy
+  has_many :assisted_courses, through: :assistantships, source: :course
 
   validates :login, presence: true,
                     uniqueness: true,

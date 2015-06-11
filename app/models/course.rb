@@ -32,10 +32,12 @@ class Course < ActiveRecord::Base
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :course_notifications, dependent: :delete_all
   has_many :certificates
-
-  scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
+  has_many :assistantships, dependent: :destroy
+  has_many :assistants, through: :assistantships, source: :user
 
   belongs_to :organization
+
+  scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
   enum disabled_status: [ :enabled, :disabled ]
 
@@ -45,6 +47,7 @@ class Course < ActiveRecord::Base
     # Even self.association.delete_all first does a SELECT.
     # This relies on the database to cascade deletes.
     ActiveRecord::Base.connection.execute("DELETE FROM courses WHERE id = #{id}")
+    assistantships.each { |a| a.destroy! } # apparently this is not performed automatically with optimized destroy
 
     # Delete cache.
     delete_cache # Would be an after_destroy callback normally
