@@ -21,6 +21,8 @@ TmcServer::Application.routes.draw do
         get 'courses', to: 'courses#show_json', format: 'json', as: 'one_course_json'
       end
 
+      resources :assistants, only: [:index, :new, :create]
+
       resources :points, only: [:index, :show] do
         member do
           get 'refresh_gdocs'
