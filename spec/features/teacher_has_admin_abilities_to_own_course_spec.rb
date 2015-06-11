@@ -7,17 +7,22 @@ feature 'Teacher has admin abilities to own course', feature: true do
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
     @teacher = FactoryGirl.create :user, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @student = FactoryGirl.create :user, password: 'foobar'
+    @admin = FactoryGirl.create :admin, password: 'admin'
 
     @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization)
     @course.refresh
 
-    @submission = FactoryGirl.create :submission, course: @course, user: @user, exercise_name: 'trivial'
+    @submission = FactoryGirl.create :submission, course: @course, user: @student, exercise_name: 'trivial'
     @submission_data = FactoryGirl.create :submission_data, submission: @submission
 
     visit '/'
     log_in_as(@teacher.login, 'xooxer')
+    #log_in_as(@admin.login, 'admin')
   end
+
+  let!(:awarded_point) { FactoryGirl.create :awarded_point, course: @course, submission: @submission, user: @student }
+
 
   scenario 'Teacher can see model solution for exercise' do
     visit '/exercises/1'
@@ -43,4 +48,17 @@ feature 'Teacher has admin abilities to own course', feature: true do
     expect(page).to have_content('Test Results')
     expect(page).not_to have_content('Access denied')
   end
+
+  scenario 'Teacher can see users points from his own courses' do
+
+    #@awarded_point = FactoryGirl.create :awarded_point, course: @course, submission: @submission, user: @student
+
+    visit '/org/slug/courses/1'
+    #click_link 'Details'
+    click_link 'View points'
+
+    save_and_open_page
+
+  end
+
 end

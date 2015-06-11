@@ -50,6 +50,10 @@ class Ability
         sub.exercise.submittable_by?(user)
       end
 
+      can :update, Submission do |sub|
+        user.teacher?(sub.course.organization)
+      end
+
       cannot :read, FeedbackAnswer
       can :create, FeedbackAnswer do |ans|
         ans.submission.user_id == user.id
@@ -58,6 +62,18 @@ class Ability
       cannot :read, Solution
       can :read, Solution do |sol|
         sol.visible_to?(user)
+      end
+
+      cannot :manage, Review
+      can :manage, Review do |r|
+        r.manageable_by?(user)
+      end
+      can :read, Review do |r|
+        r.readable_by?(user)
+      end
+
+      can :create_review, Submission do |s|
+        user.teacher?(s.course.organization)
       end
 
       cannot :mark_as_read, Review
@@ -70,7 +86,16 @@ class Ability
       end
 
       can :view_code_reviews, Course do |c|
-        c.submissions.exists?(user_id: user.id, reviewed: true)
+        c.submissions.exists?(user_id: user.id, reviewed: true) || user.teacher?(c.organization)
+      end
+
+      can :list_code_reviews, Course do |c|
+        user.teacher?(c.organization)
+      end
+
+      cannot :create, AwardedPoint
+      can :create, AwardedPoint do |ap|
+        ap.creatable_by?(user)
       end
 
       cannot :read, Certificate
