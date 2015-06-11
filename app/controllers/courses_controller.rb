@@ -71,20 +71,13 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-    authorize! :refresh, @course
-
-    begin
-      session[:refresh_report] = @course.refresh
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
-    end
-
+    refresh_course(@course)
     redirect_to organization_course_path
   end
 
   def new
     @course = Course.new
-    authorize! :create, @exercises
+    authorize! :teach, @organization
   end
 
   def create
@@ -94,7 +87,8 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       if @course.save
-        format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
+        refresh_course(@course)
+        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
@@ -130,6 +124,11 @@ class CoursesController < ApplicationController
     authorize! :teach, @organization
     @course.disabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
+  end
+
+  def help
+    @course = Course.find(params[:course_id])
+    authorize! :read, @course
   end
 
   def manage_unlocks
@@ -191,5 +190,14 @@ class CoursesController < ApplicationController
     empty_group = sliced[:empty_group] || {}
     groups[''] = empty_group unless empty_group.empty?
     groups
+  end
+
+  def refresh_course(course)
+    authorize! :refresh, course
+    begin
+      session[:refresh_report] = course.refresh
+    rescue CourseRefresher::Failure => e
+      session[:refresh_report] = e.report
+    end
   end
 end

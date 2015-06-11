@@ -10,7 +10,7 @@ class Course < ActiveRecord::Base
 
   validates :name,
             presence: true,
-            uniqueness: true,
+            uniqueness: { scope: :organization },
             length: { within: 1..40 },
             format: {
               without: / /,
@@ -288,6 +288,10 @@ class Course < ActiveRecord::Base
 
   def initially_refreshed?
     refreshed_at.nil?
+  end
+
+  def taught_by?(user)
+    user.teacher?(self.organization)
   end
 
   private
