@@ -62,20 +62,27 @@ class ParticipantsController < ApplicationController
     @percent_completed = {}
     for course_id in @awarded_points.keys
       course = Course.find(course_id)
-      @courses << course
+      if current_user.administrator? || current_user.teacher?(course.organization) || @user.id == current_user.id
+        @courses << course
 
-      awarded = @awarded_points[course.id]
-      missing = AvailablePoint.course_points(course).order!.map(&:name) - awarded
-      @missing_points[course_id] = missing
+        awarded = @awarded_points[course.id]
+        missing = AvailablePoint.course_points(course).order!.map(&:name) - awarded
+        @missing_points[course_id] = missing
 
-      if awarded.size + missing.size > 0
-        @percent_completed[course_id] = 100 * (awarded.size.to_f / (awarded.size + missing.size))
-      else
-        @percent_completed[course_id] = 0
+        if awarded.size + missing.size > 0
+          @percent_completed[course_id] = 100 * (awarded.size.to_f / (awarded.size + missing.size))
+        else
+          @percent_completed[course_id] = 0
+        end
       end
     end
 
-    @submissions = @user.submissions.order('id DESC').includes(:user)
+    if current_user.administrator? || current_user.id == @user.id
+      @submissions = @user.submissions.order('id DESC').includes(:user)
+    else # teacher sees only submissions for own organization courses
+      @submissions = @user.submissions.order('id DESC').includes(:user).where(course: current_user.teaching_in_courses)
+    end
+
     Submission.eager_load_exercises(@submissions)
   end
 
