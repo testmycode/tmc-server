@@ -1,0 +1,11 @@
+<%= link_to exercise.name, exercise %>
+<%
+   notes = []
+   notes << 'hidden' if exercise.hidden?
+   notes << 'expired' if exercise.expired_for?(current_user)
+   notes << 'locked' unless exercise.unlocked_for?(current_user)
+   notes << 'disabled' if exercise.disabled?
+%>
+<% unless notes.empty? %>
+  (<%= notes.join(', ') %>)
+<% end %>

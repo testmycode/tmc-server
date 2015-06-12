@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks]
+  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks, :manage_exercises]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -150,6 +150,11 @@ class CoursesController < ApplicationController
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
   rescue UnlockSpec::InvalidSyntaxError => e
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
+  end
+
+  def manage_exercises
+    authorize! :teach, @organization
+    assign_show_view_vars
   end
 
   private
