@@ -163,8 +163,16 @@ describe Course, type: :model do
     end
 
     it 'requires name to be non-unique' do
-      Course.create!(valid_params)
-      should_be_invalid_params(valid_params)
+      organization = FactoryGirl.create :accepted_organization
+      Course.create!(valid_params.merge(organization: organization))
+      should_be_invalid_params(valid_params.merge(organization: organization))
+    end
+
+    it 'allows same course name in different organizations' do
+      organization1 = FactoryGirl.create :accepted_organization
+      organization2 = FactoryGirl.create :accepted_organization
+      Course.create!(valid_params.merge(organization: organization1))
+      expect{ Course.create!(valid_params.merge(organization: organization2)) }.not_to raise_error
     end
 
     it 'forbids spaces in the name' do # this could eventually be lifted as long as everything else is made to tolerate spaces

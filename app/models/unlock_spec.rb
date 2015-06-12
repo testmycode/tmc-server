@@ -3,13 +3,14 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   class InvalidSyntaxError < StandardError; end
 
   def initialize(exercise, conditions)
+    @raw_spec = conditions
     @exercise = exercise
     @conditions = []
     @universal_descriptions = []
     @describers = []
     for i in 0...conditions.size
       begin
-        parse_condition(conditions[i].to_s.strip)
+        parse_condition(conditions[i].to_s.strip) unless conditions[i].to_s.blank?
       rescue InvalidSyntaxError
         raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
       rescue
@@ -22,6 +23,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     @conditions.empty? && @valid_after.nil?
   end
 
+  attr_reader :raw_spec
   attr_reader :valid_after
   attr_reader :universal_descriptions
 
@@ -155,6 +157,28 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       word
     else
       word.pluralize
+    end
+  end
+
+  def self.parsable?(spec)
+    conditions = ActiveSupport::JSON.decode(spec)
+    for i in 0...conditions.size
+      begin
+        str = conditions[i].to_s.strip
+        next if str.blank?
+        unless  DateAndTimeUtils.looks_like_date_or_time(str) ||
+            str =~ /^exercise\s+(?:group\s+)?(\S+)$/ ||
+            str =~ /^points?\s+(\S+.*)$/ ||
+            str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/ ||
+            str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/ ||
+            str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
+          fail InvalidSyntaxError.new('Invalid syntax')
+        end
+      rescue InvalidSyntaxError
+        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
+      rescue
+        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$!.message}"
+      end
     end
   end
 end
