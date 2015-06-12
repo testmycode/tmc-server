@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks ]
+  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks, :submissions_data]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -66,6 +66,21 @@ class CoursesController < ApplicationController
     data = {
         api_version: ApiVersion::API_VERSION,
         courses: CourseList.new(current_user, view_context).course_list_data(@organization, course)
+    }
+    render json: data.to_json
+  end
+
+  def submissions_data
+    authorize! :teach, @organization
+
+    submissions = @course.submissions.order('created_at DESC')
+    exercises = @course.exercises
+    data = {
+        api_version:                      ApiVersion::API_VERSION,
+        course_name:                      @course.name,
+        course_id:                        @course.id,
+        exercises:                        ExerciseList.new.exercise_list(exercises),
+        submissions:                      SubmissionList2.new.submission_list(submissions)
     }
     render json: data.to_json
   end
