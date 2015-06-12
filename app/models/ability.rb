@@ -77,7 +77,6 @@ class Ability
       end
 
       cannot :reply, FeedbackAnswer
-      cannot :email, CourseNotification
 
       can :create, :organization
       cannot :create, :organization if user.guest?
