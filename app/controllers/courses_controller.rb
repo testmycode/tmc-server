@@ -154,6 +154,11 @@ class CoursesController < ApplicationController
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
   end
 
+  def manage_exercises
+    authorize! :teach, @organization
+    assign_show_view_vars
+  end
+
   private
 
   def course_params

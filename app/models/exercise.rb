@@ -27,6 +27,8 @@ class Exercise < ActiveRecord::Base
     where(course_id: course.id, gdocs_sheet: gdocs_sheet)
   }
 
+  enum disabled_status: [:enabled, :disabled]
+
   def relative_path
     name.gsub('-', '/')
   end

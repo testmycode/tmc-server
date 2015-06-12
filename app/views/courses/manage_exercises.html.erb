@@ -1,0 +1,29 @@
+<h1>Enable and disable exercises</h1>
+<%= form_tag set_disabled_statuses_organization_course_exercises_path(@organization, @course), method: :post do %>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>
+        Exercise
+      </th>
+      <th>
+        Select
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @exercises.each do |exercise| %>
+      <tr>
+        <td>
+          <%= render partial: 'exercises/list_single', locals: { exercise: exercise } %>
+        </td>
+        <td>
+          <%= check_box_tag "exercise[#{exercise.name}]" %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= submit_tag 'Enable selected', class: 'btn btn-mini btn-info' %>
+  <%= submit_tag 'Disable selected', class: 'btn btn-mini btn-danger' %>
+<% end %>

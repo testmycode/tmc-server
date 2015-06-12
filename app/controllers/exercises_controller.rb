@@ -53,4 +53,23 @@ class ExercisesController < ApplicationController
       end
     end
   end
+
+  def set_disabled_statuses
+    @course = Course.find(params[:course_id])
+    @organization = @course.organization
+    authorize! :teach, @organization
+
+    action = params[:commit] == 'Disable selected' ? :disabled! : :enabled!
+    exercise_params = params[:exercise]
+    exercise_names = []
+    exercise_names = exercise_params.map { |k, v| v == '1' ? k : nil }.compact unless exercise_params.nil?
+
+    exercise_names.each do |name|
+      exercise = Exercise.find_by(name: name)
+      exercise.send(action) unless exercise.nil?
+    end
+
+    redirect_to manage_exercises_organization_course_path(@organization, @course),
+                notice: 'Selected exercises successfully updated.'
+  end
 end
