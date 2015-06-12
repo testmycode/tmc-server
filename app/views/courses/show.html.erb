@@ -13,7 +13,7 @@
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
       </ul>
-      <% if can? :teach, @organization %>
+      <% if can? :teach, @course %>
         <ul>
           <li>Source type: <%= @course.source_backend.upcase %> </li>
           <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>

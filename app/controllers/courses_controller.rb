@@ -102,7 +102,7 @@ class CoursesController < ApplicationController
   end
 
   def enable
-    authorize! :teach, @organization
+    authorize! :teach, @organization # should assistants be able to enable/disable?
     @course.enabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
   end

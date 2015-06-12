@@ -314,6 +314,10 @@ class Course < ActiveRecord::Base
     result
   end
 
+  def assistant?(user)
+    assistants.include? user
+  end
+
   private
 
   def check_source_backend
