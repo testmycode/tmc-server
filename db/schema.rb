@@ -74,8 +74,8 @@ ActiveRecord::Schema.define(version: 20150609083655) do
     t.boolean  "locked_exercise_points_visible", default: true,     null: false
     t.text     "description"
     t.string   "paste_visibility"
-    t.boolean  "disabled"
     t.integer  "organization_id"
+    t.integer  "disabled_status",                default: 0
     t.string   "title"
     t.string   "material_url"
   end
