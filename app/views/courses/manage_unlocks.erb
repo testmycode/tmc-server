@@ -20,17 +20,8 @@
             </td>
             <td>
               <% group.exercises(false).each do |exercise| %>
-                  <%= exercise.name %>
-                  <%
-                     notes = []
-                     notes << 'hidden' if exercise.hidden?
-                     notes << 'expired' if exercise.expired_for?(current_user)
-                     notes << 'locked' unless exercise.unlocked_for?(current_user)
-                  %>
-                  <% unless notes.empty? %>
-                      (<%= notes.join(', ') %>)
-                  <% end %>
-                  <br/>
+                <%= render partial: 'exercises/list_single', locals: { exercise: exercise } %>
+                <br/>
               <% end %>
             </td>
             <td>
