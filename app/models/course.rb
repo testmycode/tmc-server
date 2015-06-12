@@ -293,6 +293,10 @@ class Course < ActiveRecord::Base
     refreshed_at.nil?
   end
 
+  def assistant?(user)
+    assistants.include? user
+  end
+
   private
 
   def check_source_backend

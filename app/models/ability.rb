@@ -80,6 +80,12 @@ class Ability
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected?
       end
+
+      cannot :teach, Course
+      can :teach, Course do |c|
+        return false if c.organization.rejected?
+        c.organization.teacher?(user) || c.assistant?(user)
+      end
     end
   end
 end
