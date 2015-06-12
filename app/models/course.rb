@@ -106,7 +106,7 @@ class Course < ActiveRecord::Base
     self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
 
-    self.description = new_options['description']
+    # self.description = new_options['description'] # disabled for now, description read from course template or db
     self.paste_visibility = new_options['paste_visibility']
     if !new_options['locked_exercise_points_visible'].nil?
       self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']
