@@ -4,6 +4,22 @@
 <ul>
   <li><%= link_to 'Download project template (zip)', exercise_zip_url(@exercise) %></li>
 
+  <% unless @exercise.available_points.empty? %>
+    <%
+      available_points = @exercise.available_points.to_a.sort.map(&:name)
+      awarded_points = available_points & @exercise.points_for(current_user)
+      nonawarded_points = available_points - awarded_points
+      all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
+      all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
+    %>
+    <li>
+      Got <%= awarded_points.size %> out of <%= pluralize(available_points.size, 'point') %>
+      (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
+    </li>
+  <% else %>
+    <li>No points available</li>
+  <% end %>
+
   <% if @exercise.hidden? %>
     <li>This exercise is currently hidden</li>
   <% end %>
