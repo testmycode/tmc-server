@@ -272,3 +272,6 @@ DEPENDENCIES
   transaction_isolation (~> 1.0.3)
   uglifier (~> 2.7.0)
   xml-simple (~> 1.1.1)
+
+BUNDLED WITH
+   1.10.3

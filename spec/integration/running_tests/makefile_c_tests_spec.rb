@@ -23,7 +23,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     expect(tcr).to be_successful
 
     expect(submission.awarded_points.count).to eq(3)
-    expect(submission.awarded_points.first.name).to eq('point1')
+    expect(submission.awarded_points.map(&:name)).to include('point1')
   end
 
   specify 'C compilation failures' do

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe TestRunGrader do
   include GitTestActions
-  # TODO: ad c testcase?
+
   before :each do
     @submission = FactoryGirl.create(:submission, processed: false)
     ['1.1', '1.2'].each do |name|
@@ -72,8 +72,9 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
 
     # Should not depend on result order, so let's try the same in reverse order
-
-    @submission = FactoryGirl.create(:submission, processed: false)
+    @submission = FactoryGirl.create(:submission, course: @submission.course,
+                                                  exercise: @submission.exercise,
+                                                  processed: false)
     TestRunGrader.grade_results(@submission, half_successful_results.reverse)
 
     points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
@@ -82,8 +83,8 @@ describe TestRunGrader do
   end
 
   it 'should only award points which are available from the exercise' do
-    otherExercise = FactoryGirl.create(:exercise, course_id: @submission.course_id)
-    FactoryGirl.create(:available_point, exercise_id: otherExercise.id, name: '1.3')
+    other_exercise = FactoryGirl.create(:exercise, course_id: @submission.course_id)
+    FactoryGirl.create(:available_point, exercise_id: other_exercise.id, name: '1.3')
 
     results = [
       {
