@@ -178,7 +178,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def points_for(user)
-    AwardedPoint.course_user_points(course, user).map(&:name)
+    AwardedPoint.exercise_user_points(self, user).map(&:name)
   end
 
   def missing_review_points_for(user)

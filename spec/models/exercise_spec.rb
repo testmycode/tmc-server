@@ -300,7 +300,8 @@ describe Exercise, type: :model do
     pt2 = FactoryGirl.create(:available_point, exercise: exercise, requires_review: true)
     pt3 = FactoryGirl.create(:available_point, exercise: exercise, requires_review: true)
 
-    FactoryGirl.create(:awarded_point, course: course, user: user, name: pt2.name)
+    submission = FactoryGirl.create(:submission, course: course, exercise: exercise, user: user)
+    FactoryGirl.create(:awarded_point, course: course, submission: submission, user: user, name: pt2.name)
     expect(exercise.missing_review_points_for(user)).to eq([pt3.name])
   end
 end

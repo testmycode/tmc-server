@@ -9,6 +9,13 @@ class AwardedPoint < ActiveRecord::Base
   belongs_to :user
   belongs_to :submission
 
+  def self.exercise_user_points(exercise, user)
+    where(course_id: exercise.course_id, user_id: user.id)
+      .joins(:submission)
+      .where('submissions.course_id = ? AND submissions.exercise_name = ?',
+             exercise.course_id, exercise.name)
+  end
+
   def self.course_user_points(course, user)
     where(course_id: course.id, user_id: user.id)
   end
