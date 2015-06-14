@@ -81,6 +81,27 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
   end
 
+  it 'should only award points which are available from the exercise' do
+    otherExercise = FactoryGirl.create(:exercise, course_id: @submission.course_id)
+    FactoryGirl.create(:available_point, exercise_id: otherExercise.id, name: '1.3')
+
+    results = [
+      {
+        'className' => 'MyTest',
+        'methodName' => 'testSomething',
+        'status' => 'PASSED',
+        'pointNames' => ['1.1', '1.2', '1.3']
+      }
+    ]
+
+    TestRunGrader.grade_results(@submission, results)
+
+    points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
+    expect(points).to include('1.1')
+    expect(points).to include('1.2')
+    expect(points).not_to include('1.3')
+  end
+
   it 'should always mark awarded points in the submission record but not create duplicate awarded_points rows' do
     TestRunGrader.grade_results(@submission, half_successful_results)
 
