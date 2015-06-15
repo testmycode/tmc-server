@@ -54,6 +54,11 @@ class Ability
         user.teacher?(sub.course.organization)
       end
 
+      cannot :manage_feedback_questions, Course
+      can :manage_feedback_questions, Course do |c|
+        user.teacher?(c.organization)
+      end
+
       cannot :read, FeedbackAnswer
       can :create, FeedbackAnswer do |ans|
         ans.submission.user_id == user.id
