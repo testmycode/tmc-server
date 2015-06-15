@@ -122,6 +122,12 @@ class CoursesController < ApplicationController
     @course.submissions.each do |s|
       @students << s.user unless @students.include? s.user
     end
+
+    respond_to do |format|
+      format.html
+      format.text { render text: @students.map { |s| "#{s.email}" }.join("\n") }
+      format.csv { render text: "Username,Email\n" + @students.map { |s| "#{s.username},#{s.email}"}.join("\n") }
+    end
   end
 
   private
