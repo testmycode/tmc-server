@@ -31,12 +31,24 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
-    FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
+    admin = FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
+    org = FactoryGirl.create(:accepted_organization)
+    org.teachers << admin
+    org.save
   %>
 
   <h1>Tutorial</h1>
 
   <div id="toc"></div>
+
+  <h2>User types</h2>
+
+  <p>
+    TMC website is used by different kinds of users:
+    <ul>
+      <li></li>
+    </ul>
+  </p>
 
   <h2>Creating a course</h2>
 
@@ -51,7 +63,7 @@ require 'cgi' # for escapeHTML
   <p>Let's log in as an administrator.</p>
 
   <%
-    visit '/'
+    visit "/org/#{org.slug}"
     fill_in 'session_login', :with => 'admin'
     fill_in 'session_password', :with => 'admin'
   %>
@@ -256,7 +268,10 @@ require 'cgi' # for escapeHTML
     This may be inconvenient, but it also somewhat protects against mistakes.
   </p>
 
-  <% page.visit(page.current_url) %>
+  <%
+     page.visit(page.current_url)
+     click_on 'View status page'
+  %>
   <% highlight('[value="Refresh"]') %>
   <%= screenshot %>
   <% click_on 'Refresh' %>
