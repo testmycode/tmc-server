@@ -101,22 +101,23 @@ class Exercise < ActiveRecord::Base
   # Whether a user may make submissions
   def submittable_by?(user)
     returnable? &&
-      (user.administrator? ||
-        (!expired_for?(user) && !hidden? && published? && !user.guest? && unlocked_for?(user)))
+      (user.administrator? || user.teacher?(course.organization) ||
+        (!expired_for?(user) && !hidden? && published? && !disabled? && !user.guest? && unlocked_for?(user)))
   end
 
   # Whether a user may see all metadata about the exercise
   def visible_to?(user)
     user.administrator? || user.teacher?(course.organization) ||
-      (!hidden? && published? && unlock_spec_obj.permits_unlock_for?(user))
+      (!hidden? && published? && !disabled? && unlock_spec_obj.permits_unlock_for?(user))
   end
 
   # Whether the user may see the scoreboard for the exercise
   def points_visible_to?(user)
-    user.administrator? ||
+    user.administrator? || user.teacher?(course.organization) ||
       (
         !hidden? &&
         published? &&
+        !disabled? &&
         (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user))
       )
   end
