@@ -123,6 +123,10 @@ class User < ActiveRecord::Base
     organizations.include? organization
   end
 
+  def assistant?(course)
+    assisted_courses.include? course
+  end
+
   private
 
   def encrypt_password
