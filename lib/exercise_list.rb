@@ -16,6 +16,7 @@ class ExerciseList
         solution_visible_after: exercise.solution_visible_after,
         has_tests: exercise.has_tests,
         deadline_spec: exercise.deadline_spec,
+        soft_deadline_spec: exercise.soft_deadline_spec,
         unlock_spec: exercise.unlock_spec,
         code_review_requests_enabled: exercise.code_review_requests_enabled,
         run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled
