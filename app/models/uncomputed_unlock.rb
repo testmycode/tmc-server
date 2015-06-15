@@ -21,6 +21,16 @@ class UncomputedUnlock < ActiveRecord::Base
     end
   end
 
+  # Primarily used for demoing unlock date change through gui, this version of the method creates uncomputed unlocks
+  # for every user, not requiring the user to have awarded points from the course. This method will most likely be
+  # left unused in production build.
+  def self.create_all_for_course_eager(course)
+    transaction do
+      rows_to_insert = User.all.pluck(:id).map { |uid| { course_id: course.id, user_id: uid } }
+      UncomputedUnlock.create!(rows_to_insert)
+    end
+  end
+
   def self.resolve(course, user)
     if find_by_course_id_and_user_id(course, user)
       Unlock.refresh_unlocks(course, user)

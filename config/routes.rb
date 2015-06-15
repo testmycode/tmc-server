@@ -4,7 +4,6 @@ TmcServer::Application.routes.draw do
       post 'accept'
       post 'reject'
       get 'reject_reason_input'
-      get 'course_templates', to: 'course_templates#list_for_teachers'
     end
 
     collection do
@@ -12,13 +11,20 @@ TmcServer::Application.routes.draw do
     end
 
     resources :teachers, only: [:index, :new, :create, :destroy]
+    get 'course_templates', to: 'course_templates#list_for_teachers'
+    get 'course_templates/:id', to: 'course_templates#prepare_course', as: 'prepare_course'
 
     resources :courses do
       member do
         get 'refresh'
         post 'refresh'
+        get 'courses', to: 'courses#show_json', format: 'json', as: 'one_course_json'
         get 'manage_deadlines'
         post 'save_deadlines'
+        post 'enable'
+        post 'disable'
+        get 'manage_unlocks'
+        post 'save_unlocks'
       end
 
       resources :points, only: [:index, :show] do
@@ -26,6 +32,8 @@ TmcServer::Application.routes.draw do
           get 'refresh_gdocs'
         end
       end
+
+      get 'help'
 
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
@@ -39,10 +47,13 @@ TmcServer::Application.routes.draw do
       resource :unlock, only: [:show, :create]
       resource :course_notifications, only: [:create, :index, :show, :new]
     end
-
   end
 
-  resources :course_templates, except: :show
+  resources :course_templates, except: :show do
+    member do
+      post 'toggle_hidden', to: 'course_templates#toggle_hidden'
+    end
+  end
 
   resources :sessions, only: [:new, :create, :destroy]
 

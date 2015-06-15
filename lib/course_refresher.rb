@@ -241,7 +241,10 @@ class CourseRefresher
                                           end)
           @review_points[e.name] = parse_review_points(metadata['review_points'])
 
-          preserve_exercise_deadlines(e, metadata) unless e.course.initially_refreshed?
+          unless e.course.initially_refreshed?
+            preserve_exercise_deadlines(e, metadata)
+            preserve_exercise_unlocks(e, metadata)
+          end
 
           e.options = metadata
           e.save!
@@ -472,6 +475,10 @@ class CourseRefresher
       static_deadline = e.static_deadline || ''
       unlock_deadline = e.unlock_deadline || ''
       metadata['deadline'] = [static_deadline, unlock_deadline]
+    end
+
+    def preserve_exercise_unlocks(e, metadata)
+      metadata['unlocked_after'] = e.unlock_conditions
     end
   end
 end

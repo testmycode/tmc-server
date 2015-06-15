@@ -10,7 +10,7 @@ class Course < ActiveRecord::Base
 
   validates :name,
             presence: true,
-            uniqueness: true,
+            uniqueness: { scope: :organization },
             length: { within: 1..40 },
             format: {
               without: / /,
@@ -34,6 +34,8 @@ class Course < ActiveRecord::Base
 
   belongs_to :organization
 
+  enum disabled_status: [ :enabled, :disabled ]
+
   def destroy
     # Optimization: delete dependent objects quickly.
     # Rails' :dependent => :delete_all is very slow.
@@ -49,7 +51,9 @@ class Course < ActiveRecord::Base
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
 
   def visible_to?(user)
-    user.administrator? || (
+    user.administrator? ||
+    user.teacher?(organization) || (
+      !disabled? &&
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
       (
@@ -284,6 +288,10 @@ class Course < ActiveRecord::Base
 
   def initially_refreshed?
     refreshed_at.nil?
+  end
+
+  def taught_by?(user)
+    user.teacher?(self.organization)
   end
 
   private

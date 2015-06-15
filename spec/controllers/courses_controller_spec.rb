@@ -3,16 +3,18 @@ require 'spec_helper'
 describe CoursesController, type: :controller do
   before(:each) do
     @user = FactoryGirl.create(:user)
+    @teacher = FactoryGirl.create(:user)
     @organization = FactoryGirl.create(:accepted_organization)
+    Teachership.create(user: @teacher, organization: @organization)
   end
 
   describe 'GET index' do
     it 'shows visible courses in order by name, split into ongoing and expired' do
       controller.current_user = FactoryGirl.create(:admin)
       @courses = [
-        FactoryGirl.create(:course, name: 'SomeTestCourse'),
-        FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week),
-        FactoryGirl.create(:course, name: 'AnotherTestCourse')
+        FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
+        FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
+        FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
       ]
 
       get :index, organization_id: @organization.slug
@@ -34,9 +36,9 @@ describe CoursesController, type: :controller do
       end
 
       it 'renders all non-hidden courses in order by name' do
-        FactoryGirl.create(:course, name: 'Course1')
-        FactoryGirl.create(:course, name: 'Course2', hide_after: Time.now + 1.week)
-        FactoryGirl.create(:course, name: 'Course3')
+        FactoryGirl.create(:course, name: 'Course1', organization: @organization)
+        FactoryGirl.create(:course, name: 'Course2', organization: @organization, hide_after: Time.now + 1.week)
+        FactoryGirl.create(:course, name: 'Course3', organization: @organization)
         FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
         FactoryGirl.create(:course, name: 'HiddenCourse', hidden: true)
 
@@ -214,7 +216,7 @@ describe CoursesController, type: :controller do
 
       it 'redirects to the created course' do
         post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
-        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
+        expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
       end
     end
 
@@ -291,6 +293,121 @@ describe CoursesController, type: :controller do
         expect(e.static_deadline).to eq('3.3.2000')
         expect(e.unlock_deadline).to be_nil
       end
+    end
+  end
+
+  describe 'POST disable' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+    end
+
+    describe 'As a teacher' do
+      it 'disables the course' do
+        controller.current_user = @teacher
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(Course.find(@course.id).disabled?).to eq(true)
+      end
+    end
+
+    describe 'As a student' do
+      it 'denies access' do
+        controller.current_user = @user
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+  end
+
+  describe 'POST enable' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+    end
+
+    describe 'As a teacher' do
+      it 'enables the course' do
+        controller.current_user = @teacher
+        post :enable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(Course.find(@course.id).disabled?).to eq(false)
+      end
+    end
+
+    describe 'As a student' do
+      it 'denies access' do
+        controller.current_user = @user
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+  end
+
+  describe 'GET manage_unlocks' do
+    it 'when non-teacher should respond with a 401' do
+      @course = FactoryGirl.create :course
+      @course.organization = @organization
+      controller.current_user = @user
+      get :manage_unlocks, organization_id: @organization.slug, id: @course.id
+      expect(response.code.to_i).to eq(401)
+    end
+  end
+
+  describe 'POST save_unlocks' do
+    before :each do
+      @course = FactoryGirl.create :course
+      @course.organization = @organization
+      controller.current_user = @user
+    end
+
+    describe 'when teacher' do
+      before :each do
+        Teachership.create(user: @user, organization: @organization)
+      end
+
+      it 'saves unlock dates for exercises in group named ""' do
+        @course.exercises.create(name: 'e1')
+        @course.exercises.create(name: 'e2')
+        @course.exercises.create(name: 'e3')
+
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0' => '1.2.2000' }
+
+        @course.exercise_group_by_name('').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
+        end
+      end
+
+      it 'saves unlock dates for exercises in group named something else' do
+        @course.exercises.create(name: 'group1-e1')
+        @course.exercises.create(name: 'group1-e2')
+        @course.exercises.create(name: 'group1-e3')
+        @course.exercises.create(name: 'group2-e1')
+
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, group: { group1: { '0' => '1.2.2000' } }
+
+        @course.exercise_group_by_name('group1').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
+        end
+        @course.exercise_group_by_name('group2').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to be_nil
+        end
+      end
+
+      it 'empty unlock date is acceptable' do
+        @course.exercises.create(name: 'e1')
+        @course.exercises.create(name: 'e2')
+        @course.exercises.create(name: 'e3')
+
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '' }
+
+        @course.exercise_group_by_name('').exercises(false).each do |e|
+          expect(e.unlock_spec_obj.valid_after).to be_nil
+        end
+      end
+    end
+
+    it 'when non-teacher should respond with a 401' do
+      @course.exercises.create(name: 'e')
+      post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
+      expect(response.code.to_i).to eq(401)
     end
   end
 end

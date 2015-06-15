@@ -8,6 +8,9 @@ class OrganizationsController < ApplicationController
   end
 
   def show
+    ordering = 'hidden, LOWER(name)'
+    @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
+    @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
   end
 
   def new
