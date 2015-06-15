@@ -57,4 +57,40 @@ feature 'Teacher disables exercises', feature: true do
       expect(page).to_not have_content("#{ex.name} (disabled)")
     end
   end
+
+  scenario 'Teacher can submit solutions for disabled exercises' do
+    @ex1.disabled!
+    @ex1.returnable_forced = true # Not an actual exercise, must force
+    @ex1.save!
+
+    log_in_as(@teacher.login, @teacher.password)
+    visit '/org/slug/courses/1'
+
+    click_link @ex1.name
+
+    expect(page).to have_content('Submit answer')
+  end
+
+  scenario 'Student cannot see disabled exercises' do
+    @ex3.disabled!
+    @ex4.disabled!
+
+    log_in_as(@user.login, @user.password)
+    visit '/org/slug/courses/1'
+
+    expect(page).to have_content("#{@ex1.name}")
+    expect(page).to have_content("#{@ex2.name}")
+    expect(page).to_not have_content("#{@ex3.name}")
+    expect(page).to_not have_content("#{@ex4.name}")
+  end
+
+  scenario 'Student cannot access disabled exercise page' do
+    @ex1.disabled!
+
+    log_in_as(@user.login, @user.password)
+
+    visit "/exercises/#{@ex1.id}"
+
+    expect(page).to have_content('Access denied')
+  end
 end
