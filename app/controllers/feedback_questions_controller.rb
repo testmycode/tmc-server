@@ -1,7 +1,4 @@
-
 # Handles the feedback question editing UI.
-#
-# TODO: While this is nice, I think feedback questions should live in a conf file in the repo so that the entire course is defined by the repo.
 class FeedbackQuestionsController < ApplicationController
   before_action :get_course
   before_action :set_organization
@@ -11,18 +8,18 @@ class FeedbackQuestionsController < ApplicationController
     add_breadcrumb 'Feedback questions'
 
     @questions = @course.feedback_questions.order(:position)
-    authorize! :show, @questions
+    authorize! :manage_feedback_questions, @course
   end
 
   def new
     @question = FeedbackQuestion.new(course: @course)
-    authorize! :create, @question
+    authorize! :manage_feedback_questions, @course
   end
 
   def create
     @question = FeedbackQuestion.new(feedback_question_params[:feedback_question])
     @question.course = @course
-    authorize! :create, @question
+    authorize! :manage_feedback_questions, @course
 
     fix_question_kind(@question)
 
@@ -38,16 +35,14 @@ class FeedbackQuestionsController < ApplicationController
   def show
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read, @question
-    authorize! :read, @course
+    authorize! :manage_feedback_questions, @course
   end
 
   def update
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
     @organization = @course.organization
-    authorize! :read, @course
-    authorize! :update, @question
+    authorize! :manage_feedback_questions, @course
 
     @question.question = params[:feedback_question][:question]
     @question.title = params[:feedback_question][:title]
@@ -65,8 +60,7 @@ class FeedbackQuestionsController < ApplicationController
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
     @organization = @course.organization
-    authorize! :read, @course
-    authorize! :delete, @question
+    authorize! :manage_feedback_questions, @course
 
     begin
       @question.destroy

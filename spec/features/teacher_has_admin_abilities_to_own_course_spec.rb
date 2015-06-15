@@ -68,4 +68,28 @@ feature 'Teacher has admin abilities to own course', feature: true do
     page.execute_script("$('form#new_review').submit()")
     expect(page).to have_content('None at the moment.')
   end
+
+  scenario 'Teacher can manage course feedback questions' do
+    visit '/org/slug/courses/1'
+    click_link 'Manage feedback questions'
+    click_link 'Add question'
+
+    fill_in('feedback_question_question', with: 'Meaning of life?')
+    fill_in('feedback_question_title', with: 'meaning')
+    choose('feedback_question_kind_text')
+    click_button('Create question')
+
+    expect(page).to have_content('Feedback questions for mycourse')
+    expect(page).to have_content('Meaning of life?')
+
+    click_link('Meaning of life?')
+    fill_in('feedback_question_question', with: 'Your feelings?')
+    click_button('Save')
+
+    expect(page).to have_content('Feedback questions for mycourse')
+    expect(page).to have_content('Your feelings?')
+
+    click_link('Delete')
+    expect(page).to have_content('No feedback questions set.')
+  end
 end
