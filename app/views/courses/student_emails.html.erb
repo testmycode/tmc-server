@@ -1,3 +1,7 @@
+<div class="alternative-format-links">
+  [<%= link_to 'plain text', students_organization_course_path(format: :txt) %>]
+  [<%= link_to 'csv', students_organization_course_path(format: :csv) %>]
+</div>
 <h1>Students in <%= @course.name %></h1>
 
 <table class="table table-striped">
