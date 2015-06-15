@@ -10,19 +10,16 @@ feature 'Teacher has admin abilities to own course', feature: true do
     @student = FactoryGirl.create :user, password: 'foobar'
     @admin = FactoryGirl.create :admin, password: 'admin'
 
-    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization)
+    @course = FactoryGirl.create :course, name: 'mycourse', source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
     @course.refresh
 
-    @submission = FactoryGirl.create :submission, course: @course, user: @student, exercise_name: 'trivial'
+    @exercise1 = @course.exercises.find_by(name: 'arith_funcs')
+    @submission = FactoryGirl.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true
     @submission_data = FactoryGirl.create :submission_data, submission: @submission
 
     visit '/'
     log_in_as(@teacher.login, 'xooxer')
-    #log_in_as(@admin.login, 'admin')
   end
-
-  let!(:awarded_point) { FactoryGirl.create :awarded_point, course: @course, submission: @submission, user: @student }
-
 
   scenario 'Teacher can see model solution for exercise' do
     visit '/exercises/1'
@@ -50,15 +47,25 @@ feature 'Teacher has admin abilities to own course', feature: true do
   end
 
   scenario 'Teacher can see users points from his own courses' do
-
-    #@awarded_point = FactoryGirl.create :awarded_point, course: @course, submission: @submission, user: @student
-
+    available_point = @course.available_points.find_by(name: 'arith-funcs')
+    available_point.award_to(@student, @submission)
     visit '/org/slug/courses/1'
-    #click_link 'Details'
     click_link 'View points'
 
-    save_and_open_page
-
+    expect(page).to have_content('1/8')
+    expect(page).not_to have_content('0/8')
   end
 
+  scenario 'Teacher can make code review' do
+    visit '/org/slug/courses/1'
+
+    expect(page).to have_content('1 code review requested')
+    click_link '1 code review requested'
+    click_link 'Requested'
+
+    fill_in('review_review_body', with: 'Code looks ok')
+
+    page.execute_script("$('form#new_review').submit()")
+    expect(page).to have_content('None at the moment.')
+  end
 end
