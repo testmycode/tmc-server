@@ -82,6 +82,7 @@ module IntegrationTestActions
   end
 
   def screenshot_to_file(path)
+    page.driver.resize_window 1200, 1200
     FileUtils.mkdir_p(File.dirname(path))
     if page.driver.respond_to? :render
       page.driver.render(path) # Webkit
