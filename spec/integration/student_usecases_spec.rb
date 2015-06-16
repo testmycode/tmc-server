@@ -89,7 +89,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
   end
 
   it 'should show exercises whose deadline has passed but without a submission form' do
-    @course.exercise_group_by_name('').group_deadline = [Date.yesterday.to_s].to_json
+    @course.exercise_group_by_name('').hard_group_deadline = [Date.yesterday.to_s].to_json
 
     visit '/org/slug/courses'
     click_link 'mycourse'
