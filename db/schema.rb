@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150609074523) do
+ActiveRecord::Schema.define(version: 20150616081429) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -76,6 +76,7 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.string   "paste_visibility"
     t.integer  "organization_id"
     t.integer  "disabled_status",                default: 0
+    t.integer  "course_template_id"
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree

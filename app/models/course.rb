@@ -33,6 +33,7 @@ class Course < ActiveRecord::Base
   has_many :course_notifications, dependent: :delete_all
 
   belongs_to :organization
+  belongs_to :course_template
 
   enum disabled_status: [ :enabled, :disabled ]
 

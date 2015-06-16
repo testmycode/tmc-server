@@ -155,7 +155,7 @@ class CoursesController < ApplicationController
   private
 
   def course_params
-    params.permit(course: [:name, :source_url, :git_branch])
+    params.permit(course: [:name, :source_url, :git_branch, :course_template_id])
   end
 
   def assign_show_view_vars

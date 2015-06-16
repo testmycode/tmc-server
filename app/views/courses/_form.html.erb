@@ -5,6 +5,7 @@
   <%= labeled_field("Source Type", f.text_field(:source_backend, :value => 'git', :disabled => 'disabled')) %>
   <%= labeled_field("Source URL", f.text_field(:source_url)) %>
   <%= labeled_field("Git branch name", f.text_field(:git_branch, :value => 'master')) %>
+  <%= f.hidden_field(:course_template_id, :value => @course.course_template_id) %>
   <div class="actions">
     <%= f.submit 'Add Course', class: "btn btn-primary"%>
   </div>
