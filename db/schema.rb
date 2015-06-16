@@ -40,8 +40,8 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.string   "message"
     t.integer  "sender_id"
     t.integer  "course_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "course_templates", force: true do |t|
@@ -55,8 +55,6 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.datetime "expires_at"
     t.boolean  "hidden",       default: false
   end
-
-  add_index "course_templates", ["name"], name: "index_course_templates_on_name", unique: true, using: :btree
 
   create_table "courses", force: true do |t|
     t.string   "name"
@@ -110,8 +108,8 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.string   "exercise_name",        null: false
     t.integer  "submission_id"
     t.text     "answer",               null: false
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "feedback_answers", ["feedback_question_id", "course_id", "exercise_name"], name: "index_feedback_answers_question_course_exercise", using: :btree
@@ -121,8 +119,8 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.integer  "course_id",  null: false
     t.text     "question",   null: false
     t.string   "kind",       null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "position",   null: false
     t.text     "title"
   end
@@ -135,14 +133,11 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.string   "slug"
     t.datetime "accepted_at"
     t.boolean  "acceptance_pending"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.boolean  "rejected",           default: false, null: false
     t.string   "rejected_reason"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
-
-  add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
-  add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
 
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false
@@ -160,16 +155,16 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.integer  "feedback_answer_id"
     t.text     "body"
     t.string   "from"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "reviews", force: true do |t|
     t.integer  "submission_id",                  null: false
     t.integer  "reviewer_id"
     t.text     "review_body",                    null: false
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "points"
     t.boolean  "marked_as_read", default: false, null: false
   end
@@ -213,6 +208,8 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.integer  "times_sent_to_sandbox",                    default: 0,     null: false
     t.datetime "processing_attempts_started_at"
     t.integer  "processing_priority",                      default: 0,     null: false
+    t.binary   "stdout_compressed"
+    t.binary   "stderr_compressed"
     t.text     "params_json"
     t.boolean  "requires_review",                          default: false, null: false
     t.boolean  "requests_review",                          default: false, null: false
@@ -269,8 +266,8 @@ ActiveRecord::Schema.define(version: 20150609074523) do
   create_table "uncomputed_unlocks", force: true do |t|
     t.integer  "course_id",  null: false
     t.integer  "user_id",    null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "uncomputed_unlocks", ["course_id", "user_id"], name: "index_uncomputed_unlocks_on_course_id_and_user_id", using: :btree
@@ -289,8 +286,8 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.integer  "user_id",    null: false
     t.string   "field_name", null: false
     t.text     "value",      null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "user_field_values", ["user_id", "field_name"], name: "index_user_field_values_on_user_id_and_field_name", unique: true, using: :btree
