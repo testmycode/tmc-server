@@ -1,6 +1,6 @@
 # Handles the feedback question editing UI.
 class FeedbackQuestionsController < ApplicationController
-  before_action :get_course
+  before_action :set_course
   before_action :set_organization
 
   def index
@@ -78,15 +78,14 @@ class FeedbackQuestionsController < ApplicationController
     params.permit({ feedback_question: [:question, :title, :kind] }, :intrange_min, :intrange_max, :commit, :course_id)
   end
 
-  def get_course
+  def set_course
     @course = Course.find(params[:course_id]) if params[:course_id]
     authorize! :read, @course
   end
 
   def fix_question_kind(question)
-    if question.kind == 'intrange'
-      question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
-    end
+    return unless question.kind == 'intrange'
+    question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
   end
 
   def set_organization
