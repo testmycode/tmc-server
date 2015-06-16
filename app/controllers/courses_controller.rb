@@ -105,8 +105,10 @@ class CoursesController < ApplicationController
 
     groups = group_params
     groups.each do |name, deadlines|
-      json_array = [deadlines[:static], deadlines[:unlock]].to_json
-      @course.exercise_group_by_name(name).group_deadline=(json_array)
+      soft_deadlines = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
+      hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
+      @course.exercise_group_by_name(name).soft_group_deadline = soft_deadlines
+      @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
     end
 
     redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
