@@ -92,4 +92,17 @@ feature 'Teacher has admin abilities to own course', feature: true do
     click_link('Delete')
     expect(page).to have_content('No feedback questions set.')
   end
+
+  scenario 'Teacher can view course feedback answers' do
+    question = FactoryGirl.create :feedback_question, course: @course, question: 'Meaning of life?'
+    answer = FactoryGirl.create :feedback_answer, feedback_question: question, course: @course, exercise: @exercise1, submission: @submission, answer: 'no idea'
+
+    visit '/org/slug/courses/1'
+    click_link 'View feedback'
+
+    expect(page).not_to have_content('access denied')
+    expect(page).to have_content('Feedback statistics')
+    expect(page).to have_content('Showing 1 to 1 of 1 entries')
+    expect(page).to have_content(answer.answer)
+  end
 end

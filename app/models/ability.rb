@@ -60,6 +60,25 @@ class Ability
       end
 
       cannot :read, FeedbackAnswer
+      can :read_feedback_answers, Course do |c|
+        user.teacher?(c.organization)
+      end
+      can :read_feedback_answers, Exercise do |e|
+        user.teacher?(e.course.organization)
+      end
+
+      cannot :read, FeedbackQuestion
+      can :read_feedback_questions, Course do |c|
+        user.teacher?(c.organization)
+      end
+      can :read_feedback_questions, Exercise do |e|
+        user.teacher?(e.course.organization)
+      end
+
+      can :reply_feedback_answer, FeedbackAnswer do |ans|
+        user.teacher?(ans.course.organization)
+      end
+
       can :create, FeedbackAnswer do |ans|
         ans.submission.user_id == user.id
       end

@@ -1,9 +1,8 @@
 # Handles replying to a feedback answer by e-mail.
 class FeedbackRepliesController < ApplicationController
   def create
-    authorize! :reply, FeedbackAnswer
-
     answer = FeedbackAnswer.find(params['answer_id'])
+    authorize! :reply_feedback_answer, answer
     answer.reply_to_feedback_answers.create(from: current_user.email, body: params['body'])
 
     FeedbackReplyMailer.feedback_email(
