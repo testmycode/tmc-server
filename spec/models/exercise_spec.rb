@@ -92,19 +92,11 @@ describe Exercise, type: :model do
   end
 
   def set_deadline(ex, t)
-    if t.is_a? Array
-      ex.deadline_spec = t.to_json
-    else
-      ex.deadline_spec = [t.to_s].to_json
-    end
+    ex.deadline_spec = [t.to_s].flatten.to_json
   end
 
   def set_soft_deadline(ex, t)
-    if t.is_a? Array
-      ex.soft_deadline_spec = t.to_json
-    else
-      ex.soft_deadline_spec = [t.to_s].to_json
-    end
+    ex.soft_deadline_spec = [t.to_s].flatten.to_json
   end
 
   it 'should treat date deadlines as being at 23:59:59 local time' do
