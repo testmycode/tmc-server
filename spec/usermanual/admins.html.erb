@@ -31,10 +31,7 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
-    admin = FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
-    org = FactoryGirl.create(:accepted_organization, name: 'Some organization')
-    org.teachers << admin
-    org.save
+    FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
     FactoryGirl.create(:course_template)
     FactoryGirl.create(:course_template)
     FactoryGirl.create(:course_template)
@@ -102,6 +99,7 @@ require 'cgi' # for escapeHTML
       <li>
         <b>Source url</b> is a remote repository from which student will pull exercises as source files.
         When this field is edited, TMC webapp will validate the url by attempting to clone the repository from the url.
+        You can find information on how to create a course repository by yourself from this <a href="customcourse.html#starting_from_a_template">guide</a>.
       </li>
       <li>
         After the <b>Expires at</b> date no courses can be cloned from the expired template.
@@ -114,18 +112,132 @@ require 'cgi' # for escapeHTML
     to suit their needs.
   </p>
 
+  <p>After clicking 'Create course template', TMC will show the list of all templates again.</p>
+
 <%
    click_on 'Create Course template'
    visit '/course_templates'
    expect(page).to have_content('newtemplate')
    highlight 'a:contains("hide"):last'
+   highlight 'a:contains("Edit"):last'
 %>
 <%= screenshot %>
+
+  <p>
+    Course template default fields may be edited at any time by administrator via link 'Edit'. Expiration date
+    may be changed through the same link.
+  </p>
 
   <p>
     Course templates may be hidden instead of being destroyed. Hidden templates will not be available for copying
     as if they were destroyed, even though the template still exists in the database.
   </p>
+
+  <h2>Accepting pending organizations</h2>
+
+  <p>
+    Another responsibility for administrators is to manage pending organization requests, accepting or denying them
+    as they see fit. Anyone can make an organization request, so they should be accepted through careful consideration.
+  </p>
+
+  <p>Administrator will see this notice on the front page when a new organization is requested:</p>
+
+<%
+  FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
+  FactoryGirl.create :user, login: 'user', password: 'user'
+
+  click_on 'Sign out'
+  fill_in 'session_login', with: 'user'
+  fill_in 'session_password', with: 'user'
+  click_on 'Sign in'
+
+  visit '/'
+  click_link 'Request a new organization'
+  fill_in 'organization[name]', with: 'Helsingin yliopisto'
+  fill_in 'organization[information]', with: 'University life'
+  fill_in 'organization[slug]', with: 'hy'
+  click_button 'Request organization'
+  expect(page).to have_content 'Organization was successfully requested.'
+
+  click_on 'Sign out'
+  fill_in 'session_login', with: 'admin'
+  fill_in 'session_password', with: 'admin'
+  click_on 'Sign in'
+  visit '/'
+  highlight 'a:contains("Show")'
+%>
+<%= screenshot %>
+
+  <p>
+    Clicking 'show' will list all pending organization requests.
+  </p>
+
+<%
+  click_on 'Show'
+  highlight 'a:contains("Accept")'
+%>
+<%= screenshot %>
+<%
+  click_on 'Accept'
+  expect(page).to have_content 'Organization request was successfully accepted.'
+%>
+<%= screenshot %>
+
+  <p>
+    After clicking 'Accept', organization requester is promoted as organization's teacher and obtains rights to manage it.
+  </p>
+<%
+  visit '/'
+%>
+<%= screenshot %>
+
+<p>
+  Alternatively, after clicking 'Reject', administrator must fill a form to give a reason for rejection.
+</p>
+
+<%
+  Organization.find_by(slug: 'hy').destroy!
+  click_on 'Sign out'
+  fill_in 'session_login', with: 'user'
+  fill_in 'session_password', with: 'user'
+  click_on 'Sign in'
+
+  visit '/'
+  click_link 'Request a new organization'
+  fill_in 'organization[name]', with: 'Helsingin yliopisto'
+  fill_in 'organization[information]', with: 'University life'
+  fill_in 'organization[slug]', with: 'hy'
+  click_button 'Request organization'
+  expect(page).to have_content 'Organization was successfully requested.'
+
+  click_on 'Sign out'
+  fill_in 'session_login', with: 'admin'
+  fill_in 'session_password', with: 'admin'
+  click_on 'Sign in'
+  visit '/'
+
+  click_on 'Show'
+  highlight 'a:contains("Reject")'
+%>
+<%= screenshot %>
+
+<%
+   click_on 'Reject'
+   fill_in 'organization_rejected_reason', with: 'No such university exists, you can\'t fool me!'
+%>
+<%= screenshot %>
+<%
+  click_on 'Reject organization'
+  expect(page).to have_content 'Organization request was successfully rejected.'
+%>
+<%= screenshot %>
+
+<p>Requested organization will not be shown anywhere in the front page after rejection.</p>
+
+<%
+  visit '/'
+%>
+<%= screenshot %>
 
 </body>
 </html>
