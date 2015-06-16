@@ -9,7 +9,7 @@
 
   var chart;
   function drawChart() {
-    $.getJSON('<%= j(course_feedback_answers_path(@course, :format => :json)) %>', function(data) {
+    $.getJSON('<%= j(organization_course_feedback_answers_path(@organization, @course, :format => :json)) %>', function(data) {
       var dataTable = new google.visualization.DataTable();
       dataTable.addColumn('string', 'Name');
       dataTable.addColumn('number', '<%= @questions[0].title_or_question %>');
