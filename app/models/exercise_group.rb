@@ -77,7 +77,7 @@ class ExerciseGroup
   def group_unlock_conditions=(unlock_conditions)
     exercises(false).each do |e|
       e.unlock_spec = unlock_conditions
-      e.save
+      e.save!
     end
   end
 
@@ -90,7 +90,7 @@ class ExerciseGroup
   def set_group_deadline(method, deadline)
     exercises(false).each do |e|
       e.send(method, deadline)
-      e.save
+      e.save!
     end
   end
 end
