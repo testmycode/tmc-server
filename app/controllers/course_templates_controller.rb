@@ -52,7 +52,8 @@ class CourseTemplatesController < ApplicationController
                          title: @course_template.title,
                          description: @course_template.description,
                          material_url: @course_template.material_url,
-                         source_url: @course_template.source_url
+                         source_url: @course_template.source_url,
+                         course_template_id: @course_template.id
   end
 
   def toggle_hidden

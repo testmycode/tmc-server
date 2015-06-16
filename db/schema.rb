@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20150625081824) do
+=======
+ActiveRecord::Schema.define(version: 20150616081429) do
+>>>>>>> 92e7d17... adding course_template_id for course
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -99,6 +103,7 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.integer  "disabled_status",                default: 0
     t.string   "title"
     t.string   "material_url"
+    t.integer  "course_template_id"
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree

@@ -125,7 +125,6 @@ class CoursesController < ApplicationController
     authorize! :manage_deadlines, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage deadlines'
-    assign_show_view_vars
   end
 
   def save_deadlines
@@ -196,7 +195,7 @@ class CoursesController < ApplicationController
   private
 
   def course_params
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :course_template_id)
   end
 
   def assign_show_view_vars

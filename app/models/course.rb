@@ -46,6 +46,7 @@ class Course < ActiveRecord::Base
   has_many :assistants, through: :assistantships, source: :user
 
   belongs_to :organization
+  belongs_to :course_template
 
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
