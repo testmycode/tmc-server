@@ -263,8 +263,9 @@ require 'cgi' # for escapeHTML
   <%
      page.visit(page.current_url)
      click_on 'View status page'
+     page.visit(page.current_url)
   %>
-  <% highlight('[value="Refresh"]') %>
+  <% highlight('a:contains("Refresh")') %>
   <%= screenshot %>
   <% click_on 'Refresh' %>
   <% course.reload %>
@@ -283,6 +284,14 @@ require 'cgi' # for escapeHTML
   </p>
 
   <h2>Personalized course progression</h2>
+
+  <p>
+    <i>
+      Notice that course progression can now be configured from the webapp.
+      Configuration from the repository is only loaded initially, and will not change
+      after subsequent refreshes.
+    </i>
+  </p>
 
   <p>
     TMC can be used to offer courses that may be started at any time.
