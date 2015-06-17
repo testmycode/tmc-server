@@ -264,11 +264,11 @@ describe CoursesController, type: :controller do
         put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'newMaterial'}
       end
 
-      it 'should respomd with 401' do
+      it 'should respond with 401' do
         expect(response.code.to_i).to eq(401)
       end
 
-      it 'shouldnt update' do
+      it 'shouldn\'t update' do
         course = Course.last
         expect(course.title).to eq('oldTitle')
         expect(course.description).to eq('oldDescription')
