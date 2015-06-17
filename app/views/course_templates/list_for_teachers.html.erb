@@ -1,4 +1,6 @@
-<h1>Listing course templates</h1>
+<h1>New Course</h1>
+
+<h3>Create course from templates</h3>
 
 <table>
   <thead>
@@ -18,8 +20,16 @@
         <td><%= course_template.title %></td>
         <td><%= course_template.description %></td>
         <td><%= course_template.material_url %></td>
-        <td><%= link_to 'Create course', organization_prepare_course_path(@organization, course_template), class: "btn btn-mini btn-primary" %></td>
+        <td><%= link_to 'Create Course', organization_prepare_course_path(@organization, course_template), class: "btn btn-mini btn-primary" %></td>
       </tr>
   <% end %>
   </tbody>
 </table>
+
+<br/>
+
+<h3>Create custom course</h3>
+
+<div class="row-fluid span12">
+  <%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+</div>

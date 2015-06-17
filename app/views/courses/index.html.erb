@@ -18,8 +18,9 @@
   </div>
 <% end %>
 
-
-<% if current_user.administrator? %>
-  <%= link_to 'Create New Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+<% if can? :teach, @organization %>
+  <div class="row-fluid span12">
+    <%= link_to 'Create New Course', organization_course_templates_path(@organization), class: "btn btn-mini btn-warning" %>
+  </div>
 <% end %>
 

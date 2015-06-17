@@ -18,8 +18,8 @@ feature 'Teacher creates course from course template', feature: true do
     log_in_as(@teacher.login, 'xooxer')
 
     visit '/org/slug'
-    click_link 'Create New Course from template'
-    click_link 'Create course'
+    click_link 'Create New Course'
+    click_link 'Create Course'
     fill_in 'course_name', with: 'customname'
     fill_in 'course_title', with: 'Custom Title'
     fill_in 'course_description', with: 'Custom description'
@@ -44,8 +44,8 @@ feature 'Teacher creates course from course template', feature: true do
     log_in_as(@teacher.login, 'xooxer')
 
     visit '/org/slug'
-    click_link 'Create New Course from template'
-    click_link 'Create course'
+    click_link 'Create New Course'
+    click_link 'Create Course'
     fill_in 'course_name', with: 'w h i t e s p a c e s'
     click_button 'Add Course'
 
