@@ -253,6 +253,10 @@ class Exercise < ActiveRecord::Base
     soft_deadline_spec_obj.unlock_deadline_spec
   end
 
+  def has_unlock_deadline?
+    !unlock_deadline.blank? || !soft_unlock_deadline.blank?
+  end
+
   def requires_unlock?
     !unlock_spec_obj.empty?
   end

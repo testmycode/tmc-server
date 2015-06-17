@@ -356,3 +356,15 @@ tr>.align-right {
 .borderless td {
   border: none;
 }
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.float-clear {
+    clear: both;
+}
