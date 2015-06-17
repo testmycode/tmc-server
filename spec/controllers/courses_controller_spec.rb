@@ -231,7 +231,7 @@ describe CoursesController, type: :controller do
 
   describe 'PUT update' do
     before :each do
-      @course = FactoryGirl.create :course, title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial', organization: @organization
+      @course = FactoryGirl.create :course, name: 'oldName', title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial', organization: @organization
       controller.current_user = @user
     end
 
@@ -259,6 +259,12 @@ describe CoursesController, type: :controller do
         put :update, organization_id: @organization.to_param, id: @course.to_param, course: {material_url: 'colons : galore'}
         expect(response).to render_template('edit')
       end
+    end
+
+    it 'can\'t update course name' do
+      Teachership.create user: @user, organization: @organization
+      put :update, organization_id: @organization.to_param, id: @course.to_param, course: {name: 'newName'}
+      expect(Course.last.name).to eq('oldName')
     end
 
     describe 'when non-teacher attemps to update' do

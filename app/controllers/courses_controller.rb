@@ -81,7 +81,7 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = Course.new(course_params)
+    @course = Course.new(course_params_for_create)
     @course.organization = @organization
     authorize! :create, @course
 
@@ -167,8 +167,12 @@ class CoursesController < ApplicationController
 
   private
 
-  def course_params
+  def course_params_for_create
     params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+  end
+
+  def course_params
+    params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch)
   end
 
   def assign_show_view_vars
