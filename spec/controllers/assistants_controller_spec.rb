@@ -59,13 +59,6 @@ describe AssistantsController, type: :controller do
       end
     end
 
-    describe 'GET new' do
-      it 'denies access' do
-        get :new, organization_id: @organization.slug, course_id: @course.id
-        expect(response.code.to_i).to eq(401)
-      end
-    end
-
     describe 'POST create' do
       it 'denies access' do
         post :create, organization_id: @organization.slug, course_id: @course.id, username: @user.username

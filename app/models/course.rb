@@ -294,7 +294,7 @@ class Course < ActiveRecord::Base
   end
 
   def assistant?(user)
-    assistants.include? user
+    Assistantship.find_by(course: self, user: user).present?
   end
 
   private

@@ -77,7 +77,6 @@ feature 'Teacher can add assistants to course', feature: true do
     visit '/org/slug'
     click_link course.name
     click_link 'Manage assistants'
-    click_link 'Add a new assistant'
     fill_in 'username', with: username
     click_button 'Add a new assistant'
   end

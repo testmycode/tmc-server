@@ -63,4 +63,16 @@ describe Assistantship, type: :model do
     expect(user2.assisted_courses).to eq([])
     expect(user3.assisted_courses).to eq([])
   end
+
+  it 'user\'s and course\'s assistant? method works' do
+    user1 = FactoryGirl.create :user
+    user2 = FactoryGirl.create :user
+    course1 = FactoryGirl.create :course
+    course2 = FactoryGirl.create :course
+    Assistantship.create! user: user1, course: course1
+    expect(user1.assistant? course1).to be true
+    expect(user1.assistant? course2).to be false
+    expect(course1.assistant? user1).to be true
+    expect(course1.assistant? user2).to be false
+  end
 end
