@@ -9,7 +9,7 @@ Below is a quick summary of the setup procedure. It is followed by detailed inst
 
 ### Quick summary
 
-The following programs should be installed first: `ruby` (and `bundler` gem), `PostgreSQL 9.2+`, `screen`,`git`, `zip`, `unzip`, `convert` (from ImageMagick), `xfonts-75dpi`, `javac`, `java`, `ant`, `mvn`, `gcc`, `make` and `bc`. Additionally, tmc-sandbox requires: `squashfs-tools`, `multistrap` `e2fsprogs`, `e2tools` and `build-essential`.
+The following packages should be installed first: `ruby` (and `bundler` gem), `postgresql` (9.2+), `screen`,`git`, `zip`, `unzip`, `imagemagick`, `xfonts-75dpi`, `javac`, `java`, `ant`, `mvn`, `gcc`, `make`, `bc`, `libcurl4-openssl-dev` (or some other flavor) and `check`. Additionally, tmc-sandbox requires: `squashfs-tools`, `multistrap` `e2fsprogs`, `e2tools` and `build-essential`.
 
 1. Download submodules with `git submodule update --init --recursive`
 2. Install dependencies with `bundle install`
