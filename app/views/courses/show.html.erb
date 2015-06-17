@@ -3,7 +3,7 @@
     <h1><%= @course.name %></h1>
     <p><%= @course.description %></p>
     <div>
-      <% if @refresh_report %>
+      <% if @refresh_report && can?(:refresh_own, @course) %>
         <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
       <% end %>
 
@@ -16,20 +16,24 @@
       </ul>
       <% if can? :teach, @organization %>
         <ul>
-          <li>Source type: <%= @course.source_backend.upcase %> </li>
-          <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
 
-          <% if @course.source_backend == 'git' %>
-            <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
-            <% if github_url %>
-              <li>Github URL: <%= link_to github_url, github_url %></li>
-            <% end %>
-            <li>Git branch: <%= @course.git_branch %></li>
-            <% gitrev = @course.git_revision %>
-            <% if gitrev %>
-              <li>Git revision: <%= gitrev %></li>
+          <% if can? :refresh_own, @course %>
+            <li>Source type: <%= @course.source_backend.upcase %> </li>
+            <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
+
+            <% if @course.source_backend == 'git' %>
+                <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
+                <% if github_url %>
+                    <li>Github URL: <%= link_to github_url, github_url %></li>
+                <% end %>
+                <li>Git branch: <%= @course.git_branch %></li>
+                <% gitrev = @course.git_revision %>
+                <% if gitrev %>
+                    <li>Git revision: <%= gitrev %></li>
+                <% end %>
             <% end %>
           <% end %>
+
           <% if @course.refreshed_at %>
             <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
           <% end %>
@@ -96,7 +100,7 @@
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock dates', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
       <% end %>
-      <% if can? :refresh, @course %>
+      <% if can? :refresh_own, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
       <% end %>
 

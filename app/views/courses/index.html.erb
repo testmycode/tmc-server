@@ -1,7 +1,3 @@
-<% if can? :view, :participants_list %>
-  <%= link_to 'List of registered users', participants_path %>
-<% end %>
-
 <h2>Courses</h2>
 
 <% if (current_user.administrator? || current_user.teacher?(@organization)) && !@expired_courses.empty? %>
@@ -22,10 +18,8 @@
   </div>
 <% end %>
 
-<% if can? :create, Course %>
-  <div class="row-fluid">
-    <div class="span12">
-      <%= link_to 'Create New Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
-    </div>
+<% if can? :teach, @organization %>
+  <div class="row-fluid span12">
+    <%= link_to 'Create New Course', organization_course_templates_path(@organization), class: "btn btn-mini btn-warning" %>
   </div>
 <% end %>

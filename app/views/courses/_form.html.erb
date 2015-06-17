@@ -2,11 +2,21 @@
   <%= render 'shared/error_messages', :target => @course %>
 
   <%= labeled_field("Course name (should not contain whitespace)", f.text_field(:name)) %>
-  <%= labeled_field("Source Type", f.text_field(:source_backend, :value => 'git', :disabled => 'disabled')) %>
-  <%= labeled_field("Source URL", f.text_field(:source_url)) %>
-  <%= labeled_field("Git branch name", f.text_field(:git_branch, :value => 'master')) %>
-  <%= f.hidden_field(:course_template_id, :value => @course.course_template_id) %>
+
+  <% if @course.course_template.nil? %>
+    <%= labeled_field("Source Type", f.text_field(:source_backend, value: 'git', disabled: 'disabled')) %>
+    <%= labeled_field("Source URL", f.text_field(:source_url)) %>
+    <%= labeled_field("Git branch name", f.text_field(:git_branch, value: 'master')) %>
+  <% else %>
+    <%= f.hidden_field(:source_backend, value: 'git') %>
+    <%= f.hidden_field(:source_url, value: @course.source_url) %>
+    <%= f.hidden_field(:git_branch, value: 'master') %>
+  <% end %>
+
+  <%= f.hidden_field(:course_template_id, value: @course.course_template_id) %>
+
   <div class="actions">
     <%= f.submit 'Add Course', class: "btn btn-primary"%>
   </div>
+
 <% end %>

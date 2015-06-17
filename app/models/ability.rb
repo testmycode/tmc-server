@@ -36,6 +36,9 @@ class Ability
       can :refresh, Course do |c|
         c.taught_by?(user)
       end
+      can :refresh_own, Course do |c|
+        c.taught_by?(user) && c.course_template.nil? #user can only refresh his/her custom course.
+      end
 
       cannot :read, Exercise
       can :read, Exercise do |ex|
