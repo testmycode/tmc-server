@@ -305,6 +305,13 @@ class Course < ActiveRecord::Base
     super(material)
   end
 
+  def contains_unlock_deadlines?
+    exercise_groups.each do |group|
+      return true if group.contains_unlock_deadlines?
+    end
+    false
+  end
+
   private
 
   def check_source_backend

@@ -1,30 +1,39 @@
-<h1>Edit deadlines</h1>
+<script type="text/javascript">
+  $(document).ready(function() {
+    if (<%= @course.contains_unlock_deadlines? %>) {
+      $(".unlock-deadline-field").show();
+    }
+  });
+</script>
+
+<h1 class="float-left">Edit deadlines</h1>
+<a id="toggle-advanced-deadline-options" class="btn btn-small btn-default float-right" href="javascript:void(0);">Toggle advanced options</a>
+<div class="float-clear"></div>
+
 <%= form_tag save_deadlines_organization_course_url(@organization, @course), method: :post do %>
-  <table class="exercise-list table table-hover table-condensed">
+  <table class="exercise-list table table-condensed">
     <thead>
     <tr>
-      <th>
-        Exercise group
-      </th>
-      <th>
-        Exercise
-      </th>
-      <th>
-        Soft deadlines
-      </th>
-      <th>
-        Hard deadlines
-      </th>
+      <th>Exercise group</th>
+      <th>Exercise</th>
+      <th>Soft deadlines</th>
+      <th>Hard deadlines</th>
+      <th></th>
     </tr>
     </thead>
-    <tbody>
+
     <% @course.exercise_groups.each do |group| %>
+      <%
+         group_display_name = group.name.empty? ? '(default)' : group.name
+         param_name = group.name.empty? ? 'empty_group' : "group[#{group.name}]"
+         exercises = group.exercises(false).natsort_by(&:name)
+         uniform = group.uniform_group_deadlines?
+      %>
+      <tbody id="group_<%= group.name %>">
       <tr>
+        <td><%= group_display_name %></td>
         <td>
-          <%= group.name %><br/>
-        </td>
-        <td>
-          <% group.exercises(false).each do |exercise| %>
+          <% exercises.each do |exercise| %>
             <%= exercise.name %>
             <%
                notes = []
@@ -41,18 +50,81 @@
         <td>
           <%=
               render partial: 'deadline_fields',
-                     locals: { group: group, deadline: group.soft_group_deadline, deadline_type: 'soft' }
+                     locals:
+                       {
+                         group: group,
+                         deadline: group.soft_group_deadline,
+                         deadline_type: 'soft',
+                         param_name: param_name,
+                         disabled: !uniform,
+                         uniform: uniform
+                       }
           %>
         </td>
         <td>
           <%=
               render partial: 'deadline_fields',
-                     locals: { group: group, deadline: group.hard_group_deadline, deadline_type: 'hard' }
+                     locals:
+                       {
+                         group: group,
+                         deadline: group.hard_group_deadline,
+                         deadline_type: 'hard',
+                         param_name: param_name,
+                         disabled: !uniform,
+                         uniform: uniform
+                       }
           %>
         </td>
+        <td class="deadline-toggle-buttons">
+          <a class="toggle-groups-exercises btn btn-mini btn-default" id="toggle1_<%= group.name %>" href="javascript:void(0);">Show single exercises</a>
+        </td>
       </tr>
+      </tbody>
+
+      <tbody id="exercises_<%= group.name %>" class="single-exercise-deadlines">
+      <% exercises.each do |ex| %>
+        <tr>
+          <td><%= group_display_name %></td>
+          <td><%= ex.name %></td>
+          <td>
+            <%=
+                render partial: 'deadline_fields',
+                       locals:
+                         {
+                           group: group,
+                           deadline: ex.soft_deadline_spec_obj,
+                           deadline_type: 'soft',
+                           param_name: "exercise[#{ex.name}]",
+                           disabled: true, # initially hidden and disabled, javascript will enable when shown
+                           uniform: true
+                         }
+            %>
+          </td>
+          <td>
+            <%=
+                render partial: 'deadline_fields',
+                       locals:
+                         {
+                           group: group,
+                           deadline: ex.deadline_spec_obj,
+                           deadline_type: 'hard',
+                           param_name: "exercise[#{ex.name}]",
+                           disabled: true,
+                           uniform: true
+                         }
+            %>
+          </td>
+          <td class="deadline-toggle-buttons">
+            <% if ex == exercises.first %>
+              <a class="reset-group-deadlines btn btn-mini btn-warning" id="reset_<%=group.name %>" href="javascript:void(0);">Clear single deadlines</a><br/>
+              <a class="toggle-groups-exercises btn btn-mini btn-default" id="toggle2_<%= group.name %>" href="javascript:void(0);">Show the whole group</a><br/>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+
     <% end %>
-    </tbody>
   </table>
   <%= submit_tag 'Save changes', class: "btn btn-info" %>
 <% end %>

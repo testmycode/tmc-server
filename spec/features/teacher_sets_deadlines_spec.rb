@@ -74,4 +74,22 @@ feature 'Teacher sets deadlines', feature: true do
     visit '/org/slug/courses/1'
     expect(page).to have_content('06.06.2000')
   end
+
+  scenario 'Group deadline input fields are disabled for editing if individual exercises in the group have different deadlines' do
+    e1 = @course.exercises.first
+    e2 = @course.exercises.second
+    e1.deadline_spec = ['1.1.2000'].to_json
+    e2.deadline_spec = ['2.2.2000'].to_json
+    e1.save!
+    e2.save!
+
+    log_in_as(@teacher.login, '1234')
+    visit '/org/slug/courses/1'
+    click_link 'Manage deadlines'
+
+    expect(page).to have_field('empty_group_hard_static', disabled: true)
+    expect(page).to have_field('empty_group_hard_unlock', disabled: true)
+    expect(page).to have_field('empty_group_soft_static', disabled: true)
+    expect(page).to have_field('empty_group_soft_unlock', disabled: true)
+  end
 end
