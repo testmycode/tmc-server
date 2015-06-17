@@ -1,7 +1,10 @@
 <div class="row-fluid">
   <div class="span12">
-    <h1><%= @course.name %></h1>
+    <h1><%= @course.title %></h1>
     <p><%= @course.description %></p>
+    <% unless @course.material_url.blank? %>
+      <p><%= link_to 'Material', @course.material_url %></p>
+    <% end %>
     <div>
       <% if @refresh_report %>
         <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
@@ -95,6 +98,7 @@
       <% if can? :teach, @organization %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock dates', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
+        <%= link_to 'Edit course parameters', edit_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
       <% end %>
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>

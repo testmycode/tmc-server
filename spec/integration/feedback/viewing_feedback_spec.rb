@@ -19,7 +19,7 @@ describe 'Viewing feedback', type: :request, integration: true do
     @exercise = FactoryGirl.create(:exercise, course: @course)
     @answer = FactoryGirl.create(:feedback_answer, feedback_question: @question, course: @course, exercise: @exercise, answer: 'this is the answer')
 
-    click_link @course.name
+    click_link @course.title
     click_link 'View feedback'
     expect(page).to have_content('this is the answer')
   end
@@ -29,13 +29,13 @@ describe 'Viewing feedback', type: :request, integration: true do
     @ex2 = FactoryGirl.create(:exercise, course: @course)
     @answer = FactoryGirl.create(:feedback_answer, course: @course, exercise: @ex1, answer: 'this is the answer')
 
-    click_link @course.name
+    click_link @course.title
     click_link @ex1.name
     click_link 'View feedback'
     expect(page).to have_content('this is the answer')
 
     visit '/org/slug/courses'
-    click_link @course.name
+    click_link @course.title
     click_link @ex2.name
     click_link 'View feedback'
     expect(page).not_to have_content('this is the answer')

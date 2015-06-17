@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks]
+  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks ]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -81,7 +81,7 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = Course.new(course_params[:course])
+    @course = Course.new(course_params_for_create)
     @course.organization = @organization
     authorize! :teach, @organization
 
@@ -92,6 +92,19 @@ class CoursesController < ApplicationController
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
+    end
+  end
+
+  def edit
+    authorize! :teach, @organization
+  end
+
+  def update
+    authorize! :teach, @organization
+    if @course.update(course_params)
+      redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
+    else
+      render :edit
     end
   end
 
@@ -156,8 +169,12 @@ class CoursesController < ApplicationController
 
   private
 
+  def course_params_for_create
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+  end
+
   def course_params
-    params.permit(course: [:name, :source_url, :git_branch])
+    params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch)
   end
 
   def assign_show_view_vars
