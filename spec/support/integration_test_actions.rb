@@ -22,6 +22,7 @@ module IntegrationTestActions
     #save_and_open_page
     click_link 'Create New Course'
     fill_in 'course_name', with: options[:name]
+    fill_in 'course_title', with: options[:name]
     # fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
     fill_in 'course_source_url', with: options[:source_url] if options[:source_url]
     click_button 'Add Course'

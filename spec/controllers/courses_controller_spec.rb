@@ -210,12 +210,12 @@ describe CoursesController, type: :controller do
 
     describe 'with valid parameters' do
       it 'creates the course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
         expect(Course.last.source_url).to eq('git@example.com')
       end
 
       it 'redirects to the created course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
         expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
       end
     end
@@ -225,6 +225,62 @@ describe CoursesController, type: :controller do
         post :create, organization_id: @organization.slug, course: { name: 'invalid name with spaces' }
         expect(response).to render_template('new')
         expect(assigns(:course).name).to eq('invalid name with spaces')
+      end
+    end
+  end
+
+  describe 'PUT update' do
+    before :each do
+      @course = FactoryGirl.create :course, name: 'oldName', title: 'oldTitle', description: 'oldDescription', material_url: 'http://oldMaterial.com', organization: @organization
+      controller.current_user = @user
+    end
+
+    describe 'with valid parameters' do
+      before :each do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
+      end
+
+      it 'updates the course' do
+        course = Course.last
+        expect(course.title).to eq('newTitle')
+        expect(course.description).to eq('newDescription')
+        expect(course.material_url).to eq('http://newMaterial.com')
+      end
+
+      it 'redirects to updated course' do
+        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
+      end
+    end
+
+    describe 'with invalid parameters' do
+      it 're-renders course update form' do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'a' * 41}
+        expect(response).to render_template('edit')
+      end
+    end
+
+    it 'can\'t update course name' do
+      Teachership.create user: @user, organization: @organization
+      put :update, organization_id: @organization.to_param, id: @course.to_param, course: {name: 'newName'}
+      expect(Course.last.name).to eq('oldName')
+    end
+
+    describe 'when non-teacher attemps to update' do
+      before :each do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
+      end
+
+      it 'should respond with 401' do
+        expect(response.code.to_i).to eq(401)
+      end
+
+      it 'shouldn\'t update' do
+        course = Course.last
+        expect(course.title).to eq('oldTitle')
+        expect(course.description).to eq('oldDescription')
+        expect(course.material_url).to eq('http://oldMaterial.com')
       end
     end
   end

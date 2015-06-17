@@ -9,7 +9,7 @@ describe CourseRefresher do
     repo_path = "#{@test_tmp_dir}/fake_remote_repo"
     repo_url = "file://#{repo_path}"
 
-    @course = Course.create!(name: 'TestCourse', source_backend: 'git', source_url: repo_url)
+    @course = Course.create!(name: 'TestCourse', title: 'TestCourse', source_backend: 'git', source_url: repo_url)
 
     create_bare_repo(repo_path)
 
