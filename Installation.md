@@ -5,8 +5,6 @@ We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` w
 
 For testing environment PhantomJS (at least version 1.8.1) is required by Poltergeist gem to run headless browser tests. See [poltergeist](https://github.com/teampoltergeist/poltergeist) for documentation.
 
-If you are using Java 8, the following test will fail `RemoteSandboxForTesting should include tools.jar in the classpath for ant projects`. Please refer to [issue #232](https://github.com/testmycode/tmc-server/issues/232) for further information.
-
 Below is a quick summary of the setup procedure. It is followed by detailed instructions for Ubuntu.
 
 ### Quick summary
