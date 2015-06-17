@@ -92,4 +92,33 @@ feature 'Teacher sets deadlines', feature: true do
     expect(page).to have_field('empty_group_soft_static', disabled: true)
     expect(page).to have_field('empty_group_soft_unlock', disabled: true)
   end
+
+  scenario 'Teacher can set deadlines for individual exercises' do
+    e1 = @course.exercises.first
+    e2 = @course.exercises.second
+    e3 = @course.exercises.third
+
+    log_in_as(@teacher.login, '1234')
+    visit '/org/slug/courses/1'
+    click_link 'Manage deadlines'
+    click_link 'Toggle advanced options'
+    click_link 'Show single exercises'
+
+    [e1, e2, e3].each do |e|
+      fill_in "exercise_#{e.name}_soft_static", with: '1.1.2000'
+      fill_in "exercise_#{e.name}_soft_unlock", with: 'unlock + 7 days'
+      fill_in "exercise_#{e.name}_hard_static", with: '2.2.2000'
+      fill_in "exercise_#{e.name}_hard_unlock", with: 'unlock + 1 month'
+    end
+
+    click_button 'Save changes'
+    click_link 'Show single exercises'
+
+    [e1, e2, e3].each do |e|
+      expect(page).to have_field("exercise_#{e.name}_soft_static", with: '1.1.2000')
+      expect(page).to have_field("exercise_#{e.name}_soft_unlock", with: 'unlock + 7 days')
+      expect(page).to have_field("exercise_#{e.name}_hard_static", with: '2.2.2000')
+      expect(page).to have_field("exercise_#{e.name}_hard_unlock", with: 'unlock + 1 month')
+    end
+  end
 end
