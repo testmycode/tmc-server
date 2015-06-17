@@ -146,7 +146,7 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
   <p>
-    When you're a teacher in some organization, other teachers may join in at your initiative. Click 'Add a new teacher'.
+    When you're a teacher in some organization, you may add new teachers. Click 'Add a new teacher'.
   </p>
 
 <%
@@ -209,10 +209,6 @@ require 'cgi' # for escapeHTML
       <li>
         <b>Material url</b> takes user to the online resource that educates and helps the course participant with solving
         the course exercises.
-      </li>
-      <li>
-        <b>Source url</b> is a remote repository from which student will pull exercises as source files.
-        Don't change this field unless you decided not to use the template and create your course the hard way.
       </li>
     </ul>
   </p>
@@ -301,7 +297,7 @@ require 'cgi' # for escapeHTML
 
 <%
    course = Course.find_by id: 1
-   course.exercise_group_by_name('').group_deadline = ['1.1.2011'].to_json
+   course.exercise_group_by_name('').group_deadline = ['01-01-2011'].to_json
    click_on 'Manage deadlines'
 %>
 <%= screenshot %>
@@ -343,7 +339,7 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   course.exercise_group_by_name('').group_unlock_conditions = ['1.1.2011'].to_json
+   course.exercise_group_by_name('').group_unlock_conditions = ['01-01-2011'].to_json
    UncomputedUnlock.create_all_for_course_eager(course)
    click_on 'Manage unlock dates'
 %>
