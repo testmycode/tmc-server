@@ -2,9 +2,9 @@
 
 <table>
   <thead>
-  <tr>
-    <th>Name</th>
-  </tr>
+    <tr>
+      <th>Name</th>
+    </tr>
   </thead>
 
   <tbody>
@@ -16,4 +16,4 @@
   </tbody>
 </table>
 
-<%= link_to 'Add a new assistant', new_organization_course_assistant_path(@course.organization, @course), class: "btn btn-mini btn-warning" %>
+<%= render 'form' %>

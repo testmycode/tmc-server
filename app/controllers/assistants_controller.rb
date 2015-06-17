@@ -4,10 +4,6 @@ class AssistantsController < ApplicationController
   def index
     authorize! :teach, @course.organization
     @assistants = @course.assistants
-  end
-
-  def new
-    authorize! :teach, @course.organization
     @assistantship = Assistantship.new
   end
 
@@ -20,7 +16,8 @@ class AssistantsController < ApplicationController
     if @assistantship.save
       redirect_to organization_course_assistants_path, notice: 'Assistant added to course'
     else
-      render :new
+      @assistants = @course.assistants
+      render :index
     end
   end
 
