@@ -38,11 +38,9 @@ feature 'Teacher can edit course parameters', feature: true do
     click_link 'Edit course parameters'
 
     fill_in 'course_title', with: 'a' * 41
-    fill_in 'course_material_url', with: 'colons : galore'
     click_button 'Update Course'
 
     expect(page).to have_content 'Title is too long'
-    expect(page).to have_content 'Material url should not contain colon'
 
     visit '/org/slug'
     expect(page).to have_content 'oldTitle'

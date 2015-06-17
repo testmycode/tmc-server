@@ -223,21 +223,21 @@ describe CoursesController, type: :controller do
 
   describe 'PUT update' do
     before :each do
-      @course = FactoryGirl.create :course, name: 'oldName', title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial', organization: @organization
+      @course = FactoryGirl.create :course, name: 'oldName', title: 'oldTitle', description: 'oldDescription', material_url: 'http://oldMaterial.com', organization: @organization
       controller.current_user = @user
     end
 
     describe 'with valid parameters' do
       before :each do
         Teachership.create user: @user, organization: @organization
-        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'newMaterial'}
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
       end
 
       it 'updates the course' do
         course = Course.last
         expect(course.title).to eq('newTitle')
         expect(course.description).to eq('newDescription')
-        expect(course.material_url).to eq('newMaterial')
+        expect(course.material_url).to eq('http://newMaterial.com')
       end
 
       it 'redirects to updated course' do
@@ -248,7 +248,7 @@ describe CoursesController, type: :controller do
     describe 'with invalid parameters' do
       it 're-renders course update form' do
         Teachership.create user: @user, organization: @organization
-        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {material_url: 'colons : galore'}
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'a' * 41}
         expect(response).to render_template('edit')
       end
     end
@@ -261,7 +261,7 @@ describe CoursesController, type: :controller do
 
     describe 'when non-teacher attemps to update' do
       before :each do
-        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'newMaterial'}
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
       end
 
       it 'should respond with 401' do
@@ -272,7 +272,7 @@ describe CoursesController, type: :controller do
         course = Course.last
         expect(course.title).to eq('oldTitle')
         expect(course.description).to eq('oldDescription')
-        expect(course.material_url).to eq('oldMaterial')
+        expect(course.material_url).to eq('http://oldMaterial.com')
       end
     end
   end
