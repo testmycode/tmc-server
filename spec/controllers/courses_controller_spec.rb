@@ -231,8 +231,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST save_deadlines' do
     before :each do
-      @course = FactoryGirl.create(:course)
-      @course.organization = @organization
+      @course = FactoryGirl.create :course, organization: @organization
 
       Teachership.create(user: @user, organization: @organization)
       controller.current_user = @user
@@ -320,8 +319,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST save_unlocks' do
     before :each do
-      @course = FactoryGirl.create :course
-      @course.organization = @organization
+      @course = FactoryGirl.create :course, organization: @organization
       controller.current_user = @user
     end
 

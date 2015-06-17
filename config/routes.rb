@@ -27,6 +27,8 @@ TmcServer::Application.routes.draw do
         post 'save_unlocks'
       end
 
+      resources :assistants, only: [:index, :new, :create]
+
       resources :points, only: [:index, :show] do
         member do
           get 'refresh_gdocs'

@@ -11,10 +11,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150609074523) do
+ActiveRecord::Schema.define(version: 20150611073002) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "assistantships", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "course_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "assistantships", ["course_id"], name: "index_assistantships_on_course_id", using: :btree
+  add_index "assistantships", ["user_id"], name: "index_assistantships_on_user_id", using: :btree
 
   create_table "available_points", force: true do |t|
     t.integer "exercise_id",                     null: false
@@ -74,8 +84,11 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.boolean  "locked_exercise_points_visible", default: true,     null: false
     t.text     "description"
     t.string   "paste_visibility"
+    t.boolean  "disabled"
     t.integer  "organization_id"
     t.integer  "disabled_status",                default: 0
+    t.string   "title"
+    t.string   "material_url"
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
@@ -98,6 +111,7 @@ ActiveRecord::Schema.define(version: 20150609074523) do
     t.string   "valgrind_strategy"
     t.boolean  "code_review_requests_enabled",     default: false, null: false
     t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
+    t.text     "soft_deadline_spec"
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree

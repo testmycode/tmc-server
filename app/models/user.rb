@@ -12,6 +12,8 @@ class User < ActiveRecord::Base
   has_many :comments
   has_many :teacherships, dependent: :destroy
   has_many :organizations, through: :teacherships
+  has_many :assistantships, dependent: :destroy
+  has_many :assisted_courses, through: :assistantships, source: :course
 
   validates :login, presence: true,
                     uniqueness: true,
@@ -153,6 +155,10 @@ class User < ActiveRecord::Base
 
   def teaching_in_courses
     Course.where(organization_id: teaching_in_organizations).ids
+  end
+
+  def assistant?(course)
+    assisted_courses.include? course
   end
 
   private
