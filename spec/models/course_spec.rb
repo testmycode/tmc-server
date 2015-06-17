@@ -193,11 +193,6 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(source_url: ''))
     end
 
-    it 'doesn\'t allow colon in material url' do
-      should_be_invalid_params(valid_params.merge(material_url: 'http://google.fi'))
-      should_be_invalid_params(valid_params.merge(material_url: ':::'))
-    end
-
     def should_be_invalid_params(params)
       expect { Course.create!(params) }.to raise_error
     end
@@ -254,5 +249,16 @@ describe Course, type: :model do
     def assert_destroyed(obj)
       expect(obj.class.find_by_id(obj.id)).to be_nil
     end
+  end
+
+  it 'assigns material_url with http:// prepended to it' do
+    course = FactoryGirl.create :course, material_url: 'google.com'
+    expect(course.material_url).to eq('http://google.com')
+    course.material_url = ''
+    expect(course.material_url).to eq('')
+    course.material_url = 'https://google.com'
+    expect(course.material_url).to eq('https://google.com')
+    course.material_url = 'http://google.com'
+    expect(course.material_url).to eq('http://google.com')
   end
 end

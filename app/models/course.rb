@@ -21,12 +21,6 @@ class Course < ActiveRecord::Base
             presence: true,
             length: { within: 1..40 }
 
-  validates :material_url,
-            format: {
-                without: /:/,
-                message: 'should not contain colon (:). Remove "http://" from the beginning if you have it'
-            }
-
   validates :source_url, presence: true
   validate :check_source_backend
   after_initialize :set_default_source_backend
@@ -301,6 +295,14 @@ class Course < ActiveRecord::Base
 
   def taught_by?(user)
     user.teacher?(self.organization)
+  end
+
+  def material_url=(material)
+    return super('') if material.blank?
+    unless material =~ /^https?:\/\//
+      return super("http://#{material}")
+    end
+    super(material)
   end
 
   private
