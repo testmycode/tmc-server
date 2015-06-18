@@ -6,7 +6,7 @@
   #TODO: get rid of header/layout duplication
   %>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>How to create exercises with TMC</title>
+  <title>TMC webapp user manual - custom course</title>
 
   <link rel="stylesheet" type="text/css" href="../css/usermanual.css" />
   <link rel="stylesheet" type="text/css" href="../lib/shjs/sh_style.css" />
@@ -31,10 +31,13 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
-    FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
+    teacher = FactoryGirl.create(:user, :login => 'teacher', :password => 'teacher')
+    org = FactoryGirl.create(:accepted_organization, name: 'Some organization')
+    org.teachers << teacher
+    org.save
   %>
 
-  <h1>Tutorial</h1>
+  <h1>Tutorial for creating a course from custom repository</h1>
 
   <div id="toc"></div>
 
@@ -48,12 +51,12 @@ require 'cgi' # for escapeHTML
     that saves time and frustration even when working alone.
   </p>
 
-  <p>Let's log in as an administrator.</p>
+  <p>Let's log in as a teacher of some organization.</p>
 
   <%
-    visit '/'
-    fill_in 'session_login', :with => 'admin'
-    fill_in 'session_password', :with => 'admin'
+    visit "/org/#{org.slug}"
+    fill_in 'session_login', :with => 'teacher'
+    fill_in 'session_password', :with => 'teacher'
   %>
   <% highlight '[value="Sign in"]' %>
   <%= screenshot %>
@@ -62,10 +65,10 @@ require 'cgi' # for escapeHTML
   %>
 
   <p>
-    Now we can create a new course.
+    Now we can create a new course for our organization.
   </p>
 
-  <% highlight('a:contains("Create New Course")') %>
+  <% highlight('a:contains("Create New Course"):first') %>
   <%= screenshot %>
   <% click_on 'Create New Course' %>
 
@@ -131,7 +134,8 @@ require 'cgi' # for escapeHTML
 
   <h3>Starting from a template</h3>
   <p>
-    We start by cloning the <a href="<%= course_template_homepage %>">course template</a>,
+    We start by cloning the <a href="<%= course_template_homepage %>">course template</a>
+    (not to be confused with course templates that exist in TMC webapp),
     which has some useful scripts. We'll name the template repo as the 'template' remote,
     since won't be pushing back to the template. The actual course repo will be the 'origin' remote.
   </p>
@@ -256,8 +260,12 @@ require 'cgi' # for escapeHTML
     This may be inconvenient, but it also somewhat protects against mistakes.
   </p>
 
-  <% page.visit(page.current_url) %>
-  <% highlight('[value="Refresh"]') %>
+  <%
+     page.visit(page.current_url)
+     click_on 'View status page'
+     page.visit(page.current_url)
+  %>
+  <% highlight('a:contains("Refresh")') %>
   <%= screenshot %>
   <% click_on 'Refresh' %>
   <% course.reload %>
@@ -276,6 +284,14 @@ require 'cgi' # for escapeHTML
   </p>
 
   <h2>Personalized course progression</h2>
+
+  <p>
+    <i>
+      Notice that course progression can now be configured from the webapp.
+      Configuration from the repository is only loaded initially, and will not change
+      after subsequent refreshes.
+    </i>
+  </p>
 
   <p>
     TMC can be used to offer courses that may be started at any time.

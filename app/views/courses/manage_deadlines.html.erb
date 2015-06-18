@@ -9,7 +9,12 @@
       <th>
         Exercise
       </th>
-      <th></th>
+      <th>
+        Soft deadlines
+      </th>
+      <th>
+        Hard deadlines
+      </th>
     </tr>
     </thead>
     <tbody>
@@ -25,18 +30,16 @@
           <% end %>
         </td>
         <td>
-          <% deadline = group.group_deadline %>
-          <%
-             if group.name.empty?
-               param_array = 'empty_group'
-             else
-               param_array = "group[#{group.name}]"
-             end
+          <%=
+              render partial: 'deadline_fields',
+                     locals: { group: group, deadline: group.soft_group_deadline, deadline_type: 'soft' }
           %>
-          <%= label_tag "#{param_array}[static]", 'Deadline' %>
-          <%= text_field_tag "#{param_array}[static]", deadline.static_deadline_spec %>
-          <%= label_tag "#{param_array}[unlock]", 'Unlock-based deadline' %>
-          <%= text_field_tag "#{param_array}[unlock]", deadline.unlock_deadline_spec %>
+        </td>
+        <td>
+          <%=
+              render partial: 'deadline_fields',
+                     locals: { group: group, deadline: group.hard_group_deadline, deadline_type: 'hard' }
+          %>
         </td>
       </tr>
     <% end %>

@@ -34,7 +34,7 @@
           <% end %>
         </td>
         <td>
-          <% dl = exercise.deadline_for(current_user) %>
+          <% dl = exercise.soft_deadline_for(current_user) || exercise.deadline_for(current_user) %>
           <% if dl %>
             <%= dl.strftime("%d.%m.%Y %H:%M") %>
           <% end %>

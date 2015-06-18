@@ -29,4 +29,13 @@ feature 'Teacher can add new teacher to an organization', feature: true do
     click_button 'Add a new teacher'
     expect(page).to have_content 'User does not exist'
   end
+
+  scenario 'Teacher cannot access teacher management page if organization is pending' do
+    @organization = FactoryGirl.create :organization, slug: 'slug2'
+    Teachership.create!(user: @teacher, organization: @organization)
+    log_in_as(@teacher.username, 'foobar')
+
+    visit '/org/slug2'
+    expect(page).to_not have_content 'Show teachers in this organization'
+  end
 end
