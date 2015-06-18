@@ -70,6 +70,7 @@ class CoursesController < ApplicationController
     render json: data.to_json
   end
 
+  # This is for analysis and better points from exercise program, which will be done one day.
   def submissions_data
     authorize! :teach, @organization
 
@@ -80,7 +81,7 @@ class CoursesController < ApplicationController
         course_name:                      @course.name,
         course_id:                        @course.id,
         exercises:                        ExerciseList.new.exercise_list(exercises),
-        submissions:                      SubmissionList2.new.submission_list(submissions)
+        submissions:                      SubmissionList.new(current_user, view_context).submission_list_for_analysis(submissions)
     }
     render json: data.to_json
   end

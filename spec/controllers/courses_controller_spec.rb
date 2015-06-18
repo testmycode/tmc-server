@@ -475,7 +475,7 @@ describe CoursesController, type: :controller do
       @submission_1 = FactoryGirl.create(:submission, course: @course, user: @user, exercise: @exercise)
     end
 
-    def get_submissios_data(options = {}, requester)
+    def get_submissions_data(options = {}, requester)
       options = {
         format: 'json',
         api_version: ApiVersion::API_VERSION,
@@ -505,7 +505,7 @@ describe CoursesController, type: :controller do
         @another_user = FactoryGirl.create(:user)
         @submission_4 = FactoryGirl.create(:submission, course: @course, user: @another_user, exercise: @exercise)
 
-        result = get_submissios_data(@user)
+        result = get_submissions_data(@user)
         expect(result['course_name']).to eq(@course.name)
         expect(result['exercises'].count).to eq(1)
         expect(result['exercises'][0]['available_points'].count).to eq(2)
@@ -515,21 +515,21 @@ describe CoursesController, type: :controller do
         expect(result['submissions'][1]['awarded_points']).to eq(2)
         expect(result['submissions'][2]['awarded_points']).to eq(0)
       end
-  end
+    end
 
     describe 'for the teacher from other organization' do
       it 'returns error: Access denied' do
         @teacher = FactoryGirl.create(:user)
         @another_organization = FactoryGirl.create(:organization)
         Teachership.create(user: @teacher, organization: @another_organization)
-        result = get_submissios_data(@teacher)
+        result = get_submissions_data(@teacher)
         expect(result['error']).to eq('Access denied')
       end
     end
 
     describe 'for the normal user' do
       it 'returns error: Access denied' do
-        result = get_submissios_data(@user)
+        result = get_submissions_data(@user)
         expect(result['error']).to eq('Access denied')
       end
     end
