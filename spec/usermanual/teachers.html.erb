@@ -297,7 +297,7 @@ require 'cgi' # for escapeHTML
 
 <%
    course = Course.find_by id: 1
-   course.exercise_group_by_name('').group_deadline = ['01-01-2011'].to_json
+   course.exercise_group_by_name('').hard_group_deadline = ['01-01-2011'].to_json
    click_on 'Manage deadlines'
 %>
 <%= screenshot %>
@@ -328,7 +328,7 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   course.exercise_group_by_name('').group_deadline = [''].to_json
+   course.exercise_group_by_name('').hard_group_deadline = [''].to_json
    visit '/org/hy/courses/1'
    highlight 'a:contains("Manage unlock dates")'
 %>
