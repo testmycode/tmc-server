@@ -59,7 +59,7 @@ class ReviewsController < ApplicationController
       submission_id: @submission.id,
       reviewer_id: current_user.id
     )
-    authorize! :create, @new_review
+    authorize! :create_review, @submission
     render 'reviews/submission_index'
   end
 
@@ -70,7 +70,7 @@ class ReviewsController < ApplicationController
       reviewer_id: current_user.id,
       review_body: params[:review][:review_body]
     )
-    authorize! :create, @review
+    authorize! :create_review, @submission
 
     @organization = @submission.course.organization
 

@@ -230,4 +230,88 @@ describe User, type: :model do
     expect(User.authenticate('instructor', 'ihatecookies')).to be_nil
     expect(User.authenticate('root', 'ilikecookies')).to be_nil
   end
+
+  describe 'visibility' do
+    before :each do
+      @organization1 = FactoryGirl.create :accepted_organization, slug: 'slug1'
+      @organization2 = FactoryGirl.create :accepted_organization, slug: 'slug2'
+      @user1 = FactoryGirl.create :user
+      @user2 = FactoryGirl.create :user
+      @user3 = FactoryGirl.create :user
+      @course1 = FactoryGirl.create :course, organization: @organization1
+      @course2 = FactoryGirl.create :course, organization: @organization2
+      @course3 = FactoryGirl.create :course, organization: @organization1
+      @ex1 = FactoryGirl.create :exercise, course: @course
+      @ex2 = FactoryGirl.create :exercise, course: @course2
+      @ex3 = FactoryGirl.create :exercise, course: @course3
+      @sub1 = FactoryGirl.create :submission, user: @user1,
+                                              course: @course1, exercise: @ex1
+      @sub2 = FactoryGirl.create :submission, user: @user2,
+                                              course: @course2, exercise: @ex2
+      @sub3 = FactoryGirl.create :submission, user: @user3,
+                                              course: @course3, exercise: @ex3
+      @avp1 = FactoryGirl.create :available_point, course: @course1,
+                                                   exercise: @ex1, name: 'p1'
+      @avp2 = FactoryGirl.create :available_point, course: @course2,
+                                                   exercise: @ex2, name: 'p2'
+      @avp3 = FactoryGirl.create :available_point, course: @course3,
+                                                   exercise: @ex3, name: 'p3'
+      @awp1 = FactoryGirl.create :awarded_point, course: @course1,
+                                                 submission: @sub1, user: @user1,
+                                                 name: 'p1'
+      @awp2 = FactoryGirl.create :awarded_point, course: @course2,
+                                                 submission: @sub2, user: @user2,
+                                                 name: 'p2'
+      @awp3 = FactoryGirl.create :awarded_point, course: @course3,
+                                                 submission: @sub3, user: @user3, name: 'p3'
+    end
+
+    it 'should tell if student belongs to course' do
+      expect(@user1.student_in_course?(@course1)).to be true
+      expect(@user1.student_in_course?(@course2)).to be false
+      expect(@user2.student_in_course?(@course1)).to be false
+      expect(@user2.student_in_course?(@course2)).to be true
+    end
+
+    it 'should tell if student belongs to organization' do
+      expect(@user1.student_in_organization?(@course1.organization)). to be true
+      expect(@user1.student_in_organization?(@course2.organization)). to be false
+      expect(@user2.student_in_organization?(@course1.organization)). to be false
+      expect(@user2.student_in_organization?(@course2.organization)). to be true
+    end
+
+    describe 'teacher' do
+      before :each do
+        @teacher = FactoryGirl.create :user
+        Teachership.create! user: @teacher, organization: @organization1
+      end
+
+      it 'should be visible to teacher' do
+        expect(@user1.visible_to_teacher?(@teacher)).to be true
+        expect(@user2.visible_to_teacher?(@teacher)).to be false
+      end
+
+      it 'should show courses which teacher can teach' do
+        expect(@teacher.teaching_in_courses).to match_array([@course1.id, @course3.id])
+      end
+    end
+
+    describe 'assistant' do
+      before :each do
+        @assistant = FactoryGirl.create :user
+        Assistantship.create! user: @assistant, course: @course1
+      end
+
+      it 'should be visible to assistant' do
+        expect(@user1.visible_to_assistant?(@assistant)).to be true
+        expect(@user2.visible_to_assistant?(@assistant)).to be false
+        expect(@user3.visible_to_assistant?(@assistant)).to be false
+      end
+
+      it 'should show courses which assistant can teach' do
+        Assistantship.create! user: @assistant, course: @course2
+        expect(@assistant.teaching_in_courses).to match_array([@course1.id, @course2.id])
+      end
+    end
+  end
 end
