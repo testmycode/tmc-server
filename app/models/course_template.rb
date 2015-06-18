@@ -1,6 +1,7 @@
 # Course stub to be copied by teachers for their own organisations
 
 require 'net/http'
+require 'course_refresher'
 
 class CourseTemplate < ActiveRecord::Base
   include SystemCommands
@@ -38,5 +39,23 @@ class CourseTemplate < ActiveRecord::Base
 
   def clonable?
     !hidden && (expires_at.nil? || expires_at > Time.now)
+  end
+
+  def cache_path
+    "#{Course.cache_root}/#{name}-#{cache_version}"
+  end
+
+  # We assume that all courses created from same template share cache_version
+  def cache_version
+    courses.first.cache_version
+  end
+
+  def refresh
+    firstcourse = true
+    courses.each do |c|
+      options = firstcourse ? {} : {no_directory_changes: true}
+      CourseRefresher.new.refresh_course(c, options)
+      firstcourse = false
+    end
   end
 end

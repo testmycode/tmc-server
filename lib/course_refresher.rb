@@ -14,8 +14,8 @@ require 'benchmark'
 # Safely refreshes a course from a git repository
 # TODO: split this into submodules
 class CourseRefresher
-  def refresh_course(course)
-    Impl.new.refresh_course(course)
+  def refresh_course(course, options = {})
+    Impl.new.refresh_course(course, options)
   end
 
   class Report
@@ -58,7 +58,7 @@ class CourseRefresher
       @report.timings[method_name] = result
     end
 
-    def refresh_course(course)
+    def refresh_course(course, options)
       @report = Report.new
 
       # We do the whole operation in a transaction with an exclusive lock on the Course row.
@@ -105,20 +105,20 @@ class CourseRefresher
           FileUtils.rm_rf(@course.cache_path)
           FileUtils.mkdir_p(@course.cache_path)
 
-          measure_and_log :update_or_clone_repository
-          measure_and_log :check_directory_names
+          measure_and_log :update_or_clone_repository             unless options[:no_directory_changes]
+          measure_and_log :check_directory_names                  unless options[:no_directory_changes]
           measure_and_log :update_course_options
           measure_and_log :add_records_for_new_exercises
           measure_and_log :delete_records_for_removed_exercises
           measure_and_log :update_exercise_options
           measure_and_log :set_has_tests_flags
           measure_and_log :update_available_points
-          measure_and_log :make_solutions
-          measure_and_log :make_stubs
-          measure_and_log :checksum_stubs
-          measure_and_log :make_zips_of_stubs
-          measure_and_log :make_zips_of_solutions
-          measure_and_log :set_permissions
+          measure_and_log :make_solutions                         unless options[:no_directory_changes]
+          measure_and_log :make_stubs                             unless options[:no_directory_changes]
+          measure_and_log :checksum_stubs                         unless options[:no_directory_changes]
+          measure_and_log :make_zips_of_stubs                     unless options[:no_directory_changes]
+          measure_and_log :make_zips_of_solutions                 unless options[:no_directory_changes]
+          measure_and_log :set_permissions                        unless options[:no_directory_changes]
           measure_and_log :invalidate_unlocks
 
           @course.refreshed_at = Time.now
