@@ -6,7 +6,7 @@
       <p><%= link_to 'Material', @course.material_url %></p>
     <% end %>
     <div>
-      <% if @refresh_report && can?(:refresh_own, @course) %>
+      <% if @refresh_report && can?(:refresh, @course) %>
         <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
       <% end %>
 
@@ -20,7 +20,7 @@
       <% if can? :teach, @organization %>
         <ul>
 
-          <% if can? :refresh_own, @course %>
+          <% if can? :refresh, @course %>
             <li>Source type: <%= @course.source_backend.upcase %> </li>
             <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
 
@@ -104,7 +104,7 @@
         <%= link_to 'Manage unlock dates', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
         <%= link_to 'Edit course parameters', edit_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
       <% end %>
-      <% if can? :refresh_own, @course %>
+      <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
       <% end %>
 

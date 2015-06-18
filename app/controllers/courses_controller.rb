@@ -71,6 +71,7 @@ class CoursesController < ApplicationController
   end
 
   def refresh
+    authorize! :refresh, @course
     refresh_course(@course)
     redirect_to organization_course_path
   end
@@ -212,7 +213,6 @@ class CoursesController < ApplicationController
   end
 
   def refresh_course(course)
-    authorize! :refresh, course
     begin
       session[:refresh_report] = course.refresh
     rescue CourseRefresher::Failure => e
