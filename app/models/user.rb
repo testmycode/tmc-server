@@ -124,7 +124,7 @@ class User < ActiveRecord::Base
   end
 
   def assistant?(course)
-    Assistantship.find_by(course: course, user: self).present?
+    assisted_courses.exists?(course)
   end
 
   private
