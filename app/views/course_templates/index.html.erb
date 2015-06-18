@@ -1,14 +1,14 @@
-<h1>Listing course_templates</h1>
+<h1>Course templates</h1>
 
-<table>
+<table class="table table-striped table-condensed">
   <thead>
     <tr>
       <th>Name</th>
       <th>Title</th>
       <th>Description</th>
-      <th>Material url</th>
-      <th>Source url</th>
-      <th>Expires at</th>
+      <th>Material&nbsp;url</th>
+      <th>Source&nbsp;url</th>
+      <th>Expires&nbsp;at</th>
       <th colspan="2"></th>
     </tr>
   </thead>
@@ -22,8 +22,8 @@
         <td><%= course_template.material_url %></td>
         <td><%= course_template.source_url %></td>
         <td><%= course_template.expires_at %></td>
-        <td><%= link_to 'Edit', edit_course_template_path(course_template) %></td>
-        <td><%= link_to 'Destroy', course_template, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Edit', edit_course_template_path(course_template), class: "btn btn-mini btn-info" %></td>
+        <td><%= link_to 'Destroy', course_template, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini btn-danger" %></td>
         <td>
           <% if course_template.hidden %>
             <%= link_to 'unhide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-mini btn-danger" %>
