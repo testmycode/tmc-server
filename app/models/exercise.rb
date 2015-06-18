@@ -134,10 +134,17 @@ class Exercise < ActiveRecord::Base
     deadline_spec_obj.deadline_for(user)
   end
 
+  def soft_deadline_for(user)
+    soft_deadline_spec_obj.deadline_for(user)
+  end
+
   # Whether the deadline has passed
   def expired_for?(user)
-    dl = deadline_for(user)
-    dl != nil && dl < Time.now
+    deadline_expired?(deadline_for(user))
+  end
+
+  def soft_deadline_expired_for?(user)
+    deadline_expired?(soft_deadline_for(user))
   end
 
   # Whether a user has made a submission for this exercise
@@ -213,13 +220,18 @@ class Exercise < ActiveRecord::Base
     @deadline_spec_obj = DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
   end
 
+  def soft_deadline_spec=(spec)
+    check_is_json_array_of_strings(spec)
+    super(spec)
+    @soft_deadline_spec_obj = DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
+  end
+
   def deadline_spec_obj
-    @deadline_spec_obj ||=
-      if self.deadline_spec
-        DeadlineSpec.new(self, ActiveSupport::JSON.decode(self.deadline_spec))
-      else
-        DeadlineSpec.new(self, [])
-      end
+    @deadline_spec_obj ||= new_deadline_spec_obj(self.deadline_spec)
+  end
+
+  def soft_deadline_spec_obj
+    @soft_deadline_spec_obj ||= new_deadline_spec_obj(self.soft_deadline_spec)
   end
 
   def static_deadline
@@ -228,6 +240,14 @@ class Exercise < ActiveRecord::Base
 
   def unlock_deadline
     deadline_spec_obj.unlock_deadline_spec
+  end
+
+  def soft_static_deadline
+    soft_deadline_spec_obj.static_deadline_spec
+  end
+
+  def soft_unlock_deadline
+    soft_deadline_spec_obj.unlock_deadline_spec
   end
 
   def requires_unlock?
@@ -258,6 +278,7 @@ class Exercise < ActiveRecord::Base
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
     self.deadline_spec = to_json_array(new_options["deadline"])
+    self.soft_deadline_spec = to_json_array(new_options["soft_deadline"])
     self.unlock_spec = to_json_array(new_options["unlocked_after"])
     self.publish_time = new_options["publish_time"]
     self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"], new_options["gdocs_sheet"])
@@ -299,6 +320,7 @@ class Exercise < ActiveRecord::Base
   def self.default_options
     {
       "deadline" => nil,
+      "soft_deadline" => nil,
       "publish_time" => nil,
       "gdocs_sheet" => nil,
       "points_visible" => true,
@@ -339,6 +361,18 @@ class Exercise < ActiveRecord::Base
   end
 
   private
+
+  def new_deadline_spec_obj(spec)
+    if spec
+      DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
+    else
+      DeadlineSpec.new(self, [])
+    end
+  end
+
+  def deadline_expired?(deadline)
+    deadline != nil && deadline < Time.now
+  end
 
   def new_gdocs_sheet(enabled, sheetname)
     return nil unless enabled

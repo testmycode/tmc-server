@@ -25,7 +25,7 @@ class SubmissionTestSetup
     @repo_path = 'remote_repo'
     create_bare_repo(@repo_path)
 
-    @course = Course.create!(name: course_name, source_backend: 'git', source_url: @repo_path, organization: organization)
+    @course = Course.create!(name: course_name, title: course_name, source_backend: 'git', source_url: @repo_path, organization: organization)
     @repo = clone_course_repo(@course)
     @repo.copy_fixture_exercise(exercise_name, exercise_dest)
     @repo.add_commit_push
