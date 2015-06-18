@@ -119,42 +119,53 @@ class User < ActiveRecord::Base
     login.downcase <=> other.login.downcase
   end
 
-  def teacher?(organization)
-    organizations.include? organization
-  end
-
   def readable_by?(user)
     user.administrator? ||
         self.id == user.id ||
-        visible_to_teacher?(user)
+        visible_to_teacher?(user) ||
+        visible_to_assistant?(user)
   end
 
   def visible_to_teacher?(teacher)
     teacher.organizations.each do |org|
-      return true if self.belongs_to_organization?(org)
+      return true if self.student_in_organization?(org)
     end
     false
   end
 
-  def belongs_to_organization?(organization)
-    courses = []
-    submissions.each do |submission|
-      courses << submission.course
+  def visible_to_assistant?(assistant)
+    assistant.assisted_courses.each do |c|
+      return true if self.student_in_course?(c)
     end
-
-    courses.each do |course|
-      return true if course.organization_id == organization.id
-    end
-
     false
   end
 
-  def teaching_in_organizations
-    Teachership.where(user: self).ids
+  def student_in_course?(c)
+    self.in?(User.course_students(c))
+  end
+
+  def student_in_organization?(organization)
+    organization.courses.each do | c|
+      return true if self.student_in_course?(c)
+    end
+    false
   end
 
   def teaching_in_courses
-    Course.where(organization_id: teaching_in_organizations).ids
+    if !self.assistantships.empty?
+      Course.where(id: assistantships.pluck(:course_id)).ids
+    elsif !self.organizations.empty?
+      Course.where(organization_id: teaching_in_organizations).ids
+    end
+  end
+
+
+  def teaching_in_organizations
+    Teachership.where(user: self).pluck(:organization_id)
+  end
+
+  def teacher?(organization)
+    organizations.include? organization
   end
 
   def assistant?(course)

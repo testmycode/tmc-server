@@ -62,7 +62,7 @@ class ParticipantsController < ApplicationController
     @percent_completed = {}
     for course_id in @awarded_points.keys
       course = Course.find(course_id)
-      if current_user.administrator? || current_user.teacher?(course.organization) || @user.id == current_user.id
+      if course.visible_to?(current_user)
         @courses << course
 
         awarded = @awarded_points[course.id]
@@ -79,7 +79,7 @@ class ParticipantsController < ApplicationController
 
     if current_user.administrator? || current_user.id == @user.id
       @submissions = @user.submissions.order('id DESC').includes(:user)
-    else # teacher sees only submissions for own organization courses
+    else # teacher and assistant sees only submissions for own teacherd courses
       @submissions = @user.submissions.order('id DESC').includes(:user).where(course: current_user.teaching_in_courses)
     end
 

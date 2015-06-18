@@ -55,7 +55,8 @@ class Course < ActiveRecord::Base
 
   def visible_to?(user)
     user.administrator? ||
-    user.teacher?(organization) || (
+    user.teacher?(organization) ||
+    user.assistant?(self) || (
       !disabled? &&
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
@@ -294,7 +295,7 @@ class Course < ActiveRecord::Base
   end
 
   def taught_by?(user)
-    user.teacher?(self.organization)
+    user.teacher?(organization)
   end
 
   def assistant?(user)

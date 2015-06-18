@@ -168,7 +168,7 @@ class CoursesController < ApplicationController
     unless current_user.guest?
       max_submissions = 100
       @submissions = @course.submissions
-      @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator? || current_user.teacher?(@organization)
+      @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @total_submissions = @submissions.where(user: User.legitimate_students).count
       @submissions = @submissions.limit(max_submissions)
