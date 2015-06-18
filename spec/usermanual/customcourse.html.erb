@@ -72,15 +72,20 @@ require 'cgi' # for escapeHTML
   <%= screenshot %>
   <% click_on 'Create New Course' %>
 
-  <% course_name = 'programming101' %>
+  <%
+     course_name = 'programming101'
+     course_title = 'Programming 101'
+  %>
   <p>
-    We'll name our course "<%= course_name %>", and we'll also have to give the address
+    We'll name our course "<%= course_name %>", give it a title "<%= course_title %>" and we'll also have to give the address
     of the git repository where we'll store the exercises.
   </p>
 
   <%
     fill_in 'course_name', :with => course_name
     highlight '#course_name'
+    fill_in 'course_title', with: course_title
+    highlight '#course_title'
 
     repo_path = ENV['TMC_USERMANUAL_REPO_PATH'] || (ENV['HOME'] + '/tmc-example-repo')
     FileUtils.rm_rf(repo_path)
