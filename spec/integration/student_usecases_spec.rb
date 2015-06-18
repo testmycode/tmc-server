@@ -8,7 +8,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path, organization: @organization)
+    @course = Course.create!(name: 'mycourse', title: 'mycourse', source_backend: 'git', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
@@ -89,7 +89,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
   end
 
   it 'should show exercises whose deadline has passed but without a submission form' do
-    @course.exercise_group_by_name('').group_deadline = [Date.yesterday.to_s].to_json
+    @course.exercise_group_by_name('').hard_group_deadline = [Date.yesterday.to_s].to_json
 
     visit '/org/slug/courses'
     click_link 'mycourse'

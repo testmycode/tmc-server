@@ -334,12 +334,13 @@ describe CourseTemplatesController, type: :controller do
 
     describe 'GET prepare_course' do
       before :each do
-        @template = FactoryGirl.create :course_template, name: 'name', source_url: 'https://github.com/testmycode/tmc-testcourse.git'
+        @template = FactoryGirl.create :course_template, name: 'name', title: 'title', source_url: 'https://github.com/testmycode/tmc-testcourse.git'
       end
 
       it 'should assign @course with course template attributes' do
         get :prepare_course, organization_id: @organization.slug, id: @template.id
         expect(assigns(:course).name).to eq('name')
+        expect(assigns(:course).title).to eq('title')
         expect(assigns(:course).source_url).to eq('https://github.com/testmycode/tmc-testcourse.git')
       end
     end
