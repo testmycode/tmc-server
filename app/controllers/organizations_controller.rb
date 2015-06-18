@@ -4,7 +4,7 @@ class OrganizationsController < ApplicationController
   skip_authorization_check only: [:index, :show]
 
   def index
-    @organizations = Organization.accepted_organizations
+    @organizations = Organization.accepted_organizations.order('name')
   end
 
   def show
