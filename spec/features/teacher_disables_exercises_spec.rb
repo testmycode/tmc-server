@@ -24,7 +24,7 @@ feature 'Teacher disables exercises', feature: true do
     click_link 'Manage exercises'
 
     [@ex1, @ex2, @ex3].each do |ex|
-      check "exercise_#{ex.name}"
+      check "course_exercises_#{ex.id}"
     end
 
     click_button 'Disable selected'
@@ -47,7 +47,7 @@ feature 'Teacher disables exercises', feature: true do
     click_link 'Manage exercises'
 
     [@ex1, @ex2, @ex3, @ex4].each do |ex|
-      check "exercise_#{ex.name}"
+      check "course_exercises_#{ex.id}"
     end
 
     click_button 'Enable selected'

@@ -74,7 +74,7 @@ describe ExercisesController, type: :controller do
 
     describe 'as a teacher' do
       it 'disables correct exercises' do
-        post_set_disabled_statuses exercise: { @ex1.name => '1', @ex2.name => '1', @ex3.name => '0' }, commit: 'Disable selected'
+        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id] }, commit: 'Disable selected'
         @ex1.reload
         @ex2.reload
         @ex3.reload
@@ -85,7 +85,7 @@ describe ExercisesController, type: :controller do
 
       it 'enables correct exercises' do
         @ex3.disabled!
-        post_set_disabled_statuses exercise: { @ex1.name => '1', @ex2.name => '1', @ex3.name => '0' }, commit: 'Enable selected'
+        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id] }, commit: 'Enable selected'
         @ex1.reload
         @ex2.reload
         @ex3.reload
@@ -96,7 +96,7 @@ describe ExercisesController, type: :controller do
 
       it 'does not fail if no parameters are given' do
         expect do
-          post_set_disabled_statuses
+          post_set_disabled_statuses course: { exercises: [] } # Form still sends an empty array
         end.to_not raise_error
       end
     end
