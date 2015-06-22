@@ -1,5 +1,5 @@
 <h1>Enable and disable exercises</h1>
-<%= form_tag set_disabled_statuses_organization_course_exercises_path(@organization, @course), method: :post do %>
+<%= form_for @course, url: set_disabled_statuses_organization_course_exercises_path(@organization, @course), method: :post do |f| %>
   <table class="table table-striped">
     <thead>
     <tr>
@@ -12,18 +12,18 @@
     </tr>
     </thead>
     <tbody>
-    <% @exercises.each do |exercise| %>
+    <%= f.collection_check_boxes(:exercises, @exercises, :id, :name) do |c| %>
       <tr>
         <td>
-          <%= render partial: 'exercises/list_single', locals: { exercise: exercise } %>
+          <%= render partial: 'exercises/list_single', locals: { exercise: @exercises.detect { |e| e.id == c.value } } %>
         </td>
         <td>
-          <%= check_box_tag "exercise[#{exercise.name}]" %>
+          <%= c.check_box %>
         </td>
       </tr>
     <% end %>
     </tbody>
   </table>
-  <%= submit_tag 'Enable selected', class: 'btn btn-mini btn-info' %>
-  <%= submit_tag 'Disable selected', class: 'btn btn-mini btn-danger' %>
+  <%= f.submit 'Enable selected', class: 'btn btn-mini btn-info' %>
+  <%= f.submit 'Disable selected', class: 'btn btn-mini btn-danger' %>
 <% end %>

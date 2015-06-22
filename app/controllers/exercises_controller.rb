@@ -60,13 +60,12 @@ class ExercisesController < ApplicationController
     authorize! :teach, @organization
 
     action = params[:commit] == 'Disable selected' ? :disabled! : :enabled!
-    exercise_params = params[:exercise]
-    exercise_names = []
-    exercise_names = exercise_params.map { |k, v| v == '1' ? k : nil }.compact unless exercise_params.nil?
+    exercise_params = params[:course][:exercises]
+    exercise_params.reject!(&:blank?)
 
-    exercise_names.each do |name|
-      exercise = Exercise.find_by(name: name)
-      exercise.send(action) unless exercise.nil?
+    exercises = Exercise.where(id: exercise_params)
+    exercises.each do |ex|
+      ex.send(action)
     end
 
     redirect_to manage_exercises_organization_course_path(@organization, @course),
