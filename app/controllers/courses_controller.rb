@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, except: [:index, :show_json, :new, :create, :help]
+  before_action :set_course, except: [:create, :help, :index, :new, :show_json]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
