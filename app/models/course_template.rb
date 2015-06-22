@@ -45,11 +45,6 @@ class CourseTemplate < ActiveRecord::Base
     "#{Course.cache_root}/#{name}-#{cache_version}"
   end
 
-  # We assume that all courses created from same template share cache_version
-  def cache_version
-    courses.first.cache_version
-  end
-
   def refresh
     firstcourse = true
     courses.each do |c|

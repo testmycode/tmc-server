@@ -1,5 +1,5 @@
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, only: [:edit, :update, :destroy, :prepare_course, :toggle_hidden]
+  before_action :set_course_template, only: [:edit, :update, :destroy, :prepare_course, :toggle_hidden, :refresh]
 
   def index
     authorize! :read, CourseTemplate
@@ -67,13 +67,25 @@ class CourseTemplatesController < ApplicationController
                          description: @course_template.description,
                          material_url: @course_template.material_url,
                          source_url: @course_template.source_url,
-                         course_template_id: @course_template.id)
+                         course_template_id: @course_template.id,
+                         cache_version: @course_template.cache_version)
   end
 
   def toggle_hidden
     @course_template.hidden = !@course_template.hidden
     @course_template.save
     redirect_to course_templates_path, notice: 'Course templates hidden status changed'
+  end
+
+  def refresh
+    notice = "All good"
+    begin
+      @course_template.refresh
+    rescue CourseRefresher::Failure => e
+      byebug
+      notice = "Something fucked up"
+    end
+    redirect_to course_templates_path, notice: notice
   end
 
   private

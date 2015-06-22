@@ -64,6 +64,7 @@ resources :organizations, except: :destory, path: 'org' do
   resources :course_templates, except: :show do
     member do
       post 'toggle_hidden', to: 'course_templates#toggle_hidden'
+      post 'refresh'
     end
   end
 

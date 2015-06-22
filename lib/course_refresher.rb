@@ -102,8 +102,8 @@ class CourseRefresher
 
           @course.cache_version += 1 # causes @course.*_path to return paths in the new cache
 
-          FileUtils.rm_rf(@course.cache_path)
-          FileUtils.mkdir_p(@course.cache_path)
+          FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
+          FileUtils.mkdir_p(@course.cache_path)                   unless options[:no_directory_changes]
 
           measure_and_log :update_or_clone_repository             unless options[:no_directory_changes]
           measure_and_log :check_directory_names                  unless options[:no_directory_changes]
@@ -129,12 +129,12 @@ class CourseRefresher
         rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
           @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
           # Delete the new cache we were working on
-          FileUtils.rm_rf(@course.cache_path)
+          FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
           raise ActiveRecord::Rollback
         end
       end
 
-      if @report.errors.empty?
+      if @report.errors.empty? && !options[:no_directory_changes]
         FileUtils.rm_rf(@old_cache_path)
         seed_maven_cache
       end
