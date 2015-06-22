@@ -6,6 +6,7 @@ class CreateCourseTemplates < ActiveRecord::Migration
       t.string :description
       t.string :material_url
       t.string :source_url
+      t.integer  "cache_version",   default: 0,     null: false
 
       t.timestamps
     end

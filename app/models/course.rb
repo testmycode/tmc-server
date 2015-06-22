@@ -112,6 +112,10 @@ class Course < ActiveRecord::Base
     "#{FileStore.root}/course"
   end
 
+  def cache_version=(x)
+    course_template.cache_version = x if course_template.present?
+  end
+
   def cache_path
     return course_template.cache_path if course_template.present?
     "#{Course.cache_root}/#{name}-#{cache_version}"

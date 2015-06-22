@@ -9,7 +9,7 @@
       <th>Material url</th>
       <th>Source url</th>
       <th>Expires at</th>
-      <th colspan="2"></th>
+      <th colspan="4"></th>
     </tr>
   </thead>
 
@@ -22,6 +22,7 @@
         <td><%= course_template.material_url %></td>
         <td><%= course_template.source_url %></td>
         <td><%= course_template.expires_at %></td>
+        <td><%= link_to 'Refresh', refresh_course_template_path(course_template), method: :post, class: "btn btn-mini btn-primary" %></td>
         <td><%= link_to 'Edit', edit_course_template_path(course_template) %></td>
         <td><%= link_to 'Destroy', course_template, method: :delete, data: { confirm: 'Are you sure?' } %></td>
         <td>
