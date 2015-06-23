@@ -48,8 +48,7 @@ class CourseTemplate < ActiveRecord::Base
   def refresh
     firstcourse = true
     courses.each do |c|
-      options = firstcourse ? {} : {no_directory_changes: true}
-      CourseRefresher.new.refresh_course(c, options)
+      c.refresh no_directory_changes: !firstcourse
       firstcourse = false
     end
   end

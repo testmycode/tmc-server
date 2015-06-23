@@ -222,9 +222,7 @@ class Course < ActiveRecord::Base
     @groups = nil
   end
 
-  def refresh
-    shouldnt_make_directory_changes = created_from_template? && File.exist?(cache_path)
-    options = { no_directory_changes: shouldnt_make_directory_changes }
+  def refresh(options = {})
     CourseRefresher.new.refresh_course(self, options)
   end
 
