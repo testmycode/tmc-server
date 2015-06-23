@@ -9,6 +9,8 @@ class CoursesController < ApplicationController
 
   skip_authorization_check only: [:index]
 
+  skip_authorization_check only: [:index]
+
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
 
