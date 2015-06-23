@@ -62,7 +62,6 @@ class CourseTemplatesController < ApplicationController
     begin
       @course_template.refresh
     rescue CourseRefresher::Failure => e
-      byebug
       notice = "Something fucked up"
     end
     redirect_to course_templates_path, notice: notice
