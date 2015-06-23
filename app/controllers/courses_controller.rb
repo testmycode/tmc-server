@@ -82,8 +82,10 @@ class CoursesController < ApplicationController
   end
 
   def new
+    authorize! :teach, @organization
+    add_organization_breadcrumb
+    add_breadcrumb 'Create new course'
     @course = Course.new
-    authorize! :create, @exercises
   end
 
   def create
@@ -114,6 +116,8 @@ class CoursesController < ApplicationController
 
   def manage_deadlines
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage deadlines'
     assign_show_view_vars
   end
 
@@ -145,9 +149,11 @@ class CoursesController < ApplicationController
   rescue DeadlineSpec::InvalidSyntaxError => e
     redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s
   end
-
+  
   def manage_unlocks
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage unlocks'
     assign_show_view_vars
   end
 
