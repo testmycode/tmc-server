@@ -72,8 +72,6 @@ class ReviewsController < ApplicationController
     )
     authorize! :create_review, @submission
 
-    @organization = @submission.course.organization
-
     begin
       ActiveRecord::Base.connection.transaction do
         award_points
@@ -88,7 +86,9 @@ class ReviewsController < ApplicationController
       flash[:success] = 'Code review added.'
       notify_user_about_new_review
       send_email_about_new_review if params[:send_email]
-      redirect_to organization_course_reviews_path(@organization, @submission.course_id)
+      @course = @submission.course
+      @organization = @course.organization
+      redirect_to organization_course_reviews_path(@organization, @course)
     end
   end
 
