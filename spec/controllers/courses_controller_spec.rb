@@ -210,12 +210,12 @@ describe CoursesController, type: :controller do
 
     describe 'with valid parameters' do
       it 'creates the course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
         expect(Course.last.source_url).to eq('git@example.com')
       end
 
       it 'redirects to the created course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
         expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
       end
     end
@@ -225,6 +225,62 @@ describe CoursesController, type: :controller do
         post :create, organization_id: @organization.slug, course: { name: 'invalid name with spaces' }
         expect(response).to render_template('new')
         expect(assigns(:course).name).to eq('invalid name with spaces')
+      end
+    end
+  end
+
+  describe 'PUT update' do
+    before :each do
+      @course = FactoryGirl.create :course, name: 'oldName', title: 'oldTitle', description: 'oldDescription', material_url: 'http://oldMaterial.com', organization: @organization
+      controller.current_user = @user
+    end
+
+    describe 'with valid parameters' do
+      before :each do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
+      end
+
+      it 'updates the course' do
+        course = Course.last
+        expect(course.title).to eq('newTitle')
+        expect(course.description).to eq('newDescription')
+        expect(course.material_url).to eq('http://newMaterial.com')
+      end
+
+      it 'redirects to updated course' do
+        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
+      end
+    end
+
+    describe 'with invalid parameters' do
+      it 're-renders course update form' do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'a' * 41}
+        expect(response).to render_template('edit')
+      end
+    end
+
+    it 'can\'t update course name' do
+      Teachership.create user: @user, organization: @organization
+      put :update, organization_id: @organization.to_param, id: @course.to_param, course: {name: 'newName'}
+      expect(Course.last.name).to eq('oldName')
+    end
+
+    describe 'when non-teacher attemps to update' do
+      before :each do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
+      end
+
+      it 'should respond with 401' do
+        expect(response.code.to_i).to eq(401)
+      end
+
+      it 'shouldn\'t update' do
+        course = Course.last
+        expect(course.title).to eq('oldTitle')
+        expect(course.description).to eq('oldDescription')
+        expect(course.material_url).to eq('http://oldMaterial.com')
       end
     end
   end
@@ -243,10 +299,19 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'e2')
       @course.exercises.create(name: 'e3')
 
-      post :save_deadlines, organization_id: @organization.slug, id: @course.id, empty_group: { static: '1.1.2000', unlock: '' }
+      post :save_deadlines,
+           organization_id: @organization.slug,
+           id: @course.id,
+           empty_group: {
+               soft: { static: '1.1.2000', unlock: '' },
+               hard: { static: '', unlock: 'unlock + 2 weeks' }
+           }
 
       @course.exercise_group_by_name('').exercises(false).each do |e|
-        expect(e.static_deadline).to eq('1.1.2000')
+        expect(e.soft_static_deadline).to eq('1.1.2000')
+        expect(e.soft_unlock_deadline).to be_nil
+        expect(e.static_deadline).to be_nil
+        expect(e.unlock_deadline).to eq('unlock + 2 weeks')
       end
     end
 
@@ -254,12 +319,35 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'group1-e1')
       @course.exercises.create(name: 'group1-e2')
       @course.exercises.create(name: 'group1-e3')
+      @course.exercises.create(name: 'group2-e1')
+      @course.exercises.create(name: 'group2-e2')
 
-      post :save_deadlines, organization_id: @organization.slug, id: @course.id, group: { group1: { static: '1.1.2000', unlock: 'unlock + 7 days' } }
+      post :save_deadlines,
+           organization_id: @organization.slug,
+           id: @course.id,
+           group: {
+               group1: {
+                   soft: { static: '1.1.2000', unlock: 'unlock + 7 days' },
+                   hard: { static: '', unlock: 'unlock + 2 months' }
+               },
+               group2: {
+                   soft: { static: '2.2.2000', unlock: '' },
+                   hard: { static: '3.3.2000', unlock: '' }
+               }
+           }
 
       @course.exercise_group_by_name('group1').exercises(false).each do |e|
-        expect(e.static_deadline).to eq('1.1.2000')
-        expect(e.unlock_deadline).to eq('unlock + 7 days')
+        expect(e.soft_static_deadline).to eq('1.1.2000')
+        expect(e.soft_unlock_deadline).to eq('unlock + 7 days')
+        expect(e.static_deadline).to be_nil
+        expect(e.unlock_deadline).to eq('unlock + 2 months')
+      end
+
+      @course.exercise_group_by_name('group2').exercises(false).each do |e|
+        expect(e.soft_static_deadline).to eq('2.2.2000')
+        expect(e.soft_unlock_deadline).to be_nil
+        expect(e.static_deadline).to eq('3.3.2000')
+        expect(e.unlock_deadline).to be_nil
       end
     end
   end

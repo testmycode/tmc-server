@@ -17,6 +17,10 @@ class Course < ActiveRecord::Base
               message: 'should not contain white spaces'
             }
 
+  validates :title,
+            presence: true,
+            length: { within: 1..40 }
+
   validates :source_url, presence: true
   validate :check_source_backend
   validate :source_url_same_as_templates
@@ -92,7 +96,6 @@ class Course < ActiveRecord::Base
     self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
 
-    self.description = new_options['description']
     self.paste_visibility = new_options['paste_visibility']
     if !new_options['locked_exercise_points_visible'].nil?
       self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']
@@ -308,6 +311,14 @@ class Course < ActiveRecord::Base
 
   def created_from_template?
     course_template.present?
+  end
+
+  def material_url=(material)
+    return super('') if material.blank?
+    unless material =~ /^https?:\/\//
+      return super("http://#{material}")
+    end
+    super(material)
   end
 
   private
