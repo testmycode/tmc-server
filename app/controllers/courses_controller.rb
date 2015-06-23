@@ -101,6 +101,8 @@ class CoursesController < ApplicationController
 
   def edit
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Edit course parameters'
   end
 
   def update
@@ -128,6 +130,7 @@ class CoursesController < ApplicationController
     authorize! :manage_deadlines, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage deadlines'
+    assign_show_view_vars
   end
 
   def save_deadlines
@@ -158,7 +161,14 @@ class CoursesController < ApplicationController
   rescue DeadlineSpec::InvalidSyntaxError => e
     redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s
   end
-  
+
+  def help
+    @course = Course.find(params[:course_id])
+    authorize! :read, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Help page'
+  end
+
   def manage_unlocks
     authorize! :manage_unlocks, @course
     add_course_breadcrumb
@@ -188,11 +198,6 @@ class CoursesController < ApplicationController
     add_breadcrumb 'Manage exercises'
     @exercises = @course.exercises.natsort_by(&:name)
     @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
-  end
-
-  def help
-    @course = Course.find(params[:course_id])
-    authorize! :read, @course
   end
 
   private
