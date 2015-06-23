@@ -7,15 +7,14 @@ class CoursesController < ApplicationController
   before_action :set_organization
   before_action :set_course, except: [:index, :show_json, :new, :create, :help]
 
+  skip_authorization_check only: [:index]
+
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
 
     respond_to do |format|
       format.html do
-        @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
-        @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
-        authorize! :read, @ongoing_courses
-        authorize! :read, @expired_courses
+        redirect_to organization_path(@organization)
       end
       format.json do
         courses = @organization.courses.ongoing.order(ordering)
