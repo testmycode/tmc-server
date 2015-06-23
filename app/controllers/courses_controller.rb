@@ -87,7 +87,10 @@ class CoursesController < ApplicationController
 
     respond_to do |format|
       if @course.save
-        refresh_course(@course)
+        # When we have fresh course created from template, we might not want to make directory changes,
+        # because repository already exists in the system.
+        no_directory_changes = @course.created_from_template? && File.exist?(@course.cache_path)
+        refresh_course(@course, no_directory_changes: no_directory_changes)
         format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
@@ -192,10 +195,10 @@ class CoursesController < ApplicationController
     groups
   end
 
-  def refresh_course(course)
+  def refresh_course(course, options = {})
     authorize! :refresh, course
     begin
-      session[:refresh_report] = course.refresh
+      session[:refresh_report] = course.refresh(options)
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
     end
