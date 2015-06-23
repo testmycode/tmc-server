@@ -23,6 +23,7 @@ class Course < ActiveRecord::Base
 
   validates :source_url, presence: true
   validate :check_source_backend
+  validate :source_url_same_as_templates
   after_initialize :set_default_source_backend
   before_save :set_cache_version
 
@@ -138,7 +139,7 @@ class Course < ActiveRecord::Base
   end
 
   def increment_cache_version
-    if course_template.present?
+    if created_from_template?
       course_template.cache_version += 1
     else
       self.cache_version += 1
@@ -146,7 +147,7 @@ class Course < ActiveRecord::Base
   end
 
   def cache_path
-    return course_template.cache_path if course_template.present?
+    return course_template.cache_path if created_from_template?
     "#{Course.cache_root}/#{name}-#{cache_version}"
   end
 
@@ -222,13 +223,13 @@ class Course < ActiveRecord::Base
   end
 
   def refresh
-    should_make_directory_changes = course_template.nil? || !File.exist?(cache_path)
-    options = { no_directory_changes: !should_make_directory_changes }
+    shouldnt_make_directory_changes = created_from_template? && File.exist?(cache_path)
+    options = { no_directory_changes: shouldnt_make_directory_changes }
     CourseRefresher.new.refresh_course(self, options)
   end
 
   def delete_cache
-    FileUtils.rm_rf cache_path if course_template.nil?
+    FileUtils.rm_rf cache_path unless created_from_template?
   end
 
   def self.valid_source_backends
@@ -355,6 +356,10 @@ class Course < ActiveRecord::Base
     super(material)
   end
 
+  def created_from_template?
+    course_template.present?
+  end
+
   private
 
   def check_source_backend
@@ -368,6 +373,12 @@ class Course < ActiveRecord::Base
   end
 
   def set_cache_version
-    self.cache_version = course_template.cache_version if course_template.present?
+    self.cache_version = course_template.cache_version if created_from_template?
+  end
+
+  def source_url_same_as_templates
+    if created_from_template?
+      errors.add(:source_url, 'must be same as template\'s source_url, if course created from template') unless self.source_url == course_template.source_url
+    end
   end
 end
