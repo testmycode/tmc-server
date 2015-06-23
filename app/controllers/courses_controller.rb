@@ -169,7 +169,8 @@ class CoursesController < ApplicationController
 
   def manage_exercises
     authorize! :teach, @organization
-    assign_show_view_vars
+    @exercises = @course.exercises.natsort_by(&:name)
+    @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end
 
   private
