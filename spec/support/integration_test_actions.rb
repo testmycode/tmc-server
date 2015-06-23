@@ -32,6 +32,18 @@ module IntegrationTestActions
     expect(page).to have_content(options[:name])
   end
 
+  def create_course_from_template(options = {})
+    visit "/org/#{options[:organization_slug]}"
+    click_link 'Create New Course from template'
+    click_link 'Create course'
+    fill_in 'course_name', with: options[:name]
+    click_button 'Add Course'
+
+    expect(page).to have_content('Course was successfully created')
+    expect(page).to have_content(options[:name])
+    expect(page).to have_content('help page')
+  end
+
   def manually_refresh_course(coursename, organization_slug)
     visit "/org/#{organization_slug}/courses"
     click_link coursename
