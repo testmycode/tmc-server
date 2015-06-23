@@ -53,4 +53,8 @@ class CourseTemplate < ActiveRecord::Base
       firstcourse = false
     end
   end
+
+  def after_destroy
+    FileUtils.rm_rf cache_path if courses.empty?
+  end
 end
