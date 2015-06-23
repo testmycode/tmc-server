@@ -16,7 +16,7 @@ class ReviewsController < ApplicationController
       respond_to do |format|
         format.html do
           add_course_breadcrumb
-          add_breadcrumb 'Code reviews', organization_course_reviews_path
+          add_breadcrumb 'Code reviews'
           render 'reviews/course_index'
         end
         format.json do
@@ -28,6 +28,7 @@ class ReviewsController < ApplicationController
       fail "Submission's exercise has been moved or deleted" unless @submission.exercise
 
       @course = @submission.course
+      @organization = @course.organization
 
       respond_to do |format|
         format.html do
@@ -51,9 +52,8 @@ class ReviewsController < ApplicationController
     @organization = @course.organization
 
     add_course_breadcrumb
-    add_exercise_breadcrumb
-    add_submission_breadcrumb
-    add_breadcrumb 'Code review editor', new_submission_review_path(@submission)
+    add_breadcrumb 'Code reviews', organization_course_reviews_path(@organization, @course)
+    add_breadcrumb 'Code review editor'
 
     @new_review = Review.new(
       submission_id: @submission.id,
