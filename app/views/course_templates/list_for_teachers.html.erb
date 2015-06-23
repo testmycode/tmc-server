@@ -26,7 +26,8 @@
   </tbody>
 </table>
 
-<br/>
-
-<h3>Create custom course</h3>
-<%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+<% if SiteSetting.value('enable_custom_repositories') %>
+  <br/>
+  <h3>Create custom course</h3>
+  <%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+<% end %>
