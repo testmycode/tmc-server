@@ -48,6 +48,8 @@ class ReviewsController < ApplicationController
     @show_page_presence = true
 
     @course = @submission.course
+    @organization = @course.organization
+
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
@@ -84,7 +86,9 @@ class ReviewsController < ApplicationController
       flash[:success] = 'Code review added.'
       notify_user_about_new_review
       send_email_about_new_review if params[:send_email]
-      redirect_to course_reviews_path(@submission.course_id)
+      @course = @submission.course
+      @organization = @course.organization
+      redirect_to organization_course_reviews_path(@organization, @course)
     end
   end
 
