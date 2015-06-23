@@ -19,7 +19,7 @@ feature 'Teacher disables exercises', feature: true do
 
   scenario 'Teacher disables exercises' do
     log_in_as(@teacher.login, @teacher.password)
-    visit '/org/slug/courses/1'
+    visit_course @course
 
     click_link 'Manage exercises'
 
@@ -42,7 +42,7 @@ feature 'Teacher disables exercises', feature: true do
     @ex4.enabled!
 
     log_in_as(@teacher.login, @teacher.password)
-    visit '/org/slug/courses/1'
+    visit_course @course
 
     click_link 'Manage exercises'
 
@@ -64,7 +64,7 @@ feature 'Teacher disables exercises', feature: true do
     @ex1.save!
 
     log_in_as(@teacher.login, @teacher.password)
-    visit '/org/slug/courses/1'
+    visit_course @course
 
     click_link @ex1.name
 
@@ -76,7 +76,7 @@ feature 'Teacher disables exercises', feature: true do
     @ex4.disabled!
 
     log_in_as(@user.login, @user.password)
-    visit '/org/slug/courses/1'
+    visit_course @course
 
     expect(page).to have_content("#{@ex1.name}")
     expect(page).to have_content("#{@ex2.name}")
@@ -92,5 +92,9 @@ feature 'Teacher disables exercises', feature: true do
     visit "/exercises/#{@ex1.id}"
 
     expect(page).to have_content('Access denied')
+  end
+
+  def visit_course(course)
+    visit "/org/slug/courses/#{course.id}"
   end
 end

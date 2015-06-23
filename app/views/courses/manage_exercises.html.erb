@@ -15,7 +15,7 @@
     <%= f.collection_check_boxes(:exercises, @exercises, :id, :name) do |c| %>
       <tr>
         <td>
-          <%= render partial: 'exercises/list_single', locals: { exercise: @exercises.detect { |e| e.id == c.value } } %>
+          <%= render partial: 'exercises/list_single', locals: { exercise: @exercises_id_map[c.value] } %>
         </td>
         <td>
           <%= c.check_box %>

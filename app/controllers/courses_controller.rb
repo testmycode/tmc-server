@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks, :manage_exercises]
+  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :manage_exercises, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -169,7 +169,8 @@ class CoursesController < ApplicationController
 
   def manage_exercises
     authorize! :teach, @organization
-    assign_show_view_vars
+    @exercises = @course.exercises.natsort_by(&:name)
+    @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end
 
   private
