@@ -24,6 +24,7 @@ class Course < ActiveRecord::Base
   validates :source_url, presence: true
   validate :check_source_backend
   after_initialize :set_default_source_backend
+  before_save :set_cache_version
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
@@ -136,8 +137,12 @@ class Course < ActiveRecord::Base
     "#{FileStore.root}/course"
   end
 
-  def cache_version=(x)
-    course_template.cache_version = x if course_template.present?
+  def increment_cache_version
+    if course_template.present?
+      course_template.cache_version += 1
+    else
+      self.cache_version += 1
+    end
   end
 
   def cache_path
@@ -217,11 +222,13 @@ class Course < ActiveRecord::Base
   end
 
   def refresh
-    CourseRefresher.new.refresh_course(self)
+    should_make_directory_changes = course_template.nil? || !File.exist?(cache_path)
+    options = { no_directory_changes: !should_make_directory_changes }
+    CourseRefresher.new.refresh_course(self, options)
   end
 
   def delete_cache
-    FileUtils.rm_rf cache_path
+    FileUtils.rm_rf cache_path if course_template.nil?
   end
 
   def self.valid_source_backends
@@ -358,5 +365,9 @@ class Course < ActiveRecord::Base
 
   def set_default_source_backend
     self.source_backend ||= Course.default_source_backend
+  end
+
+  def set_cache_version
+    self.cache_version = course_template.cache_version if course_template.present?
   end
 end

@@ -100,7 +100,7 @@ class CourseRefresher
 
           @old_cache_path = @course.cache_path
 
-          @course.cache_version += 1 # causes @course.*_path to return paths in the new cache
+          @course.increment_cache_version                         unless options[:no_directory_changes] # causes @course.*_path to return paths in the new cache
 
           FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
           FileUtils.mkdir_p(@course.cache_path)                   unless options[:no_directory_changes]
@@ -121,6 +121,7 @@ class CourseRefresher
           measure_and_log :set_permissions                        unless options[:no_directory_changes]
           measure_and_log :invalidate_unlocks
 
+          @course.course_template.save! if @course.course_template.present?
           @course.refreshed_at = Time.now
           @course.save!
           @course.exercises.each &:save!
