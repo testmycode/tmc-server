@@ -17,6 +17,9 @@ class FeedbackQuestionsController < ApplicationController
   def new
     @question = FeedbackQuestion.new(course: @course)
     authorize! :create, @question
+    add_course_breadcrumb
+    add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
+    add_breadcrumb 'Add new question'
   end
 
   def create
@@ -38,8 +41,12 @@ class FeedbackQuestionsController < ApplicationController
   def show
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
+    @organization = @course.organization
     authorize! :read, @question
     authorize! :read, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
+    add_breadcrumb "Question #{@question.title}"
   end
 
   def update
