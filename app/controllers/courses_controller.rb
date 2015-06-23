@@ -75,8 +75,10 @@ class CoursesController < ApplicationController
   end
 
   def new
-    @course = Course.new
     authorize! :teach, @organization
+    add_organization_breadcrumb
+    add_breadcrumb 'Create new course'
+    @course = Course.new
   end
 
   def create
@@ -96,6 +98,8 @@ class CoursesController < ApplicationController
 
   def edit
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Edit course parameters'
   end
 
   def update
@@ -109,6 +113,8 @@ class CoursesController < ApplicationController
 
   def manage_deadlines
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage deadlines'
     assign_show_view_vars
   end
 
@@ -143,10 +149,14 @@ class CoursesController < ApplicationController
   def help
     @course = Course.find(params[:course_id])
     authorize! :read, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Help page'
   end
 
   def manage_unlocks
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage unlocks'
     assign_show_view_vars
   end
 
