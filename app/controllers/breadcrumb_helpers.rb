@@ -3,7 +3,12 @@
 #
 # See https://github.com/weppos/breadcrumbs_on_rails
 module BreadcrumbHelpers # Included in ApplicationController
+  def add_organization_breadcrumb
+    add_breadcrumb "Organization #{@organization.name}", organization_path(@organization)
+  end
+
   def add_course_breadcrumb
+    add_organization_breadcrumb
     add_breadcrumb "Course #{@course.name}", organization_course_path(@organization, @course)
   end
 
