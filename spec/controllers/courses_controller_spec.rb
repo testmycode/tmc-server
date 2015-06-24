@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe CoursesController, type: :controller do
+  include GitTestActions
+
   before(:each) do
     @user = FactoryGirl.create(:user)
     @teacher = FactoryGirl.create(:user)
@@ -231,14 +233,25 @@ describe CoursesController, type: :controller do
 
   describe 'PUT update' do
     before :each do
-      @course = FactoryGirl.create :course, name: 'oldName', title: 'oldTitle', description: 'oldDescription', material_url: 'http://oldMaterial.com', organization: @organization
+      @course = FactoryGirl.create :course,
+                                   name: 'oldName',
+                                   title: 'oldTitle',
+                                   description: 'oldDescription',
+                                   material_url: 'http://oldMaterial.com',
+                                   source_url: 'git@oldrepo.com',
+                                   organization: @organization
       controller.current_user = @user
     end
 
     describe 'with valid parameters' do
       before :each do
         Teachership.create user: @user, organization: @organization
-        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {
+                       title: 'newTitle',
+                       description: 'newDescription',
+                       material_url: 'http://newMaterial.com',
+                       source_url: 'git@newrepo.com'
+                   }
       end
 
       it 'updates the course' do
@@ -246,6 +259,7 @@ describe CoursesController, type: :controller do
         expect(course.title).to eq('newTitle')
         expect(course.description).to eq('newDescription')
         expect(course.material_url).to eq('http://newMaterial.com')
+        expect(course.source_url).to eq('git@newrepo.com')
       end
 
       it 'redirects to updated course' do
@@ -265,6 +279,36 @@ describe CoursesController, type: :controller do
       Teachership.create user: @user, organization: @organization
       put :update, organization_id: @organization.to_param, id: @course.to_param, course: {name: 'newName'}
       expect(Course.last.name).to eq('oldName')
+    end
+
+    it 'can\'t update course template id' do
+      Teachership.create user: @user, organization: @organization
+      put :update, organization_id: @organization.to_param, id: @course.to_param, course: {course_template_id: 2}
+      expect(Course.last.course_template_id).to be_nil
+    end
+
+    describe 'when course created from template' do
+      before :each do
+        Teachership.create user: @user, organization: @organization
+
+        @repo_path = @test_tmp_dir + '/fake_remote_repo'
+        create_bare_repo(@repo_path)
+        @template = FactoryGirl.create :course_template, source_url: @repo_path
+
+        @course.course_template = @template
+        @course.source_url = @template.source_url
+        @course.save!
+      end
+
+      it 'can\'t update source_url' do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {source_url: 'git@example.com'}
+        expect(Course.last.source_url).to eq(@template.source_url)
+      end
+
+      it 'can\'t update git_branch' do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {git_branch: 'ufobranch'}
+        expect(Course.last.git_branch).to eq('master')
+      end
     end
 
     describe 'when non-teacher attemps to update' do
