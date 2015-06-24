@@ -121,7 +121,7 @@ class CourseRefresher
           measure_and_log :set_permissions                        unless options[:no_directory_changes]
           measure_and_log :invalidate_unlocks
 
-          @course.course_template.save! if @course.created_from_template?
+          @course.course_template.save! unless @course.custom?
           @course.refreshed_at = Time.now
           @course.save!
           @course.exercises.each &:save!

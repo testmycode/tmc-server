@@ -139,15 +139,15 @@ class Course < ActiveRecord::Base
   end
 
   def increment_cache_version
-    if created_from_template?
-      course_template.cache_version += 1
-    else
+    if custom?
       self.cache_version += 1
+    else
+      course_template.cache_version += 1
     end
   end
 
   def cache_path
-    return course_template.cache_path if created_from_template?
+    return course_template.cache_path unless custom?
     "#{Course.cache_root}/#{name}-#{cache_version}"
   end
 
@@ -227,7 +227,7 @@ class Course < ActiveRecord::Base
   end
 
   def delete_cache
-    FileUtils.rm_rf cache_path unless created_from_template?
+    FileUtils.rm_rf cache_path if custom?
   end
 
   def self.valid_source_backends
@@ -371,11 +371,11 @@ class Course < ActiveRecord::Base
   end
 
   def set_cache_version
-    self.cache_version = course_template.cache_version if created_from_template?
+    self.cache_version = course_template.cache_version unless custom?
   end
 
   def source_url_same_as_templates
-    if created_from_template?
+    if !custom?
       errors.add(:source_url, 'must be same as template\'s source_url, if course created from template') unless self.source_url == course_template.source_url
     end
   end
