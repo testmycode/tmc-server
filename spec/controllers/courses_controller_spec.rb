@@ -199,7 +199,9 @@ describe CoursesController, type: :controller do
 
   describe 'POST create' do
     before :each do
-      controller.current_user = FactoryGirl.create(:admin)
+      check_custom_enabled
+      controller.current_user = FactoryGirl.create :user
+      Teachership.create user: controller.current_user, organization: @organization
     end
 
     describe 'with valid parameters' do
@@ -211,6 +213,28 @@ describe CoursesController, type: :controller do
       it 'redirects to the created course' do
         post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
         expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
+      end
+
+      it 'does directory changes via refresh when course is custom' do
+        source_url = FactoryGirl.create(:course_template).source_url
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: source_url }
+        expect(Course.last.cache_version).to eq(1)
+      end
+
+      describe 'when course is created from template' do
+        before :each do
+          @template = FactoryGirl.create :course_template
+        end
+
+        it 'does directory changes when course is first created from template, but doesn\'t do changes when creating more courses from same template' do
+          expect(CourseTemplate.last.cache_version).to eq(0)
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @template.id, source_url: @template.source_url }
+          expect(Course.last.cache_version).to eq(1)
+          expect(CourseTemplate.last.cache_version).to eq(1)
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @template.id, source_url: @template.source_url }
+          expect(Course.all.pluck :cache_version).to eq([1, 1])
+          expect(CourseTemplate.last.cache_version).to eq(1)
+        end
       end
     end
 
