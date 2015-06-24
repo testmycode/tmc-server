@@ -131,6 +131,10 @@ class User < ActiveRecord::Base
     assisted_courses.exists?(course)
   end
 
+  def assistantship(course)
+    Assistantship.find_by(user_id: self, course_id: course)
+  end
+
   private
 
   def encrypt_password

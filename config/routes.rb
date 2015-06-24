@@ -27,7 +27,7 @@ TmcServer::Application.routes.draw do
         post 'save_unlocks'
       end
 
-      resources :assistants, only: [:index, :new, :create]
+      resources :assistants, only: [:index, :new, :create, :destroy]
 
       resources :points, only: [:index, :show] do
         member do
