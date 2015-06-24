@@ -1,14 +1,34 @@
 require 'fileutils'
 require 'system_commands'
 
+def make_repo_for_course_template
+  repo_path = "#{::Rails.root}/tmp/tests/factory_repo"
+  return repo_path if Dir.exist? repo_path
+
+  abs_path = File.expand_path(repo_path)
+  system!("git init -q --bare #{repo_path}")
+  Dir.mktmpdir do |tmpdir|
+    system!("git init -q #{tmpdir}")
+    Dir.chdir(tmpdir) do
+      system!('echo Hello > README')
+      system!('git add README')
+      system!("git commit -qm \"Added dummy README\"")
+      system!("git remote add origin #{abs_path}")
+      system!('git push -q origin master >/dev/null 2>&1')
+    end
+  end
+
+  repo_path
+end
+
 FactoryGirl.define do
 
   factory :course_template do
     sequence(:name) { |n| "template#{n}" }
     sequence(:title) { |n| "template title#{n}" }
-    sequence(:description) { |n| "course descriptiong#{n}" }
+    sequence(:description) { |n| "course description#{n}" }
     sequence(:material_url) { |n| "http://www.material#{n}.com" }
-    source_url 'https://github.com/testmycode/tmc-testcourse.git'
+    source_url { make_repo_for_course_template }
   end
 
   factory :user do
