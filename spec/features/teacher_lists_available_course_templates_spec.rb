@@ -20,7 +20,7 @@ feature 'Teacher lists available course templates', feature: true do
     log_in_as(@teacher.login, 'xooxer')
 
     visit '/org/slug'
-    click_link 'Create New Course from template'
+    click_link 'Create New Course'
     expect(page).to have_content('template1')
     expect(page).to have_content('template2')
     expect(page).to have_content('template3')

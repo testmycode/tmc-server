@@ -321,6 +321,10 @@ class Course < ActiveRecord::Base
     super(material)
   end
 
+  def custom?
+    course_template_id.nil?
+  end
+
   private
 
   def check_source_backend

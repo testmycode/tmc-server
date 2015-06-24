@@ -208,6 +208,7 @@ describe CoursesController, type: :controller do
   describe 'POST create' do
     before :each do
       controller.current_user = FactoryGirl.create(:admin)
+      check_custom_enabled
     end
 
     describe 'with valid parameters' do
@@ -509,5 +510,11 @@ describe CoursesController, type: :controller do
       post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
       expect(response.code.to_i).to eq(401)
     end
+  end
+
+  private
+
+  def check_custom_enabled
+    pending 'Enable custom repositories from site.defaults.yml' unless SiteSetting.value('enable_custom_repositories')
   end
 end

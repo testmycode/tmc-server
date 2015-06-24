@@ -68,17 +68,25 @@ require 'cgi' # for escapeHTML
     Now we can create a new course for our organization.
   </p>
 
-  <% highlight('a:contains("Create New Course"):first') %>
+  <% highlight('a:contains("Create New"):first') %>
   <%= screenshot %>
-  <% click_on 'Create New Course' %>
+  <% click_on 'Create New' %>
 
-  <%
-     course_name = 'programming101'
-     course_title = 'Programming 101'
-  %>
+  <p>
+    From this page we select to create custom course.
+  </p>
+
+  <% highlight('a:contains("Create New Custom Course"):first') %>
+  <%= screenshot %>
+  <% click_on 'Create New Custom Course' %>
+
+  <% course_name = 'programming101' %>
+  <% course_title = 'Programming 101' %>
+
   <p>
     We'll name our course "<%= course_name %>", give it a title "<%= course_title %>" and we'll also have to give the address
-    of the git repository where we'll store the exercises.
+    of the git repository where we'll store the exercises. Also we have to define branch.
+    Master branch is good for us.
   </p>
 
   <%
@@ -95,6 +103,8 @@ require 'cgi' # for escapeHTML
 
     fill_in 'course_source_url', :with => repo_url
     highlight '#course_source_url'
+    fill_in 'course_git_branch', :with => 'master'
+    highlight '#course_git_branch'
   %>
 
   <p>

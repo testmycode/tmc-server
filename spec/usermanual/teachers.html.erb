@@ -177,26 +177,26 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    From organization's front page, click 'Create new course from template'
+    From organization's front page, click 'Create New Course'
   </p>
 
 <%
   visit '/org/hy'
-  highlight 'a:contains("Create New Course from template")'
+  highlight 'a:contains("Create New Course")'
 %>
 <%= screenshot %>
 
 <%
-  click_on 'Create New Course from template'
+  click_on 'Create New Course'
 %>
 <%= screenshot %>
 
   <p>
-    You will see a list of all the course templates TMC has to offer. Click 'Create course' button on the template that you want.
+    You will see a list of all the course templates TMC has to offer. Click 'Create Course' button on the template that you want.
   </p>
 
 <%
-  first(:link, 'Create course').click
+  first(:link, 'Create Course').click
 %>
 <%= screenshot %>
 

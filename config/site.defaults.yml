@@ -82,6 +82,8 @@ emails:
 # Allow people to create user accounts
 enable_signup: true
 
+# Allow teachers to create courses from their own repositories
+enable_custom_repositories: true
 
 ### Model solutions ###
 

@@ -34,7 +34,9 @@ class Ability
         c.taught_by?(user)
       end
       can :refresh, Course do |c|
-        c.taught_by?(user)
+        c.taught_by?(user) &&
+            c.custom? && # user can only refresh his/her custom course.
+            SiteSetting.value('enable_custom_repositories') # and only if custom repositories are allowed
       end
 
       cannot :read, Exercise
