@@ -9,12 +9,14 @@
   </div>
 <% end %>
 
-<table class="table table-striped">
+<table class="table table-striped" id="organization-table">
   <thead>
   <tr>
     <th>Name</th>
     <th>Information</th>
-    <th colspan="2"></th>
+    <% if current_user.administrator? %>
+      <th colspan="2"></th>
+    <% end %>
   </tr>
   </thead>
 
@@ -32,6 +34,8 @@
   <% end %>
   </tbody>
 </table>
+
+<%= use_datatables('#organization-table', bPaginate: false) %>
 
 <br>
 
