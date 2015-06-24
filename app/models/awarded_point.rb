@@ -84,10 +84,6 @@ class AwardedPoint < ActiveRecord::Base
     result
   end
 
-  def creatable_by?(user)
-    user.teacher?(course.organization)
-  end
-
   private
 
   def self.without_admins(query)

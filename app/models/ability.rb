@@ -103,8 +103,8 @@ class Ability
         r.readable_by?(user) || (can? :teach, r.submission.course)
       end
 
-      can :create_review, Submission do |s|
-        can? :teach, s.course
+      can :create_review, Course do |c|
+        can? :teach, c
       end
 
       cannot :mark_as_read, Review
