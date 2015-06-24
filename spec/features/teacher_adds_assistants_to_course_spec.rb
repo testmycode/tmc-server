@@ -10,7 +10,7 @@ feature 'Teacher can add assistants to course', feature: true do
     @course = FactoryGirl.create :course, source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
-    click_link @course.name
+    click_link @course.title
   end
 
   scenario 'Teacher succeeds at adding assistant when valid username is given' do
@@ -75,7 +75,7 @@ feature 'Teacher can add assistants to course', feature: true do
 
   def add_assistant(username, course)
     visit '/org/slug'
-    click_link course.name
+    click_link course.title
     click_link 'Manage assistants'
     fill_in 'username', with: username
     click_button 'Add a new assistant'
