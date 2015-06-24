@@ -232,6 +232,24 @@ describe CoursesController, type: :controller do
     end
   end
 
+  describe 'POST refresh' do
+    before :each do
+      check_custom_enabled
+      controller.current_user = FactoryGirl.create :user
+      Teachership.create user: controller.current_user, organization: @organization
+
+      repo_path = @test_tmp_dir + '/fake_remote_repo'
+      create_bare_repo(repo_path)
+      @template = FactoryGirl.create :course_template, source_url: repo_path
+    end
+
+    it 'can\'t refresh if course created from template' do
+      @course = FactoryGirl.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
+      post :refresh, organization_id: @organization.slug, id: @course.id
+      expect(response.code.to_i).to eq(401)
+    end
+  end
+
   describe 'PUT update' do
     before :each do
       @course = FactoryGirl.create :course,
@@ -292,9 +310,9 @@ describe CoursesController, type: :controller do
       before :each do
         Teachership.create user: @user, organization: @organization
 
-        @repo_path = @test_tmp_dir + '/fake_remote_repo'
-        create_bare_repo(@repo_path)
-        @template = FactoryGirl.create :course_template, source_url: @repo_path
+        repo_path = @test_tmp_dir + '/fake_remote_repo'
+        create_bare_repo(repo_path)
+        @template = FactoryGirl.create :course_template, source_url: repo_path
 
         @course.course_template = @template
         @course.source_url = @template.source_url

@@ -92,7 +92,7 @@ class CoursesController < ApplicationController
       if @course.save
         # When we have fresh course created from template, we might not want to make directory changes,
         # if repository already exists in the system.
-        no_directory_changes = @course.created_from_template? && File.exist?(@course.cache_path)
+        no_directory_changes = !@course.custom? && File.exist?(@course.cache_path)
         refresh_course(@course, no_directory_changes: no_directory_changes)
         format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
       else
@@ -180,10 +180,10 @@ class CoursesController < ApplicationController
   end
 
   def course_params
-    if (@course.created_from_template?)
-      params.require(:course).permit(:title, :description, :material_url)
-    else
+    if (@course.custom?)
       params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch)
+    else
+      params.require(:course).permit(:title, :description, :material_url)
     end
   end
 
