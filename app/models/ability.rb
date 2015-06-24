@@ -75,7 +75,6 @@ class Ability
       end
 
       cannot :reply, FeedbackAnswer
-      cannot :email, CourseNotification
 
       cannot :read, CourseTemplate
       can :prepare_course, CourseTemplate
@@ -90,7 +89,7 @@ class Ability
 
       cannot :teach, Organization
       can :teach, Organization do |o|
-        o.teacher?(user) && !o.rejected?
+        o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
       end
 
     end

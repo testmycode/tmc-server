@@ -54,15 +54,20 @@ class ExerciseGroup
     "<ExerciseGroup #{@course.name}:#{@name}>"
   end
 
-  def group_deadline
-    exercises(false).map { |n| n.deadline_spec_obj }.first
+  def hard_group_deadline
+    group_deadline(:deadline_spec_obj)
   end
 
-  def group_deadline=(deadline)
-    exercises(false).each do |e|
-      e.deadline_spec=(deadline)
-      e.save
-    end
+  def soft_group_deadline
+    group_deadline(:soft_deadline_spec_obj)
+  end
+
+  def hard_group_deadline=(deadline)
+    set_group_deadline(:deadline_spec=, deadline)
+  end
+
+  def soft_group_deadline=(deadline)
+    set_group_deadline(:soft_deadline_spec=, deadline)
   end
 
   def group_unlock_conditions
@@ -72,7 +77,20 @@ class ExerciseGroup
   def group_unlock_conditions=(unlock_conditions)
     exercises(false).each do |e|
       e.unlock_spec = unlock_conditions
-      e.save
+      e.save!
+    end
+  end
+
+  private
+
+  def group_deadline(method)
+    exercises(false).map { |n| n.send(method) }.first
+  end
+
+  def set_group_deadline(method, deadline)
+    exercises(false).each do |e|
+      e.send(method, deadline)
+      e.save!
     end
   end
 end
