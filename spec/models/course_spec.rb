@@ -168,12 +168,16 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(organization: organization))
     end
 
-    it 'allows same course name in different organizations' do
+    it 'allows same course name in different organizations, if cloned from same template' do
       organization1 = FactoryGirl.create :accepted_organization
       organization2 = FactoryGirl.create :accepted_organization
       Course.create!(valid_params.merge(organization: organization1))
       expect{ Course.create!(valid_params.merge(organization: organization2)) }.not_to raise_error
     end
+
+    it 'forbids two custom courses to share a name'
+
+    it 'forbids custom course\'s name to be same as some template\'s name'
 
     it 'forbids spaces in the name' do # this could eventually be lifted as long as everything else is made to tolerate spaces
       should_be_invalid_params(valid_params.merge(name: 'Test Course'))
@@ -193,12 +197,23 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(source_url: ''))
     end
 
+    it 'if course created from template, repo url can\'t be different from template\'s repo url' do
+      template = FactoryGirl.create :course_template
+      expect{ Course.create!(valid_params.merge(course_template: template, source_url: template.source_url)) }.not_to raise_error
+      should_be_invalid_params(valid_params.merge(course_template: template, source_url: "#{template.source_url}~"))
+    end
+
     def should_be_invalid_params(params)
       expect { Course.create!(params) }.to raise_error
     end
   end
 
   describe 'destruction' do
+    before :each do
+      template = FactoryGirl.create :course_template
+      @templated_course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    end
+
     it 'deletes its cache directory' do
       c = Course.create!(name: 'MyCourse', title: 'My Course', source_url: source_url)
       FileUtils.mkdir_p(c.cache_path)
@@ -208,20 +223,28 @@ describe Course, type: :model do
       expect(File).not_to exist(c.cache_path)
     end
 
+    it 'doesn\'t delete cache if course created from template' do
+      FileUtils.mkdir_p(@templated_course.cache_path)
+      FileUtils.touch("#{@templated_course.cache_path}/foo.txt")
+
+      @templated_course.destroy
+      expect(File).to exist(@templated_course.cache_path)
+    end
+
     it 'deletes dependent exercises' do
-      ex = FactoryGirl.create(:exercise)
+      ex = FactoryGirl.create :exercise, course: @templated_course
       ex.course.destroy
       assert_destroyed(ex)
     end
 
     it 'deletes dependent submissions' do
-      sub = FactoryGirl.create(:submission)
+      sub = FactoryGirl.create :submission, course: @templated_course
       sub.course.destroy
       assert_destroyed(sub)
     end
 
     it 'deletes dependent feedback questions and answers' do
-      a = FactoryGirl.create(:feedback_answer)
+      a = FactoryGirl.create :feedback_answer, course: @templated_course
       q = a.feedback_question
       q.course.destroy
       assert_destroyed(a)
@@ -229,19 +252,19 @@ describe Course, type: :model do
     end
 
     it 'deletes available points' do
-      pt = FactoryGirl.create(:available_point)
+      pt = FactoryGirl.create :available_point, course: @templated_course
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it 'deletes awarded points' do
-      pt = FactoryGirl.create(:awarded_point)
+      pt = FactoryGirl.create :awarded_point, course: @templated_course
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it 'deletes test scanner cache entries' do
-      ent = FactoryGirl.create(:test_scanner_cache_entry)
+      ent = FactoryGirl.create :test_scanner_cache_entry, course: @templated_course
       ent.course.destroy
       assert_destroyed(ent)
     end
