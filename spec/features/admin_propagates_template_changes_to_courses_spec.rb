@@ -81,13 +81,14 @@ feature 'Admin propagates template changes to all courses cloned from template',
     click_link @organization1.name
     click_link 'course'
     first(:link, 'MyExercise').click
-    expect(page).to have_content(user.login)
+    expect(page).to have_content('Showing 1 to 1 of 1 entries')
     expect(page).not_to have_content('No submissions yet.')
 
     visit '/'
     click_link @organization2.name
     click_link 'course'
     first(:link, 'MyExercise').click
+    expect(page).not_to have_content('Showing 1 to 1 of 1 entries')
     expect(page).to have_content('No submissions yet.')
   end
 
