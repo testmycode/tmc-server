@@ -14,7 +14,6 @@ feature 'Teacher can add new teacher to an organization', feature: true do
   scenario 'Teacher succeeds add new teacher when valid username is given' do
     log_in_as(@teacher.username, 'foobar')
     click_link 'Show teachers in this organization'
-    click_link 'Add a new teacher'
     fill_in 'username', with: @new_teacher.username
     click_button 'Add a new teacher'
     expect(page).to have_content 'Teacher added to organization'
@@ -24,7 +23,6 @@ feature 'Teacher can add new teacher to an organization', feature: true do
   scenario 'Teacher cannot give teachership for non-existing user' do
     log_in_as(@teacher.username, 'foobar')
     click_link 'Show teachers in this organization'
-    click_link 'Add a new teacher'
     fill_in 'username', with: 'notusername'
     click_button 'Add a new teacher'
     expect(page).to have_content 'User does not exist'

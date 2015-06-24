@@ -10,7 +10,7 @@ TmcServer::Application.routes.draw do
       get 'list_requests'
     end
 
-    resources :teachers, only: [:index, :new, :create, :destroy]
+    resources :teachers, only: [:index, :create, :destroy]
 
     resources :courses do
       member do
@@ -23,7 +23,7 @@ TmcServer::Application.routes.draw do
         resources :emails, only: [:index]
       end
 
-      resources :assistants, only: [:index, :new, :create, :destroy]
+      resources :assistants, only: [:index, :create, :destroy]
 
       resources :points, only: [:index, :show] do
         member do
