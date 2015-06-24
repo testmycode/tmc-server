@@ -4,10 +4,6 @@ class TeachersController < ApplicationController
   def index
     authorize! :teach, @organization
     @teachers = @organization.teachers
-  end
-
-  def new
-    authorize! :teach, @organization
     @teachership = Teachership.new
   end
 
@@ -20,7 +16,8 @@ class TeachersController < ApplicationController
     if @teachership.save
       redirect_to organization_teachers_path, notice: 'Teacher added to organization'
     else
-      render :new
+      @teachers = @organization.teachers
+      render :index
     end
   end
 
