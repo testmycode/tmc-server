@@ -1,0 +1,9 @@
+<h1>Assistants in <%= @course.title %></h1>
+
+<ul>
+  <% @assistants.each do |assistant| %>
+    <li><%= link_to assistant.username, participant_path(assistant) %></li>
+  <% end %>
+</ul>
+
+<%= render 'form' %>

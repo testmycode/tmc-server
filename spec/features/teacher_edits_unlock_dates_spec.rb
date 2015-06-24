@@ -9,7 +9,7 @@ feature 'Teacher edits unlock dates', feature: true do
     @user = FactoryGirl.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
 
-    @course = FactoryGirl.create :course, source_url: 'https://github.com/testmycode/tmc-testcourse.git'
+    @course = FactoryGirl.create :course, source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
     @course.refresh
     @course.exercise_group_by_name('').group_unlock_conditions = ['1.1.2011'].to_json
     UncomputedUnlock.create_all_for_course_eager(@course)
