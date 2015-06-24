@@ -23,7 +23,7 @@ TmcServer::Application.routes.draw do
         resources :emails, only: [:index]
       end
 
-      resources :assistants, only: [:index, :new, :create]
+      resources :assistants, only: [:index, :new, :create, :destroy]
 
       resources :points, only: [:index, :show] do
         member do

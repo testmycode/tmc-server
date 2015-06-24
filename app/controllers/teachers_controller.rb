@@ -30,13 +30,10 @@ class TeachersController < ApplicationController
   end
 
   def destroy
-    authorize! :teach, @organization
+    authorize! :remove_teacher, @organization
     @teachership = Teachership.find(params[:id])
-    if @teachership.destroy
-      redirect_to organization_teachers_path ,notice: 'Teacher removed from organization'
-    else
-      redirect_to organization_teachers_path ,alert: 'Something went wrong and teacher was not removed from organization'
-    end
+    @teachership.destroy!
+    redirect_to organization_teachers_path ,notice: 'Teacher removed from organization'
   end
 
   private

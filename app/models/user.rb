@@ -177,6 +177,10 @@ class User < ActiveRecord::Base
     Teachership.where(user: self).pluck(:organization_id)
   end
 
+  def assistantship(course)
+    Assistantship.find_by(user_id: self, course_id: course)
+  end
+
   private
 
   def encrypt_password

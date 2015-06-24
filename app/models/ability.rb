@@ -156,10 +156,18 @@ class Ability
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
       end
 
+      can :remove_teacher, Organization do |o|
+        o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
+      end
+
       cannot :teach, Course
       can :teach, Course do |c|
         return false if c.organization.rejected?
         c.organization.teacher?(user) || c.assistant?(user)
+      end
+
+      can :remove_assistant, Course do |c|
+        c.organization.teacher?(user)
       end
     end
   end
