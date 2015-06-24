@@ -123,6 +123,10 @@ class User < ActiveRecord::Base
     organizations.include? organization
   end
 
+  def teachership(organization)
+    Teachership.find_by(user_id: self, organization_id: organization)
+  end
+
   def assistant?(course)
     assisted_courses.exists?(course)
   end
