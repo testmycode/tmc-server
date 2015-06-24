@@ -149,6 +149,7 @@ describe Course, type: :model do
     let(:valid_params) do
       {
         name: 'TestCourse',
+        title: 'Test Course',
         source_url: 'git@example.com'
       }
     end
@@ -162,12 +163,29 @@ describe Course, type: :model do
     end
 
     it 'requires name to be non-unique' do
-      Course.create!(valid_params)
-      should_be_invalid_params(valid_params)
+      organization = FactoryGirl.create :accepted_organization
+      Course.create!(valid_params.merge(organization: organization))
+      should_be_invalid_params(valid_params.merge(organization: organization))
+    end
+
+    it 'allows same course name in different organizations' do
+      organization1 = FactoryGirl.create :accepted_organization
+      organization2 = FactoryGirl.create :accepted_organization
+      Course.create!(valid_params.merge(organization: organization1))
+      expect{ Course.create!(valid_params.merge(organization: organization2)) }.not_to raise_error
     end
 
     it 'forbids spaces in the name' do # this could eventually be lifted as long as everything else is made to tolerate spaces
       should_be_invalid_params(valid_params.merge(name: 'Test Course'))
+    end
+
+    it 'requires a title' do
+      should_be_invalid_params(valid_params.merge(title: nil))
+      should_be_invalid_params(valid_params.merge(title: ''))
+    end
+
+    it 'requires title to be reasonably short' do
+      should_be_invalid_params(valid_params.merge(title: 'a' * 41))
     end
 
     it 'requires a remote repo url' do
@@ -182,7 +200,7 @@ describe Course, type: :model do
 
   describe 'destruction' do
     it 'deletes its cache directory' do
-      c = Course.create!(name: 'MyCourse', source_url: source_url)
+      c = Course.create!(name: 'MyCourse', title: 'My Course', source_url: source_url)
       FileUtils.mkdir_p(c.cache_path)
       FileUtils.touch("#{c.cache_path}/foo.txt")
 
@@ -231,5 +249,16 @@ describe Course, type: :model do
     def assert_destroyed(obj)
       expect(obj.class.find_by_id(obj.id)).to be_nil
     end
+  end
+
+  it 'assigns material_url with http:// prepended to it' do
+    course = FactoryGirl.create :course, material_url: 'google.com'
+    expect(course.material_url).to eq('http://google.com')
+    course.material_url = ''
+    expect(course.material_url).to eq('')
+    course.material_url = 'https://google.com'
+    expect(course.material_url).to eq('https://google.com')
+    course.material_url = 'http://google.com'
+    expect(course.material_url).to eq('http://google.com')
   end
 end

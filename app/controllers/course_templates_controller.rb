@@ -1,5 +1,5 @@
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, only: [:edit, :update, :destroy]
+  before_action :set_course_template, only: [:edit, :update, :destroy, :prepare_course, :toggle_hidden]
 
   def index
     authorize! :read, CourseTemplate
@@ -35,13 +35,30 @@ class CourseTemplatesController < ApplicationController
 
   def destroy
     @course_template.destroy
-    redirect_to course_templates_url, notice: 'Course template was successfully destroyed.'
+    redirect_to course_templates_path, notice: 'Course template was successfully destroyed.'
   end
 
   def list_for_teachers
-    organization_slug = params[:id]
-    authorize! :teach, Organization.find_by_slug(organization_slug)
-    @course_templates = CourseTemplate.all
+    @organization = Organization.find_by(slug: params[:organization_id])
+    authorize! :teach, @organization
+    @course_templates = CourseTemplate.available
+  end
+
+  def prepare_course
+    @organization = Organization.find_by(slug: params[:organization_id])
+    authorize! :teach, @organization
+    authorize! :clone, @course_template
+    @course = Course.new name: @course_template.name,
+                         title: @course_template.title,
+                         description: @course_template.description,
+                         material_url: @course_template.material_url,
+                         source_url: @course_template.source_url
+  end
+
+  def toggle_hidden
+    @course_template.hidden = !@course_template.hidden
+    @course_template.save
+    redirect_to course_templates_path, notice: 'Course templates hidden status changed'
   end
 
   private
@@ -52,6 +69,6 @@ class CourseTemplatesController < ApplicationController
   end
 
   def course_template_params
-    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url)
+    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at)
   end
 end

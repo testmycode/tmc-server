@@ -126,6 +126,14 @@ describe CourseTemplatesController, type: :controller do
         expect(response).to redirect_to(course_templates_url)
       end
     end
+
+    describe 'POST toggle_hidden' do
+      it 'changes course templates visibility' do
+        @course_template = FactoryGirl.create :course_template, name: 'template', hidden: false
+        post :toggle_hidden, id: @course_template.to_param
+        expect(CourseTemplate.last.hidden).to be(true)
+      end
+    end
   end
 
   describe 'when non admin' do
@@ -309,15 +317,31 @@ describe CourseTemplatesController, type: :controller do
       controller.current_user = @user
       @organization = FactoryGirl.create(:accepted_organization)
       Teachership.create!(user: @user, organization: @organization)
-      FactoryGirl.create :course_template, name: 'template1'
-      FactoryGirl.create :course_template, name: 'template2'
-      FactoryGirl.create :course_template, name: 'template3'
     end
 
-    describe 'GET course_templates' do
+    describe 'GET list_for_teachers' do
+      before :each do
+        FactoryGirl.create :course_template, name: 'template1'
+        FactoryGirl.create :course_template, name: 'template2'
+        FactoryGirl.create :course_template, name: 'template3'
+      end
+
       it 'should show course templates' do
-        get :list_for_teachers, id: @organization.slug
+        get :list_for_teachers, organization_id: @organization.slug
         expect(assigns(:course_templates).map(&:name)).to eq(%w(template1 template2 template3))
+      end
+    end
+
+    describe 'GET prepare_course' do
+      before :each do
+        @template = FactoryGirl.create :course_template, name: 'name', title: 'title', source_url: 'https://github.com/testmycode/tmc-testcourse.git'
+      end
+
+      it 'should assign @course with course template attributes' do
+        get :prepare_course, organization_id: @organization.slug, id: @template.id
+        expect(assigns(:course).name).to eq('name')
+        expect(assigns(:course).title).to eq('title')
+        expect(assigns(:course).source_url).to eq('https://github.com/testmycode/tmc-testcourse.git')
       end
     end
   end
@@ -326,11 +350,19 @@ describe CourseTemplatesController, type: :controller do
     before :each do
       controller.current_user = @user
       @organization = FactoryGirl.create(:accepted_organization)
+      @template = FactoryGirl.create :course_template
     end
 
-    describe 'GET course_templates' do
+    describe 'GET list_for_teachers' do
       it 'should respond with a 401' do
-        get :list_for_teachers, id: @organization.slug
+        get :list_for_teachers, organization_id: @organization.slug
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+
+    describe 'GET prepare_course' do
+      it 'should respond with a 401' do
+        get :prepare_course, organization_id: @organization.slug, id: @template.id
         expect(response.code.to_i).to eq(401)
       end
     end

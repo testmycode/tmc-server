@@ -30,6 +30,12 @@ class Ability
       can :read, Course do |c|
         c.visible_to?(user)
       end
+      can :create, Course do |c|
+        c.taught_by?(user)
+      end
+      can :refresh, Course do |c|
+        c.taught_by?(user)
+      end
 
       cannot :read, Exercise
       can :read, Exercise do |ex|
@@ -69,16 +75,21 @@ class Ability
       end
 
       cannot :reply, FeedbackAnswer
-      cannot :email, CourseNotification
 
       cannot :read, CourseTemplate
+      can :prepare_course, CourseTemplate
+
+      cannot :clone, CourseTemplate
+      can :clone, CourseTemplate do |ct|
+        ct.clonable?
+      end
 
       can :request, :organization
       cannot :request, :organization if user.guest?
 
       cannot :teach, Organization
       can :teach, Organization do |o|
-        o.teacher?(user) && !o.rejected?
+        o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
       end
 
       cannot :teach, Course

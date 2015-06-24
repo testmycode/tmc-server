@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks]
+  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks ]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -71,33 +71,40 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-    authorize! :refresh, @course
-
-    begin
-      session[:refresh_report] = @course.refresh
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
-    end
-
+    refresh_course(@course)
     redirect_to organization_course_path
   end
 
   def new
     @course = Course.new
-    authorize! :create, @exercises
+    authorize! :teach, @organization
   end
 
   def create
-    @course = Course.new(course_params[:course])
+    @course = Course.new(course_params_for_create)
     @course.organization = @organization
-    authorize! :create, @course
+    authorize! :teach, @organization
 
     respond_to do |format|
       if @course.save
-        format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
+        refresh_course(@course)
+        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
+    end
+  end
+
+  def edit
+    authorize! :teach, @organization
+  end
+
+  def update
+    authorize! :teach, @organization
+    if @course.update(course_params)
+      redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
+    else
+      render :edit
     end
   end
 
@@ -111,8 +118,10 @@ class CoursesController < ApplicationController
 
     groups = group_params
     groups.each do |name, deadlines|
-      json_array = [deadlines[:static], deadlines[:unlock]].to_json
-      @course.exercise_group_by_name(name).group_deadline=(json_array)
+      soft_deadlines = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
+      hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
+      @course.exercise_group_by_name(name).soft_group_deadline = soft_deadlines
+      @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
     end
 
     redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
@@ -130,6 +139,11 @@ class CoursesController < ApplicationController
     authorize! :teach, @organization
     @course.disabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
+  end
+
+  def help
+    @course = Course.find(params[:course_id])
+    authorize! :read, @course
   end
 
   def manage_unlocks
@@ -155,8 +169,12 @@ class CoursesController < ApplicationController
 
   private
 
+  def course_params_for_create
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+  end
+
   def course_params
-    params.permit(course: [:name, :source_url, :git_branch])
+    params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch)
   end
 
   def assign_show_view_vars
@@ -191,5 +209,14 @@ class CoursesController < ApplicationController
     empty_group = sliced[:empty_group] || {}
     groups[''] = empty_group unless empty_group.empty?
     groups
+  end
+
+  def refresh_course(course)
+    authorize! :refresh, course
+    begin
+      session[:refresh_report] = course.refresh
+    rescue CourseRefresher::Failure => e
+      session[:refresh_report] = e.report
+    end
   end
 end
