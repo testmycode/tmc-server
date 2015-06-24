@@ -35,8 +35,8 @@ module IntegrationTestActions
 
   def create_course_from_template(options = {})
     visit "/org/#{options[:organization_slug]}"
-    click_link 'Create New Course from template'
-    click_link 'Create course'
+    click_link 'Create New Course'
+    click_link 'Create Course'
     fill_in 'course_name', with: options[:name]
     fill_in 'course_title', with: options[:name]
     click_button 'Add Course'

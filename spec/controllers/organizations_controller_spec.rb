@@ -94,7 +94,7 @@ describe OrganizationsController, type: :controller do
 
       it 'lists only pending organization requests' do
         get :list_requests, {}
-        expect(assigns(:requested_organizations)).to eq([@org1, @org3])
+        expect(assigns(:requested_organizations).sort).to eq([@org1, @org3].sort)
       end
     end
 
