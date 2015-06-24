@@ -466,4 +466,72 @@ describe CoursesController, type: :controller do
       expect(response.code.to_i).to eq(401)
     end
   end
+
+  describe 'GET submissions_data' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+      @course.organization = @organization
+      @exercise = FactoryGirl.create(:exercise, course: @course)
+      @submission_1 = FactoryGirl.create(:submission, course: @course, user: @user, exercise: @exercise)
+    end
+
+    def get_submissions_data(options = {}, requester)
+      options = {
+        format: 'json',
+        api_version: ApiVersion::API_VERSION,
+        id: @course.id.to_s,
+        organization_id: @organization.slug
+      }.merge options
+      @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(requester.login, requester.password)
+      get :submissions_data, options
+      JSON.parse(response.body)
+    end
+
+    describe 'for the teacher' do
+      it 'returns submissions for the course with right amount awarded_points' do
+        Teachership.create(user: @user, organization: @organization)
+        # submission with awarded points
+        @submission_2 = FactoryGirl.create(:submission, course: @course, user: @user, exercise: @exercise)
+        @available_point_1 = FactoryGirl.create(:available_point, exercise: @exercise)
+        @available_point_2 = FactoryGirl.create(:available_point, exercise: @exercise)
+        FactoryGirl.create(:awarded_point, course: @course, name: @available_point_1.name, submission: @submission_2, user: @user)
+        FactoryGirl.create(:awarded_point, course: @course, name: @available_point_2.name, submission: @submission_2, user: @user)
+        # users submission for another course
+        @course_2 = FactoryGirl.create(:course)
+        @course_2.organization = @organization
+        @exercise_2 = FactoryGirl.create(:exercise, course: @course_2)
+        @submission_3 = FactoryGirl.create(:submission, course: @course_2, user: @user, exercise: @exercise_2)
+        # submission of another user for same course
+        @another_user = FactoryGirl.create(:user)
+        @submission_4 = FactoryGirl.create(:submission, course: @course, user: @another_user, exercise: @exercise)
+
+        result = get_submissions_data(@user)
+        expect(result['course_name']).to eq(@course.name)
+        expect(result['exercises'].count).to eq(1)
+        expect(result['exercises'][0]['available_points'].count).to eq(2)
+        expect(result['submissions'].count).to eq(3)
+        expect(result['submissions'][0]['exercise_name']).to eq(@exercise.name)
+        expect(result['submissions'][0]['awarded_points']).to eq(0)
+        expect(result['submissions'][1]['awarded_points']).to eq(2)
+        expect(result['submissions'][2]['awarded_points']).to eq(0)
+      end
+    end
+
+    describe 'for the teacher from other organization' do
+      it 'returns error: Access denied' do
+        @teacher = FactoryGirl.create(:user)
+        @another_organization = FactoryGirl.create(:organization)
+        Teachership.create(user: @teacher, organization: @another_organization)
+        result = get_submissions_data(@teacher)
+        expect(result['error']).to eq('Access denied')
+      end
+    end
+
+    describe 'for the normal user' do
+      it 'returns error: Access denied' do
+        result = get_submissions_data(@user)
+        expect(result['error']).to eq('Access denied')
+      end
+    end
+  end
 end
