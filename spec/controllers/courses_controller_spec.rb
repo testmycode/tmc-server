@@ -228,10 +228,7 @@ describe CoursesController, type: :controller do
       check_custom_enabled
       controller.current_user = FactoryGirl.create :user
       Teachership.create user: controller.current_user, organization: @organization
-
-      repo_path = @test_tmp_dir + '/fake_remote_repo'
-      create_bare_repo(repo_path)
-      @template = FactoryGirl.create :course_template, source_url: repo_path
+      @template = FactoryGirl.create :course_template
     end
 
     it 'can\'t refresh if course created from template' do
@@ -300,11 +297,7 @@ describe CoursesController, type: :controller do
     describe 'when course created from template' do
       before :each do
         Teachership.create user: @user, organization: @organization
-
-        repo_path = @test_tmp_dir + '/fake_remote_repo'
-        create_bare_repo(repo_path)
-        @template = FactoryGirl.create :course_template, source_url: repo_path
-
+        @template = FactoryGirl.create :course_template
         @course.course_template = @template
         @course.source_url = @template.source_url
         @course.save!
