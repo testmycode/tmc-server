@@ -1,5 +1,4 @@
 class TeachersController < ApplicationController
-  before_action :set_teacher, only: [:destroy]
   before_action :set_organization
 
   def index
@@ -32,14 +31,15 @@ class TeachersController < ApplicationController
 
   def destroy
     authorize! :teach, @organization
+    @teachership = Teachership.find(params[:id])
+    if @teachership.destroy
+      redirect_to organization_teachers_path ,notice: 'Teacher removed from organization'
+    else
+      redirect_to organization_teachers_path ,alert: 'Something went wrong and teacher was not removed from organization'
+    end
   end
 
   private
-
-  def set_teacher
-    @teachership = Teachership.find(params[:id])
-    @teacher = @teachership.user
-  end
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])

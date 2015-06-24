@@ -120,6 +120,14 @@ class User < ActiveRecord::Base
     login.downcase <=> other.login.downcase
   end
 
+  def teacher?(organization)
+    organizations.include? organization
+  end
+
+  def teachership(organization)
+    Teachership.find_by(user_id: self, organization_id: organization)
+  end
+
   def assistant?(course)
     assisted_courses.exists?(course)
   end
@@ -167,10 +175,6 @@ class User < ActiveRecord::Base
 
   def teaching_in_organizations
     Teachership.where(user: self).pluck(:organization_id)
-  end
-
-  def teacher?(organization)
-    organizations.include? organization
   end
 
   private

@@ -11,7 +11,7 @@ describe TeachersController, type: :controller do
     describe 'with an accepted organization' do
       before :each do
         @organization = FactoryGirl.create(:accepted_organization)
-        Teachership.create!(user: @teacher, organization: @organization)
+        @teachership = Teachership.create!(user: @teacher, organization: @organization)
         controller.current_user = @teacher
       end
 
@@ -41,12 +41,20 @@ describe TeachersController, type: :controller do
           end.to change(Teachership, :count).by(0)
         end
       end
+
+      describe 'DELETE destroy' do
+        it 'destroys teachership' do
+          expect do
+            delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
+          end.to change(Teachership, :count).by(-1)
+        end
+      end
     end
 
     describe 'with a pending organization' do
       before :each do
         @organization = FactoryGirl.create(:organization)
-        Teachership.create!(user: @teacher, organization: @organization)
+        @teachership = Teachership.create!(user: @teacher, organization: @organization)
         controller.current_user = @teacher
       end
 
@@ -56,9 +64,17 @@ describe TeachersController, type: :controller do
           expect(response.code.to_i).to eq(401)
         end
       end
+
       describe 'POST create' do
         it 'denies access' do
           post :create, organization_id: @organization.slug, username: @user.username
+          expect(response.code.to_i).to eq(401)
+        end
+      end
+
+      describe 'DELETE destroy' do
+        it 'denies access' do
+          delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
           expect(response.code.to_i).to eq(401)
         end
       end
@@ -68,6 +84,7 @@ describe TeachersController, type: :controller do
   describe 'As a user' do
     before :each do
       @organization = FactoryGirl.create(:accepted_organization)
+      @teachership = Teachership.create!(user: @teacher, organization: @organization)
       controller.current_user = @user
     end
 
@@ -88,6 +105,13 @@ describe TeachersController, type: :controller do
     describe 'POST create' do
       it 'denies access' do
         post :create, organization_id: @organization.slug
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+
+    describe 'DELETE destroy' do
+      it 'denies access' do
+        delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
         expect(response.code.to_i).to eq(401)
       end
     end

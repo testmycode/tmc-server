@@ -4,6 +4,7 @@
   <thead>
   <tr>
     <th>Name</th>
+    <th>Remove</th>
   </tr>
   </thead>
 
@@ -11,6 +12,7 @@
   <% @teachers.each do |teacher| %>
     <tr>
       <td><%= teacher.username %></td>
+      <td><%= link_to 'Remove', organization_teacher_path(@organization, teacher.teachership(@organization)), method: :delete, class: "btn btn-mini btn-warning", data: { confirm: 'Are you sure?' } %></td>
     </tr>
   <% end %>
   </tbody>
