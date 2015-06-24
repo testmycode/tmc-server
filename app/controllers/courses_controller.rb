@@ -109,12 +109,12 @@ class CoursesController < ApplicationController
   end
 
   def manage_deadlines
-    authorize! :teach, @organization
+    authorize! :teach, @course
     assign_show_view_vars
   end
 
   def save_deadlines
-    authorize! :teach, @organization
+    authorize! :teach, @course
 
     groups = group_params
     groups.each do |name, deadlines|
@@ -130,7 +130,7 @@ class CoursesController < ApplicationController
   end
 
   def enable
-    authorize! :teach, @organization
+    authorize! :teach, @organization # should assistants be able to enable/disable?
     @course.enabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
   end
@@ -147,12 +147,12 @@ class CoursesController < ApplicationController
   end
 
   def manage_unlocks
-    authorize! :teach, @organization
+    authorize! :teach, @course
     assign_show_view_vars
   end
 
   def save_unlocks
-    authorize! :teach, @organization
+    authorize! :teach, @course
 
     groups = group_params
     groups.each do |name, conditions|

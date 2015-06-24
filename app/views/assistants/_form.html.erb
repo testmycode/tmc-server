@@ -1,0 +1,13 @@
+<h1>Add a new assistant to <%= @course.title %></h1>
+
+<%= form_tag :organization_course_assistants do %>
+  <%= render 'shared/error_messages', target: @assistantship %>
+
+  <div class="field">
+    <%= label_tag :username %><br>
+    <%= text_field_tag :username %>
+  </div>
+  <div class="actions">
+    <%= submit_tag 'Add a new assistant' %>
+  </div>
+<% end %>
