@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks, :student_emails]
+  before_action :set_course, only: [:show, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -150,22 +150,6 @@ class CoursesController < ApplicationController
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
   rescue UnlockSpec::InvalidSyntaxError => e
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
-  end
-
-  def student_emails
-    authorize! :teach, @organization
-    add_course_breadcrumb
-    add_breadcrumb('Students', students_organization_course_path(@organization, @course))
-    @students = []
-    @course.submissions.each do |s|
-      @students << s.user unless @students.include? s.user
-    end
-
-    respond_to do |format|
-      format.html
-      format.text { render text: @students.map { |s| "#{s.email}" }.join("\n") }
-      format.csv { render text: "Username,Email\n" + @students.map { |s| "#{s.username},#{s.email}"}.join("\n") }
-    end
   end
 
   private
