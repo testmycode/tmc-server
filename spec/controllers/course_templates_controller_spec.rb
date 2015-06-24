@@ -345,6 +345,9 @@ describe CourseTemplatesController, type: :controller do
         expect(assigns(:course).name).to eq('name')
         expect(assigns(:course).title).to eq('title')
         expect(assigns(:course).source_url).to eq(@repo_path)
+        #expect(assigns(:course).source_url).to eq('https://github.com/testmycode/tmc-testcourse.git')
+        expect(assigns(:course).course_template_id).to eq(@template.id)
+        expect(assigns(:course).cache_version).to eq(@template.cache_version)
       end
     end
   end
