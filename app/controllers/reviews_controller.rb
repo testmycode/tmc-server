@@ -58,7 +58,7 @@ class ReviewsController < ApplicationController
       submission_id: @submission.id,
       reviewer_id: current_user.id
     )
-    authorize! :create_review, @submission
+    authorize! :create_review, @course
     render 'reviews/submission_index'
   end
 
@@ -69,7 +69,7 @@ class ReviewsController < ApplicationController
       reviewer_id: current_user.id,
       review_body: params[:review][:review_body]
     )
-    authorize! :create_review, @submission
+    authorize! :create_review, @submission.course
 
     begin
       ActiveRecord::Base.connection.transaction do

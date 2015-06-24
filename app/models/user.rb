@@ -134,14 +134,15 @@ class User < ActiveRecord::Base
 
   def readable_by?(user)
     user.administrator? ||
-        self.id == user.id ||
-        visible_to_teacher?(user) ||
-        visible_to_assistant?(user)
+      id == user.id ||
+      visible_to_teacher?(user) ||
+      visible_to_assistant?(user)
   end
 
   def visible_to_teacher?(teacher)
-    teacher.organizations.each do |org|
-      return true if self.student_in_organization?(org)
+    courses = Course.joins(organization: :teacherships).where(teacherships: { user_id: teacher.id })
+    courses.each do |c|
+      return true if self.student_in_course?(c)
     end
     false
   end
@@ -158,20 +159,19 @@ class User < ActiveRecord::Base
   end
 
   def student_in_organization?(organization)
-    organization.courses.each do | c|
+    organization.courses.each do |c|
       return true if self.student_in_course?(c)
     end
     false
   end
 
   def teaching_in_courses
-    if !self.assistantships.empty?
+    if !assistantships.empty?
       Course.where(id: assistantships.pluck(:course_id)).ids
-    elsif !self.organizations.empty?
+    elsif !organizations.empty?
       Course.where(organization_id: teaching_in_organizations).ids
     end
   end
-
 
   def teaching_in_organizations
     Teachership.where(user: self).pluck(:organization_id)
