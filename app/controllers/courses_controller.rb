@@ -112,22 +112,6 @@ class CoursesController < ApplicationController
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
   end
 
-  def student_emails
-    authorize! :teach, @organization
-    add_course_breadcrumb
-    add_breadcrumb('Students', students_organization_course_path(@organization, @course))
-    @students = []
-    @course.submissions.each do |s|
-      @students << s.user unless @students.include? s.user
-    end
-
-    respond_to do |format|
-      format.html
-      format.text { render text: @students.map { |s| "#{s.email}" }.join("\n") }
-      format.csv { render text: "Username,Email\n" + @students.map { |s| "#{s.username},#{s.email}"}.join("\n") }
-    end
-  end
-
   private
 
   def course_params

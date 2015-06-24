@@ -264,37 +264,4 @@ describe CoursesController, type: :controller do
       end
     end
   end
-
-  describe 'GET students' do
-    before :each do
-      @course = FactoryGirl.create(:course)
-      @course.organization = @organization
-
-      Teachership.create(user: @user, organization: @organization)
-      controller.current_user = @user
-
-      @ex1 = @course.exercises.create(name: 'e1')
-      @ex2 = @course.exercises.create(name: 'e2')
-
-      @user1 = FactoryGirl.create(:user)
-      @user2 = FactoryGirl.create(:user)
-      @user3 = FactoryGirl.create(:user)
-
-      FactoryGirl.create(:submission, course: @course, user: @user1, exercise: @ex1)
-      FactoryGirl.create(:submission, course: @course, user: @user1, exercise: @ex2)
-      FactoryGirl.create(:submission, course: @course, user: @user2, exercise: @ex2)
-    end
-
-    it 'assigns users in @students array if they have submitted exercises to the course' do
-      get :student_emails, organization_id: @organization.slug, id: @course.id
-      expect(assigns(:students)).to include(@user1)
-      expect(assigns(:students)).to include(@user2)
-      expect(assigns(:students)).to_not include(@user3)
-    end
-
-    it 'does not contain duplicates if there are multiple submissions from a student' do
-      get :student_emails, organization_id: @organization.slug, id: @course.id
-      expect(assigns(:students).uniq.length).to eq(assigns(:students).length)
-    end
-  end
 end

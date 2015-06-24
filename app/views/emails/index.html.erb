@@ -1,6 +1,6 @@
 <div class="alternative-format-links">
-  [<%= link_to 'plain text', students_organization_course_path(format: :txt) %>]
-  [<%= link_to 'csv', students_organization_course_path(format: :csv) %>]
+  [<%= link_to 'plain text', organization_emails_path(format: :txt) %> |
+  <%= link_to 'csv', organization_emails_path(format: :csv) %>]
 </div>
 <h1>Students in <%= @course.name %></h1>
 
@@ -19,7 +19,7 @@
         <%= student.username %>
       </td>
       <td>
-        <a href="mailto:<%= student.email %>"><%= student.email %></a>
+        <%= mail_to(student.email) %>
       </td>
     </tr>
   <% end %>
