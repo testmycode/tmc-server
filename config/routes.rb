@@ -25,7 +25,10 @@ TmcServer::Application.routes.draw do
         post 'disable'
         get 'manage_unlocks'
         post 'save_unlocks'
+        resources :emails, only: [:index]
       end
+
+      resources :assistants, only: [:index, :new, :create]
 
       resources :points, only: [:index, :show] do
         member do
