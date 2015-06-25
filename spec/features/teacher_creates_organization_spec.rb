@@ -50,4 +50,15 @@ feature 'User can create new organization', feature: true do
     click_button 'Reject organization'
     expect(page).to have_content 'Organization request was successfully rejected.'
   end
+
+  scenario 'Teacher can hide organization' do
+    @organization = FactoryGirl.create :accepted_organization
+    Teachership.create!(user: @user, organization: @organization)
+    log_in_as(@user.login, 'foobar2')
+    click_link @organization.name
+    expect(page).to have_content @organization.name
+    click_link 'hide organization'
+    expect(page).to have_content "Organzation is now hidden to users"
+    expect(page).to have_content 'make organization visible'
+  end
 end
