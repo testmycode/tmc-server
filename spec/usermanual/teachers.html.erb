@@ -35,9 +35,18 @@ require 'cgi' # for escapeHTML
     FactoryGirl.create :user, login: 'professor', password: 'professor'
     FactoryGirl.create :admin, login: 'admin', password: 'admin'
     FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
-    FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101'
-    FactoryGirl.create :course_template, name: 'prog102', title: 'Programming 102'
-    FactoryGirl.create :course_template, name: 'skynet', title: 'Skynet laboratory'
+
+    repo_path = "#{::Rails.root}/tmp/tests/fake_remote_repo"
+    create_bare_repo(repo_path)
+    clone_path = repo_path + '-wc'
+    clone_repo(repo_path, clone_path)
+    repo = GitRepo.new(clone_path)
+    repo.copy_simple_exercise('HelloWorld')
+    repo.add_commit_push
+
+    FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_path
+    FactoryGirl.create :course_template, name: 'prog102', title: 'Programming 102', source_url: repo_path
+    FactoryGirl.create :course_template, name: 'skynet', title: 'Skynet laboratory', source_url: repo_path
   %>
 
   <h1>Teacher Manual</h1>

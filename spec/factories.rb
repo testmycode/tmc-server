@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'system_commands'
-require 'support/git_test_actions'
+require File.expand_path 'spec/support/git_test_actions'
 
 include GitTestActions
 
