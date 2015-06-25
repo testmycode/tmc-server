@@ -132,7 +132,6 @@ class Ability
       end
 
       cannot :reply, FeedbackAnswer
-      cannot :email, CourseNotification
 
       cannot :read, CourseTemplate
       can :prepare_course, CourseTemplate

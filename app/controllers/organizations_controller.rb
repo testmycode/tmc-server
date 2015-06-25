@@ -4,11 +4,11 @@ class OrganizationsController < ApplicationController
   skip_authorization_check only: [:index, :show]
 
   def index
-    @organizations = Organization.accepted_organizations
+    @organizations = Organization.accepted_organizations.order('LOWER(name)')
   end
 
   def show
-    ordering = 'hidden, LOWER(name)'
+    ordering = 'hidden, disabled_status, LOWER(name)'
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
     @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
   end

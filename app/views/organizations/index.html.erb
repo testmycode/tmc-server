@@ -7,7 +7,7 @@
   </div>
 <% end %>
 
-<table>
+<table class="table table-striped">
   <thead>
   <tr>
     <th>Name</th>
@@ -35,4 +35,8 @@
 
 <% if !current_user.guest? %>
     <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
+<% end %>
+
+<% if current_user.administrator? %>
+  <%= link_to 'Mange course templates', course_templates_path, class: "btn btn-mini btn-default" %>
 <% end %>

@@ -4,10 +4,10 @@
   <%= render 'shared/error_messages', target: @teachership %>
 
   <div class="field">
-    <%= label_tag :username %><br>
+    <%= label_tag :username %>
     <%= text_field_tag :username %>
   </div>
   <div class="actions">
-    <%= submit_tag 'Add a new teacher' %>
+    <%= submit_tag 'Add a new teacher', class: 'btn btn-info' %>
   </div>
 <% end %>

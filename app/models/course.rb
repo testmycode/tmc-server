@@ -302,7 +302,7 @@ class Course < ActiveRecord::Base
   end
 
   def assistant?(user)
-    assistants.include? user
+    assistants.exists?(user)
   end
 
   def material_url=(material)

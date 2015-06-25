@@ -170,7 +170,7 @@ class User < ActiveRecord::Base
   end
 
   def assistant?(course)
-    assisted_courses.include? course
+    assisted_courses.exists?(course)
   end
 
   private

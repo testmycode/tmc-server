@@ -1,19 +1,9 @@
 <h1>Assistants in <%= @course.title %></h1>
 
-<table>
-  <thead>
-  <tr>
-    <th>Name</th>
-  </tr>
-  </thead>
-
-  <tbody>
+<ul>
   <% @assistants.each do |assistant| %>
-    <tr>
-      <td><%= assistant.username %></td>
-    </tr>
+    <li><%= link_to assistant.username, participant_path(assistant) %></li>
   <% end %>
-  </tbody>
-</table>
+</ul>
 
-<%= link_to 'Add a new assistant', new_organization_course_assistant_path(@course.organization, @course), class: "btn btn-mini btn-warning" %>
+<%= render 'form' %>

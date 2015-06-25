@@ -10,7 +10,7 @@ feature 'Teacher can add assistants to course', feature: true do
     @course = FactoryGirl.create :course, source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
-    click_link @course.name
+    click_link @course.title
   end
 
   scenario 'Teacher succeeds at adding assistant when valid username is given' do
@@ -45,11 +45,11 @@ feature 'Teacher can add assistants to course', feature: true do
     log_in_as(@assistant.username, 'newfoobar')
     visit "/org/slug/courses/#{@course.id}"
     click_link 'Manage deadlines'
-    fill_in 'empty_group_static', with: '1.1.2000'
+    fill_in 'empty_group_hard_static', with: '1.1.2000'
     click_button 'Save changes'
 
     expect(page).to have_content('Successfully saved deadlines.')
-    expect(page).to have_field('empty_group_static', with: '1.1.2000')
+    expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
 
     visit "/org/slug/courses/#{@course.id}"
     click_link 'Manage unlock dates'
@@ -75,9 +75,8 @@ feature 'Teacher can add assistants to course', feature: true do
 
   def add_assistant(username, course)
     visit '/org/slug'
-    click_link course.name
+    click_link course.title
     click_link 'Manage assistants'
-    click_link 'Add a new assistant'
     fill_in 'username', with: username
     click_button 'Add a new assistant'
   end
