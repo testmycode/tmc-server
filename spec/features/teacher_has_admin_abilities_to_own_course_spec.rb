@@ -10,10 +10,17 @@ feature 'Teacher has admin abilities to own course', feature: true do
     @student = FactoryGirl.create :user, password: 'foobar'
     @admin = FactoryGirl.create :admin, password: 'admin'
 
-    @course = FactoryGirl.create :course, name: 'mycourse', source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
+    repo_path = Dir.pwd + '/remote_repo'
+    create_bare_repo(repo_path)
+    @course = FactoryGirl.create :course, name: 'mycourse', source_url: repo_path, organization: @organization
+
+    @repo = clone_course_repo(@course)
+    @repo.copy_simple_exercise('MyExercise')
+    @repo.add_commit_push
+
     @course.refresh
 
-    @exercise1 = @course.exercises.find_by(name: 'arith_funcs')
+    @exercise1 = @course.exercises.first
     @submission = FactoryGirl.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true
     @submission_data = FactoryGirl.create :submission_data, submission: @submission
 
@@ -27,8 +34,8 @@ feature 'Teacher has admin abilities to own course', feature: true do
 
     click_link 'View suggested solution'
 
-    expect(page).to have_content('Solution for arith_funcs')
-    expect(page).to have_content('src/Arith.java')
+    expect(page).to have_content('Solution for MyExercise')
+    expect(page).to have_content('src/SimpleStuff.java')
   end
 
   scenario 'Teacher can see all submissions for his organizations courses' do
@@ -47,13 +54,13 @@ feature 'Teacher has admin abilities to own course', feature: true do
   end
 
   scenario 'Teacher can see users points from his own courses' do
-    available_point = @course.available_points.find_by(name: 'arith-funcs')
+    available_point = FactoryGirl.create :available_point, exercise: @exercise1
     available_point.award_to(@student, @submission)
     visit '/org/slug/courses/1'
     click_link 'View points'
 
-    expect(page).to have_content('1/8')
-    expect(page).not_to have_content('0/8')
+    expect(page).to have_content('1/6')
+    expect(page).not_to have_content('0/')
   end
 
   scenario 'Teacher can make code review' do
@@ -102,7 +109,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
 
     expect(page).not_to have_content('access denied')
     expect(page).to have_content('Feedback statistics')
-    expect(page).to have_content('Showing 1 to 1 of 1 entries')
+    expect(page).to have_content(question.question)
     expect(page).to have_content(answer.answer)
   end
 end
