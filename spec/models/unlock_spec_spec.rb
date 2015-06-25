@@ -24,6 +24,10 @@ describe UnlockSpec, type: :model do
     end
   end
 
+  def call_parsable(spec)
+    UnlockSpec.parsable?(spec.to_json, course)
+  end
+
   RSpec::Matchers.define :permit_unlock_for do |user|
     match do |unlock_spec|
       unlock_spec.permits_unlock_for?(user)
@@ -127,6 +131,30 @@ describe UnlockSpec, type: :model do
       expect(UnlockSpec.new(ex3, ['2 points in grp-ex1', '1 exercise in grp'])).to permit_unlock_for(user)
       expect(UnlockSpec.new(ex3, ['3 points in grp-ex1', '1 exercise in grp'])).not_to permit_unlock_for(user)
       expect(UnlockSpec.new(ex3, ['2 points in grp-ex1', '2 exercise in grp'])).not_to permit_unlock_for(user)
+    end
+  end
+
+  describe 'parsable?' do
+    it 'should return true if spec is valid' do
+      expect(call_parsable(['1.1.2000'])).to eq(true)
+      expect(call_parsable(['1 exercise in grp'])).to eq(true)
+      expect(call_parsable(['60% of grp-ex2'])).to eq(true)
+      expect(call_parsable(['50% of grp'])).to eq(true)
+      expect(call_parsable(['5 points in grp'])).to eq(true)
+      expect(call_parsable(['2 points in grp-ex1'])).to eq(true)
+    end
+
+    it 'should raise error if spec is invalid' do
+      expect { call_parsable(['1.1.100000']) }.to raise_error
+      expect { call_parsable(['1.1.0000']) }.to raise_error
+      expect { call_parsable(['1 exercise in nonexistent']) }.to raise_error
+      expect { call_parsable(['60% of grp-nonexistent']) }.to raise_error
+      expect { call_parsable(['60% of grp-']) }.to raise_error
+      expect { call_parsable(['60% of gr']) }.to raise_error
+      expect { call_parsable(['60% of grp-ex']) }.to raise_error
+      expect { call_parsable(['60% of grp-ex2-']) }.to raise_error
+      expect { call_parsable(['60% if grp-ex2']) }.to raise_error
+      expect { call_parsable(['foo']) }.to raise_error
     end
   end
 end

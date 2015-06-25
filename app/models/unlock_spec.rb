@@ -160,25 +160,43 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     end
   end
 
-  def self.parsable?(spec)
+  def self.parsable?(spec, course)
     conditions = ActiveSupport::JSON.decode(spec)
-    for i in 0...conditions.size
+    conditions.each_with_index do |condition, i|
       begin
-        str = conditions[i].to_s.strip
+        str = condition.to_s.strip
         next if str.blank?
-        unless  DateAndTimeUtils.looks_like_date_or_time(str) ||
-            str =~ /^exercise\s+(?:group\s+)?(\S+)$/ ||
-            str =~ /^points?\s+(\S+.*)$/ ||
-            str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/ ||
-            str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/ ||
-            str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
-          fail InvalidSyntaxError.new('Invalid syntax')
+
+        if DateAndTimeUtils.looks_like_date_or_time(str)
+          time = DateAndTimeUtils.to_time(str)
+          fail InvalidSyntaxError.new if time.year > 10000 || time.year < 1 # Datetime overflow
+        elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/
+          group_or_exercise_valid?($1, course)
+        elsif str =~ /^points?\s+(\S+.*)$/
+          # ok
+        elsif str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
+          group_or_exercise_valid?($2, course)
+        elsif str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/
+          group_or_exercise_valid?($2, course)
+        elsif str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
+          group_or_exercise_valid?($2, course)
+        else
+          fail InvalidSyntaxError.new
         end
       rescue InvalidSyntaxError
-        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
+        fail InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{condition})")
       rescue
-        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$!.message}"
+        fail InvalidSyntaxError.new("Problem with unlock condition #{i + 1} (#{condition}): #{$!.message}")
       end
+    end
+
+    true
+  end
+
+  # This method does almost the same thing as check_group_or_exercise_exists, but we cannot use it for unknown reasons.
+  def self.group_or_exercise_valid?(name, course)
+    unless course.exercises.any? { |ex| ex.name =~ /^#{name}(?:$|\-.+$)/ }
+      fail "No such exercise or exercise group: #{name}. Remember that exercises need to be specified with their full name including their group."
     end
   end
 end
