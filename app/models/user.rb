@@ -119,7 +119,7 @@ class User < ActiveRecord::Base
   def <=>(other)
     login.downcase <=> other.login.downcase
   end
-  
+
   def teacher?(organization)
     organizations.include? organization
   end

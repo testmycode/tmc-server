@@ -171,6 +171,10 @@ class Ability
       can :remove_assistant, Course do |c|
         c.organization.teacher?(user)
       end
+
+      can :toggle_hidden, Organization do |o|
+        can? :teach, o
+      end
     end
   end
 end

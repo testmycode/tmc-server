@@ -1,5 +1,5 @@
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input]
+  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input, :toggle_hidden]
 
   skip_authorization_check only: [:index]
 
@@ -90,6 +90,13 @@ class OrganizationsController < ApplicationController
     else
       redirect_to organization_path(@organization)
     end
+  end
+
+  def toggle_hidden
+    authorize! :toggle_hidden, @organization
+    @organization.hidden = !@organization.hidden
+    @organization.save!
+    redirect_to organization_path, notice: "Organzation is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
   end
 
   private
