@@ -32,8 +32,19 @@
   </p>
 
   <%= link_to 'Edit organization', edit_organization_path(@organization) %>
+  <br/><br/>
+<% end %>
+
+<%# --- correct possion for this will be done later ---%>
+<% if can? :toggle_hidden, @organization %>
+  <p>
+    <strong><%= "#{@organization.hidden ? 'Status hidden:' : 'Status visible:'}" %></strong>
+    <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_hidden_organization_path(@organization),
+                method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger'}" %>
+  </p>
   <br/>
 <% end %>
+<%# -----------------------%>
 
 <% if @organization.acceptance_pending? %>
   <p>

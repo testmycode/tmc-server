@@ -97,6 +97,10 @@ class Ability
         return false if c.organization.rejected?
         c.organization.teacher?(user) || c.assistant?(user)
       end
+
+      can :toggle_hidden, Organization do |o|
+        can? :teach, o
+      end
     end
   end
 end
