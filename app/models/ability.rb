@@ -24,9 +24,11 @@ class Ability
       cannot :read, :code_reviews
       cannot :read, :course_information
 
+      # This check is bit heavy with sql queries if used in views to iterate on lists
       can :read, User do |u|
         u.readable_by?(user)
       end
+
       can :create, User if SiteSetting.value(:enable_signup)
 
       cannot :read, Course

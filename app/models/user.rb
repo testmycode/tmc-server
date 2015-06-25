@@ -119,7 +119,7 @@ class User < ActiveRecord::Base
   def <=>(other)
     login.downcase <=> other.login.downcase
   end
-
+  
   def teacher?(organization)
     organizations.include? organization
   end
@@ -132,6 +132,7 @@ class User < ActiveRecord::Base
     assisted_courses.exists?(course)
   end
 
+  # TODO: this might need optimizing for minimizing sql queries made
   def readable_by?(user)
     user.administrator? ||
       id == user.id ||
