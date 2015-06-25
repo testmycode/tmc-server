@@ -14,7 +14,7 @@ class ExercisesController < ApplicationController
         Course.transaction(requires_new: true) do
           if !current_user.guest?
             @submissions = @exercise.submissions.order('submissions.created_at DESC')
-            @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
+            @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator? || current_user.teacher?(@organization)
             @submissions = @submissions.includes(:awarded_points).includes(:user)
           else
             @submissions = nil

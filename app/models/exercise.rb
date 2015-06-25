@@ -113,7 +113,8 @@ class Exercise < ActiveRecord::Base
 
   # Whether the user may see the scoreboard for the exercise
   def points_visible_to?(user)
-    user.administrator? || user.teacher?(course.organization) ||
+    user.administrator? ||
+    user.teacher?(course.organization) ||
       (
         !hidden? &&
         published? &&
