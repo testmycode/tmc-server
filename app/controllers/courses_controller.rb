@@ -167,6 +167,12 @@ class CoursesController < ApplicationController
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
   end
 
+  def manage_exercises
+    authorize! :teach, @organization
+    @exercises = @course.exercises.natsort_by(&:name)
+    @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
+  end
+
   private
 
   def course_params_for_create

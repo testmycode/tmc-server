@@ -101,6 +101,7 @@
       <% if can? :teach, @course %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock dates', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
+        <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-default btn-mini" %>
         <%= link_to 'Edit course parameters', edit_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
       <% end %>
       <% if can? :teach, @organization %>
