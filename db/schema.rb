@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150616081429) do
+ActiveRecord::Schema.define(version: 20150612072207) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,7 +81,6 @@ ActiveRecord::Schema.define(version: 20150616081429) do
     t.boolean  "locked_exercise_points_visible", default: true,     null: false
     t.text     "description"
     t.string   "paste_visibility"
-    t.boolean  "disabled"
     t.integer  "organization_id"
     t.integer  "disabled_status",                default: 0
     t.string   "title"
@@ -109,6 +108,7 @@ ActiveRecord::Schema.define(version: 20150616081429) do
     t.boolean  "code_review_requests_enabled",     default: false, null: false
     t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
     t.text     "soft_deadline_spec"
+    t.integer  "disabled_status",                  default: 0
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
@@ -249,8 +249,7 @@ ActiveRecord::Schema.define(version: 20150616081429) do
     t.datetime "updated_at"
   end
 
-  add_index "teacherships", ["organization_id"], name: "index_teacherships_on_organization_id", using: :btree
-  add_index "teacherships", ["user_id"], name: "index_teacherships_on_user_id", using: :btree
+  add_index "teacherships", ["user_id", "organization_id"], name: "index_teacherships_on_user_id_and_organization_id", unique: true, using: :btree
 
   create_table "test_case_runs", force: true do |t|
     t.integer  "submission_id"
