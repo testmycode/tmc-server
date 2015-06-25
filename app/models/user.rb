@@ -119,6 +119,7 @@ class User < ActiveRecord::Base
     login.downcase <=> other.login.downcase
   end
 
+  # TODO: this might need optimizing for minimizing sql queries made
   def readable_by?(user)
     user.administrator? ||
       id == user.id ||
