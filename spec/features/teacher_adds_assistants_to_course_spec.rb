@@ -7,7 +7,9 @@ feature 'Teacher can add assistants to course', feature: true do
     @teacher = FactoryGirl.create :user, password: 'foobar'
     @assistant = FactoryGirl.create :user, password: 'newfoobar'
     @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @course = FactoryGirl.create :course, source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(@repo_path)
+    @course = FactoryGirl.create :course, source_url: @repo_path, organization: @organization
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
     click_link @course.title
