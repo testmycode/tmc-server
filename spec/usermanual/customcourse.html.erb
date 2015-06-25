@@ -144,7 +144,11 @@ require 'cgi' # for escapeHTML
 
   <%
     course_template_homepage = 'https://github.com/testmycode/tmc-course-template'
-    course_template_repo = 'git://github.com/testmycode/tmc-course-template.git'
+
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    course_template_repo = @repo_path
+    create_bare_repo(@repo_path)
+
   %>
 
   <h3>Starting from a template</h3>
