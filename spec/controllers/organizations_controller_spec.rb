@@ -134,6 +134,23 @@ describe OrganizationsController, type: :controller do
     end
   end
 
+  describe 'As a teacher' do
+    before :each do
+      controller.current_user = @user
+    end
+
+    describe 'POST toggle_hidden' do
+      it 'toggles value of hidden field between true and false' do
+        org = FactoryGirl.create(:accepted_organization)
+        Teachership.create(user_id: @user.id, organization_id: org.id)
+        post :toggle_hidden, id: org.to_param
+        org.reload
+        expect(org.hidden).to be true
+        expect(response).to redirect_to(organization_path)
+      end
+    end
+  end
+
   describe 'As a normal user' do
     before :each do
       controller.current_user = @user
@@ -238,6 +255,14 @@ describe OrganizationsController, type: :controller do
       it 'denies access' do
         org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
         post :reject, id: org.to_param
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+
+    describe 'POST toggle_hidden' do
+      it 'denies access' do
+        org = FactoryGirl.create(:accepted_organization)
+        post :toggle_hidden, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
     end
