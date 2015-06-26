@@ -24,7 +24,7 @@
         :end_time => @end_time,
         :time_unit => @time_unit
       }
-      json_path = course_stat_path(@course, 'submissions', json_args)
+      json_path = organization_course_stat_path(@organization, @course, 'submissions', json_args)
     %>
 
     $.getJSON('<%= raw json_path %>', function(data) {
