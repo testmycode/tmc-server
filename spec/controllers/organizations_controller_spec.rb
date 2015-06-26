@@ -101,7 +101,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST accept' do
       it 'accepts the organization request' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :accept, id: org.to_param
         org.reload
         expect(org.acceptance_pending).to eq(false)
@@ -110,7 +110,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST reject' do
       it 'sets the organization rejected flag to true' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :reject, id: org.to_param, organization: { rejected_reason: 'reason' }
         org.reload
         expect(org.rejected).to eq(true)
@@ -229,7 +229,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST accept' do
       it 'denies access' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :accept, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
@@ -237,7 +237,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST reject' do
       it 'denies access' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :reject, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
