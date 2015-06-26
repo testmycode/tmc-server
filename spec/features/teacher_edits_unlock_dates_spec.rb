@@ -20,6 +20,8 @@ feature 'Teacher edits unlock dates', feature: true do
     course.exercise_group_by_name('').group_unlock_conditions = ['1.1.2011'].to_json
     UncomputedUnlock.create_all_for_course_eager(course)
 
+    @course = course
+
     visit '/'
   end
 
