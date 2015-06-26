@@ -48,13 +48,7 @@ class OrganizationsController < ApplicationController
       render :edit
     end
   end
-
-  def destroy
-    authorize! :destroy, @organization
-    @organization.destroy
-    redirect_to organizations_path, notice: 'Organization was successfully destroyed.'
-  end
-
+  
   def list_requests
     authorize! :view, :organization_requests
     add_breadcrumb 'New organization requests'
