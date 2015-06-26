@@ -2,7 +2,10 @@ class AssistantsController < ApplicationController
   before_action :set_course
 
   def index
-    authorize! :teach, @course.organization
+    @organization = @course.organization
+    authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage assistants'
     @assistants = @course.assistants
     @assistantship = Assistantship.new
   end

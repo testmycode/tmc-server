@@ -48,7 +48,7 @@ class OrganizationsController < ApplicationController
       render :edit
     end
   end
-  
+
   def list_requests
     authorize! :view, :organization_requests
     add_breadcrumb 'New organization requests'
