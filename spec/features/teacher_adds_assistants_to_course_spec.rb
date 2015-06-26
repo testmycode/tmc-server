@@ -10,6 +10,10 @@ feature 'Teacher can add assistants to course', feature: true do
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
     @course = FactoryGirl.create :course, source_url: @repo_path, organization: @organization
+    @repo = clone_course_repo(@course)
+    @repo.copy_simple_exercise('MyExercise')
+    @repo.add_commit_push
+    @course.refresh
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
     click_link @course.title
