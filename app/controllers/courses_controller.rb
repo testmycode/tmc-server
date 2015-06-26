@@ -175,6 +175,8 @@ class CoursesController < ApplicationController
 
   def manage_exercises
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage exercises'
     @exercises = @course.exercises.natsort_by(&:name)
     @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end
