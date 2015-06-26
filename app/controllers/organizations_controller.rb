@@ -42,12 +42,6 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  def destroy
-    authorize! :destroy, @organization
-    @organization.destroy
-    redirect_to organizations_url, notice: 'Organization was successfully destroyed.'
-  end
-
   def list_requests
     authorize! :view, :organization_requests
     @requested_organizations = Organization.pending_organizations

@@ -1,5 +1,5 @@
 TmcServer::Application.routes.draw do
-  resources :organizations, path: 'org' do
+  resources :organizations, except: :destory, path: 'org' do
     member do
       post 'accept'
       post 'reject'

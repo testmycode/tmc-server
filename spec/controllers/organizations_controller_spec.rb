@@ -70,21 +70,6 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'DELETE destroy' do
-      it 'destroys the requested organization' do
-        organization = Organization.create! valid_attributes
-        expect do
-          delete :destroy, id: organization.to_param
-        end.to change(Organization, :count).by(-1)
-      end
-
-      it 'redirects to the organizations list' do
-        organization = Organization.create! valid_attributes
-        delete :destroy, id: organization.to_param
-        expect(response).to redirect_to(organizations_url)
-      end
-    end
-
     describe 'GET list_requests' do
       before :each do
         @org1 = FactoryGirl.create(:organization)
@@ -208,14 +193,6 @@ describe OrganizationsController, type: :controller do
       it 'denies access' do
         organization = Organization.create! valid_attributes
         put :update, id: organization.to_param, organization: {}
-        expect(response.code.to_i).to eq(401)
-      end
-    end
-
-    describe 'DELETE destroy' do
-      it 'denies access' do
-        organization = Organization.create! valid_attributes
-        delete :destroy, id: organization.to_param
         expect(response.code.to_i).to eq(401)
       end
     end
