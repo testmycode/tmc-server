@@ -146,11 +146,16 @@ describe Course, type: :model do
   end
 
   describe 'validation' do
+    before :each do
+      @organization = FactoryGirl.create :accepted_organization
+    end
+
     let(:valid_params) do
       {
         name: 'TestCourse',
         title: 'Test Course',
-        source_url: 'git@example.com'
+        source_url: 'git@example.com',
+        organization: @organization
       }
     end
 
@@ -162,22 +167,30 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(name: 'a' * 41))
     end
 
-    it 'requires name to be non-unique' do
-      organization = FactoryGirl.create :accepted_organization
-      Course.create!(valid_params.merge(organization: organization))
-      should_be_invalid_params(valid_params.merge(organization: organization))
+    it 'requires name to be unique within organization' do
+      Course.create!(valid_params)
+      should_be_invalid_params(valid_params)
     end
 
     it 'allows same course name in different organizations, if cloned from same template' do
+      template = FactoryGirl.create :course_template
+      organization1 = FactoryGirl.create :accepted_organization
+      organization2 = FactoryGirl.create :accepted_organization
+      Course.create!(valid_params.merge(organization: organization1, course_template: template, source_url: template.source_url))
+      expect{ Course.create!(valid_params.merge(organization: organization2, course_template: template, source_url: template.source_url)) }.not_to raise_error
+    end
+
+    it 'forbids two custom courses to share a name' do
       organization1 = FactoryGirl.create :accepted_organization
       organization2 = FactoryGirl.create :accepted_organization
       Course.create!(valid_params.merge(organization: organization1))
-      expect{ Course.create!(valid_params.merge(organization: organization2)) }.not_to raise_error
+      should_be_invalid_params(valid_params.merge(organization: organization2))
     end
 
-    it 'forbids two custom courses to share a name'
-
-    it 'forbids custom course\'s name to be same as some template\'s name'
+    it 'forbids custom course\'s name to be same as some template\'s name' do
+      template = FactoryGirl.create :course_template, name: 'someName'
+      expect{ Course.create!(valid_params.merge(name: 'someName')) }.to raise_error
+    end
 
     it 'forbids spaces in the name' do # this could eventually be lifted as long as everything else is made to tolerate spaces
       should_be_invalid_params(valid_params.merge(name: 'Test Course'))
@@ -210,8 +223,8 @@ describe Course, type: :model do
 
   describe 'destruction' do
     before :each do
-      template = FactoryGirl.create :course_template
-      @templated_course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+      @template = FactoryGirl.create :course_template
+      @templated_course = FactoryGirl.create :course, course_template: @template, source_url: @template.source_url
     end
 
     it 'deletes its cache directory' do
@@ -229,6 +242,11 @@ describe Course, type: :model do
 
       @templated_course.destroy
       expect(File).to exist(@templated_course.cache_path)
+    end
+
+    it 'doesn\'t delete course template' do
+      @templated_course.destroy
+      expect(CourseTemplate.all.count).to eq(1)
     end
 
     it 'deletes dependent exercises' do
@@ -283,5 +301,41 @@ describe Course, type: :model do
     expect(course.material_url).to eq('https://google.com')
     course.material_url = 'http://google.com'
     expect(course.material_url).to eq('http://google.com')
+  end
+
+  it 'sets cache_version to be same as course_template\'s' do
+    template = FactoryGirl.create :course_template
+    template.cache_version = 5
+
+    templated_course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    expect(templated_course.cache_version).to eq(5)
+
+    custom_course = FactoryGirl.create :course
+    expect(custom_course.cache_version).to eq(0)
+
+    templated_course.cache_version = 10
+    templated_course.save!
+    expect(templated_course.cache_version).to eq(5)
+
+    custom_course.cache_version = 10
+    custom_course.save!
+    expect(custom_course.cache_version).to eq(10)
+  end
+
+  it 'increments own cache_version if custom course' do
+    course = FactoryGirl.create :course
+    expect{course.increment_cache_version}.to change{course.cache_version}.by(1)
+  end
+
+  it 'increments template\'s cache_version if templated' do
+    template = FactoryGirl.create :course_template
+    course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    expect{course.increment_cache_version}.to change{template.cache_version}.by(1)
+  end
+
+  it 'templated course\'s cache path is template\'s cache path, regardless of names' do
+    template = FactoryGirl.create :course_template, name: 'templatesName'
+    course = FactoryGirl.create :course, name: 'coursesName', course_template: template, source_url: template.source_url
+    expect(course.cache_path).to eq(template.cache_path)
   end
 end

@@ -24,6 +24,7 @@ class Course < ActiveRecord::Base
   validates :source_url, presence: true
   validate :check_source_backend
   validate :source_url_same_as_templates
+  validate :check_custom_course_name_not_taken
   after_initialize :set_default_source_backend
   before_save :set_cache_version
 
@@ -322,6 +323,16 @@ class Course < ActiveRecord::Base
   end
 
   private
+
+  def check_custom_course_name_not_taken
+    if custom?
+      custom_courses = Course.where(course_template: nil)
+      custom_courses = custom_courses.where('id <> ?', self.id) unless self.id.nil?
+      name_taken_by_another_custom_course = custom_courses.pluck(:name).include?(self.name)
+      name_taken_by_course_template = CourseTemplate.pluck(:name).include?(self.name)
+      errors.add(:name, 'is already taken') if name_taken_by_another_custom_course || name_taken_by_course_template
+    end
+  end
 
   def check_source_backend
     unless Course.valid_source_backends.include?(source_backend)
