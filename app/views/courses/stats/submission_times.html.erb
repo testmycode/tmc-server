@@ -8,7 +8,7 @@
   google.setOnLoadCallback(drawChart);
 
   function drawChart() {
-    $.getJSON('<%= raw course_stat_path(@course, 'submission_times', :format => 'json') %>', function(data) {
+    $.getJSON('<%= raw organization_course_stat_path(@organization, @course, 'submission_times', :format => 'json') %>', function(data) {
 
       var dataTable = new google.visualization.DataTable();
       dataTable.addColumn('number', 'Hour');
