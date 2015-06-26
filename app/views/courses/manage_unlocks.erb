@@ -1,43 +1,69 @@
+<script type="text/javascript">
+  var unlock_condition_counts = {};
+  var add_unlock_condition = function (selector, group_param) {
+    var current_unlock_condition_count = unlock_condition_counts[group_param];
+    var input_name = group_param + "[" + current_unlock_condition_count + "]";
+    var input_id = input_name.replace("][", "_").replace("[", "_").replace("]", "");
+
+    $(selector).append(
+      "<input type='text'" +
+      "name='" + input_name + "'" +
+      "id='" + input_id + "' /><br/>"
+    );
+
+    unlock_condition_counts[group_param]++;
+  };
+</script>
+
 <h1>Edit unlock dates</h1>
 <%= form_tag save_unlocks_organization_course_path, method: :post do %>
-    <table class="exercise-list table table-hover table-condensed">
-      <thead>
+  <table class="exercise-list table table-hover table-condensed">
+    <thead>
+    <tr>
+      <th>Exercise group</th>
+      <th>Exercise</th>
+      <th>Unlock conditions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @course.exercise_groups.each do |group| %>
       <tr>
-        <th>
-          Exercise group
-        </th>
-        <th>
-          Exercise
-        </th>
-        <th></th>
+        <td>
+          <%= group.name %><br/>
+        </td>
+        <td>
+          <% group.exercises(false).each do |exercise| %>
+            <%= render partial: 'exercises/list_single', locals: { exercise: exercise } %>
+            <br/>
+          <% end %>
+        </td>
+        <td>
+          <%
+             if group.name.empty?
+               param_array = 'empty_group'
+             else
+               param_array = "group[#{group.name}]"
+             end
+
+             group_unlock_conditions = group.group_unlock_conditions
+             group_unlock_conditions = [''] if group_unlock_conditions.empty? # Always have at least one input field
+          %>
+          <script type="text/javascript">
+            unlock_condition_counts["<%= param_array %>"] = <%= group_unlock_conditions.length %>
+          </script>
+          <div id="unlock-conditions-<%= group.name %>">
+            <% group_unlock_conditions.each_with_index do |condition, i| %>
+              <%= text_field_tag "#{param_array}[#{i}]", condition %><br/>
+            <% end %>
+          </div>
+          <a id="add-condition-<%= group.name %>"
+             href="javascript:void(0);"
+             onclick="add_unlock_condition('#unlock-conditions-<%= group.name %>', '<%= param_array %>')"
+             class="add-condition-button btn btn-mini btn-default">Add a condition</a>
+        </td>
       </tr>
-      </thead>
-      <tbody>
-      <% @course.exercise_groups.each do |group| %>
-          <tr>
-            <td>
-              <%= group.name %><br/>
-            </td>
-            <td>
-              <% group.exercises(false).each do |exercise| %>
-                <%= render partial: 'exercises/list_single', locals: { exercise: exercise } %>
-                <br/>
-              <% end %>
-            </td>
-            <td>
-              <%
-                 if group.name.empty?
-                   param_array = 'empty_group'
-                 else
-                   param_array = "group[#{group.name}]"
-                 end
-              %>
-              <%= label_tag "#{param_array}[0]", 'Unlock date' %>
-              <%= text_field_tag "#{param_array}[0]", group.group_unlock_conditions[0] %>
-            </td>
-          </tr>
-      <% end %>
-      </tbody>
-    </table>
-    <%= submit_tag 'Save changes', class: "btn btn-info" %>
+    <% end %>
+    </tbody>
+  </table>
+  <%= submit_tag 'Save changes', class: "btn btn-info" %>
 <% end %>
