@@ -391,6 +391,22 @@ describe CoursesController, type: :controller do
           expect(e.unlock_spec_obj.valid_after).to be_nil
         end
       end
+
+      it 'accepts and saves multiple unlock conditions' do
+        @course.exercises.create(name: 'e1')
+        @course.exercises.create(name: 'e2')
+        @course.exercises.create(name: 'e3')
+
+        post :save_unlocks, organization_id: @organization.slug, id: @course.id,
+             empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' }
+
+        @course.exercise_group_by_name('').exercises(false).each do |e|
+          spec = e.unlock_spec_obj.raw_spec
+          expect(spec).to include('1.2.2000')
+          expect(spec).to include('exercise e1')
+          expect(spec).to include('5% of e2')
+        end
+      end
     end
 
     it 'when non-teacher should respond with a 401' do
