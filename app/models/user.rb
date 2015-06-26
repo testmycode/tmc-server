@@ -12,6 +12,8 @@ class User < ActiveRecord::Base
   has_many :comments
   has_many :teacherships, dependent: :destroy
   has_many :organizations, through: :teacherships
+  has_many :assistantships, dependent: :destroy
+  has_many :assisted_courses, through: :assistantships, source: :course
 
   validates :login, presence: true,
                     uniqueness: true,
@@ -117,8 +119,58 @@ class User < ActiveRecord::Base
     login.downcase <=> other.login.downcase
   end
 
+  # TODO: this might need optimizing for minimizing sql queries made
+  def readable_by?(user)
+    user.administrator? ||
+      id == user.id ||
+      visible_to_teacher?(user) ||
+      visible_to_assistant?(user)
+  end
+
+  def visible_to_teacher?(teacher)
+    courses = Course.joins(organization: :teacherships).where(teacherships: { user_id: teacher.id })
+    courses.each do |c|
+      return true if self.student_in_course?(c)
+    end
+    false
+  end
+
+  def visible_to_assistant?(assistant)
+    assistant.assisted_courses.each do |c|
+      return true if self.student_in_course?(c)
+    end
+    false
+  end
+
+  def student_in_course?(c)
+    self.in?(User.course_students(c))
+  end
+
+  def student_in_organization?(organization)
+    organization.courses.each do |c|
+      return true if self.student_in_course?(c)
+    end
+    false
+  end
+
+  def teaching_in_courses
+    if !assistantships.empty?
+      Course.where(id: assistantships.pluck(:course_id)).ids
+    elsif !organizations.empty?
+      Course.where(organization_id: teaching_in_organizations).ids
+    end
+  end
+
+  def teaching_in_organizations
+    Teachership.where(user: self).pluck(:organization_id)
+  end
+
   def teacher?(organization)
     organizations.include? organization
+  end
+
+  def assistant?(course)
+    assisted_courses.exists?(course)
   end
 
   private

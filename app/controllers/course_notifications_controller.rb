@@ -1,7 +1,7 @@
 # Handles emailing notification to every participant
 class CourseNotificationsController < ApplicationController
-  before_action :auth
   before_action :set_organization
+  before_action :auth
 
   def new
     @notifier ||= CourseNotification.new
@@ -47,7 +47,7 @@ class CourseNotificationsController < ApplicationController
   end
 
   def auth
-    authorize! :email, CourseNotification
+    authorize! :teach, @organization
   end
 
   def set_organization

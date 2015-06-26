@@ -55,4 +55,50 @@ describe ExercisesController, type: :controller do
       end
     end
   end
+
+  describe 'POST set_disabled_statuses' do
+    before :each do
+      @organization = FactoryGirl.create(:accepted_organization)
+      @course = FactoryGirl.create(:course, organization: @organization)
+      @ex1 = FactoryGirl.create(:exercise, course: @course)
+      @ex2 = FactoryGirl.create(:exercise, course: @course)
+      @ex3 = FactoryGirl.create(:exercise, course: @course)
+      @teacher = FactoryGirl.create(:user)
+      Teachership.create!(organization: @organization, user: @teacher)
+      controller.current_user = @teacher
+    end
+
+    def post_set_disabled_statuses(options = {})
+      post :set_disabled_statuses, options.merge(organization_id: @organization.slug, course_id: @course.id)
+    end
+
+    describe 'as a teacher' do
+      it 'disables correct exercises' do
+        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id] }, commit: 'Disable selected'
+        @ex1.reload
+        @ex2.reload
+        @ex3.reload
+        expect(@ex1.disabled?).to eq(true)
+        expect(@ex2.disabled?).to eq(true)
+        expect(@ex3.disabled?).to eq(false)
+      end
+
+      it 'enables correct exercises' do
+        @ex3.disabled!
+        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id] }, commit: 'Enable selected'
+        @ex1.reload
+        @ex2.reload
+        @ex3.reload
+        expect(@ex1.enabled?).to eq(true)
+        expect(@ex2.enabled?).to eq(true)
+        expect(@ex3.enabled?).to eq(false)
+      end
+
+      it 'does not fail if no parameters are given' do
+        expect do
+          post_set_disabled_statuses course: { exercises: [] } # Form still sends an empty array
+        end.to_not raise_error
+      end
+    end
+  end
 end

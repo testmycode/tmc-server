@@ -21,15 +21,12 @@ describe CourseNotificationsController, type: :controller do
     }
   end
 
-  it 'should not allow a non-admin user to send email' do
+  it 'should not allow a non-admin/non-teacher user to send email' do
     bypass_rescue
 
     @user = FactoryGirl.create(:user)
     controller.current_user = @user
 
-    ability = Ability.new(controller.current_user)
-
-    expect(ability).not_to be_able_to(:email, CourseNotification)
     expect { post :create, params }.to raise_error
   end
 
@@ -84,6 +81,17 @@ describe CourseNotificationsController, type: :controller do
       post :create, params
       expect(response).to redirect_to(new_organization_course_course_notifications_path(@organization, @course))
       expect(flash[:error]).not_to be_empty
+    end
+  end
+
+  describe 'for a teacher' do
+    it 'allows to send email' do
+      @teacher = FactoryGirl.create(:user, email: 'admin@mydomain.com')
+      Teachership.create(user: @teacher,organization: @organization)
+      controller.current_user = @teacher
+
+      post :create, params
+      expect(response).to redirect_to(organization_course_path(@organization, @course))
     end
   end
 end

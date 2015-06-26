@@ -25,7 +25,11 @@ TmcServer::Application.routes.draw do
         post 'disable'
         get 'manage_unlocks'
         post 'save_unlocks'
+        get 'manage_exercises'
+        resources :emails, only: [:index]
       end
+
+      resources :assistants, only: [:index, :new, :create]
 
       resources :points, only: [:index, :show] do
         member do
@@ -35,9 +39,14 @@ TmcServer::Application.routes.draw do
 
       get 'help'
 
+      resources :exercises, only: [:index] do
+        collection do
+          post 'set_disabled_statuses'
+        end
+      end
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
-      resources :exercises, only: [:index]
       resources :submissions, only: [:index]
       resources :reviewed_submissions, only: [:index]
       resources :feedback_questions, only: [:index, :new, :create]

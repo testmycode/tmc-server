@@ -2,12 +2,12 @@ require 'natsort'
 
 # Presents the code review UI.
 class ReviewsController < ApplicationController
-  before_action :set_organization
+  before_action :set_organization, except: [:new, :create]
 
   def index
     if params[:course_id]
       fetch :course
-
+      @organization = @course.organization
       @my_reviews = @course.submissions
         .where(user_id: current_user.id)
         .where('requests_review OR requires_review OR reviewed')
@@ -28,6 +28,7 @@ class ReviewsController < ApplicationController
       fail "Submission's exercise has been moved or deleted" unless @submission.exercise
 
       @course = @submission.course
+      @organization = @course.organization
 
       respond_to do |format|
         format.html do
@@ -48,6 +49,7 @@ class ReviewsController < ApplicationController
     @show_page_presence = true
 
     @course = @submission.course
+    @organization = @course.organization
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
@@ -57,7 +59,7 @@ class ReviewsController < ApplicationController
       submission_id: @submission.id,
       reviewer_id: current_user.id
     )
-    authorize! :create, @new_review
+    authorize! :create_review, @course
     render 'reviews/submission_index'
   end
 
@@ -68,7 +70,9 @@ class ReviewsController < ApplicationController
       reviewer_id: current_user.id,
       review_body: params[:review][:review_body]
     )
-    authorize! :create, @review
+    authorize! :create_review, @submission.course
+
+    @organization = @submission.course.organization
 
     begin
       ActiveRecord::Base.connection.transaction do
@@ -84,7 +88,7 @@ class ReviewsController < ApplicationController
       flash[:success] = 'Code review added.'
       notify_user_about_new_review
       send_email_about_new_review if params[:send_email]
-      redirect_to course_reviews_path(@submission.course_id)
+      redirect_to organization_course_reviews_path(@organization, @submission.course_id)
     end
   end
 

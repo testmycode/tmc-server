@@ -12,16 +12,16 @@ class CourseBelongsToOrganization < ActiveRecord::Migration
                                                slug: 'default',
                                                acceptance_pending: false
             default_organization.teachers << User.select(&:administrator?)
-            default_organization.save
+            default_organization.save!
           end
           orphans.each do |c|
             c.organization = default_organization
-            c.save
+            c.save!
           end
         end
       end
       dir.down do
-        Course.all.each { |c| c.organization = nil; c.save }
+        Course.all.each { |c| c.organization = nil; c.save! }
         default_organization.destroy unless default_organization.nil?
       end
     end

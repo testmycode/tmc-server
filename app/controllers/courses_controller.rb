@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, only: [:show, :edit, :update, :refresh, :manage_deadlines, :save_deadlines, :enable, :disable, :manage_unlocks, :save_unlocks ]
+  before_action :set_course, except: [:create, :help, :index, :new, :show_json]
 
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
@@ -109,12 +109,12 @@ class CoursesController < ApplicationController
   end
 
   def manage_deadlines
-    authorize! :teach, @organization
+    authorize! :teach, @course
     assign_show_view_vars
   end
 
   def save_deadlines
-    authorize! :teach, @organization
+    authorize! :teach, @course
 
     groups = group_params
     groups.each do |name, deadlines|
@@ -143,7 +143,7 @@ class CoursesController < ApplicationController
   end
 
   def enable
-    authorize! :teach, @organization
+    authorize! :teach, @organization # should assistants be able to enable/disable?
     @course.enabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
   end
@@ -160,12 +160,12 @@ class CoursesController < ApplicationController
   end
 
   def manage_unlocks
-    authorize! :teach, @organization
+    authorize! :teach, @course
     assign_show_view_vars
   end
 
   def save_unlocks
-    authorize! :teach, @organization
+    authorize! :teach, @course
 
     groups = group_params
     groups.each do |name, conditions|
@@ -178,6 +178,12 @@ class CoursesController < ApplicationController
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
   rescue UnlockSpec::InvalidSyntaxError => e
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
+  end
+
+  def manage_exercises
+    authorize! :teach, @organization
+    @exercises = @course.exercises.natsort_by(&:name)
+    @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end
 
   private
@@ -200,7 +206,7 @@ class CoursesController < ApplicationController
     unless current_user.guest?
       max_submissions = 100
       @submissions = @course.submissions
-      @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
+      @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @total_submissions = @submissions.where(user: User.legitimate_students).count
       @submissions = @submissions.limit(max_submissions)
