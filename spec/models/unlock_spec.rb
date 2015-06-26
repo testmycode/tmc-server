@@ -14,6 +14,8 @@ describe Unlock, type: :model do
       @user = FactoryGirl.create(:user)
       @available_point = FactoryGirl.create(:available_point, exercise_id: @ex1.id)
       @available_point2 = FactoryGirl.create(:available_point, exercise_id: @ex2.id)
+
+      @course.reload
     end
 
     it 'creates unlocks as specified' do
