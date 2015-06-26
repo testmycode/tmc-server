@@ -60,7 +60,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
     click_link 'View points'
 
     expect(page).to have_content('1/6')
-    expect(page).not_to have_content('0/')
+    expect(page).not_to have_content('0/6')
   end
 
   scenario 'Teacher can make code review' do
