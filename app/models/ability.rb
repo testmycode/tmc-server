@@ -87,12 +87,16 @@ class Ability
       can :request, :organization
       cannot :request, :organization if user.guest?
 
-      cannot :teach, Organization
-      can :teach, Organization do |o|
-        o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
+      can :remove_teacher, Organization do |o|
+        can? :teach, o
       end
 
-      can :remove_teacher, Organization do |o|
+      can :remove_assistant, Course do |c|
+        can? :teach, c.organization
+      end
+
+      cannot :teach, Organization
+      can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
       end
 
@@ -100,10 +104,6 @@ class Ability
       can :teach, Course do |c|
         return false if c.organization.rejected?
         c.organization.teacher?(user) || c.assistant?(user)
-      end
-
-      can :remove_assistant, Course do |c|
-        c.organization.teacher?(user)
       end
     end
   end
