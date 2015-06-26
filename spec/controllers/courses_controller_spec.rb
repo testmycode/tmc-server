@@ -219,6 +219,9 @@ describe CoursesController, type: :controller do
         source_url = FactoryGirl.create(:course_template).source_url
         post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: source_url }
         expect(Course.last.cache_version).to eq(1)
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', source_url: source_url }
+        expect(Course.all.pluck :cache_version).to eq([1, 1])
+        expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
       end
 
       describe 'when course is created from template' do
@@ -234,6 +237,7 @@ describe CoursesController, type: :controller do
           post :create, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @template.id, source_url: @template.source_url }
           expect(Course.all.pluck :cache_version).to eq([1, 1])
           expect(CourseTemplate.last.cache_version).to eq(1)
+          expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
         end
       end
     end

@@ -57,6 +57,10 @@ class CourseTemplate < ActiveRecord::Base
     end
   end
 
+  def cache_exists?
+    File.exist?(cache_path)
+  end
+
   private
 
   def delete_courses_if_custom_courses_disabled

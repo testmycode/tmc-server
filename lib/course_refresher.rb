@@ -115,7 +115,7 @@ class CourseRefresher
           measure_and_log :update_available_points
           measure_and_log :make_solutions                         unless options[:no_directory_changes]
           measure_and_log :make_stubs                             unless options[:no_directory_changes]
-          measure_and_log :checksum_stubs                         unless options[:no_directory_changes]
+          measure_and_log :checksum_stubs
           measure_and_log :make_zips_of_stubs                     unless options[:no_directory_changes]
           measure_and_log :make_zips_of_solutions                 unless options[:no_directory_changes]
           measure_and_log :set_permissions                        unless options[:no_directory_changes]

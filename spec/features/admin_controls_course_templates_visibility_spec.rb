@@ -23,7 +23,7 @@ feature 'Admin sets expiredate to course templates', feature: true do
     log_in_as(@admin.login, 'xooxer')
     visit('/course_templates')
 
-    find('tr', text: 'template2').click_link('Edit')
+    find('tr', text: 'Template 2').click_link('Edit')
 
     fill_in 'course_template_expires_at', with: '2020-01-01'
     click_button 'Update Course template'
@@ -35,10 +35,10 @@ feature 'Admin sets expiredate to course templates', feature: true do
     log_in_as(@admin.login, 'xooxer')
     visit('/course_templates')
 
-    find('tr', text: 'template2').click_link('hide')
-    expect(find('tr', text: 'template2')).to have_content('unhide')
-    find('tr', text: 'template2').click_link('unhide')
-    expect(find('tr', text: 'template2')).to have_content('hide')
+    find('tr', text: 'Template 2').click_link('hide')
+    expect(find('tr', text: 'Template 2')).to have_content('unhide')
+    find('tr', text: 'Template 2').click_link('unhide')
+    expect(find('tr', text: 'Template 2')).to have_content('hide')
   end
 
   scenario "Teacher doesn't see expired or hidden course templates" do

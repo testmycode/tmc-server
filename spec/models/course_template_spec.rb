@@ -101,4 +101,6 @@ describe CourseTemplate, type: :model do
     template.destroy
     expect(Dir.exist? cache_path).to be(false)
   end
+
+  it 'keeps course\'s source_urls synchronized'
 end
