@@ -174,7 +174,7 @@ class CoursesController < ApplicationController
   end
 
   def manage_exercises
-    authorize! :teach, @organization
+    authorize! :manage_exercises, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage exercises'
     @exercises = @course.exercises.natsort_by(&:name)
