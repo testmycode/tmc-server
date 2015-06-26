@@ -27,6 +27,9 @@ class CourseTemplate < ActiveRecord::Base
   scope :not_hidden, -> { where(hidden: false) }
   scope :available, -> { not_expired.not_hidden }
 
+  after_destroy :delete_courses_if_custom_courses_disabled
+  after_destroy :delete_cache
+
   def valid_source_url?
     return true unless source_url_changed? # don't attempt repo cloning if source url wasn't even changed
     Dir.mktmpdir do |dir|
@@ -49,11 +52,22 @@ class CourseTemplate < ActiveRecord::Base
     firstcourse = true
     courses.each do |c|
       c.refresh no_directory_changes: !firstcourse
+      reload
       firstcourse = false
     end
   end
 
-  def after_destroy
+  private
+
+  def delete_courses_if_custom_courses_disabled
+    courses.each { |c| c.destroy! } if !custom_courses_enabled?
+  end
+
+  def delete_cache
     FileUtils.rm_rf cache_path if courses.empty?
+  end
+
+  def custom_courses_enabled?
+    SiteSetting.value('enable_custom_repositories')
   end
 end

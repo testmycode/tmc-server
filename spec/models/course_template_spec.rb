@@ -65,4 +65,40 @@ describe CourseTemplate, type: :model do
       expect { CourseTemplate.create!(params) }.to raise_error
     end
   end
+
+  it 'refreshes all it\'s courses on refresh call' do
+    template = FactoryGirl.create :course_template
+    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    expect(template.cache_version).to eq(0)
+    expect(Course.all.pluck :cache_version).to eq([0, 0, 0])
+    template.refresh
+    expect(template.cache_version).to eq(1)
+    expect(Course.all.pluck :cache_version).to eq([1, 1, 1])
+  end
+
+  it 'keeps course\'s cache_versions synchronized' do
+    template = FactoryGirl.create :course_template
+    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    expect(template.cache_version).to eq(0)
+    expect(Course.all.pluck :cache_version).to eq([0, 0])
+    template.refresh
+    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    expect(template.cache_version).to eq(1)
+    expect(Course.all.pluck :cache_version).to eq([1, 1, 1])
+  end
+
+  it 'removes cloned repository if no courses' do
+    template = FactoryGirl.create :course_template
+    course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    template.refresh
+    cache_path = template.cache_path
+    expect(Dir.exist? cache_path).to be(true)
+    course.destroy
+    expect(Dir.exist? cache_path).to be(true)
+    template.destroy
+    expect(Dir.exist? cache_path).to be(false)
+  end
 end
