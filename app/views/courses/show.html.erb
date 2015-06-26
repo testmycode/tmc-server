@@ -12,7 +12,12 @@
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
+<<<<<<< HEAD
         <% if can? :teach, @organization %>
+=======
+        <li><%= link_to 'View help page', organization_course_help_path(@organization, @course)%></li>
+        <% if can? :list_user_emails, @course %>
+>>>>>>> 225dded... More permission and links fixes and customization
           <li><%= link_to 'View student emails', organization_emails_path %></li>
         <% end %>
       </ul>
@@ -93,6 +98,9 @@
           <li><%= link_to 'View feedback', organization_course_feedback_answers_path(@organization, @course)%></li>
           <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
+      <% end %>
+      <% if can? :teach, @organization %>
+        <%= link_to 'Manage assistants', organization_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
       <% end %>
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>

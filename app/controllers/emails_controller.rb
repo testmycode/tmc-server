@@ -29,7 +29,7 @@ class EmailsController < ApplicationController
     @course = Course.find(params[:id])
     @organization = @course.organization
 
-    authorize! :teach, @organization
+    authorize! :list_user_emails, @course
 
     add_course_breadcrumb
     add_breadcrumb('Students', organization_emails_path)
