@@ -1,14 +1,16 @@
 # Handles emailing notification to every participant
 class CourseNotificationsController < ApplicationController
   before_action :set_organization
-  before_action :auth
 
   def new
+    course = Course.find(course_notification_params[:course_id])
+    authorize! :send_mail_to_participants, course
     @notifier ||= CourseNotification.new
   end
 
   def create
     course = Course.find(course_notification_params[:course_id])
+    authorize! :send_mail_to_participants, course
 
     participants = User.course_students(course)
     emails = participants.map(&:email).reject(&:blank?)
@@ -44,10 +46,6 @@ class CourseNotificationsController < ApplicationController
 
   def course_notification_params
     params.permit(:commit, :course_id, course_notification: [:topic, :message])
-  end
-
-  def auth
-    authorize! :teach, @organization
   end
 
   def set_organization

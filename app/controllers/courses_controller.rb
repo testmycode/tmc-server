@@ -96,11 +96,11 @@ class CoursesController < ApplicationController
   end
 
   def edit
-    authorize! :teach, @organization
+    authorize! :edit_course_paramaters, @course
   end
 
   def update
-    authorize! :teach, @organization
+    authorize! :edit_course_paramaters, @course
     if @course.update(course_params)
       redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
     else
@@ -109,12 +109,12 @@ class CoursesController < ApplicationController
   end
 
   def manage_deadlines
-    authorize! :teach, @course
+    authorize! :manage_deadlines, @course
     assign_show_view_vars
   end
 
   def save_deadlines
-    authorize! :teach, @course
+    authorize! :manage_deadlines, @course
 
     groups = group_params
     groups.each do |name, deadlines|
@@ -147,12 +147,12 @@ class CoursesController < ApplicationController
   end
 
   def manage_unlocks
-    authorize! :teach, @course
+    authorize! :manage_unlocks, @course
     assign_show_view_vars
   end
 
   def save_unlocks
-    authorize! :teach, @course
+    authorize! :manage_unlocks, @course
 
     groups = group_params
     groups.each do |name, conditions|
