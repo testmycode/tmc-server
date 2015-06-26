@@ -119,10 +119,17 @@ require 'cgi' # for escapeHTML
    click_on 'Create Course template'
    visit '/course_templates'
    expect(page).to have_content('newtemplate')
+   highlight 'a:contains("Refresh"):last'
    highlight 'a:contains("hide"):last'
    highlight 'a:contains("Edit"):last'
 %>
 <%= screenshot %>
+
+  <p>
+    Whenever any changes to the remote repository are made (new exercises added, exercises removed, etc),
+    the course template that uses that repository needs to be refreshed. After clicking 'Refresh', all courses
+    created from the template will be up-to-date. This operation takes some time.
+  </p>
 
   <p>
     Course template default fields may be edited at any time by administrator via link 'Edit'. Expiration date
