@@ -168,7 +168,7 @@ class CoursesController < ApplicationController
   end
 
   def manage_exercises
-    authorize! :teach, @organization
+    authorize! :manage_exercises, @course
     @exercises = @course.exercises.natsort_by(&:name)
     @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end

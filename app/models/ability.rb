@@ -157,6 +157,10 @@ class Ability
         can? :teach, c
       end
 
+      can :manage_exercises, Course do |c|
+        can? :teach, c.organization
+      end
+
       can :edit_course_paramaters, Course do |c|
         can? :teach, c.organization
       end
