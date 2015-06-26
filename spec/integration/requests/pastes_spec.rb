@@ -7,6 +7,8 @@ describe 'Paste JSON api', type: :request, integration: true do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryGirl.create(:user)
+    Teachership.create user_id: @teacher.id, organization_id: @organization.id
     @course = Course.create!(name: 'mycourse', title: 'mycourse', source_backend: 'git', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
