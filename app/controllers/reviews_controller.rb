@@ -2,12 +2,12 @@ require 'natsort'
 
 # Presents the code review UI.
 class ReviewsController < ApplicationController
-  before_action :set_organization
+  before_action :set_organization, except: [:new, :create]
 
   def index
     if params[:course_id]
       fetch :course
-
+      @organization = @course.organization
       @my_reviews = @course.submissions
         .where(user_id: current_user.id)
         .where('requests_review OR requires_review OR reviewed')
@@ -51,6 +51,7 @@ class ReviewsController < ApplicationController
     @course = @submission.course
     @organization = @course.organization
 
+    authorize! :create_review, @course
     add_course_breadcrumb
     add_breadcrumb 'Code reviews', organization_course_reviews_path(@organization, @course)
     add_breadcrumb 'Code review editor'
@@ -59,18 +60,20 @@ class ReviewsController < ApplicationController
       submission_id: @submission.id,
       reviewer_id: current_user.id
     )
-    authorize! :create, @new_review
     render 'reviews/submission_index'
   end
 
   def create
     fetch :submission
+    @course = @submission.course
+    @organization = @course.organization
+    authorize! :create_review, @course
+
     @review = Review.new(
-      submission_id: @submission.id,
-      reviewer_id: current_user.id,
-      review_body: params[:review][:review_body]
+        submission_id: @submission.id,
+        reviewer_id: current_user.id,
+        review_body: params[:review][:review_body]
     )
-    authorize! :create, @review
 
     begin
       ActiveRecord::Base.connection.transaction do
@@ -86,8 +89,6 @@ class ReviewsController < ApplicationController
       flash[:success] = 'Code review added.'
       notify_user_about_new_review
       send_email_about_new_review if params[:send_email]
-      @course = @submission.course
-      @organization = @course.organization
       redirect_to organization_course_reviews_path(@organization, @course)
     end
   end

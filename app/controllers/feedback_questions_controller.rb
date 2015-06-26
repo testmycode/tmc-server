@@ -1,31 +1,27 @@
-
 # Handles the feedback question editing UI.
-#
-# TODO: While this is nice, I think feedback questions should live in a conf file in the repo so that the entire course is defined by the repo.
 class FeedbackQuestionsController < ApplicationController
-  before_action :get_course
+  before_action :set_course
   before_action :set_organization
 
   def index
+    authorize! :manage_feedback_questions, @course
     add_course_breadcrumb
     add_breadcrumb 'Feedback questions'
-
     @questions = @course.feedback_questions.order(:position)
-    authorize! :show, @questions
   end
 
   def new
-    @question = FeedbackQuestion.new(course: @course)
-    authorize! :create, @question
+    authorize! :manage_feedback_questions, @course
     add_course_breadcrumb
     add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
     add_breadcrumb 'Add new question'
+    @question = FeedbackQuestion.new(course: @course)
   end
 
   def create
+    authorize! :manage_feedback_questions, @course
     @question = FeedbackQuestion.new(feedback_question_params[:feedback_question])
     @question.course = @course
-    authorize! :create, @question
 
     fix_question_kind(@question)
 
@@ -42,8 +38,7 @@ class FeedbackQuestionsController < ApplicationController
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
     @organization = @course.organization
-    authorize! :read, @question
-    authorize! :read, @course
+    authorize! :manage_feedback_questions, @course
     add_course_breadcrumb
     add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
     add_breadcrumb "Question #{@question.title}"
@@ -53,8 +48,7 @@ class FeedbackQuestionsController < ApplicationController
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
     @organization = @course.organization
-    authorize! :read, @course
-    authorize! :update, @question
+    authorize! :manage_feedback_questions, @course
 
     @question.question = params[:feedback_question][:question]
     @question.title = params[:feedback_question][:title]
@@ -72,8 +66,7 @@ class FeedbackQuestionsController < ApplicationController
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
     @organization = @course.organization
-    authorize! :read, @course
-    authorize! :delete, @question
+    authorize! :manage_feedback_questions, @course
 
     begin
       @question.destroy
@@ -91,15 +84,14 @@ class FeedbackQuestionsController < ApplicationController
     params.permit({ feedback_question: [:question, :title, :kind] }, :intrange_min, :intrange_max, :commit, :course_id)
   end
 
-  def get_course
+  def set_course
     @course = Course.find(params[:course_id]) if params[:course_id]
     authorize! :read, @course
   end
 
   def fix_question_kind(question)
-    if question.kind == 'intrange'
-      question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
-    end
+    return unless question.kind == 'intrange'
+    question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
   end
 
   def set_organization

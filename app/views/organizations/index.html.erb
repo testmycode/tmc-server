@@ -9,7 +9,7 @@
   </div>
 <% end %>
 
-<table>
+<table class="table table-striped">
   <thead>
   <tr>
     <th>Name</th>
@@ -40,5 +40,5 @@
 <% end %>
 
 <% if can? :read, CourseTemplate %>
-    <%= link_to 'Manage Course templates', course_templates_path, class: "btn btn-mini btn-warning" %>
+    <%= link_to 'Manage Course templates', course_templates_path, class: "btn btn-mini btn-default" %>
 <% end %>

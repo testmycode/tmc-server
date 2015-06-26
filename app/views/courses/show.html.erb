@@ -16,8 +16,11 @@
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
         <li><%= link_to 'View help page', organization_course_help_path(@organization, @course)%></li>
+        <% if can? :teach, @organization %>
+          <li><%= link_to 'View student emails', organization_emails_path %></li>
+        <% end %>
       </ul>
-      <% if can? :teach, @organization %>
+      <% if can? :teach, @course %>
         <ul>
           <li>Source type: <%= @course.source_backend.upcase %> </li>
           <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
@@ -95,10 +98,14 @@
           <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
       <% end %>
-      <% if can? :teach, @organization %>
+      <% if can? :teach, @course %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock dates', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
+        <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-default btn-mini" %>
         <%= link_to 'Edit course parameters', edit_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
+      <% end %>
+      <% if can? :teach, @organization %>
+        <%= link_to 'Manage assistants', organization_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
       <% end %>
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>

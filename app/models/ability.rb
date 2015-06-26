@@ -23,42 +23,90 @@ class Ability
       cannot :read, User
       cannot :read, :code_reviews
       cannot :read, :course_information
-      can :read, User, id: user.id
+
+      # This check is bit heavy with sql queries if used in views to iterate on lists
+      can :read, User do |u|
+        u.readable_by?(user)
+      end
+
       can :create, User if SiteSetting.value(:enable_signup)
 
       cannot :read, Course
       can :read, Course do |c|
-        c.visible_to?(user)
+        c.visible_to?(user) || (can? :teach, c)
       end
       can :create, Course do |c|
-        c.taught_by?(user)
+        can? :teach, c.organization
       end
       can :refresh, Course do |c|
-        c.taught_by?(user)
+        can? :teach, c.organization
       end
 
       cannot :read, Exercise
       can :read, Exercise do |ex|
-        ex.visible_to?(user)
+        ex.visible_to?(user) || (can? :teach, ex.course)
       end
       can :download, Exercise do |ex|
         ex.downloadable_by?(user)
       end
 
       cannot :read, Submission
-      can :read, Submission, user_id: user.id
+      can :read, Submission do |sub|
+        sub.readable_by?(user) || (can? :teach, sub.course)
+      end
+
       can :create, Submission do |sub|
         sub.exercise.submittable_by?(user)
       end
 
+      can :update, Submission do |sub|
+        can? :teach, sub.course
+      end
+
+      cannot :manage_feedback_questions, Course
+      can :manage_feedback_questions, Course do |c|
+        can? :teach, c
+      end
+
       cannot :read, FeedbackAnswer
+      can :read_feedback_answers, Course do |c|
+        can? :teach, c
+      end
+      can :read_feedback_answers, Exercise do |e|
+        can? :teach, e.course
+      end
+
+      cannot :read, FeedbackQuestion
+      can :read_feedback_questions, Course do |c|
+        can? :teach, c
+      end
+      can :read_feedback_questions, Exercise do |e|
+        can? :teach, e.course
+      end
+
+      can :reply_feedback_answer, FeedbackAnswer do |ans|
+        can? :teach, ans.course
+      end
+
       can :create, FeedbackAnswer do |ans|
         ans.submission.user_id == user.id
       end
 
       cannot :read, Solution
       can :read, Solution do |sol|
-        sol.visible_to?(user)
+        sol.visible_to?(user) || (can? :teach, sol.exercise.course)
+      end
+
+      cannot :manage, Review
+      can :manage, Review do |r|
+        r.manageable_by?(user) || (can? :teach, r.submission.course)
+      end
+      can :read, Review do |r|
+        r.readable_by?(user) || (can? :teach, r.submission.course)
+      end
+
+      can :create_review, Course do |c|
+        can? :teach, c
       end
 
       cannot :mark_as_read, Review
@@ -71,7 +119,16 @@ class Ability
       end
 
       can :view_code_reviews, Course do |c|
-        c.submissions.exists?(user_id: user.id, reviewed: true)
+        c.submissions.exists?(user_id: user.id, reviewed: true) || (can? :teach, c)
+      end
+
+      can :list_code_reviews, Course do |c|
+        can? :teach, c
+      end
+
+      cannot :create, AwardedPoint
+      can :create, AwardedPoint do |ap|
+        can? :teach, ap.course
       end
 
       cannot :reply, FeedbackAnswer
@@ -92,6 +149,11 @@ class Ability
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
       end
 
+      cannot :teach, Course
+      can :teach, Course do |c|
+        return false if c.organization.rejected?
+        c.organization.teacher?(user) || c.assistant?(user)
+      end
     end
   end
 end

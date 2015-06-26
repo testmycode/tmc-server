@@ -35,9 +35,18 @@ require 'cgi' # for escapeHTML
     FactoryGirl.create :user, login: 'professor', password: 'professor'
     FactoryGirl.create :admin, login: 'admin', password: 'admin'
     FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
-    FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101'
-    FactoryGirl.create :course_template, name: 'prog102', title: 'Programming 102'
-    FactoryGirl.create :course_template, name: 'skynet', title: 'Skynet laboratory'
+
+    repo_path = "#{::Rails.root}/tmp/tests/fake_remote_repo"
+    create_bare_repo(repo_path)
+    clone_path = repo_path + '-wc'
+    clone_repo(repo_path, clone_path)
+    repo = GitRepo.new(clone_path)
+    repo.copy_simple_exercise('HelloWorld')
+    repo.add_commit_push
+
+    FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_path
+    FactoryGirl.create :course_template, name: 'prog102', title: 'Programming 102', source_url: repo_path
+    FactoryGirl.create :course_template, name: 'skynet', title: 'Skynet laboratory', source_url: repo_path
   %>
 
   <h1>Teacher Manual</h1>
@@ -277,6 +286,36 @@ require 'cgi' # for escapeHTML
    click_on 'Enable Course'
 %>
 
+  <h2>Adding course assistants</h2>
+
+  <p>
+    Course assistants have teacher permissions for single course, not for whole organization.
+    You can add course assistants by going to course page and clicking 'Manage assistants' button.
+  </p>
+
+<%
+   visit '/org/hy/courses/1'
+   highlight 'a:contains("Manage assistants")'
+%>
+<%= screenshot %>
+
+  <p>
+    Adding new course assistants works same way as adding new teacher, so you need to enter assistant's username.
+  </p>
+
+<%
+   click_on 'Manage assistants'
+   highlight 'a:contains("Add a new assistant")'
+%>
+<%= screenshot %>
+
+<%
+   click_on 'Add a new assistant'
+   fill_in 'username', with: 'assistant'
+   highlight '[value="Add a new assistant"]'
+%>
+<%= screenshot %>
+
   <h2>Course progression</h2>
 
   <p>
@@ -342,6 +381,206 @@ require 'cgi' # for escapeHTML
    course.exercise_group_by_name('').group_unlock_conditions = ['01-01-2011'].to_json
    UncomputedUnlock.create_all_for_course_eager(course)
    click_on 'Manage unlock dates'
+%>
+<%= screenshot %>
+
+  <h2>Managing feedback questions</h2>
+
+  <p>
+    Every course can have feedback questions, which are asked after successful submission.
+    Questions can be configured by clicking 'Manage feedback questions' from course front page.
+  </p>
+
+<%
+   visit '/org/hy/courses/1'
+   highlight 'a:contains("Manage feedback questions")'
+%>
+<%= screenshot %>
+
+  <p>
+    New question can be added by clicking 'Add question'.
+  </p>
+
+<%
+   click_on 'Manage feedback questions'
+   highlight 'a:contains("Add question")'
+
+%>
+<%= screenshot %>
+
+  <p>
+    First enter the question text and shorter title, which can be shown on result view. Questions can be either
+    free text answers or number value from selected range. If you want to create free text question, choose
+    'Text area' as question type.
+  </p>
+
+<%
+   click_on 'Add question'
+   fill_in 'feedback_question_question', with: 'What problems you had in this exercise?'
+   fill_in 'feedback_question_title', with: 'problems'
+   choose('Text area')
+   highlight '[value="Create question"]'
+
+%>
+<%= screenshot %>
+<%
+   click_on 'Create question'
+%>
+
+  <p>
+    If you want to create question with number valua answers, for example for statistical purposes, you can choose
+    'Integer range' option instead. New input fiels for minimum and maximum values are shown.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/feedback_questions/new'
+   fill_in 'feedback_question_question', with: 'How difficult was this exercise (1-5)?'
+   fill_in 'feedback_question_title', with: 'difficulty'
+   choose('Integer range')
+   fill_in 'intrange_min', with: '1'
+   fill_in 'intrange_max', with: '5'
+
+   highlight '[value="Create question"]'
+%>
+<%= screenshot %>
+<%
+   click_on 'Create question'
+%>
+
+  <p>
+    When questions are made, you can adjust their order with 'Up' and 'Down' options. Question can be removed
+    by clicking 'Delete'.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/feedback_questions/'
+   highlight 'a:contains("Up")'
+   highlight 'a:contains("Down")'
+   highlight 'a:contains("Delete")'
+
+%>
+<%= screenshot %>
+
+  <p>
+    After students have answered to questions, the answers can be viewed by clicking 'View feedback' from
+    course main page.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/'
+   highlight 'a:contains("View feedback")'
+%>
+<%= screenshot %>
+
+  <h2>Code review</h2>
+
+  <p>
+    Some assignments require code review to be completed, and students can also request code review if they want.
+    If there are unreviewed requests, course front page has link 'n code view requested'. You can start review process
+    by clickin that link.
+  </p>
+
+  <p>
+    Also submission list on the bottom of the page shows individually if submission still requires review.
+  </p>
+
+<%
+   student = FactoryGirl.create :user, login: 'student'
+   course = Course.find(1)
+   exercise1 = course.exercises.find_by(name: 'arith_funcs')
+   submission = FactoryGirl.create :submission, course: course, user: student, exercise: exercise1, requests_review: true
+   submission_data = FactoryGirl.create :submission_data, submission: submission
+   available_point = FactoryGirl.create :available_point, exercise: exercise1
+   available_point.award_to(student, submission)
+
+   visit '/org/hy/courses/1/'
+   highlight 'a:contains("Requested")'
+   highlight 'a:contains("1 code review requested")'
+%>
+<%= screenshot %>
+
+  <p>
+    Review page shows all submission which still require review. Click the 'Requested' link for the submission which
+    you want to review.
+  </p>
+
+<%
+   click_on '1 code review requested'
+   highlight 'a:contains("Requested")'
+
+%>
+<%= screenshot %>
+
+  <p>
+    On the actual review screen, you can see studens answer code at the bottom of the page. Showing test results
+    can be toggled by clicking 'Test results'. When you have taken look at the code, click 'Start code review'
+    to start writing your actual review feedback.
+  </p>
+
+<%
+   click_on 'Requested'
+   highlight 'button:contains("Start code review")'
+
+%>
+<%= screenshot %>
+
+  <p>
+    Write you review text in the textarea. If you want to notify the student by email, you can check 'Notify
+    by e-mail' checkbox. When you are ready, click 'Save review', and review process is done.
+  </p>
+
+<%
+   click_on 'Start code review'
+   fill_in 'review_review_body', with: 'Code looks ok but you could...'
+   highlight 'label:contains("Notify by e-mail")'
+   highlight 'button:contains("Save review")'
+   sleep 1      # to prevent javascript animation to be captured
+%>
+<%= screenshot %>
+
+  <h2>Checking points and students progression</h2>
+
+  <p>
+    Students current progress can be check from the points page. It is accessible through 'View points' link from
+    the course front page.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/'
+   highlight 'a:contains("View points")'
+%>
+<%= screenshot %>
+
+  <p>
+    This page show summary of all students and exercise groups. If you want to see single student's data, click his
+    username.
+  </p>
+
+<%
+   click_on 'View points'
+   highlight 'a:contains("student")'
+%>
+<%= screenshot %>
+
+  <p>
+    On the student's page you can see summary of his progress in all courses, for example how many percentages of
+    all exercises have been completed. At the bottom of the page there's list of his submission history. If you want
+    to check some single submission data, you can click 'Details' link.
+  </p>
+
+<%
+   click_on 'student'
+   highlight 'a:contains("Details")'
+%>
+<%= screenshot %>
+
+  <p>
+    On the submission details page you can see all relevant data to submission, including student's answers,
+    test results, and suggested solution. You can also rerun submission and start code review.
+  </p>
+
+<%
+   click_on 'Details'
 %>
 <%= screenshot %>
 

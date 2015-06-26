@@ -70,11 +70,11 @@
     <tbody>
       <% @summary[:users].each_with_index do |user, index| %>
         <% username = user.login %>
-        <% row_class = if user.administrator? then "admin" else "student" end %>
+        <% row_class = if user.administrator? || user.teacher?(@organization) then "admin" else "student" end %>
         <tr class="<%= row_class %>">
           <td><%= index + 1 %></td>
           <td>
-            <% if can? :read, user %>
+            <% if current_user.id == user.id || (can? :teach, @course) %>
               <%= link_to username, participant_path(user) %>
             <% else %>
               <%= username %>

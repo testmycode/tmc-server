@@ -14,7 +14,7 @@ class ExercisesController < ApplicationController
         Course.transaction(requires_new: true) do
           if !current_user.guest?
             @submissions = @exercise.submissions.order('submissions.created_at DESC')
-            @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
+            @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator? || current_user.teacher?(@organization)
             @submissions = @submissions.includes(:awarded_points).includes(:user)
           else
             @submissions = nil
@@ -52,5 +52,21 @@ class ExercisesController < ApplicationController
         render json: data.to_json
       end
     end
+  end
+
+  def set_disabled_statuses
+    @course = Course.find(params[:course_id])
+    @organization = @course.organization
+    authorize! :teach, @organization
+
+    action = params[:commit] == 'Disable selected' ? :disabled : :enabled
+    exercise_params = params[:course][:exercises]
+    exercise_params.reject!(&:blank?)
+
+    exercises = Exercise.where(id: exercise_params)
+    exercises.update_all(disabled_status: Exercise.disabled_statuses[action])
+
+    redirect_to manage_exercises_organization_course_path(@organization, @course),
+                notice: 'Selected exercises successfully updated.'
   end
 end

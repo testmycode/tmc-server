@@ -35,6 +35,8 @@ class Course < ActiveRecord::Base
   has_many :unlocks, dependent: :delete_all
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :course_notifications, dependent: :delete_all
+  has_many :assistantships, dependent: :destroy
+  has_many :assistants, through: :assistantships, source: :user
 
   belongs_to :organization
 
@@ -46,6 +48,7 @@ class Course < ActiveRecord::Base
     # Even self.association.delete_all first does a SELECT.
     # This relies on the database to cascade deletes.
     ActiveRecord::Base.connection.execute("DELETE FROM courses WHERE id = #{id}")
+    assistantships.each { |a| a.destroy! } # apparently this is not performed automatically with optimized destroy
 
     # Delete cache.
     delete_cache # Would be an after_destroy callback normally
@@ -56,7 +59,8 @@ class Course < ActiveRecord::Base
 
   def visible_to?(user)
     user.administrator? ||
-    user.teacher?(organization) || (
+    user.teacher?(organization) ||
+    user.assistant?(self) || (
       !disabled? &&
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
@@ -294,7 +298,11 @@ class Course < ActiveRecord::Base
   end
 
   def taught_by?(user)
-    user.teacher?(self.organization)
+    user.teacher?(organization)
+  end
+
+  def assistant?(user)
+    assistants.exists?(user)
   end
 
   def material_url=(material)
