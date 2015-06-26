@@ -23,9 +23,13 @@ feature 'Teacher edits unlock dates', feature: true do
     visit '/'
   end
 
+  def visit_course
+    visit "/org/slug/courses/#{@course.id}"
+  end
+
   scenario 'Teacher sees default unlock dates' do
     log_in_as(@teacher.login, 'xooxer')
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'Manage unlock dates'
 
     expect(page).to have_field('empty_group_0', with: '1.1.2011')
@@ -33,7 +37,7 @@ feature 'Teacher edits unlock dates', feature: true do
 
   scenario 'Teacher sets new unlock date' do
     log_in_as(@teacher.login, 'xooxer')
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'Manage unlock dates'
 
     fill_in 'empty_group_0', with: '4.6.2015'
@@ -44,7 +48,7 @@ feature 'Teacher edits unlock dates', feature: true do
 
   scenario 'Exercises are locked if teacher sets unlock date to be later than current time' do
     log_in_as(@teacher.login, 'xooxer')
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'Manage unlock dates'
 
     fill_in 'empty_group_0', with: "#{Time.now + 3.days}"
@@ -55,7 +59,7 @@ feature 'Teacher edits unlock dates', feature: true do
 
   scenario 'Exercises are unlocked if teacher sets unlock date to be earlier than current time' do
     log_in_as(@teacher.login, 'xooxer')
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'Manage unlock dates'
 
     fill_in 'empty_group_0', with: "#{Time.now - 3.days}"
@@ -66,7 +70,7 @@ feature 'Teacher edits unlock dates', feature: true do
 
   scenario 'Teacher can set empty unlock date' do
     log_in_as(@teacher.login, 'xooxer')
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'Manage unlock dates'
 
     fill_in 'empty_group_0', with: ''
@@ -75,9 +79,9 @@ feature 'Teacher edits unlock dates', feature: true do
     expect(page).to have_field('empty_group_0', with: '')
   end
 
-  scenario 'Teacher cant edit unlock date with wrong format' do
+  scenario 'Teacher cannot edit unlock date with wrong format' do
     log_in_as(@teacher.login, 'xooxer')
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'Manage unlock dates'
 
     fill_in 'empty_group_0', with: '32.13.abcd'
@@ -87,9 +91,30 @@ feature 'Teacher edits unlock dates', feature: true do
     expect(page).to have_field('empty_group_0', with: '1.1.2011')
   end
 
+  scenario 'Teacher can set multiple unlock conditions' do
+    log_in_as(@teacher.login, 'xooxer')
+    visit_course
+    click_link 'Manage unlock dates'
+    fill_in 'empty_group_0', with: '2.2.2012'
+    click_link 'Add a condition'
+    fill_in 'empty_group_1', with: '3.3.2013'
+    click_link 'Add a condition'
+    fill_in 'empty_group_2', with: '4.4.2014'
+    click_link 'Add a condition'
+    click_link 'Add a condition'
+
+    click_button 'Save changes'
+    expect(page).to_not have_field('empty_group_0', with: '1.1.2011')
+    expect(page).to have_field('empty_group_0', with: '2.2.2012')
+    expect(page).to have_field('empty_group_1', with: '3.3.2013')
+    expect(page).to have_field('empty_group_2', with: '4.4.2014')
+    expect(page).to_not have_field('empty_group_3')
+    expect(page).to_not have_field('empty_group_4')
+  end
+
   scenario 'Non-teacher doesnt have access to editing unlock dates' do
     log_in_as(@user.login, 'foobar')
-    visit '/org/slug/courses/1'
+    visit_course
     expect(page).not_to have_content('Manage unlock dates')
   end
 end
