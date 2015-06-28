@@ -1,10 +1,9 @@
-<h1>Add a new assistant to <%= @course.title %></h1>
+<h4>Add a new assistant (give username)</h4>
 
 <%= form_tag :organization_course_assistants do %>
   <%= render 'shared/error_messages', target: @assistantship %>
 
   <div class="field">
-    <%= label_tag :username %><br>
     <%= text_field_tag :username %>
   </div>
   <div class="actions">

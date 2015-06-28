@@ -144,6 +144,14 @@ class Ability
       can :request, :organization
       cannot :request, :organization if user.guest?
 
+      can :remove_teacher, Organization do |o|
+        can? :teach, o
+      end
+
+      can :remove_assistant, Course do |c|
+        can? :teach, c.organization
+      end
+
       cannot :teach, Organization
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?

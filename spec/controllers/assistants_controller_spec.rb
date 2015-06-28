@@ -45,6 +45,15 @@ describe AssistantsController, type: :controller do
         end.to change(Assistantship, :count).by(0)
       end
     end
+
+    describe 'DELETE destroy' do
+      it 'removes assistant' do
+        @assistantship = Assistantship.create! user: @user, course: @course
+        expect do
+          delete :destroy, organization_id: @organization.slug, course_id: @course.id, id: @assistantship.to_param
+        end.to change(Assistantship, :count).by(-1)
+      end
+    end
   end
 
   describe 'As a user' do
@@ -62,6 +71,14 @@ describe AssistantsController, type: :controller do
     describe 'POST create' do
       it 'denies access' do
         post :create, organization_id: @organization.slug, course_id: @course.id, username: @user.username
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+
+    describe 'DELETE destroy' do
+      it 'denies access' do
+        @assistantship = Assistantship.create! user: @user, course: @course
+        delete :destroy, organization_id: @organization.slug, course_id: @course, id: @assistantship.to_param
         expect(response.code.to_i).to eq(401)
       end
     end
