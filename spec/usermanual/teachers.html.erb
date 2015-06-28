@@ -487,7 +487,7 @@ require 'cgi' # for escapeHTML
 <%
    student = FactoryGirl.create :user, login: 'student'
    course = Course.find(1)
-   exercise1 = course.exercises.find_by(name: 'arith_funcs')
+   exercise1 = course.exercises.find_by(name: 'HelloWorld')
    submission = FactoryGirl.create :submission, course: course, user: student, exercise: exercise1, requests_review: true
    submission_data = FactoryGirl.create :submission_data, submission: submission
    available_point = FactoryGirl.create :available_point, exercise: exercise1
@@ -511,11 +511,11 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
-  <p>
-    On the actual review screen, you can see studens answer code at the bottom of the page. Showing test results
-    can be toggled by clicking 'Test results'. When you have taken look at the code, click 'Start code review'
-    to start writing your actual review feedback.
-  </p>
+<p>
+  On the actual review screen, you can see studens answer code at the bottom of the page. Showing test results
+  can be toggled by clicking 'Test results'. When you have taken look at the code, click 'Start code review'
+  to start writing your actual review feedback.
+</p>
 
 <%
    click_on 'Requested'

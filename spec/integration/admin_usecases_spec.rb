@@ -5,6 +5,8 @@ describe 'The system (used by an instructor for administration)', type: :request
 
   before :each do
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryGirl.create(:user)
+    Teachership.create user_id: @teacher.id, organization_id: @organization.id
 
     visit '/'
     @user = FactoryGirl.create(:admin, password: 'xooxer')

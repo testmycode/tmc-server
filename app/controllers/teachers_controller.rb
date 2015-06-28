@@ -5,11 +5,16 @@ class TeachersController < ApplicationController
   def index
     authorize! :teach, @organization
     @teachers = @organization.teachers
+    add_organization_breadcrumb
+    add_breadcrumb 'Teachers list'
   end
 
   def new
     authorize! :teach, @organization
     @teachership = Teachership.new
+    add_organization_breadcrumb
+    add_breadcrumb 'Teachers list', organization_teachers_path(@organization)
+    add_breadcrumb 'Add a new teacher'
   end
 
   def create

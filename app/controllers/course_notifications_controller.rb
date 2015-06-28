@@ -5,6 +5,9 @@ class CourseNotificationsController < ApplicationController
 
   def new
     @notifier ||= CourseNotification.new
+    @course = Course.find_by(id: params[:course_id])
+    add_course_breadcrumb
+    add_breadcrumb 'Course notification'
   end
 
   def create

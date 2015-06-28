@@ -4,22 +4,24 @@ class FeedbackQuestionsController < ApplicationController
   before_action :set_organization
 
   def index
+    authorize! :manage_feedback_questions, @course
     add_course_breadcrumb
     add_breadcrumb 'Feedback questions'
-
     @questions = @course.feedback_questions.order(:position)
-    authorize! :manage_feedback_questions, @course
   end
 
   def new
-    @question = FeedbackQuestion.new(course: @course)
     authorize! :manage_feedback_questions, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
+    add_breadcrumb 'Add new question'
+    @question = FeedbackQuestion.new(course: @course)
   end
 
   def create
+    authorize! :manage_feedback_questions, @course
     @question = FeedbackQuestion.new(feedback_question_params[:feedback_question])
     @question.course = @course
-    authorize! :manage_feedback_questions, @course
 
     fix_question_kind(@question)
 
@@ -35,7 +37,11 @@ class FeedbackQuestionsController < ApplicationController
   def show
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
+    @organization = @course.organization
     authorize! :manage_feedback_questions, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
+    add_breadcrumb "Question #{@question.title}"
   end
 
   def update

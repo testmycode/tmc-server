@@ -7,15 +7,14 @@ class CoursesController < ApplicationController
   before_action :set_organization
   before_action :set_course, except: [:create, :help, :index, :new, :show_json]
 
+  skip_authorization_check only: [:index]
+
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
 
     respond_to do |format|
       format.html do
-        @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
-        @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
-        authorize! :read, @ongoing_courses
-        authorize! :read, @expired_courses
+        redirect_to organization_path(@organization)
       end
       format.json do
         courses = @organization.courses.ongoing.order(ordering)
@@ -76,8 +75,10 @@ class CoursesController < ApplicationController
   end
 
   def new
-    @course = Course.new
     authorize! :teach, @organization
+    add_organization_breadcrumb
+    add_breadcrumb 'Create new course'
+    @course = Course.new
   end
 
   def create
@@ -97,6 +98,8 @@ class CoursesController < ApplicationController
 
   def edit
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Edit course parameters'
   end
 
   def update
@@ -110,6 +113,8 @@ class CoursesController < ApplicationController
 
   def manage_deadlines
     authorize! :teach, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage deadlines'
     assign_show_view_vars
   end
 
@@ -144,10 +149,14 @@ class CoursesController < ApplicationController
   def help
     @course = Course.find(params[:course_id])
     authorize! :read, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Help page'
   end
 
   def manage_unlocks
     authorize! :teach, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage unlocks'
     assign_show_view_vars
   end
 
@@ -169,6 +178,8 @@ class CoursesController < ApplicationController
 
   def manage_exercises
     authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage exercises'
     @exercises = @course.exercises.natsort_by(&:name)
     @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end
