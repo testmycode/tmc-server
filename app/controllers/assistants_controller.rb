@@ -24,6 +24,13 @@ class AssistantsController < ApplicationController
     end
   end
 
+  def destroy
+    authorize! :remove_assistant, @course
+    @assistantship = Assistantship.find(params[:id])
+    @assistantship.destroy!
+    redirect_to organization_course_assistants_path, notice: 'Assistant removed from course'
+  end
+
   private
 
   def set_course
