@@ -314,10 +314,7 @@ class Course < ActiveRecord::Base
   end
 
   def contains_unlock_deadlines?
-    exercise_groups.each do |group|
-      return true if group.contains_unlock_deadlines?
-    end
-    false
+    exercise_groups.any? { |group| group.contains_unlock_deadlines?}
   end
 
   private

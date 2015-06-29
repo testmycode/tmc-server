@@ -70,10 +70,7 @@ class ExerciseGroup
   end
 
   def contains_unlock_deadlines?
-    exercises(false).each do |e|
-      return true if e.has_unlock_deadline?
-    end
-    false
+    exercises(false).any? { |e| e.has_unlock_deadline?}
   end
 
   def hard_group_deadline=(deadline)
