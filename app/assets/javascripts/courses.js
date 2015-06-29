@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var toggle_reply_form_and_button = function (e) {
+    var toggle_reply_form_and_button = function(e) {
         var id = e.target.id.substring(7);
         $("#form_"+id).toggle();
         $("#button_"+id).toggle();
@@ -9,7 +9,7 @@ $(document).ready(function() {
     $(".feedback-reply-button").click(toggle_reply_form_and_button);
     $(".feedback-reply-cancel-button").click(toggle_reply_form_and_button);
 
-    var toggle_feedback_reply = function (e) {
+    var toggle_feedback_reply = function(e) {
         var id = e.target.id.substring(5);
         $("#repl_"+id).toggle();
         $("#show_"+id).toggle();
@@ -27,7 +27,7 @@ $(document).ready(function() {
 
     var deadline_group_toggle_statuses = {};
 
-    var toggle_deadline_group_status = function (id) {
+    var toggle_deadline_group_status = function(id) {
         if (deadline_group_toggle_statuses.hasOwnProperty(id)) {
             deadline_group_toggle_statuses[id] = !deadline_group_toggle_statuses[id];
         } else {
@@ -35,7 +35,7 @@ $(document).ready(function() {
         }
     };
 
-    var get_deadline_group_toggle_status = function (id) {
+    var get_deadline_group_toggle_status = function(id) {
         if (deadline_group_toggle_statuses.hasOwnProperty(id)) {
             return deadline_group_toggle_statuses[id];
         } else {
@@ -43,7 +43,7 @@ $(document).ready(function() {
         }
     };
 
-    var toggle_deadline_grouping = function (e) {
+    var toggle_deadline_grouping = function(e) {
         var id = e.target.id.substring(8);
         toggle_deadline_group_status(id);
 
@@ -62,7 +62,7 @@ $(document).ready(function() {
 
     $(".toggle-groups-exercises").click(toggle_deadline_grouping);
 
-    var reset_group_deadlines = function (e) {
+    var reset_group_deadlines = function(e) {
         if (!confirm("Clear deadlines in this group?")) {
             return;
         }
@@ -86,7 +86,7 @@ $(document).ready(function() {
 
     $(".reset-group-deadlines").click(reset_group_deadlines);
 
-    var toggle_advanced_deadline_options = function (e) {
+    var toggle_advanced_deadline_options = function(e) {
         $(".unlock-deadline-field").toggle();
     };
 
