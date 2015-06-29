@@ -9,7 +9,15 @@ feature 'Teacher creates course from course template', feature: true do
     @user = FactoryGirl.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create :course_template, name: 'template', title: 'template', source_url: 'https://github.com/testmycode/tmc-testcourse.git'
+    repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(repo_path)
+    clone_path = repo_path + '-wc'
+    clone_repo(repo_path, clone_path)
+    repo = GitRepo.new(clone_path)
+    repo.copy_simple_exercise('MyExercise')
+    repo.add_commit_push
+
+    FactoryGirl.create :course_template, name: 'template', title: 'template', source_url: repo_path
 
     visit '/'
   end
@@ -33,8 +41,7 @@ feature 'Teacher creates course from course template', feature: true do
     expect(page).to have_content('help page')
 
     click_link 'View status page'
-    expect(page).to have_content('arith_funcs')
-    expect(page).to have_content('maven_exercise')
+    expect(page).to have_content('MyExercise')
 
     visit '/org/slug/courses'
     expect(page).to have_content('Custom Title')

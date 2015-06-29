@@ -1,10 +1,13 @@
 # Handles emailing notification to every participant
 class CourseNotificationsController < ApplicationController
-  before_action :auth
   before_action :set_organization
+  before_action :auth
 
   def new
     @notifier ||= CourseNotification.new
+    @course = Course.find_by(id: params[:course_id])
+    add_course_breadcrumb
+    add_breadcrumb 'Course notification'
   end
 
   def create
@@ -47,7 +50,7 @@ class CourseNotificationsController < ApplicationController
   end
 
   def auth
-    authorize! :email, CourseNotification
+    authorize! :teach, @organization
   end
 
   def set_organization
