@@ -39,6 +39,7 @@ class Course < ActiveRecord::Base
   has_many :assistants, through: :assistantships, source: :user
 
   belongs_to :organization
+  belongs_to :course_template
 
   enum disabled_status: [ :enabled, :disabled ]
 
@@ -311,6 +312,10 @@ class Course < ActiveRecord::Base
       return super("http://#{material}")
     end
     super(material)
+  end
+
+  def custom?
+    course_template_id.nil?
   end
 
   private

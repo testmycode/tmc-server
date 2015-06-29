@@ -70,12 +70,14 @@ class CoursesController < ApplicationController
   end
 
   def refresh
+    authorize! :refresh, @course
     refresh_course(@course)
     redirect_to organization_course_path
   end
 
   def new
     authorize! :teach, @organization
+    return respond_access_denied('Custom courses not enabled') unless custom_courses_enabled?
     add_organization_breadcrumb
     add_breadcrumb 'Create new course'
     @course = Course.new
@@ -85,6 +87,7 @@ class CoursesController < ApplicationController
     @course = Course.new(course_params_for_create)
     @course.organization = @organization
     authorize! :teach, @organization
+    return respond_access_denied('Custom courses not enabled') if @course.custom? && !custom_courses_enabled?
 
     respond_to do |format|
       if @course.save
@@ -187,7 +190,7 @@ class CoursesController < ApplicationController
   private
 
   def course_params_for_create
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :course_template_id)
   end
 
   def course_params
@@ -229,11 +232,14 @@ class CoursesController < ApplicationController
   end
 
   def refresh_course(course)
-    authorize! :refresh, course
     begin
       session[:refresh_report] = course.refresh
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
     end
+  end
+
+  def custom_courses_enabled?
+    SiteSetting.value('enable_custom_repositories')
   end
 end
