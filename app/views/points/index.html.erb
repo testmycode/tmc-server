@@ -39,7 +39,7 @@
         <th>
           Student<br />
           <% unless params[:sort_by].blank? %>
-            [<%= link_to 'sort', course_points_path(@course) %>]
+            [<%= link_to 'sort', organization_course_points_path(@organization, @course) %>]
           <% else %>
             [sort]
           <% end %>
@@ -59,7 +59,7 @@
           <th>
             Total<br />
             <% unless params[:sort_by] == 'total_points' %>
-              [<%= link_to 'sort', course_points_path(@course, :sort_by => "total_points") %>]
+              [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "total_points") %>]
             <% else %>
               [sort]
             <% end %>

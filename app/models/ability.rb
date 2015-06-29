@@ -141,6 +141,30 @@ class Ability
         ct.clonable?
       end
 
+      can :list_user_emails, Course do |c|
+        can? :teach, c
+      end
+
+      can :send_mail_to_participants, Course do |c|
+        can? :teach, c
+      end
+
+      can :manage_deadlines, Course do |c|
+        can? :teach, c
+      end
+
+      can :manage_unlocks, Course do |c|
+        can? :teach, c
+      end
+
+      can :manage_exercises, Course do |c|
+        can? :teach, c.organization
+      end
+
+      can :edit_course_paramaters, Course do |c|
+        can? :teach, c.organization
+      end
+
       can :request, :organization
       cannot :request, :organization if user.guest?
 

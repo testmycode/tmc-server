@@ -4,8 +4,7 @@ require 'cancan/matchers'
 describe CourseNotificationsController, type: :controller do
   before :each do
     @organization = FactoryGirl.create(:accepted_organization)
-    @course = FactoryGirl.create(:course)
-    @course.organization = @organization
+    @course = FactoryGirl.create(:course, organization: @organization)
   end
 
   let(:topic) { 'Hi all' }

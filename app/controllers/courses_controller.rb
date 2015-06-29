@@ -97,13 +97,13 @@ class CoursesController < ApplicationController
   end
 
   def edit
-    authorize! :teach, @organization
+    authorize! :edit_course_paramaters, @course
     add_course_breadcrumb
     add_breadcrumb 'Edit course parameters'
   end
 
   def update
-    authorize! :teach, @organization
+    authorize! :edit_course_paramaters, @course
     if @course.update(course_params)
       redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
     else
@@ -112,14 +112,14 @@ class CoursesController < ApplicationController
   end
 
   def manage_deadlines
-    authorize! :teach, @course
+    authorize! :manage_deadlines, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage deadlines'
     assign_show_view_vars
   end
 
   def save_deadlines
-    authorize! :teach, @course
+    authorize! :manage_deadlines, @course
 
     groups = group_params
     groups.each do |name, deadlines|
@@ -167,14 +167,14 @@ class CoursesController < ApplicationController
   end
 
   def manage_unlocks
-    authorize! :teach, @course
+    authorize! :manage_unlocks, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage unlocks'
     assign_show_view_vars
   end
 
   def save_unlocks
-    authorize! :teach, @course
+    authorize! :manage_unlocks, @course
 
     groups = group_params
     groups.each do |name, conditions|
@@ -190,7 +190,7 @@ class CoursesController < ApplicationController
   end
 
   def manage_exercises
-    authorize! :teach, @organization
+    authorize! :manage_exercises, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage exercises'
     @exercises = @course.exercises.natsort_by(&:name)
