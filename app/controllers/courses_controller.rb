@@ -129,6 +129,19 @@ class CoursesController < ApplicationController
       @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
     end
 
+    exercises = params[:exercise] || {}
+    exercises.each do |name, deadlines|
+      soft_deadlines = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
+      hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
+
+      exercise = Exercise.where(course_id: @course.id).find_by(name: name)
+      unless exercise.nil?
+        exercise.soft_deadline_spec = soft_deadlines
+        exercise.deadline_spec = hard_deadlines
+        exercise.save!
+      end
+    end
+
     redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
   rescue DeadlineSpec::InvalidSyntaxError => e
     redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s

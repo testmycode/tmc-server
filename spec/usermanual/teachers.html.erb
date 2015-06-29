@@ -336,7 +336,7 @@ require 'cgi' # for escapeHTML
 
 <%
    course = Course.find_by id: 1
-   course.exercise_group_by_name('').hard_group_deadline = ['01-01-2011'].to_json
+   course.exercise_group_by_name('').hard_group_deadline = ['01.01.2011'].to_json
    click_on 'Manage deadlines'
 %>
 <%= screenshot %>
@@ -348,15 +348,75 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    Common deadlines are configured by date (in any format, be it finnish '1.1.2000' or us '2000-1-1').
-    Unlock-based deadlines count down some period of time after unlocking the exercise manually, and are configured
-    via input: <code>unlock + 2 weeks</code> (quick example).
-    Unlock based deadlines also accept: <code>&lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code>
+    Common deadlines are configured by date or date-time. TMC understands multiple formats, for example:
+    <ul>
+      <li>20.1.2000</li>
+      <li>30.12.2000 20:00</li>
+      <li>2000-1-20</li>
+      <li>2000-12-30 20:00</li>
+      <li>2000-12-30 8:00 PM</li>
+    </ul>
   </p>
 
   <p>
-    Fields for this form may be prefilled depending on course template configuration. After editing the deadlines,
-    form will be prefilled with given values on every refresh.
+    Unlock-based deadlines will calculate unique deadlines for each student based on the time they unlocked the exercise.
+    For example, to give students 2 weeks to complete an exercise after it becomes available, set the deadline to
+    <code>unlock + 2 weeks</code>. Other possible values for unlock-based deadlines are
+    <code>unlock + &lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code>.
+    To edit unlock-based deadlines, advanced options must be enabled by clicking the button in the top right corner of the page.
+  </p>
+
+  <p>
+    By default, the form is set to edit deadlines for all exercises in an exercise group at once. Exercises that the deadlines apply to
+    are listed on the 'Exercises' column. If you want to edit deadlines for individual exercises, click 'Show single exercises'.
+    This will expand the form to show all exercises in the group.
+  </p>
+
+<%
+  highlight 'a:contains("Show single exercises")'
+%>
+
+<%= screenshot %>
+<% click_on 'Show single exercises' %>
+<%= screenshot %>
+
+<%
+   i = 1
+   course.exercises.each do |e|
+     e.deadline_spec = ["#{i}.1.2000"].to_json
+     i += 1
+     e.save!
+   end
+   visit '/org/hy/courses/1/manage_deadlines'
+
+   disabled_text = find_field('empty_group_hard_static', disabled: true).value
+%>
+
+  <p>
+    If the exercises in a group have differing deadlines, the group deadline input fields will be disabled and show
+    '<%= disabled_text %>'.
+  </p>
+
+<%= screenshot %>
+
+  <p>
+    If you want to edit the deadlines for the whole group again, you need to change the single deadlines so they all
+    match within the group, or you can reset them by clicking 'Clear single deadlines'.
+  </p>
+
+<%
+   click_on 'Show single exercises'
+   highlight 'a:contains("Clear single deadlines")'
+%>
+
+<%= screenshot %>
+
+  <p>
+    If both date-based and unlock-based deadlines are enabled for the same exercise, the one which expires first wil be used.
+  </p>
+
+  <p>
+    After creating a course from template, the deadlines may already be defined depending on the course template configuration.
   </p>
 
   <h3>Unlock dates</h3>
