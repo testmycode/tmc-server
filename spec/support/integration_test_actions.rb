@@ -21,6 +21,7 @@ module IntegrationTestActions
     visit "/org/#{options[:organization_slug]}/courses"
     #save_and_open_page
     click_link 'Create New Course'
+    click_link 'Create New Custom Course'
     fill_in 'course_name', with: options[:name]
     fill_in 'course_title', with: options[:name]
     # fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
