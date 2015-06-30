@@ -41,7 +41,9 @@ require 'cgi' # for escapeHTML
     clone_path = repo_path + '-wc'
     clone_repo(repo_path, clone_path)
     repo = GitRepo.new(clone_path)
-    repo.copy_simple_exercise('HelloWorld')
+    repo.copy_simple_exercise('Week1/HelloWorld')
+    repo.copy_simple_exercise('Week1/SimpleExercise')
+    repo.copy_simple_exercise('Week2/HelloWorldAdvanced')
     repo.add_commit_push
 
     FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_path
@@ -336,7 +338,7 @@ require 'cgi' # for escapeHTML
 
 <%
    course = Course.find_by id: 1
-   course.exercise_group_by_name('').hard_group_deadline = ['01.01.2011'].to_json
+   course.exercise_group_by_name('Week1').hard_group_deadline = ['01.01.2011'].to_json
    click_on 'Manage deadlines'
 %>
 <%= screenshot %>
@@ -373,11 +375,11 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-  highlight 'a:contains("Show single exercises")'
+  highlight '#toggle1_Week1'
 %>
 
 <%= screenshot %>
-<% click_on 'Show single exercises' %>
+<% click_on 'toggle1_Week1' %>
 <%= screenshot %>
 
 <%
@@ -388,8 +390,7 @@ require 'cgi' # for escapeHTML
      e.save!
    end
    visit '/org/hy/courses/1/manage_deadlines'
-
-   disabled_text = find_field('empty_group_hard_static', disabled: true).value
+   disabled_text = find_field('group_Week1_hard_static', disabled: true).value
 %>
 
   <p>
@@ -405,7 +406,7 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   click_on 'Show single exercises'
+   click_on 'toggle1_Week1'
    highlight 'a:contains("Clear single deadlines")'
 %>
 
@@ -427,7 +428,7 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   course.exercise_group_by_name('').hard_group_deadline = [''].to_json
+   course.exercise_group_by_name('Week1').hard_group_deadline = [''].to_json
    visit '/org/hy/courses/1'
    highlight 'a:contains("Manage unlock dates")'
 %>
@@ -438,7 +439,7 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   course.exercise_group_by_name('').group_unlock_conditions = ['01-01-2011'].to_json
+   course.exercise_group_by_name('Week1').group_unlock_conditions = ['01-01-2011'].to_json
    UncomputedUnlock.create_all_for_course_eager(course)
    click_on 'Manage unlock dates'
 %>
@@ -547,7 +548,7 @@ require 'cgi' # for escapeHTML
 <%
    student = FactoryGirl.create :user, login: 'student'
    course = Course.find(1)
-   exercise1 = course.exercises.find_by(name: 'HelloWorld')
+   exercise1 = course.exercises.find_by(name: 'Week1-HelloWorld')
    submission = FactoryGirl.create :submission, course: course, user: student, exercise: exercise1, requests_review: true
    submission_data = FactoryGirl.create :submission_data, submission: submission
    available_point = FactoryGirl.create :available_point, exercise: exercise1
