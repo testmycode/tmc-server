@@ -22,22 +22,19 @@
       </ul>
       <% if can? :teach, @course %>
         <ul>
+          <li>Source type: <%= @course.source_backend.upcase %> </li>
+          <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
 
-          <% if can? :refresh, @course %>
-            <li>Source type: <%= @course.source_backend.upcase %> </li>
-            <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
-
-            <% if @course.source_backend == 'git' %>
-                <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
-                <% if github_url %>
-                    <li>Github URL: <%= link_to github_url, github_url %></li>
-                <% end %>
-                <li>Git branch: <%= @course.git_branch %></li>
-                <% gitrev = @course.git_revision %>
-                <% if gitrev %>
-                    <li>Git revision: <%= gitrev %></li>
-                <% end %>
-            <% end %>
+          <% if @course.source_backend == 'git' %>
+              <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
+              <% if github_url %>
+                <li>Github URL: <%= link_to github_url, github_url %></li>
+              <% end %>
+              <li>Git branch: <%= @course.git_branch %></li>
+              <% gitrev = @course.git_revision %>
+              <% if gitrev %>
+                <li>Git revision: <%= gitrev %></li>
+              <% end %>
           <% end %>
 
           <% if @course.refreshed_at %>
@@ -102,6 +99,7 @@
           <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
       <% end %>
+
       <% if can? :manage_deadlines, @course %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock dates', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>

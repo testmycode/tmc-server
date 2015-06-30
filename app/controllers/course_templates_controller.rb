@@ -62,12 +62,12 @@ class CourseTemplatesController < ApplicationController
     add_organization_breadcrumb
     add_breadcrumb 'Course templates', organization_course_templates_path
     add_breadcrumb 'Create new course'
-    @course = Course.new name: @course_template.name,
+    @course = Course.new(name: @course_template.name,
                          title: @course_template.title,
                          description: @course_template.description,
                          material_url: @course_template.material_url,
                          source_url: @course_template.source_url,
-                         course_template_id: @course_template.id
+                         course_template_id: @course_template.id)
   end
 
   def toggle_hidden
