@@ -48,12 +48,12 @@ class CourseTemplatesController < ApplicationController
     @organization = Organization.find_by(slug: params[:organization_id])
     authorize! :teach, @organization
     authorize! :clone, @course_template
-    @course = Course.new name: @course_template.name,
+    @course = Course.new(name: @course_template.name,
                          title: @course_template.title,
                          description: @course_template.description,
                          material_url: @course_template.material_url,
                          source_url: @course_template.source_url,
-                         course_template_id: @course_template.id
+                         course_template_id: @course_template.id)
   end
 
   def toggle_hidden
