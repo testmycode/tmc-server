@@ -4,7 +4,7 @@ TmcServer::Application.routes.draw do
       post 'accept'
       post 'reject'
       get 'reject_reason_input'
-      post 'toggle_hidden'
+      post 'toggle_visibility'
     end
 
     collection do
