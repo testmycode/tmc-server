@@ -98,7 +98,7 @@ class Ability
         c.organization.teacher?(user) || c.assistant?(user)
       end
 
-      can :toggle_hidden, Organization do |o|
+      can :toggle_visibility, Organization do |o|
         can? :teach, o
       end
     end
