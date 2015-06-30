@@ -124,11 +124,11 @@ describe OrganizationsController, type: :controller do
       controller.current_user = @user
     end
 
-    describe 'POST toggle_hidden' do
+    describe 'POST toggle_visibility' do
       it 'toggles value of hidden field between true and false' do
         org = FactoryGirl.create(:accepted_organization)
         Teachership.create(user_id: @user.id, organization_id: org.id)
-        post :toggle_hidden, id: org.to_param
+        post :toggle_visibility, id: org.to_param
         org.reload
         expect(org.hidden).to be true
         expect(response).to redirect_to(organization_path)
@@ -236,10 +236,10 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'POST toggle_hidden' do
+    describe 'POST toggle_visibility' do
       it 'denies access' do
         org = FactoryGirl.create(:accepted_organization)
-        post :toggle_hidden, id: org.to_param
+        post :toggle_visibility, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
     end
