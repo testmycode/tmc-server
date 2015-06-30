@@ -1,5 +1,5 @@
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input]
+  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input, :toggle_visibility]
 
   skip_authorization_check only: [:index]
 
@@ -49,12 +49,6 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  def destroy
-    authorize! :destroy, @organization
-    @organization.destroy
-    redirect_to organizations_path, notice: 'Organization was successfully destroyed.'
-  end
-
   def list_requests
     authorize! :view, :organization_requests
     add_breadcrumb 'New organization requests'
@@ -90,6 +84,13 @@ class OrganizationsController < ApplicationController
     else
       redirect_to organization_path(@organization)
     end
+  end
+
+  def toggle_visibility
+    authorize! :toggle_visibility, @organization
+    @organization.hidden = !@organization.hidden
+    @organization.save!
+    redirect_to organization_path, notice: "Organzation is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
   end
 
   private

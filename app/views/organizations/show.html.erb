@@ -28,6 +28,15 @@
   </p>
 
   <%= link_to 'Edit organization', edit_organization_path(@organization) %>
+  <br/><br/>
+<% end %>
+
+<% if can? :toggle_visibility, @organization %>
+  <p>
+    <strong><%= "#{@organization.hidden ? 'Status hidden:' : 'Status visible:'}" %></strong>
+    <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
+                method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger'}" %>
+  </p>
   <br/>
 <% end %>
 

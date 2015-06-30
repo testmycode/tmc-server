@@ -1,9 +1,10 @@
 TmcServer::Application.routes.draw do
-  resources :organizations, path: 'org' do
+  resources :organizations, except: :destory, path: 'org' do
     member do
       post 'accept'
       post 'reject'
       get 'reject_reason_input'
+      post 'toggle_visibility'
     end
 
     collection do
