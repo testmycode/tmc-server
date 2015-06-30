@@ -8,6 +8,8 @@ describe 'The system, receiving submissions with UTF-8 special characters', type
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryGirl.create(:user)
+    Teachership.create user_id: @teacher.id, organization_id: @organization.id
     @course = Course.create!(name: 'mycourse', title: 'mycourse', source_backend: 'git', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy(FixtureExercise.fixture_exercises_root + '/Utf8')

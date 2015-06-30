@@ -62,6 +62,17 @@ class ExerciseGroup
     group_deadline(:soft_deadline_spec_obj)
   end
 
+  # Returns true if all exercises in this group have the same deadline
+  def uniform_group_deadlines?
+    exercises(false).map do |e|
+      [e.static_deadline, e.unlock_deadline, e.soft_static_deadline, e.soft_unlock_deadline]
+    end.uniq.length == 1
+  end
+
+  def contains_unlock_deadlines?
+    exercises(false).any? { |e| e.has_unlock_deadline?}
+  end
+
   def hard_group_deadline=(deadline)
     set_group_deadline(:deadline_spec=, deadline)
   end

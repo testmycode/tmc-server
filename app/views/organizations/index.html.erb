@@ -1,4 +1,6 @@
-<h1>Organizations</h1>
+<h1>Welcome to TMC</h1>
+
+<h2>Organizations</h2>
 
 <% if current_user.administrator? && !Organization.pending_organizations.empty? %>
   <div class="alert alert-warning" role="alert">
@@ -7,19 +9,22 @@
   </div>
 <% end %>
 
-<table>
+<table id="organization-table">
   <thead>
   <tr>
     <th>Name</th>
     <th>Information</th>
-    <th colspan="2"></th>
+    <% if current_user.administrator? %>
+      <th></th>
+      <th></th>
+    <% end %>
   </tr>
   </thead>
 
   <tbody>
   <% @organizations.each do |organization| %>
     <tr>
-      <td><%= link_to organization.name, organization %></td>
+      <td><%= link_to organization.name, organization_path(organization) %></td>
       <td><%= organization.information %></td>
 
       <% if current_user.administrator? %>
@@ -31,8 +36,14 @@
   </tbody>
 </table>
 
+<%= use_datatables('#organization-table', bPaginate: false) %>
+
 <br>
 
 <% if !current_user.guest? %>
     <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
+<% end %>
+
+<% if can? :read, CourseTemplate %>
+    <%= link_to 'Manage Course templates', course_templates_path, class: "btn btn-mini btn-default" %>
 <% end %>
