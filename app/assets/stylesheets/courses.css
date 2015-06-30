@@ -1,0 +1,21 @@
+td.deadline-toggle-buttons {
+    vertical-align: bottom;
+    text-align: right;
+}
+
+td.deadline-toggle-buttons a {
+    margin: 0 5px 5px 0;
+}
+
+#toggle-advanced-deadline-options {
+    margin: 25px 8px 0 0;
+}
+
+.unlock-deadline-field {
+    display: none;
+}
+
+.single-exercise-deadlines {
+    display:none;
+    background-color: #F9F9F9;
+}

@@ -1,15 +1,13 @@
 class TeachersController < ApplicationController
-  before_action :set_teacher, only: [:destroy]
   before_action :set_organization
 
   def index
     authorize! :teach, @organization
     @teachers = @organization.teachers
-  end
-
-  def new
-    authorize! :teach, @organization
     @teachership = Teachership.new
+    add_organization_breadcrumb
+    add_breadcrumb 'Teachers list', organization_teachers_path(@organization)
+    add_breadcrumb 'Add a new teacher'
   end
 
   def create
@@ -21,20 +19,19 @@ class TeachersController < ApplicationController
     if @teachership.save
       redirect_to organization_teachers_path, notice: 'Teacher added to organization'
     else
-      render :new
+      @teachers = @organization.teachers
+      render :index
     end
   end
 
   def destroy
-    authorize! :teach, @organization
+    authorize! :remove_teacher, @organization
+    @teachership = Teachership.find(params[:id])
+    @teachership.destroy!
+    redirect_to organization_teachers_path ,notice: 'Teacher removed from organization'
   end
 
   private
-
-  def set_teacher
-    @teachership = Teachership.find(params[:id])
-    @teacher = @teachership.user
-  end
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])

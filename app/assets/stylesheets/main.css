@@ -357,6 +357,18 @@ tr>.align-right {
   border: none;
 }
 
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.float-clear {
+    clear: both;
+}
+
 .no-wrap {
   white-space: nowrap;
 }

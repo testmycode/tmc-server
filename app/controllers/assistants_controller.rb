@@ -2,7 +2,10 @@ class AssistantsController < ApplicationController
   before_action :set_course
 
   def index
-    authorize! :teach, @course.organization
+    @organization = @course.organization
+    authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Manage assistants'
     @assistants = @course.assistants
     @assistantship = Assistantship.new
   end
@@ -19,6 +22,13 @@ class AssistantsController < ApplicationController
       @assistants = @course.assistants
       render :index
     end
+  end
+
+  def destroy
+    authorize! :remove_assistant, @course
+    @assistantship = Assistantship.find(params[:id])
+    @assistantship.destroy!
+    redirect_to organization_course_assistants_path, notice: 'Assistant removed from course'
   end
 
   private

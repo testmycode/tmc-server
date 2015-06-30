@@ -20,6 +20,8 @@ class CourseTemplate < ActiveRecord::Base
   validates :description, length: { maximum: 512 }
   validate :valid_source_url?
 
+  has_many :courses
+
   scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
   scope :not_hidden, -> { where(hidden: false) }
   scope :available, -> { not_expired.not_hidden }

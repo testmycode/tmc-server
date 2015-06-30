@@ -27,6 +27,22 @@ describe OrganizationsController, type: :controller do
       controller.current_user = @admin
     end
 
+    describe 'GET index' do
+      it 'shows visible courses in order by name, split into ongoing and expired' do
+        @organization = Organization.create! valid_attributes
+        @courses = [
+            FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
+            FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
+            FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
+        ]
+
+        get :show, id: @organization.slug
+
+        expect(assigns(:ongoing_courses).map(&:name)).to eq(%w(AnotherTestCourse SomeTestCourse))
+        expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
+      end
+    end
+
     describe 'PUT update' do
       describe 'with valid params' do
         let(:new_attributes) do

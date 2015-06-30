@@ -7,15 +7,14 @@ class CoursesController < ApplicationController
   before_action :set_organization
   before_action :set_course, except: [:create, :help, :index, :new, :show_json]
 
+  skip_authorization_check only: [:index]
+
   def index
     ordering = 'hidden, disabled_status, LOWER(name)'
 
     respond_to do |format|
       format.html do
-        @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
-        @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
-        authorize! :read, @ongoing_courses
-        authorize! :read, @expired_courses
+        redirect_to organization_path(@organization)
       end
       format.json do
         courses = @organization.courses.ongoing.order(ordering)
@@ -71,13 +70,16 @@ class CoursesController < ApplicationController
   end
 
   def refresh
+    authorize! :refresh, @course
     refresh_course(@course)
     redirect_to organization_course_path
   end
 
   def new
-    @course = Course.new
     authorize! :teach, @organization
+    add_organization_breadcrumb
+    add_breadcrumb 'Create new course'
+    @course = Course.new
   end
 
   def create
@@ -96,11 +98,13 @@ class CoursesController < ApplicationController
   end
 
   def edit
-    authorize! :teach, @organization
+    authorize! :edit_course_paramaters, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Edit course parameters'
   end
 
   def update
-    authorize! :teach, @organization
+    authorize! :edit_course_paramaters, @course
     if @course.update(course_params)
       redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
     else
@@ -109,12 +113,14 @@ class CoursesController < ApplicationController
   end
 
   def manage_deadlines
-    authorize! :teach, @course
+    authorize! :manage_deadlines, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage deadlines'
     assign_show_view_vars
   end
 
   def save_deadlines
-    authorize! :teach, @course
+    authorize! :manage_deadlines, @course
 
     groups = group_params
     groups.each do |name, deadlines|
@@ -122,6 +128,19 @@ class CoursesController < ApplicationController
       hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
       @course.exercise_group_by_name(name).soft_group_deadline = soft_deadlines
       @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
+    end
+
+    exercises = params[:exercise] || {}
+    exercises.each do |name, deadlines|
+      soft_deadlines = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
+      hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
+
+      exercise = Exercise.where(course_id: @course.id).find_by(name: name)
+      unless exercise.nil?
+        exercise.soft_deadline_spec = soft_deadlines
+        exercise.deadline_spec = hard_deadlines
+        exercise.save!
+      end
     end
 
     redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
@@ -144,15 +163,19 @@ class CoursesController < ApplicationController
   def help
     @course = Course.find(params[:course_id])
     authorize! :read, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Help page'
   end
 
   def manage_unlocks
-    authorize! :teach, @course
+    authorize! :manage_unlocks, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage unlocks'
     assign_show_view_vars
   end
 
   def save_unlocks
-    authorize! :teach, @course
+    authorize! :manage_unlocks, @course
 
     groups = group_params
     groups.each do |name, conditions|
@@ -167,10 +190,18 @@ class CoursesController < ApplicationController
     redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
   end
 
+  def manage_exercises
+    authorize! :manage_exercises, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage exercises'
+    @exercises = @course.exercises.natsort_by(&:name)
+    @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
+  end
+
   private
 
   def course_params_for_create
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :course_template_id)
   end
 
   def course_params
@@ -187,7 +218,7 @@ class CoursesController < ApplicationController
     unless current_user.guest?
       max_submissions = 100
       @submissions = @course.submissions
-      @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
+      @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @total_submissions = @submissions.where(user: User.legitimate_students).count
       @submissions = @submissions.limit(max_submissions)
@@ -212,7 +243,6 @@ class CoursesController < ApplicationController
   end
 
   def refresh_course(course)
-    authorize! :refresh, course
     begin
       session[:refresh_report] = course.refresh
     rescue CourseRefresher::Failure => e

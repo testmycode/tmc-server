@@ -39,6 +39,7 @@ class Course < ActiveRecord::Base
   has_many :assistants, through: :assistantships, source: :user
 
   belongs_to :organization
+  belongs_to :course_template
 
   enum disabled_status: [ :enabled, :disabled ]
 
@@ -59,7 +60,8 @@ class Course < ActiveRecord::Base
 
   def visible_to?(user)
     user.administrator? ||
-    user.teacher?(organization) || (
+    user.teacher?(organization) ||
+    user.assistant?(self) || (
       !disabled? &&
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
@@ -296,12 +298,12 @@ class Course < ActiveRecord::Base
     refreshed_at.nil?
   end
 
-  def assistant?(user)
-    assistants.exists?(user)
+  def taught_by?(user)
+    user.teacher?(organization)
   end
 
-  def taught_by?(user)
-    user.teacher?(self.organization)
+  def assistant?(user)
+    assistants.exists?(user)
   end
 
   def material_url=(material)
@@ -310,6 +312,10 @@ class Course < ActiveRecord::Base
       return super("http://#{material}")
     end
     super(material)
+  end
+
+  def contains_unlock_deadlines?
+    exercise_groups.any? { |group| group.contains_unlock_deadlines?}
   end
 
   private

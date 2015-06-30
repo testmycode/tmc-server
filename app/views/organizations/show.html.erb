@@ -1,9 +1,5 @@
 <h1><%= @organization.name %></h1>
 
-<div>
-  <%= render template: 'courses/index'  %>
-</div>
-
 <% if current_user.administrator? %>
   <p>
     <strong>Organization ID:</strong>
@@ -35,7 +31,6 @@
   <br/><br/>
 <% end %>
 
-<%# --- correct position for this will be done later ---%>
 <% if can? :toggle_visibility, @organization %>
   <p>
     <strong><%= "#{@organization.hidden ? 'Status hidden:' : 'Status visible:'}" %></strong>
@@ -44,7 +39,6 @@
   </p>
   <br/>
 <% end %>
-<%# -----------------------%>
 
 <% if @organization.acceptance_pending? %>
   <p>
@@ -63,9 +57,17 @@
   </p>
 <% end %>
 
+<% if can? :view, :participants_list %>
+    <br/>
+    <%= link_to 'List of registered users', participants_path %>
+<% end %>
+
 <% if can? :teach, @organization %>
   <br/>
   <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization) %>
-  <br/><br/>
-  <%= link_to 'Create New Course from template', organization_course_templates_path(@organization), class: "btn btn-mini btn-warning" %>
+  <br/>
 <% end %>
+
+<div>
+  <%= render template: 'courses/index'  %>
+</div>

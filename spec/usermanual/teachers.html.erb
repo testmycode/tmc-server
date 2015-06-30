@@ -35,9 +35,20 @@ require 'cgi' # for escapeHTML
     FactoryGirl.create :user, login: 'professor', password: 'professor'
     FactoryGirl.create :admin, login: 'admin', password: 'admin'
     FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
-    FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101'
-    FactoryGirl.create :course_template, name: 'prog102', title: 'Programming 102'
-    FactoryGirl.create :course_template, name: 'skynet', title: 'Skynet laboratory'
+
+    repo_path = "#{::Rails.root}/tmp/tests/fake_remote_repo"
+    create_bare_repo(repo_path)
+    clone_path = repo_path + '-wc'
+    clone_repo(repo_path, clone_path)
+    repo = GitRepo.new(clone_path)
+    repo.copy_simple_exercise('Week1/HelloWorld')
+    repo.copy_simple_exercise('Week1/SimpleExercise')
+    repo.copy_simple_exercise('Week2/HelloWorldAdvanced')
+    repo.add_commit_push
+
+    FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_path
+    FactoryGirl.create :course_template, name: 'prog102', title: 'Programming 102', source_url: repo_path
+    FactoryGirl.create :course_template, name: 'skynet', title: 'Skynet laboratory', source_url: repo_path
   %>
 
   <h1>Teacher Manual</h1>
@@ -177,26 +188,26 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    From organization's front page, click 'Create new course from template'
+    From organization's front page, click 'Create New Course'
   </p>
 
 <%
   visit '/org/hy'
-  highlight 'a:contains("Create New Course from template")'
+  highlight 'a:contains("Create New Course")'
 %>
 <%= screenshot %>
 
 <%
-  click_on 'Create New Course from template'
+  click_on 'Create New Course'
 %>
 <%= screenshot %>
 
   <p>
-    You will see a list of all the course templates TMC has to offer. Click 'Create course' button on the template that you want.
+    You will see a list of all the course templates TMC has to offer. Click 'Create Course' button on the template that you want.
   </p>
 
 <%
-  first(:link, 'Create course').click
+  first(:link, 'Create Course').click
 %>
 <%= screenshot %>
 
@@ -277,6 +288,36 @@ require 'cgi' # for escapeHTML
    click_on 'Enable Course'
 %>
 
+  <h2>Adding course assistants</h2>
+
+  <p>
+    Course assistants have teacher permissions for single course, not for whole organization.
+    You can add course assistants by going to course page and clicking 'Manage assistants' button.
+  </p>
+
+<%
+   visit '/org/hy/courses/1'
+   highlight 'a:contains("Manage assistants")'
+%>
+<%= screenshot %>
+
+  <p>
+    Adding new course assistants works same way as adding new teacher, so you need to enter assistant's username.
+  </p>
+
+<%
+   click_on 'Manage assistants'
+   highlight 'a:contains("Add a new assistant")'
+%>
+<%= screenshot %>
+
+<%
+   click_on 'Add a new assistant'
+   fill_in 'username', with: 'assistant'
+   highlight '[value="Add a new assistant"]'
+%>
+<%= screenshot %>
+
   <h2>Course progression</h2>
 
   <p>
@@ -297,7 +338,7 @@ require 'cgi' # for escapeHTML
 
 <%
    course = Course.find_by id: 1
-   course.exercise_group_by_name('').hard_group_deadline = ['01-01-2011'].to_json
+   course.exercise_group_by_name('Week1').hard_group_deadline = ['01.01.2011'].to_json
    click_on 'Manage deadlines'
 %>
 <%= screenshot %>
@@ -309,15 +350,74 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    Common deadlines are configured by date (in any format, be it finnish '1.1.2000' or us '2000-1-1').
-    Unlock-based deadlines count down some period of time after unlocking the exercise manually, and are configured
-    via input: <code>unlock + 2 weeks</code> (quick example).
-    Unlock based deadlines also accept: <code>&lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code>
+    Common deadlines are configured by date or date-time. TMC understands multiple formats, for example:
+    <ul>
+      <li>20.1.2000</li>
+      <li>30.12.2000 20:00</li>
+      <li>2000-1-20</li>
+      <li>2000-12-30 20:00</li>
+      <li>2000-12-30 8:00 PM</li>
+    </ul>
   </p>
 
   <p>
-    Fields for this form may be prefilled depending on course template configuration. After editing the deadlines,
-    form will be prefilled with given values on every refresh.
+    Unlock-based deadlines will calculate unique deadlines for each student based on the time they unlocked the exercise.
+    For example, to give students 2 weeks to complete an exercise after it becomes available, set the deadline to
+    <code>unlock + 2 weeks</code>. Other possible values for unlock-based deadlines are
+    <code>unlock + &lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code>.
+    To edit unlock-based deadlines, advanced options must be enabled by clicking the button in the top right corner of the page.
+  </p>
+
+  <p>
+    By default, the form is set to edit deadlines for all exercises in an exercise group at once. Exercises that the deadlines apply to
+    are listed on the 'Exercises' column. If you want to edit deadlines for individual exercises, click 'Show single exercises'.
+    This will expand the form to show all exercises in the group.
+  </p>
+
+<%
+  highlight '#toggle1_Week1'
+%>
+
+<%= screenshot %>
+<% click_on 'toggle1_Week1' %>
+<%= screenshot %>
+
+<%
+   i = 1
+   course.exercises.each do |e|
+     e.deadline_spec = ["#{i}.1.2000"].to_json
+     i += 1
+     e.save!
+   end
+   visit '/org/hy/courses/1/manage_deadlines'
+   disabled_text = find_field('group_Week1_hard_static', disabled: true).value
+%>
+
+  <p>
+    If the exercises in a group have differing deadlines, the group deadline input fields will be disabled and show
+    '<%= disabled_text %>'.
+  </p>
+
+<%= screenshot %>
+
+  <p>
+    If you want to edit the deadlines for the whole group again, you need to change the single deadlines so they all
+    match within the group, or you can reset them by clicking 'Clear single deadlines'.
+  </p>
+
+<%
+   click_on 'toggle1_Week1'
+   highlight 'a:contains("Clear single deadlines")'
+%>
+
+<%= screenshot %>
+
+  <p>
+    If both date-based and unlock-based deadlines are enabled for the same exercise, the one which expires first wil be used.
+  </p>
+
+  <p>
+    After creating a course from template, the deadlines may already be defined depending on the course template configuration.
   </p>
 
   <h3>Unlock dates</h3>
@@ -328,7 +428,7 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   course.exercise_group_by_name('').hard_group_deadline = [''].to_json
+   course.exercise_group_by_name('Week1').hard_group_deadline = [''].to_json
    visit '/org/hy/courses/1'
    highlight 'a:contains("Manage unlock dates")'
 %>
@@ -339,9 +439,209 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   course.exercise_group_by_name('').group_unlock_conditions = ['01-01-2011'].to_json
+   course.exercise_group_by_name('Week1').group_unlock_conditions = ['01-01-2011'].to_json
    UncomputedUnlock.create_all_for_course_eager(course)
    click_on 'Manage unlock dates'
+%>
+<%= screenshot %>
+
+  <h2>Managing feedback questions</h2>
+
+  <p>
+    Every course can have feedback questions, which are asked after successful submission.
+    Questions can be configured by clicking 'Manage feedback questions' from course front page.
+  </p>
+
+<%
+   visit '/org/hy/courses/1'
+   highlight 'a:contains("Manage feedback questions")'
+%>
+<%= screenshot %>
+
+  <p>
+    New question can be added by clicking 'Add question'.
+  </p>
+
+<%
+   click_on 'Manage feedback questions'
+   highlight 'a:contains("Add question")'
+
+%>
+<%= screenshot %>
+
+  <p>
+    First enter the question text and shorter title, which can be shown on result view. Questions can be either
+    free text answers or number value from selected range. If you want to create free text question, choose
+    'Text area' as question type.
+  </p>
+
+<%
+   click_on 'Add question'
+   fill_in 'feedback_question_question', with: 'What problems you had in this exercise?'
+   fill_in 'feedback_question_title', with: 'problems'
+   choose('Text area')
+   highlight '[value="Create question"]'
+
+%>
+<%= screenshot %>
+<%
+   click_on 'Create question'
+%>
+
+  <p>
+    If you want to create question with number valua answers, for example for statistical purposes, you can choose
+    'Integer range' option instead. New input fiels for minimum and maximum values are shown.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/feedback_questions/new'
+   fill_in 'feedback_question_question', with: 'How difficult was this exercise (1-5)?'
+   fill_in 'feedback_question_title', with: 'difficulty'
+   choose('Integer range')
+   fill_in 'intrange_min', with: '1'
+   fill_in 'intrange_max', with: '5'
+
+   highlight '[value="Create question"]'
+%>
+<%= screenshot %>
+<%
+   click_on 'Create question'
+%>
+
+  <p>
+    When questions are made, you can adjust their order with 'Up' and 'Down' options. Question can be removed
+    by clicking 'Delete'.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/feedback_questions/'
+   highlight 'a:contains("Up")'
+   highlight 'a:contains("Down")'
+   highlight 'a:contains("Delete")'
+
+%>
+<%= screenshot %>
+
+  <p>
+    After students have answered to questions, the answers can be viewed by clicking 'View feedback' from
+    course main page.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/'
+   highlight 'a:contains("View feedback")'
+%>
+<%= screenshot %>
+
+  <h2>Code review</h2>
+
+  <p>
+    Some assignments require code review to be completed, and students can also request code review if they want.
+    If there are unreviewed requests, course front page has link 'n code view requested'. You can start review process
+    by clickin that link.
+  </p>
+
+  <p>
+    Also submission list on the bottom of the page shows individually if submission still requires review.
+  </p>
+
+<%
+   student = FactoryGirl.create :user, login: 'student'
+   course = Course.find(1)
+   exercise1 = course.exercises.find_by(name: 'Week1-HelloWorld')
+   submission = FactoryGirl.create :submission, course: course, user: student, exercise: exercise1, requests_review: true
+   submission_data = FactoryGirl.create :submission_data, submission: submission
+   available_point = FactoryGirl.create :available_point, exercise: exercise1
+   available_point.award_to(student, submission)
+
+   visit '/org/hy/courses/1/'
+   highlight 'a:contains("Requested")'
+   highlight 'a:contains("1 code review requested")'
+%>
+<%= screenshot %>
+
+  <p>
+    Review page shows all submission which still require review. Click the 'Requested' link for the submission which
+    you want to review.
+  </p>
+
+<%
+   click_on '1 code review requested'
+   highlight 'a:contains("Requested")'
+
+%>
+<%= screenshot %>
+
+<p>
+  On the actual review screen, you can see studens answer code at the bottom of the page. Showing test results
+  can be toggled by clicking 'Test results'. When you have taken look at the code, click 'Start code review'
+  to start writing your actual review feedback.
+</p>
+
+<%
+   click_on 'Requested'
+   highlight 'button:contains("Start code review")'
+
+%>
+<%= screenshot %>
+
+  <p>
+    Write you review text in the textarea. If you want to notify the student by email, you can check 'Notify
+    by e-mail' checkbox. When you are ready, click 'Save review', and review process is done.
+  </p>
+
+<%
+   click_on 'Start code review'
+   fill_in 'review_review_body', with: 'Code looks ok but you could...'
+   highlight 'label:contains("Notify by e-mail")'
+   highlight 'button:contains("Save review")'
+   sleep 1      # to prevent javascript animation to be captured
+%>
+<%= screenshot %>
+
+  <h2>Checking points and students progression</h2>
+
+  <p>
+    Students current progress can be check from the points page. It is accessible through 'View points' link from
+    the course front page.
+  </p>
+
+<%
+   visit '/org/hy/courses/1/'
+   highlight 'a:contains("View points")'
+%>
+<%= screenshot %>
+
+  <p>
+    This page show summary of all students and exercise groups. If you want to see single student's data, click his
+    username.
+  </p>
+
+<%
+   click_on 'View points'
+   highlight 'a:contains("student")'
+%>
+<%= screenshot %>
+
+  <p>
+    On the student's page you can see summary of his progress in all courses, for example how many percentages of
+    all exercises have been completed. At the bottom of the page there's list of his submission history. If you want
+    to check some single submission data, you can click 'Details' link.
+  </p>
+
+<%
+   click_on 'student'
+   highlight 'a:contains("Details")'
+%>
+<%= screenshot %>
+
+  <p>
+    On the submission details page you can see all relevant data to submission, including student's answers,
+    test results, and suggested solution. You can also rerun submission and start code review.
+  </p>
+
+<%
+   click_on 'Details'
 %>
 <%= screenshot %>
 
