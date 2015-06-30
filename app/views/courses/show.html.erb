@@ -6,7 +6,7 @@
       <p><%= link_to 'Material', @course.material_url %></p>
     <% end %>
     <div>
-      <% if @refresh_report %>
+      <% if @refresh_report && can?(:refresh, @course) %>
         <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
       <% end %>
 
@@ -36,6 +36,7 @@
               <li>Git revision: <%= gitrev %></li>
             <% end %>
           <% end %>
+
           <% if @course.refreshed_at %>
             <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
           <% end %>
@@ -98,6 +99,7 @@
           <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
       <% end %>
+
       <% if can? :manage_deadlines, @course %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock dates', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
@@ -114,7 +116,6 @@
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
       <% end %>
-
       <% if can? :teach, @organization %>
         <% if @course.disabled? %>
           <%= link_to 'Enable Course', enable_organization_course_path(@organization, @course), method: :post, class: "btn btn-info btn-mini" %>
@@ -125,6 +126,7 @@
           %>
         <% end %>
       <% end %>
+
       <% unlockables = @course.unlockable_exercises_for(current_user) %>
       <% unless unlockables.empty? %>
         <p>

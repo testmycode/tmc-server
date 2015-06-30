@@ -31,7 +31,7 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
-    teacher = FactoryGirl.create(:user, :login => 'teacher', :password => 'teacher')
+    teacher = FactoryGirl.create(:admin, :login => 'teacher', :password => 'teacher')
     org = FactoryGirl.create(:accepted_organization, name: 'Some organization')
     org.teachers << teacher
     org.save
@@ -68,17 +68,25 @@ require 'cgi' # for escapeHTML
     Now we can create a new course for our organization.
   </p>
 
-  <% highlight('a:contains("Create New Course"):first') %>
+  <% highlight('a:contains("Create New"):first') %>
   <%= screenshot %>
-  <% click_on 'Create New Course' %>
+  <% click_on 'Create New' %>
 
-  <%
-     course_name = 'programming101'
-     course_title = 'Programming 101'
-  %>
+  <p>
+    From this page we select to create custom course.
+  </p>
+
+  <% highlight('a:contains("Create New Custom Course"):first') %>
+  <%= screenshot %>
+  <% click_on 'Create New Custom Course' %>
+
+  <% course_name = 'programming101' %>
+  <% course_title = 'programming 101' %>
+
   <p>
     We'll name our course "<%= course_name %>", give it a title "<%= course_title %>" and we'll also have to give the address
-    of the git repository where we'll store the exercises.
+    of the git repository where we'll store the exercises. Also we have to define branch.
+    Master branch is good for us.
   </p>
 
   <%
@@ -95,6 +103,8 @@ require 'cgi' # for escapeHTML
 
     fill_in 'course_source_url', :with => repo_url
     highlight '#course_source_url'
+    fill_in 'course_git_branch', :with => 'master'
+    highlight '#course_git_branch'
   %>
 
   <p>
@@ -134,11 +144,7 @@ require 'cgi' # for escapeHTML
 
   <%
     course_template_homepage = 'https://github.com/testmycode/tmc-course-template'
-
-    @repo_path = @test_tmp_dir + '/fake_remote_repo'
-    course_template_repo = @repo_path
-    create_bare_repo(@repo_path)
-
+    course_template_repo = 'git://github.com/testmycode/tmc-course-template.git'
   %>
 
   <h3>Starting from a template</h3>
@@ -183,7 +189,7 @@ require 'cgi' # for escapeHTML
   </p>
 
   <%=
-    expect(File).to be_directory(shell_session.working_dir + '/private/template_project')
+    expect(File).to be_directory("#{workdir}/private/template_project")
     shell_session.example do |sh|
       sh.run "cd private/template_project; find ."
     end

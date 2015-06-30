@@ -70,6 +70,7 @@ class CoursesController < ApplicationController
   end
 
   def refresh
+    authorize! :refresh, @course
     refresh_course(@course)
     redirect_to organization_course_path
   end
@@ -200,7 +201,7 @@ class CoursesController < ApplicationController
   private
 
   def course_params_for_create
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :course_template_id)
   end
 
   def course_params
@@ -242,7 +243,6 @@ class CoursesController < ApplicationController
   end
 
   def refresh_course(course)
-    authorize! :refresh, course
     begin
       session[:refresh_report] = course.refresh
     rescue CourseRefresher::Failure => e
