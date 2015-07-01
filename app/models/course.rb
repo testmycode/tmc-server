@@ -24,6 +24,14 @@ class Course < ActiveRecord::Base
   # If made from template, make sure cache_version is not out of sync.
   before_save :set_cache_version
   before_validation :save_template
+  validates :source_url, presence: true
+  validates :custom_points_url,
+            format: {
+              with: /(\Ahttps?:\/\/)?/,
+              message: 'should begin with http:// or https://'
+            }
+  validate :check_source_backend
+  after_initialize :set_default_source_backend
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
@@ -402,6 +410,13 @@ class Course < ActiveRecord::Base
 
   def custom_points_url?
     !custom_points_url.blank?
+  end
+
+  def parsed_custom_points_url(organization, course, user)
+    custom_points_url
+        .gsub('{user}', user.username)
+        .gsub('{course}', course.id.to_s)
+        .gsub('{org}', organization.slug)
   end
 
   private
