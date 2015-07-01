@@ -318,6 +318,10 @@ class Course < ActiveRecord::Base
     exercise_groups.any? { |group| group.contains_unlock_deadlines?}
   end
 
+  def custom_points_url?
+    !custom_points_url.blank?
+  end
+
   private
 
   def check_source_backend
