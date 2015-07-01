@@ -220,6 +220,10 @@ class Ability
       end
 
       cannot :email, CourseNotification
+
+      can :view_custom_points_url, Course do |c|
+        can?(:teach, c) || User.course_students(c).include?(user)
+      end
     end
   end
 end

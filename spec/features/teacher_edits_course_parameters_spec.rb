@@ -57,4 +57,52 @@ feature 'Teacher can edit course parameters', feature: true do
     click_link 'oldTitle'
     expect(page).not_to have_button 'Update Course'
   end
+
+  describe 'Teacher sets custom points URL with dynamic parameters' do
+    before :each do
+      log_in_as @teacher.login, 'foobar'
+      visit '/org/slug'
+      click_link 'oldTitle'
+      click_link 'Edit course parameters'
+
+      fill_in 'course_custom_points_url', with: 'http://example.com/{org}/{course}/{user}'
+      click_button 'Update Course'
+      log_out
+    end
+
+    scenario 'Teacher can see the URL correctly' do
+      log_in_as @teacher.login, 'foobar'
+      visit '/org/slug'
+      click_link 'oldTitle'
+
+      expect(page).to have_link('View points', href: "http://example.com/slug/#{@course.id}/#{@teacher.login}")
+    end
+
+    scenario 'Guest cannot see the custom URL' do
+      visit '/org/slug'
+      click_link 'oldTitle'
+
+      expect(page).to_not have_link('View points')
+    end
+
+    scenario 'Student cannot see the custom URL if they have no submissions in the course' do
+      log_in_as @user.login, 'xooxer'
+      visit '/org/slug'
+      click_link 'oldTitle'
+
+      expect(page).to_not have_link('View points')
+    end
+
+    scenario 'Student can see the custom URL correctly if they have submissions in the course' do
+      exercise = FactoryGirl.create(:exercise, course: @course)
+      submission = FactoryGirl.create(:submission, course: @course, user: @user, exercise: exercise)
+      FactoryGirl.create(:awarded_point, course: @course, user: @user, submission: submission)
+
+      log_in_as @user.login, 'xooxer'
+      visit '/org/slug'
+      click_link 'oldTitle'
+
+      expect(page).to have_link('View points', href: "http://example.com/slug/#{@course.id}/#{@user.login}")
+    end
+  end
 end
