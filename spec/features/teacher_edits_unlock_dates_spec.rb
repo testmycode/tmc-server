@@ -26,7 +26,7 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Teacher sees default unlock dates' do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    click_link 'Manage unlock dates'
+    click_link 'Manage unlock conditions'
 
     expect(page).to have_field('empty_group_0', with: '1.1.2011')
   end
@@ -34,7 +34,7 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Teacher sets new unlock date' do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    click_link 'Manage unlock dates'
+    click_link 'Manage unlock conditions'
 
     fill_in 'empty_group_0', with: '4.6.2015'
     click_button 'Save changes'
@@ -45,7 +45,7 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Exercises are locked if teacher sets unlock date to be later than current time' do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    click_link 'Manage unlock dates'
+    click_link 'Manage unlock conditions'
 
     fill_in 'empty_group_0', with: "#{Time.now + 3.days}"
     click_button 'Save changes'
@@ -56,7 +56,7 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Exercises are unlocked if teacher sets unlock date to be earlier than current time' do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    click_link 'Manage unlock dates'
+    click_link 'Manage unlock conditions'
 
     fill_in 'empty_group_0', with: "#{Time.now - 3.days}"
     click_button 'Save changes'
@@ -67,7 +67,7 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Teacher can set empty unlock date' do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    click_link 'Manage unlock dates'
+    click_link 'Manage unlock conditions'
 
     fill_in 'empty_group_0', with: ''
     click_button 'Save changes'
@@ -78,7 +78,7 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Teacher cannot edit unlock date with wrong format' do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    click_link 'Manage unlock dates'
+    click_link 'Manage unlock conditions'
 
     fill_in 'empty_group_0', with: '32.13.abcd'
     click_button 'Save changes'
@@ -90,7 +90,7 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Teacher can set multiple unlock conditions' do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    click_link 'Manage unlock dates'
+    click_link 'Manage unlock conditions'
     fill_in 'empty_group_0', with: '2.2.2012'
     click_link 'Add a condition'
     fill_in 'empty_group_1', with: 'exercise MyExercise'
@@ -111,6 +111,6 @@ feature 'Teacher edits unlock dates', feature: true do
   scenario 'Non-teacher doesnt have access to editing unlock dates' do
     log_in_as(@user.login, 'foobar')
     visit_course
-    expect(page).not_to have_content('Manage unlock dates')
+    expect(page).not_to have_content('Manage unlock conditions')
   end
 end
