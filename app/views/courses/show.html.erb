@@ -11,7 +11,13 @@
       <% end %>
 
       <ul>
-        <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
+        <li>
+          <% if @course.custom_points_url? %>
+            <%= link_to 'View points', @course.parsed_custom_points_url(@organization, @course, current_user), target: '_blank' %>
+          <% else %>
+            <%= link_to 'View points', organization_course_points_path(@organization, @course) %>
+          <% end %>
+        </li>
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
