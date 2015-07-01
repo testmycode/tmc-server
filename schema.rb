@@ -11,19 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150701092323) do
+ActiveRecord::Schema.define(version: 20150408121203) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "assistantships", force: true do |t|
-    t.integer  "user_id"
-    t.integer  "course_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "assistantships", ["user_id", "course_id"], name: "index_assistantships_on_user_id_and_course_id", unique: true, using: :btree
 
   create_table "available_points", force: true do |t|
     t.integer "exercise_id",                     null: false
@@ -58,24 +49,8 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.string   "message"
     t.integer  "sender_id"
     t.integer  "course_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "course_templates", force: true do |t|
-    t.string   "name"
-    t.string   "title"
-    t.string   "description"
-    t.string   "material_url"
-    t.string   "source_url"
-    t.boolean  "dummy",          default: false,    null: false
-    t.boolean  "hidden",         default: false
-    t.integer  "cache_version",  default: 0,        null: false
-    t.string   "source_backend", default: "git",    null: false
-    t.string   "git_branch",     default: "master", null: false
-    t.datetime "expires_at"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "courses", force: true do |t|
@@ -83,26 +58,21 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "hide_after"
-    t.boolean  "hidden",                         default: false, null: false
-    t.integer  "cache_version",                  default: 0,     null: false
+    t.boolean  "hidden",                         default: false,    null: false
+    t.integer  "cache_version",                  default: 0,        null: false
     t.string   "spreadsheet_key"
+    t.string   "source_backend",                                    null: false
+    t.string   "source_url",                                        null: false
+    t.text     "git_branch",                     default: "master", null: false
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
-    t.boolean  "locked_exercise_points_visible", default: true,  null: false
+    t.boolean  "locked_exercise_points_visible", default: true,     null: false
     t.text     "description"
     t.string   "paste_visibility"
     t.string   "formal_name"
-    t.boolean  "certificate_downloadable",       default: false, null: false
+    t.boolean  "certificate_downloadable",       default: false,    null: false
     t.string   "certificate_unlock_spec"
-    t.integer  "organization_id"
-    t.integer  "disabled_status",                default: 0
-    t.string   "title"
-    t.string   "material_url"
-    t.integer  "course_template_id",                             null: false
-    t.string   "custom_points_url"
   end
-
-  add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
 
   create_table "exercises", force: true do |t|
     t.string   "name"
@@ -122,8 +92,6 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.string   "valgrind_strategy"
     t.boolean  "code_review_requests_enabled",     default: false, null: false
     t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
-    t.text     "soft_deadline_spec"
-    t.integer  "disabled_status",                  default: 0
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
@@ -135,8 +103,8 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.string   "exercise_name",        null: false
     t.integer  "submission_id"
     t.text     "answer",               null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
   end
 
   add_index "feedback_answers", ["feedback_question_id", "course_id", "exercise_name"], name: "index_feedback_answers_question_course_exercise", using: :btree
@@ -146,27 +114,13 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.integer  "course_id",  null: false
     t.text     "question",   null: false
     t.string   "kind",       null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer  "position",   null: false
     t.text     "title"
   end
 
   add_index "feedback_questions", ["id"], name: "index_feedback_questions_on_id", using: :btree
-
-  create_table "organizations", force: true do |t|
-    t.string   "name"
-    t.string   "information"
-    t.string   "slug"
-    t.datetime "accepted_at"
-    t.boolean  "acceptance_pending"
-    t.boolean  "rejected",           default: false, null: false
-    t.string   "rejected_reason"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "hidden",             default: false
-    t.integer  "requester_id"
-  end
 
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false
@@ -184,16 +138,16 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.integer  "feedback_answer_id"
     t.text     "body"
     t.string   "from"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
   end
 
   create_table "reviews", force: true do |t|
     t.integer  "submission_id",                  null: false
     t.integer  "reviewer_id"
     t.text     "review_body",                    null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
     t.text     "points"
     t.boolean  "marked_as_read", default: false, null: false
   end
@@ -211,13 +165,14 @@ ActiveRecord::Schema.define(version: 20150701092323) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
-  create_table "submission_data", primary_key: "submission_id", force: true do |t|
-    t.binary "return_file"
-    t.binary "stdout_compressed"
-    t.binary "stderr_compressed"
-    t.binary "vm_log_compressed"
-    t.binary "valgrind_compressed"
-    t.binary "validations_compressed"
+  create_table "submission_data", id: false, force: true do |t|
+    t.integer "submission_id",          null: false
+    t.binary  "return_file"
+    t.binary  "stdout_compressed"
+    t.binary  "stderr_compressed"
+    t.binary  "vm_log_compressed"
+    t.binary  "valgrind_compressed"
+    t.binary  "validations_compressed"
   end
 
   create_table "submissions", force: true do |t|
@@ -237,8 +192,6 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.integer  "times_sent_to_sandbox",                    default: 0,     null: false
     t.datetime "processing_attempts_started_at"
     t.integer  "processing_priority",                      default: 0,     null: false
-    t.binary   "stdout_compressed"
-    t.binary   "stderr_compressed"
     t.text     "params_json"
     t.boolean  "requires_review",                          default: false, null: false
     t.boolean  "requests_review",                          default: false, null: false
@@ -258,15 +211,6 @@ ActiveRecord::Schema.define(version: 20150701092323) do
   add_index "submissions", ["course_id", "user_id"], name: "index_submissions_on_course_id_and_user_id", using: :btree
   add_index "submissions", ["processed"], name: "index_submissions_on_processed", using: :btree
   add_index "submissions", ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name", using: :btree
-
-  create_table "teacherships", force: true do |t|
-    t.integer  "user_id"
-    t.integer  "organization_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "teacherships", ["user_id", "organization_id"], name: "index_teacherships_on_user_id_and_organization_id", unique: true, using: :btree
 
   create_table "test_case_runs", force: true do |t|
     t.integer  "submission_id"
@@ -294,8 +238,8 @@ ActiveRecord::Schema.define(version: 20150701092323) do
   create_table "uncomputed_unlocks", force: true do |t|
     t.integer  "course_id",  null: false
     t.integer  "user_id",    null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "uncomputed_unlocks", ["course_id", "user_id"], name: "index_uncomputed_unlocks_on_course_id_and_user_id", using: :btree
@@ -314,8 +258,8 @@ ActiveRecord::Schema.define(version: 20150701092323) do
     t.integer  "user_id",    null: false
     t.string   "field_name", null: false
     t.text     "value",      null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "user_field_values", ["user_id", "field_name"], name: "index_user_field_values_on_user_id_and_field_name", unique: true, using: :btree
