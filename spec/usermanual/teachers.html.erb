@@ -184,7 +184,7 @@ require 'cgi' # for escapeHTML
 
   <p>
     Simplest way to create a course is to copy it from a template. You will be able to manage submission deadlines,
-    exercise unlock dates etc. You will not, however, be able to edit the exercise source code.
+    exercise unlock conditions etc. You will not, however, be able to edit the exercise source code.
   </p>
 
   <p>
@@ -321,7 +321,7 @@ require 'cgi' # for escapeHTML
   <h2>Course progression</h2>
 
   <p>
-    To control course progression, each exercise and exercise group may be configured with deadlines and unlock dates.
+    To control course progression, each exercise and exercise group may be configured with deadlines and unlock conditions.
   </p>
 
   <h3>Deadlines</h3>
@@ -420,28 +420,28 @@ require 'cgi' # for escapeHTML
     After creating a course from template, the deadlines may already be defined depending on the course template configuration.
   </p>
 
-  <h3>Unlock dates</h3>
+  <h3>Unlock conditions</h3>
 
   <p>
-    If exercise or exercise group has an unlock date attached to it and it has not passed yet, exercise will not accept submissions.
-    Unlock dates can be set by clicking 'Manage unlock dates' in the course page.
+    If exercise or exercise group has an unlock condition attached to it and it has not passed yet, exercise will not accept submissions.
+    Unlock conditions can be set by clicking 'Manage unlock conditions' in the course page.
   </p>
 
 <%
    course.exercise_group_by_name('Week1').hard_group_deadline = [''].to_json
    visit '/org/hy/courses/1'
-   highlight 'a:contains("Manage unlock dates")'
+   highlight 'a:contains("Manage unlock conditions")'
 %>
 <%= screenshot %>
 
   <p>
-    Unlock dates may be set for each exercise group separately.
+    Unlock conditions may be set for each exercise group separately.
   </p>
 
 <%
    course.exercise_group_by_name('Week1').group_unlock_conditions = ['01-01-2011'].to_json
    UncomputedUnlock.create_all_for_course_eager(course)
-   click_on 'Manage unlock dates'
+   click_on 'Manage unlock conditions'
 %>
 <%= screenshot %>
 
