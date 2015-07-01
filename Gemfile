@@ -15,11 +15,12 @@ gem 'foreigner', '~> 1.1.6'
 gem 'xml-simple', '~> 1.1.1'
 gem 'transaction_isolation', '~> 1.0.3'
 gem 'andand'
-gem 'mimemagic'
+gem 'mimemagic', "~> 0.3.0"
 gem 'rack-cors'
 gem 'newrelic_rpm'
 gem 'activerecord-session_store', '~> 0.1.0'
 gem 'pdfkit', '~> 0.6.2'
+gem "paperclip", "~> 4.3"
 
 gem 'pghero'
 

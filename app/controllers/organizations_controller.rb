@@ -122,6 +122,6 @@ class OrganizationsController < ApplicationController
   end
 
   def organization_params
-    params.require(:organization).permit(:name, :information, :slug, :rejected_reason)
+    params.require(:organization).permit(:name, :information, :logo, :slug, :rejected_reason)
   end
 end
