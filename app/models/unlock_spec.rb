@@ -8,13 +8,14 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     @conditions = []
     @universal_descriptions = []
     @describers = []
-    for i in 0...conditions.size
+    @datetime_count = 0
+    conditions.each_with_index do |condition, i|
       begin
-        parse_condition(conditions[i].to_s.strip) unless conditions[i].to_s.blank?
+        parse_condition(condition.to_s.strip) unless condition.to_s.blank?
       rescue InvalidSyntaxError
-        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
+        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{condition})")
       rescue
-        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$!.message}"
+        raise "Problem with unlock condition #{i + 1} (#{condition}): #{$!.message}"
       end
     end
   end
@@ -55,6 +56,8 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     if DateAndTimeUtils.looks_like_date_or_time(str)
       time = DateAndTimeUtils.to_time(str)
       fail 'Date out of range' if time.year > 10000 || time.year < 1 # Prevent database datetime overflow
+      fail 'You can\'t have multiple unlock dates for the same exercise' if @datetime_count > 0 # Multiple unlock dates don't work correctly
+      @datetime_count += 1
       @valid_after = DateAndTimeUtils.to_time(str)
 
     elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/

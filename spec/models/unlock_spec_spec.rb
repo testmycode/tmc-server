@@ -142,6 +142,8 @@ describe UnlockSpec, type: :model do
       expect(call_parsable(['50% of grp'])).to eq(true)
       expect(call_parsable(['5 points in grp'])).to eq(true)
       expect(call_parsable(['2 points in grp-ex1'])).to eq(true)
+      expect(call_parsable(['1.1.2000', '1 exercise in grp'])).to eq(true)
+      expect(call_parsable(['20% of grp', '50% of grp', '80% of grp'])).to eq(true)
     end
 
     it 'should raise error if spec is invalid' do
@@ -155,6 +157,8 @@ describe UnlockSpec, type: :model do
       expect { call_parsable(['60% of grp-ex2-']) }.to raise_error
       expect { call_parsable(['60% if grp-ex2']) }.to raise_error
       expect { call_parsable(['foo']) }.to raise_error
+      expect { call_parsable(['foo', '1.1.2000']) }.to raise_error
+      expect { call_parsable(['2.2.2000', '1.1.2000']) }.to raise_error
     end
   end
 end
