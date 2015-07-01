@@ -338,4 +338,35 @@ describe Course, type: :model do
     course = FactoryGirl.create :course, name: 'coursesName', course_template: template, source_url: template.source_url
     expect(course.cache_path).to eq(template.cache_path)
   end
+
+  describe 'contains_unlock_deadlines?' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+      @ex1 = FactoryGirl.create(:exercise, course: @course)
+      @ex2 = FactoryGirl.create(:exercise, course: @course)
+      @ex3 = FactoryGirl.create(:exercise, course: @course)
+    end
+
+    it 'returns false if no exercise in the course has unlock-based deadlines' do
+      @ex1.deadline_spec = ['2.2.2000'].to_json
+      @ex2.deadline_spec = ['3.2.2000'].to_json
+      @ex1.soft_deadline_spec = ['1.2.2000'].to_json
+      @ex3.soft_deadline_spec = ['1.1.2000'].to_json
+
+      [@ex1, @ex2, @ex3].each { |e| e.save! }
+
+      expect(@course.contains_unlock_deadlines?).to eq(false)
+    end
+
+    it 'returns true if any exercise in the course has unlock-based deadlines' do
+      @ex1.deadline_spec = ['2.2.2000'].to_json
+      @ex2.deadline_spec = ['3.2.2000'].to_json
+      @ex1.soft_deadline_spec = ['1.2.2000', 'unlock + 5 days'].to_json
+      @ex3.soft_deadline_spec = ['1.1.2000'].to_json
+
+      [@ex1, @ex2, @ex3].each { |e| e.save! }
+
+      expect(@course.contains_unlock_deadlines?).to eq(true)
+    end
+  end
 end

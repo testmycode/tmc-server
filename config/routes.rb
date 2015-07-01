@@ -1,16 +1,17 @@
 TmcServer::Application.routes.draw do
-  resources :organizations, path: 'org' do
+  resources :organizations, except: :destory, path: 'org' do
     member do
       post 'accept'
       post 'reject'
       get 'reject_reason_input'
+      post 'toggle_visibility'
     end
 
     collection do
       get 'list_requests'
     end
 
-    resources :teachers, only: [:index, :new, :create, :destroy]
+    resources :teachers, only: [:index, :create, :destroy]
     get 'course_templates', to: 'course_templates#list_for_teachers'
     get 'course_templates/:id', to: 'course_templates#prepare_course', as: 'prepare_course'
 
@@ -25,7 +26,11 @@ TmcServer::Application.routes.draw do
         post 'disable'
         get 'manage_unlocks'
         post 'save_unlocks'
+        get 'manage_exercises'
+        resources :emails, only: [:index]
       end
+
+      resources :assistants, only: [:index, :create, :destroy]
 
       resources :points, only: [:index, :show] do
         member do
@@ -35,9 +40,14 @@ TmcServer::Application.routes.draw do
 
       get 'help'
 
+      resources :exercises, only: [:index] do
+        collection do
+          post 'set_disabled_statuses'
+        end
+      end
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
-      resources :exercises, only: [:index]
       resources :submissions, only: [:index]
       resources :reviewed_submissions, only: [:index]
       resources :feedback_questions, only: [:index, :new, :create]

@@ -11,10 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150616081429) do
+ActiveRecord::Schema.define(version: 20150625081824) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "assistantships", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "course_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "assistantships", ["user_id", "course_id"], name: "index_assistantships_on_user_id_and_course_id", unique: true, using: :btree
 
   create_table "available_points", force: true do |t|
     t.integer "exercise_id",                     null: false
@@ -101,6 +110,7 @@ ActiveRecord::Schema.define(version: 20150616081429) do
     t.boolean  "code_review_requests_enabled",     default: false, null: false
     t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
     t.text     "soft_deadline_spec"
+    t.integer  "disabled_status",                  default: 0
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
@@ -141,6 +151,7 @@ ActiveRecord::Schema.define(version: 20150616081429) do
     t.string   "rejected_reason"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "hidden",             default: false
   end
 
   create_table "password_reset_keys", force: true do |t|
@@ -241,8 +252,7 @@ ActiveRecord::Schema.define(version: 20150616081429) do
     t.datetime "updated_at"
   end
 
-  add_index "teacherships", ["organization_id"], name: "index_teacherships_on_organization_id", using: :btree
-  add_index "teacherships", ["user_id"], name: "index_teacherships_on_user_id", using: :btree
+  add_index "teacherships", ["user_id", "organization_id"], name: "index_teacherships_on_user_id_and_organization_id", unique: true, using: :btree
 
   create_table "test_case_runs", force: true do |t|
     t.integer  "submission_id"

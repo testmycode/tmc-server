@@ -19,9 +19,6 @@ EOS
 
   before :each do
     @user = FactoryGirl.create(:user)
-  end
-
-  after :each do
     UserField.instance_variable_set('@all', nil)
     ExtraField.instance_variable_set('@fields', nil)
   end

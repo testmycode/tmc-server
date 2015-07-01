@@ -11,6 +11,9 @@ feature 'Admin creates course templates', feature: true do
   end
 
   scenario 'Admin succeeds at creating' do
+    repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(repo_path)
+
     log_in_as(@admin.login, 'xooxer')
     visit '/course_templates'
 
@@ -19,7 +22,7 @@ feature 'Admin creates course templates', feature: true do
     fill_in 'course_template_title', with: 'title'
     fill_in 'course_template_description', with: 'description'
     fill_in 'course_template_material_url', with: 'material'
-    fill_in 'course_template_source_url', with: 'https://github.com/testmycode/tmc-testcourse.git'
+    fill_in 'course_template_source_url', with: repo_path
     click_button 'Create Course template'
 
     expect(page).to have_content('title')

@@ -5,12 +5,15 @@ describe CourseTemplatesController, type: :controller do
     @user = FactoryGirl.create(:user)
     @admin = FactoryGirl.create(:admin)
     @guest = Guest.new
+
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(@repo_path)
   end
 
   let(:valid_attributes) do
     {
       name: 'TestTemplateCourse',
-      source_url: 'https://github.com/testmycode/tmc-testcourse.git',
+      source_url: @repo_path,
       title: 'Test Template Title'
     }
   end
@@ -334,14 +337,14 @@ describe CourseTemplatesController, type: :controller do
 
     describe 'GET prepare_course' do
       before :each do
-        @template = FactoryGirl.create :course_template, name: 'name', title: 'title', source_url: 'https://github.com/testmycode/tmc-testcourse.git'
+        @template = FactoryGirl.create :course_template, name: 'name', title: 'title', source_url: @repo_path
       end
 
       it 'should assign @course with course template attributes' do
         get :prepare_course, organization_id: @organization.slug, id: @template.id
         expect(assigns(:course).name).to eq('name')
         expect(assigns(:course).title).to eq('title')
-        expect(assigns(:course).source_url).to eq('https://github.com/testmycode/tmc-testcourse.git')
+        expect(assigns(:course).source_url).to eq(@repo_path)
         expect(assigns(:course).course_template_id).to eq(@template.id)
         expect(assigns(:course).cache_version).to eq(@template.cache_version)
       end

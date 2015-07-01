@@ -74,12 +74,15 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
+  repo_path = "#{::Rails.root}/tmp/tests/fake_remote_repo"
+  create_bare_repo(repo_path)
+
   click_on 'New Course template'
   fill_in 'course_template_name', with: 'newtemplate'
   fill_in 'course_template_title', with: 'New Template'
   fill_in 'course_template_description', with: 'Short description'
   fill_in 'course_template_material_url', with: 'www.material.com'
-  fill_in 'course_template_source_url', with: 'https://github.com/testmycode/tmc-testcourse.git'
+  fill_in 'course_template_source_url', with: repo_path
   highlight '#course_template_name'
   highlight '#course_template_title'
   highlight '#course_template_source_url'

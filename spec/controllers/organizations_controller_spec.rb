@@ -27,6 +27,22 @@ describe OrganizationsController, type: :controller do
       controller.current_user = @admin
     end
 
+    describe 'GET index' do
+      it 'shows visible courses in order by name, split into ongoing and expired' do
+        @organization = Organization.create! valid_attributes
+        @courses = [
+            FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
+            FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
+            FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
+        ]
+
+        get :show, id: @organization.slug
+
+        expect(assigns(:ongoing_courses).map(&:name)).to eq(%w(AnotherTestCourse SomeTestCourse))
+        expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
+      end
+    end
+
     describe 'PUT update' do
       describe 'with valid params' do
         let(:new_attributes) do
@@ -70,21 +86,6 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'DELETE destroy' do
-      it 'destroys the requested organization' do
-        organization = Organization.create! valid_attributes
-        expect do
-          delete :destroy, id: organization.to_param
-        end.to change(Organization, :count).by(-1)
-      end
-
-      it 'redirects to the organizations list' do
-        organization = Organization.create! valid_attributes
-        delete :destroy, id: organization.to_param
-        expect(response).to redirect_to(organizations_url)
-      end
-    end
-
     describe 'GET list_requests' do
       before :each do
         @org1 = FactoryGirl.create(:organization)
@@ -100,7 +101,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST accept' do
       it 'accepts the organization request' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :accept, id: org.to_param
         org.reload
         expect(org.acceptance_pending).to eq(false)
@@ -109,10 +110,27 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST reject' do
       it 'sets the organization rejected flag to true' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :reject, id: org.to_param, organization: { rejected_reason: 'reason' }
         org.reload
         expect(org.rejected).to eq(true)
+      end
+    end
+  end
+
+  describe 'As a teacher' do
+    before :each do
+      controller.current_user = @user
+    end
+
+    describe 'POST toggle_visibility' do
+      it 'toggles value of hidden field between true and false' do
+        org = FactoryGirl.create(:accepted_organization)
+        Teachership.create(user_id: @user.id, organization_id: org.id)
+        post :toggle_visibility, id: org.to_param
+        org.reload
+        expect(org.hidden).to be true
+        expect(response).to redirect_to(organization_path)
       end
     end
   end
@@ -194,14 +212,6 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'DELETE destroy' do
-      it 'denies access' do
-        organization = Organization.create! valid_attributes
-        delete :destroy, id: organization.to_param
-        expect(response.code.to_i).to eq(401)
-      end
-    end
-
     describe 'GET list_requests' do
       it 'denies access' do
         get :list_requests, {}
@@ -211,7 +221,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST accept' do
       it 'denies access' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :accept, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
@@ -219,8 +229,16 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST reject' do
       it 'denies access' do
-        org = Organization.init(valid_attributes.merge(acceptance_pending: true), @user)
+        org = Organization.init(valid_attributes, @user)
         post :reject, id: org.to_param
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+
+    describe 'POST toggle_visibility' do
+      it 'denies access' do
+        org = FactoryGirl.create(:accepted_organization)
+        post :toggle_visibility, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
     end

@@ -31,8 +31,8 @@ class FeedbackAnswersController < ApplicationController
     respond_to do |format|
       format.html do
         authorize! :read, @parent
-        authorize! :read, FeedbackQuestion
-        authorize! :read, FeedbackAnswer
+        authorize! :read_feedback_questions, @parent
+        authorize! :read_feedback_answers, @parent
 
         @text_answers = @parent.feedback_answers
           .joins(:feedback_question)

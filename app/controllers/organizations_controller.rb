@@ -1,25 +1,32 @@
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input]
+  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input, :toggle_visibility]
 
-  skip_authorization_check only: [:index, :show]
+  skip_authorization_check only: [:index]
 
   def index
-    @organizations = Organization.accepted_organizations
+    ordering = 'LOWER(name)'
+    @organizations = Organization.accepted_organizations.order(ordering)
   end
 
   def show
-    ordering = 'hidden, LOWER(name)'
+    add_organization_breadcrumb
+    ordering = 'hidden, disabled_status, LOWER(name)'
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
     @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
+    authorize! :read, @ongoing_courses
+    authorize! :read, @expired_courses
   end
 
   def new
     authorize! :request, :organization
+    add_breadcrumb 'Create new organization'
     @organization = Organization.new
   end
 
   def edit
     authorize! :edit, @organization
+    add_organization_breadcrumb
+    add_breadcrumb 'Edit'
   end
 
   def create
@@ -27,7 +34,7 @@ class OrganizationsController < ApplicationController
     @organization = Organization.init(organization_params, current_user)
 
     if !@organization.errors.any?
-      redirect_to @organization, notice: 'Organization was successfully requested.'
+      redirect_to organization_path(@organization), notice: 'Organization was successfully requested.'
     else
       render :new
     end
@@ -36,20 +43,15 @@ class OrganizationsController < ApplicationController
   def update
     authorize! :edit, @organization
     if @organization.update(organization_params)
-      redirect_to @organization, notice: 'Organization was successfully updated.'
+      redirect_to organization_path(@organization), notice: 'Organization was successfully updated.'
     else
       render :edit
     end
   end
 
-  def destroy
-    authorize! :destroy, @organization
-    @organization.destroy
-    redirect_to organizations_url, notice: 'Organization was successfully destroyed.'
-  end
-
   def list_requests
     authorize! :view, :organization_requests
+    add_breadcrumb 'New organization requests'
     @requested_organizations = Organization.pending_organizations
   end
 
@@ -61,12 +63,14 @@ class OrganizationsController < ApplicationController
       @organization.save
       redirect_to list_requests_organizations_path, notice: 'Organization request was successfully accepted.'
     else
-      redirect_to organizations_path
+      redirect_to organization_path(@organization)
     end
   end
 
   def reject_reason_input
     authorize! :reject, :organization_requests
+    add_breadcrumb 'New organization requests', list_requests_organizations_path
+    add_breadcrumb 'Reject organization'
   end
 
   def reject
@@ -78,8 +82,15 @@ class OrganizationsController < ApplicationController
       @organization.save
       redirect_to list_requests_organizations_path, notice: 'Organization request was successfully rejected.'
     else
-      redirect_to organizations_path
+      redirect_to organization_path(@organization)
     end
+  end
+
+  def toggle_visibility
+    authorize! :toggle_visibility, @organization
+    @organization.hidden = !@organization.hidden
+    @organization.save!
+    redirect_to organization_path, notice: "Organzation is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
   end
 
   private

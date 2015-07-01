@@ -12,17 +12,9 @@ describe CoursesController, type: :controller do
 
   describe 'GET index' do
     it 'shows visible courses in order by name, split into ongoing and expired' do
-      controller.current_user = FactoryGirl.create(:admin)
-      @courses = [
-        FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
-        FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
-        FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
-      ]
-
       get :index, organization_id: @organization.slug
-
-      expect(assigns(:ongoing_courses).map(&:name)).to eq(%w(AnotherTestCourse SomeTestCourse))
-      expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
+      expect(response.code.to_i).to eq(302)
+      expect(response).to redirect_to(organization_path(@organization))
     end
 
     describe 'in JSON format' do
@@ -370,8 +362,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST save_deadlines' do
     before :each do
-      @course = FactoryGirl.create(:course)
-      @course.organization = @organization
+      @course = FactoryGirl.create :course, organization: @organization
 
       Teachership.create(user: @user, organization: @organization)
       controller.current_user = @user
@@ -491,8 +482,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST save_unlocks' do
     before :each do
-      @course = FactoryGirl.create :course
-      @course.organization = @organization
+      @course = FactoryGirl.create :course, organization: @organization
       controller.current_user = @user
     end
 

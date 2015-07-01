@@ -2,10 +2,15 @@ require 'spec_helper'
 
 describe CourseTemplate, type: :model do
   describe 'validation' do
+    before :each do
+      @repo_path = @test_tmp_dir + '/fake_remote_repo'
+      create_bare_repo(@repo_path)
+    end
+
     let(:valid_params) do
       {
         name: 'TestTemplateCourse',
-        source_url: 'https://github.com/testmycode/tmc-testcourse.git',
+        source_url: @repo_path,
         title: 'Test Template Title'
       }
     end

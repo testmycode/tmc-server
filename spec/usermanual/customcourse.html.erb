@@ -31,7 +31,7 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
-    teacher = FactoryGirl.create(:user, :login => 'teacher', :password => 'teacher')
+    teacher = FactoryGirl.create(:admin, :login => 'teacher', :password => 'teacher')
     org = FactoryGirl.create(:accepted_organization, name: 'Some organization')
     org.teachers << teacher
     org.save
@@ -189,7 +189,7 @@ require 'cgi' # for escapeHTML
   </p>
 
   <%=
-    expect(File).to be_directory(shell_session.working_dir + '/private/template_project')
+    expect(File).to be_directory("#{workdir}/private/template_project")
     shell_session.example do |sh|
       sh.run "cd private/template_project; find ."
     end
