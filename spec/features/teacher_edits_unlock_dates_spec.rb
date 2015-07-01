@@ -99,17 +99,17 @@ feature 'Teacher edits unlock dates', feature: true do
     click_link 'Manage unlock dates'
     fill_in 'empty_group_0', with: '2.2.2012'
     click_link 'Add a condition'
-    fill_in 'empty_group_1', with: '3.3.2013'
+    fill_in 'empty_group_1', with: 'exercise MyExercise'
     click_link 'Add a condition'
-    fill_in 'empty_group_2', with: '4.4.2014'
+    fill_in 'empty_group_2', with: '50% of MyExercise'
     click_link 'Add a condition'
     click_link 'Add a condition'
 
     click_button 'Save changes'
     expect(page).to_not have_field('empty_group_0', with: '1.1.2011')
     expect(page).to have_field('empty_group_0', with: '2.2.2012')
-    expect(page).to have_field('empty_group_1', with: '3.3.2013')
-    expect(page).to have_field('empty_group_2', with: '4.4.2014')
+    expect(page).to have_field('empty_group_1', with: 'exercise MyExercise')
+    expect(page).to have_field('empty_group_2', with: '50% of MyExercise')
     expect(page).to_not have_field('empty_group_3')
     expect(page).to_not have_field('empty_group_4')
   end
