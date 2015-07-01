@@ -21,6 +21,9 @@ class Organization < ActiveRecord::Base
   has_many :teachers, through: :teacherships, source: :user
   has_many :courses, dependent: :nullify
 
+  has_attached_file :logo, :styles => { :small_logo => "100x100>" }
+  validates_attachment_content_type :logo, :content_type => /\Aimage\/.*\Z/
+
   scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
   scope :pending_organizations, -> { where(acceptance_pending: true) }
 
