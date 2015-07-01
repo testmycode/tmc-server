@@ -1,5 +1,5 @@
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input, :toggle_visibility]
+  before_action :set_organization, except: [:index, :create, :new, :list_requests]
 
   skip_authorization_check only: [:index]
 
@@ -67,12 +67,6 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  def reject_reason_input
-    authorize! :reject, :organization_requests
-    add_breadcrumb 'New organization requests', list_requests_organizations_path
-    add_breadcrumb 'Reject organization'
-  end
-
   def reject
     authorize! :reject, :organization_requests
     if @organization.acceptance_pending
@@ -84,6 +78,12 @@ class OrganizationsController < ApplicationController
     else
       redirect_to organization_path(@organization)
     end
+  end
+
+  def reject_reason_input
+    authorize! :reject, :organization_requests
+    add_breadcrumb 'New organization requests', list_requests_organizations_path
+    add_breadcrumb 'Reject organization'
   end
 
   def toggle_visibility
