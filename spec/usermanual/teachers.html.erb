@@ -429,21 +429,38 @@ require 'cgi' # for escapeHTML
 
 <%
    course.exercise_group_by_name('Week1').hard_group_deadline = [''].to_json
+   course.exercise_group_by_name('Week2').hard_group_deadline = [''].to_json
    visit '/org/hy/courses/1'
    highlight 'a:contains("Manage unlock conditions")'
 %>
 <%= screenshot %>
 
   <p>
-    Unlock conditions may be set for each exercise group separately.
+    Unlock conditions may be set for each exercise group separately. You can add multiple unlock conditions for the same exercise group by clicking
+    'Add a condition'. If multiple conditions are defined, all of them must be true before the exercise is unlocked.
   </p>
 
 <%
-   course.exercise_group_by_name('Week1').group_unlock_conditions = ['01-01-2011'].to_json
+   course.exercise_group_by_name('Week1').group_unlock_conditions = ['1.1.2000'].to_json
+   course.exercise_group_by_name('Week2').group_unlock_conditions = ['8.1.2000', '80% of Week1'].to_json
    UncomputedUnlock.create_all_for_course_eager(course)
    click_on 'Manage unlock conditions'
+   highlight '#add-condition-Week1'
 %>
+
 <%= screenshot %>
+
+  <p>
+    The conditions that can be used are:
+    <ul>
+      <li><code>exercise [group] &lt;exercise-or-group&gt;</code></li>
+      <li><code>point[s] &lt;list-of-point-names&gt;</code></li>
+      <li><code>&lt;N&gt;% [in|of|from] &lt;exercise-or-group&gt;</code></li>
+      <li><code>&lt;N&gt; point[s] &lt;exercise-or-group&gt;</code></li>
+      <li><code>&lt;N&gt; exercise[s] [in|of|from] &lt;exercise-or-group&gt;</code></li>
+      <li><code>&lt;date-or-datetime&gt;</code></li>
+    </ul>
+  </p>
 
   <h2>Managing feedback questions</h2>
 
