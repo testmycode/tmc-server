@@ -197,12 +197,8 @@ describe Course, type: :model do
       should_be_valid_params(valid_params.merge(custom_points_url: 'http://example.com'))
       should_be_valid_params(valid_params.merge(custom_points_url: 'https://example.com'))
       should_be_valid_params(valid_params.merge(custom_points_url: 'https://example.com/{org}/{course}/{user}'))
-
-      should_be_invalid_params(valid_params.merge(custom_points_url: 'www.example.com'))
-      should_be_invalid_params(valid_params.merge(custom_points_url: 'http'))
-      should_be_invalid_params(valid_params.merge(custom_points_url: 'http:'))
-      should_be_invalid_params(valid_params.merge(custom_points_url: 'http:/'))
-      should_be_invalid_params(valid_params.merge(custom_points_url: 'ftp://example.com'))
+      should_be_valid_params(valid_params.merge(custom_points_url: 'example.com/{org}/{course}/{user}'))
+      should_be_valid_params(valid_params.merge(custom_points_url: 'example.com'))
     end
 
     def should_be_invalid_params(params)

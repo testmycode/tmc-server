@@ -22,11 +22,6 @@ class Course < ActiveRecord::Base
             length: { within: 1..40 }
 
   validates :source_url, presence: true
-  validates :custom_points_url,
-            format: {
-              with: /(\Ahttps?:\/\/|\A\z)/,
-              message: 'should begin with http:// or https://'
-            }
   validate :check_source_backend
   after_initialize :set_default_source_backend
 
@@ -317,6 +312,11 @@ class Course < ActiveRecord::Base
       return super("http://#{material}")
     end
     super(material)
+  end
+
+  def custom_points_url=(url)
+    return super("http://#{url}") unless url =~ /^(https?:\/\/|$)/
+    super(url)
   end
 
   def contains_unlock_deadlines?
