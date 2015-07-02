@@ -24,7 +24,7 @@ class Course < ActiveRecord::Base
   validates :source_url, presence: true
   validates :custom_points_url,
             format: {
-              with: /(\Ahttps?:\/\/)?/,
+              with: /(\Ahttps?:\/\/|\A\z)/,
               message: 'should begin with http:// or https://'
             }
   validate :check_source_backend
