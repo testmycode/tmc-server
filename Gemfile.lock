@@ -270,6 +270,7 @@ DEPENDENCIES
   newrelic_rpm
   paperclip (~> 4.3)
   pdfkit (~> 0.6.2)
+  paperclip (~> 4.3)
   pg (~> 0.17.0)
   pghero
   poltergeist (~> 1.5.0)
