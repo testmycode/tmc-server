@@ -8,7 +8,10 @@ class Ability
     if user.administrator?
       can :manage, :all
       can :create, Course
-      can :refresh, Course
+      cannot :refresh, Course
+      can :refresh, Course do |c|
+        c.custom?
+      end
       can :view, :participants_list
       can :rerun, Submission
       can :refresh_gdocs_spreadsheet, Course do |c|
@@ -40,8 +43,7 @@ class Ability
       end
       can :refresh, Course do |c|
         c.taught_by?(user) &&
-            c.custom? && # user can only refresh his/her custom course.
-            SiteSetting.value('enable_custom_repositories') # and only if custom repositories are allowed
+            c.custom? # user can only refresh his/her custom course.
       end
 
       cannot :read, Exercise

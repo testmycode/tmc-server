@@ -22,18 +22,20 @@
       </ul>
       <% if can? :teach, @course %>
         <ul>
-          <li>Source type: <%= @course.source_backend.upcase %> </li>
-          <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
+          <% if current_user.administrator? %>
+            <li>Source type: <%= @course.source_backend.upcase %> </li>
+            <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
 
-          <% if @course.source_backend == 'git' %>
-            <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
-            <% if github_url %>
-              <li>Github URL: <%= link_to github_url, github_url %></li>
-            <% end %>
-            <li>Git branch: <%= @course.git_branch %></li>
-            <% gitrev = @course.git_revision %>
-            <% if gitrev %>
-              <li>Git revision: <%= gitrev %></li>
+            <% if @course.source_backend == 'git' %>
+                <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
+                <% if github_url %>
+                    <li>Github URL: <%= link_to github_url, github_url %></li>
+                <% end %>
+                <li>Git branch: <%= @course.git_branch %></li>
+                <% gitrev = @course.git_revision %>
+                <% if gitrev %>
+                    <li>Git revision: <%= gitrev %></li>
+                <% end %>
             <% end %>
           <% end %>
 
