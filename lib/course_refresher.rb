@@ -248,6 +248,11 @@ class CourseRefresher
           end
 
           e.options = metadata
+
+          if (e.new_record? && !e.course.initially_refreshed?)
+            e.disabled!
+          end
+
           e.save!
         rescue SyntaxError
           @report.errors << "Failed to parse metadata: #{$!}"

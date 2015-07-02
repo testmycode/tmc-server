@@ -78,7 +78,7 @@ class CourseTemplatesController < ApplicationController
   end
 
   def refresh
-    notice = "All good"
+    notice = "Course template successfully refreshed"
     begin
       @course_template.refresh
     rescue CourseRefresher::Failure => e
