@@ -31,10 +31,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
   end
 
   scenario 'Admin refreshes template, courses get updated' do
-    course = Course.find_by_name!('course')
-    repo = clone_course_repo(course)
-    repo.copy_simple_exercise('MyExercise')
-    repo.add_commit_push
+    add_exercise
 
     log_in_as @admin.login, 'xooxer'
     visit '/course_templates'
@@ -51,11 +48,29 @@ feature 'Admin propagates template changes to all courses cloned from template',
     expect(page).to have_content('MyExercise')
   end
 
+  scenario 'New added exercise is disabled by default, old stay enabled' do
+    add_exercise
+
+    log_in_as @admin.login, 'xooxer'
+    visit '/course_templates'
+    click_link 'Refresh'
+
+    Course.first.exercises.first.enabled!
+
+    add_exercise('MyAnotherExercise')
+    visit '/course_templates'
+    click_link 'Refresh'
+
+    visit '/'
+    click_link @organization1.name
+    click_link 'course'
+    save_and_open_page
+    expect(page).not_to have_content('MyExercise (disabled)')
+    expect(page).to have_content('MyAnotherExercise (disabled)')
+  end
+
   scenario 'Submissions are not shared among courses created from same template' do
-    course = Course.find_by_name!('course')
-    repo = clone_course_repo(course)
-    repo.copy_simple_exercise('MyExercise')
-    repo.add_commit_push
+    add_exercise
 
     ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.solve_all
@@ -64,6 +79,10 @@ feature 'Admin propagates template changes to all courses cloned from template',
     log_in_as @admin.login, 'xooxer'
     visit '/course_templates'
     click_link 'Refresh'
+
+    Course.find_each do |c|
+      c.exercises.first.enabled!
+    end
 
     user = FactoryGirl.create :user, password: 'foobar'
 
@@ -92,4 +111,12 @@ feature 'Admin propagates template changes to all courses cloned from template',
     expect(page).to have_content('No submissions yet.')
   end
 
+  private
+
+  def add_exercise(exercise_name = 'MyExercise')
+    course = Course.find_by_name!('course')
+    repo = clone_course_repo(course)
+    repo.copy_simple_exercise(exercise_name)
+    repo.add_commit_push
+  end
 end
