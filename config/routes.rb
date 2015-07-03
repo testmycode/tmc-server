@@ -27,6 +27,7 @@ TmcServer::Application.routes.draw do
         get 'manage_unlocks'
         post 'save_unlocks'
         get 'manage_exercises'
+        post 'toggle_submission_result_visibility'
         resources :emails, only: [:index]
       end
 
