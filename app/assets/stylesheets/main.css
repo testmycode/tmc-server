@@ -10,6 +10,10 @@
   color: green;
 }
 
+.h_i_d_d_e_n {  /* Submision status :hidden is change for css to be 'h_i_d_d_e_n' so that we can see it (: */
+    color: orange;
+}
+
 /* Basic commons */
 
 .small{

@@ -16,8 +16,9 @@ module SubmissionsHelper
   end
 
   def submission_status(submission)
-    status = submission.status
-    raw("<span class=\"#{status}\">#{status.to_s.capitalize}</span>")
+    status = submission.status(current_user)
+    # if status is :hidden we have to give something else to css so that we can see it
+    raw("<span class=\"#{status == :hidden ? 'h_i_d_d_e_n' : status}\">#{status.to_s.capitalize}</span>")
   end
 
   def submission_review_column(submission)

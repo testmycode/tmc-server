@@ -177,6 +177,10 @@ class Ability
         can? :teach, c
       end
 
+      can :see_points, Submission do |s|
+        !s.course.hide_submission_result? || can?(:teach, s.course)
+      end
+
       cannot :teach, Organization
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
