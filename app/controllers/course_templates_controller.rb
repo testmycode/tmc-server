@@ -95,6 +95,6 @@ class CourseTemplatesController < ApplicationController
   end
 
   def course_template_params
-    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at)
+    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at, :git_branch)
   end
 end

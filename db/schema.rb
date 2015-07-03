@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150625081824) do
+ActiveRecord::Schema.define(version: 20150703070009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,11 +59,13 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.string   "description"
     t.string   "material_url"
     t.string   "source_url"
-    t.integer  "cache_version", default: 0,     null: false
+    t.integer  "cache_version",  default: 0,        null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "expires_at"
-    t.boolean  "hidden",        default: false
+    t.boolean  "hidden",         default: false
+    t.string   "source_backend", default: "git",    null: false
+    t.text     "git_branch",     default: "master", null: false
   end
 
   create_table "courses", force: true do |t|

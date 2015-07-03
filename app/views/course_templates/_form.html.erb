@@ -32,6 +32,10 @@
     <%= f.text_field :source_url %>
   </div>
   <div class="field">
+    <%= f.label :git_branch %>
+    <%= f.text_field :git_branch, :default => 'master' %>
+  </div>
+  <div class="field">
     <%= f.label :expires_at %><br>
     <%= f.date_field :expires_at %>
   </div>
