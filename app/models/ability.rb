@@ -215,6 +215,10 @@ class Ability
         can? :teach, o
       end
 
+      can :toggle_submission_result_visibility, Course do |c|
+        can? :teach, c
+      end
+
       cannot :teach, Organization
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
