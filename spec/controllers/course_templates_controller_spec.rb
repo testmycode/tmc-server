@@ -14,6 +14,8 @@ describe CourseTemplatesController, type: :controller do
     {
       name: 'TestTemplateCourse',
       source_url: @repo_path,
+      source_backend: 'git',
+      git_branch: 'master',
       title: 'Test Template Title'
     }
   end
@@ -22,6 +24,8 @@ describe CourseTemplatesController, type: :controller do
     {
       name: 'w h i t e s p a c e s',
       source_url: '',
+      source_backend: 'txt',
+      git_branch: 'nonexistent',
       title: 'a' * 41
     }
   end

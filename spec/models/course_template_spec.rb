@@ -11,6 +11,8 @@ describe CourseTemplate, type: :model do
       {
         name: 'TestTemplateCourse',
         source_url: @repo_path,
+        source_backend: 'git',
+        git_branch: 'master',
         title: 'Test Template Title'
       }
     end
@@ -59,6 +61,14 @@ describe CourseTemplate, type: :model do
     it 'requires a remote repo url' do
       should_be_invalid_params(valid_params.merge(source_url: nil))
       should_be_invalid_params(valid_params.merge(source_url: ''))
+    end
+
+    it 'requires correct source_backend' do
+      should_be_invalid_params(valid_params.merge(source_backend: 'txt'))
+    end
+
+    it 'requires correct git branch' do
+      should_be_invalid_params(valid_params.merge(git_branch: 'nonexistent'))
     end
 
     def should_be_invalid_params(params)

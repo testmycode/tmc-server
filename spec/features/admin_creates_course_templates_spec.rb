@@ -23,8 +23,10 @@ feature 'Admin creates course templates', feature: true do
     fill_in 'course_template_description', with: 'description'
     fill_in 'course_template_material_url', with: 'material'
     fill_in 'course_template_source_url', with: repo_path
+    fill_in 'course_template_git_branch', with: 'master'
     click_button 'Create Course template'
 
+    expect(page).to have_content('Course template was successfully created.')
     expect(page).to have_content('title')
   end
 
@@ -36,6 +38,7 @@ feature 'Admin creates course templates', feature: true do
     fill_in 'course_template_name', with: 'name with w h i t e s p a c e s'
     fill_in 'course_template_title', with: 'a' * 41
     fill_in 'course_template_source_url', with: ''
+    fill_in 'course_template_git_branch', with: 'nonexistent'
     click_button 'Create Course template'
 
     expect(page).to have_content('Name should not contain white spaces')
