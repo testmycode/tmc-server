@@ -50,7 +50,9 @@
         </td>
         <% if show_awarded_points %>
           <td>
-            <%= points_list(submission.points_list) %>
+            <% if can? :see_points, submission %>
+              <%= points_list(submission.points_list) %>
+            <% end %>
           </td>
         <% end %>
         <% if show_review_column %>
