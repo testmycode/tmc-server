@@ -18,9 +18,9 @@
             </li>
           <% end %>
         <% else %>
-          <li>
-            <%= link_to 'View points', organization_course_points_path(@organization, @course) %>
-          </li>
+          <% if can? :see_submission_results, @course %>
+            <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
+          <% end %>
         <% end %>
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>

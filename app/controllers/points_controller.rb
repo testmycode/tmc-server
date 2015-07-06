@@ -2,11 +2,11 @@ require 'natsort'
 # Shows the points summary table and exercise group-specific tables.
 class PointsController < ApplicationController
   include PointsHelper
-  skip_authorization_check except: :refresh_gdocs
   before_action :set_organization
 
   def index
     @course = Course.find(params[:course_id])
+    authorize! :see_points, @course
     add_course_breadcrumb
     add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
 
@@ -34,6 +34,7 @@ class PointsController < ApplicationController
   def show
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])
+    authorize! :see_points, @course
 
     add_course_breadcrumb
     add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
@@ -61,6 +62,8 @@ class PointsController < ApplicationController
       end
     end
   end
+
+  private
 
   def summary_hash(course, visible_exercises, sheets)
     per_user_and_sheet = {}
@@ -105,8 +108,6 @@ class PointsController < ApplicationController
       summary[:users] = summary[:users].sort_by { |user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
     end
   end
-
-  private
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])
