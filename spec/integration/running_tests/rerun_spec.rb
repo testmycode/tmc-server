@@ -50,5 +50,19 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
 
       expect(@submission.awarded_points).to include(old_point)
     end
+
+    it 'should not mark previously awarded points as late if the original submission was submitted before soft deadline' do
+      RemoteSandboxForTesting.run_submission(@submission)
+
+      expect(@submission.awarded_points.all?(&:late?)).to eq(false)
+
+      @submission.exercise.soft_deadline_spec = [Date.today - 7.days].to_json
+      @submission.exercise.save!
+      @submission.reload
+
+      RemoteSandboxForTesting.run_submission(@submission)
+
+      expect(@submission.awarded_points.all?(&:late?)).to eq(false)
+    end
   end
 end

@@ -96,7 +96,8 @@ module TestRunGrader
           submission.awarded_points << AwardedPoint.new(
             name: point_name,
             course: course,
-            user: user
+            user: user,
+            late: exercise.soft_deadline_expired_for?(user)
           )
         end
       end
