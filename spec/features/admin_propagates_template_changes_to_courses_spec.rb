@@ -64,7 +64,6 @@ feature 'Admin propagates template changes to all courses cloned from template',
     visit '/'
     click_link @organization1.name
     click_link 'course'
-    save_and_open_page
     expect(page).not_to have_content('MyExercise (disabled)')
     expect(page).to have_content('MyAnotherExercise (disabled)')
   end

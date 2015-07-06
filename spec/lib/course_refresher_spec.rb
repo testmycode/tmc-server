@@ -34,10 +34,13 @@ describe CourseRefresher do
       system!('git checkout -b foo >/dev/null 2>&1')
     end
     @local_clone.active_branch = 'foo'
+    add_exercise('MyExercise')
+
+    @template.git_branch = 'foo'
+    @template.save!
     @course.git_branch = 'foo'
     @course.save!
 
-    add_exercise('MyExercise')
     @refresher.refresh_course @course
     expect(@course.exercises.size).to eq(1)
     expect(@course.exercises[0].name).to eq('MyExercise')
