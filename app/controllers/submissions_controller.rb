@@ -45,14 +45,14 @@ class SubmissionsController < ApplicationController
           user_id: @submission.user_id,
           course: @course.name,
           exercise_name: @submission.exercise.name,
-          status: @submission.status,
+          status: @submission.status(current_user),
           points: @submission.points_list,
           processing_time: @submission.processing_time,
           message_for_paste: @submission.message_for_paste,
           missing_review_points: @exercise.missing_review_points_for(@submission.user)
         }
         output = output.merge(
-          case @submission.status
+          case @submission.status(current_user)
           when :processing then {
             submissions_before_this: @submission.unprocessed_submissions_before_this,
             total_unprocessed: Submission.unprocessed_count
@@ -66,6 +66,10 @@ class SubmissionsController < ApplicationController
             feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
             feedback_answer_url: submission_feedback_answers_url(@submission, format: :json),
             processing_time: @submission.processing_time
+          }
+          when :hidden then {
+            points: 0,
+            test_cases: nil
           }
           end
         )
