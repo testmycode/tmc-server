@@ -19,12 +19,15 @@ class CourseRefresher
   end
 
   class Report
-    def initialize
+    def initialize(course = nil)
+      @course = course
       @errors = []
       @warnings = []
       @notices = []
       @timings = {}
     end
+
+    attr_reader :course
 
     attr_reader :errors
     attr_reader :warnings
@@ -59,7 +62,7 @@ class CourseRefresher
     end
 
     def refresh_course(course, options)
-      @report = Report.new
+      @report = Report.new(course)
 
       # We do the whole operation in a transaction with an exclusive lock on the Course row.
       # We start generating a new version of the course's file cache.

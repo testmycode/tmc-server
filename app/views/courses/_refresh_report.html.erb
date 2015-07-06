@@ -1,3 +1,7 @@
+  <% unless report.course.nil? %>
+      <h3><%=report.course.name%> (<%=report.course.organization.name%>)</h3>
+  <% end %>
+
   <% if report.successful? %>
     <p class="success">Refresh successful.</p>
   <% else %>

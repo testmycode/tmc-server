@@ -6,6 +6,10 @@ class CourseTemplatesController < ApplicationController
     ordering = 'LOWER(name)'
     add_breadcrumb 'Course templates', course_templates_path
     @course_templates = CourseTemplate.all.order(ordering)
+    if session[:template_refresh_report]
+      @template_refresh_report = session[:template_refresh_report]
+      session.delete(:template_refresh_report)
+    end
   end
 
   def new
@@ -80,9 +84,9 @@ class CourseTemplatesController < ApplicationController
   end
 
   def refresh
-    notice = "Course template successfully refreshed"
+    notice = 'Course template successfully refreshed'
     begin
-      @course_template.refresh
+      session[:template_refresh_report] = @course_template.refresh
     rescue CourseRefresher::Failure => e
       notice = "Refresh failed, something went wrong:<br><br>#{e}"
     end
