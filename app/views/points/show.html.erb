@@ -52,6 +52,7 @@
         <% if !user.administrator? || current_user.administrator? %>
           <% row_class = if user.administrator? then "admin" else "student" end %>
           <% user_points = @users_to_points[user.login] %>
+          <% user_late_points = @users_to_late_points[user.login] %>
           <tr class="<%= row_class %>">
             <td><%= index + 1 %></td>
             <td>
@@ -63,7 +64,10 @@
             </td>
             <% @exercises.each do |exercise| %>
               <% exercise.available_points.each do |p| %>
-                <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
+                <td>
+                  <%= raw("&#x2714;") if user_points.include?(p.name) %>
+                  <%= raw('<span class="late-points">&#x2714;*</span>') if user_late_points.include?(p.name) %>
+                </td>
               <% end %>
             <% end %>
           </tr>
@@ -72,3 +76,5 @@
     </tbody>
   </table>
 <% end %>
+<br/>
+<span class='late-points'>*</span> = The exercise for this point was submitted late.

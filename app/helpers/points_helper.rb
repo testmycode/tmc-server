@@ -21,4 +21,27 @@ module PointsHelper
   def points_list(points)
     points.map { |pt| h(pt) }.join('&nbsp; ').html_safe
   end
+
+  def points_list_obj(points)
+    points.map do |pt|
+      if pt.late?
+        "<span class='late-points'>#{h(pt.name)}*</span>"
+      else
+        h(pt.name)
+      end
+    end.join('&nbsp; ').html_safe
+  end
+
+  def generate_csv_group(csv, group_name, users, sheets, sheet_points_for_user, total_points_for_user)
+    csv << [group_name]
+    csv << ['Username'] + sheets.map { |sheet| sheet[:name] } + ['Total']
+
+    users.each do |user|
+      points = sheets.map do |sheet|
+        sheet_points_for_user.call(user.login, sheet[:name])
+      end
+      csv << [user.login] + points + [total_points_for_user.call(user.login)]
+    end
+    csv << ['']
+  end
 end

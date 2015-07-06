@@ -1,12 +1,15 @@
 <% require 'portable_csv' %>
 <%= PortableCSV.generate(:force_quotes => true) do |csv|
-  csv << ["Username"] + @summary[:sheets].map {|sheet| sheet[:name] } + ["Total"]
+  generate_csv_group(csv, 'All awarded points', @summary[:users], @summary[:sheets],
+                     ->(user, sheet) { @summary[:awarded_for_user_and_sheet][user][sheet] },
+                     ->(user) { @summary[:total_for_user][user] })
 
-  @summary[:users].each do |user|
-    points = @summary[:sheets].map do |sheet|
-      @summary[:awarded_for_user_and_sheet][user.login][sheet[:name]].to_i
-    end
-    total = @summary[:total_for_user][user.login].to_i
-    csv << [user.login] + points + [total]
-  end
+  generate_csv_group(csv, 'Points for exercises returned in time', @summary[:users], @summary[:sheets],
+                     ->(user, sheet) { @summary[:awarded_for_user_and_sheet][user][sheet] -
+                       @summary[:awarded_late_for_user_and_sheet][user][sheet] },
+                     ->(user) { @summary[:total_for_user][user] - @summary[:total_late_for_user][user] })
+
+  generate_csv_group(csv, 'Points for exercises returned late', @summary[:users], @summary[:sheets],
+                     ->(user, sheet) { @summary[:awarded_late_for_user_and_sheet][user][sheet] },
+                     ->(user) { @summary[:total_late_for_user][user] })
 end.html_safe %>

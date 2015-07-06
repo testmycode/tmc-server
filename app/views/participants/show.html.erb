@@ -17,9 +17,13 @@
     <h3><%= course.name %></h3>
     <ul>
       <li>Completed: <%= sprintf("%.0f", @percent_completed[course.id]) %>%</li>
-      <li>Awarded points: <%= points_list(@awarded_points[course.id]) %></li>
+      <li>Awarded points: <%= points_list_obj(@awarded_points[course.id]) %></li>
       <li>Missing points: <%= points_list(@missing_points[course.id]) %></li>
     </ul>
+  <% end %>
+  <% if @awarded_points.values.flatten.any?(&:late?) %>
+    <br/>
+    <span class='late-points'>*</span> = The exercise for this point was submitted late.
   <% end %>
 </section>
 

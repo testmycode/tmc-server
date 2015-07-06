@@ -1,12 +1,20 @@
 <% unless @bare_layout %>
-  <h1>Summary of points for <%= @course.name %></h1>
+  <h1 class="float-left">Summary of points for <%= @course.name %></h1>
+<% end %>
+
+<% contains_late_points = !@summary[:total_late_for_user].empty? %>
+
+<% if contains_late_points %>
+  <a href="javascript:void(0);" onclick="$('.late-points-toggle').toggle();"
+     id="late-points-toggle-button" class="btn btn-default btn-small float-right">Show/hide late points</a>
 <% end %>
 
 <%
    show_total_column = @summary[:sheets].size > 1
 %>
 
-<%= content_tag('div', :class => if @bare_layout then nil else 'scrollable' end) do %>
+<div class="float-clear"></div>
+<%= content_tag('div', class: @bare_layout ? nil : 'scrollable') do %>
   <table class="points">
     <thead>
       <tr>
@@ -82,17 +90,58 @@
           </td>
           <% @summary[:sheets].each do |sheet| %>
             <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>
+            <% user_late_points = @summary[:awarded_late_for_user_and_sheet][username] || {} %>
+            <% user_late_points_for_this_sheet = user_late_points[sheet[:name]].to_i %>
             <td>
-              <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
+              <% unless user_late_points_for_this_sheet == 0 %>
+                <div class="late-points-toggle" style="display: none;">
+                  <%=
+                      raw("#{user_points_for_this_sheet - user_late_points_for_this_sheet}" +
+                            '<span class="late-points">' +
+                            "+#{user_late_points_for_this_sheet}" +
+                            '</span>' +
+                            "/#{sheet[:total_available]}")
+                  %>
+                </div>
+                <div class="late-points-toggle">
+                  <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
+                </div>
+              <% else %>
+                <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
+              <% end %>
             </td>
           <% end %>
           <% if show_total_column %>
-            <td><%= "#{@summary[:total_for_user][username].to_i}/#{@summary[:total_available]}" %></td>
+            <td>
+              <% total_for_user = @summary[:total_for_user][username].to_i %>
+              <% total_late_for_user = @summary[:total_late_for_user][username].to_i %>
+              <% unless total_late_for_user == 0 %>
+                <div class="late-points-toggle" style="display: none;">
+                  <%=
+                      raw("#{total_for_user - total_late_for_user}" +
+                            '<span class="late-points">' +
+                            "+#{total_late_for_user}" +
+                            '</span>' +
+                            "/#{@summary[:total_available]}")
+                  %>
+                </div>
+                <div class="late-points-toggle">
+                  <%= "#{total_for_user}/#{@summary[:total_available]}" %>
+                </div>
+              <% else %>
+                <%= "#{total_for_user}/#{@summary[:total_available]}" %>
+              <% end %>
+            </td>
           <% end %>
         </tr>
       <% end %>
     </tbody>
   </table>
+<% end %>
+
+<% if contains_late_points %>
+  <br/>
+  Points after a plus sign indicate that the exercises for those points were submitted late.
 <% end %>
 
 <div class="alternative-format-links">[<%= link_to('csv', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv')) %>]</div>
