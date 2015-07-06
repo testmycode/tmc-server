@@ -253,7 +253,7 @@ require 'cgi' # for escapeHTML
    visit '/org/hy'
    highlight 'a:contains("Programming 101")'
    click_on 'Edit course parameters'
-   fill_in 'course_custom_points_url', with: 'my-custom-points.io/%{user}'
+   fill_in 'course_custom_points_url', with: 'http://my-points.io/%{user}'
 %>
 <%= screenshot %>
 
@@ -262,6 +262,9 @@ require 'cgi' # for escapeHTML
     If you want to use an external point awarding system, you can enter its URL to the 'Custom points URL' field. You can also use a template
     string that will generate the URL dynamically. For example, <code style='white-space: nowrap'>http://my-custom-points.io/%{user}</code> would show as
     <code style='white-space: nowrap'>http://my-custom-points.io/MyUsername</code> when viewed by user <code>MyUsername</code>
+    If you want to use an external point awarding system, you can enter its URL to the 'External scoreboard URL' field. You can also use a template
+    string that will generate the URL dynamically. For example, <code style='white-space: nowrap'>http://my-points.io/%{user}</code> would show as
+    <code style='white-space: nowrap'>http://my-points.io/MyUsername</code> when viewed by user <code>MyUsername</code>
   </p>
 
   <p>
