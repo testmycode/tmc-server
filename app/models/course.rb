@@ -22,11 +22,17 @@ class Course < ActiveRecord::Base
             length: { within: 1..40 }
 
   validates :source_url, presence: true
-  validate :check_source_backend
   validate :source_url_same_as_templates
+  validate :check_source_backend
   validate :check_custom_course_name_not_taken
+
   after_initialize :set_default_source_backend
+
+  # if made from template, make sure all values are fetched from there
   before_save :set_cache_version
+  before_save :set_source_url
+  before_save :set_git_branch
+  before_save :set_source_backend
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
@@ -60,6 +66,21 @@ class Course < ActiveRecord::Base
 
   scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
+
+  def git_branch
+    return course_template.git_branch unless custom?
+    super
+  end
+
+  def source_url
+    return course_template.source_url unless custom?
+    super
+  end
+
+  def source_backend
+    return course_template.source_backend unless custom?
+    super
+  end
 
   def visible_to?(user)
     user.administrator? ||
@@ -357,6 +378,18 @@ class Course < ActiveRecord::Base
 
   def set_cache_version
     self.cache_version = course_template.cache_version unless custom?
+  end
+
+  def set_source_url
+    self.source_url = course_template.source_url unless custom?
+  end
+
+  def set_git_branch
+    self.git_branch = course_template.git_branch unless custom?
+  end
+
+  def set_source_backend
+    self.source_backend = course_template.source_backend unless custom?
   end
 
   def source_url_same_as_templates
