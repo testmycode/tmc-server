@@ -84,7 +84,7 @@ class CourseTemplatesController < ApplicationController
     begin
       @course_template.refresh
     rescue CourseRefresher::Failure => e
-      notice = "Something fucked up"
+      notice = "Refresh failed, something went wrong:<br><br>#{e}"
     end
     redirect_to course_templates_path, notice: notice
   end
