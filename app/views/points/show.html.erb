@@ -5,9 +5,6 @@
 
 <ul>
   <li>
-    <%= link_to 'Back to summary', organization_course_points_path(@organization, @course) %>
-  </li>
-  <li>
     <% if params[:sort_by].blank? %>
       <%= link_to 'Sort by points', organization_course_point_path(@organization, @course, @sheetname, :sort_by => 'points') %>
     <% else %>

@@ -60,6 +60,14 @@ class Ability
         can? :teach, sub.course
       end
 
+      can :download, Submission do |sub|
+        !sub.course.hide_submission_result? && can?(:read, sub)
+      end
+
+      can :see_result, Submission do |sub|
+        !sub.course.hide_submission_result? || can?(:teach, sub.course)
+      end
+
       cannot :manage_feedback_questions, Course
       can :manage_feedback_questions, Course do |c|
         can? :teach, c
@@ -91,7 +99,9 @@ class Ability
 
       cannot :read, Solution
       can :read, Solution do |sol|
-        sol.visible_to?(user) || (can? :teach, sol.exercise.course)
+        course = sol.exercise.course
+        (sol.visible_to?(user) && course.hide_submission_result?) ||
+            (can? :teach, course)
       end
 
       cannot :manage, Review
@@ -177,8 +187,8 @@ class Ability
         can? :teach, c
       end
 
-      can :see_points, Submission do |s|
-        !s.course.hide_submission_result? || can?(:teach, s.course)
+      can :see_points, Course do |c|
+        !c.hide_submission_result? || can?(:teach, c)
       end
 
       cannot :teach, Organization
