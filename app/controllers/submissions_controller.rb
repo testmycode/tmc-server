@@ -19,8 +19,9 @@ class SubmissionsController < ApplicationController
         end
       end
       format.html do # uses AJAX
+        @organization = @course.organization
         add_course_breadcrumb
-        add_breadcrumb 'All submissions', organization_course_submissions_path(@organization, @course)
+        add_breadcrumb 'All submissions'
       end
     end
   end
