@@ -65,7 +65,7 @@ feature 'Teacher can edit course parameters', feature: true do
       click_link 'oldTitle'
       click_link 'Edit course parameters'
 
-      fill_in 'course_custom_points_url', with: 'http://example.com/{org}/{course}/{user}'
+      fill_in 'course_custom_points_url', with: 'http://example.com/%{org}/%{course}/%{user}'
       click_button 'Update Course'
       log_out
     end
