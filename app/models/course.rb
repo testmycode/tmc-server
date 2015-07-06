@@ -465,4 +465,12 @@ class Course < ActiveRecord::Base
       errors.add(:custom_points_url, 'contains invalid keys')
     end
   end
+
+  def check_custom_points_url
+    begin
+      custom_points_url % { user: '', course: '', org: '' } unless custom_points_url.blank?
+    rescue
+      errors.add(:custom_points_url, 'contains invalid keys')
+    end
+  end
 end
