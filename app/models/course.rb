@@ -30,6 +30,9 @@ class Course < ActiveRecord::Base
               with: /(\Ahttps?:\/\/|\A\z)/,
               message: 'should begin with http:// or https://'
             }
+  validate :check_source_backend
+  validate :check_custom_points_url
+  after_initialize :set_default_source_backend
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
@@ -406,15 +409,12 @@ class Course < ActiveRecord::Base
     exercise_groups.any? { |group| group.contains_unlock_deadlines?}
   end
 
-  def custom_points_url?
+  def has_custom_points_url?
     !custom_points_url.blank?
   end
 
   def parsed_custom_points_url(organization, course, user)
-    custom_points_url
-        .gsub('{user}', user.username)
-        .gsub('{course}', course.id.to_s)
-        .gsub('{org}', organization.slug)
+    custom_points_url % { user: user.username, course: course.id.to_s, org: organization.slug }
   end
 
   private
@@ -456,5 +456,13 @@ class Course < ActiveRecord::Base
   def name_range_with_slug
     add_length = organization.slug.length + 1
     (name_range.first + add_length)..(name_range.last + add_length)
+  end
+
+  def check_custom_points_url
+    begin
+      custom_points_url % { user: '', course: '', org: '' } unless custom_points_url.blank?
+    rescue
+      errors.add(:custom_points_url, 'contains invalid keys')
+    end
   end
 end

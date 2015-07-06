@@ -11,7 +11,7 @@
       <% end %>
 
       <ul>
-        <% if @course.custom_points_url? %>
+        <% if @course.has_custom_points_url? %>
           <% if can? :view_custom_points_url, @course %>
             <li>
               <%= link_to 'View points', @course.parsed_custom_points_url(@organization, @course, current_user), target: '_blank' %>
