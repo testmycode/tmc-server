@@ -11,7 +11,7 @@
       <% end %>
 
       <ul>
-        <% if can? :see_submission_results, @course %>
+        <% if can? :see_points, @course %>
           <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
         <% end %>
         <% if can? :view_code_reviews, @course %>

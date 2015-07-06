@@ -50,8 +50,10 @@
         </td>
         <% if show_awarded_points %>
           <td>
-            <% if can? :see_points, submission %>
+            <% if can? :see_result, submission %>
               <%= points_list(submission.points_list) %>
+            <% else %>
+              <span class="h_i_d_d_e_n">hidden</span>
             <% end %>
           </td>
         <% end %>
