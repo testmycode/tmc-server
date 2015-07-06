@@ -16,7 +16,7 @@
   <%= bs_labeled_field("Course title*", f.text_field(:title)) %>
   <%= bs_labeled_field("Course description", f.text_area(:description)) %>
   <%= bs_labeled_field("Material URL", f.text_field(:material_url)) %>
-  <%= bs_labeled_field("Custom points URL", custom_points_url_help + f.text_field(:custom_points_url)) %>
+  <%= bs_labeled_field("External scoreboard URL", custom_points_url_help + f.text_field(:custom_points_url)) %>
   <%= bs_labeled_field("Course name", f.text_field(:name, disabled: true)) %>
   <p>Fields with (*) are required</p>
   <div class="actions">

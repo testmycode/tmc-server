@@ -25,3 +25,5 @@ en:
     attributes:
       organization:
         slug: "Organization ID"
+      course:
+        custom_points_url: "External scoreboard URL"
