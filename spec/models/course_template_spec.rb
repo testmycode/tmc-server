@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe CourseTemplate, type: :model do
+  include GitTestActions
+
   describe 'validation' do
     before :each do
       @repo_path = @test_tmp_dir + '/fake_remote_repo'
@@ -78,11 +80,12 @@ describe CourseTemplate, type: :model do
 
   it 'refreshes all it\'s courses on refresh call' do
     template = FactoryGirl.create :course_template
-    FactoryGirl.create :course, course_template: template, source_url: template.source_url
-    FactoryGirl.create :course, course_template: template, source_url: template.source_url
-    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
+    template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
+    template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cache_version).to eq(0)
     expect(Course.all.pluck :cache_version).to eq([0, 0, 0])
+
     template.refresh
     expect(template.cache_version).to eq(1)
     expect(Course.all.pluck :cache_version).to eq([1, 1, 1])
@@ -90,19 +93,50 @@ describe CourseTemplate, type: :model do
 
   it 'keeps course\'s cache_versions synchronized' do
     template = FactoryGirl.create :course_template
-    FactoryGirl.create :course, course_template: template, source_url: template.source_url
-    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
+    template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cache_version).to eq(0)
     expect(Course.all.pluck :cache_version).to eq([0, 0])
     template.refresh
-    FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cache_version).to eq(1)
     expect(Course.all.pluck :cache_version).to eq([1, 1, 1])
+  end
+
+  it 'keeps course\'s source url and git branch synchronized' do
+    template = FactoryGirl.create :course_template
+    course1 = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    course2 = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+
+    new_repo_path = "#{::Rails.root}/tmp/tests/factory_repo_changed"
+    create_bare_repo new_repo_path
+    template.source_url = new_repo_path
+    template.save!
+
+    expect(template.source_url).to eq(new_repo_path)
+    expect(course1.source_url).to eq(new_repo_path)
+    expect(course2.source_url).to eq(new_repo_path)
+
+    local_clone = clone_course_repo(course1)
+    local_clone.chdir do
+      system!('git checkout -b foo >/dev/null 2>&1')
+    end
+    local_clone.active_branch = 'foo'
+    local_clone.copy_fixture_exercise('SimpleExercise', 'MyExercise')
+    local_clone.add_commit_push
+
+    template.git_branch = 'foo'
+    template.save!
+
+    expect(template.git_branch).to eq('foo')
+    expect(course1.git_branch).to eq('foo')
+    expect(course2.git_branch).to eq('foo')
   end
 
   it 'removes cloned repository if no courses' do
     template = FactoryGirl.create :course_template
     course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    template.reload
     template.refresh
     cache_path = template.cache_path
     expect(Dir.exist? cache_path).to be(true)
@@ -112,5 +146,4 @@ describe CourseTemplate, type: :model do
     expect(Dir.exist? cache_path).to be(false)
   end
 
-  it 'keeps course\'s source_urls synchronized'
 end

@@ -31,6 +31,8 @@ class CourseTemplate < ActiveRecord::Base
   scope :not_hidden, -> { where(hidden: false) }
   scope :available, -> { not_expired.not_hidden }
 
+  after_save :update_courses_sourcedata
+
   after_destroy :delete_courses
   after_destroy :delete_cache
 
@@ -81,7 +83,16 @@ class CourseTemplate < ActiveRecord::Base
 
   private
 
-  def delete_courses
+  def update_courses_sourcedata
+    courses.each do |c|
+      c.cache_version = self.cache_version
+      c.source_url = self.source_url
+      c.git_branch = self.git_branch
+      c.source_backend = self.source_backend
+    end
+  end
+
+    def delete_courses
     courses.each { |c| c.destroy! }
   end
 
