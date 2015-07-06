@@ -3,7 +3,7 @@ require 'submission_processor'
 # Receives submissions and presents the full submission list and submission view.
 # Also handles rerun requests.
 class SubmissionsController < ApplicationController
-  around_action :course_transaction
+  around_action :course_transaction # is this really needed to do all methods. should have except: [:index, :show] ?
   before_action :get_course_and_exercise
 
   # Manually checked for #show and index
@@ -19,8 +19,9 @@ class SubmissionsController < ApplicationController
         end
       end
       format.html do # uses AJAX
+        @organization = @course.organization
         add_course_breadcrumb
-        add_breadcrumb 'All submissions', course_submissions_path(@course)
+        add_breadcrumb 'All submissions'
       end
     end
   end
