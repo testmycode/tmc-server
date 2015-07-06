@@ -74,7 +74,8 @@ class CourseTemplatesController < ApplicationController
                          source_url: @course_template.source_url,
                          git_branch: @course_template.git_branch,
                          course_template_id: @course_template.id,
-                         cache_version: @course_template.cache_version)
+                         cache_version: @course_template.cache_version,
+    )
   end
 
   def toggle_hidden
