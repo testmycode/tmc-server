@@ -15,11 +15,15 @@
   <h2>Points</h2>
   <% for course in @courses %>
     <h3><%= course.name %></h3>
-    <ul>
-      <li>Completed: <%= sprintf("%.0f", @percent_completed[course.id]) %>%</li>
-      <li>Awarded points: <%= points_list(@awarded_points[course.id]) %></li>
-      <li>Missing points: <%= points_list(@missing_points[course.id]) %></li>
-    </ul>
+    <% if can? :see_points, course %>
+      <ul>
+        <li>Completed: <%= sprintf("%.0f", @percent_completed[course.id]) %>%</li>
+        <li>Awarded points: <%= points_list(@awarded_points[course.id]) %></li>
+        <li>Missing points: <%= points_list(@missing_points[course.id]) %></li>
+      </ul>
+    <% else %>
+      For this course points are not visible.
+    <% end %>
   <% end %>
 </section>
 
