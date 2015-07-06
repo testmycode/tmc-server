@@ -1,5 +1,13 @@
 <h1>Course templates</h1>
 
+<% if @template_refresh_report %>
+    <h2>Refresh statistics</h2>
+    <p><%=pluralize(@template_refresh_report.count, 'course')%> refreshed.</p>
+    <% @template_refresh_report.each do | rep| %>
+        <%= render :partial => 'courses/refresh_report', :locals => { :report => rep } %>
+    <% end %>
+<% end %>
+
 <table class="table table-striped table-condensed">
   <thead>
     <tr class="no-wrap">

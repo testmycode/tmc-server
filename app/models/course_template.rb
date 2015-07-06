@@ -43,13 +43,13 @@ class CourseTemplate < ActiveRecord::Base
       File.exist?("#{dir}/.git")
     end
   rescue StandardError => e
-    errors.add(:source_url, "can be invalid")
-    errors.add(:git_branch, "can be invalid")
-    errors.add(:base, "Cannot clone repository from given information. Error: " + e.to_s)
+    errors.add(:source_url, 'can be invalid')
+    errors.add(:git_branch, 'can be invalid')
+    errors.add(:base, '"Cannot clone repository from given information. Error: ' + e.to_s)
   end
 
   def valid_source_backend?
-    errors.add(:source_backend, "not git") unless source_backend == 'git'
+    errors.add(:source_backend, '"not git') unless source_backend == 'git'
   end
 
   def set_default_source_backend
@@ -69,12 +69,14 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def refresh
+    results = []
     firstcourse = true
     courses.each do |c|
-      c.refresh no_directory_changes: !firstcourse
+      results.push(c.refresh no_directory_changes: !firstcourse)
       reload
       firstcourse = false
     end
+    results
   end
 
   def cache_exists?
@@ -85,19 +87,18 @@ class CourseTemplate < ActiveRecord::Base
 
   def update_courses_sourcedata
     courses.each do |c|
-      c.cache_version = self.cache_version
-      c.source_url = self.source_url
-      c.git_branch = self.git_branch
-      c.source_backend = self.source_backend
+      c.cache_version = cache_version
+      c.source_url = source_url
+      c.git_branch = git_branch
+      c.source_backend = source_backend
     end
   end
 
-    def delete_courses
+  def delete_courses
     courses.each { |c| c.destroy! }
   end
 
   def delete_cache
     FileUtils.rm_rf cache_path if courses.empty?
   end
-
 end
