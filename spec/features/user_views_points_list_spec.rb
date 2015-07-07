@@ -39,7 +39,7 @@ feature 'User views points list', feature: true do
   end
 
   scenario 'User can see the points for individual exercises normally' do
-    visit "/org/slug/courses/#{@course.id}/points/#{@e1.name}"
+    visit "/org/slug/courses/#{@course.id}/points/#{@e1.gdocs_sheet}"
     expect(page).to have_content('✔')
     expect(page).to_not have_content('✔*')
   end
@@ -47,7 +47,7 @@ feature 'User views points list', feature: true do
   scenario 'User can see the individual points that were submitted late' do
     AwardedPoint.update_all(late: true)
 
-    visit "/org/slug/courses/#{@course.id}/points/#{@e1.name}"
+    visit "/org/slug/courses/#{@course.id}/points/#{@e1.gdocs_sheet}"
     expect(page).to have_content('✔*')
   end
 end
