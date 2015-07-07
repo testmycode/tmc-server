@@ -69,6 +69,7 @@ class Course < ActiveRecord::Base
 
   scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
+  scope :custom, -> { where(course_template: nil) }
 
   def git_branch
     return course_template.git_branch unless custom?
@@ -384,8 +385,7 @@ class Course < ActiveRecord::Base
 
   def check_custom_course_name_not_taken
     if custom?
-      custom_courses = Course.where(course_template: nil)
-      custom_courses = custom_courses.where('id <> ?', self.id) unless self.id.nil?
+      custom_courses = Course.custom.where.not(id: self.id)
       name_taken_by_another_custom_course = custom_courses.pluck(:name).include?(self.name)
       name_taken_by_course_template = CourseTemplate.pluck(:name).include?(self.name)
       errors.add(:name, 'is already taken') if name_taken_by_another_custom_course || name_taken_by_course_template
