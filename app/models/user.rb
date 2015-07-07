@@ -181,6 +181,11 @@ class User < ActiveRecord::Base
     Assistantship.find_by(user_id: self, course_id: course)
   end
 
+  # Checks if the user is only a student. Returns false if the user is a student and also an assistant in any course
+  def student?
+    !guest? && !administrator? && !Teachership.exists?(user_id: self.id) && !Assistantship.exists?(user_id: self.id)
+  end
+
   private
 
   def encrypt_password

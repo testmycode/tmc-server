@@ -1,3 +1,5 @@
+require 'natsort'
+
 class OrganizationsController < ApplicationController
   before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input, :toggle_visibility]
 
@@ -6,6 +8,11 @@ class OrganizationsController < ApplicationController
   def index
     ordering = 'LOWER(name)'
     @organizations = Organization.accepted_organizations.order(ordering)
+
+    @my_organizations = Organization.taught_organizations(current_user)
+    @my_organizations |= Organization.assisted_organizations(current_user)
+    @my_organizations |= Organization.participated_organizations(current_user)
+    @my_organizations.natsort_by!(&:name)
   end
 
   def show
