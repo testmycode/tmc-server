@@ -1,7 +1,5 @@
 <h1>Welcome to TMC</h1>
 
-<h2>Organizations</h2>
-
 <% if current_user.administrator? && !Organization.pending_organizations.empty? %>
   <div class="alert alert-warning" role="alert">
     <%= pluralize(Organization.pending_organizations.size, 'new organization request') %>.
@@ -9,7 +7,32 @@
   </div>
 <% end %>
 
-<table class="table table-striped" id="organization-table">
+<% unless @my_organizations.empty? %>
+  <h2>My organizations</h2>
+
+  <table id="my-organizations-table" class="table">
+    <thead>
+    <tr>
+      <th>Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @my_organizations.each do |organization| %>
+      <tr>
+        <td><%= link_to organization.name, organization_path(organization) %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @my_organizations.empty? %>
+  <h2>Organizations</h2>
+<% else %>
+  <h2>All organizations</h2>
+<% end %>
+
+<table id="organization-table" class="table">
   <thead>
   <tr>
     <th>Name</th>
