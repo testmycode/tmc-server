@@ -29,15 +29,18 @@ class SubmissionsController < ApplicationController
   def show
     @course ||= @submission.course
     @exercise ||= @submission.exercise
-    @files = SourceFileList.for_submission(@submission)
     @organization = @course.organization
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
 
     respond_to do |format|
-      format.html
-      format.zip { send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip") }
+      format.html {
+        @files = SourceFileList.for_submission(@submission)
+      }
+      format.zip {
+        send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip")
+      }
       format.json do
         output = {
           api_version: ApiVersion::API_VERSION,
@@ -65,10 +68,6 @@ class SubmissionsController < ApplicationController
               submissions_before_this: @submission.unprocessed_submissions_before_this,
               total_unprocessed: Submission.unprocessed_count
             }
-            when :hidden then {
-              test_cases: nil,
-              points: 0
-            }
             when :ok then {
               test_cases: @submission.test_case_records,
               feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
@@ -76,6 +75,13 @@ class SubmissionsController < ApplicationController
             }
             when :fail then {
               test_cases: @submission.test_case_records
+            }
+            when :hidden then {
+              all_tests_passed:  nil,
+              test_cases: nil,
+              points: nil,
+              validations: nil,
+              valgrind: nil
             }
             when :error then {
               error: @submission.pretest_error
