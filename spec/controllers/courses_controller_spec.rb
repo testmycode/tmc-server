@@ -577,4 +577,40 @@ describe CoursesController, type: :controller do
       expect(response.code.to_i).to eq(401)
     end
   end
+
+  describe 'POST toggle_submission_result_visibility' do
+    before :each do
+      @course = FactoryGirl.create :course, organization: @organization
+    end
+
+    describe 'when teacher' do
+      it 'toggles visibility of submsission results' do
+        controller.current_user = @teacher
+        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        @course.reload
+        expect(@course.hide_submission_result).to be true
+        expect(response).to redirect_to(organization_course_path)
+      end
+    end
+
+    describe 'when the assistant of the course' do
+      it 'toggles visibility of submsission results' do
+        Assistantship.create(user: @user, course: @course)
+        controller.current_user = @user
+        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        @course.reload
+        expect(@course.hide_submission_result).to be true
+        expect(response).to redirect_to(organization_course_path)
+      end
+    end
+
+    describe 'when non-teacher or non-admin' do
+      it 'acces denied' do
+        controller.current_user = @user
+        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        @course.reload
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+  end
 end

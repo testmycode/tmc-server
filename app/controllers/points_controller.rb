@@ -8,7 +8,7 @@ class PointsController < ApplicationController
     @course = Course.find(params[:course_id])
     authorize! :see_points, @course
     add_course_breadcrumb
-    add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
+    add_breadcrumb 'Points'
 
     exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
     sheets = @course.gdocs_sheets(exercises).natsort

@@ -128,9 +128,9 @@
       <% end %>
       <% if can? :toggle_submission_result_visibility, @course %>
         <% if @course.hide_submission_result? %>
-          <%= link_to 'Unhide submssion results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-mini" %>
+          <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-mini" %>
         <% else %>
-          <%= link_to 'Hide submssion results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-mini" %>
+          <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-mini" %>
         <% end %>
       <% end %>
       <% if can? :refresh, @course %>
