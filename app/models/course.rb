@@ -319,8 +319,8 @@ class Course < ActiveRecord::Base
     result
   end
 
-  def initially_refreshed?
-    refreshed_at.nil?
+  def refreshed?
+    !refreshed_at.nil?
   end
 
   def taught_by?(user)
