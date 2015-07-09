@@ -16,9 +16,11 @@ class OrganizationsController < ApplicationController
 
   def show
     add_organization_breadcrumb
-    ordering = 'hidden, LOWER(name)'
+    ordering = 'hidden, disabled_status, LOWER(courses.name)'
+    @my_courses = Course.participated_courses(current_user).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
     @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
+    @my_courses_percent_completed = percent_completed_hash(@my_courses, current_user)
     authorize! :read, @ongoing_courses
     authorize! :read, @expired_courses
   end
@@ -100,6 +102,18 @@ class OrganizationsController < ApplicationController
   end
 
   private
+
+  def percent_completed_hash(courses, user)
+    percent_completed = {}
+    all_awarded = user.awarded_points.map(&:course_id)
+    all_available = AvailablePoint.courses_points(courses).map(&:course_id)
+    courses.each do |course|
+      awarded = all_awarded.select { |id| id == course.id }.length.to_f
+      available = all_available.select { |id| id == course.id }.length.to_f
+      percent_completed[course.id] = 100 * (awarded / available)
+    end
+    percent_completed
+  end
 
   def set_organization
     @organization = Organization.find_by(slug: params[:id])
