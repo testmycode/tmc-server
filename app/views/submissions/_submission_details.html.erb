@@ -5,7 +5,7 @@
         <p>Processing...</p>
         <p class="processing-status"><!-- for JS to fill in --></p>
       <% elsif @submission.cannot_see_results?(current_user) %>
-        <p class="h_i_d_d_e_n">All test done - results are hidden</p>
+        <p class="h_i_d_d_e_n">All tests done - results are hidden</p>
       <% elsif @submission.all_tests_passed? %>
         <p class="success">All tests successful</p>
       <% elsif @submission.tests_ran? %>
@@ -16,7 +16,7 @@
     </div>
 
     <ul>
-      <% if can?(:see_result, @submission) && (!@submission.points_list.empty? || !@submission.exercise.nil?) %>
+      <% if can?(:read_result, @submission) && (!@submission.points_list.empty? || !@submission.exercise.nil?) %>
         <li>
           <%
              awarded_points = @submission.points_list

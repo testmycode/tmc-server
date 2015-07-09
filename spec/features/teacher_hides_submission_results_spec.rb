@@ -58,12 +58,32 @@ describe 'Teacher can hide submission results from users', feature: true do
     log_in_as(@user.username, 'foobar')
     visit_course
     click_link('Details')
-    expect(page).to have_content('All test done - results are hidden')
+    expect(page).to have_content('All tests done - results are hidden')
     expect(page).to_not have_content('Got 1 out of 1 point')
     expect(page).to_not have_link('View suggested solution')
     click_link('Test Results')
     expect(page).to have_content('Test Cases')
     expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
     expect(find('tr', text: tcr.test_case_name).all('td').count).to eq(2)
+  end
+
+  scenario 'when c language exercise then in submission page user can not see results of submission' do
+    FactoryGirl.create :submission_data, submission: @submission
+    tcr = FactoryGirl.create :test_case_run, submission: @submission
+    @submission.stdout = 'some stdout text'
+    @submission.stderr = 'some stderr text'
+    @submission.valgrind = 'some valgrind text'
+    @submission.save!
+    log_in_as(@user.username, 'foobar')
+    visit_course
+    click_link('Details')
+    expect(page).to have_content('All tests done - results are hidden')
+    expect(page).to_not have_content('Got 1 out of 1 point')
+    expect(page).to_not have_link('View suggested solution')
+    click_link('Test Results')
+    expect(page).to have_content('Test Cases')
+    expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
+    expect(find('tr', text: tcr.test_case_name).all('td').count).to eq(2)
+    expect(find_by_id('myTab').all('li').count).to eq(2)
   end
 end

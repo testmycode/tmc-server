@@ -64,7 +64,7 @@ class Ability
         !sub.course.hide_submission_result? && can?(:read, sub)
       end
 
-      can :see_result, Submission do |sub|
+      can :read_result, Submission do |sub|
         !sub.course.hide_submission_result? || can?(:teach, sub.course)
       end
 
