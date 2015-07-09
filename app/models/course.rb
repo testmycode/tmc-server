@@ -57,6 +57,11 @@ class Course < ActiveRecord::Base
 
   scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
+  scope :participated_courses, ->(user) do
+    joins(:awarded_points)
+      .where(awarded_points: { user_id: user.id })
+      .group('courses.id')
+  end
 
   def visible_to?(user)
     user.administrator? ||
