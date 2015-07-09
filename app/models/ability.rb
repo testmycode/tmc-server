@@ -138,6 +138,8 @@ class Ability
         ct.clonable?
       end
 
+      can :view_statistics, Organization
+
       can :list_user_emails, Course do |c|
         can? :teach, c
       end
