@@ -45,6 +45,18 @@
   </p>
 <% end %>
 
+<% if can? :view_statistics, @organization %>
+  <p>
+    <%= link_to 'Show statistics', organization_stats_path(@organization) %>
+  </p>
+<% end %>
+
+<% if @organization.acceptance_pending? %>
+  <p>
+    <strong>This organization needs to be accepted by an administrator.</strong>
+  </p>
+<% end %>
+
 <% if @organization.rejected? %>
   <p>
     <strong>

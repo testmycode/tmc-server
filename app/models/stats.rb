@@ -1,9 +1,11 @@
 # Helpers for serving /stats.
 module Stats
-  def self.all
+  def self.courses(organization = nil)
+    courses = Course.all
+    courses = courses.where(organization: organization) unless organization.nil?
     {
       registered_users: all_regular_users.count,
-      course_stats: Course.all.reduce({}) { |h, c| h.merge(c.name => for_course(c)) }
+      course_stats: courses.reduce({}) { |h, c| h.merge(c.name => for_course(c)) }
     }
   end
 
