@@ -126,6 +126,7 @@ span.git-branch {
   padding-left: 10pt;
 }
 
+tr.hidden-organization *,
 tr.hidden-course * {
   color: gray;
   font-color: gray;

@@ -6,9 +6,8 @@ class OrganizationsController < ApplicationController
   skip_authorization_check only: [:index]
 
   def index
-    ordering = 'LOWER(name)'
+    ordering = 'hidden, LOWER(name)'
     @organizations = Organization.accepted_organizations.order(ordering)
-
     @my_organizations = Organization.taught_organizations(current_user)
     @my_organizations |= Organization.assisted_organizations(current_user)
     @my_organizations |= Organization.participated_organizations(current_user)

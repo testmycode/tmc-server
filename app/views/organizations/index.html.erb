@@ -45,14 +45,15 @@
 
   <tbody>
   <% @organizations.each do |organization| %>
-    <tr>
-      <td><%= link_to organization.name, organization_path(organization) %></td>
-      <td><%= organization.information %></td>
-
-      <% if current_user.administrator? %>
-        <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
-      <% end %>
-    </tr>
+    <% if !organization.hidden? || current_user.administrator? %>
+      <tr class="<%= "hidden-organization" if organization.hidden?  %>">
+        <td><%= link_to organization.name, organization_path(organization) %></td>
+        <td><%= organization.information %></td>
+        <% if current_user.administrator? %>
+          <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
+        <% end %>
+      </tr>
+    <% end %>
   <% end %>
   </tbody>
 </table>
