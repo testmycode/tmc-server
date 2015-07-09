@@ -12,13 +12,13 @@
   <% if @submission.tests_ran? %>
     <li><a href="#testResults">Test Results</a></li>
   <% end %>
-  <% unless @submission.stdout.blank? %>
+  <% if !@submission.stdout.blank? && can?(:read_result, @submission) %>
     <li><a href="#stdout" >Stdout</a></li>
   <% end %>
-  <% unless @submission.stderr.blank? %>
+  <% if !@submission.stderr.blank? && can?(:read_result, @submission) %>
     <li><a href="#stderr" >Stderr</a></li>
   <% end %>
-  <% unless @submission.valgrind.blank? %>
+  <% if !@submission.valgrind.blank? && can?(:read_result, @submission) %>
     <li><a href="#valgrind" >Valgrind</a></li>
   <% end %>
   <% if can?(:read_vm_log, @submission) && !@submission.vm_log.blank? %>
@@ -43,19 +43,19 @@
         </div>
       <% end %>
 
-      <% unless @submission.stdout.blank? %>
+      <% if !@submission.stdout.blank? && can?(:read_results, @submission) %>
         <div class="tab-pane" id="stdout">
           <%= render 'submissions/stdout' %>
         </div>
       <% end %>
 
-      <% unless @submission.stderr.blank? %>
+      <% if !@submission.stderr.blank? && can?(:read_results, @submission) %>
         <div class="tab-pane" id="stderr">
           <%= render 'submissions/stderr' %>
         </div>
       <% end %>
 
-      <% unless @submission.valgrind.blank? %>
+      <% if !@submission.valgrind.blank? && can?(:read_results, @submission) %>
         <div class="tab-pane" id="valgrind">
           <%= render 'submissions/valgrind' %>
         </div>
