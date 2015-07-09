@@ -37,6 +37,9 @@
                     <li>Git revision: <%= gitrev %></li>
                 <% end %>
             <% end %>
+            <% unless @course.custom? %>
+              <li>Created from template: <%= link_to @course.course_template.name, course_templates_path %></li>
+            <% end %>
           <% end %>
 
           <% if @course.refreshed_at %>

@@ -210,7 +210,7 @@ class CoursesController < ApplicationController
   end
 
   def course_params
-    if (@course.custom?)
+    if @course.custom?
       params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch)
     else
       params.require(:course).permit(:title, :description, :material_url)
