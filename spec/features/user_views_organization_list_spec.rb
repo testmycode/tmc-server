@@ -92,4 +92,12 @@ feature 'User views organization list', feature: true do
       expect(page).to_not have_content('Organization Five')
     end
   end
+
+  scenario 'Hidden organization is not visible to user in organization list' do
+    @organization = FactoryGirl.create :accepted_organization
+    @organization.hidden = true
+    @organization.save!
+    log_in_as(@user.login, 'foobar')
+    expect(page).to_not have_link @organization.name
+  end
 end

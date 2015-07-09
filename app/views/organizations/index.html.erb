@@ -39,22 +39,21 @@
     <th>Information</th>
     <% if current_user.administrator? %>
       <th></th>
-      <th></th>
     <% end %>
   </tr>
   </thead>
 
   <tbody>
   <% @organizations.each do |organization| %>
-    <tr>
-      <td><%= link_to organization.name, organization_path(organization) %></td>
-      <td><%= organization.information %></td>
-
-      <% if current_user.administrator? %>
-        <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
-        <td><%= link_to 'Destroy', organization, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      <% end %>
-    </tr>
+    <% if !organization.hidden? || current_user.administrator? %>
+      <tr class="<%= "hidden-organization" if organization.hidden?  %>">
+        <td><%= link_to organization.name, organization_path(organization) %></td>
+        <td><%= organization.information %></td>
+        <% if current_user.administrator? %>
+          <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
+        <% end %>
+      </tr>
+    <% end %>
   <% end %>
   </tbody>
 </table>
