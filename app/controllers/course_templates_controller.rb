@@ -1,5 +1,5 @@
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, only: [:edit, :update, :destroy, :prepare_course, :toggle_hidden, :refresh]
+  before_action :set_course_template, except: [:index, :new, :create, :list_for_teachers]
 
   def index
     authorize! :read, CourseTemplate
