@@ -1,6 +1,6 @@
 # Shows the various statistics under /stats.
 class StatsController < ApplicationController
-  skip_authorization_check
+  skip_authorization_check except: [:organization_stats_index]
   before_action :set_organization
 
   def index
@@ -48,6 +48,7 @@ class StatsController < ApplicationController
   end
 
   def organization_stats_index
+    authorize! :view_statistics, @organization
     @stats = Stats.courses(@organization)
     respond_to do |format|
       format.html { render }
