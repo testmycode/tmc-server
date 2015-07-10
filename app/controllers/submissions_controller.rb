@@ -3,7 +3,7 @@ require 'submission_processor'
 # Receives submissions and presents the full submission list and submission view.
 # Also handles rerun requests.
 class SubmissionsController < ApplicationController
-  around_action :course_transaction # is this really needed to do all methods. should have except: [:index, :show] ?
+  around_action :course_transaction
   before_action :get_course_and_exercise
 
   # Manually checked for #show and index
