@@ -10,6 +10,8 @@ class Ability
       can :create, Course
       can :refresh, Course
       can :view, :participants_list
+      can :view, :organization_requests
+      can :accept, :organization_requests
       can :rerun, Submission
       can :refresh_gdocs_spreadsheet, Course do |c|
         !c.spreadsheet_key.blank?
