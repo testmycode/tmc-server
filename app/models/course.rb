@@ -157,7 +157,8 @@ class Course < ActiveRecord::Base
     "#{cache_path}/solution_zip"
   end
 
-  def exercise_groups
+  def exercise_groups(force_reload = false)
+    @groups = nil if force_reload
     @groups ||= begin
       result = exercises.all.map(&:exercise_group_name).uniq
         .map { |gname| ExerciseGroup.new(self, gname) }
@@ -173,13 +174,13 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def exercise_group_by_name(name)
-    exercise_groups.find { |eg| eg.name == name }
+  def exercise_group_by_name(name, force_reload = false)
+    exercise_groups(force_reload).find { |eg| eg.name == name }
   end
 
   # Returns exercises in group `name`, or whose full name is `name`.
-  def exercises_by_name_or_group(name)
-    group = exercise_group_by_name(name)
+  def exercises_by_name_or_group(name, force_reload = false)
+    group = exercise_group_by_name(name, force_reload)
     exercises.to_a.select { |ex| ex.name == name || (group && ex.belongs_to_exercise_group?(group)) }
   end
 

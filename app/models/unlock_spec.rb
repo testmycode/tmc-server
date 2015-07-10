@@ -142,7 +142,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   end
 
   def check_group_or_exercise_exists(course, group_or_exercise_name)
-    if course.exercises_by_name_or_group(group_or_exercise_name).empty?
+    if course.exercises_by_name_or_group(group_or_exercise_name, true).empty?
       fail "No such exercise or exercise group: #{group_or_exercise_name}. Remember that exercises need to be specified with their full name including their group."
     end
   end
