@@ -60,12 +60,8 @@ class Ability
         can? :teach, sub.course
       end
 
-      can :download, Submission do |sub|
-        !sub.course.hide_submission_result? && can?(:read, sub)
-      end
-
-      can :read_result, Submission do |sub|
-        !sub.course.hide_submission_result? || can?(:teach, sub.course)
+      can :read_results, Submission do |sub|
+        !sub.course.hide_submission_results? || (can? :teach, sub.course)
       end
 
       cannot :manage_feedback_questions, Course
@@ -187,7 +183,7 @@ class Ability
       end
 
       can :see_points, Course do |c|
-        !c.hide_submission_result? || can?(:teach, c)
+        !c.hide_submission_results? || (can? :teach, c)
       end
 
       cannot :teach, Organization

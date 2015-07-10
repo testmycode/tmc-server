@@ -9,7 +9,7 @@ describe 'Teacher can hide submission results from users', feature: true do
     @user = FactoryGirl.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
     @course = FactoryGirl.create :course, organization: @organization
-    @course.hide_submission_result = true
+    @course.hide_submission_results = true
     @course.save!
     @exercise = FactoryGirl.create(:exercise, course: @course)
     @available_point = FactoryGirl.create(:available_point, exercise: @exercise)

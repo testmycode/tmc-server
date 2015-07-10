@@ -250,6 +250,11 @@ class Course < ActiveRecord::Base
     submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
   end
 
+  def toggle_submission_result_visiblity
+    self.hide_submission_results = !self.hide_submission_results
+    save!
+  end
+
   # Returns a hash of exercise group => {
   #   :available_points => number of available points,
   #   :points_by_user => {user_id => number_of_points}
