@@ -1,5 +1,14 @@
 <h1><%= @organization.name %></h1>
 
+<% if @organization.acceptance_pending? %>
+    <p>
+      <strong>This organization needs to be accepted by an administrator.</strong>
+      <% if can? :view, :organization_requests %>
+          <%= link_to 'Show penging requests', list_requests_organizations_path %>
+      <% end %>
+    </p>
+<% end %>
+
 <% if current_user.administrator? %>
   <p>
     <strong>Organization ID:</strong>
@@ -38,12 +47,6 @@
                 method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger'}" %>
   </p>
   <br/>
-<% end %>
-
-<% if @organization.acceptance_pending? %>
-  <p>
-    <strong>This organization needs to be accepted by an administrator.</strong>
-  </p>
 <% end %>
 
 <% if @organization.rejected? %>
