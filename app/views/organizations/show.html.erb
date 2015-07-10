@@ -86,15 +86,20 @@
 
 <% unless @my_assisted_courses.empty? %>
   <%=
-    render partial: 'courses/list_my_assisted_courses',
-           locals: { courses: @my_assisted_courses, title: 'Courses I assist' }
-    %>
+      render partial: 'courses/list_my_assisted_courses',
+             locals: { courses: @my_assisted_courses, title: 'Courses I assist' }
+  %>
 <% end %>
 
 <% unless @my_courses.empty? %>
-  <%= render partial: 'courses/list_my_courses', locals: { courses: @my_courses, percent_completed: @my_courses_percent_completed, title: 'My Courses' } %>
+  <%=
+      render partial: 'courses/list_my_courses',
+             locals: { courses: @my_courses, title: 'My courses', percent_completed: @my_courses_percent_completed }
+  %>
 <% end %>
 
+<% all_courses_title = @my_courses.empty? && @my_assisted_courses.empty? ? 'Courses' : 'All courses' %>
+
 <div>
-  <%= render template: 'courses/index'  %>
+  <%= render template: 'courses/index', locals: { title: all_courses_title }  %>
 </div>
