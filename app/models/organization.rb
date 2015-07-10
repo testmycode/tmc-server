@@ -22,6 +22,7 @@ class Organization < ActiveRecord::Base
   has_many :courses, dependent: :nullify
 
   has_attached_file :logo, styles: { small_logo: '100x100>' }
+  validates :logo, dimensions: { min_width: 100, min_height: 100 }, allow_nil: true
   validates_attachment_content_type :logo, content_type: /\Aimage\/.*\Z/
 
   scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
