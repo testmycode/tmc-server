@@ -96,7 +96,7 @@ class OrganizationsController < ApplicationController
     authorize! :toggle_visibility, @organization
     @organization.hidden = !@organization.hidden
     @organization.save!
-    redirect_to organization_path, notice: "Organzation is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
+    redirect_to organization_path, notice: "Organization is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
   end
 
   private
