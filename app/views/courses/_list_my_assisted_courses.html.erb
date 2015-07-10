@@ -1,0 +1,37 @@
+<h2><%= title %></h2>
+<table class="course-list table table-striped table-bordered table-hover">
+  <thead>
+  <tr>
+    <th>
+      Course
+    </th>
+    <th>
+      Code reviews
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <% courses.each do |course| %>
+    <tr class="course <% if course.hidden? || course.disabled? %>hidden-course<% end %>">
+      <td>
+        <%= link_to course.title, organization_course_path(@organization, course) %>
+      </td>
+      <td>
+        <%
+           required = course.reviews_required.count
+           requested = course.reviews_requested.count
+        %>
+        <% if required > 0 %>
+          <%= link_to "#{required} required", organization_course_reviews_path(course.organization, course) %>
+        <% end %>
+        <% if required > 0 && requested > 0 %>
+          <%= raw(', ') %>
+        <% end %>
+        <% if requested > 0 %>
+          <%= link_to "#{requested} requested", organization_course_reviews_path(course.organization, course) %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

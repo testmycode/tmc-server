@@ -1,4 +1,10 @@
-<h2>Courses</h2>
+<h2>
+  <% if defined? title %>
+    <%= title %>
+  <% else %>
+    Courses
+  <% end %>
+</h2>
 
 <% if (can? :teach, @organization) && !@expired_courses.empty? %>
   <h3>Ongoing courses</h3>
