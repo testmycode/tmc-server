@@ -31,7 +31,7 @@ describe PointsController, type: :controller do
       end
 
       it 'should not show a page when submission result are hidden' do
-        @course.hide_submission_result = true
+        @course.hide_submission_results = true
         @course.save!
         get :index, organization_id: @organization.slug, course_id: @course.id
         expect(response.code.to_i).to eq(401)
@@ -63,7 +63,7 @@ describe PointsController, type: :controller do
       end
 
       it 'should not show a page when submission result are hidden' do
-        @course.hide_submission_result = true
+        @course.hide_submission_results = true
         @course.save!
         get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
         expect(response.code.to_i).to eq(401)

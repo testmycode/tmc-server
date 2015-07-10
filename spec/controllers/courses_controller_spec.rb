@@ -588,7 +588,7 @@ describe CoursesController, type: :controller do
         controller.current_user = @teacher
         post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
         @course.reload
-        expect(@course.hide_submission_result).to be true
+        expect(@course.hide_submission_results).to be true
         expect(response).to redirect_to(organization_course_path)
       end
     end
@@ -599,7 +599,7 @@ describe CoursesController, type: :controller do
         controller.current_user = @user
         post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
         @course.reload
-        expect(@course.hide_submission_result).to be true
+        expect(@course.hide_submission_results).to be true
         expect(response).to redirect_to(organization_course_path)
       end
     end

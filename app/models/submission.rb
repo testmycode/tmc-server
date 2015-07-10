@@ -101,7 +101,7 @@ class Submission < ActiveRecord::Base
   def status(user)
     if !processed?
       :processing
-    elsif cannot_see_results?(user)
+    elsif !can_see_results?(user)
       :hidden
     elsif all_tests_passed?
       :ok
@@ -112,10 +112,11 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def cannot_see_results?(user)
-    (all_tests_passed? || tests_ran?) &&
-        !(user.administrator? || self.course.organization.teacher?(user) || self.course.assistant?(user)) &&
-        self.course.hide_submission_result
+  def can_see_results?(user)
+    !(self.course.hide_submission_results? && (all_tests_passed? || tests_ran?)) ||
+        self.course.organization.teacher?(user) ||
+        self.course.assistant?(user) ||
+        user.administrator?
   end
 
   def points_list

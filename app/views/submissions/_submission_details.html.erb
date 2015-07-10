@@ -4,8 +4,8 @@
       <% if !@submission.processed? %>
         <p>Processing...</p>
         <p class="processing-status"><!-- for JS to fill in --></p>
-      <% elsif @submission.cannot_see_results?(current_user) %>
-        <p class="h_i_d_d_e_n">All tests done - results are hidden</p>
+      <% elsif !@submission.can_see_results?(current_user) %>
+        <p class="hidden_status">All tests done - results are hidden</p>
       <% elsif @submission.all_tests_passed? %>
         <p class="success">All tests successful</p>
       <% elsif @submission.tests_ran? %>
@@ -16,7 +16,7 @@
     </div>
 
     <ul>
-      <% if can?(:read_result, @submission) && (!@submission.points_list.empty? || !@submission.exercise.nil?) %>
+      <% if (can? :read_results, @submission) && (!@submission.points_list.empty? || !@submission.exercise.nil?) %>
         <li>
           <%
              awarded_points = @submission.points_list
@@ -46,7 +46,7 @@
         <li>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</li>
       <% end %>
 
-      <% if can? :download, @submission %>
+      <% if can? :read, @submission %>
         <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
       <% end %>
 

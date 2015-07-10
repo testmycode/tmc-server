@@ -77,7 +77,7 @@ describe SubmissionsController, type: :controller do
 
     describe 'when submission results are hidden' do
       before :each do
-        @course.hide_submission_result = true
+        @course.hide_submission_results = true
         @course.save!
       end
 
