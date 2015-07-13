@@ -43,7 +43,7 @@ $ sudo apt-get update
 
 TMC-server dependencies
 ```bash
-$ sudo apt-get install git build-essential zip unzip imagemagick maven make phantomjs bc postgresql postgresql-contrib chrpath libssl-dev libxft-dev libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev xfonts-75dpi
+$ sudo apt-get install git build-essential zip unzip imagemagick maven make phantomjs bc postgresql postgresql-contrib chrpath libssl-dev libxft-dev libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev xfonts-75dpi libpq-dev
 ```
 Ruby dependencies
 ```bash
