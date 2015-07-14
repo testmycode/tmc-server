@@ -151,7 +151,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     wait_for_submission_to_be_processed
 
     visit '/org/slug/courses'
-    click_link 'mycourse'
+    within '#ongoing-courses' do click_link 'mycourse' end
     first('.exercise-list').click_link 'MyExercise'
     click_link 'View suggested solution'
     expect(page).to have_content('Solution for MyExercise')
