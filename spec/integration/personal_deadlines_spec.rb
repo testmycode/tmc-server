@@ -27,7 +27,7 @@ describe 'Personal deadlines', type: :request, integration: true do
   specify 'doing one exercise should unlock the other' do
     @course.refresh
     visit '/org/slug/courses'
-    click_link 'mycourse'
+    within '#ongoing-courses' do click_link 'mycourse' end
 
     expect(page).to have_content('MyExercise1')
     expect(page).not_to have_content('MyExercise2')
@@ -35,7 +35,7 @@ describe 'Personal deadlines', type: :request, integration: true do
     submit_correct_solution('MyExercise1')
 
     visit '/org/slug/courses'
-    click_link 'mycourse'
+    within '#ongoing-courses' do click_link 'mycourse' end
     expect(page).to have_content('MyExercise2')
     expect(page).not_to have_content('(locked)')
   end
@@ -49,12 +49,12 @@ describe 'Personal deadlines', type: :request, integration: true do
       @course.refresh
 
       visit '/org/slug/courses'
-      click_link 'mycourse'
+      within '#ongoing-courses' do click_link 'mycourse' end
 
       submit_correct_solution('MyExercise1')
 
       visit '/org/slug/courses'
-      click_link 'mycourse'
+      within '#ongoing-courses' do click_link 'mycourse' end
       expect(page).to have_content('MyExercise2 (locked)')
       expect(page).to have_content('unlock 1 new exercise')
 

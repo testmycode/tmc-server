@@ -40,7 +40,7 @@ describe 'The system (used by an instructor for viewing statistics)', type: :req
 
   def visit_exercise(exercise_name)
     visit '/org/slug/courses'
-    click_link 'mycourse'
+    within '#ongoing-courses' do click_link 'mycourse' end
     first('.exercise-list').click_link exercise_name
   end
 
@@ -57,7 +57,7 @@ describe 'The system (used by an instructor for viewing statistics)', type: :req
     ex.make_zip
 
     visit '/org/slug/courses'
-    click_link 'mycourse'
+    within '#ongoing-courses' do click_link 'mycourse' end
     first('.exercise-list').click_link exercise_name
     attach_file('Zipped project', "#{exercise_name}.zip")
     click_button 'Submit'
