@@ -44,7 +44,7 @@ feature 'User lists own organization courses', feature: true do
 
     scenario 'sees the courses they assist in a separate list (also disabled and expired)' do
       within 'table#my-assisted-courses-table' do
-        expect(page).to have_content('rourse_1')
+        expect(page).to have_content('course_1')
         expect(page).to have_content('course_old')
         expect(page).to have_content('course_disabled')
         expect(page).to_not have_content('course_2')
