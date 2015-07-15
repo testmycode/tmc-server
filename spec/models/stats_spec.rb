@@ -19,7 +19,7 @@ describe Stats, type: :model do
     create_successful_submission(course: course1, exercise: cat2ex1, user: user1)
     create_successful_submission(course: course2, exercise: cat3ex1, user: user1)
 
-    stats = Stats.all
+    stats = Stats.courses
 
     expect(stats[:registered_users]).to eq(3)
 

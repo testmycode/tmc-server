@@ -1,16 +1,20 @@
 # Shows the various statistics under /stats.
 class StatsController < ApplicationController
-  skip_authorization_check
+  skip_authorization_check except: [:organization_stats_index]
   before_action :set_organization
 
   def index
     get_vars
     if @course
       add_course_breadcrumb
-      add_breadcrumb 'Stats', organization_course_stats_path
+      add_breadcrumb 'Statistics'
       course_stats_index
+    elsif @organization
+      add_organization_breadcrumb
+      add_breadcrumb 'Statistics'
+      organization_stats_index
     else
-      add_breadcrumb 'Stats', stats_path
+      add_breadcrumb 'Statistics'
       general_stats_index
     end
   end
@@ -43,8 +47,17 @@ class StatsController < ApplicationController
     end
   end
 
+  def organization_stats_index
+    authorize! :view_statistics, @organization
+    @stats = Stats.courses(@organization)
+    respond_to do |format|
+      format.html { render }
+      format.json { render json: @stats, callback: params[:jsonp] }
+    end
+  end
+
   def general_stats_index
-    @stats = Stats.all
+    @stats = Stats.courses
     respond_to do |format|
       format.html { render }
       format.json { render json: @stats, callback: params[:jsonp] }

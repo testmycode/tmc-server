@@ -645,5 +645,26 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
+  <h2>Viewing organization's statistics</h2>
+
+  <p>
+    From the organization front page you can view some statistics by clicking link 'Show statistics'.
+  </p>
+
+<%
+   visit '/org/hy/'
+   highlight 'a:contains("Show statistics")'
+%>
+<%= screenshot %>
+
+  <p>
+    Statistics page lists information about participants and completed exercises for all your organization's courses.
+  </p>
+
+<%
+   click_on 'Show statistics'
+%>
+<%= screenshot %>
+
 </body>
 </html>

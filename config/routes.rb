@@ -57,6 +57,8 @@ TmcServer::Application.routes.draw do
       resource :unlock, only: [:show, :create]
       resource :course_notifications, only: [:create, :index, :show, :new]
     end
+
+    resources :stats, only: [:index]
   end
 
   resources :course_templates, except: :show do
