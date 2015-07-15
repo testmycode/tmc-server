@@ -19,7 +19,7 @@
         <td><%= course_template.name %></td>
         <td><%= course_template.title %></td>
         <td><%= course_template.description %></td>
-        <td><%= link_to course_template.material_url, course_template.material_url %></td>
+        <td><%= link_to course_template.material_url, course_template.material_url unless course_template.material_url.blank? %></td>
         <td><%= course_template.source_url %></td>
         <td><%= course_template.expires_at %></td>
         <td><%= link_to 'Edit', edit_course_template_path(course_template), class: "btn btn-mini btn-info" %></td>
