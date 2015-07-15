@@ -1,15 +1,33 @@
 <% require 'portable_csv' %>
+<%
+   all_for_user_and_sheet = ->(user, sheet) do
+     for_user = @summary[:awarded_for_user_and_sheet][user] || {}
+     for_user[sheet] || 0
+   end
+   late_for_user_and_sheet = ->(user, sheet) do
+     for_user = @summary[:awarded_late_for_user_and_sheet][user] || {}
+     for_user[sheet] || 0
+   end
+   in_time_for_user_and_sheet = ->(user, sheet) do
+     all_for_user_and_sheet.call(user, sheet) - late_for_user_and_sheet.call(user, sheet)
+   end
+   total_for_user = ->(user) do
+     @summary[:total_for_user][user] || 0
+   end
+   total_late_for_user = ->(user) do
+     @summary[:total_late_for_user][user] || 0
+   end
+   total_in_time_for_user = ->(user) do
+     total_for_user.call(user) - total_late_for_user.call(user)
+   end
+%>
 <%= PortableCSV.generate(:force_quotes => true) do |csv|
   generate_csv_group(csv, 'All awarded points', @summary[:users], @summary[:sheets],
-                     ->(user, sheet) { @summary[:awarded_for_user_and_sheet][user][sheet] },
-                     ->(user) { @summary[:total_for_user][user] })
+                     all_for_user_and_sheet, total_for_user)
 
   generate_csv_group(csv, 'Points for exercises returned in time', @summary[:users], @summary[:sheets],
-                     ->(user, sheet) { @summary[:awarded_for_user_and_sheet][user][sheet] -
-                       @summary[:awarded_late_for_user_and_sheet][user][sheet] },
-                     ->(user) { @summary[:total_for_user][user] - @summary[:total_late_for_user][user] })
+                     in_time_for_user_and_sheet, total_in_time_for_user)
 
   generate_csv_group(csv, 'Points for exercises returned late', @summary[:users], @summary[:sheets],
-                     ->(user, sheet) { @summary[:awarded_late_for_user_and_sheet][user][sheet] },
-                     ->(user) { @summary[:total_late_for_user][user] })
+                     late_for_user_and_sheet, total_late_for_user)
 end.html_safe %>
