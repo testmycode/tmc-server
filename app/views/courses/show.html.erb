@@ -6,12 +6,14 @@
       <p><%= link_to 'Material', @course.material_url %></p>
     <% end %>
     <div>
-      <% if @refresh_report && can?(:refresh, @course) %>
+      <% if @refresh_report && (can? :refresh, @course) %>
         <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
       <% end %>
 
       <ul>
-        <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
+        <% if can? :see_points, @course %>
+          <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
+        <% end %>
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
@@ -112,6 +114,13 @@
       <% end %>
       <% if can? :teach, @organization %>
         <%= link_to 'Manage assistants', organization_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
+      <% end %>
+      <% if can? :toggle_submission_result_visibility, @course %>
+        <% if @course.hide_submission_results? %>
+          <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-mini" %>
+        <% else %>
+          <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-mini" %>
+        <% end %>
       <% end %>
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>

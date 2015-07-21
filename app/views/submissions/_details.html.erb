@@ -35,7 +35,7 @@
             <tr>
               <th>Case</th>
               <th>Status</th>
-              <% if !@submission.all_tests_passed? %>
+              <% if !@submission.all_tests_passed? && (can? :read_results, @submission) %>
                 <th>Info</th>
               <% end %>
             </tr>
@@ -46,13 +46,15 @@
               <tr>
                 <td><%= tcr.test_case_name %></td>
                 <td>
-                  <% if tcr.successful? %>
+                  <% if cannot? :read_results, @submission %>
+                      <span class="hidden_status">Hidden</span>
+                  <% elsif tcr.successful? %>
                     <span class="success">Ok</span>
                   <% else %>
                     <span class="failure">Fail</span>
                   <% end %>
                 </td>
-                <% if !@submission.all_tests_passed? %>
+                <% if !@submission.all_tests_passed? && (can? :read_results, @submission) %>
                   <td>
                     <%= tcr.message %>
                     <% if tcr.exception != nil %>

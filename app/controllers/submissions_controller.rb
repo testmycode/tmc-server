@@ -19,8 +19,9 @@ class SubmissionsController < ApplicationController
         end
       end
       format.html do # uses AJAX
+        @organization = @course.organization
         add_course_breadcrumb
-        add_breadcrumb 'All submissions', course_submissions_path(@course)
+        add_breadcrumb 'All submissions'
       end
     end
   end
@@ -28,15 +29,18 @@ class SubmissionsController < ApplicationController
   def show
     @course ||= @submission.course
     @exercise ||= @submission.exercise
-    @files = SourceFileList.for_submission(@submission)
     @organization = @course.organization
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
 
     respond_to do |format|
-      format.html
-      format.zip { send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip") }
+      format.html {
+        @files = SourceFileList.for_submission(@submission)
+      }
+      format.zip {
+        send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip")
+      }
       format.json do
         output = {
           api_version: ApiVersion::API_VERSION,
@@ -44,46 +48,46 @@ class SubmissionsController < ApplicationController
           user_id: @submission.user_id,
           course: @course.name,
           exercise_name: @submission.exercise.name,
-          status: @submission.status,
+          status: @submission.status(current_user),
           points: @submission.points_list,
+          validations: @submission.validations,
+          valgrind: @submission.valgrind,
+          solution_url: @exercise.solution.visible_to?(current_user) ? view_context.exercise_solution_url(@exercise) : nil,
+          submitted_at: @submission.created_at,
           processing_time: @submission.processing_time,
-          message_for_paste: @submission.message_for_paste,
+          reviewed: @submission.reviewed?,
+          requests_review:  @submission.requests_review?,
+          paste_url: @submission.paste_available ? paste_url(@submission.paste_key) : nil,
+          message_for_paste: @submission.paste_available ? @submission.message_for_paste : nil,
           missing_review_points: @exercise.missing_review_points_for(@submission.user)
         }
+
         output = output.merge(
-          case @submission.status
-          when :processing then {
-            submissions_before_this: @submission.unprocessed_submissions_before_this,
-            total_unprocessed: Submission.unprocessed_count
-          }
-          when :error then { error: @submission.pretest_error }
-          when :fail then {
-            test_cases: @submission.test_case_records
-          }
-          when :ok then {
-            test_cases: @submission.test_case_records,
-            feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
-            feedback_answer_url: submission_feedback_answers_url(@submission, format: :json),
-            processing_time: @submission.processing_time
-          }
+          case @submission.status(current_user)
+            when :processing then {
+              submissions_before_this: @submission.unprocessed_submissions_before_this,
+              total_unprocessed: Submission.unprocessed_count
+            }
+            when :ok then {
+              test_cases: @submission.test_case_records,
+              feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
+              feedback_answer_url: submission_feedback_answers_url(@submission, format: :json),
+            }
+            when :fail then {
+              test_cases: @submission.test_case_records
+            }
+            when :hidden then {
+              all_tests_passed:  nil,
+              test_cases: nil,
+              points: nil,
+              validations: nil,
+              valgrind: nil
+            }
+            when :error then {
+              error: @submission.pretest_error
+            }
           end
         )
-
-        if @exercise.solution.visible_to?(current_user)
-          output[:solution_url] = view_context.exercise_solution_url(@exercise)
-        end
-
-        output[:validations] = @submission.validations
-        output[:valgrind] = @submission.valgrind
-
-        if @submission.paste_available?
-          output[:paste_url] = paste_url(@submission.paste_key)
-          output[:message_for_paste] = @submission.message_for_paste
-        end
-
-        output[:reviewed] = @submission.reviewed?
-        output[:requests_review] = @submission.requests_review?
-        output[:submitted_at] = @submission.created_at
 
         render json: output
       end

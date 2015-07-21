@@ -55,7 +55,7 @@
     <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
   <% end %>
 
-  <% if can?(:read, FeedbackAnswer) %>
+  <% if can? :read, FeedbackAnswer %>
     <li><%= link_to 'View feedback', exercise_feedback_answers_path(@exercise) %></li>
   <% end %>
 </ul>
