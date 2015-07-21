@@ -11,10 +11,10 @@
       <% end %>
 
       <ul>
-        <% if @course.has_custom_points_url? %>
-          <% if can? :view_custom_points_url, @course %>
+        <% if @course.has_external_scoreboard_url? %>
+          <% if can? :view_external_scoreboard_url, @course %>
             <li>
-              <%= link_to 'View points', @course.parsed_custom_points_url(@organization, @course, current_user), target: '_blank' %>
+              <%= link_to 'View points', @course.parsed_external_scoreboard_url(@organization, @course, current_user), target: '_blank' %>
             </li>
           <% end %>
         <% else %>

@@ -253,7 +253,7 @@ require 'cgi' # for escapeHTML
    visit '/org/hy'
    highlight 'a:contains("Programming 101")'
    click_on 'Edit course parameters'
-   fill_in 'course_custom_points_url', with: 'http://my-points.io/%{user}'
+   fill_in 'course_external_scoreboard_url', with: 'http://my-points.io/%{user}'
 %>
 <%= screenshot %>
 
