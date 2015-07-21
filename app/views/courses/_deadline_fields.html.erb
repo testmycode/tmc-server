@@ -1,7 +1,8 @@
 <%
    static_autofill = uniform ? deadline.static_deadline_spec : 'various'
    unlock_autofill = uniform ? deadline.unlock_deadline_spec : 'various'
-   field_class = uniform ? nil : 'various'
+   field_class = uniform ? '' : 'various'
+   field_class += ' datetime-picker'
 %>
 <%= label_tag "#{param_name}[#{deadline_type}][static]", 'Deadline' %>
 <%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: field_class %><br/>
