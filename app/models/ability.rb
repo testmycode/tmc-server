@@ -187,6 +187,10 @@ class Ability
       can :toggle_visibility, Organization do |o|
         can? :teach, o
       end
+
+      can :view_external_scoreboard_url, Course do |c|
+        can?(:teach, c) || User.course_students(c).include?(user)
+      end
     end
   end
 end

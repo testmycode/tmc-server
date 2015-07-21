@@ -23,6 +23,7 @@ class Course < ActiveRecord::Base
 
   validates :source_url, presence: true
   validate :check_source_backend
+  validate :check_external_scoreboard_url
   after_initialize :set_default_source_backend
 
   has_many :exercises, dependent: :delete_all
@@ -314,8 +315,21 @@ class Course < ActiveRecord::Base
     super(material)
   end
 
+  def external_scoreboard_url=(url)
+    return super("http://#{url}") unless url =~ /^(https?:\/\/|$)/
+    super(url)
+  end
+
   def contains_unlock_deadlines?
     exercise_groups.any? { |group| group.contains_unlock_deadlines?}
+  end
+
+  def has_external_scoreboard_url?
+    !external_scoreboard_url.blank?
+  end
+
+  def parsed_external_scoreboard_url(organization, course, user)
+    external_scoreboard_url % { user: user.username, course: course.id.to_s, org: organization.slug }
   end
 
   private
@@ -328,5 +342,13 @@ class Course < ActiveRecord::Base
 
   def set_default_source_backend
     self.source_backend ||= Course.default_source_backend
+  end
+
+  def check_external_scoreboard_url
+    begin
+      external_scoreboard_url % { user: '', course: '', org: '' } unless external_scoreboard_url.blank?
+    rescue
+      errors.add(:external_scoreboard_url, 'contains invalid keys')
+    end
   end
 end

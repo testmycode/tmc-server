@@ -11,7 +11,17 @@
       <% end %>
 
       <ul>
-        <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
+        <% if @course.has_external_scoreboard_url? %>
+          <% if can? :view_external_scoreboard_url, @course %>
+            <li>
+              <%= link_to 'View points', @course.parsed_external_scoreboard_url(@organization, @course, current_user), target: '_blank' %>
+            </li>
+          <% end %>
+        <% else %>
+          <li>
+            <%= link_to 'View points', organization_course_points_path(@organization, @course) %>
+          </li>
+        <% end %>
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>

@@ -1,12 +1,23 @@
 <h1>Edit course</h1>
 
+<%
+   external_scoreboard_url_help = %q{
+     <small>
+       %{user} = username<br/>
+       %{course} = course id<br/>
+       %{org} = organization id<br/>
+     </small>
+   }
+%>
+
 <%= form_for(@course, url: organization_course_path) do |f| %>
   <%= render 'shared/error_messages', target: @course %>
 
-  <%= labeled_field("Course title*", f.text_field(:title)) %>
-  <%= labeled_field("Course description", f.text_area(:description)) %>
-  <%= labeled_field("Material URL", f.text_field(:material_url)) %>
-  <%= labeled_field("Course name", f.text_field(:name, disabled: true)) %>
+  <%= bs_labeled_field("Course title*", f.text_field(:title)) %>
+  <%= bs_labeled_field("Course description", f.text_area(:description)) %>
+  <%= bs_labeled_field("Material URL", f.text_field(:material_url)) %>
+  <%= bs_labeled_field("External scoreboard URL", external_scoreboard_url_help + f.text_field(:external_scoreboard_url)) %>
+  <%= bs_labeled_field("Course name", f.text_field(:name, disabled: true)) %>
   <p>Fields with (*) are required</p>
   <div class="actions">
     <%= f.submit 'Update Course', class: "btn btn-primary"%>
