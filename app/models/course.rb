@@ -23,7 +23,7 @@ class Course < ActiveRecord::Base
 
   validates :source_url, presence: true
   validate :check_source_backend
-  validate :check_custom_points_url
+  validate :check_external_scoreboard_url
   after_initialize :set_default_source_backend
 
   has_many :exercises, dependent: :delete_all
@@ -315,7 +315,7 @@ class Course < ActiveRecord::Base
     super(material)
   end
 
-  def custom_points_url=(url)
+  def external_scoreboard_url=(url)
     return super("http://#{url}") unless url =~ /^(https?:\/\/|$)/
     super(url)
   end
@@ -324,12 +324,12 @@ class Course < ActiveRecord::Base
     exercise_groups.any? { |group| group.contains_unlock_deadlines?}
   end
 
-  def has_custom_points_url?
-    !custom_points_url.blank?
+  def has_external_scoreboard_url?
+    !external_scoreboard_url.blank?
   end
 
-  def parsed_custom_points_url(organization, course, user)
-    custom_points_url % { user: user.username, course: course.id.to_s, org: organization.slug }
+  def parsed_external_scoreboard_url(organization, course, user)
+    external_scoreboard_url % { user: user.username, course: course.id.to_s, org: organization.slug }
   end
 
   private
@@ -344,11 +344,11 @@ class Course < ActiveRecord::Base
     self.source_backend ||= Course.default_source_backend
   end
 
-  def check_custom_points_url
+  def check_external_scoreboard_url
     begin
-      custom_points_url % { user: '', course: '', org: '' } unless custom_points_url.blank?
+      external_scoreboard_url % { user: '', course: '', org: '' } unless external_scoreboard_url.blank?
     rescue
-      errors.add(:custom_points_url, 'contains invalid keys')
+      errors.add(:external_scoreboard_url, 'contains invalid keys')
     end
   end
 end

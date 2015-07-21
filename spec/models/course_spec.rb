@@ -194,11 +194,11 @@ describe Course, type: :model do
     end
 
     it 'validates custom points URL correctly' do
-      should_be_valid_params(valid_params.merge(custom_points_url: 'http://example.com'))
-      should_be_valid_params(valid_params.merge(custom_points_url: 'https://example.com'))
-      should_be_valid_params(valid_params.merge(custom_points_url: 'https://example.com/{org}/{course}/{user}'))
-      should_be_valid_params(valid_params.merge(custom_points_url: 'example.com/{org}/{course}/{user}'))
-      should_be_valid_params(valid_params.merge(custom_points_url: 'example.com'))
+      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'http://example.com'))
+      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'https://example.com'))
+      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'https://example.com/{org}/{course}/{user}'))
+      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'example.com/{org}/{course}/{user}'))
+      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'example.com'))
     end
 
     def should_be_invalid_params(params)
