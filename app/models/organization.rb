@@ -23,6 +23,9 @@ class Organization < ActiveRecord::Base
 
   scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
   scope :pending_organizations, -> { where(acceptance_pending: true) }
+  scope :assisted_organizations, ->(user) { joins(:courses, courses: :assistantships).where(assistantships: { user_id: user.id }) }
+  scope :taught_organizations, ->(user) { joins(:teacherships).where(teacherships: { user_id: user.id }) }
+  scope :participated_organizations, ->(user) { joins(:courses, courses: :awarded_points).where(awarded_points: { user_id: user.id }) }
 
   def self.init(params, initial_user)
     organization = Organization.new(params.merge(acceptance_pending: true))

@@ -55,10 +55,9 @@ feature 'User can create new organization', feature: true do
     @organization = FactoryGirl.create :accepted_organization
     Teachership.create!(user: @user, organization: @organization)
     log_in_as(@user.login, 'foobar2')
-    click_link @organization.name
-    expect(page).to have_content @organization.name
+    visit "/org/#{@organization.slug}"
     click_link 'hide organization'
-    expect(page).to have_content "Organzation is now hidden to users"
+    expect(page).to have_content "Organization is now hidden to users"
     expect(page).to have_content 'make organization visible'
   end
 end

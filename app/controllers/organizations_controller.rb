@@ -1,11 +1,17 @@
+require 'natsort'
+
 class OrganizationsController < ApplicationController
   before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input, :toggle_visibility]
 
   skip_authorization_check only: [:index]
 
   def index
-    ordering = 'LOWER(name)'
+    ordering = 'hidden, LOWER(name)'
     @organizations = Organization.accepted_organizations.order(ordering)
+    @my_organizations = Organization.taught_organizations(current_user)
+    @my_organizations |= Organization.assisted_organizations(current_user)
+    @my_organizations |= Organization.participated_organizations(current_user)
+    @my_organizations.natsort_by!(&:name)
   end
 
   def show
@@ -90,7 +96,7 @@ class OrganizationsController < ApplicationController
     authorize! :toggle_visibility, @organization
     @organization.hidden = !@organization.hidden
     @organization.save!
-    redirect_to organization_path, notice: "Organzation is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
+    redirect_to organization_path, notice: "Organization is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
   end
 
   private
