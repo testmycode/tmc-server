@@ -179,8 +179,7 @@ class CoursesController < ApplicationController
 
     groups = group_params
     groups.each do |name, conditions|
-      array = []
-      conditions.each { |k, v| array << v unless v.blank? }
+      array = conditions.values.reject(&:blank?)
       @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
       UncomputedUnlock.create_all_for_course_eager(@course)
     end
