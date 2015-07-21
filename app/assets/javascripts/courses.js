@@ -25,6 +25,16 @@ $(document).ready(function() {
      * Deadline group toggle functions
      */
 
+    $(".datetime-picker").datetimepicker({
+        lazyInit: true,
+        dayOfWeekStart: 1,
+        validateOnBlur: false,
+        allowBlank: true,
+        enterLikeTab: false,
+        defaultTime: '23:59',
+        format: 'd.m.Y H:i'
+    });
+
     var deadline_group_toggle_statuses = {};
 
     var toggle_deadline_group_status = function(id) {

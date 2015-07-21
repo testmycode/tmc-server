@@ -5,6 +5,7 @@
 //= require jquery-ui
 //= require jquery.dataTables.min
 //= require jquery.cookie
+//= require jquery.datetimepicker
 //= require bootstrap.min
 //= require misc
 //= require naturalSort
