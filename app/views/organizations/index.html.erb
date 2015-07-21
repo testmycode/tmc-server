@@ -45,8 +45,8 @@
 
   <tbody>
   <% @organizations.each do |organization| %>
-    <% if !organization.hidden? || current_user.administrator? %>
-      <tr class="<%= "hidden-organization" if organization.hidden?  %>">
+    <% if !organization.hidden? || can?(:view_hidden_organizations, nil) %>
+      <tr class="<%= 'hidden-organization' if organization.hidden?  %>">
         <td><%= link_to organization.name, organization_path(organization) %></td>
         <td><%= organization.information %></td>
         <% if current_user.administrator? %>
