@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Validators::FeedbackAnswerFormatValidator, type: :model do
+describe FeedbackAnswerFormatValidator, type: :model do
   it 'should validate integer ranges' do
     answer = FactoryGirl.create(:feedback_answer)
     answer.feedback_question.kind = 'intrange[-5..5]'
