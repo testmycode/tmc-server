@@ -124,6 +124,26 @@ describe OrganizationsController, type: :controller do
       controller.current_user = @user
     end
 
+    describe 'PUT update' do
+      it 'updates the requested organization if slug not changed' do
+        org = FactoryGirl.create(:accepted_organization)
+        Teachership.create(user_id: @user.id, organization_id: org.id)
+        put :update, id: org.to_param, organization: { name: 'New organization name' }
+        org.reload
+        expect(org.name).to eq('New organization name')
+        expect(response).to redirect_to(organization_path)
+      end
+    end
+
+    describe 'PUT update with slug change' do
+      it 'denies access' do
+        org = FactoryGirl.create(:accepted_organization)
+        Teachership.create(user_id: @user.id, organization_id: org.id)
+        put :update, id: org.to_param, organization: { slug: 'newslug' }
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+
     describe 'POST toggle_visibility' do
       it 'toggles value of hidden field between true and false' do
         org = FactoryGirl.create(:accepted_organization)

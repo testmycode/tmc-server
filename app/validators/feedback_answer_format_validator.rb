@@ -1,4 +1,4 @@
-class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
+class FeedbackAnswerFormatValidator < ActiveModel::Validator
   def validate(record)
     kind = record.feedback_question.kind
     ans = record.answer.strip

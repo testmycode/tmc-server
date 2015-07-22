@@ -173,6 +173,14 @@ class Ability
         can? :teach, c.organization
       end
 
+      can :edit, Organization do |o|
+        can? :teach, o
+      end
+
+      can :toggle_visibility, Organization do |o|
+        can? :teach, o
+      end
+
       cannot :teach, Organization
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
@@ -182,10 +190,6 @@ class Ability
       can :teach, Course do |c|
         return false if c.organization.rejected?
         c.organization.teacher?(user) || c.assistant?(user)
-      end
-
-      can :toggle_visibility, Organization do |o|
-        can? :teach, o
       end
     end
   end

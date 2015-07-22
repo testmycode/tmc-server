@@ -1,4 +1,11 @@
-<h1><%= @organization.name %></h1>
+<h1>
+  <%= @organization.name %>
+  <%= image_tag @organization.logo.url(:small_logo) if @organization.logo? %>
+</h1>
+
+<p>
+  <%= @organization.information %>
+</p>
 
 <% if current_user.administrator? %>
   <p>
@@ -21,14 +28,6 @@
     <strong>Accepted at:</strong>
     <%= @organization.accepted_at %>
   </p>
-
-  <p>
-    <strong>Information:</strong>
-    <%= @organization.information %>
-  </p>
-
-  <%= link_to 'Edit organization', edit_organization_path(@organization) %>
-  <br/><br/>
 <% end %>
 
 <% if can? :toggle_visibility, @organization %>
@@ -37,7 +36,6 @@
     <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
                 method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger'}" %>
   </p>
-  <br/>
 <% end %>
 
 <% if @organization.acceptance_pending? %>
@@ -57,15 +55,9 @@
   </p>
 <% end %>
 
-<% if can? :view, :participants_list %>
-    <br/>
-    <%= link_to 'List of registered users', participants_path %>
-<% end %>
-
 <% if can? :teach, @organization %>
-  <br/>
-  <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization) %>
-  <br/>
+  <%= link_to 'Edit organization', edit_organization_path(@organization) %><br/>
+  <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization) %><br/>
 <% end %>
 
 <div>

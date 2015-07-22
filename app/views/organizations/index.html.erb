@@ -9,6 +9,11 @@
   </div>
 <% end %>
 
+<% if can? :view, :participants_list %>
+    <%= link_to 'List of registered users', participants_path %>
+    <br/><br/>
+<% end %>
+
 <table id="organization-table">
   <thead>
   <tr>

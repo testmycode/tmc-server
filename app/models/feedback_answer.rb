@@ -6,7 +6,7 @@ class FeedbackAnswer < ActiveRecord::Base
   belongs_to :submission
   has_many :reply_to_feedback_answers, dependent: :delete_all
 
-  validates_with Validators::FeedbackAnswerFormatValidator
+  validates_with FeedbackAnswerFormatValidator
 
   def replied?
     reply_to_feedback_answers.count > 0
