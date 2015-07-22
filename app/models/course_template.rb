@@ -29,6 +29,7 @@ class CourseTemplate < ActiveRecord::Base
 
   scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
   scope :not_hidden, -> { where(hidden: false) }
+  scope :hidden, -> { where(hidden: true) }
   scope :available, -> { not_expired.not_hidden }
 
   after_save :update_courses_sourcedata
