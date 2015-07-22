@@ -1,4 +1,10 @@
 <script type="text/javascript">
+  var remove_condition = function(e) {
+    $(e).prev().remove();
+    $(e).next().remove();
+    $(e).remove(); // Remove input, br and self
+  };
+
   var unlock_condition_counts = {};
   var add_unlock_condition = function (selector, group_param) {
     var current_unlock_condition_count = unlock_condition_counts[group_param];
@@ -8,7 +14,10 @@
     $(selector).append(
       "<input type='text'" +
       "name='" + input_name + "'" +
-      "id='" + input_id + "' /><br/>"
+      "id='" + input_id + "' /> " +
+      "<a href='javascript:void(0);'" +
+      "onclick='remove_condition(this)'" +
+      "class='btn btn-mini btn-default remove-condition-button'>remove</a><br/>"
     );
 
     unlock_condition_counts[group_param]++;
@@ -53,7 +62,9 @@
           </script>
           <div id="unlock-conditions-<%= group.name %>">
             <% group_unlock_conditions.each_with_index do |condition, i| %>
-              <%= text_field_tag "#{param_array}[#{i}]", condition %><br/>
+              <%= text_field_tag "#{param_array}[#{i}]", condition %>
+              <a href='javascript:void(0);' onclick='remove_condition(this)'
+                 class='btn btn-mini btn-default remove-condition-button'>remove</a><br/>
             <% end %>
           </div>
           <a id="add-condition-<%= group.name %>"
