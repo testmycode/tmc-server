@@ -51,6 +51,4 @@
 <% if can? :teach, @organization %>
   <br/>
   <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization) %>
-  <br/>
-  <%= link_to 'Create course from template', course_templates_organization_path(@organization) %>
 <% end %>
