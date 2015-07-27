@@ -1,8 +1,12 @@
 <script type="text/javascript">
   var remove_condition = function(e) {
-    $(e).prev().remove();
-    $(e).next().remove();
-    $(e).remove(); // Remove input, br and self
+    if ($(e).parent("div").children("input").size() > 1) {
+      $(e).prev().remove();
+      $(e).next().remove();
+      $(e).remove(); // Remove input, br and self
+    } else {
+      $(e).prev().val(""); // Clear input
+    }
   };
 
   var unlock_condition_counts = {};
