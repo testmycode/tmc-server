@@ -8,13 +8,14 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     @conditions = []
     @universal_descriptions = []
     @describers = []
-    for i in 0...conditions.size
+    @datetime_count = 0
+    conditions.each_with_index do |condition, i|
       begin
-        parse_condition(conditions[i].to_s.strip) unless conditions[i].to_s.blank?
+        parse_condition(condition.to_s.strip) unless condition.to_s.blank?
       rescue InvalidSyntaxError
-        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
+        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{condition})")
       rescue
-        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$!.message}"
+        raise "Problem with unlock condition #{i + 1} (#{condition}): #{$!.message}"
       end
     end
   end
@@ -54,6 +55,10 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   def parse_condition(str)
     course = @exercise.course
     if DateAndTimeUtils.looks_like_date_or_time(str)
+      time = DateAndTimeUtils.to_time(str)
+      fail 'Date out of range' if time.year > 10000 || time.year < 1 # Prevent database datetime overflow
+      fail 'You can\'t have multiple unlock dates for the same exercise' if @datetime_count > 0 # Multiple unlock dates don't work correctly
+      @datetime_count += 1
       @valid_after = DateAndTimeUtils.to_time(str)
 
     elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/
@@ -137,7 +142,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   end
 
   def check_group_or_exercise_exists(course, group_or_exercise_name)
-    if course.exercises_by_name_or_group(group_or_exercise_name).empty?
+    if course.exercises_by_name_or_group(group_or_exercise_name, true).empty?
       fail "No such exercise or exercise group: #{group_or_exercise_name}. Remember that exercises need to be specified with their full name including their group."
     end
   end
@@ -160,25 +165,12 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     end
   end
 
-  def self.parsable?(spec)
-    conditions = ActiveSupport::JSON.decode(spec)
-    for i in 0...conditions.size
-      begin
-        str = conditions[i].to_s.strip
-        next if str.blank?
-        unless  DateAndTimeUtils.looks_like_date_or_time(str) ||
-            str =~ /^exercise\s+(?:group\s+)?(\S+)$/ ||
-            str =~ /^points?\s+(\S+.*)$/ ||
-            str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/ ||
-            str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/ ||
-            str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
-          fail InvalidSyntaxError.new('Invalid syntax')
-        end
-      rescue InvalidSyntaxError
-        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{conditions[i]})")
-      rescue
-        raise "Problem with unlock condition #{i + 1} (#{conditions[i]}): #{$!.message}"
-      end
-    end
+  def self.parsable?(spec, exercise)
+    UnlockSpec.new(exercise, ActiveSupport::JSON.decode(spec)) # Parses spec and fails if invalid
+    true
+  rescue InvalidSyntaxError
+    raise
+  rescue
+    raise InvalidSyntaxError.new $!
   end
 end

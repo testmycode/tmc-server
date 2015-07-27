@@ -199,9 +199,10 @@ class Exercise < ActiveRecord::Base
 
   def unlock_spec=(spec)
     check_is_json_array_of_strings(spec)
-    UnlockSpec.parsable?(spec)
-    super(spec)
-    @unlock_spec_obj = nil
+    if UnlockSpec.parsable?(spec, self)
+      super(spec)
+      @unlock_spec_obj = nil
+    end
   end
 
   def unlock_spec_obj

@@ -16,6 +16,10 @@ td.deadline-toggle-buttons a {
 }
 
 .single-exercise-deadlines {
-    display:none;
+    display: none;
     background-color: #F9F9F9;
+}
+
+.remove-condition-button {
+    margin: 0 0 10px 5px;
 }
