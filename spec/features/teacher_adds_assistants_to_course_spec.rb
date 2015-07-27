@@ -36,6 +36,7 @@ feature 'Teacher can add assistants to course', feature: true do
   end
 
   scenario 'Assistant accesses same resources as teacher for the course' do
+    pending
     @course.refresh
 
     log_in_as(@teacher.username, 'foobar')

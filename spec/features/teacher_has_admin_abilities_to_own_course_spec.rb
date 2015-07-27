@@ -52,8 +52,8 @@ feature 'Teacher has admin abilities to own course', feature: true do
     visit '/org/slug/courses/1'
     click_link 'View points'
 
-    expect(page).to have_content('1/6')
-    expect(page).not_to have_content('0/6')
+    expect(page).to have_content('1/8')
+    expect(page).not_to have_content('0/8')
   end
 
   scenario 'Teacher can make code review' do
