@@ -40,6 +40,6 @@
 
 <br>
 
-<% if !current_user.guest? %>
+<% if current_user.admin %>
     <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
 <% end %>
