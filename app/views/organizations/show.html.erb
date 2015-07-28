@@ -1,5 +1,9 @@
 <h1><%= @organization.name %></h1>
 
+<p>
+  <%= @organization.information %>
+</p>
+
 <% if current_user.administrator? %>
   <p>
     <strong>Organization ID:</strong>
@@ -21,26 +25,15 @@
     <strong>Accepted at:</strong>
     <%= @organization.accepted_at %>
   </p>
-
-  <p>
-    <strong>Information:</strong>
-    <%= @organization.information %>
-  </p>
-
-  <%= link_to 'Edit organization', edit_organization_path(@organization) %>
-  <br/><br/>
 <% end %>
 
-<%# --- correct position for this will be done later ---%>
 <% if can? :toggle_visibility, @organization %>
   <p>
     <strong><%= "#{@organization.hidden ? 'Status hidden:' : 'Status visible:'}" %></strong>
     <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
                 method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger'}" %>
   </p>
-  <br/>
 <% end %>
-<%# -----------------------%>
 
 <% if @organization.acceptance_pending? %>
   <p>
@@ -57,6 +50,11 @@
       </i>
     </strong>
   </p>
+<% end %>
+
+<% if current_user.administrator? %>
+    <br/>
+    <%= link_to 'Edit organization', edit_organization_path(@organization) %>
 <% end %>
 
 <% if can? :view, :participants_list %>
