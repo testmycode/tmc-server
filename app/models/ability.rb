@@ -39,9 +39,6 @@ class Ability
       can :create, Course do |c|
         can? :teach, c.organization
       end
-      can :refresh, Course do |c|
-        can? :teach, c.organization
-      end
 
       cannot :read, Exercise
       can :read, Exercise do |ex|
