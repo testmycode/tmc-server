@@ -6,8 +6,7 @@ class TeachersController < ApplicationController
     @teachers = @organization.teachers
     @teachership = Teachership.new
     add_organization_breadcrumb
-    add_breadcrumb 'Teachers list', organization_teachers_path(@organization)
-    add_breadcrumb 'Add a new teacher'
+    add_breadcrumb 'Manage teachers'
   end
 
   def create
