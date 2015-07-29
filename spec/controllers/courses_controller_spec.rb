@@ -4,6 +4,10 @@ describe CoursesController, type: :controller do
   include GitTestActions
 
   before(:each) do
+    @source_path = "#{@test_tmp_dir}/fake_source"
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    @source_url = "file://#{@source_path}"
+    create_bare_repo(@repo_path)
     @user = FactoryGirl.create(:user)
     @teacher = FactoryGirl.create(:user)
     @organization = FactoryGirl.create(:accepted_organization)
@@ -206,12 +210,13 @@ describe CoursesController, type: :controller do
 
     describe 'with valid parameters' do
       it 'creates the course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
-        expect(Course.last.source_url).to eq('git@example.com')
+        expect do
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path }
+        end.to change { Course.count }.by(1)
       end
 
       it 'redirects to the created course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path }
         expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
       end
 
@@ -231,10 +236,10 @@ describe CoursesController, type: :controller do
 
         it 'does directory changes when course is first created from template, but doesn\'t do changes when creating more courses from same template' do
           expect(CourseTemplate.last.cache_version).to eq(0)
-          post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @template.id, source_url: @template.source_url }
+          post :create_from_template, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @template.id }
           expect(Course.last.cache_version).to eq(1)
           expect(CourseTemplate.last.cache_version).to eq(1)
-          post :create, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @template.id, source_url: @template.source_url }
+          post :create_from_template, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @template.id }
           expect(Course.all.pluck :cache_version).to eq([1, 1])
           expect(CourseTemplate.last.cache_version).to eq(1)
           expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
@@ -248,6 +253,22 @@ describe CoursesController, type: :controller do
         expect(response).to render_template('new')
         expect(assigns(:course).name).to eq('invalid name with spaces')
       end
+    end
+  end
+
+  describe 'GET prepare_course_from_template' do
+    before :each do
+      @template = FactoryGirl.create :course_template, name: 'name', title: 'title', source_url: @repo_path
+      controller.current_user = @teacher
+    end
+
+    it 'should assign @course with course template attributes' do
+      get :prepare_from_template, organization_id: @organization.slug, course_template_id: @template.id
+      expect(assigns(:course).name).to eq('name')
+      expect(assigns(:course).title).to eq('title')
+      expect(assigns(:course).source_url).to eq(@repo_path)
+      expect(assigns(:course).course_template_id).to eq(@template.id)
+      expect(assigns(:course).cache_version).to eq(@template.cache_version)
     end
   end
 
@@ -268,12 +289,14 @@ describe CoursesController, type: :controller do
 
   describe 'PUT update' do
     before :each do
+      @new_repo_path = @test_tmp_dir + '/new_fake_remote_repo'
+      create_bare_repo(@new_repo_path)
       @course = FactoryGirl.create :course,
                                    name: 'oldName',
                                    title: 'oldTitle',
                                    description: 'oldDescription',
                                    material_url: 'http://oldMaterial.com',
-                                   source_url: 'git@oldrepo.com',
+                                   source_url: @repo_path,
                                    organization: @organization
       controller.current_user = @user
     end
@@ -285,7 +308,7 @@ describe CoursesController, type: :controller do
                        title: 'newTitle',
                        description: 'newDescription',
                        material_url: 'http://newMaterial.com',
-                       source_url: 'git@newrepo.com'
+                       source_url: @new_repo_path
                    }
       end
 
@@ -294,7 +317,7 @@ describe CoursesController, type: :controller do
         expect(course.title).to eq('newTitle')
         expect(course.description).to eq('newDescription')
         expect(course.material_url).to eq('http://newMaterial.com')
-        expect(course.source_url).to eq('git@newrepo.com')
+        expect(course.source_url).to eq(@new_repo_path)
       end
 
       it 'redirects to updated course' do
@@ -318,8 +341,9 @@ describe CoursesController, type: :controller do
 
     it 'can\'t update course template id' do
       Teachership.create user: @user, organization: @organization
+      old_id = @course.course_template_id
       put :update, organization_id: @organization.to_param, id: @course.to_param, course: {course_template_id: 2}
-      expect(Course.last.course_template_id).to be_nil
+      expect(Course.last.course_template_id).to eq(old_id)
     end
 
     describe 'when course created from template' do
@@ -332,7 +356,7 @@ describe CoursesController, type: :controller do
       end
 
       it 'can\'t update source_url' do
-        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {source_url: 'git@example.com'}
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {source_url: @new_repo_path}
         expect(Course.last.source_url).to eq(@template.source_url)
       end
 

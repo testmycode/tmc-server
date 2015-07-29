@@ -338,22 +338,6 @@ describe CourseTemplatesController, type: :controller do
         expect(assigns(:course_templates).map(&:name)).to eq(%w(template1 template2 template3))
       end
     end
-
-    describe 'GET prepare_course' do
-      before :each do
-        @template = FactoryGirl.create :course_template, name: 'name', title: 'title', source_url: @repo_path
-      end
-
-      it 'should assign @course with course template attributes' do
-        get :prepare_course, organization_id: @organization.slug, id: @template.id
-        expect(assigns(:course).name).to eq('name')
-        expect(assigns(:course).title).to eq('title')
-        expect(assigns(:course).source_url).to eq(@repo_path)
-        #expect(assigns(:course).source_url).to eq('https://github.com/testmycode/tmc-testcourse.git')
-        expect(assigns(:course).course_template_id).to eq(@template.id)
-        expect(assigns(:course).cache_version).to eq(@template.cache_version)
-      end
-    end
   end
 
   describe 'when non-teacher' do
@@ -366,13 +350,6 @@ describe CourseTemplatesController, type: :controller do
     describe 'GET list_for_teachers' do
       it 'should respond with a 401' do
         get :list_for_teachers, organization_id: @organization.slug
-        expect(response.code.to_i).to eq(401)
-      end
-    end
-
-    describe 'GET prepare_course' do
-      it 'should respond with a 401' do
-        get :prepare_course, organization_id: @organization.slug, id: @template.id
         expect(response.code.to_i).to eq(401)
       end
     end

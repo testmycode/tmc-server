@@ -10,29 +10,21 @@ class Course < ActiveRecord::Base
 
   validates :name,
             presence: true,
-            uniqueness: { scope: :organization },
+            uniqueness: true,
             length: { within: 1..40 },
             format: {
               without: / /,
               message: 'should not contain white spaces'
             }
-
   validates :title,
             presence: true,
             length: { within: 1..40 }
-
-  validates :source_url, presence: true
-  validate :source_url_same_as_templates
-  validate :check_source_backend
-  validate :check_custom_course_name_not_taken
-
-  after_initialize :set_default_source_backend
+  validates :description, length: { maximum: 512 }
 
   # if made from template, make sure all values are fetched from there
   before_save :set_cache_version
-  before_save :set_source_url
-  before_save :set_git_branch
-  before_save :set_source_backend
+
+  before_validation :save_template
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
@@ -69,21 +61,35 @@ class Course < ActiveRecord::Base
 
   scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
-  scope :custom, -> { where(course_template: nil) }
 
   def git_branch
-    return course_template.git_branch unless custom?
-    super
+    initialize_dummy_template
+    course_template.git_branch
   end
 
   def source_url
-    return course_template.source_url unless custom?
-    super
+    initialize_dummy_template
+    course_template.source_url
   end
 
   def source_backend
-    return course_template.source_backend unless custom?
-    super
+    initialize_dummy_template
+    course_template.source_backend
+  end
+
+  def git_branch=(branch)
+    initialize_dummy_template
+    course_template.git_branch = branch
+  end
+
+  def source_url=(url)
+    initialize_dummy_template
+    course_template.source_url = url
+  end
+
+  def source_backend=(backend)
+    initialize_dummy_template
+    course_template.source_backend = backend
   end
 
   def visible_to?(user)
@@ -162,16 +168,11 @@ class Course < ActiveRecord::Base
   end
 
   def increment_cache_version
-    if custom?
-      self.cache_version += 1
-    else
-      course_template.cache_version += 1
-    end
+    course_template.increment_cache_version
   end
 
   def cache_path
-    return course_template.cache_path unless custom?
-    "#{Course.cache_root}/#{name}-#{cache_version}"
+    return course_template.cache_path
   end
 
   # Holds a clone of the course repository
@@ -377,50 +378,35 @@ class Course < ActiveRecord::Base
     super(material)
   end
 
-  def created_from_template?
-    course_template.present?
+  #def created_from_template?
+    #course_template.present?
+  #end
+
+  def custom?
+    course_template.dummy?
+  end
+
+  def contains_unlock_deadlines?
+    exercise_groups.any? { |group| group.contains_unlock_deadlines?}
   end
 
   private
 
-  def check_custom_course_name_not_taken
-    if custom?
-      custom_courses = Course.custom.where.not(id: self.id)
-      name_taken_by_another_custom_course = custom_courses.pluck(:name).include?(self.name)
-      name_taken_by_course_template = CourseTemplate.pluck(:name).include?(self.name)
-      errors.add(:name, 'is already taken') if name_taken_by_another_custom_course || name_taken_by_course_template
-    end
-  end
-
-  def check_source_backend
-    unless Course.valid_source_backends.include?(source_backend)
-      errors.add(:source_backend, 'must be one of [' + Course.valid_source_backends.join(', ') + ']')
-    end
-  end
-
-  def set_default_source_backend
-    self.source_backend ||= Course.default_source_backend
-  end
-
   def set_cache_version
-    self.cache_version = course_template.cache_version unless custom?
+    self.cache_version = course_template.cache_version
   end
 
-  def set_source_url
-    self.source_url = course_template.source_url unless custom?
-  end
-
-  def set_git_branch
-    self.git_branch = course_template.git_branch unless custom?
-  end
-
-  def set_source_backend
-    self.source_backend = course_template.source_backend unless custom?
-  end
-
-  def source_url_same_as_templates
-    if !custom?
-      errors.add(:source_url, 'must be same as template\'s source_url, if course created from template') unless self.source_url == course_template.source_url
+  def save_template
+    return if course_template.nil?
+    course_template.save!
+    self.course_template = course_template
+  rescue
+    course_template.errors.full_messages.each do |msg|
+      errors.add(:base, msg)
     end
+  end
+
+  def initialize_dummy_template
+    self.course_template ||= CourseTemplate.new_dummy(self)
   end
 end

@@ -41,8 +41,9 @@ describe Course, type: :model do
         :clone_path
       ]
 
+      course = FactoryGirl.create :course
       for path in object_paths
-        expect(Course.new.send(path)).to match(/^\//)
+        expect(course.send(path)).to match(/^\//)
       end
     end
   end
@@ -154,7 +155,7 @@ describe Course, type: :model do
       {
         name: 'TestCourse',
         title: 'Test Course',
-        source_url: 'git@example.com',
+        source_url: source_url,
         organization: @organization
       }
     end
@@ -167,24 +168,11 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(name: 'a' * 41))
     end
 
-    it 'requires name to be unique within organization' do
-      Course.create!(valid_params)
-      should_be_invalid_params(valid_params)
-    end
-
-    it 'allows same course name in different organizations, if cloned from same template' do
-      template = FactoryGirl.create :course_template
-      organization1 = FactoryGirl.create :accepted_organization
-      organization2 = FactoryGirl.create :accepted_organization
-      Course.create!(valid_params.merge(organization: organization1, course_template: template, source_url: template.source_url))
-      expect{ Course.create!(valid_params.merge(organization: organization2, course_template: template, source_url: template.source_url)) }.not_to raise_error
-    end
-
-    it 'forbids two custom courses to share a name' do
-      organization1 = FactoryGirl.create :accepted_organization
-      organization2 = FactoryGirl.create :accepted_organization
-      Course.create!(valid_params.merge(organization: organization1))
-      should_be_invalid_params(valid_params.merge(organization: organization2))
+    it 'requires name to be unique' do
+      FactoryGirl.create :course, name: 'Unique'
+      expect do
+        FactoryGirl.create :course, name: 'Unique'
+      end.to raise_error
     end
 
     it 'forbids custom course\'s name to be same as some template\'s name' do
@@ -228,7 +216,7 @@ describe Course, type: :model do
     end
 
     it 'deletes its cache directory' do
-      c = Course.create!(name: 'MyCourse', title: 'My Course', source_url: source_url)
+      c = FactoryGirl.create :course
       FileUtils.mkdir_p(c.cache_path)
       FileUtils.touch("#{c.cache_path}/foo.txt")
 
@@ -334,28 +322,12 @@ describe Course, type: :model do
     end
   end
 
-  it 'sets cache_version to be same as course_template\'s' do
-    template = FactoryGirl.create :course_template
-    template.cache_version = 5
-
-    templated_course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
-    expect(templated_course.cache_version).to eq(5)
-
-    custom_course = FactoryGirl.create :course
-    expect(custom_course.cache_version).to eq(0)
-
-    templated_course.cache_version = 10
-    templated_course.save!
-    expect(templated_course.cache_version).to eq(5)
-
-    custom_course.cache_version = 10
-    custom_course.save!
-    expect(custom_course.cache_version).to eq(10)
-  end
-
   it 'increments own cache_version if custom course' do
     course = FactoryGirl.create :course
-    expect{course.increment_cache_version}.to change{course.cache_version}.by(1)
+    expect do
+      course.increment_cache_version
+      course.save!
+    end.to change{course.cache_version}.by(1)
   end
 
   it 'increments template\'s cache_version if templated' do

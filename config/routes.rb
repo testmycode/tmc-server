@@ -48,6 +48,11 @@ resources :organizations, except: :destory, path: 'org' do
 
       get 'help'
 
+      collection do
+        get 'clone_template/:course_template_id' => 'courses#prepare_from_template', as: 'prepare_course'
+        post 'clone_template' => 'courses#create_from_template', as: 'clone_course'
+      end
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
       resources :submissions, only: [:index]
