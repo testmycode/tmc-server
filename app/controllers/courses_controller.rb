@@ -5,7 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, except: [:create, :help, :index, :new, :show_json]
+  before_action :set_course, except: [:create, :help, :index, :new, :show_json, :create_from_template, :prepare_from_template]
 
   skip_authorization_check only: [:index]
 
@@ -83,20 +83,59 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = Course.new(course_params_for_create)
+    create_params = course_params_for_create
+    input_name = create_params[:name]
+    create_params[:name] = @organization.slug + '-' + input_name
+
+    @course = Course.new(create_params)
     @course.organization = @organization
     authorize! :teach, @organization
-    return respond_access_denied('Custom courses not enabled') if @course.custom? && !custom_courses_enabled?
+    return respond_access_denied('Custom courses not enabled') unless custom_courses_enabled?
 
     respond_to do |format|
       if @course.save
-        # When we have fresh course created from template, we might not want to make directory changes,
-        # if repository already exists in the system.
-        no_directory_changes = !@course.custom? && @course.course_template.cache_exists?
-        refresh_course(@course, no_directory_changes: no_directory_changes)
+        refresh_course(@course, no_directory_changes: false)
         format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
       else
+        @course.name = input_name
         format.html { render action: 'new', notice: 'Course could not be created.' }
+      end
+    end
+  end
+
+  def prepare_from_template
+    @course_template = CourseTemplate.find(params[:course_template_id])
+    authorize! :teach, @organization
+    authorize! :clone, @course_template
+    add_organization_breadcrumb
+    add_breadcrumb 'Course templates', organization_course_templates_path
+    add_breadcrumb 'Create new course'
+    @course = Course.new(name: @course_template.name,
+                         title: @course_template.title,
+                         description: @course_template.description,
+                         material_url: @course_template.material_url,
+                         course_template_id: @course_template.id,
+                         cache_version: @course_template.cache_version)
+    @course.course_template = @course_template
+  end
+
+  def create_from_template
+    create_params = course_params_for_create_from_template
+    input_name = create_params[:name]
+    create_params[:name] = @organization.slug + '-' + input_name
+
+    @course = Course.new(create_params)
+    @course.organization = @organization
+    @course_template = @course.course_template
+    authorize! :teach, @organization
+
+    respond_to do |format|
+      if @course.save
+        refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?)
+        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
+      else
+        @course.name = input_name
+        format.html { render action: 'prepare_from_template', notice: 'Course could not be created' }
       end
     end
   end
@@ -205,7 +244,11 @@ class CoursesController < ApplicationController
   private
 
   def course_params_for_create
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :course_template_id)
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
+  end
+
+  def course_params_for_create_from_template
+    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
   end
 
   def course_params

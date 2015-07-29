@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150703070009) do
+ActiveRecord::Schema.define(version: 20150727080841) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 20150703070009) do
     t.boolean  "hidden",         default: false
     t.string   "source_backend", default: "git",    null: false
     t.text     "git_branch",     default: "master", null: false
+    t.boolean  "dummy",          default: false,    null: false
   end
 
   create_table "courses", force: true do |t|
@@ -73,20 +74,17 @@ ActiveRecord::Schema.define(version: 20150703070009) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "hide_after"
-    t.boolean  "hidden",                         default: false,    null: false
-    t.integer  "cache_version",                  default: 0,        null: false
+    t.boolean  "hidden",                         default: false, null: false
+    t.integer  "cache_version",                  default: 0,     null: false
     t.string   "spreadsheet_key"
-    t.string   "source_backend",                                    null: false
-    t.string   "source_url",                                        null: false
-    t.text     "git_branch",                     default: "master", null: false
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
-    t.boolean  "locked_exercise_points_visible", default: true,     null: false
+    t.boolean  "locked_exercise_points_visible", default: true,  null: false
     t.text     "description"
     t.string   "paste_visibility"
     t.integer  "organization_id"
     t.integer  "disabled_status",                default: 0
-    t.integer  "course_template_id"
+    t.integer  "course_template_id",                             null: false
     t.string   "title"
     t.string   "material_url"
   end

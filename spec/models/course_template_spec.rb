@@ -52,10 +52,6 @@ describe CourseTemplate, type: :model do
       should_be_invalid_params(valid_params.merge(title: 'a' * 41))
     end
 
-    it 'requires title to be reasonably long' do
-      should_be_invalid_params(valid_params.merge(title: 'aaa'))
-    end
-
     it 'requires description to be reasonably short' do
       should_be_invalid_params(valid_params.merge(description: 'a' * 513))
     end

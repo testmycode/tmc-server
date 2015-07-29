@@ -16,7 +16,7 @@ class CourseTemplate < ActiveRecord::Base
             }
   validates :title,
             presence: true,
-            length: { within: 4..40 }
+            length: { within: 1..40 }
   validates :description, length: { maximum: 512 }
   validates :git_branch, presence: true
   validates :source_url, presence: true
@@ -35,6 +35,17 @@ class CourseTemplate < ActiveRecord::Base
 
   after_destroy :delete_courses
   after_destroy :delete_cache
+
+  def self.new_dummy(course, options = {})
+    CourseTemplate.new(dummy: true,
+                       name: course.name,
+                       title: course.title,
+                       description: course.description,
+                       material_url: course.material_url,
+                       source_url: options[:source_url],
+                       git_branch: options[:git_branch] || 'master',
+                       source_backend: options[:source_backend] || 'git')
+  end
 
   def valid_git_repo?
     return true unless source_url_changed? || git_branch_changed? # don't attempt repo cloning if source url or branch wasn't even changed
@@ -66,6 +77,13 @@ class CourseTemplate < ActiveRecord::Base
 
   def cache_path
     "#{Course.cache_root}/#{name}-#{cache_version}"
+  end
+
+  def increment_cache_version
+    self.cache_version += 1
+    courses.each do |course|
+      course.cache_version = cache_version
+    end
   end
 
   def refresh

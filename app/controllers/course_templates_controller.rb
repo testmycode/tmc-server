@@ -59,25 +59,6 @@ class CourseTemplatesController < ApplicationController
     @course_templates = CourseTemplate.available
   end
 
-  def prepare_course
-    @organization = Organization.find_by(slug: params[:organization_id])
-    authorize! :teach, @organization
-    authorize! :clone, @course_template
-    add_organization_breadcrumb
-    add_breadcrumb 'Course templates', organization_course_templates_path
-    add_breadcrumb 'Create new course'
-    @course = Course.new(name: @course_template.name,
-                         title: @course_template.title,
-                         description: @course_template.description,
-                         material_url: @course_template.material_url,
-                         source_backend: @course_template.source_backend,
-                         source_url: @course_template.source_url,
-                         git_branch: @course_template.git_branch,
-                         course_template_id: @course_template.id,
-                         cache_version: @course_template.cache_version,
-    )
-  end
-
   def toggle_hidden
     @course_template.hidden = !@course_template.hidden
     @course_template.save
