@@ -56,9 +56,7 @@ class CourseTemplate < ActiveRecord::Base
       File.exist?("#{dir}/.git")
     end
   rescue StandardError => e
-    errors.add(:source_url, 'can be invalid')
-    errors.add(:git_branch, 'can be invalid')
-    errors.add(:base, '"Cannot clone repository from given information. Error: ' + e.to_s)
+    errors.add(:base, 'Cannot clone repository. Error: ' + e.to_s)
   end
 
   def valid_source_backend?

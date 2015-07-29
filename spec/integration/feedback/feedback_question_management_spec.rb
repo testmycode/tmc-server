@@ -11,7 +11,10 @@ describe 'Feedback question management', type: :request, integration: true do
     visit '/'
     log_in_as(@user.login, 'xooxer')
 
-    create_new_course name: 'TheCourse', source_url: Dir.pwd + '/unused', organization_slug: @organization.slug
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(@repo_path)
+
+    create_new_course name: 'TheCourse', source_url: @repo_path, organization_slug: @organization.slug
 
     visit '/org/slug/courses'
     click_link 'TheCourse'

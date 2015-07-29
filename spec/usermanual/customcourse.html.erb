@@ -98,7 +98,7 @@ require 'cgi' # for escapeHTML
     repo_path = ENV['TMC_USERMANUAL_REPO_PATH'] || (ENV['HOME'] + '/tmc-example-repo')
     FileUtils.rm_rf(repo_path)
     FileUtils.mkdir_p(repo_path)
-    system(mk_command('git', 'init', '--bare', '-q', repo_path))
+    create_bare_repo(repo_path, initial_commit: true)
     repo_url = 'file://' + repo_path
 
     fill_in 'course_source_url', :with => repo_url
@@ -167,6 +167,12 @@ require 'cgi' # for escapeHTML
       sh.blank_line
       sh.run "git remote add origin #{course.source_url}"
     end
+  %>
+
+  <%
+     Dir.chdir(workdir) do |dir|
+       system!('git pull --rebase origin master > /dev/null 2> /dev/null')
+     end
   %>
 
   <p>

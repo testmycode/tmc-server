@@ -28,7 +28,7 @@ feature 'Admin sets expiredate to course templates', feature: true do
     fill_in 'course_template_expires_at', with: '2020-01-01'
     click_button 'Update Course template'
 
-    expect(page).to have_content('2020-01-01')
+    expect(page).to have_content('01.01.2020')
   end
 
   scenario 'Admin succeeds at toggling between hidden and non-hidden' do
@@ -54,13 +54,13 @@ feature 'Admin sets expiredate to course templates', feature: true do
 
   scenario "Teacher can't create course from expired template" do
     log_in_as(@teacher.login, 'xooxer')
-    visit("/org/slug/course_templates/#{@ct_expired_visible.id}")
+    visit("/org/slug/courses/clone_template/#{@ct_expired_visible.id}")
     expect(page).to have_content('Access denied')
   end
 
   scenario "Teacher can't create course from hidden template" do
     log_in_as(@teacher.login, 'xooxer')
-    visit("/org/slug/course_templates/#{@ct_non_expired_hidden.id}")
+    visit("/org/slug/courses/clone_template/#{@ct_non_expired_hidden.id}")
     expect(page).to have_content('Access denied')
   end
 end
