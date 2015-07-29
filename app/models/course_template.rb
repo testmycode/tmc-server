@@ -30,7 +30,8 @@ class CourseTemplate < ActiveRecord::Base
   scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
   scope :not_hidden, -> { where(hidden: false) }
   scope :hidden, -> { where(hidden: true) }
-  scope :available, -> { not_expired.not_hidden }
+  scope :not_dummy, -> { where(dummy: false) }
+  scope :available, -> { not_expired.not_hidden.not_dummy }
 
   after_save :update_courses_sourcedata
 
@@ -73,7 +74,7 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def clonable?
-    !hidden && (expires_at.nil? || expires_at > Time.now)
+    !hidden? && (expires_at.nil? || expires_at > Time.now) && !dummy?
   end
 
   def cache_path

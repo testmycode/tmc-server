@@ -2,9 +2,10 @@
   <td><%= course_template.name %></td>
   <td><%= course_template.title %></td>
   <td><%= course_template.description %></td>
-  <td><%= link_to course_template.material_url, course_template.material_url unless course_template.material_url.blank? %></td>
-  <td><%= course_template.source_url %></td>
-  <td><%= course_template.expires_at %></td>
+  <td><%= link_to 'material', course_template.material_url unless course_template.material_url.blank? %></td>
+  <td><%= link_to 'source', course_template.source_url %></td>
+  <td><%= course_template.expires_at.strftime('%d.%m.%Y') unless course_template.expires_at.nil? %></td>
+  <td><%= link_to 'Refresh', refresh_course_template_path(course_template), method: :post, class: "btn btn-mini btn-primary" %></td>
   <td><%= link_to 'Edit', edit_course_template_path(course_template), class: "btn btn-mini btn-info" %></td>
   <td><%= link_to 'Destroy', course_template, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini btn-danger" %></td>
   <td>
