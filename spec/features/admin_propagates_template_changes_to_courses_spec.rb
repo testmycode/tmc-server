@@ -113,7 +113,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
   private
 
   def add_exercise(exercise_name = 'MyExercise')
-    course = Course.find_by_name!('course')
+    course = Course.find_by_name!(@organization1.slug + '-course')
     repo = clone_course_repo(course)
     repo.copy_simple_exercise(exercise_name)
     repo.add_commit_push

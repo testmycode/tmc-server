@@ -14,7 +14,6 @@ resources :organizations, except: :destory, path: 'org' do
     resources :teachers, only: [:index, :create, :destroy]
 
     get 'course_templates', to: 'course_templates#list_for_teachers'
-    get 'course_templates/:id', to: 'course_templates#prepare_course', as: 'prepare_course'
 
     resources :courses do
       member do

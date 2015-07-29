@@ -252,7 +252,7 @@ class CourseRefresher
 
           e.options = metadata
 
-          if (e.new_record? && !e.course.initially_refreshed?)
+          if (e.new_record? && e.course.refreshed?)
             e.disabled!
           end
 
