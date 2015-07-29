@@ -1,12 +1,10 @@
 # Parses and abstracts specification in the "unlocked_after" field of a `metadata.yml` file.
 class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
   class InvalidSyntaxError < StandardError; end
-  
-  def initialize(exercise, conditions)
-  # def initialize(course, conditions)
-    # @course = course
+
+  def initialize(course, conditions)
+    @course = course
     @raw_spec = conditions
-    @exercise = exercise
     @conditions = []
     @universal_descriptions = []
     @describers = []

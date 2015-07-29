@@ -115,14 +115,14 @@ class CoursesController < ApplicationController
   end
 
   def manage_deadlines
-    authorize! :teach, @organization
+    authorize! :manage_deadlines, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage deadlines'
     assign_show_view_vars
   end
 
   def save_deadlines
-    authorize! :teach, @organization
+    authorize! :manage_deadlines, @course
 
     groups = group_params
     groups.each do |name, deadlines|
@@ -151,14 +151,14 @@ class CoursesController < ApplicationController
   end
   
   def manage_unlocks
-    authorize! :teach, @organization
+    authorize! :manage_unlocks, @course
     add_course_breadcrumb
     add_breadcrumb 'Manage unlocks'
     assign_show_view_vars
   end
 
   def save_unlocks
-    authorize! :teach, @organization
+    authorize! :manage_unlocks, @course
 
     groups = group_params
     groups.each do |name, conditions|

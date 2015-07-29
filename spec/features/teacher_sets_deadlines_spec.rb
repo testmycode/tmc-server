@@ -13,10 +13,9 @@ feature 'Teacher sets deadlines', feature: true do
     @course.refresh
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create(:exercise, course: course)
-    FactoryGirl.create(:exercise, course: course)
-    FactoryGirl.create(:exercise, course: course)
-    @course = course
+    FactoryGirl.create(:exercise, course: @course)
+    FactoryGirl.create(:exercise, course: @course)
+    FactoryGirl.create(:exercise, course: @course)
 
     visit '/'
   end
@@ -64,7 +63,7 @@ feature 'Teacher sets deadlines', feature: true do
   end
 
   scenario 'Course page shows soft deadlines to users' do
-    log_in_as(@admin.login, '1234')
+    log_in_as(@teacher.login, '1234')
     visit_course
     click_link 'Manage deadlines'
     fill_in 'empty_group_soft_static', with: '5.5.2000'
