@@ -4,7 +4,8 @@
     <p>
       <strong>This organization needs to be accepted by an administrator.</strong>
       <% if can? :view, :organization_requests %>
-          <%= link_to 'Show penging requests', list_requests_organizations_path %>
+          <%= link_to 'Accept', accept_organization_path(@organization), method: :post, class: 'btn btn-success' %>
+          <%= link_to 'Reject', reject_reason_input_organization_path(@organization), class: 'btn btn-danger' %>
       <% end %>
     </p>
 <% end %>
