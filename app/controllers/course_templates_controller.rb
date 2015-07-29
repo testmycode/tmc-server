@@ -5,8 +5,8 @@ class CourseTemplatesController < ApplicationController
     authorize! :read, CourseTemplate
     ordering = 'LOWER(name)'
     add_breadcrumb 'Course templates', course_templates_path
-    @course_templates = CourseTemplate.not_hidden.order(ordering)
-    @hidden_course_templates = CourseTemplate.hidden.order(ordering)
+    @course_templates = CourseTemplate.not_hidden.not_dummy.order(ordering)
+    @hidden_course_templates = CourseTemplate.hidden.not_dummy.order(ordering)
     if session[:template_refresh_report]
       @template_refresh_report = session[:template_refresh_report]
       session.delete(:template_refresh_report)
@@ -57,7 +57,7 @@ class CourseTemplatesController < ApplicationController
     authorize! :teach, @organization
     add_organization_breadcrumb
     add_breadcrumb 'Course templates'
-    @course_templates = CourseTemplate.available
+    @course_templates = CourseTemplate.available.order('LOWER(title)')
   end
 
   def toggle_hidden

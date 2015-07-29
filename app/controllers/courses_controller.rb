@@ -128,6 +128,7 @@ class CoursesController < ApplicationController
     @course.organization = @organization
     @course_template = @course.course_template
     authorize! :teach, @organization
+    authorize! :clone, @course_template
 
     respond_to do |format|
       if @course.save
