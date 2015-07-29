@@ -2,7 +2,7 @@
   [<%= link_to 'plain text', organization_emails_path(format: :txt) %> |
   <%= link_to 'csv', organization_emails_path(format: :csv) %>]
 </div>
-<h1>Students in <%= @course.name %></h1>
+<h1>Students in <%= @course.title %></h1>
 
 <table class="table table-striped">
   <tr>
@@ -16,7 +16,7 @@
   <% @students.each do |student| %>
     <tr>
       <td>
-        <%= student.username %>
+        <%= link_to student.username, participant_path(student) %>
       </td>
       <td>
         <%= mail_to(student.email) %>
