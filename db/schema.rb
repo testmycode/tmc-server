@@ -152,6 +152,7 @@ ActiveRecord::Schema.define(version: 20150727080841) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "hidden",             default: false
+    t.integer  "requester_id"
   end
 
   create_table "password_reset_keys", force: true do |t|

@@ -5,7 +5,8 @@ class CourseTemplatesController < ApplicationController
     authorize! :read, CourseTemplate
     ordering = 'LOWER(name)'
     add_breadcrumb 'Course templates', course_templates_path
-    @course_templates = CourseTemplate.all.order(ordering)
+    @course_templates = CourseTemplate.not_hidden.order(ordering)
+    @hidden_course_templates = CourseTemplate.hidden.order(ordering)
     if session[:template_refresh_report]
       @template_refresh_report = session[:template_refresh_report]
       session.delete(:template_refresh_report)

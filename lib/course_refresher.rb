@@ -245,7 +245,7 @@ class CourseRefresher
                                           end)
           @review_points[e.name] = parse_review_points(metadata['review_points'])
 
-          unless e.course.initially_refreshed?
+          if e.course.refreshed?
             preserve_exercise_deadlines(e, metadata)
             preserve_exercise_unlocks(e, metadata)
           end
