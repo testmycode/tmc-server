@@ -16,7 +16,6 @@
     <th>Information</th>
     <% if current_user.administrator? %>
       <th></th>
-      <th></th>
     <% end %>
   </tr>
   </thead>
@@ -29,7 +28,6 @@
 
       <% if current_user.administrator? %>
         <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
-        <td><%= link_to 'Destroy', organization, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       <% end %>
     </tr>
   <% end %>
