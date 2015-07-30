@@ -72,6 +72,8 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.datetime "updated_at"
   end
 
+  add_index "course_templates", ["name"], name: "index_course_templates_on_name", unique: true, using: :btree
+
   create_table "courses", force: true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -159,6 +161,9 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.datetime "updated_at"
     t.boolean  "hidden",             default: false
   end
+
+  add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
+  add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
 
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false

@@ -56,7 +56,7 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  resources :course_templates
+  resources :course_templates, except: :show
 
   resources :sessions, only: [:new, :create, :destroy]
 

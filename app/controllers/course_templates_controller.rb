@@ -1,14 +1,10 @@
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, only: [:show, :edit, :update, :destroy]
+  before_action :set_course_template, only: [:edit, :update, :destroy]
 
   # GET /course_templates
   def index
     authorize! :read, CourseTemplate
     @course_templates = CourseTemplate.all
-  end
-
-  # GET /course_templates/1
-  def show
   end
 
   # GET /course_templates/new
