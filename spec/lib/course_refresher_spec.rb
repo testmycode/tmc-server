@@ -612,8 +612,8 @@ describe CourseRefresher do
 
       repo_path = "#{@test_tmp_dir}/another_fake_remote_repo"
       course.source_url = "file://#{repo_path}"
-      course.save!
       create_bare_repo(repo_path)
+      course.save!
       @local_clone = clone_course_repo(course)
 
       add_exercise('NewEx')
