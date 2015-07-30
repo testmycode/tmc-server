@@ -10,6 +10,7 @@ feature 'User can create new organization', feature: true do
   end
 
   scenario 'User succeeds create organization with valid parameters' do
+    pending 'create organization link hidden from users temporarily'
     log_in_as(@user.login, 'foobar2')
     click_link 'Request a new organization'
     fill_in 'organization[name]', with: 'Code School'
@@ -20,6 +21,7 @@ feature 'User can create new organization', feature: true do
   end
 
   scenario 'User cannot create organization with invalid parameters' do
+    pending 'create organization link hidden from users temporarily'
     log_in_as(@user.login, 'foobar2')
     click_link 'Request a new organization'
     fill_in 'organization[name]', with: 'Code School'
