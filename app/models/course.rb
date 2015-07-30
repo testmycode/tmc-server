@@ -58,6 +58,16 @@ class Course < ActiveRecord::Base
   scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
 
+  def self.new_from_template(course_template)
+    Course.new(name: course_template.name,
+               title: course_template.title,
+               description: course_template.description,
+               material_url: course_template.material_url,
+               course_template_id: course_template.id,
+               cache_version: course_template.cache_version,
+               course_template: course_template)
+  end
+
   def git_branch
     course_template_obj.git_branch
   end
