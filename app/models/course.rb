@@ -66,7 +66,6 @@ class Course < ActiveRecord::Base
                title: course_template.title,
                description: course_template.description,
                material_url: course_template.material_url,
-               course_template_id: course_template.id,
                cache_version: course_template.cache_version,
                course_template: course_template)
   end
