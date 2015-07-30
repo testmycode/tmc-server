@@ -85,25 +85,7 @@ class CoursesController < ApplicationController
   end
 
   def create
-    create_params = course_params_for_create
-    input_name = create_params[:name]
-    create_params[:name] = @organization.slug + '-' + input_name
-
-    @course = Course.new(create_params)
-    @course.organization = @organization
-    authorize! :teach, @organization
-
-    return respond_access_denied('Custom courses not enabled') unless custom_courses_enabled?
-
-    respond_to do |format|
-      if @course.save
-        refresh_course(@course, no_directory_changes: false)
-        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
-      else
-        @course.name = input_name
-        format.html { render action: 'new', notice: 'Course could not be created.' }
-      end
-    end
+    create_impl(custom: true, params: course_params_for_create)
   end
 
   def prepare_from_template
@@ -113,35 +95,11 @@ class CoursesController < ApplicationController
     add_organization_breadcrumb
     add_breadcrumb 'Course templates', organization_course_templates_path
     add_breadcrumb 'Create new course'
-    @course = Course.new(name: @course_template.name,
-                         title: @course_template.title,
-                         description: @course_template.description,
-                         material_url: @course_template.material_url,
-                         course_template_id: @course_template.id,
-                         cache_version: @course_template.cache_version)
-    @course.course_template = @course_template
+    @course = Course.new_from_template(@course_template)
   end
 
   def create_from_template
-    create_params = course_params_for_create_from_template
-    input_name = create_params[:name]
-    create_params[:name] = @organization.slug + '-' + input_name
-
-    @course = Course.new(create_params)
-    @course.organization = @organization
-    @course_template = @course.course_template
-    authorize! :teach, @organization
-    authorize! :clone, @course_template
-
-    respond_to do |format|
-      if @course.save
-        refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?)
-        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
-      else
-        @course.name = input_name
-        format.html { render action: 'prepare_from_template', notice: 'Course could not be created' }
-      end
-    end
+    create_impl(custom: false, params: course_params_for_create_from_template)
   end
 
   def edit
@@ -303,6 +261,34 @@ class CoursesController < ApplicationController
       session[:refresh_report] = course.refresh(options)
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
+    end
+  end
+
+  def custom_courses_enabled?
+    SiteSetting.value('enable_custom_repositories')
+  end
+
+  def create_impl(options = {})
+    create_params = options[:params]
+    input_name = create_params[:name]
+    create_params[:name] = @organization.slug + '-' + input_name
+
+    @course = Course.new(create_params)
+    @course.organization = @organization
+    @course_template = @course.course_template
+
+    authorize! :teach, @organization
+    authorize! :clone, @course_template unless options[:custom]
+    return respond_access_denied('Custom courses not enabled') if options[:custom] && !custom_courses_enabled?
+
+    respond_to do |format|
+      if @course.save
+        refresh_course(@course, no_directory_changes: options[:custom] ? false : @course.course_template.cache_exists?)
+        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
+      else
+        @course.name = input_name
+        format.html { render action: options[:custom] ? 'new' : 'prepare_from_template', notice: 'Course could not be created' }
+      end
     end
   end
 end

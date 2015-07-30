@@ -1,27 +1,23 @@
-<%= form_for(@course, url: organization_courses_path) do |f| %>
-  <%= render 'shared/error_messages', :target => @course %>
+<%= form_for(@course, url: form_path) do |f| %>
+  <%= render 'shared/error_messages', target: @course %>
 
-  <%= bs_labeled_field("Course name (should not contain whitespace)*", f.text_field(:name)) %>
-  <%= bs_labeled_field("Course title*", f.text_field(:title)) %>
-  <%= bs_labeled_field("Course description", f.text_area(:description)) %>
-  <%= bs_labeled_field("Material URL", f.text_field(:material_url)) %>
+  <%= bs_labeled_field('Course name (should not contain whitespace)*', f.text_field(:name)) %>
+  <%= bs_labeled_field('Course title*', f.text_field(:title)) %>
+  <%= bs_labeled_field('Course description', f.text_area(:description)) %>
+  <%= bs_labeled_field('Material URL', f.text_field(:material_url)) %>
 
-  <% if @course.custom? %>
-    <%= bs_labeled_field("Source Type", f.text_field(:source_backend, :value => 'git', :disabled => 'disabled')) %>
-    <%= bs_labeled_field("Source URL*", f.text_field(:source_url)) %>
-    <%= bs_labeled_field("Git branch name*", f.text_field(:git_branch, :value => 'master')) %>
+  <% if custom %>
+    <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled')) %>
+    <%= bs_labeled_field('Source URL*', f.text_field(:source_url)) %>
+    <%= bs_labeled_field('Git branch name*', f.text_field(:git_branch, value: 'master')) %>
   <% else %>
-    <%= f.hidden_field(:source_backend, value: 'git') %>
-    <%= f.hidden_field(:source_url, value: @course.source_url) %>
-    <%= f.hidden_field(:git_branch, value: 'master') %>
+    <%= f.hidden_field(:course_template_id, value: @course_template.id) %>
   <% end %>
-
-  <%= f.hidden_field(:course_template_id, value: @course.course_template_id) %>
 
   <p>Fields with (*) are required</p>
   <%= f.hidden_field(:course_template_id, value: @course.course_template_id) %>
 
   <div class="actions">
-    <%= f.submit 'Add Course', class: "btn btn-primary"%>
+    <%= f.submit 'Add Course', class: 'btn btn-primary'%>
   </div>
 <% end %>
