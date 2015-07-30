@@ -11,7 +11,6 @@ class Course < ActiveRecord::Base
   validates :name,
             presence: true,
             uniqueness: true,
-            length: { within: 1..40 },
             format: {
               without: / /,
               message: 'should not contain white spaces'
@@ -20,10 +19,10 @@ class Course < ActiveRecord::Base
             presence: true,
             length: { within: 1..40 }
   validates :description, length: { maximum: 512 }
+  validate :check_name_length
 
-  # if made from template, make sure all values are fetched from there
+  # If made from template, make sure cache_version is not out of sync.
   before_save :set_cache_version
-
   before_validation :save_template
 
   has_many :exercises, dependent: :delete_all
@@ -60,33 +59,27 @@ class Course < ActiveRecord::Base
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
 
   def git_branch
-    initialize_dummy_template
-    course_template.git_branch
+    course_template_obj.git_branch
   end
 
   def source_url
-    initialize_dummy_template
-    course_template.source_url
+    course_template_obj.source_url
   end
 
   def source_backend
-    initialize_dummy_template
-    course_template.source_backend
+    course_template_obj.source_backend
   end
 
   def git_branch=(branch)
-    initialize_dummy_template
-    course_template.git_branch = branch
+    course_template_obj.git_branch = branch
   end
 
   def source_url=(url)
-    initialize_dummy_template
-    course_template.source_url = url
+    course_template_obj.source_url = url
   end
 
   def source_backend=(backend)
-    initialize_dummy_template
-    course_template.source_backend = backend
+    course_template_obj.source_backend = backend
   end
 
   def visible_to?(user)
@@ -151,11 +144,11 @@ class Course < ActiveRecord::Base
   end
 
   def increment_cache_version
-    course_template.increment_cache_version
+    course_template_obj.increment_cache_version
   end
 
   def cache_path
-    return course_template.cache_path
+    course_template_obj.cache_path
   end
 
   # Holds a clone of the course repository
@@ -350,7 +343,7 @@ class Course < ActiveRecord::Base
   end
 
   def custom?
-    course_template.dummy?
+    course_template_obj.dummy?
   end
 
   def contains_unlock_deadlines?
@@ -360,20 +353,41 @@ class Course < ActiveRecord::Base
   private
 
   def set_cache_version
-    self.cache_version = course_template.cache_version
+    self.cache_version = course_template_obj.cache_version
   end
 
   def save_template
-    return if course_template.nil?
-    course_template.save!
-    self.course_template = course_template
+    course_template_obj.save!
   rescue
-    course_template.errors.full_messages.each do |msg|
+    course_template_obj.errors.full_messages.each do |msg|
       errors.add(:base, msg)
     end
   end
 
-  def initialize_dummy_template
+  def course_template_obj
     self.course_template ||= CourseTemplate.new_dummy(self)
+  end
+
+  def check_name_length
+    # If name starts with organization slug (org-course1), then check that
+    # the actual name (course1) is within range (for backward compatibility).
+    if name.start_with?("#{organization.slug}-")
+      test_range = name_range_with_slug
+    else
+      test_range = name_range
+    end
+
+    unless test_range.include?(name.length)
+      errors.add(:name, "must be between #{name_range} characters")
+    end
+  end
+
+  def name_range
+    1..40
+  end
+
+  def name_range_with_slug
+    add_length = organization.slug.length + 1
+    (name_range.first + add_length)..(name_range.last + add_length)
   end
 end
