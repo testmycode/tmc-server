@@ -228,6 +228,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.copy_fixture_exercise('SimpleExerciseWithValidationErrors', 'MyValidationExercise')
     @repo.add_commit_push
     @course.refresh
+    @course.exercises.find_by(name: 'MyValidationExercise').enabled!
     visit current_path
 
     ex = FixtureExercise.new('SimpleExerciseWithValidationErrors', 'MyValidationExercise')

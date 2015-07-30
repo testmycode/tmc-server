@@ -20,6 +20,8 @@ FactoryGirl.define do
     sequence(:description) { |n| "course description#{n}" }
     sequence(:material_url) { |n| "http://www.material#{n}.com" }
     source_url { make_repo_for_course_template }
+    source_backend 'git'
+    git_branch 'master'
   end
 
   factory :user do
@@ -39,7 +41,9 @@ FactoryGirl.define do
   factory :course, class: Course do
     sequence(:name) { |n| "course#{n}" }
     sequence(:title) { |n| "Course #{n}"}
-    source_url 'git@example.com'
+    source_url { make_repo_for_course_template }
+    source_backend 'git'
+    git_branch 'master'
     organization
   end
 

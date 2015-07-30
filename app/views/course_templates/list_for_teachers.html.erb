@@ -2,10 +2,9 @@
 
 <h3>Create course from templates</h3>
 
-<table>
+<table class='table table-striped'>
   <thead>
   <tr>
-    <th>Name</th>
     <th>Title</th>
     <th>Description</th>
     <th>Material url</th>
@@ -16,17 +15,17 @@
   <tbody>
   <% @course_templates.each do |course_template| %>
       <tr>
-        <td><%= course_template.name %></td>
         <td><%= course_template.title %></td>
         <td><%= course_template.description %></td>
-        <td><%= course_template.material_url %></td>
-        <td><%= link_to 'Create Course', organization_prepare_course_path(@organization, course_template), class: "btn btn-mini btn-primary" %></td>
+        <td><%= link_to course_template.material_url, course_template.material_url unless course_template.material_url.nil? %></td>
+        <td><%= link_to 'Create Course', prepare_course_organization_courses_path(@organization, course_template), class: "btn btn-mini btn-primary" %></td>
       </tr>
   <% end %>
   </tbody>
 </table>
 
-<br/>
-
-<h3>Create custom course</h3>
-<%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+<% if SiteSetting.value('enable_custom_repositories') %>
+  <br/>
+  <h3>Create custom course</h3>
+  <%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+<% end %>

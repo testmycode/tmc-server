@@ -18,6 +18,7 @@ module IntegrationTestActions
   end
 
   def create_new_course(options = {})
+    check_custom_enabled
     visit "/org/#{options[:organization_slug]}/courses"
     #save_and_open_page
     click_link 'Create New Course'
@@ -32,7 +33,21 @@ module IntegrationTestActions
     expect(page).to have_content(options[:name])
   end
 
+  def create_course_from_template(options = {})
+    visit "/org/#{options[:organization_slug]}"
+    click_link 'Create New Course'
+    click_link 'Create Course'
+    fill_in 'course_name', with: options[:name]
+    fill_in 'course_title', with: options[:name]
+    click_button 'Add Course'
+
+    expect(page).to have_content('Course was successfully created')
+    expect(page).to have_content(options[:name])
+    expect(page).to have_content('help page')
+  end
+
   def manually_refresh_course(coursename, organization_slug)
+    check_custom_enabled
     visit "/org/#{organization_slug}/courses"
     click_link coursename
     click_on 'Refresh'
@@ -112,5 +127,9 @@ module IntegrationTestActions
     # todo: put these in the background and ensure they finish before in an after :suite block
     system!(cmd)
     system!(cmd2)
+  end
+
+  def check_custom_enabled
+    pending 'Enable custom repositories from site.defaults.yml' unless SiteSetting.value('enable_custom_repositories')
   end
 end

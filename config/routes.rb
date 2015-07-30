@@ -13,7 +13,6 @@ TmcServer::Application.routes.draw do
 
     resources :teachers, only: [:index, :create, :destroy]
     get 'course_templates', to: 'course_templates#list_for_teachers'
-    get 'course_templates/:id', to: 'course_templates#prepare_course', as: 'prepare_course'
 
     resources :courses do
       member do
@@ -46,6 +45,11 @@ TmcServer::Application.routes.draw do
         end
       end
 
+      collection do
+        get 'clone_template/:course_template_id' => 'courses#prepare_from_template', as: 'prepare_course'
+        post 'clone_template' => 'courses#create_from_template', as: 'clone_course'
+      end
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
       resources :submissions, only: [:index]
@@ -62,6 +66,7 @@ TmcServer::Application.routes.draw do
   resources :course_templates, except: :show do
     member do
       post 'toggle_hidden', to: 'course_templates#toggle_hidden'
+      post 'refresh'
     end
   end
 

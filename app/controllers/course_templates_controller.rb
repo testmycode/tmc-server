@@ -1,11 +1,16 @@
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, only: [:edit, :update, :destroy, :prepare_course, :toggle_hidden]
+  before_action :set_course_template, except: [:index, :new, :create, :list_for_teachers]
 
   def index
     authorize! :read, CourseTemplate
     ordering = 'LOWER(name)'
     add_breadcrumb 'Course templates', course_templates_path
-    @course_templates = CourseTemplate.all.order(ordering)
+    @course_templates = CourseTemplate.not_hidden.not_dummy.order(ordering)
+    @hidden_course_templates = CourseTemplate.hidden.not_dummy.order(ordering)
+    if session[:template_refresh_report]
+      @template_refresh_report = session[:template_refresh_report]
+      session.delete(:template_refresh_report)
+    end
   end
 
   def new
@@ -52,28 +57,23 @@ class CourseTemplatesController < ApplicationController
     authorize! :teach, @organization
     add_organization_breadcrumb
     add_breadcrumb 'Course templates'
-    @course_templates = CourseTemplate.available
-  end
-
-  def prepare_course
-    @organization = Organization.find_by(slug: params[:organization_id])
-    authorize! :teach, @organization
-    authorize! :clone, @course_template
-    add_organization_breadcrumb
-    add_breadcrumb 'Course templates', organization_course_templates_path
-    add_breadcrumb 'Create new course'
-    @course = Course.new(name: @course_template.name,
-                         title: @course_template.title,
-                         description: @course_template.description,
-                         material_url: @course_template.material_url,
-                         source_url: @course_template.source_url,
-                         course_template_id: @course_template.id)
+    @course_templates = CourseTemplate.available.order('LOWER(title)')
   end
 
   def toggle_hidden
     @course_template.hidden = !@course_template.hidden
     @course_template.save
     redirect_to course_templates_path, notice: 'Course templates hidden status changed'
+  end
+
+  def refresh
+    notice = 'Course template successfully refreshed'
+    begin
+      session[:template_refresh_report] = @course_template.refresh
+    rescue CourseRefresher::Failure => e
+      notice = "Refresh failed, something went wrong:<br><br>#{e}"
+    end
+    redirect_to course_templates_path, notice: notice
   end
 
   private
@@ -84,6 +84,6 @@ class CourseTemplatesController < ApplicationController
   end
 
   def course_template_params
-    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at)
+    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at, :git_branch)
   end
 end

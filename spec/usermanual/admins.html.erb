@@ -86,6 +86,7 @@ require 'cgi' # for escapeHTML
   highlight '#course_template_name'
   highlight '#course_template_title'
   highlight '#course_template_source_url'
+  highlight '#course_template_git_branch'
 %>
 <%= screenshot %>
 
@@ -105,6 +106,10 @@ require 'cgi' # for escapeHTML
         You can find information on how to create a course repository by yourself from this <a href="customcourse.html#starting_from_a_template">guide</a>.
       </li>
       <li>
+        <b>Git branch</b> is the name of the branch which combined with source url defines the actual result of the repository cloning.
+        Default value is master.
+      </li>
+      <li>
         After the <b>Expires at</b> date no courses can be cloned from the expired template. Expiration date will not affect courses
         that were cloned before the expiration date.
       </li>
@@ -112,7 +117,7 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    All of these fields except for <b>Source url</b> and <b>Expires at</b> may be changed by the teacher during the course copying process
+    All of these fields except for <b>Source url</b>, <b>Git branch</b> and <b>Expires at</b> may be changed by the teacher during the course copying process
     to suit their needs.
   </p>
 
@@ -122,10 +127,17 @@ require 'cgi' # for escapeHTML
    click_on 'Create Course template'
    visit '/course_templates'
    expect(page).to have_content('newtemplate')
+   highlight 'a:contains("Refresh"):last'
    highlight 'a:contains("hide"):last'
    highlight 'a:contains("Edit"):last'
 %>
 <%= screenshot %>
+
+  <p>
+    Whenever any changes to the remote repository are made (new exercises added, exercises removed, etc),
+    the course template that uses that repository needs to be refreshed. After clicking 'Refresh', all courses
+    created from the template will be up-to-date. This operation takes some time.
+  </p>
 
   <p>
     Course template default fields may be edited at any time by administrator via link 'Edit'. Expiration date
