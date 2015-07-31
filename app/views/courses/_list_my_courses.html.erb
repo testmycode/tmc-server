@@ -1,0 +1,25 @@
+<h2><%= title %></h2>
+<table id="my-courses-table" class="course-list table table-striped table-bordered table-hover">
+  <thead>
+  <tr>
+    <th>
+      Course
+    </th>
+    <th>
+      Completed
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <% courses.each do |course| %>
+    <tr class="course <% if course.hidden? || course.disabled? %>hidden-course<% end %>">
+      <td>
+        <%= link_to course.title, organization_course_path(@organization, course) %>
+      </td>
+      <td>
+        <%= sprintf('%.0f', percent_completed[course.id]) %>%
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

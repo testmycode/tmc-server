@@ -19,6 +19,13 @@ class AvailablePoint < ActiveRecord::Base
       .where(exercises: { course_id: course.id })
   end
 
+  # Selects all points for list of courses (with course_id for convenience)
+  def self.courses_points(courses)
+    select('available_points.*, exercises.course_id')
+      .joins(:exercise)
+      .where(exercises: { course_id: courses.map(&:id) })
+  end
+
   def self.course_sheet_points(course, sheet)
     joins(:exercise)
       .where(exercises: { course_id: course.id, gdocs_sheet: sheet })
