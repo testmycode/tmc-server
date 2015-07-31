@@ -40,7 +40,7 @@ class PointsController < ApplicationController
     add_breadcrumb @sheetname, organization_course_point_path(@organization, @course, @sheetname)
 
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).order!
-    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
+    @users_to_points, @users_to_late_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
 
     @users = User.course_sheet_students(@course, @sheetname)
     if params[:sort_by] == 'points'
@@ -55,7 +55,8 @@ class PointsController < ApplicationController
       format.json do
         output = {
           api_version: ApiVersion::API_VERSION,
-          users_to_points: @users_to_points
+          users_to_points: @users_to_points,
+          users_to_late_points: @users_to_late_points
         }
         render json: output
       end
@@ -64,17 +65,27 @@ class PointsController < ApplicationController
 
   def summary_hash(course, visible_exercises, sheets)
     per_user_and_sheet = {}
+    late_per_user_and_sheet = {}
     for sheet in sheets
       AwardedPoint.count_per_user_in_course_with_sheet(course, sheet).each_pair do |username, count|
         per_user_and_sheet[username] ||= {}
         per_user_and_sheet[username][sheet] = count
       end
+      AwardedPoint.count_late_per_user_in_course_with_sheet(course, sheet).each_pair do |username, count|
+        late_per_user_and_sheet[username] ||= {}
+        late_per_user_and_sheet[username][sheet] = count
+      end
     end
 
     user_totals = {}
+    user_late_totals = {}
     for username, per_sheet in per_user_and_sheet
       user_totals[username] ||= 0
       user_totals[username] += per_sheet.values.reduce(0, &:+)
+    end
+    for username, per_sheet in late_per_user_and_sheet
+      user_late_totals[username] ||= 0
+      user_late_totals[username] += per_sheet.values.reduce(0, &:+)
     end
 
     include_admins = current_user.administrator?
@@ -92,7 +103,9 @@ class PointsController < ApplicationController
       total_awarded: AwardedPoint.course_points(course, include_admins).length,
       total_available: AvailablePoint.course_points_of_exercises(course, visible_exercises).length,
       awarded_for_user_and_sheet: per_user_and_sheet,
+      awarded_late_for_user_and_sheet: late_per_user_and_sheet,
       total_for_user: user_totals,
+      total_late_for_user: user_late_totals,
       users: users
     }
   end

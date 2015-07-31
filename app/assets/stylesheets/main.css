@@ -187,6 +187,14 @@ table.points > * > tr > td {
   text-align: center;
 }
 
+.late-points {
+  color: #ff524d !important;
+}
+
+#late-points-toggle-button {
+  margin-top: 25px;
+}
+
 /* Code reviews */
 
 .code-review {
