@@ -19,6 +19,7 @@ FactoryGirl.define do
   factory :course, class: Course do
     sequence(:name) { |n| "course#{n}" }
     source_url 'git@example.com'
+    organization
   end
 
   factory :exercise do
@@ -117,5 +118,19 @@ FactoryGirl.define do
     sequence(:name) { |n| "certificate#{n}" }
 
     after(:build) { |cert| cert.class.skip_callback(:save, :generate) }
+  end
+
+  factory :organization do
+    sequence(:name) { |n| "organization#{n}" }
+    sequence(:information) { |n| "information#{n}" }
+    sequence(:slug) { |n| "organization#{n}" }
+    acceptance_pending true
+  end
+
+  factory :accepted_organization, class: Organization do
+    sequence(:name) { |n| "a_organization#{n}" }
+    sequence(:information) { |n| "a_information#{n}" }
+    sequence(:slug) { |n| "a_organization#{n}" }
+    acceptance_pending false
   end
 end

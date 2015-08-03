@@ -1,0 +1,28 @@
+<h1>New organization requests</h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Information</th>
+    <th>Requested by</th>
+    <th>Requested at</th>
+    <th colspan="3"></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @requested_organizations.each do |organization| %>
+    <% requested_by = organization.teachers.first %>
+    <tr>
+      <td><%= organization.name %></td>
+      <td><%= organization.information %></td>
+      <td><%= link_to requested_by.username, participant_path(requested_by) %></td>
+      <td><%= organization.created_at %></td>
+      <td><%= link_to 'Show information', organization %></td>
+      <td><%= link_to 'Accept', accept_organization_path(organization), method: :post, class: 'btn btn-success' %></td>
+      <td><%= link_to 'Reject', reject_reason_input_organization_path(organization), class: 'btn btn-danger' %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

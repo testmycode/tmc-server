@@ -1,0 +1,43 @@
+<h1>Welcome to TMC</h1>
+
+<h2>Organizations</h2>
+
+<% if current_user.administrator? && !Organization.pending_organizations.empty? %>
+  <div class="alert alert-warning" role="alert">
+    <%= pluralize(Organization.pending_organizations.size, 'new organization request') %>.
+    <%= link_to 'Show', list_requests_organizations_path %>
+  </div>
+<% end %>
+
+<table class="table table-striped" id="organization-table">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Information</th>
+    <% if current_user.administrator? %>
+      <th></th>
+    <% end %>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @organizations.each do |organization| %>
+    <tr>
+      <td><%= link_to organization.name, organization_path(organization) %></td>
+      <td><%= organization.information %></td>
+
+      <% if current_user.administrator? %>
+        <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= use_datatables('#organization-table', bPaginate: false) %>
+
+<br>
+
+<% if current_user.administrator? %>
+    <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
+<% end %>

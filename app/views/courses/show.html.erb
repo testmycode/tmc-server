@@ -8,12 +8,15 @@
       <% end %>
 
       <ul>
-        <li><%= link_to 'View points', course_points_path(@course) %></li>
+        <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
         <% if can? :view_code_reviews, @course %>
-          <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
+          <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
+        <% end %>
+        <% if can? :list_user_emails, @course %>
+          <li><%= link_to 'View student emails', organization_emails_path %></li>
         <% end %>
       </ul>
-      <% if can? :read, :course_information %>
+      <% if can? :teach, @course %>
         <ul>
           <li>Source type: <%= @course.source_backend.upcase %> </li>
           <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
@@ -33,6 +36,10 @@
             <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
           <% end %>
 
+          <% if @course.disabled? %>
+            <li>The course is currently <strong>disabled</strong>.</li>
+          <% end %>
+
           <% if @course.hidden? %>
             <li>The course is currently hidden. Unhide by editing
             <code>course_options.yml</code></li>
@@ -48,8 +55,8 @@
 
           <li>
             Number of submissions (from <span title="administrators and specially marked test user accounts are excluded">actual users</span>): <%= @total_submissions %>
-            (stats <%= link_to 'over time', course_stat_path(@course, 'submissions') %>,
-             <%= link_to 'by hour', course_stat_path(@course, 'submission_times') %>)
+            (stats <%= link_to 'over time', organization_course_stat_path(@organization, @course, 'submissions') %>,
+             <%= link_to 'by hour', organization_course_stat_path(@organization, @course, 'submission_times') %>)
           </li>
 
           <% if @course.spreadsheet_key %>
@@ -59,7 +66,7 @@
             </li>
           <% end %>
           <li>
-            <%= link_to 'Send message to every participant', new_course_course_notifications_path(@course) %>
+            <%= link_to 'Send message to every participant', new_organization_course_course_notifications_path(@organization, @course) %>
           </li>
         </ul>
 
@@ -71,32 +78,50 @@
           <ul>
             <% if reviews_required > 0 %>
               <li class="review-required">
-                <%= link_to pluralize(reviews_required, "code review") + " required", course_reviews_path(@course) %>
+                <%= link_to pluralize(reviews_required, "code review") + " required", organization_course_reviews_path(@organization, @course) %>
               </li>
             <% end %>
             <% if reviews_requested > 0 %>
               <li class="review-requested">
-                <%= link_to pluralize(reviews_requested, "code review") + " requested", course_reviews_path(@course) %>
+                <%= link_to pluralize(reviews_requested, "code review") + " requested", organization_course_reviews_path(@organization, @course) %>
               </li>
             <% end %>
           </ul>
         <% end %>
 
         <ul>
-          <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
-          <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
+          <li><%= link_to 'View feedback', organization_course_feedback_answers_path(@organization, @course)%></li>
+          <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
       <% end %>
+      <% if can? :teach, @organization %>
+        <%= link_to 'Manage assistants', organization_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
+      <% end %>
       <% if can? :refresh, @course %>
-        <%= link_to 'Refresh', refresh_course_path(@course), class: "btn btn-warning btn-mini" %>
+        <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
+      <% end %>
+
+      <% if can? :teach, @organization %>
+        <% if @course.disabled? %>
+          <%= link_to 'Enable Course', enable_organization_course_path(@organization, @course), method: :post, class: "btn btn-info btn-mini" %>
+        <% else %>
+          <%=
+              link_to 'Disable Course', disable_organization_course_path(@organization, @course), method: :post,
+                      data: { confirm: "Are you sure you want to disable the course?" }, class: "btn btn-danger btn-mini"
+          %>
+        <% end %>
       <% end %>
       <% unlockables = @course.unlockable_exercises_for(current_user) %>
       <% unless unlockables.empty? %>
         <p>
-          You can <%= link_to "unlock #{pluralize(unlockables.count, 'new exercise')}", course_unlock_path(@course) %>.
+          You can <%= link_to "unlock #{pluralize(unlockables.count, 'new exercise')}", organization_course_unlock_path(@organization, @course) %>.
         </p>
       <% end %>
     </div>
+
+    <% if signed_in? %>
+        <div class="alternative-format-links">[<%= link_to 'json', "#{one_course_json_organization_course_path organization_id: @organization.slug, id: @course.id, api_version: ApiVersion::API_VERSION}" %>]</div>
+    <% end %>
 
     <h2>All exercises</h2>
     <div>
@@ -115,7 +140,7 @@
         <% if @total_submissions > @submissions.count %>
           <p>
             Only showing <%= @submissions.count %> of <%= @total_submissions %>
-            <%= link_to "(show all)", course_submissions_path(@course) %>.
+            <%= link_to "(show all)", organization_course_submissions_path(@organization, @course) %>.
           </p>
         <% end %>
         <div>

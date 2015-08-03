@@ -39,7 +39,7 @@
         <th>
           Student<br />
           <% unless params[:sort_by].blank? %>
-            [<%= link_to 'sort', course_points_path(@course) %>]
+            [<%= link_to 'sort', organization_course_points_path(@organization, @course) %>]
           <% else %>
             [sort]
           <% end %>
@@ -47,9 +47,9 @@
         <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
           <th>
             <%= sheet %><br />
-            [<%= link_to 'open', course_point_path(@course, sheet) %>]
+            [<%= link_to 'open', organization_course_point_path(@organization, @course, sheet) %>]
             <% unless params[:sort_by] == "#{sheet}_points" %>
-              [<%= link_to 'sort', course_points_path(@course, :sort_by => "#{sheet}_points") %>]
+              [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "#{sheet}_points") %>]
             <% else %>
               [sort]
             <% end %>
@@ -59,7 +59,7 @@
           <th>
             Total<br />
             <% unless params[:sort_by] == 'total_points' %>
-              [<%= link_to 'sort', course_points_path(@course, :sort_by => "total_points") %>]
+              [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "total_points") %>]
             <% else %>
               [sort]
             <% end %>
@@ -70,11 +70,11 @@
     <tbody>
       <% @summary[:users].each_with_index do |user, index| %>
         <% username = user.login %>
-        <% row_class = if user.administrator? then "admin" else "student" end %>
+        <% row_class = if user.administrator? || user.teacher?(@organization) then "admin" else "student" end %>
         <tr class="<%= row_class %>">
           <td><%= index + 1 %></td>
           <td>
-            <% if can? :read, user %>
+            <% if current_user.id == user.id || (can? :teach, @course) %>
               <%= link_to username, participant_path(user) %>
             <% else %>
               <%= username %>
@@ -95,4 +95,4 @@
   </table>
 <% end %>
 
-<div class="alternative-format-links">[<%= link_to('csv', course_points_path(@course, :sort_by => params[:sort_by], :format => 'csv')) %>]</div>
+<div class="alternative-format-links">[<%= link_to('csv', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv')) %>]</div>

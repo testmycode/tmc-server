@@ -7,7 +7,10 @@ describe 'The system (used by a student)', type: :request, integration: true do
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path)
+    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryGirl.create(:user)
+    Teachership.create user_id: @teacher.id, organization_id: @organization.id
+    @course = Course.create!(name: 'mycourse', source_backend: 'git', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
@@ -17,7 +20,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @user = FactoryGirl.create(:user, password: 'xooxer')
     @ability = Ability.new(@user)
 
-    visit '/'
+    visit '/org/slug/courses'
     log_in_as(@user.login, 'xooxer')
     click_link 'mycourse'
   end
@@ -81,7 +84,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.add_commit_push
     @course.refresh
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'mycourse'
 
     expect(page).not_to have_content('MyExercise')
@@ -92,7 +95,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.add_commit_push
     @course.refresh
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'mycourse'
 
     expect(page).to have_content('MyExercise')
@@ -149,7 +152,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'mycourse'
     first('.exercise-list').click_link 'MyExercise'
     click_link 'View suggested solution'
@@ -167,7 +170,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     click_button 'Submit'
     wait_for_submission_to_be_processed
 
-    visit '/'
+    visit '/org/slug/courses'
     click_link 'mycourse'
     first('.exercise-list').click_link 'MyExercise'
 
@@ -177,7 +180,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
   it 'should not count submissions made by non legitimate_students in submission counts' do
     @fake_user = FactoryGirl.create(:admin, login: 'uuseri', password: 'xooxer', legitimate_student: false)
     log_out
-    visit '/'
+    visit '/org/slug/courses'
     log_in_as(@fake_user.login, 'xooxer')
 
     FixtureExercise::SimpleExercise.new('MyExercise')
@@ -210,7 +213,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     expect(page).to have_content('Goodbye')
     @other_user = FactoryGirl.create(:user, login: 'uuseri', password: 'xooxer')
 
-    visit '/'
+    visit '/org/slug/courses'
     log_in_as(@other_user.login, 'xooxer')
 
     @ability = Ability.new(@other_user)
@@ -315,7 +318,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
       expect(page).to have_content('All tests successful')
       expect(page).to have_content('Ok')
 
-      visit '/'
+      visit '/org/slug/courses'
 
       log_out
 
@@ -378,7 +381,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
       expect(page).to have_content('All tests successful')
       expect(page).to have_content('Ok')
 
-      visit '/'
+      visit '/org/slug/courses'
 
       log_out
 

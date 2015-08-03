@@ -1,12 +1,13 @@
 # Shows the various statistics under /stats.
 class StatsController < ApplicationController
   skip_authorization_check
+  before_action :set_organization
 
   def index
     get_vars
     if @course
       add_course_breadcrumb
-      add_breadcrumb 'Stats', course_stats_path(@course)
+      add_breadcrumb 'Stats', organization_course_stats_path
       course_stats_index
     else
       add_breadcrumb 'Stats', stats_path
@@ -19,8 +20,8 @@ class StatsController < ApplicationController
     page = params[:id]
     if @course
       add_course_breadcrumb
-      add_breadcrumb 'Stats', course_stats_path(@course)
-      add_breadcrumb page.humanize, course_stat_path(@course, page)
+      add_breadcrumb 'Stats', organization_course_stats_path
+      add_breadcrumb page.humanize, organization_course_stat_path(@organization, @course, page)
       course_stats_show(page)
     else
       add_breadcrumb 'Stats', stats_path
@@ -149,5 +150,11 @@ class StatsController < ApplicationController
     else
       fail "Invalid value for parameter #{name}"
     end
+  end
+
+  private
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

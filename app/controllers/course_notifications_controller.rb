@@ -1,13 +1,19 @@
 # Handles emailing notification to every participant
 class CourseNotificationsController < ApplicationController
-  before_action :auth
+  before_action :set_organization
 
   def new
+    course = Course.find(course_notification_params[:course_id])
+    authorize! :send_mail_to_participants, course
     @notifier ||= CourseNotification.new
+    @course = Course.find_by(id: params[:course_id])
+    add_course_breadcrumb
+    add_breadcrumb 'Course notification'
   end
 
   def create
     course = Course.find(course_notification_params[:course_id])
+    authorize! :send_mail_to_participants, course
 
     participants = User.course_students(course)
     emails = participants.map(&:email).reject(&:blank?)
@@ -16,7 +22,7 @@ class CourseNotificationsController < ApplicationController
 
     if notifier.message.blank?
       flash[:error] = 'Cannot send a blank message.'
-      return redirect_to new_course_course_notifications_path(course)
+      return redirect_to new_organization_course_course_notifications_path(@organization, course)
     end
 
     failed_emails = []
@@ -36,7 +42,7 @@ class CourseNotificationsController < ApplicationController
     end
     msg = 'Mail has been set succesfully'
     msg << " except for the following addresses: #{failed_emails.join(', ')}" unless failed_emails.empty?
-    redirect_to course_path(course), notice: msg
+    redirect_to organization_course_path(@organization, course), notice: msg
   end
 
   private
@@ -45,7 +51,7 @@ class CourseNotificationsController < ApplicationController
     params.permit(:commit, :course_id, course_notification: [:topic, :message])
   end
 
-  def auth
-    authorize! :email, CourseNotification
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
   end
 end

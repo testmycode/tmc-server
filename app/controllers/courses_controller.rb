@@ -4,25 +4,27 @@ require 'course_list'
 require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
+  before_action :set_organization
+  before_action :set_course, except: [:index, :show_json, :new, :create, :help]
+
+  skip_authorization_check only: [:index]
+
   def index
-    ordering = 'hidden, LOWER(name)'
+    ordering = 'hidden, disabled_status, LOWER(name)'
 
     respond_to do |format|
       format.html do
-        @ongoing_courses = Course.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
-        @expired_courses = Course.expired.order(ordering).select { |c| c.visible_to?(current_user) }
-        authorize! :read, @ongoing_courses
-        authorize! :read, @expired_courses
+        redirect_to organization_path(@organization)
       end
       format.json do
-        courses = Course.ongoing.order(ordering)
+        courses = @organization.courses.ongoing.order(ordering)
         courses = courses.select { |c| c.visible_to?(current_user) }
         authorize! :read, courses
         return respond_access_denied('Authentication required') if current_user.guest?
 
         data = {
           api_version: ApiVersion::API_VERSION,
-          courses: CourseList.new(current_user, view_context).course_list_data(courses)
+          courses: CourseList.new(current_user, view_context).course_list_data(@organization, courses)
         }
         render json: data.to_json
       end
@@ -35,7 +37,6 @@ class CoursesController < ApplicationController
       session.delete(:refresh_report)
     end
 
-    @course = Course.find(params[:id])
     authorize! :read, @course
     UncomputedUnlock.resolve(@course, current_user)
 
@@ -48,15 +49,27 @@ class CoursesController < ApplicationController
         return respond_access_denied('Authentication required') if current_user.guest?
         data = {
           api_version: ApiVersion::API_VERSION,
-          course: CourseInfo.new(current_user, view_context).course_data(@course)
+          course: CourseInfo.new(current_user, view_context).course_data(@organization, @course)
         }
         render json: data.to_json
       end
     end
   end
 
+  # Method for teacher to give a single course for students to select.
+  def show_json
+    course = [Course.find(params[:id])]
+    authorize! :read, course
+    return respond_access_denied('Authentication required') if current_user.guest?
+
+    data = {
+        api_version: ApiVersion::API_VERSION,
+        courses: CourseList.new(current_user, view_context).course_list_data(@organization, course)
+    }
+    render json: data.to_json
+  end
+
   def refresh
-    @course = Course.find(params[:id])
     authorize! :refresh, @course
 
     begin
@@ -65,7 +78,7 @@ class CoursesController < ApplicationController
       session[:refresh_report] = e.report
     end
 
-    redirect_to course_path(@course)
+    redirect_to organization_course_path
   end
 
   def new
@@ -74,22 +87,35 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = Course.new(course_params[:course])
-    authorize! :create, @course
+    @course = Course.new(course_params)
+    @course.organization = @organization
+    authorize! :teach, @organization
 
     respond_to do |format|
       if @course.save
-        format.html { redirect_to(@course, notice: 'Course was successfully created.') }
+        format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
       else
         format.html { render action: 'new', notice: 'Course could not be created.' }
       end
     end
   end
 
+  def enable
+    authorize! :teach, @organization # should assistants be able to enable/disable?
+    @course.enabled!
+    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
+  end
+
+  def disable
+    authorize! :teach, @organization
+    @course.disabled!
+    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
+  end
+
   private
 
   def course_params
-    params.permit(course: [:name, :source_url, :git_branch])
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
   end
 
   def assign_show_view_vars
@@ -102,11 +128,19 @@ class CoursesController < ApplicationController
     unless current_user.guest?
       max_submissions = 100
       @submissions = @course.submissions
-      @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
+      @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @total_submissions = @submissions.where(user: User.legitimate_students).count
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end
+  end
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
+  end
+
+  def set_course
+    @course = Course.find(params[:id])
   end
 end

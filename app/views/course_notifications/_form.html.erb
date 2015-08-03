@@ -1,4 +1,4 @@
-<%= form_for @notifier, url: course_course_notifications_path do |f| %>
+<%= form_for @notifier, url: organization_course_course_notifications_path do |f| %>
   <%= f.label :topic %>
   <br />
   <%= f.text_field :topic %>
@@ -7,5 +7,5 @@
   <br />
   <%= f.text_area :message %>
   <br />
-  <%= f.submit 'Send email to every course participant', confirm: "Do you really want to send this message to every participant?" %>
+  <%= f.submit 'Send email to every course participant', class: "btn btn-info", data: { confirm: "Do you really want to send this message to every participant?" } %>
 <% end %>

@@ -3,28 +3,24 @@ require 'spec_helper'
 describe CoursesController, type: :controller do
   before(:each) do
     @user = FactoryGirl.create(:user)
+    @teacher = FactoryGirl.create(:user)
+    @organization = FactoryGirl.create(:accepted_organization)
+    Teachership.create(user: @teacher, organization: @organization)
   end
 
   describe 'GET index' do
     it 'shows visible courses in order by name, split into ongoing and expired' do
-      controller.current_user = FactoryGirl.create(:admin)
-      @courses = [
-        FactoryGirl.create(:course, name: 'SomeTestCourse'),
-        FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week),
-        FactoryGirl.create(:course, name: 'AnotherTestCourse')
-      ]
-
-      get :index
-
-      expect(assigns(:ongoing_courses).map(&:name)).to eq(%w(AnotherTestCourse SomeTestCourse))
-      expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
+      get :index, organization_id: @organization.slug
+      expect(response.code.to_i).to eq(302)
+      expect(response).to redirect_to(organization_path(@organization))
     end
 
     describe 'in JSON format' do
       def get_index_json(options = {})
         options = {
           format: 'json',
-          api_version: ApiVersion::API_VERSION
+          api_version: ApiVersion::API_VERSION,
+          organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = 'Basic ' + Base64.encode64("#{@user.login}:#{@user.password}")
         get :index, options
@@ -32,9 +28,9 @@ describe CoursesController, type: :controller do
       end
 
       it 'renders all non-hidden courses in order by name' do
-        FactoryGirl.create(:course, name: 'Course1')
-        FactoryGirl.create(:course, name: 'Course2', hide_after: Time.now + 1.week)
-        FactoryGirl.create(:course, name: 'Course3')
+        FactoryGirl.create(:course, name: 'Course1', organization: @organization)
+        FactoryGirl.create(:course, name: 'Course2', organization: @organization, hide_after: Time.now + 1.week)
+        FactoryGirl.create(:course, name: 'Course3', organization: @organization)
         FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
         FactoryGirl.create(:course, name: 'HiddenCourse', hidden: true)
 
@@ -62,7 +58,7 @@ describe CoursesController, type: :controller do
         sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
         sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
 
-        get :show, id: @course.id
+        get :show, organization_id: @organization.slug, id: @course.id
 
         expect(assigns['submissions']).to include(sub1)
         expect(assigns['submissions']).to include(sub2)
@@ -78,7 +74,7 @@ describe CoursesController, type: :controller do
         FactoryGirl.create(:submission, course: @course)
         FactoryGirl.create(:submission, course: @course)
 
-        get :show, id: @course.id
+        get :show, organization_id: @organization.slug, id: @course.id
 
         expect(assigns['submissions']).to be_nil
       end
@@ -93,7 +89,7 @@ describe CoursesController, type: :controller do
         my_sub = FactoryGirl.create(:submission, user: @user, course: @course)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
 
-        get :show, id: @course.id
+        get :show, organization_id: @organization.slug, id: @course.id
 
         expect(assigns['submissions']).to include(my_sub)
         expect(assigns['submissions']).not_to include(other_guys_sub)
@@ -112,7 +108,8 @@ describe CoursesController, type: :controller do
         options = {
           format: 'json',
           api_version: ApiVersion::API_VERSION,
-          id: @course.id.to_s
+          id: @course.id.to_s,
+          organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
         get :show, options
@@ -205,21 +202,65 @@ describe CoursesController, type: :controller do
 
     describe 'with valid parameters' do
       it 'creates the course' do
-        post :create, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
         expect(Course.last.source_url).to eq('git@example.com')
       end
 
       it 'redirects to the created course' do
-        post :create, course: { name: 'NewCourse', source_url: 'git@example.com' }
-        expect(response).to redirect_to(Course.last)
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
+        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
       end
     end
 
     describe 'with invalid parameters' do
       it 're-renders the course creation form' do
-        post :create, course: { name: 'invalid name with spaces' }
+        post :create, organization_id: @organization.slug, course: { name: 'invalid name with spaces' }
         expect(response).to render_template('new')
         expect(assigns(:course).name).to eq('invalid name with spaces')
+      end
+    end
+  end
+
+  describe 'POST disable' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+    end
+
+    describe 'As a teacher' do
+      it 'disables the course' do
+        controller.current_user = @teacher
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(Course.find(@course.id).disabled?).to eq(true)
+      end
+    end
+
+    describe 'As a student' do
+      it 'denies access' do
+        controller.current_user = @user
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(response.code.to_i).to eq(401)
+      end
+    end
+  end
+
+  describe 'POST enable' do
+    before :each do
+      @course = FactoryGirl.create(:course)
+    end
+
+    describe 'As a teacher' do
+      it 'enables the course' do
+        controller.current_user = @teacher
+        post :enable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(Course.find(@course.id).disabled?).to eq(false)
+      end
+    end
+
+    describe 'As a student' do
+      it 'denies access' do
+        controller.current_user = @user
+        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        expect(response.code.to_i).to eq(401)
       end
     end
   end

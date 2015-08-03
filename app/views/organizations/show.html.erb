@@ -1,0 +1,73 @@
+<h1><%= @organization.name %></h1>
+
+<p>
+  <%= @organization.information %>
+</p>
+
+<% if current_user.administrator? %>
+  <p>
+    <strong>Organization ID:</strong>
+    <%= @organization.slug %>
+  </p>
+
+  <p>
+    <strong>Requested by:</strong>
+    <% requested_by = @organization.teachers.first %>
+    <%= link_to requested_by.username, participant_path(requested_by) %>
+  </p>
+
+  <p>
+    <strong>Requested at:</strong>
+    <%= @organization.created_at %>
+  </p>
+
+  <p>
+    <strong>Accepted at:</strong>
+    <%= @organization.accepted_at %>
+  </p>
+<% end %>
+
+<% if can? :toggle_visibility, @organization %>
+  <p>
+    <strong><%= "#{@organization.hidden ? 'Status hidden:' : 'Status visible:'}" %></strong>
+    <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
+                method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger'}" %>
+  </p>
+<% end %>
+
+<% if @organization.acceptance_pending? %>
+  <p>
+    <strong>This organization needs to be accepted by an administrator.</strong>
+  </p>
+<% end %>
+
+<% if @organization.rejected? %>
+  <p>
+    <strong>
+      This organization was rejected by an administrator. Reason:
+      <i>
+        <%= @organization.rejected_reason %>
+      </i>
+    </strong>
+  </p>
+<% end %>
+
+<% if current_user.administrator? %>
+    <br/>
+    <%= link_to 'Edit organization', edit_organization_path(@organization) %>
+<% end %>
+
+<% if can? :view, :participants_list %>
+    <br/>
+    <%= link_to 'List of registered users', participants_path %>
+<% end %>
+
+<% if can? :teach, @organization %>
+  <br/>
+  <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization) %>
+  <br/>
+<% end %>
+
+<div>
+  <%= render template: 'courses/index'  %>
+</div>

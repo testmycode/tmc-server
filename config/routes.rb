@@ -1,4 +1,51 @@
 TmcServer::Application.routes.draw do
+  resources :organizations, except: :destory, path: 'org' do
+    member do
+      post 'accept'
+      post 'reject'
+      get 'reject_reason_input'
+      post 'toggle_visibility'
+    end
+
+    collection do
+      get 'list_requests'
+    end
+
+    resources :teachers, only: [:index, :create, :destroy]
+
+    resources :courses do
+      member do
+        get 'refresh'
+        post 'refresh'
+        post 'enable'
+        post 'disable'
+        get 'courses', to: 'courses#show_json', format: 'json', as: 'one_course_json'
+        get 'students', to: 'courses#student_emails'
+        resources :emails, only: [:index]
+      end
+
+      resources :assistants, only: [:index, :create, :destroy]
+
+      resources :points, only: [:index, :show] do
+        member do
+          get 'refresh_gdocs'
+        end
+      end
+
+      resources :stats, only: [:index, :show]
+      resources :exercise_status, only: [:show]
+      resources :exercises, only: [:index]
+      resources :submissions, only: [:index]
+      resources :reviewed_submissions, only: [:index]
+      resources :feedback_questions, only: [:index, :new, :create]
+      resources :feedback_answers, only: [:index]
+      get 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :as => 'feedback_answers_chart'
+      resources :reviews, only: [:index]
+      resource :unlock, only: [:show, :create]
+      resource :course_notifications, only: [:create, :index, :show, :new]
+    end
+  end
+
   resources :sessions, only: [:new, :create, :destroy]
 
   get '/signin', to: 'sessions#new'
@@ -27,31 +74,6 @@ TmcServer::Application.routes.draw do
   resources :password_reset_keys
   get '/reset_password/:code' => 'password_reset_keys#show', :as => 'reset_password'
   delete '/reset_password/:code' => 'password_reset_keys#destroy'
-
-  resources :courses do
-    member do
-      get 'refresh'
-      post 'refresh'
-    end
-
-    resources :points, only: [:index, :show] do
-      member do
-        get 'refresh_gdocs'
-      end
-    end
-
-    resources :stats, only: [:index, :show]
-    resources :exercise_status, only: [:show]
-    resources :exercises, only: [:index]
-    resources :submissions, only: [:index]
-    resources :reviewed_submissions, only: [:index]
-    resources :feedback_questions, only: [:index, :new, :create]
-    resources :feedback_answers, only: [:index]
-    get 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :as => 'feedback_answers_chart'
-    resources :reviews, only: [:index]
-    resource :unlock, only: [:show, :create]
-    resource :course_notifications, only: [:create, :index, :show, :new]
-  end
 
   resources :exercises, only: [:show] do
     resources :submissions, only: [:create]
@@ -88,5 +110,5 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  root to: 'courses#index'
+  root to: 'organizations#index'
 end

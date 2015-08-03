@@ -1,10 +1,10 @@
 
-<% if can? :read, :code_reviews %>
+<% if can? :list_code_reviews, @course %>
   <h1>Code reviews for <%= @course.name %></h1>
   <section>
     <h2>Administration</h2>
 
-    <p><%= link_to 'View all reviewed submissions', course_reviewed_submissions_path(@course) %></p>
+    <p><%= link_to 'View all reviewed submissions', organization_course_reviewed_submissions_path %></p>
 
     <% subs = @course.submissions_to_review.order('created_at DESC') %>
     <h3>Submissions to review</h3>
@@ -21,8 +21,8 @@
 
 <section>
   <h2>My code reviews</h2>
-  <% if current_user.administrator? %>
-    <p class="fine-print">(this is what you would see as a non-administrator)</p>
+  <% if current_user.administrator? || current_user.teacher?(@organization)%>
+    <p class="fine-print">(this is what you would see as a student)</p>
   <% end %>
   <% if @my_reviews.empty? %>
     <p>No code reviews yet.</p>
