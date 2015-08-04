@@ -84,6 +84,13 @@
   <br/>
 <% end %>
 
+<% unless @my_assisted_courses.empty? %>
+  <%=
+    render partial: 'courses/list_my_assisted_courses',
+           locals: { courses: @my_assisted_courses, title: 'Courses I assist' }
+    %>
+<% end %>
+
 <% unless @my_courses.empty? %>
   <%= render partial: 'courses/list_my_courses', locals: { courses: @my_courses, percent_completed: @my_courses_percent_completed, title: 'My Courses' } %>
 <% end %>

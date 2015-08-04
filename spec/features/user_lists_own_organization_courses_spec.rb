@@ -10,10 +10,10 @@ feature 'User lists own organization courses', feature: true do
     @user = FactoryGirl.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create :course, name: 'course_1', title: 'Course 1', organization: @organization
-    FactoryGirl.create :course, name: 'course_2', title: 'Course 2', organization: @organization
-    FactoryGirl.create :course, name: 'course_old', title: 'Old Course', organization: @organization, hide_after: Time.now - 2.minutes
-    FactoryGirl.create :course, name: 'course_disabled', title: 'Disabled Course', organization: @organization, disabled_status: 1
+    FactoryGirl.create :course, name: 'course_1', organization: @organization
+    FactoryGirl.create :course, name: 'course_2', organization: @organization
+    FactoryGirl.create :course, name: 'course_old', organization: @organization, hide_after: Time.now - 2.minutes
+    FactoryGirl.create :course, name: 'course_disabled', organization: @organization, disabled_status: 1
 
     visit '/'
   end
@@ -25,10 +25,10 @@ feature 'User lists own organization courses', feature: true do
     end
 
     scenario 'sees both active and retired courses' do
-      expect(page).to have_content('Course 1')
-      expect(page).to have_content('Course 2')
-      expect(page).to have_content('Old Course')
-      expect(page).to have_content('Disabled Course')
+      expect(page).to have_content('course_1')
+      expect(page).to have_content('course_2')
+      expect(page).to have_content('course_old')
+      expect(page).to have_content('course_disabled')
     end
   end
 
@@ -43,11 +43,12 @@ feature 'User lists own organization courses', feature: true do
     end
 
     scenario 'sees the courses they assist in a separate list (also disabled and expired)' do
+      puts page.html
       within 'table#my-assisted-courses-table' do
-        expect(page).to have_content('Course 1')
-        expect(page).to have_content('Old Course')
-        expect(page).to have_content('Disabled Course')
-        expect(page).to_not have_content('Course 2')
+        expect(page).to have_content('rourse_1')
+        expect(page).to have_content('course_old')
+        expect(page).to have_content('course_disabled')
+        expect(page).to_not have_content('course_2')
       end
     end
   end
@@ -63,18 +64,18 @@ feature 'User lists own organization courses', feature: true do
     end
 
     scenario 'sees only active courses' do
-      expect(page).to have_content('Course 1')
-      expect(page).to have_content('Course 2')
-      expect(page).not_to have_content('Old Course')
-      expect(page).not_to have_content('Disabled Course')
+      expect(page).to have_content('course_1')
+      expect(page).to have_content('course_2')
+      expect(page).not_to have_content('old_course')
+      expect(page).not_to have_content('disabled_course')
     end
 
     scenario 'sees courses they participate in a separate list (not expired or disabled)' do
       within 'table#my-courses-table' do
-        expect(page).to have_content('Course 1')
-        expect(page).to_not have_content('Course 2')
-        expect(page).to_not have_content('Old Course')
-        expect(page).to_not have_content('Disabled Course')
+        expect(page).to have_content('course_1')
+        expect(page).to_not have_content('course_2')
+        expect(page).to_not have_content('old_course')
+        expect(page).to_not have_content('disabled_course')
       end
     end
   end
