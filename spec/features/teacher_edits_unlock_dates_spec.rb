@@ -14,8 +14,6 @@ feature 'Teacher edits unlock dates', feature: true do
     @course.exercise_group_by_name('').group_unlock_conditions = ['1.1.2011'].to_json
     UncomputedUnlock.create_all_for_course_eager(@course)
 
-    @course = course
-
     visit '/'
   end
 
@@ -88,6 +86,7 @@ feature 'Teacher edits unlock dates', feature: true do
   end
 
   scenario 'Teacher can set multiple unlock conditions' do
+    pending 'Using wrong way of creating test courses'
     log_in_as(@teacher.login, 'xooxer')
     visit_course
     click_link 'Manage unlock conditions'
