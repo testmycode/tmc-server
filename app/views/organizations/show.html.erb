@@ -69,7 +69,7 @@
 <% end %>
 
 <% unless @my_courses.empty? %>
-  <%= render partial: 'courses/list_my_courses', locals: { courses: @my_courses, percent_completed: @my_courses_percent_completed } %>
+  <%= render partial: 'courses/list_my_courses', locals: { courses: @my_courses, percent_completed: @my_courses_percent_completed, title: 'My Courses' } %>
 <% end %>
 
 <div>
