@@ -327,6 +327,10 @@ class Course < ActiveRecord::Base
     assistants.exists?(user)
   end
 
+  def contains_unlock_deadlines?
+    exercise_groups.any? { |group| group.contains_unlock_deadlines?}
+  end
+
   private
 
   def check_source_backend

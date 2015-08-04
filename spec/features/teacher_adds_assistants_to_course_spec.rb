@@ -36,7 +36,6 @@ feature 'Teacher can add assistants to course', feature: true do
   end
 
   scenario 'Assistant accesses same resources as teacher for the course' do
-    pending
     @course.refresh
 
     log_in_as(@teacher.username, 'foobar')
@@ -46,11 +45,11 @@ feature 'Teacher can add assistants to course', feature: true do
     log_in_as(@assistant.username, 'newfoobar')
     visit "/org/slug/courses/#{@course.id}"
     click_link 'Manage deadlines'
-    fill_in 'empty_group_static', with: '1.1.2000'
+    fill_in 'empty_group_hard_static', with: '1.1.2000'
     click_button 'Save changes'
 
     expect(page).to have_content('Successfully saved deadlines.')
-    expect(page).to have_field('empty_group_static', with: '1.1.2000')
+    expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
 
     visit "/org/slug/courses/#{@course.id}"
     click_link 'Manage unlock dates'

@@ -82,8 +82,10 @@ class CoursesController < ApplicationController
   end
 
   def new
+    authorize! :teach, @organization
+    add_organization_breadcrumb
+    add_breadcrumb 'Create new course'
     @course = Course.new
-    authorize! :create, @exercises
   end
 
   def create
@@ -110,6 +112,73 @@ class CoursesController < ApplicationController
     authorize! :teach, @organization
     @course.disabled!
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
+  end
+
+  def manage_deadlines
+    authorize! :manage_deadlines, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage deadlines'
+    assign_show_view_vars
+  end
+
+  def save_deadlines
+    authorize! :manage_deadlines, @course
+
+    groups = group_params
+    groups.each do |name, deadlines|
+      soft_deadlines = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
+      hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
+      @course.exercise_group_by_name(name).soft_group_deadline = soft_deadlines
+      @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
+    end
+
+    exercises = params[:exercise] || {}
+    exercises.each do |name, deadlines|
+      soft_deadlines = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
+      hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
+
+      exercise = Exercise.where(course_id: @course.id).find_by(name: name)
+      unless exercise.nil?
+        exercise.soft_deadline_spec = soft_deadlines
+        exercise.deadline_spec = hard_deadlines
+        exercise.save!
+      end
+    end
+
+    redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
+  rescue DeadlineSpec::InvalidSyntaxError => e
+    redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s
+  end
+  
+  def manage_unlocks
+    authorize! :manage_unlocks, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage unlocks'
+    assign_show_view_vars
+  end
+
+  def save_unlocks
+    authorize! :manage_unlocks, @course
+
+    groups = group_params
+    groups.each do |name, conditions|
+      array = []
+      conditions.each { |k, v| array << v }
+      @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
+      UncomputedUnlock.create_all_for_course_eager(@course)
+    end
+
+    redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'
+  rescue UnlockSpec::InvalidSyntaxError => e
+    redirect_to manage_unlocks_organization_course_path(@organization, @course), alert: e.to_s
+  end
+
+  def manage_exercises
+    authorize! :manage_exercises, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Manage exercises'
+    @exercises = @course.exercises.natsort_by(&:name)
+    @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end
 
   private
@@ -142,5 +211,13 @@ class CoursesController < ApplicationController
 
   def set_course
     @course = Course.find(params[:id])
+  end
+
+  def group_params
+    sliced = params.slice(:group, :empty_group)
+    groups = sliced[:group] || {}
+    empty_group = sliced[:empty_group] || {}
+    groups[''] = empty_group unless empty_group.empty?
+    groups
   end
 end

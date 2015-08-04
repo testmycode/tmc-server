@@ -240,6 +240,12 @@ class CourseRefresher
                                             merge_course_specific_suboptions(opts)
                                           end)
           @review_points[e.name] = parse_review_points(metadata['review_points'])
+
+          unless e.course.initially_refreshed?
+            preserve_exercise_deadlines(e, metadata)
+            preserve_exercise_unlocks(e, metadata)
+          end
+
           e.options = metadata
           e.save!
         rescue SyntaxError
@@ -463,6 +469,16 @@ class CourseRefresher
 
     def seed_maven_cache
       MavenCacheSeeder.start(@course.clone_path, RemoteSandbox.all)
+    end
+
+    def preserve_exercise_deadlines(e, metadata) # Do not update deadlines from repo, read them from database
+      static_deadline = e.static_deadline || ''
+      unlock_deadline = e.unlock_deadline || ''
+      metadata['deadline'] = [static_deadline, unlock_deadline]
+    end
+
+    def preserve_exercise_unlocks(e, metadata)
+      metadata['unlocked_after'] = e.unlock_conditions
     end
   end
 end

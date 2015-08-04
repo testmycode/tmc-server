@@ -1,4 +1,4 @@
-<h1>Submission <%= @submission.id %></h1>
+<h1>Submission <%= @submission.id %> <%= "(#{@submission.user.username})" if can? :teach, @submission.course %></h1>
 <%= render 'submission_details' %>
 
 <% if @submission.pretest_error %>

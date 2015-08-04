@@ -22,6 +22,11 @@ TmcServer::Application.routes.draw do
         get 'courses', to: 'courses#show_json', format: 'json', as: 'one_course_json'
         get 'students', to: 'courses#student_emails'
         resources :emails, only: [:index]
+        get 'manage_deadlines'
+        post 'save_deadlines'
+        get 'manage_unlocks'
+        post 'save_unlocks'
+        get 'manage_exercises'
       end
 
       resources :assistants, only: [:index, :create, :destroy]
@@ -32,9 +37,14 @@ TmcServer::Application.routes.draw do
         end
       end
 
+      resources :exercises, only: [:index] do
+        collection do
+          post 'set_disabled_statuses'
+        end
+      end
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
-      resources :exercises, only: [:index]
       resources :submissions, only: [:index]
       resources :reviewed_submissions, only: [:index]
       resources :feedback_questions, only: [:index, :new, :create]

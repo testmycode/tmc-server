@@ -53,4 +53,55 @@ class ExerciseGroup
   def inspect
     "<ExerciseGroup #{@course.name}:#{@name}>"
   end
+
+  def hard_group_deadline
+    group_deadline(:deadline_spec_obj)
+  end
+
+  def soft_group_deadline
+    group_deadline(:soft_deadline_spec_obj)
+  end
+
+  # Returns true if all exercises in this group have the same deadline
+  def uniform_group_deadlines?
+    exercises(false).map do |e|
+      [e.static_deadline, e.unlock_deadline, e.soft_static_deadline, e.soft_unlock_deadline]
+    end.uniq.length == 1
+  end
+
+  def contains_unlock_deadlines?
+    exercises(false).any? { |e| e.has_unlock_deadline?}
+  end
+
+  def hard_group_deadline=(deadline)
+    set_group_deadline(:deadline_spec=, deadline)
+  end
+
+  def soft_group_deadline=(deadline)
+    set_group_deadline(:soft_deadline_spec=, deadline)
+  end
+
+  def group_unlock_conditions
+    exercises(false).map { |n| n.unlock_conditions }.first
+  end
+
+  def group_unlock_conditions=(unlock_conditions)
+    exercises(false).each do |e|
+      e.unlock_spec = unlock_conditions
+      e.save!
+    end
+  end
+
+  private
+
+  def group_deadline(method)
+    exercises(false).map { |n| n.send(method) }.first
+  end
+
+  def set_group_deadline(method, deadline)
+    exercises(false).each do |e|
+      e.send(method, deadline)
+      e.save!
+    end
+  end
 end

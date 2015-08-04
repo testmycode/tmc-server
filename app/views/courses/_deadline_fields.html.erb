@@ -1,0 +1,11 @@
+<%
+   static_autofill = uniform ? deadline.static_deadline_spec : 'various'
+   unlock_autofill = uniform ? deadline.unlock_deadline_spec : 'various'
+   field_class = uniform ? nil : 'various'
+%>
+<%= label_tag "#{param_name}[#{deadline_type}][static]", 'Deadline' %>
+<%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: field_class %><br/>
+<div class="unlock-deadline-field">
+  <%= label_tag "#{param_name}[#{deadline_type}][unlock]", 'Unlock-based deadline' %>
+  <%= text_field_tag "#{param_name}[#{deadline_type}][unlock]", unlock_autofill, disabled: disabled, class: field_class %>
+</div>
