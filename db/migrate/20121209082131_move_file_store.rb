@@ -2,6 +2,7 @@ require 'fileutils'
 
 class MoveFileStore < ActiveRecord::Migration
   def up
+    return true if 1==1
     FileUtils.mkdir_p("#{::Rails.root}/db")
     if File.exist?("#{::Rails.root}/tmp/cache")
       FileUtils.move("#{::Rails.root}/tmp/cache", "#{::Rails.root}/db/files")

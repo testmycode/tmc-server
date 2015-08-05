@@ -35,9 +35,6 @@ class CourseTemplate < ActiveRecord::Base
 
   after_save :update_courses_sourcedata
 
-  after_destroy :delete_courses
-  after_destroy :delete_cache
-
   def self.new_dummy(course, options = {})
     CourseTemplate.new(dummy: true,
                        name: course.name,
@@ -110,13 +107,5 @@ class CourseTemplate < ActiveRecord::Base
       c.git_branch = git_branch
       c.source_backend = source_backend
     end
-  end
-
-  def delete_courses
-    courses.each { |c| c.destroy! }
-  end
-
-  def delete_cache
-    FileUtils.rm_rf cache_path if courses.empty?
   end
 end

@@ -1,10 +1,15 @@
 class AddTitleAndMaterialUrlToCourses < ActiveRecord::Migration
+
+  class Course < ActiveRecord::Base
+  end
+
   def change
     add_column :courses, :title, :string
     add_column :courses, :material_url, :string
+
     reversible do |dir|
       dir.up do
-        Course.all.each { |c| c.title = c.name; c.save! }
+        Course.all.each { |c| c.title = c.name.titleize; c.save! }
       end
     end
   end
