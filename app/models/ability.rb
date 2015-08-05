@@ -8,7 +8,10 @@ class Ability
     if user.administrator?
       can :manage, :all
       can :create, Course
-      can :refresh, Course
+      cannot :refresh, Course
+      can :refresh, Course do |c|
+        c.custom?
+      end
       can :view, :participants_list
       can :view, :organization_requests
       can :accept, :organization_requests
@@ -40,6 +43,11 @@ class Ability
 
       can :create, Course do |c|
         can? :teach, c.organization
+      end
+
+      can :refresh, Course do |c|
+        c.taught_by?(user) &&
+            c.custom? # user can only refresh his/her custom course.
       end
 
       cannot :read, Exercise
@@ -141,8 +149,8 @@ class Ability
 
       cannot :reply, FeedbackAnswer
 
-      can :create, :organization
-      cannot :create, :organization if user.guest?
+      can :request, :organization
+      cannot :request, :organization if user.guest?
 
       can :view_statistics, Organization
 
@@ -168,6 +176,14 @@ class Ability
 
       can :edit_course_paramaters, Course do |c|
         can? :teach, c.organization
+      end
+
+      cannot :read, CourseTemplate
+      can :prepare_course, CourseTemplate
+
+      cannot :clone, CourseTemplate
+      can :clone, CourseTemplate do |ct|
+        ct.clonable?
       end
 
       can :request, :organization
@@ -200,6 +216,8 @@ class Ability
       can :toggle_visibility, Organization do |o|
         can? :teach, o
       end
+
+      cannot :email, CourseNotification
     end
   end
 end

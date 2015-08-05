@@ -1,7 +1,13 @@
 require 'spec_helper'
 
 describe CoursesController, type: :controller do
+  include GitTestActions
+
   before(:each) do
+    @source_path = "#{@test_tmp_dir}/fake_source"
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    @source_url = "file://#{@source_path}"
+    create_bare_repo(@repo_path)
     @user = FactoryGirl.create(:user)
     @teacher = FactoryGirl.create(:user)
     @organization = FactoryGirl.create(:accepted_organization)
@@ -197,18 +203,46 @@ describe CoursesController, type: :controller do
 
   describe 'POST create' do
     before :each do
-      controller.current_user = FactoryGirl.create(:admin)
+      controller.current_user = FactoryGirl.create :user
+      Teachership.create user: controller.current_user, organization: @organization
     end
 
     describe 'with valid parameters' do
       it 'creates the course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
-        expect(Course.last.source_url).to eq('git@example.com')
+        expect do
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path }
+        end.to change { Course.count }.by(1)
       end
 
       it 'redirects to the created course' do
-        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', source_url: 'git@example.com' }
-        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path }
+        expect(response).to redirect_to(organization_course_help_path(@organization, Course.last))
+      end
+
+      it 'does directory changes via refresh when course is custom' do
+        source_url = FactoryGirl.create(:course_template).source_url
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: source_url }
+        expect(Course.last.cache_version).to eq(1)
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', source_url: source_url }
+        expect(Course.all.pluck :cache_version).to eq([1, 1])
+        expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
+      end
+
+      describe 'when course is created from template' do
+        before :each do
+          @template = FactoryGirl.create :course_template
+        end
+
+        it 'does directory changes when course is first created from template, but doesn\'t do changes when creating more courses from same template' do
+          expect(CourseTemplate.last.cache_version).to eq(0)
+          post :create_from_template, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @template.id }
+          expect(Course.last.cache_version).to eq(1)
+          expect(CourseTemplate.last.cache_version).to eq(1)
+          post :create_from_template, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @template.id }
+          expect(Course.all.pluck :cache_version).to eq([1, 1])
+          expect(CourseTemplate.last.cache_version).to eq(1)
+          expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
+        end
       end
     end
 
@@ -217,6 +251,133 @@ describe CoursesController, type: :controller do
         post :create, organization_id: @organization.slug, course: { name: 'invalid name with spaces' }
         expect(response).to render_template('new')
         expect(assigns(:course).name).to eq('invalid name with spaces')
+      end
+    end
+  end
+
+  describe 'GET prepare_course_from_template' do
+    before :each do
+      @template = FactoryGirl.create :course_template, name: 'name', title: 'title', source_url: @repo_path
+      controller.current_user = @teacher
+    end
+
+    it 'should assign @course with course template attributes' do
+      get :prepare_from_template, organization_id: @organization.slug, course_template_id: @template.id
+      expect(assigns(:course).name).to eq('name')
+      expect(assigns(:course).title).to eq('title')
+      expect(assigns(:course).source_url).to eq(@repo_path)
+      expect(assigns(:course).course_template_id).to eq(@template.id)
+      expect(assigns(:course).cache_version).to eq(@template.cache_version)
+    end
+  end
+
+  describe 'POST refresh' do
+    before :each do
+      controller.current_user = FactoryGirl.create :user
+      Teachership.create user: controller.current_user, organization: @organization
+      @template = FactoryGirl.create :course_template
+    end
+
+    it 'can\'t refresh if course created from template' do
+      @course = FactoryGirl.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
+      post :refresh, organization_id: @organization.slug, id: @course.id
+      expect(response.code.to_i).to eq(401)
+    end
+  end
+
+  describe 'PUT update' do
+    before :each do
+      @new_repo_path = @test_tmp_dir + '/new_fake_remote_repo'
+      create_bare_repo(@new_repo_path)
+      @course = FactoryGirl.create :course,
+                                   name: 'oldName',
+                                   title: 'oldTitle',
+                                   description: 'oldDescription',
+                                   material_url: 'http://oldMaterial.com',
+                                   source_url: @repo_path,
+                                   organization: @organization
+      controller.current_user = @user
+    end
+
+    describe 'with valid parameters' do
+      before :each do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {
+                       title: 'newTitle',
+                       description: 'newDescription',
+                       material_url: 'http://newMaterial.com',
+                       source_url: @new_repo_path
+                   }
+      end
+
+      it 'updates the course' do
+        course = Course.last
+        expect(course.title).to eq('newTitle')
+        expect(course.description).to eq('newDescription')
+        expect(course.material_url).to eq('http://newMaterial.com')
+        expect(course.source_url).to eq(@new_repo_path)
+      end
+
+      it 'redirects to updated course' do
+        expect(response).to redirect_to(organization_course_path(@organization, Course.last))
+      end
+    end
+
+    describe 'with invalid parameters' do
+      it 're-renders course update form' do
+        Teachership.create user: @user, organization: @organization
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'a' * 41}
+        expect(response).to render_template('edit')
+      end
+    end
+
+    it 'can\'t update course name' do
+      Teachership.create user: @user, organization: @organization
+      put :update, organization_id: @organization.to_param, id: @course.to_param, course: {name: 'newName'}
+      expect(Course.last.name).to eq('oldName')
+    end
+
+    it 'can\'t update course template id' do
+      Teachership.create user: @user, organization: @organization
+      old_id = @course.course_template_id
+      put :update, organization_id: @organization.to_param, id: @course.to_param, course: {course_template_id: 2}
+      expect(Course.last.course_template_id).to eq(old_id)
+    end
+
+    describe 'when course created from template' do
+      before :each do
+        Teachership.create user: @user, organization: @organization
+        @template = FactoryGirl.create :course_template
+        @course.course_template = @template
+        @course.source_url = @template.source_url
+        @course.save!
+      end
+
+      it 'can\'t update source_url' do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {source_url: @new_repo_path}
+        expect(Course.last.source_url).to eq(@template.source_url)
+      end
+
+      it 'can\'t update git_branch' do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {git_branch: 'ufobranch'}
+        expect(Course.last.git_branch).to eq('master')
+      end
+    end
+
+    describe 'when non-teacher attemps to update' do
+      before :each do
+        put :update, organization_id: @organization.to_param, id: @course.to_param, course: {title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com'}
+      end
+
+      it 'should respond with 401' do
+        expect(response.code.to_i).to eq(401)
+      end
+
+      it 'shouldn\'t update' do
+        course = Course.last
+        expect(course.title).to eq('oldTitle')
+        expect(course.description).to eq('oldDescription')
+        expect(course.material_url).to eq('http://oldMaterial.com')
       end
     end
   end
@@ -415,5 +576,4 @@ describe CoursesController, type: :controller do
       expect(response.code.to_i).to eq(401)
     end
   end
-
 end

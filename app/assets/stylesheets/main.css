@@ -369,3 +369,7 @@ tr>.align-right {
 .float-clear {
     clear: both;
 }
+
+.no-wrap {
+  white-space: nowrap;
+}

@@ -1,0 +1,45 @@
+<%= form_for(@course_template) do |f| %>
+  <% if @course_template.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@course_template.errors.count, "error") %> prohibited this course_template from being saved:</h2>
+
+      <ul>
+      <% @course_template.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :title %><br>
+    <%= f.text_field :title %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br>
+    <%= f.text_field :description %>
+  </div>
+  <div class="field">
+    <%= f.label :material_url %><br>
+    <%= f.text_field :material_url %>
+  </div>
+  <div class="field">
+    <%= f.label :source_url %><br>
+    <%= f.text_field :source_url %>
+  </div>
+  <div class="field">
+    <%= f.label :git_branch %>
+    <%= f.text_field :git_branch, :default => 'master' %>
+  </div>
+  <div class="field">
+    <%= f.label :expires_at %><br>
+    <%= f.date_field :expires_at %>
+  </div>
+  <div class="actions">
+    <%= f.submit class: "btn btn-info" %>
+  </div>
+<% end %>

@@ -1,0 +1,13 @@
+<h1>Add a new teacher to <%= @organization.name %></h1>
+
+<%= form_tag :organization_teachers do %>
+  <%= render 'shared/error_messages', target: @teachership %>
+
+  <div class="field">
+    <%= label_tag :username %>
+    <%= text_field_tag :username %>
+  </div>
+  <div class="actions">
+    <%= submit_tag 'Add a new teacher', class: 'btn btn-info' %>
+  </div>
+<% end %>

@@ -1,5 +1,5 @@
 TmcServer::Application.routes.draw do
-  resources :organizations, except: :destory, path: 'org' do
+resources :organizations, except: :destory, path: 'org' do
     member do
       post 'accept'
       post 'reject'
@@ -12,6 +12,8 @@ TmcServer::Application.routes.draw do
     end
 
     resources :teachers, only: [:index, :create, :destroy]
+
+    get 'course_templates', to: 'course_templates#list_for_teachers'
 
     resources :courses do
       member do
@@ -43,6 +45,13 @@ TmcServer::Application.routes.draw do
         end
       end
 
+      get 'help'
+
+      collection do
+        get 'clone_template/:course_template_id' => 'courses#prepare_from_template', as: 'prepare_course'
+        post 'clone_template' => 'courses#create_from_template', as: 'clone_course'
+      end
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
       resources :submissions, only: [:index]
@@ -56,6 +65,13 @@ TmcServer::Application.routes.draw do
     end
 
     resources :stats, only: [:index]
+  end
+
+  resources :course_templates, except: :show do
+    member do
+      post 'toggle_hidden', to: 'course_templates#toggle_hidden'
+      post 'refresh'
+    end
   end
 
   resources :sessions, only: [:new, :create, :destroy]

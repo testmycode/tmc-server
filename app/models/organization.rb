@@ -21,6 +21,8 @@ class Organization < ActiveRecord::Base
   has_many :teachers, through: :teacherships, source: :user
   has_many :courses, dependent: :nullify
 
+  belongs_to :requester, class_name: 'User'
+
   scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
   scope :pending_organizations, -> { where(acceptance_pending: true) }
   scope :assisted_organizations, ->(user) { joins(:courses, courses: :assistantships).where(assistantships: { user_id: user.id }) }
@@ -28,7 +30,7 @@ class Organization < ActiveRecord::Base
   scope :participated_organizations, ->(user) { joins(:courses, courses: :awarded_points).where(awarded_points: { user_id: user.id }) }
 
   def self.init(params, initial_user)
-    organization = Organization.new(params.merge(acceptance_pending: true))
+    organization = Organization.new(params.merge(acceptance_pending: true, requester: initial_user))
     teachership = Teachership.new(user: initial_user, organization: organization)
     if !organization.save || !teachership.save
       organization.destroy

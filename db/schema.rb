@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150625081824) do
+ActiveRecord::Schema.define(version: 20150727080841) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,21 +61,36 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-  
+
+  create_table "course_templates", force: true do |t|
+    t.string   "name"
+    t.string   "title"
+    t.string   "description"
+    t.string   "material_url"
+    t.string   "source_url"
+    t.integer  "cache_version",  default: 0,        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "expires_at"
+    t.boolean  "hidden",         default: false
+    t.string   "source_backend", default: "git",    null: false
+    t.text     "git_branch",     default: "master", null: false
+    t.boolean  "dummy",          default: false,    null: false
+  end
+
+  add_index "course_templates", ["name"], name: "index_course_templates_on_name", unique: true, using: :btree
+
   create_table "courses", force: true do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "hide_after"
-    t.boolean  "hidden",                         default: false,    null: false
-    t.integer  "cache_version",                  default: 0,        null: false
+    t.boolean  "hidden",                         default: false, null: false
+    t.integer  "cache_version",                  default: 0,     null: false
     t.string   "spreadsheet_key"
-    t.string   "source_backend",                                    null: false
-    t.string   "source_url",                                        null: false
-    t.text     "git_branch",                     default: "master", null: false
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
-    t.boolean  "locked_exercise_points_visible", default: true,     null: false
+    t.boolean  "locked_exercise_points_visible", default: true,  null: false
     t.text     "description"
     t.string   "paste_visibility"
     t.string   "formal_name"
@@ -83,6 +98,10 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.string   "certificate_unlock_spec"
     t.integer  "organization_id"
     t.integer  "disabled_status",                default: 0
+    t.integer  "course_template_id",                             null: false
+    t.string   "title"
+    t.string   "material_url"
+    t.integer  "course_template_id"
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
@@ -148,7 +167,11 @@ ActiveRecord::Schema.define(version: 20150625081824) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "hidden",             default: false
+    t.integer  "requester_id"
   end
+
+  add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
+  add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
 
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false
