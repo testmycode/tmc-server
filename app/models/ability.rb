@@ -144,7 +144,9 @@ class Ability
       can :create, :organization
       cannot :create, :organization if user.guest?
 
-      can :view_statistics, Organization
+      can :view_statistics, Organization do |o|
+        can? :teach, o
+      end
 
       can :list_user_emails, Course do |c|
         can? :teach, c
