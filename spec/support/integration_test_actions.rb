@@ -37,6 +37,7 @@ module IntegrationTestActions
     click_link 'Create New Course'
     click_link 'Create Course'
     fill_in 'course_name', with: options[:name]
+    fill_in 'course_title', with: options[:name]
     click_button 'Add Course'
 
     expect(page).to have_content('Course was successfully created')

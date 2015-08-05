@@ -203,7 +203,6 @@ describe CoursesController, type: :controller do
 
   describe 'POST create' do
     before :each do
-      check_custom_enabled
       controller.current_user = FactoryGirl.create :user
       Teachership.create user: controller.current_user, organization: @organization
     end
@@ -274,7 +273,6 @@ describe CoursesController, type: :controller do
 
   describe 'POST refresh' do
     before :each do
-      check_custom_enabled
       controller.current_user = FactoryGirl.create :user
       Teachership.create user: controller.current_user, organization: @organization
       @template = FactoryGirl.create :course_template
@@ -562,5 +560,4 @@ describe CoursesController, type: :controller do
       expect(response.code.to_i).to eq(401)
     end
   end
-
 end

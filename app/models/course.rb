@@ -380,10 +380,6 @@ class Course < ActiveRecord::Base
     super(material)
   end
 
-  #def created_from_template?
-    #course_template.present?
-  #end
-
   def custom?
     course_template_obj.dummy?
   end

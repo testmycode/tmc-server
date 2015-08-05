@@ -256,16 +256,11 @@ class CoursesController < ApplicationController
   end
   
   def refresh_course(course, options = {})
-    authorize! :refresh, course
     begin
       session[:refresh_report] = course.refresh(options)
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
     end
-  end
-
-  def custom_courses_enabled?
-    SiteSetting.value('enable_custom_repositories')
   end
 
   def create_impl(options = {})
@@ -279,7 +274,6 @@ class CoursesController < ApplicationController
 
     authorize! :teach, @organization
     authorize! :clone, @course_template unless options[:custom]
-    return respond_access_denied('Custom courses not enabled') if options[:custom] && !custom_courses_enabled?
 
     respond_to do |format|
       if @course.save
