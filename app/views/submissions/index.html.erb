@@ -23,7 +23,7 @@
       $.ajax({
         dataType: 'json',
         type: 'GET',
-        url: '<%= escape_javascript(course_submissions_path(@course, :format => :json, :row_format => 'datatables', :now => Time.now, :api_version => ApiVersion::API_VERSION)) %>',
+        url: '<%= escape_javascript(organization_course_submissions_path(@organization, @course, :format => :json, :row_format => 'datatables', :now => Time.now, :api_version => ApiVersion::API_VERSION)) %>',
         data: params,
         success: function(data) {
           rowCount += data.rows.length;
@@ -49,7 +49,3 @@
 
 
 <%= show_submission_list([], :invoke_datatables => false) %>
-
-<div class="link-back">
-  <%= link_to 'Back', organization_course_path(@course) %>
-</div>

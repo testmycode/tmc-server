@@ -20,7 +20,7 @@ class SubmissionsController < ApplicationController
       end
       format.html do # uses AJAX
         add_course_breadcrumb
-        add_breadcrumb 'All submissions', course_submissions_path(@course)
+        add_breadcrumb 'All submissions', organization_course_submissions_path(@organization, @course)
       end
     end
   end
@@ -209,6 +209,7 @@ class SubmissionsController < ApplicationController
       check_access!
     elsif params[:course_id]
       @course = Course.lock('FOR SHARE').find(params[:course_id])
+      @organization = @course.organization
       authorize! :read, @course
     else
       respond_access_denied
