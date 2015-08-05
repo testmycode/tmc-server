@@ -263,11 +263,11 @@ class SubmissionsController < ApplicationController
     paste_visibility = @course.paste_visibility || 'open'
     case paste_visibility
     when 'protected'
-      respond_access_denied unless current_user.administrator? || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
+      respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
     when 'no-tests-public'
       respond_access_denied unless @submission.created_at > 2.hours.ago
     else
-      respond_access_denied unless current_user.administrator? || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
+      respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
     end
   end
 end
