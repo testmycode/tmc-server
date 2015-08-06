@@ -27,11 +27,11 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
-    respond_with_error(exception.message, 404)
+    respond_with_error(message = 'Not found', 404, exception)
   end
 
-  rescue_from ActionController::MissingFile do
-    respond_with_error('File not found', 404)
+  rescue_from ActionController::MissingFile do |exception|
+    respond_with_error(message = 'File not found', 404, exception)
   end
 
   before_action :set_default_url_options
@@ -119,9 +119,12 @@ class ApplicationController < ActionController::Base
     respond_with_error(msg, 401)
   end
 
-  def respond_with_error(msg, code = 500, extra_json_keys = {})
+  def respond_with_error(msg, code = 500, exception = nil, extra_json_keys = {})
     respond_to do |format|
-      format.html { render text: '<p class="error">' + ERB::Util.html_escape(msg) + '</p>', layout: true, status: code }
+      format.html { render 'shared/respond_with_error',
+                           locals: { message: ERB::Util.html_escape(msg), exception: exception },
+                           layout: true,
+                           status: code }
       format.json do
         if code == 401
           # To support older TmcNetBeans versions using faulty http basic auth
