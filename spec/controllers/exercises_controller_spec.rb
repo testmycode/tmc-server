@@ -69,7 +69,7 @@ describe ExercisesController, type: :controller do
     end
 
     def post_set_disabled_statuses(options = {})
-      post :set_disabled_statuses, options.merge(organization_id: @organization.slug, course_id: @course.id)
+      post :set_disabled_statuses, options.merge(organization_id: @organization.slug, course_id: @course.name)
     end
 
     describe 'as a teacher' do

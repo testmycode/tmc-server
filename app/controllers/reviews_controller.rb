@@ -201,7 +201,7 @@ class ReviewsController < ApplicationController
 
   def fetch(*stuff)
     if stuff.include? :course
-      @course = Course.find(params[:course_id])
+      @course = Course.find_by(name: params[:course_id])
       authorize! :read, @course
     end
     if stuff.include? :submission

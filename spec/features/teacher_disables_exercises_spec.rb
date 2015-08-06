@@ -95,6 +95,6 @@ feature 'Teacher disables exercises', feature: true do
   end
 
   def visit_course(course)
-    visit "/org/slug/courses/#{course.id}"
+    visit "/org/slug/courses/#{course.name}"
   end
 end

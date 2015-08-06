@@ -86,7 +86,7 @@ class FeedbackQuestionsController < ApplicationController
   end
 
   def set_course
-    @course = Course.find(params[:course_id]) if params[:course_id]
+    @course = Course.find_by(name: params[:course_id]) if params[:course_id]
     authorize! :read, @course
   end
 

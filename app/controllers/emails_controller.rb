@@ -26,7 +26,7 @@ class EmailsController < ApplicationController
   end
 
   def index_course
-    @course = Course.find(params[:id])
+    @course = Course.find_by(name: params[:id])
     @organization = @course.organization
 
     authorize! :list_user_emails, @course

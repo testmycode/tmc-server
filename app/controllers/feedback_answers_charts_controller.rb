@@ -1,6 +1,6 @@
 class FeedbackAnswersChartsController < ApplicationController
   def show
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by(name: params[:course_id])
     @organization = @course.organization
 
     authorize! :read_feedback_questions, @course

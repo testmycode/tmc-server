@@ -55,7 +55,7 @@ class ExercisesController < ApplicationController
   end
 
   def set_disabled_statuses
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by(name: params[:course_id])
     @organization = @course.organization
     authorize! :teach, @organization
 

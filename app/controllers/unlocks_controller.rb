@@ -1,7 +1,7 @@
 # Receives explicit unlock requests and shows a web UI for making them.
 class UnlocksController < ApplicationController
   def show
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by(name: params[:course_id])
     authorize! :read, @course
     @organization = Organization.find_by(slug: params[:organization_id])
     @exercises = @course.unlockable_exercises_for(current_user)
@@ -15,7 +15,7 @@ class UnlocksController < ApplicationController
   end
 
   def create
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by(name: params[:course_id])
     authorize! :read, @course
     @organization = Organization.find_by(slug: params[:organization_id])
     @exercises = @course.unlockable_exercises_for(current_user)

@@ -2,7 +2,7 @@
 class ReviewedSubmissionsController < ApplicationController
   
   def index
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by(name: params[:course_id])
     @organization = @course.organization
     authorize! :teach, @course
     add_course_breadcrumb

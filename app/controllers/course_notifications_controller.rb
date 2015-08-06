@@ -3,16 +3,16 @@ class CourseNotificationsController < ApplicationController
   before_action :set_organization
 
   def new
-    course = Course.find(course_notification_params[:course_id])
+    course = Course.find_by(name: course_notification_params[:course_id])
     authorize! :send_mail_to_participants, course
     @notifier ||= CourseNotification.new
-    @course = Course.find_by(id: params[:course_id])
+    @course = Course.find_by(name: params[:course_id])
     add_course_breadcrumb
     add_breadcrumb 'Course notification'
   end
 
   def create
-    course = Course.find(course_notification_params[:course_id])
+    course = Course.find_by(name: course_notification_params[:course_id])
     authorize! :send_mail_to_participants, course
 
     participants = User.course_students(course)

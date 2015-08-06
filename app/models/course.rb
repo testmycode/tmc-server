@@ -338,6 +338,10 @@ class Course < ActiveRecord::Base
     exercise_groups.any? { |group| group.contains_unlock_deadlines?}
   end
 
+  def to_param
+    name
+  end
+
   private
 
   def check_source_backend

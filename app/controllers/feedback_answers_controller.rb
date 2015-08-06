@@ -1,7 +1,7 @@
 class FeedbackAnswersController < ApplicationController
   def index
     if params[:course_id]
-      @course = Course.find(params[:course_id])
+      @course = Course.find_by(name: params[:course_id])
       @parent = @course
       @numeric_stats = @course.exercises.where(hidden: false).sort.map do |ex|
         [ex, FeedbackAnswer.numeric_answer_averages(ex), ex.submissions_having_feedback.count]

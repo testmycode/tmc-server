@@ -21,6 +21,10 @@ feature 'Teacher has admin abilities to own course', feature: true do
     log_in_as(@teacher.login, 'xooxer')
   end
 
+  def visit_course
+    visit "/org/slug/courses/#{@course.name}"
+  end
+
   scenario 'Teacher can see model solution for exercise' do
     visit '/exercises/1'
     expect(page).to have_content('View suggested solution')
@@ -32,7 +36,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
   end
 
   scenario 'Teacher can see all submissions for his organizations courses' do
-    visit '/org/slug/courses/1'
+    visit_course
 
     expect(page).to have_content('Latest submissions')
     expect(page).not_to have_content('No data available in table')
@@ -49,7 +53,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
   scenario 'Teacher can see users points from his own courses' do
     available_point = @course.available_points.find_by(name: 'arith-funcs')
     available_point.award_to(@student, @submission)
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'View points'
 
     expect(page).to have_content('1/8')
@@ -57,7 +61,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
   end
 
   scenario 'Teacher can make code review' do
-    visit '/org/slug/courses/1'
+    visit_course
 
     expect(page).to have_content('1 code review requested')
     click_link '1 code review requested'
@@ -70,7 +74,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
   end
 
   scenario 'Teacher can manage course feedback questions' do
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'Manage feedback questions'
     click_link 'Add question'
 
@@ -97,7 +101,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
     question = FactoryGirl.create :feedback_question, course: @course, question: 'Meaning of life?'
     answer = FactoryGirl.create :feedback_answer, feedback_question: question, course: @course, exercise: @exercise1, submission: @submission, answer: 'no idea'
 
-    visit '/org/slug/courses/1'
+    visit_course
     click_link 'View feedback'
 
     expect(page).not_to have_content('access denied')

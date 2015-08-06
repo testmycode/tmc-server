@@ -34,22 +34,22 @@ describe PointsController, type: :controller do
 
       it 'should show a page' do
         get :show, organization_id: @organization.slug,
-            course_id: @course.id, id: @sheetname
+            course_id: @course.name, id: @sheetname
         expect(response).to be_success
       end
 
       it 'should contain @user login' do
-        get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
+        get :show, organization_id: @organization.slug, course_id: @course.name, id: @sheetname
         expect(response.body).to have_content(@user.login)
       end
 
       it 'should contain available point name' do
-        get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
+        get :show, organization_id: @organization.slug, course_id: @course.name, id: @sheetname
         expect(response.body).to have_content(@available_point.name)
       end
 
       it 'should contain a success marker' do
-        get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
+        get :show, organization_id: @organization.slug, course_id: @course.name, id: @sheetname
         expect(response.body).to have_content('✔')
       end
     end

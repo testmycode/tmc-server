@@ -37,7 +37,7 @@ class StatsController < ApplicationController
 
   def get_vars
     if params[:course_id]
-      @course = Course.find(params[:course_id])
+      @course = Course.find_by(name: params[:course_id])
     end
   end
 

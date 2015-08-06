@@ -58,7 +58,7 @@ class CoursesController < ApplicationController
 
   # Method for teacher to give a single course for students to select.
   def show_json
-    course = [Course.find(params[:id])]
+    course = [Course.find_by(name: params[:id])]
     authorize! :read, course
     return respond_access_denied('Authentication required') if current_user.guest?
 
@@ -209,7 +209,8 @@ class CoursesController < ApplicationController
   end
 
   def set_course
-    @course = Course.find(params[:id])
+    @course = Course.find_by(name: params[:id])
+    fail ActiveRecord::RecordNotFound, 'Invalid course id' if @course.nil?
   end
 
   def group_params
