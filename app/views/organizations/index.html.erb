@@ -19,7 +19,10 @@
     <tbody>
     <% @my_organizations.each do |organization| %>
       <tr>
-        <td><%= link_to organization.name, organization_path(organization) %></td>
+        <td>
+          <%= link_to organization.name, organization_path(organization) %>
+          <% if organization.acceptance_pending? %> (pending)<% end %>
+        </td>
       </tr>
     <% end %>
     </tbody>
