@@ -1,7 +1,7 @@
 class ExercisesController < ApplicationController
   def show
-    @exercise = Exercise.find(params[:id])
-    @course = Course.lock('FOR SHARE').find(@exercise.course_id)
+    @course = Course.lock('FOR SHARE').find_by(name: params[:course_id])
+    @exercise = Exercise.find_by(name: params[:id], course: @course)
     @organization = @course.organization
     authorize! :read, @course
     authorize! :read, @exercise

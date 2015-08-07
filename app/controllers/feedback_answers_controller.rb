@@ -8,8 +8,8 @@ class FeedbackAnswersController < ApplicationController
       end
       @title = @course.name
     elsif params[:exercise_id]
-      @exercise = Exercise.find(params[:exercise_id])
-      @course = @exercise.course
+      @course = Course.find_by(name: params[:course_id])
+      @exercise = Exercise.find_by(name: params[:exercise_id], course: @course)
       @parent = @exercise
       @numeric_stats = [[@exercise, FeedbackAnswer.numeric_answer_averages(@exercise), @exercise.submissions_having_feedback.count]]
       @title = @exercise.name

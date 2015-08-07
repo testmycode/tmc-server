@@ -198,8 +198,8 @@ class SubmissionsController < ApplicationController
       @exercise = @submission.exercise
       @organization = @course.organization
     elsif params[:exercise_id]
-      @exercise = Exercise.find(params[:exercise_id])
-      @course = Course.lock('FOR SHARE').find(@exercise.course_id)
+      @course = Course.lock('FOR SHARE').find_by(name: params[:course_id])
+      @exercise = Exercise.find_by(name: params[:exercise_id], course: @course)
       @organization = @course.organization
       authorize! :read, @course
       authorize! :read, @exercise

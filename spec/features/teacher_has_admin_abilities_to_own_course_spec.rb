@@ -26,7 +26,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
   end
 
   scenario 'Teacher can see model solution for exercise' do
-    visit "/org/slug/courses/#{@course.name}/exercises/1"
+    visit "/org/slug/courses/#{@course.name}/exercises/#{@exercise1.name}"
     expect(page).to have_content('View suggested solution')
 
     click_link 'View suggested solution'

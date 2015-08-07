@@ -1,8 +1,8 @@
 # Returns the suggestion solution as a ZIP.
 class SolutionsController < ApplicationController
   def show
-    @exercise = Exercise.find(params[:exercise_id])
-    @course = @exercise.course
+    @course = Course.find_by(name: params[:course_id])
+    @exercise = Exercise.find_by(name: params[:exercise_id], course: @course)
     @organization = @course.organization
 
     add_course_breadcrumb
