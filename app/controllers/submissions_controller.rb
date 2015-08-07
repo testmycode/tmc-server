@@ -70,7 +70,7 @@ class SubmissionsController < ApplicationController
         )
 
         if @exercise.solution.visible_to?(current_user)
-          output[:solution_url] = view_context.exercise_solution_url(@exercise)
+          output[:solution_url] = view_context.organization_course_exercise_solution_url(@organization, @course, @exercise)
         end
 
         output[:validations] = @submission.validations
@@ -144,7 +144,7 @@ class SubmissionsController < ApplicationController
           redirect_to(submission_path(@submission),
                       notice: 'Submission received.')
         else
-          redirect_to(exercise_path(@exercise),
+          redirect_to(organization_course_exercise_path(@organization, @course, @exercise),
                       alert: errormsg)
         end
       end
@@ -178,7 +178,7 @@ class SubmissionsController < ApplicationController
     for submission in @exercise.submissions
       schedule_for_rerun(submission, -2)
     end
-    redirect_to exercise_path(@exercise), notice: 'Reruns scheduled'
+    redirect_to organization_course_exercise_path(@organization, @course, @exercise), notice: 'Reruns scheduled'
   end
 
   private
@@ -196,19 +196,22 @@ class SubmissionsController < ApplicationController
       authorize! :read, @submission
       @course = @submission.course
       @exercise = @submission.exercise
+      @organization = @course.organization
     elsif params[:exercise_id]
       @exercise = Exercise.find(params[:exercise_id])
       @course = Course.lock('FOR SHARE').find(@exercise.course_id)
+      @organization = @course.organization
       authorize! :read, @course
       authorize! :read, @exercise
     elsif params[:paste_key]
       @submission = Submission.find_by_paste_key!(params[:paste_key])
       @exercise = @submission.exercise
       @course = @exercise.course
+      @organization = @course.organization
       @is_paste = true
       check_access!
     elsif params[:course_id]
-      @course = Course.lock('FOR SHARE').find(params[:course_id])
+      @course = Course.lock('FOR SHARE').find_by(name: params[:course_id])
       @organization = @course.organization
       authorize! :read, @course
     else

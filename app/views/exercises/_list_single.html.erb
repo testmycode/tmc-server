@@ -1,4 +1,4 @@
-<%= link_to exercise.name, exercise %>
+<%= link_to exercise.name, organization_course_exercise_path(@organization, @course, exercise) %>
 <%
    notes = []
    notes << 'hidden' if exercise.hidden?

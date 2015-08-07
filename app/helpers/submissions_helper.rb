@@ -88,9 +88,12 @@ module SubmissionsHelper
   end
 
   def link_to_submission_exericse(submission, text = nil, missing_text = '')
-    if submission.exercise
-      text = submission.exercise.name if text.nil?
-      link_to text, exercise_path(submission.exercise)
+    exercise = submission.exercise
+    if exercise
+      course = exercise.course
+      organization = course.organization
+      text = exercise.name if text.nil?
+      link_to text, organization_course_exercise_path(organization, course, exercise)
     else
       missing_text
     end

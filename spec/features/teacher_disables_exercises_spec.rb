@@ -89,7 +89,7 @@ feature 'Teacher disables exercises', feature: true do
 
     log_in_as(@user.login, @user.password)
 
-    visit "/exercises/#{@ex1.id}"
+    visit "/org/slug/courses/#{@course.name}/exercises/#{@ex1.id}"
 
     expect(page).to have_content('Access denied')
   end

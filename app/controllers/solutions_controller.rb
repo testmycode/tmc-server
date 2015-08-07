@@ -7,7 +7,7 @@ class SolutionsController < ApplicationController
 
     add_course_breadcrumb
     add_exercise_breadcrumb
-    add_breadcrumb 'Suggested solution', exercise_solution_path(@exercise)
+    add_breadcrumb 'Suggested solution', organization_course_exercise_solution_path(@organization, @course, @exercise)
 
     @solution = @exercise.solution
     begin

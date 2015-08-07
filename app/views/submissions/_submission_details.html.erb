@@ -49,7 +49,7 @@
       <% end %>
 
       <% if @exercise.solution && @exercise.solution.visible_to?(current_user) %>
-        <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
+        <li><%= link_to 'View suggested solution', organization_course_exercise_solution_path(@organization, @course, @exercise) %></li>
       <% end %>
 
       <% if can? :create_review, @course %>

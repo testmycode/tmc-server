@@ -123,11 +123,13 @@ describe CoursesController, type: :controller do
       it 'should render the exercises for each course' do
         result = get_show_json
 
+        ex = @course.exercises[0];
+
         exs = result['course']['exercises']
         expect(exs[0]['name']).to eq('Exercise1')
         expect(exs[1]['name']).to eq('Exercise2')
-        expect(exs[0]['zip_url']).to eq(exercise_url(@course.exercises[0].id, format: 'zip'))
-        expect(exs[0]['return_url']).to eq(exercise_submissions_url(@course.exercises[0].id, format: 'json'))
+        expect(exs[0]['zip_url']).to eq(organization_course_exercise_url(ex.course.organization, ex.course, ex, format: 'zip'))
+        expect(exs[0]['return_url']).to eq(organization_course_exercise_submissions_url(ex.course.organization, ex.course, ex, format: 'json'))
       end
 
       it 'should include only visible exercises' do

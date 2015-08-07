@@ -68,11 +68,11 @@
   <% end %>
 
   <% if @exercise.solution && (can? :read, @exercise.solution) %>
-    <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
+    <li><%= link_to 'View suggested solution', organization_course_exercise_solution_path(@organization, @course, @exercise) %></li>
   <% end %>
 
   <% if can?(:read, FeedbackAnswer) %>
-    <li><%= link_to 'View feedback', exercise_feedback_answers_path(@exercise) %></li>
+    <li><%= link_to 'View feedback', organization_course_exercise_feedback_answers_path(@organization, @course, @exercise) %></li>
   <% end %>
 </ul>
 
@@ -110,7 +110,11 @@
         end
       %>
       <br>
-      <%= button_to 'Rerun all submissions', exercise_update_submissions_path(@exercise), :method => :put, :confirm => confirm_msg, class: "btn btn-danger"%>
+      <%=
+          button_to 'Rerun all submissions',
+                    update_submissions_organization_course_exercise_path(@organization, @course, @exercise),
+                    method: :put, confirm: confirm_msg, class: "btn btn-danger"
+      %>
       (may add points; never deletes points; may take a long time)
     </div>
   </div>

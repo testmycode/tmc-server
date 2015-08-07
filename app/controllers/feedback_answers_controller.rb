@@ -1,6 +1,6 @@
 class FeedbackAnswersController < ApplicationController
   def index
-    if params[:course_id]
+    if params[:course_id] && !params[:exercise_id]
       @course = Course.find_by(name: params[:course_id])
       @parent = @course
       @numeric_stats = @course.exercises.where(hidden: false).sort.map do |ex|
@@ -21,7 +21,7 @@ class FeedbackAnswersController < ApplicationController
     add_course_breadcrumb
     if @exercise
       add_exercise_breadcrumb
-      add_breadcrumb 'Feedback', exercise_feedback_answers_path(@exercise)
+      add_breadcrumb 'Feedback', organization_course_exercise_feedback_answers_path(@organization, @course, @exercise)
     else
       add_breadcrumb 'Feedback', organization_course_feedback_answers_path
     end

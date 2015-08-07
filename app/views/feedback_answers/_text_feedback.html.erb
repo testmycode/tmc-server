@@ -9,7 +9,7 @@
       <% end %>
       with <%= link_to "submission ##{answer.submission.id}", answer.submission %>
       <% unless @exercise %>
-        for <%= link_to answer.exercise.name, answer.exercise %>
+        for <%= link_to answer.exercise.name, organization_course_exercise_path(answer.exercise.course.organization, answer.exercise.course, answer.exercise) %>
       <% end %>
       at <%= answer.created_at.strftime("%H:%M %d.%m.%Y") %>
     </div>
