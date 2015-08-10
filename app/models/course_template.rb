@@ -61,7 +61,7 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def set_default_source_backend
-    self.source_backend ||= Course.default_source_backend
+    self.source_backend ||= CourseTemplate.default_source_backend
   end
 
   def self.default_source_backend
