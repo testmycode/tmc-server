@@ -43,7 +43,8 @@ describe CoursesController, type: :controller do
 
   describe 'GET show' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryGirl.create(:course, organization: @organization)
+      @exercise = FactoryGirl.create(:exercise, course: @course)
     end
 
     describe 'for administrators' do
@@ -55,8 +56,8 @@ describe CoursesController, type: :controller do
       it "should show everyone's submissions" do
         user1 = FactoryGirl.create(:user)
         user2 = FactoryGirl.create(:user)
-        sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
-        sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+        sub1 = FactoryGirl.create(:submission, user: user1, course: @course, exercise: @exercise)
+        sub2 = FactoryGirl.create(:submission, user: user2, course: @course, exercise: @exercise)
 
         get :show, organization_id: @organization.slug, id: @course.name
 
@@ -98,7 +99,7 @@ describe CoursesController, type: :controller do
 
     describe 'in JSON format' do
       before :each do
-        @course = FactoryGirl.create(:course, name: 'Course1')
+        @course = FactoryGirl.create(:course, name: 'Course1', organization: @organization)
         @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: @course)
         @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: @course)
         @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: @course)
@@ -225,7 +226,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST disable' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryGirl.create(:course, organization: @organization)
     end
 
     describe 'As a teacher' do
@@ -247,7 +248,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST enable' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryGirl.create(:course, organization: @organization)
     end
 
     describe 'As a teacher' do
@@ -334,8 +335,7 @@ describe CoursesController, type: :controller do
 
   describe 'GET manage_unlocks' do
     it 'when non-teacher should respond with a 401' do
-      @course = FactoryGirl.create :course
-      @course.organization = @organization
+      @course = FactoryGirl.create :course, organization: @organization
       controller.current_user = @user
       get :manage_unlocks, organization_id: @organization.slug, id: @course.name
       expect(response.code.to_i).to eq(401)

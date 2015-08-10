@@ -1,8 +1,7 @@
 class ExercisesController < ApplicationController
+  before_action :set_params, only: [:show]
+
   def show
-    @course = Course.lock('FOR SHARE').find_by(name: params[:course_id])
-    @exercise = Exercise.find_by(name: params[:id], course: @course)
-    @organization = @course.organization
     authorize! :read, @course
     authorize! :read, @exercise
 
@@ -68,5 +67,19 @@ class ExercisesController < ApplicationController
 
     redirect_to manage_exercises_organization_course_path(@organization, @course),
                 notice: 'Selected exercises successfully updated.'
+  end
+
+  private
+
+  def set_params
+    @course = Course.lock('FOR SHARE').find_by(name: params[:course_id])
+    @exercise = Exercise.find_by(name: params[:id], course: @course)
+    @organization = @course.organization
+    fail ActiveRecord::RecordNotFound unless @exercise
+    check_exercise_course_organization_matches
+  end
+
+  def check_exercise_course_organization_matches
+    fail ActiveRecord::RecordNotFound unless @exercise && @course && @exercise.course == @course && @course.organization == @organization
   end
 end

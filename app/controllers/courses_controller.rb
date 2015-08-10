@@ -206,11 +206,17 @@ class CoursesController < ApplicationController
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])
+    fail ActiveRecord::RecordNotFound unless @organization
   end
 
   def set_course
     @course = Course.find_by(name: params[:id])
-    fail ActiveRecord::RecordNotFound, 'Invalid course id' if @course.nil?
+    fail ActiveRecord::RecordNotFound unless @course
+    check_course_matches_organization
+  end
+
+  def check_course_matches_organization
+    fail ActiveRecord::RecordNotFound unless @course && @course.organization == @organization
   end
 
   def group_params
