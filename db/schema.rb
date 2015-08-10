@@ -68,17 +68,16 @@ ActiveRecord::Schema.define(version: 20150727080841) do
     t.string   "description"
     t.string   "material_url"
     t.string   "source_url"
+    t.string   "dummy",          default: "f",      null: false
+    t.string   "boolean",        default: "f",      null: false
+    t.boolean  "hidden",         default: false
     t.integer  "cache_version",  default: 0,        null: false
+    t.string   "source_backend", default: "git",    null: false
+    t.string   "git_branch",     default: "master", null: false
+    t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "expires_at"
-    t.boolean  "hidden",         default: false
-    t.string   "source_backend", default: "git",    null: false
-    t.text     "git_branch",     default: "master", null: false
-    t.boolean  "dummy",          default: false,    null: false
   end
-
-  add_index "course_templates", ["name"], name: "index_course_templates_on_name", unique: true, using: :btree
 
   create_table "courses", force: true do |t|
     t.string   "name"
@@ -94,14 +93,13 @@ ActiveRecord::Schema.define(version: 20150727080841) do
     t.text     "description"
     t.string   "paste_visibility"
     t.string   "formal_name"
-    t.boolean  "certificate_downloadable",       default: false,    null: false
+    t.boolean  "certificate_downloadable",       default: false, null: false
     t.string   "certificate_unlock_spec"
     t.integer  "organization_id"
     t.integer  "disabled_status",                default: 0
-    t.integer  "course_template_id",                             null: false
     t.string   "title"
     t.string   "material_url"
-    t.integer  "course_template_id"
+    t.integer  "course_template_id",                             null: false
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
@@ -170,9 +168,6 @@ ActiveRecord::Schema.define(version: 20150727080841) do
     t.integer  "requester_id"
   end
 
-  add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
-  add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
-
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false
     t.text     "code",       null: false
@@ -216,14 +211,13 @@ ActiveRecord::Schema.define(version: 20150727080841) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
-  create_table "submission_data", id: false, force: true do |t|
-    t.integer "submission_id",          null: false
-    t.binary  "return_file"
-    t.binary  "stdout_compressed"
-    t.binary  "stderr_compressed"
-    t.binary  "vm_log_compressed"
-    t.binary  "valgrind_compressed"
-    t.binary  "validations_compressed"
+  create_table "submission_data", primary_key: "submission_id", force: true do |t|
+    t.binary "return_file"
+    t.binary "stdout_compressed"
+    t.binary "stderr_compressed"
+    t.binary "vm_log_compressed"
+    t.binary "valgrind_compressed"
+    t.binary "validations_compressed"
   end
 
   create_table "submissions", force: true do |t|
@@ -272,8 +266,7 @@ ActiveRecord::Schema.define(version: 20150727080841) do
     t.datetime "updated_at"
   end
 
-  add_index "teacherships", ["organization_id"], name: "index_teacherships_on_organization_id", using: :btree
-  add_index "teacherships", ["user_id"], name: "index_teacherships_on_user_id", using: :btree
+  add_index "teacherships", ["user_id", "organization_id"], name: "index_teacherships_on_user_id_and_organization_id", unique: true, using: :btree
 
   create_table "test_case_runs", force: true do |t|
     t.integer  "submission_id"
