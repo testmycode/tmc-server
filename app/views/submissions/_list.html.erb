@@ -33,7 +33,7 @@
         <td><%= submission.created_at.strftime("%d.%m.%Y %H:%M") %></td>
         <% if show_student_column %>
           <td>
-            <% if current_user.id == submission.user.id || (can? :teach, @course) %>
+            <% if current_user.id == submission.user.id || can?(:teach, @course) %>
               <%= link_to submission.user.login, participant_path(submission.user) %>
             <% else %>
               <%= submission.user.login %>

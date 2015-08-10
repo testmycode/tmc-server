@@ -6,7 +6,7 @@
   <% end %>
 </h2>
 
-<% if (can? :teach, @organization) && !@expired_courses.empty? %>
+<% if can?(:teach, @organization) && !@expired_courses.empty? %>
   <h3>Ongoing courses</h3>
 <% end %>
 <% unless @ongoing_courses.empty? %>
@@ -19,7 +19,7 @@
   <p>No available courses.</p>
 <% end %>
 
-<% if (can? :teach, @organization) && !@expired_courses.empty? %>
+<% if can?(:teach, @organization) && !@expired_courses.empty? %>
   <h3>Expired courses</h3>
   <div class="row-fluid">
     <div class="span12">
