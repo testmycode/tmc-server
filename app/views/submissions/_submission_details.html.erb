@@ -61,7 +61,7 @@
       <% end %>
     </ul>
 
-    <% if can? :update, @submission %>
+    <% if can? :rerun, @submission %>
       <br/>
       <div>
         <%= form_tag submission_path(@submission), :method => :put, :class => 'single-button' do %>

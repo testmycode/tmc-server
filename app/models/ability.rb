@@ -63,6 +63,10 @@ class Ability
         can? :teach, sub.course
       end
 
+      can :rerun, Submission do |sub|
+        can? :teach, sub.course.organization
+      end
+
       cannot :manage_feedback_questions, Course
       can :manage_feedback_questions, Course do |c|
         can? :teach, c

@@ -163,6 +163,7 @@ class SubmissionsController < ApplicationController
     submission = Submission.find(params[:id]) || respond_not_found
     authorize! :update, submission
     if params[:rerun]
+      authorize! :rerun, submission
       schedule_for_rerun(submission, -1)
       redirect_to submission_path(submission), notice: 'Rerun scheduled'
     elsif params[:dismiss_review]
