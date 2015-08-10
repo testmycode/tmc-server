@@ -3,6 +3,7 @@ class SolutionsController < ApplicationController
   def show
     @course = Course.find_by(name: params[:course_id])
     @exercise = Exercise.find_by(name: params[:exercise_id], course: @course)
+    fail ActiveRecord::RecordNotFound unless @exercise
     @organization = @course.organization
 
     add_course_breadcrumb
