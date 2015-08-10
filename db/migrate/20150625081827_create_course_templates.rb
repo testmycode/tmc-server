@@ -6,7 +6,7 @@ class CreateCourseTemplates < ActiveRecord::Migration
       t.string :description
       t.string :material_url
       t.string :source_url
-      t.string :dummy, :boolean, null: false, default: false
+      t.boolean :dummy, null: false, default: false
       t.boolean :hidden, default: false
       t.integer :cache_version,   default: 0,     null: false
       t.string :source_backend, null: false, default: 'git'

@@ -125,12 +125,7 @@ describe CourseTemplatesController, type: :controller do
       it 'destroys course template' do
         expect do
           delete :destroy, id: @course_template.to_param
-        end.to change(CourseTemplate, :count).by(-1)
-      end
-
-      it 'redirects to the course templates list' do
-        delete :destroy, id: @course_template.to_param
-        expect(response).to redirect_to(course_templates_url)
+        end.to raise_exception
       end
     end
 

@@ -72,7 +72,7 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-    authorize! :refresh, @course
+     authorize! :refresh, @course
     refresh_course(@course)
     redirect_to organization_course_path
   end
@@ -253,7 +253,7 @@ class CoursesController < ApplicationController
     groups[''] = empty_group unless empty_group.empty?
     groups
   end
-  
+
   def refresh_course(course, options = {})
     begin
       session[:refresh_report] = course.refresh(options)

@@ -73,7 +73,7 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def cache_path
-    "#{Course.cache_root}/#{name}-#{cache_version}"
+    File.join(Course.cache_root, "#{name}-#{cache_version}")
   end
 
   def increment_cache_version

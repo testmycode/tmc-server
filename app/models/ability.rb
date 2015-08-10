@@ -181,7 +181,7 @@ class Ability
       cannot :read, CourseTemplate
       can :prepare_course, CourseTemplate
 
-      cannot :clone, CourseTemplate
+      #cannot :clone, CourseTemplate
       can :clone, CourseTemplate do |ct|
         ct.clonable?
       end

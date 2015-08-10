@@ -128,18 +128,4 @@ describe CourseTemplate, type: :model do
     expect(course1.git_branch).to eq('foo')
     expect(course2.git_branch).to eq('foo')
   end
-
-  it 'removes cloned repository if no courses' do
-    template = FactoryGirl.create :course_template
-    course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
-    template.reload
-    template.refresh
-    cache_path = template.cache_path
-    expect(Dir.exist? cache_path).to be(true)
-    course.destroy
-    expect(Dir.exist? cache_path).to be(true)
-    template.destroy
-    expect(Dir.exist? cache_path).to be(false)
-  end
-
 end

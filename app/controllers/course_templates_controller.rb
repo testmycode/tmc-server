@@ -47,9 +47,7 @@ class CourseTemplatesController < ApplicationController
   end
 
   def destroy
-    authorize! :destroy, CourseTemplate
-    @course_template.destroy
-    redirect_to course_templates_path, notice: 'Course template was successfully destroyed.'
+    raise "One does not destroy a course template"
   end
 
   def list_for_teachers

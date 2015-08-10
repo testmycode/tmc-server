@@ -68,8 +68,7 @@ ActiveRecord::Schema.define(version: 20150727080841) do
     t.string   "description"
     t.string   "material_url"
     t.string   "source_url"
-    t.string   "dummy",          default: "f",      null: false
-    t.string   "boolean",        default: "f",      null: false
+    t.boolean  "dummy",          default: false,    null: false
     t.boolean  "hidden",         default: false
     t.integer  "cache_version",  default: 0,        null: false
     t.string   "source_backend", default: "git",    null: false

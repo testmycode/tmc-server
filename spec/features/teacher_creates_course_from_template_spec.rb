@@ -6,6 +6,7 @@ feature 'Teacher creates course from course template', feature: true do
   before :each do
     @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
     @teacher = FactoryGirl.create :user, password: 'xooxer'
+    @teacher.update!(administrator: true)
     @user = FactoryGirl.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
 

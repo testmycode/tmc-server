@@ -20,11 +20,12 @@ feature 'Admin propagates template changes to all courses cloned from template',
     FactoryGirl.create :course_template, name: 'template', title: 'template', source_url: @repo_path
 
     visit '/'
-    log_in_as @teacher1.login, 'teacher1'
+    #log_in_as @teacher1.login, 'teacher1'
+    log_in_as @admin.login, 'xooxer'
     create_course_from_template name: 'course', organization_slug: @organization1.slug
 
-    log_out
-    log_in_as @teacher2.login, 'teacher2'
+    #log_out
+    #log_in_as @teacher2.login, 'teacher2'
     create_course_from_template name: 'course', organization_slug: @organization2.slug
 
     log_out

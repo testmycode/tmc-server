@@ -234,6 +234,7 @@ describe CoursesController, type: :controller do
         end
 
         it 'does directory changes when course is first created from template, but doesn\'t do changes when creating more courses from same template' do
+      #    expect(CourseTemplate.last.dummy).to be_true
           expect(CourseTemplate.last.cache_version).to eq(0)
           post :create_from_template, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @template.id }
           expect(Course.last.cache_version).to eq(1)

@@ -39,8 +39,8 @@ class Course < ActiveRecord::Base
   has_many :assistantships, dependent: :destroy
   has_many :assistants, through: :assistantships, source: :user
 
-  belongs_to :organization
   belongs_to :course_template
+  belongs_to :organization
 
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
@@ -403,9 +403,9 @@ class Course < ActiveRecord::Base
 
   def save_template
     course_template_obj.save!
-  rescue
+  rescue => e
     course_template_obj.errors.full_messages.each do |msg|
-      errors.add(:base, msg)
+      errors.add(:base, msg + e.message)
     end
   end
 
