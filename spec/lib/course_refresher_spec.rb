@@ -7,11 +7,12 @@ describe CourseRefresher do
     @user = FactoryGirl.create(:user)
 
     repo_path = "#{@test_tmp_dir}/fake_remote_repo"
-    repo_url = "file://#{repo_path}"
-
-    @course = Course.create!(name: 'TestCourse', source_backend: 'git', source_url: repo_url)
-
+    @repo_url = "file://#{repo_path}"
     create_bare_repo(repo_path)
+
+    @template = FactoryGirl.create :course_template, name: 'Template', source_url: @repo_url
+    @course = FactoryGirl.create :course, name: 'TestCourse', title: 'TestCourse', source_backend: 'git', course_template: @template, source_url: @repo_url
+    @course2 = FactoryGirl.create :course, name: 'TestCourse2', title: 'TestCourse2', source_backend: 'git', course_template: @template, source_url: @repo_url
 
     @local_clone = clone_course_repo(@course)
 
@@ -20,21 +21,27 @@ describe CourseRefresher do
 
   it 'should discover new exercises' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.exercises.size).to eq(1)
     expect(@course.exercises[0].name).to eq('MyExercise')
+    expect(@course2.exercises.size).to eq(1)
+    expect(@course2.exercises[0].name).to eq('MyExercise')
   end
 
+  # test that git branch is changed for all courses of the same template
   it 'clones the given git branch' do
     @local_clone.chdir do
       system!('git checkout -b foo >/dev/null 2>&1')
     end
     @local_clone.active_branch = 'foo'
+    add_exercise('MyExercise')
+
+    @template.git_branch = 'foo'
+    @template.save!
     @course.git_branch = 'foo'
     @course.save!
 
-    add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    @refresher.refresh_course @course
     expect(@course.exercises.size).to eq(1)
     expect(@course.exercises[0].name).to eq('MyExercise')
   end
@@ -42,20 +49,28 @@ describe CourseRefresher do
   it 'should discover new exercises in subdirectories' do
     add_exercise('MyCategory/MyExercise')
     add_exercise('MyCategory/MySubcategory/MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.exercises.size).to eq(2)
+    expect(@course2.exercises.size).to eq(2)
     names = @course.exercises.map &:name
+    expect(names).to include('MyCategory-MyExercise')
+    expect(names).to include('MyCategory-MySubcategory-MyExercise')
+    names = @course2.exercises.map &:name
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
   end
 
   it 'should allow duplicate available point names for different exercises' do
     add_exercise('MyCategory/MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
     add_exercise('MyCategory/MySubcategory/MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.exercises.size).to eq(2)
+    expect(@course2.exercises.size).to eq(2)
     names = @course.exercises.map &:name
+    expect(names).to include('MyCategory-MyExercise')
+    expect(names).to include('MyCategory-MySubcategory-MyExercise')
+    names = @course2.exercises.map &:name
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
 
@@ -64,40 +79,55 @@ describe CourseRefresher do
     expect(points0).not_to eq(0)
     expect(points1).not_to eq(0)
     expect(points0).to eq(points1)
+    points0 = @course2.exercises[0].available_points.length
+    points1 = @course2.exercises[1].available_points.length
+    expect(points0).not_to eq(0)
+    expect(points1).not_to eq(0)
+    expect(points0).to eq(points1)
 
     uniq_points = @course.available_points.map(&:name).uniq.length
+    expect(uniq_points).to eq(points0)
+    expect(uniq_points).to eq(points1)
+    uniq_points = @course2.available_points.map(&:name).uniq.length
     expect(uniq_points).to eq(points0)
     expect(uniq_points).to eq(points1)
   end
 
   it 'should reload course options' do
     expect(@course.hide_after).to be_nil
+    expect(@course2.hide_after).to be_nil
 
     change_course_options_file 'hide_after' => '2011-07-01 13:00'
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.hide_after).to eq(Time.zone.parse('2011-07-01 13:00')) # local time zone
+    expect(@course2.hide_after).to eq(Time.zone.parse('2011-07-01 13:00')) # local time zone
 
     change_course_options_file 'hide_after' => nil
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.hide_after).to eq(nil)
+    expect(@course2.hide_after).to eq(nil)
 
     change_course_options_file 'hidden' => true
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course).to be_hidden
+    expect(@course2).to be_hidden
 
     change_course_options_file 'spreadsheet_key' => 'qwerty'
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.spreadsheet_key).to eq('qwerty')
+    expect(@course2.spreadsheet_key).to eq('qwerty')
   end
 
   it 'should work with an empty course options file' do
     change_course_options_file '', raw: true
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.hide_after).to eq(nil)
+    expect(@course2.hide_after).to eq(nil)
 
     change_course_options_file '---', raw: true
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.hide_after).to eq(nil)
+    expect(@course2.hide_after).to eq(nil)
   end
 
   it 'should load exercise metadata with defaults from superdirs' do
@@ -113,10 +143,12 @@ describe CourseRefresher do
       commit: true
     )
 
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
     expect(@course.exercises.first.gdocs_sheet).to eq('xoo')
+    expect(@course2.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
+    expect(@course2.exercises.first.gdocs_sheet).to eq('xoo')
   end
 
   it 'should load changed exercise metadata except for deadlines' do
@@ -130,7 +162,7 @@ describe CourseRefresher do
                          { 'deadline' => '2012-01-02 12:34' },
                          commit: true
     )
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     change_metadata_file(
       'metadata.yml',
@@ -142,9 +174,11 @@ describe CourseRefresher do
       { 'gdocs_sheet' => 'foo' },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    refresh_courses
     expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
     expect(@course.exercises.first.gdocs_sheet).to eq('foo')
+    expect(@course2.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
+    expect(@course2.exercises.first.gdocs_sheet).to eq('foo')
   end
 
   it 'should allow course-specific overrides in course options' do
@@ -159,7 +193,7 @@ describe CourseRefresher do
                                    'hide_after' => '2003-01-01 00:00'
                                  }
                                })
-    @refresher.refresh_course(@course)
+    @refresher.refresh_course @course
 
     expect(@course.hide_after).to eq(Time.zone.parse('2002-01-01 00:00'))
   end
@@ -181,7 +215,7 @@ describe CourseRefresher do
       },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    @refresher.refresh_course @course
 
     expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2002-01-01 00:00'))
   end
@@ -205,7 +239,7 @@ describe CourseRefresher do
       { 'deadline' => '2001-01-01 00:00' },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    @refresher.refresh_course @course
 
     expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2001-01-01 00:00'))
   end
@@ -224,7 +258,7 @@ describe CourseRefresher do
       },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    @refresher.refresh_course @course
 
     expect(@course.exercises.first.deadline_for(@user)).to be_nil
   end
@@ -241,19 +275,21 @@ describe CourseRefresher do
       { 'deadline' => nil },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.exercises.first.deadline_for(@user)).to be_nil
+    expect(@course2.exercises.first.deadline_for(@user)).to be_nil
   end
 
   it 'should delete removed exercises from the database' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     delete_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.exercises.size).to eq(0)
+    expect(@course2.exercises.size).to eq(0)
   end
 
   it 'should mark available points requiring review' do
@@ -263,12 +299,16 @@ describe CourseRefresher do
       { 'review_points' => 'addsub reviewonly' },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.available_points.find_by_name('addsub')).to require_review
     expect(@course.available_points.find_by_name('reviewonly')).not_to be_nil
     expect(@course.available_points.find_by_name('reviewonly')).to require_review
     expect(@course.available_points.find_by_name('mul')).not_to require_review
+    expect(@course2.available_points.find_by_name('addsub')).to require_review
+    expect(@course2.available_points.find_by_name('reviewonly')).not_to be_nil
+    expect(@course2.available_points.find_by_name('reviewonly')).to require_review
+    expect(@course2.available_points.find_by_name('mul')).not_to require_review
   end
 
   it "should change available points' requiring review state after second refresh" do
@@ -278,73 +318,84 @@ describe CourseRefresher do
       { 'review_points' => 'addsub reviewonly' },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    refresh_courses
     change_metadata_file(
       'metadata.yml',
       { 'review_points' => 'mul' },
       commit: true
     )
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.available_points.find_by_name('addsub')).not_to require_review
     expect(@course.available_points.find_by_name('reviewonly')).to be_nil
     expect(@course.available_points.find_by_name('mul')).to require_review
+    expect(@course2.available_points.find_by_name('addsub')).not_to require_review
+    expect(@course2.available_points.find_by_name('reviewonly')).to be_nil
+    expect(@course2.available_points.find_by_name('mul')).to require_review
   end
 
   it 'should ignore exercises under directories with a .tmcignore file' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     FileUtils.touch("#{@local_clone.path}/MyExercise/.tmcignore")
     @local_clone.add_commit_push
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.exercises.size).to eq(0)
+    expect(@course2.exercises.size).to eq(0)
   end
 
   it 'should restore exercises that are removed and subsequently readded' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     delete_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.exercises.size).to eq(1)
+    expect(@course2.exercises.size).to eq(1)
   end
 
   it 'should cope with exercises that use Java packages' do
     add_exercise('MyExercise', fixture_name: 'ExerciseWithPackages')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.exercises.size).to eq(1)
+    expect(@course2.exercises.size).to eq(1)
     exercise = @course.exercises.first
+    expect(exercise.name).to eq('MyExercise')
+    expect(exercise.available_points.map(&:name)).to include('packagedtest')
+    exercise = @course2.exercises.first
     expect(exercise.name).to eq('MyExercise')
     expect(exercise.available_points.map(&:name)).to include('packagedtest')
   end
 
   it 'should scan the exercises for available points' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     points = @course.exercises.where(name: 'MyExercise').first.available_points
+    expect(points.map(&:name)).to include('addsub')
+    points = @course2.exercises.where(name: 'MyExercise').first.available_points
     expect(points.map(&:name)).to include('addsub')
   end
 
   it 'should delete previously available points that are no longer available' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
     delete_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(AvailablePoint.all).to be_empty
   end
 
   it 'should never delete awarded points' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     exercise = @course.exercises.first
     sub = FactoryGirl.create(:submission, course: @course, exercise_name: exercise.name)
@@ -354,7 +405,7 @@ describe CourseRefresher do
                                          name: AvailablePoint.first.name)
 
     delete_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(AwardedPoint.all).to include(awarded_point)
   end
@@ -363,7 +414,7 @@ describe CourseRefresher do
     # Tested more thoroughly in lib/course_@refresher/exercise_file_filter_spec.rb
     add_exercise('MyExercise')
 
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     stub = Exercise.find_by_name('MyExercise').stub_path
 
@@ -383,7 +434,7 @@ describe CourseRefresher do
     # Tested more thoroughly in lib/course_@refresher/exercise_file_filter_spec.rb
     add_exercise('MyExercise')
 
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     solution = Exercise.find_by_name('MyExercise').solution_path
 
@@ -397,7 +448,7 @@ describe CourseRefresher do
 
   it 'should regenerate changed solutions' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     @local_clone.chdir do
       new_file = File.read('MyExercise/src/SimpleStuff.java').gsub('return a + b;', 'return b + a;')
@@ -405,7 +456,7 @@ describe CourseRefresher do
     end
     @local_clone.add_commit_push
 
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     solution = Exercise.find_by_name('MyExercise').solution_path
     simple_stuff = File.read(solution + '/src/SimpleStuff.java')
@@ -416,15 +467,16 @@ describe CourseRefresher do
     add_exercise('MyExercise')
     add_exercise('MyCategory/MyExercise')
 
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(File).to exist(@course.stub_zip_path + '/MyExercise.zip')
     expect(File).to exist(@course.stub_zip_path + '/MyCategory-MyExercise.zip')
+    expect(@course.stub_zip_path).to eq(@course2.stub_zip_path)
   end
 
   it 'should not include hidden tests in the zips' do
     add_exercise('MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     sh!('unzip', @course.stub_zip_path + '/MyExercise.zip')
     expect(File).not_to exist('MyExercise/test/SimpleHiddenTest.java')
@@ -436,7 +488,7 @@ describe CourseRefresher do
     local_repo.write_file('MyExercise/metadata.yml', 'foo: bar')
     local_repo.write_file('MyExercise/non-metadata.yml', 'foo: bar')
     local_repo.add_commit_push
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     sh!('unzip', @course.stub_zip_path + '/MyExercise.zip')
     expect(File).not_to exist('MyExercise/metadata.yml')
@@ -445,13 +497,13 @@ describe CourseRefresher do
 
   it 'should not remake zip files of removed exercises' do
     add_exercise('MyCategory/MyExercise')
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(File).to exist(@course.stub_zip_path + '/MyCategory-MyExercise.zip')
 
     FileUtils.rm_rf "#{@local_clone.path}/MyCategory/MyExercise"
     @local_clone.add_commit_push
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(File).not_to exist(@course.stub_zip_path + '/MyCategory-MyExercise.zip')
   end
@@ -460,15 +512,17 @@ describe CourseRefresher do
     add_exercise('MyExercise')
     add_exercise('MyCategory/MyExercise')
 
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(File).to exist(@course.solution_zip_path + '/MyExercise.zip')
     expect(File).to exist(@course.solution_zip_path + '/MyCategory-MyExercise.zip')
   end
 
   it 'should delete the old cache directory' do
+    expect(@course.cache_path).to eq(@course2.cache_path)
     old_path = @course.cache_path
-    @refresher.refresh_course(@course)
+    refresh_courses
+    expect(@course.cache_path).to eq(@course2.cache_path)
     new_path = @course.cache_path
 
     expect(new_path).not_to eq(old_path)
@@ -481,7 +535,7 @@ describe CourseRefresher do
     FileUtils.mkdir_p(expected_path)
     FileUtils.touch(expected_path + '/foo.txt')
 
-    @refresher.refresh_course(@course)
+    refresh_courses
 
     expect(@course.cache_path).to eq(expected_path)
     expect(File).not_to exist(expected_path + '/foo.txt')
@@ -492,25 +546,33 @@ describe CourseRefresher do
     local_repo.write_file('MyExercise/foo.txt', 'something')
     local_repo.add_commit_push
 
-    @refresher.refresh_course(@course)
+    refresh_courses
     cs1 = @course.exercises.first.checksum
+    cs2 = @course2.exercises.first.checksum
 
     local_repo.write_file('MyExercise/foo.txt', 'something else')
     local_repo.add_commit_push
     local_repo.write_file('MyExercise/foo.txt', 'something')
     local_repo.add_commit_push
 
-    @refresher.refresh_course(@course)
-    cs2 = @course.exercises.first.checksum
+    refresh_courses
+    cs3 = @course.exercises.first.checksum
+    cs4 = @course2.exercises.first.checksum
 
     local_repo.write_file('MyExercise/foo.txt', 'something else')
     local_repo.add_commit_push
-    @refresher.refresh_course(@course)
-    cs3 = @course.exercises.first.checksum
+    refresh_courses
+    cs5 = @course.exercises.first.checksum
+    cs6 = @course2.exercises.first.checksum
 
-    [cs1, cs2, cs3].each { |cs| expect(cs).not_to be_blank }
-    expect(cs1).to eq(cs2) # Only file contents should be checksummed, not metadata
-    expect(cs2).not_to eq(cs3)
+    [cs1, cs2, cs3, cs4, cs5, cs6].each { |cs| expect(cs).not_to be_blank }
+    expect(cs1).to eq(cs3) # Only file contents should be checksummed, not metadata
+    expect(cs3).not_to eq(cs5)
+    expect(cs2).to eq(cs4)
+    expect(cs4).not_to eq(cs6)
+    expect(cs1).to eq(cs2)
+    expect(cs3).to eq(cs4)
+    expect(cs5).to eq(cs6)
   end
 
   it 'should be able to scan maven exercises' # TODO
@@ -518,13 +580,13 @@ describe CourseRefresher do
   it 'should not allow dashes in exercise folders' do
     add_exercise('My-Exercise')
 
-    expect { @refresher.refresh_course(@course) }.to raise_error(CourseRefresher::Failure)
+    expect { refresh_courses }.to raise_error(CourseRefresher::Failure)
   end
 
   it 'should not allow dashes in exercise categories' do
     add_exercise('My-Category/MyExercise')
 
-    expect { @refresher.refresh_course(@course) }.to raise_error(CourseRefresher::Failure)
+    expect { refresh_courses }.to raise_error(CourseRefresher::Failure)
   end
 
   it 'should allow dashes in exercise subfolders' do
@@ -533,32 +595,52 @@ describe CourseRefresher do
     local_repo.write_file('MyExercise/my-dir/foo.txt', 'something')
     local_repo.add_commit_push
 
-    report = @refresher.refresh_course(@course)
+    report = @refresher.refresh_course @course
     expect(report.errors).to be_empty
     expect(report.warnings).to be_empty
   end
 
   it 'should report YAML parsing errors normally' do
     change_course_options_file "foo: bar\noops :error", raw: true
-    expect { @refresher.refresh_course(@course) }.to raise_error(CourseRefresher::Failure)
+    expect { refresh_courses }.to raise_error(CourseRefresher::Failure)
   end
 
   describe 'when done twice' do
     it 'should be able to use a different repo' do
-      @refresher.refresh_course(@course)
+      course = FactoryGirl.create :course, source_url: @repo_url
+      @refresher.refresh_course course
 
       repo_path = "#{@test_tmp_dir}/another_fake_remote_repo"
-      @course.source_url = "file://#{repo_path}"
-      @course.save!
+      course.source_url = "file://#{repo_path}"
       create_bare_repo(repo_path)
-      @local_clone = clone_course_repo(@course)
+      course.save!
+      @local_clone = clone_course_repo(course)
 
       add_exercise('NewEx')
-      @refresher.refresh_course(@course)
+      @refresher.refresh_course course
 
-      expect(@course.exercises.size).to eq(1)
-      expect(@course.exercises.first.name).to eq('NewEx')
+      expect(course.exercises.size).to eq(1)
+      expect(course.exercises.first.name).to eq('NewEx')
     end
+
+    it 'should be able to use a different repo for templated courses' #do
+    ##
+    #  refresh_courses
+
+    #  repo_path = "#{@test_tmp_dir}/another_fake_remote_repo"
+    #  create_bare_repo(repo_path)
+    #  @template.source_url = "file://#{repo_path}"
+    #  @template.save!
+    #  @local_clone = clone_course_repo(@course)
+
+    #  add_exercise('NewEx')
+    #  refresh_courses
+
+    #  expect(@course.exercises.size).to eq(1)
+    #  expect(@course.exercises.first.name).to eq('NewEx')
+    #  expect(@course2.exercises.size).to eq(1)
+    #  expect(@course2.exercises.first.name).to eq('NewEx')
+    #end
   end
 
   describe 'on failure' do
@@ -568,16 +650,18 @@ describe CourseRefresher do
 
     it 'should not leave the new cache directory lying around' do
       sabotage
-      expect { @refresher.refresh_course(@course) }.to raise_error
+      expect { refresh_courses }.to raise_error
 
+      expect(File).not_to exist(@template.cache_path)
       expect(File).not_to exist(@course.cache_path)
+      expect(File).not_to exist(@course2.cache_path)
     end
 
     it 'should not delete the old cache directory' do
-      @refresher.refresh_course(@course)
+      refresh_courses
       old_path = @course.cache_path
       sabotage
-      expect { @refresher.refresh_course(@course) }.to raise_error
+      expect { refresh_courses }.to raise_error
 
       expect(File).to exist(old_path)
     end
@@ -588,10 +672,14 @@ describe CourseRefresher do
       old_points = AvailablePoint.order(:id).to_a
 
       sabotage
-      expect { @refresher.refresh_course(@course) }.to raise_error
+      expect { refresh_courses }.to raise_error
 
+      @template.reload
+      expect(@template.cache_version).to eq(old_cache_version)
       @course.reload
       expect(@course.cache_version).to eq(old_cache_version)
+      @course2.reload
+      expect(@course2.cache_version).to eq(old_cache_version)
       expect(Exercise.order(:id).to_a).to eq(old_exercises)
       expect(AvailablePoint.order(:id).to_a).to eq(old_points)
     end
@@ -600,19 +688,51 @@ describe CourseRefresher do
   describe 'for MakefileC exercises' do
     it 'should scan the exercises for available points' do
       add_exercise('MakefileC', fixture_name: 'MakefileC')
-      @refresher.refresh_course(@course)
+      refresh_courses
 
       points = @course.exercises.where(name: 'MakefileC').first.available_points
+      expect(points.map(&:name)).to include('point1')
+      points = @course2.exercises.where(name: 'MakefileC').first.available_points
       expect(points.map(&:name)).to include('point1')
     end
 
     it 'should delete previously available points that are no longer available' do
       add_exercise('MakefileC', fixture_name: 'MakefileC')
-      @refresher.refresh_course(@course)
+      refresh_courses
       delete_exercise('MakefileC')
-      @refresher.refresh_course(@course)
+      refresh_courses
 
       expect(AvailablePoint.all).to be_empty
+    end
+  end
+
+  describe 'with no_directory_changes flag' do
+    it 'doesn\'t increment cache_version' do
+      refresh_courses
+      expect(@template.cache_version).not_to eq(2)
+      expect(@course.cache_version).not_to eq(2)
+      expect(@course2.cache_version).not_to eq(2)
+      expect(@template.cache_version).to eq(1)
+      expect(@course.cache_version).to eq(1)
+      expect(@course2.cache_version).to eq(1)
+    end
+
+    it 'doesn\'t create duplicate repository folder' do
+      refresh_courses
+      expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
+    end
+
+    it 'doesn\'t remove any folders on fail' do
+      @refresher.refresh_course(@course)
+      @template.reload
+
+      expect(CourseRefresher).to receive(:simulate_failure!).and_raise('simulated failure')
+      expect{ @refresher.refresh_course(@course2, no_directory_changes: true) }.to raise_error
+
+      expect(File).to exist(@template.cache_path)
+      expect(File).to exist(@course.cache_path)
+      expect(File).to exist(@course2.cache_path)
+      expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
     end
   end
 
@@ -642,5 +762,11 @@ describe CourseRefresher do
       File.open(filename, 'wb') { |f| f.write(data) }
       @local_clone.add_commit_push if options[:commit]
     end
+  end
+
+  def refresh_courses
+    @refresher.refresh_course(@course)
+    @refresher.refresh_course(@course2, no_directory_changes: true)
+    @template.reload
   end
 end

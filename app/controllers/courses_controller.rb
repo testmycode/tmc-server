@@ -5,7 +5,9 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, except: [:index, :show_json, :new, :create, :help]
+  before_action :set_course, except: [:create, :help, :index, :new, :show_json, :create_from_template, :prepare_from_template]
+
+  skip_authorization_check only: [:index]
 
   skip_authorization_check only: [:index]
 
@@ -70,14 +72,8 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-    authorize! :refresh, @course
-
-    begin
-      session[:refresh_report] = @course.refresh
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
-    end
-
+     authorize! :refresh, @course
+    refresh_course(@course)
     redirect_to organization_course_path
   end
 
@@ -89,16 +85,35 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = Course.new(course_params)
-    @course.organization = @organization
-    authorize! :teach, @organization
+    create_impl(custom: true, params: course_params_for_create)
+  end
 
-    respond_to do |format|
-      if @course.save
-        format.html { redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully created.') }
-      else
-        format.html { render action: 'new', notice: 'Course could not be created.' }
-      end
+  def prepare_from_template
+    @course_template = CourseTemplate.find(params[:course_template_id])
+    authorize! :teach, @organization
+    authorize! :clone, @course_template
+    add_organization_breadcrumb
+    add_breadcrumb 'Course templates', organization_course_templates_path
+    add_breadcrumb 'Create new course'
+    @course = Course.new_from_template(@course_template)
+  end
+
+  def create_from_template
+    create_impl(custom: false, params: course_params_for_create_from_template)
+  end
+
+  def edit
+    authorize! :teach, @organization
+    add_course_breadcrumb
+    add_breadcrumb 'Edit course parameters'
+  end
+
+  def update
+    authorize! :teach, @organization
+    if @course.update(course_params)
+      redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
+    else
+      render :edit
     end
   end
 
@@ -149,7 +164,14 @@ class CoursesController < ApplicationController
   rescue DeadlineSpec::InvalidSyntaxError => e
     redirect_to manage_deadlines_organization_course_path(@organization, @course), alert: e.to_s
   end
-  
+
+  def help
+    @course = Course.find(params[:course_id])
+    authorize! :read, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Help page'
+  end
+
   def manage_unlocks
     authorize! :manage_unlocks, @course
     add_course_breadcrumb
@@ -182,8 +204,20 @@ class CoursesController < ApplicationController
 
   private
 
+  def course_params_for_create
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
+  end
+
+  def course_params_for_create_from_template
+    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
+  end
+
   def course_params
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch)
+    if @course.custom?
+      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch)
+    else
+      params.require(:course).permit(:title, :description, :material_url)
+    end
   end
 
   def assign_show_view_vars
@@ -218,5 +252,36 @@ class CoursesController < ApplicationController
     empty_group = sliced[:empty_group] || {}
     groups[''] = empty_group unless empty_group.empty?
     groups
+  end
+
+  def refresh_course(course, options = {})
+    begin
+      session[:refresh_report] = course.refresh(options)
+    rescue CourseRefresher::Failure => e
+      session[:refresh_report] = e.report
+    end
+  end
+
+  def create_impl(options = {})
+    create_params = options[:params]
+    input_name = create_params[:name]
+    create_params[:name] = @organization.slug + '-' + input_name
+
+    @course = Course.new(create_params)
+    @course.organization = @organization
+    @course_template = @course.course_template
+
+    authorize! :teach, @organization
+    authorize! :clone, @course_template unless options[:custom]
+
+    respond_to do |format|
+      if @course.save
+        refresh_course(@course, no_directory_changes: options[:custom] ? false : @course.course_template.cache_exists?)
+        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
+      else
+        @course.name = input_name
+        format.html { render action: options[:custom] ? 'new' : 'prepare_from_template', notice: 'Course could not be created' }
+      end
+    end
   end
 end

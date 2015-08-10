@@ -22,8 +22,8 @@
 
   <p>
     <strong>Requested by:</strong>
-    <% requested_by = @organization.teachers.first %>
-    <%= link_to requested_by.username, participant_path(requested_by) %>
+    <% requested_by = @organization.requester %>
+    <%= link_to requested_by.username, participant_path(requested_by) unless requested_by.nil? %>
   </p>
 
   <p>

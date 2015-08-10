@@ -1,0 +1,51 @@
+<h1>Course templates</h1>
+
+<% unless @course_templates.empty? %>
+  <h3>Visible</h3>
+  <table class="table table-striped table-condensed">
+    <thead>
+    <tr class="no-wrap">
+      <th>Name</th>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Material url</th>
+      <th>Source url</th>
+      <th>Expires at</th>
+      <th colspan="3"></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% @course_templates.each do |course_template| %>
+      <%= render partial: 'table_row', locals: { course_template: course_template } %>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% unless @hidden_course_templates.empty? %>
+  <h3>Hidden</h3>
+  <table class="table table-striped table-condensed">
+    <thead>
+    <tr class="no-wrap">
+      <th>Name</th>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Material url</th>
+      <th>Source url</th>
+      <th>Expires at</th>
+      <th colspan="3"></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% @hidden_course_templates.each do |course_template| %>
+      <%= render partial: 'table_row', locals: { course_template: course_template } %>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<br>
+
+<%= link_to 'New Course template', new_course_template_path %>

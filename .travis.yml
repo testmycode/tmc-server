@@ -10,6 +10,8 @@ git:
 before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
+  - git config --global user.email "travis@example.com"
+  - git config --global user.name "Travis"
 
 services:
   - postgresql

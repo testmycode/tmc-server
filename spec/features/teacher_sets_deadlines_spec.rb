@@ -4,14 +4,22 @@ feature 'Teacher sets deadlines', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
+    organization = FactoryGirl.create :accepted_organization, slug: 'slug'
     @teacher = FactoryGirl.create :user, password: '1234'
     @admin = FactoryGirl.create :admin, password: '1234'
+
+    repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(repo_path)
     @course = FactoryGirl.create :course,
-                                 source_url: 'https://github.com/testmycode/tmc-testcourse.git',
-                                 organization: @organization
+                                 source_url: repo_path,
+                                 organization: organization
+
+    repo = clone_course_repo(@course)
+    repo.copy_simple_exercise('MyExercise')
+    repo.add_commit_push
+
     @course.refresh
-    Teachership.create! user: @teacher, organization: @organization
+    Teachership.create! user: @teacher, organization: organization
 
     FactoryGirl.create(:exercise, course: @course)
     FactoryGirl.create(:exercise, course: @course)

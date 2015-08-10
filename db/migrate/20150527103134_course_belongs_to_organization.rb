@@ -1,4 +1,10 @@
 class CourseBelongsToOrganization < ActiveRecord::Migration
+
+  class Course < ActiveRecord::Base
+    belongs_to :organization
+
+  end
+
   def change
     add_reference :courses, :organization, index: true, foreign_key: true
     default_organization = Organization.find_by slug: 'default'
