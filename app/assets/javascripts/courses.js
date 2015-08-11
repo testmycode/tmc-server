@@ -101,4 +101,17 @@ $(document).ready(function() {
     };
 
     $("#toggle-advanced-deadline-options").click(toggle_advanced_deadline_options);
+
+    /*
+     * Manage exercises select all
+     */
+
+    var select_unselect_all = function(e) {
+        var check = this.checked;
+        $(".exercise-checkbox").each(function() {
+            this.checked = check;
+        });
+    };
+
+    $("#select-all").click(select_unselect_all);
 });

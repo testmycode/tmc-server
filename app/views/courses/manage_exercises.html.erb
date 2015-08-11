@@ -1,4 +1,8 @@
-<h1>Enable and disable exercises</h1>
+<h1 class="float-left">Enable and disable exercises</h1>
+<div class="float-right" style="margin: 25px 20px 0 0">
+  <label><input type="checkbox" id="select-all"> Select all</label>
+</div>
+<div class="float-clear"></div>
 <%= form_for @course, url: set_disabled_statuses_organization_course_exercises_path(@organization, @course), method: :post do |f| %>
   <table class="table table-striped">
     <thead>
@@ -7,23 +11,22 @@
         Exercise
       </th>
       <th>
-        Select
+        Enabled
       </th>
     </tr>
     </thead>
     <tbody>
-    <%= f.collection_check_boxes(:exercises, @exercises, :id, :name) do |c| %>
+    <%= f.collection_check_boxes(:exercises, @exercises, :id, :name, checked: @exercises.reject(&:disabled?).map(&:id)) do |c| %>
       <tr>
         <td>
           <%= render partial: 'exercises/list_single', locals: { exercise: @exercises_id_map[c.value] } %>
         </td>
         <td>
-          <%= c.check_box %>
+          <%= c.check_box class: 'exercise-checkbox' %>
         </td>
       </tr>
     <% end %>
     </tbody>
   </table>
-  <%= f.submit 'Enable selected', class: 'btn btn-mini btn-info' %>
-  <%= f.submit 'Disable selected', class: 'btn btn-mini btn-danger' %>
+  <%= f.submit 'Update exercises', class: 'btn btn-mini btn-info' %>
 <% end %>

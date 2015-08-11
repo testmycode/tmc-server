@@ -24,10 +24,10 @@ feature 'Teacher disables exercises', feature: true do
     click_link 'Manage exercises'
 
     [@ex1, @ex2, @ex3].each do |ex|
-      check "course_exercises_#{ex.id}"
+      uncheck "course_exercises_#{ex.id}"
     end
 
-    click_button 'Disable selected'
+    click_button 'Update exercises'
 
     [@ex1, @ex2, @ex3].each do |ex|
       expect(page).to have_content("#{ex.name} (disabled)")
@@ -46,11 +46,11 @@ feature 'Teacher disables exercises', feature: true do
 
     click_link 'Manage exercises'
 
-    [@ex1, @ex2, @ex3, @ex4].each do |ex|
+    [@ex1, @ex2, @ex3].each do |ex|
       check "course_exercises_#{ex.id}"
     end
 
-    click_button 'Enable selected'
+    click_button 'Update exercises'
 
     [@ex1, @ex2, @ex3, @ex4].each do |ex|
       expect(page).to have_content("#{ex.name}")
