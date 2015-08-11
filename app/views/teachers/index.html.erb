@@ -1,5 +1,9 @@
 <h1>Teachers in <%= @organization.name %></h1>
 
+<%= render 'form' %>
+
+<h4>Current teachers</h4>
+
 <table class="table table-striped table-condensed">
   <thead>
   <tr>
@@ -17,5 +21,3 @@
   <% end %>
   </tbody>
 </table>
-
-<%= render 'form' %>
