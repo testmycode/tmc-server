@@ -55,7 +55,7 @@
           <tr class="<%= row_class %>">
             <td><%= index + 1 %></td>
             <td>
-              <% if current_user.id == user.id || (can? :teach, @course) %>
+              <% if current_user.id == user.id || can?(:teach, @course) %>
                 <%= link_to user.login, participant_path(user) %>
               <% else %>
                 <%= user.login %>

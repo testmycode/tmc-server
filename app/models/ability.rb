@@ -38,7 +38,7 @@ class Ability
 
       cannot :read, Course
       can :read, Course do |c|
-        c.visible_to?(user) || (can? :teach, c)
+        c.visible_to?(user) || can?(:teach, c)
       end
 
       can :create, Course do |c|
@@ -52,7 +52,7 @@ class Ability
 
       cannot :read, Exercise
       can :read, Exercise do |ex|
-        ex.visible_to?(user) || (can? :teach, ex.course)
+        ex.visible_to?(user) || can?(:teach, ex.course)
       end
       can :download, Exercise do |ex|
         ex.downloadable_by?(user)
@@ -60,7 +60,7 @@ class Ability
 
       cannot :read, Submission
       can :read, Submission do |sub|
-        sub.readable_by?(user) || (can? :teach, sub.course)
+        sub.readable_by?(user) || can?(:teach, sub.course)
       end
 
       can :create, Submission do |sub|
@@ -69,6 +69,10 @@ class Ability
 
       can :update, Submission do |sub|
         can? :teach, sub.course
+      end
+
+      can :rerun, Submission do |sub|
+        can? :teach, sub.course.organization
       end
 
       cannot :manage_feedback_questions, Course
@@ -102,15 +106,15 @@ class Ability
 
       cannot :read, Solution
       can :read, Solution do |sol|
-        sol.visible_to?(user) || (can? :teach, sol.exercise.course)
+        sol.visible_to?(user) || can?(:teach, sol.exercise.course)
       end
 
       cannot :manage, Review
       can :manage, Review do |r|
-        r.manageable_by?(user) || (can? :teach, r.submission.course)
+        r.manageable_by?(user) || can?(:teach, r.submission.course)
       end
       can :read, Review do |r|
-        r.readable_by?(user) || (can? :teach, r.submission.course)
+        r.readable_by?(user) || can?(:teach, r.submission.course)
       end
 
       can :create_review, Course do |c|
@@ -127,7 +131,7 @@ class Ability
       end
 
       can :view_code_reviews, Course do |c|
-        c.submissions.exists?(user_id: user.id, reviewed: true) || (can? :teach, c)
+        c.submissions.exists?(user_id: user.id, reviewed: true) || can?(:teach, c)
       end
 
       can :list_code_reviews, Course do |c|
