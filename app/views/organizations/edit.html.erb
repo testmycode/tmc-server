@@ -5,7 +5,7 @@
 
   <%= bs_labeled_field('name', f.text_field(:name)) %>
   <%= bs_labeled_field('infomation', f.text_area(:information)) %>
-  <%= bs_labeled_field('change logo', f.file_field(:logo)) %>
+  <%= bs_labeled_field('change logo', f.file_field(:logo)) %><br/>
   <%= bs_labeled_field('slug', f.text_field(:slug, disabled: !current_user.administrator?)) %>
   <div class="actions">
     <%= f.submit %>
