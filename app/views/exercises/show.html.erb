@@ -67,7 +67,7 @@
     <li>The exercise is not returnable.</li>
   <% end %>
 
-  <% if @exercise.solution && (can? :read, @exercise.solution) %>
+  <% if @exercise.solution && can?(:read, @exercise.solution) %>
     <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
   <% end %>
 

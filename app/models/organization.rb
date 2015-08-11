@@ -5,7 +5,7 @@ class Organization < ActiveRecord::Base
             presence: true,
             length: { within: 2..40 },
             uniqueness: true
-  validates :information, length: { maximum: 500 }
+  validates :information, length: { maximum: 255 }
   validates :slug,
             presence: true,
             length: { within: 2..20 },
