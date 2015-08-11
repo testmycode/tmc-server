@@ -30,8 +30,6 @@ class Course < ActiveRecord::Base
               with: /(\Ahttps?:\/\/|\A\z)/,
               message: 'should begin with http:// or https://'
             }
-  validate :check_source_backend
-  after_initialize :set_default_source_backend
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
