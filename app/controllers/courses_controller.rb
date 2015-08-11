@@ -78,7 +78,7 @@ class CoursesController < ApplicationController
   end
 
   def new
-    authorize! :teach, @organization
+    authorize! :create, :custom_course
     add_organization_breadcrumb
     add_breadcrumb 'Create new course'
     @course = Course.new
@@ -272,7 +272,11 @@ class CoursesController < ApplicationController
     @course_template = @course.course_template
 
     authorize! :teach, @organization
-    authorize! :clone, @course_template unless options[:custom]
+    if options[:custom]
+      authorize! :create, :custom_course
+    else
+      authorize! :clone, @course_template
+    end
 
     respond_to do |format|
       if @course.save
