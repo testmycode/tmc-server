@@ -51,6 +51,8 @@ class OrganizationsController < ApplicationController
 
   def update
     authorize! :edit, @organization
+    authorize! :edit_slug, @organization unless organization_params[:slug].nil?
+
     if @organization.update(organization_params)
       redirect_to organization_path(@organization), notice: 'Organization was successfully updated.'
     else
@@ -122,6 +124,6 @@ class OrganizationsController < ApplicationController
   end
 
   def organization_params
-    params.require(:organization).permit(:name, :information, :slug, :rejected_reason)
+    params.require(:organization).permit(:name, :information, :logo, :slug, :rejected_reason)
   end
 end
