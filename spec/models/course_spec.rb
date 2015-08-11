@@ -1,8 +1,11 @@
 require 'spec_helper'
 
 describe Course, type: :model do
-  let(:source_path) { "#{@test_tmp_dir}/fake_source" }
-  let(:source_url) { "file://#{source_path}" }
+  before :each do
+    @source_path = "#{@test_tmp_dir}/fake_source"
+    create_bare_repo(@source_path)
+  end
+  let(:source_url) { "file://#{@source_path}" }
   let(:user) { FactoryGirl.create(:user) }
 
   describe 'gdocs_sheets' do
@@ -205,11 +208,11 @@ describe Course, type: :model do
     end
 
     it 'validates custom points URL correctly' do
-      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'http://example.com'))
-      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'https://example.com'))
-      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'https://example.com/{org}/{course}/{user}'))
-      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'example.com/{org}/{course}/{user}'))
-      should_be_valid_params(valid_params.merge(external_scoreboard_url: 'example.com'))
+      should_be_valid_params(valid_params.merge(name: 'course_1', external_scoreboard_url: 'http://example.com'))
+      should_be_valid_params(valid_params.merge(name: 'course_2', external_scoreboard_url: 'https://example.com'))
+      should_be_valid_params(valid_params.merge(name: 'course_3', external_scoreboard_url: 'https://example.com/{org}/{course}/{user}'))
+      should_be_valid_params(valid_params.merge(name: 'course_4', external_scoreboard_url: 'example.com/{org}/{course}/{user}'))
+      should_be_valid_params(valid_params.merge(name: 'course_5', external_scoreboard_url: 'example.com'))
     end
 
     def should_be_invalid_params(params)
