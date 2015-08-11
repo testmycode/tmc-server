@@ -16,7 +16,7 @@ class CourseTemplate < ActiveRecord::Base
             }
   validates :title,
             presence: true,
-            length: { within: 1..40 }
+            length: { within: 1..255 }
   validates :description, length: { maximum: 512 }
   validates :git_branch, presence: true
   validates :source_url, presence: true
