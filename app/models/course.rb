@@ -60,10 +60,15 @@ class Course < ActiveRecord::Base
 
   scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
   scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
-  scope :assisted_courses, ->(user) { joins(:assistantships).where(assistantships: { user_id: user.id }) }
-  scope :participated_courses, ->(user) do
+  scope :assisted_courses, ->(user, organization) do
+    joins(:assistantships)
+      .where(assistantships: { user_id: user.id })
+      .where(organization_id: organization.id)
+  end
+  scope :participated_courses, ->(user, organization) do
     joins(:awarded_points)
       .where(awarded_points: { user_id: user.id })
+      .where(organization_id: organization.id)
       .group('courses.id')
   end
 
