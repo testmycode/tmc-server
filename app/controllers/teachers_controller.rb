@@ -3,7 +3,8 @@ class TeachersController < ApplicationController
 
   def index
     authorize! :teach, @organization
-    @teachers = @organization.teachers
+    ordering = 'LOWER(login)'
+    @teachers = @organization.teachers.order(ordering)
     @teachership = Teachership.new
     add_organization_breadcrumb
     add_breadcrumb 'Manage teachers'
@@ -26,8 +27,9 @@ class TeachersController < ApplicationController
   def destroy
     authorize! :remove_teacher, @organization
     @teachership = Teachership.find(params[:id])
+    destroyed_username = @teachership.user.login
     @teachership.destroy!
-    redirect_to organization_teachers_path ,notice: 'Teacher removed from organization'
+    redirect_to organization_teachers_path ,notice: "Teacher #{destroyed_username} removed from organization"
   end
 
   private

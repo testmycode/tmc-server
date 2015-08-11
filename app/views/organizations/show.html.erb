@@ -57,12 +57,6 @@
   </p>
 <% end %>
 
-<% if @organization.acceptance_pending? %>
-  <p>
-    <strong>This organization needs to be accepted by an administrator.</strong>
-  </p>
-<% end %>
-
 <% if @organization.rejected? %>
   <p>
     <strong>
