@@ -377,3 +377,8 @@ tr>.align-right {
 .no-wrap {
   white-space: nowrap;
 }
+
+/* EU Cookie consent */
+.cookie_consent {
+  margin-bottom: 0px;
+}
