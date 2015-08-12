@@ -8,6 +8,7 @@ class Ability
     if user.administrator?
       can :manage, :all
       can :create, Course
+      can :create, :custom_course
       cannot :refresh, Course
       can :refresh, Course do |c|
         c.custom?

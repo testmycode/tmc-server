@@ -10,6 +10,7 @@ describe CoursesController, type: :controller do
     create_bare_repo(@repo_path)
     @user = FactoryGirl.create(:user)
     @teacher = FactoryGirl.create(:user)
+    @admin = FactoryGirl.create(:admin)
     @organization = FactoryGirl.create(:accepted_organization)
     Teachership.create(user: @teacher, organization: @organization)
   end
@@ -54,7 +55,6 @@ describe CoursesController, type: :controller do
 
     describe 'for administrators' do
       before :each do
-        @admin = FactoryGirl.create(:admin)
         controller.current_user = @admin
       end
 
@@ -203,8 +203,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST create' do
     before :each do
-      controller.current_user = FactoryGirl.create :user
-      Teachership.create user: controller.current_user, organization: @organization
+      controller.current_user = @admin
     end
 
     describe 'with valid parameters' do
@@ -231,6 +230,7 @@ describe CoursesController, type: :controller do
       describe 'when course is created from template' do
         before :each do
           @template = FactoryGirl.create :course_template
+          controller.current_user = @teacher
         end
 
         it 'does directory changes when course is first created from template, but doesn\'t do changes when creating more courses from same template' do
