@@ -2,10 +2,10 @@ class ExerciseStatusController < ApplicationController
   skip_authorization_check
 
   def show
-    course_id = params[:course_id]
+    course_name = params[:course_name]
     user_id = params[:id]
 
-    course = Course.where(id: course_id).first || Course.where(name: course_id).first
+    course = Course.where(id: course_name).first || Course.where(name: course_name).first
     user = User.where(id: user_id).first || User.where(login: user_id).first
 
     return respond_access_denied unless course.visible_to?(Guest.new) || current_user.administrator?

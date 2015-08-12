@@ -208,19 +208,16 @@ class SubmissionsController < ApplicationController
   end
 
   def set_exercise(param_name = :exercise_id)
-    @course = Course.lock('FOR SHARE').find_by(name: params[:course_id])
-    @exercise = Exercise.find_by(name: params[param_name], course: @course)
-    @organization = Organization.find_by(slug: params[:organization_id])
-    check_course_matches_organization
-    check_exercise_matches_course
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.lock('FOR SHARE').find_by!(name: params[:course_name], organization: @organization)
+    @exercise = Exercise.find_by!(name: params[param_name], course: @course)
     authorize! :read, @course
     authorize! :read, @exercise
   end
 
   def set_course
-    @course = Course.lock('FOR SHARE').find_by(name: params[:course_id])
-    @organization = @course.organization
-    check_course_matches_organization
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.lock('FOR SHARE').find_by!(name: params[:course_name], organization: @organization)
     authorize! :read, @course
   end
 
@@ -231,14 +228,6 @@ class SubmissionsController < ApplicationController
     @organization = @course.organization
     @is_paste = true
     check_access!
-  end
-
-  def check_course_matches_organization
-    fail ActiveRecord::RecordNotFound unless @course && @course.organization == @organization
-  end
-
-  def check_exercise_matches_course
-    fail ActiveRecord::RecordNotFound unless @exercise && @exercise.course == @course
   end
 
   def schedule_for_rerun(submission, priority)

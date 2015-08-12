@@ -13,7 +13,7 @@ TmcServer::Application.routes.draw do
 
     resources :teachers, only: [:index, :create, :destroy]
 
-    resources :courses do
+    resources :courses, param: :name do
       member do
         get 'refresh'
         post 'refresh'

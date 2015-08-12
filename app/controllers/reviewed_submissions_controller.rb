@@ -2,8 +2,8 @@
 class ReviewedSubmissionsController < ApplicationController
   
   def index
-    @course = Course.find_by(name: params[:course_id])
-    @organization = @course.organization
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.find_by!(name: params[:course_name], organization: @organization)
     authorize! :teach, @course
     add_course_breadcrumb
     add_breadcrumb 'Code reviews', organization_course_reviews_path(@organization, @course)

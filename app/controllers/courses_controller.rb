@@ -58,7 +58,7 @@ class CoursesController < ApplicationController
 
   # Method for teacher to give a single course for students to select.
   def show_json
-    course = [Course.find_by(name: params[:id])]
+    course = [Course.find_by!(name: params[:name])]
     authorize! :read, course
     return respond_access_denied('Authentication required') if current_user.guest?
 
@@ -205,18 +205,12 @@ class CoursesController < ApplicationController
   end
 
   def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id])
-    fail ActiveRecord::RecordNotFound unless @organization
+    @organization ||= Organization.find_by!(slug: params[:organization_id])
   end
 
   def set_course
-    @course = Course.find_by(name: params[:id])
-    fail ActiveRecord::RecordNotFound unless @course
-    check_course_matches_organization
-  end
-
-  def check_course_matches_organization
-    fail ActiveRecord::RecordNotFound unless @course && @course.organization == @organization
+    @organization ||= Organization.find_by!(slug: params[:organization_id])
+    @course = Course.find_by!(name: params[:name], organization: @organization)
   end
 
   def group_params

@@ -16,7 +16,7 @@ describe CourseNotificationsController, type: :controller do
         message: message
       },
       organization_id: @organization.slug,
-      course_id: @course.name
+      course_name: @course.name
     }
   end
 

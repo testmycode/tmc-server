@@ -117,8 +117,7 @@ class OrganizationsController < ApplicationController
   end
 
   def set_organization
-    @organization = Organization.find_by(slug: params[:id])
-    fail ActiveRecord::RecordNotFound unless @organization
+    @organization = Organization.find_by!(slug: params[:id])
   end
 
   def organization_params

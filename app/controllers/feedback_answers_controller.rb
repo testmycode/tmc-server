@@ -1,15 +1,17 @@
 class FeedbackAnswersController < ApplicationController
   def index
-    if params[:course_id] && !params[:exercise_id]
-      @course = Course.find_by(name: params[:course_id])
+    @organization = Organization.find_by!(slug: params[:organization_id])
+
+    if params[:course_name] && !params[:exercise_id]
+      @course = Course.find_by!(name: params[:course_name], organization: @organization)
       @parent = @course
       @numeric_stats = @course.exercises.where(hidden: false).sort.map do |ex|
         [ex, FeedbackAnswer.numeric_answer_averages(ex), ex.submissions_having_feedback.count]
       end
       @title = @course.name
     elsif params[:exercise_id]
-      @course = Course.find_by(name: params[:course_id])
-      @exercise = Exercise.find_by(name: params[:exercise_id], course: @course)
+      @course = Course.find_by!(name: params[:course_name], organization: @organization)
+      @exercise = Exercise.find_by!(name: params[:exercise_id], course: @course)
       @parent = @exercise
       @numeric_stats = [[@exercise, FeedbackAnswer.numeric_answer_averages(@exercise), @exercise.submissions_having_feedback.count]]
       @title = @exercise.name
@@ -17,7 +19,6 @@ class FeedbackAnswersController < ApplicationController
       return respond_not_found
     end
 
-    @organization = @course.organization
     add_course_breadcrumb
     if @exercise
       add_exercise_breadcrumb

@@ -59,7 +59,7 @@ describe CoursesController, type: :controller do
         sub1 = FactoryGirl.create(:submission, user: user1, course: @course, exercise: @exercise)
         sub2 = FactoryGirl.create(:submission, user: user2, course: @course, exercise: @exercise)
 
-        get :show, organization_id: @organization.slug, id: @course.name
+        get :show, organization_id: @organization.slug, name: @course.name
 
         expect(assigns['submissions']).to include(sub1)
         expect(assigns['submissions']).to include(sub2)
@@ -75,7 +75,7 @@ describe CoursesController, type: :controller do
         FactoryGirl.create(:submission, course: @course)
         FactoryGirl.create(:submission, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.name
+        get :show, organization_id: @organization.slug, name: @course.name
 
         expect(assigns['submissions']).to be_nil
       end
@@ -90,7 +90,7 @@ describe CoursesController, type: :controller do
         my_sub = FactoryGirl.create(:submission, user: @user, course: @course)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.name
+        get :show, organization_id: @organization.slug, name: @course.name
 
         expect(assigns['submissions']).to include(my_sub)
         expect(assigns['submissions']).not_to include(other_guys_sub)
@@ -109,7 +109,7 @@ describe CoursesController, type: :controller do
         options = {
           format: 'json',
           api_version: ApiVersion::API_VERSION,
-          id: @course.name,
+          name: @course.name,
           organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
@@ -232,7 +232,7 @@ describe CoursesController, type: :controller do
     describe 'As a teacher' do
       it 'disables the course' do
         controller.current_user = @teacher
-        post :disable, organization_id: @organization.slug, id: @course.name
+        post :disable, organization_id: @organization.slug, name: @course.name
         expect(Course.find(@course.id).disabled?).to eq(true)
       end
     end
@@ -240,7 +240,7 @@ describe CoursesController, type: :controller do
     describe 'As a student' do
       it 'denies access' do
         controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.name
+        post :disable, organization_id: @organization.slug, name: @course.name
         expect(response.code.to_i).to eq(401)
       end
     end
@@ -254,7 +254,7 @@ describe CoursesController, type: :controller do
     describe 'As a teacher' do
       it 'enables the course' do
         controller.current_user = @teacher
-        post :enable, organization_id: @organization.slug, id: @course.name
+        post :enable, organization_id: @organization.slug, name: @course.name
         expect(Course.find(@course.id).disabled?).to eq(false)
       end
     end
@@ -262,7 +262,7 @@ describe CoursesController, type: :controller do
     describe 'As a student' do
       it 'denies access' do
         controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.name
+        post :disable, organization_id: @organization.slug, name: @course.name
         expect(response.code.to_i).to eq(401)
       end
     end
@@ -282,7 +282,7 @@ describe CoursesController, type: :controller do
 
       post :save_deadlines,
            organization_id: @organization.slug,
-           id: @course.name,
+           name: @course.name,
            empty_group: {
                soft: { static: '1.1.2000', unlock: '' },
                hard: { static: '', unlock: 'unlock + 2 weeks' }
@@ -305,7 +305,7 @@ describe CoursesController, type: :controller do
 
       post :save_deadlines,
            organization_id: @organization.slug,
-           id: @course.name,
+           name: @course.name,
            group: {
                group1: {
                    soft: { static: '1.1.2000', unlock: 'unlock + 7 days' },
@@ -337,7 +337,7 @@ describe CoursesController, type: :controller do
     it 'when non-teacher should respond with a 401' do
       @course = FactoryGirl.create :course, organization: @organization
       controller.current_user = @user
-      get :manage_unlocks, organization_id: @organization.slug, id: @course.name
+      get :manage_unlocks, organization_id: @organization.slug, name: @course.name
       expect(response.code.to_i).to eq(401)
     end
   end
@@ -358,7 +358,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.name, empty_group: { '0' => '1.2.2000' }
+        post :save_unlocks, organization_id: @organization.slug, name: @course.name, empty_group: { '0' => '1.2.2000' }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -371,7 +371,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'group1-e3')
         @course.exercises.create(name: 'group2-e1')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.name, group: { group1: { '0' => '1.2.2000' } }
+        post :save_unlocks, organization_id: @organization.slug, name: @course.name, group: { group1: { '0' => '1.2.2000' } }
 
         @course.exercise_group_by_name('group1').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -386,8 +386,8 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.name, empty_group: { 0 => '1.2.2000' }
-        post :save_unlocks, organization_id: @organization.slug, id: @course.name, empty_group: { 0 => '' }
+        post :save_unlocks, organization_id: @organization.slug, name: @course.name, empty_group: { 0 => '1.2.2000' }
+        post :save_unlocks, organization_id: @organization.slug, name: @course.name, empty_group: { 0 => '' }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_nil
@@ -399,7 +399,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.name,
+        post :save_unlocks, organization_id: @organization.slug, name: @course.name,
              empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
@@ -413,7 +413,7 @@ describe CoursesController, type: :controller do
 
     it 'when non-teacher should respond with a 401' do
       @course.exercises.create(name: 'e')
-      post :save_unlocks, organization_id: @organization.slug, id: @course.name, empty_group: { 0 => '1.2.2000' }
+      post :save_unlocks, organization_id: @organization.slug, name: @course.name, empty_group: { 0 => '1.2.2000' }
       expect(response.code.to_i).to eq(401)
     end
   end
