@@ -37,7 +37,7 @@ TmcServer::Application.routes.draw do
         end
       end
 
-      resources :exercises, only: [:show] do
+      resources :exercises, param: :name, only: [:show] do
         collection do
           post 'set_disabled_statuses'
         end

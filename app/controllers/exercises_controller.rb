@@ -74,6 +74,6 @@ class ExercisesController < ApplicationController
   def set_params
     @organization = Organization.find_by!(slug: params[:organization_id])
     @course = Course.lock('FOR SHARE').find_by!(name: params[:course_name], organization: @organization)
-    @exercise = Exercise.find_by!(name: params[:id], course: @course)
+    @exercise = Exercise.find_by!(name: params[:name], course: @course)
   end
 end

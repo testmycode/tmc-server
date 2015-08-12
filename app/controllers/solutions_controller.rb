@@ -3,7 +3,7 @@ class SolutionsController < ApplicationController
   def show
     @organization = Organization.find_by!(slug: params[:organization_id])
     @course = Course.find_by!(name: params[:course_name], organization: @organization)
-    @exercise = Exercise.find_by!(name: params[:exercise_id], course: @course)
+    @exercise = Exercise.find_by!(name: params[:exercise_name], course: @course)
 
     add_course_breadcrumb
     add_exercise_breadcrumb

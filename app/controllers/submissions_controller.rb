@@ -183,7 +183,7 @@ class SubmissionsController < ApplicationController
   end
 
   def update_by_exercise
-    set_exercise(:id)
+    set_exercise(:name)
 
     for submission in @exercise.submissions
       schedule_for_rerun(submission, -2)
@@ -207,7 +207,7 @@ class SubmissionsController < ApplicationController
     authorize! :read, @submission
   end
 
-  def set_exercise(param_name = :exercise_id)
+  def set_exercise(param_name = :exercise_name)
     @organization = Organization.find_by!(slug: params[:organization_id])
     @course = Course.lock('FOR SHARE').find_by!(name: params[:course_name], organization: @organization)
     @exercise = Exercise.find_by!(name: params[param_name], course: @course)
