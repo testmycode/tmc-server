@@ -6,7 +6,13 @@
   <td><%= link_to 'source', course_template.source_url %></td>
   <td><%= course_template.expires_at.strftime('%d.%m.%Y') unless course_template.expires_at.nil? %></td>
   <td><%= link_to course_template.courses.count, course_template_path(course_template) %></td>
-  <td><%= link_to 'Refresh', refresh_course_template_path(course_template), method: :post, class: "btn btn-mini btn-primary" %></td>
+  <% refreshable = course_template.courses.count > 0 %>
+  <td>
+    <%= link_to_if(refreshable, 'Refresh', refresh_course_template_path(course_template),
+                   class: "btn btn-mini btn-primary",
+                   data: { confirm: 'Are you sure? This will refresh all courses made from this template.' },
+                   method: :post) {'-'} %>
+  </td>
   <td><%= link_to 'Edit', edit_course_template_path(course_template), class: "btn btn-mini btn-info" %></td>
   <td><%= link_to 'Destroy', course_template, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-mini btn-danger" %></td>
   <td>
