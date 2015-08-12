@@ -13,6 +13,12 @@ class CourseTemplatesController < ApplicationController
     end
   end
 
+  def show
+    authorize! :read, CourseTemplate
+    add_breadcrumb 'Course templates', course_templates_path
+    add_breadcrumb "#{@course_template.title}"
+  end
+
   def new
     authorize! :create, CourseTemplate
     add_breadcrumb 'Course templates', course_templates_path

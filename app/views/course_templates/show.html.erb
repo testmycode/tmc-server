@@ -1,0 +1,51 @@
+<h1><%= @course_template.title %></h1>
+
+<p>
+  <strong>Name:</strong>
+  <%= @course_template.name %>
+</p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @course_template.title %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @course_template.description %>
+</p>
+
+<p>
+  <strong>Material url:</strong>
+  <%= link_to @course_template.material_url %>
+</p>
+
+<p>
+  <strong>Sourse url:</strong>
+  <%= @course_template.source_url %>
+</p>
+
+<p>
+  <strong>Cache version:</strong>
+  <%= @course_template.cache_version %>
+</p>
+
+<p>
+  <strong>Expires at:</strong>
+  <%= @course_template.expires_at %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @course_template.name %>
+</p>
+
+<%= link_to 'Edit', edit_course_template_path(@course_template), class: "btn btn-mini btn-info" %>
+
+<h4>Courses made from this template</h4>
+
+<ul>
+  <% @course_template.courses.each do |course| %>
+      <li><%= link_to course.name, organization_course_path(course.organization, course) %>, <%= course.organization.name %></li>
+  <% end %>
+</ul>
