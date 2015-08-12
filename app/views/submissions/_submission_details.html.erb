@@ -4,6 +4,8 @@
       <% if !@submission.processed? %>
         <p>Processing...</p>
         <p class="processing-status"><!-- for JS to fill in --></p>
+      <% elsif !@submission.can_see_results?(current_user) %>
+        <p class="hidden_status">All tests done - results are hidden</p>
       <% elsif @submission.all_tests_passed? %>
         <p class="success">All tests successful</p>
       <% elsif @submission.tests_ran? %>
@@ -14,7 +16,7 @@
     </div>
 
     <ul>
-      <% unless @submission.points_list.empty? || @submission.exercise.nil? %>
+      <% if (can? :read_results, @submission) && (!@submission.points_list.empty? || !@submission.exercise.nil?) %>
         <li>
           <%
              awarded_points = @submission.points_list
@@ -27,13 +29,13 @@
           (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
         </li>
       <% end %>
-      <% if current_user.administrator? or not @is_paste %>
+      <% if (can? :teach, @course) or not @is_paste %>
         <li>
           Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
-          <% if current_user.administrator? %>
-            <%= link_to @submission.user.login, participant_path(@submission.user) %>.
+          <% if can? :teach, @course %>
+            <%= link_to @submission.user.username, participant_path(@submission.user) %>.
           <% else %>
-            <%= @submission.user.login %>.
+            <%= @submission.user.username %>.
           <% end %>
         </li>
       <% end %>
@@ -48,7 +50,7 @@
         <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
       <% end %>
 
-      <% if @exercise.solution && @exercise.solution.visible_to?(current_user) %>
+      <% if can? :read, @exercise.solution %>
         <li><%= link_to 'View suggested solution', organization_course_exercise_solution_path(@organization, @course, @exercise) %></li>
       <% end %>
 
@@ -61,7 +63,7 @@
       <% end %>
     </ul>
 
-    <% if can? :update, @submission %>
+    <% if can? :rerun, @submission %>
       <br/>
       <div>
         <%= form_tag submission_path(@submission), :method => :put, :class => 'single-button' do %>

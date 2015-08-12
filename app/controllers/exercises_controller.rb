@@ -58,15 +58,17 @@ class ExercisesController < ApplicationController
     @course = Course.find_by!(name: params[:course_name], organization: @organization)
     authorize! :teach, @organization
 
-    action = params[:commit] == 'Disable selected' ? :disabled : :enabled
-    exercise_params = params[:course][:exercises]
-    exercise_params.reject!(&:blank?)
+    selected_exercise_ids = params[:course][:exercises]
+    selected_exercise_ids.reject!(&:blank?)
 
-    exercises = Exercise.where(id: exercise_params)
-    exercises.update_all(disabled_status: Exercise.disabled_statuses[action])
+    course_exercises = Exercise.where(course: @course)
+    selected_exercises = Exercise.where(id: selected_exercise_ids, course: @course)
+
+    course_exercises.update_all(disabled_status: true)
+    selected_exercises.update_all(disabled_status: false)
 
     redirect_to manage_exercises_organization_course_path(@organization, @course),
-                notice: 'Selected exercises successfully updated.'
+                notice: 'Exercises successfully updated.'
   end
 
   private

@@ -3,18 +3,10 @@
 <%= form_for(@organization) do |f| %>
   <%= render 'shared/error_messages', target: @organization %>
 
-  <div class="field">
-    <%= f.label :name %><br>
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :information %><br>
-    <%= f.text_area :information %>
-  </div>
-  <div class="field">
-    <%= f.label :slug %><br>
-    <%= f.text_field :slug %>
-  </div>
+  <%= bs_labeled_field('name', f.text_field(:name)) %>
+  <%= bs_labeled_field('infomation', f.text_area(:information)) %>
+  <%= bs_labeled_field('change logo (recommended minimum size 100x100)', f.file_field(:logo)) %><br/>
+  <%= bs_labeled_field('slug', f.text_field(:slug, disabled: !current_user.administrator?)) %>
   <div class="actions">
     <%= f.submit %>
   </div>

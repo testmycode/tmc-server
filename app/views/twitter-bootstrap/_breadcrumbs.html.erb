@@ -10,5 +10,12 @@
     <li class="active">
       <%= @breadcrumbs.last[:name] %>
     </li>
+    <% if current_user.administrator? %>
+      <li class="pull-right">[Role: Admin]</li>
+    <% elsif (defined? @organization) && can?(:teach, @organization) %>
+      <li class="pull-right">[Role: Teacher]</li>
+    <% elsif (defined? @course) && can?(:teach, @course) %>
+      <li class="pull-right">[Role: Course-assistant]</li>
+    <% end %>
   </ul>
 <% end %>

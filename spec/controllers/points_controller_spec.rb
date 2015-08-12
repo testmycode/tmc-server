@@ -3,34 +3,44 @@ require 'spec_helper'
 
 describe PointsController, type: :controller do
   render_views
+
   before :each do
+    @user = FactoryGirl.create(:user)
     @organization = FactoryGirl.create(:accepted_organization)
     @course = FactoryGirl.create(:course, organization: @organization)
     @sheetname = 'testsheet'
-    @exercise = FactoryGirl.create(:exercise, course: @course,
-                                              gdocs_sheet: @sheetname)
-    @admin = FactoryGirl.create(:admin)
+    @exercise = FactoryGirl.create(:exercise, course: @course, gdocs_sheet: @sheetname)
+    @submission = FactoryGirl.create(:submission,
+                                     course: @course,
+                                     user: @user,
+                                     exercise: @exercise)
+    @available_point = FactoryGirl.create(:available_point, exercise: @exercise)
+    @awarded_point = FactoryGirl.create(:awarded_point,
+                                        course: @course,
+                                        name: @available_point.name,
+                                        submission: @submission,
+                                        user: @user)
+    controller.current_user = @user
+  end
+
+  describe 'GET index' do
+    describe 'when user has participated in a course' do
+      it 'should show a page' do
+        get :index, organization_id: @organization.slug, course_name: @course.name
+        expect(response).to be_success
+      end
+
+      it 'should not show a page when submission result are hidden' do
+        @course.hide_submission_results = true
+        @course.save!
+        get :index, organization_id: @organization.slug, course_name: @course.name
+        expect(response.code.to_i).to eq(401)
+      end
+    end
   end
 
   describe 'GET show' do
     describe 'when user has participated in a course' do
-      before :each do
-        controller.current_user = @admin
-        @user = FactoryGirl.create(:user)
-        @submission = FactoryGirl.create(:submission,
-                                         course: @course,
-                                         user: @user,
-                                         exercise: @exercise)
-        @available_point = FactoryGirl.create(:available_point,
-                                              exercise: @exercise)
-
-        @awarded_point = FactoryGirl.create(:awarded_point,
-                                            course: @course,
-                                            name: @available_point.name,
-                                            submission: @submission,
-                                            user: @user)
-      end
-
       it 'should show a page' do
         get :show, organization_id: @organization.slug,
             course_name: @course.name, id: @sheetname
@@ -50,6 +60,13 @@ describe PointsController, type: :controller do
       it 'should contain a success marker' do
         get :show, organization_id: @organization.slug, course_name: @course.name, id: @sheetname
         expect(response.body).to have_content('✔')
+      end
+
+      it 'should not show a page when submission result are hidden' do
+        @course.hide_submission_results = true
+        @course.save!
+        get :show, organization_id: @organization.slug, course_name: @course.name, id: @sheetname
+        expect(response.code.to_i).to eq(401)
       end
     end
   end

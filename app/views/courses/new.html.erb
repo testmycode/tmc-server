@@ -1,3 +1,4 @@
 <h1>New course</h1>
 
-<%= render 'form' %>
+<%= render partial: 'form', locals: { custom: true, form_path: organization_courses_path } %>
+

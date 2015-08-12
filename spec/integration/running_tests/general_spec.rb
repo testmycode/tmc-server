@@ -43,7 +43,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
 
       RemoteSandboxForTesting.run_submission(@submission)
 
-      expect(@submission.status).to eq(:error)
+      expect(@submission.status(@user)).to eq(:error)
       expect(@submission.pretest_error).to match(/Compilation error/)
     end
 
@@ -100,6 +100,6 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     make_setup 'UsingToolsJar'
     @setup.make_zip
     RemoteSandboxForTesting.run_submission(@submission)
-    expect(@submission.status).to eq(:ok)
+    expect(@submission.status(@user)).to eq(:ok)
   end
 end

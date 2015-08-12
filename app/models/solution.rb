@@ -23,6 +23,8 @@ class Solution
       false
     elsif @exercise.submittable_by?(user) && !@exercise.completed_by?(user)
       false
+    elsif @exercise.course.hide_submission_results?
+      false
     else
       show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')
       show_when_expired = SiteSetting.value('show_model_solutions_when_exercise_expired')

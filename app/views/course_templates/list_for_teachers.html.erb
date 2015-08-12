@@ -1,0 +1,34 @@
+<h1>New Course</h1>
+
+<h3>Create course from templates</h3>
+
+<table class='table table-striped'>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Material url</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @course_templates.each do |course_template| %>
+      <tr>
+        <td><%= course_template.title %></td>
+        <td><%= course_template.description %></td>
+        <td><%= link_to course_template.material_url, course_template.material_url unless course_template.material_url.nil? %></td>
+        <td><%= link_to 'Create Course', prepare_course_organization_courses_path(@organization, course_template), class: "btn btn-mini btn-primary" %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<br/>
+
+<% if can? :create, :custom_course %>
+
+  <h3>Create custom course</h3>
+  <%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+
+<% end %>

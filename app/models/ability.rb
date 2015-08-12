@@ -8,7 +8,11 @@ class Ability
     if user.administrator?
       can :manage, :all
       can :create, Course
-      can :refresh, Course
+      can :create, :custom_course
+      cannot :refresh, Course
+      can :refresh, Course do |c|
+        c.custom?
+      end
       can :view, :participants_list
       can :view, :organization_requests
       can :accept, :organization_requests
@@ -35,16 +39,21 @@ class Ability
 
       cannot :read, Course
       can :read, Course do |c|
-        c.visible_to?(user) || (can? :teach, c)
+        c.visible_to?(user) || can?(:teach, c)
       end
 
       can :create, Course do |c|
         can? :teach, c.organization
       end
 
+      can :refresh, Course do |c|
+        c.taught_by?(user) &&
+            c.custom? # user can only refresh his/her custom course.
+      end
+
       cannot :read, Exercise
       can :read, Exercise do |ex|
-        ex.visible_to?(user) || (can? :teach, ex.course)
+        ex.visible_to?(user) || can?(:teach, ex.course)
       end
       can :download, Exercise do |ex|
         ex.downloadable_by?(user)
@@ -52,7 +61,7 @@ class Ability
 
       cannot :read, Submission
       can :read, Submission do |sub|
-        sub.readable_by?(user) || (can? :teach, sub.course)
+        sub.readable_by?(user) || can?(:teach, sub.course)
       end
 
       can :create, Submission do |sub|
@@ -61,6 +70,18 @@ class Ability
 
       can :update, Submission do |sub|
         can? :teach, sub.course
+      end
+
+      can :rerun, Submission do |sub|
+        can? :teach, sub.course.organization
+      end
+
+      can :download, Submission do |sub|
+        !sub.course.hide_submission_result? && can?(:read, sub)
+      end
+
+      can :read_results, Submission do |sub|
+        !sub.course.hide_submission_results? || (can? :teach, sub.course)
       end
 
       cannot :manage_feedback_questions, Course
@@ -94,15 +115,16 @@ class Ability
 
       cannot :read, Solution
       can :read, Solution do |sol|
-        sol.visible_to?(user) || (can? :teach, sol.exercise.course)
+        course = sol.exercise.course
+        sol.visible_to?(user) || (can? :teach, course)
       end
 
       cannot :manage, Review
       can :manage, Review do |r|
-        r.manageable_by?(user) || (can? :teach, r.submission.course)
+        r.manageable_by?(user) || can?(:teach, r.submission.course)
       end
       can :read, Review do |r|
-        r.readable_by?(user) || (can? :teach, r.submission.course)
+        r.readable_by?(user) || can?(:teach, r.submission.course)
       end
 
       can :create_review, Course do |c|
@@ -119,7 +141,7 @@ class Ability
       end
 
       can :view_code_reviews, Course do |c|
-        c.submissions.exists?(user_id: user.id, reviewed: true) || (can? :teach, c)
+        c.submissions.exists?(user_id: user.id, reviewed: true) || can?(:teach, c)
       end
 
       can :list_code_reviews, Course do |c|
@@ -141,8 +163,8 @@ class Ability
 
       cannot :reply, FeedbackAnswer
 
-      can :create, :organization
-      cannot :create, :organization if user.guest?
+      can :request, :organization
+      cannot :request, :organization if user.guest?
 
       can :view_statistics, Organization do |o|
         can? :teach, o
@@ -172,6 +194,13 @@ class Ability
         can? :teach, c.organization
       end
 
+      cannot :read, CourseTemplate
+      can :prepare_course, CourseTemplate
+
+      can :clone, CourseTemplate do |ct|
+        ct.clonable?
+      end
+
       can :request, :organization
       cannot :request, :organization if user.guest?
 
@@ -188,6 +217,22 @@ class Ability
         can? :teach, c.organization
       end
 
+      can :edit, Organization do |o|
+        can? :teach, o
+      end
+
+      can :toggle_visibility, Organization do |o|
+        can? :teach, o
+      end
+
+      can :toggle_submission_result_visibility, Course do |c|
+        can? :teach, c
+      end
+
+      can :see_points, Course do |c|
+        !c.hide_submission_results? || (can? :teach, c)
+      end
+
       cannot :teach, Organization
       can :teach, Organization do |o|
         o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
@@ -199,8 +244,10 @@ class Ability
         c.organization.teacher?(user) || c.assistant?(user)
       end
 
-      can :toggle_visibility, Organization do |o|
-        can? :teach, o
+      cannot :email, CourseNotification
+
+      can :view_external_scoreboard_url, Course do |c|
+        can?(:teach, c) || User.course_students(c).include?(user)
       end
     end
   end

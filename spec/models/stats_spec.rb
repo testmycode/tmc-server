@@ -43,7 +43,7 @@ describe Stats, type: :model do
   def create_successful_submission(opts)
     sub = FactoryGirl.create(:submission, opts.merge(all_tests_passed: true))
     FactoryGirl.create(:test_case_run, submission: sub, successful: true)
-    expect(sub.status).to eq(:ok)
+    expect(sub.status(opts[:user])).to eq(:ok)
     sub
   end
 end

@@ -3,14 +3,10 @@
 <%= form_for(@organization) do |f| %>
   <%= render 'shared/error_messages', target: @organization %>
 
-  <div class="field">
-    <%= f.label :name %><br>
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :information %><br>
-    <%= f.text_area :information %>
-  </div>
+  <%= bs_labeled_field('name', f.text_field(:name)) %>
+  <%= bs_labeled_field('infomation', f.text_area(:information)) %>
+  <%= bs_labeled_field('logo (recommended minimum size 100x100)', f.file_field(:logo)) %><br/>
+
   <div class="field">
     <%= f.label :slug %>
     Preview:
@@ -20,6 +16,7 @@
     <br/>
     <%= f.text_field :slug, onkeyup: 'Organizations.updateSlugPreview(this.value)' %>
   </div>
+
   <div class="actions">
     <%= f.submit 'Request organization' %>
   </div>

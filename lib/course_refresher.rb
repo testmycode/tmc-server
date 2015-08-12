@@ -14,17 +14,20 @@ require 'benchmark'
 # Safely refreshes a course from a git repository
 # TODO: split this into submodules
 class CourseRefresher
-  def refresh_course(course)
-    Impl.new.refresh_course(course)
+  def refresh_course(course, options = {})
+    Impl.new.refresh_course(course, options)
   end
 
   class Report
-    def initialize
+    def initialize(course = nil)
+      @course = course
       @errors = []
       @warnings = []
       @notices = []
       @timings = {}
     end
+
+    attr_reader :course
 
     attr_reader :errors
     attr_reader :warnings
@@ -58,8 +61,8 @@ class CourseRefresher
       @report.timings[method_name] = result
     end
 
-    def refresh_course(course)
-      @report = Report.new
+    def refresh_course(course, options)
+      @report = Report.new(course)
 
       # We do the whole operation in a transaction with an exclusive lock on the Course row.
       # We start generating a new version of the course's file cache.
@@ -100,27 +103,28 @@ class CourseRefresher
 
           @old_cache_path = @course.cache_path
 
-          @course.cache_version += 1 # causes @course.*_path to return paths in the new cache
+          @course.increment_cache_version                         unless options[:no_directory_changes] # causes @course.*_path to return paths in the new cache
 
-          FileUtils.rm_rf(@course.cache_path)
-          FileUtils.mkdir_p(@course.cache_path)
+          FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
+          FileUtils.mkdir_p(@course.cache_path)                   unless options[:no_directory_changes]
 
-          measure_and_log :update_or_clone_repository
-          measure_and_log :check_directory_names
+          measure_and_log :update_or_clone_repository             unless options[:no_directory_changes]
+          measure_and_log :check_directory_names                  unless options[:no_directory_changes]
           measure_and_log :update_course_options
           measure_and_log :add_records_for_new_exercises
           measure_and_log :delete_records_for_removed_exercises
           measure_and_log :update_exercise_options
           measure_and_log :set_has_tests_flags
           measure_and_log :update_available_points
-          measure_and_log :make_solutions
-          measure_and_log :make_stubs
+          measure_and_log :make_solutions                         unless options[:no_directory_changes]
+          measure_and_log :make_stubs                             unless options[:no_directory_changes]
           measure_and_log :checksum_stubs
-          measure_and_log :make_zips_of_stubs
-          measure_and_log :make_zips_of_solutions
-          measure_and_log :set_permissions
+          measure_and_log :make_zips_of_stubs                     unless options[:no_directory_changes]
+          measure_and_log :make_zips_of_solutions                 unless options[:no_directory_changes]
+          measure_and_log :set_permissions                        unless options[:no_directory_changes]
           measure_and_log :invalidate_unlocks
 
+          @course.course_template.save!
           @course.refreshed_at = Time.now
           @course.save!
           @course.exercises.each &:save!
@@ -129,12 +133,12 @@ class CourseRefresher
         rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
           @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
           # Delete the new cache we were working on
-          FileUtils.rm_rf(@course.cache_path)
+          FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
           raise ActiveRecord::Rollback
         end
       end
 
-      if @report.errors.empty?
+      if @report.errors.empty? && !options[:no_directory_changes]
         FileUtils.rm_rf(@old_cache_path)
         seed_maven_cache
       end
@@ -241,12 +245,17 @@ class CourseRefresher
                                           end)
           @review_points[e.name] = parse_review_points(metadata['review_points'])
 
-          unless e.course.initially_refreshed?
+          if e.course.refreshed?
             preserve_exercise_deadlines(e, metadata)
             preserve_exercise_unlocks(e, metadata)
           end
 
           e.options = metadata
+
+          if (e.new_record? && e.course.refreshed?)
+            e.disabled!
+          end
+
           e.save!
         rescue SyntaxError
           @report.errors << "Failed to parse metadata: #{$!}"

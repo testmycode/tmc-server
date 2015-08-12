@@ -7,10 +7,16 @@ feature 'Teacher can add assistants to course', feature: true do
     @teacher = FactoryGirl.create :user, password: 'foobar'
     @assistant = FactoryGirl.create :user, password: 'newfoobar'
     @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @course = FactoryGirl.create :course, source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(@repo_path)
+    @course = FactoryGirl.create :course, source_url: @repo_path, organization: @organization
+    @repo = clone_course_repo(@course)
+    @repo.copy_simple_exercise('MyExercise')
+    @repo.add_commit_push
+    @course.refresh
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
-    click_link @course.name
+    click_link @course.title
   end
 
   scenario 'Teacher succeeds at adding assistant when valid username is given' do
@@ -75,7 +81,7 @@ feature 'Teacher can add assistants to course', feature: true do
 
   def add_assistant(username, course)
     visit '/org/slug'
-    click_link course.name
+    click_link course.title
     click_link 'Manage assistants'
     fill_in 'username', with: username
     click_button 'Add a new assistant'

@@ -1,8 +1,11 @@
 require 'spec_helper'
 
 describe Course, type: :model do
-  let(:source_path) { "#{@test_tmp_dir}/fake_source" }
-  let(:source_url) { "file://#{source_path}" }
+  before :each do
+    @source_path = "#{@test_tmp_dir}/fake_source"
+    create_bare_repo(@source_path)
+  end
+  let(:source_url) { "file://#{@source_path}" }
   let(:user) { FactoryGirl.create(:user) }
 
   describe 'gdocs_sheets' do
@@ -41,8 +44,9 @@ describe Course, type: :model do
         :clone_path
       ]
 
+      course = FactoryGirl.create :course
       for path in object_paths
-        expect(Course.new.send(path)).to match(/^\//)
+        expect(course.send(path)).to match(/^\//)
       end
     end
   end
@@ -146,10 +150,16 @@ describe Course, type: :model do
   end
 
   describe 'validation' do
+    before :each do
+      @organization = FactoryGirl.create :accepted_organization
+    end
+
     let(:valid_params) do
       {
         name: 'TestCourse',
-        source_url: 'git@example.com'
+        title: 'Test Course',
+        source_url: source_url,
+        organization: @organization
       }
     end
 
@@ -161,13 +171,29 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(name: 'a' * 41))
     end
 
-    it 'requires name to be non-unique' do
-      Course.create!(valid_params)
-      should_be_invalid_params(valid_params)
+    it 'requires name to be unique' do
+      FactoryGirl.create :course, name: 'Unique'
+      expect do
+        FactoryGirl.create :course, name: 'Unique'
+      end.to raise_error
+    end
+
+    it 'forbids custom course\'s name to be same as some template\'s name' do
+      template = FactoryGirl.create :course_template, name: 'someName'
+      expect{ Course.create!(valid_params.merge(name: 'someName')) }.to raise_error
     end
 
     it 'forbids spaces in the name' do # this could eventually be lifted as long as everything else is made to tolerate spaces
       should_be_invalid_params(valid_params.merge(name: 'Test Course'))
+    end
+
+    it 'requires a title' do
+      should_be_invalid_params(valid_params.merge(title: nil))
+      should_be_invalid_params(valid_params.merge(title: ''))
+    end
+
+    it 'requires title to be reasonably short' do
+      should_be_invalid_params(valid_params.merge(title: 'a' * 41))
     end
 
     it 'requires a remote repo url' do
@@ -175,14 +201,40 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(source_url: ''))
     end
 
+    it 'if course created from template, repo url can\'t be different from template\'s repo url' do
+      template = FactoryGirl.create :course_template
+      expect{ Course.create!(valid_params.merge(course_template: template, source_url: template.source_url)) }.not_to raise_error
+      should_be_invalid_params(valid_params.merge(course_template: template, source_url: "#{template.source_url}~"))
+    end
+
+    it 'validates custom points URL correctly' do
+      should_be_valid_params(valid_params.merge(name: 'course_1', external_scoreboard_url: 'http://example.com'))
+      should_be_valid_params(valid_params.merge(name: 'course_2', external_scoreboard_url: 'https://example.com'))
+      should_be_valid_params(valid_params.merge(name: 'course_3', external_scoreboard_url: 'https://example.com/{org}/{course}/{user}'))
+      should_be_valid_params(valid_params.merge(name: 'course_4', external_scoreboard_url: 'example.com/{org}/{course}/{user}'))
+      should_be_valid_params(valid_params.merge(name: 'course_5', external_scoreboard_url: 'example.com'))
+    end
+
     def should_be_invalid_params(params)
       expect { Course.create!(params) }.to raise_error
+    end
+
+    def should_be_valid_params(params)
+      expect do
+        c = Course.create!(params)
+        c.destroy!
+      end.to_not raise_error
     end
   end
 
   describe 'destruction' do
+    before :each do
+      @template = FactoryGirl.create :course_template
+      @templated_course = FactoryGirl.create :course, course_template: @template, source_url: @template.source_url
+    end
+
     it 'deletes its cache directory' do
-      c = Course.create!(name: 'MyCourse', source_url: source_url)
+      c = FactoryGirl.create :course
       FileUtils.mkdir_p(c.cache_path)
       FileUtils.touch("#{c.cache_path}/foo.txt")
 
@@ -190,20 +242,33 @@ describe Course, type: :model do
       expect(File).not_to exist(c.cache_path)
     end
 
+    it 'doesn\'t delete cache if course created from template' do
+      FileUtils.mkdir_p(@templated_course.cache_path)
+      FileUtils.touch("#{@templated_course.cache_path}/foo.txt")
+
+      @templated_course.destroy
+      expect(File).to exist(@templated_course.cache_path)
+    end
+
+    it 'doesn\'t delete course template' do
+      @templated_course.destroy
+      expect(CourseTemplate.all.count).to eq(1)
+    end
+
     it 'deletes dependent exercises' do
-      ex = FactoryGirl.create(:exercise)
+      ex = FactoryGirl.create :exercise, course: @templated_course
       ex.course.destroy
       assert_destroyed(ex)
     end
 
     it 'deletes dependent submissions' do
-      sub = FactoryGirl.create(:submission)
+      sub = FactoryGirl.create :submission, course: @templated_course
       sub.course.destroy
       assert_destroyed(sub)
     end
 
     it 'deletes dependent feedback questions and answers' do
-      a = FactoryGirl.create(:feedback_answer)
+      a = FactoryGirl.create :feedback_answer, course: @templated_course
       q = a.feedback_question
       q.course.destroy
       assert_destroyed(a)
@@ -211,19 +276,19 @@ describe Course, type: :model do
     end
 
     it 'deletes available points' do
-      pt = FactoryGirl.create(:available_point)
+      pt = FactoryGirl.create :available_point, course: @templated_course
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it 'deletes awarded points' do
-      pt = FactoryGirl.create(:awarded_point)
+      pt = FactoryGirl.create :awarded_point, course: @templated_course
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it 'deletes test scanner cache entries' do
-      ent = FactoryGirl.create(:test_scanner_cache_entry)
+      ent = FactoryGirl.create :test_scanner_cache_entry, course: @templated_course
       ent.course.destroy
       assert_destroyed(ent)
     end
@@ -262,5 +327,36 @@ describe Course, type: :model do
 
       expect(@course.contains_unlock_deadlines?).to eq(true)
     end
+
+    it 'assigns material_url with http:// prepended to it' do
+      course = FactoryGirl.create :course, material_url: 'google.com'
+      expect(course.material_url).to eq('http://google.com')
+      course.material_url = ''
+      expect(course.material_url).to eq('')
+      course.material_url = 'https://google.com'
+      expect(course.material_url).to eq('https://google.com')
+      course.material_url = 'http://google.com'
+      expect(course.material_url).to eq('http://google.com')
+    end
+  end
+
+  it 'increments own cache_version if custom course' do
+    course = FactoryGirl.create :course
+    expect do
+      course.increment_cache_version
+      course.save!
+    end.to change{course.cache_version}.by(1)
+  end
+
+  it 'increments template\'s cache_version if templated' do
+    template = FactoryGirl.create :course_template
+    course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    expect{course.increment_cache_version}.to change{template.cache_version}.by(1)
+  end
+
+  it 'templated course\'s cache path is template\'s cache path, regardless of names' do
+    template = FactoryGirl.create :course_template, name: 'templatesName'
+    course = FactoryGirl.create :course, name: 'coursesName', course_template: template, source_url: template.source_url
+    expect(course.cache_path).to eq(template.cache_path)
   end
 end

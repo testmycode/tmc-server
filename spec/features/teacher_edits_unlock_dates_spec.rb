@@ -4,13 +4,19 @@ feature 'Teacher edits unlock dates', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
+    organization = FactoryGirl.create :accepted_organization, slug: 'slug'
     @teacher = FactoryGirl.create :user, password: 'xooxer'
     @user = FactoryGirl.create :user, password: 'foobar'
-    Teachership.create! user: @teacher, organization: @organization
+    Teachership.create! user: @teacher, organization: organization
 
-    @course = FactoryGirl.create :course, source_url: 'https://github.com/testmycode/tmc-testcourse.git', organization: @organization
+    repo_path = @test_tmp_dir + '/fake_remote_repo'
+    create_bare_repo(repo_path)
+    @course = FactoryGirl.create :course, source_url: repo_path, organization: organization
+    repo = clone_course_repo(@course)
+    repo.copy_simple_exercise('MyExercise')
+    repo.add_commit_push
     @course.refresh
+
     @course.exercise_group_by_name('').group_unlock_conditions = ['1.1.2011'].to_json
     UncomputedUnlock.create_all_for_course_eager(@course)
 
@@ -86,7 +92,7 @@ feature 'Teacher edits unlock dates', feature: true do
   end
 
   scenario 'Teacher can set multiple unlock conditions' do
-    pending 'Using wrong way of creating test courses'
+    #pending 'Using wrong way of creating test courses'
     log_in_as(@teacher.login, 'xooxer')
     visit_course
     click_link 'Manage unlock conditions'

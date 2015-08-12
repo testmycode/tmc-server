@@ -1,0 +1,13 @@
+<p class="error">
+ Error: <%= message %>
+</p>
+
+<% if can?(:view, :error_details) && !exception.nil? %>
+  <h4>
+    Details for admin only:
+  </h4>
+
+  <p><%= exception.message %></p>
+
+  <pre><%= exception.backtrace.join('<br>').html_safe %></pre>
+<% end %>

@@ -1,7 +1,29 @@
 require 'fileutils'
 require 'system_commands'
+require File.expand_path 'spec/support/git_test_actions'
+
+include GitTestActions
+
+def make_repo_for_course_template
+  repo_path = "#{::Rails.root}/tmp/tests/factory_repo"
+  return repo_path if Dir.exist? repo_path
+
+  create_bare_repo repo_path
+  repo_path
+end
 
 FactoryGirl.define do
+
+  factory :course_template do
+    sequence(:name) { |n| "template#{n}" }
+    sequence(:title) { |n| "template title#{n}" }
+    sequence(:description) { |n| "course description#{n}" }
+    sequence(:material_url) { |n| "http://www.material#{n}.com" }
+    source_url { make_repo_for_course_template }
+    source_backend 'git'
+    git_branch 'master'
+  end
+
   factory :user do
     sequence(:login) { |n| "user#{n}" }
     sequence(:password) { |n| "userpass#{n}" }
@@ -18,7 +40,10 @@ FactoryGirl.define do
 
   factory :course, class: Course do
     sequence(:name) { |n| "course#{n}" }
-    source_url 'git@example.com'
+    sequence(:title) { |n| "Course #{n}"}
+    source_url { make_repo_for_course_template }
+    source_backend 'git'
+    git_branch 'master'
     organization
   end
 

@@ -1,5 +1,5 @@
 TmcServer::Application.routes.draw do
-  resources :organizations, except: :destory, path: 'org' do
+resources :organizations, except: :destory, path: 'org' do
     member do
       post 'accept'
       post 'reject'
@@ -12,6 +12,8 @@ TmcServer::Application.routes.draw do
     end
 
     resources :teachers, only: [:index, :create, :destroy]
+
+    get 'course_templates', to: 'course_templates#list_for_teachers'
 
     resources :courses, param: :name do
       member do
@@ -27,6 +29,7 @@ TmcServer::Application.routes.draw do
         get 'manage_unlocks'
         post 'save_unlocks'
         get 'manage_exercises'
+        post 'toggle_submission_result_visibility'
       end
 
       resources :assistants, only: [:index, :create, :destroy]
@@ -51,6 +54,13 @@ TmcServer::Application.routes.draw do
         resources :feedback_answers, only: [:index]
       end
 
+      get 'help'
+
+      collection do
+        get 'clone_template/:course_template_id' => 'courses#prepare_from_template', as: 'prepare_course'
+        post 'clone_template' => 'courses#create_from_template', as: 'clone_course'
+      end
+
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
       resources :submissions, only: [:index]
@@ -64,6 +74,13 @@ TmcServer::Application.routes.draw do
     end
 
     resources :stats, only: [:index]
+  end
+
+  resources :course_templates do
+    member do
+      post 'toggle_hidden', to: 'course_templates#toggle_hidden'
+      post 'refresh'
+    end
   end
 
   resources :sessions, only: [:new, :create, :destroy]

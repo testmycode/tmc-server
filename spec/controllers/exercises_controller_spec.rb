@@ -72,25 +72,25 @@ describe ExercisesController, type: :controller do
     end
 
     describe 'as a teacher' do
-      it 'disables correct exercises' do
-        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id] }, commit: 'Disable selected'
+      it 'disables not selected exercises' do
+        post_set_disabled_statuses course: { exercises: [@ex2.id] }
         @ex1.reload
         @ex2.reload
         @ex3.reload
-        expect(@ex1.disabled?).to eq(true)
-        expect(@ex2.disabled?).to eq(true)
-        expect(@ex3.disabled?).to eq(false)
+        expect(@ex1.enabled?).to eq(false)
+        expect(@ex2.enabled?).to eq(true)
+        expect(@ex3.enabled?).to eq(false)
       end
 
-      it 'enables correct exercises' do
+      it 'enables all selected' do
         @ex3.disabled!
-        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id] }, commit: 'Enable selected'
+        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id, @ex3.id] }
         @ex1.reload
         @ex2.reload
         @ex3.reload
         expect(@ex1.enabled?).to eq(true)
         expect(@ex2.enabled?).to eq(true)
-        expect(@ex3.enabled?).to eq(false)
+        expect(@ex3.enabled?).to eq(true)
       end
 
       it 'does not fail if no parameters are given' do

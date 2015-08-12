@@ -1,37 +1,57 @@
 <div class="row-fluid">
   <div class="span12">
-    <h1><%= @course.name %></h1>
+    <h1><%= @course.title %></h1>
     <p><%= @course.description %></p>
+    <% unless @course.material_url.blank? %>
+      <p><%= link_to 'Material', @course.material_url %></p>
+    <% end %>
     <div>
-      <% if @refresh_report %>
+      <% if @refresh_report && (can? :refresh, @course) %>
         <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
       <% end %>
 
       <ul>
-        <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
+        <% if @course.has_external_scoreboard_url? %>
+          <% if can? :view_external_scoreboard_url, @course %>
+            <li>
+              <%= link_to 'View points', @course.parsed_external_scoreboard_url(@organization, @course, current_user), target: '_blank' %>
+            </li>
+          <% end %>
+        <% else %>
+          <% if can? :see_points, @course %>
+            <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
+          <% end %>
+        <% end %>
         <% if can? :view_code_reviews, @course %>
           <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course) %></li>
         <% end %>
         <% if can? :list_user_emails, @course %>
           <li><%= link_to 'View student emails', organization_emails_path %></li>
         <% end %>
+        <li><%= link_to 'View help page', organization_course_help_path(@organization, @course)%></li>
       </ul>
       <% if can? :teach, @course %>
         <ul>
-          <li>Source type: <%= @course.source_backend.upcase %> </li>
-          <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
+          <% if current_user.administrator? %>
+            <li>Source type: <%= @course.source_backend.upcase %> </li>
+            <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
 
-          <% if @course.source_backend == 'git' %>
-            <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
-            <% if github_url %>
-              <li>Github URL: <%= link_to github_url, github_url %></li>
+            <% if @course.source_backend == 'git' %>
+                <% github_url = github_repo_url_to_project_page_url(@course.source_url) %>
+                <% if github_url %>
+                    <li>Github URL: <%= link_to github_url, github_url %></li>
+                <% end %>
+                <li>Git branch: <%= @course.git_branch %></li>
+                <% gitrev = @course.git_revision %>
+                <% if gitrev %>
+                    <li>Git revision: <%= gitrev %></li>
+                <% end %>
             <% end %>
-            <li>Git branch: <%= @course.git_branch %></li>
-            <% gitrev = @course.git_revision %>
-            <% if gitrev %>
-              <li>Git revision: <%= gitrev %></li>
+            <% unless @course.custom? %>
+              <li>Created from template: <%= link_to @course.course_template.name, course_templates_path %></li>
             <% end %>
           <% end %>
+
           <% if @course.refreshed_at %>
             <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
           <% end %>
@@ -94,6 +114,7 @@
           <li><%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course) %></li>
         </ul>
       <% end %>
+
       <% if can? :manage_deadlines, @course %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock conditions', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
@@ -103,6 +124,14 @@
       <% end %>
       <% if can? :teach, @organization %>
           <%= link_to 'Manage assistants', organization_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
+          <%= link_to 'Edit course parameters', edit_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
+      <% end %>
+      <% if can? :toggle_submission_result_visibility, @course %>
+        <% if @course.hide_submission_results? %>
+          <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-mini" %>
+        <% else %>
+          <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-mini" %>
+        <% end %>
       <% end %>
       <% if can? :refresh, @course %>
         <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>

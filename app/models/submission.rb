@@ -98,9 +98,11 @@ class Submission < ActiveRecord::Base
     k =~ /^[a-zA-Z\-_]+$/ && v =~ /^[a-zA-Z\-_]+$/
   end
 
-  def status
+  def status(user)
     if !processed?
       :processing
+    elsif !can_see_results?(user)
+      :hidden
     elsif all_tests_passed?
       :ok
     elsif tests_ran?
@@ -108,6 +110,13 @@ class Submission < ActiveRecord::Base
     else
       :error
     end
+  end
+
+  def can_see_results?(user)
+    !(self.course.hide_submission_results? && (all_tests_passed? || tests_ran?)) ||
+        self.course.organization.teacher?(user) ||
+        self.course.assistant?(user) ||
+        user.administrator?
   end
 
   def points_list

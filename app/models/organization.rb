@@ -5,7 +5,7 @@ class Organization < ActiveRecord::Base
             presence: true,
             length: { within: 2..40 },
             uniqueness: true
-  validates :information, length: { maximum: 500 }
+  validates :information, length: { maximum: 255 }
   validates :slug,
             presence: true,
             length: { within: 2..20 },
@@ -21,6 +21,11 @@ class Organization < ActiveRecord::Base
   has_many :teachers, through: :teacherships, source: :user
   has_many :courses, dependent: :nullify
 
+  belongs_to :requester, class_name: 'User'
+
+  has_attached_file :logo, styles: { small_logo: '100x100>' }
+  validates_attachment_content_type :logo, content_type: /\Aimage\/.*\Z/
+
   scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
   scope :pending_organizations, -> { where(acceptance_pending: true) }
   scope :assisted_organizations, ->(user) { joins(:courses, courses: :assistantships).where(assistantships: { user_id: user.id }) }
@@ -28,7 +33,7 @@ class Organization < ActiveRecord::Base
   scope :participated_organizations, ->(user) { joins(:courses, courses: :awarded_points).where(awarded_points: { user_id: user.id }) }
 
   def self.init(params, initial_user)
-    organization = Organization.new(params.merge(acceptance_pending: true))
+    organization = Organization.new(params.merge(acceptance_pending: true, requester: initial_user))
     teachership = Teachership.new(user: initial_user, organization: organization)
     if !organization.save || !teachership.save
       organization.destroy
@@ -50,8 +55,6 @@ class Organization < ActiveRecord::Base
   end
 
   def valid_slug? # slug must not be an existing route (/org/new etc)
-    if %w(new list_requests).include? slug
-      errors.add(:slug, 'is a system reserved word')
-    end
+    errors.add(:slug, 'is a system reserved word') if %w(new list_requests).include? slug
   end
 end

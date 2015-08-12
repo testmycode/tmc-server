@@ -95,8 +95,7 @@ describe OrganizationsController, type: :controller do
 
       it 'lists only pending organization requests' do
         get :list_requests, {}
-        expect(assigns(:requested_organizations)).to include(@org1)
-        expect(assigns(:requested_organizations)).to include(@org3)
+        expect(assigns(:requested_organizations).sort).to eq([@org1, @org3].sort)
       end
     end
 
@@ -122,6 +121,26 @@ describe OrganizationsController, type: :controller do
   describe 'As a teacher' do
     before :each do
       controller.current_user = @user
+    end
+
+    describe 'PUT update' do
+      it 'updates the requested organization if slug not changed' do
+        org = FactoryGirl.create(:accepted_organization)
+        Teachership.create(user_id: @user.id, organization_id: org.id)
+        put :update, id: org.to_param, organization: { name: 'New organization name' }
+        org.reload
+        expect(org.name).to eq('New organization name')
+        expect(response).to redirect_to(organization_path)
+      end
+    end
+
+    describe 'PUT update with slug change' do
+      it 'denies access' do
+        org = FactoryGirl.create(:accepted_organization)
+        Teachership.create(user_id: @user.id, organization_id: org.id)
+        put :update, id: org.to_param, organization: { slug: 'newslug' }
+        expect(response.code.to_i).to eq(401)
+      end
     end
 
     describe 'POST toggle_visibility' do

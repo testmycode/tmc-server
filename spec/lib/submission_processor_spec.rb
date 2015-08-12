@@ -55,13 +55,15 @@ describe SubmissionProcessor do
         expect_no_processing
         SubmissionProcessor.new.reprocess_timed_out_submissions
       end
+
       it 'should mark it as processed and having an error' do
+        user = FactoryGirl.create :user
         SubmissionProcessor.new.reprocess_timed_out_submissions
         @sub.reload
         expect(@sub).to be_processed
         expect(@sub.pretest_error).not_to be_empty
         expect(@sub.secret_token).to be_nil
-        expect(@sub.status).to eq(:error)
+        expect(@sub.status(user)).to eq(:error)
       end
     end
 

@@ -41,6 +41,11 @@
             <%= render 'sessions/login_form' %>
             <ul class="nav pull-right">
               <% if signed_in? %>
+                <% if current_user.administrator? %>
+                  <li>
+                    <%= link_to 'Course templates', course_templates_path %>
+                  </li>
+                <% end %>
                 <li>
                   <%= link_to "My account (#{current_user.username})", user_path %>
                 </li>
