@@ -4,7 +4,6 @@ class CertificatesController < ApplicationController
   before_action :add_certificate_breadcrumbs, except: [:show]
 
   def index
-    authorize! :read, @user
     @certificates = @user.certificates.order(:created_at).includes(:course)
     @names = @certificates.map(&:name).uniq.sort
 
@@ -45,6 +44,7 @@ class CertificatesController < ApplicationController
   def set_user
     id = params[:participant_id] || params[:certificate][:user_id]
     @user = User.find(id)
+    authorize! :read, @user
   end
 
   def set_courses

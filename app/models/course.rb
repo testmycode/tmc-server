@@ -103,7 +103,7 @@ class Course < ActiveRecord::Base
     self.certificate_downloadable = !!new_options['certificate_downloadable']
 
     if !new_options['certificate_unlock_spec'].blank?
-      self.certificate_unlock_spec = new_options['certificate_unlock_spec']
+      self.certificate_unlock_spec = to_json_array(new_options['certificate_unlock_spec'])
     else
       self.certificate_unlock_spec = nil
     end
@@ -315,5 +315,14 @@ class Course < ActiveRecord::Base
 
   def set_default_source_backend
     self.source_backend ||= Course.default_source_backend
+  end
+
+  def to_json_array(value)
+    if value != nil
+      value = [value] unless value.is_a?(Array)
+      value.to_json
+    else
+      "[]"
+    end
   end
 end
