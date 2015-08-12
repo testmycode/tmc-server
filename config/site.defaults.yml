@@ -82,6 +82,8 @@ emails:
 # Allow people to create user accounts
 enable_signup: true
 
+# Enable tmc-langs framework
+enable_tmc_langs: false
 
 ### Model solutions ###
 
