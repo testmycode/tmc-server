@@ -100,6 +100,7 @@ ActiveRecord::Schema.define(version: 20150727080941) do
     t.string   "material_url"
     t.integer  "course_template_id",                             null: false
     t.string   "external_scoreboard_url"
+    t.boolean  "hide_submission_results",        default: false
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree

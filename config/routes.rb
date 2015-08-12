@@ -29,6 +29,7 @@ resources :organizations, except: :destory, path: 'org' do
         get 'manage_unlocks'
         post 'save_unlocks'
         get 'manage_exercises'
+        post 'toggle_submission_result_visibility'
       end
 
       resources :assistants, only: [:index, :create, :destroy]

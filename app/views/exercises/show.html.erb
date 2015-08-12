@@ -4,7 +4,7 @@
 <ul>
   <li><%= link_to 'Download project template (zip)', exercise_zip_url(@exercise) %></li>
 
-  <% unless @exercise.available_points.empty? %>
+  <% if !@exercise.available_points.empty? && !@course.hide_submission_results?  %>
     <%
       available_points = @exercise.available_points.to_a.map(&:name)
       awarded_points = @exercise.points_for(current_user)
@@ -71,7 +71,7 @@
     <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
   <% end %>
 
-  <% if can?(:read, FeedbackAnswer) %>
+  <% if can? :read, FeedbackAnswer %>
     <li><%= link_to 'View feedback', exercise_feedback_answers_path(@exercise) %></li>
   <% end %>
 </ul>

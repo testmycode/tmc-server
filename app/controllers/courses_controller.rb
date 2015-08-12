@@ -202,6 +202,12 @@ class CoursesController < ApplicationController
     @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
   end
 
+  def toggle_submission_result_visibility
+    authorize! :toggle_submission_result_visibility, @course
+    @course.toggle_submission_result_visiblity
+    redirect_to organization_course_path(@organization, @course), notice: "Submission results are now #{@course.hide_submission_results ? 'hidden' : 'visible'}"
+  end
+
   private
 
   def course_params_for_create

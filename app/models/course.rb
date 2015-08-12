@@ -322,13 +322,18 @@ class Course < ActiveRecord::Base
   def submissions_to_review
     submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
   end
-
+  
   def certificate_downloadable_for?(user)
     user.administrator? || (
       !user.guest? &&
        certificate_downloadable &&
        (certificate_unlock_spec.nil? ||
         UnlockSpec.new(self, ActiveSupport::JSON.decode(certificate_unlock_spec)).permits_unlock_for?(user)))
+  end
+
+  def toggle_submission_result_visiblity
+    self.hide_submission_results = !self.hide_submission_results
+    save!
   end
 
   # Returns a hash of exercise group => {
