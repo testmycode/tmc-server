@@ -92,6 +92,9 @@ resources :organizations, except: :destory, path: 'org' do
 
   resources :participants do
     resources :certificates, only: [:index]
+    collection do
+      get 'me', to: 'participants#me'
+    end
   end
 
   resources :certificates, only: [:show, :create]

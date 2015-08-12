@@ -249,6 +249,10 @@ class Ability
       can :view_external_scoreboard_url, Course do |c|
         can?(:teach, c) || User.course_students(c).include?(user)
       end
+
+      can :view_participant_information, User do |u|
+        !user.guest? && u.readable_by?(user)
+      end
     end
   end
 end
