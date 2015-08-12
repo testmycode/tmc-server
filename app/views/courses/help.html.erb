@@ -21,5 +21,5 @@
 
 <% unless @course.material_url.blank? %>
   <h2>Link to online course material:</h2>
-  <p><%= link_to "http://#{@course.material_url}", "http://#{@course.material_url}" %></p>
+  <p><%= link_to @course.material_url, @course.material_url %></p>
 <% end %>
