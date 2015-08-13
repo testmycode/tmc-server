@@ -48,7 +48,7 @@ class ParticipantsController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    authorize! :read, @user
+    authorize! :view_participant_information, @user
     @awarded_points = Hash[@user.awarded_points.to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
 
     if current_user.administrator?
@@ -84,6 +84,11 @@ class ParticipantsController < ApplicationController
     end
 
     Submission.eager_load_exercises(@submissions)
+  end
+
+  def me
+    authorize! :view_participant_information, current_user
+    redirect_to participant_path(current_user)
   end
 
   private
