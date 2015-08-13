@@ -22,7 +22,8 @@ class SubmissionTestSetup
     should_save = options[:save]
     @user = options[:user] || create_user
 
-    @repo_path = 'remote_repo'
+    @test_tmp_dir = "#{::Rails.root}/tmp/tests"
+    @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
 
     @course = Course.create!(name: course_name, title: course_name, source_backend: 'git', source_url: @repo_path, organization: organization)
