@@ -48,7 +48,7 @@
                 <% end %>
             <% end %>
             <% unless @course.custom? %>
-              <li>Created from template: <%= link_to @course.course_template.name, course_templates_path %></li>
+              <li>Created from template: <%= link_to @course.course_template.name, course_template_path(@course.course_template) %></li>
             <% end %>
           <% end %>
 
