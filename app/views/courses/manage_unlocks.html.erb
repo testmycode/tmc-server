@@ -28,7 +28,23 @@
   };
 </script>
 
-<h1>Edit unlock conditions</h1>
+<h1 class="float-left">Edit unlock conditions</h1>
+
+<div class="float-right">
+  <p>Syntax:</p>
+<pre class="unlock-help">
+exercise [group] &lt;exercise-or-group&gt;
+point[s] &lt;list-of-point-names&gt;
+&lt;N&gt;% [in|of|from] &lt;exercise-or-group&gt;
+&lt;N&gt; point[s] &lt;exercise-or-group&gt;
+&lt;N&gt; exercise[s] [in|of|from] &lt;exercise-or-group&gt;
+&lt;date-or-datetime&gt;
+</pre>
+</div>
+
+
+<div class="float-clear"></div>
+
 <%= form_tag save_unlocks_organization_course_path, method: :post do %>
   <table class="exercise-list table table-hover table-condensed">
     <thead>

@@ -23,3 +23,11 @@ td.deadline-toggle-buttons a {
 .remove-condition-button {
     margin: 0 0 10px 5px;
 }
+
+.unlock-help {
+    display: inline-block;
+    font-size: 75%;
+    padding: 10px;
+    line-height: 1.3em;
+    background-color: white;
+}
