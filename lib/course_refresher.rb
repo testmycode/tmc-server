@@ -323,25 +323,44 @@ class CourseRefresher
       end
     end
 
+    # To keep bakwards compatability we first try to parse the tmc_available_points.txt, if not existent, read
+    # available points from the stdout / points.txt
     def get_c_exercise_points(exercise)
       full_path = File.join(@course.clone_path, exercise.relative_path)
       hash = FileTreeHasher.hash_file_tree(full_path)
       TestScannerCache.get_or_update(@course, exercise.name, hash) do
-        `cd #{full_path} && make && make get-points > points.txt`
-        output = IO.readlines("#{full_path}/points.txt")
+        all_points = Set.new
+        Dir.chdir(full_path) do
+          sh!(%w(make test))
+          sh!(%w(make get-points > points.txt), {escape: false})
 
-        # drop makefile output
-        output.pop
-        available_points_content = output.drop(3)
+          tmc_available_points = File.join(full_path, 'test', 'tmc_available_points.txt')
+          if File.exists? tmc_available_points
+            IO.readlines(tmc_available_points).map(&:strip).each do |line|
+              if line =~ /\[.*\] \[.*\] (.*)/
+                $1.split(' ').map(&:strip).each { |p| all_points << p}
+              else
+                raise "Warning: weird line in available points file: #{line}"
+              end
+            end
+          elsif File.exists?(File.join(full_path, 'points.txt'))
+            available_points_content = IO.readlines("#{full_path}/points.txt")
+            # drop makefile output
+            # This is how initial check tests used to work.
+            available_points_content.pop
+            available_points_content = available_points_content.drop(3)
+            available_points_content.each do |line|
+              line = line.gsub(' ', '').chomp
+              all_points << line
+            end
+          else
+            raise "Could not extract points for makefile exercise: #{exercise}"
+          end
 
-        points = Set.new
-        available_points_content.each do |line|
-          line = line.gsub(' ', '').chomp
-          points << line
+          sh!(%w(make clean))
+          FileUtils.rm("#{full_path}/points.txt") if File.exists?(File.join(full_path, 'points.txt'))
         end
-        `cd #{full_path} && make clean`
-        FileUtils.rm("#{full_path}/points.txt")
-        points
+        all_points
       end
     end
 
