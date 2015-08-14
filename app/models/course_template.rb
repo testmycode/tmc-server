@@ -47,12 +47,13 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def valid_git_repo?
+    timeout = 10
     safe_source_url = Shellwords.escape(source_url)
     safe_git_branch = Shellwords.escape(git_branch)
-    cmd = "git ls-remote --exit-code #{safe_source_url} #{safe_git_branch}"
+    cmd = "timeout #{timeout+1} git ls-remote --exit-code #{safe_source_url} #{safe_git_branch}"
     output = ''
     begin
-      Timeout::timeout(5) do
+      Timeout::timeout(timeout) do
         output = `#{cmd} 2>&1`
       end
     rescue Timeout::Error
