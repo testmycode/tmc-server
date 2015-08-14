@@ -12,8 +12,8 @@ feature 'User lists own organization courses', feature: true do
 
     FactoryGirl.create :course, name: 'course_1', title: 'Course 1', organization: @organization
     FactoryGirl.create :course, name: 'course_2', title: 'Course 2', organization: @organization
-    FactoryGirl.create :course, name: 'course_3', title: 'Course 3', organization: @organization, hide_after: Time.now - 2.minutes
-    FactoryGirl.create :course, name: 'course_4', title: 'Course 4', organization: @organization, disabled_status: 1
+    FactoryGirl.create :course, name: 'course_3', title: 'Course 3', organization: @organization
+    FactoryGirl.create :course, name: 'course_4', title: 'Course 4', organization: @organization, status: 1
 
     visit '/'
   end

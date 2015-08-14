@@ -93,7 +93,7 @@ describe CourseRefresher do
     expect(uniq_points).to eq(points1)
   end
 
-  it 'should reload course options' do
+  xit 'should reload course options' do
     expect(@course.hide_after).to be_nil
     expect(@course2.hide_after).to be_nil
 
@@ -118,7 +118,7 @@ describe CourseRefresher do
     expect(@course2.spreadsheet_key).to eq('qwerty')
   end
 
-  it 'should work with an empty course options file' do
+  xit 'should work with an empty course options file' do
     change_course_options_file '', raw: true
     refresh_courses
     expect(@course.hide_after).to eq(nil)
@@ -181,7 +181,7 @@ describe CourseRefresher do
     expect(@course2.exercises.first.gdocs_sheet).to eq('foo')
   end
 
-  it 'should allow course-specific overrides in course options' do
+  xit 'should allow course-specific overrides in course options' do
     expect(@course.hide_after).to be_nil
 
     change_course_options_file('hide_after' => '2001-01-01 00:00',

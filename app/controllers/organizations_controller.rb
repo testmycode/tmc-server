@@ -6,7 +6,7 @@ class OrganizationsController < ApplicationController
   skip_authorization_check only: [:index]
 
   def index
-    ordering = 'hidden, LOWER(name)'
+    ordering = 'LOWER(name)'
     @organizations = Organization.accepted_organizations.order(ordering)
     @my_organizations = Organization.taught_organizations(current_user)
     @my_organizations |= Organization.assisted_organizations(current_user)
@@ -16,7 +16,7 @@ class OrganizationsController < ApplicationController
 
   def show
     add_organization_breadcrumb
-    ordering = 'hidden, disabled_status, LOWER(courses.name)'
+    ordering = 'status, LOWER(courses.name)'
     @my_courses = Course.participated_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
