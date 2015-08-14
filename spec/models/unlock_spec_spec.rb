@@ -25,7 +25,7 @@ describe UnlockSpec, type: :model do
   end
 
   def call_parsable(spec)
-    UnlockSpec.parsable?(spec.to_json, ex1)
+    UnlockSpec.parsable?(spec.to_json, ex1.course)
   end
 
   RSpec::Matchers.define :permit_unlock_for do |user|

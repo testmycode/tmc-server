@@ -189,6 +189,8 @@ class CourseRefresher
     end
 
     def update_course_options
+      return if @course.refreshed?
+
       options_file = "#{@course.clone_path}/course_options.yml"
 
       opts = {}

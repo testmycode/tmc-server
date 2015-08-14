@@ -164,8 +164,8 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     end
   end
 
-  def self.parsable?(spec, exercise)
-    UnlockSpec.new(exercise.course, ActiveSupport::JSON.decode(spec)) # Parses spec and fails if invalid
+  def self.parsable?(spec, course)
+    UnlockSpec.new(course, ActiveSupport::JSON.decode(spec)) # Parses spec and fails if invalid
     true
   rescue InvalidSyntaxError
     raise

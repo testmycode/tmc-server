@@ -211,18 +211,26 @@ class CoursesController < ApplicationController
   private
 
   def course_params_for_create
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch,
+                                   :source_backend, :locked_exercise_points_visible, :formal_name,
+                                   :certificate_downloadable, :raw_certificate_unlock_spec, :status)
   end
 
   def course_params_for_create_from_template
-    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
+    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id,
+                                   :locked_exercise_points_visible, :formal_name, :certificate_downloadable,
+                                   :raw_certificate_unlock_spec, :status)
   end
 
   def course_params
     if @course.custom?
-      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
+      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch,
+                                     :external_scoreboard_url, :locked_exercise_points_visible, :formal_name,
+                                     :certificate_downloadable, :raw_certificate_unlock_spec, :status)
     else
-      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url,
+                                     :locked_exercise_points_visible, :formal_name, :certificate_downloadable,
+                                     :raw_certificate_unlock_spec, :status)
     end
   end
 

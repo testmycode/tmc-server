@@ -31,6 +31,7 @@ class Course < ActiveRecord::Base
   #            message: 'should begin with http:// or https://'
   #          }
   validate :check_external_scoreboard_url
+  validate :check_certificate_unlock_spec
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
@@ -396,6 +397,16 @@ class Course < ActiveRecord::Base
     external_scoreboard_url % { user: user.username, course: course.id.to_s, org: organization.slug }
   end
 
+  def raw_certificate_unlock_spec
+    return '' if certificate_unlock_spec.nil?
+    ActiveSupport::JSON.decode(certificate_unlock_spec).join("\n")
+  end
+
+  def raw_certificate_unlock_spec=(spec)
+    json_array = ActiveSupport::JSON.encode(spec.gsub("\r", '').split("\n").reject(&:blank?))
+    self.certificate_unlock_spec = json_array
+  end
+
   private
 
   def set_cache_version
@@ -442,6 +453,15 @@ class Course < ActiveRecord::Base
       external_scoreboard_url % { user: '', course: '', org: '' } unless external_scoreboard_url.blank?
     rescue
       errors.add(:external_scoreboard_url, 'contains invalid keys')
+    end
+  end
+
+  def check_certificate_unlock_spec
+    return if certificate_unlock_spec.nil?
+    begin
+      UnlockSpec.parsable?(certificate_unlock_spec, self)
+    rescue => e
+      errors.add(:certificate_unlock_spec, e.message)
     end
   end
 end
