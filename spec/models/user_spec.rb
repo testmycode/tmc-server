@@ -47,6 +47,21 @@ describe User, type: :model do
       expect(a).to include(@user2)
     end
 
+    it 'organization_students' do
+      organization1 = FactoryGirl.create :accepted_organization, slug: 'slug1'
+      organization2 = FactoryGirl.create :accepted_organization, slug: 'slug2'
+      @course1.update(organization: organization1)
+      @course2.update(organization: organization2)
+
+      a = User.organization_students(organization1)
+      expect(a.length).to eq(1)
+      expect(a).to include(@user1)
+
+      a = User.organization_students(organization2)
+      expect(a.length).to eq(1)
+      expect(a).to include(@user2)
+    end
+
     it 'course_sheet_students' do
       a = User.course_sheet_students(@course1, 's1')
       expect(a.length).to eq(1)

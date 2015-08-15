@@ -35,6 +35,13 @@ class User < ActiveRecord::Base
       .group('users.id')
   end
 
+  # TODO: Later after enrollment has implemented, this should use it instead
+  def self.organization_students(organization)
+    joins(awarded_points: :course)
+      .where(courses: { organization_id: organization.id })
+      .group('users.id')
+  end
+
   def self.course_sheet_students(course, sheetname)
     AwardedPoint.users_in_course_with_sheet(course, sheetname)
   end

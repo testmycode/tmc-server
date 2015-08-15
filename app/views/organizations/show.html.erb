@@ -73,9 +73,9 @@
     <%= link_to 'Edit organization', edit_organization_path(@organization) %>
 <% end %>
 
-<% if can? :view, :participants_list %>
+<% if can? :view_participant_list, @organization%>
     <br/>
-    <%= link_to 'List of registered users', participants_path %>
+    <%= link_to 'List of registered users', organization_participants_path(@organization) %>
 <% end %>
 
 <% if can? :teach, @organization %>

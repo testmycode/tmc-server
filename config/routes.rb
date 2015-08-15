@@ -11,6 +11,8 @@ resources :organizations, except: :destory, path: 'org' do
       get 'list_requests'
     end
 
+    resources :participants, only: [:index]
+
     resources :teachers, only: [:index, :create, :destroy]
 
     get 'course_templates', to: 'course_templates#list_for_teachers'
