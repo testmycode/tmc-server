@@ -23,6 +23,15 @@ class ActionToken < ActiveRecord::Base
     key
   end
 
+  def self.generate_email_confirmation_token(user)
+    token = user.email_confirmation_token
+    if token.nil?
+      token = self.create!(user: user, action: :confirm_email)
+      user.action_tokens << token
+    end
+    token
+  end
+
   def expired?
     expires_at < Time.now
   end

@@ -30,10 +30,12 @@ class UsersController < ApplicationController
     set_user_fields
 
     if @user.errors.empty? && @user.save
+      token = ActionToken.generate_email_confirmation_token(@user)
+      EmailConfirmationMailer.confirmation_link_email(@user, token).deliver
       if @bare_layout
-        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', layout: true
+        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created. Please confirm your email address to continue.</div>', layout: true
       else
-        flash[:notice] = 'User account created. You can now log in.'
+        flash[:notice] = 'User account created. Please confirm your email address to continue.'
         redirect_to root_path
       end
     else

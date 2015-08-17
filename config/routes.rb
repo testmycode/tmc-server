@@ -90,6 +90,8 @@ resources :organizations, except: :destory, path: 'org' do
 
   resource :user
 
+  get '/confirm_email/:token', to: 'email_confirmations#confirm_email'
+
   resources :participants do
     resources :certificates, only: [:index]
     collection do

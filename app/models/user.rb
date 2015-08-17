@@ -186,6 +186,16 @@ class User < ActiveRecord::Base
     Assistantship.find_by(user_id: self, course_id: course)
   end
 
+  def activate_email
+    self.email_confirmed_at = Time.now
+    self.email_confirmation_token.destroy!
+    save!(:validate => false)
+  end
+
+  def email_confirmation_token
+    self.action_tokens.find { |t| t.action == 'confirm_email' }
+  end
+
   private
 
   def encrypt_password
