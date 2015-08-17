@@ -28,6 +28,7 @@ FactoryGirl.define do
     sequence(:login) { |n| "user#{n}" }
     sequence(:password) { |n| "userpass#{n}" }
     sequence(:email) { |n| "user#{n}@example.com" }
+    email_confirmed_at Time.now
     administrator false
   end
 
@@ -35,6 +36,7 @@ FactoryGirl.define do
     sequence(:login) { |n| "admin#{n}" }
     sequence(:password) { |n| "adminpass#{n}" }
     sequence(:email) { |n| "admin#{n}@example.com" }
+    email_confirmed_at Time.now
     administrator true
   end
 
