@@ -1,28 +1,10 @@
 <h1>Email confirmation</h1>
 </br>
 
-<p>Hi <b><%= @user.username %></b>, you have to confirm your email address.</p>
-<p>Please, check that your email address is correct. (you can change it)</p>
+<p>You have to confirm your email address. Please, check that email address is correct and change it if needed.</p>
 </br>
 
-<%= form_tag("/user/#{@user.username}/send_confirmation_mail", method: "post") do %>
+<%= form_tag("send_confirmation_mail", method: "post") do %>
     <%= email_field_tag(:email, @user.email, id: 'email') %></br>
-    <div id='password' class='hidden'>
-        <%= label_tag(:password) %>
-        <%= password_field_tag(:password) %></br>
-    </div>
     <%= submit_tag("Send Confirmation Email", class: 'btn btn-primary') %>
 <% end %>
-
-
-<script>
-    $('#email').keyup(function () {
-        var email = document.getElementById('email');
-        if (email.value != email.defaultValue) {
-            $("#password").removeClass('hidden');
-            alert('if you change email, you have to give password');
-        } else {
-            $("#password").addClass('hidden');
-        }
-    });
-</script>
