@@ -91,6 +91,8 @@ resources :organizations, except: :destory, path: 'org' do
   resource :user
 
   get '/confirm_email/:token', to: 'email_confirmations#confirm_email'
+  get '/user/:username/email_confirmation_request', to: 'email_confirmations#request_user_to_confirm_email', as: 'email_confirmation_request'
+  post '/user/:username/send_confirmation_mail', to: 'email_confirmations#send_confirmation_mail', as: 'send_confirmation_mail'
 
   resources :participants do
     resources :certificates, only: [:index]
