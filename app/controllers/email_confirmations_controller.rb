@@ -19,9 +19,16 @@ class EmailConfirmationsController < ApplicationController
 
   def send_confirmation_mail
     user = user_from_non_confirmed_session
-    token = ActionToken.generate_email_confirmation_token(user)
-    EmailConfirmationMailer.confirmation_link_email(user, token).deliver
-    clear_non_confirmed_session_for user
-    redirect_to root_path, notice: 'Check your emails and click the confirmation link of the email we send'
+    if user.email != params[:email]
+      user.email = params[:email]
+      if user.save
+        token = ActionToken.generate_email_confirmation_token(user)
+        EmailConfirmationMailer.confirmation_link_email(user, token).deliver
+        clear_non_confirmed_session_for user
+        redirect_to root_path, notice: 'Check your emails and click the confirmation link of the email we send'
+      else
+        redirect_to email_confirmation_request_path, alert: "Email address #{params[:email]} has already been taken by some other account."
+      end
+    end
   end
 end
