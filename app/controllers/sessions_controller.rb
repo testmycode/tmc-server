@@ -14,6 +14,10 @@ class SessionsController < ApplicationController
     redirect_params = {}
     if user.nil?
       redirect_params = { alert: 'Login or password incorrect. Try again.' }
+    elsif user.email_confirmed_at.nil?
+      @user = user
+      redirect_to email_confirmation_request_path(@user.username)
+      return
     else
       sign_in user
     end
