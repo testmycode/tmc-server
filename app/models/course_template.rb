@@ -48,24 +48,10 @@ class CourseTemplate < ActiveRecord::Base
 
   def valid_git_repo?
     timeout = 10
-    safe_source_url = Shellwords.escape(source_url)
-    safe_git_branch = Shellwords.escape(git_branch)
-    cmd = "timeout #{timeout+1} git ls-remote --exit-code #{safe_source_url} #{safe_git_branch}"
-    output = ''
-    begin
-      Timeout::timeout(timeout) do
-        output = `#{cmd} 2>&1`
-      end
-    rescue Timeout::Error
-      errors.add(:base, "Cannot clone repository, timeout expired, git ls-remote output: #{output}")
-      return false
-    end
-    status = $?
-    unless status.success?
-      errors.add(:base, "Cannot clone repository, git ls-remote output: #{output}")
-      return false
-    end
+    sh!('git', 'ls-remote', '--exit-code', source_url, git_branch, { timeout: timeout })
     true
+  rescue StandardError => e
+    errors.add(:base, 'Cannot clone repository. Error: ' + e.to_s)
   end
 
   def valid_source_backend?
