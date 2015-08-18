@@ -156,9 +156,9 @@ describe User, type: :model do
 
     it 'should destroy any password reset key it has' do
       user = FactoryGirl.create(:user)
-      key = PasswordResetKey.create!(user: user)
+      key = ActionToken.create!(user: user, action: :reset_password)
       user.destroy
-      expect(PasswordResetKey.find_by_id(key.id)).to be_nil
+      expect(ActionToken.find_by_id(key.id)).to be_nil
     end
 
     it 'should destroy any user field values' do

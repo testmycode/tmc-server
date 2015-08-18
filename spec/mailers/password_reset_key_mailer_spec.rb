@@ -8,14 +8,14 @@ describe PasswordResetKeyMailer, type: :mailer do
   end
 
   let(:user) { FactoryGirl.create(:user) }
-  let(:key) { PasswordResetKey.create!(user: user) }
+  let(:key) { ActionToken.create!(user: user, action: :reset_password) }
 
   it 'should e-mail a password reset key' do
     mail = PasswordResetKeyMailer.reset_link_email(user, key)
 
     expect(mail.to).to include(user.email)
     expect(mail.from).to include('noreply@example.com')
-    expect(mail.encoded).to include('http://example.com/foo/reset_password/' + key.code)
+    expect(mail.encoded).to include('http://example.com/foo/reset_password/' + key.token)
 
     mail.deliver
     expect(ActionMailer::Base.deliveries).not_to be_empty

@@ -18,7 +18,7 @@ describe "Resetting one's password by e-mail", type: :request, integration: true
       !user.password_reset_key.nil?
     end
 
-    visit '/reset_password/' + user.password_reset_key.code
+    visit '/reset_password/' + user.password_reset_key.token
 
     expect(page).to have_content('Resetting password for theuser')
     fill_in 'New password', with: 'new_password'
