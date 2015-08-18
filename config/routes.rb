@@ -106,8 +106,8 @@ resources :organizations, except: :destory, path: 'org' do
   resources :stats, only: [:index]
 
   resources :password_reset_keys
-  get '/reset_password/:code' => 'password_reset_keys#show', :as => 'reset_password'
-  delete '/reset_password/:code' => 'password_reset_keys#destroy'
+  get '/reset_password/:token' => 'password_reset_keys#show', :as => 'reset_password'
+  delete '/reset_password/:token' => 'password_reset_keys#destroy'
 
   resources :exercises, only: [:show] do
     resources :submissions, only: [:create]

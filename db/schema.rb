@@ -11,10 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150727080941) do
+ActiveRecord::Schema.define(version: 20150817095112) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "action_tokens", force: true do |t|
+    t.integer  "user_id",    null: false
+    t.string   "token",      null: false
+    t.datetime "created_at", null: false
+    t.integer  "action",     null: false
+    t.datetime "expires_at"
+    t.datetime "updated_at"
+  end
 
   create_table "assistantships", force: true do |t|
     t.integer  "user_id"
@@ -99,8 +108,8 @@ ActiveRecord::Schema.define(version: 20150727080941) do
     t.string   "title"
     t.string   "material_url"
     t.integer  "course_template_id",                             null: false
-    t.string   "external_scoreboard_url"
     t.boolean  "hide_submission_results",        default: false
+    t.string   "external_scoreboard_url"
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
@@ -166,17 +175,11 @@ ActiveRecord::Schema.define(version: 20150727080941) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "hidden",             default: false
-    t.integer  "requester_id"
     t.string   "logo_file_name"
     t.string   "logo_content_type"
     t.integer  "logo_file_size"
     t.datetime "logo_updated_at"
-  end
-
-  create_table "password_reset_keys", force: true do |t|
-    t.integer  "user_id",    null: false
-    t.text     "code",       null: false
-    t.datetime "created_at", null: false
+    t.integer  "requester_id"
   end
 
   create_table "points_upload_queues", force: true do |t|
@@ -216,13 +219,14 @@ ActiveRecord::Schema.define(version: 20150727080941) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
-  create_table "submission_data", primary_key: "submission_id", force: true do |t|
-    t.binary "return_file"
-    t.binary "stdout_compressed"
-    t.binary "stderr_compressed"
-    t.binary "vm_log_compressed"
-    t.binary "valgrind_compressed"
-    t.binary "validations_compressed"
+  create_table "submission_data", id: false, force: true do |t|
+    t.integer "submission_id",          null: false
+    t.binary  "return_file"
+    t.binary  "stdout_compressed"
+    t.binary  "stderr_compressed"
+    t.binary  "vm_log_compressed"
+    t.binary  "valgrind_compressed"
+    t.binary  "validations_compressed"
   end
 
   create_table "submissions", force: true do |t|
@@ -271,7 +275,8 @@ ActiveRecord::Schema.define(version: 20150727080941) do
     t.datetime "updated_at"
   end
 
-  add_index "teacherships", ["user_id", "organization_id"], name: "index_teacherships_on_user_id_and_organization_id", unique: true, using: :btree
+  add_index "teacherships", ["organization_id"], name: "index_teacherships_on_organization_id", using: :btree
+  add_index "teacherships", ["user_id"], name: "index_teacherships_on_user_id", using: :btree
 
   create_table "test_case_runs", force: true do |t|
     t.integer  "submission_id"
@@ -338,6 +343,8 @@ ActiveRecord::Schema.define(version: 20150727080941) do
 
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
 
+  add_foreign_key "action_tokens", "users", :name => "password_reset_keys_user_id_fk", :dependent => :delete
+
   add_foreign_key "available_points", "exercises", :name => "available_points_exercise_id_fk", :dependent => :delete
 
   add_foreign_key "awarded_points", "courses", :name => "awarded_points_course_id_fk", :dependent => :delete
@@ -350,8 +357,6 @@ ActiveRecord::Schema.define(version: 20150727080941) do
   add_foreign_key "feedback_answers", "submissions", :name => "feedback_answers_submission_id_fk", :dependent => :nullify
 
   add_foreign_key "feedback_questions", "courses", :name => "feedback_questions_course_id_fk", :dependent => :delete
-
-  add_foreign_key "password_reset_keys", "users", :name => "password_reset_keys_user_id_fk", :dependent => :delete
 
   add_foreign_key "reviews", "submissions", :name => "reviews_submission_id_fk", :dependent => :delete
   add_foreign_key "reviews", "users", :name => "reviews_reviewer_id_fk", :column => "reviewer_id", :dependent => :nullify

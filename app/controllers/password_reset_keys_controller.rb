@@ -17,7 +17,7 @@ class PasswordResetKeysController < ApplicationController
       return redirect_to(new_password_reset_key_path, alert: 'No such e-mail address registered')
     end
 
-    key = PasswordResetKey.generate_for(user)
+    key = ActionToken.generate_password_reset_key_for(user)
     PasswordResetKeyMailer.reset_link_email(user, key).deliver
   end
 
@@ -56,9 +56,9 @@ class PasswordResetKeysController < ApplicationController
   private
 
   def find_key_and_user
-    code = params['code']
-    @key = PasswordResetKey.find_by_code(code)
-    fail ActiveRecord::RecordNotFound.new('Invalid password reset code') if @key.nil? || @key.expired?
+    token = params['token']
+    @key = ActionToken.find_by_token(token)
+    fail ActiveRecord::RecordNotFound.new('Invalid password reset key') if @key.nil? || @key.expired?
     @user = @key.user
   end
 end
