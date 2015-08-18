@@ -117,18 +117,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def enable
-    authorize! :teach, @organization # should assistants be able to enable/disable?
-    @course.enabled!
-    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
-  end
-
-  def disable
-    authorize! :teach, @organization
-    @course.disabled!
-    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
-  end
-
   def manage_deadlines
     authorize! :manage_deadlines, @course
     add_course_breadcrumb

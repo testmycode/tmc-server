@@ -28,7 +28,8 @@ describe OrganizationsController, type: :controller do
     end
 
     describe 'GET index' do
-      xit 'shows visible courses in order by name, split into ongoing and expired' do
+      it 'shows visible courses in order by name, split into ongoing and expired' do
+        skip 'TODO: implement enrollment'
         @organization = Organization.create! valid_attributes
         @courses = [
             FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),

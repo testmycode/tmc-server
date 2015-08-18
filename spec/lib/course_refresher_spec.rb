@@ -93,41 +93,33 @@ describe CourseRefresher do
     expect(uniq_points).to eq(points1)
   end
 
-  xit 'should reload course options' do
-    expect(@course.hide_after).to be_nil
-    expect(@course2.hide_after).to be_nil
+  it 'should not reload course options after initial refresh' do
+    expect(@course.formal_name).to be_nil
+    expect(@course2.spreadsheet_key).to be_nil
 
-    change_course_options_file 'hide_after' => '2011-07-01 13:00'
+    change_course_options_file('formal_name' => 'Formal Course Name',
+                               'spreadsheet_key' => 'qwerty')
     refresh_courses
-    expect(@course.hide_after).to eq(Time.zone.parse('2011-07-01 13:00')) # local time zone
-    expect(@course2.hide_after).to eq(Time.zone.parse('2011-07-01 13:00')) # local time zone
+    expect(@course.formal_name).to eq('Formal Course Name')
+    expect(@course2.spreadsheet_key).to eq('qwerty')
 
-    change_course_options_file 'hide_after' => nil
+    change_course_options_file('formal_name' => 'Changed Formal Name',
+                               'spreadsheet_key' => 'asdfgh')
     refresh_courses
-    expect(@course.hide_after).to eq(nil)
-    expect(@course2.hide_after).to eq(nil)
-
-    change_course_options_file 'hidden' => true
-    refresh_courses
-    expect(@course).to be_hidden
-    expect(@course2).to be_hidden
-
-    change_course_options_file 'spreadsheet_key' => 'qwerty'
-    refresh_courses
-    expect(@course.spreadsheet_key).to eq('qwerty')
+    expect(@course.formal_name).to eq('Formal Course Name')
     expect(@course2.spreadsheet_key).to eq('qwerty')
   end
 
-  xit 'should work with an empty course options file' do
+  it 'should work with an empty course options file' do
     change_course_options_file '', raw: true
     refresh_courses
-    expect(@course.hide_after).to eq(nil)
-    expect(@course2.hide_after).to eq(nil)
+    expect(@course.formal_name).to eq(nil)
+    expect(@course2.formal_name).to eq(nil)
 
     change_course_options_file '---', raw: true
     refresh_courses
-    expect(@course.hide_after).to eq(nil)
-    expect(@course2.hide_after).to eq(nil)
+    expect(@course.formal_name).to eq(nil)
+    expect(@course2.formal_name).to eq(nil)
   end
 
   it 'should load exercise metadata with defaults from superdirs' do
@@ -181,21 +173,21 @@ describe CourseRefresher do
     expect(@course2.exercises.first.gdocs_sheet).to eq('foo')
   end
 
-  xit 'should allow course-specific overrides in course options' do
-    expect(@course.hide_after).to be_nil
+  it 'should allow course-specific overrides in course options' do
+    expect(@course.formal_name).to be_nil
 
-    change_course_options_file('hide_after' => '2001-01-01 00:00',
+    change_course_options_file('formal_name' => 'Name 1',
                                'courses' => {
                                  @course.name => {
-                                   'hide_after' => '2002-01-01 00:00'
+                                   'formal_name' => 'Name 2'
                                  },
                                  'other-course' => {
-                                   'hide_after' => '2003-01-01 00:00'
+                                   'formal_name' => 'Name 3'
                                  }
                                })
     @refresher.refresh_course @course
 
-    expect(@course.hide_after).to eq(Time.zone.parse('2002-01-01 00:00'))
+    expect(@course.formal_name).to eq('Name 2')
   end
 
   it 'should allow course-specific overrides in metadata settings' do

@@ -383,50 +383,6 @@ describe CoursesController, type: :controller do
     end
   end
 
-  describe 'POST disable' do
-    before :each do
-      @course = FactoryGirl.create(:course)
-    end
-
-    describe 'As a teacher' do
-      xit 'disables the course' do
-        controller.current_user = @teacher
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(Course.find(@course.id).disabled?).to eq(true)
-      end
-    end
-
-    describe 'As a student' do
-      xit 'denies access' do
-        controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(response.code.to_i).to eq(401)
-      end
-    end
-  end
-
-  describe 'POST enable' do
-    before :each do
-      @course = FactoryGirl.create(:course)
-    end
-
-    describe 'As a teacher' do
-      xit 'enables the course' do
-        controller.current_user = @teacher
-        post :enable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(Course.find(@course.id).disabled?).to eq(false)
-      end
-    end
-
-    describe 'As a student' do
-      xit 'denies access' do
-        controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(response.code.to_i).to eq(401)
-      end
-    end
-  end
-
   describe 'POST save_deadlines' do
     before :each do
       @course = FactoryGirl.create :course, organization: @organization
