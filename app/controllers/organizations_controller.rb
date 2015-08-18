@@ -16,7 +16,7 @@ class OrganizationsController < ApplicationController
 
   def show
     add_organization_breadcrumb
-    ordering = 'status, LOWER(courses.name)'
+    ordering = 'LOWER(courses.name)'
     @my_courses = Course.participated_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }

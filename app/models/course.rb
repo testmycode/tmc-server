@@ -66,8 +66,8 @@ class Course < ActiveRecord::Base
     delete_cache # Would be an after_destroy callback normally
   end
 
-  scope :ongoing, -> { where('true = true') } # TODO course enrollment
-  scope :expired, -> { where('true = false') }
+  scope :ongoing, -> { where(status: [statuses[:open], statuses[:restricted]]) } # TODO course enrollment
+  scope :expired, -> { where(status: statuses[:hidden]) }
   scope :assisted_courses, ->(user, organization) do
     joins(:assistantships)
       .where(assistantships: { user_id: user.id })

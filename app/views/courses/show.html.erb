@@ -57,7 +57,11 @@
           <% end %>
 
           <% if @course.hidden? %>
-            <li>The course is currently hidden.</li>
+            <li>The course is currently <strong>hidden.</strong></li>
+          <% end %>
+
+          <% if @course.restricted? %>
+            <li>The course if currently <strong>restricted.</strong> (Users aren't allowed to send submissions.)</li>
           <% end %>
 
           <li>

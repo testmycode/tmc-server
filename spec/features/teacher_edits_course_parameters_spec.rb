@@ -167,7 +167,13 @@ feature 'Teacher can edit course parameters', feature: true do
       end
 
       scenario 'Student cannot submit answers to restricted course' do
-        skip 'TODO: implement'
+        FactoryGirl.create :returnable_exercise, course: @course2, name: 'exercise1'
+        log_out
+        log_in_as @user.login, 'xooxer'
+        visit '/org/slug'
+        click_link 'dontchange'
+        click_link 'exercise1'
+        expect(page).to_not have_content('Submit answer')
       end
     end
   end

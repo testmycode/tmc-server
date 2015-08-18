@@ -29,12 +29,11 @@ describe OrganizationsController, type: :controller do
 
     describe 'GET index' do
       it 'shows visible courses in order by name, split into ongoing and expired' do
-        skip 'TODO: implement enrollment'
         @organization = Organization.create! valid_attributes
         @courses = [
             FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
-            FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
-            FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
+            FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, status: Course.statuses[:hidden]),
+            FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization, status: Course.statuses[:restricted])
         ]
 
         get :show, id: @organization.slug

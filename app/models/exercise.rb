@@ -102,7 +102,7 @@ class Exercise < ActiveRecord::Base
   def submittable_by?(user)
     returnable? &&
       (user.administrator? || user.teacher?(course.organization) ||
-        (!expired_for?(user) && !hidden? && published? && !disabled? && !user.guest? && unlocked_for?(user)))
+        (!expired_for?(user) && !hidden? && published? && !disabled? && !user.guest? && unlocked_for?(user) && !course.restricted?))
   end
 
   # Whether a user may see all metadata about the exercise

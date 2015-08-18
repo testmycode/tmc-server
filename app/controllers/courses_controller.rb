@@ -12,7 +12,7 @@ class CoursesController < ApplicationController
   skip_authorization_check only: [:index]
 
   def index
-    ordering = 'status, LOWER(name)'
+    ordering = 'LOWER(name)'
 
     respond_to do |format|
       format.html do
