@@ -3,10 +3,10 @@ class RemoveOldCourseHiddenFields < ActiveRecord::Migration
     rename_column :courses, :disabled_status, :status
 
     Course.all.each do |course|
-      course.update!(status: 2) if course.hidden
+      course.update!(status: 1) if course.hidden
       unless course.hide_after.nil?
         if course.hide_after <= Time.now
-          course.update!(status: 2)
+          course.update!(status: 1)
         else
           course.update!(enrollment_ends_at: course.hide_after)
         end
@@ -26,7 +26,7 @@ class RemoveOldCourseHiddenFields < ActiveRecord::Migration
     rename_column :courses, :status, :disabled_status
 
     Course.all.each do |course|
-      course.update!(hidden: true, disabled_status: 0) if course.disabled_status == 2
+      course.update!(hidden: true, disabled_status: 0) if course.disabled_status == 1
       course.update!(hidden_if_registered_after: course.enrollment_ends_at)
     end
   end
