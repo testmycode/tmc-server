@@ -46,7 +46,7 @@ class CourseTemplatesController < ApplicationController
   def update
     authorize! :edit, CourseTemplate
     if @course_template.update(course_template_params)
-      redirect_to course_templates_path, notice: 'Course template was successfully updated.'
+      redirect_to course_templates_path, notice: "Course template '#{@course_template.name}' was successfully updated."
     else
       render :edit
     end

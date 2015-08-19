@@ -47,11 +47,8 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def valid_git_repo?
-    return true unless source_url_changed? || git_branch_changed? # don't attempt repo cloning if source url or branch wasn't even changed
-    Dir.mktmpdir do |dir|
-      sh!('git', 'clone', '-q', '-b', git_branch, source_url, dir)
-      File.exist?("#{dir}/.git")
-    end
+    result = sh!('git', 'ls-remote', '--exit-code', source_url, git_branch, timeout: 10)
+    result[:status].success?
   rescue StandardError => e
     errors.add(:base, 'Cannot clone repository. Error: ' + e.to_s)
   end
