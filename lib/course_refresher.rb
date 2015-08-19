@@ -189,7 +189,7 @@ class CourseRefresher
     end
 
     def update_course_options
-      return if @course.refreshed?
+      return if @course.refreshed? # After initial refresh all options are set and updated via web ui
 
       options_file = "#{@course.clone_path}/course_options.yml"
 
