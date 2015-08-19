@@ -1,10 +1,21 @@
 require 'portable_csv'
 
 class ParticipantsController < ApplicationController
-  add_breadcrumb 'Participants', :participants_path, only: [:index, :show], if: -> { current_user.administrator? }
+  before_action :set_organization, only: [:index]
 
   def index
-    authorize! :view, :participants_list
+    if @organization.nil?
+      authorize! :view, :participants_list
+      courses = Course.all
+      users = User.all
+    else
+      authorize! :view_participant_list, @organization
+      add_organization_breadcrumb
+      courses = Course.where(organization: @organization)
+      users = User.organization_students(@organization)
+    end
+    add_breadcrumb 'Participants'
+
     @ordinary_fields = %w(username email)
     @extra_fields = UserField.all
     valid_fields = @ordinary_fields + @extra_fields.map(&:name) + ['include_administrators']
@@ -21,13 +32,14 @@ class ParticipantsController < ApplicationController
         @column_params.keys
       end
 
-    @courses = Course.order(:name).to_a
+    @courses = courses.order(:name).to_a
+
     unless params['group_completion_course_id'].blank?
-      @group_completion_course = Course.find(params['group_completion_course_id'])
+      @group_completion_course = courses.find(params['group_completion_course_id'])
       @group_completion = @group_completion_course.exercise_group_completion_by_user
     end
 
-    @participants = User.filter_by(@filter_params).order(:login)
+    @participants = users.filter_by(@filter_params).order(:login)
 
     if @group_completion && params['show_with_no_points'].blank?
       @participants = @participants.includes(:awarded_points).to_a.select do |user|
@@ -52,6 +64,7 @@ class ParticipantsController < ApplicationController
     @awarded_points = Hash[@user.awarded_points.to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
 
     if current_user.administrator?
+      add_breadcrumb 'Participants', :participants_path
       add_breadcrumb @user.username, participant_path(@user)
     else
       add_breadcrumb 'My stats', participant_path(@user)
@@ -159,5 +172,11 @@ class ParticipantsController < ApplicationController
         csv << row
       end
     end
+  end
+
+  private
+
+  def set_organization
+    @organization = Organization.find_by(slug:params[:organization_id]) unless params[:organization_id].nil?
   end
 end

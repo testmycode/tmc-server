@@ -11,6 +11,8 @@ resources :organizations, except: :destory, path: 'org' do
       get 'list_requests'
     end
 
+    resources :participants, only: [:index]
+
     resources :teachers, only: [:index, :create, :destroy]
 
     get 'course_templates', to: 'course_templates#list_for_teachers'
@@ -102,8 +104,8 @@ resources :organizations, except: :destory, path: 'org' do
   resources :stats, only: [:index]
 
   resources :password_reset_keys
-  get '/reset_password/:code' => 'password_reset_keys#show', :as => 'reset_password'
-  delete '/reset_password/:code' => 'password_reset_keys#destroy'
+  get '/reset_password/:token' => 'password_reset_keys#show', :as => 'reset_password'
+  delete '/reset_password/:token' => 'password_reset_keys#destroy'
 
   resources :exercises, only: [:show] do
     resources :submissions, only: [:create]

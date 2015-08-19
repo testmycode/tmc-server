@@ -253,6 +253,10 @@ class Ability
       can :view_participant_information, User do |u|
         !user.guest? && u.readable_by?(user)
       end
+
+      can :view_participant_list, Organization do |o|
+        can?(:teach, o)
+      end
     end
   end
 end

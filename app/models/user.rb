@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
 
   has_many :submissions, dependent: :delete_all
   has_many :awarded_points, dependent: :delete_all
-  has_one :password_reset_key, dependent: :delete
+  has_many :action_tokens, dependent: :delete_all
   has_many :user_field_values, dependent: :delete_all, autosave: true
   has_many :unlocks, dependent: :delete_all
   has_many :uncomputed_unlocks, dependent: :delete_all
@@ -32,6 +32,13 @@ class User < ActiveRecord::Base
   def self.course_students(course)
     joins(:awarded_points)
       .where(awarded_points: { course_id: course.id })
+      .group('users.id')
+  end
+
+  # TODO: Later after enrollment has implemented, this should use it instead
+  def self.organization_students(organization)
+    joins(awarded_points: :course)
+      .where(courses: { organization_id: organization.id })
       .group('users.id')
   end
 
@@ -105,6 +112,10 @@ class User < ActiveRecord::Base
     user = find_by_login(login)
     return nil if user.nil?
     return user if user.has_password?(submitted_password)
+  end
+
+  def password_reset_key
+    self.action_tokens.find { |t| t.action == 'reset_password' }
   end
 
   def has_point?(course, point_name)

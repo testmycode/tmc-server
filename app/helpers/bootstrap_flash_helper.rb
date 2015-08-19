@@ -9,7 +9,8 @@ module BootstrapFlashHelper
 
       type = :success if type.to_sym == :notice
       type = :error   if type.to_sym == :alert
-      next unless ALERT_TYPES.include?(type)
+
+      next unless ALERT_TYPES.include?(type.to_sym)
 
       Array(message).each do |msg|
         text = content_tag(:div,
