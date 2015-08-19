@@ -17,7 +17,7 @@ module SystemCommands
     options = {
       assert_silent: false,
       escape: true,
-      timeout: 0
+      timeout: nil
     }
     if args.last.is_a?(Hash)
       options = options.merge(args.pop)
@@ -33,24 +33,14 @@ module SystemCommands
       end
     end
 
-    output = nil
-    status = nil
-
-    if options[:timeout] > 0
-      cmd = "timeout #{options[:timeout]+1} #{cmd}"
-      begin
-        Timeout::timeout(options[:timeout]) do
-          output = `#{cmd} 2>&1`
-          status = $?
-        end
-      rescue Timeout::Error
-        fail "Timeout for #{cmd}, status: #{status}, output:#{output}"
-      end
-    else
-      output = `#{cmd} 2>&1`
-      status = $?
+    unless options[:timeout].nil?
+      cmd = "timeout #{options[:timeout]} #{cmd}"
     end
 
+    output = `#{cmd} 2>&1`
+    status = $?
+
+    fail "Time out for command ''#{cmd}'', status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
     fail "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
     fail "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 

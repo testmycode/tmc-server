@@ -13,4 +13,10 @@ describe SystemCommands do
       sh!('sleep', 2)
     }.not_to raise_error
   end
+
+  it 'should fail if expecting no output' do
+    expect {
+      sh!('echo', 'Hello', assert_silent: true)
+    }.to raise_error
+  end
 end
