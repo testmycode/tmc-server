@@ -40,7 +40,7 @@ module SystemCommands
     output = `#{cmd} 2>&1`
     status = $?
 
-    fail "Time out for command ''#{cmd}'', status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
+    fail "Command '#{cmd}' timed out, status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
     fail "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
     fail "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 
