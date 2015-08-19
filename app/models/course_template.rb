@@ -47,9 +47,8 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def valid_git_repo?
-    timeout = 10
-    sh!('git', 'ls-remote', '--exit-code', source_url, git_branch, { timeout: timeout })
-    true
+    result = sh!('git', 'ls-remote', '--exit-code', source_url, git_branch, timeout: 10)
+    result[:status].success?
   rescue StandardError => e
     errors.add(:base, 'Cannot clone repository. Error: ' + e.to_s)
   end
