@@ -196,6 +196,11 @@ class User < ActiveRecord::Base
     self.action_tokens.find { |t| t.action == 'confirm_email' }
   end
 
+  def email_confirmed_at
+    return Time.now if Rails.env.development?
+    super
+  end
+
   private
 
   def encrypt_password
