@@ -1,9 +1,13 @@
 class RenamePasswordResetKeyToActionToken < ActiveRecord::Migration
 
+  class ActionToken < ActiveRecord::Base
+
+  end
+
   def up
     rename_table :password_reset_keys, :action_tokens
     rename_column :action_tokens, :code, :token
-    add_column :action_tokens, :action, :integer, null: false
+    add_column :action_tokens, :action, :integer, null: true
     add_column :action_tokens, :expires_at, :datetime
     add_column :action_tokens, :updated_at, :datetime
 
@@ -11,6 +15,8 @@ class RenamePasswordResetKeyToActionToken < ActiveRecord::Migration
       at.update!(action: 1, expires_at: at.created_at + 24.hours)
       raise MigrationError('Action token (id: '+at.id+') has more than 255 characters.') if at.token.length > 255
     end
+
+    change_column_null :action_tokens, :action, false
 
     change_column :action_tokens, :token, :string
   end
