@@ -7,7 +7,7 @@ require 'securerandom'
 # A password reset key is valid for a limited time and may safely be left unused.
 class ActionToken < ActiveRecord::Base
   belongs_to :user
-  validates :user_id, presence: true, uniqueness: true
+  validates :user_id, presence: true, uniqueness: { scope: :action }
   validates :token, uniqueness: true # this going wrong should be extremely unlikely
 
   before_create :randomize_token

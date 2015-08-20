@@ -81,10 +81,17 @@ describe UsersController, type: :controller do
       expect(User.count).to eq(0)
     end
 
-    it 'should require an email confirmation' do
+    it 'should require an email repeat' do
       @valid_attrs.delete :email_repeat
       post :create, user: @valid_attrs
       expect(User.count).to eq(0)
+    end
+
+    it 'should create confirm_email_token' do
+      post :create, user: @valid_attrs
+      user = User.find_by_login(@valid_attrs[:login])
+      expect(user.email_confirmed_at).to be_nil
+      expect(user.email_confirmation_token).not_to be_nil
     end
 
     it 'should require a password' do
@@ -133,12 +140,6 @@ describe UsersController, type: :controller do
       controller.current_user = @user
     end
 
-    it 'should save the email field' do
-      put :update, user: { email: 'newemail', email_repeat: 'newemail' }
-      expect(response).to redirect_to(user_path)
-      expect(@user.reload.email).to eq('newemail')
-    end
-
     it 'should not allow changing the login' do
       old_login = @user.login
       put :update, user: { email: 'newemail', login: 'newlogin' }
@@ -160,6 +161,29 @@ describe UsersController, type: :controller do
       expect(@user.field_value_record(fields[0]).value).to eq('foo')
       expect(@user.field_value_record(fields[1]).value).not_to be_blank
       expect(@user.field_value_record(fields[2]).value).to be_blank
+    end
+
+    describe 'changing the email' do
+      before :each do
+        put :update, user: { email: 'newemail', email_repeat: 'newemail' }
+      end
+
+      it 'should save the email field' do
+        expect(response).to redirect_to(user_path)
+        expect(@user.reload.email).to eq('newemail')
+      end
+
+      it 'should change email_confirmed_at to nil' do
+        expect(@user.reload.email_confirmed_at).to be_nil
+      end
+
+      it 'should create email_confirmation_token' do
+        expect(@user.reload.email_confirmation_token).not_to be_nil
+      end
+
+      it 'should give notice to click confirmation link in email' do
+        expect(flash[:notice]).to have_content('Confirmation email has been sent to your new email address')
+      end
     end
 
     describe 'changing the password' do
