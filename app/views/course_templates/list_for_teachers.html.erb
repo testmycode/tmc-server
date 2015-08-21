@@ -1,6 +1,11 @@
 <h1>New Course</h1>
 
-<h3>Create course from templates</h3>
+<h3>Create course from template</h3>
+
+<p class="help">
+  Course can be created by cloning it from template, which are offered by TMC. Template includes fully usable
+  course with exercises, and you can customize your course details and deadlines individually.
+</p>
 
 <table class='table table-striped'>
   <thead>
@@ -29,6 +34,12 @@
 <% if can? :create, :custom_course %>
 
   <h3>Create custom course</h3>
+
+  <p class="help">
+    You can also make your completely own course. Then you need to maintain your exercises and store them in
+    git repository. Check details from the manual.
+  </p>
+
   <%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
 
 <% end %>
