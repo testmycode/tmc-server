@@ -53,6 +53,7 @@ module ApplicationHelper
 
   def bs_labeled_field(label, field, options = {})
     type = options[:type] || :text
+    helptext = "<span class=\"helptext\">#{options[:helptext]}</span>" if options[:helptext]
 
     case type
     when :boolean
@@ -61,7 +62,7 @@ module ApplicationHelper
       str << '</label>'
     else
       str = label_tag label, nil, class: 'control-label'
-      str += raw("<div class=\"controls\">" + raw(field) + '</div>')
+      str += raw("#{helptext}<div class=\"controls\">#{raw(field)}</div>")
     end
     raw(str)
   end
