@@ -32,9 +32,9 @@ class UsersController < ApplicationController
     if @user.errors.empty? && @user.save
       send_email_confirmation_mail(@user)
       if @bare_layout
-        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created. Please confirm your email address to continue.</div>', layout: true
+        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created. Confirmation email has been sent to your email address.</div>', layout: true
       else
-        flash[:notice] = 'User account created. Please confirm your email address to continue.'
+        flash[:notice] = 'User account created. Confirmation email has been sent to your email address.'
         redirect_to root_path
       end
     else
