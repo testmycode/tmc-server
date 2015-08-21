@@ -28,7 +28,7 @@ class OrganizationsController < ApplicationController
 
   def new
     authorize! :request, :organization
-    add_breadcrumb 'Create new organization'
+    add_breadcrumb 'Request new organization'
     @organization = Organization.new
   end
 
