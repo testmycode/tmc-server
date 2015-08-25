@@ -69,7 +69,8 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    When logged in as a user (sign up first if you haven't already), in the front page, click 'Request a new organization'.
+    When logged in as a user (sign up first if you haven't already), go to url </i>/org/new</i> in current TMC webapp,
+    (for example http://tmc.mooc.fi/org/new).
   </p>
 
 <%
@@ -77,11 +78,9 @@ require 'cgi' # for escapeHTML
   fill_in 'session_login', with: 'teacher'
   fill_in 'session_password', with: 'teacher'
   click_on 'Sign in'
-  highlight 'a:contains("Request a new organization")'
 %>
-<%= screenshot %>
 <%
-  click_on 'Request a new organization'
+  visit '/org/new'
   fill_in 'organization_name', with: 'Helsingin yliopisto'
   fill_in 'organization_information', with: 'University life'
   fill_in 'organization_slug', with: 'hy'
@@ -94,7 +93,7 @@ require 'cgi' # for escapeHTML
       <li><b>Name</b> of the organization that will be seen in the app</li>
       <li><b>Description</b> about your organization, seen in this organization's page</li>
       <li><b>Logo</b> for your organization, seen in this organization's page (you can change this and other fields above later)</li>
-      <li>"<b>Slug</b>", a short word that will be part of your organization's url. You will have an opportunity to preview organization's url</li>
+      <li><b>Organization ID</b>, a short word that will be part of your organization's url. You will have an opportunity to preview organization's url</li>
     </ul>
   </p>
 
@@ -109,17 +108,13 @@ require 'cgi' # for escapeHTML
     you may see the organization's page, but you can't do much else with it.
   </p>
 
-<%
-  visit '/'
-  expect(page).not_to have_content 'Helsingin yliopisto'
-%>
-<%= screenshot %>
-
   <p>
     After your organization is accepted, you will be able to see it in the organization listing at the front page.
+    Your own organizations are listed first separately, and accepted organizations are shown also in 'All organizations' list.
   </p>
 
 <%
+  visit '/'
   click_on 'Sign out'
   fill_in 'session_login', with: 'admin'
   fill_in 'session_password', with: 'admin'
@@ -146,39 +141,36 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-  click_on 'Helsingin yliopisto'
+  page.first(:link, "Helsingin yliopisto").click
   highlight 'a:contains("Show teachers in this organization")'
 %>
 <%= screenshot %>
 
 <%
    click_on 'Show teachers in this organization'
-   highlight 'a:contains("Add a new teacher")'
 %>
-<%= screenshot %>
 
   <p>
-    When you're a teacher in some organization, you may add new teachers. Click 'Add a new teacher'.
+    When you're a teacher in some organization, you may add new teachers. To recruit a new teacher, you will have to
+    know the teacher's username. The page form will not list available usernames. Type the username then click
+    'Add a new teacher'.
   </p>
 
 <%
-   click_on 'Add a new teacher'
    fill_in 'username', with: 'professor'
+   highlight '[value="Add a new teacher"]'
 %>
 <%= screenshot %>
-
-  <p>
-    To recruit a new teacher, you will have to know the teacher's username. The page form will not list available usernames.
-    Type the username then click 'Add a new teacher'.
-  </p>
 
 <%
    click_on 'Add a new teacher'
+   highlight 'a:contains("Remove")'
 %>
 <%= screenshot %>
 
   <p>
-    Added teacher will now have the same access rights for the organization as you have.
+    Added teacher will now have the same access rights for the organization as you have. You can also remove existing
+    teachers easily.
   </p>
 
   <h2>Creating a course</h2>
@@ -253,6 +245,7 @@ require 'cgi' # for escapeHTML
 <%
    visit '/org/hy'
    highlight 'a:contains("Programming 101")'
+   click_on 'Programming 101'
    click_on 'Edit course parameters'
    fill_in 'course_external_scoreboard_url', with: 'http://my-points.io/%{user}'
 %>
@@ -270,7 +263,8 @@ require 'cgi' # for escapeHTML
 
   <p>
     If you're so inclined, you may also create your own course without a template. This <a href="customcourse.html">guide</a>
-    may prove useful to you in this case.
+    may prove useful to you in this case. Creating this kind of custom courses may also be disabled, based on the
+    current TMC webapp configuration.
   </p>
 
   <h2>Disabling course</h2>
@@ -320,12 +314,6 @@ require 'cgi' # for escapeHTML
 
 <%
    click_on 'Manage assistants'
-   highlight 'a:contains("Add a new assistant")'
-%>
-<%= screenshot %>
-
-<%
-   click_on 'Add a new assistant'
    fill_in 'username', with: 'assistant'
    highlight '[value="Add a new assistant"]'
 %>

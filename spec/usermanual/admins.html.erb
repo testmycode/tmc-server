@@ -30,12 +30,16 @@
 require 'cgi' # for escapeHTML
 %>
 
-  <%
-    FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
-    FactoryGirl.create(:course_template)
-    FactoryGirl.create(:course_template)
-    FactoryGirl.create(:course_template)
-  %>
+<%
+  FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
+  ct1 = FactoryGirl.create(:course_template)
+  ct2 = FactoryGirl.create(:course_template)
+  ct3 = FactoryGirl.create(:course_template)
+  organization = FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
+  course = FactoryGirl.create(:course, organization: organization)
+  course.course_template = ct3
+  course.save!
+%>
 
   <h1>Admin Manual</h1>
 
@@ -82,15 +86,17 @@ require 'cgi' # for escapeHTML
   fill_in 'course_template_title', with: 'New Template'
   fill_in 'course_template_description', with: 'Short description'
   fill_in 'course_template_material_url', with: 'www.material.com'
-  fill_in 'course_template_source_url', with: repo_path
+  fill_in 'course_template_source_url', with: 'https://www.githug.com/account/course.git.'
   highlight '#course_template_name'
   highlight '#course_template_title'
   highlight '#course_template_source_url'
   highlight '#course_template_git_branch'
 %>
 <%= screenshot %>
-
-  <p>
+<%
+   fill_in 'course_template_source_url', with: repo_path
+%>
+   <p>
     Highlighted fields are required and can't be left blank. Explanation for each field:
     <ul>
       <li>Courses are shown by <b>Name</b> in IDE plugins (such as NetBeans). Name can't contain whitespaces.</li>
@@ -124,18 +130,22 @@ require 'cgi' # for escapeHTML
   <p>After clicking 'Create course template', TMC will show the list of all templates again.</p>
 
 <%
+   ct2.hidden = true
+   ct2.save!
    click_on 'Create Course template'
    visit '/course_templates'
    expect(page).to have_content('newtemplate')
    highlight 'a:contains("Refresh"):last'
-   highlight 'a:contains("hide"):last'
-   highlight 'a:contains("Edit"):last'
+   highlight 'a:contains("hide"):first'
+   highlight 'a:contains("Edit"):first'
+   highlight 'a:contains("unhide")'
 %>
 <%= screenshot %>
 
   <p>
     Whenever any changes to the remote repository are made (new exercises added, exercises removed, etc),
-    the course template that uses that repository needs to be refreshed. After clicking 'Refresh', all courses
+    the course template that uses that repository needs to be refreshed. You can refresh only course templates,
+    which already have some courses made from them. After clicking 'Refresh', all courses
     created from the template will be up-to-date. This operation takes some time.
   </p>
 
@@ -159,7 +169,6 @@ require 'cgi' # for escapeHTML
   <p>Administrator will see this notice on the front page when a new organization is requested:</p>
 
 <%
-  FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
   FactoryGirl.create :user, login: 'user', password: 'user'
 
   click_on 'Sign out'
@@ -167,8 +176,7 @@ require 'cgi' # for escapeHTML
   fill_in 'session_password', with: 'user'
   click_on 'Sign in'
 
-  visit '/'
-  click_link 'Request a new organization'
+  visit '/org/new'
   fill_in 'organization[name]', with: 'Helsingin yliopisto'
   fill_in 'organization[information]', with: 'University life'
   fill_in 'organization[slug]', with: 'hy'
@@ -218,8 +226,7 @@ require 'cgi' # for escapeHTML
   fill_in 'session_password', with: 'user'
   click_on 'Sign in'
 
-  visit '/'
-  click_link 'Request a new organization'
+  visit '/org/new'
   fill_in 'organization[name]', with: 'Helsingin yliopisto'
   fill_in 'organization[information]', with: 'University life'
   fill_in 'organization[slug]', with: 'hy'
