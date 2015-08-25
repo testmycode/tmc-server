@@ -1,0 +1,15 @@
+<% if cookies['eu_cookie_consented'] != 'true' %>
+  <div class="cookie_consent alert">
+    Cookies help us deliver our services. By using our services, you agree to our use of cookies.
+    <%= link_to "Learn more", "http://cookiepedia.co.uk", target: :blank %>
+    <button type="button" id="cookie-consent-got-it" class="close" data-dismiss="alert">Got It</button>
+  </div>
+
+  <script>
+    $(document).ready( function(){
+      $("#cookie-consent-got-it").click(function() {
+        $.cookie('eu_cookie_consented', 'true', { path: '/', expires: 365 });
+      });
+    });
+  </script>
+<% end %>
