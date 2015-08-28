@@ -19,7 +19,7 @@ module SystemCommands
       escape: true
     }
     if args.last.is_a?(Hash)
-      options = args.pop.merge(options)
+      options = options.merge(args.pop)
     end
 
     if options[:escape]
@@ -27,6 +27,7 @@ module SystemCommands
     else
       if args.length == 1
         cmd = args[0]
+        cmd = cmd.join(' ') if cmd.is_a?(Array)
       else
         fail 'Expected a single string argument when :escape => true'
       end
