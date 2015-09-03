@@ -30,6 +30,7 @@
             when '.jsp' then 'html'
             when '.less' then 'css'
             when '.sass' then 'css'
+            when '.hpp' then 'h'
             when '.properties' then 'plain'
             when '' then 'plain'
             else File.extname(file.path)[1..-1]
