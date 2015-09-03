@@ -129,6 +129,7 @@ class SourceFileList
       name.end_with?('.js') ||
       name.end_with?('.c') ||
       name.end_with?('.cpp') ||
+      name.end_with?('.hpp') ||
       name.end_with?('.h') ||
       name.end_with?('.rb') ||
       dir.include?('/WEB-INF')
