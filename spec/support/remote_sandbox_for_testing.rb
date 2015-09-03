@@ -5,6 +5,7 @@ class RemoteSandboxForTesting
   @server_pids = nil
   @result_queue = nil
   @server_ports = nil
+  @host = 'http://localhost'
 
   def self.server_ports
     # Currently just one server. Running multiple server webapps on the same machine is problematic.
@@ -22,6 +23,12 @@ class RemoteSandboxForTesting
     SandboxResultsSaver.save_results(submission, results)
   end
 
+  # Allows tests to be run w/o root by using an external sandbox.
+  def self.use_server_at(host, port)
+    @host = host
+    @server_ports = [port].flatten
+  end
+
   def self.init_servers_as_root!(actual_user, actual_group)
     fail 'Root helper already started' if @root_helper
     fail 'init_servers_as_root! should be called as root' if Process::Sys.geteuid != 0
@@ -36,12 +43,12 @@ class RemoteSandboxForTesting
 
   def self.init_stubs!
     RemoteSandbox.stub(:all) do
-      server_ports.map { |port| RemoteSandbox.new("http://localhost:#{port}/") }
+      server_ports.map { |port| RemoteSandbox.new("#{@host}:#{port}/") }
     end
   end
 
   def self.cleanup_after_all_tests!
-    @root_helper.stop
+    @root_helper.stop if @root_helper
     @root_helper = nil
 
     result_queue.cleanup!
