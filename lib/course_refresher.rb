@@ -245,11 +245,6 @@ class CourseRefresher
                                           end)
           @review_points[e.name] = parse_review_points(metadata['review_points'])
 
-          if e.course.refreshed?
-            preserve_exercise_deadlines(e, metadata)
-            preserve_exercise_unlocks(e, metadata)
-          end
-
           e.options = metadata
 
           if (e.new_record? && e.course.refreshed?)
@@ -478,16 +473,6 @@ class CourseRefresher
 
     def seed_maven_cache
       MavenCacheSeeder.start(@course.clone_path, RemoteSandbox.all)
-    end
-
-    def preserve_exercise_deadlines(e, metadata) # Do not update deadlines from repo, read them from database
-      static_deadline = e.static_deadline || ''
-      unlock_deadline = e.unlock_deadline || ''
-      metadata['deadline'] = [static_deadline, unlock_deadline]
-    end
-
-    def preserve_exercise_unlocks(e, metadata)
-      metadata['unlocked_after'] = e.unlock_conditions
     end
   end
 end

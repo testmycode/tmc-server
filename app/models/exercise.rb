@@ -283,11 +283,13 @@ class Exercise < ActiveRecord::Base
     super(DateAndTimeUtils.to_time(new_value, prefer_end_of_day: true))
   end
 
+  # Ignore some options if already set; to keep changes done in UI.
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
-    self.deadline_spec = to_json_array(new_options["deadline"])
-    self.soft_deadline_spec = to_json_array(new_options["soft_deadline"])
-    self.unlock_spec = to_json_array(new_options["unlocked_after"])
+
+    self.deadline_spec = to_json_array(new_options["deadline"]) if deadline_spec.nil?
+    self.soft_deadline_spec = to_json_array(new_options["soft_deadline"]) if self.soft_deadline_spec.nil?
+    self.unlock_spec = to_json_array(new_options["unlocked_after"]) if self.unlock_spec.nil?
     self.publish_time = new_options["publish_time"]
     self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"], new_options["gdocs_sheet"])
     self.hidden = new_options["hidden"]

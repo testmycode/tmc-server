@@ -151,7 +151,7 @@ describe CourseRefresher do
     expect(@course2.exercises.first.gdocs_sheet).to eq('xoo')
   end
 
-  it 'should load changed exercise metadata except for deadlines' do
+  it 'should load changed exercise metadata except for fields defined in UI' do
     add_exercise('MyExercise', commit: false)
     change_metadata_file(
       'metadata.yml',
@@ -164,6 +164,14 @@ describe CourseRefresher do
     )
     refresh_courses
 
+    # set soft dl
+    expect(ActiveSupport::JSON.decode(@course.exercises.first.soft_deadline_spec)).to be_empty
+    ex = @course.exercises.first
+    ex.soft_deadline_spec = "[\"02.01.2012 12:33\",\"\"]"
+    ex.save!
+    expect(@course.exercises.first.soft_deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:33'))
+
+
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2013-01-01 00:00', 'gdocs_sheet' => 'xoo' },
@@ -175,6 +183,7 @@ describe CourseRefresher do
       commit: true
     )
     refresh_courses
+    expect(@course.exercises.first.soft_deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:33'))
     expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
     expect(@course.exercises.first.gdocs_sheet).to eq('foo')
     expect(@course2.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
