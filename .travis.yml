@@ -1,8 +1,19 @@
-sudo: true
+sudo: false
 
 language: ruby
+
 rvm:
   - 2.2.0
+
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - valgrind
+      - check
+      - pkg-config
+      - gcc
 
 git:
   submodules: false
@@ -12,14 +23,26 @@ before_install:
   - git submodule update --init --recursive
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
+  # tmc-check
+  - mkdir $HOME/check && git clone https://github.com/testmycode/tmc-check.git && cd tmc-check && make && make install PREFIX=$HOME/check && export PATH="$HOME/check/bin:$PATH" && cd ..
+  - export LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
+  - export C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH
+  - export PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
+  # mock sandbox
+  - cd .. && git clone https://github.com/jamox/tmc-mock-sandbox.git && cd tmc-mock-sandbox && BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install && cd ../tmc-server
 
 services:
   - postgresql
 
 before_script:
   - createuser -U postgres -s tmc
+  - bundle exec rake db:reset
+  - cd ../tmc-mock-sandbox/ && BUNDLE_GEMFILE=$(pwd)/Gemfile bundle exec rackup --port 3002 &
+  - echo "Waiting for bg task to start"
+  - sleep 10
 
 script:
-  - bundle exec rake db:reset
-  - export rvmsudo_secure_path=1
-  - rvmsudo bundle exec rake spec SPEC="spec/controllers spec/models spec/helpers spec/mailers"
+  - env SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3002 bundle exec rake spec SPEC_OPTS="-f d"
+
+after_script:
+  - kill %1

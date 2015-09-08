@@ -18,6 +18,6 @@ class ResultsController < ApplicationController
   rescue SandboxResultsSaver::InvalidTokenError
     respond_access_denied('Invalid or expired token')
   else
-    render json: 'OK', layout: false
+    render json: {status: 'OK'}, layout: false
   end
 end
