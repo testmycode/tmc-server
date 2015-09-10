@@ -11,7 +11,7 @@ feature 'Teacher lists own organization courses', feature: true do
 
     FactoryGirl.create :course, name: 'course_1', title: 'Course 1', organization: @organization
     FactoryGirl.create :course, name: 'course_2', title: 'Course 2', organization: @organization
-    FactoryGirl.create :course, name: 'course_old', title: 'Old Course', organization: @organization, hide_after: Time.now - 2.minutes
+    FactoryGirl.create :course, name: 'course_old', title: 'Old Course', organization: @organization, status: 1
 
     visit '/'
   end

@@ -114,4 +114,15 @@ $(document).ready(function() {
     };
 
     $("#select-all").click(select_unselect_all);
+
+    /*
+     * Edit course parameters
+     */
+
+    var toggle_certificate_unlock_conditions = function() {
+        var check = this.checked;
+        $("#certificate-unlock-spec").css('display', check ? '' : 'none');
+    };
+
+    $("#course_certificate_downloadable").click(toggle_certificate_unlock_conditions);
 });

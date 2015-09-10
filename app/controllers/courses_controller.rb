@@ -12,7 +12,7 @@ class CoursesController < ApplicationController
   skip_authorization_check only: [:index]
 
   def index
-    ordering = 'hidden, disabled_status, LOWER(name)'
+    ordering = 'LOWER(name)'
 
     respond_to do |format|
       format.html do
@@ -117,18 +117,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def enable
-    authorize! :teach, @organization # should assistants be able to enable/disable?
-    @course.enabled!
-    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully enabled.')
-  end
-
-  def disable
-    authorize! :teach, @organization
-    @course.disabled!
-    redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
-  end
-
   def manage_deadlines
     authorize! :manage_deadlines, @course
     add_course_breadcrumb
@@ -211,18 +199,26 @@ class CoursesController < ApplicationController
   private
 
   def course_params_for_create
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch,
+                                   :source_backend, :locked_exercise_points_visible, :formal_name,
+                                   :certificate_downloadable, :raw_certificate_unlock_spec, :status)
   end
 
   def course_params_for_create_from_template
-    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
+    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id,
+                                   :locked_exercise_points_visible, :formal_name, :certificate_downloadable,
+                                   :raw_certificate_unlock_spec, :status)
   end
 
   def course_params
     if @course.custom?
-      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
+      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch,
+                                     :external_scoreboard_url, :locked_exercise_points_visible, :formal_name,
+                                     :certificate_downloadable, :raw_certificate_unlock_spec, :status)
     else
-      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url,
+                                     :locked_exercise_points_visible, :formal_name, :certificate_downloadable,
+                                     :raw_certificate_unlock_spec, :status)
     end
   end
 

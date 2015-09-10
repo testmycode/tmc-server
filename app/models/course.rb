@@ -31,6 +31,7 @@ class Course < ActiveRecord::Base
   #            message: 'should begin with http:// or https://'
   #          }
   validate :check_external_scoreboard_url
+  validate :check_certificate_unlock_spec
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
@@ -51,7 +52,7 @@ class Course < ActiveRecord::Base
 
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
-  enum disabled_status: [ :enabled, :disabled ]
+  enum status: [ :open, :hidden, :restricted ]
 
   def destroy
     # Optimization: delete dependent objects quickly.
@@ -65,8 +66,8 @@ class Course < ActiveRecord::Base
     delete_cache # Would be an after_destroy callback normally
   end
 
-  scope :ongoing, -> { where(['hide_after IS NULL OR hide_after > ?', Time.now]) }
-  scope :expired, -> { where(['hide_after IS NOT NULL AND hide_after <= ?', Time.now]) }
+  scope :ongoing, -> { where(status: [statuses[:open], statuses[:restricted]]) } # TODO course enrollment
+  scope :expired, -> { where(status: statuses[:hidden]) }
   scope :assisted_courses, ->(user, organization) do
     joins(:assistantships)
       .where(assistantships: { user_id: user.id })
@@ -115,41 +116,12 @@ class Course < ActiveRecord::Base
   def visible_to?(user)
     user.administrator? ||
     user.teacher?(organization) ||
-    user.assistant?(self) || (
-      !disabled? &&
-      !hidden &&
-      (hide_after.nil? || hide_after > Time.now) &&
-      (
-        hidden_if_registered_after.nil? ||
-        hidden_if_registered_after > Time.now ||
-        (!user.guest? && hidden_if_registered_after > user.created_at)
-      )
-    )
-  end
-
-  def hide_after=(x)
-    super(DateAndTimeUtils.to_time(x, prefer_end_of_day: true))
-  end
-
-  def hidden_if_registered_after=(x)
-    super(DateAndTimeUtils.to_time(x, prefer_end_of_day: false))
+    user.assistant?(self) ||
+    !hidden?
   end
 
   # This could eventually be made a hstore
   def options=(new_options)
-    if !new_options['hide_after'].blank?
-      self.hide_after = new_options['hide_after']
-    else
-      self.hide_after = nil
-    end
-
-    if !new_options['hidden_if_registered_after'].blank?
-      self.hidden_if_registered_after = new_options['hidden_if_registered_after']
-    else
-      self.hidden_if_registered_after = nil
-    end
-
-    self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
 
     self.paste_visibility = new_options['paste_visibility']
@@ -425,6 +397,16 @@ class Course < ActiveRecord::Base
     external_scoreboard_url % { user: user.username, course: course.id.to_s, org: organization.slug }
   end
 
+  def raw_certificate_unlock_spec
+    return '' if certificate_unlock_spec.nil?
+    ActiveSupport::JSON.decode(certificate_unlock_spec).join("\n")
+  end
+
+  def raw_certificate_unlock_spec=(spec)
+    json_array = ActiveSupport::JSON.encode(spec.gsub("\r", '').split("\n").reject(&:blank?))
+    self.certificate_unlock_spec = json_array
+  end
+
   private
 
   def set_cache_version
@@ -471,6 +453,15 @@ class Course < ActiveRecord::Base
       external_scoreboard_url % { user: '', course: '', org: '' } unless external_scoreboard_url.blank?
     rescue
       errors.add(:external_scoreboard_url, 'contains invalid keys')
+    end
+  end
+
+  def check_certificate_unlock_spec
+    return if certificate_unlock_spec.nil?
+    begin
+      UnlockSpec.parsable?(certificate_unlock_spec, self)
+    rescue => e
+      errors.add(:certificate_unlock_spec, e.message)
     end
   end
 end

@@ -51,71 +51,34 @@ describe Course, type: :model do
     end
   end
 
-  it 'should be visible if not hidden and hide_after is nil' do
-    c = FactoryGirl.create(:course, hidden: false, hide_after: nil)
-    expect(c).to be_visible_to(user)
-  end
-
-  it 'should be visible if not hidden and hide_after has not passed' do
-    c = FactoryGirl.create(:course, hidden: false, hide_after: Time.now + 2.minutes)
-    expect(c).to be_visible_to(user)
+  it 'should be visible if not hidden' do
+    c1 = FactoryGirl.create(:course)
+    c1.open!
+    c2 = FactoryGirl.create(:course)
+    c2.restricted!
+    expect(c1).to be_visible_to(user)
+    expect(c2).to be_visible_to(user)
   end
 
   it 'should not be visible if hidden' do
-    c = FactoryGirl.create(:course, hidden: true, hide_after: nil)
-    expect(c).not_to be_visible_to(user)
-  end
-
-  it 'should not be visible if hide_after has passed' do
-    c = FactoryGirl.create(:course, hidden: false, hide_after: Time.now - 2.minutes)
+    c = FactoryGirl.create(:course)
+    c.hidden!
     expect(c).not_to be_visible_to(user)
   end
 
   it 'should always be visible to administrators' do
     admin = FactoryGirl.create(:admin)
-    c = FactoryGirl.create(:course, hidden: true, hide_after: Time.now - 2.minutes)
+    c = FactoryGirl.create(:course)
+    c.hidden!
     expect(c).to be_visible_to(admin)
   end
 
   it 'should always be visible to organization teachers' do
     organization = FactoryGirl.create(:accepted_organization)
     Teachership.create!(user: user, organization: organization)
-    c = FactoryGirl.create(:course, hidden: true, hide_after: Time.now - 2.minutes, organization: organization)
+    c = FactoryGirl.create(:course, organization: organization)
+    c.hidden!
     expect(c).to be_visible_to(user)
-  end
-
-  it 'should be visible if user has registered before the hidden_if_registered_after setting' do
-    user.created_at = Time.zone.parse('2010-01-02')
-    user.save!
-    c = FactoryGirl.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-03'))
-    expect(c).to be_visible_to(user)
-  end
-
-  it 'should not be visible if user has registered after the hidden_if_registered_after setting' do
-    user.created_at = Time.zone.parse('2010-01-02')
-    user.save!
-    c = FactoryGirl.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-01'))
-    expect(c).not_to be_visible_to(user)
-  end
-
-  it 'should accept Finnish dates and datetimes for hide_after' do
-    c = FactoryGirl.create(:course)
-    c.hide_after = '19.8.2012'
-    expect(c.hide_after.day).to eq(19)
-    expect(c.hide_after.month).to eq(8)
-    expect(c.hide_after.year).to eq(2012)
-
-    c.hide_after = '15.9.2011 19:15'
-    expect(c.hide_after.day).to eq(15)
-    expect(c.hide_after.month).to eq(9)
-    expect(c.hide_after.hour).to eq(19)
-    expect(c.hide_after.year).to eq(2011)
-  end
-
-  it 'should consider a hide_after date without time to mean the end of that day' do
-    c = FactoryGirl.create(:course, hide_after: '18.11.2013')
-    expect(c.hide_after.hour).to eq(23)
-    expect(c.hide_after.min).to eq(59)
   end
 
   it 'should know the exercise groups of its exercises' do

@@ -8,7 +8,7 @@ feature 'Teacher can edit course parameters', feature: true do
     @teacher = FactoryGirl.create :user, password: 'foobar'
     @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
     @course = FactoryGirl.create :course, title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial.com', organization: @organization
-    FactoryGirl.create :course, title: 'dontchange', organization: @organization
+    @course2 = FactoryGirl.create :course, title: 'dontchange', organization: @organization
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
   end
@@ -103,6 +103,78 @@ feature 'Teacher can edit course parameters', feature: true do
       click_link 'oldTitle'
 
       expect(page).to have_link('View points', href: "http://example.com/slug/#{@course.id}/#{@user.login}")
+    end
+  end
+
+  describe 'Teacher changes course status' do
+    before :each do
+      log_in_as @teacher.login, 'foobar'
+      visit '/org/slug'
+      click_link 'dontchange'
+    end
+
+    describe 'Teacher hides a course' do
+      before :each do
+        click_link 'Edit course parameters'
+        select 'Hidden', from: 'course_status'
+        click_button 'Update Course'
+      end
+
+      scenario 'Teacher can access hidden course' do
+        visit '/org/slug'
+        expect(page).to have_content 'dontchange'
+      end
+
+      scenario 'Student cannot access hidden course' do
+        log_out
+        log_in_as @user.login, 'xooxer'
+        visit '/org/slug'
+        expect(page).to_not have_content 'dontchange'
+      end
+    end
+
+    describe 'Teacher opens a hidden course' do
+      before :each do
+        @course2.hidden!
+        click_link 'Edit course parameters'
+        select 'Open', from: 'course_status'
+        click_button 'Update Course'
+      end
+
+      scenario 'Student can access the opened course' do
+        log_out
+        log_in_as @user.login, 'xooxer'
+        visit '/org/slug'
+        expect(page).to have_content 'dontchange'
+      end
+    end
+
+    describe 'Teacher restricts course' do
+      before :each do
+        click_link 'Edit course parameters'
+        select 'Restricted', from: 'course_status'
+        click_button 'Update Course'
+      end
+
+      scenario 'Teacher can access restricted course' do
+        visit '/org/slug'
+        expect(page).to have_content 'dontchange'
+      end
+
+      scenario 'Student can access restricted course' do
+        visit '/org/slug'
+        expect(page).to have_content 'dontchange'
+      end
+
+      scenario 'Student cannot submit answers to restricted course' do
+        FactoryGirl.create :returnable_exercise, course: @course2, name: 'exercise1'
+        log_out
+        log_in_as @user.login, 'xooxer'
+        visit '/org/slug'
+        click_link 'dontchange'
+        click_link 'exercise1'
+        expect(page).to_not have_content('Submit answer')
+      end
     end
   end
 end

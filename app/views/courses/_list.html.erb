@@ -8,7 +8,7 @@
   </thead>
   <tbody>
     <% locals[:courses].each do |course| %>
-      <tr class="course <% if course.hidden? || course.disabled? %>hidden-course<% end %>">
+      <tr class="course <% if course.hidden? %>hidden-course<% end %>">
         <td>
           <%= link_to course.title, organization_course_path(@organization, course) %>
         </td>

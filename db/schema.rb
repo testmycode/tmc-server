@@ -91,11 +91,8 @@ ActiveRecord::Schema.define(version: 20150817095112) do
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "hide_after"
-    t.boolean  "hidden",                         default: false, null: false
     t.integer  "cache_version",                  default: 0,     null: false
     t.string   "spreadsheet_key"
-    t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
     t.boolean  "locked_exercise_points_visible", default: true,  null: false
     t.text     "description"
@@ -104,11 +101,13 @@ ActiveRecord::Schema.define(version: 20150817095112) do
     t.boolean  "certificate_downloadable",       default: false, null: false
     t.string   "certificate_unlock_spec"
     t.integer  "organization_id"
-    t.integer  "disabled_status",                default: 0
+    t.integer  "status",                         default: 0
     t.string   "title"
     t.string   "material_url"
     t.integer  "course_template_id",                             null: false
     t.boolean  "hide_submission_results",        default: false
+    t.datetime "enrollment_begins_at"
+    t.datetime "enrollment_ends_at"
     t.string   "external_scoreboard_url"
   end
 
