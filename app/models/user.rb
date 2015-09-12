@@ -17,11 +17,11 @@ class User < ActiveRecord::Base
   has_many :assisted_courses, through: :assistantships, source: :course
 
   validates :login, presence: true,
-                    uniqueness: true,
+                    uniqueness: { case_sensitive: false },
                     length: { within: 2..20 }
 
   validates :email, presence: true,
-                    uniqueness: true
+                    uniqueness: { case_sensitive: false }
 
   scope :legitimate_students, -> { where(legitimate_student: true) }
   scope :non_legitimate_students, -> { where(legitimate_student: false) }
