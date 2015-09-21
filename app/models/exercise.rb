@@ -125,7 +125,7 @@ class Exercise < ActiveRecord::Base
 
   # Whether the user may download the exercise ZIP file
   def downloadable_by?(user)
-    visible_to?(user) && unlocked_for?(user)
+    user.assistant?(course) || visible_to?(user) && unlocked_for?(user)
   end
 
   # Whether the exercise has been published (it may still be hidden)
@@ -272,7 +272,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def unlocked_for?(user)
-    user.assistant?(course) || !requires_unlock? || time_unlocked_for(user)
+    !requires_unlock? || time_unlocked_for(user)
   end
 
   def unlockable_for?(user)
