@@ -1,5 +1,11 @@
 TmcServer::Application.routes.draw do
-resources :organizations, except: :destory, path: 'org' do
+  resources :organizations, except: :destory, path: 'org' do
+
+    resources :exercises, only: [:show] do
+      resources :submissions, only: [:create]
+      resource :solution, only: [:show]
+      resources :feedback_answers, only: [:index]
+    end
     member do
       post 'accept'
       post 'reject'
