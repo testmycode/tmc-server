@@ -101,7 +101,7 @@ class Exercise < ActiveRecord::Base
   # Whether a user may make submissions
   def submittable_by?(user)
     returnable? &&
-      (user.administrator? || user.teacher?(course.organization) ||
+      (user.administrator? || user.teacher?(course.organization) || user.assistant?(course) ||
         (!expired_for?(user) && !hidden? && published? && !disabled? && !user.guest? && unlocked_for?(user)))
   end
 
