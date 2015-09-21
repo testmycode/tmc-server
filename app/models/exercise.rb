@@ -272,7 +272,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def unlocked_for?(user)
-    !requires_unlock? || time_unlocked_for(user)
+    user.assistant?(course) || !requires_unlock? || time_unlocked_for(user)
   end
 
   def unlockable_for?(user)
