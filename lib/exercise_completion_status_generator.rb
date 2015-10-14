@@ -1,6 +1,9 @@
 # Generates a progress percentage [0..100] telling how much a user has completed of a course's exercises.
 class ExerciseCompletionStatusGenerator
   def self.completion_status(user, course)
+    if course.hide_submission_results?
+      return {}
+    end
     awarded_points = user.awarded_points.where(course_id: course.id).map(&:name)
     all_exercises = Exercise.where(course: course).includes(:available_points)
     attempted_exercise_names = Submission.where(

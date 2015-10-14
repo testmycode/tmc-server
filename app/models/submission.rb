@@ -102,7 +102,8 @@ class Submission < ActiveRecord::Base
     if !processed?
       :processing
     elsif !can_see_results?(user)
-      :hidden
+      :ok
+      #:hidden
     elsif all_tests_passed?
       :ok
     elsif tests_ran?
@@ -298,7 +299,7 @@ class Submission < ActiveRecord::Base
   end
 
   def readable_by?(user)
-    user.administrator? || user.teacher?(self.course.organization) || self.user_id == user.id
+    user.administrator? || user.teacher?(self.course.organization) || self.user_id == user.id && self.exercise.visible_to?(user)
   end
 
   def set_paste_key_if_paste_available
