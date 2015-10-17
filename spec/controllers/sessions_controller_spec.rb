@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe SessionsController, type: :controller do
   before :each do
-    @user = mock_model(User, :administrator? => true)
+    @user = mock_model(User, administrator: true, email_confirmed_at: Time.now)
     allow(User).to receive(:authenticate) do |login, pwd|
       @user if login == 'instructor' && pwd == 'correct_password'
     end

@@ -26,6 +26,20 @@ module SessionsHelper
     reset_session
   end
 
+  def non_confirmed(user)
+    session[:non_confirmed_user_id] = user.id
+  end
+
+  def user_from_non_confirmed_session
+    User.find_by_id(session[:non_confirmed_user_id])
+  end
+
+  def clear_non_confirmed_session_for(user)
+    session[:non_confirmed_user_id] = nil
+    @current_user = Guest.new
+    reset_session
+  end
+
   private
 
   def user_from_session

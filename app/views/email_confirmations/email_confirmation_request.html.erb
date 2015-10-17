@@ -1,0 +1,10 @@
+<h1>Email confirmation</h1>
+</br>
+
+<p>You have to confirm your email address. Please, check that email address is correct and change it if needed.</p>
+</br>
+
+<%= form_tag("send_confirmation_mail", method: "post") do %>
+    <%= email_field_tag(:email, @user.email, id: 'email') %></br>
+    <%= submit_tag("Send Confirmation Email", class: 'btn btn-primary') %>
+<% end %>

@@ -1,12 +1,35 @@
 require 'spec_helper'
 
 describe ActionToken, type: :model do
-  before :each do
-    @user = FactoryGirl.create(:user)
-    @way_in_the_past = Time.now - 3.days
+
+  describe 'for email confirmantion' do
+    before :each do
+      @user = User.create!(login: 'test', email: 'test@test.com')
+    end
+
+    describe '#generate_email_confirmation_token_for(user)' do
+      it 'should generate a new key' do
+        ActionToken.generate_email_confirmation_token(@user)
+        @user.reload
+        expect(@user.email_confirmation_token).not_to be_nil
+        expect(@user.email_confirmation_token.token).not_to be_blank
+      end
+
+      it 'should use old key if it exist' do
+        key = ActionToken.create!(user: @user, action: :confirm_email)
+        ActionToken.generate_email_confirmation_token(@user)
+        @user.reload
+        expect(@user.email_confirmation_token.token).to eq(key.token)
+      end
+    end
   end
 
   describe 'for password_reset_key' do
+    before :each do
+      @user = FactoryGirl.create(:user)
+      @way_in_the_past = Time.now - 3.days
+    end
+
     it 'should get a random token by default' do
       token1 = ActionToken.create!(user: @user, action: :reset_password).token
       @user.password_reset_key.destroy

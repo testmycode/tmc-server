@@ -30,10 +30,11 @@ class UsersController < ApplicationController
     set_user_fields
 
     if @user.errors.empty? && @user.save
+      send_email_confirmation_mail(@user)
       if @bare_layout
-        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', layout: true
+        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created. Confirmation email has been sent to your email address.</div>', layout: true
       else
-        flash[:notice] = 'User account created. You can now log in.'
+        flash[:notice] = 'User account created. Confirmation email has been sent to your email address.'
         redirect_to root_path
       end
     else
@@ -55,6 +56,7 @@ class UsersController < ApplicationController
   def update
     @user = current_user
 
+    current_email = @user.email
     set_email
     password_changed = maybe_update_password(@user, params[:user])
     user_field_changes = set_user_fields
@@ -66,11 +68,14 @@ class UsersController < ApplicationController
     end
 
     if @user.errors.empty? && @user.save
-      if password_changed
-        flash[:notice] = 'Changes saved and password changed'
-      else
-        flash[:notice] = 'Changes saved'
+      notice = 'Changes saved. '
+      if current_email != @user.email
+        send_email_confirmation_mail(@user)
+        @user.update!(email_confirmed_at: nil)
+        notice += 'Confirmation email has been sent to your new email address. '
       end
+      notice += 'Password changed' if password_changed
+      flash[:notice] = notice
       redirect_to user_path
     else
       flash.now[:error] = 'Failed to save profile'
@@ -150,5 +155,10 @@ class UsersController < ApplicationController
         end
       end
     end
+  end
+
+  def send_email_confirmation_mail(user)
+    token = ActionToken.generate_email_confirmation_token(user)
+    EmailConfirmationMailer.confirmation_link_email(user, token).deliver
   end
 end
