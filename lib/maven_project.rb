@@ -58,7 +58,7 @@ class MavenProject
 
   def compile!
     Dir.chdir(path) do
-      SystemCommands.sh!('mvn -q package -Dmaven.test.skip=true', {escape: false})
+      SystemCommands.sh!('mvn', '-q', 'package', '-Dmaven.test.skip=true')
     end
   end
 
