@@ -82,6 +82,7 @@ describe SubmissionsController, type: :controller do
       end
 
       it "should return 'hidden' status and right field (processed and tests passed)" do
+        pending('Waiting for clients to be updated')
         @submission.all_tests_passed = true
         @submission.points = 'some points'
         @submission.save!
@@ -98,6 +99,7 @@ describe SubmissionsController, type: :controller do
       end
 
       it "should return 'hidden' status (processed but failed tests)" do
+        pending('Waiting for clients to be updated')
         get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
         json = JSON.parse response.body
         expect(json['status']).to eq('hidden')
