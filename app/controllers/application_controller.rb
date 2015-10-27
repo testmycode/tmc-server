@@ -60,16 +60,16 @@ class ApplicationController < ActionController::Base
   def check_api_version
     if should_check_api_version?
       if params[:api_version].blank?
-        return respond_with_error('Please update the TMC client. No API version received from client.', 404, obsolete_client: true)
+        return respond_with_error('Please update the TMC client. No API version received from client.', 404, nil, obsolete_client: true)
       elsif params[:api_version].to_s != ApiVersion::API_VERSION.to_s
-        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, obsolete_client: true)
+        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, nil, obsolete_client: true)
       end
 
       unless params[:client].blank? # Client and client version checks are optional
         begin
           check_client_version(params[:client], params[:client_version])
         rescue
-          return respond_with_error($!.message, 404, obsolete_client: true)
+          return respond_with_error($!.message, 404, nil, obsolete_client: true)
         end
       end
     end
