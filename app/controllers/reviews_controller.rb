@@ -5,9 +5,8 @@ class ReviewsController < ApplicationController
   before_action :set_organization, except: [:new, :create]
 
   def index
-    if params[:course_id]
+    if params[:course_name]
       fetch :course
-      @organization = @course.organization
       @my_reviews = @course.submissions
         .where(user_id: current_user.id)
         .where('requests_review OR requires_review OR reviewed')
@@ -201,7 +200,7 @@ class ReviewsController < ApplicationController
 
   def fetch(*stuff)
     if stuff.include? :course
-      @course = Course.find(params[:course_id])
+      @course = Course.find_by!(name: params[:course_name], organization: @organization)
       authorize! :read, @course
     end
     if stuff.include? :submission
@@ -265,6 +264,6 @@ class ReviewsController < ApplicationController
   private
 
   def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id])
+    @organization = Organization.find_by!(slug: params[:organization_id])
   end
 end

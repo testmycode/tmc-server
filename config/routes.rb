@@ -23,7 +23,7 @@ TmcServer::Application.routes.draw do
 
     get 'course_templates', to: 'course_templates#list_for_teachers'
 
-    resources :courses do
+    resources :courses, param: :name do
       member do
         get 'refresh'
         post 'refresh'
@@ -48,10 +48,18 @@ TmcServer::Application.routes.draw do
         end
       end
 
-      resources :exercises, only: [:index] do
+      resources :exercises, param: :name, only: [:show] do
         collection do
           post 'set_disabled_statuses'
         end
+
+        member do
+          put 'submissions' => 'submissions#update_by_exercise', :as => 'update_submissions'
+        end
+
+        resources :submissions, only: [:create]
+        resource :solution, only: [:show]
+        resources :feedback_answers, only: [:index]
       end
 
       get 'help'
@@ -115,12 +123,6 @@ TmcServer::Application.routes.draw do
   get '/reset_password/:token' => 'password_reset_keys#show', :as => 'reset_password'
   delete '/reset_password/:token' => 'password_reset_keys#destroy'
 
-  resources :exercises, only: [:show] do
-    resources :submissions, only: [:create]
-    resource :solution, only: [:show]
-    resources :feedback_answers, only: [:index]
-  end
-
   resources :submissions, only: [:show, :update] do
     resource :result, only: [:create]
     resources :feedback_answers, only: [:create]
@@ -131,8 +133,6 @@ TmcServer::Application.routes.draw do
 
   get 'paste/:paste_key', to: 'submissions#show', as: 'paste'
   resources :reviews, only: [:update, :destroy]
-
-  put '/exercises/:exercise_id/submissions' => 'submissions#update_by_exercise', :as => 'exercise_update_submissions'
 
   resources :feedback_questions, only: [:show, :update, :destroy] do
     resource :position, only: [:update]

@@ -14,9 +14,9 @@ module BreadcrumbHelpers # Included in ApplicationController
 
   def add_exercise_breadcrumb
     if @exercise
-      add_breadcrumb "Exercise #{@exercise.name}", exercise_path(@exercise)
+      add_breadcrumb "Exercise #{@exercise.name}", organization_course_exercise_path(@organization, @course, @exercise)
     elsif @submission && @submission.exercise
-      add_breadcrumb "Exercise #{@submission.exercise.name}", exercise_path(@submission.exercise)
+      add_breadcrumb "Exercise #{@submission.exercise.name}", organization_course_exercise_path(@organization, @course, @submission.exercise)
     elsif @submission && @submission.exercise_name
       add_breadcrumb "(deleted exercise #{@submission.exercise_name}"
     else

@@ -1,8 +1,7 @@
 class ExercisesController < ApplicationController
+  before_action :set_params, only: [:show]
+
   def show
-    @exercise = Exercise.find(params[:id])
-    @course = Course.lock('FOR SHARE').find(@exercise.course_id)
-    @organization = @course.organization
     authorize! :read, @course
     authorize! :read, @exercise
 
@@ -55,8 +54,8 @@ class ExercisesController < ApplicationController
   end
 
   def set_disabled_statuses
-    @course = Course.find(params[:course_id])
-    @organization = @course.organization
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.find_by!(name: params[:course_name], organization: @organization)
     authorize! :teach, @organization
 
     selected_exercise_ids = params[:course][:exercises]
@@ -70,5 +69,13 @@ class ExercisesController < ApplicationController
 
     redirect_to manage_exercises_organization_course_path(@organization, @course),
                 notice: 'Exercises successfully updated.'
+  end
+
+  private
+
+  def set_params
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.lock('FOR SHARE').find_by!(name: params[:course_name], organization: @organization)
+    @exercise = Exercise.find_by!(name: params[:name], course: @course)
   end
 end

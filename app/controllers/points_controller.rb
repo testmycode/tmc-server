@@ -5,7 +5,7 @@ class PointsController < ApplicationController
   before_action :set_organization
 
   def index
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by!(name: params[:course_name], organization: @organization)
     authorize! :see_points, @course
     add_course_breadcrumb
     add_breadcrumb 'Points'
@@ -27,13 +27,13 @@ class PointsController < ApplicationController
   def refresh_gdocs
     authorize! :refresh, @course
     @sheetname = params[:id]
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by!(name: params[:course_name], organization: @organization)
     @notifications = @course.refresh_gdocs_worksheet @sheetname
   end
 
   def show
     @sheetname = params[:id]
-    @course = Course.find(params[:course_id])
+    @course = Course.find_by!(name: params[:course_name], organization: @organization)
     authorize! :see_points, @course
 
     add_course_breadcrumb
@@ -110,6 +110,6 @@ class PointsController < ApplicationController
   end
 
   def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id])
+    @organization = Organization.find_by!(slug: params[:organization_id])
   end
 end

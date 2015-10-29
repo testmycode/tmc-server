@@ -34,7 +34,7 @@ class AssistantsController < ApplicationController
   private
 
   def set_course
-    @course = Course.find_by id: params[:course_id]
+    @course = Course.find_by! name: params[:course_name]
   end
 
   def assistant_params

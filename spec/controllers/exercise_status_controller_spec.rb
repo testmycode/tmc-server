@@ -3,8 +3,7 @@ require 'spec_helper'
 describe ExerciseStatusController, type: :controller do
   before :each do
     @organization = FactoryGirl.create(:accepted_organization)
-    @course = FactoryGirl.create(:course)
-    @course.organization = @organization
+    @course = FactoryGirl.create(:course, organization: @organization)
     @exercise = FactoryGirl.create(:exercise, course: @course)
     @exercise2 = FactoryGirl.create(:exercise, course: @course)
     @exercise3 = FactoryGirl.create(:exercise, course: @course)
@@ -40,7 +39,7 @@ describe ExerciseStatusController, type: :controller do
       end
 
       def do_get
-        get :show, organization_id: @organization.slug, course_id: @course.id, id: @user.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, organization_id: @organization.slug, course_name: @course.name, id: @user.id, format: :json, api_version: ApiVersion::API_VERSION
       end
 
       it 'should show completition status for submitted exercises' do

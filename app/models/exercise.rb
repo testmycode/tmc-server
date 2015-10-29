@@ -370,6 +370,10 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  def to_param
+    name
+  end
+
   private
 
   def new_deadline_spec_obj(spec)

@@ -4,13 +4,12 @@ describe ExercisesController, type: :controller do
   describe 'GET show' do
     before :each do
       @organization = FactoryGirl.create(:accepted_organization)
-      @course = FactoryGirl.create(:course)
-      @course.organization = @organization
+      @course = FactoryGirl.create(:course, organization: @organization)
     end
     let!(:exercise) { FactoryGirl.create(:exercise, course: @course) }
 
     def get_show
-      get :show, organization_id: @organization.slug, id: exercise.id
+      get :show, organization_id: @organization.slug, course_name: @course.name, name: exercise.name
     end
 
     describe 'for guests' do
@@ -69,7 +68,7 @@ describe ExercisesController, type: :controller do
     end
 
     def post_set_disabled_statuses(options = {})
-      post :set_disabled_statuses, options.merge(organization_id: @organization.slug, course_id: @course.id)
+      post :set_disabled_statuses, options.merge(organization_id: @organization.slug, course_name: @course.name)
     end
 
     describe 'as a teacher' do

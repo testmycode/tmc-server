@@ -12,7 +12,7 @@
     <% for exercise, averages, answer_count in stats %>
       <% if answer_count > 0 %>
         <tr>
-          <td><%= link_to exercise.name, exercise %></td>
+          <td><%= link_to exercise.name, organization_course_exercise_url(exercise.course.organization, exercise.course, exercise) %></td>
           <% for question in questions %>
             <td><%= if averages[question.id] then sprintf("%.2f", averages[question.id]) else '-' end %></td>
           <% end %>
@@ -26,7 +26,7 @@
 <% if parent.is_a?(Course) %>
   <div class="alternative-format-links">[<%= link_to "json", "#{organization_course_feedback_answers_path @organization, @parent, :format => :json}" %>]</div>
 <% elsif parent.is_a?(Exercise) %>
-  <div class="alternative-format-links">[<%= link_to "json", "#{organization_exercise_feedback_answers_path @organization, @parent, :format => :json}" %>]</div>
+  <div class="alternative-format-links">[<%= link_to "json", "#{organization_course_exercise_feedback_answers_path @organization, @parent.course, @parent, :format => :json}" %>]</div>
 <% end %>
 
 <div class="footnote">

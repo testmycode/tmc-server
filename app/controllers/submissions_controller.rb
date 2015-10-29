@@ -4,12 +4,13 @@ require 'submission_processor'
 # Also handles rerun requests.
 class SubmissionsController < ApplicationController
   around_action :course_transaction
-  before_action :get_course_and_exercise
 
   # Manually checked for #show and index
   skip_authorization_check only: [:show, :index]
 
   def index
+    set_course
+
     respond_to do |format|
       format.json do
         if params[:row_format] == 'datatables'
@@ -27,9 +28,12 @@ class SubmissionsController < ApplicationController
   end
 
   def show
-    @course ||= @submission.course
-    @exercise ||= @submission.exercise
-    @organization = @course.organization
+    if params[:paste_key]
+      return unless set_paste
+    else
+      set_submission
+    end
+
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
@@ -52,7 +56,7 @@ class SubmissionsController < ApplicationController
           points: @submission.points_list,
           validations: @submission.validations,
           valgrind: @submission.valgrind,
-          solution_url: @exercise.solution.visible_to?(current_user) ? view_context.exercise_solution_url(@exercise) : nil,
+          solution_url: @exercise.solution.visible_to?(current_user) ? view_context.organization_course_exercise_solution_url(@organization, @course, @exercise) : nil,
           submitted_at: @submission.created_at,
           processing_time: @submission.processing_time,
           reviewed: @submission.reviewed?,
@@ -95,6 +99,8 @@ class SubmissionsController < ApplicationController
   end
 
   def create
+    set_exercise
+
     if !params[:submission] || !params[:submission][:file]
       return respond_not_found('No ZIP file selected or failed to receive it')
     end
@@ -148,7 +154,7 @@ class SubmissionsController < ApplicationController
           redirect_to(submission_path(@submission),
                       notice: 'Submission received.')
         else
-          redirect_to(exercise_path(@exercise),
+          redirect_to(organization_course_exercise_path(@organization, @course, @exercise),
                       alert: errormsg)
         end
       end
@@ -164,6 +170,8 @@ class SubmissionsController < ApplicationController
   end
 
   def update
+    set_submission
+
     submission = Submission.find(params[:id]) || respond_not_found
     authorize! :update, submission
     if params[:rerun]
@@ -180,10 +188,12 @@ class SubmissionsController < ApplicationController
   end
 
   def update_by_exercise
+    set_exercise(:name)
+
     for submission in @exercise.submissions
       schedule_for_rerun(submission, -2)
     end
-    redirect_to exercise_path(@exercise), notice: 'Reruns scheduled'
+    redirect_to organization_course_exercise_path(@organization, @course, @exercise), notice: 'Reruns scheduled'
   end
 
   private
@@ -194,31 +204,35 @@ class SubmissionsController < ApplicationController
     end
   end
 
-  # Ugly manual access control :/
-  def get_course_and_exercise
-    if params[:id]
-      @submission = Submission.find(params[:id])
-      authorize! :read, @submission
-      @course = @submission.course
-      @exercise = @submission.exercise
-    elsif params[:exercise_id]
-      @exercise = Exercise.find(params[:exercise_id])
-      @course = Course.lock('FOR SHARE').find(@exercise.course_id)
-      authorize! :read, @course
-      authorize! :read, @exercise
-    elsif params[:paste_key]
-      @submission = Submission.find_by_paste_key!(params[:paste_key])
-      @exercise = @submission.exercise
-      @course = @exercise.course
-      @is_paste = true
-      check_access!
-    elsif params[:course_id]
-      @course = Course.lock('FOR SHARE').find(params[:course_id])
-      @organization = @course.organization
-      authorize! :read, @course
-    else
-      respond_access_denied
-    end
+  def set_submission
+    @submission = Submission.find(params[:id])
+    @exercise = @submission.exercise
+    @course = @submission.course
+    @organization = @course.organization
+    authorize! :read, @submission
+  end
+
+  def set_exercise(param_name = :exercise_name)
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.lock('FOR SHARE').find_by!(name: params[:course_name], organization: @organization)
+    @exercise = Exercise.find_by!(name: params[param_name], course: @course)
+    authorize! :read, @course
+    authorize! :read, @exercise
+  end
+
+  def set_course
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.lock('FOR SHARE').find_by!(name: params[:course_name], organization: @organization)
+    authorize! :read, @course
+  end
+
+  def set_paste
+    @submission = Submission.find_by_paste_key!(params[:paste_key])
+    @exercise = @submission.exercise
+    @course = @submission.course
+    @organization = @course.organization
+    @is_paste = true
+    check_access!
   end
 
   def schedule_for_rerun(submission, priority)
@@ -266,13 +280,16 @@ class SubmissionsController < ApplicationController
 
   def check_access!
     paste_visibility = @course.paste_visibility || 'open'
+    can_access = true
     case paste_visibility
     when 'protected'
-      respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
+      can_access = false unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
     when 'no-tests-public'
-      respond_access_denied unless @submission.created_at > 2.hours.ago
+      can_access = false unless @submission.created_at > 2.hours.ago
     else
-      respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
+      can_access = false unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
     end
+    respond_access_denied unless can_access
+    can_access
   end
 end

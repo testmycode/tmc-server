@@ -20,7 +20,7 @@ describe AssistantsController, type: :controller do
         user2 = FactoryGirl.create(:user)
         user3 = FactoryGirl.create(:user)
         @course.assistants << [user1, user2, user3]
-        get :index, organization_id: @organization.slug, course_id: @course.id
+        get :index, organization_id: @organization.slug, course_name: @course.name
         expect(assigns(:assistants)).to eq([user1, user2, user3])
       end
     end
@@ -28,20 +28,20 @@ describe AssistantsController, type: :controller do
     describe 'POST create' do
       it 'with a valid username adds a new assistant' do
         expect do
-          post :create, organization_id: @organization.slug, course_id: @course.id, username: @user.username
+          post :create, organization_id: @organization.slug, course_name: @course.name, username: @user.username
         end.to change(Assistantship, :count).by(1)
       end
 
       it 'with a invalid username doesn\'t add any assistants' do
         expect do
-          post :create, organization_id: @organization.slug, course_id: @course.id, username: 'invalid'
+          post :create, organization_id: @organization.slug, course_name: @course.name, username: 'invalid'
         end.to change(Assistantship, :count).by(0)
       end
 
       it 'with a username that already is an assistant for course, donesn\'t add' do
         Assistantship.create! user: @user, course: @course
         expect do
-          post :create, organization_id: @organization.slug, course_id: @course.id, username: @user.username
+          post :create, organization_id: @organization.slug, course_name: @course.name, username: @user.username
         end.to change(Assistantship, :count).by(0)
       end
     end
@@ -50,7 +50,7 @@ describe AssistantsController, type: :controller do
       it 'removes assistant' do
         @assistantship = Assistantship.create! user: @user, course: @course
         expect do
-          delete :destroy, organization_id: @organization.slug, course_id: @course.id, id: @assistantship.to_param
+          delete :destroy, organization_id: @organization.slug, course_name: @course.name, id: @assistantship.to_param
         end.to change(Assistantship, :count).by(-1)
       end
     end
@@ -63,14 +63,14 @@ describe AssistantsController, type: :controller do
 
     describe 'GET index' do
       it 'denies access' do
-        get :index, organization_id: @organization.slug, course_id: @course.id
+        get :index, organization_id: @organization.slug, course_name: @course.name
         expect(response.code.to_i).to eq(401)
       end
     end
 
     describe 'POST create' do
       it 'denies access' do
-        post :create, organization_id: @organization.slug, course_id: @course.id, username: @user.username
+        post :create, organization_id: @organization.slug, course_name: @course.name, username: @user.username
         expect(response.code.to_i).to eq(401)
       end
     end
@@ -78,7 +78,7 @@ describe AssistantsController, type: :controller do
     describe 'DELETE destroy' do
       it 'denies access' do
         @assistantship = Assistantship.create! user: @user, course: @course
-        delete :destroy, organization_id: @organization.slug, course_id: @course, id: @assistantship.to_param
+        delete :destroy, organization_id: @organization.slug, course_name: @course.name, id: @assistantship.to_param
         expect(response.code.to_i).to eq(401)
       end
     end

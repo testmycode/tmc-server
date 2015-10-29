@@ -2,9 +2,9 @@
 class EmailsController < ApplicationController
   def index
     organization_id = params[:organization_id]
-    course_id = params[:id]
+    course_name = params[:name]
 
-    if organization_id && course_id
+    if organization_id && course_name
       index_course
     else
       index_global
@@ -26,8 +26,8 @@ class EmailsController < ApplicationController
   end
 
   def index_course
-    @course = Course.find(params[:id])
-    @organization = @course.organization
+    @organization = Organization.find_by!(slug: params[:organization_id])
+    @course = Course.find_by!(name: params[:name], organization: @organization)
 
     authorize! :list_user_emails, @course
 

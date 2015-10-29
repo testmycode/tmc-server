@@ -29,7 +29,7 @@ feature 'Teacher sets deadlines', feature: true do
   end
 
   def visit_course
-    visit "/org/slug/courses/#{@course.id}"
+    visit "/org/slug/courses/#{@course.name}"
   end
 
   scenario 'Teacher succeeds at setting deadlines' do

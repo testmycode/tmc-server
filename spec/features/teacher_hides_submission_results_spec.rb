@@ -28,7 +28,7 @@ describe 'Teacher can hide submission results from users', feature: true do
   end
 
   def visit_course
-    visit "/org/#{@organization.slug}/courses/#{@course.id}"
+    visit "/org/#{@organization.slug}/courses/#{@course.name}"
   end
 
   scenario "Teacher can see button 'Unhide submisson results' when result are hidden" do

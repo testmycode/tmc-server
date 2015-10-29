@@ -49,7 +49,7 @@ feature 'Teacher can add assistants to course', feature: true do
 
     log_out
     log_in_as(@assistant.username, 'newfoobar')
-    visit "/org/slug/courses/#{@course.id}"
+    visit "/org/slug/courses/#{@course.name}"
     click_link 'Manage deadlines'
     fill_in 'empty_group_hard_static', with: '1.1.2000'
     click_button 'Save changes'
@@ -57,7 +57,7 @@ feature 'Teacher can add assistants to course', feature: true do
     expect(page).to have_content('Successfully saved deadlines.')
     expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
 
-    visit "/org/slug/courses/#{@course.id}"
+    visit "/org/slug/courses/#{@course.name}"
     click_link 'Manage unlock conditions'
 
     fill_in 'empty_group_0', with: '4.6.2015'
@@ -74,7 +74,7 @@ feature 'Teacher can add assistants to course', feature: true do
 
     log_out
     log_in_as(@assistant.username, 'newfoobar')
-    visit "/org/slug/courses/#{course2.id}"
+    visit "/org/slug/courses/#{course2.name}"
     expect(page).not_to have_content('Manage deadlines')
     expect(page).not_to have_content('Manage unlock conditions')
   end

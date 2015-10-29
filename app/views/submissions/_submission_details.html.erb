@@ -51,7 +51,7 @@
       <% end %>
 
       <% if can? :read, @exercise.solution %>
-        <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
+        <li><%= link_to 'View suggested solution', organization_course_exercise_solution_path(@organization, @course, @exercise) %></li>
       <% end %>
 
       <% if can? :create_review, @course %>

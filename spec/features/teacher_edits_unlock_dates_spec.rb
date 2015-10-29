@@ -24,7 +24,7 @@ feature 'Teacher edits unlock dates', feature: true do
   end
 
   def visit_course
-    visit "/org/slug/courses/#{@course.id}"
+    visit "/org/slug/courses/#{@course.name}"
   end
 
   scenario 'Teacher sees default unlock dates' do
