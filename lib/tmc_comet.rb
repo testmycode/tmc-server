@@ -16,7 +16,7 @@ class TmcComet < MavenProject
     # This needs to be mvn install'ed as opposed to merely packaged because
     # the WAR file is loaded dynamically.
     Dir.chdir(path.parent) do
-      SystemCommands.sh!('mvn', '-q', 'install')
+      SystemCommands.sh!('mvn', '-q', 'install', '-Dmaven.test.skip=true')
     end
   end
 
