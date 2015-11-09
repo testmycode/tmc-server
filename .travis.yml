@@ -1,5 +1,10 @@
 sudo: true
 
+env:
+  - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
+  - RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
+  - RSPEC_PATTERN="spec/integration/*.rb"
+
 language: ruby
 rvm:
   - 2.2.0
@@ -7,19 +12,34 @@ rvm:
 git:
   submodules: false
 
+addons:
+  apt:
+    packages:
+      - valgrind
+      - check
+      - pkg-config
+      - gcc
+
 before_install:
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-  - git submodule update --init --recursive
-  - git config --global user.email "travis@example.com"
-  - git config --global user.name "Travis"
+  - . ./setup-travis.sh
+
+install:
+  - bundle install --retry=3 --jobs=3 --deployment
 
 services:
   - postgresql
 
 before_script:
   - createuser -U postgres -s tmc
+  - bundle exec rake db:reset
 
 script:
-  - bundle exec rake db:reset
-  - export rvmsudo_secure_path=1
-  - rvmsudo bundle exec rake spec SPEC="spec/controllers spec/models spec/helpers spec/mailers"
+  - ./ext/tmc-sandbox/web/webapp.rb start
+  - bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
+
+after_failure:
+  - cat ext/tmc-sandbox/web/log/*
+
+notifications:
+  slack:
+    secure: YCiWybZYBoJ2JDjpPp5Idf4OvqScay5WfEuQMdvee42kgsSVolew6V5YUx41E29Of+2xAcQ+be5XImzO7SlTYuaGD6hf0JZvjjxO3gpycCljNSvDgFnBF9s4WuUQ31LozI6eQqo/9c5zUFxW9MGeeaRUWvurlW0rRHM3UKokAQk=

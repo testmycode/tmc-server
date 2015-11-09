@@ -19,23 +19,27 @@ Dir[Rails.root.join('lib/**/*.rb')].each { |f| require f }
 # Sandboxes must be started as root.
 # We infer the actual user from Etc.getlogin or the owner of ::Rails.root.
 proc do
-  fail 'Please run tests under sudo (or rvmsudo)' if Process.uid != 0
+  if ENV['SANDBOX_HOST'] && ENV['SANDBOX_PORT']
+    RemoteSandboxForTesting.use_server_at(ENV['SANDBOX_HOST'], ENV['SANDBOX_PORT'])
+  else
+    fail 'Please run tests under sudo (or rvmsudo)' if Process.uid != 0
 
-  user = File.stat(::Rails.root).uid
-  group = Etc.getpwuid(user).gid
+    user = File.stat(::Rails.root).uid
+    group = Etc.getpwuid(user).gid
 
-  RemoteSandboxForTesting.init_servers_as_root!(user, group)
+    RemoteSandboxForTesting.init_servers_as_root!(user, group)
 
-  # Ensure tmp and tmp/tests are created with correct permissions
-  FileUtils.mkdir_p('tmp/tests')
-  FileUtils.chown(user, group, 'tmp')
-  FileUtils.chown(user, group, 'tmp/tests')
-  FileUtils.chown(user, group, 'log')
-  FileUtils.chown(user, group, 'log/test.log') if File.exist? 'log/test.log'
-  FileUtils.chown(user, group, 'log/test_cometd.log') if File.exist? 'log/test_cometd.log'
+    # Ensure tmp and tmp/tests are created with correct permissions
+    FileUtils.mkdir_p('tmp/tests')
+    FileUtils.chown(user, group, 'tmp')
+    FileUtils.chown(user, group, 'tmp/tests')
+    FileUtils.chown(user, group, 'log')
+    FileUtils.chown(user, group, 'log/test.log') if File.exist? 'log/test.log'
+    FileUtils.chown(user, group, 'log/test_cometd.log') if File.exist? 'log/test_cometd.log'
 
-  # Drop root
-  Process::Sys.setreuid(user, user)
+    # Drop root
+    Process::Sys.setreuid(user, user)
+  end
 end.call
 
 # Use :selenium this if you want to see what's going on and don't feel like screenshotting
