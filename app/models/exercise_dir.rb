@@ -49,33 +49,10 @@ class ExerciseDir
 
   def self.find_exercise_dirs(path)
     path = Pathname(path)
-
-    result = []
-
-    path.find do |subpath|
-      Find.prune if !subpath.directory? || irrelevant_directory?(subpath)
-
-      cls = exercise_type_impl(subpath)
-      unless cls.nil?
-        if subpath.basename.to_s.include?('-')
-          fail "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
-        end
-
-        result << cls.new(subpath)
-      end
-    end
-
-    result
+    TmcLangs.get.find_exercise_dirs(path).map {|dir| ExerciseDir.get(dir) }
   end
 
   private
-
-  def self.irrelevant_directory?(path)
-    path.directory? && (
-      path.children.map(&:basename).map(&:to_s).include?('.tmcignore') ||
-      path.basename.to_s.start_with?('.')
-    )
-  end
 
   def self.exercise_type_impl(path)
     if (path + 'pom.xml').exist?
