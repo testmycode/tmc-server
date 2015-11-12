@@ -50,6 +50,7 @@ describe CourseRefresher do
     add_exercise('MyCategory/MyExercise')
     add_exercise('MyCategory/MySubcategory/MyExercise')
     refresh_courses
+
     expect(@course.exercises.size).to eq(2)
     expect(@course2.exercises.size).to eq(2)
     names = @course.exercises.map &:name
@@ -436,7 +437,9 @@ describe CourseRefresher do
 
     # Should have tmc-junit-runner.jar and its dependencies
     expect(File).to exist(stub + '/lib/testrunner/tmc-junit-runner.jar')
-    expect((Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size).to eq(1 + TmcJunitRunner.get.lib_paths.size)
+    # TmcJunitRunner is a uber jar
+    expect((Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size).to eq(1)
+
   end
 
   it 'should generate solution versions of exercises' do

@@ -58,6 +58,16 @@ if Capybara.default_driver == :selenium
   Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
 end
 
+def get_m3_home
+  mvn_home = `mvn --version | grep "Maven home" | sed 's/Maven home: //'`.chomp
+end
+
+if ENV['M3_HOME'].blank?
+  maven_home = get_m3_home
+  warn "$M3_HOME is not set, trying with #{maven_home}- maven tests might be failing"
+  ENV['M3_HOME']= maven_home
+end
+
 def without_db_notices(&block)
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
   block.call
