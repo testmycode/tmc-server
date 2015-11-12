@@ -27,4 +27,15 @@ class TmcLangs < MavenProject
     SystemCommands.sh!('java', '-jar', jar_path, 'find-exercises', path, temp_file.path)
     JSON.parse(File.read(temp_file))
   end
+
+  def scan_exercise(path)
+    temp_file = ::Tempfile.new('langs')
+    SystemCommands.sh!('java', '-jar', jar_path, 'scan-exercise', path, temp_file.path)
+    JSON.parse(File.read(temp_file))
+  end
+
+  def get_test_case_methods(exercise_path)
+    scan_exercise(exercise_path)['tests']
+  end
+
 end

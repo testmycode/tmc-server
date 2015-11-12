@@ -287,13 +287,9 @@ class CourseRefresher
         review_points = @review_points[exercise.name]
         point_names = Set.new
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
-        exercise_type = ExerciseDir.exercise_type(clone_path)
-        case exercise_type
-          when :makefile_c
-            point_names += get_c_exercise_points(exercise)
-          else
-            point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
-        end
+
+        point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
+
         point_names += review_points
 
         added = []
@@ -325,6 +321,7 @@ class CourseRefresher
 
     # To keep bakwards compatability we first try to parse the tmc_available_points.txt, if not existent, read
     # available points from the stdout / points.txt
+    # TODO: remove when in langs
     def get_c_exercise_points(exercise)
       full_path = File.join(@course.clone_path, exercise.relative_path)
       hash = FileTreeHasher.hash_file_tree(full_path)
