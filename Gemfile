@@ -6,10 +6,10 @@ gem 'rails', '~> 4.1.0'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
-gem 'pg', '~> 0.17.0'
-gem 'cancancan', '~> 1.9.0'
+gem 'pg', '~> 0.18.0'
+gem 'cancancan', '~> 1.13.0'
 gem 'rest-client', '~> 1.6.7'
-gem 'daemons', '~> 1.1.9'
+gem 'daemons', '~> 1.2.3'
 gem 'natcmp', '~> 1.4'
 gem 'foreigner', '~> 1.1.6'
 gem 'xml-simple', '~> 1.1.1'
@@ -19,7 +19,7 @@ gem 'mimemagic', "~> 0.3.0"
 gem 'rack-cors'
 gem 'newrelic_rpm'
 gem 'activerecord-session_store', '~> 0.1.0'
-gem 'pdfkit', '~> 0.6.2'
+gem 'pdfkit', '~> 0.8.2'
 gem "paperclip", "~> 4.3"
 
 gem 'pghero'
@@ -31,19 +31,19 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'rspec', '~> 3.1.0'
-  gem 'rspec-core', '~> 3.1.0'
-  gem 'rspec-rails', '~> 3.1.0'
+  gem 'rspec', '~> 3.3.0'
+  gem 'rspec-core', '~> 3.3.0'
+  gem 'rspec-rails', '~> 3.3.0'
   gem 'rspec-activemodel-mocks', '~> 1.0.0'
   gem 'factory_girl_rails', '~> 4.5.0'
-  gem 'capybara', '~> 2.4.0'
-  gem 'poltergeist', '~> 1.5.0'
+  gem 'capybara', '~> 2.5.0'
+  gem 'poltergeist', '~> 1.7.0'
   #gem 'selenium-webdriver', '~> 2.44.0'
-  gem 'database_cleaner', '~> 1.3.0'
+  gem 'database_cleaner', '~> 1.5.0'
   gem 'mimic', '~> 0.4.3'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
   gem 'launchy'  # for capybara's save_and_open_page
   gem 'railroady' # for doc/diagrams
   gem 'simplecov'
-  gem 'rubocop', '~> 0.29.1', require: false
+  gem 'rubocop', '~> 0.35.0', require: false
 end
