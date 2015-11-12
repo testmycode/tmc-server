@@ -37,6 +37,7 @@ module SystemCommands
     unless options[:timeout].nil?
       cmd = "timeout #{options[:timeout]} #{cmd}"
     end
+    puts "execing: #{cmd} in #{Dir.pwd}"
 
     output = `#{cmd} 2>&1`
     status = $?

@@ -25,31 +25,33 @@ class CourseRefresher
       from_dir = Pathname(@project_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
 
-      paths = files_for_stub(from_dir)
-      while_copying(from_dir, to_dir, paths) do |rel_path|
-        from = from_dir + rel_path
-        to = to_dir + rel_path
-        contents = filter_file_for_stub(from)
-        write_file(to, contents) unless contents.nil?
-      end
+      TmcLangs.get.make_stubs(from_dir, to_dir)
+      #paths = files_for_stub(from_dir)
+      #while_copying(from_dir, to_dir, paths) do |rel_path|
+      #  from = from_dir + rel_path
+      #  to = to_dir + rel_path
+      #  contents = filter_file_for_stub(from)
+      #  write_file(to, contents) unless contents.nil?
+      #end
 
-      clean_empty_dirs_in_project(to_dir)
+      #clean_empty_dirs_in_project(to_dir)
     end
 
     def make_solution(to_dir)
       from_dir = Pathname(@project_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
 
-      paths = files_for_solution(from_dir)
-      while_copying(from_dir, to_dir, paths) do |rel_path|
-        from = from_dir + rel_path
-        to = to_dir + rel_path
-        contents = filter_file_for_solution(from)
-        write_file(to, contents) unless contents.nil?
-        maybe_write_html_file(read_file_utf8(from), "#{to}.html") if looks_like_text_file?(from)
-      end
+      TmcLangs.get.make_solutions(from_dir, to_dir)
+      #paths = files_for_solution(from_dir)
+      #while_copying(from_dir, to_dir, paths) do |rel_path|
+      #  from = from_dir + rel_path
+      #  to = to_dir + rel_path
+      #  contents = filter_file_for_solution(from)
+      #  write_file(to, contents) unless contents.nil?
+      #  maybe_write_html_file(read_file_utf8(from), "#{to}.html") if looks_like_text_file?(from)
+      #end
 
-      clean_empty_dirs_in_project(to_dir)
+      #clean_empty_dirs_in_project(to_dir)
     end
 
     private

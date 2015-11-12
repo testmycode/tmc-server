@@ -287,13 +287,9 @@ class CourseRefresher
         review_points = @review_points[exercise.name]
         point_names = Set.new
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
-        exercise_type = ExerciseDir.exercise_type(clone_path)
-        case exercise_type
-          when :makefile_c
-            point_names += get_c_exercise_points(exercise)
-          else
-            point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
-        end
+
+        point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
+
         point_names += review_points
 
         added = []
@@ -325,6 +321,7 @@ class CourseRefresher
 
     # To keep bakwards compatability we first try to parse the tmc_available_points.txt, if not existent, read
     # available points from the stdout / points.txt
+    # TODO: remove when in langs
     def get_c_exercise_points(exercise)
       full_path = File.join(@course.clone_path, exercise.relative_path)
       hash = FileTreeHasher.hash_file_tree(full_path)
@@ -370,24 +367,26 @@ class CourseRefresher
     end
 
     def make_solutions
-      @course.exercises.each do |e|
-        clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
-        solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
-        FileUtils.mkdir_p(solution_path)
+      TmcLangs.get.make_solutions(@course.clone_path, @course.solution_path)
+     # @course.exercises.each do |e|
+     #   clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
+     #   solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
+     #   FileUtils.mkdir_p(solution_path)
 
-        ExerciseFileFilter.new(clone_path).make_solution(solution_path)
-      end
+     #   ExerciseFileFilter.new(clone_path).make_solution(solution_path)
+     # end
     end
 
     def make_stubs
-      @course.exercises.each do |e|
-        clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
-        stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
-        FileUtils.mkdir_p(stub_path)
-        ExerciseFileFilter.new(clone_path).make_stub(stub_path)
-        exercise_type = ExerciseDir.exercise_type(clone_path)
-        add_shared_files_to_stub(exercise_type, stub_path)
-      end
+    TmcLangs.get.make_stubs(@course.clone_path, @course.stub_path)
+    #  @course.exercises.each do |e|
+    #    clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
+    #    stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
+    #    FileUtils.mkdir_p(stub_path)
+    #    ExerciseFileFilter.new(clone_path).make_stub(stub_path)
+    #    exercise_type = ExerciseDir.exercise_type(clone_path)
+    #    add_shared_files_to_stub(exercise_type, stub_path)
+    #  end
     end
 
     def add_shared_files_to_stub(exercise_type, stub_path)
