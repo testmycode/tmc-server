@@ -270,7 +270,7 @@ class SubmissionsController < ApplicationController
     when 'protected'
       respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
     when 'no-tests-public'
-      respond_access_denied unless @submission.created_at > 2.hours.ago
+      respond_access_denied unless can?(:teach, @course) ||  @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s 
     else
       respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
     end
