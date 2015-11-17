@@ -34,6 +34,7 @@ before_script:
   - bundle exec rake db:reset
 
 script:
+  - ./clitest.sh
   - ./ext/tmc-sandbox/web/webapp.rb start
   - bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
 

@@ -14,9 +14,18 @@ class TmcLangs < MavenProject
     super("#{::Rails.root}/ext/tmc-langs")
   end
 
-  def pom_path
-    path + 'tmc-langs-cli/' +  'pom.xml'
+  # def pom_path
+  #   path + 'tmc-langs-cli/' +  'pom.xml'
+  # end
+
+  def package_path
+    path + 'tmc-langs-cli/target' + package_file_name
   end
+
+  def package_file_name
+    "tmc-langs-cli-#{pom_file.artifact_version}.jar"
+  end
+
 
   def jar_and_lib_paths
     [jar_path] + lib_paths
@@ -38,4 +47,11 @@ class TmcLangs < MavenProject
     scan_exercise(exercise_path)['tests']
   end
 
+  def make_stubs(from_dir, to_dir)
+    SystemCommands.sh!('java', '-jar', jar_path, 'prepare-stubs', from_dir, to_dir)
+  end
+
+  def make_solutions(from_dir, to_dir)
+    SystemCommands.sh!('java', '-jar', jar_path, 'prepare-solutions', from_dir, to_dir)
+  end
 end
