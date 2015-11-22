@@ -14,10 +14,6 @@ class TmcLangs < MavenProject
     super("#{::Rails.root}/ext/tmc-langs")
   end
 
-  # def pom_path
-  #   path + 'tmc-langs-cli/' +  'pom.xml'
-  # end
-
   def package_path
     path + 'tmc-langs-cli/target' + package_file_name
   end
