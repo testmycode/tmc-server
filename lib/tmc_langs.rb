@@ -22,16 +22,15 @@ class TmcLangs < MavenProject
     path + 'tmc-langs-cli/target' + package_file_name
   end
 
-
   def find_exercise_dirs(path)
     temp_file = ::Tempfile.new('langs')
-    SystemCommands.sh!('java', '-jar', jar_path, 'find-exercises', path, temp_file.path)
+    exec('find-exercises', path, temp_file.path)
     JSON.parse(File.read(temp_file))
   end
 
   def scan_exercise(path)
     temp_file = ::Tempfile.new('langs')
-    SystemCommands.sh!('java', '-jar', jar_path, 'scan-exercise', path, temp_file.path)
+    exec('scan-exercise', path, temp_file.path)
     JSON.parse(File.read(temp_file))
   end
 
@@ -40,10 +39,15 @@ class TmcLangs < MavenProject
   end
 
   def make_stubs(from_dir, to_dir)
-    SystemCommands.sh!('java', '-jar', jar_path, 'prepare-stubs', from_dir, to_dir)
+    exec('prepare-stubs', from_dir, to_dir)
   end
 
   def make_solutions(from_dir, to_dir)
-    SystemCommands.sh!('java', '-jar', jar_path, 'prepare-solutions', from_dir, to_dir)
+    exec('prepare-solutions', from_dir, to_dir)
+  end
+
+  private
+  def exec(*args)
+    SystemCommands.sh!('java', '-jar', jar_path, args.flatten)
   end
 end
