@@ -259,6 +259,7 @@ class Submission < ActiveRecord::Base
     self.processing_tried_at = nil
     self.processing_began_at = nil
     self.processing_completed_at = nil
+    self.sandbox = nil
     self.randomize_secret_token
     self.save!
   end
