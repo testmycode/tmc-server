@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150817095112) do
+ActiveRecord::Schema.define(version: 20151126104102) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -175,11 +175,11 @@ ActiveRecord::Schema.define(version: 20150817095112) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "hidden",             default: false
+    t.integer  "requester_id"
     t.string   "logo_file_name"
     t.string   "logo_content_type"
     t.integer  "logo_file_size"
     t.datetime "logo_updated_at"
-    t.integer  "requester_id"
   end
 
   create_table "points_upload_queues", force: true do |t|
@@ -219,14 +219,13 @@ ActiveRecord::Schema.define(version: 20150817095112) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
-  create_table "submission_data", id: false, force: true do |t|
-    t.integer "submission_id",          null: false
-    t.binary  "return_file"
-    t.binary  "stdout_compressed"
-    t.binary  "stderr_compressed"
-    t.binary  "vm_log_compressed"
-    t.binary  "valgrind_compressed"
-    t.binary  "validations_compressed"
+  create_table "submission_data", primary_key: "submission_id", force: true do |t|
+    t.binary "return_file"
+    t.binary "stdout_compressed"
+    t.binary "stderr_compressed"
+    t.binary "vm_log_compressed"
+    t.binary "valgrind_compressed"
+    t.binary "validations_compressed"
   end
 
   create_table "submissions", force: true do |t|
@@ -261,6 +260,7 @@ ActiveRecord::Schema.define(version: 20150817095112) do
     t.datetime "client_time"
     t.integer  "client_nanotime",                limit: 8
     t.text     "client_ip"
+    t.string   "sandbox"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], name: "index_submissions_on_course_id_and_exercise_name", using: :btree

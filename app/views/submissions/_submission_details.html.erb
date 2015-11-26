@@ -61,6 +61,10 @@
       <% if @submission.paste_available? and not @submission.all_tests_passed? and not @is_paste %>
         <li><%= link_to "Show Paste", paste_path(@submission.paste_key) %></li>
       <% end %>
+
+      <% if current_user.administrator? && @submission.sandbox  %>
+        <li>Sandbox used: <%= @submission.sandbox %></li>
+      <% end %>
     </ul>
 
     <% if can? :rerun, @submission %>

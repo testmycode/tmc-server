@@ -46,6 +46,8 @@ class RemoteSandbox
         File.open(tar_path, 'r') do |tar_file|
           begin
             RestClient.post post_url, file: tar_file, notify: notify_url, token: submission.secret_token
+            submission.sandbox = post_url
+            submission.save!
           rescue
             raise SandboxUnavailableError.new
           end
