@@ -1,45 +1,36 @@
 sudo: true
-
 env:
+  matrix:
   - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
   - RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
   - RSPEC_PATTERN="spec/integration/*.rb"
-
+  global:
+    secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
 language: ruby
 rvm:
   - 2.2.0
-
 git:
   submodules: false
-
 addons:
   apt:
     packages:
-      - valgrind
-      - check
-      - pkg-config
-      - gcc
-
+    - valgrind
+    - check
+    - pkg-config
+    - gcc
 before_install:
-  - . ./setup-travis.sh
-
+  - ". ./setup-travis.sh"
 install:
   - bundle install --retry=3 --jobs=3 --deployment
-
 services:
   - postgresql
-
 before_script:
   - createuser -U postgres -s tmc
   - bundle exec rake db:reset
-
 script:
-  - ./ext/tmc-sandbox/web/webapp.rb start
+  - "./ext/tmc-sandbox/web/webapp.rb start"
   - bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
-
+after_success:
+  - . ./.travis-update-usermanual.sh
 after_failure:
   - cat ext/tmc-sandbox/web/log/*
-
-notifications:
-  slack:
-    secure: YCiWybZYBoJ2JDjpPp5Idf4OvqScay5WfEuQMdvee42kgsSVolew6V5YUx41E29Of+2xAcQ+be5XImzO7SlTYuaGD6hf0JZvjjxO3gpycCljNSvDgFnBF9s4WuUQ31LozI6eQqo/9c5zUFxW9MGeeaRUWvurlW0rRHM3UKokAQk=
