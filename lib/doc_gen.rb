@@ -44,7 +44,7 @@ class DocGen
   end
 
   def output_path
-    "#{root_path}/pages/#{@doc_name}.html"
+    "#{root_path}/#{@doc_name}.html"
   end
 
   def next_screenshot_name
