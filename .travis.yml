@@ -14,12 +14,12 @@ git:
 addons:
   apt:
     packages:
-    - valgrind
-    - check
-    - pkg-config
-    - gcc
+      - valgrind
+      - check
+      - pkg-config
+      - gcc
 before_install:
-  - ". ./setup-travis.sh"
+  - . ./setup-travis.sh
 install:
   - bundle install --retry=3 --jobs=3 --deployment
 services:
@@ -28,7 +28,7 @@ before_script:
   - createuser -U postgres -s tmc
   - bundle exec rake db:reset
 script:
-  - "./ext/tmc-sandbox/web/webapp.rb start"
+  - ./ext/tmc-sandbox/web/webapp.rb start
   - bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
 after_success:
   - . ./.travis-update-usermanual.sh
