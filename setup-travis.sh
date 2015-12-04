@@ -49,6 +49,7 @@ ls -la
 tar xvf sandbox.tar.gz  -C ext/
 cd ext/tmc-sandbox/uml
 ls -laR
+df -h
 sudo ./run-test-exercise.sh
 cd ../../../
 cd ext/tmc-sandbox/web
