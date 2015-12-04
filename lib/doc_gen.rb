@@ -26,7 +26,7 @@ class DocGen
   def screenshot(_options = {})
     name = next_screenshot_name
     screenshot_to_file("#{root_path}/screenshots/#{name}")
-    '<img src="../screenshots/' + name + '" alt="(screenshot)" class="screenshot" />'
+    '<img src="screenshots/' + name + '" alt="(screenshot)" class="screenshot" />'
   end
 
   def highlight(matcher)
@@ -44,7 +44,7 @@ class DocGen
   end
 
   def output_path
-    "#{root_path}/pages/#{@doc_name}.html"
+    "#{root_path}/#{@doc_name}.html"
   end
 
   def next_screenshot_name
