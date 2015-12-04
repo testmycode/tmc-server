@@ -43,8 +43,11 @@ export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
 bundle exec rake compile
 
 # Use pre built tmc-sandbox
-wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
+wget -O sandbox.tar.gz http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz
+sha256sum sandbox.tar.gz
+tar xvz -C ext/ sandbox.tar.gz
 cd ext/tmc-sandbox/uml
+ls -la
 sudo ./run-test-exercise.sh
 cd ../../../
 cd ext/tmc-sandbox/web
