@@ -48,7 +48,7 @@ sha256sum sandbox.tar.gz
 ls -la
 tar xvf sandbox.tar.gz  -C ext/
 cd ext/tmc-sandbox/uml
-ls -la
+ls -laR
 sudo ./run-test-exercise.sh
 cd ../../../
 cd ext/tmc-sandbox/web
