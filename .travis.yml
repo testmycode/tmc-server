@@ -1,5 +1,4 @@
 sudo: true
-dist: trusty
 
 env:
   - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
