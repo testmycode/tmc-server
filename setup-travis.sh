@@ -43,7 +43,15 @@ export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
 bundle exec rake compile
 
 # Use pre built tmc-sandbox
-wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
+wget -O sandbox.tar.gz http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz
+sha256sum sandbox.tar.gz
+ls -la
+tar xvf sandbox.tar.gz  -C ext/
+cd ext/tmc-sandbox/uml
+ls -laR
+df -h
+sudo ./run-test-exercise.sh
+cd ../../../
 cd ext/tmc-sandbox/web
 # Set current user and reduce max instances, though only one instance will be used at any given time
 sed -i "s/\(tmc_user: \)tmc/\1 $(whoami)/" site.defaults.yml
