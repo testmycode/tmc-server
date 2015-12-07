@@ -1,4 +1,3 @@
-sudo: true
 group: legacy
 
 env:
