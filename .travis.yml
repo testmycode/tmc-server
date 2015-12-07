@@ -1,4 +1,5 @@
 sudo: true
+group: legacy
 
 env:
   - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
