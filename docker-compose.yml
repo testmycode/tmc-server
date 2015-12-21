@@ -1,0 +1,14 @@
+db:
+  image: postgres
+web:
+  build: .
+  command: bundle exec rails s -p 3000 -b '0.0.0.0'
+  #volumes:
+  #  - .:/tmc-server
+  ports:
+    - "3000:3000"
+  environment:
+    SANDBOX_HOST: "192.168.1.11"
+    SANDBOX_PORT: 3001
+  links:
+    - db
