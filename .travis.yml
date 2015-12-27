@@ -1,4 +1,5 @@
-sudo: true
+sudo: required
+dist: precise
 
 env:
   - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
