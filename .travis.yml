@@ -1,5 +1,7 @@
 sudo: required
 dist: precise
+group: legacy
+
 
 env:
   - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
