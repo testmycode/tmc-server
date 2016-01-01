@@ -30,7 +30,7 @@ class TmcLangs < MavenProject
 
   def scan_exercise(path)
     temp_file = ::Tempfile.new('langs')
-    exec('scan-exercise', path, temp_file.path)
+    exec("scan-exercise", path, temp_file.path)
     JSON.parse(File.read(temp_file))
   end
 
@@ -39,15 +39,15 @@ class TmcLangs < MavenProject
   end
 
   def make_stubs(from_dir, to_dir)
-    exec('prepare-stubs', from_dir, to_dir)
+    exec("prepare-stubs", from_dir, to_dir)
   end
 
   def make_solutions(from_dir, to_dir)
-    exec('prepare-solutions', from_dir, to_dir)
+    exec("prepare-solutions", from_dir, to_dir)
   end
 
   private
-  def exec(*args)
-    SystemCommands.sh!('java', '-jar', jar_path, args.flatten)
+  def exec(cmd, exercise_path, output_path)
+    SystemCommands.sh!('java', '-jar', jar_path, cmd, '--exercisePath', exercise_path, '--outputPath', output_path)
   end
 end

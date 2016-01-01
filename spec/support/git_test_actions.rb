@@ -1,4 +1,5 @@
 module GitTestActions
+  require 'system_commands'
   include SystemCommands
 
   def create_bare_repo(path, options = {})
