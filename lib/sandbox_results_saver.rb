@@ -8,6 +8,8 @@ module SandboxResultsSaver
     ActiveRecord::Base.transaction do
       fail InvalidTokenError.new('Invalid or expired token') if results['token'] != submission.secret_token
 
+      maybe_tranform_results_from_tmc_langs!(results)
+
       submission.all_tests_passed = false
       submission.pretest_error = nil
 
@@ -58,6 +60,55 @@ module SandboxResultsSaver
 
   private
 
+  def self.maybe_tranform_results_from_tmc_langs!(results)
+    # extract data from this -- it's JSON man
+    if results.has_key? 'test_output'
+      test_output = JSON.parse results["test_output"]
+      case test_output['status']
+      when 'COMPILE_FAILED'
+        results['status'] = 'failed'
+        results['exit_code'] = '101'
+      when 'TESTS_FAILED'
+        output = test_output['testResults'].map do |result|
+          result['className'], result['methodName'] = result['name'].split(/\s/)
+          result['message'] = result['errorMessage']
+          result['backtrace'] = result['backtrace'].join("\n") if result.has_key? 'backtrace'
+          result['pointNames'] = result['points'] if result.has_key? 'points'
+          result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
+          result
+        end
+        results['old_test_output'] = results['test_output']
+        results['test_output'] = output
+      when 'PASSED'
+        output = test_output['testResults'].map do |result|
+          result['className'], result['methodName'] = result['name'].split(/\s/)
+          result['message'] = result['errorMessage']
+          result['backtrace'] = result['backtrace'].join("\n") if result.has_key? 'backtrace'
+          result['pointNames'] = result['points'] if result.has_key? 'points'
+          result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
+          result
+        end
+        results['old_test_output'] = results['test_output']
+        results['test_output'] = output
+      else
+        require 'pry'
+        binding.pry
+      end
+
+      if test_output.has_key? 'logs'
+        results['stdout'] += test_output['logs']['stdout'].pack('c*') if test_output['logs'].has_key? 'stdout'
+        results['stderr'] += test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
+      end
+    else
+      require 'pry'
+      binding.pry
+    end
+
+    # TODO: figure out
+    #results["valgrind"]
+    #results["validations"]
+  end
+
   def self.decode_test_output(test_output, stderr)
     likely_out_of_memory = stderr.include?('java.lang.OutOfMemoryError')
 
@@ -70,10 +121,16 @@ module SandboxResultsSaver
     end
 
     begin
-      result = ActiveSupport::JSON.decode(test_output)
+      result = if test_output.is_a?(Enumerable)
+                 test_output
+               else
+                 ActiveSupport::JSON.decode(test_output)
+               end
       fail unless result.is_a?(Enumerable)
       result
     rescue
+      require 'pry'
+      binding.pry
       if likely_out_of_memory
         'Out of memory.'
       else

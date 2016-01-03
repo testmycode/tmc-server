@@ -98,10 +98,16 @@ class FixtureExercise
     # hard link instead as a small optimization
 
     FileUtils.rm_rf("#{path}/lib")
+    FileUtils.rm_rf("#{path}/nbproject")
 
     FileUtils.mkdir_p("#{path}/lib")
     Dir.glob("#{common_files_path}/lib/*.jar") do |file|
       FileUtils.ln(file, "#{path}/lib/")
+    end
+    FileUtils.ln(File.join(common_files_path,'build.xml'), File.join(path, 'build.xml'))
+    FileUtils.mkdir_p("#{path}/nbproject")
+    Dir.glob("#{common_files_path}/nbproject/*") do |file|
+      FileUtils.ln(file, "#{path}/nbproject/")
     end
   end
 

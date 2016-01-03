@@ -1,6 +1,7 @@
 require 'pathname'
 require 'exercise_dir/java_simple'
 require 'exercise_dir/java_maven'
+require 'exercise_dir/langs'
 require 'exercise_dir/makefile_c'
 
 # Holds the path to and metadata about an exercise directory.
@@ -56,13 +57,13 @@ class ExerciseDir
 
   def self.exercise_type_impl(path)
     if (path + 'pom.xml').exist?
-      JavaMaven
+      Langs
     elsif (path + 'Makefile').exist? && (path + 'test/').exist?
       MakefileC
     elsif (path + 'src/').exist? && (path + 'test/').exist?
-      JavaSimple
+      Langs
     else
-      nil
+      Langs
     end
   end
 end
