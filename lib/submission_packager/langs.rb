@@ -12,7 +12,6 @@ class SubmissionPackager
       tests = stub || cloned
       copy_libs(cloned, dest)
       FileUtils.cp_r(received + 'src', dest + 'src')
-      #TODO: do with langs
       FileUtils.cp_r(tests + 'test', dest + 'test')
       copy_files_in_dir_no_recursion(cloned, dest)
 
@@ -24,15 +23,6 @@ class SubmissionPackager
 
     def copy_libs(cloned, dest)
       FileUtils.cp_r(cloned + 'lib', dest + 'lib')
-      FileUtils.mkdir_p(dest + 'lib' + 'testrunner')
-      FileUtils.mkdir_p(dest + 'checkstyle-runner')
-      for jar_path in TmcJunitRunner.get.jar_and_lib_paths
-        destname = jar_path.basename
-        if destname.to_s.start_with?('tmc-junit-runner')
-          destname = 'tmc-junit-runner.jar'
-        end
-        FileUtils.cp(jar_path, dest + 'lib' + 'testrunner' + destname)
-      end
     end
 
     def tmc_run_path

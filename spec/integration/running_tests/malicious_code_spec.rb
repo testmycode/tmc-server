@@ -41,7 +41,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
       setup = setup_and_run('malicious/Exit1')
       submission = setup.submission
 
-      expect(submission.pretest_error).to include(' (did you use an exit() command?)')
+      expect(submission.pretest_error).to include('exit() command?')
     end
   end
 end

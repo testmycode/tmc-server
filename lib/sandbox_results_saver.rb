@@ -63,7 +63,14 @@ module SandboxResultsSaver
   def self.maybe_tranform_results_from_tmc_langs!(results)
     # extract data from this -- it's JSON man
     if results.has_key? 'test_output'
-      test_output = JSON.parse results["test_output"]
+      begin
+        test_output = JSON.parse results["test_output"]
+      rescue JSON::ParserError
+        results['test_output'] = {}
+        results['status'] = 'finished'
+        results['exit_code'] = 'faulty-json'
+        return
+      end
       case test_output['status']
       when 'COMPILE_FAILED'
         results['status'] = 'failed'
