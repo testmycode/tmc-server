@@ -20,8 +20,6 @@ if [ -z "$error_msg_locale" ]; then
   echo "Setting error_msg_locale"
   error_msg_locale=en
 fi
-ERROR_MSG_LOCALE_DEF="-Dfi.helsinki.cs.tmc.edutestutils.defaultLocale=$error_msg_locale"
-STYLE_ERROR_MSG_LOCALE_DEF="-Dtmc.locale=$error_msg_locale"
 
 ramdisk_usage_kb() {
   df / | tail -n 1 | awk '{ print $3 }'
@@ -30,8 +28,15 @@ ramdisk_usage_kb() {
 TMC_MAVEN_PLUGIN_VERSION=1.6
 
 # Identify project type
-PROJECT_TYPE=langs
 
+if [ -f Makefile ]; then
+  PROJECT_TYPE=makefile_c
+else
+  PROJECT_TYPE=langs
+fi
+
+mvn -v
+export M3_HOME=/opt/apache-maven-3.1.1
 JAVAC_EXE_PATH=`readlink -f \`which javac\``
 MAKE_EXE_PATH=`readlink -f \`which make\``
 JDK_DIR=`dirname \`dirname "$JAVAC_EXE_PATH"\``
@@ -79,6 +84,18 @@ case $PROJECT_TYPE in
 
     #rm -f test_output.txt
   ;;
+
+  makefile_c)
+    JAVA_RAM_KB=${JAVA_RAM_KB-`expr $TOTAL_RAM_KB - 48 \* 1024`}
+    echo "Memory allocated to tests: ${JAVA_RAM_KB}KB"
+    make clean 2>&1 | tee test_output.txt
+    [ ${PIPESTATUS[0]} -eq 0 ] || exit 101
+    make all 2>&1 | tee test_output.txt
+    [ ${PIPESTATUS[0]} -eq 0 ] || exit 101
+    rm -f test_output.txt
+
+    CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*"
+  ;;
 esac
 
 JVM_OPTIONS=("-Xms${JAVA_RAM_KB}K" "-Xmx${JAVA_RAM_KB}K" "${runtime_params[@]}")
@@ -93,10 +110,25 @@ fi
 echo "Running tests..."
 case $PROJECT_TYPE in
   langs)
-    # TODO: what about validations
     java -jar tmc-langs.jar run-tests --exercisePath . --outputPath test_output.txt > stdout.txt 2> stderr.txt || exit 104
-    cat test_output.txt
+    java -jar tmc-langs.jar checkstyle --exercisePath . --outputPath validations.json --locale $error_msg_locale >> stdout.txt 2> stderr.txt || exit 105
     ls -laR
+  ;;
+
+  makefile_c)
+    # RUN_VALGRIND and VALGRIND_OPTS can be set in .tmcrc on per exercise basis
+    RESULTS_DIR=.
+    if [ ${RUN_VALGRIND} ]; then
+      valgrind -q ${VALGRIND_OPTS} --log-file=valgrind.log ./test/test > stdout.txt 2> stderr.txt
+    else
+      # valgrind.log must exist. Otherwise tar packaging fails
+      touch valgrind.log
+      make run-test > stdout.txt 2> stderr.txt
+      RESULTS_DIR=test/
+    fi
+    if [ ! -f test_output.txt ]; then
+      tmc-check-convert-results $RESULTS_DIR > test_output.txt
+    fi
   ;;
 esac
 

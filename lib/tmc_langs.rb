@@ -18,6 +18,10 @@ class TmcLangs < MavenProject
     "tmc-langs-cli-#{pom_file.artifact_version}.jar"
   end
 
+  def package_path
+    path + 'tmc-langs-cli/target' + package_file_name
+  end
+
   def jar_path
     path + 'tmc-langs-cli/target' + package_file_name
   end

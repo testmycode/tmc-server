@@ -64,7 +64,7 @@ end
 
 if ENV['M3_HOME'].blank?
   maven_home = get_m3_home
-  warn "$M3_HOME is not set, trying with #{maven_home}- maven tests might be failing"
+  warn "$M3_HOME is not set, trying with #{maven_home} - however, maven tests might be failing"
   ENV['M3_HOME']= maven_home
 end
 

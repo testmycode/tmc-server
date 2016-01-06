@@ -4,7 +4,6 @@ require 'recursive_yaml_reader'
 require 'exercise_dir'
 require 'test_scanner'
 require 'digest/md5'
-require 'tmc_junit_runner'
 require 'course_refresher/exercise_file_filter'
 require 'maven_cache_seeder'
 require 'set'
@@ -372,22 +371,6 @@ class CourseRefresher
 
     def make_stubs
       TmcLangs.get.make_stubs(@course.clone_path, @course.stub_path)
-    end
-
-    def add_shared_files_to_stub(exercise_type, stub_path)
-      case exercise_type
-      when :makefile_c
-        # nothing yet
-      when :java_simple
-        FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
-        FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
-        FileUtils.cp(TmcJunitRunner.get.lib_paths, stub_path + 'lib' + 'testrunner')
-      else
-        # Until NB's Maven API is published, it's convenient to deliver the test runner in the zip like with java_simple.
-        FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
-        FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
-        FileUtils.cp(TmcJunitRunner.get.lib_paths, stub_path + 'lib' + 'testrunner')
-      end
     end
 
     # Returns a sorted list of relative pathnames to stub files of the exercise.

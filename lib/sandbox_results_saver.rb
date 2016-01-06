@@ -113,7 +113,6 @@ module SandboxResultsSaver
 
     # TODO: figure out
     #results["valgrind"]
-    #results["validations"]
   end
 
   def self.decode_test_output(test_output, stderr)
