@@ -66,14 +66,12 @@ module SandboxResultsSaver
       begin
         test_output = JSON.parse results["test_output"]
       rescue JSON::ParserError
-        results['test_output'] = {}
-        results['status'] = 'finished'
-        results['exit_code'] = 'faulty-json'
+        #results['test_output'] = {}
+        #results['status'] = 'finished'
+        #results['exit_code'] = 'faulty-json'
         return
       end
-      return if results.is_a? Array
-      require 'pry'
-      binding.pry
+      return if test_output.is_a?(Array) # No need to parse as the data doesn't seem to be from langs.
       case test_output['status']
       when 'COMPILE_FAILED'
         results['status'] = 'failed'
