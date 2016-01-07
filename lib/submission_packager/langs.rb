@@ -11,8 +11,11 @@ class SubmissionPackager
       cloned = Pathname(exercise.clone_path)
       tests = stub || cloned
       copy_libs(cloned, dest)
-      FileUtils.cp_r(received + 'src', dest + 'src')
-      FileUtils.cp_r(tests + 'test', dest + 'test')
+
+      config = TmcLangs.get.get_exercise_config(exercise.clone_path)
+      config['studentFilePaths'].each { |folder| FileUtils.cp_r(received + folder, dest + folder) }
+      config['exerciseFilePaths'].each { |folder| FileUtils.cp_r(tests + folder, dest + folder) }
+
       copy_files_in_dir_no_recursion(cloned, dest)
 
       tmc_project_file = TmcProjectFile.for_project(cloned.to_s)

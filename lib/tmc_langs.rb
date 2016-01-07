@@ -50,6 +50,12 @@ class TmcLangs < MavenProject
     exec("prepare-solutions", from_dir, to_dir)
   end
 
+  def get_exercise_config(from_dir)
+    temp_file = ::Tempfile.new('langs')
+    exec("get-exercise-packaging-configuration", from_dir, temp_file.path)
+    JSON.parse(File.read(temp_file))
+  end
+
   private
   def exec(cmd, exercise_path, output_path)
     SystemCommands.sh!('java', '-jar', jar_path, cmd, '--exercisePath', exercise_path, '--outputPath', output_path)
