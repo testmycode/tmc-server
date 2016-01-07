@@ -71,6 +71,9 @@ module SandboxResultsSaver
         results['exit_code'] = 'faulty-json'
         return
       end
+      return if results.is_a? Array
+      require 'pry'
+      binding.pry
       case test_output['status']
       when 'COMPILE_FAILED'
         results['status'] = 'failed'
