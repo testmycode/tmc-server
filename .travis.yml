@@ -1,9 +1,15 @@
-sudo: true
+sudo: required
+dist: precise
+group: legacy
+
 
 env:
-  - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
-  - RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
-  - RSPEC_PATTERN="spec/integration/*.rb"
+  matrix:
+    - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
+    - RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
+    - RSPEC_PATTERN="spec/integration/*.rb"
+  global:
+    secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
 
 language: ruby
 rvm:
@@ -36,6 +42,9 @@ before_script:
 script:
   - ./ext/tmc-sandbox/web/webapp.rb start
   - bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
+
+after_success:
+  - ./.travis-update-usermanual.sh
 
 after_failure:
   - cat ext/tmc-sandbox/web/log/*
