@@ -66,9 +66,6 @@ module SandboxResultsSaver
       begin
         test_output = JSON.parse results["test_output"]
       rescue JSON::ParserError
-        #results['test_output'] = {}
-        #results['status'] = 'finished'
-        #results['exit_code'] = 'faulty-json'
         return
       end
       return if test_output.is_a?(Array) # No need to parse as the data doesn't seem to be from langs.
@@ -76,18 +73,7 @@ module SandboxResultsSaver
       when 'COMPILE_FAILED'
         results['status'] = 'failed'
         results['exit_code'] = '101'
-      when 'TESTS_FAILED'
-        output = test_output['testResults'].map do |result|
-          result['className'], result['methodName'] = result['name'].split(/\s/)
-          result['message'] = result['errorMessage']
-          result['backtrace'] = result['backtrace'].join("\n") if result.has_key? 'backtrace'
-          result['pointNames'] = result['points'] if result.has_key? 'points'
-          result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
-          result
-        end
-        results['old_test_output'] = results['test_output']
-        results['test_output'] = output
-      when 'PASSED'
+      when 'TESTS_FAILED', 'PASSED'
         output = test_output['testResults'].map do |result|
           result['className'], result['methodName'] = result['name'].split(/\s/)
           result['message'] = result['errorMessage']
@@ -99,8 +85,7 @@ module SandboxResultsSaver
         results['old_test_output'] = results['test_output']
         results['test_output'] = output
       else
-        require 'pry'
-        binding.pry
+        raise "Unknown result type: #{test_output}"
       end
 
       if test_output.has_key? 'logs'
@@ -108,12 +93,8 @@ module SandboxResultsSaver
         results['stderr'] += test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
       end
     else
-      require 'pry'
-      binding.pry
+      raise "Missing key 'test_output': #{test_output}"
     end
-
-    # TODO: figure out
-    #results["valgrind"]
   end
 
   def self.decode_test_output(test_output, stderr)
