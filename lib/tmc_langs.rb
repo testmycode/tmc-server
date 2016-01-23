@@ -35,6 +35,7 @@ class TmcLangs < MavenProject
   def scan_exercise(path)
     temp_file = ::Tempfile.new('langs')
     exec("scan-exercise", path, temp_file.path)
+    clean(path)
     JSON.parse(File.read(temp_file))
   end
 
@@ -48,6 +49,10 @@ class TmcLangs < MavenProject
 
   def make_solutions(from_dir, to_dir)
     exec("prepare-solutions", from_dir, to_dir)
+  end
+
+  def clean(project)
+    exec("clean", project, "ignored")
   end
 
   def get_exercise_config(from_dir)
