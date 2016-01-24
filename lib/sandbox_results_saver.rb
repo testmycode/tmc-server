@@ -33,6 +33,8 @@ module SandboxResultsSaver
             "Test preparation error:\n" + results['test_output']
           when '104'
             "Checkstyle runner error:\n" + results['test_output']
+          when '105'
+            'Missing test output. Did you terminate your program with an exit() command?'
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
@@ -84,6 +86,9 @@ module SandboxResultsSaver
         end
         results['old_test_output'] = results['test_output']
         results['test_output'] = output
+      when 'TESTRUN_INTERRUPTED'
+        results['status'] = 'failed'
+        results['exit_code'] = '105'
       else
         raise "Unknown result type: #{test_output}"
       end
