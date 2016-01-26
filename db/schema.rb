@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151126104102) do
+ActiveRecord::Schema.define(version: 20160126151158) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,6 +61,16 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "cookie_sessions", force: :cascade do |t|
+    t.string   "session_id", null: false
+    t.text     "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "cookie_sessions", ["session_id"], name: "index_cookie_sessions_on_session_id", unique: true, using: :btree
+  add_index "cookie_sessions", ["updated_at"], name: "index_cookie_sessions_on_updated_at", using: :btree
 
   create_table "course_notifications", force: :cascade do |t|
     t.string   "topic"
@@ -330,34 +340,33 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   add_index "user_field_values", ["user_id", "field_name"], name: "index_user_field_values_on_user_id_and_field_name", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "login",                              null: false
+    t.string   "login",              limit: 255,                 null: false
     t.text     "password_hash"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "salt"
-    t.boolean  "administrator",      default: false, null: false
-    t.text     "email",              default: "",    null: false
-    t.boolean  "legitimate_student", default: true,  null: false
+    t.string   "salt",               limit: 255
+    t.boolean  "administrator",                  default: false, null: false
+    t.text     "email",                          default: "",    null: false
+    t.boolean  "legitimate_student",             default: true,  null: false
   end
 
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
 
-  add_foreign_key "action_tokens", "users"
-  add_foreign_key "available_points", "exercises"
-  add_foreign_key "awarded_points", "courses"
-  add_foreign_key "awarded_points", "submissions"
-  add_foreign_key "awarded_points", "users"
-  add_foreign_key "courses", "organizations"
-  add_foreign_key "exercises", "courses"
-  add_foreign_key "feedback_answers", "feedback_questions"
-  add_foreign_key "feedback_answers", "submissions"
-  add_foreign_key "feedback_questions", "courses"
-  add_foreign_key "reviews", "submissions"
-  add_foreign_key "reviews", "users", column: "reviewer_id"
-  add_foreign_key "submission_data", "submissions"
-  add_foreign_key "submissions", "courses"
-  add_foreign_key "submissions", "users"
-  add_foreign_key "test_case_runs", "submissions"
-  add_foreign_key "test_scanner_cache_entries", "courses"
-  add_foreign_key "user_field_values", "users"
+  add_foreign_key "action_tokens", "users", name: "password_reset_keys_user_id_fk", on_delete: :cascade
+  add_foreign_key "available_points", "exercises", name: "available_points_exercise_id_fk", on_delete: :cascade
+  add_foreign_key "awarded_points", "courses", name: "awarded_points_course_id_fk", on_delete: :cascade
+  add_foreign_key "awarded_points", "submissions", name: "awarded_points_submission_id_fk", on_delete: :nullify
+  add_foreign_key "awarded_points", "users", name: "awarded_points_user_id_fk", on_delete: :cascade
+  add_foreign_key "exercises", "courses", name: "exercises_course_id_fk", on_delete: :cascade
+  add_foreign_key "feedback_answers", "feedback_questions", name: "feedback_answers_feedback_question_id_fk", on_delete: :cascade
+  add_foreign_key "feedback_answers", "submissions", name: "feedback_answers_submission_id_fk", on_delete: :nullify
+  add_foreign_key "feedback_questions", "courses", name: "feedback_questions_course_id_fk", on_delete: :cascade
+  add_foreign_key "reviews", "submissions", name: "reviews_submission_id_fk", on_delete: :cascade
+  add_foreign_key "reviews", "users", column: "reviewer_id", name: "reviews_reviewer_id_fk", on_delete: :nullify
+  add_foreign_key "submission_data", "submissions", name: "submission_data_submission_id_fk", on_delete: :cascade
+  add_foreign_key "submissions", "courses", name: "submissions_course_id_fk", on_delete: :cascade
+  add_foreign_key "submissions", "users", name: "submissions_user_id_fk", on_delete: :cascade
+  add_foreign_key "test_case_runs", "submissions", name: "test_case_runs_submission_id_fk", on_delete: :cascade
+  add_foreign_key "test_scanner_cache_entries", "courses", name: "test_scanner_cache_entries_course_id_fk", on_delete: :cascade
+  add_foreign_key "user_field_values", "users", name: "user_field_values_user_id_fk", on_delete: :cascade
 end
