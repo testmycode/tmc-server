@@ -2,8 +2,9 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 4.1.0'
+gem 'rails', '~> 4.2.0'
 
+gem 'responders', '~> 2.0'
 gem 'rake'
 gem 'google-spreadsheet-ruby'
 gem 'pg', '~> 0.18.0'
