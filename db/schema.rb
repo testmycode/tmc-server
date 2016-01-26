@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "action_tokens", force: true do |t|
+  create_table "action_tokens", force: :cascade do |t|
     t.integer  "user_id",    null: false
     t.string   "token",      null: false
     t.datetime "created_at", null: false
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.datetime "updated_at"
   end
 
-  create_table "assistantships", force: true do |t|
+  create_table "assistantships", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "course_id"
     t.datetime "created_at"
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "assistantships", ["user_id", "course_id"], name: "index_assistantships_on_user_id_and_course_id", unique: true, using: :btree
 
-  create_table "available_points", force: true do |t|
+  create_table "available_points", force: :cascade do |t|
     t.integer "exercise_id",                     null: false
     t.string  "name",                            null: false
     t.boolean "requires_review", default: false, null: false
@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "available_points", ["exercise_id", "name"], name: "index_available_points_on_exercise_id_and_name", unique: true, using: :btree
 
-  create_table "awarded_points", force: true do |t|
+  create_table "awarded_points", force: :cascade do |t|
     t.integer "course_id",     null: false
     t.integer "user_id",       null: false
     t.integer "submission_id"
@@ -53,7 +53,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   add_index "awarded_points", ["course_id", "user_id", "submission_id"], name: "index_awarded_points_on_course_id_and_user_id_and_submission_id", using: :btree
   add_index "awarded_points", ["user_id", "submission_id", "name"], name: "index_awarded_points_on_user_id_and_submission_id_and_name", unique: true, using: :btree
 
-  create_table "certificates", force: true do |t|
+  create_table "certificates", force: :cascade do |t|
     t.string   "name"
     t.binary   "pdf"
     t.integer  "user_id"
@@ -62,7 +62,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.datetime "updated_at"
   end
 
-  create_table "course_notifications", force: true do |t|
+  create_table "course_notifications", force: :cascade do |t|
     t.string   "topic"
     t.string   "message"
     t.integer  "sender_id"
@@ -71,7 +71,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.datetime "updated_at"
   end
 
-  create_table "course_templates", force: true do |t|
+  create_table "course_templates", force: :cascade do |t|
     t.string   "name"
     t.string   "title"
     t.string   "description"
@@ -87,7 +87,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.datetime "updated_at"
   end
 
-  create_table "courses", force: true do |t|
+  create_table "courses", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -114,7 +114,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
 
-  create_table "exercises", force: true do |t|
+  create_table "exercises", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -139,7 +139,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
   add_index "exercises", ["gdocs_sheet"], name: "index_exercises_on_gdocs_sheet", using: :btree
 
-  create_table "feedback_answers", force: true do |t|
+  create_table "feedback_answers", force: :cascade do |t|
     t.integer  "feedback_question_id", null: false
     t.integer  "course_id",            null: false
     t.string   "exercise_name",        null: false
@@ -152,7 +152,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   add_index "feedback_answers", ["feedback_question_id", "course_id", "exercise_name"], name: "index_feedback_answers_question_course_exercise", using: :btree
   add_index "feedback_answers", ["submission_id"], name: "index_feedback_answers_question", using: :btree
 
-  create_table "feedback_questions", force: true do |t|
+  create_table "feedback_questions", force: :cascade do |t|
     t.integer  "course_id",  null: false
     t.text     "question",   null: false
     t.string   "kind",       null: false
@@ -164,7 +164,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "feedback_questions", ["id"], name: "index_feedback_questions_on_id", using: :btree
 
-  create_table "organizations", force: true do |t|
+  create_table "organizations", force: :cascade do |t|
     t.string   "name"
     t.string   "information"
     t.string   "slug"
@@ -182,13 +182,13 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.datetime "logo_updated_at"
   end
 
-  create_table "points_upload_queues", force: true do |t|
+  create_table "points_upload_queues", force: :cascade do |t|
     t.integer  "point_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "reply_to_feedback_answers", force: true do |t|
+  create_table "reply_to_feedback_answers", force: :cascade do |t|
     t.integer  "feedback_answer_id"
     t.text     "body"
     t.string   "from"
@@ -196,7 +196,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.datetime "updated_at"
   end
 
-  create_table "reviews", force: true do |t|
+  create_table "reviews", force: :cascade do |t|
     t.integer  "submission_id",                  null: false
     t.integer  "reviewer_id"
     t.text     "review_body",                    null: false
@@ -209,7 +209,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   add_index "reviews", ["reviewer_id"], name: "index_reviews_on_reviewer_id", using: :btree
   add_index "reviews", ["submission_id"], name: "index_reviews_on_submission_id", using: :btree
 
-  create_table "sessions", force: true do |t|
+  create_table "sessions", force: :cascade do |t|
     t.string   "session_id", null: false
     t.text     "data"
     t.datetime "created_at"
@@ -219,7 +219,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
-  create_table "submission_data", primary_key: "submission_id", force: true do |t|
+  create_table "submission_data", primary_key: "submission_id", force: :cascade do |t|
     t.binary "return_file"
     t.binary "stdout_compressed"
     t.binary "stderr_compressed"
@@ -228,7 +228,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
     t.binary "validations_compressed"
   end
 
-  create_table "submissions", force: true do |t|
+  create_table "submissions", force: :cascade do |t|
     t.integer  "user_id"
     t.text     "pretest_error"
     t.datetime "created_at"
@@ -268,17 +268,16 @@ ActiveRecord::Schema.define(version: 20151126104102) do
   add_index "submissions", ["processed"], name: "index_submissions_on_processed", using: :btree
   add_index "submissions", ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name", using: :btree
 
-  create_table "teacherships", force: true do |t|
+  create_table "teacherships", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "organization_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "teacherships", ["organization_id"], name: "index_teacherships_on_organization_id", using: :btree
-  add_index "teacherships", ["user_id"], name: "index_teacherships_on_user_id", using: :btree
+  add_index "teacherships", ["user_id", "organization_id"], name: "index_teacherships_on_user_id_and_organization_id", unique: true, using: :btree
 
-  create_table "test_case_runs", force: true do |t|
+  create_table "test_case_runs", force: :cascade do |t|
     t.integer  "submission_id"
     t.text     "test_case_name"
     t.text     "message"
@@ -291,7 +290,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "test_case_runs", ["submission_id"], name: "index_test_case_runs_on_submission_id", using: :btree
 
-  create_table "test_scanner_cache_entries", force: true do |t|
+  create_table "test_scanner_cache_entries", force: :cascade do |t|
     t.integer  "course_id",     null: false
     t.string   "exercise_name"
     t.string   "files_hash"
@@ -301,7 +300,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "test_scanner_cache_entries", ["course_id", "exercise_name"], name: "index_test_scanner_cache_entries_on_course_id_and_exercise_name", unique: true, using: :btree
 
-  create_table "uncomputed_unlocks", force: true do |t|
+  create_table "uncomputed_unlocks", force: :cascade do |t|
     t.integer  "course_id",  null: false
     t.integer  "user_id",    null: false
     t.datetime "created_at"
@@ -310,7 +309,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "uncomputed_unlocks", ["course_id", "user_id"], name: "index_uncomputed_unlocks_on_course_id_and_user_id", using: :btree
 
-  create_table "unlocks", force: true do |t|
+  create_table "unlocks", force: :cascade do |t|
     t.integer  "user_id",       null: false
     t.integer  "course_id",     null: false
     t.string   "exercise_name", null: false
@@ -320,7 +319,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "unlocks", ["user_id", "course_id", "exercise_name"], name: "index_unlocks_on_user_id_and_course_id_and_exercise_name", unique: true, using: :btree
 
-  create_table "user_field_values", force: true do |t|
+  create_table "user_field_values", force: :cascade do |t|
     t.integer  "user_id",    null: false
     t.string   "field_name", null: false
     t.text     "value",      null: false
@@ -330,7 +329,7 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "user_field_values", ["user_id", "field_name"], name: "index_user_field_values_on_user_id_and_field_name", unique: true, using: :btree
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.string   "login",                              null: false
     t.text     "password_hash"
     t.datetime "created_at"
@@ -343,33 +342,22 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
 
-  add_foreign_key "action_tokens", "users", :name => "password_reset_keys_user_id_fk", :dependent => :delete
-
-  add_foreign_key "available_points", "exercises", :name => "available_points_exercise_id_fk", :dependent => :delete
-
-  add_foreign_key "awarded_points", "courses", :name => "awarded_points_course_id_fk", :dependent => :delete
-  add_foreign_key "awarded_points", "submissions", :name => "awarded_points_submission_id_fk", :dependent => :nullify
-  add_foreign_key "awarded_points", "users", :name => "awarded_points_user_id_fk", :dependent => :delete
-
-  add_foreign_key "exercises", "courses", :name => "exercises_course_id_fk", :dependent => :delete
-
-  add_foreign_key "feedback_answers", "feedback_questions", :name => "feedback_answers_feedback_question_id_fk", :dependent => :delete
-  add_foreign_key "feedback_answers", "submissions", :name => "feedback_answers_submission_id_fk", :dependent => :nullify
-
-  add_foreign_key "feedback_questions", "courses", :name => "feedback_questions_course_id_fk", :dependent => :delete
-
-  add_foreign_key "reviews", "submissions", :name => "reviews_submission_id_fk", :dependent => :delete
-  add_foreign_key "reviews", "users", :name => "reviews_reviewer_id_fk", :column => "reviewer_id", :dependent => :nullify
-
-  add_foreign_key "submission_data", "submissions", :name => "submission_data_submission_id_fk", :dependent => :delete
-
-  add_foreign_key "submissions", "courses", :name => "submissions_course_id_fk", :dependent => :delete
-  add_foreign_key "submissions", "users", :name => "submissions_user_id_fk", :dependent => :delete
-
-  add_foreign_key "test_case_runs", "submissions", :name => "test_case_runs_submission_id_fk", :dependent => :delete
-
-  add_foreign_key "test_scanner_cache_entries", "courses", :name => "test_scanner_cache_entries_course_id_fk", :dependent => :delete
-
-  add_foreign_key "user_field_values", "users", :name => "user_field_values_user_id_fk", :dependent => :delete
-
+  add_foreign_key "action_tokens", "users"
+  add_foreign_key "available_points", "exercises"
+  add_foreign_key "awarded_points", "courses"
+  add_foreign_key "awarded_points", "submissions"
+  add_foreign_key "awarded_points", "users"
+  add_foreign_key "courses", "organizations"
+  add_foreign_key "exercises", "courses"
+  add_foreign_key "feedback_answers", "feedback_questions"
+  add_foreign_key "feedback_answers", "submissions"
+  add_foreign_key "feedback_questions", "courses"
+  add_foreign_key "reviews", "submissions"
+  add_foreign_key "reviews", "users", column: "reviewer_id"
+  add_foreign_key "submission_data", "submissions"
+  add_foreign_key "submissions", "courses"
+  add_foreign_key "submissions", "users"
+  add_foreign_key "test_case_runs", "submissions"
+  add_foreign_key "test_scanner_cache_entries", "courses"
+  add_foreign_key "user_field_values", "users"
 end
