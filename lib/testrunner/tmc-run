@@ -107,7 +107,11 @@ echo "Running tests..."
 case $PROJECT_TYPE in
   langs)
     java -jar tmc-langs.jar run-tests --exercisePath . --outputPath test_output.txt > stdout.txt 2> stderr.txt || exit 103
-    java -jar tmc-langs.jar checkstyle --exercisePath . --outputPath validations.json --locale $error_msg_locale >> stdout.txt 2> stderr.txt || exit 104
+    cat stdout.txt
+    cat stderr.txt
+    java -jar tmc-langs.jar checkstyle --exercisePath . --outputPath validations.json --locale $error_msg_locale > stdout.txt 2> stderr.txt || exit 104
+    cat stdout.txt
+    cat stderr.txt
     ls -laR
   ;;
 

@@ -84,6 +84,7 @@ module SandboxResultsSaver
           result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
           result
         end
+
         results['old_test_output'] = results['test_output']
         results['test_output'] = output
       when 'TESTRUN_INTERRUPTED'
@@ -94,8 +95,10 @@ module SandboxResultsSaver
       end
 
       if test_output.has_key? 'logs'
-        results['stdout'] += test_output['logs']['stdout'].pack('c*') if test_output['logs'].has_key? 'stdout'
-        results['stderr'] += test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
+        results['stdout'] = ''
+        results['stderr'] = ''
+        results['stdout'] = test_output['logs']['stdout'].pack('c*') if test_output['logs'].has_key? 'stdout'
+        results['stderr'] = test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
       end
     else
       raise "Missing key 'test_output': #{test_output}"
