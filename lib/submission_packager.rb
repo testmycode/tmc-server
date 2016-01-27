@@ -52,9 +52,9 @@ class SubmissionPackager
         extra_params['runtime_params'] = exercise.runtime_params_array
         write_extra_params(dest + '.tmcparams', extra_params)
 
-        if config[:include_ide_files]
+        #if config[:include_ide_files]
           copy_ide_files(Pathname(exercise.clone_path), received, dest)
-        end
+        #end
 
         # To get hidden tests etc, gsub stub with clone path...
         if config[:tests_from_stub]
