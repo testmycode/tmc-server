@@ -50,7 +50,7 @@ class ExerciseDir
 
   def self.find_exercise_dirs(path)
     path = Pathname(path)
-    TmcLangs.get.find_exercise_dirs(path).map {|dir| ExerciseDir.get(dir) }
+    TmcLangs.get.find_exercise_dirs(path).sort.map {|dir| ExerciseDir.get(dir) }
   end
 
   private
