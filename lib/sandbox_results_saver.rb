@@ -64,6 +64,7 @@ module SandboxResultsSaver
 
   def self.maybe_tranform_results_from_tmc_langs!(results)
     # extract data from this -- it's JSON man
+    results.delete('validations') if results['validations'] == 'null'
     if results.has_key? 'test_output'
       begin
         test_output = JSON.parse results["test_output"]
