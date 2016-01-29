@@ -55,3 +55,7 @@ cat site.defaults.yml
 bundle install --retry=3 --jobs=3
 rake ext
 cd ../../../
+git clone https://github.com/testmycode/tmc-langs.git $HOME/tmc-langs
+cd $HOME/tmc-langs
+mvn package -Dmaven.test.skip=true
+cd -

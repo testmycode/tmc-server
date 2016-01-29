@@ -1,7 +1,6 @@
 class SubmissionPackager
-  class JavaMaven < SubmissionPackager
+  class Langs < SubmissionPackager
     private
-
     def find_received_project_root(received_root)
       src_dir_path = TmcDirUtils.find_dir_containing(received_root, 'src')
       fail 'No src directory' if src_dir_path.nil?
@@ -11,12 +10,11 @@ class SubmissionPackager
     def copy_files(exercise, received, dest, stub = nil, opts = {})
       cloned = Pathname(exercise.clone_path)
       tests = stub || cloned
+      copy_libs(cloned, dest)
 
-      FileUtils.cp(cloned + 'pom.xml', dest)
-
-      FileUtils.mkdir_p(dest + 'src')
-      cp_r_if_exists(received + 'src' + 'main', dest + 'src')
-      cp_r_if_exists(tests + 'src' + 'test', dest + 'src')
+      config = TmcLangs.get.get_exercise_config(exercise.clone_path)
+      config['studentFilePaths'].each { |folder| FileUtils.cp_r(received + folder, dest + folder) }
+      config['exerciseFilePaths'].each { |folder| FileUtils.cp_r(tests + folder, dest + folder) }
 
       copy_files_in_dir_no_recursion(cloned, dest)
 
@@ -26,8 +24,13 @@ class SubmissionPackager
       copy_and_chmod_tmcrun(dest) unless opts[:no_tmc_run]
     end
 
+    def copy_libs(cloned, dest)
+      FileUtils.cp_r(cloned + 'lib', dest + 'lib')
+    end
+
     def tmc_run_path
       "#{::Rails.root}/lib/testrunner/tmc-run"
     end
   end
 end
+

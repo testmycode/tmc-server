@@ -16,6 +16,8 @@
 /coverage
 .DS_Store
 
+/vendor/bundle
+
 # Eclipse
 /.project
 /.buildpath

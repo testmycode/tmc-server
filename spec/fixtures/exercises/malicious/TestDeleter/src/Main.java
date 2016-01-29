@@ -2,8 +2,8 @@ import java.io.File;
 
 public class Main {
     public static void theMethod() throws Exception {
-        delete("classes/test/ATest.class");
-        delete("classes/test/BTest.class");
+        delete("build/test/classes/ATest.class");
+        delete("build/test/classes/BTest.class");
         delete("test/ATest.java");
         delete("test/BTest.java");
     }

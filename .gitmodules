@@ -1,9 +1,6 @@
 [submodule "ext/tmc-sandbox"]
 	path = ext/tmc-sandbox
 	url = git@github.com:testmycode/tmc-sandbox.git
-[submodule "ext/tmc-junit-runner"]
-	path = ext/tmc-junit-runner
-	url = git@github.com:testmycode/tmc-junit-runner.git
 [submodule "ext/tmc-comet"]
 	path = ext/tmc-comet
 	url = git@github.com:testmycode/tmc-comet.git
@@ -13,3 +10,6 @@
 [submodule "ext/tmc-checkstyle-runner"]
 	path = ext/tmc-checkstyle-runner
 	url = git@github.com:testmycode/tmc-checkstyle-runner.git
+[submodule "ext/tmc-langs"]
+	path = ext/tmc-langs
+	url = git@github.com:testmycode/tmc-langs.git

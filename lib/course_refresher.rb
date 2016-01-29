@@ -4,7 +4,6 @@ require 'recursive_yaml_reader'
 require 'exercise_dir'
 require 'test_scanner'
 require 'digest/md5'
-require 'tmc_junit_runner'
 require 'course_refresher/exercise_file_filter'
 require 'maven_cache_seeder'
 require 'set'
@@ -287,13 +286,9 @@ class CourseRefresher
         review_points = @review_points[exercise.name]
         point_names = Set.new
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
-        exercise_type = ExerciseDir.exercise_type(clone_path)
-        case exercise_type
-          when :makefile_c
-            point_names += get_c_exercise_points(exercise)
-          else
-            point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
-        end
+
+        point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
+
         point_names += review_points
 
         added = []
@@ -325,6 +320,7 @@ class CourseRefresher
 
     # To keep bakwards compatability we first try to parse the tmc_available_points.txt, if not existent, read
     # available points from the stdout / points.txt
+    # TODO: remove when in langs
     def get_c_exercise_points(exercise)
       full_path = File.join(@course.clone_path, exercise.relative_path)
       hash = FileTreeHasher.hash_file_tree(full_path)
@@ -370,40 +366,11 @@ class CourseRefresher
     end
 
     def make_solutions
-      @course.exercises.each do |e|
-        clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
-        solution_path = Pathname("#{@course.solution_path}/#{e.relative_path}")
-        FileUtils.mkdir_p(solution_path)
-
-        ExerciseFileFilter.new(clone_path).make_solution(solution_path)
-      end
+      TmcLangs.get.make_solutions(@course.clone_path, @course.solution_path)
     end
 
     def make_stubs
-      @course.exercises.each do |e|
-        clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
-        stub_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
-        FileUtils.mkdir_p(stub_path)
-        ExerciseFileFilter.new(clone_path).make_stub(stub_path)
-        exercise_type = ExerciseDir.exercise_type(clone_path)
-        add_shared_files_to_stub(exercise_type, stub_path)
-      end
-    end
-
-    def add_shared_files_to_stub(exercise_type, stub_path)
-      case exercise_type
-      when :makefile_c
-        # nothing yet
-      when :java_simple
-        FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
-        FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
-        FileUtils.cp(TmcJunitRunner.get.lib_paths, stub_path + 'lib' + 'testrunner')
-      else
-        # Until NB's Maven API is published, it's convenient to deliver the test runner in the zip like with java_simple.
-        FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
-        FileUtils.cp(TmcJunitRunner.get.jar_path, stub_path + 'lib' + 'testrunner' + 'tmc-junit-runner.jar')
-        FileUtils.cp(TmcJunitRunner.get.lib_paths, stub_path + 'lib' + 'testrunner')
-      end
+      TmcLangs.get.make_stubs(@course.clone_path, @course.stub_path)
     end
 
     # Returns a sorted list of relative pathnames to stub files of the exercise.

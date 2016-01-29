@@ -8,6 +8,8 @@ module SandboxResultsSaver
     ActiveRecord::Base.transaction do
       fail InvalidTokenError.new('Invalid or expired token') if results['token'] != submission.secret_token
 
+      maybe_tranform_results_from_tmc_langs!(results)
+
       submission.all_tests_passed = false
       submission.pretest_error = nil
 
@@ -31,6 +33,8 @@ module SandboxResultsSaver
             "Test preparation error:\n" + results['test_output']
           when '104'
             "Checkstyle runner error:\n" + results['test_output']
+          when '105'
+            'Missing test output. Did you terminate your program with an exit() command?'
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
@@ -58,6 +62,56 @@ module SandboxResultsSaver
 
   private
 
+  def self.maybe_tranform_results_from_tmc_langs!(results)
+    # extract data from this -- it's JSON man
+    if results.has_key? 'test_output'
+      begin
+        test_output = JSON.parse results["test_output"]
+      rescue JSON::ParserError
+        return
+      end
+      return if test_output.is_a?(Array) # No need to parse as the data doesn't seem to be from langs.
+      if test_output.has_key? 'logs'
+        results['stdout'] = ''
+        results['stderr'] = ''
+        results['stdout'] = test_output['logs']['stdout'].pack('c*') if test_output['logs'].has_key? 'stdout'
+        results['stderr'] = test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
+        test_output['stdout'] = results['stdout']
+        test_output['stderr'] = results['stderr']
+        results['test_output'] = test_output.to_json
+      end
+      case test_output['status']
+      when 'COMPILE_FAILED'
+        results['status'] = 'failed'
+        results['exit_code'] = '101'
+      when 'TESTS_FAILED', 'PASSED'
+        output = test_output['testResults'].map do |result|
+          result['className'], result['methodName'] = result['name'].split(/\s/)
+          result['message'] = result['errorMessage']
+          result['backtrace'] = result['backtrace'].join("\n") if result.has_key? 'backtrace'
+          result['pointNames'] = result['points'] if result.has_key? 'points'
+          result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
+          result
+        end
+        if test_output.has_key? 'logs'
+          results['stdout'] = test_output['logs']['stdout'].pack('c*') if test_output['logs'].has_key? 'stdout'
+          results['stderr'] = test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
+        end
+
+        results['old_test_output'] = results['test_output']
+        results['test_output'] = output
+      when 'TESTRUN_INTERRUPTED'
+        results['status'] = 'failed'
+        results['exit_code'] = '105'
+      else
+        raise "Unknown result type: #{test_output}"
+      end
+
+    else
+      raise "Missing key 'test_output': #{test_output}"
+    end
+  end
+
   def self.decode_test_output(test_output, stderr)
     likely_out_of_memory = stderr.include?('java.lang.OutOfMemoryError')
 
@@ -70,7 +124,11 @@ module SandboxResultsSaver
     end
 
     begin
-      result = ActiveSupport::JSON.decode(test_output)
+      result = if test_output.is_a?(Enumerable)
+                 test_output
+               else
+                 ActiveSupport::JSON.decode(test_output)
+               end
       fail unless result.is_a?(Enumerable)
       result
     rescue

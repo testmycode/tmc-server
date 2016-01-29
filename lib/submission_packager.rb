@@ -4,7 +4,6 @@ require 'pathname'
 require 'safe_unzipper'
 require 'shellwords'
 require 'system_commands'
-require 'tmc_junit_runner'
 require 'tmc_dir_utils'
 require 'submission_packager/java_simple'
 require 'submission_packager/java_maven'
@@ -53,9 +52,9 @@ class SubmissionPackager
         extra_params['runtime_params'] = exercise.runtime_params_array
         write_extra_params(dest + '.tmcparams', extra_params)
 
-        if config[:include_ide_files]
+        #if config[:include_ide_files]
           copy_ide_files(Pathname(exercise.clone_path), received, dest)
-        end
+        #end
 
         # To get hidden tests etc, gsub stub with clone path...
         if config[:tests_from_stub]
@@ -142,7 +141,10 @@ class SubmissionPackager
     end
   end
 
+  # and tmc-langs
   def copy_and_chmod_tmcrun(dest)
+    FileUtils.cp(TmcLangs.get.jar_path, dest + 'tmc-langs.jar')
+
     FileUtils.cp(tmc_run_path, dest + 'tmc-run')
     sh! ['chmod', 'a+x', dest + 'tmc-run']
   end

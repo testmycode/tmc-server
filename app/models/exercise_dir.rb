@@ -1,6 +1,7 @@
 require 'pathname'
 require 'exercise_dir/java_simple'
 require 'exercise_dir/java_maven'
+require 'exercise_dir/langs'
 require 'exercise_dir/makefile_c'
 
 # Holds the path to and metadata about an exercise directory.
@@ -49,43 +50,19 @@ class ExerciseDir
 
   def self.find_exercise_dirs(path)
     path = Pathname(path)
-
-    result = []
-
-    path.find do |subpath|
-      Find.prune if !subpath.directory? || irrelevant_directory?(subpath)
-
-      cls = exercise_type_impl(subpath)
-      unless cls.nil?
-        if subpath.basename.to_s.include?('-')
-          fail "Exercise directory #{subpath.basename} has a dash (-), which is not allowed"
-        end
-
-        result << cls.new(subpath)
-      end
-    end
-
-    result
+    TmcLangs.get.find_exercise_dirs(path).map {|dir| ExerciseDir.get(dir) }
   end
 
   private
 
-  def self.irrelevant_directory?(path)
-    path.directory? && (
-      path.children.map(&:basename).map(&:to_s).include?('.tmcignore') ||
-      path.basename.to_s.start_with?('.')
-    )
-  end
-
+  # For now langs packages only java simple and any new formats. -jamo 5/1/2016
   def self.exercise_type_impl(path)
     if (path + 'pom.xml').exist?
       JavaMaven
     elsif (path + 'Makefile').exist? && (path + 'test/').exist?
       MakefileC
-    elsif (path + 'src/').exist? && (path + 'test/').exist?
-      JavaSimple
     else
-      nil
+      Langs
     end
   end
 end
