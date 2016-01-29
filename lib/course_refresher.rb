@@ -287,7 +287,12 @@ class CourseRefresher
         point_names = Set.new
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
 
-        point_names += test_case_methods(exercise).map { |x| x[:points] }.flatten
+        points_data = test_case_methods(exercise)
+        if tmp[0].is_a? Hash
+          point_names += points_data.map { |x| x[:points] }.flatten
+        else
+          point_names += points_data.flatten
+	end
 
         point_names += review_points
 
