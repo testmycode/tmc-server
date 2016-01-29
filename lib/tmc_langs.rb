@@ -34,6 +34,7 @@ class TmcLangs < MavenProject
 
   def scan_exercise(path)
     temp_file = ::Tempfile.new('langs')
+    clean(path)
     exec("scan-exercise", path, temp_file.path)
     clean(path)
     JSON.parse(File.read(temp_file))
@@ -63,6 +64,8 @@ class TmcLangs < MavenProject
 
   private
   def exec(cmd, exercise_path, output_path)
-    SystemCommands.sh!('java', '-jar', jar_path, cmd, '--exercisePath', exercise_path, '--outputPath', output_path)
+    res = SystemCommands.sh!('java', '-jar', jar_path, cmd, '--exercisePath', exercise_path, '--outputPath', output_path)
+    Rails.logger.debug(res)
+    res
   end
 end
