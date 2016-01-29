@@ -23,9 +23,6 @@ module TmcServer
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    ActiveRecord::SessionStore::Session.table_name = 'cookie_sessions'
-
-
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password, :api_password, :submission_file, :return_file]
 
