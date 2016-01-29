@@ -1,3 +1,7 @@
+## 2016-01-29
+
+* Started using [tmc-langs](https://github.com/testmycode/tmc-langs) for processing exercises. NOTE: for maven projects this requires installation of maven3 and having $M3_HOME set properly.
+
 ## 2015-06-06
 
 * Added support for students to generate certificates for accomplished courses. Note, this requires installation of
