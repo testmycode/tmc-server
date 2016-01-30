@@ -75,8 +75,8 @@ module SandboxResultsSaver
       if test_output.has_key? 'logs'
         results['stdout'] = ''
         results['stderr'] = ''
-        results['stdout'] = test_output['logs']['stdout'].pack('c*') if test_output['logs'].has_key? 'stdout'
-        results['stderr'] = test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
+        results['stdout'] = test_output['logs']['stdout'].pack('c*').force_encoding('utf-8') if test_output['logs'].has_key? 'stdout'
+        results['stderr'] = test_output['logs']['stderr'].pack('c*').force_encoding('utf-8') if test_output['logs'].has_key? 'stderr'
         test_output['stdout'] = results['stdout']
         test_output['stderr'] = results['stderr']
         results['test_output'] = test_output.to_json
