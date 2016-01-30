@@ -100,7 +100,7 @@ module SandboxResultsSaver
         end
 
         results['old_test_output'] = results['test_output']
-        results['test_output'] = output
+        results['test_output'] = output.empty? ? '[]' : output # To allow tests to have no tests.
       when 'TESTRUN_INTERRUPTED'
         results['status'] = 'failed'
         results['exit_code'] = '105'
