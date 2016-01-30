@@ -140,7 +140,7 @@ class User < ActiveRecord::Base
   end
 
   def assistant?(course)
-    assisted_courses.exists?(course)
+    assisted_courses.exists?(course.id)
   end
 
   # TODO: this might need optimizing for minimizing sql queries made

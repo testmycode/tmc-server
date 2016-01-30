@@ -322,7 +322,7 @@ class Course < ActiveRecord::Base
   def submissions_to_review
     submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
   end
-  
+
   def certificate_downloadable_for?(user)
     user.administrator? || (
       !user.guest? &&
@@ -389,7 +389,7 @@ class Course < ActiveRecord::Base
   end
 
   def assistant?(user)
-    assistants.exists?(user)
+    assistants.exists?(user.id)
   end
 
   def contains_unlock_deadlines?
