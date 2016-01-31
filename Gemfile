@@ -42,7 +42,7 @@ group :development, :test do
   gem 'pry'
   gem 'pry-rails'
   gem 'pry-byebug'
-  gem 'knapsack', require: false
+  gem 'brakeman'
   gem 'bundler-audit'
 
   gem 'database_cleaner', '~> 1.5.0'

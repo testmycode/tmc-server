@@ -5,9 +5,11 @@ group: legacy
 
 env:
   matrix:
-    - RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
-    - RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
-    - RSPEC_PATTERN="spec/integration/*.rb"
+    - CI_NODE=1 RSPEC=1 RSPEC_PATTERN="spec/{controllers,features,helpers,lib,mailers,models,usermanual}/**/*.rb"
+    - CI_NODE=2 RSPEC=1 RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
+    - CI_NODE=3 RSPEC=1 RSPEC_PATTERN="spec/integration/*.rb"
+    - CI_NODE=4 BREAKMAN=1
+    - CI_NODE=5 AUDIT=1
   global:
     secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
 
@@ -40,8 +42,10 @@ before_script:
   - bundle exec rake db:reset
 
 script:
-  - ./ext/tmc-sandbox/web/webapp.rb start
-  - bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
+  - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb start ;fi
+  - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001 ; fi
+  - if [ ! -z "$BREAKMAN" ]; then bundle exec brakeman ; fi
+  - if [ ! -z "$AUDIT" ]; then bundle exec bundle-audit update && bundle exec bundle-audit check ; fi
 
 after_success:
   - ./.travis-update-usermanual.sh
