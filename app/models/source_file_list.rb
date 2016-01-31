@@ -132,6 +132,7 @@ class SourceFileList
       name.end_with?('.hpp') ||
       name.end_with?('.h') ||
       name.end_with?('.rb') ||
+      (dir.include?('/src') && name.end_with?('.py')) ||
       dir.include?('/WEB-INF')
   end
 
