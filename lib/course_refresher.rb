@@ -225,7 +225,7 @@ class CourseRefresher
       removed_exercises = @course.exercises.reject { |e| exercise_names.include?(e.name) }
       removed_exercises.each do |e|
         @report.notices << "Removed exercise #{e.name}"
-        @course.exercises.delete(e)
+        @course.exercises.destroy(e)
         e.destroy
       end
     end
@@ -311,7 +311,7 @@ class CourseRefresher
           if point_names.none? { |name| name == point.name }
             removed << point.name
             point.destroy
-            exercise.available_points.delete(point)
+            exercise.available_points.destroy(point)
           else
             point.requires_review = review_points.include?(point.name)
             point.save!
