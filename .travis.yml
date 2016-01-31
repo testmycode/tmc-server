@@ -11,7 +11,13 @@ env:
     - CI_NODE=4 BREAKMAN=1
     - CI_NODE=5 AUDIT=1
   global:
-    secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
+    - MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
+    - CHECK_INSTALL_DIR=$HOME/check
+    - LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
+    - C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH
+    - PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+    - PATH="$CHECK_INSTALL_DIR/bin:$PATH"
+    #secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
 
 language: ruby
 rvm:
@@ -29,7 +35,7 @@ addons:
       - gcc
 
 before_install:
-  - . ./setup-travis.sh
+  - ./setup-travis.sh
 
 install:
   - bundle install --retry=3 --jobs=3 --deployment

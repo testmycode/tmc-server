@@ -7,8 +7,6 @@ set -ev
 
 # Unset bundle Gemfile, since we have multiple projects with separate Gemfiles and it will just cause confusion
 unset BUNDLE_GEMFILE
-# Reduce mavens memory usage
-export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
 
 # Update bundler
 gem update --system
@@ -34,21 +32,12 @@ then
   bundle install --jobs=3 --retry=3 --deployment
   make
   make install PREFIX=$CHECK_INSTALL_DIR
-  export PATH="$CHECK_INSTALL_DIR/bin:$PATH"
   cd ..
-  export LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
-  export C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH
-  export PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-fi
 
+  # Build submodules except sandbox
+  bundle exec rake compile
 
-# Build submodules except sandbox
-bundle exec rake compile
-
-
-if [ ! -z "$RSPEC" ]
-then
-# Use pre built tmc-sandbox
+  # Use pre built tmc-sandbox
   wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
   cd ext/tmc-sandbox/web
   # Set current user and reduce max instances, though only one instance will be used at any given time
