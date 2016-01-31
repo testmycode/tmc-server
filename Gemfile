@@ -9,7 +9,7 @@ gem 'rake'
 gem 'google-spreadsheet-ruby'
 gem 'pg', '~> 0.18.0'
 gem 'cancancan', '~> 1.13.0'
-gem 'rest-client', '~> 1.6.7'
+gem 'rest-client', '~> 1.8.0'
 gem 'daemons', '~> 1.2.3'
 gem 'natcmp', '~> 1.4'
 gem 'xml-simple', '~> 1.1.1'
@@ -39,6 +39,12 @@ group :development, :test do
   gem 'capybara', '~> 2.5.0'
   gem 'poltergeist', '~> 1.7.0'
   #gem 'selenium-webdriver', '~> 2.44.0'
+  gem 'pry'
+  gem 'pry-rails'
+  gem 'pry-byebug'
+  gem 'knapsack', require: false
+  gem 'bundler-audit'
+
   gem 'database_cleaner', '~> 1.5.0'
   gem 'mimic', '~> 0.4.3'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
