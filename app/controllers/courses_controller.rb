@@ -23,10 +23,11 @@ class CoursesController < ApplicationController
         courses = courses.select { |c| c.visible_to?(current_user) }
         authorize! :read, courses
         return respond_access_denied('Authentication required') if current_user.guest?
+        opts = {include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions]}
 
         data = {
           api_version: ApiVersion::API_VERSION,
-          courses: CourseList.new(current_user, view_context).course_list_data(@organization, courses)
+          courses: CourseList.new(current_user, view_context).course_list_data(@organization, courses, opts)
         }
         render json: data.to_json
       end
@@ -49,9 +50,10 @@ class CoursesController < ApplicationController
       end
       format.json do
         return respond_access_denied('Authentication required') if current_user.guest?
+        opts = {include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions]}
         data = {
           api_version: ApiVersion::API_VERSION,
-          course: CourseInfo.new(current_user, view_context).course_data(@organization, @course)
+          course: CourseInfo.new(current_user, view_context).course_data(@organization, @course, opts)
         }
         render json: data.to_json
       end
