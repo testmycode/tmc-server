@@ -17,7 +17,9 @@ env:
     - C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH
     - PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
     - PATH="$CHECK_INSTALL_DIR/bin:$PATH"
-    #secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
+    - SANDBOX_HOST=127.0.0.1
+    - SANDBOX_PORT=3001
+    - secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
 
 language: ruby
 rvm:
@@ -48,8 +50,8 @@ before_script:
   - bundle exec rake db:reset
 
 script:
-  - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb start ;fi
-  - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001 ; fi
+  - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb start && sleep 10 && curl 127.0.0.1:3001 ;fi
+  - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d"; fi
   - if [ ! -z "$BREAKMAN" ]; then bundle exec brakeman ; fi
   - if [ ! -z "$AUDIT" ]; then bundle exec bundle-audit update && bundle exec bundle-audit check ; fi
 
