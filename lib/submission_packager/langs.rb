@@ -25,7 +25,7 @@ class SubmissionPackager
     end
 
     def copy_libs(cloned, dest)
-      FileUtils.cp_r(cloned + 'lib', dest + 'lib')
+      FileUtils.cp_r(cloned + 'lib', dest + 'lib') if File.exists?(cloned + 'lib')
     end
 
     def tmc_run_path
