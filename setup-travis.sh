@@ -51,7 +51,3 @@ then
   rake ext
   cd ../../../
 fi
-git clone https://github.com/testmycode/tmc-langs.git $HOME/tmc-langs
-cd $HOME/tmc-langs
-mvn package -Dmaven.test.skip=true
-cd -
