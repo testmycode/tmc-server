@@ -50,7 +50,7 @@ before_script:
   - bundle exec rake db:reset
 
 script:
-  - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb start && sleep 10 && curl 127.0.0.1:3001 ;fi
+  - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb run && sleep 10 && curl 127.0.0.1:3001 ;fi
   - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d"; fi
   - if [ ! -z "$BREAKMAN" ]; then bundle exec brakeman ; fi
   - if [ ! -z "$AUDIT" ]; then bundle exec bundle-audit update && bundle exec bundle-audit check ; fi
