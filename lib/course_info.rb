@@ -65,6 +65,7 @@ class CourseInfo
     data[:latest_submission_id] = last_submission.id unless last_submission.nil?
     data[:points]
 
+    data
   end
 
   private
