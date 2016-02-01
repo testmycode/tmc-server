@@ -342,22 +342,22 @@ ActiveRecord::Schema.define(version: 20151126104102) do
 
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
 
-  add_foreign_key "action_tokens", "users"
-  add_foreign_key "available_points", "exercises"
-  add_foreign_key "awarded_points", "courses"
-  add_foreign_key "awarded_points", "submissions"
-  add_foreign_key "awarded_points", "users"
+  add_foreign_key "action_tokens", "users", on_delete: :cascade
+  add_foreign_key "available_points", "exercises", on_delete: :cascade
+  add_foreign_key "awarded_points", "courses", on_delete: :cascade
+  add_foreign_key "awarded_points", "submissions", on_delete: :nullify
+  add_foreign_key "awarded_points", "users", on_delete: :cascade
   add_foreign_key "courses", "organizations"
-  add_foreign_key "exercises", "courses"
-  add_foreign_key "feedback_answers", "feedback_questions"
-  add_foreign_key "feedback_answers", "submissions"
-  add_foreign_key "feedback_questions", "courses"
-  add_foreign_key "reviews", "submissions"
+  add_foreign_key "exercises", "courses", on_delete: :cascade
+  add_foreign_key "feedback_answers", "feedback_questions", on_delete: :cascade
+  add_foreign_key "feedback_answers", "submissions", on_delete: :nullify
+  add_foreign_key "feedback_questions", "courses", on_delete: :cascade
+  add_foreign_key "reviews", "submissions", on_delete: :cascade
   add_foreign_key "reviews", "users", column: "reviewer_id"
-  add_foreign_key "submission_data", "submissions"
-  add_foreign_key "submissions", "courses"
-  add_foreign_key "submissions", "users"
-  add_foreign_key "test_case_runs", "submissions"
-  add_foreign_key "test_scanner_cache_entries", "courses"
-  add_foreign_key "user_field_values", "users"
+  add_foreign_key "submission_data", "submissions", on_delete: :cascade
+  add_foreign_key "submissions", "courses", on_delete: :cascade
+  add_foreign_key "submissions", "users", on_delete: :cascade
+  add_foreign_key "test_case_runs", "submissions", on_delete: :cascade
+  add_foreign_key "test_scanner_cache_entries", "courses", on_delete: :cascade
+  add_foreign_key "user_field_values", "users", on_delete: :cascade
 end

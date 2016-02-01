@@ -9,7 +9,7 @@ class AddCourseRegistrations < ActiveRecord::Migration
     end
 
     add_index :course_registrations, [:course_id, :user_id], unique: true
-    add_foreign_key :course_registrations, :courses, dependent: :delete
-    add_foreign_key :course_registrations, :users, dependent: :delete
+    add_foreign_key :course_registrations, :courses, on_delete: :cascade
+    add_foreign_key :course_registrations, :users, on_delete: :cascade
   end
 end

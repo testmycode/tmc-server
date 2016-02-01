@@ -1,24 +1,24 @@
 class AddForeignKeyConstraints < ActiveRecord::Migration
   def change
-    add_foreign_key "exercises", "courses", dependent: :delete
-    add_foreign_key "submissions", "courses", dependent: :delete
-    add_foreign_key "awarded_points", "courses", dependent: :delete
-    add_foreign_key "test_scanner_cache_entries", "courses", dependent: :delete
-    add_foreign_key "feedback_questions", "courses", dependent: :delete
-    add_foreign_key "student_events", "courses", dependent: :delete
+    add_foreign_key "exercises", "courses", on_delete: :cascade
+    add_foreign_key "submissions", "courses", on_delete: :cascade
+    add_foreign_key "awarded_points", "courses", on_delete: :cascade
+    add_foreign_key "test_scanner_cache_entries", "courses", on_delete: :cascade
+    add_foreign_key "feedback_questions", "courses", on_delete: :cascade
+    add_foreign_key "student_events", "courses", on_delete: :cascade
 
-    add_foreign_key "available_points", "exercises", dependent: :delete
+    add_foreign_key "available_points", "exercises", on_delete: :cascade
 
-    add_foreign_key "feedback_answers", "feedback_questions", dependent: :delete
+    add_foreign_key "feedback_answers", "feedback_questions", on_delete: :cascade
 
-    add_foreign_key "submissions", "users", dependent: :delete
-    add_foreign_key "awarded_points", "users", dependent: :delete
-    add_foreign_key "password_reset_keys", "users", dependent: :delete
-    add_foreign_key "user_field_values", "users", dependent: :delete
-    add_foreign_key "student_events", "users", dependent: :delete
+    add_foreign_key "submissions", "users", on_delete: :cascade
+    add_foreign_key "awarded_points", "users", on_delete: :cascade
+    add_foreign_key "password_reset_keys", "users", on_delete: :cascade
+    add_foreign_key "user_field_values", "users", on_delete: :cascade
+    add_foreign_key "student_events", "users", on_delete: :cascade
 
-    add_foreign_key "test_case_runs", "submissions", dependent: :delete
-    add_foreign_key "awarded_points", "submissions", dependent: :nullify
-    add_foreign_key "feedback_answers", "submissions", dependent: :nullify
+    add_foreign_key "test_case_runs", "submissions", on_delete: :cascade
+    add_foreign_key "awarded_points", "submissions", on_delete: :nullify
+    add_foreign_key "feedback_answers", "submissions", on_delete: :nullify
   end
 end

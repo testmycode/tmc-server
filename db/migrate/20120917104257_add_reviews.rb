@@ -10,7 +10,7 @@ class AddReviews < ActiveRecord::Migration
     end
     add_index :reviews, [:submission_id]
     add_index :reviews, [:reviewer_id]
-    add_foreign_key :reviews, :submissions, dependent: :delete
+    add_foreign_key :reviews, :submissions, on_delete: :cascade
     add_foreign_key :reviews, :users, column: 'reviewer_id', dependent: :nullify
   end
 end

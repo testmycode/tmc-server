@@ -7,7 +7,7 @@ class AddSubmissionDataTable < ActiveRecord::Migration
       t.binary :stderr_compressed
     end
     execute 'ALTER TABLE submission_data ADD PRIMARY KEY (submission_id)'
-    add_foreign_key :submission_data, :submissions, dependent: :delete
+    add_foreign_key :submission_data, :submissions, on_delete: :cascade
     execute <<EOS
       INSERT INTO submission_data (submission_id, return_file, stdout_compressed, stderr_compressed)
       SELECT id, return_file, stdout_compressed, stderr_compressed FROM submissions
