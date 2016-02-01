@@ -46,6 +46,7 @@ class SubmissionsController < ApplicationController
           api_version: ApiVersion::API_VERSION,
           all_tests_passed: @submission.all_tests_passed?,
           user_id: @submission.user_id,
+          login: @submission.user.login,
           course: @course.name,
           exercise_name: @submission.exercise.name,
           status: @submission.status(current_user),
@@ -88,6 +89,9 @@ class SubmissionsController < ApplicationController
             }
           end
         )
+        if !!params[:include_files]
+          output[:files] = SourceFileList.for_submission(@submission).map{ |f| {path: f.path ,contents: f.contents} }
+        end
 
         render json: output
       end
@@ -270,7 +274,7 @@ class SubmissionsController < ApplicationController
     when 'protected'
       respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
     when 'no-tests-public'
-      respond_access_denied unless can?(:teach, @course) ||  @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s 
+      respond_access_denied unless can?(:teach, @course) ||  @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
     else
       respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
     end
