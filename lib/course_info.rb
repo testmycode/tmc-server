@@ -7,7 +7,7 @@ class CourseInfo
     @course_list = CourseList.new(user, helpers)
   end
 
-  def course_data(organization, course)
+  def course_data(organization, course, opts = {})
     exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
 
     @unlocked_exercises = course.unlocks
@@ -24,7 +24,7 @@ class CourseInfo
       ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
     end
 
-    @course_list.course_data(organization, course).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
+    @course_list.course_data(organization, course, opts).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
                                                          exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
   end
 
@@ -63,11 +63,19 @@ class CourseInfo
     last_submission = get_latest_submission(exercise)
     data[:latest_submission_url] = @helpers.submission_url(last_submission, format: 'zip') unless last_submission.nil?
     data[:latest_submission_id] = last_submission.id unless last_submission.nil?
+    data[:points]
 
-    data
   end
 
   private
+
+  def exercises
+    @exercises ||= course.exercises.select { |e| e.points_visible_to?(@user) }
+  end
+
+  def sheets
+    @sheets ||= course.gdocs_sheets(exercises).natsort
+  end
 
   def exercise_return_url(e)
     "#{@helpers.exercise_submissions_url(e, format: 'json')}"
