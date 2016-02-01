@@ -22,32 +22,29 @@ git submodule update --init --recursive
 git config --global user.email "travis@example.com"
 git config --global user.name "Travis"
 
-if [ ! -z "$RSPEC" ]
-then
-  # Install tmc-check
-  export CHECK_INSTALL_DIR=$HOME/check
-  mkdir $CHECK_INSTALL_DIR
-  git clone https://github.com/testmycode/tmc-check.git
-  cd tmc-check
-  bundle install --jobs=3 --retry=3 --deployment
-  make
-  make install PREFIX=$CHECK_INSTALL_DIR
-  cd ..
+# Install tmc-check
+export CHECK_INSTALL_DIR=$HOME/check
+mkdir $CHECK_INSTALL_DIR
+git clone https://github.com/testmycode/tmc-check.git
+cd tmc-check
+bundle install --jobs=3 --retry=3 --deployment
+make
+make install PREFIX=$CHECK_INSTALL_DIR
+cd ..
 
-  # Build submodules except sandbox
-  bundle exec rake compile
+# Build submodules except sandbox
+bundle exec rake compile
 
-  # Use pre built tmc-sandbox
-  wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
-  cd ext/tmc-sandbox/web
-  # Set current user and reduce max instances, though only one instance will be used at any given time
-  sed -i "s/\(tmc_user: \)tmc/\1 $(whoami)/" site.defaults.yml
-  sed -i "s/\(tmc_group: \)tmc/\1 $(whoami)/" site.defaults.yml
-  sed -i 's/\(max_instances: \)[0-9]*/\12/' site.defaults.yml
-  # Disable network
-  sed -i '/^network:$/{$!{N;s/^\(network:\)\n\(  enabled: \)true$/\1\n\2false/;ty;P;D;:y}}' site.defaults.yml
-  cat site.defaults.yml
-  bundle install --retry=3 --jobs=3
-  rake ext
-  cd ../../../
-fi
+# Use pre built tmc-sandbox
+wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
+cd ext/tmc-sandbox/web
+# Set current user and reduce max instances, though only one instance will be used at any given time
+sed -i "s/\(tmc_user: \)tmc/\1 $(whoami)/" site.defaults.yml
+sed -i "s/\(tmc_group: \)tmc/\1 $(whoami)/" site.defaults.yml
+sed -i 's/\(max_instances: \)[0-9]*/\12/' site.defaults.yml
+# Disable network
+sed -i '/^network:$/{$!{N;s/^\(network:\)\n\(  enabled: \)true$/\1\n\2false/;ty;P;D;:y}}' site.defaults.yml
+cat site.defaults.yml
+bundle install --retry=3 --jobs=3
+rake ext
+cd ../../../
