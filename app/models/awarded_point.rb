@@ -118,5 +118,7 @@ class AwardedPoint < ActiveRecord::Base
       .where(awarded_points[:user_id].eq(users[:id]))
       .where(exercises[:course_id].eq(course.id))
       .where(exercises[:gdocs_sheet].eq(sheetname))
+      .where(submissions[:course_id].eq(course.id))
+      .where(submissions[:user_id].eq(users[:id]))
   end
 end
