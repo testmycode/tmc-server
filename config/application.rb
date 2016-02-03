@@ -33,13 +33,15 @@ module TmcServer
 
     config.relative_url_root = SiteSetting.value('base_path')
 
-    config.middleware.use Rack::Cors do
+    config.middleware.insert_before 0, "Rack::Cors", :debug => true, :logger => (-> { Rails.logger }) do
       allow do
         origins SiteSetting.all_settings['cors_origins']
         resource '/auth*', headers: :any, methods: [:get, :post]
+        resource '/courses', headers: :any, methods: [:get]
         resource '/courses/*', headers: :any, methods: [:get]
         resource '/courses/*/points*', headers: :any, methods: [:get]
         resource '/exercises/*', headers: :any, methods: [:get]
+        resource '/org/*/courses.json', headers: :any, methods: [:get]
         resource '/org/*/courses/*', headers: :any, methods: [:get]
         resource '/org/*/courses/*/points*', headers: :any, methods: [:get]
         resource '/courses/*/exercise_status/*', headers: :any, methods: [:get]
