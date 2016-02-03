@@ -59,15 +59,15 @@ class ApplicationController < ActionController::Base
 
   def check_api_version
     if should_check_api_version?
-      if params[:api_version].blank?
+      if client_api_version.blank?
         return respond_with_error('Please update the TMC client. No API version received from client.', 404, nil, obsolete_client: true)
-      elsif params[:api_version].to_s != ApiVersion::API_VERSION.to_s
-        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, nil, obsolete_client: true)
+      elsif client_api_version.to_s != ApiVersion::API_VERSION.to_s
+        return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{client_api_version}", 404, nil, obsolete_client: true)
       end
 
-      unless params[:client].blank? # Client and client version checks are optional
+      unless client_name.blank? # Client and client version checks are optional
         begin
-          check_client_version(params[:client], params[:client_version])
+          check_client_version(client_name, client_version)
         rescue
           return respond_with_error($!.message, 404, nil, obsolete_client: true)
         end
@@ -145,13 +145,13 @@ class ApplicationController < ActionController::Base
 
   # To support older versions of tmc-netbeans-plugin
   def client_supports_http_basic_auth?
-    return true if params[:client].blank?
-    client = params[:client]
-    client_version = begin
-      Version.new(params['client_version']) unless params['client_version'].blank?
+    return true if client_name.blank?
+    client = client_name
+    version = begin
+      Version.new(client_version) unless client_version.blank?
     rescue
     end
-    !(client == 'netbeans_plugin' && client_version < Version.new('0.8.0'))
+    !(client == 'netbeans_plugin' && version < Version.new('0.8.0'))
   end
 
   def select_layout
@@ -202,5 +202,29 @@ class ApplicationController < ActionController::Base
     render_options.delete(:filename)
 
     render render_options
+  end
+
+  def client_api_version
+     @client_api_version ||= get_header_or_param(:api_version)
+  end
+
+  def client_name
+    @client_name ||= get_header_or_param(:client_name, :client)
+  end
+
+  def client_version
+    @client_version ||= get_header_or_param(:client_version)
+  end
+
+  def get_header_or_params(name, *rest)
+    get_header_or_param(params[name], headerify(item)) || get_header_or_param(rest.map{|item| [params[item], headerify(item)] })
+  end
+
+  def headerify(name)
+    headers["X-Tmc-#{name.to_s.titleize.gsub(/\s+/, '-')}"]
+  end
+
+  def get_header_or_params(*values)
+    values.find {|v| !v.blank?}
   end
 end
