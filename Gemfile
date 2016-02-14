@@ -27,6 +27,7 @@ gem 'readthis' # Redis for caching
 gem 'hiredis' # Redis for caching
 
 gem 'gravtastic', '~> 3.2.6'
+gem 'doorkeeper'
 
 gem 'logstasher', '~> 0.9.0'
 

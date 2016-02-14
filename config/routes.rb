@@ -1,4 +1,21 @@
 TmcServer::Application.routes.draw do
+  use_doorkeeper
+
+
+  namespace :api, :constraints => { :format => /(html|json|js|)/ } do
+    namespace :beta, defaults: { format: 'json' } do
+      get '/demo', to: 'demo#index'
+      resources :participant, only: [] do
+        member do
+          get 'courses'
+        end
+        collection do
+          get 'courses'
+        end
+      end
+    end
+  end
+
   resources :organizations, except: :destory, path: 'org' do
 
     resources :exercises, only: [:show] do
