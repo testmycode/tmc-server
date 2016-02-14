@@ -5,8 +5,8 @@ class CourseList
     @helpers = helpers
   end
 
-  def course_list_data(organization, courses, opts={})
-    courses.map { |c| course_data(organization, c, opts) }
+  def course_list_data_no_organisation(courses, opts = {})
+    courses.map { |c| course_data(c.organization, c, opts) }
   end
 
   def course_data(organization, course, opts={})
@@ -14,6 +14,7 @@ class CourseList
     data = {
       id: course.id,
       name: course.name,
+      title: course.title,
       details_url: @helpers.organization_course_url(organization, course, format: :json),
       unlock_url: @helpers.organization_course_unlock_url(organization, course, format: :json),
       reviews_url: @helpers.organization_course_reviews_url(organization, course, format: :json),

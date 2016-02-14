@@ -4,8 +4,14 @@ class Api::Beta::ParticipantController < Api::Beta::BaseController
 
   def courses
     user = User.where(id: params[:id]).first || current_user
-    courses = user.courses
-    present(courses)
+#    authorize! :read user
+    courses = user.courses_with_submissions
+    list = CourseList.new(current_user, view_context).course_list_data_no_organisation(Course.find(user.course_ids))
+    list.each do |course|
+      course[:exercises] = courses[course[:id]]
+    end
+
+    present(list)
   end
 
 end

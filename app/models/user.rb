@@ -195,6 +195,78 @@ class User < ActiveRecord::Base
     Assistantship.find_by(user_id: self, course_id: course)
   end
 
+  def courses_with_submissions
+    exercises = Exercise.arel_table
+    submissions = Submission.arel_table
+    sql =
+    query = submissions_exercises_and_points_for_user
+    without_disabled(query)
+    query
+      .project(exercises[:course_id], exercises[:name], exercises[:id], submissions[:id].count, Arel::Nodes::SqlLiteral.new('bool_or(submissions.all_tests_passed)').as('all_tests_passed'), Arel::Nodes::SqlLiteral.new('ARRAY_AGG(DISTINCT available_points.name order by available_points.name) = ARRAY_AGG(DISTINCT awarded_points.name order by awarded_points.name)').as('got_all_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT available_points.name, ' ' order by available_points.name)").as('available_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT awarded_points.name, ' ' order by awarded_points.name)").as('awarded_points'))
+    sql = query.to_sql
+
+    result = {}
+    ActiveRecord::Base.connection.execute(sql).each do |record|
+      # {"course_id"=>"8", "name"=>"viikkob-B.1.Opiskelijanumero", "count"=>"1", "all_tests_passed"=>"t", "got_all_points"=>"t", "available_points"=>"{B.1}", "awarded_points"=>"{B.1}"}
+      course_id = record['course_id'].to_i
+      result[course_id] ||= []
+      result[course_id] << {
+        exericise_name: record['name'],
+        exericise_id: record['id'].to_i,
+        submissions_count: record['count'].to_i,
+        all_tests_passed: record['all_tests_passed'] == 't',
+        got_all_points: record['got_all_points'] == 't',
+        available_points: record['available_points'].nil? ? nil : record['available_points'].split(' '),
+        awarded_points: record['awarded_points'].nil? ? nil : record['awarded_points'].split(' '),
+      }
+    end
+    result.default = []
+    result
+  end
+
+  def course_ids
+    results = []
+    ActiveRecord::Base.connection.execute(course_ids_arel.to_sql).each do |record|
+      results << record['course_id']
+    end
+    results
+  end
+
+  #private
+
+  def course_ids_arel
+    courses = Course.arel_table
+    submissions = Submission.arel_table
+    submissions.project(submissions[:course_id].as('course_id')).distinct
+      .join(courses).on(submissions[:course_id].eq(courses[:id]))
+      .where(courses[:disabled_status].eq(0))
+      .where(submissions[:user_id].eq(self.id))
+      .order(submissions[:course_id])
+  end
+
+
+  def without_disabled(query)
+    exercises = Exercise.arel_table
+    query.where(exercises[:disabled_status].eq(0))
+    query.where(exercises[:hidden].eq(false))
+  end
+
+  def submissions_exercises_and_points_for_user
+    users = User.arel_table
+    awarded_points = AwardedPoint.arel_table
+    available_points = AvailablePoint.arel_table
+    exercises = Exercise.arel_table
+    submissions = Submission.arel_table
+
+    exercises
+      .join(users, Arel::Nodes::OuterJoin).on(users[:id].eq(self.id))
+      .join(available_points, Arel::Nodes::OuterJoin).on(available_points[:exercise_id].eq(exercises[:id]))
+      .join(submissions, Arel::Nodes::OuterJoin).on(submissions[:exercise_name].eq(exercises[:name]), submissions[:user_id].eq(self.id), submissions[:course_id].eq(exercises[:course_id]))
+      .join(awarded_points, Arel::Nodes::OuterJoin).on(awarded_points[:submission_id].eq(submissions[:id]), awarded_points[:course_id].eq(submissions[:course_id]), awarded_points[:user_id].eq(users[:id]))
+      .where(exercises[:course_id].in(course_ids_arel))
+      .group(exercises[:name], exercises[:course_id], exercises[:id])
+      .order(exercises[:name], exercises[:course_id])
+  end
   private
 
   def encrypt_password
