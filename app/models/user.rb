@@ -232,7 +232,7 @@ class User < ActiveRecord::Base
     results
   end
 
-  #private
+  private
 
   def course_ids_arel
     courses = Course.arel_table
@@ -243,7 +243,6 @@ class User < ActiveRecord::Base
       .where(submissions[:user_id].eq(self.id))
       .order(submissions[:course_id])
   end
-
 
   def without_disabled(query)
     exercises = Exercise.arel_table
@@ -267,7 +266,6 @@ class User < ActiveRecord::Base
       .group(exercises[:name], exercises[:course_id], exercises[:id])
       .order(exercises[:name], exercises[:course_id])
   end
-  private
 
   def encrypt_password
     self.salt = make_salt if new_record?
