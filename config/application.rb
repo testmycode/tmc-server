@@ -36,6 +36,7 @@ module TmcServer
     config.middleware.insert_before 0, "Rack::Cors", :debug => true, :logger => (-> { Rails.logger }) do
       allow do
         origins SiteSetting.all_settings['cors_origins']
+        resource '/oauth*', headers: :any, methods: :any
         resource '/api*', headers: :any, methods: [:get, :post]
         resource '/auth*', headers: :any, methods: [:get, :post]
         resource '/paste/*', headers: :any, methods: [:get]
