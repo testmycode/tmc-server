@@ -211,8 +211,8 @@ class User < ActiveRecord::Base
       course_id = record['course_id'].to_i
       result[course_id] ||= []
       result[course_id] << {
-        exericise_name: record['name'],
-        exericise_id: record['id'].to_i,
+        exercise_name: record['name'],
+        exercise_id: record['id'].to_i,
         submissions_count: record['count'].to_i,
         all_tests_passed: record['all_tests_passed'] == 't',
         got_all_points: record['got_all_points'] == 't',
