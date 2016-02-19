@@ -10,8 +10,21 @@ class AvailablePoint < ActiveRecord::Base
   validates :name, presence: true
   validate :name_must_not_contain_whitespace
 
-  def self.course_points_of_exercises(course, exercises)
-    course_points(course).where(exercise_id: exercises.map(&:id))
+  def self.course_points_of_exercises(course, included_exercises)
+    available_points = AvailablePoint.arel_table
+
+    query = available_points
+      .project(available_points[:name].count.as('count'))
+      .where(available_points[:exercise_id].in(included_exercises.map(&:id)))
+
+
+    res = ActiveRecord::Base.connection.execute(query.to_sql).to_a
+    if res.size > 0
+      res[0]['count'].to_i
+    else
+      Rails.logger.warn("No points found for course: #{course.id}")
+      0
+    end
   end
 
   def self.course_points(course)
@@ -26,7 +39,23 @@ class AvailablePoint < ActiveRecord::Base
       .where(exercises: { course_id: courses.map(&:id) })
   end
 
-  def self.course_sheet_points(course, sheet)
+  def self.course_sheet_points(course, sheetnames)
+    available_points = AvailablePoint.arel_table
+    exercises = Exercise.arel_table
+    query = available_points
+      .project(available_points[:id].count.as('count'), exercises[:gdocs_sheet])
+      .join(exercises).on(exercises[:course_id].eq(course.id), exercises[:gdocs_sheet].in(sheetnames), available_points[:exercise_id].eq(exercises[:id]))
+      .where(exercises[:gdocs_sheet].in(sheetnames))
+      .group(exercises[:gdocs_sheet])
+
+    res = {}
+    ActiveRecord::Base.connection.execute(query.to_sql).each do |record|
+      res[record['gdocs_sheet']] = record['count'].to_i
+    end
+    res
+  end
+
+  def self.course_sheet_points_list(course, sheet)
     joins(:exercise)
       .where(exercises: { course_id: course.id, gdocs_sheet: sheet })
   end
