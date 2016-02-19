@@ -32,7 +32,6 @@ class PointsController < ApplicationController
 
   def show
     @sheetname = params[:id]
-    show_timestamps = !!params[:timestamps]
     @course = Course.find(params[:course_id])
 
     add_course_breadcrumb
@@ -40,7 +39,7 @@ class PointsController < ApplicationController
     add_breadcrumb @sheetname, course_point_path(@course, @sheetname)
 
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).order!
-    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps)
+    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, {show_timestamps: show_timestamps})
 
     @users = User.course_sheet_students(@course, @sheetname)
     if params[:sort_by] == 'points'
@@ -63,13 +62,7 @@ class PointsController < ApplicationController
   end
 
   def summary_hash(course, visible_exercises, sheets)
-    per_user_and_sheet = {}
-    for sheet in sheets
-      AwardedPoint.count_per_user_in_course_with_sheet(course, sheet).each_pair do |username, count|
-        per_user_and_sheet[username] ||= {}
-        per_user_and_sheet[username][sheet] = count
-      end
-    end
+    per_user_and_sheet = AwardedPoint.count_per_user_in_course_with_sheet(course, sheets)
 
     user_totals = {}
     for username, per_sheet in per_user_and_sheet
@@ -81,16 +74,18 @@ class PointsController < ApplicationController
     users = User.select('login, id, administrator').where(login: per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
     users = users.where(administrator: false) unless include_admins
 
+    total_awarded = AwardedPoint.course_sheet_points(course, sheets, include_admins)
+    total_available = AvailablePoint.course_sheet_points(course, sheets)
     {
       sheets: sheets.map do |sheet|
         {
           name: sheet,
-          total_awarded: AwardedPoint.course_sheet_points(course, sheet, include_admins).length,
-          total_available: AvailablePoint.course_sheet_points(course, sheet).length
+          total_awarded: total_awarded[sheet],
+          total_available: total_available[sheet]
         }
       end,
-      total_awarded: AwardedPoint.course_points(course, include_admins).length,
-      total_available: AvailablePoint.course_points_of_exercises(course, visible_exercises).length,
+      total_awarded: AwardedPoint.course_points(course, include_admins),
+      total_available: AvailablePoint.course_points_of_exercises(course, visible_exercises),
       awarded_for_user_and_sheet: per_user_and_sheet,
       total_for_user: user_totals,
       users: users
