@@ -57,19 +57,19 @@ class AwardedPoint < ActiveRecord::Base
   end
 
   # Gets a hash of user to array of point names awarded for exercises of the given sheet
-  def self.per_user_in_course_with_sheet(course, sheetname, include_timestamps = false)
+  def self.per_user_in_course_with_sheet(course, sheetname, opts = {})
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
     submissions = Submission.arel_table
 
-    sql = per_user_in_course_with_sheet_query(course, sheetname)
+    sql = per_user_in_course_with_sheet_query(course, sheetname, opts[:only_for_user])
       .project([users[:login].as('username'), awarded_points[:name].as('name'), submissions[:created_at].as('time')])
       .to_sql
 
     result = {}
     ActiveRecord::Base.connection.execute(sql).each do |record|
       result[record['username']] ||= []
-      if include_timestamps
+      if optsp[:include_timestamps]
         result[record['username']] << {point: record['name'], time: record['time']}
       else
         result[record['username']] << record['name']
@@ -102,7 +102,7 @@ class AwardedPoint < ActiveRecord::Base
     query.joins('INNER JOIN users ON users.id = awarded_points.user_id').where(users: { administrator: false })
   end
 
-  def self.per_user_in_course_with_sheet_query(course, sheetname)
+  def self.per_user_in_course_with_sheet_query(course, sheetname, only_for_user = nil)
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
     available_points = AvailablePoint.arel_table
@@ -114,11 +114,13 @@ class AwardedPoint < ActiveRecord::Base
       .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
       .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]))
       .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
+      .where(awarded_points[:user_id].eq(only_for_user.id))
       .where(awarded_points[:course_id].eq(course.id))
       .where(awarded_points[:user_id].eq(users[:id]))
       .where(exercises[:course_id].eq(course.id))
       .where(exercises[:gdocs_sheet].eq(sheetname))
       .where(submissions[:course_id].eq(course.id))
+      .where(submissions[:user_id].eq(only_for_user.id))
       .where(submissions[:user_id].eq(users[:id]))
   end
 end
