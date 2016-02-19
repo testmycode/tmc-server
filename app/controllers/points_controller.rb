@@ -32,16 +32,15 @@ class PointsController < ApplicationController
 
   def show
     @sheetname = params[:id]
-    @course = Course.find(params[:course_id])
-    only_for_user = User.find_by(login: params[:username])
     show_timestamps = !!params[:timestamps]
+    @course = Course.find(params[:course_id])
 
     add_course_breadcrumb
     add_breadcrumb 'Points', course_points_path(@course)
     add_breadcrumb @sheetname, course_point_path(@course, @sheetname)
 
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).order!
-    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, {show_timestamps: show_timestamps, only_for_user: only_for_user})
+    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps)
 
     @users = User.course_sheet_students(@course, @sheetname)
     if params[:sort_by] == 'points'
