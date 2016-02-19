@@ -22,6 +22,8 @@ gem 'activerecord-session_store', '~> 0.1.0'
 gem 'pdfkit', '~> 0.8.2'
 gem "paperclip", "~> 4.3"
 
+gem 'dalli'
+
 gem 'pghero'
 
 group :assets do
