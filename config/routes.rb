@@ -13,6 +13,12 @@ TmcServer::Application.routes.draw do
           get 'courses'
         end
       end
+      resources :stats, only: [] do
+        collection do
+          get 'submission_queue_times'
+          get 'submission_processing_times'
+        end
+      end
     end
   end
 
