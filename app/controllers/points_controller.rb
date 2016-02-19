@@ -10,10 +10,14 @@ class PointsController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Points'
 
-    exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
+    exercises = @course.exercises.where(exercises: {hidden: false})
+    #exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
     sheets = @course.gdocs_sheets(exercises).natsort
     @summary = summary_hash(@course, exercises, sheets)
     sort_summary(@summary, params[:sort_by]) if params[:sort_by]
+
+    expires_in 1.minutes, :public => true
+
 
     respond_to do |format|
       format.html
