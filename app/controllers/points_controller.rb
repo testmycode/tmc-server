@@ -9,11 +9,14 @@ class PointsController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Points', course_points_path(@course)
 
-    exercises = @course.exercises.where(exercises: {hidden: false})
-    #exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
-    sheets = @course.gdocs_sheets(exercises).natsort
-    @summary = summary_hash(@course, exercises, sheets)
-    sort_summary(@summary, params[:sort_by]) if params[:sort_by]
+    Rails.cache.fetch("points_#{@course.id}/", expires_in: 10.minutes) do
+      exercises = @course.exercises.where(exercises: {hidden: false})
+      #exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
+      sheets = @course.gdocs_sheets(exercises).natsort
+      @summary = summary_hash(@course, exercises, sheets)
+      sort_summary(@summary, params[:sort_by]) if params[:sort_by]
+      @summary
+    end
 
     expires_in 1.minutes, :public => true
 

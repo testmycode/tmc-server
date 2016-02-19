@@ -21,6 +21,8 @@ gem 'newrelic_rpm'
 gem 'activerecord-session_store', '~> 0.1.0'
 gem 'pdfkit', '~> 0.6.2'
 
+gem 'dalli'
+
 gem 'pghero'
 
 group :assets do
