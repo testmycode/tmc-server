@@ -10,16 +10,28 @@ class PointsController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Points'
 
-    Rails.cache.fetch("points_#{@course.id}/", expires_in: 1.minutes) do
-      exercises = @course.exercises.where(exercises: {hidden: false})
-      #exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
-      sheets = @course.gdocs_sheets(exercises).natsort
-      @summary = summary_hash(@course, exercises, sheets)
-      sort_summary(@summary, params[:sort_by]) if params[:sort_by]
-      @summary
+    only_for_user = User.find_by(login: params[:username])
+
+    if only_for_user
+        exercises = @course.exercises.where(exercises: {hidden: false})
+        sheets = @course.gdocs_sheets(exercises).natsort
+        @summary = summary_hash(@course, exercises, sheets, only_for_user)
+        sort_summary(@summary, params[:sort_by]) if params[:sort_by]
+        @summary
+    else
+      Rails.cache.fetch("points_#{@course.id}_admin_#{current_user.administrator?}/", expires_in: 1.minutes) do
+        exercises = @course.exercises.where(exercises: {hidden: false})
+        #exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
+        sheets = @course.gdocs_sheets(exercises).natsort
+        @summary = summary_hash(@course, exercises, sheets)
+        sort_summary(@summary, params[:sort_by]) if params[:sort_by]
+
+        expires_in 1.minutes, :public => true
+
+        @summary
+      end
     end
 
-    expires_in 1.minutes, :public => true
 
     respond_to do |format|
       format.html
@@ -72,8 +84,8 @@ class PointsController < ApplicationController
 
   private
 
-  def summary_hash(course, visible_exercises, sheets)
-    per_user_and_sheet = AwardedPoint.count_per_user_in_course_with_sheet(course, sheets)
+  def summary_hash(course, visible_exercises, sheets, only_for_user = nil)
+    per_user_and_sheet = AwardedPoint.count_per_user_in_course_with_sheet(course, sheets, only_for_user)
 
     user_totals = {}
     for username, per_sheet in per_user_and_sheet
@@ -83,6 +95,7 @@ class PointsController < ApplicationController
 
     include_admins = current_user.administrator?
     users = User.select('login, id, administrator').where(login: per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
+
     users = users.where(administrator: false) unless include_admins
 
     total_awarded = AwardedPoint.course_sheet_points(course, sheets, include_admins)
