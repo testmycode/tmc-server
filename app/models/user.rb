@@ -1,5 +1,7 @@
 class User < ActiveRecord::Base
   include Comparable
+  include Gravtastic
+  gravtastic
 
   has_many :submissions, dependent: :delete_all
   has_many :awarded_points, dependent: :delete_all

@@ -377,3 +377,10 @@ tr>.align-right {
 .no-wrap {
   white-space: nowrap;
 }
+
+.avatar {
+  border-radius: 50%;
+  box-shadow: 0 0 1px 1px rgba(0,0,0,0.3);
+  width: 100px;
+  margin: 1em;
+}
