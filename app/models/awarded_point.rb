@@ -103,17 +103,20 @@ class AwardedPoint < ActiveRecord::Base
 
   # Gets a hash of user to count of points awarded for exercises of the given sheet
   # TODO find users, shttename -> sheetnames
-  def self.count_per_user_in_course_with_sheet(course, sheetnames)
+  def self.count_per_user_in_course_with_sheet(course, sheetnames, only_for_user = nil)
     users = User.arel_table
     exercises = Exercise.arel_table
 
-    sql = per_user_in_course_with_sheet_query(course, sheetnames)
+    query = per_user_in_course_with_sheet_query(course, sheetnames)
       .project(users[:login].as('username'), users[:login].count.as('count'), exercises[:gdocs_sheet])
       .group(users[:login], exercises[:gdocs_sheet])
-      .to_sql
+
+    if only_for_user
+      query.where(users[:id].eq(only_for_user.id))
+    end
 
     result = {}
-    ActiveRecord::Base.connection.execute(sql).each do |record|
+    ActiveRecord::Base.connection.execute(query.to_sql).each do |record|
       result[record['username']] ||= {}
       result[record['username']][record['gdocs_sheet']] ||= 0
       result[record['username']][record['gdocs_sheet']] = record['count'].to_i
