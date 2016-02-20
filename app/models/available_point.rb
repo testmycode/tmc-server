@@ -27,6 +27,10 @@ class AvailablePoint < ActiveRecord::Base
     end
   end
 
+  def self.course_points_of_exercises_list(course, exercises)
+    course_points(course).where(exercise_id: exercises.map(&:id))
+  end
+
   def self.course_points(course)
     joins(:exercise)
       .where(exercises: { course_id: course.id })
