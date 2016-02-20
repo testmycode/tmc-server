@@ -83,7 +83,7 @@ class AwardedPoint < ActiveRecord::Base
   end
 
   # Gets a hash of user to array of point names awarded for exercises of the given sheet
-  def self.per_user_in_course_with_sheet(course, sheetname, opts = {})
+  def self.per_user_in_course_with_sheet(course, sheetname)
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
     submissions = Submission.arel_table
@@ -95,11 +95,7 @@ class AwardedPoint < ActiveRecord::Base
     result = {}
     ActiveRecord::Base.connection.execute(sql).each do |record|
       result[record['username']] ||= []
-      if opts[:include_timestamps]
-        result[record['username']] << {point: record['name'], time: record['time']}
-      else
-        result[record['username']] << record['name']
-      end
+      result[record['username']] << record['name']
     end
     result.default = []
     result

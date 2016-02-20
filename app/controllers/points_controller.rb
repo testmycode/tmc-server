@@ -46,7 +46,7 @@ class PointsController < ApplicationController
     add_breadcrumb @sheetname, course_point_path(@course, @sheetname)
 
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).order!
-    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, {show_timestamps: show_timestamps})
+    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
 
     @users = User.course_sheet_students(@course, @sheetname)
     if params[:sort_by] == 'points'
