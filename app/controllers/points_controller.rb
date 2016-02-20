@@ -32,7 +32,6 @@ class PointsController < ApplicationController
       end
     end
 
-
     respond_to do |format|
       format.html
       format.csv do
