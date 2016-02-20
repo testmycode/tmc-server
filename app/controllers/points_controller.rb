@@ -10,7 +10,7 @@ class PointsController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Points'
 
-    Rails.cache.fetch("points_#{@course.id}/", expires_in: 10.minutes) do
+    Rails.cache.fetch("points_#{@course.id}/", expires_in: 1.minutes) do
       exercises = @course.exercises.where(exercises: {hidden: false})
       #exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
       sheets = @course.gdocs_sheets(exercises).natsort
