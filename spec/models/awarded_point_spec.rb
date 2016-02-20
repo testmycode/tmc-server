@@ -119,8 +119,8 @@ describe AwardedPoint, type: :model do
       end
 
       specify 'count_per_user_in_course_with_sheet' do
-        counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
-        expect(counts).to eq( {"user16"=>{"sheet2"=>1}})
+        points = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
+        expect(points[@user.login][@sheet2]).to eq(1)
       end
     end
   end
