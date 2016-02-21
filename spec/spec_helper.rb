@@ -51,7 +51,7 @@ end.call
 Capybara.default_driver = :poltergeist
 
 Capybara.server_port = FreePorts.take_next
-Capybara.default_wait_time = 20 # Comet messages may take longer to appear than the default 2 sec
+Capybara.default_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
 
 if Capybara.default_driver == :selenium
