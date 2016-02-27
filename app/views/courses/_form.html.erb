@@ -1,14 +1,23 @@
 <%= form_for(@course, url: form_path) do |f| %>
   <%= render 'shared/error_messages', target: @course %>
 
-  <%= bs_labeled_field('Course name (should not contain whitespace)*', f.text_field(:name)) %>
-  <%= bs_labeled_field('Course title*', f.text_field(:title)) %>
-  <%= bs_labeled_field('Course description', f.text_area(:description)) %>
-  <%= bs_labeled_field('Material URL', f.text_field(:material_url)) %>
+  <%= bs_labeled_field('Course name (should not contain whitespace)*', f.text_field(:name),
+                       helptext: 'Technical name, which will be used in exercise directory names. Good course
+                                  name is short but recognizable, for example <i>java-basics-s2015</i>') %>
+  <%= bs_labeled_field('Course title*', f.text_field(:title),
+                       helptext: 'More human readable title, which will be shown on lists.
+                                  Example of good title: <i>Java programming basics, spring 2015</i>' ) %>
+  <%= bs_labeled_field('Course description', f.text_area(:description),
+                       helptext: 'Free description for course details. Maximum length is 512 characters.') %>
+  <%= bs_labeled_field('Material URL', f.text_field(:material_url),
+                       helptext: 'Link for the course material') %>
 
   <% if custom %>
-    <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled')) %>
-    <%= bs_labeled_field('Source URL*', f.text_field(:source_url)) %>
+    <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled',),
+                         helptext: 'Git is only supported source.') %>
+    <%= bs_labeled_field('Source URL*', f.text_field(:source_url),
+                         helptext: 'Location of git repository. This combined with branch name will be validated
+                                    to check that repository can be cloned.') %>
     <%= bs_labeled_field('Git branch name*', f.text_field(:git_branch, value: 'master')) %>
   <% else %>
     <%= f.hidden_field(:course_template_id, value: @course_template.id) %>

@@ -60,7 +60,7 @@ class CourseTemplatesController < ApplicationController
     @organization = Organization.find_by(slug: params[:organization_id])
     authorize! :teach, @organization
     add_organization_breadcrumb
-    add_breadcrumb 'Course templates'
+    add_breadcrumb 'Create new course'
     @course_templates = CourseTemplate.available.order('LOWER(title)')
   end
 

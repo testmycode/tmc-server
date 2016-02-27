@@ -1,12 +1,14 @@
-<h1>Editing organization</h1>
+<h1>Edit organization information</h1>
 
 <%= form_for(@organization) do |f| %>
   <%= render 'shared/error_messages', target: @organization %>
 
   <%= bs_labeled_field('name', f.text_field(:name)) %>
   <%= bs_labeled_field('infomation', f.text_area(:information)) %>
-  <%= bs_labeled_field('change logo (recommended minimum size 100x100)', f.file_field(:logo)) %><br/>
-  <%= bs_labeled_field('slug', f.text_field(:slug, disabled: !current_user.administrator?)) %>
+  <%= bs_labeled_field('change logo', f.file_field(:logo),
+                       helptext: 'recommended minimum size 100x100') %><br/>
+  <%= bs_labeled_field('Organization ID', f.text_field(:slug, disabled: !current_user.administrator?),
+                       helptext: 'You can\'t change your ID') %>
   <div class="actions">
     <%= f.submit %>
   </div>
