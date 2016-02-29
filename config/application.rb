@@ -41,7 +41,7 @@ module TmcServer
         resource '/courses', headers: :any, methods: [:get]
         resource '/courses/*', headers: :any, methods: [:get]
         resource '/courses/*/points*', headers: :any, methods: [:get]
-        resource '/exercises/*', headers: :any, methods: [:get]
+        resource '/exercises/*', headers: :any, methods: [:get, :post]
         resource '/org/*/courses.json', headers: :any, methods: [:get]
         resource '/org/*/courses/*', headers: :any, methods: [:get]
         resource '/org/*/courses/*/points*', headers: :any, methods: [:get]
