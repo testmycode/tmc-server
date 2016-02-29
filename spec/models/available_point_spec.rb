@@ -23,11 +23,16 @@ describe AvailablePoint, type: :model do
 
       a = AvailablePoint.course_sheet_points(course, 's1')
       expect(a.size).to eq(1)
-      expect(a).to include(ap1)
+      expect(a['s1']).to eq(1)
 
       a = AvailablePoint.course_sheet_points(course, 's2')
       expect(a.size).to eq(1)
-      expect(a).to include(ap2)
+      expect(a['s2']).to eq(1)
+
+      a = AvailablePoint.course_sheet_points(course, ['s1', 's2'])
+      expect(a.size).to eq(2)
+      expect(a['s1']).to eq(1)
+      expect(a['s2']).to eq(1)
     end
 
     specify 'course_points_of_exercises' do
@@ -35,15 +40,15 @@ describe AvailablePoint, type: :model do
       ex1 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: 's1')
       ex2 = FactoryGirl.create(:exercise, course: course, gdocs_sheet: 's2')
 
-      ap1 = FactoryGirl.create(:available_point, exercise: ex1)
-      ap2 = FactoryGirl.create(:available_point, exercise: ex2)
+      FactoryGirl.create(:available_point, exercise: ex1)
+      FactoryGirl.create(:available_point, exercise: ex2)
 
       FactoryGirl.create(:exercise, gdocs_sheet: 's2') # gets wrong course
 
       a = AvailablePoint.course_points_of_exercises(course, [ex2])
-      expect(a.size).to eq(1)
-      expect(a).to include (ap2)
-      expect(a).not_to include (ap1)
+      expect(a).to eq(1)
+      a = AvailablePoint.course_points_of_exercises(course, [ex1, ex2])
+      expect(a).to eq(2)
     end
   end
 

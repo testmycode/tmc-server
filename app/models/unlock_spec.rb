@@ -148,7 +148,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
 
   def available_and_awarded(course, group_or_exercise_name, user)
     required_exercises = course.exercises_by_name_or_group(group_or_exercise_name)
-    available = AvailablePoint.course_points_of_exercises(course, required_exercises)
+    available = AvailablePoint.course_points_of_exercises_list(course, required_exercises)
       .map(&:name)
     awarded = AwardedPoint.course_user_points(course, user)
       .map(&:name)

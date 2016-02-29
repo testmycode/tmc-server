@@ -75,16 +75,24 @@ module SandboxResultsSaver
       if test_output.has_key? 'logs'
         results['stdout'] = ''
         results['stderr'] = ''
-        results['stdout'] = test_output['logs']['stdout'].pack('c*').force_encoding('utf-8') if test_output['logs'].has_key? 'stdout'
-        results['stderr'] = test_output['logs']['stderr'].pack('c*').force_encoding('utf-8') if test_output['logs'].has_key? 'stderr'
+        if test_output['logs'].has_key? 'stdout'
+          stdout = test_output['logs']['stdout'].pack('c*').force_encoding('utf-8')
+          results['stdout'] = test_output['logs']['stdout'] = stdout
+        end
+        if test_output['logs'].has_key? 'stderr'
+          stderr = test_output['logs']['stderr'].pack('c*').force_encoding('utf-8')
+          results['stderr'] = test_output['logs']['stderr'] = stderr
+        end
         test_output['stdout'] = results['stdout']
         test_output['stderr'] = results['stderr']
         results['test_output'] = test_output.to_json
+
       end
       case test_output['status']
       when 'COMPILE_FAILED'
         results['status'] = 'failed'
         results['exit_code'] = '101'
+        results['test_output'] = test_output['logs'].map {|k,v|  "#{k}: #{v}"}.join("\n")
       when 'TESTS_FAILED', 'PASSED'
         output = test_output['testResults'].map do |result|
           result['className'], result['methodName'] = result['name'].split(/\s/)
@@ -94,11 +102,6 @@ module SandboxResultsSaver
           result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
           result
         end
-        if test_output.has_key? 'logs'
-          results['stdout'] = test_output['logs']['stdout'].pack('c*') if test_output['logs'].has_key? 'stdout'
-          results['stderr'] = test_output['logs']['stderr'].pack('c*') if test_output['logs'].has_key? 'stderr'
-        end
-
         results['old_test_output'] = results['test_output']
         results['test_output'] = output.empty? ? '[]' : output # To allow tests to have no tests.
       when 'TESTRUN_INTERRUPTED'

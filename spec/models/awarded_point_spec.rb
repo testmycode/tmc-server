@@ -48,17 +48,10 @@ describe AwardedPoint, type: :model do
 
     specify 'course_points' do
       points = AwardedPoint.course_points(@course)
-      expect(points.length).to eq(3)
-      expect(points).to include(@ap)
-      expect(points).to include(@ap2)
-      expect(points).to include(@ap3)
+      expect(points).to eq(3)
 
       points = AwardedPoint.course_points(@course, true)
-      expect(points.length).to eq(4)
-      expect(points).to include(@ap)
-      expect(points).to include(@ap2)
-      expect(points).to include(@ap3)
-      expect(points).to include(@ap_admin)
+      expect(points).to eq(4)
     end
 
     specify 'course_user_points' do
@@ -74,19 +67,13 @@ describe AwardedPoint, type: :model do
 
     specify 'course_sheet_points' do
       points = AwardedPoint.course_sheet_points(@course, @sheet1)
-      expect(points.length).to eq(2)
-      expect(points).to include(@ap)
-      expect(points).to include(@ap3)
+      expect(points[@sheet1]).to eq(2)
 
       points = AwardedPoint.course_sheet_points(@course, @sheet1, true)
-      expect(points.length).to eq(3)
-      expect(points).to include(@ap)
-      expect(points).to include(@ap3)
-      expect(points).to include(@ap_admin)
+      expect(points[@sheet1]).to eq(3)
 
       points = AwardedPoint.course_sheet_points(@course, @sheet2)
-      expect(points.length).to eq(1)
-      expect(points).to include(@ap2)
+      expect(points[@sheet2]).to eq(1)
     end
 
     specify 'course_user_sheet_points' do
@@ -107,12 +94,12 @@ describe AwardedPoint, type: :model do
 
     specify 'count_per_user_in_course_with_sheet' do
       counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet1)
-      expect(Hash[counts][@user.login]).to eq(2)
-      expect(Hash[counts][@user2.login]).to be_nil
+      expect(counts[@user.login][@sheet1]).to eq(2)
+      expect(counts[@user2.login]).to be_nil
 
       counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
-      expect(Hash[counts][@user.login]).to be_nil
-      expect(Hash[counts][@user2.login]).to eq(1)
+      expect(counts[@user.login]).to be_nil
+      expect(counts[@user2.login][@sheet2]).to eq(1)
     end
 
     describe 'with change in exercise name' do
@@ -122,8 +109,7 @@ describe AwardedPoint, type: :model do
 
       specify 'course_sheet_points' do
         points = AwardedPoint.course_sheet_points(@course, @sheet2)
-        expect(points.length).to eq(1)
-        expect(points).to include(@ap2)
+        expect(points[@sheet2]).to eq(1)
       end
 
       specify 'course_user_sheet_points' do
@@ -133,9 +119,8 @@ describe AwardedPoint, type: :model do
       end
 
       specify 'count_per_user_in_course_with_sheet' do
-        counts = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
-        expect(Hash[counts][@user.login]).to be_nil
-        expect(Hash[counts][@user2.login]).to eq(1)
+        points = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
+        expect(points[@user.login][@sheet2]).to eq(1)
       end
     end
   end

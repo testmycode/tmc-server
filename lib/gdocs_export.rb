@@ -30,7 +30,7 @@ module GDocsExport
   end
 
   def self.worksheet_points(notifications, ws, course, sheetname)
-    points = AvailablePoint.course_sheet_points(course, sheetname).map(&:name)
+    points = AvailablePoint.course_sheet_points_list(course, sheetname).map(&:name)
     points.reduce([]) do |result, point|
       if point_col(ws, point) < 0
         notifications << "point #{point} not found on sheet #{sheetname}"

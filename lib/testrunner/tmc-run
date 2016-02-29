@@ -94,7 +94,6 @@ case $PROJECT_TYPE in
   ;;
 esac
 
-JVM_OPTIONS=("-Xms${JAVA_RAM_KB}K" "-Xmx${JAVA_RAM_KB}K" "${runtime_params[@]}")
 
 # Source .tmcrc if any
 if [ -f .tmcrc ]; then
@@ -106,6 +105,7 @@ fi
 echo "Running tests..."
 case $PROJECT_TYPE in
   langs)
+    export JVM_OPTIONS="-Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K ${runtime_params[@]}"
     java -jar tmc-langs.jar run-tests --exercisePath . --outputPath test_output.txt > stdout.txt 2> stderr.txt || exit 103
     cat stdout.txt
     cat stderr.txt
