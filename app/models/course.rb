@@ -254,11 +254,15 @@ class Course < ActiveRecord::Base
   end
 
   def certificate_downloadable_for?(user)
-    user.administrator? || (
-      !user.guest? &&
-       certificate_downloadable &&
-       (certificate_unlock_spec.nil? ||
-        UnlockSpec.new(self, ActiveSupport::JSON.decode(certificate_unlock_spec)).permits_unlock_for?(user)))
+    begin 
+      user.administrator? || (
+        !user.guest? &&
+         certificate_downloadable &&
+         (certificate_unlock_spec.nil? ||
+          UnlockSpec.new(self, ActiveSupport::JSON.decode(certificate_unlock_spec)).permits_unlock_for?(user)))
+    rescue => e
+      Rails.logger.warn("Incorrect certificate download spec: #{e}")
+    end
   end
 
   # Returns a hash of exercise group => {
