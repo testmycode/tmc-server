@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150408121203) do
+ActiveRecord::Schema.define(version: 20160302150252) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -114,13 +114,22 @@ ActiveRecord::Schema.define(version: 20150408121203) do
     t.integer  "course_id",  null: false
     t.text     "question",   null: false
     t.string   "kind",       null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "position",   null: false
     t.text     "title"
   end
 
   add_index "feedback_questions", ["id"], name: "index_feedback_questions_on_id", using: :btree
+
+  create_table "migrated_submissions", id: false, force: true do |t|
+    t.integer  "from_course_id"
+    t.integer  "to_course_id"
+    t.integer  "original_submission_id"
+    t.integer  "new_submission_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "password_reset_keys", force: true do |t|
     t.integer  "user_id",    null: false
