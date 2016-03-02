@@ -20,15 +20,8 @@ class StudentSubmissionMigrator
     end
   end
 
-  #private
-
-  def validate_migration!
-    raise CannotRefreshError, "Cannot migrate with courses which have diffenent git revisions" unless @old_course.git_revision == @new_course.git_revision
-    raise CannotRefreshError, "Cannot migration between these courses is not allowed" unless migration_is_allowed
-  end
-
   def migration_is_allowed
-    allowed_migrations = SiteSetting.value(:allow_migrations_between_couses)
+    allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
     return false if allowed_migrations.nil?
     allowed_migrations.each do |allowed_pair|
       puts allowed_pair
@@ -36,6 +29,14 @@ class StudentSubmissionMigrator
     end
     false
   end
+
+  private
+
+  def validate_migration!
+    raise CannotRefreshError, "Cannot migrate with courses which have diffenent git revisions" unless @old_course.git_revision == @new_course.git_revision
+    raise CannotRefreshError, "Cannot migration between these courses is not allowed" unless migration_is_allowed
+  end
+
 
   def migrate_submission_and_data(submission)
     new_submission = submission.dup
@@ -46,9 +47,10 @@ class StudentSubmissionMigrator
     migrate_test_case_runs(submission, new_submission)
     migrate_awarded_points(submission, new_submission)
     new_submission.save!
-    new_submission.update_columns(created_at: submission.created_at, updated_at: submission.updated_at, processing_attempts_started_at: submission.processing_attempts_started_at)
+    new_submission.reload
+    new_submission.update_columns(created_at: submission.created_at, processing_attempts_started_at: submission.processing_attempts_started_at)
     MigratedSubmissions.create!(from_course_id: @old_course.id, to_course_id: @new_course.id, original_submission_id: submission.id, new_submission_id: new_submission.id)
-
+    Unlock.refresh_unlocks(new_submission.course, submission.user)
   end
 
   def migrate_submission_data(submission, new_submission)
@@ -62,16 +64,18 @@ class StudentSubmissionMigrator
       new_test_case_run = test_case_run.dup
       new_test_case_run.submission = new_submission
       new_test_case_run.save!
-      new_test_case_run.update_columns(created_at: test_case_run.created_at, updated_at: testacase_run.updated_at)
+      new_test_case_run.update_columns(created_at: test_case_run.created_at, updated_at: test_case_run.updated_at)
     end
   end
 
   def migrate_awarded_points(submission, new_submission)
     submission.awarded_points.each do |awarded_point|
       new_point = awarded_point.dup
-      new_point.course = @new_course
-      new_point.submission = new_submission
-      new_point.save!
+      unless AwardedPoint.find_by(course_id: @new_course.id, name: awarded_point.name, user_id: @user.id)
+        new_point.course = @new_course
+        new_point.submission = new_submission
+        new_point.save!
+      end
     end
   end
 
