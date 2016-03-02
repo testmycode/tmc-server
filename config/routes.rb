@@ -51,6 +51,12 @@ TmcServer::Application.routes.draw do
     resources :reviews, only: [:index]
     resource :unlock, only: [:show, :create]
     resource :course_notifications, only: [:create, :index, :show, :new]
+
+    resources :migrate_to_other_course, only: [:show] do
+      member do
+        post :migrate
+      end
+    end
   end
 
   resources :exercises, only: [:show] do
