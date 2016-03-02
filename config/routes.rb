@@ -115,6 +115,12 @@ TmcServer::Application.routes.draw do
   get '/reset_password/:token' => 'password_reset_keys#show', :as => 'reset_password'
   delete '/reset_password/:token' => 'password_reset_keys#destroy'
 
+  resources :migrate_to_other_course, only: [:show] do
+    member do
+      post :migrate
+    end
+  end
+
   resources :exercises, only: [:show] do
     resources :submissions, only: [:create]
     resource :solution, only: [:show]
