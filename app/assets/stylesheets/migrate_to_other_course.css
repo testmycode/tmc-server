@@ -1,0 +1,17 @@
+/* ...
+*= require_self
+*/
+
+.hero-unit-alert {
+  padding: 0px !important;
+  background-color: inherit !important;
+}
+
+.controls {
+  margin-left: 280px !important;
+}
+
+.control-label {
+  width: 260px !important;
+}
+
