@@ -6,10 +6,12 @@ class MigrateToOtherCourseController < ApplicationController
 
     authorize! :read, @old_course
     authorize! :read, @to_course
+    authorize! :read, current_user
 
     @already_migrated = already_migrated
     @extra_alert_text = get_extra_text
-    return respond_with_error("This migration is not allowed") if !StudentSubmissionMigrator.new(@old_course, @to_course, current_user).migration_is_allowed || current_user.guest?
+    return respond_with_error("Please login to continue") if current_user.guest?
+    return respond_with_error("This migration is not allowed") if !StudentSubmissionMigrator.new(@old_course, @to_course, current_user).migration_is_allowed
   end
 
   def migrate

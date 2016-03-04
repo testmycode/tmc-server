@@ -91,9 +91,9 @@ class ParticipantsController < ApplicationController
     end
 
     if current_user.administrator? || current_user.id == @user.id
-      @submissions = @user.submissions.order('id DESC').includes(:user)
+      @submissions = @user.submissions.order('created_at DESC').includes(:user)
     else # teacher and assistant sees only submissions for own teacherd courses
-      @submissions = @user.submissions.order('id DESC').includes(:user).where(course: current_user.teaching_in_courses)
+      @submissions = @user.submissions.order('created_at DESC').includes(:user).where(course: current_user.teaching_in_courses)
     end
 
     Submission.eager_load_exercises(@submissions)
