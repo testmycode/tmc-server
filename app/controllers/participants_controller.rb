@@ -75,7 +75,6 @@ class ParticipantsController < ApplicationController
       end
     end
 
-    #@submissions = @user.submissions.order('id DESC').includes(:user)
     @submissions = @user.submissions.order('created_at DESC').includes(:user)
     Submission.eager_load_exercises(@submissions)
   end
