@@ -24,6 +24,7 @@ gem "paperclip", "~> 4.3"
 gem 'dalli'
 gem 'gravtastic', '~> 3.2.6'
 
+gem 'logstasher', '~> 0.9.0'
 
 gem 'pghero'
 
