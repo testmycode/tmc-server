@@ -233,7 +233,7 @@ ActiveRecord::Schema.define(version: 20160309101401) do
     t.integer  "logo_file_size"
     t.datetime "logo_updated_at"
     t.string   "phone"
-    t.string   "contact_person"
+    t.text     "contact_information"
     t.string   "email"
   end
 
