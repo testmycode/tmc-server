@@ -13,7 +13,7 @@ class PointsController < ApplicationController
     only_for_user = User.find_by(login: params[:username])
 
     if only_for_user
-        exercises = @course.exercises.where(exercises: {hidden: false})
+        exercises = @course.exercises.enabled.where(exercises: {hidden: false})
         sheets = @course.gdocs_sheets(exercises).natsort
         @summary = summary_hash(@course, exercises, sheets, only_for_user)
         sort_summary(@summary, params[:sort_by]) if params[:sort_by]
