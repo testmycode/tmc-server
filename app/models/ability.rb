@@ -14,8 +14,11 @@ class Ability
         c.custom?
       end
       can :view, :participants_list
-      can :view, :organization_requests
-      can :accept, :organization_requests
+
+      can :view, :unverified_organizations
+      can :verify, :unverified_organizations
+      can :disable, Organization
+
       can :rerun, Submission
       can :refresh_gdocs_spreadsheet, Course do |c|
         !c.spreadsheet_key.blank?
@@ -235,13 +238,12 @@ class Ability
 
       cannot :teach, Organization
       can :teach, Organization do |o|
-        o.teacher?(user) && !o.rejected? && !o.acceptance_pending?
+        o.teacher?(user) && !o.disabled?
       end
 
       cannot :teach, Course
       can :teach, Course do |c|
-        return false if c.organization.rejected?
-        c.organization.teacher?(user) || c.assistant?(user)
+        !c.organization.disabled? && (c.organization.teacher?(user) || c.assistant?(user))
       end
 
       cannot :email, CourseNotification

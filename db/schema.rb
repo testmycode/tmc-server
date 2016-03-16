@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160309101401) do
+ActiveRecord::Schema.define(version: 20160310111733) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -217,19 +217,19 @@ ActiveRecord::Schema.define(version: 20160309101401) do
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
   create_table "organizations", force: :cascade do |t|
-    t.string   "name",               limit: 255
-    t.string   "information",        limit: 255
-    t.string   "slug",               limit: 255
-    t.datetime "accepted_at"
-    t.boolean  "acceptance_pending"
-    t.boolean  "rejected",                       default: false, null: false
-    t.string   "rejected_reason",    limit: 255
+    t.string   "name"
+    t.string   "information"
+    t.string   "slug"
+    t.datetime "verified_at"
+    t.boolean  "verified"
+    t.boolean  "disabled",            default: false, null: false
+    t.string   "disabled_reason"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "hidden",                         default: false
-    t.integer  "requester_id"
-    t.string   "logo_file_name",     limit: 255
-    t.string   "logo_content_type",  limit: 255
+    t.boolean  "hidden",              default: false
+    t.integer  "creator_id"
+    t.string   "logo_file_name"
+    t.string   "logo_content_type"
     t.integer  "logo_file_size"
     t.datetime "logo_updated_at"
     t.string   "phone"

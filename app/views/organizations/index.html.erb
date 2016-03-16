@@ -2,7 +2,7 @@
 
 <% if current_user.administrator? && !Organization.pending_organizations.empty? %>
   <div class="alert alert-warning" role="alert">
-    <%= pluralize(Organization.pending_organizations.size, 'new organization request') %>.
+    <%= pluralize(Organization.pending_organizations.size, 'new organization to verify') %>.
     <%= link_to 'Show', list_requests_organizations_path %>
   </div>
 <% end %>
@@ -21,7 +21,7 @@
       <tr>
         <td>
           <%= link_to organization.name, organization_path(organization) %>
-          <% if organization.acceptance_pending? %> (pending)<% end %>
+          <% if !organization.verified? %> (unverified)<% end %>
         </td>
       </tr>
     <% end %>
