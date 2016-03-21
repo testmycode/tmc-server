@@ -44,7 +44,7 @@ class OrganizationsController < ApplicationController
     @organization = Organization.init(organization_params, current_user)
 
     if !@organization.errors.any?
-      redirect_to organization_path(@organization), notice: 'Organization was successfully requested.'
+      redirect_to organization_path(@organization), notice: 'Organization was successfully created.'
     else
       render :new
     end
