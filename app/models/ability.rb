@@ -119,7 +119,7 @@ class Ability
       cannot :read, Solution
       can :read, Solution do |sol|
         course = sol.exercise.course
-        sol.visible_to?(user) || (can? :teach, course)
+        sol.visible_to?(user)
       end
 
       cannot :manage, Review

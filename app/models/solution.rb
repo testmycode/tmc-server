@@ -13,7 +13,11 @@ class Solution
   end
 
   def visible_to?(user)
-    if user.administrator? || user.teacher?(@exercise.course.organization) || user.assistant?(@exercise.course)
+    if user.administrator?
+      true
+    elsif !@exercise.course.organization.verified
+      false
+    elsif user.teacher?(@exercise.course.organization) || user.assistant?(@exercise.course)
       true
     elsif user.guest?
       false

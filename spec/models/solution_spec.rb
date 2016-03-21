@@ -5,6 +5,7 @@ describe Solution, type: :model do
     user = FactoryGirl.create(:user)
     ex = FactoryGirl.create(:exercise)
     sol = ex.solution
+    ex.course.organization.verified = true
 
     ex.solution_visible_after = Time.now - 5.days
     expect(sol).to be_visible_to(user)
@@ -29,12 +30,22 @@ describe Solution, type: :model do
     user = FactoryGirl.create(:user)
     ex = FactoryGirl.create(:exercise)
     sol = ex.solution
+    ex.course.organization.verified = true
 
     ex.solution_visible_after = Time.now - 5.days
     expect(sol).to be_visible_to(user)
 
     allow(ex).to receive('visible_to?').and_return(false)
     expect(sol).not_to be_visible_to(user)
+  end
+
+  it 'should not be visible for teacher if organization is not verified' do
+    teacher = FactoryGirl.create(:user)
+    ex = FactoryGirl.create(:exercise)
+    sol = ex.solution
+    Teachership.create!(user: teacher, organization: ex.course.organization)
+
+    expect(sol).not_to be_visible_to(teacher)
   end
 
   def show_when_completed(setting)

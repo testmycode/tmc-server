@@ -15,6 +15,8 @@ class SolutionsController < ApplicationController
     rescue CanCan::AccessDenied
       if current_user.guest?
         return respond_access_denied('Please log in to view the model solution.')
+      elsif current_user.teacher?(@organization) || current_user.assistant?(@course)
+        return respond_access_denied("You can't see model solutions until organization is verified by administrator")
       else
         return respond_access_denied("It seems you haven't solved the exercise yourself yet.")
       end
