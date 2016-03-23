@@ -81,8 +81,8 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
     concurrent-ruby (1.0.0)
+    connection_pool (2.2.0)
     daemons (1.2.3)
-    dalli (2.7.6)
     database_cleaner (1.5.1)
     diff-lcs (1.2.5)
     docile (1.1.5)
@@ -131,6 +131,7 @@ GEM
     haml (4.0.7)
       tilt
     highline (1.7.8)
+    hiredis (0.6.1)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     i18n (0.7.0)
@@ -243,6 +244,10 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rainbow (2.1.0)
     rake (10.5.0)
+    readthis (1.2.0)
+      connection_pool (~> 2.1)
+      redis (~> 3.0)
+    redis (3.2.2)
     request_store (1.3.0)
     responders (2.1.1)
       railties (>= 4.2.0, < 5.1)
@@ -352,11 +357,11 @@ DEPENDENCIES
   cancancan (~> 1.13.0)
   capybara (~> 2.5.0)
   daemons (~> 1.2.3)
-  dalli
   database_cleaner (~> 1.5.0)
   factory_girl_rails (~> 4.5.0)
   google-spreadsheet-ruby
   gravtastic (~> 3.2.6)
+  hiredis
   jquery-rails (~> 3.1.2)
   launchy
   logstasher (~> 0.9.0)
@@ -376,6 +381,7 @@ DEPENDENCIES
   railroady
   rails (~> 4.2.0)
   rake
+  readthis
   responders (~> 2.0)
   rest-client (~> 1.8.0)
   rspec (~> 3.3.0)

@@ -21,7 +21,10 @@ gem 'newrelic_rpm'
 gem 'activerecord-session_store', '~> 0.1.0'
 gem 'pdfkit', '~> 0.8.2'
 gem "paperclip", "~> 4.3"
-gem 'dalli'
+
+gem 'readthis' # Redis for caching
+gem 'hiredis' # Redis for caching
+
 gem 'gravtastic', '~> 3.2.6'
 
 gem 'logstasher', '~> 0.9.0'
