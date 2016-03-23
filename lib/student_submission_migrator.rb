@@ -78,5 +78,4 @@ class StudentSubmissionMigrator
       end
     end
   end
-
 end

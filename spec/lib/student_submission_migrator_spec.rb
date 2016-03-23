@@ -75,7 +75,7 @@ describe StudentSubmissionMigrator  do
     expect(s1).to eql(s2)
     s1 = new_submission.attributes
     s2 = old_submission.attributes
-    %w{created_at updated_at processing_attempts_started_at}.each do |field|
+    %w{created_at processing_attempts_started_at}.each do |field|
       expect(s1[field] - s2[field]).to be < 0.001 # for minor inconsistencies with timestamps accuracy...
     end
 
@@ -99,8 +99,6 @@ describe StudentSubmissionMigrator  do
       s2.delete(field)
     end
     expect(s1).to eq(s2)
-
   end
-
 end
 
