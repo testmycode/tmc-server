@@ -180,7 +180,7 @@ require 'cgi' # for escapeHTML
   fill_in 'organization[name]', with: 'Helsingin yliopisto'
   fill_in 'organization[information]', with: 'University life'
   fill_in 'organization[slug]', with: 'hy'
-  click_button 'Request organization'
+  click_button 'Create Organization'
   expect(page).to have_content 'Organization was successfully requested.'
 
   click_on 'Sign out'
@@ -230,7 +230,7 @@ require 'cgi' # for escapeHTML
   fill_in 'organization[name]', with: 'Helsingin yliopisto'
   fill_in 'organization[information]', with: 'University life'
   fill_in 'organization[slug]', with: 'hy'
-  click_button 'Request organization'
+  click_button 'Create Organization'
   expect(page).to have_content 'Organization was successfully requested.'
 
   click_on 'Sign out'

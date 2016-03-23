@@ -36,6 +36,7 @@ class OrganizationsController < ApplicationController
     authorize! :edit, @organization
     add_organization_breadcrumb
     add_breadcrumb 'Edit'
+    @cant_edit_slug = !current_user.administrator?
   end
 
   def create
@@ -124,6 +125,6 @@ class OrganizationsController < ApplicationController
   end
 
   def organization_params
-    params.require(:organization).permit(:name, :information, :logo, :slug, :rejected_reason)
+    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :rejected_reason)
   end
 end
