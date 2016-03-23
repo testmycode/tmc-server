@@ -54,7 +54,15 @@ Rails.application.configure do
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
 
   # Use a different cache store in production.
-  config.cache_store = :mem_cache_store, { size: 64.megabytes }
+  if ENV['REDIS_URL']
+    config.cache_store = :readthis_store, {
+        expires_in: 1.weeks.to_i, #default
+        namespace: 'cache',
+        redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
+    }
+  else
+    config.cache_store = :memory_store, { size: 64.megabytes } #
+  end
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = "http://assets.example.com"
