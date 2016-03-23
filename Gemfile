@@ -25,6 +25,7 @@ gem 'logstasher', '~> 0.9.0'
 
 gem 'pghero'
 
+gem 'newrelic-redis'
 gem 'readthis' # Redis for caching
 gem 'hiredis' # Redis for caching
 
