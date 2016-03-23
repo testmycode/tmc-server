@@ -10,37 +10,54 @@
   <%= @organization.information %>
 </p>
 
-<% if @organization.acceptance_pending? %>
+<% if !@organization.verified? %>
     <p>
-      <strong>This organization needs to be accepted by an administrator.</strong>
-      <% if can? :view, :organization_requests %>
-          <%= link_to 'Accept', accept_organization_path(@organization), method: :post, class: 'btn btn-success' %>
-          <%= link_to 'Reject', reject_reason_input_organization_path(@organization), class: 'btn btn-danger' %>
+      <strong>This organization is not verified yet by an administrator.</strong>
+      <% if can? :view, :unverified_organizations %>
+          <%= link_to 'Verify', verify_organization_path(@organization), method: :post, class: 'btn btn-success' %>
+          <%= link_to 'Disable', disable_reason_input_organization_path(@organization), class: 'btn btn-danger' %>
       <% end %>
     </p>
 <% end %>
 
 <% if current_user.administrator? %>
+  <hr>
   <p>
     <strong>Organization ID:</strong>
     <%= @organization.slug %>
   </p>
-
   <p>
-    <strong>Requested by:</strong>
-    <% requested_by = @organization.requester %>
-    <%= link_to requested_by.username, participant_path(requested_by) unless requested_by.nil? %>
+    <strong>Created by:</strong>
+    <% created_by = @organization.creator %>
+    <%= link_to created_by.username, participant_path(created_by) unless created_by.nil? %>
   </p>
-
   <p>
-    <strong>Requested at:</strong>
+    <strong>Created at:</strong>
     <%= @organization.created_at %>
   </p>
-
   <p>
-    <strong>Accepted at:</strong>
-    <%= @organization.accepted_at %>
+    <strong>Contact person:</strong>
+    <%= @organization.contact_information %>
   </p>
+  <p>
+    <strong>Contact phone:</strong>
+    <%= @organization.phone %>
+  </p>
+  <p>
+    <strong>Contact email:</strong>
+    <%= mail_to @organization.email %>
+  </p>
+
+
+  <% if @organization.verified %>
+    <p>
+      <strong>Verified at:</strong>
+      <%= @organization.verified_at %>
+    </p>
+  <% end %>
+
+  <hr>
+
 <% end %>
 
 <% if can? :toggle_visibility, @organization %>
@@ -57,14 +74,10 @@
   </p>
 <% end %>
 
-<% if @organization.rejected? %>
+<% if @organization.disabled? %>
   <p>
-    <strong>
-      This organization was rejected by an administrator. Reason:
-      <i>
-        <%= @organization.rejected_reason %>
-      </i>
-    </strong>
+    <strong>This organization is disabled by an administrator. Reason:</strong>
+    <i><%= @organization.disabled_reason %></i>
   </p>
 <% end %>
 

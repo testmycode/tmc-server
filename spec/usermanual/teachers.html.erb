@@ -108,7 +108,7 @@ require 'cgi' # for escapeHTML
 
 <%
   click_on 'Create Organization'
-  expect(page).to have_content("Organization was successfully requested.")
+  expect(page).to have_content("Organization was successfully created.")
 %>
 <%= screenshot %>
 
@@ -130,8 +130,8 @@ require 'cgi' # for escapeHTML
   click_on 'Sign in'
 
   click_on 'Show'
-  click_on 'Accept'
-  expect(page).to have_content 'Organization request was successfully accepted.'
+  click_on 'Verify'
+  expect(page).to have_content 'Organization is now verified.'
 
   visit '/'
   click_on 'Sign out'

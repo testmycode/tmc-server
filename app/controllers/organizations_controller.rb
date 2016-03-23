@@ -1,7 +1,7 @@
 require 'natsort'
 
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :edit, :update, :destroy, :accept, :reject, :reject_reason_input, :toggle_visibility]
+  before_action :set_organization, only: [:show, :edit, :update, :destroy, :verify, :disable, :disable_reason_input, :toggle_visibility]
 
   skip_authorization_check only: [:index]
 
@@ -44,7 +44,7 @@ class OrganizationsController < ApplicationController
     @organization = Organization.init(organization_params, current_user)
 
     if !@organization.errors.any?
-      redirect_to organization_path(@organization), notice: 'Organization was successfully requested.'
+      redirect_to organization_path(@organization), notice: 'Organization was successfully created.'
     else
       render :new
     end
@@ -62,37 +62,36 @@ class OrganizationsController < ApplicationController
   end
 
   def list_requests
-    authorize! :view, :organization_requests
-    add_breadcrumb 'New organization requests'
-    @requested_organizations = Organization.pending_organizations
+    authorize! :view, :unverified_organizations
+    add_breadcrumb 'Unverified organizations'
+    @unverified_organizations = Organization.pending_organizations
   end
 
-  def accept
-    authorize! :accept, :organization_requests
-    if @organization.acceptance_pending
-      @organization.acceptance_pending = false
-      @organization.accepted_at = DateTime.now
+  def verify
+    authorize! :verify, :unverified_organizations
+    if !@organization.verified
+      @organization.verified = true
+      @organization.verified_at = DateTime.now
       @organization.save
-      redirect_to list_requests_organizations_path, notice: 'Organization request was successfully accepted.'
+      redirect_to list_requests_organizations_path, notice: 'Organization is now verified.'
     else
       redirect_to organization_path(@organization)
     end
   end
 
-  def reject_reason_input
-    authorize! :reject, :organization_requests
-    add_breadcrumb 'New organization requests', list_requests_organizations_path
-    add_breadcrumb 'Reject organization'
+  def disable_reason_input
+    authorize! :disable, Organization
+    add_organization_breadcrumb
+    add_breadcrumb 'Disable organization'
   end
 
-  def reject
-    authorize! :reject, :organization_requests
-    if @organization.acceptance_pending
-      @organization.acceptance_pending = false
-      @organization.rejected = true
-      @organization.rejected_reason = organization_params[:rejected_reason]
+  def disable
+    authorize! :disable, Organization
+    if !@organization.disabled
+      @organization.disabled = true
+      @organization.disabled_reason = organization_params[:disabled_reason]
       @organization.save
-      redirect_to list_requests_organizations_path, notice: 'Organization request was successfully rejected.'
+      redirect_to list_requests_organizations_path, notice: "Organization #{@organization.name} successfully disabled."
     else
       redirect_to organization_path(@organization)
     end
@@ -125,6 +124,6 @@ class OrganizationsController < ApplicationController
   end
 
   def organization_params
-    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :rejected_reason)
+    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
   end
 end

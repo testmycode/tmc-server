@@ -149,13 +149,13 @@ FactoryGirl.define do
     sequence(:name) { |n| "organization#{n}" }
     sequence(:information) { |n| "information#{n}" }
     sequence(:slug) { |n| "organization#{n}" }
-    acceptance_pending true
+    verified false
   end
 
   factory :accepted_organization, class: Organization do
     sequence(:name) { |n| "a_organization#{n}" }
     sequence(:information) { |n| "a_information#{n}" }
     sequence(:slug) { |n| "a_organization#{n}" }
-    acceptance_pending false
+    verified true
   end
 end
