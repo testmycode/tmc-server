@@ -22,6 +22,7 @@ gem 'activerecord-session_store', '~> 0.1.0'
 gem 'pdfkit', '~> 0.8.2'
 gem "paperclip", "~> 4.3"
 
+gem 'newrelic-redis'
 gem 'readthis' # Redis for caching
 gem 'hiredis' # Redis for caching
 
