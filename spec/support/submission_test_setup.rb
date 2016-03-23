@@ -14,7 +14,7 @@ class SubmissionTestSetup
   def initialize(options = {})
     options = default_options.merge(options)
 
-    organization = options[:organization] || Organization.create!(name: 'name', information: 'info', slug: 'slug', acceptance_pending: false)
+    organization = options[:organization] || Organization.create!(name: 'name', information: 'info', slug: 'slug', verified: true)
     course_name = options[:course_name]
     exercise_name = options[:exercise_name] || 'SimpleExercise'
     exercise_dest = options[:exercise_dest] || exercise_name

@@ -7,9 +7,9 @@ TmcServer::Application.routes.draw do
       resources :feedback_answers, only: [:index]
     end
     member do
-      post 'accept'
-      post 'reject'
-      get 'reject_reason_input'
+      post 'verify'
+      post 'disable'
+      get 'disable_reason_input'
       post 'toggle_visibility'
     end
 

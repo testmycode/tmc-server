@@ -159,14 +159,14 @@ require 'cgi' # for escapeHTML
     as if they were destroyed, even though the template still exists in the database.
   </p>
 
-  <h2>Accepting pending organizations</h2>
+  <h2>Verifying new organizations</h2>
 
   <p>
-    Another responsibility for administrators is to manage pending organization requests, accepting or denying them
-    as they see fit. Anyone can make an organization request, so they should be accepted through careful consideration.
+    Another responsibility for administrators is to verify all new created organizations. They can be either verified
+    or disabled. Anyone can create a new organization, so they should be verified through careful consideration.
   </p>
 
-  <p>Administrator will see this notice on the front page when a new organization is requested:</p>
+  <p>Administrator will see this notice on the front page when there are any unverified new organizations:</p>
 
 <%
   FactoryGirl.create :user, login: 'user', password: 'user'
@@ -180,8 +180,8 @@ require 'cgi' # for escapeHTML
   fill_in 'organization[name]', with: 'Helsingin yliopisto'
   fill_in 'organization[information]', with: 'University life'
   fill_in 'organization[slug]', with: 'hy'
-  click_button 'Request organization'
-  expect(page).to have_content 'Organization was successfully requested.'
+  click_button 'Create Organization'
+  expect(page).to have_content 'Organization was successfully created.'
 
   click_on 'Sign out'
   fill_in 'session_login', with: 'admin'
@@ -193,22 +193,22 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
   <p>
-    Clicking 'show' will list all pending organization requests.
+    Clicking 'show' will list all unverified organizations.
   </p>
 
 <%
   click_on 'Show'
-  highlight 'a:contains("Accept")'
+  highlight 'a:contains("Verify")'
 %>
 <%= screenshot %>
 <%
-  click_on 'Accept'
-  expect(page).to have_content 'Organization request was successfully accepted.'
+  click_on 'Verify'
+  expect(page).to have_content 'Organization is now verified.'
 %>
 <%= screenshot %>
 
   <p>
-    After clicking 'Accept', organization requester is promoted as organization's teacher and obtains rights to manage it.
+    After clicking 'Verify', organization is fully operational.
   </p>
 <%
   visit '/'
@@ -216,7 +216,7 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
 <p>
-  Alternatively, after clicking 'Reject', administrator must fill a form to give a reason for rejection.
+  Alternatively, after clicking 'Disable', administrator must fill a form to give a reason for disabling.
 </p>
 
 <%
@@ -230,8 +230,8 @@ require 'cgi' # for escapeHTML
   fill_in 'organization[name]', with: 'Helsingin yliopisto'
   fill_in 'organization[information]', with: 'University life'
   fill_in 'organization[slug]', with: 'hy'
-  click_button 'Request organization'
-  expect(page).to have_content 'Organization was successfully requested.'
+  click_button 'Create Organization'
+  expect(page).to have_content 'Organization was successfully created.'
 
   click_on 'Sign out'
   fill_in 'session_login', with: 'admin'
@@ -240,22 +240,22 @@ require 'cgi' # for escapeHTML
   visit '/'
 
   click_on 'Show'
-  highlight 'a:contains("Reject")'
+  highlight 'a:contains("Disable")'
 %>
 <%= screenshot %>
 
 <%
-   click_on 'Reject'
-   fill_in 'organization_rejected_reason', with: 'No such university exists, you can\'t fool me!'
+   click_on 'Disable'
+   fill_in 'organization_disabled_reason', with: 'No such university exists, you can\'t fool me!'
 %>
 <%= screenshot %>
 <%
-  click_on 'Reject organization'
-  expect(page).to have_content 'Organization request was successfully rejected.'
+  click_on 'Disable organization'
+  expect(page).to have_content 'Organization Helsingin yliopisto successfully disabled.'
 %>
 <%= screenshot %>
 
-<p>Requested organization will not be shown anywhere in the front page after rejection.</p>
+<p>Disabled organization will not be shown anywhere in the front page.</p>
 
 <%
   visit '/'

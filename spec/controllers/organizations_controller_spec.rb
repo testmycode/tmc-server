@@ -10,7 +10,7 @@ describe OrganizationsController, type: :controller do
     {
       name: 'TestOrganization',
       slug: 'test-organization',
-      acceptance_pending: false
+      verified: true
     }
   end
 
@@ -18,7 +18,7 @@ describe OrganizationsController, type: :controller do
     {
       name: nil,
       slug: 'test organization',
-      acceptance_pending: nil
+      verified: nil
     }
   end
 
@@ -95,25 +95,25 @@ describe OrganizationsController, type: :controller do
 
       it 'lists only pending organization requests' do
         get :list_requests, {}
-        expect(assigns(:requested_organizations).sort).to eq([@org1, @org3].sort)
+        expect(assigns(:unverified_organizations).sort).to eq([@org1, @org3].sort)
       end
     end
 
-    describe 'POST accept' do
-      it 'accepts the organization request' do
+    describe 'POST verify' do
+      it 'verifies the organization' do
         org = Organization.init(valid_attributes, @user)
-        post :accept, id: org.to_param
+        post :verify, id: org.to_param
         org.reload
-        expect(org.acceptance_pending).to eq(false)
+        expect(org.verified).to eq(true)
       end
     end
 
-    describe 'POST reject' do
-      it 'sets the organization rejected flag to true' do
+    describe 'POST disable' do
+      it 'sets the organization disabled flag to true' do
         org = Organization.init(valid_attributes, @user)
-        post :reject, id: org.to_param, organization: { rejected_reason: 'reason' }
+        post :disable, id: org.to_param, organization: { disabled_reason: 'reason' }
         org.reload
-        expect(org.rejected).to eq(true)
+        expect(org.disabled).to eq(true)
       end
     end
   end
@@ -239,18 +239,18 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'POST accept' do
+    describe 'POST verify' do
       it 'denies access' do
         org = Organization.init(valid_attributes, @user)
-        post :accept, id: org.to_param
+        post :verify, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
     end
 
-    describe 'POST reject' do
+    describe 'POST disable' do
       it 'denies access' do
         org = Organization.init(valid_attributes, @user)
-        post :reject, id: org.to_param
+        post :disable, id: org.to_param
         expect(response.code.to_i).to eq(401)
       end
     end

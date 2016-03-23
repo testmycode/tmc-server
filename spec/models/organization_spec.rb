@@ -6,7 +6,7 @@ describe Organization, type: :model do
       name: 'TestOrganization',
       information: 'TestInformation',
       slug: 'test-organization',
-      acceptance_pending: false
+      verified: true
     }
   end
   describe 'validation' do
@@ -42,7 +42,7 @@ describe Organization, type: :model do
     end
 
     it 'requires a pending flag' do
-      should_be_invalid_params(valid_params.merge(acceptance_pending: nil))
+      should_be_invalid_params(valid_params.merge(verified: nil))
     end
 
     it 'requires slug to be a non-reserved url' do
@@ -58,7 +58,7 @@ describe Organization, type: :model do
     it 'creates a pending organization' do
       @user = FactoryGirl.create(:user)
       @org = Organization.init(valid_params, @user)
-      expect(@org.acceptance_pending).to be(true)
+      expect(@org.verified).to be(false)
     end
 
     it 'grants the requesting user teachership to the organization' do

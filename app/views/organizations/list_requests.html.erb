@@ -1,28 +1,42 @@
-<h1>New organization requests</h1>
+<h1>Unverified organizations</h1>
 
 <table>
   <thead>
   <tr>
     <th>Name</th>
     <th>Information</th>
-    <th>Requested by</th>
-    <th>Requested at</th>
+    <th>Created by</th>
+    <th>Created at</th>
     <th colspan="3"></th>
   </tr>
   </thead>
 
   <tbody>
-  <% @requested_organizations.each do |organization| %>
-    <% requested_by = organization.requester %>
+  <% @unverified_organizations.each do |organization| %>
+    <% created_by = organization.creator %>
     <tr>
-      <td><%= organization.name %></td>
+      <td><%= link_to organization.name, organization %></td>
       <td><%= organization.information %></td>
-      <td><%= link_to requested_by.username, participant_path(requested_by) unless requested_by.nil? %></td>
+      <td><%= link_to created_by.username, participant_path(created_by) unless created_by.nil? %></td>
       <td><%= organization.created_at %></td>
-      <td><%= link_to 'Show information', organization %></td>
-      <td><%= link_to 'Accept', accept_organization_path(organization), method: :post, class: 'btn btn-success' %></td>
-      <td><%= link_to 'Reject', reject_reason_input_organization_path(organization), class: 'btn btn-danger' %></td>
+      <td><%= link_to 'Verify', verify_organization_path(organization), method: :post, class: 'btn btn-success' %></td>
+      <td><%= link_to 'Disable', disable_reason_input_organization_path(organization), class: 'btn btn-danger' %></td>
     </tr>
+    <tr>
+      <td></td>
+      <th align="right">Contact details:</th>
+      <td colspan="2"><%= organization.contact_information%></td>
+    </tr>
+      <tr>
+        <td></td>
+        <th align="right">Contact email:</th>
+        <td colspan="2"><%= mail_to organization.email%></td>
+      </tr>
+      <tr>
+        <td></td>
+        <th align="right">Contact phone:</th>
+        <td colspan="2"><%= organization.phone%></td>
+      </tr>
   <% end %>
   </tbody>
 </table>

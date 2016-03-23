@@ -14,26 +14,26 @@ class Organization < ActiveRecord::Base
               message: 'must be lowercase alphanumeric and may contain underscores and hyphens'
             },
             uniqueness: true
-  validates :acceptance_pending, inclusion: [true, false]
+  validates :verified, inclusion: [true, false]
   validate :valid_slug?, on: :create
 
   has_many :teacherships, dependent: :destroy
   has_many :teachers, through: :teacherships, source: :user
   has_many :courses, dependent: :nullify
 
-  belongs_to :requester, class_name: 'User'
+  belongs_to :creator, class_name: 'User'
 
   has_attached_file :logo, styles: { small_logo: '100x100>' }
   validates_attachment_content_type :logo, content_type: /\Aimage\/.*\Z/
 
-  scope :accepted_organizations, -> { where(acceptance_pending: false).where(rejected: false) }
-  scope :pending_organizations, -> { where(acceptance_pending: true) }
+  scope :accepted_organizations, -> { where(verified: true).where(disabled: false)}
+  scope :pending_organizations, -> { where(verified: false).where(disabled: false) }
   scope :assisted_organizations, ->(user) { joins(:courses, courses: :assistantships).where(assistantships: { user_id: user.id }) }
   scope :taught_organizations, ->(user) { joins(:teacherships).where(teacherships: { user_id: user.id }) }
   scope :participated_organizations, ->(user) { joins(:courses, courses: :awarded_points).where(awarded_points: { user_id: user.id }) }
 
   def self.init(params, initial_user)
-    organization = Organization.new(params.merge(acceptance_pending: true, requester: initial_user))
+    organization = Organization.new(params.merge(verified: false, creator: initial_user))
     teachership = Teachership.new(user: initial_user, organization: organization)
     if !organization.save || !teachership.save
       organization.destroy

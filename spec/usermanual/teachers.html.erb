@@ -97,9 +97,18 @@ require 'cgi' # for escapeHTML
     </ul>
   </p>
 
+  <p>
+    Contact details for tmc administrative purposes. These are not shown publicly.
+    <ul>
+      <li><b>Contact person name</b>, who is responsible for this organization. Also some more specific information can be included</li>
+      <li><b>Phone number</b> for the contact person</li>
+      <li><b>Email</b> for the contact person</li>
+    </ul>
+  </p>
+
 <%
-  click_on 'Request organization'
-  expect(page).to have_content("Organization was successfully requested.")
+  click_on 'Create Organization'
+  expect(page).to have_content("Organization was successfully created.")
 %>
 <%= screenshot %>
 
@@ -121,8 +130,8 @@ require 'cgi' # for escapeHTML
   click_on 'Sign in'
 
   click_on 'Show'
-  click_on 'Accept'
-  expect(page).to have_content 'Organization request was successfully accepted.'
+  click_on 'Verify'
+  expect(page).to have_content 'Organization is now verified.'
 
   visit '/'
   click_on 'Sign out'

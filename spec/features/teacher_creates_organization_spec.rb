@@ -31,26 +31,26 @@ feature 'User can create new organization', feature: true do
     expect(page).to have_content 'error'
   end
 
-  scenario 'Admin can accept pending organization creation request' do
+  scenario 'Admin can verify pending organizations' do
     @organization = FactoryGirl.create :organization
     Teachership.create!(user: @user, organization: @organization)
     log_in_as(@admin.login, 'foobar')
     click_link 'Show'
     expect(page).to have_content @organization.name
-    click_link 'Accept'
-    expect(page).to have_content 'Organization request was successfully accepted.'
+    click_link 'Verify'
+    expect(page).to have_content 'Organization is now verified.'
   end
 
-  scenario 'Admin can reject pending organization creation request' do
+  scenario 'Admin can disable unvefiried organization' do
     @organization = FactoryGirl.create :organization
     Teachership.create!(user: @user, organization: @organization)
     log_in_as(@admin.login, 'foobar')
     click_link 'Show'
     expect(page).to have_content @organization.name
-    click_link 'Reject'
-    expect(page).to have_content "You are about to reject organization #{@organization.name}"
-    click_button 'Reject organization'
-    expect(page).to have_content 'Organization request was successfully rejected.'
+    click_link 'Disable'
+    expect(page).to have_content "You are about to disable organization #{@organization.name}"
+    click_button 'Disable organization'
+    expect(page).to have_content "Organization #{@organization.name} successfully disabled."
   end
 
   scenario 'Teacher can hide organization' do
