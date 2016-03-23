@@ -164,6 +164,15 @@ ActiveRecord::Schema.define(version: 20160302150252) do
 
   add_index "feedback_questions", ["id"], name: "index_feedback_questions_on_id", using: :btree
 
+  create_table "migrated_submissions", id: false, force: :cascade do |t|
+    t.integer  "from_course_id"
+    t.integer  "to_course_id"
+    t.integer  "original_submission_id"
+    t.integer  "new_submission_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "organizations", force: :cascade do |t|
     t.string   "name"
     t.string   "information"
@@ -180,21 +189,6 @@ ActiveRecord::Schema.define(version: 20160302150252) do
     t.string   "logo_content_type"
     t.integer  "logo_file_size"
     t.datetime "logo_updated_at"
-  end
-
-  create_table "migrated_submissions", id: false, force: true do |t|
-    t.integer  "from_course_id"
-    t.integer  "to_course_id"
-    t.integer  "original_submission_id"
-    t.integer  "new_submission_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "password_reset_keys", force: true do |t|
-    t.integer  "user_id",    null: false
-    t.text     "code",       null: false
-    t.datetime "created_at", null: false
   end
 
   create_table "points_upload_queues", force: :cascade do |t|
