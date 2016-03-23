@@ -217,19 +217,19 @@ ActiveRecord::Schema.define(version: 20160310111733) do
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
   create_table "organizations", force: :cascade do |t|
-    t.string   "name"
-    t.string   "information"
-    t.string   "slug"
+    t.string   "name",                limit: 255
+    t.string   "information",         limit: 255
+    t.string   "slug",                limit: 255
     t.datetime "verified_at"
     t.boolean  "verified"
-    t.boolean  "disabled",            default: false, null: false
-    t.string   "disabled_reason"
+    t.boolean  "disabled",                        default: false, null: false
+    t.string   "disabled_reason",     limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "hidden",              default: false
+    t.boolean  "hidden",                          default: false
     t.integer  "creator_id"
-    t.string   "logo_file_name"
-    t.string   "logo_content_type"
+    t.string   "logo_file_name",      limit: 255
+    t.string   "logo_content_type",   limit: 255
     t.integer  "logo_file_size"
     t.datetime "logo_updated_at"
     t.string   "phone"
