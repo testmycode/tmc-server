@@ -23,8 +23,10 @@ gem 'pdfkit', '~> 0.6.2'
 
 gem 'logstasher', '~> 0.9.0'
 
-gem 'dalli'
 gem 'pghero'
+
+gem 'readthis' # Redis for caching
+gem 'hiredis' # Redis for caching
 
 group :assets do
   gem 'sprockets-rails', require: 'sprockets/railtie'
