@@ -18,14 +18,11 @@ class PointsController < ApplicationController
         sort_summary(@summary, params[:sort_by]) if params[:sort_by]
         @summary
     else
-      Rails.cache.fetch("points_#{@course.id}_admin_#{current_user.administrator?}/", expires_in: 1.minutes) do
+      @summary = Rails.cache.fetch("points_#{@course.id}_admin_#{current_user.administrator?}/", expires_in: 1.minutes) do
         exercises = @course.exercises.where(exercises: {hidden: false})
-        #exercises = @course.exercises.select { |e| e.points_visible_to?(current_user) }
         sheets = @course.gdocs_sheets(exercises).natsort
         @summary = summary_hash(@course, exercises, sheets)
         sort_summary(@summary, params[:sort_by]) if params[:sort_by]
-
-        expires_in 1.minutes, :public => true
 
         @summary
       end
