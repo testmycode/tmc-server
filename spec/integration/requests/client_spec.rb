@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Paste JSON api', type: :request  do
+describe Api::Beta::ParticipantController, type: :request  do
 
   before :each do
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
