@@ -20,7 +20,7 @@ class PointsController < ApplicationController
         @summary
     else
       @summary = Rails.cache.fetch("points_#{@course.id}_admin_#{current_user.administrator?}/", expires_in: 1.minutes) do
-        exercises = @course.exercises.where(exercises: {hidden: false, disabled: false})
+        exercises = @course.exercises.where(exercises: {hidden: false})
         sheets = @course.gdocs_sheets(exercises).natsort
         @summary = summary_hash(@course, exercises, sheets)
 
