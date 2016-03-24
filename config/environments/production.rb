@@ -60,6 +60,7 @@ Rails.application.configure do
         namespace: 'cache',
         redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
     }
+    Readthis.fault_tolerant = true
   else
     config.cache_store = :memory_store, { size: 64.megabytes } #
   end
