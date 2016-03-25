@@ -5,6 +5,10 @@ class CourseList
     @helpers = helpers
   end
 
+  def course_list_data(organization, courses, opts={})
+    courses.map { |c| course_data(organization, c, opts) }
+  end
+
   def course_list_data_no_organisation(courses, opts = {})
     courses.map { |c| course_data(c.organization, c, opts) }
   end
