@@ -48,10 +48,14 @@ end.call
 # Recommendation for Selenium: run tests under Xvfb:
 # In console 1: Xvfb :99
 # In console 2: env DISPLAY=:99 rvmsudo rake spec
-Capybara.default_driver = :poltergeist
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app, timeout: 30)
+end
+
+ Capybara.default_driver = :poltergeist
 
 Capybara.server_port = FreePorts.take_next
-Capybara.default_max_wait_time = 10 # Comet messages may take longer to appear than the default 2 sec
+Capybara.default_max_wait_time = 30 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
 
 if Capybara.default_driver == :selenium
