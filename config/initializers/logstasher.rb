@@ -2,10 +2,14 @@ if LogStasher.enabled?
   LogStasher.add_custom_fields do |fields|
     # This block is run in application_controller context,
     # so you have access to all controller methods
-    if current_user
-      fields[:user] = current_user.login
-    else
-      fields[:user] = 'guest'
+    begin 
+      if current_user && current_user.login
+        fields[:user] = current_user.login
+      else
+        fields[:user] = 'guest'
+      end
+    rescue NameError
+      fields[:user] = 'pghero?'
     end
     fields[:site] = request.path =~ /^\/api/ ? 'api' : 'user'
 
