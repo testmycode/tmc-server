@@ -13,7 +13,8 @@ Doorkeeper.configure do
   admin_authenticator do
     # Put your admin authentication logic here.
     # Example implementation:
-    User.find_by_id(session[:user_id]) || redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
+    (user = User.find_by_id(session[:user_id]) && !user.nil? && user.administrator?) || redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
+
   end
 
   resource_owner_from_credentials do |routes|
