@@ -2,6 +2,10 @@
 class SessionsController < ApplicationController
   skip_authorization_check
 
+  def new
+    session[:return_to] ||= params[:return_to]
+  end
+
   def create
     begin
       clear_expired_sessions
@@ -29,8 +33,13 @@ class SessionsController < ApplicationController
   private
 
   def try_to_redirect_back(redirect_params = {})
-    if !request.env['HTTP_REFERER'].blank?
+    if !session[:return_to].blank?
+      return_to = session.delete(:return_to)
+      redirect_to return_to, redirect_params
+    elsif !request.env['HTTP_REFERER'].blank?
       redirect_to :back, redirect_params
+    elsif !request.referrer.blank?
+      redirect_to request.referrer, redirect_params
     else
       redirect_to root_path, redirect_params
     end

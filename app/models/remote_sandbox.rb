@@ -18,7 +18,8 @@ class RemoteSandbox
     for server in all.shuffle # could be smarter about this
       begin
         server.send_submission(submission, notify_url)
-      rescue SandboxUnavailableError
+      rescue SandboxUnavailableError=>e
+        Rails.logger.warn e
         # ignore
       else
         Rails.logger.info "Submission #{submission.id} sent to remote sandbox at #{server.baseurl}"

@@ -1,0 +1,3 @@
+module Api::Beta
+
+end

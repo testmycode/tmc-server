@@ -99,7 +99,8 @@ class ApplicationController < ActionController::Base
     params[:format] == 'json' &&
       controller_name != 'stats' &&
       controller_name != 'auths' &&
-      !(controller_name == 'feedback_answers' && action_name == 'index')
+      !(controller_name == 'feedback_answers' && action_name == 'index') &&
+      !(controller_path.starts_with? 'api')
   end
 
   def set_bare_layout
