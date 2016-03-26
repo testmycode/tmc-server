@@ -91,12 +91,15 @@ class ParticipantsController < ApplicationController
     end
 
     if current_user.administrator? || current_user.id == @user.id
-      @submissions = @user.submissions.order('created_at DESC').includes(:user)
+      @submissions = @user.submissions.order('created_at DESC').includes(:user).includes(:course)
     else # teacher and assistant sees only submissions for own teacherd courses
-      @submissions = @user.submissions.order('created_at DESC').includes(:user).where(course: current_user.teaching_in_courses)
+      @submissions = @user.submissions.order('created_at DESC').includes(:user, :course).where(course: current_user.teaching_in_courses)
     end
+    @submission_count = @submissions.count
+    @submissions = @submissions.limit(100) unless !!params[:view_all]
 
     Submission.eager_load_exercises(@submissions)
+
   end
 
   def me

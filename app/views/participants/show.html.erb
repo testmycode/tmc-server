@@ -31,5 +31,8 @@
 
 <section>
   <h2>Submissions</h2>
+  <% if @submissions.size < @submission_count %>
+    <p>Showing latest <%= @submissions.size%> of <%= @submission_count %> submissions. <%= link_to "View all submissions", participant_path(@user, view_all: 1) %></p>
+  <% end %>
   <%= show_submission_list(@submissions) %>
 </section>
