@@ -14,8 +14,11 @@ class ExercisesController < ApplicationController
         Course.transaction(requires_new: true) do
           if !current_user.guest?
             @submissions = @exercise.submissions.order('submissions.created_at DESC')
+
             @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
             @submissions = @submissions.includes(:awarded_points).includes(:user)
+            @submission_count = @submissions.count
+            @submissions = @submissions.limit(50) unless !!params[:view_all]
           else
             @submissions = nil
           end
