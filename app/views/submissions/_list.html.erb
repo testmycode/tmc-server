@@ -28,12 +28,13 @@
     </tr>
   </thead>
   <tbody>
+    <% can_teach = can?(:teach, @course) %>
     <% submissions.each do |submission| %>
       <tr>
         <td><%= submission.created_at.strftime("%d.%m.%Y %H:%M") %></td>
         <% if show_student_column %>
           <td>
-            <% if current_user.id == submission.user.id || can?(:teach, @course) %>
+            <% if current_user.id == submission.user.id || can_teach %>
               <%= link_to submission.user.login, participant_path(submission.user) %>
             <% else %>
               <%= submission.user.login %>
