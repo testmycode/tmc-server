@@ -8,8 +8,8 @@ env:
     - CI_NODE=2 RSPEC=1 RSPEC_PATTERN="spec/{features,usermanual}/**/*.rb"
     - CI_NODE=3 RSPEC=1 RSPEC_PATTERN="spec/integration/{running_tests,comet}/**/*.rb"
     - CI_NODE=4 RSPEC=1 RSPEC_PATTERN="spec/integration/{feedback,requests}/**/*.rb"
-    - CI_NODE=5 RSPEC=1 RSPEC_PATTERN="spec/integration/{admin_usecases_spec.rb,broken_utf8_spec.rb,personal_deadlines_spec.rb}"
-    - CI_NODE=6 RSPEC=1 RSPEC_PATTERN="spec/integration/{reset_password_spec.rb,stats_view_usecases_spec.rb,student_usecases_spec.rb,utf8_exercise_spec.rb}"
+    - CI_NODE=5 RSPEC=1 RSPEC_PATTERN="spec/integration/{admin_usecases_spec.rb,broken_utf8_spec.rb,personal_deadlines_spec.rb,reset_password_spec.rb,stats_view_usecases_spec.rb}"
+    - CI_NODE=6 RSPEC=1 RSPEC_PATTERN="spec/integration/{student_usecases_spec.rb,utf8_exercise_spec.rb}"
     - CI_NODE=7 BREAKMAN=1 AUDIT=1
   global:
     - secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
