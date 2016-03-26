@@ -52,10 +52,10 @@ class PointsController < ApplicationController
     add_breadcrumb 'Points', course_points_path(@course)
     add_breadcrumb @sheetname, course_point_path(@course, @sheetname)
 
-    @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).order!
+    @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).includes(:available_points).order!
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname)
 
-    @users = User.course_sheet_students(@course, @sheetname)
+    @users = User.course_sheet_students(@course, @sheetname).includes(:organizations)
     if params[:sort_by] == 'points'
       @users = @users.sort_by do |u|
         [-@users_to_points[u.login].size, u.login.downcase]
