@@ -102,10 +102,11 @@ class StatsController < ApplicationController
           .where('created_at < ?', @end_time)
 
         date_format = '%Y-%m-%d %H:%M:%S' # query returns in this format, without timezone
+        #date_format = '%FT%T.%LZ' # query returns in this format, without timezone
 
         lookup = {}
         for r in records
-          lookup[r.t] = r.c.to_i
+          lookup[r.t.strftime(date_format)] = r.c.to_i
         end
         lookup.default = 0
 
