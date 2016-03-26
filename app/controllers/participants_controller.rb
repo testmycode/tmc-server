@@ -75,7 +75,10 @@ class ParticipantsController < ApplicationController
       end
     end
 
-    @submissions = @user.submissions.order('created_at DESC').includes(:user)
+    @submissions = @user.submissions.order('created_at DESC').includes(:user).includes(:course)
+    @submission_count = @submissions.count
+    @submissions = @submissions.limit(100) unless !!params[:view_all]
+
     Submission.eager_load_exercises(@submissions)
   end
 
