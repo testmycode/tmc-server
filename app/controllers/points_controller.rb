@@ -100,8 +100,8 @@ class PointsController < ApplicationController
       sheets: sheets.map do |sheet|
         {
           name: sheet,
-          total_awarded: total_awarded[sheet],
-          total_available: total_available[sheet]
+          total_awarded: (total_awarded[sheet] || 0),
+          total_available: (total_available[sheet] || 0)
         }
       end,
       total_awarded: AwardedPoint.course_points(course, include_admins),
