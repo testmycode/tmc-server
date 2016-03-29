@@ -40,6 +40,7 @@ module TmcServer
         resource '/api*', headers: :any, methods: [:get, :post]
       end
       allow do
+        origins SiteSetting.all_settings['cors_origins']
         resource '/auth*', headers: :any, methods: [:get, :post]
         resource '/paste/*', headers: :any, methods: [:get]
         resource '/courses', headers: :any, methods: [:get]
