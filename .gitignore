@@ -4,8 +4,9 @@
 /db/files
 /log/
 /public/assets/
+/public/system/
 /tmp/
-/doc/usermanual/pages
+/doc/usermanual/
 /doc/usermanual/screenshots
 /config/site.yml
 /config/newrelic.yml
@@ -26,4 +27,5 @@
 # IntelliJ IDEA
 /.idea
 
-
+# Byebug history file
+.byebug_history
