@@ -23,21 +23,14 @@ git config --global user.email "travis@example.com"
 git config --global user.name "Travis"
 
 # Install tmc-check
-export CHECK_INSTALL_DIR=$HOME/check
+#export CHECK_INSTALL_DIR=$HOME/check
 mkdir $CHECK_INSTALL_DIR
 git clone https://github.com/testmycode/tmc-check.git
 cd tmc-check
 bundle install --jobs=3 --retry=3 --deployment
 make
 make install PREFIX=$CHECK_INSTALL_DIR
-export PATH="$CHECK_INSTALL_DIR/bin:$PATH"
 cd ..
-export LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
-export C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH
-export PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-
-# Reduce mavens memory usage
-export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
 
 # Build submodules except sandbox
 bundle exec rake compile
