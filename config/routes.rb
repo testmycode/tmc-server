@@ -13,6 +13,7 @@ TmcServer::Application.routes.draw do
           get 'courses'
         end
       end
+      resources :course_id_information, only: [:index]
       resources :stats, only: [] do
         collection do
           get 'submission_queue_times'
