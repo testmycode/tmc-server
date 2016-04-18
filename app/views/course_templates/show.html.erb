@@ -46,6 +46,6 @@
 
 <ul>
   <% @course_template.courses.each do |course| %>
-      <li><%= link_to course.name, organization_course_path(course.organization, course) %>, <%= course.organization.name %></li>
+      <li><%= link_to course.title, organization_course_path(course.organization, course) %>, <%= course.organization.name %></li>
   <% end %>
 </ul>

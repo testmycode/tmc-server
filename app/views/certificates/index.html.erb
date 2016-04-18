@@ -19,7 +19,7 @@
             <% if can? :read, cert.course %>
               <td><%= link_to cert.course.name, cert.course %></td>
             <% else %>
-              <td><%= cert.course.name %></td>
+              <td><%= cert.course.title %></td>
             <% end %>
             <td>
               <%= link_to 'View certificate', cert %>
