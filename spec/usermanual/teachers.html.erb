@@ -6,7 +6,7 @@
   #TODO: get rid of header/layout duplication
   %>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>TMC webapp user manual - teacher</title>
+  <title>TMC user manual - teacher</title>
 
   <link rel="stylesheet" type="text/css" href="css/usermanual.css" />
   <link rel="stylesheet" type="text/css" href="lib/shjs/sh_style.css" />
@@ -33,6 +33,7 @@ require 'cgi' # for escapeHTML
   <%
     FactoryGirl.create :user, login: 'teacher', password: 'teacher'
     FactoryGirl.create :user, login: 'professor', password: 'professor'
+    FactoryGirl.create :user, login: 'oldassistant', password: 'oldassistant'
     FactoryGirl.create :admin, login: 'admin', password: 'admin'
     FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
 
@@ -55,21 +56,35 @@ require 'cgi' # for escapeHTML
 
   <div id="toc"></div>
 
+  <h2>Overview</h2>
   <p>
-    Teacher is a user that has a teachership status to one or more organizations.
-    Their main responsibility is to manage their organization, along with regular
-    duties related to teaching their students.
-  </p>
-
-  <h2>Requesting organization</h2>
-
-  <p>
-    TMC webapp is divided to several organizations, which have their own staff and courses. To start using TMC as
-    a teacher, you must either be added to some established organization or request your own.
+    Teacher is a user that controls his own organization. Organization can have several teachers, and they all can
+    create and manage courses. One teacher can also belong to several organizations.
   </p>
 
   <p>
-    When logged in as a user (sign up first if you haven't already), go to url </i>/org/new</i> in current TMC webapp,
+    As a teacher, you can create fully functional courses from available templates. You can customize exercise sets,
+    their deadlines and unlock conditions etc. Courses can also have customized feedback questions which can be asked
+    from students after successful submission.
+  </p>
+
+  <p>
+    Courses can also have course assistants, who have partial teachership permissions for that course only, not for all
+    organization's courses.
+  </p>
+
+  <h2>Creating organization</h2>
+
+  <p>
+    When you are starting to use TMC for your own teaching first time, first step is to create your own organization.
+    If your organization is big, it's good to check from the front page if the organization already exists in the system.
+    If it is already found, you should contact the other teachers and ask them to promote you as teacher in the
+    existing organization.
+  </p>
+
+  <p>
+    First you have to be logged in the system normally. If needed, click the <i>Sign up</i> link and create your personal
+    account. When logged in, go to url </i>/org/new</i> in the TMC system,
     (for example http://tmc.mooc.fi/org/new).
   </p>
 
@@ -84,6 +99,10 @@ require 'cgi' # for escapeHTML
   fill_in 'organization_name', with: 'Helsingin yliopisto'
   fill_in 'organization_information', with: 'University life'
   fill_in 'organization_slug', with: 'hy'
+  fill_in 'organization_contact_information', with: 'Matti Meikäläinen'
+  fill_in 'organization_phone', with: '+3584012345678'
+  fill_in 'organization_email', with: 'matti@meikalainen.fi'
+  highlight 'a:contains("Create Organization")'
 %>
 <%= screenshot %>
 
@@ -113,13 +132,9 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
   <p>
-    After sending the request, you will have to wait for TMC's administrators to accept your request. While request is pending,
-    you may see the organization's page, but you can't do much else with it.
-  </p>
-
-  <p>
-    After your organization is accepted, you will be able to see it in the organization listing at the front page.
-    Your own organizations are listed first separately, and accepted organizations are shown also in 'All organizations' list.
+    When you have successfully created organization, it is ready for use. Only few functionalities, like model answers,
+    are not available until administrators have verified the organization. When logged in, your organization is listed
+    separately on TMC front page. Verified organizations are also publicly listed.
   </p>
 
 <%
@@ -145,8 +160,9 @@ require 'cgi' # for escapeHTML
 
   <h2>Adding new teachers</h2>
 
-  <p>
-    From your organization's front page, you can list all the teachers in the organization.
+  <p>As a teacher, you can list, add and remove teachers in your organization. From the organization front page,
+    you can find link to list all the teachers. Remember that all teachers in the organization have same access
+    rights as you, so be careful when adding new teachers.
   </p>
 
 <%
@@ -160,9 +176,8 @@ require 'cgi' # for escapeHTML
 %>
 
   <p>
-    When you're a teacher in some organization, you may add new teachers. To recruit a new teacher, you will have to
-    know the teacher's username. The page form will not list available usernames. Type the username then click
-    'Add a new teacher'.
+    To recruit a new teacher, you will have to know the teachers's exact username in TMC system. Type the username
+    then click 'Add a new teacher'.
   </p>
 
 <%
@@ -171,22 +186,22 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
+<p>
+  You can also remove existing teachers easily by clicking 'Remove' buttons.
+</p>
+
 <%
    click_on 'Add a new teacher'
    highlight 'a:contains("Remove")'
 %>
 <%= screenshot %>
 
-  <p>
-    Added teacher will now have the same access rights for the organization as you have. You can also remove existing
-    teachers easily.
-  </p>
-
   <h2>Creating a course</h2>
 
   <p>
-    Simplest way to create a course is to copy it from a template. You will be able to manage submission deadlines,
-    exercise unlock conditions etc. You will not, however, be able to edit the exercise source code.
+    TMC offers fully working course templates, from which you can create your own courses. Courses will include
+    teaching material and set of exercises. You can customize your own course by managing susbmission deadlines,
+    exercise unlock conditions, feedback answers etc.
   </p>
 
   <p>
@@ -199,14 +214,17 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
+  <p>
+    You will see a list of all the course templates TMC has to offer. If needed, take a look at the course description
+    and course material, to choose which course is suitable for your needs. Click 'Create Course' button on the course
+    that you want.
+  </p>
+
 <%
   click_on 'Create New Course'
+  highlight 'a:contains("Create Course")'
 %>
 <%= screenshot %>
-
-  <p>
-    You will see a list of all the course templates TMC has to offer. Click 'Create Course' button on the template that you want.
-  </p>
 
 <%
   first(:link, 'Create Course').click
@@ -214,20 +232,26 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
   <p>
-    On the following form the fields will be prefilled with template defaults. You may change these fields to suit your needs.
+    On the following form the fields will be prefilled with template defaults.
+    You may change these fields to suit your needs.
     <ul>
-      <li>Courses are shown by <b>Name</b> in IDE plugins (such as NetBeans). Name can't contain whitespaces.</li>
-      <li><b>Title</b> is a prettier version of the name that may contain whitespaces, and is shown on webapp pages.</li>
-      <li><b>Description</b> is a short piece of text to show when browsing this particular course.</li>
       <li>
-        <b>Material url</b> takes user to the online resource that educates and helps the course participant with solving
-        the course exercises.
+        Course <b>Name</b> is technical name, which is shown in IDE plugins (such as NetBeans) and
+        in directory structures. Name can't contain whitespaces. This can't be changed later.
+      </li>
+      <li><b>Title</b> is a prettier version of the name that may contain whitespaces, and is shown on TMC pages.</li>
+      <li><b>Description</b> is place for short information about the course.</li>
+      <li>
+        <b>Material url</b> is the link to the course material, which is the main learning source for the students.
+        Material should include the exercises too, and normally it's wise to use course's own material, even though
+        it's possible to create also your own.
       </li>
     </ul>
   </p>
 
   <p>
-    Click 'Add Course'. You might want to wait a while as course will fill itself with exercises downloaded via Source url.
+    Finally click the 'Add Course' button. It might take some time while the TMC populates the new course with
+    exercices.
   </p>
 
 <%
@@ -237,8 +261,22 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
   <p>
-    Course should now be available for students to submit their solutions to exercises. TMC will show a help page to get you started
-    with teaching the course. Click 'view status page' to return to course's front page.
+    After the course has been created, you will get message announcing that. Now the course
+    should now be available for students to submit their solutions to exercises.
+    TMC will show a help page to get you started with teaching the course. Click 'view status page' to return
+    to course's front page, where you can manage course details.
+  </p>
+
+  <p>
+    Here you may see submissions sent to any exercises in this course, view model solutions, make code reviews etc. You may also access
+    course page from organization's page.
+  </p>
+
+  <p>
+    Course main page is divided into few sections. First, you have the general management part, which contains links to
+    exercise, deadline, unlock, assistant and course option management. After that, there is the exercise list,
+    and at the bottom, you can find student's submissions. Remember, that as a teacher (or assistant), you will see
+    submissions from all the students, while students see only their own submissions.
   </p>
 
 <%
@@ -246,10 +284,14 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
+  <h2>Editing course details</h2>
+
   <p>
-    Here you may see submissions sent to any exercises in this course, view model solutions, make code reviews etc. You may also access
-    course page from organization's page.
+    You can edit the initially entered course information plus some other things by clicking the 'Edit course parameters'
+    button.
   </p>
+
+  <p>Technical course name is permanent, and it can't be edited.</p>
 
 <%
    visit '/org/hy'
@@ -260,21 +302,16 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
-  <p>
-    If you're so inclined, you may create your own course without a template. This <a href="customcourse.html">guide</a>
-    If you want to use an external point awarding system, you can enter its URL to the 'Custom points URL' field. You can also use a template
-    string that will generate the URL dynamically. For example, <code style='white-space: nowrap'>http://my-custom-points.io/%{user}</code> would show as
-    <code style='white-space: nowrap'>http://my-custom-points.io/MyUsername</code> when viewed by user <code>MyUsername</code>
-    If you want to use an external point awarding system, you can enter its URL to the 'External scoreboard URL' field. You can also use a template
-    string that will generate the URL dynamically. For example, <code style='white-space: nowrap'>http://my-points.io/%{user}</code> would show as
-    <code style='white-space: nowrap'>http://my-points.io/MyUsername</code> when viewed by user <code>MyUsername</code>
-  </p>
+<h3>External score board</h3>
 
-  <p>
-    If you're so inclined, you may also create your own course without a template. This <a href="customcourse.html">guide</a>
-    may prove useful to you in this case. Creating this kind of custom courses may also be disabled, based on the
-    current TMC webapp configuration.
-  </p>
+<p>
+  If you want to use an external point awarding system, you can enter its URL to the 'Custom points URL' field. You can also use a template
+  string that will generate the URL dynamically. For example, <code style='white-space: nowrap'>http://my-custom-points.io/%{user}</code> would show as
+  <code style='white-space: nowrap'>http://my-custom-points.io/MyUsername</code> when viewed by user <code>MyUsername</code>
+  If you want to use an external point awarding system, you can enter its URL to the 'External scoreboard URL' field. You can also use a template
+  string that will generate the URL dynamically. For example, <code style='white-space: nowrap'>http://my-points.io/%{user}</code> would show as
+  <code style='white-space: nowrap'>http://my-points.io/MyUsername</code> when viewed by user <code>MyUsername</code>
+</p>
 
   <h2>Disabling course</h2>
 
@@ -284,13 +321,15 @@ require 'cgi' # for escapeHTML
     or if you want to force students to take a vacation. Disabled courses can be enabled at a later time.
   </p>
 
+<p>Simply click 'Disable Course' link to disable course.</p>
+
 <%
    visit '/org/hy/courses/1'
    highlight 'a:contains("Disable Course")'
 %>
 <%= screenshot %>
 
-  <p>Simply click 'Disable Course' link to disable course</p>
+<p>Click 'Enable Course' link to enable it again.</p>
 
 <%
   click_on 'Disable Course'
@@ -298,13 +337,19 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
-  <p>Click 'Enable Course' link to enable it again</p>
-
 <%
    click_on 'Enable Course'
 %>
 
-  <h2>Adding course assistants</h2>
+  <h2>Course assistants</h2>
+
+<%
+  visit '/org/hy/courses/1/assistants'
+  fill_in 'username', with: 'oldassistant'
+  click_on 'Add a new assistant'
+  visit '/org/hy/courses/1/assistants'
+
+%>
 
   <p>
     Course assistants have teacher permissions for single course, not for whole organization.
@@ -332,12 +377,44 @@ require 'cgi' # for escapeHTML
 
   <p>
     To control course progression, each exercise and exercise group may be configured with deadlines and unlock conditions.
+    First, it's important to understand the concept of deadline and unlock condition.
   </p>
 
-  <h3>Deadlines</h3>
+  <h3>Definitions</h3>
+
+  <img src="../images/exercise_deadline_unlock.png" alt="Unlocks and deadlines for exercises">
+  <h4>Deadlines</h4>
 
   <p>
-    From the course's front page, click the 'Manage deadlines' button.
+    There are 2 kind of deadlines. <b>Soft deadline</b> is a deadline which is shown for students, but TMC will accept
+    and process submissions even after that, only flagging that it's submitted late. <b>Hard deadline</b> is a strict
+    deadline, so that when it is passed, TMC refuses to process any submissions.
+  </p>
+
+  <p>
+    Choosing the deadlines depends on your needs. For example, you can set soft deadlines for every friday evening,
+    and hard deadline for sunday evenings, to give students few days extra time, if thay fail to submit in time.
+    Then you can take into account the late submissions in the grading, if needed.
+  </p>
+
+  <p>
+    Deadlines can be either common time-based for all, or they can be unique unlock-based, so that student will
+    always have exactly one week to submit. Then the exact deadline time will depend on the time where the exercise
+    became available for the student.
+  </p>
+
+  <h4>Unlock conditions</h4>
+
+  <p>
+    Unlock condition is a condition, which determines when the exercise is available for the student. Two most common
+    cases are fixed date, or some percentage of previous exercises completed. So unlock condition can be common for all,
+    or unique for every student, based on their progress.
+  </p>
+
+  <h3>Setting deadlines</h3>
+
+  <p>
+    To setup deadlines for the exercises, click the 'Manage deadlines' button from the course's front page.
   </p>
 
 <%
@@ -354,12 +431,6 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
   <p>
-    Distinction is made between hard and soft deadlines. When soft deadline is met, nothing relevant to TMC webapp happens.
-    Soft deadlines are meant to pressure students with smaller reprecussions.
-    When hard deadline is met, exercise will stop accepting submissions.
-  </p>
-
-  <p>
     Common deadlines are configured by date or date-time. TMC understands multiple formats, for example:
     <ul>
       <li>20.1.2000</li>
@@ -370,18 +441,31 @@ require 'cgi' # for escapeHTML
     </ul>
   </p>
 
+  <hr>
+
   <p>
-    Unlock-based deadlines will calculate unique deadlines for each student based on the time they unlocked the exercise.
+    Another way to setup deadlines is to use unique unlock-based deadlines. It means that deadline for each
+    student is based on the time they unlocked the exercise (see <a href="#unlock_conditions">Unlock conditions</a>).
     For example, to give students 2 weeks to complete an exercise after it becomes available, set the deadline to
-    <code>unlock + 2 weeks</code>. Other possible values for unlock-based deadlines are
-    <code>unlock + &lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code>.
-    To edit unlock-based deadlines, advanced options must be enabled by clicking the button in the top right corner of the page.
+    <code>unlock + 2 weeks</code>.
   </p>
 
   <p>
-    By default, the form is set to edit deadlines for all exercises in an exercise group at once. Exercises that the deadlines apply to
-    are listed on the 'Exercises' column. If you want to edit deadlines for individual exercises, click 'Show single exercises'.
-    This will expand the form to show all exercises in the group.
+    All possible valuers for unlock-based deadline are:<br><br>
+    <code>unlock + &lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code>.
+  </p>
+
+  <p>
+    To edit unlock-based deadlines, advanced options must be enabled by clicking the button in the top right corner of the page.
+    If both date-based and unlock-based deadlines are enabled for the same exercise, the one which expires first wil be used.
+  </p>
+
+  <hr>
+
+  <p>
+    Exercises are organized into pre-defined groups. By default, deadlines are set per group, so that all exercices in
+    the current group will get the same deadline. If you need more customization, you can click 'Show single exercises',
+    and then the form allows to set deadlines at single exercise level.
   </p>
 
 <%
@@ -405,7 +489,7 @@ require 'cgi' # for escapeHTML
 
   <p>
     If the exercises in a group have differing deadlines, the group deadline input fields will be disabled and show
-    '<%= disabled_text %>'.
+    '<%= disabled_text %>', so you can't accidentally override exercise specific settings.
   </p>
 
 <%= screenshot %>
@@ -422,18 +506,20 @@ require 'cgi' # for escapeHTML
 
 <%= screenshot %>
 
-  <p>
-    If both date-based and unlock-based deadlines are enabled for the same exercise, the one which expires first wil be used.
-  </p>
+  <p>When you are done with the settings, remember to click 'Save changes' at the bottom of the page.</p>
 
   <p>
     After creating a course from template, the deadlines may already be defined depending on the course template configuration.
   </p>
 
-  <h3>Unlock conditions</h3>
+  <h3>Setting unlock conditions</h3>
 
   <p>
-    If exercise or exercise group has an unlock condition attached to it and it has not passed yet, exercise will not accept submissions.
+    If exercise or exercise group has an unlock condition attached to it and it has not passed yet, exercise will not
+    accept submissions. If there are no unlocks set, exercise is always active.
+  </p>
+
+  <p>
     Unlock conditions can be set by clicking 'Manage unlock conditions' in the course page.
   </p>
 
@@ -472,104 +558,37 @@ require 'cgi' # for escapeHTML
     </ul>
   </p>
 
-  <h2>Managing feedback questions</h2>
+  <p><code>&lt;exercise-or-group&gt;</code> is the exact name for the exercise.</p>
 
   <p>
-    Every course can have feedback questions, which are asked after successful submission.
-    Questions can be configured by clicking 'Manage feedback questions' from course front page.
+    Some most common examples:
+    <ul>
+      <li>
+        Fixed date:<br>
+        <code>1.9.2016</code>
+      </li>
+      <li>
+        80% of the points from some precious week<br>
+        <code>80% from exercice-group-X</code>
+      </li>
+      <li>
+        Single important exercise made successfully<br>
+        <code>exercise important-exercise</code>
+      </li>
+    </ul>
   </p>
-
-<%
-   visit '/org/hy/courses/1'
-   highlight 'a:contains("Manage feedback questions")'
-%>
-<%= screenshot %>
-
-  <p>
-    New question can be added by clicking 'Add question'.
-  </p>
-
-<%
-   click_on 'Manage feedback questions'
-   highlight 'a:contains("Add question")'
-
-%>
-<%= screenshot %>
-
-  <p>
-    First enter the question text and shorter title, which can be shown on result view. Questions can be either
-    free text answers or number value from selected range. If you want to create free text question, choose
-    'Text area' as question type.
-  </p>
-
-<%
-   click_on 'Add question'
-   fill_in 'feedback_question_question', with: 'What problems you had in this exercise?'
-   fill_in 'feedback_question_title', with: 'problems'
-   choose('Text area')
-   highlight '[value="Create question"]'
-
-%>
-<%= screenshot %>
-<%
-   click_on 'Create question'
-%>
-
-  <p>
-    If you want to create question with number valua answers, for example for statistical purposes, you can choose
-    'Integer range' option instead. New input fiels for minimum and maximum values are shown.
-  </p>
-
-<%
-   visit '/org/hy/courses/1/feedback_questions/new'
-   fill_in 'feedback_question_question', with: 'How difficult was this exercise (1-5)?'
-   fill_in 'feedback_question_title', with: 'difficulty'
-   choose('Integer range')
-   fill_in 'intrange_min', with: '1'
-   fill_in 'intrange_max', with: '5'
-
-   highlight '[value="Create question"]'
-%>
-<%= screenshot %>
-<%
-   click_on 'Create question'
-%>
-
-  <p>
-    When questions are made, you can adjust their order with 'Up' and 'Down' options. Question can be removed
-    by clicking 'Delete'.
-  </p>
-
-<%
-   visit '/org/hy/courses/1/feedback_questions/'
-   highlight 'a:contains("Up")'
-   highlight 'a:contains("Down")'
-   highlight 'a:contains("Delete")'
-
-%>
-<%= screenshot %>
-
-  <p>
-    After students have answered to questions, the answers can be viewed by clicking 'View feedback' from
-    course main page.
-  </p>
-
-<%
-   visit '/org/hy/courses/1/'
-   highlight 'a:contains("View feedback")'
-%>
-<%= screenshot %>
 
   <h2>Code review</h2>
 
   <p>
-    Some assignments require code review to be completed, and students can also request code review if they want.
-    If there are unreviewed requests, course front page has link 'n code view requested'. You can start review process
-    by clickin that link.
+    Code review is a process, where course teacher or assistant looks the code in the submitted answer, and
+    reviews it with commenting. Some exercises require code review to be completed, and students can also
+    request code review if they want.
   </p>
-
   <p>
-    Also submission list on the bottom of the page shows individually if submission still requires review.
+    If there are any unreviewed requests, course front page has link 'n code view requested'.
+    You can start review process by clicking that link. Also submission list on the bottom of the page shows
+    individually if submission still requires review.
   </p>
 
 <%
@@ -599,11 +618,11 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
-<p>
-  On the actual review screen, you can see studens answer code at the bottom of the page. Showing test results
-  can be toggled by clicking 'Test results'. When you have taken look at the code, click 'Start code review'
-  to start writing your actual review feedback.
-</p>
+  <p>
+    On the actual review screen, you can see studens answer code at the bottom of the page. Showing test results
+    can be toggled by clicking 'Test results'. When you have taken look at the code, click 'Start code review'
+    to start writing your actual review feedback.
+  </p>
 
 <%
    click_on 'Requested'
@@ -623,6 +642,99 @@ require 'cgi' # for escapeHTML
    highlight 'label:contains("Notify by e-mail")'
    highlight 'button:contains("Save review")'
    sleep 1      # to prevent javascript animation to be captured
+%>
+<%= screenshot %>
+
+<h2>Managing feedback questions</h2>
+
+<p>
+  Every course can have feedback questions, which are asked after successful submission. Question can be either
+  free text answer or number value for selected range.
+  For example, numeric questions can be "How difficult was this exercise? (1-5)", and text question
+  "What problems you had in this exercise?".
+</p>
+
+<p>
+  Questions can be configured by clicking 'Manage feedback questions' from course front page.
+</p>
+
+<%
+  visit '/org/hy/courses/1'
+  highlight 'a:contains("Manage feedback questions")'
+%>
+<%= screenshot %>
+
+<p>
+  New question can be added by clicking 'Add question'.
+</p>
+
+<%
+  click_on 'Manage feedback questions'
+  highlight 'a:contains("Add question")'
+
+%>
+<%= screenshot %>
+
+<p>
+  First enter the actual question text and short title, which can be shown on result view.
+  If you want to create free text question, choose 'Text area' as question type.
+</p>
+
+<%
+  click_on 'Add question'
+  fill_in 'feedback_question_question', with: 'What problems you had in this exercise?'
+  fill_in 'feedback_question_title', with: 'problems'
+  choose('Text area')
+  highlight '[value="Create question"]'
+
+%>
+<%= screenshot %>
+<%
+  click_on 'Create question'
+%>
+
+<p>
+  If you want to create question with number value answers, for example likert scale for statistical purposes,
+  you can choose 'Integer range' option instead. New input fiels for minimum and maximum values are shown.
+</p>
+
+<%
+  visit '/org/hy/courses/1/feedback_questions/new'
+  fill_in 'feedback_question_question', with: 'How difficult was this exercise (1-5)?'
+  fill_in 'feedback_question_title', with: 'difficulty'
+  choose('Integer range')
+  fill_in 'intrange_min', with: '1'
+  fill_in 'intrange_max', with: '5'
+
+  highlight '[value="Create question"]'
+%>
+<%= screenshot %>
+<%
+  click_on 'Create question'
+%>
+
+<p>
+  When questions are made, you can adjust their order with 'Up' and 'Down' options. Question can be removed
+  by clicking 'Delete'.
+</p>
+
+<%
+  visit '/org/hy/courses/1/feedback_questions/'
+  highlight 'a:contains("Up")'
+  highlight 'a:contains("Down")'
+  highlight 'a:contains("Delete")'
+
+%>
+<%= screenshot %>
+
+<p>
+  After students have answered to questions, the answers can be viewed by clicking 'View feedback' from
+  course main page.
+</p>
+
+<%
+  visit '/org/hy/courses/1/'
+  highlight 'a:contains("View feedback")'
 %>
 <%= screenshot %>
 
@@ -692,6 +804,17 @@ require 'cgi' # for escapeHTML
    click_on 'Show statistics'
 %>
 <%= screenshot %>
+
+  <h2>Custom courses</h2>
+
+    <p>
+      TMC has support for creating fully customized own courses from scratch, without using offered course templates.
+      This option might be disabled on the running TMC server, and may not be supported.
+      Normally you don't need to bother with that, and it is for advanced use only.
+
+      <a href="customcourse.html">Guide for custom courses</a> tells the details about the fully custom courses
+      with their own exercices etc.
+    </p>
 
 </body>
 </html>
