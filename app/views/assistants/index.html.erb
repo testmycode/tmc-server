@@ -1,4 +1,8 @@
-<h1>Assistants in course <%= @course.name %></h1>
+<h1>Assistants in course <%= @course.title %></h1>
+
+<%= render 'form' %>
+
+<h4>Current assistants</h4>
 
 <table class="table table-striped table-condensed">
   <thead>
@@ -10,12 +14,11 @@
 
   <tbody>
   <% @assistants.each do |assistant| %>
-      <tr>
-        <td><%= link_to assistant.username, participant_path(assistant) %></td>
-        <td><%= link_to 'Remove', organization_course_assistant_path(@course.organization, @course, assistant.assistantship(@course)), method: :delete, class: "btn btn-mini btn-warning", data: { confirm: 'Are you sure?' } %></td>
-      </tr>
+    <tr>
+      <td><%= link_to assistant.username, participant_path(assistant) %></td>
+      <td><%= link_to 'Remove', organization_course_assistant_path(@course.organization, @course, assistant.assistantship(@course)), method: :delete, class: "btn btn-mini btn-warning", data: { confirm: 'Are you sure?' } %></td>
+    </tr>
   <% end %>
   </tbody>
 </table>
 
-<%= render 'form' %>

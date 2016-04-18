@@ -17,7 +17,7 @@ class TeachersController < ApplicationController
     @teachership = Teachership.new(user: user, organization: @organization)
 
     if @teachership.save
-      redirect_to organization_teachers_path, notice: 'Teacher added to organization'
+      redirect_to organization_teachers_path, notice: "Teacher #{user.login} added to organization"
     else
       @teachers = @organization.teachers
       render :index

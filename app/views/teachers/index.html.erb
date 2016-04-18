@@ -1,5 +1,10 @@
 <h1>Teachers in <%= @organization.name %></h1>
 
+<p>
+  All teachers have same full permissions to whole organization. If you want to grant permissions only
+  for single courses, you should add course-specific assistants instead.
+</p>
+
 <%= render 'form' %>
 
 <h4>Current teachers</h4>
