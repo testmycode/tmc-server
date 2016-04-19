@@ -12,7 +12,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
 
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = FactoryGirl.create :course, name: 'mycourse', source_url: repo_path, organization: @organization
+    @course = FactoryGirl.create :course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization
 
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')

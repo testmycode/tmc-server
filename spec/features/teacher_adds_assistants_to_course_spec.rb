@@ -22,7 +22,7 @@ feature 'Teacher can add assistants to course', feature: true do
   scenario 'Teacher succeeds at adding assistant when valid username is given' do
     log_in_as(@teacher.username, 'foobar')
     add_assistant @assistant.username, @course
-    expect(page).to have_content 'Assistant added to course'
+    expect(page).to have_content "Assistant #{@assistant.username} added to course"
     expect(page).to have_content @assistant.username
   end
 

@@ -1,4 +1,4 @@
-<h1>Submissions for <%= @course.name %></h1>
+<h1>Submissions for <%= @course.title %></h1>
 
 <% if [@start_time.hour, @start_time.min, @end_time.hour, @end_time.min].all? {|x| x == 0 } %>
   <h2><%= @start_time.strftime("%d.%m.%Y") %> &mdash; <%= @end_time.strftime("%d.%m.%Y") %></h2>

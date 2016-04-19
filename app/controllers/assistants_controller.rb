@@ -17,7 +17,7 @@ class AssistantsController < ApplicationController
     @assistantship = Assistantship.new(user: user, course: @course)
 
     if @assistantship.save
-      redirect_to organization_course_assistants_path, notice: 'Assistant added to course'
+      redirect_to organization_course_assistants_path, notice: "Assistant #{user.login} added to course"
     else
       @assistants = @course.assistants
       render :index
@@ -27,8 +27,9 @@ class AssistantsController < ApplicationController
   def destroy
     authorize! :remove_assistant, @course
     @assistantship = Assistantship.find(params[:id])
+    destroyed_username = @assistantship.user.login
     @assistantship.destroy!
-    redirect_to organization_course_assistants_path, notice: 'Assistant removed from course'
+    redirect_to organization_course_assistants_path, notice: "Assistant #{destroyed_username} removed from course"
   end
 
   private
