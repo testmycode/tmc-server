@@ -100,7 +100,7 @@ feature 'Teacher can edit course parameters', feature: true do
 
       log_in_as @user.login, 'xooxer'
       visit '/org/slug'
-      click_link 'oldTitle'
+      first(:link, 'oldTitle').click
 
       expect(page).to have_link('View points', href: "http://example.com/slug/#{@course.id}/#{@user.login}")
     end

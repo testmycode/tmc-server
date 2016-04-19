@@ -44,10 +44,10 @@ feature 'User lists own organization courses', feature: true do
 
     scenario 'sees the courses they assist in a separate list (also disabled and expired)' do
       within 'table#my-assisted-courses-table' do
-        expect(page).to have_content('course_1')
-        expect(page).to have_content('course_2')
-        expect(page).to have_content('course_4')
-        expect(page).to_not have_content('course_3')
+        expect(page).to have_content('Course 1')
+        expect(page).to have_content('Course 2')
+        expect(page).to have_content('Course 4')
+        expect(page).to_not have_content('Course 3')
       end
     end
   end
@@ -63,18 +63,18 @@ feature 'User lists own organization courses', feature: true do
     end
 
     scenario 'sees only active courses' do
-      expect(page).to have_content('course_1')
-      expect(page).to have_content('course_2')
-      expect(page).not_to have_content('course_3')
-      expect(page).not_to have_content('course_4')
+      expect(page).to have_content('Course 1')
+      expect(page).to have_content('Course 2')
+      expect(page).not_to have_content('Course 3')
+      expect(page).not_to have_content('Course 4')
     end
 
     scenario 'sees courses they participate in a separate list (not expired or disabled)' do
       within 'table#my-courses-table' do
-        expect(page).to have_content('course_1')
-        expect(page).to have_content('course_2')
-        expect(page).to_not have_content('course_3')
-        expect(page).to_not have_content('course_4')
+        expect(page).to have_content('Course 1')
+        expect(page).to have_content('Course 2')
+        expect(page).to_not have_content('Course 3')
+        expect(page).to_not have_content('Course 4')
       end
     end
   end
