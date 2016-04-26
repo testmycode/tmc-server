@@ -1,5 +1,3 @@
-
-
 <h1>
   <%= @organization.name %>
   <%= image_tag @organization.logo.url(:small_logo) if @organization.logo? %>
@@ -10,10 +8,14 @@
   <%= @organization.information %>
 </p>
 
-<% if !@organization.verified? %>
+<% if !@organization.verified? & can?(:teach, @organization)%>
     <p>
-      <strong>This organization is not verified yet by an administrator.</strong>
+      <strong>
+        This organization is not verified yet by an administrator. Courses are fully functional, but some
+        features, like model answers, are not enabled.
+      </strong>
       <% if can? :view, :unverified_organizations %>
+          <br>
           <%= link_to 'Verify', verify_organization_path(@organization), method: :post, class: 'btn btn-success' %>
           <%= link_to 'Disable', disable_reason_input_organization_path(@organization), class: 'btn btn-danger' %>
       <% end %>
