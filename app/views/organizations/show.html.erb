@@ -3,10 +3,15 @@
   <%= image_tag @organization.logo.url(:small_logo) if @organization.logo? %>
 </h1>
 
-
 <p>
   <%= @organization.information %>
 </p>
+
+<% unless @organization.website.blank? %>
+  <p>
+    <strong>Website:</strong> <%= link_to @organization.website, @organization.website, target: "_blank" %>
+  </p>
+<% end %>
 
 <% if !@organization.verified? & can?(:teach, @organization)%>
     <p>
