@@ -9,6 +9,9 @@ This allows for lots of small exercises without the need for course instructors 
 The system has been used with great success by the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) in
 several elementary programming and data structures courses with hundreds of users.
 
+## Usermanual ##
+Automatically built usermanual can be viewed at: http://testmycode-usermanual.github.io
+
 ## Setup ##
 
 For setup and startup instructions, please see the [installation guide](Installation.md).
