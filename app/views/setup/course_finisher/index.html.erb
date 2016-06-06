@@ -1,0 +1,23 @@
+<h1>Create new course</h1>
+
+<h2>Course is ready!</h2>
+
+<p>
+  Your course is now set up and ready to use!
+</p>
+
+<p>
+  Initially, the course is set to be on disabled status, so it is hidden, until you decide to publish it.
+  You can do it
+</p>
+
+<p>
+  <i>Todo: some kind of short summary of previous choices</i>
+</p>
+
+<%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
+    <%= button_tag('Publish now') %>
+    <%= button_tag('Finish and publish later') %>
+<% end %>
+
+(no functionality yet)

@@ -1,6 +1,31 @@
 TmcServer::Application.routes.draw do
   use_doorkeeper
 
+  namespace :setup do
+    get '', to: 'start#index'
+#    get 'course_details/:id', to: 'course_details#index', as: 'course_details'
+
+    ### Creating organizations:
+    resources :create_organization, only: [:index, :new, :create] do
+    end
+
+    ### Creating courses:
+    resources :organizations, only: [:index], path: '' do
+      resources :course_chooser, only: [:index]
+      resources :course_details, only: [:edit, :create]
+
+      resources :courses, only: [] do
+        resource :course_timing, only: [:index, :show, :edit, :update] do
+        #resource :course_deadlines do
+          # member do
+          #   post 'confirm'
+          # end
+        end
+        resources :course_assistants, only: [:index, :create]
+        resources :course_finisher, only: [:index, :create]
+      end
+    end
+  end
 
   namespace :api, :constraints => { :format => /(html|json|js|)/ } do
     namespace :beta, defaults: { format: 'json' } do

@@ -1,0 +1,122 @@
+<script type="text/javascript">
+  $(document).ready(function() {
+    if (<%= @course.contains_unlock_deadlines? %>) {
+      $(".unlock-deadline-field").show();
+    }
+  });
+</script>
+
+
+<h1>Create new course</h1>
+
+<h2>Phase 3 - Course timing (not functional yet)</h2>
+
+<p>
+  Here you will schedule the course and exercise sets. Unlock means the condition when exercises are visible
+  and downloadable. Deadline defines the moment, when the submissions has to be made. These options will cover
+  most common initial choices, but full customization can be made later on advanced settings.
+</p>
+
+  <%= form_tag setup_organization_course_course_timing_path(course_id: @course.id), method: 'PUT' do %>
+      <%= label_tag :start_date, 'Course start date: (not yet implemented)'%>
+      <%= date_field :start_date, nil  %>
+      <br>
+      <hr>
+      <h3>Unlocks</h3>
+      Choose the type, how the exercises are opened:<br>
+      <%= radio_button_tag :unlock_type, "1" %>
+      <%= label_tag :unlock_type_1, 'One week before deadline' %>
+      <%= radio_button_tag :unlock_type, "2" %>
+      <%= label_tag :unlock_type_2, '80% of previous set completed' %>
+      <%= radio_button_tag :unlock_type, "3" %>
+      <%= label_tag :unlock_type_3, 'Everything open at start' %>
+
+      <hr>
+      <h3>Deadlines</h3>
+      <%= label_tag :first_set_date, 'Deadline for first set:'%>
+      <%= date_field :first_set_date, nil  %>
+      <br>
+      Choose how incoming exercise set deadlines are set:<br>
+      <%= radio_button_tag :deadline_type, "1" %>
+      <%= label_tag :deadline_type_1, 'Weekly' %>
+      <%= radio_button_tag :deadline_type, "2" %>
+      <%= label_tag :deadline_type_2, 'All same' %>
+      <br>
+      <%= submit_tag 'Show preview', class: 'btn' %>
+      <%= submit_tag 'Accept and continue', class: 'btn' %>
+  <% end %>
+
+  <hr>
+  <h3>Preview</h3>
+
+    <table class="exercise-list table table-condensed">
+      <thead>
+      <tr>
+        <th>Exercise group</th>
+        <th>Deadline (hard)</th>
+        <th>Unlock</th>
+      </tr>
+      </thead>
+
+      <% #byebug %>
+      <% @course.exercise_groups.each do |group| %>
+        <%
+          group_display_name = group.name.empty? ? '(default)' : group.name
+          param_name = group.name.empty? ? 'empty_group' : "group[#{group.name}]"
+#            exercises = group.exercises(false).natsort_by(&:name)
+          uniform = group.uniform_group_deadlines?
+        %>
+
+          <tbody id="group_<%= group.name %>">
+          <tr>
+            <td><%= group_display_name %></td>
+
+            <td>
+            <%
+              deadline = group.soft_group_deadline
+              deadline_type = 'soft'
+              disabled = !uniform
+
+              static_autofill = uniform ? deadline.static_deadline_spec : 'various'
+              unlock_autofill = uniform ? deadline.unlock_deadline_spec : 'various'
+              field_class = uniform ? nil : 'various'
+            %>
+
+            <%= label_tag "#{param_name}[#{deadline_type}][static]", 'Deadline' %>
+            <%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: "#{field_class} datetime-picker" %><br/>
+            <div class="unlock-deadline-field">
+              <%= label_tag "#{param_name}[#{deadline_type}][unlock]", 'Flexible deadline' %>
+              <%= text_field_tag "#{param_name}[#{deadline_type}][unlock]", unlock_autofill, disabled: disabled, class: field_class %>
+            </div>
+            </td>
+
+            <% #### Unlocks #### %>
+            <td>
+              <%
+                if group.name.empty?
+                  param_array = 'empty_group'
+                else
+                  param_array = "group[#{group.name}]"
+                end
+
+                group_unlock_conditions = group.group_unlock_conditions
+                group_unlock_conditions = [''] if group_unlock_conditions.empty? # Always have at least one input field
+              %>
+              <script type="text/javascript">
+                unlock_condition_counts["<%= param_array %>"] = <%= group_unlock_conditions.length %>
+              </script>
+              <div id="unlock-conditions-<%= group.name %>">
+                <% group_unlock_conditions.each_with_index do |condition, i| %>
+                    <%= text_field_tag "#{param_array}[#{i}]", condition %>
+                <% end %>
+              </div>
+            </td>
+
+
+      <% end %>
+    </table>
+
+<% if session[:refresh_report] %>
+    <%= render :partial => 'courses/refresh_report', :locals => { :report => session[:refresh_report] } %>
+    <% session.delete(:refresh_report) %>
+<% end %>

@@ -1,0 +1,21 @@
+<h1>Setup start page</h1>
+
+<% unless signed_in? %>
+    <p>
+      To setup your own tmc courses, please sign in first.
+    </p>
+<% else %>
+    <%
+      unless @my_organizations.empty? %>
+        <p>[ <i>teacher view</i> ]</p>
+        <p>Welcome to create courses</p>
+        <p><%= link_to 'Create new course',  setup_organization_course_chooser_index_path(@organization), class: 'btn' %></p>
+    <%
+      #not teacher yet
+      else %>
+        <p>[ <i>non-teacher</i> ]</p>
+        <p>Welcome to setup your own TMC courses. First step is to create your own organization.</p>
+        <p><%= link_to 'Create organization', setup_create_organization_index_path, class: 'btn' %></p>
+    <% end %>
+
+<% end %>
