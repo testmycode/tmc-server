@@ -10,10 +10,10 @@ class Setup::CourseFinisherController < Setup::SetupController
   end
 
   def create
+    authorize! :teach, @organization
+
     #TODO: Publish / enable
 
     redirect_to organization_course_path(@organization, @course)
   end
-
-
 end

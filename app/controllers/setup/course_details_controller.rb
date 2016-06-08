@@ -26,7 +26,7 @@ class Setup::CourseDetailsController < Setup::SetupController
 
     if @course.save
       refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?)
-      redirect_to setup_organization_course_course_deadlines_path(@organization.slug, @course.id)
+      redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
     else
       @course_template = @course.course_template
       @course.name = input_name

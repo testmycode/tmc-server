@@ -16,7 +16,6 @@ describe Setup::StartController, type: :controller do
     describe 'GET index' do
       it 'shows own organization' do
         get :index
-        byebug
         expect(assigns(:organization)).to eq(@organization)
       end
     end
