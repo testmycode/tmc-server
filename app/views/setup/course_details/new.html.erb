@@ -1,0 +1,19 @@
+<h1>Create new course</h1>
+<h2>Phase 2 - Basic information</h2>
+
+<% ## TODO: Split to partial with edit ## %>
+<%= form_for(@course, url: setup_organization_course_path) do |f| %>
+    <%= render 'shared/error_messages', target: @course %>
+
+    <%= bs_labeled_field('Course name (should not contain whitespace)*', f.text_field(:name)) %>
+    <%= bs_labeled_field('Course title*', f.text_field(:title)) %>
+    <%= bs_labeled_field('Course description', f.text_area(:description)) %>
+    <%= bs_labeled_field('Material URL', f.text_field(:material_url)) %>
+
+    <p>Fields with (*) are required</p>
+    <%= f.hidden_field(:course_template_id, value: @course.course_template_id) %>
+
+    <div class="actions">
+      <%= f.submit 'Add Course', class: 'btn btn-primary'%>
+    </div>
+<% end %>

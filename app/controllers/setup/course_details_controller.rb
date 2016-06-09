@@ -1,16 +1,14 @@
 class Setup::CourseDetailsController < Setup::SetupController
 
-#  skip_authorization_check
+  before_action :set_course, except: [:new]
 
-  def edit
-
+  def new
     authorize! :teach, @organization
     print_setup_breadcrumb(2)
 
-    @course_template = CourseTemplate.find(params[:id])
+    @course_template = CourseTemplate.find(params[:template_id])
     @course = Course.new_from_template(@course_template)
     @course.organization = @organization
-
   end
 
   def create
@@ -31,7 +29,22 @@ class Setup::CourseDetailsController < Setup::SetupController
       @course_template = @course.course_template
       @course.name = input_name
       print_setup_breadcrumb(2)
-      render action: 'edit', notice: 'Course could not be created'
+      render action: 'new', notice: 'Course could not be created'
+    end
+  end
+
+  def edit
+    authorize! :teach, @organization
+    print_setup_breadcrumb(2)
+  end
+
+  def update
+    authorize! :teach, @organization
+    if @course.update(course_params)
+      redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id),
+                  notice: 'Course details updated'
+    else
+      render :edit
     end
 
   end
@@ -48,6 +61,14 @@ class Setup::CourseDetailsController < Setup::SetupController
 
   def course_params_for_create_from_template
     params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
+  end
+
+  def course_params
+    if @course.custom?
+      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
+    else
+      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+    end
   end
 
 end

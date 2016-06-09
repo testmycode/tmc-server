@@ -12,9 +12,10 @@ TmcServer::Application.routes.draw do
     ### Creating courses:
     resources :organizations, only: [:index], path: '' do
       resources :course_chooser, only: [:index]
-      resources :course_details, only: [:edit, :create]
 
+      resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'}
       resources :courses, only: [] do
+        resource :course_details, only: [:edit, :update]
         resource :course_timing, only: [:index, :show, :edit, :update] do
         #resource :course_deadlines do
           # member do

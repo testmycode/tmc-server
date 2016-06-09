@@ -11,14 +11,12 @@ class Setup::SetupController < ApplicationController
       },
       {
         # step_number: 2,
-        title: 'Info (todo link)',
-        #path: :edit_setup_organization_course_detail,
-        #options: {organization_id: 'hy', course_id: nil, id: 1}
-        path: :new_setup_create_organization_path
+        title: 'Details',
+        path: :edit_setup_organization_course_course_details_path
       },
       {
         # step_number: 3,
-        title: 'Deadlines',
+        title: 'Timing',
         path: :setup_organization_course_course_timing_path
       },
       {
@@ -38,13 +36,10 @@ class Setup::SetupController < ApplicationController
 
     add_breadcrumb 'Setup', :setup_path
 
-    #TODO: Just temporary fixed course id
-    #@course = Course.find 1
-
-    for i in 0..step-1 do
-      #byebug if i == 1
+    for i in 0..step-2 do
       add_breadcrumb (i+1).to_s+'. '+steps[i][:title], steps[i][:path]
     end
+    add_breadcrumb (step).to_s+'. '+steps[step-1][:title]
 
     # links = [ { '1. Course template': :setup_organization_course_chooser_index_path },
     #           { '2. Info': edit_setup_organization_course_detail_path(@organization.slug, @course.id) },
@@ -52,11 +47,6 @@ class Setup::SetupController < ApplicationController
     #           { '4. Assistants': edit_setup_organization_course_assistant_path },
     #           { '5. Finish': nil }
     # ]
-
-    # for i in 0..step-1 do
-    #   add_breadcrumb links[i].each_key.first.to_s, links[i].each_value.first
-    # end
-
 
   end
 
