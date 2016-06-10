@@ -1,6 +1,6 @@
 <h1>Create a new organization</h1>
 
-<%= form_for(@organization) do |f| %>
+<%= form_for(@organization, url: setup_organizations_path) do |f| %>
     <%= render 'shared/error_messages', target: @organization %>
 
     <%= bs_labeled_field('name', f.text_field(:name)) %>

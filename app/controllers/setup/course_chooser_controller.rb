@@ -4,12 +4,7 @@ class Setup::CourseChooserController < Setup::SetupController
 
   def index
     authorize! :teach, @organization
-
-    add_breadcrumb 'Setup', :setup_path
-    add_breadcrumb '1. Course template',
-
+    print_setup_breadcrumb(1)
     @course_templates = CourseTemplate.available.order('LOWER(title)')
-
   end
-
 end

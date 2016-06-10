@@ -1,6 +1,6 @@
 class Setup::SetupController < ApplicationController
 
-  before_action :set_organization
+  before_action :set_organization, :add_setup_breadcrumb
 
   def steps
     [
@@ -34,8 +34,6 @@ class Setup::SetupController < ApplicationController
 
   def print_setup_breadcrumb(step = 0)
 
-    add_breadcrumb 'Setup', :setup_path
-
     for i in 0..step-2 do
       add_breadcrumb (i+1).to_s+'. '+steps[i][:title], steps[i][:path]
     end
@@ -64,6 +62,10 @@ class Setup::SetupController < ApplicationController
   def link_to_next_step(step_number)
     #byebug
     return steps[step_number][:path]
+  end
+
+  def add_setup_breadcrumb
+    add_breadcrumb 'Setup'
   end
 
   def set_organization

@@ -2,26 +2,15 @@ TmcServer::Application.routes.draw do
   use_doorkeeper
 
   namespace :setup do
-    get '', to: 'start#index'
-#    get 'course_details/:id', to: 'course_details#index', as: 'course_details'
+    resources :start, only: [:index]
 
-    ### Creating organizations:
-    resources :create_organization, only: [:index, :new, :create] do
-    end
-
-    ### Creating courses:
-    resources :organizations, only: [:index], path: '' do
+    resources :organizations, only: [:index, :new, :create], path: '' do
       resources :course_chooser, only: [:index]
 
       resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'}
       resources :courses, only: [] do
         resource :course_details, only: [:edit, :update]
-        resource :course_timing, only: [:index, :show, :edit, :update] do
-        #resource :course_deadlines do
-          # member do
-          #   post 'confirm'
-          # end
-        end
+        resource :course_timing, only: [:index, :show, :edit, :update]
         resources :course_assistants, only: [:index, :create]
         resources :course_finisher, only: [:index, :create]
       end

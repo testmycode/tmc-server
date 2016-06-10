@@ -3,7 +3,6 @@ class Setup::StartController < Setup::SetupController
   skip_authorization_check only: [:index]
 
   def index
-    print_setup_breadcrumb(0)
 
     @my_organizations = Organization.taught_organizations(current_user)
 

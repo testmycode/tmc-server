@@ -1,10 +1,9 @@
-class Setup::CreateOrganizationController < Setup::SetupController
+class Setup::OrganizationsController < Setup::SetupController
 
   skip_authorization_check only: [:index]
 
   def index
-    add_breadcrumb "Organization Setup"
-
+    redirect_to setup_start_index_path
   end
 
   def new
@@ -12,7 +11,6 @@ class Setup::CreateOrganizationController < Setup::SetupController
     add_breadcrumb 'Setup'
     add_breadcrumb 'Create new organization'
     @organization = Organization.new
-
   end
 
   def create
@@ -24,11 +22,6 @@ class Setup::CreateOrganizationController < Setup::SetupController
     else
       render :new
     end
-  end
-
-  def ready
-    authorize! :request, :organization
-
   end
 
   def organization_params
