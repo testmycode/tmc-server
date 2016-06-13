@@ -8,7 +8,7 @@
 
 <p>
   Initially, the course is set to be on disabled status, so it is hidden, until you decide to publish it.
-  You can do it
+  You can choose to publish it now or later.
 </p>
 
 <p>
@@ -16,8 +16,6 @@
 </p>
 
 <%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
-    <%= button_tag('Publish now') %>
-    <%= button_tag('Finish and publish later') %>
+    <%= submit_tag('Publish now') %>
+    <%= submit_tag('Finish and publish later') %>
 <% end %>
-
-(no functionality yet)

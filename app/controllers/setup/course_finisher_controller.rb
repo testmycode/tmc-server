@@ -6,14 +6,17 @@ class Setup::CourseFinisherController < Setup::SetupController
     authorize! :teach, @organization
 
     print_setup_breadcrumb(5)
-
   end
 
   def create
     authorize! :teach, @organization
 
-    #TODO: Publish / enable
-
+    if params[:commit] == 'Publish now'
+      @course.enabled!
+    else
+      @course.disabled!
+    end
+    @course.save!
     redirect_to organization_course_path(@organization, @course)
   end
 end
