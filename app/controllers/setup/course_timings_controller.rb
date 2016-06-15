@@ -11,9 +11,7 @@ class Setup::CourseTimingsController < Setup::SetupController
     authorize! :teach, @organization
 
     print_setup_breadcrumb(3)
-
     if params[:commit] == "Fill and preview"
-
       case params[:unlock_type]
         when '1'
           clear_all_unlocks
@@ -31,7 +29,6 @@ class Setup::CourseTimingsController < Setup::SetupController
             return
           end
           fill_deadlines_with_interval(first_set_date, 7)
-          ## TODO: Weekly
         when '3'
           if first_set_date[0].blank?
             redirect_to setup_organization_course_course_timing_path, notice: "Please insert first set date"

@@ -8,7 +8,6 @@ class Setup::OrganizationsController < Setup::SetupController
 
   def new
     authorize! :request, :organization
-    add_breadcrumb 'Setup'
     add_breadcrumb 'Create new organization'
     @organization = Organization.new
   end

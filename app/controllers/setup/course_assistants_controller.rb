@@ -5,6 +5,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
   def index
     authorize! :teach, @organization
 
+    # TODO: List all assistants
     #@assistants = @course.assistants ## Only if assistants would be shown...
     @assistantship = Assistantship.new
 
@@ -15,15 +16,8 @@ class Setup::CourseAssistantsController < Setup::SetupController
   def create
     authorize! :teach, @organization
 
-
     if params[:commit] == 'Add new assistant'
       new_assistant = User.find_by(login: assistant_params[:username])
-      # if new_assistant.nil?
-      #   redirect_to setup_organization_course_course_assistants_path, notice: "User not found!"
-      #   return
-      # end
-
-      @course = Course.find(params[:course_id])
       @assistantship = Assistantship.new(user: new_assistant, course: @course)
 
       if @assistantship.save
@@ -33,11 +27,9 @@ class Setup::CourseAssistantsController < Setup::SetupController
         render :index
       end
     else
-      ## Continue
+      # Continue to next step
       redirect_to setup_organization_course_course_finisher_index_path
     end
-
-
   end
 
   def assistant_params

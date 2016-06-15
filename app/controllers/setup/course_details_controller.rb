@@ -46,12 +46,12 @@ class Setup::CourseDetailsController < Setup::SetupController
     else
       render :edit
     end
-
   end
 
   private
 
   def refresh_course(course, options = {})
+    # TODO: Could include course ID
     begin
       session[:refresh_report] = course.refresh(options)
     rescue CourseRefresher::Failure => e
@@ -70,5 +70,4 @@ class Setup::CourseDetailsController < Setup::SetupController
       params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
     end
   end
-
 end

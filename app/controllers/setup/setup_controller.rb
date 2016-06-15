@@ -2,7 +2,7 @@ class Setup::SetupController < ApplicationController
 
   before_action :set_organization, :add_setup_breadcrumb
 
-  def steps
+  STEPS =
     [
       {
         # step_number: 1,
@@ -29,15 +29,14 @@ class Setup::SetupController < ApplicationController
         title: 'Finish',
         path: nil
       }
-    ]
-  end
+    ].freeze
 
   def print_setup_breadcrumb(step = 0)
 
     for i in 0..step-2 do
-      add_breadcrumb (i+1).to_s+'. '+steps[i][:title], steps[i][:path]
+      add_breadcrumb (i+1).to_s+'. '+STEPS[i][:title], STEPS[i][:path]
     end
-    add_breadcrumb (step).to_s+'. '+steps[step-1][:title]
+    add_breadcrumb (step).to_s+'. '+STEPS[step-1][:title]
 
     # links = [ { '1. Course template': :setup_organization_course_chooser_index_path },
     #           { '2. Info': edit_setup_organization_course_detail_path(@organization.slug, @course.id) },
@@ -50,7 +49,7 @@ class Setup::SetupController < ApplicationController
 
   def step_number(title)
     found = 0
-    steps.each do | st |
+    STEPS.each do | st |
       found += 1
       if (st[:title] == title)
         return found
@@ -61,7 +60,7 @@ class Setup::SetupController < ApplicationController
 
   def link_to_next_step(step_number)
     #byebug
-    return steps[step_number][:path]
+    return STEPS[step_number][:path]
   end
 
   def add_setup_breadcrumb
