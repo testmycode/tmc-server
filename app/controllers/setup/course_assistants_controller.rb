@@ -32,8 +32,9 @@ class Setup::CourseAssistantsController < Setup::SetupController
     end
   end
 
+  private
+
   def assistant_params
     params.permit(:username)
   end
-
 end

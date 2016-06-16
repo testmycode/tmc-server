@@ -11,6 +11,7 @@ class Setup::CourseTimingsController < Setup::SetupController
     authorize! :teach, @organization
 
     print_setup_breadcrumb(3)
+
     if params[:commit] == "Fill and preview"
       case params[:unlock_type]
         when '1'
@@ -46,9 +47,8 @@ class Setup::CourseTimingsController < Setup::SetupController
 
       path = setup_organization_course_course_assistants_path
       redirect_to path
-      #redirect_to setup_organization_course_course_timing_path, notice: "Manual changes updated"
     else
-      raise 'Wrong button...'
+      raise 'Wrong button'
     end
 
   rescue UnlockSpec::InvalidSyntaxError => e
@@ -60,7 +60,7 @@ class Setup::CourseTimingsController < Setup::SetupController
   private
 
   def save_unlocks
-    #authorize! :manage_unlocks, @course
+    authorize! :manage_unlocks, @course
 
     groups = group_params
     groups.each do |name, conditions|
@@ -71,14 +71,14 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   def clear_all_unlocks
-    #authorize! :manage_unlocks, @course
+    authorize! :manage_unlocks, @course
     @course.exercise_groups.each do |eg|
       eg.group_unlock_conditions = [""].to_json
     end
   end
 
   def unlocks_previous_set_completed(percentage = 80)
-    #authorize! :manage_unlocks, @course
+    authorize! :manage_unlocks, @course
     prevname = nil
     @course.exercise_groups.each do |eg|
       eg.group_unlock_conditions = Array("#{percentage}% from #{prevname}").to_json unless prevname.nil?
@@ -87,7 +87,7 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   def save_deadlines
-    #authorize! :manage_deadlines, @course
+    authorize! :manage_deadlines, @course
     groups = group_params
     groups.each do |name, deadlines|
       hard_deadlines = [deadlines[:hard][:static], ""].to_json
@@ -96,14 +96,14 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   def clear_all_deadlines
-    #authorize! :manage_deadlines, @course
+    authorize! :manage_deadlines, @course
     @course.exercise_groups.each do |eg|
       eg.hard_group_deadline = ["", ""].to_json
     end
   end
 
   def fill_deadlines_with_interval(first_date, days = 7)
-    #authorize! :manage_deadlines, @course
+    authorize! :manage_deadlines, @course
     date = first_date
     @course.exercise_groups.each do |eg|
       eg.hard_group_deadline = date.to_json
@@ -113,19 +113,13 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   def fill_all_deadlines_with(date)
-    #authorize! :manage_deadlines, @course
+    authorize! :manage_deadlines, @course
     @course.exercise_groups.each do |eg|
       eg.hard_group_deadline = date.to_json
     end
   end
 
-
-  #temporary
-  def ready_to_continue
-    if params[:unlock_type] & params[:deadline_type]
-      @ready_to_continue = true
-    end
-  end
+  private
 
   def group_params
     sliced = params.slice(:group, :empty_group)

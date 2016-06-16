@@ -37,14 +37,6 @@ class Setup::SetupController < ApplicationController
       add_breadcrumb (i+1).to_s+'. '+STEPS[i][:title], STEPS[i][:path]
     end
     add_breadcrumb (step).to_s+'. '+STEPS[step-1][:title]
-
-    # links = [ { '1. Course template': :setup_organization_course_chooser_index_path },
-    #           { '2. Info': edit_setup_organization_course_detail_path(@organization.slug, @course.id) },
-    #           { '3. Deadlines': edit_setup_organization_course_deadline_path(@organization.slug, @course.id)},
-    #           { '4. Assistants': edit_setup_organization_course_assistant_path },
-    #           { '5. Finish': nil }
-    # ]
-
   end
 
   def step_number(title)
@@ -59,13 +51,14 @@ class Setup::SetupController < ApplicationController
   end
 
   def link_to_next_step(step_number)
-    #byebug
     return STEPS[step_number][:path]
   end
 
   def add_setup_breadcrumb
-    add_breadcrumb 'Setup'
+    add_breadcrumb 'Setup', setup_start_index_path
   end
+
+  private
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])
