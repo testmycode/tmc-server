@@ -67,5 +67,3 @@ describe Setup::CourseDetailsController, type: :controller do
     end
   end
 end
-
-

@@ -1,5 +1,4 @@
 class Setup::CourseFinisherController < Setup::SetupController
-
   before_action :set_course
 
   def index

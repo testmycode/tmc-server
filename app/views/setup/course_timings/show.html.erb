@@ -121,7 +121,7 @@
 
   <% end %>
 
-<% if session[:refresh_report] %>
+<% if session[:refresh_report] && current_user.administrator? %>
     <%= render :partial => 'courses/refresh_report', :locals => { :report => session[:refresh_report] } %>
     <% session.delete(:refresh_report) %>
 <% end %>

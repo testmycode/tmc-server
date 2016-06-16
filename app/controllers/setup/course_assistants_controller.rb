@@ -1,16 +1,14 @@
 class Setup::CourseAssistantsController < Setup::SetupController
-
   before_action :set_course
 
   def index
     authorize! :teach, @organization
 
     # TODO: List all assistants
-    #@assistants = @course.assistants ## Only if assistants would be shown...
+    # @assistants = @course.assistants ## Only if assistants would be shown...
     @assistantship = Assistantship.new
 
     print_setup_breadcrumb(4)
-
   end
 
   def create
@@ -32,8 +30,9 @@ class Setup::CourseAssistantsController < Setup::SetupController
     end
   end
 
+  private
+
   def assistant_params
     params.permit(:username)
   end
-
 end

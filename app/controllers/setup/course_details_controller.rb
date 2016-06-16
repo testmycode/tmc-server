@@ -1,6 +1,5 @@
 class Setup::CourseDetailsController < Setup::SetupController
-
-  before_action :set_course, except: [:new]
+  before_action :set_course, except: [:new, :create]
 
   def new
     authorize! :teach, @organization

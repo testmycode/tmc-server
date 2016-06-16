@@ -1,5 +1,4 @@
 class Setup::CourseChooserController < Setup::SetupController
-
   before_action :set_organization
 
   def index

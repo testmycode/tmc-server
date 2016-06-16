@@ -20,7 +20,7 @@ describe Setup::CourseChooserController, type: :controller do
       it 'should list available templates' do
         get :index, {organization_id: @organization.slug}
         expect(assigns(:organization)).to eq(@organization)
-        expect(assigns(:course_templates).map(&:name)).to eq(%w(template1 template2))
+        expect(assigns(:course_templates).map(&:name)).to eq(%W(#{@ct1.name} #{@ct2.name}))
       end
     end
   end

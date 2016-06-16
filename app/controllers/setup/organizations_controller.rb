@@ -1,5 +1,4 @@
 class Setup::OrganizationsController < Setup::SetupController
-
   skip_authorization_check only: [:index]
 
   def index
@@ -26,5 +25,4 @@ class Setup::OrganizationsController < Setup::SetupController
   def organization_params
     params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
   end
-
 end
