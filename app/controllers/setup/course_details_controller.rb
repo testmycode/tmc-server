@@ -4,7 +4,7 @@ class Setup::CourseDetailsController < Setup::SetupController
 
   def new
     authorize! :teach, @organization
-    print_setup_breadcrumb(2)
+    print_setup_phases(2)
 
     @course_template = CourseTemplate.find(params[:template_id])
     @course = Course.new_from_template(@course_template)
@@ -28,14 +28,14 @@ class Setup::CourseDetailsController < Setup::SetupController
     else
       @course_template = @course.course_template
       @course.name = input_name
-      print_setup_breadcrumb(2)
+      print_setup_phases(2)
       render action: 'new', notice: 'Course could not be created'
     end
   end
 
   def edit
     authorize! :teach, @organization
-    print_setup_breadcrumb(2)
+    print_setup_phases(2)
   end
 
   def update

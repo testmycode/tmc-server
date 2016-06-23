@@ -5,7 +5,7 @@ class Setup::CourseFinisherController < Setup::SetupController
   def index
     authorize! :teach, @organization
 
-    print_setup_breadcrumb(5)
+    print_setup_phases(5)
   end
 
   def create

@@ -31,14 +31,6 @@ class Setup::SetupController < ApplicationController
       }
     ].freeze
 
-  def print_setup_breadcrumb(step = 0)
-
-    for i in 0..step-2 do
-      add_breadcrumb (i+1).to_s+'. '+STEPS[i][:title], STEPS[i][:path]
-    end
-    add_breadcrumb (step).to_s+'. '+STEPS[step-1][:title]
-  end
-
   def step_number(title)
     found = 0
     STEPS.each do | st |
@@ -56,6 +48,28 @@ class Setup::SetupController < ApplicationController
 
   def add_setup_breadcrumb
     add_breadcrumb 'Setup', setup_start_index_path
+    add_breadcrumb 'Create new course' if controller_name.starts_with?('course_')
+  end
+
+  def print_setup_phases(phase = 0)
+    STEPS.each_with_index do |st, i|
+      path = nil
+      if i < phase - 1
+        type = 'visited'
+        path = STEPS[i][:path]
+      elsif i == phase - 1
+        type = 'current'
+      else
+        type = 'unavailable'
+      end
+      add_phase (i+1).to_s+'. '+STEPS[i][:title], type, path
+    end
+  end
+
+  def add_phase(name, type, url = '')
+    @course_setup_phases ||= []
+    url = eval(url.to_s) if url =~ /_path|_url|@/
+    @course_setup_phases << { name: name, url: url, type: type }
   end
 
   private
@@ -67,5 +81,4 @@ class Setup::SetupController < ApplicationController
   def set_course
     @course = Course.find(params[:course_id]) unless params[:course_id].nil?
   end
-
 end

@@ -1,5 +1,7 @@
 <h1>Create new course</h1>
 
+<%= render 'setup/wizard_bar' %>
+
 <h2>Phase 2 - Basic information</h2>
 
 <%= form_for(@course, url: setup_organization_course_course_details_path) do |f| %>

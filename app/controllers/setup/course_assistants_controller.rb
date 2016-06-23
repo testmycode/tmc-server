@@ -9,7 +9,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
     #@assistants = @course.assistants ## Only if assistants would be shown...
     @assistantship = Assistantship.new
 
-    print_setup_breadcrumb(4)
+    print_setup_phases(4)
 
   end
 
@@ -23,7 +23,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
       if @assistantship.save
         redirect_to setup_organization_course_course_assistants_path, notice: "Assistant #{new_assistant.login} added"
       else
-        print_setup_breadcrumb(4)
+        print_setup_phases(4)
         render :index
       end
     else

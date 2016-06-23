@@ -4,13 +4,13 @@ class Setup::CourseTimingsController < Setup::SetupController
 
   def show
     authorize! :teach, @organization
-    print_setup_breadcrumb(3)
+    print_setup_phases(3)
   end
 
   def update
     authorize! :teach, @organization
 
-    print_setup_breadcrumb(3)
+    print_setup_phases(3)
 
     if params[:commit] == "Fill and preview"
       case params[:unlock_type]
