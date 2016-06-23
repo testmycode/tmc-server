@@ -44,7 +44,7 @@ before_script:
 
 script:
   - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb start; fi
-  - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001; fi
+  - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network --tag ~integration -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001; fi
   - if [ ! -z "$BREAKMAN" ]; then bundle --binstubs && ./bin/brakeman ; fi
   - if [ ! -z "$AUDIT" ]; then bundle exec bundle-audit update && bundle exec bundle-audit check ; fi
 
