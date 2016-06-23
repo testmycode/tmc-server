@@ -5,7 +5,7 @@ TmcServer::Application.routes.draw do
   namespace :api, :constraints => { :format => /(html|json|js|)/ } do
     namespace :beta, defaults: { format: 'json' } do
       get '/demo', to: 'demo#index'
-      resources :participant, only: [] do
+      resources :participant, only: [:index] do
         member do
           get 'courses'
         end
