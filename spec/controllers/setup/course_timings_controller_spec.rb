@@ -36,7 +36,7 @@ describe Setup::CourseTimingsController, type: :controller do
             organization_id: @organization.slug,
             course_id: @course.id,
             commit: 'Fill and preview',
-            unlock_type: '1'
+            unlock_type: 'no_unlocks'
         }
         expect(assigns(:course).exercise_group_by_name('group1').group_unlock_conditions).to eq([''])
         expect(assigns(:course).exercise_group_by_name('group2').group_unlock_conditions).to eq([''])
@@ -48,7 +48,7 @@ describe Setup::CourseTimingsController, type: :controller do
             organization_id: @organization.slug,
             course_id: @course.id,
             commit: 'Fill and preview',
-            unlock_type: '2'
+            unlock_type: 'percent_from_previous'
         }
         expect(assigns(:course).exercise_group_by_name('group1').group_unlock_conditions).to eq([])
         expect(assigns(:course).exercise_group_by_name('group2').group_unlock_conditions).to eq(['80% from group1'])
@@ -63,7 +63,7 @@ describe Setup::CourseTimingsController, type: :controller do
             organization_id: @organization.slug,
             course_id: @course.id,
             commit: 'Fill and preview',
-            deadline_type: '1'
+            deadline_type: 'no_deadlines'
         }
         expect(assigns(:course).exercise_group_by_name('group1').hard_group_deadline.static_deadline_spec).to eq(nil)
         expect(assigns(:course).exercise_group_by_name('group2').hard_group_deadline.static_deadline_spec).to eq(nil)
@@ -75,7 +75,7 @@ describe Setup::CourseTimingsController, type: :controller do
             organization_id: @organization.slug,
             course_id: @course.id,
             commit: 'Fill and preview',
-            deadline_type: '2',
+            deadline_type: 'weekly_deadlines',
             first_set_date: ['2021-01-01']
         }
         expect(assigns(:course).exercise_group_by_name('group1').hard_group_deadline.static_deadline_spec).to eq('2021-01-01')
@@ -89,7 +89,7 @@ describe Setup::CourseTimingsController, type: :controller do
             organization_id: @organization.slug,
             course_id: @course.id,
             commit: 'Fill and preview',
-            deadline_type: '3',
+            deadline_type: 'all_same_deadline',
             first_set_date: ['2021-01-01']
         }
         expect(assigns(:course).exercise_group_by_name('group1').hard_group_deadline.static_deadline_spec).to eq('2021-01-01')

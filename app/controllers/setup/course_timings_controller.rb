@@ -13,23 +13,23 @@ class Setup::CourseTimingsController < Setup::SetupController
 
     if params[:commit] == 'Fill and preview'
       case params[:unlock_type]
-      when '1'
+      when 'no_unlocks'
         clear_all_unlocks
-      when '2'
+      when 'percent_from_previous'
         unlocks_previous_set_completed(80)
       end
 
       first_set_date = params[:first_set_date]
       case params[:deadline_type]
-      when '1'  # No deadlines
+      when 'no_deadlines'
         clear_all_deadlines
-      when '2'  #
+      when 'weekly_deadlines'
         if first_set_date[0].blank?
           redirect_to setup_organization_course_course_timing_path, notice: 'Please insert first set date'
           return
         end
         fill_deadlines_with_interval(first_set_date, 7)
-      when '3'
+      when 'all_same_deadline'
         if first_set_date[0].blank?
           redirect_to setup_organization_course_course_timing_path, notice: 'Please insert first set date'
           return

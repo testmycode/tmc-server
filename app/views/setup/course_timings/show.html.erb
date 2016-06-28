@@ -36,9 +36,9 @@
     <hr>
     <h3>Unlocks</h3>
     Choose the type, how the exercises are opened:<br>
-    <%= radio_button_tag :unlock_type, "1", (params[:unlock_type] == "1") %>
+    <%= radio_button_tag :unlock_type, "no_unlocks", (params[:unlock_type] == "no_unlocks") %>
     <%= label_tag :unlock_type_1, 'Everything open at start' %>
-    <%= radio_button_tag :unlock_type, "2", (params[:unlock_type] == "2") %>
+    <%= radio_button_tag :unlock_type, "percent_from_previous", (params[:unlock_type] == "percent_from_previous") %>
     <%= label_tag :unlock_type_2, '80% from previous set completed' %>
 
     <hr>
@@ -47,11 +47,11 @@
     <%= date_field :first_set_date, nil  %>
     <br>
     Choose how incoming exercise set deadlines are set:<br>
-    <%= radio_button_tag :deadline_type, "1" %>
+    <%= radio_button_tag :deadline_type, "no_deadlines" %>
     <%= label_tag :deadline_type_1, 'No deadlines' %>
-    <%= radio_button_tag :deadline_type, "2" %>
+    <%= radio_button_tag :deadline_type, "weekly_deadlines" %>
     <%= label_tag :deadline_type_2, 'Weekly' %>
-    <%= radio_button_tag :deadline_type, "3" %>
+    <%= radio_button_tag :deadline_type, "all_same_deadline" %>
     <%= label_tag :deadline_type_3, 'All same' %>
     <br>
     <%= submit_tag 'Fill and preview', class: 'btn' %>
