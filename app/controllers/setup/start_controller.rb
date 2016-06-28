@@ -1,5 +1,4 @@
 class Setup::StartController < Setup::SetupController
-
   skip_authorization_check only: [:index]
 
   def index

@@ -1,5 +1,4 @@
 class Setup::SetupController < ApplicationController
-
   before_action :set_organization, :add_setup_breadcrumb
 
   STEPS =
@@ -33,17 +32,15 @@ class Setup::SetupController < ApplicationController
 
   def step_number(title)
     found = 0
-    STEPS.each do | st |
+    STEPS.each do |st|
       found += 1
-      if (st[:title] == title)
-        return found
-      end
+      return found if st[:title] == title
     end
-    return nil
+    nil
   end
 
   def link_to_next_step(step_number)
-    return STEPS[step_number][:path]
+    STEPS[step_number][:path]
   end
 
   def add_setup_breadcrumb

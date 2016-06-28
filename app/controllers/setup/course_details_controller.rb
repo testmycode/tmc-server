@@ -1,5 +1,4 @@
 class Setup::CourseDetailsController < Setup::SetupController
-
   before_action :set_course, except: [:new, :create]
 
   def new

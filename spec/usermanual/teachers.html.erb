@@ -200,12 +200,13 @@ require 'cgi' # for escapeHTML
 
   <p>
     TMC offers fully working course templates, from which you can create your own courses. Courses will include
-    teaching material and set of exercises. You can customize your own course by managing susbmission deadlines,
+    teaching material and set of exercises. You can customize your own course by managing submission deadlines,
     exercise unlock conditions, feedback answers etc.
   </p>
 
   <p>
-    From organization's front page, click 'Create New Course'
+    Creating new course is done with a wizard containing few phases, which helps you getting the initial settings done.
+    To start the creating process, click 'Create New Course' button from organization's front page.
   </p>
 
 <%
@@ -214,22 +215,24 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
+  <h3>Phase 1, course template</h3>
+
   <p>
     You will see a list of all the course templates TMC has to offer. If needed, take a look at the course description
-    and course material, to choose which course is suitable for your needs. Click 'Create Course' button on the course
+    and course material, to choose which course is suitable for your needs. Click 'Choose' button on the course
     that you want.
   </p>
 
 <%
   click_on 'Create New Course'
-  highlight 'a:contains("Create Course")'
+  highlight 'a:contains("Choose")'
 %>
 <%= screenshot %>
 
 <%
-  first(:link, 'Create Course').click
+  first(:link, 'Choose').click
 %>
-<%= screenshot %>
+  <h3>Phase 2, details</h3>
 
   <p>
     On the following form the fields will be prefilled with template defaults.
@@ -249,6 +252,8 @@ require 'cgi' # for escapeHTML
     </ul>
   </p>
 
+<%= screenshot %>
+
   <p>
     Finally click the 'Add Course' button. It might take some time while the TMC populates the new course with
     exercices.
@@ -256,16 +261,86 @@ require 'cgi' # for escapeHTML
 
 <%
   click_on 'Add Course'
-  highlight 'a:contains("View status page")'
+%>
+
+  <h3>Phase 3, timing</h3>
+
+  <p>
+    Here you can set the basic timing for the course's exercise sets. Some most common alternatives are
+    given. Full customization can be made later on advanced settings, see
+    <a href="#Course progression">Course progression</a> for details.
+  </p>
+
+  <p>
+    Unlock states when the exercises are available. You have 2 options to choose, either have everything open
+    from start, of requiring 80% from the points of the previous set completed.
+  </p>
+
+  <p>
+    Deadline (which in this case is hard deadline, see soft deadline on advanced settings later) is the moment,
+    when the submissions has to be made. TMC refuses to accept any attempts after that. You can choose to have
+    no deadlines at all, weekly deadlines or just single deadline for all exercises.
+    Insert first set deadline if needed if needed.
+  </p>
+
+  <p>
+    For example, you can choose to have 80% of previous unlock condition, and weekly deadlines starting
+    from 1.1.2017. By clicking "Fill and preview", you will see the settings in the preview section.
+  </p>
+
+<%
+  choose 'unlock_type_2'
+  fill_in 'first_set_date_', with: '1.1.2017'
+  choose 'deadline_type_2'
+
+  highlight '#unlock_type_2'
+  highlight '#deadline_type_2'
+  highlight '#first_set_date_'
+  highlight '[value="Fill and preview"]'
+  highlight '[value="Accept and continue"]'
 %>
 <%= screenshot %>
 
   <p>
-    After the course has been created, you will get message announcing that. Now the course
-    should now be available for students to submit their solutions to exercises.
-    TMC will show a help page to get you started with teaching the course. Click 'view status page' to return
-    to course's front page, where you can manage course details.
+    You can also manually adjust the settings in the preview section.
+    After you have verified that settings look good, click 'Accept and continue'.
   </p>
+
+<%
+  click_on 'Accept and continue'
+%>
+
+  <h3>Phase 4, assistants</h3>
+
+<%= screenshot %>
+
+  <p>
+    If you already know who will be your course assistants, you can add them to course now. Just fill their
+    TMC username and click 'Add new assistant'. If you don't want to add assistant, you can do it later.
+    When you are ready, click 'Continue'.
+  </p>
+
+<%
+  click_on 'Continue'
+  highlight '[value="Fill and preview"]'
+  highlight '[value="Accept and continue"]'
+%>
+
+  <h3>Phase 5, finish</h3>
+
+<%= screenshot %>
+
+  <p>
+    Course is now ready. You can choose to publish course right away, or keep it hidden as disabled, until it is
+    ready to be published later. Click either of the buttons, and you will be redirected to course main page.
+  </p>
+
+<%
+  click_on 'Publish now'
+%>
+  <h3>Course main page</h3>
+
+<%= screenshot %>
 
   <p>
     Here you may see submissions sent to any exercises in this course, view model solutions, make code reviews etc. You may also access
@@ -278,11 +353,6 @@ require 'cgi' # for escapeHTML
     and at the bottom, you can find student's submissions. Remember, that as a teacher (or assistant), you will see
     submissions from all the students, while students see only their own submissions.
   </p>
-
-<%
-   click_on 'View status page'
-%>
-<%= screenshot %>
 
   <h2>Editing course details</h2>
 
