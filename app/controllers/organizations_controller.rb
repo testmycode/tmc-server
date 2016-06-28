@@ -3,7 +3,7 @@ require 'natsort'
 class OrganizationsController < ApplicationController
   before_action :set_organization, only: [:show, :edit, :update, :destroy, :verify, :disable, :disable_reason_input, :toggle_visibility]
 
-  skip_authorization_check only: [:index]
+  skip_authorization_check only: [:index, :new]
 
   def index
     ordering = 'hidden, LOWER(name)'
@@ -27,7 +27,7 @@ class OrganizationsController < ApplicationController
   end
 
   def new
-    authorize! :request, :organization
+    return respond_access_denied('Please log in first to create new organization') if !can? :request, :organization
     add_breadcrumb 'Create new organization'
     @organization = Organization.new
   end
@@ -124,6 +124,6 @@ class OrganizationsController < ApplicationController
   end
 
   def organization_params
-    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
+    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason, :website)
   end
 end
