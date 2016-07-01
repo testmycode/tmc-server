@@ -1,20 +1,18 @@
 <% unless @course_setup_phases.nil? %>
   <div id="course-setup-progress-bar">
-    <p>
-      <% @course_setup_phases.each do |phase| %>
-        <%
-        case phase[:type]
-          when 'visited' %>
-            <span class="visited"><%= link_to phase[:name], phase[:url] %></span> <%
-          when 'current' %>
-            <span class="current"><%= phase[:name]%></span> <%
-          when 'unavailable' %>
-            <span class="unavailable"><%= phase[:name]%></span> <%
-        end
-        unless phase.equal?(@course_setup_phases.last) %>
-          <span class="separator">|</span>
-        <% end %>
+    <% @course_setup_phases.each do |phase| %>
+      <%
+      case phase[:type]
+        when 'visited' %>
+          <span class="visited"><%= link_to phase[:name], phase[:url] %></span> <%
+        when 'current' %>
+          <span class="current"><%= phase[:name]%></span> <%
+        when 'unavailable' %>
+          <span class="unavailable"><%= phase[:name]%></span> <%
+      end
+      unless phase.equal?(@course_setup_phases.last) %>
+        <span class="separator">|</span>
       <% end %>
-    </p>
+    <% end %>
   </div>
 <% end %>

@@ -16,6 +16,8 @@ class Setup::CourseFinisherController < Setup::SetupController
       @course.disabled!
     end
     @course.save!
+
+    reset_setup_session
     redirect_to organization_course_path(@organization, @course)
   end
 end

@@ -23,6 +23,7 @@ class Setup::CourseDetailsController < Setup::SetupController
 
     if @course.save
       refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?)
+      update_setup_course(@course.id)
       redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
     else
       @course_template = @course.course_template
@@ -32,6 +33,7 @@ class Setup::CourseDetailsController < Setup::SetupController
     end
   end
 
+  # TODO: check for sessions
   def edit
     authorize! :teach, @organization
     print_setup_phases(2)

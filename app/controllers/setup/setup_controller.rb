@@ -6,7 +6,7 @@ class Setup::SetupController < ApplicationController
       {
         # step_number: 1,
         title: 'Template',
-        path: :setup_organization_course_chooser_index
+        path: :setup_organization_course_chooser_index_path
       },
       {
         # step_number: 2,
@@ -21,12 +21,12 @@ class Setup::SetupController < ApplicationController
       {
         # step_number: 4,
         title: 'Assistants',
-        path: :setup_organization_course_course_assistants
+        path: :setup_organization_course_course_assistants_path
       },
       {
         # step_number: 5,
         title: 'Finish',
-        path: nil
+        path: :setup_organization_course_course_finisher_index_path
       }
     ].freeze
 
@@ -49,27 +49,65 @@ class Setup::SetupController < ApplicationController
   end
 
   def print_setup_phases(phase = 0)
+    update_setup_phase(phase)
+    maxphase = setup_in_progress? ? session[:ongoing_course_setup][:phase] : phase
     STEPS.each_with_index do |st, i|
       path = nil
-      if i < phase - 1
+      if i == phase - 1
+        type = 'current'
+      elsif i < maxphase
         type = 'visited'
         path = STEPS[i][:path]
-      elsif i == phase - 1
-        type = 'current'
       else
         type = 'unavailable'
       end
-      add_phase (i+1).to_s+'. '+STEPS[i][:title], type, path
+      options = {}
+      options = { pass_parameters: true } if setup_in_progress? && maxphase > 2
+      add_phase (i+1).to_s+'. '+STEPS[i][:title], type, path, options
     end
   end
 
-  def add_phase(name, type, url = '')
+  def add_phase(name, type, url = '', options = {})
     @course_setup_phases ||= []
+    if options[:pass_parameters]
+      url = url.to_s + "('#{@organization.slug}', #{@course.id})"
+    end
     url = eval(url.to_s) if url =~ /_path|_url|@/
     @course_setup_phases << { name: name, url: url, type: type }
   end
 
   private
+
+  def save_wizard_to_session(phase = 1)
+    return if setup_in_progress?
+    session[:ongoing_course_setup] = {
+        course_id: nil,
+        phase: phase,
+        started: Time.now
+    }
+  end
+
+  def setup_in_progress?
+    !session[:ongoing_course_setup].nil?
+  end
+
+  def reset_setup_session
+    session[:ongoing_course_setup] = nil
+  end
+
+  def update_setup_phase(phase)
+    if setup_in_progress?
+      session[:ongoing_course_setup][:phase] = phase if session[:ongoing_course_setup][:phase] < phase
+    end
+  end
+
+  def update_setup_course(id = nil)
+    if id.nil?
+      session[:ongoing_course_setup][:course_id] = @course.id
+    else
+      session[:ongoing_course_setup][:course_id] = id
+    end
+  end
 
   def set_organization
     @organization = Organization.find_by(slug: params[:organization_id])
