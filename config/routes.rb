@@ -11,7 +11,7 @@ TmcServer::Application.routes.draw do
       resources :courses, only: [] do
         resource :course_details, only: [:edit, :update]
         resource :course_timing, only: [:index, :show, :edit, :update]
-        resources :course_assistants, only: [:index, :create]
+        resources :course_assistants, only: [:index, :create, :destroy]
         resources :course_finisher, only: [:index, :create]
       end
     end
@@ -78,8 +78,6 @@ TmcServer::Application.routes.draw do
         get 'manage_exercises'
         post 'toggle_submission_result_visibility'
       end
-
-      resources :assistants, only: [:index, :create, :destroy]
 
       resources :points, only: [:index, :show] do
         member do

@@ -45,7 +45,7 @@ class Setup::SetupController < ApplicationController
 
   def add_setup_breadcrumb
     add_breadcrumb 'Setup', setup_start_index_path
-    add_breadcrumb 'Create new course' if controller_name.starts_with?('course_')
+    add_breadcrumb 'Create new course' if controller_name.starts_with?('course_') && setup_in_progress?
   end
 
   def print_setup_phases(phase = 0)

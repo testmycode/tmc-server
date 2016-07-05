@@ -1,14 +1,19 @@
-<h1>Create new course</h1>
-
-<%= render 'setup/wizard_bar' %>
-
-<h2>Phase 4 - Course assistants</h2>
+<% if @setup_in_progress %>
+  <h1>Create new course</h1>
+  <%= render 'setup/wizard_bar' %>
+  <h2>Phase 4 - Course assistants</h2>
+<% else %>
+  <h1>Assistants in course <%= @course.title %></h1>
+<% end %>
 
 <p>
   You can have course assistants, who have partial teachership permissions for the course.
   They can see students' answers, make code reviews and help students.
-  You can also skip this and add assistants later.
 </p>
+
+<% if @setup_in_progress %>
+  <p>You can also skip this phase and add assistants later.</p>
+<% end %>
 
 <%= form_tag(setup_organization_course_course_assistants_path) do %>
     <%= hidden_field_tag 'course_id', @course.id %>
@@ -20,6 +25,33 @@
     </div>
     <div class="actions">
       <%= submit_tag 'Add new assistant', class: 'btn btn-mini' %>
-      <%= submit_tag 'Continue', class: 'btn btn-mini' %>
+      <br><br>
+      <% if @setup_in_progress %>
+        <%= submit_tag 'Continue', class: 'btn btn-mini' %>
+      <% else %>
+        <%= submit_tag 'Back to course main page', class: 'btn btn-mini' %>
+      <% end %>
     </div>
+<% end %>
+
+<% unless @assistants.empty? %>
+  <h4>Current assistants</h4>
+
+  <table class="table table-striped table-condensed">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Remove</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% @assistants.each do |assistant| %>
+        <tr>
+          <td><%= link_to assistant.username, participant_path(assistant) %></td>
+          <td><%= link_to 'Remove', setup_organization_course_course_assistant_path(@course.organization, @course, assistant.assistantship(@course)), method: :delete, class: "btn btn-mini btn-warning", data: { confirm: 'Are you sure?' } %></td>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
 <% end %>
