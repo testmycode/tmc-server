@@ -33,17 +33,26 @@ class Setup::CourseDetailsController < Setup::SetupController
     end
   end
 
-  # TODO: check for sessions
   def edit
     authorize! :teach, @organization
-    print_setup_phases(2)
+    @setup_in_progress = setup_in_progress?
+    if setup_in_progress?
+      print_setup_phases(2)
+    else
+      add_course_breadcrumb
+      add_breadcrumb('Edit details')
+    end
   end
 
   def update
     authorize! :teach, @organization
     if @course.update(course_params)
-      redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id),
-                  notice: 'Course details updated'
+      if setup_in_progress?
+        redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id),
+                    notice: 'Course details updated.'
+      else
+        redirect_to organization_course_path(@organization, @course), notice: 'Course details updated.'
+      end
     else
       render :edit
     end

@@ -1,8 +1,19 @@
-<h1>Create new course</h1>
+<h1>Edit course details</h1>
 
-<%= render 'setup/wizard_bar' %>
+<% if @setup_in_progress %>
+  <%= render 'setup/wizard_bar' %>
+  <h2>Phase 2 - Basic information</h2>
+<% end %>
 
-<h2>Phase 2 - Basic information</h2>
+<%
+  external_scoreboard_url_help = %q{
+     <small>
+       %{user} = username<br/>
+       %{course} = course id<br/>
+       %{org} = organization id<br/>
+     </small>
+   }
+%>
 
 <%= form_for(@course, url: setup_organization_course_course_details_path) do |f| %>
     <%= render 'shared/error_messages', target: @course %>
@@ -11,13 +22,17 @@
     <%= bs_labeled_field('Course description', f.text_area(:description)) %>
     <%= bs_labeled_field('Material URL', f.text_field(:material_url)) %>
 
+    <% unless @setup_in_progress %>
+      <%= bs_labeled_field("External scoreboard URL", external_scoreboard_url_help + f.text_field(:external_scoreboard_url)) %>
+    <% end %>
+
+    <% # TODO: check full custom course support %>
+    <% #custom = @course.custom? %>
     <% custom = false %>
     <% if custom %>
         <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled')) %>
         <%= bs_labeled_field('Source URL*', f.text_field(:source_url)) %>
         <%= bs_labeled_field('Git branch name*', f.text_field(:git_branch, value: 'master')) %>
-    <% else %>
-        <%= f.hidden_field(:course_template_id, value: @course.course_template.id) %>
     <% end %>
 
     <p>Fields with (*) are required</p>

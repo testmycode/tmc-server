@@ -21,7 +21,7 @@ feature 'Teacher can edit course parameters', feature: true do
     fill_in 'course_title', with: 'newTitle'
     fill_in 'course_description', with: 'newDescription'
     fill_in 'course_material_url', with: 'newMaterial.com'
-    click_button 'Update Course'
+    click_button 'Update course information'
 
     expect(page).to have_content 'newTitle'
     expect(page).to have_content 'newDescription'
@@ -38,7 +38,7 @@ feature 'Teacher can edit course parameters', feature: true do
     click_link 'Edit course parameters'
 
     fill_in 'course_title', with: 'a' * 41
-    click_button 'Update Course'
+    click_button 'Update course information'
 
     expect(page).to have_content 'Title is too long'
 
@@ -66,7 +66,7 @@ feature 'Teacher can edit course parameters', feature: true do
       click_link 'Edit course parameters'
 
       fill_in 'course_external_scoreboard_url', with: 'http://example.com/%{org}/%{course}/%{user}'
-      click_button 'Update Course'
+      click_button 'Update course information'
       log_out
     end
 

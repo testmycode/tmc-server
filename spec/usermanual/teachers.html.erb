@@ -289,12 +289,12 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-  choose 'unlock_type_2'
+  choose 'unlock_type_percent_from_previous'
   fill_in 'first_set_date_', with: '1.1.2017'
-  choose 'deadline_type_2'
+  choose 'deadline_type_weekly_deadlines'
 
-  highlight '#unlock_type_2'
-  highlight '#deadline_type_2'
+  highlight '#unlock_type_percent_from_previous'
+  highlight '#deadline_type_weekly_deadlines'
   highlight '#first_set_date_'
   highlight '[value="Fill and preview"]'
   highlight '[value="Accept and continue"]'
@@ -414,10 +414,10 @@ require 'cgi' # for escapeHTML
   <h2>Course assistants</h2>
 
 <%
-  visit '/org/hy/courses/1/assistants'
+  visit '/org/hy/courses/1/'
+  click_on 'Manage assistants'
   fill_in 'username', with: 'oldassistant'
-  click_on 'Add a new assistant'
-  visit '/org/hy/courses/1/assistants'
+  click_on 'Add new assistant'
 
 %>
 
