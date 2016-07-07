@@ -20,6 +20,17 @@ describe Setup::CourseTimingsController, type: :controller do
         get :show, {organization_id: @organization.slug, course_id: @course.id}
         expect(assigns(:organization)).to eq(@organization)
       end
+
+      it 'should show wizard bar correctly' do
+        init_session
+        get :show, {organization_id: @organization.slug, course_id: @course.id}
+        expect(assigns(:course_setup_phases)).not_to be_nil
+      end
+
+      it 'should not show wizard bar when not in wizard mode' do
+        get :show, {organization_id: @organization.slug, course_id: @course.id}
+        expect(assigns(:course_setup_phases)).to be_nil
+      end
     end
 
     describe 'PUT update' do
@@ -128,6 +139,35 @@ describe Setup::CourseTimingsController, type: :controller do
         expect(assigns(:course).exercise_group_by_name('group2').group_unlock_conditions).to eq(['92% from group1'])
         expect(assigns(:course).exercise_group_by_name('group3').group_unlock_conditions).to eq(['94% from group2'])
       end
+
+      it 'should redirect to next step if in wizard mode' do
+        init_session
+        put :update, {
+            organization_id: @organization.slug,
+            course_id: @course.id,
+            commit: 'Accept and continue',
+            group: {
+                group1: {'0'=>'', 'hard'=>{'static'=>''}},
+                group2: {'0'=>'92% from group1', 'hard'=>{'static'=>''}},
+                group3: {'0'=>'94% from group2', 'hard'=>{'static'=>''}}
+            }
+        }
+        expect(response).to redirect_to(setup_organization_course_course_assistants_path(@organization, @course))
+      end
+
+      it 'should not redirect to next step if not in wizard mode' do
+        put :update, {
+            organization_id: @organization.slug,
+            course_id: @course.id,
+            commit: 'Accept and continue',
+            group: {
+                group1: {'0'=>'', 'hard'=>{'static'=>''}},
+                group2: {'0'=>'92% from group1', 'hard'=>{'static'=>''}},
+                group3: {'0'=>'94% from group2', 'hard'=>{'static'=>''}}
+            }
+        }
+        expect(response).to redirect_to(organization_course_path(@organization, @course))
+      end
     end
   end
 
@@ -142,5 +182,15 @@ describe Setup::CourseTimingsController, type: :controller do
       put :update, {organization_id: @organization.slug, course_id: @course.id, commit: 'Fill and preview', unlock_type: '1'}
       expect(response.code.to_i).to eq(401)
     end
+  end
+
+  private
+
+  def init_session
+    session[:ongoing_course_setup] = {
+        course_id: @course.id,
+        phase: 3,
+        started: Time.now
+    }
   end
 end

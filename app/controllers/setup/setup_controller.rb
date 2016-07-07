@@ -102,6 +102,7 @@ class Setup::SetupController < ApplicationController
   end
 
   def update_setup_course(id = nil)
+    return unless setup_in_progress?
     if id.nil?
       session[:ongoing_course_setup][:course_id] = @course.id
     else

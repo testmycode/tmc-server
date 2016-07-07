@@ -116,6 +116,7 @@
       <% end %>
 
       <% if can? :manage_deadlines, @course %>
+        <%= link_to 'Manage basic timing', setup_organization_course_course_timing_path(@organization, @course), class: "btn tvn-default btn-mini" %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock conditions', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
       <% end %>

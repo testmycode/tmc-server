@@ -12,11 +12,13 @@
   });
 </script>
 
-<h1>Create new course</h1>
-
-<%= render 'setup/wizard_bar' %>
-
-<h2>Phase 3 - Course timing</h2>
+<% if @setup_in_progress %>
+  <h1>Create new course</h1>
+  <%= render 'setup/wizard_bar' %>
+  <h2>Phase 3 - Course timing</h2>
+<% else %>
+  <h1>Course timing</h1>
+<% end %>
 
 <p>
   Here you will schedule the course and exercise sets. Unlock means the condition when exercises are visible

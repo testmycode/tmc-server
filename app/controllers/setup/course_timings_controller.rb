@@ -3,7 +3,14 @@ class Setup::CourseTimingsController < Setup::SetupController
 
   def show
     authorize! :teach, @organization
-    print_setup_phases(3)
+
+    @setup_in_progress = setup_in_progress?
+    if setup_in_progress?
+      print_setup_phases(3)
+    else
+      add_course_breadcrumb
+      add_breadcrumb('Timing')
+    end
   end
 
   def update
@@ -44,8 +51,11 @@ class Setup::CourseTimingsController < Setup::SetupController
       save_unlocks
       save_deadlines
 
-      path = setup_organization_course_course_assistants_path
-      redirect_to path
+      if setup_in_progress?
+        redirect_to setup_organization_course_course_assistants_path(@organization, @course)
+      else
+        redirect_to organization_course_path(@organization, @course)
+      end
     else
       raise 'Wrong button'
     end
