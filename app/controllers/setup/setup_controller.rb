@@ -88,7 +88,12 @@ class Setup::SetupController < ApplicationController
   end
 
   def setup_in_progress?
-    !session[:ongoing_course_setup].nil?
+    return false if session[:ongoing_course_setup].nil?
+    if !session[:ongoing_course_setup][:course_id].nil? && !@course.nil?
+      session[:ongoing_course_setup][:course_id] == @course.id
+    else
+      true
+    end
   end
 
   def reset_setup_session

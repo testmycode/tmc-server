@@ -24,12 +24,12 @@
       <%= text_field_tag :username %>
     </div>
     <div class="actions">
-      <%= submit_tag 'Add new assistant', class: 'btn btn-mini' %>
+      <%= submit_tag 'Add new assistant', class: 'btn' %>
       <br><br>
       <% if @setup_in_progress %>
-        <%= submit_tag 'Continue', class: 'btn btn-mini' %>
+        <%= submit_tag 'Continue', class: 'btn btn-primary' %>
       <% else %>
-        <%= submit_tag 'Back to course main page', class: 'btn btn-mini' %>
+        <%= submit_tag 'Back to course main page', class: 'btn' %>
       <% end %>
     </div>
 <% end %>
