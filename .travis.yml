@@ -1,6 +1,5 @@
 sudo: required
-dist: precise
-group: legacy
+dist: trusty
 
 env:
   matrix:
