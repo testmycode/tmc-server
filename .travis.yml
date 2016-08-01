@@ -28,6 +28,8 @@ addons:
       - gcc
 
 before_install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew install docker-engine
   - . ./setup-travis.sh
 
 install:
@@ -44,7 +46,7 @@ before_script:
   - bundle exec rake db:reset
 
 script:
-  - if [ ! -z "$RSPEC" ]; then docker run  --rm --network="host" -p 3001:3001  --privileged -v devshm:/dev/shm jamo/tmc-sandbox ; fi
+  - if [ ! -z "$RSPEC" ]; then run -d --privileged --network="host" -p 3001:3001  -v tmp:/dev/shm jamo/tmc-sandbox ; fi
   - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001; fi
   - if [ ! -z "$BREAKMAN" ]; then bundle --binstubs && ./bin/brakeman ; fi
   - if [ ! -z "$AUDIT" ]; then bundle exec bundle-audit update && bundle exec bundle-audit check ; fi
