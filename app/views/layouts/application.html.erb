@@ -14,6 +14,7 @@
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= stylesheet_link_tag 'application-test', media: 'all' if Rails.env == 'test' %>
     <%= stylesheet_link_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.css") %>
+    <%= stylesheet_link_tag 'setup/setup', media: 'all' if controller_path.split('/').first.eql?('setup') %>
 
     <%= javascript_include_tag 'application' %>
     <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>

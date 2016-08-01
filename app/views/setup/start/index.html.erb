@@ -1,0 +1,30 @@
+<h1>Setup start page</h1>
+
+<% unless signed_in? %>
+    <p>
+      To setup your own tmc courses, please sign in first.
+    </p>
+<% else %>
+    <%
+      # teacher view
+      unless @my_organizations.empty? %>
+        <p>
+          Welcome to TMC setup. Following wizard guides you with basic settings for new course.
+        </p>
+        <% unless @organization.blank? %>
+            <p><%= link_to 'Create new course', setup_organization_course_chooser_index_path(@organization), class: 'btn' %></p>
+        <% else %>
+            <p>You are teacher in multiple organizations. Click the organization name, where you want to create a new course.</p>
+            <ul>
+              <% @my_organizations.each do |org| %>
+                  <li><%= link_to org.name, setup_organization_course_chooser_index_path(org) %></li>
+              <% end %>
+            </ul>
+        <% end %>
+    <%
+      # not teacher yet
+      else %>
+        <p>Welcome to setup your own TMC courses. First step is to create your own organization.</p>
+        <p><%= link_to 'Create organization', new_setup_organization_path, class: 'btn' %></p>
+    <% end %>
+<% end %>

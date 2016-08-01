@@ -29,5 +29,11 @@
 <% end %>
 
 <% if can? :teach, @organization %>
-  <%= link_to 'Create New Course', organization_course_templates_path(@organization), class: "btn btn-mini btn-warning" %>
+  <%= link_to 'Create New Course', setup_organization_course_chooser_index_path(@organization), class: "btn btn-warning" %>
 <% end %>
+
+<% if can? :create, :custom_course %>
+    <br><br>
+    <%= link_to 'Create Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+<% end %>
+</p>
