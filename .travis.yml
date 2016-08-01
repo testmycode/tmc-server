@@ -1,6 +1,5 @@
-sudo: required
-dist: precise
-group: legacy
+sudo: true
+dist: trusty
 
 env:
   matrix:
@@ -33,8 +32,11 @@ before_install:
 
 install:
   - bundle install --retry=3 --jobs=3 --deployment
+  - docker pull jamo/tmc-sandbox
+  - mkdir devshm
 
 services:
+  - docker
   - postgresql
 
 before_script:
@@ -42,7 +44,7 @@ before_script:
   - bundle exec rake db:reset
 
 script:
-  - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb start; fi
+  - if [ ! -z "$RSPEC" ]; then docker run  --rm --network="host" -p 3001:3001  --privileged -v devshm:/dev/shm jamo/tmc-sandbox ; fi
   - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001; fi
   - if [ ! -z "$BREAKMAN" ]; then bundle --binstubs && ./bin/brakeman ; fi
   - if [ ! -z "$AUDIT" ]; then bundle exec bundle-audit update && bundle exec bundle-audit check ; fi
