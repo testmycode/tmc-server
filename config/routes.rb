@@ -1,6 +1,21 @@
 TmcServer::Application.routes.draw do
   use_doorkeeper
 
+  namespace :setup do
+    resources :start, only: [:index]
+
+    resources :organizations, only: [:index, :new, :create], path: '' do
+      resources :course_chooser, only: [:index]
+
+      resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'}
+      resources :courses, only: [] do
+        resource :course_details, only: [:edit, :update]
+        resource :course_timing, only: [:index, :show, :edit, :update]
+        resources :course_assistants, only: [:index, :create, :destroy]
+        resources :course_finisher, only: [:index, :create]
+      end
+    end
+  end
 
   namespace :api, :constraints => { :format => /(html|json|js|)/ } do
     namespace :beta, defaults: { format: 'json' } do
@@ -63,8 +78,6 @@ TmcServer::Application.routes.draw do
         get 'manage_exercises'
         post 'toggle_submission_result_visibility'
       end
-
-      resources :assistants, only: [:index, :create, :destroy]
 
       resources :points, only: [:index, :show] do
         member do

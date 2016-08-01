@@ -35,12 +35,14 @@ module IntegrationTestActions
   def create_course_from_template(options = {})
     visit "/org/#{options[:organization_slug]}"
     click_link 'Create New Course'
-    click_link 'Create Course'
+    click_link 'Choose'
     fill_in 'course_name', with: options[:name]
     fill_in 'course_title', with: options[:name]
     click_button 'Add Course'
+    click_button 'Accept and continue'
+    click_button 'Continue'
+    click_button 'Publish now'
 
-    expect(page).to have_content('Course was successfully created')
     expect(page).to have_content(options[:name])
     expect(page).to have_content('help page')
   end

@@ -22,7 +22,7 @@ feature 'Teacher can add assistants to course', feature: true do
   scenario 'Teacher succeeds at adding assistant when valid username is given' do
     log_in_as(@teacher.username, 'foobar')
     add_assistant @assistant.username, @course
-    expect(page).to have_content "Assistant #{@assistant.username} added to course"
+    expect(page).to have_content "Assistant #{@assistant.username} added"
     expect(page).to have_content @assistant.username
   end
 
@@ -34,10 +34,8 @@ feature 'Teacher can add assistants to course', feature: true do
 
   scenario 'Teacher cannot grant second assistantship to same user' do
     log_in_as(@teacher.username, 'foobar')
-
     add_assistant @assistant.username, @course
     add_assistant @assistant.username, @course
-
     expect(page).to have_content 'User is already an assistant for this course'
   end
 
@@ -84,6 +82,6 @@ feature 'Teacher can add assistants to course', feature: true do
     click_link course.title
     click_link 'Manage assistants'
     fill_in 'username', with: username
-    click_button 'Add a new assistant'
+    click_button 'Add new assistant'
   end
 end

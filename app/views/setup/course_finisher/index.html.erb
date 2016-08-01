@@ -1,0 +1,19 @@
+<h1>Create new course</h1>
+
+<%= render 'setup/wizard_bar' %>
+
+<h2>Course is ready!</h2>
+
+<p>
+  Your course is now set up and ready to use!
+</p>
+
+<p>
+  Initially, the course is set to be on disabled status, so it is hidden, until you decide to publish it.
+  You can choose to publish it now or later.
+</p>
+
+<%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
+    <%= submit_tag('Publish now') %>
+    <%= submit_tag('Finish and publish later') %>
+<% end %>

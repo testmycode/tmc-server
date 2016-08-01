@@ -104,21 +104,6 @@ class CoursesController < ApplicationController
     create_impl(custom: false, params: course_params_for_create_from_template)
   end
 
-  def edit
-    authorize! :teach, @organization
-    add_course_breadcrumb
-    add_breadcrumb 'Edit course parameters'
-  end
-
-  def update
-    authorize! :teach, @organization
-    if @course.update(course_params)
-      redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
-    else
-      render :edit
-    end
-  end
-
   def enable
     authorize! :teach, @organization # should assistants be able to enable/disable?
     @course.enabled!
