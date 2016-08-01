@@ -7,7 +7,9 @@ describe Setup::CourseDetailsController, type: :controller do
     @organization = FactoryGirl.create(:accepted_organization)
     @teacher = FactoryGirl.create(:user)
     @user = FactoryGirl.create(:user)
+    @admin = FactoryGirl.create(:admin)
     Teachership.create!(user: @teacher, organization: @organization)
+
     @ct = FactoryGirl.create(:course_template)
 
     @source_path = "#{@test_tmp_dir}/fake_source"
@@ -43,9 +45,28 @@ describe Setup::CourseDetailsController, type: :controller do
         it 'should create a course' do
           init_session
           expect do
-            post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path, course_template_id: @ct.id }
+            post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id }
           end.to change { Course.count }.by(1)
         end
+
+        it 'redirects to the created course' do
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id }
+          expect(response).to redirect_to(setup_organization_course_course_timing_path(@organization, Course.last))
+        end
+
+        it 'does directory changes when course is first created from template, but doesn\'t do changes when creating more courses from same template' do
+          expect(CourseTemplate.last.dummy).to be true
+          expect(CourseTemplate.last.cache_version).to eq(0)
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id }
+          expect(Course.all.pluck :cache_version).to eq([0, 1])
+
+          expect(CourseTemplate.find(@ct.id).cache_version).to eq(1)
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @ct.id }
+          expect(Course.all.pluck :cache_version).to eq([0, 1, 1])
+          expect(CourseTemplate.find(@ct.id).cache_version).to eq(1)
+          expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
+        end
+
       end
 
       ## TODO: Refactor old course_controller setup tests here
@@ -99,7 +120,7 @@ describe Setup::CourseDetailsController, type: :controller do
           init_session
           put :update, organization_id: @organization.slug, course_id: @course.id,
               course: { title: 'New title', description: 'New description', material_url: 'http://new.url' }
-          expect(response).to redirect_to(setup_organization_course_course_timing_path(@organization, Course.find(@course)))
+          expect(response).to redirect_to(setup_organization_course_course_timing_path(@organization, Course.find(@course.id)))
         end
       end
 
@@ -107,7 +128,7 @@ describe Setup::CourseDetailsController, type: :controller do
         it 'redirects to course page' do
           put :update, organization_id: @organization.slug, course_id: @course.id,
               course: { title: 'New title', description: 'New description', material_url: 'http://new.url' }
-          expect(response).to redirect_to(organization_course_path(@organization, Course.find(@course)))
+          expect(response).to redirect_to(organization_course_path(@organization, Course.find(@course.id)))
         end
       end
 
@@ -166,6 +187,30 @@ describe Setup::CourseDetailsController, type: :controller do
     end
 
     ## TODO: Tests for the rest of the actions, when they are properly implemented
+  end
+  
+  describe 'As admin' do
+    before :each do
+      controller.current_user = @admin
+    end
+
+    describe 'when creating custom course' do
+      it 'should create the course' do
+        init_session
+        expect do
+          post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path }
+        end.to change { Course.count }.by(1)
+      end
+
+      it 'does directory changes via refresh' do
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @ct.source_url }
+        expect(Course.last.cache_version).to eq(1)
+        post :create, organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', source_url: @ct.source_url }
+        expect(Course.all.pluck :cache_version).to eq([0, 1, 1])
+        expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
+      end
+    end
+
   end
 
   describe 'As non-teacher' do

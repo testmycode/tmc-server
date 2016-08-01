@@ -27,9 +27,12 @@ module IntegrationTestActions
     # fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
     fill_in 'course_source_url', with: options[:source_url] if options[:source_url]
     click_button 'Add Course'
+    click_button 'Accept and continue'
+    click_button 'Continue'
+    click_button 'Publish now'
 
-    expect(page).to have_content('Course was successfully created.')
     expect(page).to have_content(options[:name])
+    expect(page).to have_content('help page')
   end
 
   def create_course_from_template(options = {})

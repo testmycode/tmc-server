@@ -3,22 +3,35 @@ class Setup::CourseDetailsController < Setup::SetupController
 
   def new
     authorize! :teach, @organization
+    @course_template = CourseTemplate.find(params[:template_id])
+    authorize! :clone, @course_template
+
     print_setup_phases(2)
 
-    @course_template = CourseTemplate.find(params[:template_id])
     @course = Course.new_from_template(@course_template)
     @course.organization = @organization
+  end
+
+  def custom
+    authorize! :create, :custom_course
+    print_setup_phases(2)
+
+    @course = Course.new
+    @course.organization = @organization
+    @custom = true
+    render 'new'
   end
 
   def create
     authorize! :teach, @organization
 
-    params = course_params_for_create_from_template
+    custom = params[:course][:course_template_id].blank?
 
-    input_name = params[:name]
-    params[:name] = @organization.slug + '-' + input_name
+    create_params = custom ? course_params_for_create_custom : course_params_for_create_from_template
+    input_name = create_params[:name]
+    create_params[:name] = @organization.slug + '-' + input_name
 
-    @course = Course.new(params)
+    @course = Course.new(create_params)
     @course.organization = @organization
 
     if @course.save
@@ -26,9 +39,10 @@ class Setup::CourseDetailsController < Setup::SetupController
       update_setup_course(@course.id)
       redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
     else
-      @course_template = @course.course_template
+      @course_template = @course.course_template unless custom
       @course.name = input_name
       print_setup_phases(2)
+      @custom = custom
       render action: 'new', notice: 'Course could not be created'
     end
   end
@@ -71,6 +85,10 @@ class Setup::CourseDetailsController < Setup::SetupController
 
   def course_params_for_create_from_template
     params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
+  end
+
+  def course_params_for_create_custom
+    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
   end
 
   def course_params

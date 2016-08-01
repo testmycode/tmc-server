@@ -34,6 +34,6 @@
 
 <% if can? :create, :custom_course %>
     <br><br>
-    <%= link_to 'Create Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+    <%= link_to 'Create Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
 <% end %>
 </p>
