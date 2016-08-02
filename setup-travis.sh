@@ -3,8 +3,6 @@
 #
 # This is not recommended to be run locally, and it employs some hacks and tricks to get by limitations of travis.
 
-set -ev
-
 # Unset bundle Gemfile, since we have multiple projects with separate Gemfiles and it will just cause confusion
 unset BUNDLE_GEMFILE
 
