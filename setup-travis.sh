@@ -41,21 +41,3 @@ export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
 
 # Build submodules except sandbox
 bundle exec rake compile
-
-# Use pre built tmc-sandbox
-wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
-cd ext/tmc-sandbox/web
-# Set current user and reduce max instances, though only one instance will be used at any given time
-sed -i "s/\(tmc_user: \)tmc/\1 $(whoami)/" site.defaults.yml
-sed -i "s/\(tmc_group: \)tmc/\1 $(whoami)/" site.defaults.yml
-sed -i 's/\(max_instances: \)[0-9]*/\12/' site.defaults.yml
-# Disable network
-sed -i '/^network:$/{$!{N;s/^\(network:\)\n\(  enabled: \)true$/\1\n\2false/;ty;P;D;:y}}' site.defaults.yml
-cat site.defaults.yml
-bundle install --retry=3 --jobs=3
-rake ext
-cd ../../../
-git clone https://github.com/testmycode/tmc-langs.git $HOME/tmc-langs
-cd $HOME/tmc-langs
-mvn package -Dmaven.test.skip=true
-cd -
