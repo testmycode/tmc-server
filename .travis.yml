@@ -36,6 +36,7 @@ install:
   - bundle install --retry=3 --jobs=3 --deployment
   - docker pull jamo/tmc-sandbox
   - mkdir devshm
+  - mkdir devshm2
 
 services:
   - docker
@@ -46,7 +47,7 @@ before_script:
   - bundle exec rake db:reset
 
 script:
-  - docker run -t --privileged --network="host" -p 3001:3001  -v devshm:/dev/shm jamo/tmc-sandbox /bin/sh -c "cd tmc-sandbox/uml/ && ./run-test-exercise.sh && tar xvf tmp/output.tar && find tmp/*.txt -print -exec cat {} \;"
+  - docker run -t --rm --privileged  -v devshm2:/dev/shm jamo/tmc-sandbox /bin/sh -c "cd tmc-sandbox/uml/ && ./run-test-exercise.sh && tar xvf tmp/output.tar && find tmp/*.txt -print -exec cat {} \;"
   - if [ ! -z "$RSPEC" ]; then docker run -d --privileged --network="host" -p 3001:3001  -v devshm:/dev/shm jamo/tmc-sandbox ; fi
   - if [ ! -z "$RSPEC" ]; then sleep 20; curl 127.0.0.1:3001/status.json ; fi
   - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001; fi
