@@ -23,6 +23,6 @@ class Setup::OrganizationsController < Setup::SetupController
   end
 
   def organization_params
-    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
+    params.require(:organization).permit(:name, :information, :website, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
   end
 end
