@@ -5,9 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, except: [:create, :help, :index, :new, :show_json, :create_from_template, :prepare_from_template]
-
-  skip_authorization_check only: [:index]
+  before_action :set_course, except: [:help, :index, :show_json]
 
   skip_authorization_check only: [:index]
 
@@ -74,7 +72,7 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-     authorize! :refresh, @course
+    authorize! :refresh, @course
     refresh_course(@course)
     redirect_to organization_course_path
   end
