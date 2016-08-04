@@ -1,14 +1,18 @@
 <h1>Create a new organization</h1>
 
+<p>
+  Please enter the following information. Fields marked with * are mandatory.
+</p>
+
 <%= form_for(@organization, url: setup_organizations_path) do |f| %>
     <%= render 'shared/error_messages', target: @organization %>
 
-    <%= bs_labeled_field('name', f.text_field(:name)) %>
+    <%= bs_labeled_field('name', f.text_field(:name), required: true) %>
     <%= bs_labeled_field('infomation', f.text_area(:information)) %>
-    <%= bs_labeled_field('logo (recommended minimum size 100x100)', f.file_field(:logo)) %><br/>
 
     <div class="field">
-      <%= f.label :slug %>
+      <%= f.label :slug, "Organization ID *" %>
+      This is permanent and can't be changed later.<br>
       Preview:
   <span id="organization-id-preview-url">
      <%= organizations_url %>/<span id="organization-id-preview-slug"></span>
@@ -17,14 +21,20 @@
       <%= f.text_field :slug, disabled: @cant_edit_slug, onkeyup: 'Organizations.updateSlugPreview(this.value)' %>
     </div>
 
+    <%= bs_labeled_field('logo (recommended minimum size 100x100)', f.file_field(:logo)) %><br/>
+
     <h2>Contact details</h2>
+
+    <p>
+      Following fields are not public. Only visible for admins and organization teachers.
+    </p>
 
     <%= bs_labeled_field('Contact name', f.text_field(:contact_information)) %>
     <%= bs_labeled_field('Phone number', f.text_field(:phone)) %>
     <%= bs_labeled_field('Email', f.text_field(:email)) %><br/>
 
     <div class="actions">
-      <%= f.submit  %>
+      <%= f.submit class: 'btn btn-primary' %>
     </div>
 
 <% end %>

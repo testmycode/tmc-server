@@ -54,6 +54,7 @@ module ApplicationHelper
   def bs_labeled_field(label, field, options = {})
     type = options[:type] || :text
 
+    label += ' *' if options[:required]
     case type
     when :boolean
       str = '<label class="checkbox">'
