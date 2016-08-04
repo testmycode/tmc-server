@@ -1,12 +1,12 @@
 class Setup::OrganizationsController < Setup::SetupController
-  skip_authorization_check only: [:index]
+  skip_authorization_check only: [:index, :new]
 
   def index
     redirect_to setup_start_index_path
   end
 
   def new
-    authorize! :request, :organization
+    return respond_access_denied('Please log in first to create new organization') if !can? :request, :organization
     add_breadcrumb 'Create new organization'
     @organization = Organization.new
   end
