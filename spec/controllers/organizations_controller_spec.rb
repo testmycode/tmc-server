@@ -177,9 +177,9 @@ describe OrganizationsController, type: :controller do
     end
 
     describe 'GET new' do
-      it 'assigns a new organization as @organization' do
-        get :new, {}
-        expect(assigns(:organization)).to be_a_new(Organization)
+      it 'should redirect to new setup location' do
+        get :new
+        expect(response).to redirect_to(new_setup_organization_path)
       end
     end
 
@@ -188,39 +188,6 @@ describe OrganizationsController, type: :controller do
         organization = Organization.create! valid_attributes
         get :edit, id: organization.to_param
         expect(assigns(:organization)).to eq(organization)
-      end
-    end
-
-    describe 'POST create' do
-      describe 'with valid params' do
-        it 'creates a new Organization' do
-          expect do
-            post :create, organization: valid_attributes
-          end.to change(Organization, :count).by(1)
-        end
-
-        it 'assigns a newly created organization as @organization' do
-          post :create, organization: valid_attributes
-          expect(assigns(:organization)).to be_a(Organization)
-          expect(assigns(:organization)).to be_persisted
-        end
-
-        it 'redirects to the created organization' do
-          post :create, organization: valid_attributes
-          expect(response).to redirect_to(Organization.last)
-        end
-      end
-
-      describe 'with invalid params' do
-        it 'assigns a newly created but unsaved organization as @organization' do
-          post :create, organization: invalid_attributes
-          expect(assigns(:organization)).to be_a_new(Organization)
-        end
-
-        it 're-renders the \'new\' template' do
-          post :create, organization: invalid_attributes
-          expect(response).to render_template('new')
-        end
       end
     end
 

@@ -3,7 +3,7 @@ require 'natsort'
 class OrganizationsController < ApplicationController
   before_action :set_organization, only: [:show, :edit, :update, :destroy, :verify, :disable, :disable_reason_input, :toggle_visibility]
 
-  skip_authorization_check only: [:index]
+  skip_authorization_check only: [:index, :new]
 
   def index
     ordering = 'hidden, LOWER(name)'
@@ -27,9 +27,7 @@ class OrganizationsController < ApplicationController
   end
 
   def new
-    authorize! :request, :organization
-    add_breadcrumb 'Create new organization'
-    @organization = Organization.new
+    redirect_to new_setup_organization_path
   end
 
   def edit
@@ -37,17 +35,6 @@ class OrganizationsController < ApplicationController
     add_organization_breadcrumb
     add_breadcrumb 'Edit'
     @cant_edit_slug = !current_user.administrator?
-  end
-
-  def create
-    authorize! :request, :organization
-    @organization = Organization.init(organization_params, current_user)
-
-    if !@organization.errors.any?
-      redirect_to organization_path(@organization), notice: 'Organization was successfully created.'
-    else
-      render :new
-    end
   end
 
   def update

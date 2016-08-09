@@ -40,7 +40,7 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  resources :organizations, except: :destory, path: 'org' do
+  resources :organizations, except: [:destory, :create], path: 'org' do
 
     resources :exercises, only: [:show] do
       resources :submissions, only: [:create]
