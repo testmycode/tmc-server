@@ -4,7 +4,7 @@ TmcServer::Application.routes.draw do
   namespace :setup do
     resources :start, only: [:index]
 
-    resources :organizations, only: [:index, :new, :create], path: '' do
+    resources :organizations, only: [:index, :new, :create, :edit, :update], path: '' do
       resources :course_chooser, only: [:index]
 
       resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'} do
@@ -40,7 +40,7 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  resources :organizations, except: [:destory, :create], path: 'org' do
+  resources :organizations, except: [:destory, :create, :edit, :update], path: 'org' do
 
     resources :exercises, only: [:show] do
       resources :submissions, only: [:create]

@@ -22,6 +22,34 @@ class Setup::OrganizationsController < Setup::SetupController
     end
   end
 
+  def edit
+    authorize! :edit, @organization
+
+    add_organization_breadcrumb
+    add_breadcrumb 'Edit details'
+    @cant_edit_slug = !current_user.administrator?
+  end
+
+  def update
+    authorize! :edit, @organization
+    authorize! :edit_slug, @organization unless organization_params[:slug].nil?
+
+    if @organization.update(organization_params)
+      redirect_to organization_path(@organization), notice: 'Organization was successfully updated.'
+    else
+      add_organization_breadcrumb
+      add_breadcrumb 'Edit details'
+      @cant_edit_slug = !current_user.administrator?
+      render :edit
+    end
+  end
+
+  private
+
+  def set_organization
+    @organization = Organization.find_by(slug: params[:id]) unless params[:id].nil?
+  end
+
   def organization_params
     params.require(:organization).permit(:name, :information, :website, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
   end

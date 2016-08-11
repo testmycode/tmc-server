@@ -1,7 +1,7 @@
 require 'natsort'
 
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :edit, :update, :destroy, :verify, :disable, :disable_reason_input, :toggle_visibility]
+  before_action :set_organization, only: [:show, :destroy, :verify, :disable, :disable_reason_input, :toggle_visibility]
 
   skip_authorization_check only: [:index, :new]
 
@@ -28,24 +28,6 @@ class OrganizationsController < ApplicationController
 
   def new
     redirect_to new_setup_organization_path
-  end
-
-  def edit
-    authorize! :edit, @organization
-    add_organization_breadcrumb
-    add_breadcrumb 'Edit'
-    @cant_edit_slug = !current_user.administrator?
-  end
-
-  def update
-    authorize! :edit, @organization
-    authorize! :edit_slug, @organization unless organization_params[:slug].nil?
-
-    if @organization.update(organization_params)
-      redirect_to organization_path(@organization), notice: 'Organization was successfully updated.'
-    else
-      render :edit
-    end
   end
 
   def list_requests

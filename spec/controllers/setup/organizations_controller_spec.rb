@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Setup::OrganizationsController, type: :controller do
-
   before :each do
     @organization = FactoryGirl.create(:accepted_organization)
     @teacher = FactoryGirl.create(:user)
@@ -11,17 +10,25 @@ describe Setup::OrganizationsController, type: :controller do
 
   let(:valid_attributes) do
     {
-        name: 'TestOrganization',
-        slug: 'test-organization',
-        verified: true
+      name: 'TestOrganization',
+      slug: 'test-organization',
+      verified: true
     }
   end
 
   let(:invalid_attributes) do
     {
-        name: nil,
-        slug: 'test organization',
-        verified: nil
+      name: nil,
+      slug: 'test organization',
+      verified: nil
+    }
+  end
+
+  let(:new_attributes) do
+    {
+      name: 'New organization name',
+      information: 'New information',
+      website: 'http://newurl.net/'
     }
   end
 
@@ -30,10 +37,49 @@ describe Setup::OrganizationsController, type: :controller do
       controller.current_user = @teacher
     end
 
-    # TODO: organization editing tests here
-    describe 'do something' do
-      it '...' do
-        skip 'todo'
+    describe 'GET edit' do
+      it 'assigns the requested organization as @organization' do
+        get :edit, id: @organization.to_param
+        expect(assigns(:organization)).to eq(@organization)
+      end
+    end
+
+    describe 'PUT update' do
+      it 'should update organization' do
+        put :update, id: @organization.to_param, organization: new_attributes
+        org = Organization.find_by slug: @organization.slug
+        expect(org.name).to eq('New organization name')
+        expect(org.information).to eq('New information')
+        expect(org.website).to eq('http://newurl.net/')
+      end
+
+      it 'should assign the requested organization as @organization' do
+        put :update, id: @organization.to_param, organization: new_attributes
+        expect(assigns(:organization)).to eq(@organization)
+      end
+
+      it 'should redirects to the organization' do
+        put :update, id: @organization.to_param, organization: new_attributes
+        expect(response).to redirect_to(@organization)
+      end
+
+      describe 'with invalid params' do
+        it 'should assign the organization as @organization' do
+          put :update, id: @organization.to_param, organization: invalid_attributes
+          expect(assigns(:organization)).to eq(@organization)
+        end
+
+        it 'should re-render the \'edit\' template' do
+          put :update, id: @organization.to_param, organization: invalid_attributes.except(:slug)
+          expect(response).to render_template('edit')
+        end
+      end
+
+      describe 'with trying to change slug' do
+        it 'should deny access' do
+          put :update, id: @organization.to_param, organization: new_attributes.merge(slug: 'newslug')
+          expect(response.status).to eq(401)
+        end
       end
     end
   end
@@ -93,6 +139,20 @@ describe Setup::OrganizationsController, type: :controller do
           post :create, organization: invalid_attributes
           expect(response).to render_template('new')
         end
+      end
+    end
+
+    describe 'GET edit' do
+      it 'should deny access' do
+        get :edit, id: @organization.to_param
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe 'PUT update' do
+      it 'should deny access' do
+        put :update, id: @organization.to_param, organization: new_attributes
+        expect(response.status).to eq(401)
       end
     end
   end
