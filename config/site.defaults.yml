@@ -120,3 +120,11 @@ valid_clients:
 # A list of allowed origins for auth api.
 cors_origins:
   - cs.helsinki.fi
+
+### Help links ###
+# This link is for the page, which contains information how the
+# students can get started.
+course_instruction_page: http://mooc.fi/courses/general/ohjelmointi/
+
+# Teacher manual link
+teacher_manual_url: http://testmycode-usermanual.github.io/usermanual/teachers.html

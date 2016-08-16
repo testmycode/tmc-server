@@ -53,7 +53,7 @@
         <td><%= link_to organization.name, organization_path(organization) %></td>
         <td><%= organization.information %></td>
         <% if current_user.administrator? %>
-          <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
+          <td><%= link_to 'Edit', edit_setup_organization_path(organization) %></td>
         <% end %>
       </tr>
     <% end %>
