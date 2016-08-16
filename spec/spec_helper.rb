@@ -7,6 +7,7 @@ require 'etc'
 require 'fileutils'
 require 'capybara/poltergeist'
 require 'simplecov'
+require 'rspec_remote_formatter'
 SimpleCov.start 'rails'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
@@ -63,7 +64,7 @@ if Capybara.default_driver == :selenium
 end
 
 def get_m3_home
-  mvn_home = `mvn --version | grep "Maven home" | sed 's/Maven home: //'`.chomp
+  `mvn --version | grep "Maven home" | sed 's/Maven home: //'`.chomp
 end
 
 if ENV['M3_HOME'].blank?
@@ -76,6 +77,19 @@ def without_db_notices(&block)
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
   block.call
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'notice'")
+end
+
+def host_ip
+  @addr ||= if ENV['CI']
+              `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
+            else
+              '127.0.0.1'
+            end
+end
+
+# This makes it visible to others
+if ENV['CI']
+  Capybara.server_host = host_ip
 end
 
 RSpec.configure do |config|
@@ -93,7 +107,7 @@ RSpec.configure do |config|
       # integration tests can't use transaction since the webserver must see the changes
       DatabaseCleaner.strategy = :truncation
 
-      SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://127.0.0.1:#{Capybara.server_port}"
+      SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://#{host_ip}:#{Capybara.server_port}"
       SiteSetting.all_settings['emails']['email_code_reviews_by_default'] = false
       SiteSetting.all_settings['comet_server'] = {
         'url' => "http://localhost:#{CometSupport.port}/",
