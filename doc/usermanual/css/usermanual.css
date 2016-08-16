@@ -1,20 +1,67 @@
-
-body {
-  font-family: "Arial", "Helvetica", sans-serif;
-  font-size: 10pt;
+* {
+  color: #3c3c3c;
 }
 
-body > p,
+a {
+  color: #70a2f5;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 10pt;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 100px;
+}
+
+body p, li {
+  font-size: 14px;
+  line-height: 20px;
+  max-width: 600px;
+}
+
+body ul, p, h1, h2, h3, h4, h5, h6 {
+  max-width: 600px;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+body li {
+  margin-bottom: 10px;
+}
+
 body > div {
   margin-left: 8pt;
+}
+
+#toc li {
+  line-height: 24px;
+  margin-bottom: inherit;
 }
 
 img.screenshot {
   border: 3px solid gray;
   display: block;
+  max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 3em;
+}
+
+h1 {
+  font-size: 45px;
+  color: #ffab0e;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 16px;
 }
 
 code, .java, .shell, .yaml {
@@ -26,7 +73,6 @@ pre, div.shell {
   margin-right: 40pt;
   margin-bottom: 3em;
   padding: 10pt;
-  border: 2px solid gray;
 }
 
 .shell {
@@ -47,6 +93,13 @@ pre, div.shell {
   color: #749685;
 }
 
+pre.sh_sourceCode, .shell {
+  -webkit-box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+  -moz-box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+  box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+  border: 0;
+}
+
 div.file-name {
   margin-left: 10pt;
   font-family: monospace;
@@ -59,4 +112,3 @@ footer {
   color: gray;
   float: right;
 }
-
