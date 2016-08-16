@@ -125,7 +125,7 @@ describe CourseTemplatesController, type: :controller do
       it 'destroys course template' do
         expect do
           delete :destroy, id: @course_template.to_param
-        end.to raise_exception
+        end.to raise_exception(RuntimeError, 'One does not destroy a course template')
       end
     end
 

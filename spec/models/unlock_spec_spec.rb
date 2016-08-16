@@ -147,18 +147,18 @@ describe UnlockSpec, type: :model do
     end
 
     it 'should raise error if spec is invalid' do
-      expect { call_parsable(['1.1.100000']) }.to raise_error
-      expect { call_parsable(['1.1.0000']) }.to raise_error
-      expect { call_parsable(['1 exercise in nonexistent']) }.to raise_error
-      expect { call_parsable(['60% of grp-nonexistent']) }.to raise_error
-      expect { call_parsable(['60% of grp-']) }.to raise_error
-      expect { call_parsable(['60% of gr']) }.to raise_error
-      expect { call_parsable(['60% of grp-ex']) }.to raise_error
-      expect { call_parsable(['60% of grp-ex2-']) }.to raise_error
-      expect { call_parsable(['60% if grp-ex2']) }.to raise_error
-      expect { call_parsable(['foo']) }.to raise_error
-      expect { call_parsable(['foo', '1.1.2000']) }.to raise_error
-      expect { call_parsable(['2.2.2000', '1.1.2000']) }.to raise_error
+      expect { call_parsable(['1.1.100000']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['1.1.0000']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['1 exercise in nonexistent']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['60% of grp-nonexistent']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['60% of grp-']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['60% of gr']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['60% of grp-ex']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['60% of grp-ex2-']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['60% if grp-ex2']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['foo']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['foo', '1.1.2000']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
+      expect { call_parsable(['2.2.2000', '1.1.2000']) }.to raise_error(UnlockSpec::InvalidSyntaxError)
     end
   end
 end

@@ -50,7 +50,7 @@ describe Organization, type: :model do
     end
 
     def should_be_invalid_params(params)
-      expect { Organization.create!(params) }.to raise_error
+      expect { Organization.create!(params) }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 

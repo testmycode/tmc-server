@@ -14,7 +14,7 @@ describe ParticipantsController, type: :controller do
 
       it 'redirects to current participant page' do
         get :me
-        response.should redirect_to participant_path @user
+        expect(response).to redirect_to(participant_path(@user))
       end
     end
 

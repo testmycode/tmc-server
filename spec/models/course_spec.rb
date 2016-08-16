@@ -175,12 +175,12 @@ describe Course, type: :model do
       FactoryGirl.create :course, name: 'Unique'
       expect do
         FactoryGirl.create :course, name: 'Unique'
-      end.to raise_error
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'forbids custom course\'s name to be same as some template\'s name' do
       template = FactoryGirl.create :course_template, name: 'someName'
-      expect{ Course.create!(valid_params.merge(name: 'someName')) }.to raise_error
+      expect{ Course.create!(valid_params.merge(name: 'someName')) }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'forbids spaces in the name' do # this could eventually be lifted as long as everything else is made to tolerate spaces
@@ -216,7 +216,7 @@ describe Course, type: :model do
     end
 
     def should_be_invalid_params(params)
-      expect { Course.create!(params) }.to raise_error
+      expect { Course.create!(params) }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     def should_be_valid_params(params)

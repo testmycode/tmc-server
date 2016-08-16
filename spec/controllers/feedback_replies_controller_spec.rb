@@ -22,7 +22,7 @@ describe FeedbackRepliesController, '#create', type: :controller do
     ability = Ability.new(controller.current_user)
 
     expect(ability).not_to be_able_to(:reply, answer)
-    expect { post :create, params }.to raise_error
+    expect { post :create, params }.to raise_error(CanCan::AccessDenied)
   end
 
   describe 'for an admin user' do

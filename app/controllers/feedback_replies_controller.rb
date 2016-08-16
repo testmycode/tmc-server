@@ -10,7 +10,7 @@ class FeedbackRepliesController < ApplicationController
       params['email'],
       params['body'],
       answer.exercise_name
-    ).deliver
+    ).deliver_now
 
     redirect_to :back, notice: 'Reply to a review was mailed'
   end
