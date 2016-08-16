@@ -7,7 +7,9 @@ TmcServer::Application.routes.draw do
     resources :organizations, only: [:index, :new, :create], path: '' do
       resources :course_chooser, only: [:index]
 
-      resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'}
+      resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'} do
+        get 'new/custom', to: 'course_details#custom'
+      end
       resources :courses, only: [] do
         resource :course_details, only: [:edit, :update]
         resource :course_timing, only: [:index, :show, :edit, :update]
@@ -62,7 +64,7 @@ TmcServer::Application.routes.draw do
 
     get 'course_templates', to: 'course_templates#list_for_teachers'
 
-    resources :courses do
+    resources :courses, except: [:new, :create] do
       member do
         get 'refresh'
         post 'refresh'
@@ -92,11 +94,6 @@ TmcServer::Application.routes.draw do
       end
 
       get 'help'
-
-      collection do
-        get 'clone_template/:course_template_id' => 'courses#prepare_from_template', as: 'prepare_course'
-        post 'clone_template' => 'courses#create_from_template', as: 'clone_course'
-      end
 
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]

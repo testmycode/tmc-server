@@ -4,7 +4,7 @@
 
 <h2>Phase 1 - Choose template</h2>
 
-<% unless @setup_in_progress && session[:ongoing_course_setup][:phase] >= 2 %>
+<% unless @setup_in_progress && !session[:ongoing_course_setup][:course_id].nil? %>
 
   <p>
     Courses are based on the available templates, they are listed below. Choose the one you want to use.
@@ -33,10 +33,9 @@
   </table>
   <br/>
 
-  <% # For admins, plus todo: refactor custom course into new setup %>
   <% if can? :create, :custom_course %>
-      <h3>Create custom course (without setup wizard)</h3>
-      <%= link_to 'Create New Custom Course', new_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+      <h3>Create custom course (advanced mode)</h3>
+      <%= link_to 'Create New Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
   <% end %>
 
 <% else %>

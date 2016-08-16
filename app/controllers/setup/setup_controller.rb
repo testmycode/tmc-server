@@ -49,7 +49,7 @@ class Setup::SetupController < ApplicationController
   end
 
   def print_setup_phases(phase = 0)
-    update_setup_phase(phase)
+    update_setup_phase(phase) unless phase == 2
     maxphase = setup_in_progress? ? session[:ongoing_course_setup][:phase] : phase
     STEPS.each_with_index do |st, i|
       path = nil
@@ -57,12 +57,12 @@ class Setup::SetupController < ApplicationController
         type = 'current'
       elsif i < maxphase
         type = 'visited'
-        path = STEPS[i][:path]
+        path = st[:path]
       else
         type = 'unavailable'
       end
       options = {}
-      options = { pass_parameters: true } if setup_in_progress? && maxphase > 2
+      options = { pass_parameters: true } if setup_in_progress? && course_choosed?
       add_phase (i+1).to_s+'. '+STEPS[i][:title], type, path, options
     end
   end
@@ -94,6 +94,11 @@ class Setup::SetupController < ApplicationController
     else
       true
     end
+  end
+
+  def course_choosed?
+    return false if session[:ongoing_course_setup].nil?
+    !session[:ongoing_course_setup][:course_id].nil?
   end
 
   def reset_setup_session
