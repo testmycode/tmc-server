@@ -43,49 +43,6 @@ describe OrganizationsController, type: :controller do
       end
     end
 
-    describe 'PUT update' do
-      describe 'with valid params' do
-        let(:new_attributes) do
-          {
-            information: 'Changed information'
-          }
-        end
-
-        it 'updates the requested organization' do
-          organization = Organization.create! valid_attributes
-          put :update, id: organization.to_param, organization: new_attributes
-          organization.reload
-          expect(organization.information).to eq('Changed information')
-        end
-
-        it 'assigns the requested organization as @organization' do
-          organization = Organization.create! valid_attributes
-          put :update, id: organization.to_param, organization: valid_attributes
-          expect(assigns(:organization)).to eq(organization)
-        end
-
-        it 'redirects to the organization' do
-          organization = Organization.create! valid_attributes
-          put :update, id: organization.to_param, organization: valid_attributes
-          expect(response).to redirect_to(organization)
-        end
-      end
-
-      describe 'with invalid params' do
-        it 'assigns the organization as @organization' do
-          organization = Organization.create! valid_attributes
-          put :update, id: organization.to_param, organization: invalid_attributes
-          expect(assigns(:organization)).to eq(organization)
-        end
-
-        it 're-renders the \'edit\' template' do
-          organization = Organization.create! valid_attributes
-          put :update, id: organization.to_param, organization: invalid_attributes
-          expect(response).to render_template('edit')
-        end
-      end
-    end
-
     describe 'GET list_requests' do
       before :each do
         @org1 = FactoryGirl.create(:organization)
@@ -123,26 +80,6 @@ describe OrganizationsController, type: :controller do
       controller.current_user = @user
     end
 
-    describe 'PUT update' do
-      it 'updates the requested organization if slug not changed' do
-        org = FactoryGirl.create(:accepted_organization)
-        Teachership.create(user_id: @user.id, organization_id: org.id)
-        put :update, id: org.to_param, organization: { name: 'New organization name' }
-        org.reload
-        expect(org.name).to eq('New organization name')
-        expect(response).to redirect_to(organization_path)
-      end
-    end
-
-    describe 'PUT update with slug change' do
-      it 'denies access' do
-        org = FactoryGirl.create(:accepted_organization)
-        Teachership.create(user_id: @user.id, organization_id: org.id)
-        put :update, id: org.to_param, organization: { slug: 'newslug' }
-        expect(response.code.to_i).to eq(401)
-      end
-    end
-
     describe 'POST toggle_visibility' do
       it 'toggles value of hidden field between true and false' do
         org = FactoryGirl.create(:accepted_organization)
@@ -177,58 +114,9 @@ describe OrganizationsController, type: :controller do
     end
 
     describe 'GET new' do
-      it 'assigns a new organization as @organization' do
-        get :new, {}
-        expect(assigns(:organization)).to be_a_new(Organization)
-      end
-    end
-
-    describe 'GET edit' do
-      it 'assigns the requested organization as @organization' do
-        organization = Organization.create! valid_attributes
-        get :edit, id: organization.to_param
-        expect(assigns(:organization)).to eq(organization)
-      end
-    end
-
-    describe 'POST create' do
-      describe 'with valid params' do
-        it 'creates a new Organization' do
-          expect do
-            post :create, organization: valid_attributes
-          end.to change(Organization, :count).by(1)
-        end
-
-        it 'assigns a newly created organization as @organization' do
-          post :create, organization: valid_attributes
-          expect(assigns(:organization)).to be_a(Organization)
-          expect(assigns(:organization)).to be_persisted
-        end
-
-        it 'redirects to the created organization' do
-          post :create, organization: valid_attributes
-          expect(response).to redirect_to(Organization.last)
-        end
-      end
-
-      describe 'with invalid params' do
-        it 'assigns a newly created but unsaved organization as @organization' do
-          post :create, organization: invalid_attributes
-          expect(assigns(:organization)).to be_a_new(Organization)
-        end
-
-        it 're-renders the \'new\' template' do
-          post :create, organization: invalid_attributes
-          expect(response).to render_template('new')
-        end
-      end
-    end
-
-    describe 'PUT update' do
-      it 'denies access' do
-        organization = Organization.create! valid_attributes
-        put :update, id: organization.to_param, organization: {}
-        expect(response.code.to_i).to eq(401)
+      it 'should redirect to new setup location' do
+        get :new
+        expect(response).to redirect_to(new_setup_organization_path)
       end
     end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160310111733) do
+ActiveRecord::Schema.define(version: 20160804120140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -235,6 +235,7 @@ ActiveRecord::Schema.define(version: 20160310111733) do
     t.string   "phone"
     t.text     "contact_information"
     t.string   "email"
+    t.text     "website"
   end
 
   create_table "points_upload_queues", force: :cascade do |t|

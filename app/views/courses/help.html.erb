@@ -1,25 +1,41 @@
 <h1><%= @course.title %> - course help page</h1>
 
 <ul>
-  <li><%= link_to 'View status page', organization_course_path(@organization, @course) %></li>
+  <li><%= link_to 'Back to course main page', organization_course_path(@organization, @course) %></li>
 </ul>
 
 <h2>Description:</h2>
 
 <p>
-  <% if !@course.description.nil? %>
+  <% unless @course.description.blank? %>
       <%= @course.description %>
   <% else %>
       -
   <% end %>
 </p>
 
-<h2>Course url for students:</h2>
-
-<p><%= link_to organization_course_url(@organization, @course), organization_course_url(@organization, @course) %></p>
-<p>This url can be used with Netbeans plugin.</p>
+<%
+  course_instruction_page = SiteSetting.value(:course_instruction_page)
+  unless course_instruction_page.nil? %>
+    <h2>How to get started?</h2>
+    <p>
+      Instructions how to install required programming tools and configure TMC-plugin can be found
+      <%= link_to 'here', course_instruction_page, target: '_blank' %>.
+    </p>
+    <p>
+      <strong>Course url</strong> to use with Netbeans TMC-plugin is:<br>
+    <%= link_to organization_course_url(@organization, @course), organization_course_url(@organization, @course) %>
+    </p>
+<% end %>
 
 <% unless @course.material_url.blank? %>
-  <h2>Link to online course material:</h2>
-  <p><%= link_to @course.material_url, @course.material_url %></p>
+  <h2>Course material:</h2>
+  <p><%= link_to @course.material_url, @course.material_url, target: '_blank' %></p>
+<% end %>
+
+<% if can? :teach, @course %>
+  <h2>For teachers</h2>
+  <p>
+    Full teacher manual can be found <%= link_to 'here', SiteSetting.value(:teacher_manual_url), target: '_blank' %>.
+  </p>
 <% end %>
