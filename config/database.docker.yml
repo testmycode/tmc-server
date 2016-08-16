@@ -1,0 +1,8 @@
+test:
+  adapter: postgresql
+  encoding: utf8
+  database: postgres
+  pool: 5
+  username: postgres
+  password:
+  host: <%= ENV.fetch('DB_HOST', 'db') %>

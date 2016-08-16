@@ -1,0 +1,14 @@
+version: '2'
+services:
+  web:
+    build: .
+    entrypoint: ./entry.sh
+    environment:
+      - SANDBOX_HOST=sandbox
+      - SANDBOX_PORT=3001
+      - RAILS_ENV=test
+      - REPORT_URL=$REPORT_URL
+      - REPORT_PORT=4567
+      - RACK_ENV=test
+      - CI=1
+

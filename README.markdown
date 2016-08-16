@@ -16,6 +16,16 @@ Automatically built usermanual can be viewed at: http://testmycode-usermanual.gi
 
 For setup and startup instructions, please see the [installation guide](Installation.md).
 
+## Running tests in parallel ##
+
+Tests can be run parallel with docker-compose. This expects you to have functioning docker and docker-compose setup.
+
+For collecting test results from different testruns we use this: https://github.com/jamox/remote_rspec_aggregator
+Basically you wan't to `rackup --host 0.0.0.0 --port 4567` to have it accessible from the testruns running in docker.
+
+Once it's running run all tests by executing `env REPORT_URL=<IP OF DOCKER INTERFACE> docker-compose up` and see test results flowing to rspec test result aggregator.
+
+
 ## Credits ##
 
 Current maintainers of the project are
