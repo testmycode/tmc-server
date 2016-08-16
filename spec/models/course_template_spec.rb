@@ -66,7 +66,7 @@ describe CourseTemplate, type: :model do
     end
 
     def should_be_invalid_params(params)
-      expect { CourseTemplate.create!(params) }.to raise_error
+      expect { CourseTemplate.create!(params) }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 

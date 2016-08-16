@@ -157,8 +157,8 @@ describe Exercise, type: :model do
 
   it 'should raise an exception if trying to set a deadline in invalid format' do
     ex = FactoryGirl.create(:exercise)
-    expect { set_deadline(ex, 'xooxers') }.to raise_error
-    expect { set_deadline(ex, '2011-07-13 12:34:56:78') }.to raise_error
+    expect { set_deadline(ex, 'xooxers') }.to raise_error(DeadlineSpec::InvalidSyntaxError)
+    expect { set_deadline(ex, '2011-07-13 12:34:56:78') }.to raise_error(DeadlineSpec::InvalidSyntaxError)
   end
 
   it "should always be submittable by administrators as long as it's returnable" do
