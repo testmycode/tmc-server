@@ -34,7 +34,7 @@ class CourseNotificationsController < ApplicationController
           to: email,
           topic: notifier.topic,
           message: notifier.message
-        ).deliver
+        ).deliver_now
       rescue
         logger.info "Error sending course notification to email #{email}: #{$!}"
         failed_emails << email

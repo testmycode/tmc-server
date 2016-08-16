@@ -75,7 +75,7 @@ describe FeedbackAnswersController, type: :controller do
       # Check if user can create FeedbackAnswer to submission
       answer_records.each { |record| expect(ability).not_to be_able_to(:create, record) }
 
-      expect { post :create, params }.to raise_error
+      expect { post :create, params }.to raise_error(CanCan::AccessDenied)
     end
   end
 end

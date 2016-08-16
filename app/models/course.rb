@@ -446,13 +446,13 @@ class Course < ActiveRecord::Base
   def check_name_length
     # If name starts with organization slug (org-course1), then check that
     # the actual name (course1) is within range (for backward compatibility).
-    if name.start_with?("#{organization.slug}-")
+    if !name.nil? && name.start_with?("#{organization.slug}-")
       test_range = name_range_with_slug
     else
       test_range = name_range
     end
 
-    unless test_range.include?(name.length)
+    unless (!name.nil? && test_range.include?(name.length))
       errors.add(:name, "must be between #{name_range} characters")
     end
   end

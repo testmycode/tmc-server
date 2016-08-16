@@ -26,7 +26,7 @@ describe CourseNotificationsController, type: :controller do
     @user = FactoryGirl.create(:user)
     controller.current_user = @user
 
-    expect { post :create, params }.to raise_error
+    expect { post :create, params }.to raise_error(CanCan::AccessDenied)
   end
 
   describe 'for an admin user' do
