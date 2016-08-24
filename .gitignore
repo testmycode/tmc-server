@@ -6,6 +6,8 @@
 /public/assets/
 /public/system/
 /tmp/
+/doc/usermanual/*.html
+/doc/usermanual/screenshots
 /config/site.yml
 /config/newrelic.yml
 /config/database.local.yml
