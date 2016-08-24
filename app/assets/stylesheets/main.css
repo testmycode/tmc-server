@@ -384,3 +384,24 @@ tr>.align-right {
   width: 100px;
   margin: 1em;
 }
+
+.admin-panel, .teacher-panel {
+    padding: 5px;
+    margin-bottom: 18px;
+}
+
+.admin-panel h4, .teacher-panel h4 {
+    text-align: center;
+}
+
+.admin-panel ul li, .teacher-panel ul li {
+    padding: 2px;
+}
+
+.admin-panel {
+    background-color: #a9dba9;
+}
+
+.teacher-panel {
+    background-color: #dff0d8;
+}
