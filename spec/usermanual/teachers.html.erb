@@ -92,14 +92,14 @@ require 'cgi' # for escapeHTML
   click_on 'Sign in'
 %>
 <%
-  visit '/org/new'
+  visit '/setup/new'
   fill_in 'organization_name', with: 'Helsingin yliopisto'
   fill_in 'organization_information', with: 'University life'
   fill_in 'organization_slug', with: 'hy'
   fill_in 'organization_contact_information', with: 'Matti Meikäläinen'
   fill_in 'organization_phone', with: '+3584012345678'
   fill_in 'organization_email', with: 'matti@meikalainen.fi'
-  highlight 'a:contains("Create Organization")'
+  highlight '[value="Create Organization"]'
 %>
 <%= screenshot %>
 
@@ -329,7 +329,7 @@ require 'cgi' # for escapeHTML
 <h2>Editing course details</h2>
 
 <p>
-  You can edit the previsouly entered course information and some other things by clicking the 'Edit course parameters' button.
+  You can edit the previsouly entered course information and some other things by clicking the 'Edit course details' button.
 </p>
 
 <p>The technical course name is permanent, and it can't be edited.</p>
@@ -338,7 +338,7 @@ require 'cgi' # for escapeHTML
    visit '/org/hy'
    highlight 'a:contains("Programming 101")'
    click_on 'Programming 101'
-   click_on 'Edit course parameters'
+   click_on 'Edit course details'
    fill_in 'course_external_scoreboard_url', with: 'http://my-points.io/%{user}'
 %>
 <%= screenshot %>
@@ -441,19 +441,19 @@ require 'cgi' # for escapeHTML
   <h3>Setting deadlines</h3>
 
   <p>
-    To setup deadlines for the exercises, click the 'Manage deadlines' button from the course's front page.
+    To setup deadlines for the exercises, click the 'Advanced deadlines management' button from the course's front page.
   </p>
 
 <%
    visit '/org/hy/courses/1'
-   highlight 'a:contains("Manage deadlines")'
+   highlight 'a:contains("Advanced deadlines management")'
 %>
 <%= screenshot %>
 
 <%
    course = Course.find_by id: 1
    course.exercise_group_by_name('Week1').hard_group_deadline = ['01.01.2011'].to_json
-   click_on 'Manage deadlines'
+   click_on 'Advanced deadlines management'
 %>
 <%= screenshot %>
 
@@ -540,7 +540,7 @@ require 'cgi' # for escapeHTML
 </p>
 
 <p>
-  Unlock conditions can be set by clicking 'Manage unlock conditions' in the course page.
+  Unlock conditions can be set by clicking 'Advanced unlock conditions management' in the course page.
 </p>
 
 
@@ -548,7 +548,7 @@ require 'cgi' # for escapeHTML
    course.exercise_group_by_name('Week1').hard_group_deadline = [''].to_json
    course.exercise_group_by_name('Week2').hard_group_deadline = [''].to_json
    visit '/org/hy/courses/1'
-   highlight 'a:contains("Manage unlock conditions")'
+   highlight 'a:contains("Advanced unlock conditions management")'
 %>
 <%= screenshot %>
 
@@ -560,7 +560,7 @@ require 'cgi' # for escapeHTML
    course.exercise_group_by_name('Week1').group_unlock_conditions = ['1.1.2000'].to_json
    course.exercise_group_by_name('Week2').group_unlock_conditions = ['8.1.2000', '80% of Week1'].to_json
    UncomputedUnlock.create_all_for_course_eager(course)
-   click_on 'Manage unlock conditions'
+   click_on 'Advanced unlock conditions management'
    highlight '#add-condition-Week1'
 %>
 
@@ -809,8 +809,6 @@ Some common examples:
    click_on 'Show statistics'
 %>
 <%= screenshot %>
-
-  <h2>Custom courses</h2>
 
   <h2>Custom courses</h2>
 

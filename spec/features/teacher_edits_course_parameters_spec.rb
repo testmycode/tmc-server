@@ -16,7 +16,7 @@ feature 'Teacher can edit course parameters', feature: true do
   scenario 'Teacher succeeds at editing title, description and material url' do
     log_in_as @teacher.login, 'foobar'
     click_link 'oldTitle'
-    click_link 'Edit course parameters'
+    click_link 'Edit course details'
 
     fill_in 'course_title', with: 'newTitle'
     fill_in 'course_description', with: 'newDescription'
@@ -25,7 +25,7 @@ feature 'Teacher can edit course parameters', feature: true do
 
     expect(page).to have_content 'newTitle'
     expect(page).to have_content 'newDescription'
-    expect(page).to have_link 'Material', href: 'http://newMaterial.com'
+    expect(page).to have_link 'Course material', href: 'http://newMaterial.com'
 
     visit '/org/slug'
     expect(page).to have_content 'newTitle'
@@ -35,7 +35,7 @@ feature 'Teacher can edit course parameters', feature: true do
   scenario 'Teacher cannot edit if parameters are invalid' do
     log_in_as @teacher.login, 'foobar'
     click_link 'oldTitle'
-    click_link 'Edit course parameters'
+    click_link 'Edit course details'
 
     fill_in 'course_title', with: 'a' * 41
     click_button 'Update course information'
@@ -49,7 +49,7 @@ feature 'Teacher can edit course parameters', feature: true do
     click_link 'oldTitle'
     expect(page).to have_content 'oldTitle'
     expect(page).to have_content 'oldDescription'
-    expect(page).to have_link 'Material', href: 'http://oldMaterial.com'
+    expect(page).to have_link 'Course material', href: 'http://oldMaterial.com'
   end
 
   scenario 'Teacher cannot edit courses that they dont teach' do
@@ -63,7 +63,7 @@ feature 'Teacher can edit course parameters', feature: true do
       log_in_as @teacher.login, 'foobar'
       visit '/org/slug'
       click_link 'oldTitle'
-      click_link 'Edit course parameters'
+      click_link 'Edit course details'
 
       fill_in 'course_external_scoreboard_url', with: 'http://example.com/%{org}/%{course}/%{user}'
       click_button 'Update course information'
