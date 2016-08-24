@@ -14,70 +14,16 @@
 <% end %>
 
 <% if !@organization.verified? && can?(:teach, @organization) %>
-    <p>
-      <strong>
-        This organization is not verified yet by an administrator. Courses are fully functional, but some
-        features, like model answers, are not enabled.
-      </strong>
-      <% if can? :view, :unverified_organizations %>
-          <br>
-          <%= link_to 'Verify', verify_organization_path(@organization), method: :post, class: 'btn btn-success' %>
-          <%= link_to 'Disable', disable_reason_input_organization_path(@organization), class: 'btn btn-danger' %>
-      <% end %>
-    </p>
-<% end %>
-
-<% if current_user.administrator? %>
-  <hr>
   <p>
-    <strong>Organization ID:</strong>
-    <%= @organization.slug %>
-  </p>
-  <p>
-    <strong>Created by:</strong>
-    <% created_by = @organization.creator %>
-    <%= link_to created_by.username, participant_path(created_by) unless created_by.nil? %>
-  </p>
-  <p>
-    <strong>Created at:</strong>
-    <%= @organization.created_at %>
-  </p>
-  <p>
-    <strong>Contact person:</strong>
-    <%= @organization.contact_information %>
-  </p>
-  <p>
-    <strong>Contact phone:</strong>
-    <%= @organization.phone %>
-  </p>
-  <p>
-    <strong>Contact email:</strong>
-    <%= mail_to @organization.email %>
-  </p>
-
-
-  <% if @organization.verified %>
-    <p>
-      <strong>Verified at:</strong>
-      <%= @organization.verified_at %>
-    </p>
-  <% end %>
-
-  <hr>
-
-<% end %>
-
-<% if can? :toggle_visibility, @organization %>
-  <p>
-    <strong><%= "#{@organization.hidden ? 'Status hidden:' : 'Status visible:'}" %></strong>
-    <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
-                method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger'}" %>
-  </p>
-<% end %>
-
-<% if can? :view_statistics, @organization %>
-  <p>
-    <%= link_to 'Show statistics', organization_stats_path(@organization) %>
+    <strong>
+      This organization is not verified yet by an administrator. Courses are fully functional, but some
+      features, like model answers, are not enabled.
+    </strong>
+    <% if can? :view, :unverified_organizations %>
+      <br>
+      <%= link_to 'Verify', verify_organization_path(@organization), method: :post, class: 'btn btn-success' %>
+      <%= link_to 'Disable', disable_reason_input_organization_path(@organization), class: 'btn btn-danger' %>
+    <% end %>
   </p>
 <% end %>
 
@@ -88,20 +34,89 @@
   </p>
 <% end %>
 
-<% if can? :edit, @organization %>
-    <br/>
-    <%= link_to 'Edit organization', edit_setup_organization_path(@organization) %>
-<% end %>
-
-<% if can? :view_participant_list, @organization%>
-    <br/>
-    <%= link_to 'List of registered users', organization_participants_path(@organization) %>
-<% end %>
-
 <% if can? :teach, @organization %>
-  <br/>
-  <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization) %>
-  <br/>
+  <div class="teacher-panel">
+    <h4>Teacher functions</h4>
+    <ul>
+    <% if can? :toggle_visibility, @organization %>
+      <li>
+        <strong>Visibility:</strong>
+        <% if @organization.hidden %>
+          Hidden! Organization is not shown on the front page, but courses can be accessed normally.
+        <% else %>
+          Visible
+        <% end %>
+        <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
+                    method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger' }", data: { confirm: "Are you sure?" } %>
+      </li>
+    <% end %>
+
+    <% if can? :view_statistics, @organization %>
+      <li>
+        <%= link_to 'Show statistics', organization_stats_path(@organization), class: 'btn btn-mini' %>
+      </li>
+    <% end %>
+
+
+    <% if can? :edit, @organization %>
+      <li>
+        <%= link_to 'Edit organization info', edit_setup_organization_path(@organization), class: 'btn btn-mini' %>
+      </li>
+    <% end %>
+
+    <% if can? :view_participant_list, @organization%>
+      <li>
+        <%= link_to 'List of registered users', organization_participants_path(@organization), class: 'btn btn-mini' %>
+      </li>
+    <% end %>
+
+    <% if can? :teach, @organization %>
+      <li>
+        <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization), class: 'btn btn-mini' %>
+      </li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% if current_user.administrator? %>
+  <div class="admin-panel">
+    <h4>Admin functions</h4>
+    <ul>
+      <li>
+        <strong>Organization ID:</strong>
+        <%= @organization.slug %>
+      </li>
+      <li>
+        <strong>Created by:</strong>
+        <% created_by = @organization.creator %>
+        <%= link_to created_by.username, participant_path(created_by) unless created_by.nil? %>
+      </li>
+      <li>
+        <strong>Created at:</strong>
+        <%= @organization.created_at %>
+      </li>
+      <li>
+        <strong>Contact person:</strong>
+        <%= @organization.contact_information %>
+      </li>
+      <li>
+        <strong>Contact phone:</strong>
+        <%= @organization.phone %>
+      </li>
+      <li>
+        <strong>Contact email:</strong>
+        <%= mail_to @organization.email %>
+      </li>
+
+      <% if @organization.verified %>
+        <li>
+          <strong>Verified at:</strong>
+          <%= @organization.verified_at %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
 <% end %>
 
 <% unless @my_assisted_courses.empty? %>
