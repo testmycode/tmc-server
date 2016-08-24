@@ -35,7 +35,7 @@ feature 'Teacher sets deadlines', feature: true do
   scenario 'Teacher succeeds at setting deadlines' do
     log_in_as(@teacher.login, '1234')
     visit_course
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     fill_in 'empty_group_soft_static', with: '1.1.2000'
     fill_in 'empty_group_hard_static', with: '2.2.2000'
     fill_in 'empty_group_hard_unlock', with: 'unlock + 5 weeks'
@@ -50,7 +50,7 @@ feature 'Teacher sets deadlines', feature: true do
   scenario 'Error message is displayed with incorrect syntax inputs' do
     log_in_as(@teacher.login, '1234')
     visit_course
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     fill_in 'empty_group_soft_static', with: 'a.b.cccc'
     click_button 'Save changes'
 
@@ -61,19 +61,19 @@ feature 'Teacher sets deadlines', feature: true do
   scenario 'Refreshing course does not overwrite deadlines set in the form' do
     log_in_as(@admin.login, '1234') # Teachers will have the ability to refresh in the future, for now test as admin
     visit_course
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     fill_in 'empty_group_hard_static', with: '1.1.2000'
     click_button 'Save changes'
     visit_course
     click_link 'Refresh'
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
   end
 
   scenario 'Course page shows soft deadlines to users' do
     log_in_as(@teacher.login, '1234')
     visit_course
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     fill_in 'empty_group_soft_static', with: '5.5.2000'
     fill_in 'empty_group_hard_static', with: '1.1.2000'
     click_button 'Save changes'
@@ -84,7 +84,7 @@ feature 'Teacher sets deadlines', feature: true do
   scenario 'Course page shows hard deadline to users if soft deadline is not set' do
     log_in_as(@teacher.login, '1234')
     visit_course
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     fill_in 'empty_group_hard_static', with: '6.6.2000'
     click_button 'Save changes'
     visit_course
@@ -101,7 +101,7 @@ feature 'Teacher sets deadlines', feature: true do
 
     log_in_as(@teacher.login, '1234')
     visit_course
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
 
     expect(page).to have_field('empty_group_hard_static', disabled: true)
     expect(page).to have_field('empty_group_hard_unlock', disabled: true)
@@ -116,7 +116,7 @@ feature 'Teacher sets deadlines', feature: true do
 
     log_in_as(@teacher.login, '1234')
     visit_course
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     click_link 'Toggle advanced options'
     click_link 'Show single exercises'
 

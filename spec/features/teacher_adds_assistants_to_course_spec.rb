@@ -48,7 +48,7 @@ feature 'Teacher can add assistants to course', feature: true do
     log_out
     log_in_as(@assistant.username, 'newfoobar')
     visit "/org/slug/courses/#{@course.id}"
-    click_link 'Manage deadlines'
+    click_link 'Advanced deadlines management'
     fill_in 'empty_group_hard_static', with: '1.1.2000'
     click_button 'Save changes'
 
@@ -56,7 +56,7 @@ feature 'Teacher can add assistants to course', feature: true do
     expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
 
     visit "/org/slug/courses/#{@course.id}"
-    click_link 'Manage unlock conditions'
+    click_link 'Advanced unlock conditions management'
 
     fill_in 'empty_group_0', with: '4.6.2015'
     click_button 'Save changes'

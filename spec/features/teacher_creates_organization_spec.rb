@@ -10,24 +10,24 @@ feature 'User can create new organization', feature: true do
   end
 
   scenario 'User succeeds create organization with valid parameters' do
-    pending 'create organization link hidden from users temporarily'
     log_in_as(@user.login, 'foobar2')
-    click_link 'Request a new organization'
+    visit '/setup/'
+    click_link 'Create organization'
     fill_in 'organization[name]', with: 'Code School'
     fill_in 'organization[information]', with: 'Learning for real nerds'
     fill_in 'organization[slug]', with: 'cos'
-    click_button 'Request organization'
-    expect(page).to have_content 'Organization was successfully requested.'
+    click_button 'Create Organization'
+    expect(page).to have_content 'Organization was successfully created.'
   end
 
   scenario 'User cannot create organization with invalid parameters' do
-    pending 'create organization link hidden from users temporarily'
     log_in_as(@user.login, 'foobar2')
-    click_link 'Request a new organization'
+    visit '/setup/'
+    click_link 'Create organization'
     fill_in 'organization[name]', with: 'Code School'
     fill_in 'organization[information]', with: 'Learning for real nerds'
     fill_in 'organization[slug]', with: 'co.eu'
-    click_button 'Request organization'
+    click_button 'Create Organization'
     expect(page).to have_content 'error'
   end
 
