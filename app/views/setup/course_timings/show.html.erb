@@ -6,8 +6,19 @@
       validateOnBlur: false,
       allowBlank: true,
       enterLikeTab: false,
-      defaultTime: '23:59',
-      format: 'd.m.Y H:i'
+      timepicker: false,
+      format: 'd.m.Y'
+    });
+  });
+
+  $(function(){
+    $("input[name=unlock_type]").change(function(){
+      var e = document.getElementById('unlock_percentage');
+      if ($("input[name=unlock_type]:checked").val() == 'no_unlocks') {
+        e.disabled = true;
+      } else if ($("input[name=unlock_type]:checked").val() == 'percent_from_previous') {
+        e.disabled = false;
+      }
     });
   });
 </script>
@@ -21,12 +32,12 @@
 <% end %>
 
 <p>
-  Here you will schedule the course and exercise sets. Unlock means the condition when exercises are visible
-  and downloadable. Deadline defines the moment, when the submissions has to be made.
+  Here you will schedule the course and exercise sets. Deadline defines the moment, when the submissions has to be made.
+  Unlock means the condition when exercises become available for the student.
 </p>
 
 <p>
-  First choose basic option for both unlocks and deadlines. After that you can check if the details are good
+  First choose basic option for both deadlines and unlocks. After that you can check if the details are good
   or manually adjust them. These options will cover most common initial choices, but full customization
   can be made later on advanced settings.
 </p>
@@ -34,29 +45,32 @@
   <%= form_tag setup_organization_course_course_timing_path(course_id: @course.id), method: 'PUT' do %>
 
     <!--
-    <%= label_tag :start_date, 'Course start date: (not yet implemented)'%>
-    <%= date_field :start_date, nil  %>
+    <% label_tag :start_date, 'Course start date: (not yet implemented)'%>
+    <% date_field :start_date, nil  %>
     -->
-    <hr>
-    <h3>Unlocks</h3>
-    Choose the type, how the exercises are opened:<br>
-    <%= radio_button_tag :unlock_type, "no_unlocks", (params[:unlock_type] == "no_unlocks") %>
-    <%= label_tag :unlock_type_1, 'Everything open at start' %>
-    <%= radio_button_tag :unlock_type, "percent_from_previous", (params[:unlock_type] == "percent_from_previous") %>
-    <%= label_tag :unlock_type_2, '80% from previous set completed' %>
 
-    <hr>
     <h3>Deadlines</h3>
     <%= label_tag :first_set_date, 'Deadline for first set:'%>
     <%= date_field :first_set_date, nil  %>
     <br>
     Choose how incoming exercise set deadlines are set:<br>
     <%= radio_button_tag :deadline_type, "no_deadlines" %>
-    <%= label_tag :deadline_type_1, 'No deadlines' %>
+    <%= label_tag :deadline_type_1, 'No deadlines', class: 'radio inline' %><br>
     <%= radio_button_tag :deadline_type, "weekly_deadlines" %>
-    <%= label_tag :deadline_type_2, 'Weekly' %>
+    <%= label_tag :deadline_type_2, 'Weekly', class: 'radio inline' %><br>
     <%= radio_button_tag :deadline_type, "all_same_deadline" %>
-    <%= label_tag :deadline_type_3, 'All same' %>
+    <%= label_tag :deadline_type_3, 'All same', class: 'radio inline' %><br>
+
+    <h3>Unlocks</h3>
+    Choose the type, how the exercises are opened:<br>
+    <%= radio_button_tag :unlock_type, "no_unlocks", (params[:unlock_type] == "no_unlocks") %>
+    <%= label_tag :unlock_type_1, 'Everything open at start', class: 'radio inline' %><br>
+    <%= radio_button_tag :unlock_type, "percent_from_previous", (params[:unlock_type] == "percent_from_previous") %>
+    <%= label_tag :unlock_type_2, 'Percentage from previous set completed', class: 'radio inline' %><br>
+    <div style="margin-left: 36px;">
+      <%= number_field_tag :unlock_percentage, '80', min: 0, max:100, style: "width: 3em", disabled: true %>% needed
+    </div>
+
     <br>
     <%= submit_tag 'Fill and preview', class: 'btn' %>
 

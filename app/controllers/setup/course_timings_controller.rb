@@ -23,7 +23,12 @@ class Setup::CourseTimingsController < Setup::SetupController
       when 'no_unlocks'
         clear_all_unlocks
       when 'percent_from_previous'
-        unlocks_previous_set_completed(80)
+        percentage = params[:unlock_percentage]
+        unless percentage.to_i.between?(1, 100)
+          redirect_to setup_organization_course_course_timing_path, notice: 'Please insert correct unlock percentage'
+          return
+        end
+        unlocks_previous_set_completed(percentage)
       end
 
       first_set_date = params[:first_set_date]

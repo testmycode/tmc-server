@@ -59,11 +59,12 @@ describe Setup::CourseTimingsController, type: :controller do
             organization_id: @organization.slug,
             course_id: @course.id,
             commit: 'Fill and preview',
-            unlock_type: 'percent_from_previous'
+            unlock_type: 'percent_from_previous',
+            unlock_percentage: '73'
         }
         expect(assigns(:course).exercise_group_by_name('group1').group_unlock_conditions).to eq([])
-        expect(assigns(:course).exercise_group_by_name('group2').group_unlock_conditions).to eq(['80% from group1'])
-        expect(assigns(:course).exercise_group_by_name('group3').group_unlock_conditions).to eq(['80% from group2'])
+        expect(assigns(:course).exercise_group_by_name('group2').group_unlock_conditions).to eq(['73% from group1'])
+        expect(assigns(:course).exercise_group_by_name('group3').group_unlock_conditions).to eq(['73% from group2'])
       end
 
       it 'clears all deadlines' do
