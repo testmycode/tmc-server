@@ -46,7 +46,6 @@ RUN git config --global user.name "TmcTest" && \
     git config --global user.email "tmc@example.com"
 ADD Gemfile /app/Gemfile
 ADD Gemfile.lock /app/Gemfile.lock
-RUN bundle install
+RUN bundle install --system
 ADD . /app
-RUN cp config/database.docker.yml config/database.local.yml
 

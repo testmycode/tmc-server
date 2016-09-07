@@ -1,0 +1,24 @@
+version: '2'
+services:
+  sandbox:
+    image: jamo/tmc-sandbox
+    command: 'sh -c "cd /app/tmc-sandbox/web/ && bundle exec rackup --server webrick --port 3001 --host 0.0.0.0 --pid /app/tmc-sandbox/web/web.pid"'
+    expose:
+      - 3001
+    volumes:
+      - /tmp:/dev/shm
+  db:
+    image: postgres:9.4
+  dev:
+    build: .
+    command: rails s -b 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - HOST=dev
+    depends_on:
+      - db
+      - sandbox
