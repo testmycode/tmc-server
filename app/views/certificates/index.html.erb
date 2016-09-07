@@ -17,7 +17,7 @@
             <td><%= cert.created_at.strftime('%Y-%m-%d %H:%M') %></td>
             <td><%= cert.name %></td>
             <% if can? :read, cert.course %>
-              <td><%= link_to cert.course.name, cert.course %></td>
+              <td><%= link_to cert.course.name, organization_course_path(cert.course.organization, cert.course) %></td>
             <% else %>
               <td><%= cert.course.title %></td>
             <% end %>
