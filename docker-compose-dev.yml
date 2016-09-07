@@ -1,7 +1,7 @@
 version: '2'
 services:
   sandbox:
-    image: jamo/tmc-sandbox
+    image: testmycode/tmc-sandbox
     expose:
       - 3001
     volumes:
