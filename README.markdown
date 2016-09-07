@@ -16,6 +16,15 @@ Automatically built usermanual can be viewed at: http://testmycode-usermanual.gi
 
 For setup and startup instructions, please see the [installation guide](Installation.md).
 
+## Running dev in Docker ##
+
+Dev environment can be run with docker-compose: `docker-compose -f docker-compose-dev.yml up`
+
+To run rails migrations etc you may exec those like this: `docker exex -it compose_dev_1 rake db:create db:migrate`.
+
+The container name can be checked with `docker ps`
+
+
 ## Running tests in parallel ##
 
 Tests can be run parallel with docker-compose. This expects you to have functioning docker and docker-compose setup.

@@ -1,0 +1,23 @@
+version: '2'
+services:
+  sandbox:
+    image: testmycode/tmc-sandbox
+    expose:
+      - 3001
+    volumes:
+      - /tmp:/dev/shm
+  db:
+    image: postgres:9.4
+  dev:
+    build: .
+    command: rails s -b 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - HOST=dev
+    depends_on:
+      - db
+      - sandbox
