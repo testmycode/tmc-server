@@ -18,6 +18,11 @@ For setup and startup instructions, please see the [installation guide](Installa
 
 ## Running dev in Docker ##
 
+Before running dev in docker one needs to do some manual setup:
+- `git submodule update --init --recursive`
+- `rake compile`
+To build neccessary external dependencies.
+
 Dev environment can be run with docker-compose: `docker-compose -f docker-compose-dev.yml up`
 
 To run rails migrations etc you may exec those like this: `docker exec -it tmcserver_dev_1 rake db:create db:migrate db:seed`.
