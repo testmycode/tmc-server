@@ -29,8 +29,8 @@ The container name can be checked with `docker ps`
 
 Tests can be run parallel with docker-compose. This expects you to have functioning docker and docker-compose setup.
 
-For collecting test results from different testruns we use this: https://github.com/jamox/remote_rspec_aggregator
-Basically you wan't to `rackup --host 0.0.0.0 --port 4567` to have it accessible from the testruns running in docker.
+For collecting test results from different testruns you need to clone and use this: https://github.com/jamox/remote_rspec_aggregator
+Basically you wan't to clone the repo and `bundle install` once and run `rackup --host 0.0.0.0 --port 4567` to have it accessible from the testruns running in docker.
 
 Once it's running run all tests by executing `env REPORT_URL=<IP OF DOCKER INTERFACE> docker-compose up` and see test results flowing to rspec test result aggregator.
 
