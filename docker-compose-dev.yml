@@ -1,7 +1,7 @@
 version: '2'
 services:
   sandbox:
-    image: testmycode/tmc-sandbox
+    image: testmycode/tmc-sandbox:0.0.3
     expose:
       - 3001
     volumes:
@@ -10,7 +10,7 @@ services:
     image: postgres:9.4
   dev:
     build: .
-    command: rails s -b 0.0.0.0
+    command: rails s -b 0.0.0.0 --pid=/tmp/dev.pid
     volumes:
       - .:/app
     ports:
