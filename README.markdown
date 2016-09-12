@@ -20,7 +20,7 @@ For setup and startup instructions, please see the [installation guide](Installa
 
 Dev environment can be run with docker-compose: `docker-compose -f docker-compose-dev.yml up`
 
-To run rails migrations etc you may exec those like this: `docker exec -it tmcserver_dev_1 rake db:create db:migrate`.
+To run rails migrations etc you may exec those like this: `docker exec -it tmcserver_dev_1 rake db:create db:migrate db:seed`.
 
 The container name can be checked with `docker ps`
 
