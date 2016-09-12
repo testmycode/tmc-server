@@ -29,6 +29,16 @@ development:
   password:
   host: <%= ENV.fetch('DB_HOST', 'db') %>
 
+test:
+  adapter: postgresql
+  encoding: utf8
+  database: postgres
+  pool: 5
+  username: postgres
+  password:
+  host: <%= ENV.fetch('DB_HOST', 'db') %>
+
+
 <% end %>
 
 # You can optionally override stuff in a database.local.yml
