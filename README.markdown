@@ -1,7 +1,5 @@
 # Test My Code server #
 
-[![Build Status](https://travis-ci.org/testmycode/tmc-server.svg?branch=master)](https://travis-ci.org/testmycode/tmc-server)
-
 *Test My Code* ("TMC") is a tool to automate most of the exercise checking when teaching programming.
 It runs code submitted by students, gives feedback if tests fail and maintains a scoreboard.
 This allows for lots of small exercises without the need for course instructors to manually go through all of them.
