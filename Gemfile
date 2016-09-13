@@ -33,6 +33,8 @@ gem 'logstasher', '~> 0.9.0'
 
 gem 'pghero'
 
+gem 'swagger-blocks'
+
 group :assets do
   gem 'sprockets-rails', require: 'sprockets/railtie'
   gem 'jquery-rails', '~> 3.1.2'
