@@ -115,9 +115,9 @@ describe Setup::CourseTimingsController, type: :controller do
             course_id: @course.id,
             commit: 'Accept and continue',
             group: {
-                group1: {'0'=>'', 'hard'=>{'static'=>'2016-06-16'}},
-                group2: {'0'=>'', 'hard'=>{'static'=>'2016-07-16'}},
-                group3: {'0'=>'', 'hard'=>{'static'=>'2016-08-16'}}
+                group1: {'_unlock_option'=>'no_unlock', 'hard'=>{'static'=>'2016-06-16'}},
+                group2: {'_unlock_option'=>'no_unlock', 'hard'=>{'static'=>'2016-07-16'}},
+                group3: {'_unlock_option'=>'no_unlock', 'hard'=>{'static'=>'2016-08-16'}}
             }
         }
         expect(assigns(:course).exercise_group_by_name('group1').hard_group_deadline.static_deadline_spec).to eq('2016-06-16')
@@ -131,9 +131,9 @@ describe Setup::CourseTimingsController, type: :controller do
             course_id: @course.id,
             commit: 'Accept and continue',
             group: {
-                group1: {'0'=>'', 'hard'=>{'static'=>''}},
-                group2: {'0'=>'92% from group1', 'hard'=>{'static'=>''}},
-                group3: {'0'=>'94% from group2', 'hard'=>{'static'=>''}}
+                group1: {'_unlock_option'=>'no_unlock', 'hard'=>{'static'=>''}},
+                group2: {'_unlock_option'=>'percentage_from', '_percentage_required'=>'92', '_unlock_groupname'=>'group1', 'hard'=>{'static'=>''}},
+                group3: {'_unlock_option'=>'percentage_from', '_percentage_required'=>'94', '_unlock_groupname'=>'group2', 'hard'=>{'static'=>''}}
             }
         }
         expect(assigns(:course).exercise_group_by_name('group1').group_unlock_conditions).to eq([''])
@@ -148,9 +148,9 @@ describe Setup::CourseTimingsController, type: :controller do
             course_id: @course.id,
             commit: 'Accept and continue',
             group: {
-                group1: {'0'=>'', 'hard'=>{'static'=>''}},
-                group2: {'0'=>'92% from group1', 'hard'=>{'static'=>''}},
-                group3: {'0'=>'94% from group2', 'hard'=>{'static'=>''}}
+                group1: {'_unlock_option'=>'no_unlock', 'hard'=>{'static'=>''}},
+                group2: {'_unlock_option'=>'percentage_from', '_percentage_required'=>'92', '_unlock_groupname'=>'group1', 'hard'=>{'static'=>''}},
+                group3: {'_unlock_option'=>'percentage_from', '_percentage_required'=>'94', '_unlock_groupname'=>'group2', 'hard'=>{'static'=>''}}
             }
         }
         expect(response).to redirect_to(setup_organization_course_course_assistants_path(@organization, @course))
@@ -162,9 +162,9 @@ describe Setup::CourseTimingsController, type: :controller do
             course_id: @course.id,
             commit: 'Accept and continue',
             group: {
-                group1: {'0'=>'', 'hard'=>{'static'=>''}},
-                group2: {'0'=>'92% from group1', 'hard'=>{'static'=>''}},
-                group3: {'0'=>'94% from group2', 'hard'=>{'static'=>''}}
+                group1: {'_unlock_option'=>'no_unlock', 'hard'=>{'static'=>''}},
+                group2: {'_unlock_option'=>'percentage_from', '_percentage_required'=>'92', '_unlock_groupname'=>'group1', 'hard'=>{'static'=>''}},
+                group3: {'_unlock_option'=>'percentage_from', '_percentage_required'=>'94', '_unlock_groupname'=>'group2', 'hard'=>{'static'=>''}}
             }
         }
         expect(response).to redirect_to(organization_course_path(@organization, @course))

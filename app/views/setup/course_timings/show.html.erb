@@ -102,21 +102,31 @@
 
             <% #### Unlocks #### %>
             <td>
-              <%
-                if group.name.empty?
-                  param_array = 'empty_group'
-                else
-                  param_array = "group[#{group.name}]"
-                end
+              <% if complex_unlock_conditions?(group) %>
+                Complex conditions
+              <% else %>
+                <%
+                  if group.name.empty?
+                    param_array = 'empty_group'
+                  else
+                    param_array = "group[#{group.name}]"
+                  end
 
-                group_unlock_conditions = group.group_unlock_conditions
-                group_unlock_conditions = [''] if group_unlock_conditions.empty? # Always have at least one input field
-              %>
-              <div id="unlock-condition-<%= group.name %>">
-                <% group_unlock_conditions.each_with_index do |condition, i| %>
-                    <%= text_field_tag "#{param_array}[#{i}]", condition %>
-                <% end %>
-              </div>
+                  group_unlock_conditions = group.group_unlock_conditions
+                  group_unlock_conditions = [''] if group_unlock_conditions.empty? # Always have at least one input field
+                %>
+                <div id="unlock-condition-<%= group.name %>">
+                  <% condition = group_unlock_conditions.first %>
+                  <%= radio_button_tag "#{param_array}_unlock_option", 'no_unlock', condition.blank? %>
+                  <%= label_tag "#{param_array}_unlock_option_no_unlock", "No unlock", class: 'radio inline' %>
+                  <br>
+                  <%= radio_button_tag "#{param_array}_unlock_option", 'percentage_from', !condition.blank? %>
+                  <%= label_tag "#{param_array}_unlock_option_percentage from", 'Requires ', class: 'radio inline' %>
+                  <%= number_field_tag "#{param_array}_percentage_required", '80', min: 1, max:100, style: "width: 3em", value: parse_percentage_from_unlock_condition(condition) %>
+                  % from
+                  <%= select_tag "#{param_array}_unlock_groupname", options_for_select(@group_array, selected: parse_group_from_unlock_condition(condition)) %>
+                </div>
+              <% end %>
             </td>
 
             <% #### Deadlines %>

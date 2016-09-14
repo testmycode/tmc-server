@@ -11,6 +11,8 @@ class Setup::CourseTimingsController < Setup::SetupController
       add_course_breadcrumb
       add_breadcrumb('Timing')
     end
+
+    @group_array = groups_as_array
   end
 
   def update
@@ -77,9 +79,13 @@ class Setup::CourseTimingsController < Setup::SetupController
     authorize! :manage_unlocks, @course
 
     groups = group_params
-    groups.each do |name, conditions|
-      array = Array(conditions['0'])
-      @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
+    groups.each do |name, unlock_data|
+      if unlock_data[:_unlock_option] == 'no_unlock'
+        unlock_condition = ''
+      elsif unlock_data[:_unlock_option] == 'percentage_from'
+        unlock_condition = "#{unlock_data[:_percentage_required]}% from #{unlock_data[:_unlock_groupname]}"
+      end
+      @course.exercise_group_by_name(name).group_unlock_conditions = Array(unlock_condition).to_json
       UncomputedUnlock.create_all_for_course_eager(@course)
     end
   end
@@ -133,6 +139,14 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   private
+
+  def groups_as_array
+    names = ['']
+    @course.exercise_groups.each do |group|
+      names << group.name
+    end
+    names
+  end
 
   def group_params
     sliced = params.slice(:group, :empty_group)
