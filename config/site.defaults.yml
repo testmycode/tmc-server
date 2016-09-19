@@ -26,7 +26,7 @@ base_path: /
 
 # A remote sandbox will need to contact the web server when it's done processing.
 # Enter the baseurl of the webapp with which the sandboxes will find the web server.
-baseurl_for_remote_sandboxes: http://localhost:3000/
+baseurl_for_remote_sandboxes: http://<%= ENV.fetch('HOST', 'localhost') %>:3000/
 
 # List at least one sandbox instance here (in site.yml).
 #
