@@ -89,7 +89,6 @@ end
 
 # This makes it visible to others
 Capybara.server_host = host_ip
-raise host_ip
 
 RSpec.configure do |config|
   config.mock_with :rspec
