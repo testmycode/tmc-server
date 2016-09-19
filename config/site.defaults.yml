@@ -37,7 +37,7 @@ baseurl_for_remote_sandboxes: http://<%= ENV.fetch('HOST', 'localhost') %>:3000/
 # `rvmsudo ext/tmc-sandbox/web/webapp.rb run`.
 #
 remote_sandboxes:
-  - http://localhost:3001/
+  - <%= ENV.fetch('SANDBOX_URL', 'http://localhost:3001/') %>
 
 # List of spyware server URLs. See https://github.com/testmycode/tmc-spyware-server
 # The URLs should work from both clients and the server.

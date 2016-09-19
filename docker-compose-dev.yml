@@ -18,6 +18,7 @@ services:
     environment:
       - DB_HOST=db
       - HOST=dev
+      - SANDBOX_URL=http://sandbox:3001
     depends_on:
       - db
       - sandbox
