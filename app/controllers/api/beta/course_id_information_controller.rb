@@ -1,7 +1,7 @@
 class Api::Beta::CourseIdInformationController < Api::Beta::BaseController
   include Swagger::Blocks
 
-  swagger_path '/course_id_information' do
+  swagger_path '/api/beta/course_id_information' do
     operation :get do
       key :description, 'Returns list of course IDs'
       key :produces, [
