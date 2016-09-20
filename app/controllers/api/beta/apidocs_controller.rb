@@ -9,6 +9,7 @@ class Api::Beta::ApidocsController < ActionController::Base
       key :description, 'TMC API documentation'
       contact do
         key :name, 'TMC API Team'
+        key :url, 'https://cs.helsinki.fi'
       end
       license do
         key :name, 'MIT'
@@ -17,10 +18,6 @@ class Api::Beta::ApidocsController < ActionController::Base
     tag do
       key :name, 'api'
       key :description, 'API operations'
-      externalDocs do
-        key :description, 'Find more info here'
-        key :url, 'https://cs.helsinki.fi'
-      end
     end
     key :host, 'localhost:3000'
     key :consumes, ['application/json']
