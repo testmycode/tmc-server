@@ -1,8 +1,7 @@
 version: '2'
 services:
   sandbox:
-    image: testmycode/tmc-sandbox
-    command: 'sh -c "cd /app/tmc-sandbox/web/ && bundle exec rackup --server webrick --port 3001 --host 0.0.0.0 --pid /app/tmc-sandbox/web/web.pid"'
+    image: testmycode/tmc-sandbox:0.0.3
     expose:
       - 3001
     volumes:

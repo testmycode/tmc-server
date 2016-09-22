@@ -1,7 +1,5 @@
 # Test My Code server #
 
-[![Build Status](https://travis-ci.org/testmycode/tmc-server.svg?branch=master)](https://travis-ci.org/testmycode/tmc-server)
-
 *Test My Code* ("TMC") is a tool to automate most of the exercise checking when teaching programming.
 It runs code submitted by students, gives feedback if tests fail and maintains a scoreboard.
 This allows for lots of small exercises without the need for course instructors to manually go through all of them.
@@ -18,9 +16,15 @@ For setup and startup instructions, please see the [installation guide](Installa
 
 ## Running dev in Docker ##
 
+Before running dev in docker one needs to do some manual setup:
+- `git submodule update --init --recursive`
+- `rake compile`
+To build neccessary external dependencies.
+
+The dev docker mounts local folder to the image and allows code changes to be visible in real time.
 Dev environment can be run with docker-compose: `docker-compose -f docker-compose-dev.yml up`
 
-To run rails migrations etc you may exec those like this: `docker exex -it compose_dev_1 rake db:create db:migrate`.
+To run rails migrations etc you may exec those like this: `docker exec -it tmcserver_dev_1 rake db:create db:migrate db:seed`.
 
 The container name can be checked with `docker ps`
 
@@ -29,10 +33,12 @@ The container name can be checked with `docker ps`
 
 Tests can be run parallel with docker-compose. This expects you to have functioning docker and docker-compose setup.
 
-For collecting test results from different testruns we use this: https://github.com/jamox/remote_rspec_aggregator
-Basically you wan't to `rackup --host 0.0.0.0 --port 4567` to have it accessible from the testruns running in docker.
+For collecting test results from different testruns you need to clone and use this: https://github.com/jamox/remote_rspec_aggregator
+Basically you wan't to clone the repo and `bundle install` once and run `rackup --host 0.0.0.0 --port 4567` to have it accessible from the testruns running in docker.
 
-Once it's running run all tests by executing `env REPORT_URL=<IP OF DOCKER INTERFACE> docker-compose up` and see test results flowing to rspec test result aggregator.
+Once it's running run all tests by executing `env REPORT_URL=<IP OF DOCKER INTERFACE> docker-compose up --build` and see test results flowing to rspec test result aggregator.
+
+The test environment builds hermetic images for each testrun by including all source files to the testrun container. Thus we need to use `--build` (or trust docker to detect changes in directories) to run tests for newest code.
 
 
 ## Credits ##

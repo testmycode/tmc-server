@@ -21,8 +21,16 @@ class SubmissionResultReceiver
     @port
   end
 
+  def host_ip
+    @addr ||= if ENV['CI']
+                `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
+              else
+                '127.0.0.1'
+              end
+  end
+
   def receiver_url
-    "http://localhost:#{receiver_port}/results"
+    "http://#{host_ip}:#{receiver_port}/results"
   end
 
   private

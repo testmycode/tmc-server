@@ -1,16 +1,18 @@
 version: '2'
 services:
   sandbox:
-    image: testmycode/tmc-sandbox
+    image: testmycode/tmc-sandbox:0.0.3
     expose:
       - 3001
     volumes:
       - /tmp:/dev/shm
   db:
     image: postgres:9.4
+    volumes:
+      - ./pg-data:/var/lib/postgresql
   dev:
     build: .
-    command: rails s -b 0.0.0.0
+    entrypoint: ./dev-entry.sh
     volumes:
       - .:/app
     ports:
@@ -18,6 +20,7 @@ services:
     environment:
       - DB_HOST=db
       - HOST=dev
+      - SANDBOX_URL=http://sandbox:3001
     depends_on:
       - db
       - sandbox

@@ -20,7 +20,8 @@ class SiteSetting
     result = {}
     files.each do |path|
       if File.exist?(path)
-        data = YAML.load_file(path)
+        template = ERB.new File.new(path).read
+        data = YAML.load template.result(binding)
         fail "Invalid configuration file #{path}" unless data.is_a? Hash
         result = result.deep_merge(data)
       end
