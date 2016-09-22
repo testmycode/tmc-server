@@ -8,9 +8,11 @@ services:
       - /tmp:/dev/shm
   db:
     image: postgres:9.4
+    volumes:
+      - ./pg-data:/var/lib/postgresql
   dev:
     build: .
-    command: rails s -b 0.0.0.0 --pid=/tmp/dev.pid
+    entrypoint: ./dev-entry.sh
     volumes:
       - .:/app
     ports:
