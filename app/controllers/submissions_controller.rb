@@ -79,8 +79,8 @@ class SubmissionsController < ApplicationController
             }
             when :hidden then {
               all_tests_passed:  nil,
-              test_cases: [],
-              points: nil,
+              test_cases: [{name:'TestResultsAreHidden test', successful:true, message:nil, exception:nil, detailed_message: nil} ],
+              points: [],
               validations: nil,
               valgrind: nil
             }
