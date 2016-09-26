@@ -3,7 +3,7 @@ require 'natsort'
 require 'course_list'
 require 'exercise_completion_status_generator'
 
-class CoursesController < ApplicationController
+class Api::v7::CoursesController < Api::v7::BaseController
   before_action :set_organization
   before_action :set_course, except: [:help, :index, :show_json]
 
@@ -196,9 +196,9 @@ class CoursesController < ApplicationController
 #     end
 #   end
 #
-#   def set_organization
-#     @organization = Organization.find_by(slug: params[:organization_id])
-#   end
+  def set_organization
+    @organization = Organization.find_by(slug: params[:organization_id])
+  end
 #
 #   def set_course
 #     @course = Course.find(params[:id])
