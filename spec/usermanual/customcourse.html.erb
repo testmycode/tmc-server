@@ -8,6 +8,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>TMC webapp user manual - custom course</title>
 
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+
   <link rel="stylesheet" type="text/css" href="css/usermanual.css" />
   <link rel="stylesheet" type="text/css" href="lib/shjs/sh_style.css" />
 
@@ -123,10 +125,15 @@ require 'cgi' # for escapeHTML
     end
     course = Course.last
     expect(course).not_to be_nil
+
+    click_button 'Accept and continue'
+    click_button 'Continue'
+    click_button 'Publish now'
   %>
 
   <p>
-    The course was created successfully.
+    For rest of the creation phases, just click continue. After last phase the course is created successfully
+    and you should see course's main page.
   </p>
 
   <%= screenshot %>
@@ -281,11 +288,7 @@ require 'cgi' # for escapeHTML
     This may be inconvenient, but it also somewhat protects against mistakes.
   </p>
 
-  <%
-     page.visit(page.current_url)
-     click_on 'View status page'
-     page.visit(page.current_url)
-  %>
+  <% visit "/org/#{org.slug}/courses/#{course.id}/" %>
   <% highlight('a:contains("Refresh")') %>
   <%= screenshot %>
   <% click_on 'Refresh' %>

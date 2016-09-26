@@ -79,8 +79,8 @@ class SubmissionsController < ApplicationController
             }
             when :hidden then {
               all_tests_passed:  nil,
-              test_cases: nil,
-              points: nil,
+              test_cases: [{name:'TestResultsAreHidden test', successful:true, message:nil, exception:nil, detailed_message: nil} ],
+              points: [],
               validations: nil,
               valgrind: nil
             }
@@ -89,6 +89,7 @@ class SubmissionsController < ApplicationController
             }
           end
         )
+        output[:status] = :ok if output[:status] == :hidden
         if !!params[:include_files]
           output[:files] = SourceFileList.for_submission(@submission).map{ |f| {path: f.path ,contents: f.contents} }
         end

@@ -6,7 +6,7 @@ class FeedbackAnswersController < ApplicationController
       @numeric_stats = @course.exercises.where(hidden: false).sort.map do |ex|
         [ex, FeedbackAnswer.numeric_answer_averages(ex), ex.submissions_having_feedback.count]
       end
-      @title = @course.name
+      @title = @course.title
     elsif params[:exercise_id]
       @exercise = Exercise.find(params[:exercise_id])
       @course = @exercise.course

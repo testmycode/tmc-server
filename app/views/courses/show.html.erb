@@ -1,9 +1,11 @@
 <div class="row-fluid">
   <div class="span12">
     <h1><%= @course.title %></h1>
-    <p><%= @course.description %></p>
+    <% unless @course.description.blank? %>
+      <p><%= @course.description %></p>
+    <% end %>
     <% unless @course.material_url.blank? %>
-      <p><%= link_to 'Material', @course.material_url %></p>
+      <p><%= link_to 'Material', @course.material_url, target: '_blank' %></p>
     <% end %>
     <div>
       <% if @refresh_report && (can? :refresh, @course) %>
@@ -116,6 +118,7 @@
       <% end %>
 
       <% if can? :manage_deadlines, @course %>
+        <%= link_to 'Manage basic timing', setup_organization_course_course_timing_path(@organization, @course), class: "btn tvn-default btn-mini" %>
         <%= link_to 'Manage deadlines', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
         <%= link_to 'Manage unlock conditions', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
       <% end %>
@@ -123,8 +126,8 @@
         <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-default btn-mini" %>
       <% end %>
       <% if can? :teach, @organization %>
-          <%= link_to 'Manage assistants', organization_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
-          <%= link_to 'Edit course parameters', edit_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
+          <%= link_to 'Manage assistants', setup_organization_course_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
+          <%= link_to 'Edit course parameters', edit_setup_organization_course_course_details_path(@organization, @course), class: "btn btn-default btn-mini" %>
       <% end %>
       <% if can? :toggle_submission_result_visibility, @course %>
         <% if @course.hide_submission_results? %>

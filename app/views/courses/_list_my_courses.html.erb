@@ -14,7 +14,7 @@
   <% courses.each do |course| %>
     <tr class="course <% if course.hidden? || course.disabled? %>hidden-course<% end %>">
       <td>
-        <%= link_to course.name, organization_course_path(@organization, course) %>
+        <%= link_to course.title, organization_course_path(@organization, course) %>
       </td>
       <td>
         <% if percent_completed[course.id] %>

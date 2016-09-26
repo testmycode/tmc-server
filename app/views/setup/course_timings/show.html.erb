@@ -1,0 +1,131 @@
+<script type="text/javascript">
+  $(document).ready(function() {
+    $(".datetime-picker").datetimepicker({
+      lazyInit: true,
+      dayOfWeekStart: 1,
+      validateOnBlur: false,
+      allowBlank: true,
+      enterLikeTab: false,
+      defaultTime: '23:59',
+      format: 'd.m.Y H:i'
+    });
+  });
+</script>
+
+<% if @setup_in_progress %>
+  <h1>Create new course</h1>
+  <%= render 'setup/wizard_bar' %>
+  <h2>Phase 3 - Course timing</h2>
+<% else %>
+  <h1>Course timing</h1>
+<% end %>
+
+<p>
+  Here you will schedule the course and exercise sets. Unlock means the condition when exercises are visible
+  and downloadable. Deadline defines the moment, when the submissions has to be made.
+</p>
+
+<p>
+  First choose basic option for both unlocks and deadlines. After that you can check if the details are good
+  or manually adjust them. These options will cover most common initial choices, but full customization
+  can be made later on advanced settings.
+</p>
+
+  <%= form_tag setup_organization_course_course_timing_path(course_id: @course.id), method: 'PUT' do %>
+
+    <!--
+    <%= label_tag :start_date, 'Course start date: (not yet implemented)'%>
+    <%= date_field :start_date, nil  %>
+    -->
+    <hr>
+    <h3>Unlocks</h3>
+    Choose the type, how the exercises are opened:<br>
+    <%= radio_button_tag :unlock_type, "no_unlocks", (params[:unlock_type] == "no_unlocks") %>
+    <%= label_tag :unlock_type_1, 'Everything open at start' %>
+    <%= radio_button_tag :unlock_type, "percent_from_previous", (params[:unlock_type] == "percent_from_previous") %>
+    <%= label_tag :unlock_type_2, '80% from previous set completed' %>
+
+    <hr>
+    <h3>Deadlines</h3>
+    <%= label_tag :first_set_date, 'Deadline for first set:'%>
+    <%= date_field :first_set_date, nil  %>
+    <br>
+    Choose how incoming exercise set deadlines are set:<br>
+    <%= radio_button_tag :deadline_type, "no_deadlines" %>
+    <%= label_tag :deadline_type_1, 'No deadlines' %>
+    <%= radio_button_tag :deadline_type, "weekly_deadlines" %>
+    <%= label_tag :deadline_type_2, 'Weekly' %>
+    <%= radio_button_tag :deadline_type, "all_same_deadline" %>
+    <%= label_tag :deadline_type_3, 'All same' %>
+    <br>
+    <%= submit_tag 'Fill and preview', class: 'btn' %>
+
+    <hr>
+
+  <h3>Preview</h3>
+
+    <%= submit_tag 'Accept and continue', class: 'btn btn-primary' %>
+
+    <table class="exercise-list table table-condensed">
+      <thead>
+      <tr>
+        <th>Exercise group</th>
+        <th>Unlock</th>
+        <th>Deadline (hard)</th>
+      </tr>
+      </thead>
+
+      <% @course.exercise_groups.each do |group| %>
+        <%
+          group_display_name = group.name.empty? ? '(default)' : group.name
+          param_name = group.name.empty? ? 'empty_group' : "group[#{group.name}]"
+          uniform = true
+        %>
+
+          <tbody id="group_<%= group.name %>">
+          <tr>
+            <td><%= group_display_name %></td>
+
+            <% #### Unlocks #### %>
+            <td>
+              <%
+                if group.name.empty?
+                  param_array = 'empty_group'
+                else
+                  param_array = "group[#{group.name}]"
+                end
+
+                group_unlock_conditions = group.group_unlock_conditions
+                group_unlock_conditions = [''] if group_unlock_conditions.empty? # Always have at least one input field
+              %>
+              <div id="unlock-condition-<%= group.name %>">
+                <% group_unlock_conditions.each_with_index do |condition, i| %>
+                    <%= text_field_tag "#{param_array}[#{i}]", condition %>
+                <% end %>
+              </div>
+            </td>
+
+            <% #### Deadlines %>
+            <td>
+              <%
+                deadline = group.hard_group_deadline
+                deadline_type = 'hard'
+                disabled = false
+
+                static_autofill = deadline.static_deadline_spec
+                #unlock_autofill = deadline.unlock_deadline_spec
+                field_class = nil
+              %>
+
+              <%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: "#{field_class} datetime-picker" %><br/>
+            </td>
+
+      <% end %>
+    </table>
+
+  <% end %>
+
+<% if session[:refresh_report] && current_user.administrator? %>
+    <%= render :partial => 'courses/refresh_report', :locals => { :report => session[:refresh_report] } %>
+    <% session.delete(:refresh_report) %>
+<% end %>

@@ -14,4 +14,12 @@ class Api::Beta::ParticipantController < Api::Beta::BaseController
     present(list)
   end
 
+  def index
+    user = current_user
+    present({
+      username: user.login,
+      email: user.email,
+    })
+  end
+
 end

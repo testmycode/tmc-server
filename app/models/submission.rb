@@ -102,8 +102,7 @@ class Submission < ActiveRecord::Base
     if !processed?
       :processing
     elsif !can_see_results?(user)
-      :ok
-      #:hidden
+      :hidden
     elsif all_tests_passed?
       :ok
     elsif tests_ran?

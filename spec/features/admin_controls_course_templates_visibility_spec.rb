@@ -54,13 +54,13 @@ feature 'Admin sets expiredate to course templates', feature: true do
 
   scenario "Teacher can't create course from expired template" do
     log_in_as(@teacher.login, 'xooxer')
-    visit("/org/slug/courses/clone_template/#{@ct_expired_visible.id}")
+    visit("/setup/slug/course/new/#{@ct_expired_visible.id}")
     expect(page).to have_content('Access denied')
   end
 
   scenario "Teacher can't create course from hidden template" do
     log_in_as(@teacher.login, 'xooxer')
-    visit("/org/slug/courses/clone_template/#{@ct_non_expired_hidden.id}")
+    visit("/setup/slug/course/new/#{@ct_expired_visible.id}")
     expect(page).to have_content('Access denied')
   end
 end

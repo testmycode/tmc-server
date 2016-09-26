@@ -11,8 +11,16 @@ if LogStasher.enabled?
     rescue NameError
       fields[:user] = 'pghero/api?'
     end
-    fields[:site] = request.path =~ /^\/api/ ? 'api' : 'user'
 
+    begin
+      if params
+        fields[:client] = params[:client] if params[:client]
+        fields[:client_version] = params[:client_version] if params[:client_version]
+      end
+    rescue NameError
+    end
+
+    fields[:site] = request.path =~ /^\/api/ ? 'api' : 'user'
 
     # If you are using custom instrumentation, just add it to logstasher custom fields
     LogStasher.custom_fields << :myapi_runtime

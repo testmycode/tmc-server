@@ -1,0 +1,88 @@
+version: '2'
+services:
+  sandbox:
+    image: testmycode/tmc-sandbox:0.0.3
+    expose:
+      - 3001
+    volumes:
+      - /tmp:/dev/shm
+  db:
+    image: postgres:9.4
+  db1:
+    extends: db
+  db2:
+    extends: db
+  db3:
+    extends: db
+  db4:
+    extends: db
+  db5:
+    extends: db
+  db6:
+    extends: db
+  web1:
+    extends:
+      file: common.yml
+      service: web
+    environment:
+      - RSPEC_PATTERN="spec/{controllers,helpers,lib,mailers,models}/**/*.rb"
+      - DB_HOST=db1
+      - HOST=web1
+    depends_on:
+      - db1
+      - sandbox
+  web2:
+    extends:
+      file: common.yml
+      service: web
+    environment:
+      - RSPEC_PATTERN="spec/{features,usermanual}/**/*.rb"
+      - DB_HOST=db2
+      - HOST=web2
+    depends_on:
+      - db2
+      - sandbox
+  web3:
+    extends:
+      file: common.yml
+      service: web
+    environment:
+      - RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
+      - DB_HOST=db3
+      - HOST=web3
+    depends_on:
+      - db3
+      - sandbox
+  web4:
+    extends:
+      file: common.yml
+      service: web
+    environment:
+      - RSPEC_PATTERN="spec/integration/{admin_usecases_spec.rb,broken_utf8_spec.rb,personal_deadlines_spec.rb,reset_password_spec.rb,stats_view_usecases_spec.rb,utf8_exercise_spec.rb}"
+      - DB_HOST=db4
+      - HOST=web4
+    depends_on:
+      - db4
+      - sandbox
+  web5:
+    extends:
+      file: common.yml
+      service: web
+    environment:
+      - RSPEC_PATTERN="spec/integration/{student_usecases_spec.rb}"
+      - DB_HOST=db5
+      - HOST=web5
+    depends_on:
+      - db5
+      - sandbox
+  web6:
+    extends:
+      file: common.yml
+      service: web
+    environment:
+      - RSPEC_PATTERN="spec/integration/{paste_usecases_spec.rb}"
+      - DB_HOST=db6
+      - HOST=web6
+    depends_on:
+      - db6
+      - sandbox

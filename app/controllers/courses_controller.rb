@@ -5,9 +5,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, except: [:create, :help, :index, :new, :show_json, :create_from_template, :prepare_from_template]
-
-  skip_authorization_check only: [:index]
+  before_action :set_course, except: [:help, :index, :show_json]
 
   skip_authorization_check only: [:index]
 
@@ -74,49 +72,9 @@ class CoursesController < ApplicationController
   end
 
   def refresh
-     authorize! :refresh, @course
+    authorize! :refresh, @course
     refresh_course(@course)
     redirect_to organization_course_path
-  end
-
-  def new
-    authorize! :create, :custom_course
-    add_organization_breadcrumb
-    add_breadcrumb 'Create new course'
-    @course = Course.new
-  end
-
-  def create
-    create_impl(custom: true, params: course_params_for_create)
-  end
-
-  def prepare_from_template
-    @course_template = CourseTemplate.find(params[:course_template_id])
-    authorize! :teach, @organization
-    authorize! :clone, @course_template
-    add_organization_breadcrumb
-    add_breadcrumb 'Course templates', organization_course_templates_path
-    add_breadcrumb 'Create new course'
-    @course = Course.new_from_template(@course_template)
-  end
-
-  def create_from_template
-    create_impl(custom: false, params: course_params_for_create_from_template)
-  end
-
-  def edit
-    authorize! :teach, @organization
-    add_course_breadcrumb
-    add_breadcrumb 'Edit course parameters'
-  end
-
-  def update
-    authorize! :teach, @organization
-    if @course.update(course_params)
-      redirect_to organization_course_path(@organization, @course), notice: 'Course was successfully updated.'
-    else
-      render :edit
-    end
   end
 
   def enable
@@ -212,14 +170,6 @@ class CoursesController < ApplicationController
 
   private
 
-  def course_params_for_create
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
-  end
-
-  def course_params_for_create_from_template
-    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
-  end
-
   def course_params
     if @course.custom?
       params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
@@ -267,33 +217,6 @@ class CoursesController < ApplicationController
       session[:refresh_report] = course.refresh(options)
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
-    end
-  end
-
-  def create_impl(options = {})
-    create_params = options[:params]
-    input_name = create_params[:name]
-    create_params[:name] = @organization.slug + '-' + input_name
-
-    @course = Course.new(create_params)
-    @course.organization = @organization
-    @course_template = @course.course_template
-
-    authorize! :teach, @organization
-    if options[:custom]
-      authorize! :create, :custom_course
-    else
-      authorize! :clone, @course_template
-    end
-
-    respond_to do |format|
-      if @course.save
-        refresh_course(@course, no_directory_changes: options[:custom] ? false : @course.course_template.cache_exists?)
-        format.html { redirect_to(organization_course_help_path(@organization, @course), notice: 'Course was successfully created.') }
-      else
-        @course.name = input_name
-        format.html { render action: options[:custom] ? 'new' : 'prepare_from_template', notice: 'Course could not be created' }
-      end
     end
   end
 end

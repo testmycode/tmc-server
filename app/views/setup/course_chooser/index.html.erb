@@ -1,0 +1,47 @@
+<h1>Create new course</h1>
+
+<%= render 'setup/wizard_bar' %>
+
+<h2>Phase 1 - Choose template</h2>
+
+<% unless @setup_in_progress && !session[:ongoing_course_setup][:course_id].nil? %>
+
+  <p>
+    Courses are based on the available templates, they are listed below. Choose the one you want to use.
+  </p>
+
+  <table class='table table-striped'>
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Material link</th>
+      <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% @course_templates.each do |course_template| %>
+        <tr>
+          <td><%= course_template.title %></td>
+          <td><%= course_template.description %></td>
+          <td><%= link_to course_template.material_url, course_template.material_url, target: '_blank' unless course_template.material_url.nil? %></td>
+          <td><%= link_to 'Choose', new_setup_organization_course_path(@organization, course_template.id), class: "btn btn-mini btn-primary" %></td>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <br/>
+
+  <% if can? :create, :custom_course %>
+      <h3>Create custom course (advanced mode)</h3>
+      <%= link_to 'Create New Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+  <% end %>
+
+<% else %>
+  <p>
+    You have already started creating course based on course template <b><%= @course.course_template.title%></b>.
+    Please finish it first until you can choose different course template.
+  </p>
+  <td><%= link_to 'Continue with chosen course', edit_setup_organization_course_course_details_path(@organization, @course), class: "btn btn-primary" %></td>
+<% end %>

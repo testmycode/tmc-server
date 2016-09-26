@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/bash -e
 # Sets up dependencies and environment for tests to be run in Travis.
 #
 # This is not recommended to be run locally, and it employs some hacks and tricks to get by limitations of travis.
 
-set -ev
+set -v
 
 # Unset bundle Gemfile, since we have multiple projects with separate Gemfiles and it will just cause confusion
 unset BUNDLE_GEMFILE
@@ -59,3 +59,4 @@ git clone https://github.com/testmycode/tmc-langs.git $HOME/tmc-langs
 cd $HOME/tmc-langs
 mvn package -Dmaven.test.skip=true
 cd -
+set +v

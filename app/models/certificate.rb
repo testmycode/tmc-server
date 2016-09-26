@@ -16,7 +16,7 @@ class Certificate < ActiveRecord::Base
       weeks: course.exercise_groups.count,
       exercises: visible_exercises.count,
       points: AwardedPoint.course_user_points(course, user).count,
-      available_points: available_points.count,
+      available_points: available_points,
       root: path
     }
 

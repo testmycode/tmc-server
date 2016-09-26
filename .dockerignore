@@ -1,0 +1,4 @@
+db/files/
+ext/tmc-sandbox/
+vendor/bundle/
+.pg-data

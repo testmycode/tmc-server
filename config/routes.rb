@@ -1,11 +1,28 @@
 TmcServer::Application.routes.draw do
   use_doorkeeper
 
+  namespace :setup do
+    resources :start, only: [:index]
+
+    resources :organizations, only: [:index, :new, :create, :edit, :update], path: '' do
+      resources :course_chooser, only: [:index]
+
+      resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'} do
+        get 'new/custom', to: 'course_details#custom'
+      end
+      resources :courses, only: [] do
+        resource :course_details, only: [:edit, :update]
+        resource :course_timing, only: [:index, :show, :edit, :update]
+        resources :course_assistants, only: [:index, :create, :destroy]
+        resources :course_finisher, only: [:index, :create]
+      end
+    end
+  end
 
   namespace :api, :constraints => { :format => /(html|json|js|)/ } do
     namespace :beta, defaults: { format: 'json' } do
       get '/demo', to: 'demo#index'
-      resources :participant, only: [] do
+      resources :participant, only: [:index] do
         member do
           get 'courses'
         end
@@ -13,6 +30,7 @@ TmcServer::Application.routes.draw do
           get 'courses'
         end
       end
+      resources :course_id_information, only: [:index]
       resources :stats, only: [] do
         collection do
           get 'submission_queue_times'
@@ -22,7 +40,7 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  resources :organizations, except: :destory, path: 'org' do
+  resources :organizations, except: [:destory, :create, :edit, :update], path: 'org' do
 
     resources :exercises, only: [:show] do
       resources :submissions, only: [:create]
@@ -46,7 +64,7 @@ TmcServer::Application.routes.draw do
 
     get 'course_templates', to: 'course_templates#list_for_teachers'
 
-    resources :courses do
+    resources :courses, except: [:new, :create] do
       member do
         get 'refresh'
         post 'refresh'
@@ -63,8 +81,6 @@ TmcServer::Application.routes.draw do
         post 'toggle_submission_result_visibility'
       end
 
-      resources :assistants, only: [:index, :create, :destroy]
-
       resources :points, only: [:index, :show] do
         member do
           get 'refresh_gdocs'
@@ -78,11 +94,6 @@ TmcServer::Application.routes.draw do
       end
 
       get 'help'
-
-      collection do
-        get 'clone_template/:course_template_id' => 'courses#prepare_from_template', as: 'prepare_course'
-        post 'clone_template' => 'courses#create_from_template', as: 'clone_course'
-      end
 
       resources :stats, only: [:index, :show]
       resources :exercise_status, only: [:show]
