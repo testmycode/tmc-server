@@ -113,7 +113,7 @@ class OrganizationsController < ApplicationController
     courses.each do |course|
       awarded = all_awarded.select { |id| id == course.id }.length.to_f
       available = all_available.select { |id| id == course.id }.length.to_f
-      percent_completed[course.id] = 100 * (awarded / available)
+      percent_completed[course.id] = 100 * (awarded / available) unless course.hide_submission_results
     end
     percent_completed
   end
