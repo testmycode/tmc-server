@@ -38,6 +38,10 @@ TmcServer::Application.routes.draw do
         end
       end
     end
+
+    namespace :v7, defaults: { format: 'json' } do
+      resources :courses, except: [:new, :create]
+    end
   end
 
   resources :organizations, except: [:destroy, :create, :edit, :update], path: 'org' do
