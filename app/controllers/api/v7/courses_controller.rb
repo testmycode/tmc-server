@@ -4,6 +4,36 @@ require 'course_list'
 require 'exercise_completion_status_generator'
 
 class Api::v7::CoursesController < Api::v7::BaseController
+  include Swagger::Blocks
+
+  swagger_path '/org/organization_id/courses.json' do
+    operation :get do
+      key :description, 'Returns all of the organization\'s courses visible to the user in a json format'
+      key :operationId, 'findCourses'
+      key :produces, [
+        'application/json'
+      ]
+      key :tags, [
+        'course'
+      ]
+      response 200 do
+        key :description, 'Courses in json'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :Course
+          end
+        end
+      end
+      response :default do
+        key :description, 'Authentication required'
+        schema do
+          key :type, :string
+        end
+      end
+    end
+  end
+  
   before_action :set_organization
   before_action :set_course, except: [:help, :index, :show_json]
 
