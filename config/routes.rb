@@ -22,6 +22,7 @@ TmcServer::Application.routes.draw do
   namespace :api, :constraints => { :format => /(html|json|js|)/ } do
     namespace :beta, defaults: { format: 'json' } do
       get '/demo', to: 'demo#index'
+      get '/documentation', to: 'apidocs#index'
       resources :participant, only: [:index] do
         member do
           get 'courses'
@@ -38,9 +39,15 @@ TmcServer::Application.routes.draw do
         end
       end
     end
+
+    namespace :v7, defaults: { format: 'json' } do
+      resources :organizations, except: [:destroy, :create, :edit, :update], path: 'org' do
+        resources :courses, except: [:new, :create]
+      end
+    end
   end
 
-  resources :organizations, except: [:destory, :create, :edit, :update], path: 'org' do
+  resources :organizations, except: [:destroy, :create, :edit, :update], path: 'org' do
 
     resources :exercises, only: [:show] do
       resources :submissions, only: [:create]
