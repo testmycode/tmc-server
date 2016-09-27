@@ -15,7 +15,7 @@ The following packages should be installed first: `ruby` (and `bundler` gem), `p
 2. Install dependencies with `bundle install`
 3. Edit `config/site.yml`, based on `config/site.defaults.yml`.
 4. Setup PostgreSQL based on `config/database.yml` or configure `config/database.local.yml` according to your current postgres settings.
-5. Initialize rails database with `rake db:reset`
+5. Initialize rails database with `rake db:create db:migrate`
 6. Go to `ext/tmc-sandbox` and compile with `sudo make`. More information from [tmc-sandbox page](https://github.com/testmycode/tmc-sandbox).
 7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
 8. Compile the other stuff in `ext` by doing `rake compile`
@@ -27,12 +27,6 @@ After you get the test suite to pass see [post-install instructions](#post-insta
 
 ### Installation instructions for Ubuntu 14.04
 We expect the user to be using account which name is tmc.
-#### Set Java and Ruby versions
-
-```bash
-$ JAVA_VERSION=7
-$ RUBY_VERSION=2.2.0
-```
 
 #### Install dependencies
 
@@ -62,15 +56,11 @@ Install [wkhtmltopdf](https://github.com/pdfkit/PDFKit/wiki/Installing-WKHTMLTOP
 
 #### Java installation
 
-To install OpenJDK run
-```bash
-$ sudo apt-get install openjdk-$JAVA_VERSION-jdk
-```
 If you want to install the official Oracle JDK, you need to add a ppa repository. You can install Oracle JDK with the following commands
 ```bash
 $ sudo add-apt-repository ppa:webupd8team/java
 $ sudo apt-get update
-$ sudo apt-get install oracle-java$JAVA_VERSION-installer
+$ sudo apt-get install oracle-java8-installer
 ```
 
 ### Install ruby via RVM
@@ -87,7 +77,7 @@ $ source /etc/profile.d/rvm.sh
 Add yourself to RVM group and install Ruby
 
 ```bash
-$ sudo usermod -a -G rvm tmc
+$ sudo adduse tmc rvm
 ```
 
 Quote from [https://rvm.io/support/troubleshooting#sudo](https://rvm.io/support/troubleshooting#sudo)
@@ -96,8 +86,8 @@ Quote from [https://rvm.io/support/troubleshooting#sudo](https://rvm.io/support/
 Install ruby
 
 ```bash
-$ rvm install $RUBY_VERSION
-$ rvm use $RUBY_VERSION --default
+$ rvm install 2.2.0
+$ rvm use 2.2.0 --default
 $ gem install bundler
 ```
 
@@ -120,6 +110,8 @@ $ psql -c "CREATE USER tmc WITH SUPERUSER CREATEUSER CREATEDB PASSWORD 'tmc';"
 :exclamation: Superuser access is useful for dev environment, but discouraged for production.
 
 #### Set PostgreSQL to authenticate with md5 instead of local
+
+This is needed for local postgresql installation, as by default the tests are ran as root bc of the sandbox...
 
 Locate the **pg_hba.conf** file with `locate pg_hba.conf`. The file should be located */etc/postgresql/<version number>/main/pg_hba.conf*. You need root privileges to edit the file. Around line 90 change
 ```markup
@@ -149,14 +141,14 @@ $ cd tmc-server
 $ bundle install
 ```
 
-:exclamation: If you are not using a github account, replace the repository submodule URLs with a HTTPS URL in .git/config e.g. `https://github.com/testmycode/tmc-checkstyle-runner.git`
+:exclamation: If you are not using a github account, replace the repository submodule URLs with a HTTPS URL in .git/config e.g. `https://github.com/testmycode/tmc-langs.git`
 ```bash
 $ git submodule update --init --recursive
 ```
 
 You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there (notice: you do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`).
 
-Initialize the database with `rake db:create && rake db:schema:load`
+Initialize the database with `rake db:create db:migrate`
 Note: run `rake db:seed` to initialize admin account
 
 #### Build sandbox
