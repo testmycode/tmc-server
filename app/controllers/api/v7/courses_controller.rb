@@ -3,7 +3,7 @@ require 'natsort'
 require 'course_list'
 require 'exercise_completion_status_generator'
 
-class Api::v7::CoursesController < Api::v7::BaseController
+class Api::V7::CoursesController < Api::V7::BaseController
   before_action :set_organization
   before_action :set_course, except: [:help, :index, :show_json]
 
@@ -219,4 +219,4 @@ class Api::v7::CoursesController < Api::v7::BaseController
 #       session[:refresh_report] = e.report
 #     end
 #   end
-# end
+end
