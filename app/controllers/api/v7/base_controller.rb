@@ -1,6 +1,6 @@
 require 'json'
 
-class Api::v7::BaseController < ApplicationController
+class Api::V7::BaseController < ApplicationController
 
   clear_respond_to
   respond_to :json
