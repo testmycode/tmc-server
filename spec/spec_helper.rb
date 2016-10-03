@@ -80,7 +80,7 @@ def without_db_notices(&block)
 end
 
 def host_ip
-  @addr ||= if ENV['CI']
+  @addr ||= ENV['HOST'] ||= if ENV['CI']
               `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
             else
               '127.0.0.1'
