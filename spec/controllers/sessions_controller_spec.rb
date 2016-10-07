@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe SessionsController, type: :controller do
   before :each do
-    @user = mock_model(User, :administrator? => true)
+    @user = mock_model(User, administrator?: true)
     allow(User).to receive(:authenticate) do |login, pwd|
       @user if login == 'instructor' && pwd == 'correct_password'
     end
@@ -14,6 +14,23 @@ describe SessionsController, type: :controller do
       password: 'correct_password'
     }
     post :create, session: session_attrs
+  end
+
+  describe 'GET new' do
+    context 'when logged in' do
+      it 'should redirect the user away' do
+        get :new
+        expect(response).to redirect_to('/')
+      end
+
+      context 'when return_to is set' do
+        it 'should redirect the user to return path' do
+          session[:return_to] = '/important_path'
+          get :new
+          expect(response).to redirect_to('/important_path')
+        end
+      end
+    end
   end
 
   describe 'POST create' do
