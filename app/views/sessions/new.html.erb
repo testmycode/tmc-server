@@ -1,1 +1,10 @@
+<h1>Log in to proceed</h1>
 <%= render 'sessions/login_form' %>
+<% if can? :create, User %>
+  <p>
+    Don't have an account? <%= link_to 'Sign up', new_user_path %>.
+  </p>
+  <p>
+    <%= link_to 'I forgot my password', new_password_reset_key_path %>.
+  </p>
+<% end %>
