@@ -39,7 +39,6 @@
           <% title += raw(title_extras) unless title_extras.blank? %>
           <%= link_to raw(title), root_path, class: 'brand' %>
           <div class="collapse nav-collapse">
-            <%= render 'sessions/login_form' %>
             <ul class="nav pull-right">
               <% if signed_in? %>
                 <% if current_user.administrator? %>
@@ -56,13 +55,16 @@
                 <li>
                   <%= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link' %>
                 </li>
-              <% elsif can? :create, User %>
-                <li>
-                  <%= link_to 'Sign up', new_user_path %>
-                </li>
-                <li>
-                  <%= link_to 'Forgot password', new_password_reset_key_path %>
-                </li>
+              <% elsif !(params[:controller] == 'sessions' && params[:action] == 'new') %>
+                <%= render 'sessions/login_form' %>
+                <% if can? :create, User %>
+                  <li>
+                    <%= link_to 'Sign up', new_user_path %>
+                  </li>
+                  <li>
+                    <%= link_to 'Forgot password', new_password_reset_key_path %>
+                  </li>
+                <% end %>
               <% end %>
             </ul>
           </div>
@@ -70,7 +72,7 @@
       </div>
     </div>
     <div id="everything">
-      <div class="container container-fluid well-large well well-white" id="content-area">
+      <div class="container container-fluid well-large" id="content-area">
         <div id="breadcrumb">
           <div class="row-fluid">
             <div class="span12">

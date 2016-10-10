@@ -4,6 +4,10 @@ class SessionsController < ApplicationController
 
   def new
     session[:return_to] ||= params[:return_to]
+    if signed_in?
+      path = session[:return_to] ||= root_path
+      redirect_to path
+    end
   end
 
   def create

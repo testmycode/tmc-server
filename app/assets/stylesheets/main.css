@@ -83,15 +83,13 @@
   right: 1em;
 }
 
-
-
 /* bootstrapping */
 body .well-white {
   background-color: white;
 }
 
 body.default {
-  background-color: #DDDDDD;
+  background-color: #fcfcfc;
 }
 
 #page-presence {
@@ -404,4 +402,15 @@ tr>.align-right {
 
 .teacher-panel {
     background-color: #dff0d8;
+}
+
+/* Login */
+.navbar .login-form {
+  float: right;
+  margin-bottom: 0;
+}
+
+.navbar .login-form input {
+  margin-bottom: 0;
+  margin-top: 5px;
 }
