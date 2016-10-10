@@ -18,6 +18,10 @@ describe SessionsController, type: :controller do
 
   describe 'GET new' do
     context 'when logged in' do
+      before :each do
+        allow(subject).to receive(:signed_in?) { true }
+      end
+
       it 'should redirect the user away' do
         get :new
         expect(response).to redirect_to('/')

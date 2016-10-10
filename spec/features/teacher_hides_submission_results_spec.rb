@@ -38,7 +38,6 @@ describe 'Teacher can hide submission results from users', feature: true do
   end
 
   scenario 'In course page user can not see results of submission and link to points page' do
-    pending('Waiting for clients to be updated')
     log_in_as(@user.username, 'foobar')
     visit_course
     expect(page).to_not have_link('View points')
@@ -46,7 +45,6 @@ describe 'Teacher can hide submission results from users', feature: true do
   end
 
   scenario 'In My stats page user can not see results of submission' do
-    pending('Waiting for clients to be updated')
     log_in_as(@user.username, 'foobar')
     visit_course
     click_link('My stats')

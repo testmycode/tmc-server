@@ -1,5 +1,6 @@
 AllCops:
-  RunRailsCops: true
+  Rails:
+    Enabled: true
   Include:
     - '**/config.ru'
     - '**/Rakefile'

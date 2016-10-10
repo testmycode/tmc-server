@@ -43,30 +43,27 @@ describe CourseNotificationsController, type: :controller do
     it 'sends a email for every participant on course' do
       # submissions and points are added so that the user is considered to be on the course
       user = FactoryGirl.create(:user, email: 'student@some.edu.fi')
-      sub1 = FactoryGirl.create(:submission, user: user, course: @course)
+      FactoryGirl.create(:submission, user: user, course: @course)
       user2 = FactoryGirl.create(:user, email: 'std@myschool.fi')
-      sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
-      aw1 = FactoryGirl.create(:awarded_point, user_id: user.id, course_id: @course.id)
-      aw2 = FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: @course.id)
+      FactoryGirl.create(:submission, user: user2, course: @course)
+      FactoryGirl.create(:awarded_point, user_id: user.id, course_id: @course.id)
+      FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: @course.id)
 
       expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size).by(2)
 
-      mail_first = ActionMailer::Base.deliveries[-2]
-      expect(mail_first.to).to include user.email
-      expect(mail_first.body.encoded).to include message
-
-      mail_last = ActionMailer::Base.deliveries.last
-      expect(mail_last.to).to include user2.email
-      expect(mail_last.body.encoded).to include message
+      recipients = ActionMailer::Base.deliveries.flat_map(&:to)
+      expect(recipients).to include user.email
+      expect(recipients).to include user2.email
+      expect(ActionMailer::Base.deliveries.last.body.encoded).to include message
     end
 
     it "doesn't crash if some email addresses are invalid" do
       user = FactoryGirl.create(:user, email: 'student@some.edu.fi')
-      sub1 = FactoryGirl.create(:submission, user: user, course: @course)
+      FactoryGirl.create(:submission, user: user, course: @course)
       user2 = FactoryGirl.create(:user, email: 'std  @ myschool . fi') # The invalid address
-      sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
-      aw1 = FactoryGirl.create(:awarded_point, user_id: user.id, course_id: @course.id)
-      aw2 = FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: @course.id)
+      FactoryGirl.create(:submission, user: user2, course: @course)
+      FactoryGirl.create(:awarded_point, user_id: user.id, course_id: @course.id)
+      FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: @course.id)
 
       expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size).by(1)
 
@@ -86,7 +83,7 @@ describe CourseNotificationsController, type: :controller do
   describe 'for a teacher' do
     it 'allows to send email' do
       @teacher = FactoryGirl.create(:user, email: 'admin@mydomain.com')
-      Teachership.create(user: @teacher,organization: @organization)
+      Teachership.create(user: @teacher, organization: @organization)
       controller.current_user = @teacher
 
       post :create, params
