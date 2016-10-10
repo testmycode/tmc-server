@@ -7,7 +7,7 @@ gem 'rails', '~> 4.2.0'
 gem 'responders', '~> 2.0'
 gem 'rake'
 gem 'google-spreadsheet-ruby'
-gem 'pg', '~> 0.18.0'
+gem 'pg', '~> 0.19.0'
 gem 'cancancan', '~> 1.13.0'
 gem 'rest-client', '~> 1.8.0'
 gem 'daemons', '~> 1.2.3'
@@ -18,7 +18,7 @@ gem 'andand'
 gem 'mimemagic', "~> 0.3.0"
 gem 'rack-cors'
 gem 'newrelic_rpm'
-gem 'activerecord-session_store', '~> 0.1.0'
+gem 'activerecord-session_store', '~> 1.0.0'
 gem 'pdfkit', '~> 0.8.2'
 gem "paperclip", "~> 4.3"
 
