@@ -425,6 +425,13 @@ class Course < ActiveRecord::Base
     external_scoreboard_url % { user: user.username, course: course.id.to_s, org: organization.slug }
   end
 
+  def refresh_running?
+
+  end
+
+  def refresh_started
+  end
+
   private
 
   def set_cache_version
