@@ -38,6 +38,10 @@ TmcServer::Application.routes.draw do
         end
       end
     end
+
+    namespace :v8, defaults: { format: 'json' } do
+      get '/documentation', to: 'apidocs#index'
+    end
   end
 
   resources :organizations, except: [:destroy, :create, :edit, :update], path: 'org' do

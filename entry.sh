@@ -11,11 +11,6 @@ if [ ! -z $cmd ]; then
  exec $cmd
 fi
 
-echo "Cleaning customizations for hermetic stable test setup"
-rm -f config/site.yml
-echo "Fixing site.yml for test"
-sed -i 's/\(baseurl_for_remote_sandboxes:\).*/\1 '"$HOST"'/' config/site.defaults.yml
-
 echo "Running migrations and starting tests"
 
 if [ ! -z $REPORT_URL ]; then
