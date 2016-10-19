@@ -88,7 +88,11 @@ def host_ip
 end
 
 # This makes it visible to others
-Capybara.server_host = host_ip
+if ENV['MULTI_HOST_SETUP']
+  Capybara.server_host = '0.0.0.0'
+else
+  Capybara.server_host = host_ip
+end
 
 RSpec.configure do |config|
   config.mock_with :rspec
