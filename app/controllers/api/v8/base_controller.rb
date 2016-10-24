@@ -6,7 +6,7 @@ class Api::V8::BaseController < ApplicationController
 
   #  before_action :doorkeeper_authorize!
   before_action :authenticate_user!
-
+  
   rescue_from CanCan::AccessDenied do |e|
     render json: errors_json(e.message), status: :forbidden
   end
