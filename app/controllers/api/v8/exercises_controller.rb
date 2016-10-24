@@ -1,15 +1,15 @@
 class Api::V8::ExercisesController < Api::V8::BaseController
-  #before_action :doorkeeper_authorize!, scopes: [:public]
+  before_action :doorkeeper_authorize!, scopes: [:public]
 
   def index
     course_id = params[:id] || Course.find_by(name: "#{params[:slug]}-#{params[:name]}").id
     exercises = Exercise.where(course_id: course_id)
-    exs = Array.new
-    auth_exs = Array.new
+    exs = []
+    auth_exs = []
     exercises.each do |ex|
       next unless ex.visible_to?(current_user)
       next if ex.hidden || ex.disabled_status == :disabled
-      e = Hash.new
+      e = {}
       e[:id] = ex.id
       e[:name] = ex.name
       e[:created_at] = ex.created_at
