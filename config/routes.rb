@@ -46,6 +46,9 @@ TmcServer::Application.routes.draw do
           scope '/courses' do
             scope '/:name' do
               get '/' => 'courses#find_by_name'
+              scope '/exercises' do
+                get '/' => 'exercises#index'
+              end
             end
           end
         end
