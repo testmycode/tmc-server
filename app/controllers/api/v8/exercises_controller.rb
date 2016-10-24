@@ -21,7 +21,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       exs.push(e)
       auth_exs.push(ex)
     end
-    authorize! :read, exs
+    authorize! :read, auth_exs
     present(exs)
   end
 end
