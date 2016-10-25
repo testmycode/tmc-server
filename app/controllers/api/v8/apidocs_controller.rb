@@ -4,7 +4,7 @@ class Api::V8::ApidocsController < ActionController::Base
   swagger_root do
     key :swagger, "2.0"
     info do
-      key :version, "1.0.0"
+      key :version, "8"
       key :title, "TMC API documentation"
       key :description, "TMC API documentation"
       contact do
@@ -32,6 +32,13 @@ class Api::V8::ApidocsController < ActionController::Base
       key :description, "Course's id"
       key :required, true
       key :type, :integer
+    end
+    parameter :path_course_name do
+      key :name, :course_name
+      key :in, :path
+      key :description, "Course's name"
+      key :required, true
+      key :type, :string
     end
     parameter :path_exercise_id do
       key :name, :exercise_id

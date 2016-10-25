@@ -45,14 +45,14 @@ TmcServer::Application.routes.draw do
         scope '/:slug' do
           scope '/courses' do
             scope '/:name' do
-              get '/' => 'courses#show_json'
+              get '/' => 'courses#find_by_name'
             end
           end
         end
       end
       scope '/courses' do
         scope '/:id' do
-          get '/' => 'courses#show_json'
+          get '/' => 'courses#find_by_id'
         end
       end
     end
