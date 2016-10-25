@@ -1,4 +1,55 @@
 class Api::V8::ExercisesController < Api::V8::BaseController
+  include Swagger::Blocks
+
+  swagger_path '/api/v8/courses/{course_id}/exercises' do
+    operation :get do
+      key :description, 'Returns all exercises of the course as json. Course is searched by id'
+      key :operationId, 'findExercisesById'
+      key :produces, ['application/json']
+      key :tags, ['exercise']
+      parameter '$ref': '#/parameters/path_course_id'
+      response 401, '$ref': '#/responses/error'
+      response 200 do
+        key :description, 'Exercises in json'
+        schema do
+          key :title, :exercises
+          key :required, [:exercises]
+          property :exercises do
+            key :type, :array
+            items do
+              key :'$ref', :ExerciseWithPoints
+            end
+          end
+        end
+      end
+    end
+  end
+
+  swagger_path '/api/v8/organizations/{organization_id}/courses/{course_name}/exercises' do
+    operation :get do
+      key :description, 'Returns all exercises of the course as json. Course is searched by name'
+      key :operationId, 'findExercisesByName'
+      key :produces, ['application/json']
+      key :tags, ['exercise']
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      response 401, '$ref': '#/responses/error'
+      response 200 do
+        key :description, 'Exercises in json'
+        schema do
+          key :title, :exercises
+          key :required, [:exercises]
+          property :exercises do
+            key :type, :array
+            items do
+              key :'$ref', :ExerciseWithPoints
+            end
+          end
+        end
+      end
+    end
+  end
+
   before_action :doorkeeper_authorize!, scopes: [:public]
 
   def index

@@ -4,6 +4,7 @@
 # Instead they are always searched for (course_id, name).
 class AvailablePoint < ActiveRecord::Base
   include PointComparison
+  include Swagger::Blocks
 
   belongs_to :exercise
   has_one :course, through: :exercise
@@ -78,5 +79,16 @@ class AvailablePoint < ActiveRecord::Base
 
   def name_must_not_contain_whitespace
     errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
+  end
+
+  swagger_schema :AvailablePoint do
+    key :required, [
+        :id, :exercise_id, :name, :require_review,
+    ]
+
+    property :id, type: :integer, example: 1
+    property :exercise_id, type: :integer, example: 1
+    property :name, type: :string, example: "Point name"
+    property :require_review, type: :boolean, example: false
   end
 end
