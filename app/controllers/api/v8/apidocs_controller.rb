@@ -69,6 +69,7 @@ class Api::V8::ApidocsController < ActionController::Base
       end
     end
     key :host, "localhost:3000"
+    key :schemes, ["http", "https"]
     key :consumes, ["application/json"]
     key :produces, ["application/json"]
   end
