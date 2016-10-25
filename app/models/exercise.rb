@@ -426,7 +426,7 @@ class Exercise < ActiveRecord::Base
   swagger_schema :ExerciseWithPoints do
     key :required, [
         :id, :name, :created_at, :updated_at, :publish_time, :solution_visible_after,
-        :deadline, :available_points,
+        :deadline, :disabled, :available_points,
     ]
 
     property :id, type: :integer, example: 1
@@ -436,6 +436,7 @@ class Exercise < ActiveRecord::Base
     property :publish_time, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"
     property :solution_visible_after, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"
     property :deadline, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"
+    property :disabled, type: :boolean, example: false
     property :available_points, type: :array do
       items do
         key :'$ref', :AvailablePoint

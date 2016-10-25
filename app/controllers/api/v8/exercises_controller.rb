@@ -59,7 +59,6 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     auth_exs = []
     exercises.each do |ex|
       next unless ex.visible_to?(current_user)
-      next if ex.hidden || ex.disabled_status == :disabled
       e = {}
       e[:id] = ex.id
       e[:name] = ex.name
@@ -68,6 +67,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       e[:publish_time] = ex.publish_time
       e[:solution_visible_after] = ex.solution_visible_after
       e[:deadline] = ex.deadline_for(current_user)
+      e[:disabled] = ex.disabled?
       e[:available_points] = Exercise.find_by(id: ex.id).available_points
       exs.push(e)
       auth_exs.push(ex)
