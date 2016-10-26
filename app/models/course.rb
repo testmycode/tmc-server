@@ -5,6 +5,7 @@ require 'date_and_time_utils'
 
 class Course < ActiveRecord::Base
   include SystemCommands
+  include Swagger::Blocks
 
   self.include_root_in_json = false
 
@@ -473,4 +474,55 @@ class Course < ActiveRecord::Base
       errors.add(:external_scoreboard_url, 'contains invalid keys')
     end
   end
+
+  swagger_schema :Course do
+    key :required, [
+        :name,
+        :created_at,
+        :updated_at,
+        :hide_after,
+        :hidden,
+        :cache_version,
+        :spreadsheet_key,
+        :hidden_if_registered_after,
+        :refreshed_at,
+        :locked_exercise_points_visible,
+        :description,
+        :paste_visibility,
+        :formal_name,
+        :certificate_downloadable,
+        :certificate_unlock_spec,
+        :organization_id,
+        :disabled_status,
+        :title,
+        :material_url,
+        :course_template_id,
+        :external_scoreboard_url,
+        :hide_submission_results,
+    ]
+
+    property :name, type: :string, example: "courseid-coursename"
+    property :created_at, type: :string, example: "2016-10-10T13:22:19.554+03:00"
+    property :updated_at, type: :string, example: "2016-10-10T13:22:19.554+03:00"
+    property :hide_after, type: :string, example: "2016-10-10T13:22:19.554+03:00"
+    property :hidden, type: :boolean, example: false
+    property :cache_version, type: :integer, example: 1
+    property :spreadsheet_key, type: :string
+    property :hidden_if_registered_after, type: :string
+    property :refreshed_at, type: :string
+    property :locked_exercise_points_visible, type: :boolean
+    property :description, type: :string
+    property :paste_visibility, type: :string
+    property :formal_name, type: :string
+    property :certificate_downloadable, type: :boolean
+    property :certificate_unlock_spec, type: :string
+    property :organization_id, type: :integer
+    property :disabled_status, type: :integer
+    property :title, type: :string
+    property :material_url, type: :string
+    property :course_template_id, type: :integer
+    property :external_scoreboard_url, type: :string
+    property :hide_submission_results, type: :boolean
+  end
+
 end
