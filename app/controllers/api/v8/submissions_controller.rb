@@ -1,41 +1,12 @@
 class Api::V8::SubmissionsController < ApplicationController # ApplicationController --> BaseController sit ku PR merged
   include Swagger::Blocks
 
-  swagger_path '/api/v8/org/:organization_id//courses/:course_name/submissions' do
-    operation :get do
-      key :description, 'Returns the submissions visible to the user in a json format'
-      key :operationId, 'findSubmissions'
-      key :produces, [
-        'application/json'
-      ]
-      key :tags, [
-        'submission'
-      ]
-      parameter '$ref': '#/parameters/path_organization_id'
-      parameter '$ref': '#/parameters/path_course_name'
-      response 401, '$ref': '#/responses/error'
-      response 200 do
-        key :description, 'Submissions in json'
-        schema do
-          key :title, :submissions
-          key :required, [:submissions]
-          property :submissions do
-            key :type, :array
-            items do
-              key :'$ref', :Submission
-            end
-          end
-        end
-      end
-    end
-  end
-
   around_action :course_transaction
   before_action :get_course_and_user
 
   def all_submissions
     @submissions = Submission.where(course_id: @course.id)
-    binding.pry
+
     visible_submissions = []
     @submissions.each do |submission|
       next unless submission.readable_by?(current_user)
@@ -74,6 +45,35 @@ class Api::V8::SubmissionsController < ApplicationController # ApplicationContro
       authorize! :read, @user
     else
       respond_access_denied
+    end
+  end
+
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions' do
+    operation :get do
+      key :description, 'Returns the submissions visible to the user in a json format'
+      key :operationId, 'findSubmissions'
+      key :produces, [
+        'application/json'
+      ]
+      key :tags, [
+        'submission'
+      ]
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      response 401, '$ref': '#/responses/error'
+      response 200 do
+        key :description, 'Submissions in json'
+        schema do
+          key :title, :submissions
+          key :required, [:submissions]
+          property :submissions do
+            key :type, :array
+            items do
+              key :'$ref', :Submission
+            end
+          end
+        end
+      end
     end
   end
 end

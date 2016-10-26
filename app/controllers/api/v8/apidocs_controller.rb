@@ -85,10 +85,11 @@ class Api::V8::ApidocsController < ActionController::Base
   SWAGGERED_CLASSES = [
       Api::V8::CoursesController,
       Api::V8::ExercisesController,
+      Api::V8::SubmissionsController,
       Course,
       Exercise,
       AvailablePoint,
-      self,
+      self
   ].freeze
 
   def index
