@@ -112,6 +112,14 @@ class ApplicationController < ActionController::Base
     @action_name = action_name
   end
 
+  def unauthorized!(message = "Unauthorized access")
+    raise CanCan::AccessDenied.new(message: message)
+  end
+
+  def unauthorized_guest!(message = "Authentication required")
+    unauthorized!(message: message)
+  end
+
   def respond_not_found(msg = 'Not Found')
     respond_with_error(msg, 404)
   end

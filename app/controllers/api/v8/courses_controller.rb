@@ -59,7 +59,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
 
   def show_json(course)
     authorize! :read, course
-    return respond_access_denied('Authentication required') if current_user.guest?
+    unauthorized_guest! if current_user.guest?
     present(course)
   end
 end
