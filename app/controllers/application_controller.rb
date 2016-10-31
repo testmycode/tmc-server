@@ -112,12 +112,12 @@ class ApplicationController < ActionController::Base
     @action_name = action_name
   end
 
-  def unauthorized!(message = "Unauthorized access")
-    raise CanCan::AccessDenied.new(message: message)
+  def unauthorized!(message = nil)
+    raise CanCan::AccessDenied.new(message)
   end
 
   def unauthorized_guest!(message = "Authentication required")
-    unauthorized!(message: message)
+    unauthorized!(message)
   end
 
   def respond_not_found(msg = 'Not Found')
