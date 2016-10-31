@@ -172,13 +172,13 @@ describe Api::V8::CoursesController, type: :controller do
     end
 
     describe 'as guest' do
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { nil }
 
       describe 'when organization id and course name given' do
         it 'shows course information' do
           get :find_by_name, {slug: organization.slug, name: course_name}
-          expect(response).to have_http_status(:success)
-          expect(response.body).to have_content course.name
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content "Authentication required"
         end
       end
       describe "when hidden course's organization id and course name given" do
