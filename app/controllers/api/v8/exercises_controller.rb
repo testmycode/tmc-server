@@ -8,7 +8,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       key :produces, ['application/json']
       key :tags, ['exercise']
       parameter '$ref': '#/parameters/path_course_id'
-      response 401, '$ref': '#/responses/error'
+      response 401, '$ref': '#/responses/error'     #TODO: 403?, 404?
       response 200 do
         key :description, 'Exercises in json'
         schema do
@@ -50,29 +50,43 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     end
   end
 
-  before_action :doorkeeper_authorize!, scopes: [:public]
-
   def index
-    course_id = params[:id] || Course.find_by(name: "#{params[:slug]}-#{params[:name]}").id
-    exercises = Exercise.where(course_id: course_id)
-    exs = []
-    auth_exs = []
-    exercises.each do |ex|
-      next unless ex.visible_to?(current_user)
-      e = {}
-      e[:id] = ex.id
-      e[:name] = ex.name
-      e[:created_at] = ex.created_at
-      e[:updated_at] = ex.updated_at
-      e[:publish_time] = ex.publish_time
-      e[:solution_visible_after] = ex.solution_visible_after
-      e[:deadline] = ex.deadline_for(current_user)
-      e[:disabled] = ex.disabled?
-      e[:available_points] = Exercise.find_by(id: ex.id).available_points
-      exs.push(e)
-      auth_exs.push(ex)
+    unauthorized_guest! if current_user.guest?
+    course = Course.find_by(id: params[:id]) || Course.find_by(name: "#{params[:slug]}-#{params[:name]}")
+    if course == nil
+      authorize! :read, nil
+      respond_not_found('Course not found!')
+    else
+      exercises = Exercise.where(course_id: course.id)
+      exs = []
+      auth_exs = []
+      exercises.each do |ex|
+        next unless ex.visible_to?(current_user)
+        e = {}
+        e[:id] = ex.id
+        e[:name] = ex.name
+        e[:created_at] = ex.created_at
+        e[:updated_at] = ex.updated_at
+        e[:publish_time] = ex.publish_time
+        e[:solution_visible_after] = ex.solution_visible_after
+        e[:deadline] = ex.deadline_for(current_user)
+        e[:disabled] = ex.disabled?
+        e[:available_points] = Exercise.find_by(id: ex.id).available_points
+        exs.push(e)
+        auth_exs.push(ex)
+      end
+      authorize! :read, auth_exs
+      present(exs)
     end
-    authorize! :read, auth_exs
-    present(exs)
+  end
+
+
+  #TODO: replace with methods from application_controller.rb made by rimi
+  def unauthorized!(message = nil)
+    raise CanCan::AccessDenied.new(message)
+  end
+
+  def unauthorized_guest!(message = "Authentication required")
+    unauthorized!(message)
   end
 end
