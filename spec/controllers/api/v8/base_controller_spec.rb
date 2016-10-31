@@ -1,9 +1,11 @@
 require 'spec_helper'
 
-class UselessController < Api::V8::BaseController; end
+class UselessController < Api::V8::BaseController
+end
 
 RSpec.describe Api::V8::BaseController, type: :controller do
   controller UselessController do
+    skip_authorization_check # skip cancan because we dont test it here
     def index
       render text: 'Success'
     end
@@ -24,7 +26,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
 
     context 'when logged in' do
       let(:user) { FactoryGirl.create(:user) }
-      let(:token) { double resource_owner_id: user.id }
+      let(:token) { double resource_owner_id: user.id, acceptable?: true }
       it { expect(subject.id).to be user.id }
     end
   end
@@ -33,8 +35,8 @@ RSpec.describe Api::V8::BaseController, type: :controller do
     before :each do
       controller.stub(:doorkeeper_token) { token }
     end
-    context 'with an invalid token' do
-      let(:token) { double resource_owner_id: -1 }
+    context 'with a valid token having invalid user ID' do
+      let(:token) { double resource_owner_id: -1, acceptable?: true }
       it 'request is not successful' do
         expect { get :index }.to raise_error(RuntimeError)
       end
