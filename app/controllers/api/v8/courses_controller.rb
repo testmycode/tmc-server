@@ -61,6 +61,6 @@ class Api::V8::CoursesController < Api::V8::BaseController
 
   def show_json(course)
     authorize! :read, course
-    present(course)
+    render json: course, except: [:created_at, :updated_at]
   end
 end
