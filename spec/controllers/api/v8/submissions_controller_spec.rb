@@ -14,7 +14,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     controller.current_user = @user
   end
 
-  describe 'GET all submissions by course name as json' do
+  describe 'GET all submissions' do
     describe 'by course name as json' do
       describe 'as an admin' do
         before :each do
@@ -134,7 +134,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe ' an unauthorized user ' do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
@@ -268,7 +268,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe ' an unauthorized user ' do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
@@ -280,6 +280,158 @@ describe Api::V8::SubmissionsController, type: :controller do
 
           expect(json).to have_content("[]")
         end
+      end
+    end
+  end
+
+  describe 'GET single user\'s submissions by course id as json' do
+    describe 'as an admin' do
+      before :each do
+        controller.current_user = @admin
+      end
+
+      it 'should show given user\'s submissions' do
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).to have_content("\"user_id\"=>#{@user.id}")
+        expect(json).to have_content("\"id\"=>#{@submission.id}")
+      end
+    end
+
+    describe 'as a teacher' do
+      before :each do
+        Teachership.create(user: @user, organization: @organization)
+      end
+
+      it 'should show given user\'s submissions in my organizations' do
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).to have_content("\"user_id\"=>#{@user.id}")
+        expect(json).to have_content("\"id\"=>#{@submission.id}")
+      end
+
+      it 'should not show any submissions outside my organizations' do
+        other_organization = FactoryGirl.create(:accepted_organization)
+        other_course = FactoryGirl.create(:course, organization: other_organization)
+        other_exercise = FactoryGirl.create(:exercise, course: other_course)
+        other_user = FactoryGirl.create(:user)
+        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+      end
+    end
+
+    describe 'as an assistant' do
+      before :each do
+        Assistantship.create(user: @user, course: @course)
+      end
+
+      it 'should show given user\'s submissions in my courses' do
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).to have_content("\"user_id\"=>#{@user.id}")
+        expect(json).to have_content("\"id\"=>#{@submission.id}")
+      end
+
+      it 'should not show any submissions outside my courses' do
+        other_course = FactoryGirl.create(:course, organization: @organization)
+        other_exercise = FactoryGirl.create(:exercise, course: other_course)
+        other_user = FactoryGirl.create(:user)
+        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+      end
+    end
+
+    describe 'as a student' do
+      it 'should show my own submissions' do
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).to have_content("\"user_id\"=>#{@user.id}")
+        expect(json).to have_content("\"id\"=>#{@submission.id}")
+      end
+
+      it 'should not show other users\' submissions' do
+        other_user = FactoryGirl.create(:user)
+        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
+
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+      end
+    end
+
+    describe 'as an unauthorized user' do
+      before :each do
+        controller.current_user = Guest.new
+      end
+
+      it 'should not show any submissions' do
+        get :users_submissions, course_id: @course.id, user_id: @user.id
+
+        json = JSON.parse response.body
+
+        expect(json).to have_content("[\"You are not authorized to access this page.\"]")
+      end
+    end
+  end
+
+  describe 'GET user\'s own submissions by course id as json' do
+    describe 'as an user' do
+      it 'should show my own submissions' do
+        get :my_submissions, course_id: @course.id
+
+        json = JSON.parse response.body
+
+        expect(json).to have_content("\"user_id\"=>#{@user.id}")
+        expect(json).to have_content("\"id\"=>#{@submission.id}")
+      end
+
+      it 'should not show other users\' submissions' do
+        other_user = FactoryGirl.create(:user)
+        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
+
+        get :my_submissions, course_id: @course.id
+
+        json = JSON.parse response.body
+
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+        expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+      end
+    end
+
+    describe 'as an unauthorized user' do
+      before :each do
+        controller.current_user = Guest.new
+      end
+
+      it 'should not show any submissions' do
+        get :my_submissions, course_id: @course.id
+
+        json = JSON.parse response.body
+
+        expect(json).to have_content("[]")
       end
     end
   end

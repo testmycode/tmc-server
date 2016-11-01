@@ -2,7 +2,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   include Swagger::Blocks
 
   around_action :course_transaction
-  before_action :get_course_and_user
+  before_action :get_course_and_user, :only => [:all_submissions, :users_submissions]
 
   swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions' do
     operation :get do
@@ -61,8 +61,102 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
+  swagger_path '/api/v8/courses/{course_id}/exercises/submissions/{user_id}' do
+    operation :get do
+      key :description, 'Returns the submissions visible to the user in a json format'
+      key :operationId, 'findUsersSubmissionsById'
+      key :produces, [
+          'application/json'
+      ]
+      key :tags, [
+          'submission'
+      ]
+      parameter '$ref': '#/parameters/path_course_id'
+      parameter '$ref': '#/parameters/path_user_id'
+      response 401, '$ref': '#/responses/error'
+      response 200 do
+        key :description, 'User\'s submissions in json'
+        schema do
+          key :title, :submissions
+          key :required, [:submissions]
+          property :submissions do
+            key :type, :array
+            items do
+              key :'$ref', :Submission
+            end
+          end
+        end
+      end
+    end
+  end
+
+  swagger_path '/api/v8/courses/{course_id}/exercises/submissions/mine' do
+    operation :get do
+      key :description, 'Returns the user\'s own submissions in a json format'
+      key :operationId, 'findUsersOwnSubmissionsById'
+      key :produces, [
+          'application/json'
+      ]
+      key :tags, [
+          'submission'
+      ]
+      parameter '$ref': '#/parameters/path_course_id'
+      response 401, '$ref': '#/responses/error'
+      response 200 do
+        key :description, 'User\'s own submissions in json'
+        schema do
+          key :title, :submissions
+          key :required, [:submissions]
+          property :submissions do
+            key :type, :array
+            items do
+              key :'$ref', :Submission
+            end
+          end
+        end
+      end
+    end
+  end
+
   def all_submissions
     @submissions = Submission.where(course_id: @course.id)
+
+    visible_submissions = []
+    @submissions.each do |submission|
+      next unless submission.readable_by?(current_user)
+      visible_submissions.push(submission)
+    end
+
+    authorize! :read, visible_submissions
+
+    render json: {
+        submissions: visible_submissions
+    }
+  end
+
+  def users_submissions
+    @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
+
+    visible_submissions = []
+    @submissions.each do |submission|
+      next unless submission.readable_by?(current_user)
+      visible_submissions.push(submission)
+    end
+
+    authorize! :read, visible_submissions
+
+    render json: {
+        submissions: visible_submissions
+    }
+  end
+
+  def my_submissions
+    @user = current_user
+    authorize! :read, @user
+    @course = Course.lock('FOR SHARE').find(params[:course_id])
+    authorize! :read, @course
+
+    @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
 
     visible_submissions = []
     @submissions.each do |submission|
@@ -86,9 +180,17 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   end
 
   def get_course_and_user
-    if params[:course_name]
+    if request.path_info.include?('mine')
+      @user = current_user
+      authorize! :read, @user
+    elsif params[:course_name]
       @course = Course.lock('FOR SHARE').find_by(name: params[:course_name])
       @organization = @course.organization
+      authorize! :read, @course
+    elsif params[:user_id] && params[:course_id]
+      @course = Course.lock('FOR SHARE').find(params[:course_id])
+      @user = User.find(params[:user_id])
+      authorize! :read, @user
       authorize! :read, @course
     elsif params[:course_id]
       @course = Course.lock('FOR SHARE').find(params[:course_id])
