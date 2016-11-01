@@ -524,5 +524,4 @@ class Course < ActiveRecord::Base
       errors.add(:external_scoreboard_url, 'contains invalid keys')
     end
   end
-
 end
