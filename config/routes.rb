@@ -41,6 +41,20 @@ TmcServer::Application.routes.draw do
 
     namespace :v8, defaults: { format: 'json' } do
       get '/documentation', to: 'apidocs#index'
+      scope '/organizations' do
+        scope '/:slug' do
+          scope '/courses' do
+            scope '/:name' do
+              get '/' => 'courses#find_by_name'
+            end
+          end
+        end
+      end
+      scope '/courses' do
+        scope '/:id' do
+          get '/' => 'courses#find_by_id'
+        end
+      end
     end
   end
 
