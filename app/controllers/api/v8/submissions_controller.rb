@@ -1,8 +1,37 @@
-class Api::V8::SubmissionsController < ApplicationController # ApplicationController --> BaseController sit ku PR merged
+class Api::V8::SubmissionsController < Api::V8::BaseController
   include Swagger::Blocks
 
   around_action :course_transaction
   before_action :get_course_and_user
+
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions' do
+    operation :get do
+      key :description, 'Returns the submissions visible to the user in a json format'
+      key :operationId, 'findSubmissions'
+      key :produces, [
+          'application/json'
+      ]
+      key :tags, [
+          'submission'
+      ]
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      response 401, '$ref': '#/responses/error'
+      response 200 do
+        key :description, 'Submissions in json'
+        schema do
+          key :title, :submissions
+          key :required, [:submissions]
+          property :submissions do
+            key :type, :array
+            items do
+              key :'$ref', :Submission
+            end
+          end
+        end
+      end
+    end
+  end
 
   def all_submissions
     @submissions = Submission.where(course_id: @course.id)
@@ -16,7 +45,7 @@ class Api::V8::SubmissionsController < ApplicationController # ApplicationContro
     authorize! :read, visible_submissions
 
     render json: {
-      submissions: visible_submissions
+        submissions: visible_submissions
     }
   end
 
@@ -45,35 +74,6 @@ class Api::V8::SubmissionsController < ApplicationController # ApplicationContro
       authorize! :read, @user
     else
       respond_access_denied
-    end
-  end
-
-  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions' do
-    operation :get do
-      key :description, 'Returns the submissions visible to the user in a json format'
-      key :operationId, 'findSubmissions'
-      key :produces, [
-        'application/json'
-      ]
-      key :tags, [
-        'submission'
-      ]
-      parameter '$ref': '#/parameters/path_organization_id'
-      parameter '$ref': '#/parameters/path_course_name'
-      response 401, '$ref': '#/responses/error'
-      response 200 do
-        key :description, 'Submissions in json'
-        schema do
-          key :title, :submissions
-          key :required, [:submissions]
-          property :submissions do
-            key :type, :array
-            items do
-              key :'$ref', :Submission
-            end
-          end
-        end
-      end
     end
   end
 end
