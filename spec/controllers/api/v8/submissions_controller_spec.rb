@@ -14,135 +14,273 @@ describe Api::V8::SubmissionsController, type: :controller do
     controller.current_user = @user
   end
 
-  describe 'as an admin' do
-    before :each do
-      controller.current_user = @admin
+  describe 'GET all submissions by course name as json' do
+    describe 'by course name as json' do
+      describe 'as an admin' do
+        before :each do
+          controller.current_user = @admin
+        end
+
+        it 'should show all of the submissions' do
+          user1 = FactoryGirl.create(:user)
+          user2 = FactoryGirl.create(:user)
+          sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
+          sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).to have_content("\"user_id\"=>#{user1.id}")
+          expect(json).to have_content("\"user_id\"=>#{user2.id}")
+          expect(json).to have_content("\"id\"=>#{sub1.id}")
+          expect(json).to have_content("\"id\"=>#{sub2.id}")
+        end
+      end
+
+      describe 'as a teacher' do
+        before :each do
+          Teachership.create(user: @user, organization: @organization)
+        end
+
+        it 'should show all of the submissions in my organizations' do
+          user1 = FactoryGirl.create(:user)
+          user2 = FactoryGirl.create(:user)
+          sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
+          sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).to have_content("\"user_id\"=>#{user1.id}")
+          expect(json).to have_content("\"user_id\"=>#{user2.id}")
+          expect(json).to have_content("\"id\"=>#{sub1.id}")
+          expect(json).to have_content("\"id\"=>#{sub2.id}")
+        end
+
+        it 'should not show any submissions outside my organizations' do
+          other_organization = FactoryGirl.create(:accepted_organization)
+          other_course = FactoryGirl.create(:course, organization: other_organization)
+          other_exercise = FactoryGirl.create(:exercise, course: other_course)
+          other_user = FactoryGirl.create(:user)
+          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+        end
+      end
+
+      describe 'as an assistant' do
+        before :each do
+          Assistantship.create(user: @user, course: @course)
+        end
+
+        it 'should show all of the submissions in my courses' do
+          user1 = FactoryGirl.create(:user)
+          user2 = FactoryGirl.create(:user)
+          sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
+          sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).to have_content("\"user_id\"=>#{user1.id}")
+          expect(json).to have_content("\"user_id\"=>#{user2.id}")
+          expect(json).to have_content("\"id\"=>#{sub1.id}")
+          expect(json).to have_content("\"id\"=>#{sub2.id}")
+        end
+
+        it 'should not show any submissions outside my courses' do
+          other_course = FactoryGirl.create(:course, organization: @organization)
+          other_exercise = FactoryGirl.create(:exercise, course: other_course)
+          other_user = FactoryGirl.create(:user)
+          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+        end
+      end
+
+      describe 'as a student' do
+        it 'should show my own submissions' do
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).to have_content("\"user_id\"=>#{@user.id}")
+          expect(json).to have_content("\"id\"=>#{@submission.id}")
+        end
+
+        it 'should not show other users\' submissions' do
+          other_user = FactoryGirl.create(:user)
+          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
+
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+        end
+      end
+
+      describe ' an unauthorized user ' do
+        before :each do
+          controller.current_user = Guest.new
+        end
+
+        it 'should not show any submissions' do
+          get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+
+          json = JSON.parse response.body
+
+          expect(json).to have_content("[]")
+        end
+      end
     end
 
-    it 'should show all of the submissions' do
-      user1 = FactoryGirl.create(:user)
-      user2 = FactoryGirl.create(:user)
-      sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
-      sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+    describe 'by course id as json' do
+      describe 'as an admin' do
+        before :each do
+          controller.current_user = @admin
+        end
 
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+        it 'should show all of the submissions' do
+          user1 = FactoryGirl.create(:user)
+          user2 = FactoryGirl.create(:user)
+          sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
+          sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
 
-      json = JSON.parse response.body
+          get :all_submissions, course_id: @course.id
 
-      expect(json).to have_content("\"user_id\"=>#{user1.id}")
-      expect(json).to have_content("\"user_id\"=>#{user2.id}")
-      expect(json).to have_content("\"id\"=>#{sub1.id}")
-      expect(json).to have_content("\"id\"=>#{sub2.id}")
-    end
-  end
+          json = JSON.parse response.body
 
-  describe 'as a teacher' do
-    before :each do
-      Teachership.create(user: @user, organization: @organization)
-    end
+          expect(json).to have_content("\"user_id\"=>#{user1.id}")
+          expect(json).to have_content("\"user_id\"=>#{user2.id}")
+          expect(json).to have_content("\"id\"=>#{sub1.id}")
+          expect(json).to have_content("\"id\"=>#{sub2.id}")
+        end
+      end
 
-    it 'should show all of the submissions in my organizations' do
-      user1 = FactoryGirl.create(:user)
-      user2 = FactoryGirl.create(:user)
-      sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
-      sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+      describe 'as a teacher' do
+        before :each do
+          Teachership.create(user: @user, organization: @organization)
+        end
 
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+        it 'should show all of the submissions in my organizations' do
+          user1 = FactoryGirl.create(:user)
+          user2 = FactoryGirl.create(:user)
+          sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
+          sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
 
-      json = JSON.parse response.body
+          get :all_submissions, course_id: @course.id
 
-      expect(json).to have_content("\"user_id\"=>#{user1.id}")
-      expect(json).to have_content("\"user_id\"=>#{user2.id}")
-      expect(json).to have_content("\"id\"=>#{sub1.id}")
-      expect(json).to have_content("\"id\"=>#{sub2.id}")
-    end
+          json = JSON.parse response.body
 
-    it 'should not show any submissions outside my organizations' do
-      other_organization = FactoryGirl.create(:accepted_organization)
-      other_course = FactoryGirl.create(:course, organization: other_organization)
-      other_exercise = FactoryGirl.create(:exercise, course: other_course)
-      other_user = FactoryGirl.create(:user)
-      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+          expect(json).to have_content("\"user_id\"=>#{user1.id}")
+          expect(json).to have_content("\"user_id\"=>#{user2.id}")
+          expect(json).to have_content("\"id\"=>#{sub1.id}")
+          expect(json).to have_content("\"id\"=>#{sub2.id}")
+        end
 
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+        it 'should not show any submissions outside my organizations' do
+          other_organization = FactoryGirl.create(:accepted_organization)
+          other_course = FactoryGirl.create(:course, organization: other_organization)
+          other_exercise = FactoryGirl.create(:exercise, course: other_course)
+          other_user = FactoryGirl.create(:user)
+          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      json = JSON.parse response.body
+          get :all_submissions, course_id: @course.id
 
-      expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-      expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
-    end
-  end
+          json = JSON.parse response.body
 
-  describe 'as an assistant' do
-    before :each do
-      Assistantship.create(user: @user, course: @course)
-    end
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+        end
+      end
 
-    it 'should show all of the submissions in my courses' do
-      user1 = FactoryGirl.create(:user)
-      user2 = FactoryGirl.create(:user)
-      sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
-      sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+      describe 'as an assistant' do
+        before :each do
+          Assistantship.create(user: @user, course: @course)
+        end
 
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+        it 'should show all of the submissions in my courses' do
+          user1 = FactoryGirl.create(:user)
+          user2 = FactoryGirl.create(:user)
+          sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
+          sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
 
-      json = JSON.parse response.body
+          get :all_submissions, course_id: @course.id
 
-      expect(json).to have_content("\"user_id\"=>#{user1.id}")
-      expect(json).to have_content("\"user_id\"=>#{user2.id}")
-      expect(json).to have_content("\"id\"=>#{sub1.id}")
-      expect(json).to have_content("\"id\"=>#{sub2.id}")
-    end
+          json = JSON.parse response.body
 
-    it 'should not show any submissions outside my courses' do
-      other_course = FactoryGirl.create(:course, organization: @organization)
-      other_exercise = FactoryGirl.create(:exercise, course: other_course)
-      other_user = FactoryGirl.create(:user)
-      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+          expect(json).to have_content("\"user_id\"=>#{user1.id}")
+          expect(json).to have_content("\"user_id\"=>#{user2.id}")
+          expect(json).to have_content("\"id\"=>#{sub1.id}")
+          expect(json).to have_content("\"id\"=>#{sub2.id}")
+        end
 
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+        it 'should not show any submissions outside my courses' do
+          other_course = FactoryGirl.create(:course, organization: @organization)
+          other_exercise = FactoryGirl.create(:exercise, course: other_course)
+          other_user = FactoryGirl.create(:user)
+          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      json = JSON.parse response.body
+          get :all_submissions, course_id: @course.id
 
-      expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-      expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
-    end
-  end
+          json = JSON.parse response.body
 
-  describe 'as a student' do
-    it 'should show my own submissions' do
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+        end
+      end
 
-      json = JSON.parse response.body
+      describe 'as a student' do
+        it 'should show my own submissions' do
+          get :all_submissions, course_id: @course.id
 
-      expect(json).to have_content("\"user_id\"=>#{@user.id}")
-      expect(json).to have_content("\"id\"=>#{@submission.id}")
-    end
+          json = JSON.parse response.body
 
-    it 'should not show other users\' submissions' do
-      other_user = FactoryGirl.create(:user)
-      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
+          expect(json).to have_content("\"user_id\"=>#{@user.id}")
+          expect(json).to have_content("\"id\"=>#{@submission.id}")
+        end
 
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+        it 'should not show other users\' submissions' do
+          other_user = FactoryGirl.create(:user)
+          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
 
-      json = JSON.parse response.body
+          get :all_submissions, course_id: @course.id
 
-      expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-      expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
-    end
-  end
+          json = JSON.parse response.body
 
-  describe ' an unauthorized user ' do
-    before :each do
-      controller.current_user = Guest.new
-    end
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+        end
+      end
 
-    it 'should not show any submissions' do
-      get :all_submissions, organization_id: @organization.slug, course_name: @course.name
+      describe ' an unauthorized user ' do
+        before :each do
+          controller.current_user = Guest.new
+        end
 
-      json = JSON.parse response.body
+        it 'should not show any submissions' do
+          get :all_submissions, course_id: @course.id
 
-      expect(json).to have_content("[]")
+          json = JSON.parse response.body
+
+          expect(json).to have_content("[]")
+        end
+      end
     end
   end
 end

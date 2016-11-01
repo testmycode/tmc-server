@@ -33,6 +33,34 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
+  swagger_path '/api/v8/courses/{course_id}/submissions' do
+    operation :get do
+      key :description, 'Returns the submissions visible to the user in a json format'
+      key :operationId, 'findSubmissionsById'
+      key :produces, [
+        'application/json'
+      ]
+      key :tags, [
+        'submission'
+      ]
+      parameter '$ref': '#/parameters/path_course_id'
+      response 401, '$ref': '#/responses/error'
+      response 200 do
+        key :description, 'Submissions in json'
+        schema do
+          key :title, :submissions
+          key :required, [:submissions]
+          property :submissions do
+            key :type, :array
+            items do
+              key :'$ref', :Submission
+            end
+          end
+        end
+      end
+    end
+  end
+
   def all_submissions
     @submissions = Submission.where(course_id: @course.id)
 
