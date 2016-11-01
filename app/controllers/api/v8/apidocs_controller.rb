@@ -67,7 +67,7 @@ class Api::V8::ApidocsController < ActionController::Base
   SWAGGERED_CLASSES = [
       CoursesController,
       Course,
-    self,
+      self,
   ].freeze
 
   def index
