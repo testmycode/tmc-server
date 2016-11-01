@@ -29,8 +29,8 @@ class Course < ActiveRecord::Base
         :title,
         :material_url,
         :course_template_id,
-        :external_scoreboard_url,
         :hide_submission_results,
+        :external_scoreboard_url,
     ]
 
     property :name, type: :string, example: "courseid-coursename"
@@ -41,20 +41,20 @@ class Course < ActiveRecord::Base
     property :cache_version, type: :integer, example: 1
     property :spreadsheet_key, type: :string
     property :hidden_if_registered_after, type: :string
-    property :refreshed_at, type: :string
-    property :locked_exercise_points_visible, type: :boolean
-    property :description, type: :string
+    property :refreshed_at, type: :string, example: "2016-10-10T13:22:36.871+03:00"
+    property :locked_exercise_points_visible, type: :boolean, example: true
+    property :description, type: :string, example: ""
     property :paste_visibility, type: :string
     property :formal_name, type: :string
-    property :certificate_downloadable, type: :boolean
+    property :certificate_downloadable, type: :boolean, example: false
     property :certificate_unlock_spec, type: :string
-    property :organization_id, type: :integer
-    property :disabled_status, type: :integer
-    property :title, type: :string
-    property :material_url, type: :string
-    property :course_template_id, type: :integer
+    property :organization_id, type: :integer, example: 1
+    property :disabled_status, type: :string, example: "enabled"
+    property :title, type: :string, example: "testcourse"
+    property :material_url, type: :string, example: ""
+    property :course_template_id, type: :integer, example: 1
+    property :hide_submission_results, type: :boolean, example: false
     property :external_scoreboard_url, type: :string
-    property :hide_submission_results, type: :boolean
   end
 
   self.include_root_in_json = false
