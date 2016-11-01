@@ -1,4 +1,4 @@
-class Api::V7::ApidocsController < ActionController::Base
+class Api::V8::ApidocsController < ActionController::Base
   include Swagger::Blocks
 
   swagger_root do
