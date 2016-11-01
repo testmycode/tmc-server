@@ -8,7 +8,6 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       key :produces, ['application/json']
       key :tags, ['exercise']
       parameter '$ref': '#/parameters/path_course_id'
-      response 401, '$ref': '#/responses/error'     #TODO: 403?, 404?
       response 200 do
         key :description, 'Exercises in json'
         schema do
@@ -22,6 +21,14 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'Course not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
     end
   end
 
@@ -33,7 +40,6 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       key :tags, ['exercise']
       parameter '$ref': '#/parameters/path_organization_id'
       parameter '$ref': '#/parameters/path_course_name'
-      response 401, '$ref': '#/responses/error'
       response 200 do
         key :description, 'Exercises in json'
         schema do
@@ -45,6 +51,14 @@ class Api::V8::ExercisesController < Api::V8::BaseController
               key :'$ref', :ExerciseWithPoints
             end
           end
+        end
+      end
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'Course or organization not found'
+        schema do
+          key :title, :errors
+          key :type, :json
         end
       end
     end
