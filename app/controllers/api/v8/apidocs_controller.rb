@@ -65,7 +65,7 @@ class Api::V8::ApidocsController < ActionController::Base
 
   # A list of all classes that have swagger_* declarations.
   SWAGGERED_CLASSES = [
-      CoursesController,
+      Api::V8::CoursesController,
       Course,
       self,
   ].freeze
