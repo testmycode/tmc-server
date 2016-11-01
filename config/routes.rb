@@ -47,7 +47,7 @@ TmcServer::Application.routes.draw do
             scope '/:name' do
               get '/' => 'courses#find_by_name'
               scope '/exercises' do
-                get '/' => 'exercises#index'
+                get '/' => 'exercises#get_by_course'
               end
             end
           end
@@ -57,7 +57,7 @@ TmcServer::Application.routes.draw do
         scope '/:id' do
           get '/' => 'courses#find_by_id'
           scope '/exercises' do
-            get '/' => 'exercises#index'
+            get '/' => 'exercises#get_by_course'
           end
         end
       end

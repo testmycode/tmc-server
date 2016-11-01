@@ -64,7 +64,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     end
   end
 
-  def index
+  def get_by_course
     unauthorized_guest! if current_user.guest?
     course = Course.find_by(id: params[:id]) || Course.find_by(name: "#{params[:slug]}-#{params[:name]}")
     if course == nil
