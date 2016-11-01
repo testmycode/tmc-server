@@ -134,7 +134,7 @@ describe Api::V8::CoursesController, type: :controller do
           expect(response.body).to have_content "Couldn't find Course"
         end
       end
-      describe "when invalidvalid organization id and invalid course name given" do
+      describe "when invalid organization id and invalid course name given" do
         it "error about finding course" do
           get :find_by_name, {slug: "bad", name: "bad"}
           expect(response).to have_http_status(:missing)
@@ -176,6 +176,13 @@ describe Api::V8::CoursesController, type: :controller do
           expect(response.body).to have_content "Couldn't find Course"
         end
       end
+      describe "when invalid organization id and invalid course name given" do
+        it "error about finding course" do
+          get :find_by_name, {slug: "bad", name: "bad"}
+          expect(response).to have_http_status(:missing)
+          expect(response.body).to have_content "Couldn't find Course"
+        end
+      end
     end
 
     describe "as guest" do
@@ -207,6 +214,13 @@ describe Api::V8::CoursesController, type: :controller do
       describe "when valid organization id and invalid course name given" do
         it "shows authentication error" do
           get :find_by_name, {slug: organization.slug, name: "bad"}
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content "Authentication required"
+        end
+      end
+      describe "when invalid organization id and invalid course name given" do
+        it "shows authentication error" do
+          get :find_by_name, {slug: "bad", name: "bad"}
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
