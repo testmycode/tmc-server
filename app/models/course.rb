@@ -10,8 +10,6 @@ class Course < ActiveRecord::Base
   swagger_schema :Course do
     key :required, [
         :name,
-        :created_at,
-        :updated_at,
         :hide_after,
         :hidden,
         :cache_version,
@@ -34,8 +32,6 @@ class Course < ActiveRecord::Base
     ]
 
     property :name, type: :string, example: "courseid-coursename"
-    property :created_at, type: :string, example: "2016-10-10T13:22:19.554+03:00"
-    property :updated_at, type: :string, example: "2016-10-10T13:22:19.554+03:00"
     property :hide_after, type: :string, example: "2016-10-10T13:22:19.554+03:00"
     property :hidden, type: :boolean, example: false
     property :cache_version, type: :integer, example: 1
