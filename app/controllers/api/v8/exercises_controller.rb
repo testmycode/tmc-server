@@ -91,14 +91,4 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       present(exs)
     end
   end
-
-
-  #TODO: replace with methods from application_controller.rb made by rimi
-  def unauthorized!(message = nil)
-    raise CanCan::AccessDenied.new(message)
-  end
-
-  def unauthorized_guest!(message = "Authentication required")
-    unauthorized!(message)
-  end
 end
