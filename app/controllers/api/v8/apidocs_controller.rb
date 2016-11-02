@@ -19,6 +19,16 @@ class Api::V8::ApidocsController < ActionController::Base
       key :name, "api"
       key :description, "API operations"
     end
+
+    security_definition :api_key do
+      key :type, :apiKey
+      key :name, :Authorization
+      key :in, :header
+    end
+    security do
+      key :api_key, []
+    end
+
     parameter :path_organization_id do
       key :name, :organization_id
       key :in, :path
@@ -58,7 +68,15 @@ class Api::V8::ApidocsController < ActionController::Base
         end
       end
     end
+    response :auth_required do
+      key :description, "Authentication required"
+      schema do
+        key :title, :errors
+        key :type, :json
+      end
+    end
     key :host, "localhost:3000"
+    key :schemes, ["http", "https"]
     key :consumes, ["application/json"]
     key :produces, ["application/json"]
   end
@@ -66,7 +84,10 @@ class Api::V8::ApidocsController < ActionController::Base
   # A list of all classes that have swagger_* declarations.
   SWAGGERED_CLASSES = [
       Api::V8::CoursesController,
+      Api::V8::ExercisesController,
       Course,
+      Exercise,
+      AvailablePoint,
       self,
   ].freeze
 
