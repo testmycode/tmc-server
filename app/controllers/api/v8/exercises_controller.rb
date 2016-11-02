@@ -90,7 +90,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
   end
 
   def get_by_course
-    unauthorize_guest!
+    unauthorized_guest!
     course = Course.find_by!(id: params[:course_id]) if params[:course_id]
     course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     exercises = Exercise.includes(:available_points).where(course_id: course.id)

@@ -52,7 +52,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def find_by_id
-    unauthorize_guest!
+    unauthorized_guest!
     course_id = params[:course_id]
     course = Course.find_by_id(course_id)
     raise ActiveRecord::RecordNotFound, "Couldn't find Course with id #{course_id}" unless course
