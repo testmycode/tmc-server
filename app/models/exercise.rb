@@ -425,14 +425,12 @@ class Exercise < ActiveRecord::Base
 
   swagger_schema :ExerciseWithPoints do
     key :required, [
-        :id, :name, :created_at, :updated_at, :publish_time, :solution_visible_after,
+        :id, :name, :publish_time, :solution_visible_after,
         :deadline, :disabled, :available_points,
     ]
 
     property :id, type: :integer, example: 1
     property :name, type: :string, example: "Exercise name"
-    property :created_at, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"
-    property :updated_at, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"
     property :publish_time, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"
     property :solution_visible_after, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"
     property :deadline, type: :date_time, example: "2016-10-24T14:06:36.730+03:00"

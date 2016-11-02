@@ -79,8 +79,6 @@ class Api::V8::ExercisesController < Api::V8::BaseController
         e = {}
         e[:id] = ex.id
         e[:name] = ex.name
-        e[:created_at] = ex.created_at
-        e[:updated_at] = ex.updated_at
         e[:publish_time] = ex.publish_time
         e[:solution_visible_after] = ex.solution_visible_after
         e[:deadline] = ex.deadline_for(current_user)
