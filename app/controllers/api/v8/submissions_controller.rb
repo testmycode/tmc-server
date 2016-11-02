@@ -1,9 +1,6 @@
 class Api::V8::SubmissionsController < Api::V8::BaseController
   include Swagger::Blocks
 
-  around_action :course_transaction
-  before_action :get_course_and_user, :only => [:all_submissions, :users_submissions]
-
   swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions' do
     operation :get do
       key :description, 'Returns the submissions visible to the user in a json format'
@@ -118,36 +115,25 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
+  around_action :course_transaction
+
   def all_submissions
+    @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find_by(id: params[:course_id])
+    authorize! :read, @course
+
+    @organization = @course.organization
     @submissions = Submission.where(course_id: @course.id)
-
-    visible_submissions = []
-    @submissions.each do |submission|
-      next unless submission.readable_by?(current_user)
-      visible_submissions.push(submission)
-    end
-
-    authorize! :read, visible_submissions
-
-    render json: {
-        submissions: visible_submissions
-    }
+    filter_submissions(@submissions)
   end
 
   def users_submissions
+    @course = Course.lock('FOR SHARE').find(params[:course_id])
+    @user = User.find(params[:user_id])
+    authorize! :read, @user
+    authorize! :read, @course
+
     @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
-
-    visible_submissions = []
-    @submissions.each do |submission|
-      next unless submission.readable_by?(current_user)
-      visible_submissions.push(submission)
-    end
-
-    authorize! :read, visible_submissions
-
-    render json: {
-        submissions: visible_submissions
-    }
+    filter_submissions(@submissions)
   end
 
   def my_submissions
@@ -157,18 +143,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     authorize! :read, @course
 
     @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
-
-    visible_submissions = []
-    @submissions.each do |submission|
-      next unless submission.readable_by?(current_user)
-      visible_submissions.push(submission)
-    end
-
-    authorize! :read, visible_submissions
-
-    render json: {
-        submissions: visible_submissions
-    }
+    filter_submissions(@submissions)
   end
 
   private
@@ -179,31 +154,27 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
-  def get_course_and_user
-    if request.path_info.include?('mine')
-      @user = current_user
-      authorize! :read, @user
-    elsif params[:course_name]
-      @course = Course.lock('FOR SHARE').find_by(name: params[:course_name])
-      @organization = @course.organization
-      authorize! :read, @course
-    elsif params[:user_id] && params[:course_id]
-      @course = Course.lock('FOR SHARE').find(params[:course_id])
-      @user = User.find(params[:user_id])
-      authorize! :read, @user
-      authorize! :read, @course
-    elsif params[:course_id]
-      @course = Course.lock('FOR SHARE').find(params[:course_id])
-      @organization = @course.organization
-      authorize! :read, @course
-    elsif params[:user_id]
-      @user = User.find(params[:user_id])
-      authorize! :read, @user
-    elsif current_user
-      @user = current_user
-      authorize! :read, @user
+  def render_json(array)
+    if array.empty?
+      render json: {
+        error: "You are not signed in!"
+      }
     else
-      respond_access_denied
+      render json: {
+        submissions: array
+      }
     end
+  end
+
+  def filter_submissions(subs)
+    visible_submissions = []
+    subs.each do |submission|
+      next unless submission.readable_by?(current_user)
+      visible_submissions.push(submission)
+    end
+
+    authorize! :read, visible_submissions
+
+    render_json(visible_submissions)
   end
 end

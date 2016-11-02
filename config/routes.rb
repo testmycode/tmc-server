@@ -38,27 +38,33 @@ TmcServer::Application.routes.draw do
         end
       end
     end
-
+    #TODO fix documentations to have org, not organizations and :id to :course_id and :name to :course_name
     namespace :v8, defaults: { format: 'json' } do
       get '/documentation', to: 'apidocs#index'
-      scope '/organizations' do
+      scope '/org' do
         scope '/:slug' do
           scope '/courses' do
-            scope '/:name' do
+            scope '/:course_name' do
               get '/' => 'courses#find_by_name'
               scope '/exercises' do
                 get '/' => 'exercises#get_by_course'
               end
+              get '/submissions', to: 'submissions#all_submissions'
             end
           end
         end
       end
       scope '/courses' do
-        scope '/:id' do
+        scope '/:course_id' do
           get '/' => 'courses#find_by_id'
           scope '/exercises' do
             get '/' => 'exercises#get_by_course'
+            scope '/submissions' do
+              get '/mine', to: 'submissions#my_submissions'
+              get '/:user_id', to: 'submissions#users_submissions'
+            end
           end
+          get '/submissions', to: 'submissions#all_submissions'
         end
       end
     end

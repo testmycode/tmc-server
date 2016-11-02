@@ -57,6 +57,13 @@ class Api::V8::ApidocsController < ActionController::Base
       key :required, true
       key :type, :integer
     end
+    parameter :path_user_id do
+      key :name, :user_id
+      key :in, :path
+      key :description, "User's id"
+      key :required, true
+      key :type, :integer
+    end
     response :error do
       key :description, "An error occurred"
       schema do

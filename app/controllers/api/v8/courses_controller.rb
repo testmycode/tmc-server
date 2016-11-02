@@ -22,7 +22,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}" do
+  swagger_path "/api/v8/org/{organization_id}/courses/{course_name}" do
     operation :get do
       key :description, "Returns the course's information in a json format. Course is searched by organization id and course name"
       key :operationId, "getCourseByOrganizationIdAndCourseName"
@@ -45,7 +45,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
 
   def find_by_name
     unauthorized_guest! if current_user.guest?
-    course_name = "#{params[:slug]}-#{params[:name]}"
+    course_name = "#{params[:slug]}-#{params[:course_name]}"
     course = Course.find_by(name: course_name)
     raise ActiveRecord::RecordNotFound, "Couldn't find Course with name #{course_name}" unless course
     show_json(course)
@@ -53,7 +53,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
 
   def find_by_id
     unauthorized_guest! if current_user.guest?
-    course_id = params[:id]
+    course_id = params[:course_id]
     course = Course.find_by_id(course_id)
     raise ActiveRecord::RecordNotFound, "Couldn't find Course with id #{course_id}" unless course
     show_json(course)
