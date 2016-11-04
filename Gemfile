@@ -20,6 +20,7 @@ gem 'rack-cors'
 gem 'newrelic_rpm'
 gem 'activerecord-session_store', '~> 0.1.0'
 gem 'pdfkit', '~> 0.6.2'
+gem 'font-awesome-rails'
 
 gem 'logstasher', '~> 0.9.0'
 

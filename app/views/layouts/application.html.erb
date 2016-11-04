@@ -25,6 +25,12 @@
     %>
   </head>
   <body class="default">
+    <% unless cookies[:cyber_warning] == "true" %>
+      <div id="wrong-server-warning">
+        <%= fa_icon 'info-circle', class: 'fa-2x' %></span>If you're doing the Cyber Security Base with F-Secure course, you should use our new server <%= link_to 'https://tmc.mooc.fi/org/mooc', 'https://tmc.mooc.fi/org/mooc'  %> instead of this one.
+        <i class="fa fa-close fa-2x" onclick="document.cookie='cyber_warning=true'; document.getElementById('wrong-server-warning').style.display = 'none'"></i>
+      </div>
+    <% end %>
     <div class="navbar navbar-inverse navbar-static-top">
       <div class="navbar-inner">
         <div class="container">

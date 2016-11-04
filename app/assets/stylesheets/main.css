@@ -356,3 +356,20 @@ tr>.align-right {
 .borderless td {
   border: none;
 }
+
+#wrong-server-warning {
+  background-color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+#wrong-server-warning .fa-info-circle {
+  vertical-align: middle;
+  padding-right: 10px;
+  color: #2969B0;
+}
+
+#wrong-server-warning .fa-close {
+  float: right;
+  cursor: pointer;
+}
