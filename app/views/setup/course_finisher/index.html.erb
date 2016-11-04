@@ -4,16 +4,32 @@
 
 <h2>Course is ready!</h2>
 
-<p>
-  Your course is now set up and ready to use!
-</p>
+<% if @course.initial_refresh_ready? %>
+  <p>
+    Your course is now set up and ready to use!
+  </p>
+  <p>
+    Initially, the course is set to be on disabled status, so it is hidden, until you decide to publish it.
+    You can choose to publish it now or later.
+  </p>
 
-<p>
-  Initially, the course is set to be on disabled status, so it is hidden, until you decide to publish it.
-  You can choose to publish it now or later.
-</p>
-
-<%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
+  <%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
     <%= submit_tag('Publish now') %>
     <%= submit_tag('Finish and publish later') %>
+  <% end %>
+<% else %>
+  <p>
+    Your course is now set up!
+  </p>
+  <p>
+    However, exercices are still being initialized, and the course can't be yet published to accept submissions.
+    Normally this initialization process should be ready in maximum one hour, and the course main page tells
+    if the updating is still going on.
+  </p>
+  <p>
+    The course will be on disabled status, so you have to later manually publish it, when you want students to have access on it.
+  </p>
+  <%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
+    <%= submit_tag('Finish') %>
+  <% end %>
 <% end %>

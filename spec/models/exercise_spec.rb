@@ -161,6 +161,12 @@ describe Exercise, type: :model do
     expect { set_deadline(ex, '2011-07-13 12:34:56:78') }.to raise_error(DeadlineSpec::InvalidSyntaxError)
   end
 
+  it "should not be returnable if course's initial refresh is not completed" do
+    course = FactoryGirl.create(:course, initial_refresh_ready: false)
+    ex = FactoryGirl.create(:exercise, course: course, has_tests: true)
+    expect(ex).not_to be_returnable
+  end
+
   it "should always be submittable by administrators as long as it's returnable" do
     admin = FactoryGirl.create(:admin)
     ex = FactoryGirl.create(:returnable_exercise, course: course)

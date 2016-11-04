@@ -7,6 +7,17 @@
   </div>
 <% end %>
 
+<% if current_user.administrator? && @courses_under_initial_refresh %>
+  <div class="alert alert-warning" role="alert">
+    <%=pluralize(@courses_under_initial_refresh.count, 'course')%> under initial refresh!
+    <ul>
+      <% @courses_under_initial_refresh.each do |c| %>
+        <li><%= link_to(c.title, organization_course_path(c.organization, c))%> (started at: <%=c.created_at%>)</li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
 <% unless @my_organizations.empty? %>
   <h2>My organizations</h2>
 

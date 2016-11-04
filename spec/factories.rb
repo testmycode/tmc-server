@@ -44,6 +44,7 @@ FactoryGirl.define do
     source_url { make_repo_for_course_template }
     source_backend 'git'
     git_branch 'master'
+    initial_refresh_ready true
     organization
   end
 

@@ -29,7 +29,7 @@ module IntegrationTestActions
     click_button 'Add Course'
     click_button 'Accept and continue'
     click_button 'Continue'
-    click_button 'Publish now'
+    click_button 'Finish'
 
     expect(page).to have_content(options[:name])
     expect(page).to have_content('help page')
@@ -44,7 +44,7 @@ module IntegrationTestActions
     click_button 'Add Course'
     click_button 'Accept and continue'
     click_button 'Continue'
-    click_button 'Publish now'
+    click_button 'Finish'
 
     expect(page).to have_content(options[:name])
     expect(page).to have_content('help page')

@@ -125,6 +125,8 @@ require 'cgi' # for escapeHTML
     end
     course = Course.last
     expect(course).not_to be_nil
+    course.initial_refresh_ready = true
+    course.save!
 
     click_button 'Accept and continue'
     click_button 'Continue'

@@ -14,10 +14,11 @@ class Setup::CourseFinisherController < Setup::SetupController
 
     if params[:commit] == 'Publish now'
       @course.enabled!
-    else
+      @course.save!
+    elsif params[:commit] == 'Finish and publish later'
       @course.disabled!
+      @course.save!
     end
-    @course.save!
 
     reset_setup_session
     redirect_to organization_course_path(@organization, @course)
