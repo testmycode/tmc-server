@@ -69,14 +69,14 @@ class Api::V8::CoursesController < Api::V8::BaseController
     unauthorized_guest!
     course = find_by(Course, name: "#{params[:slug]}-#{params[:course_name]}")
     authorize! :read, course
-    render course_as_json course
+    render json: course
   end
 
   def find_by_id
     unauthorized_guest!
     course = find_by(Course, id: params[:course_id])
     authorize! :read, course
-    render course_as_json course
+    render json: course
   end
 
   def find_by(model, hash)
