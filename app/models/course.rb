@@ -38,8 +38,8 @@ class Course < ActiveRecord::Base
     dorequire(self)
   end
 
-  def course_as_json(course)
-    course.to_json only: [
+  def course_as_json
+    as_json only: [
         :name,
         :hide_after,
         :hidden,

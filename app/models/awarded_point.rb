@@ -2,8 +2,35 @@
 #
 # There is a reference to the submission that first awarded the point, but this
 # reference can be nil if the submission has been deleted.
+
+# TODO: move this to someplace better and rename
+# this makes a property optional. Otherwise properties are required:
+# property :name, type: :string, required: false
+def dorequire(swag)
+  swag.key :required, swag.data[:properties].data.select {|_,v| v.data[:required] != false}.map { |k,_| k }
+end
 class AwardedPoint < ActiveRecord::Base
   include PointComparison
+  include Swagger::Blocks
+
+  swagger_schema :AwardedPoint do
+    property :id, type: :integer, example: 1
+    property :course_id, type: :integer, example: 1
+    property :user_id, type: :integer, example: 1
+    property :submission_id, type: :integer, example: 2
+    property :name, type: :string, example: "exercise name"
+    dorequire(self)
+  end
+
+  def point_as_json
+    as_json only: [
+        :id,
+        :course_id,
+        :user_id,
+        :submission_id,
+        :name,
+    ]
+  end
 
   belongs_to :course
   belongs_to :user

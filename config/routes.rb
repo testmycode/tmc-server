@@ -77,6 +77,7 @@ TmcServer::Application.routes.draw do
             end
           end
           scope '/points' do
+            get '/' => 'courses#points'
             get '/mine' => 'courses#current_users_points'
             get '/:user_id' => 'courses#users_points'
           end
