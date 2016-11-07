@@ -48,6 +48,9 @@ TmcServer::Application.routes.draw do
               get '/' => 'courses#find_by_name'
               scope '/exercises' do
                 get '/' => 'exercises#get_by_course'
+                scope '/:exercise_name' do
+                  get '/download' => 'exercises#download'
+                end
               end
               scope '/submissions' do
                 get '/', to: 'submissions#all_submissions'

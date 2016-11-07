@@ -88,4 +88,10 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       present(presentable)
     end
   end
+
+  def download
+    exercise = Exercise.find_by_name(params[:exercise_name])
+    authorize! :download, exercise
+    send_file exercise.stub_zip_file_path
+  end
 end
