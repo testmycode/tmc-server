@@ -71,7 +71,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
       authorize! :read, nil
       respond_not_found('Course not found!')
     else
-      exercises = Exercise.where(course_id: course.id)
+      exercises = Exercise.includes(:available_points).where(course_id: course.id)
       visible = exercises.select { |ex| ex.visible_to?(current_user) }
       presentable = visible.map do |ex|
         {
