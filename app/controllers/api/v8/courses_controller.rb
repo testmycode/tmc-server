@@ -68,64 +68,19 @@ class Api::V8::CoursesController < Api::V8::BaseController
   def find_by_name
     unauthorized_guest!
     course = find_by(Course, name: "#{params[:slug]}-#{params[:course_name]}")
-    show_json(course, [
-        :name,
-        :hide_after,
-        :hidden,
-        :cache_version,
-        :spreadsheet_key,
-        :hidden_if_registered_after,
-        :refreshed_at,
-        :locked_exercise_points_visible,
-        :description,
-        :paste_visibility,
-        :formal_name,
-        :certificate_downloadable,
-        :certificate_unlock_spec,
-        :organization_id,
-        :disabled_status,
-        :title,
-        :material_url,
-        :course_template_id,
-        :hide_submission_results,
-        :external_scoreboard_url,
-    ])
+    authorize! :read, course
+    render course_as_json course
   end
 
   def find_by_id
     unauthorized_guest!
     course = find_by(Course, id: params[:course_id])
-    show_json(course, [
-        :name,
-        :hide_after,
-        :hidden,
-        :cache_version,
-        :spreadsheet_key,
-        :hidden_if_registered_after,
-        :refreshed_at,
-        :locked_exercise_points_visible,
-        :description,
-        :paste_visibility,
-        :formal_name,
-        :certificate_downloadable,
-        :certificate_unlock_spec,
-        :organization_id,
-        :disabled_status,
-        :title,
-        :material_url,
-        :course_template_id,
-        :hide_submission_results,
-        :external_scoreboard_url,
-    ])
-  end
-
-  def show_json(object, include=[])
     authorize! :read, course
-    render json: course, include: include
+    render course_as_json course
   end
 
-  def find_by(model, hash, *args)
-    course = model.find_by(hash, args)
+  def find_by(model, hash)
+    course = model.find_by(hash)
     raise ActiveRecord::RecordNotFound, "Couldn't find #{model.name} with #{hash.map{|k,v| "#{k}=#{v}"}.join(', ')}" unless course
     course
   end

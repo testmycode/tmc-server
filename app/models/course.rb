@@ -3,12 +3,43 @@ require 'course_refresher'
 require 'system_commands'
 require 'date_and_time_utils'
 
+# TODO: move this to someplace better and rename
+# this makes a property optional. Otherwise properties are required:
+# property :name, type: :string, required: false
+def dorequire(swag)
+  swag.key :required, swag.data[:properties].data.select {|_,v| v.data[:required] != false}.map { |k,_| k }
+end
+
 class Course < ActiveRecord::Base
   include SystemCommands
   include Swagger::Blocks
 
   swagger_schema :Course do
-    key :required, [
+    property :name, type: :string, example: "courseid-coursename"
+    property :hide_after, type: :string, example: "2016-10-10T13:22:19.554+03:00"
+    property :hidden, type: :boolean, example: false
+    property :cache_version, type: :integer, example: 1
+    property :spreadsheet_key, type: :string
+    property :hidden_if_registered_after, type: :string
+    property :refreshed_at, type: :string, example: "2016-10-10T13:22:36.871+03:00"
+    property :locked_exercise_points_visible, type: :boolean, example: true
+    property :description, type: :string, example: ""
+    property :paste_visibility, type: :string
+    property :formal_name, type: :string
+    property :certificate_downloadable, type: :boolean, example: false
+    property :certificate_unlock_spec, type: :string
+    property :organization_id, type: :integer, example: 1
+    property :disabled_status, type: :string, example: "enabled"
+    property :title, type: :string, example: "testcourse"
+    property :material_url, type: :string, example: ""
+    property :course_template_id, type: :integer, example: 1
+    property :hide_submission_results, type: :boolean, example: false
+    property :external_scoreboard_url, type: :string
+    dorequire(self)
+  end
+
+  def course_as_json(course)
+    course.to_json only: [
         :name,
         :hide_after,
         :hidden,
@@ -30,27 +61,6 @@ class Course < ActiveRecord::Base
         :hide_submission_results,
         :external_scoreboard_url,
     ]
-
-    property :name, type: :string, example: "courseid-coursename"
-    property :hide_after, type: :string, example: "2016-10-10T13:22:19.554+03:00"
-    property :hidden, type: :boolean, example: false
-    property :cache_version, type: :integer, example: 1
-    property :spreadsheet_key, type: :string
-    property :hidden_if_registered_after, type: :string
-    property :refreshed_at, type: :string, example: "2016-10-10T13:22:36.871+03:00"
-    property :locked_exercise_points_visible, type: :boolean, example: true
-    property :description, type: :string, example: ""
-    property :paste_visibility, type: :string
-    property :formal_name, type: :string
-    property :certificate_downloadable, type: :boolean, example: false
-    property :certificate_unlock_spec, type: :string
-    property :organization_id, type: :integer, example: 1
-    property :disabled_status, type: :string, example: "enabled"
-    property :title, type: :string, example: "testcourse"
-    property :material_url, type: :string, example: ""
-    property :course_template_id, type: :integer, example: 1
-    property :hide_submission_results, type: :boolean, example: false
-    property :external_scoreboard_url, type: :string
   end
 
   self.include_root_in_json = false
