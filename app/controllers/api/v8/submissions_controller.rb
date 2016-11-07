@@ -229,9 +229,10 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
 
   def users_submissions
     @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
+    authorize! :read, @course
+
     @user = User.find(params[:user_id])
     authorize! :read, @user
-    authorize! :read, @course
 
     @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
     filter_submissions(@submissions)
@@ -240,6 +241,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   def my_submissions
     @user = current_user
     authorize! :read, @user
+
     @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
     authorize! :read, @course
 
