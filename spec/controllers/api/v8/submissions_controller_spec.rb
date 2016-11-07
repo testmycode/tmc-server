@@ -4,14 +4,14 @@ describe Api::V8::SubmissionsController, type: :controller do
   let!(:user) { FactoryGirl.create(:user) }
   let!(:admin) { FactoryGirl.create(:admin) }
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let(:course_name) { 'testcourse'}
+  let(:course_name) { 'testcourse' }
   let(:course_name_with_slug) { "#{organization.slug}-#{course_name}" }
   let!(:course) { FactoryGirl.create(:course, name: "#{course_name_with_slug}", organization: organization) }
   let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
   let!(:submission) { FactoryGirl.create(:submission,
-  course: course,
-  user: user,
-  exercise: exercise)}
+                                         course: course,
+                                         user: user,
+                                         exercise: exercise) }
   before :each do
     controller.stub(:doorkeeper_token) { token }
   end
@@ -53,18 +53,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my organizations" do
-            other_organization = FactoryGirl.create(:accepted_organization)
-            other_course = FactoryGirl.create(:course, organization: other_organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_orgs_subs_for_teacher(slug: organization.slug, course_name: course_name)
           end
         end
 
@@ -76,18 +65,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my organizations" do
-            other_organization = FactoryGirl.create(:accepted_organization)
-            other_course = FactoryGirl.create(:course, organization: other_organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_orgs_subs_for_teacher(slug: organization.slug, course_name: course_name)
           end
         end
       end
@@ -107,17 +85,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my courses" do
-            other_course = FactoryGirl.create(:course, organization: organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_courses_subs_for_assistant(slug: organization.slug, course_name: course_name)
           end
         end
 
@@ -129,17 +97,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my courses" do
-            other_course = FactoryGirl.create(:course, organization: organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_courses_subs_for_assistant(slug: organization.slug, course_name: course_name)
           end
         end
       end
@@ -151,24 +109,11 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should show my own submissions" do
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).to have_content("\"user_id\"=>#{user.id}")
-            expect(json).to have_content("\"id\"=>#{submission.id}")
+            get_all_own_subs(slug: organization.slug, course_name: course_name)
           end
 
           it "should not show other users' submissions" do
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_users_subs_for_student(slug: organization.slug, course_name: course_name)
           end
         end
 
@@ -176,24 +121,11 @@ describe Api::V8::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
           it "should show my own submissions" do
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).to have_content("\"user_id\"=>#{user.id}")
-            expect(json).to have_content("\"id\"=>#{submission.id}")
+            get_all_own_subs(slug: organization.slug, course_name: course_name)
           end
 
           it "should not show other users' submissions" do
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-            get :all_submissions, slug: organization.slug, course_name: course_name
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_users_subs_for_student(slug: organization.slug, course_name: course_name)
           end
         end
       end
@@ -249,18 +181,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my organizations" do
-            other_organization = FactoryGirl.create(:accepted_organization)
-            other_course = FactoryGirl.create(:course, organization: other_organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_orgs_subs_for_teacher(course_id: course.id)
           end
         end
 
@@ -272,18 +193,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my organizations" do
-            other_organization = FactoryGirl.create(:accepted_organization)
-            other_course = FactoryGirl.create(:course, organization: other_organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_orgs_subs_for_teacher(course_id: course.id)
           end
         end
       end
@@ -303,17 +213,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my courses" do
-            other_course = FactoryGirl.create(:course, organization: organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_courses_subs_for_assistant(course_id: course.id)
           end
         end
 
@@ -325,17 +225,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should not show any submissions outside my courses" do
-            other_course = FactoryGirl.create(:course, organization: organization)
-            other_exercise = FactoryGirl.create(:exercise, course: other_course)
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_courses_subs_for_assistant(course_id: course.id)
           end
         end
       end
@@ -347,24 +237,11 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should show my own submissions" do
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).to have_content("\"user_id\"=>#{user.id}")
-            expect(json).to have_content("\"id\"=>#{submission.id}")
+            get_all_own_subs(course_id: course.id)
           end
 
           it "should not show other users' submissions" do
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_users_subs_for_student(course_id: course.id)
           end
         end
 
@@ -372,24 +249,11 @@ describe Api::V8::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
           it "should show my own submissions" do
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).to have_content("\"user_id\"=>#{user.id}")
-            expect(json).to have_content("\"id\"=>#{submission.id}")
+            get_all_own_subs(course_id: course.id)
           end
 
           it "should not show other users' submissions" do
-            other_user = FactoryGirl.create(:user)
-            other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-            get :all_submissions, course_id: course.id
-
-            json = JSON.parse response.body
-
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-            expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+            no_other_users_subs_for_student(course_id: course.id)
           end
         end
       end
@@ -410,298 +274,350 @@ describe Api::V8::SubmissionsController, type: :controller do
     end
   end
 
-  describe "GET single user's submissions by course id as json" do
-    describe "as an admin" do
-      describe "when logged in" do
-        before :each do
-          controller.current_user = admin
+  describe "GET single user's submissions" do
+    describe "by course name as json" do
+      describe "as an admin" do
+        describe "when logged in" do
+          before :each do
+            controller.current_user = admin
+          end
+
+          it "should show given user's submissions" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
         end
 
-        it "should show given user's submissions" do
-          get :users_submissions, course_id: course.id, user_id: user.id
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
-          json = JSON.parse response.body
-
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
+          it "should show given user's submissions" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
         end
       end
 
-      describe "when using access token" do
-        let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      describe "as a teacher" do
+        before :each do
+          Teachership.create(user: user, organization: organization)
+        end
 
-        it "should show given user's submissions" do
-          get :users_submissions, course_id: course.id, user_id: user.id
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
+
+          it "should show given user's submissions in my organizations" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+
+          it "should not show any submissions outside my organizations" do
+            no_other_orgs_user_subs_for_teacher(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+        end
+
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+          it "should show given user's submissions in my organizations" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+
+          it "should not show any submissions outside my organizations" do
+            no_other_orgs_user_subs_for_teacher(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+        end
+      end
+
+      describe "as an assistant" do
+        before :each do
+          Assistantship.create(user: user, course: course)
+        end
+
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
+
+          it "should show given user's submissions in my courses" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+
+          it "should not show any submissions outside my courses" do
+            no_other_courses_user_subs_for_assistant(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+        end
+
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+          it "should show given user's submissions in my courses" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+
+          it "should not show any submissions outside my courses" do
+            no_other_courses_user_subs_for_assistant(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+        end
+      end
+
+      describe "as a student" do
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
+
+          it "should show my own submissions" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+
+          it "should not show other users' submissions" do
+            no_other_users_user_subs_for_student(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+        end
+
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+          it "should show my own submissions" do
+            get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+
+          it "should not show other users' submissions" do
+            no_other_users_user_subs_for_student(slug: organization.slug, course_name: course_name, user_id: user.id)
+          end
+        end
+      end
+
+      describe "as an unauthorized user" do
+        before :each do
+          controller.current_user = Guest.new
+        end
+
+        it "should not show any submissions" do
+          get :users_submissions, slug: organization.slug, course_name: course_name, user_id: user.id
 
           json = JSON.parse response.body
 
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
+          expect(json).to have_content("[\"You are not authorized to access this page.\"]")
         end
       end
     end
 
-    describe "as a teacher" do
-      before :each do
-        Teachership.create(user: user, organization: organization)
+    describe "by course id as json" do
+      describe "as an admin" do
+        describe "when logged in" do
+          before :each do
+            controller.current_user = admin
+          end
+
+          it "should show given user's submissions" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
+        end
+
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+
+          it "should show given user's submissions" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
+        end
       end
 
-      describe "when logged in" do
+      describe "as a teacher" do
         before :each do
-          controller.current_user = user
+          Teachership.create(user: user, organization: organization)
         end
 
-        it "should show given user's submissions in my organizations" do
-          get :users_submissions, course_id: course.id, user_id: user.id
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
 
-          json = JSON.parse response.body
+          it "should show given user's submissions in my organizations" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
 
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
+          it "should not show any submissions outside my organizations" do
+            no_other_orgs_user_subs_for_teacher(course_id: course.id, user_id: user.id)
+          end
         end
 
-        it "should not show any submissions outside my organizations" do
-          other_organization = FactoryGirl.create(:accepted_organization)
-          other_course = FactoryGirl.create(:course, organization: other_organization)
-          other_exercise = FactoryGirl.create(:exercise, course: other_course)
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          get :users_submissions, course_id: course.id, user_id: user.id
+          it "should show given user's submissions in my organizations" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
 
-          json = JSON.parse response.body
-
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
-        end
-      end
-
-      describe "when using access token" do
-        let!(:token) { double resource_owner_id: user.id, acceptable?: true }
-
-        it "should show given user's submissions in my organizations" do
-          get :users_submissions, course_id: course.id, user_id: user.id
-
-          json = JSON.parse response.body
-
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
-        end
-
-        it "should not show any submissions outside my organizations" do
-          other_organization = FactoryGirl.create(:accepted_organization)
-          other_course = FactoryGirl.create(:course, organization: other_organization)
-          other_exercise = FactoryGirl.create(:exercise, course: other_course)
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-          get :users_submissions, course_id: course.id, user_id: user.id
-
-          json = JSON.parse response.body
-
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+          it "should not show any submissions outside my organizations" do
+            no_other_orgs_user_subs_for_teacher(course_id: course.id, user_id: user.id)
+          end
         end
       end
-    end
 
-    describe "as an assistant" do
-      before :each do
-        Assistantship.create(user: user, course: course)
-      end
-
-      describe "when logged in" do
+      describe "as an assistant" do
         before :each do
-          controller.current_user = user
+          Assistantship.create(user: user, course: course)
         end
 
-        it "should show given user's submissions in my courses" do
-          get :users_submissions, course_id: course.id, user_id: user.id
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
 
-          json = JSON.parse response.body
+          it "should show given user's submissions in my courses" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
 
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
+          it "should not show any submissions outside my courses" do
+            no_other_courses_user_subs_for_assistant(course_id: course.id, user_id: user.id)
+          end
         end
 
-        it "should not show any submissions outside my courses" do
-          other_course = FactoryGirl.create(:course, organization: organization)
-          other_exercise = FactoryGirl.create(:exercise, course: other_course)
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          get :users_submissions, course_id: course.id, user_id: user.id
+          it "should show given user's submissions in my courses" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
 
-          json = JSON.parse response.body
+          it "should not show any submissions outside my courses" do
+            no_other_courses_user_subs_for_assistant(course_id: course.id, user_id: user.id)
+          end
+        end
+      end
 
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+      describe "as a student" do
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
+
+          it "should show my own submissions" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
+
+          it "should not show other users' submissions" do
+            no_other_users_user_subs_for_student(course_id: course.id, user_id: user.id)
+          end
+        end
+
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+          it "should show my own submissions" do
+            get_users_own_subs(course_id: course.id, user_id: user.id)
+          end
+
+          it "should not show other users' submissions" do
+            no_other_users_user_subs_for_student(course_id: course.id, user_id: user.id)
+          end
         end
       end
 
-      describe "when using access token" do
-        let!(:token) { double resource_owner_id: user.id, acceptable?: true }
-
-        it "should show given user's submissions in my courses" do
-          get :users_submissions, course_id: course.id, user_id: user.id
-
-          json = JSON.parse response.body
-
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
-        end
-
-        it "should not show any submissions outside my courses" do
-          other_course = FactoryGirl.create(:course, organization: organization)
-          other_exercise = FactoryGirl.create(:exercise, course: other_course)
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
-
-          get :users_submissions, course_id: course.id, user_id: user.id
-
-          json = JSON.parse response.body
-
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
-        end
-      end
-    end
-
-    describe "as a student" do
-      describe "when logged in" do
+      describe "as an unauthorized user" do
         before :each do
-          controller.current_user = user
+          controller.current_user = Guest.new
         end
 
-        it "should show my own submissions" do
+        it "should not show any submissions" do
           get :users_submissions, course_id: course.id, user_id: user.id
 
           json = JSON.parse response.body
 
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
+          expect(json).to have_content("[\"You are not authorized to access this page.\"]")
         end
-
-        it "should not show other users' submissions" do
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-          get :users_submissions, course_id: course.id, user_id: user.id
-
-          json = JSON.parse response.body
-
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
-        end
-      end
-
-      describe "when using access token" do
-        let!(:token) { double resource_owner_id: user.id, acceptable?: true }
-
-        it "should show my own submissions" do
-          get :users_submissions, course_id: course.id, user_id: user.id
-
-          json = JSON.parse response.body
-
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
-        end
-
-        it "should not show other users' submissions" do
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-          get :users_submissions, course_id: course.id, user_id: user.id
-
-          json = JSON.parse response.body
-
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
-        end
-      end
-    end
-
-    describe "as an unauthorized user" do
-      before :each do
-        controller.current_user = Guest.new
-      end
-
-      it "should not show any submissions" do
-        get :users_submissions, course_id: course.id, user_id: user.id
-
-        json = JSON.parse response.body
-
-        expect(json).to have_content("[\"You are not authorized to access this page.\"]")
       end
     end
   end
 
-  describe "GET user's own submissions by course id as json" do
-    describe "as an user" do
-      describe "when logged in" do
-        before :each do
-          controller.current_user = user
+  describe "GET user's own submissions" do
+    describe "by course name as json" do
+      describe "as an user" do
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
+
+          it "should show my own submissions" do
+            get_my_own_subs(slug: organization.slug, course_name: course_name)
+          end
+
+          it "should not show other users' submissions" do
+            no_other_users_own_subs_for_anyone(slug: organization.slug, course_name: course_name)
+          end
         end
 
-        it "should show my own submissions" do
-          get :my_submissions, course_id: course.id
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          json = JSON.parse response.body
+          it "should show my own submissions" do
+            get_my_own_subs(slug: organization.slug, course_name: course_name)
+          end
 
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
-        end
-
-        it "should not show other users' submissions" do
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-          get :my_submissions, course_id: course.id
-
-          json = JSON.parse response.body
-
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+          it "should not show other users' submissions" do
+            no_other_users_own_subs_for_anyone(slug: organization.slug, course_name: course_name)
+          end
         end
       end
 
-      describe "when using access token" do
-        let!(:token) { double resource_owner_id: user.id, acceptable?: true }
-
-        it "should show my own submissions" do
-          get :my_submissions, course_id: course.id
-
-          json = JSON.parse response.body
-
-          expect(json).to have_content("\"user_id\"=>#{user.id}")
-          expect(json).to have_content("\"id\"=>#{submission.id}")
+      describe "as an unauthorized user" do
+        before :each do
+          controller.current_user = Guest.new
         end
 
-        it "should not show other users' submissions" do
-          other_user = FactoryGirl.create(:user)
-          other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
-
-          get :my_submissions, course_id: course.id
+        it "should not show any submissions" do
+          get :my_submissions, slug: organization.slug, course_name: course_name
 
           json = JSON.parse response.body
 
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-          expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+          expect(json).to have_content("You are not signed in!")
         end
       end
     end
 
-    describe "as an unauthorized user" do
-      before :each do
-        controller.current_user = Guest.new
+    describe "by course id as json" do
+      describe "as an user" do
+        describe "when logged in" do
+          before :each do
+            controller.current_user = user
+          end
+
+          it "should show my own submissions" do
+            get_my_own_subs(course_id: course.id)
+          end
+
+          it "should not show other users' submissions" do
+            no_other_users_own_subs_for_anyone(course_id: course.id)
+          end
+        end
+
+        describe "when using access token" do
+          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+          it "should show my own submissions" do
+            get_my_own_subs(course_id: course.id)
+          end
+
+          it "should not show other users' submissions" do
+            no_other_users_own_subs_for_anyone(course_id: course.id)
+          end
+        end
       end
 
-      it "should not show any submissions" do
-        get :my_submissions, course_id: course.id
+      describe "as an unauthorized user" do
+        before :each do
+          controller.current_user = Guest.new
+        end
 
-        json = JSON.parse response.body
+        it "should not show any submissions" do
+          get :my_submissions, course_id: course.id
 
-        expect(json).to have_content("You are not signed in!")
+          json = JSON.parse response.body
+
+          expect(json).to have_content("You are not signed in!")
+        end
       end
     end
   end
@@ -738,5 +654,126 @@ describe Api::V8::SubmissionsController, type: :controller do
     expect(json).to have_content("\"user_id\"=>#{user2.id}")
     expect(json).to have_content("\"id\"=>#{sub1.id}")
     expect(json).to have_content("\"id\"=>#{sub2.id}")
+  end
+
+  def get_all_own_subs(parameters)
+    get :all_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).to have_content("\"user_id\"=>#{user.id}")
+    expect(json).to have_content("\"id\"=>#{submission.id}")
+  end
+
+  def get_users_own_subs(parameters)
+    get :users_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).to have_content("\"user_id\"=>#{user.id}")
+    expect(json).to have_content("\"id\"=>#{submission.id}")
+  end
+
+  def get_my_own_subs(parameters)
+    get :my_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).to have_content("\"user_id\"=>#{user.id}")
+    expect(json).to have_content("\"id\"=>#{submission.id}")
+  end
+
+  def no_other_orgs_subs_for_teacher(parameters)
+    other_organization = FactoryGirl.create(:accepted_organization)
+    other_course = FactoryGirl.create(:course, organization: other_organization)
+    other_exercise = FactoryGirl.create(:exercise, course: other_course)
+    other_user = FactoryGirl.create(:user)
+    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+    get :all_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+  end
+
+  def no_other_orgs_user_subs_for_teacher(parameters)
+    other_organization = FactoryGirl.create(:accepted_organization)
+    other_course = FactoryGirl.create(:course, organization: other_organization)
+    other_exercise = FactoryGirl.create(:exercise, course: other_course)
+    other_user = FactoryGirl.create(:user)
+    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+    get :users_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+  end
+
+  def no_other_courses_subs_for_assistant(parameters)
+    other_course = FactoryGirl.create(:course, organization: organization)
+    other_exercise = FactoryGirl.create(:exercise, course: other_course)
+    other_user = FactoryGirl.create(:user)
+    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+    get :all_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+  end
+
+  def no_other_courses_user_subs_for_assistant(parameters)
+    other_course = FactoryGirl.create(:course, organization: organization)
+    other_exercise = FactoryGirl.create(:exercise, course: other_course)
+    other_user = FactoryGirl.create(:user)
+    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+
+    get :users_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+  end
+
+  def no_other_users_subs_for_student(parameters)
+    other_user = FactoryGirl.create(:user)
+    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
+
+    get :all_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+  end
+
+  def no_other_users_user_subs_for_student(parameters)
+    other_user = FactoryGirl.create(:user)
+    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
+
+    get :users_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+  end
+
+  def no_other_users_own_subs_for_anyone(parameters)
+    other_user = FactoryGirl.create(:user)
+    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
+
+    get :my_submissions, parameters
+
+    json = JSON.parse response.body
+
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
+    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
   end
 end

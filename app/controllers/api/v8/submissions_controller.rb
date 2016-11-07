@@ -13,7 +13,14 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
       ]
       parameter '$ref': '#/parameters/path_organization_id'
       parameter '$ref': '#/parameters/path_course_name'
-      response 401, '$ref': '#/responses/error'
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'Course or organization not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
       response 200 do
         key :description, 'Submissions in json'
         schema do
@@ -41,9 +48,53 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
         'submission'
       ]
       parameter '$ref': '#/parameters/path_course_id'
-      response 401, '$ref': '#/responses/error'
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'Course not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
       response 200 do
         key :description, 'Submissions in json'
+        schema do
+          key :title, :submissions
+          key :required, [:submissions]
+          property :submissions do
+            key :type, :array
+            items do
+              key :'$ref', :Submission
+            end
+          end
+        end
+      end
+    end
+  end
+
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions/{user_id}' do
+    operation :get do
+      key :description, 'Returns the submissions visible to the user in a json format'
+      key :operationId, 'findUsersSubmissionsByCourseName'
+      key :produces, [
+          'application/json'
+      ]
+      key :tags, [
+          'submission'
+      ]
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_user_id'
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'User, course or organization not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
+      response 200 do
+        key :description, 'User\'s submissions in json'
         schema do
           key :title, :submissions
           key :required, [:submissions]
@@ -70,9 +121,52 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
       ]
       parameter '$ref': '#/parameters/path_course_id'
       parameter '$ref': '#/parameters/path_user_id'
-      response 401, '$ref': '#/responses/error'
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'User or course not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
       response 200 do
         key :description, 'User\'s submissions in json'
+        schema do
+          key :title, :submissions
+          key :required, [:submissions]
+          property :submissions do
+            key :type, :array
+            items do
+              key :'$ref', :Submission
+            end
+          end
+        end
+      end
+    end
+  end
+
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions/mine' do
+    operation :get do
+      key :description, 'Returns the user\'s own submissions in a json format'
+      key :operationId, 'findUsersOwnSubmissionsByCourseName'
+      key :produces, [
+          'application/json'
+      ]
+      key :tags, [
+          'submission'
+      ]
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'Course or organization not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
+      response 200 do
+        key :description, 'User\'s own submissions in json'
         schema do
           key :title, :submissions
           key :required, [:submissions]
@@ -98,7 +192,14 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
           'submission'
       ]
       parameter '$ref': '#/parameters/path_course_id'
-      response 401, '$ref': '#/responses/error'
+      response 403, '$ref': '#/responses/auth_required'
+      response 404 do
+        key :description, 'Course not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
       response 200 do
         key :description, 'User\'s own submissions in json'
         schema do
@@ -127,7 +228,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   end
 
   def users_submissions
-    @course = Course.lock('FOR SHARE').find(params[:course_id])
+    @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
     @user = User.find(params[:user_id])
     authorize! :read, @user
     authorize! :read, @course
@@ -139,7 +240,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   def my_submissions
     @user = current_user
     authorize! :read, @user
-    @course = Course.lock('FOR SHARE').find(params[:course_id])
+    @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
     authorize! :read, @course
 
     @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
