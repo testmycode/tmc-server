@@ -43,24 +43,90 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
+  def points
+    course = find_by(Course, id: params[:id])
+    points = course.awarded_points
+    authorize! :read, points
+    render json: points
+  end
+
+  def users_points
+    user = find_by(User, id: params[:user_id])
+    course = find_by(Course, id: params[:id])
+    points = AwardedPoint.course_user_points(course, user)
+    authorize! :read, points
+    render json: points
+  end
+
+  def current_users_points
+    course = find_by(Course, id: params[:id])
+    points = AwardedPoint.course_user_points(course, current_user)
+    authorize! :read, points
+    render json: points
+  end
+
   def find_by_name
-    unauthorize_guest!
-    course_name = "#{params[:slug]}-#{params[:course_name]}"
-    course = Course.find_by(name: course_name)
-    raise ActiveRecord::RecordNotFound, "Couldn't find Course with name #{course_name}" unless course
-    show_json(course)
+    unauthorized_guest!
+    course = find_by(Course, name: "#{params[:slug]}-#{params[:course_name]}")
+    show_json(course, [
+        :name,
+        :hide_after,
+        :hidden,
+        :cache_version,
+        :spreadsheet_key,
+        :hidden_if_registered_after,
+        :refreshed_at,
+        :locked_exercise_points_visible,
+        :description,
+        :paste_visibility,
+        :formal_name,
+        :certificate_downloadable,
+        :certificate_unlock_spec,
+        :organization_id,
+        :disabled_status,
+        :title,
+        :material_url,
+        :course_template_id,
+        :hide_submission_results,
+        :external_scoreboard_url,
+    ])
   end
 
   def find_by_id
     unauthorized_guest!
-    course_id = params[:course_id]
-    course = Course.find_by_id(course_id)
-    raise ActiveRecord::RecordNotFound, "Couldn't find Course with id #{course_id}" unless course
-    show_json(course)
+    course = find_by(Course, id: params[:course_id])
+    show_json(course, [
+        :name,
+        :hide_after,
+        :hidden,
+        :cache_version,
+        :spreadsheet_key,
+        :hidden_if_registered_after,
+        :refreshed_at,
+        :locked_exercise_points_visible,
+        :description,
+        :paste_visibility,
+        :formal_name,
+        :certificate_downloadable,
+        :certificate_unlock_spec,
+        :organization_id,
+        :disabled_status,
+        :title,
+        :material_url,
+        :course_template_id,
+        :hide_submission_results,
+        :external_scoreboard_url,
+    ])
   end
 
-  def show_json(course)
+  def show_json(object, include=[])
     authorize! :read, course
-    render json: course, except: [:created_at, :updated_at]
+    render json: course, include: include
+  end
+
+  def find_by(model, hash, *args)
+    course = model.find_by(hash, args)
+    raise ActiveRecord::RecordNotFound, "Couldn't find #{model.name} with #{hash.map{|k,v| "#{k}=#{v}"}.join(', ')}" unless course
+    course
   end
 end
