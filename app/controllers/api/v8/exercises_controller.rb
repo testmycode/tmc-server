@@ -91,40 +91,33 @@ class Api::V8::ExercisesController < Api::V8::BaseController
 
   def get_by_course
     unauthorized_guest! if current_user.guest?
-    course = Course.find_by(id: params[:course_id]) || Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}")
-    if course == nil
-      respond_not_found_with_auth_bypass('Course not found!')
-    else
-      exercises = Exercise.includes(:available_points).where(course_id: course.id)
-      visible = exercises.select { |ex| ex.visible_to?(current_user) }
-      presentable = visible.map do |ex|
-        {
-            id: ex.id,
-            available_points: ex.available_points,
-            name: ex.name,
-            publish_time: ex.publish_time,
-            solution_visible_after: ex.solution_visible_after,
-            deadline: ex.deadline_for(current_user),
-            disabled: ex.disabled?
-        }
-      end
-      authorize! :read, visible
-      present(presentable)
+
+    course = Course.find_by!(id: params[:id]) || Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    exercises = Exercise.where(course_id: course.id)
+
+    visible = exercises.select { |ex| ex.visible_to?(current_user) }
+    presentable = visible.map do |ex|
+      {
+          id: ex.id,
+          available_points: Exercise.find_by(id: ex.id).available_points,
+          name: ex.name,
+          publish_time: ex.publish_time,
+          solution_visible_after: ex.solution_visible_after,
+          deadline: ex.deadline_for(current_user),
+          disabled: ex.disabled?
+      }
     end
+    authorize! :read, visible
+    present(presentable)
+
   end
 
   def download
-    course = Course.find_by(name: "#{params[:slug]}-#{params[:name]}")
-    if course == nil
-      respond_not_found_with_auth_bypass('Course not found!')
-    else
-      exercise = Exercise.find_by(name: params[:exercise_name], course_id: course.id)
-      if exercise == nil
-        respond_not_found_with_auth_bypass('Exercise not found!')
-      else
-        authorize! :download, exercise
-        send_file exercise.stub_zip_file_path
-      end
-    end
+    self.class.skip_authorization_check
+    course = Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    exercise = Exercise.find_by!(name: params[:exercise_name], course_id: course.id)
+
+    authorize! :download, exercise
+    send_file exercise.stub_zip_file_path
   end
 end
