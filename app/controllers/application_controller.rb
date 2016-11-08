@@ -125,6 +125,11 @@ class ApplicationController < ActionController::Base
     respond_with_error(msg, 404)
   end
 
+  def respond_not_found_with_auth_bypass(msg = 'Not Found')
+    authorize! :read, nil
+    respond_not_found(msg)
+  end
+
   def respond_access_denied(msg = 'Access denied')
     respond_with_error(msg, 401)
   end

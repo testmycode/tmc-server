@@ -79,6 +79,13 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           key :type, :file
         end
       end
+      response 404 do
+        key :description, 'Course or exercise not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
     end
   end
 
@@ -86,8 +93,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     unauthorized_guest! if current_user.guest?
     course = Course.find_by(id: params[:course_id]) || Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}")
     if course == nil
-      authorize! :read, nil
-      respond_not_found('Course not found!')
+      respond_not_found_with_auth_bypass('Course not found!')
     else
       exercises = Exercise.includes(:available_points).where(course_id: course.id)
       visible = exercises.select { |ex| ex.visible_to?(current_user) }
@@ -109,8 +115,16 @@ class Api::V8::ExercisesController < Api::V8::BaseController
 
   def download
     course = Course.find_by(name: "#{params[:slug]}-#{params[:name]}")
-    exercise = Exercise.find_by(name: params[:exercise_name], course_id: course.id)
-    authorize! :download, exercise
-    send_file exercise.stub_zip_file_path
+    if course == nil
+      respond_not_found_with_auth_bypass('Course not found!')
+    else
+      exercise = Exercise.find_by(name: params[:exercise_name], course_id: course.id)
+      if exercise == nil
+        respond_not_found_with_auth_bypass('Exercise not found!')
+      else
+        authorize! :download, exercise
+        send_file exercise.stub_zip_file_path
+      end
+    end
   end
 end
