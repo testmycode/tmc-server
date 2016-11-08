@@ -79,15 +79,15 @@ class Submission < ActiveRecord::Base
   belongs_to :course
 
   belongs_to :exercise,
-             (lambda do |submission|
-               if submission.respond_to?(:course_id)
-                 # Used when doing submission.exercise
-                 where(course: submission.course)
-               else
-                 # Used when doing submissions.include(:exercises)
-                 Exercise.joins(:submission)
-               end
-             end), foreign_key: :exercise_name, primary_key: :name
+    (lambda do |submission|
+      if submission.respond_to?(:course_id)
+        # Used when doing submission.exercise
+        where(course: submission.course)
+      else
+        # Used when doing submissions.include(:exercises)
+        Exercise.joins(:submission)
+      end
+    end), foreign_key: :exercise_name, primary_key: :name
 
   has_one :submission_data, dependent: :delete
   after_save { submission_data.save! if submission_data }
@@ -241,16 +241,8 @@ class Submission < ActiveRecord::Base
           name: tcr.test_case_name,
           successful: tcr.successful?,
           message: tcr.message,
-          exception: if tcr.exception then
-                       ActiveSupport::JSON.decode(tcr.exception)
-                     else
-                       nil
-                     end,
-          detailed_message: if tcr.detailed_message then
-                              tcr.detailed_message
-                            else
-                              nil
-                            end
+          exception: if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
+          detailed_message: if tcr.detailed_message then tcr.detailed_message else nil end
       }
     end
   end
@@ -381,6 +373,12 @@ class Submission < ActiveRecord::Base
 
   def readable_by?(user)
     user.administrator? || user.teacher?(self.course.organization) || user.assistant?(self.course) || self.user_id == user.id && self.exercise.visible_to?(user)
+  end
+
+  def self.readable(user)
+    readable_submissions = []
+    Submission.all.each { |submission| readable_submissions << submission if submission.readable_by?(user) }
+    return readable_submissions
   end
 
   def set_paste_key_if_paste_available

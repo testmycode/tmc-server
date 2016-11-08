@@ -138,9 +138,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         it "should not show any submissions" do
           get :all_submissions, slug: organization.slug, course_name: course_name
 
-          json = JSON.parse response.body
-
-          expect(json).to have_content("You are not signed in!")
+          expect(response.body).to have_content("You are not signed in!")
         end
       end
     end
@@ -266,9 +264,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         it "should not show any submissions" do
           get :all_submissions, course_id: course.id
 
-          json = JSON.parse response.body
-
-          expect(json).to have_content("You are not signed in!")
+          expect(response.body).to have_content("You are not signed in!")
         end
       end
     end
@@ -396,9 +392,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         it "should not show any submissions" do
           get :users_submissions, slug: organization.slug, course_name: course_name, user_id: user.id
 
-          json = JSON.parse response.body
-
-          expect(json).to have_content("[\"You are not authorized to access this page.\"]")
+          expect(response.body).to have_content("[\"You are not authorized to access this page.\"]")
         end
       end
     end
@@ -524,9 +518,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         it "should not show any submissions" do
           get :users_submissions, course_id: course.id, user_id: user.id
 
-          json = JSON.parse response.body
-
-          expect(json).to have_content("[\"You are not authorized to access this page.\"]")
+          expect(response.body).to have_content("[\"You are not authorized to access this page.\"]")
         end
       end
     end
@@ -570,9 +562,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         it "should not show any submissions" do
           get :my_submissions, slug: organization.slug, course_name: course_name
 
-          json = JSON.parse response.body
-
-          expect(json).to have_content("You are not signed in!")
+          expect(response.body).to have_content("You are not signed in!")
         end
       end
     end
@@ -614,9 +604,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         it "should not show any submissions" do
           get :my_submissions, course_id: course.id
 
-          json = JSON.parse response.body
-
-          expect(json).to have_content("You are not signed in!")
+          expect(response.body).to have_content("You are not signed in!")
         end
       end
     end
@@ -632,12 +620,8 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, slug: organization.slug, course_name: course_name
 
-    json = JSON.parse response.body
-
-    expect(json).to have_content("\"user_id\"=>#{user1.id}")
-    expect(json).to have_content("\"user_id\"=>#{user2.id}")
-    expect(json).to have_content("\"id\"=>#{sub1.id}")
-    expect(json).to have_content("\"id\"=>#{sub2.id}")
+    expect(response.body).to include(sub1.to_json)
+    expect(response.body).to include(sub2.to_json)
   end
 
   def get_two_subs_by_id
@@ -648,39 +632,26 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, course_id: course.id
 
-    json = JSON.parse response.body
-
-    expect(json).to have_content("\"user_id\"=>#{user1.id}")
-    expect(json).to have_content("\"user_id\"=>#{user2.id}")
-    expect(json).to have_content("\"id\"=>#{sub1.id}")
-    expect(json).to have_content("\"id\"=>#{sub2.id}")
+    expect(response.body).to include(sub1.to_json)
+    expect(response.body).to include(sub2.to_json)
   end
 
   def get_all_own_subs(parameters)
     get :all_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).to have_content("\"user_id\"=>#{user.id}")
-    expect(json).to have_content("\"id\"=>#{submission.id}")
+    expect(response.body).to include(submission.to_json)
   end
 
   def get_users_own_subs(parameters)
     get :users_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).to have_content("\"user_id\"=>#{user.id}")
-    expect(json).to have_content("\"id\"=>#{submission.id}")
+    expect(response.body).to include(submission.to_json)
   end
 
   def get_my_own_subs(parameters)
     get :my_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).to have_content("\"user_id\"=>#{user.id}")
-    expect(json).to have_content("\"id\"=>#{submission.id}")
+    expect(response.body).to include(submission.to_json)
   end
 
   def no_other_orgs_subs_for_teacher(parameters)
@@ -692,10 +663,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+    expect(response.body).not_to include(other_guys_sub.to_json)
   end
 
   def no_other_orgs_user_subs_for_teacher(parameters)
@@ -707,10 +675,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :users_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+    expect(response.body).not_to include(other_guys_sub.to_json)
   end
 
   def no_other_courses_subs_for_assistant(parameters)
@@ -721,10 +686,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+    expect(response.body).not_to include(other_guys_sub.to_json)
   end
 
   def no_other_courses_user_subs_for_assistant(parameters)
@@ -735,10 +697,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :users_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+    expect(response.body).not_to include(other_guys_sub.to_json)
   end
 
   def no_other_users_subs_for_student(parameters)
@@ -747,10 +706,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+    expect(response.body).not_to include(other_guys_sub.to_json)
   end
 
   def no_other_users_user_subs_for_student(parameters)
@@ -759,10 +715,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :users_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+    expect(response.body).not_to include(other_guys_sub.to_json)
   end
 
   def no_other_users_own_subs_for_anyone(parameters)
@@ -771,9 +724,6 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :my_submissions, parameters
 
-    json = JSON.parse response.body
-
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.id}")
-    expect(json).not_to have_content("\"id\"=>#{other_guys_sub.user.id}")
+    expect(response.body).not_to include(other_guys_sub.to_json)
   end
 end

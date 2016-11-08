@@ -219,34 +219,43 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   around_action :course_transaction
 
   def all_submissions
-    @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find_by(id: params[:course_id])
-    authorize! :read, @course
+    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find_by(id: params[:course_id])
+    authorize! :read, course
 
-    @organization = @course.organization
-    @submissions = Submission.where(course_id: @course.id)
-    filter_submissions(@submissions)
+    organization = course.organization
+
+    submissions = Submission.where(course_id: course.id).readable(current_user)
+    authorize! :read, submissions
+
+    render_json(submissions)
   end
 
   def users_submissions
-    @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
-    authorize! :read, @course
+    user = User.find(params[:user_id])
+    authorize! :read, user
 
-    @user = User.find(params[:user_id])
-    authorize! :read, @user
+    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
+    authorize! :read, course
 
-    @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
-    filter_submissions(@submissions)
+    submissions = Submission.where(course_id: course.id, user_id: user.id).readable(current_user)
+    submissions.each do |s|
+      authorize! :read, s
+    end
+
+    render_json(submissions)
   end
 
   def my_submissions
-    @user = current_user
-    authorize! :read, @user
+    user = current_user
+    authorize! :read, user
 
-    @course = Course.lock('FOR SHARE').find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
-    authorize! :read, @course
+    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
+    authorize! :read, course
 
-    @submissions = Submission.where(course_id: @course.id, user_id: @user.id)
-    filter_submissions(@submissions)
+    submissions = Submission.where(course_id: course.id, user_id: user.id).readable(current_user)
+    authorize! :read, submissions
+
+    render_json(submissions)
   end
 
   private
@@ -267,17 +276,5 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
         submissions: array
       }
     end
-  end
-
-  def filter_submissions(subs)
-    visible_submissions = []
-    subs.each do |submission|
-      next unless submission.readable_by?(current_user)
-      visible_submissions.push(submission)
-    end
-
-    authorize! :read, visible_submissions
-
-    render_json(visible_submissions)
   end
 end
