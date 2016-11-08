@@ -64,6 +64,24 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     end
   end
 
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/download' do
+    operation :get do
+      key :description, 'Download the exercise as a zip file'
+      key :operationId, 'downloadExercise'
+      key :produces, ['application/zip']
+      key :tags, ['exercise']
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      response 200 do
+        key :description, 'Exercise zip file'
+        schema do
+          key :type, :file
+        end
+      end
+    end
+  end
+
   def get_by_course
     unauthorized_guest! if current_user.guest?
     course = Course.find_by(id: params[:course_id]) || Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}")
@@ -90,7 +108,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
   end
 
   def download
-    exercise = Exercise.find_by_name(params[:exercise_name])
+    course = Course.find_by(name: "#{params[:slug]}-#{params[:name]}")
+    exercise = Exercise.find_by(name: params[:exercise_name], course_id: course.id)
     authorize! :download, exercise
     send_file exercise.stub_zip_file_path
   end
