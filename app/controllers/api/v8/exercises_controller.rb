@@ -113,7 +113,6 @@ class Api::V8::ExercisesController < Api::V8::BaseController
   end
 
   def download
-    #self.class.skip_authorization_check
     course = Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
     exercise = Exercise.find_by!(name: params[:exercise_name], course_id: course.id)
 
