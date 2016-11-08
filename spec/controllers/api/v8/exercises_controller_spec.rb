@@ -105,21 +105,38 @@ describe Api::V8::ExercisesController, type: :controller do
   end
 
   describe 'Downloading an exercise zip' do
-    before do
-      @repo = clone_course_repo(course)
-      @repo.copy_simple_exercise('zipexercise')
-      @repo.add_commit_push
-      course.refresh
-    end
-
     describe 'as an unauthenticated user' do
       let(:token) { double resource_owner_id: guest.id, acceptable?: true }
-      it 'should succeed', driver: :rack_test do
+
+      it 'should succeed if the course name and slug ar correct', driver: :rack_test do
+        repo = clone_course_repo(course)
+        repo.copy_simple_exercise('zipexercise')
+        repo.add_commit_push
+        course.refresh
+
         visit "/api/v8/org/#{slug}/courses/#{course_name}/exercises/zipexercise/download"
         File.open("zipexercise.zip", 'wb') { |f| f.write(page.source) }
         system!("unzip -qq zipexercise.zip")
         expect(File).to be_a_directory("zipexercise")
         expect(File).to exist("zipexercise/src/SimpleStuff.java")
+      end
+      it "should fail if the course name doesn't exist", driver: :rack_test do
+        repo = clone_course_repo(course)
+        repo.copy_simple_exercise('zipexercise2')
+        repo.add_commit_push
+        course.refresh
+
+        visit "/api/v8/org/#{slug}/courses/wrong_course_name/exercises/zipexercise2/download"
+        expect(page.status_code).to be(404)
+      end
+      it "should fail if the oranization slug doesn't exist", driver: :rack_test do
+        repo = clone_course_repo(course)
+        repo.copy_simple_exercise('zipexercise3')
+        repo.add_commit_push
+        course.refresh
+
+        visit "/api/v8/org/wrong_org_slug/courses/#{course_name}/exercises/zipexercise3/download"
+        expect(page.status_code).to be(404)
       end
     end
   end

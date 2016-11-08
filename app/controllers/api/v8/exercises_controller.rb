@@ -91,8 +91,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
 
   def get_by_course
     unauthorized_guest! if current_user.guest?
-
-    course = Course.find_by!(id: params[:id]) || Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    course = Course.find_by!(id: params[:id]) if (params[:id])
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
     exercises = Exercise.where(course_id: course.id)
 
     visible = exercises.select { |ex| ex.visible_to?(current_user) }
@@ -113,7 +113,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
   end
 
   def download
-    self.class.skip_authorization_check
+    #self.class.skip_authorization_check
     course = Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
     exercise = Exercise.find_by!(name: params[:exercise_name], course_id: course.id)
 
