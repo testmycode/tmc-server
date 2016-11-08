@@ -16,7 +16,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
         schema do
           key :type, :array
           items do
-            key :"$ref", :AwardedPoint
+            key :"$ref", :AwardedPointWithExerciseId
           end
         end
       end
@@ -104,46 +104,36 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def points
-    course = find_by(Course, id: params[:id])
+    course = Course.find_by!(id: params[:id])
     points = course.awarded_points
     authorize! :read, points
-    render json: points.map {|p| p.point_as_json}
+    render json: AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
 
   def users_points
-    user = find_by(User, id: params[:user_id])
-    course = find_by(Course, id: params[:id])
-    points = AwardedPoint.course_user_points(course, user)
+    points = AwardedPoint.includes(:submission).where(course_id: params[:id], user_id: params[:user_id])
+    points.map {|p| p.point_as_json}
     authorize! :read, points
     render json: points.map {|p| p.point_as_json}
   end
 
   def current_users_points
-    course = find_by(Course, id: params[:id])
-    points = AwardedPoint.course_user_points(course, current_user)
+    points = AwardedPoint.where(course_id: params[:id], user_id: current_user.id)
     authorize! :read, points
     render json: points.map {|p| p.point_as_json}
   end
 
   def find_by_name
     unauthorized_guest!
-    course = find_by(Course, name: "#{params[:slug]}-#{params[:course_name]}")
+    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     authorize! :read, course
     render json: course.course_as_json
   end
 
   def find_by_id
     unauthorized_guest!
-    course = find_by(Course, id: params[:course_id])
+    course = Course.find_by!(id: params[:course_id])
     authorize! :read, course
     render json: course.course_as_json
-  end
-
-  # TODO: Move to more accessible place
-  # The intent of this is to make DB querying errors more descriptive and uniform
-  def find_by(model, hash)
-    course = model.find_by(hash)
-    raise ActiveRecord::RecordNotFound, "Couldn't find #{model.name} with #{hash.map{|k,v| "#{k}=#{v}"}.join(', ')}" unless course
-    course
   end
 end

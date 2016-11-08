@@ -18,7 +18,7 @@ class AwardedPoint < ActiveRecord::Base
     property :course_id, type: :integer, example: 1
     property :user_id, type: :integer, example: 1
     property :submission_id, type: :integer, example: 2
-    property :name, type: :string, example: "exercise name"
+    property :name, type: :string, example: "point name"
     dorequire(self)
   end
 
@@ -30,6 +30,19 @@ class AwardedPoint < ActiveRecord::Base
         :submission_id,
         :name,
     ]
+  end
+
+  swagger_schema :AwardedPointWithExerciseId do
+    property :awarded_point do
+      key :"$ref", :AwardedPoint
+    end
+    property :exercise_id, type: :integer, example: 1
+    dorequire(self)
+  end
+
+  def self.points_json_with_exercise_id(points, exercises)
+    exercises = exercises.map{ |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
+    points.map {|p| {awarded_point: p.point_as_json, exercise_id: exercises["#{p.course_id}-#{p.submission.exercise_name}"]}}
   end
 
   belongs_to :course
