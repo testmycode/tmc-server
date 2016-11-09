@@ -216,18 +216,15 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
-  around_action :course_transaction
+  around_action :wrap_transaction
 
   def all_submissions
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
-    organization = course.organization
+    submissions = authorized_content(Submission.where(course_id: course.id))
 
-    submissions = Submission.where(course_id: course.id).readable(current_user)
-    authorize! :read, submissions
-
-    render_json(submissions)
+    respond_with submissions
   end
 
   def users_submissions
@@ -237,12 +234,9 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
-    submissions = Submission.where(course_id: course.id, user_id: user.id).readable(current_user)
-    submissions.each do |s|
-      authorize! :read, s
-    end
+    submissions = authorized_content(Submission.where(course_id: course.id, user_id: user.id))
 
-    render_json(submissions)
+    respond_with submissions
   end
 
   def my_submissions
@@ -252,25 +246,8 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
-    submissions = Submission.where(course_id: course.id, user_id: user.id).readable(current_user)
-    authorize! :read, submissions
+    submissions = authorized_content(Submission.where(course_id: course.id, user_id: user.id))
 
-    render_json(submissions)
-  end
-
-  private
-
-  def course_transaction
-    Course.transaction(requires_new: true) do
-      yield
-    end
-  end
-
-  def render_json(array)
-      unauthorized!("You are not signed in!") if array.empty?
-
-      render json: {
-        submissions: array
-      }
+    respond_with submissions
   end
 end

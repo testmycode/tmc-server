@@ -376,9 +376,7 @@ class Submission < ActiveRecord::Base
   end
 
   def self.readable(user)
-    readable_submissions = []
-    Submission.all.each { |submission| readable_submissions << submission if submission.readable_by?(user) }
-    return readable_submissions
+    select { |submission| submission.readable_by?(user) }
   end
 
   def set_paste_key_if_paste_available
