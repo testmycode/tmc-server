@@ -37,7 +37,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
-  swagger_path '/api/v8/courses/{course_id}/submissions' do
+  swagger_path '/api/v8/courses/{course_id}/exercises/submissions' do
     operation :get do
       key :description, 'Returns the submissions visible to the user in a json format'
       key :operationId, 'findSubmissionsById'
@@ -267,14 +267,10 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   end
 
   def render_json(array)
-    if array.empty?
-      render json: {
-        error: "You are not signed in!"
-      }
-    else
+      unauthorized!("You are not signed in!") if array.empty?
+
       render json: {
         submissions: array
       }
-    end
   end
 end
