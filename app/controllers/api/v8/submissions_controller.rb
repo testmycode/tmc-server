@@ -219,7 +219,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
   around_action :course_transaction
 
   def all_submissions
-    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find_by(id: params[:course_id])
+    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
     organization = course.organization
@@ -234,7 +234,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     user = User.find(params[:user_id])
     authorize! :read, user
 
-    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
+    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
     submissions = Submission.where(course_id: course.id, user_id: user.id).readable(current_user)
@@ -249,7 +249,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     user = current_user
     authorize! :read, user
 
-    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.lock('FOR SHARE').find(params[:course_id])
+    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
     submissions = Submission.where(course_id: course.id, user_id: user.id).readable(current_user)
