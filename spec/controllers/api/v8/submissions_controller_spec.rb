@@ -620,8 +620,10 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, slug: organization.slug, course_name: course_name
 
-    expect(response.body).to include(sub1.to_json)
-    expect(response.body).to include(sub2.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), "incorrect submission or user id"
+    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), "incorrect submission or user id"
   end
 
   def get_two_subs_by_id
@@ -632,26 +634,34 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, course_id: course.id
 
-    expect(response.body).to include(sub1.to_json)
-    expect(response.body).to include(sub2.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), "incorrect submission or user id"
+    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), "incorrect submission or user id"
   end
 
   def get_all_own_subs(parameters)
     get :all_submissions, parameters
 
-    expect(response.body).to include(submission.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), "incorrect submission or user id"
   end
 
   def get_users_own_subs(parameters)
     get :users_submissions, parameters
 
-    expect(response.body).to include(submission.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), "incorrect submission or user id"
   end
 
   def get_my_own_subs(parameters)
     get :my_submissions, parameters
 
-    expect(response.body).to include(submission.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), "incorrect submission or user id"
   end
 
   def no_other_orgs_subs_for_teacher(parameters)
@@ -663,7 +673,9 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, parameters
 
-    expect(response.body).not_to include(other_guys_sub.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_orgs_user_subs_for_teacher(parameters)
@@ -675,7 +687,9 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :users_submissions, parameters
 
-    expect(response.body).not_to include(other_guys_sub.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_courses_subs_for_assistant(parameters)
@@ -686,7 +700,9 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, parameters
 
-    expect(response.body).not_to include(other_guys_sub.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_courses_user_subs_for_assistant(parameters)
@@ -697,7 +713,9 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :users_submissions, parameters
 
-    expect(response.body).not_to include(other_guys_sub.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_users_subs_for_student(parameters)
@@ -706,7 +724,9 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :all_submissions, parameters
 
-    expect(response.body).not_to include(other_guys_sub.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_users_user_subs_for_student(parameters)
@@ -715,7 +735,9 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :users_submissions, parameters
 
-    expect(response.body).not_to include(other_guys_sub.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_users_own_subs_for_anyone(parameters)
@@ -724,6 +746,8 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     get :my_submissions, parameters
 
-    expect(response.body).not_to include(other_guys_sub.to_json)
+    r = JSON.parse response.body
+
+    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 end
