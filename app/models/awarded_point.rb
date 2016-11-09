@@ -4,11 +4,14 @@
 # reference can be nil if the submission has been deleted.
 
 # TODO: move this to someplace better and rename
-# this makes a property optional. Otherwise properties are required:
-# property :name, type: :string, required: false
-def dorequire(swag)
-  swag.key :required, swag.data[:properties].data.select {|_,v| v.data[:required] != false}.map { |k,_| k }
+# Makes all properties required based on the default value and the
+# property's own 'required' key's value.
+def dorequire(swag, requiredByDefault = true)
+  key :required, data[:properties].data.select { |_, v|
+    v.data[:required] || (v.data[:required].nil? && requiredByDefault)
+  }.map { |k, _| k }
 end
+
 class AwardedPoint < ActiveRecord::Base
   include PointComparison
   include Swagger::Blocks
@@ -40,9 +43,11 @@ class AwardedPoint < ActiveRecord::Base
     dorequire(self)
   end
 
-  def self.points_json_with_exercise_id(points, exercises)
-    exercises = exercises.map{ |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
-    points.map {|p| {awarded_point: p.point_as_json, exercise_id: exercises["#{p.course_id}-#{p.submission.exercise_name}"]}}
+  def self.points_json_with_exercise_id(points_with_submissions, related_exercises)
+    related_exercises = related_exercises.map { |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
+    points_with_submissions.map { |p|
+      {awarded_point: p.point_as_json, exercise_id: related_exercises["#{p.course_id}-#{p.submission.exercise_name}"]}
+    }
   end
 
   belongs_to :course

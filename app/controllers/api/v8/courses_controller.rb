@@ -37,7 +37,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
         schema do
           key :type, :array
           items do
-            key :"$ref", :AwardedPoint
+            key :"$ref", :AwardedPointWithExerciseId
           end
         end
       end
@@ -57,7 +57,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
         schema do
           key :type, :array
           items do
-            key :"$ref", :AwardedPoint
+            key :"$ref", :AwardedPointWithExerciseId
           end
         end
       end
@@ -111,16 +111,18 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def users_points
+    course = Course.find_by!(id: params[:id])
     points = AwardedPoint.includes(:submission).where(course_id: params[:id], user_id: params[:user_id])
-    points.map {|p| p.point_as_json}
+    points.map { |p| p.point_as_json }
     authorize! :read, points
-    render json: points.map {|p| p.point_as_json}
+    render json: AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
 
   def current_users_points
+    course = Course.find_by!(id: params[:id])
     points = AwardedPoint.where(course_id: params[:id], user_id: current_user.id)
     authorize! :read, points
-    render json: points.map {|p| p.point_as_json}
+    render json: AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
 
   def find_by_name

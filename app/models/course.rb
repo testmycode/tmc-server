@@ -4,10 +4,12 @@ require 'system_commands'
 require 'date_and_time_utils'
 
 # TODO: move this to someplace better and rename
-# this makes a property optional. Otherwise properties are required:
-# property :name, type: :string, required: false
-def dorequire(swag)
-  swag.key :required, swag.data[:properties].data.select {|_,v| v.data[:required] != false}.map { |k,_| k }
+# Makes all properties required based on the default value and the
+# property's own 'required' key's value.
+def dorequire(swag, requiredByDefault = true)
+  key :required, data[:properties].data.select { |_, v|
+    v.data[:required] || (v.data[:required].nil? && requiredByDefault)
+  }.map { |k, _| k }
 end
 
 class Course < ActiveRecord::Base
