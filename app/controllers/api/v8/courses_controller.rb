@@ -8,7 +8,6 @@ class Api::V8::CoursesController < Api::V8::BaseController
       key :produces, ["application/json"]
       key :tags, ["course", "points"]
       parameter "$ref": "#/parameters/path_course_id"
-      parameter "$ref": "#/parameters/path_user_id"
       response 403, "$ref": "#/responses/error"
       response 404, "$ref": "#/responses/error"
       response 200 do
