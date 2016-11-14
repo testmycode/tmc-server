@@ -120,4 +120,19 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     authorize! :download, exercise
     send_file exercise.stub_zip_file_path
   end
+
+  def get_points
+    course = Course.find_by!(id: params[:id]) if params[:id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    conditions = {
+        submissions: {exercise_name: params[:exercise_name]},
+        course_id: course.id
+    }
+    params[:user_id] = current_user.id if params[:user_id] == 'mine'
+    conditions[:user_id] = params[:user_id] if params[:user_id]
+    points = AwardedPoint.includes(:submission)
+      .where(conditions)
+    authorize! :read, points
+    present(AwardedPoint.points_json_with_exercise_id(points, course.exercises))
+  end
 end
