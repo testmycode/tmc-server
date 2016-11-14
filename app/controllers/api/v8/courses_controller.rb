@@ -22,7 +22,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/courses/{course_id}/points/{user_id}" do
+  swagger_path "/api/v8/courses/{course_id}/points/user/{user_id}" do
     operation :get do
       key :description, "Returns the given user's points from the course in a json format. Course is searched by id"
       key :produces, ["application/json"]
@@ -43,7 +43,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/courses/{course_id}/points/mine" do
+  swagger_path "/api/v8/courses/{course_id}/points/user" do
     operation :get do
       key :description, "Returns the current user's points from the course in a json format. Course is searched by id"
       key :produces, ["application/json"]
@@ -84,7 +84,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/{user_id}" do
+  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/user/{user_id}" do
     operation :get do
       key :description, "Returns the given user's points from the course in a json format. Course is searched by name"
       key :produces, ["application/json"]
@@ -106,7 +106,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/mine" do
+  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/user" do
     operation :get do
       key :description, "Returns the current user's points from the course in a json format. Course is searched by name"
       key :produces, ["application/json"]
@@ -167,22 +167,22 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def points
-    course = Course.find_by!(id: params[:id])
+    course = Course.find_by!(id: params[:course_id])
     points = AwardedPoint.includes(:submission).where(course_id: course.id)
     authorize! :read, points
     present AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
 
   def users_points
-    course = Course.find_by!(id: params[:id])
-    points = AwardedPoint.includes(:submission).where(course_id: params[:id], user_id: params[:user_id])
+    course = Course.find_by!(id: params[:course_id])
+    points = AwardedPoint.includes(:submission).where(course_id: params[:course_id], user_id: params[:user_id])
     authorize! :read, points
     present AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
 
   def current_users_points
-    course = Course.find_by!(id: params[:id])
-    points = AwardedPoint.includes(:submission).where(course_id: params[:id], user_id: current_user.id)
+    course = Course.find_by!(id: params[:course_id])
+    points = AwardedPoint.includes(:submission).where(course_id: params[:course_id], user_id: current_user.id)
     authorize! :read, points
     present AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
