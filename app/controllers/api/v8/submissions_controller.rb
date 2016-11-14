@@ -222,7 +222,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
-    submissions = authorized_content(Submission.where(course_id: course.id))
+    submissions = filter_submissions(authorized_content(Submission.where(course_id: course.id)))
 
     present(submissions)
   end
@@ -234,7 +234,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
-    submissions = authorized_content(Submission.where(course_id: course.id, user_id: user.id))
+    submissions = filter_submissions(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
 
     present(submissions)
   end
@@ -245,8 +245,44 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
 
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
+    
+    submissions = filter_submissions(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
 
-    submissions = authorized_content(Submission.where(course_id: course.id, user_id: user.id))
     present(submissions)
+  end
+
+  private
+
+  def filter_submissions(submissions)
+    filtered_fields = submissions.map do |sub|
+      {
+          id: sub.id,
+          user_id: sub.user_id,
+          pretest_error: sub.pretest_error,
+          created_at: sub.created_at,
+          exercise_name: sub.exercise_name,
+          course_id: sub.course_id,
+          processed: sub.processed,
+          all_tests_passed: sub.all_tests_passed,
+          points: sub.points,
+          processing_tried_at: sub.processing_tried_at,
+          processing_began_at: sub.processing_began_at,
+          processing_completed_at: sub.processing_completed_at,
+          times_sent_to_sandbox: sub.times_sent_to_sandbox,
+          processing_attempts_started_at: sub.processing_attempts_started_at,
+          stdout: sub.stdout,
+          stderr: sub.stderr,
+          params_json: sub.params_json,
+          requires_review: sub.requires_review,
+          requests_review: sub.requests_review,
+          reviewed: sub.reviewed,
+          message_for_reviewer: sub.message_for_reviewer,
+          newer_submission_reviewed: sub.newer_submission_reviewed,
+          review_dismissed: sub.review_dismissed,
+          paste_available: sub.paste_available,
+          message_for_paste: sub.message_for_paste,
+          paste_key: sub.paste_key
+      }
+    end
   end
 end

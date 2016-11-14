@@ -10,11 +10,9 @@ class Submission < ActiveRecord::Base
         :user_id,
         :pretest_error,
         :created_at,
-        :updated_at,
         :exercise_name,
         :course_id,
         :processed,
-        :secret_token,
         :all_tests_passed,
         :points,
         :processing_tried_at,
@@ -22,9 +20,8 @@ class Submission < ActiveRecord::Base
         :processing_completed_at,
         :times_sent_to_sandbox,
         :processing_attempts_started_at,
-        :processing_priority,
-        :stdout_compressed,
-        :stderr_compressed,
+        :stdout,
+        :stderr,
         :params_json,
         :requires_review,
         :requests_review,
@@ -34,21 +31,16 @@ class Submission < ActiveRecord::Base
         :review_dismissed,
         :paste_available,
         :message_for_paste,
-        :paste_key,
-        :client_time,
-        :client_nanotime,
-        :client_ip,
-        :sandbox
+        :paste_key
     ]
+
     property :id, type: :integer, example: 1
     property :user_id, type: :integer, example: 1
     property :pretest_error, type: :text, description: "Can be null", example: "Missing test output. Did you terminate your program with an exit() command?"
     property :created_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
-    property :updated_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
     property :exercise_name, type: :string, example: "trivial"
     property :course_id, type: :integer, example: 1
     property :processed, type: :boolean, example: true
-    property :secret_token, type: :string, description: "Can be null"
     property :all_tests_passed, type: :boolean, example: true
     property :points, type: :text, description: "Can be null"
     property :processing_tried_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
@@ -56,9 +48,8 @@ class Submission < ActiveRecord::Base
     property :processing_completed_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
     property :times_sent_to_sandbox, type: :integer, example: 1
     property :processing_attempts_started_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
-    property :processing_priority, type: :integer, example: 1
-    property :stdout_compressed, type: :binary, description: "Can be null"
-    property :stderr_compressed, type: :binary, description: "Can be null"
+    property :stdout, type: :string
+    property :stderr, type: :string
     property :params_json, type: :string, example: "{\"error_msg_locale\":\"en\"}"
     property :requires_review, type: :boolean, example: true
     property :requests_review, type: :boolean, example: true
@@ -69,10 +60,6 @@ class Submission < ActiveRecord::Base
     property :paste_available, type: :boolean, example: true
     property :message_for_paste, type: :string, example: ""
     property :paste_key, type: :string, description: "Can be null"
-    property :client_time, type: :string, description: "Can be null", example: "2016-10-17T11:10:17.295+03:00"
-    property :client_nanotime, type: :integer, description: "Can be null", example: 211152562700390
-    property :client_ip, type: :string, example: "172.18.0.1"
-    property :sandbox, type: :string, example: "http://10.8.0.100:57001/tasks.json"
   end
 
   belongs_to :user
