@@ -108,7 +108,7 @@ describe Api::V8::ExercisesController, type: :controller do
     describe 'as an unauthenticated user' do
       let(:token) { double resource_owner_id: guest.id, acceptable?: true }
 
-      it 'should succeed if the course name and slug ar correct', driver: :rack_test do
+      it 'should succeed if the course name and slug are correct', driver: :rack_test do
         repo = clone_course_repo(course)
         repo.copy_simple_exercise('zipexercise')
         repo.add_commit_push
