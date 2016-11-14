@@ -72,7 +72,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
-  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions/{user_id}' do
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions/user/{user_id}' do
     operation :get do
       key :description, 'Returns the submissions visible to the user in a json format'
       key :operationId, 'findUsersSubmissionsByCourseName'
@@ -109,7 +109,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
-  swagger_path '/api/v8/courses/{course_id}/exercises/submissions/{user_id}' do
+  swagger_path '/api/v8/courses/{course_id}/exercises/submissions/user/{user_id}' do
     operation :get do
       key :description, 'Returns the submissions visible to the user in a json format'
       key :operationId, 'findUsersSubmissionsById'
@@ -145,7 +145,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
-  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions/mine' do
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/submissions/user' do
     operation :get do
       key :description, 'Returns the user\'s own submissions in a json format'
       key :operationId, 'findUsersOwnSubmissionsByCourseName'
@@ -181,7 +181,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     end
   end
 
-  swagger_path '/api/v8/courses/{course_id}/exercises/submissions/mine' do
+  swagger_path '/api/v8/courses/{course_id}/exercises/submissions/user' do
     operation :get do
       key :description, 'Returns the user\'s own submissions in a json format'
       key :operationId, 'findUsersOwnSubmissionsById'
@@ -218,43 +218,33 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
 
   around_action :wrap_transaction
 
-  def all_submissions
-    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
-    authorize! :read, course
+  def get_submissions_all
+    unauthorized_guest! if current_user.guest?
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
+    submissions = Submission.where(course_id: course.id)
+    readable = filter_fields(submissions.select { |sub| sub.readable_by?(current_user) })
 
-    submissions = filter_fields(authorized_content(Submission.where(course_id: course.id)))
-
-    present(submissions)
+    authorize_collection :read, readable
+    present(readable)
   end
 
-  def users_submissions
-    user = User.find(params[:user_id])
-    authorize! :read, user
+  def get_submissions_user
+    unauthorized_guest! if current_user.guest?
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
+    params[:user_id] = current_user.id unless params[:user_id]
+    submissions = Submission.where(course_id: course.id, user_id: params[:user_id])
+    readable = filter_fields(submissions.select { |sub| sub.readable_by?(current_user) })
 
-    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
-    authorize! :read, course
-
-    submissions = filter_fields(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
-
-    present(submissions)
-  end
-
-  def my_submissions
-    user = current_user
-    authorize! :read, user
-
-    course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
-    authorize! :read, course
-
-    submissions = filter_fields(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
-
-    present(submissions)
+    authorize_collection :read, readable
+    present(readable)
   end
 
   private
 
   def filter_fields(submissions)
-    filtered_fields = submissions.map do |sub|
+    submissions.map do |sub|
       {
           id: sub.id,
           user_id: sub.user_id,

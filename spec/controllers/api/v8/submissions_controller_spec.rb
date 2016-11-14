@@ -136,9 +136,10 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         it "should not show any submissions" do
-          get :all_submissions, slug: organization.slug, course_name: course_name
+          get :get_submissions_all, slug: organization.slug, course_name: course_name
 
-          expect(response.body).to have_content("You are not signed in!")
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content("Authentication required")
         end
       end
     end
@@ -262,9 +263,10 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         it "should not show any submissions" do
-          get :all_submissions, course_id: course.id
+          get :get_submissions_all, course_id: course.id
 
-          expect(response.body).to have_content("You are not signed in!")
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content("Authentication required")
         end
       end
     end
@@ -390,9 +392,10 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         it "should not show any submissions" do
-          get :users_submissions, slug: organization.slug, course_name: course_name, user_id: user.id
+          get :get_submissions_user, slug: organization.slug, course_name: course_name, user_id: user.id
 
-          expect(response.body).to have_content("[\"You are not authorized to access this page.\"]")
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content("Authentication required")
         end
       end
     end
@@ -516,9 +519,10 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         it "should not show any submissions" do
-          get :users_submissions, course_id: course.id, user_id: user.id
+          get :get_submissions_user, course_id: course.id, user_id: user.id
 
-          expect(response.body).to have_content("[\"You are not authorized to access this page.\"]")
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content("Authentication required")
         end
       end
     end
@@ -560,9 +564,10 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         it "should not show any submissions" do
-          get :my_submissions, slug: organization.slug, course_name: course_name
+          get :get_submissions_user, slug: organization.slug, course_name: course_name
 
-          expect(response.body).to have_content("You are not signed in!")
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content("Authentication required")
         end
       end
     end
@@ -602,9 +607,10 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         it "should not show any submissions" do
-          get :my_submissions, course_id: course.id
+          get :get_submissions_user, course_id: course.id
 
-          expect(response.body).to have_content("You are not signed in!")
+          expect(response).to have_http_status(403)
+          expect(response.body).to have_content("Authentication required")
         end
       end
     end
@@ -618,7 +624,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     sub1 = FactoryGirl.create(:submission, user: user1, course: course)
     sub2 = FactoryGirl.create(:submission, user: user2, course: course)
 
-    get :all_submissions, slug: organization.slug, course_name: course_name
+    get :get_submissions_all, slug: organization.slug, course_name: course_name
 
     r = JSON.parse response.body
 
@@ -632,7 +638,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     sub1 = FactoryGirl.create(:submission, user: user1, course: course)
     sub2 = FactoryGirl.create(:submission, user: user2, course: course)
 
-    get :all_submissions, course_id: course.id
+    get :get_submissions_all, course_id: course.id
 
     r = JSON.parse response.body
 
@@ -641,7 +647,7 @@ describe Api::V8::SubmissionsController, type: :controller do
   end
 
   def get_all_own_subs(parameters)
-    get :all_submissions, parameters
+    get :get_submissions_all, parameters
 
     r = JSON.parse response.body
 
@@ -649,7 +655,7 @@ describe Api::V8::SubmissionsController, type: :controller do
   end
 
   def get_users_own_subs(parameters)
-    get :users_submissions, parameters
+    get :get_submissions_user, parameters
 
     r = JSON.parse response.body
 
@@ -657,7 +663,7 @@ describe Api::V8::SubmissionsController, type: :controller do
   end
 
   def get_my_own_subs(parameters)
-    get :my_submissions, parameters
+    get :get_submissions_user, parameters
 
     r = JSON.parse response.body
 
@@ -671,7 +677,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     other_user = FactoryGirl.create(:user)
     other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-    get :all_submissions, parameters
+    get :get_submissions_all, parameters
 
     r = JSON.parse response.body
 
@@ -685,7 +691,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     other_user = FactoryGirl.create(:user)
     other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-    get :users_submissions, parameters
+    get :get_submissions_user, parameters
 
     r = JSON.parse response.body
 
@@ -698,7 +704,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     other_user = FactoryGirl.create(:user)
     other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-    get :all_submissions, parameters
+    get :get_submissions_all, parameters
 
     r = JSON.parse response.body
 
@@ -711,7 +717,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     other_user = FactoryGirl.create(:user)
     other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-    get :users_submissions, parameters
+    get :get_submissions_user, parameters
 
     r = JSON.parse response.body
 
@@ -722,7 +728,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     other_user = FactoryGirl.create(:user)
     other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-    get :all_submissions, parameters
+    get :get_submissions_all, parameters
 
     r = JSON.parse response.body
 
@@ -733,7 +739,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     other_user = FactoryGirl.create(:user)
     other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-    get :users_submissions, parameters
+    get :get_submissions_user, parameters
 
     r = JSON.parse response.body
 
@@ -744,7 +750,7 @@ describe Api::V8::SubmissionsController, type: :controller do
     other_user = FactoryGirl.create(:user)
     other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-    get :my_submissions, parameters
+    get :get_submissions_user, parameters
 
     r = JSON.parse response.body
 

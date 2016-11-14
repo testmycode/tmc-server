@@ -91,8 +91,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
 
   def get_by_course
     unauthorized_guest! if current_user.guest?
-    course = Course.find_by!(id: params[:id]) if (params[:id])
-    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     exercises = Exercise.includes(:available_points).where(course_id: course.id)
 
     visible = exercises.select { |ex| ex.visible_to?(current_user) }
@@ -107,13 +107,14 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           disabled: ex.disabled?
       }
     end
-    authorize! :read, visible
+
+    authorize_collection :read, visible
     present(presentable)
 
   end
 
   def download
-    course = Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     exercise = Exercise.find_by!(name: params[:exercise_name], course_id: course.id)
 
     authorize! :download, exercise

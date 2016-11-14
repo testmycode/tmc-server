@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
   include BreadcrumbHelpers
   include EmbeddableHelper
-  include AuthorizedContentHelper
+  include AuthorizeCollectionHelper
   check_authorization
 
   rescue_from CanCan::AccessDenied do |_exception|
