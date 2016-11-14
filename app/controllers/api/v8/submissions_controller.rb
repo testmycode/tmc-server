@@ -224,7 +224,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
 
     submissions = authorized_content(Submission.where(course_id: course.id))
 
-    render json: submissions
+    present(submissions)
   end
 
   def users_submissions
@@ -236,7 +236,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
 
     submissions = authorized_content(Submission.where(course_id: course.id, user_id: user.id))
 
-    render json: submissions
+    present(submissions)
   end
 
   def my_submissions
@@ -247,6 +247,6 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     authorize! :read, course
 
     submissions = authorized_content(Submission.where(course_id: course.id, user_id: user.id))
-    render json: submissions
+    present(submissions)
   end
 end
