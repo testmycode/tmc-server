@@ -222,7 +222,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
-    submissions = filter_submissions(authorized_content(Submission.where(course_id: course.id)))
+    submissions = filter_fields(authorized_content(Submission.where(course_id: course.id)))
 
     present(submissions)
   end
@@ -234,7 +234,7 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
 
-    submissions = filter_submissions(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
+    submissions = filter_fields(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
 
     present(submissions)
   end
@@ -245,15 +245,15 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
 
     course = Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}") || Course.find(params[:course_id])
     authorize! :read, course
-    
-    submissions = filter_submissions(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
+
+    submissions = filter_fields(authorized_content(Submission.where(course_id: course.id, user_id: user.id)))
 
     present(submissions)
   end
 
   private
 
-  def filter_submissions(submissions)
+  def filter_fields(submissions)
     filtered_fields = submissions.map do |sub|
       {
           id: sub.id,
