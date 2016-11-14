@@ -6,7 +6,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     operation :get do
       key :description, "Returns the course's points in a json format. Course is searched by id"
       key :produces, ["application/json"]
-      key :tags, ["course", "points"]
+      key :tags, ["points"]
       parameter "$ref": "#/parameters/path_course_id"
       response 403, "$ref": "#/responses/error"
       response 404, "$ref": "#/responses/error"
@@ -26,7 +26,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     operation :get do
       key :description, "Returns the given user's points from the course in a json format. Course is searched by id"
       key :produces, ["application/json"]
-      key :tags, ["course", "points"]
+      key :tags, ["points"]
       parameter "$ref": "#/parameters/path_course_id"
       parameter "$ref": "#/parameters/path_user_id"
       response 403, "$ref": "#/responses/error"
@@ -47,7 +47,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     operation :get do
       key :description, "Returns the current user's points from the course in a json format. Course is searched by id"
       key :produces, ["application/json"]
-      key :tags, ["course", "points"]
+      key :tags, ["points"]
       parameter "$ref": "#/parameters/path_course_id"
       response 403, "$ref": "#/responses/error"
       response 404, "$ref": "#/responses/error"
@@ -67,7 +67,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     operation :get do
       key :description, "Returns the course's points in a json format. Course is searched by name"
       key :produces, ["application/json"]
-      key :tags, ["course", "points"]
+      key :tags, ["points"]
       parameter "$ref": "#/parameters/path_organization_id"
       parameter "$ref": "#/parameters/path_course_name"
       response 403, "$ref": "#/responses/error"
@@ -88,7 +88,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     operation :get do
       key :description, "Returns the given user's points from the course in a json format. Course is searched by name"
       key :produces, ["application/json"]
-      key :tags, ["course", "points"]
+      key :tags, ["points"]
       parameter "$ref": "#/parameters/path_organization_id"
       parameter "$ref": "#/parameters/path_course_name"
       parameter "$ref": "#/parameters/path_user_id"
@@ -110,7 +110,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     operation :get do
       key :description, "Returns the current user's points from the course in a json format. Course is searched by name"
       key :produces, ["application/json"]
-      key :tags, ["course", "points"]
+      key :tags, ["points"]
       parameter "$ref": "#/parameters/path_organization_id"
       parameter "$ref": "#/parameters/path_course_name"
       response 403, "$ref": "#/responses/error"
