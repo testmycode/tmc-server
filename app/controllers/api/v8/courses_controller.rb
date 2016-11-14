@@ -63,6 +63,70 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
+  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points" do
+    operation :get do
+      key :description, "Returns the course's points in a json format. Course is searched by name"
+      key :produces, ["application/json"]
+      key :tags, ["course", "points"]
+      parameter "$ref": "#/parameters/path_organization_id"
+      parameter "$ref": "#/parameters/path_course_name"
+      response 403, "$ref": "#/responses/error"
+      response 404, "$ref": "#/responses/error"
+      response 200 do
+        key :description, "Points in json"
+        schema do
+          key :type, :array
+          items do
+            key :"$ref", :AwardedPointWithExerciseId
+          end
+        end
+      end
+    end
+  end
+
+  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/{user_id}" do
+    operation :get do
+      key :description, "Returns the given user's points from the course in a json format. Course is searched by name"
+      key :produces, ["application/json"]
+      key :tags, ["course", "points"]
+      parameter "$ref": "#/parameters/path_organization_id"
+      parameter "$ref": "#/parameters/path_course_name"
+      parameter "$ref": "#/parameters/path_user_id"
+      response 403, "$ref": "#/responses/error"
+      response 404, "$ref": "#/responses/error"
+      response 200 do
+        key :description, "Points in json"
+        schema do
+          key :type, :array
+          items do
+            key :"$ref", :AwardedPointWithExerciseId
+          end
+        end
+      end
+    end
+  end
+
+  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/mine" do
+    operation :get do
+      key :description, "Returns the current user's points from the course in a json format. Course is searched by name"
+      key :produces, ["application/json"]
+      key :tags, ["course", "points"]
+      parameter "$ref": "#/parameters/path_organization_id"
+      parameter "$ref": "#/parameters/path_course_name"
+      response 403, "$ref": "#/responses/error"
+      response 404, "$ref": "#/responses/error"
+      response 200 do
+        key :description, "Points in json"
+        schema do
+          key :type, :array
+          items do
+            key :"$ref", :AwardedPointWithExerciseId
+          end
+        end
+      end
+    end
+  end
+
   swagger_path "/api/v8/courses/{course_id}" do
     operation :get do
       key :description, "Returns the course's information in a json format. Course is searched by id"
@@ -104,7 +168,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
 
   def points
     course = Course.find_by!(id: params[:id])
-    points = AwardedPoint.includes(:submission).where(course_id: course.id, user_id: params[:user_id])
+    points = AwardedPoint.includes(:submission).where(course_id: course.id)
     authorize! :read, points
     render json: AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
