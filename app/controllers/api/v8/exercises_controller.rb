@@ -310,7 +310,6 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     course = Course.find_by!(id: params[:id]) if params[:id]
     course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
 
-    conditions[:user_id] = params[:user_id] if params[:user_id]
     points = AwardedPoint.includes(:submission)
                  .where(submissions: {exercise_name: params[:exercise_name]},
                         course_id: course.id)
