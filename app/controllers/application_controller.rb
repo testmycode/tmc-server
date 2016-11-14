@@ -20,6 +20,7 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
   include BreadcrumbHelpers
   include EmbeddableHelper
+  include AuthorizedContentHelper
   check_authorization
 
   rescue_from CanCan::AccessDenied do |_exception|
@@ -211,5 +212,11 @@ class ApplicationController < ActionController::Base
     render_options.delete(:filename)
 
     render render_options
+  end
+
+  def wrap_transaction
+    ActiveRecord::Base.transaction(requires_new: true) do
+      yield
+    end
   end
 end

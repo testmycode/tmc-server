@@ -18,7 +18,7 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe "when course ID given" do
         it "shows course information" do
-          get :find_by_id, id: course.id
+          get :find_by_id, course_id: course.id
           expect(response).to have_http_status(:success)
           expect(response.body).to have_content course.name
         end
@@ -27,14 +27,14 @@ describe Api::V8::CoursesController, type: :controller do
         it "shows course information" do
           course.hidden = true
           course.save!
-          get :find_by_id, id: course.id
+          get :find_by_id, course_id: course.id
           expect(response).to have_http_status(:success)
           expect(response.body).to have_content course.name
         end
       end
       describe "when invalid course ID given" do
         it "shows error about finding course" do
-          get :find_by_id, id: -1
+          get :find_by_id, course_id: -1
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
@@ -46,7 +46,7 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe "when course ID given" do
         it "shows course information" do
-          get :find_by_id, id: course.id
+          get :find_by_id, course_id: course.id
           expect(response).to have_http_status(:success)
           expect(response.body).to have_content course.name
         end
@@ -55,14 +55,14 @@ describe Api::V8::CoursesController, type: :controller do
         it "shows authorization error" do
           course.hidden = true
           course.save!
-          get :find_by_id, id: course.id
+          get :find_by_id, course_id: course.id
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "You are not authorized"
         end
       end
       describe "when invalid course ID given" do
         it "shows error about finding course" do
-          get :find_by_id, id: -1
+          get :find_by_id, course_id: -1
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
@@ -74,7 +74,7 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe "when course ID given" do
         it "shows authentication error" do
-          get :find_by_id, id: course.id
+          get :find_by_id, course_id: course.id
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
@@ -83,14 +83,14 @@ describe Api::V8::CoursesController, type: :controller do
         it "shows authentication error" do
           course.hidden = true
           course.save!
-          get :find_by_id, id: course.id
+          get :find_by_id, course_id: course.id
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
       end
       describe "when invalid course ID given" do
         it "shows authentication error" do
-          get :find_by_id, id: -1
+          get :find_by_id, course_id: -1
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
@@ -106,7 +106,7 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe "when organization id and course name given" do
         it "shows course information" do
-          get :find_by_name, {slug: organization.slug, name: course_name}
+          get :find_by_name, {slug: organization.slug, course_name: course_name}
           expect(response).to have_http_status(:success)
           expect(response.body).to have_content course.name
         end
@@ -115,28 +115,28 @@ describe Api::V8::CoursesController, type: :controller do
         it "shows course information" do
           course.hidden = true
           course.save!
-          get :find_by_name, {slug: organization.slug, name: course_name}
+          get :find_by_name, {slug: organization.slug, course_name: course_name}
           expect(response).to have_http_status(:success)
           expect(response.body).to have_content course.name
         end
       end
       describe "when invalid organization id and valid course name given" do
         it "error about finding course" do
-          get :find_by_name, {slug: "bad", name: course_name}
+          get :find_by_name, {slug: "bad", course_name: course_name}
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
       end
       describe "when valid organization id and invalid course name given" do
         it "error about finding course" do
-          get :find_by_name, {slug: organization.slug, name: "bad"}
+          get :find_by_name, {slug: organization.slug, course_name: "bad"}
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
       end
       describe "when invalid organization id and invalid course name given" do
         it "error about finding course" do
-          get :find_by_name, {slug: "bad", name: "bad"}
+          get :find_by_name, {slug: "bad", course_name: "bad"}
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
@@ -148,7 +148,7 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe "when organization id and course name given" do
         it "shows course information" do
-          get :find_by_name, {slug: organization.slug, name: course_name}
+          get :find_by_name, {slug: organization.slug, course_name: course_name}
           expect(response).to have_http_status(:success)
           expect(response.body).to have_content course.name
         end
@@ -157,28 +157,28 @@ describe Api::V8::CoursesController, type: :controller do
         it "shows authorization error" do
           course.hidden = true
           course.save!
-          get :find_by_name, {slug: organization.slug, name: course_name}
+          get :find_by_name, {slug: organization.slug, course_name: course_name}
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "You are not authorized"
         end
       end
       describe "when invalid organization id and valid course name given" do
         it "shows error about finding course" do
-          get :find_by_name, {slug: "bad", name: course_name}
+          get :find_by_name, {slug: "bad", course_name: course_name}
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
       end
       describe "when valid organization id and invalid course name given" do
         it "error about finding course" do
-          get :find_by_name, {slug: organization.slug, name: "bad"}
+          get :find_by_name, {slug: organization.slug, course_name: "bad"}
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
       end
       describe "when invalid organization id and invalid course name given" do
         it "error about finding course" do
-          get :find_by_name, {slug: "bad", name: "bad"}
+          get :find_by_name, {slug: "bad", course_name: "bad"}
           expect(response).to have_http_status(:missing)
           expect(response.body).to have_content "Couldn't find Course"
         end
@@ -190,7 +190,7 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe "when organization id and course name given" do
         it "shows authentication error" do
-          get :find_by_name, {slug: organization.slug, name: course_name}
+          get :find_by_name, {slug: organization.slug, course_name: course_name}
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
@@ -199,28 +199,28 @@ describe Api::V8::CoursesController, type: :controller do
         it "shows authentication error" do
           course.hidden = true
           course.save!
-          get :find_by_name, {slug: organization.slug, name: course_name}
+          get :find_by_name, {slug: organization.slug, course_name: course_name}
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
       end
       describe "when invalid organization id and valid course name given" do
         it "shows authentication error" do
-          get :find_by_name, {slug: "bad", name: course_name}
+          get :find_by_name, {slug: "bad", course_name: course_name}
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
       end
       describe "when valid organization id and invalid course name given" do
         it "shows authentication error" do
-          get :find_by_name, {slug: organization.slug, name: "bad"}
+          get :find_by_name, {slug: organization.slug, course_name: "bad"}
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end
       end
       describe "when invalid organization id and invalid course name given" do
         it "shows authentication error" do
-          get :find_by_name, {slug: "bad", name: "bad"}
+          get :find_by_name, {slug: "bad", course_name: "bad"}
           expect(response).to have_http_status(403)
           expect(response.body).to have_content "Authentication required"
         end

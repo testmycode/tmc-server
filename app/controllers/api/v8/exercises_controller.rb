@@ -32,7 +32,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     end
   end
 
-  swagger_path '/api/v8/organizations/{organization_id}/courses/{course_name}/exercises' do
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises' do
     operation :get do
       key :description, 'Returns all exercises of the course as json. Course is searched by name'
       key :operationId, 'findExercisesByName'
@@ -66,7 +66,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
 
   def get_by_course
     unauthorized_guest! if current_user.guest?
-    course = Course.find_by(id: params[:id]) || Course.find_by(name: "#{params[:slug]}-#{params[:name]}")
+    course = Course.find_by(id: params[:course_id]) || Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}")
     if course == nil
       authorize! :read, nil
       respond_not_found('Course not found!')

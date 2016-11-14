@@ -57,6 +57,13 @@ class Api::V8::ApidocsController < ActionController::Base
       key :required, true
       key :type, :integer
     end
+    parameter :path_user_id do
+      key :name, :user_id
+      key :in, :path
+      key :description, "User's id"
+      key :required, true
+      key :type, :integer
+    end
     response :error do
       key :description, "An error occurred"
       schema do
@@ -83,12 +90,14 @@ class Api::V8::ApidocsController < ActionController::Base
 
   # A list of all classes that have swagger_* declarations.
   SWAGGERED_CLASSES = [
-      Api::V8::CoursesController,
-      Api::V8::ExercisesController,
-      Course,
-      Exercise,
-      AvailablePoint,
-      self,
+    Api::V8::CoursesController,
+    Api::V8::ExercisesController,
+    Api::V8::SubmissionsController,
+    Course,
+    Exercise,
+    AvailablePoint,
+    Submission,
+    self
   ].freeze
 
   def index

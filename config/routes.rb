@@ -7,7 +7,7 @@ TmcServer::Application.routes.draw do
     resources :organizations, only: [:index, :new, :create, :edit, :update], path: '' do
       resources :course_chooser, only: [:index]
 
-      resource :course, only: [:new, :create], controller: :course_details, path_names: { new: 'new/:template_id'} do
+      resource :course, only: [:new, :create], controller: :course_details, path_names: {new: 'new/:template_id'} do
         get 'new/custom', to: 'course_details#custom'
       end
       resources :courses, only: [] do
@@ -19,8 +19,8 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  namespace :api, :constraints => { :format => /(html|json|js|)/ } do
-    namespace :beta, defaults: { format: 'json' } do
+  namespace :api, :constraints => {:format => /(html|json|js|)/} do
+    namespace :beta, defaults: {format: 'json'} do
       get '/demo', to: 'demo#index'
       resources :participant, only: [:index] do
         member do
@@ -38,26 +38,36 @@ TmcServer::Application.routes.draw do
         end
       end
     end
-
-    namespace :v8, defaults: { format: 'json' } do
+    
+    namespace :v8, defaults: {format: 'json'} do
       get '/documentation', to: 'apidocs#index'
-      scope '/organizations' do
+      scope '/org' do
         scope '/:slug' do
           scope '/courses' do
-            scope '/:name' do
+            scope '/:course_name' do
               get '/' => 'courses#find_by_name'
               scope '/exercises' do
                 get '/' => 'exercises#get_by_course'
+              end
+              scope '/submissions' do
+                get '/', to: 'submissions#all_submissions'
+                get '/mine', to: 'submissions#my_submissions'
+                get '/:user_id', to: 'submissions#users_submissions'
               end
             end
           end
         end
       end
       scope '/courses' do
-        scope '/:id' do
+        scope '/:course_id' do
           get '/' => 'courses#find_by_id'
           scope '/exercises' do
             get '/' => 'exercises#get_by_course'
+            scope '/submissions' do
+              get '/', to: 'submissions#all_submissions'
+              get '/mine', to: 'submissions#my_submissions'
+              get '/:user_id', to: 'submissions#users_submissions'
+            end
           end
         end
       end

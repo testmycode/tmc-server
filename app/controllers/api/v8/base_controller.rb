@@ -31,7 +31,7 @@ class Api::V8::BaseController < ApplicationController
       @current_user ||= User.find_by_id(doorkeeper_token.resource_owner_id)
       raise 'Invalid token' unless @current_user
     end
-    @current_user ||= Guest.new
+    @current_user ||= user_from_session || Guest.new
   end
 
   attr_reader :current_user

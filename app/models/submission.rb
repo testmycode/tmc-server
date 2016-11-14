@@ -2,6 +2,66 @@ require 'zlib'
 require 'securerandom'
 
 class Submission < ActiveRecord::Base
+  include Swagger::Blocks
+
+  swagger_schema :Submission do
+    key :required, [
+        :id,
+        :user_id,
+        :pretest_error,
+        :created_at,
+        :exercise_name,
+        :course_id,
+        :processed,
+        :all_tests_passed,
+        :points,
+        :processing_tried_at,
+        :processing_began_at,
+        :processing_completed_at,
+        :times_sent_to_sandbox,
+        :processing_attempts_started_at,
+        :stdout,
+        :stderr,
+        :params_json,
+        :requires_review,
+        :requests_review,
+        :reviewed,
+        :message_for_reviewer,
+        :newer_submission_reviewed,
+        :review_dismissed,
+        :paste_available,
+        :message_for_paste,
+        :paste_key
+    ]
+
+    property :id, type: :integer, example: 1
+    property :user_id, type: :integer, example: 1
+    property :pretest_error, type: :text, description: "Can be null", example: "Missing test output. Did you terminate your program with an exit() command?"
+    property :created_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
+    property :exercise_name, type: :string, example: "trivial"
+    property :course_id, type: :integer, example: 1
+    property :processed, type: :boolean, example: true
+    property :all_tests_passed, type: :boolean, example: true
+    property :points, type: :text, description: "Can be null"
+    property :processing_tried_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
+    property :processing_began_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
+    property :processing_completed_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
+    property :times_sent_to_sandbox, type: :integer, example: 1
+    property :processing_attempts_started_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
+    property :stdout, type: :string
+    property :stderr, type: :string
+    property :params_json, type: :string, example: "{\"error_msg_locale\":\"en\"}"
+    property :requires_review, type: :boolean, example: true
+    property :requests_review, type: :boolean, example: true
+    property :reviewed, type: :boolean, example: true
+    property :message_for_reviewer, type: :string, example: ""
+    property :newer_submission_reviewed, type: :boolean, example: true
+    property :review_dismissed, type: :boolean, example: true
+    property :paste_available, type: :boolean, example: true
+    property :message_for_paste, type: :string, example: ""
+    property :paste_key, type: :string, description: "Can be null"
+  end
+
   belongs_to :user
   belongs_to :course
 
@@ -44,13 +104,13 @@ class Submission < ActiveRecord::Base
 
   def self.to_be_reprocessed
     self.unprocessed
-      .where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval)
-      .where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval)
+        .where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval)
+        .where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval)
   end
 
   def self.unprocessed
     self.where(processed: false)
-      .order('processing_priority DESC, processing_tried_at ASC, id ASC')
+        .order('processing_priority DESC, processing_tried_at ASC, id ASC')
   end
 
   def self.unprocessed_count
@@ -82,7 +142,7 @@ class Submission < ActiveRecord::Base
 
   def params=(value)
     if value.is_a?(Hash)
-      value.each {|k, v| raise "Invalid submission param: #{k} = #{v}" if !valid_param?(k, v) }
+      value.each { |k, v| raise "Invalid submission param: #{k} = #{v}" if !valid_param?(k, v) }
       self.params_json = value.to_json
     elsif value == nil
       self.params_json = nil
@@ -127,9 +187,9 @@ class Submission < ActiveRecord::Base
   # for the same course and exercise
   def of_same_kind
     Submission.where(
-      course_id: self.course_id,
-      exercise_name: self.exercise_name,
-      user_id: self.user_id
+        course_id: self.course_id,
+        exercise_name: self.exercise_name,
+        user_id: self.user_id
     )
   end
 
@@ -141,8 +201,8 @@ class Submission < ActiveRecord::Base
 
   def review_dismissable?
     (requires_review? || requests_review?) &&
-      !review_dismissed? &&
-      !newer_submission_reviewed?
+        !review_dismissed? &&
+        !newer_submission_reviewed?
   end
 
   def unprocessed_submissions_before_this
@@ -165,11 +225,11 @@ class Submission < ActiveRecord::Base
   def test_case_records
     test_case_runs.map do |tcr|
       {
-        name: tcr.test_case_name,
-        successful: tcr.successful?,
-        message: tcr.message,
-        exception: if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
-        detailed_message: if tcr.detailed_message then tcr.detailed_message else nil end
+          name: tcr.test_case_name,
+          successful: tcr.successful?,
+          message: tcr.message,
+          exception: if tcr.exception then ActiveSupport::JSON.decode(tcr.exception) else nil end,
+          detailed_message: if tcr.detailed_message then tcr.detailed_message else nil end
       }
     end
   end
@@ -282,12 +342,12 @@ class Submission < ActiveRecord::Base
 
   # A dirty workaround. See http://stackoverflow.com/questions/10666808/rails-eager-loading-a-belongs-to-with-conditions-refering-to-self
   def self.eager_load_exercises(submissions)
-    keys = submissions.map {|s| "(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})" }
+    keys = submissions.map { |s| "(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})" }
     keys.uniq!
     return if keys.empty?
 
     exercises = Exercise.where('(course_id, name) IN (' + keys.join(',') + ')')
-    by_key = Hash[exercises.map {|e| [[e.course_id, e.name], e] }]
+    by_key = Hash[exercises.map { |e| [[e.course_id, e.name], e] }]
     for sub in submissions
       ex = by_key[[sub.course_id, sub.exercise_name]]
       sub.exercise = ex
@@ -299,7 +359,11 @@ class Submission < ActiveRecord::Base
   end
 
   def readable_by?(user)
-    user.administrator? || user.teacher?(self.course.organization) || self.user_id == user.id && self.exercise.visible_to?(user)
+    user.administrator? || user.teacher?(self.course.organization) || user.assistant?(self.course) || self.user_id == user.id && self.exercise.visible_to?(user)
+  end
+
+  def self.readable(user)
+    select { |submission| submission.readable_by?(user) }
   end
 
   def set_paste_key_if_paste_available
