@@ -93,7 +93,7 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     unauthorized_guest! if current_user.guest?
     course = Course.find_by!(id: params[:id]) if (params[:id])
     course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
-    exercises = Exercise.where(course_id: course.id)
+    exercises = Exercise.includes(:available_points).where(course_id: course.id)
 
     visible = exercises.select { |ex| ex.visible_to?(current_user) }
     presentable = visible.map do |ex|
