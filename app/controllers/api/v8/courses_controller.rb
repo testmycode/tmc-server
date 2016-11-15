@@ -188,21 +188,21 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def points_by_course_name
-    course = Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     points = AwardedPoint.includes(:submission).where(course_id: course.id)
     authorize! :read, points
     present AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
 
   def users_points_by_course_name
-    course = Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     points = AwardedPoint.includes(:submission).where(course_id: course.id, user_id: params[:user_id])
     authorize! :read, points
     present AwardedPoint.points_json_with_exercise_id(points, course.exercises)
   end
 
   def current_users_points_by_course_name
-    course = Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     points = AwardedPoint.includes(:submission).where(course_id: course.id, user_id: current_user.id)
     authorize! :read, points
     present AwardedPoint.points_json_with_exercise_id(points, course.exercises)
