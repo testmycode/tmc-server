@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Api::V8::SubmissionsController, type: :controller do
   let!(:user) { FactoryGirl.create(:user) }
+  let!(:teacher) { FactoryGirl.create(:user) }
+  let!(:assistant) { FactoryGirl.create(:user) }
   let!(:admin) { FactoryGirl.create(:admin) }
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
@@ -12,8 +14,11 @@ describe Api::V8::SubmissionsController, type: :controller do
                                          course: course,
                                          user: user,
                                          exercise: exercise) }
+
   before :each do
     controller.stub(:doorkeeper_token) { token }
+    Teachership.create(user: teacher, organization: organization)
+    Assistantship.create(user: assistant, course: course)
   end
 
   describe "GET all submissions" do
@@ -39,13 +44,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as a teacher" do
-        before :each do
-          Teachership.create(user: user, organization: organization)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = teacher
           end
 
           it "should show all of the submissions in my organizations" do
@@ -58,7 +59,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it "should show all of the submissions in my organizations" do
             get_two_subs_by_name
@@ -71,13 +72,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as an assistant" do
-        before :each do
-          Assistantship.create(user: user, course: course)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = assistant
           end
 
           it "should show all of the submissions in my courses" do
@@ -90,7 +87,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it "should show all of the submissions in my courses" do
             get_two_subs_by_name
@@ -166,13 +163,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as a teacher" do
-        before :each do
-          Teachership.create(user: user, organization: organization)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = teacher
           end
 
           it "should show all of the submissions in my organizations" do
@@ -185,7 +178,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it "should show all of the submissions in my organizations" do
             get_two_subs_by_id
@@ -198,13 +191,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as an assistant" do
-        before :each do
-          Assistantship.create(user: user, course: course)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = assistant
           end
 
           it "should show all of the submissions in my courses" do
@@ -217,7 +206,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it "should show all of the submissions in my courses" do
             get_two_subs_by_id
@@ -295,13 +284,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as a teacher" do
-        before :each do
-          Teachership.create(user: user, organization: organization)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = teacher
           end
 
           it "should show given user's submissions in my organizations" do
@@ -314,7 +299,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it "should show given user's submissions in my organizations" do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
@@ -327,13 +312,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as an assistant" do
-        before :each do
-          Assistantship.create(user: user, course: course)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = assistant
           end
 
           it "should show given user's submissions in my courses" do
@@ -346,7 +327,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it "should show given user's submissions in my courses" do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
@@ -422,13 +403,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as a teacher" do
-        before :each do
-          Teachership.create(user: user, organization: organization)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = teacher
           end
 
           it "should show given user's submissions in my organizations" do
@@ -441,7 +418,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it "should show given user's submissions in my organizations" do
             get_users_own_subs(course_id: course.id, user_id: user.id)
@@ -454,13 +431,9 @@ describe Api::V8::SubmissionsController, type: :controller do
       end
 
       describe "as an assistant" do
-        before :each do
-          Assistantship.create(user: user, course: course)
-        end
-
         describe "when logged in" do
           before :each do
-            controller.current_user = user
+            controller.current_user = assistant
           end
 
           it "should show given user's submissions in my courses" do
@@ -473,7 +446,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
 
         describe "when using access token" do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it "should show given user's submissions in my courses" do
             get_users_own_subs(course_id: course.id, user_id: user.id)
@@ -537,7 +510,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should show my own submissions" do
-            get_my_own_subs(slug: organization.slug, course_name: course_name)
+            get_users_own_subs(slug: organization.slug, course_name: course_name)
           end
 
           it "should not show other users' submissions" do
@@ -549,7 +522,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
           it "should show my own submissions" do
-            get_my_own_subs(slug: organization.slug, course_name: course_name)
+            get_users_own_subs(slug: organization.slug, course_name: course_name)
           end
 
           it "should not show other users' submissions" do
@@ -580,7 +553,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
 
           it "should show my own submissions" do
-            get_my_own_subs(course_id: course.id)
+            get_users_own_subs(course_id: course.id)
           end
 
           it "should not show other users' submissions" do
@@ -592,7 +565,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
           it "should show my own submissions" do
-            get_my_own_subs(course_id: course.id)
+            get_users_own_subs(course_id: course.id)
           end
 
           it "should not show other users' submissions" do
@@ -655,14 +628,6 @@ describe Api::V8::SubmissionsController, type: :controller do
   end
 
   def get_users_own_subs(parameters)
-    get :get_submissions_user, parameters
-
-    r = JSON.parse response.body
-
-    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), "incorrect submission or user id"
-  end
-
-  def get_my_own_subs(parameters)
     get :get_submissions_user, parameters
 
     r = JSON.parse response.body
