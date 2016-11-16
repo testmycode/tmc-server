@@ -168,7 +168,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
 
   def points
     course = Course.find_by!(id: params[:course_id])
-    points = course.awarded_points.includes(:submission).where(course_id: course.id)
+    points = course.awarded_points.includes(:submission)
     authorize! :read, points
     present points.as_json_with_exercise_ids(course.exercises)
   end
@@ -189,21 +189,21 @@ class Api::V8::CoursesController < Api::V8::BaseController
 
   def points_by_course_name
     course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
-    points = course.awarded_points.includes(:submission).where(course_id: course.id)
+    points = course.awarded_points.includes(:submission)
     authorize! :read, points
     present points.as_json_with_exercise_ids(course.exercises)
   end
 
   def users_points_by_course_name
     course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
-    points = course.awarded_points.includes(:submission).where(course_id: course.id, user_id: params[:user_id])
+    points = course.awarded_points.includes(:submission).where(user_id: params[:user_id])
     authorize! :read, points
     present points.as_json_with_exercise_ids(course.exercises)
   end
 
   def current_users_points_by_course_name
     course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
-    points = course.awarded_points.includes(:submission).where(course_id: course.id, user_id: current_user.id)
+    points = course.awarded_points.includes(:submission).where(user_id: current_user.id)
     authorize! :read, points
     present points.as_json_with_exercise_ids(course.exercises)
   end
