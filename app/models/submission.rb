@@ -31,18 +31,18 @@ class Submission < ActiveRecord::Base
         :review_dismissed,
         :paste_available,
         :message_for_paste,
-        :paste_key
+        :paste_key,
     ]
 
     property :id, type: :integer, example: 1
     property :user_id, type: :integer, example: 1
-    property :pretest_error, type: :text, description: "Can be null", example: "Missing test output. Did you terminate your program with an exit() command?"
+    property :pretest_error, type: :string, description: "Can be null", example: "Missing test output. Did you terminate your program with an exit() command?"
     property :created_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
     property :exercise_name, type: :string, example: "trivial"
     property :course_id, type: :integer, example: 1
     property :processed, type: :boolean, example: true
     property :all_tests_passed, type: :boolean, example: true
-    property :points, type: :text, description: "Can be null"
+    property :points, type: :string, description: "Can be null"
     property :processing_tried_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
     property :processing_began_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
     property :processing_completed_at, type: :string, example: "2016-10-17T11:10:17.295+03:00"
