@@ -166,46 +166,39 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  def points
-    course = Course.find_by!(id: params[:course_id])
+  def get_points_all
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     points = course.awarded_points.includes(:submission)
-    authorize! :read, points
+    authorize_collection :read, points
     present points.as_json_with_exercise_ids(course.exercises)
+  end
+
+  def get_points_user
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
+    params[:user_id] = current_user.id unless params[:user_id]
+    points = course.awarded_points.includes(:submission).where(user_id: params[:user_id])
+    authorize_collection :read, points
+    present points.as_json_with_exercise_ids(course.exercises)
+  end
+
+  def points
   end
 
   def users_points
-    course = Course.find_by!(id: params[:course_id])
-    points = course.awarded_points.includes(:submission).where(user_id: params[:user_id])
-    authorize! :read, points
-    present points.as_json_with_exercise_ids(course.exercises)
   end
 
   def current_users_points
-    course = Course.find_by!(id: params[:course_id])
-    points = course.awarded_points.includes(:submission).where(user_id: current_user.id)
-    authorize! :read, points
-    present points.as_json_with_exercise_ids(course.exercises)
   end
 
   def points_by_course_name
-    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
-    points = course.awarded_points.includes(:submission)
-    authorize! :read, points
-    present points.as_json_with_exercise_ids(course.exercises)
   end
 
   def users_points_by_course_name
-    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
-    points = course.awarded_points.includes(:submission).where(user_id: params[:user_id])
-    authorize! :read, points
-    present points.as_json_with_exercise_ids(course.exercises)
   end
 
   def current_users_points_by_course_name
-    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
-    points = course.awarded_points.includes(:submission).where(user_id: current_user.id)
-    authorize! :read, points
-    present points.as_json_with_exercise_ids(course.exercises)
   end
 
   def get_course

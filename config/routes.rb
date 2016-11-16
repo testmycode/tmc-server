@@ -60,10 +60,10 @@ TmcServer::Application.routes.draw do
                 end
               end
               scope '/points' do
-                get '/' => 'courses#points_by_course_name'
+                get '/' => 'courses#get_points_all'
                 scope 'user' do
-                  get '/' => 'courses#current_users_points_by_course_name'
-                  get '/:user_id' => 'courses#users_points_by_course_name'
+                  get '/' => 'courses#get_points_user'
+                  get '/:user_id' => 'courses#get_points_user'
                 end
               end
             end
@@ -84,10 +84,10 @@ TmcServer::Application.routes.draw do
             end
           end
           scope '/points' do
-            get '/' => 'courses#points'
+            get '/' => 'courses#get_points_all'
             scope '/user' do
-              get '/' => 'courses#current_users_points'
-              get '/:user_id' => 'courses#users_points'
+              get '/' => 'courses#get_points_user'
+              get '/:user_id' => 'courses#get_points_user'
             end
           end
         end
