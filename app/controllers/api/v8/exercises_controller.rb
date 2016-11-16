@@ -21,14 +21,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -53,14 +47,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or organization not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -85,14 +73,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or exercise not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -117,14 +99,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or exercise not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -150,14 +126,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course, exercise or user not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -183,14 +153,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or exercise not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -216,14 +180,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or exercise not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -250,14 +208,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course, exercise or user not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 

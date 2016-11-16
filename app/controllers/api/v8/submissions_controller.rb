@@ -12,14 +12,8 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
           'submission'
       ]
       parameter '$ref': '#/parameters/path_course_id'
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'Submissions in json'
         schema do
@@ -47,14 +41,8 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
           'submission'
       ]
       parameter '$ref': '#/parameters/path_course_id'
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'User\'s own submissions in json'
         schema do
@@ -83,14 +71,8 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
       ]
       parameter '$ref': '#/parameters/path_course_id'
       parameter '$ref': '#/parameters/path_user_id'
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'User or course not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'User\'s submissions in json'
         schema do
@@ -119,14 +101,8 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
       ]
       parameter '$ref': '#/parameters/path_organization_id'
       parameter '$ref': '#/parameters/path_course_name'
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or organization not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'Submissions in json'
         schema do
@@ -155,14 +131,8 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
       ]
       parameter '$ref': '#/parameters/path_organization_id'
       parameter '$ref': '#/parameters/path_course_name'
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or organization not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'User\'s own submissions in json'
         schema do
@@ -192,14 +162,8 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
       parameter '$ref': '#/parameters/path_organization_id'
       parameter '$ref': '#/parameters/path_course_name'
       parameter '$ref': '#/parameters/path_user_id'
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'User, course or organization not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'User\'s submissions in json'
         schema do

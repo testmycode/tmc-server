@@ -82,13 +82,6 @@ class Api::V8::ApidocsController < ActionController::Base
         end
       end
     end
-    response :auth_required do
-      key :description, "Authentication required"
-      schema do
-        key :title, :errors
-        key :type, :json
-      end
-    end
     key :host, "localhost:3000"
     key :schemes, ["http", "https"]
     key :consumes, ["application/json"]
