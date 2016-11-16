@@ -93,11 +93,13 @@ class Api::V8::ApidocsController < ActionController::Base
     Api::V8::CoursesController,
     Api::V8::ExercisesController,
     Api::V8::SubmissionsController,
+    Api::V8::UsersController,
     Course,
     Exercise,
     AvailablePoint,
     Submission,
     AwardedPoint,
+    User,
     self
   ].freeze
 
