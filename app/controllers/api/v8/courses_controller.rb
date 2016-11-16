@@ -63,7 +63,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points" do
+  swagger_path "/api/v8/org/{organization_id}/courses/{course_name}/points" do
     operation :get do
       key :description, "Returns the course's points in a json format. Course is searched by name"
       key :produces, ["application/json"]
@@ -84,7 +84,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/user/{user_id}" do
+  swagger_path "/api/v8/org/{organization_id}/courses/{course_name}/points/user/{user_id}" do
     operation :get do
       key :description, "Returns the given user's points from the course in a json format. Course is searched by name"
       key :produces, ["application/json"]
@@ -106,7 +106,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
     end
   end
 
-  swagger_path "/api/v8/organizations/{organization_id}/courses/{course_name}/points/user" do
+  swagger_path "/api/v8/org/{organization_id}/courses/{course_name}/points/user" do
     operation :get do
       key :description, "Returns the current user's points from the course in a json format. Course is searched by name"
       key :produces, ["application/json"]
@@ -209,14 +209,14 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def find_by_name
-    unauthorized_guest!
+    unauthorize_guest!
     course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     authorize! :read, course
     present course.course_as_json
   end
 
   def find_by_id
-    unauthorized_guest!
+    unauthorize_guest!
     course = Course.find_by!(id: params[:course_id])
     authorize! :read, course
     present course.course_as_json
