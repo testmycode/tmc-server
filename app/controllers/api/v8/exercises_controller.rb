@@ -299,12 +299,13 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
     params[:user_id] = current_user.id unless params[:user_id]
 
-    points = AwardedPoint.includes(:submission)
+    points = course.awarded_points.includes(:submission)
       .where(submissions: {exercise_name: params[:exercise_name]},
              course_id: course.id,
              user_id: params[:user_id])
 
-    present_points(course, points)
+    authorize! :read, points
+    present(points.as_json_with_exercise_ids(course.exercises))
   end
 
   def get_points_all
@@ -312,14 +313,11 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     course = Course.find_by!(id: params[:id]) if params[:id]
     course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
 
-    points = AwardedPoint.includes(:submission)
+    points = course.awarded_points.includes(:submission)
                  .where(submissions: {exercise_name: params[:exercise_name]},
                         course_id: course.id)
-    present_points(course, points)
-  end
 
-  def present_points(course, points)
-      authorize! :read, points
-      present(AwardedPoint.points_json_with_exercise_id(points, course.exercises))
+    authorize! :read, points
+    present(points.as_json_with_exercise_ids(course.exercises))
   end
 end
