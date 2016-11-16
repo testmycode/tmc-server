@@ -294,9 +294,9 @@ class Api::V8::ExercisesController < Api::V8::BaseController
   end
 
   def get_points_user
-    unauthorized_guest! if current_user.guest?
-    course = Course.find_by!(id: params[:id]) if params[:id]
-    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    unauthorize_guest!
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
     params[:user_id] = current_user.id unless params[:user_id]
 
     points = course.awarded_points.includes(:submission)
@@ -309,9 +309,9 @@ class Api::V8::ExercisesController < Api::V8::BaseController
   end
 
   def get_points_all
-    unauthorized_guest! if current_user.guest?
-    course = Course.find_by!(id: params[:id]) if params[:id]
-    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:name]}")
+    unauthorize_guest!
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
 
     points = course.awarded_points.includes(:submission)
                  .where(submissions: {exercise_name: params[:exercise_name]},
