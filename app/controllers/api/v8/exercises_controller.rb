@@ -52,6 +52,25 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     end
   end
 
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/download' do
+    operation :get do
+      key :description, 'Download the exercise as a zip file'
+      key :operationId, 'downloadExercise'
+      key :produces, ['application/zip']
+      key :tags, ['exercise']
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      response 200 do
+        key :description, 'Exercise zip file'
+        schema do
+          key :type, :file
+        end
+      end
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
   swagger_path '/api/v8/courses/{course_id}/exercises/{exercise_name}/points' do
     operation :get do
       key :description, 'Returns all the awarded points of an excercise for all users'
