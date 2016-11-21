@@ -224,8 +224,6 @@ class Api::V8::SubmissionsController < Api::V8::BaseController
           processing_completed_at: sub.processing_completed_at,
           times_sent_to_sandbox: sub.times_sent_to_sandbox,
           processing_attempts_started_at: sub.processing_attempts_started_at,
-          stdout: sub.stdout,
-          stderr: sub.stderr,
           params_json: sub.params_json,
           requires_review: sub.requires_review,
           requests_review: sub.requests_review,
