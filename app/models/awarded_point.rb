@@ -2,8 +2,46 @@
 #
 # There is a reference to the submission that first awarded the point, but this
 # reference can be nil if the submission has been deleted.
+
 class AwardedPoint < ActiveRecord::Base
   include PointComparison
+  include Swagger::Blocks
+
+  swagger_schema :AwardedPoint do
+    key :required, [ :id, :course_id, :user_id, :submission_id, :name ]
+
+    property :id, type: :integer, example: 1
+    property :course_id, type: :integer, example: 1
+    property :user_id, type: :integer, example: 1
+    property :submission_id, type: :integer, example: 2
+    property :name, type: :string, example: "point name"
+  end
+
+  def point_as_json
+    as_json only: [
+        :id,
+        :course_id,
+        :user_id,
+        :submission_id,
+        :name,
+    ]
+  end
+
+  swagger_schema :AwardedPointWithExerciseId do
+    key :required, [ :awarded_point, :exercise_id ]
+
+    property :awarded_point do
+      key :"$ref", :AwardedPoint
+    end
+    property :exercise_id, type: :integer, example: 1
+  end
+
+  def self.as_json_with_exercise_ids(related_exercises)
+    related_exercises = related_exercises.map { |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
+    all.map do |p|
+      { awarded_point: p.point_as_json, exercise_id: related_exercises["#{p.course_id}-#{p.submission.exercise_name}"] }
+    end
+  end
 
   belongs_to :course
   belongs_to :user
@@ -11,9 +49,9 @@ class AwardedPoint < ActiveRecord::Base
 
   def self.exercise_user_points(exercise, user)
     where(course_id: exercise.course_id, user_id: user.id)
-      .joins(:submission)
-      .where('submissions.course_id = ? AND submissions.exercise_name = ?',
-             exercise.course_id, exercise.name)
+        .joins(:submission)
+        .where('submissions.course_id = ? AND submissions.exercise_name = ?',
+               exercise.course_id, exercise.name)
   end
 
   def self.course_user_points(course, user)
@@ -24,8 +62,8 @@ class AwardedPoint < ActiveRecord::Base
     awarded_points = AwardedPoint.arel_table
     users = User.arel_table
     query = awarded_points
-      .project(awarded_points[:id].count.as('count'))
-      .where(awarded_points[:course_id].eq(course.id))
+                .project(awarded_points[:id].count.as('count'))
+                .where(awarded_points[:course_id].eq(course.id))
     unless include_admins
       query.join(users).on(users[:id].eq(awarded_points[:user_id]), users[:administrator].eq(false), users[:legitimate_student].eq(true) )
     end
@@ -40,10 +78,10 @@ class AwardedPoint < ActiveRecord::Base
 
   def self.course_user_sheet_points(course, user, sheetname)
     course_user_points(course, user)
-      .joins('INNER JOIN available_points ON available_points.name = awarded_points.name')
-      .joins('INNER JOIN exercises ON available_points.exercise_id = exercises.id')
-      .where(exercises: { gdocs_sheet: sheetname, course_id: course.id })
-      .group('awarded_points.id')
+        .joins('INNER JOIN available_points ON available_points.name = awarded_points.name')
+        .joins('INNER JOIN exercises ON available_points.exercise_id = exercises.id')
+        .where(exercises: { gdocs_sheet: sheetname, course_id: course.id })
+        .group('awarded_points.id')
   end
 
   def self.course_sheet_points(course, sheetnames, include_admins = false)
@@ -52,13 +90,13 @@ class AwardedPoint < ActiveRecord::Base
     exercises = Exercise.arel_table
     users = User.arel_table
     query = awarded_points
-      .project(awarded_points[:name].count.as('count'), exercises[:gdocs_sheet])
-      .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
-      .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]), exercises[:course_id].eq(course.id))
-      .where(awarded_points[:course_id].eq(course.id))
-      .where(exercises[:gdocs_sheet].in(sheetnames))
-      .where(exercises[:course_id].eq(course.id))
-      .group(exercises[:gdocs_sheet])
+                .project(awarded_points[:name].count.as('count'), exercises[:gdocs_sheet])
+                .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
+                .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]), exercises[:course_id].eq(course.id))
+                .where(awarded_points[:course_id].eq(course.id))
+                .where(exercises[:gdocs_sheet].in(sheetnames))
+                .where(exercises[:course_id].eq(course.id))
+                .group(exercises[:gdocs_sheet])
     unless include_admins
       query.join(users).on(users[:id].eq(awarded_points[:user_id]), users[:administrator].eq(false), users[:legitimate_student].eq(true) )
     end
@@ -75,8 +113,8 @@ class AwardedPoint < ActiveRecord::Base
     users = User.arel_table
 
     sql = per_user_in_course_with_sheet_query(course, sheetname)
-      .project(users[:id].as('uid'))
-      .to_sql
+              .project(users[:id].as('uid'))
+              .to_sql
 
     uids = ActiveRecord::Base.connection.execute(sql).map { |record| record['uid'] }
     User.where(id: uids)
@@ -89,8 +127,8 @@ class AwardedPoint < ActiveRecord::Base
     submissions = Submission.arel_table
 
     sql = per_user_in_course_with_sheet_query(course, sheetname)
-      .project([users[:login].as('username'), awarded_points[:name].as('name'), submissions[:created_at].as('time')])
-      .to_sql
+              .project([users[:login].as('username'), awarded_points[:name].as('name'), submissions[:created_at].as('time')])
+              .to_sql
 
     result = {}
     ActiveRecord::Base.connection.execute(sql).each do |record|
@@ -112,8 +150,8 @@ class AwardedPoint < ActiveRecord::Base
     exercises = Exercise.arel_table
 
     query = per_user_in_course_with_sheet_query(course, sheetnames)
-      .project(users[:login].as('username'), users[:login].count.as('count'), exercises[:gdocs_sheet])
-      .group(users[:login], exercises[:gdocs_sheet])
+                .project(users[:login].as('username'), users[:login].count.as('count'), exercises[:gdocs_sheet])
+                .group(users[:login], exercises[:gdocs_sheet])
 
     if only_for_user
       query.where(users[:id].eq(only_for_user.id))
@@ -142,15 +180,15 @@ class AwardedPoint < ActiveRecord::Base
     submissions = Submission.arel_table
 
     awarded_points
-      .join(users).on(awarded_points[:user_id].eq(users[:id]))
-      .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
-      .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]))
-      .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
-      .where(awarded_points[:course_id].eq(course.id))
-      .where(awarded_points[:user_id].eq(users[:id]))
-      .where(exercises[:course_id].eq(course.id))
-      .where(exercises[:gdocs_sheet].in(sheetnames))
-      .where(submissions[:course_id].eq(course.id))
-      .where(submissions[:user_id].eq(users[:id]))
+        .join(users).on(awarded_points[:user_id].eq(users[:id]))
+        .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
+        .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]))
+        .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
+        .where(awarded_points[:course_id].eq(course.id))
+        .where(awarded_points[:user_id].eq(users[:id]))
+        .where(exercises[:course_id].eq(course.id))
+        .where(exercises[:gdocs_sheet].in(sheetnames))
+        .where(submissions[:course_id].eq(course.id))
+        .where(submissions[:user_id].eq(users[:id]))
   end
 end

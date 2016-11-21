@@ -117,7 +117,7 @@ class ApplicationController < ActionController::Base
     raise CanCan::AccessDenied.new(message)
   end
 
-  def unauthorize_guest!(message = "Authentication required")
+  def unauthorize_guest!(message = 'Authentication required')
     unauthorized!(message) if current_user.guest?
   end
 

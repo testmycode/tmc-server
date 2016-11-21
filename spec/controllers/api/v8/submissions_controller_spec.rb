@@ -21,91 +21,91 @@ describe Api::V8::SubmissionsController, type: :controller do
     Assistantship.create(user: assistant, course: course)
   end
 
-  describe "GET all submissions" do
-    describe "by course name as json" do
-      describe "as an admin" do
-        describe "when logged in" do
+  describe 'GET all submissions' do
+    describe 'by course name as json' do
+      describe 'as an admin' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = admin
           end
 
-          it "should show all of the submissions" do
+          it 'should show all of the submissions' do
             get_two_subs_by_name
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
-          it "should show all of the submissions" do
+          it 'should show all of the submissions' do
             get_two_subs_by_name
           end
         end
       end
 
-      describe "as a teacher" do
-        describe "when logged in" do
+      describe 'as a teacher' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = teacher
           end
 
-          it "should show all of the submissions in my organizations" do
+          it 'should show all of the submissions in my organizations' do
             get_two_subs_by_name
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_subs_for_teacher(slug: organization.slug, course_name: course_name)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
-          it "should show all of the submissions in my organizations" do
+          it 'should show all of the submissions in my organizations' do
             get_two_subs_by_name
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_subs_for_teacher(slug: organization.slug, course_name: course_name)
           end
         end
       end
 
-      describe "as an assistant" do
-        describe "when logged in" do
+      describe 'as an assistant' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = assistant
           end
 
-          it "should show all of the submissions in my courses" do
+          it 'should show all of the submissions in my courses' do
             get_two_subs_by_name
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_subs_for_assistant(slug: organization.slug, course_name: course_name)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
-          it "should show all of the submissions in my courses" do
+          it 'should show all of the submissions in my courses' do
             get_two_subs_by_name
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_subs_for_assistant(slug: organization.slug, course_name: course_name)
           end
         end
       end
 
-      describe "as a student" do
-        describe "when logged in" do
+      describe 'as a student' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = user
           end
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_all_own_subs(slug: organization.slug, course_name: course_name)
           end
 
@@ -114,10 +114,10 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_all_own_subs(slug: organization.slug, course_name: course_name)
           end
 
@@ -127,104 +127,104 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as an unauthorized user" do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
 
-        it "should not show any submissions" do
+        it 'should not show any submissions' do
           get :get_submissions_all, slug: organization.slug, course_name: course_name
 
           expect(response).to have_http_status(403)
-          expect(response.body).to have_content("Authentication required")
+          expect(response.body).to have_content('Authentication required')
         end
       end
     end
 
-    describe "by course id as json" do
-      describe "as an admin" do
-        describe "when logged in" do
+    describe 'by course id as json' do
+      describe 'as an admin' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = admin
           end
 
-          it "should show all of the submissions" do
+          it 'should show all of the submissions' do
             get_two_subs_by_id
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
-          it "should show all of the submissions" do
+          it 'should show all of the submissions' do
             get_two_subs_by_id
           end
         end
       end
 
-      describe "as a teacher" do
-        describe "when logged in" do
+      describe 'as a teacher' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = teacher
           end
 
-          it "should show all of the submissions in my organizations" do
+          it 'should show all of the submissions in my organizations' do
             get_two_subs_by_id
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_subs_for_teacher(course_id: course.id)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
-          it "should show all of the submissions in my organizations" do
+          it 'should show all of the submissions in my organizations' do
             get_two_subs_by_id
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_subs_for_teacher(course_id: course.id)
           end
         end
       end
 
-      describe "as an assistant" do
-        describe "when logged in" do
+      describe 'as an assistant' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = assistant
           end
 
-          it "should show all of the submissions in my courses" do
+          it 'should show all of the submissions in my courses' do
             get_two_subs_by_id
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_subs_for_assistant(course_id: course.id)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
-          it "should show all of the submissions in my courses" do
+          it 'should show all of the submissions in my courses' do
             get_two_subs_by_id
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_subs_for_assistant(course_id: course.id)
           end
         end
       end
 
-      describe "as a student" do
-        describe "when logged in" do
+      describe 'as a student' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = user
           end
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_all_own_subs(course_id: course.id)
           end
 
@@ -233,10 +233,10 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_all_own_subs(course_id: course.id)
           end
 
@@ -246,25 +246,25 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as an unauthorized user" do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
 
-        it "should not show any submissions" do
+        it 'should not show any submissions' do
           get :get_submissions_all, course_id: course.id
 
           expect(response).to have_http_status(403)
-          expect(response.body).to have_content("Authentication required")
+          expect(response.body).to have_content('Authentication required')
         end
       end
     end
   end
 
   describe "GET single user's submissions" do
-    describe "by course name as json" do
-      describe "as an admin" do
-        describe "when logged in" do
+    describe 'by course name as json' do
+      describe 'as an admin' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = admin
           end
@@ -274,7 +274,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
           it "should show given user's submissions" do
@@ -283,8 +283,8 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as a teacher" do
-        describe "when logged in" do
+      describe 'as a teacher' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = teacher
           end
@@ -293,26 +293,26 @@ describe Api::V8::SubmissionsController, type: :controller do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_user_subs_for_teacher(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it "should show given user's submissions in my organizations" do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_user_subs_for_teacher(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
         end
       end
 
-      describe "as an assistant" do
-        describe "when logged in" do
+      describe 'as an assistant' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = assistant
           end
@@ -321,31 +321,31 @@ describe Api::V8::SubmissionsController, type: :controller do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_user_subs_for_assistant(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it "should show given user's submissions in my courses" do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_user_subs_for_assistant(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
         end
       end
 
-      describe "as a student" do
-        describe "when logged in" do
+      describe 'as a student' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = user
           end
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
@@ -354,10 +354,10 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
@@ -367,23 +367,23 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as an unauthorized user" do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
 
-        it "should not show any submissions" do
+        it 'should not show any submissions' do
           get :get_submissions_user, slug: organization.slug, course_name: course_name, user_id: user.id
 
           expect(response).to have_http_status(403)
-          expect(response.body).to have_content("Authentication required")
+          expect(response.body).to have_content('Authentication required')
         end
       end
     end
 
-    describe "by course id as json" do
-      describe "as an admin" do
-        describe "when logged in" do
+    describe 'by course id as json' do
+      describe 'as an admin' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = admin
           end
@@ -393,7 +393,7 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
           it "should show given user's submissions" do
@@ -402,8 +402,8 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as a teacher" do
-        describe "when logged in" do
+      describe 'as a teacher' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = teacher
           end
@@ -412,26 +412,26 @@ describe Api::V8::SubmissionsController, type: :controller do
             get_users_own_subs(course_id: course.id, user_id: user.id)
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_user_subs_for_teacher(course_id: course.id, user_id: user.id)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it "should show given user's submissions in my organizations" do
             get_users_own_subs(course_id: course.id, user_id: user.id)
           end
 
-          it "should not show any submissions outside my organizations" do
+          it 'should not show any submissions outside my organizations' do
             no_other_orgs_user_subs_for_teacher(course_id: course.id, user_id: user.id)
           end
         end
       end
 
-      describe "as an assistant" do
-        describe "when logged in" do
+      describe 'as an assistant' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = assistant
           end
@@ -440,31 +440,31 @@ describe Api::V8::SubmissionsController, type: :controller do
             get_users_own_subs(course_id: course.id, user_id: user.id)
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_user_subs_for_assistant(course_id: course.id, user_id: user.id)
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it "should show given user's submissions in my courses" do
             get_users_own_subs(course_id: course.id, user_id: user.id)
           end
 
-          it "should not show any submissions outside my courses" do
+          it 'should not show any submissions outside my courses' do
             no_other_courses_user_subs_for_assistant(course_id: course.id, user_id: user.id)
           end
         end
       end
 
-      describe "as a student" do
-        describe "when logged in" do
+      describe 'as a student' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = user
           end
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(course_id: course.id, user_id: user.id)
           end
 
@@ -473,10 +473,10 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(course_id: course.id, user_id: user.id)
           end
 
@@ -486,30 +486,30 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as an unauthorized user" do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
 
-        it "should not show any submissions" do
+        it 'should not show any submissions' do
           get :get_submissions_user, course_id: course.id, user_id: user.id
 
           expect(response).to have_http_status(403)
-          expect(response.body).to have_content("Authentication required")
+          expect(response.body).to have_content('Authentication required')
         end
       end
     end
   end
 
   describe "GET user's own submissions" do
-    describe "by course name as json" do
-      describe "as an user" do
-        describe "when logged in" do
+    describe 'by course name as json' do
+      describe 'as an user' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = user
           end
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(slug: organization.slug, course_name: course_name)
           end
 
@@ -518,10 +518,10 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(slug: organization.slug, course_name: course_name)
           end
 
@@ -531,28 +531,28 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as an unauthorized user" do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
 
-        it "should not show any submissions" do
+        it 'should not show any submissions' do
           get :get_submissions_user, slug: organization.slug, course_name: course_name
 
           expect(response).to have_http_status(403)
-          expect(response.body).to have_content("Authentication required")
+          expect(response.body).to have_content('Authentication required')
         end
       end
     end
 
-    describe "by course id as json" do
-      describe "as an user" do
-        describe "when logged in" do
+    describe 'by course id as json' do
+      describe 'as an user' do
+        describe 'when logged in' do
           before :each do
             controller.current_user = user
           end
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(course_id: course.id)
           end
 
@@ -561,10 +561,10 @@ describe Api::V8::SubmissionsController, type: :controller do
           end
         end
 
-        describe "when using access token" do
+        describe 'when using access token' do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          it "should show my own submissions" do
+          it 'should show my own submissions' do
             get_users_own_subs(course_id: course.id)
           end
 
@@ -574,16 +574,16 @@ describe Api::V8::SubmissionsController, type: :controller do
         end
       end
 
-      describe "as an unauthorized user" do
+      describe 'as an unauthorized user' do
         before :each do
           controller.current_user = Guest.new
         end
 
-        it "should not show any submissions" do
+        it 'should not show any submissions' do
           get :get_submissions_user, course_id: course.id
 
           expect(response).to have_http_status(403)
-          expect(response.body).to have_content("Authentication required")
+          expect(response.body).to have_content('Authentication required')
         end
       end
     end
@@ -601,8 +601,8 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), "incorrect submission or user id"
-    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), "incorrect submission or user id"
+    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), 'incorrect submission or user id'
+    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
   end
 
   def get_two_subs_by_id
@@ -615,8 +615,8 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), "incorrect submission or user id"
-    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), "incorrect submission or user id"
+    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), 'incorrect submission or user id'
+    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
   end
 
   def get_all_own_subs(parameters)
@@ -624,7 +624,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), "incorrect submission or user id"
+    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), 'incorrect submission or user id'
   end
 
   def get_users_own_subs(parameters)
@@ -632,7 +632,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), "incorrect submission or user id"
+    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), 'incorrect submission or user id'
   end
 
   def no_other_orgs_subs_for_teacher(parameters)
