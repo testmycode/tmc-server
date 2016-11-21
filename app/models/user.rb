@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
   swagger_schema :UsersBasicInfo do
     key :required, [:username, :email]
     property :username, type: :string, example: 'student'
-    property :email, type: :string, example: 'student@university.fi'
+    property :email, type: :string, example: 'student@example.com'
   end
 
   has_many :submissions, dependent: :delete_all

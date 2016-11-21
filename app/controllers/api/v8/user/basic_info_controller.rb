@@ -1,4 +1,4 @@
-class Api::V8::UsersController < Api::V8::BaseController
+class Api::V8::User::BasicInfoController < Api::V8::BaseController
   include Swagger::Blocks
 
   swagger_path '/api/v8/user/basic_info' do
@@ -52,7 +52,7 @@ class Api::V8::UsersController < Api::V8::BaseController
     end
   end
 
-  def basic_info
+  def show
     unauthorize_guest! if current_user.guest?
     user = current_user
     user = User.find_by!(id: params[:user_id]) if params[:user_id]
