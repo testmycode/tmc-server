@@ -183,24 +183,6 @@ class Api::V8::CoursesController < Api::V8::BaseController
     present points.as_json_with_exercise_ids(course.exercises)
   end
 
-  def points
-  end
-
-  def users_points
-  end
-
-  def current_users_points
-  end
-
-  def points_by_course_name
-  end
-
-  def users_points_by_course_name
-  end
-
-  def current_users_points_by_course_name
-  end
-
   def get_course
     unauthorize_guest!
     course = Course.find_by!(id: params[:course_id]) if params[:course_id]
