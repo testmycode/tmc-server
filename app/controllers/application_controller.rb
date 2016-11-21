@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
   include BreadcrumbHelpers
   include EmbeddableHelper
-  include AuthorizedContentHelper
+  include AuthorizeCollectionHelper
   check_authorization
 
   rescue_from CanCan::AccessDenied do |_exception|
@@ -117,8 +117,8 @@ class ApplicationController < ActionController::Base
     raise CanCan::AccessDenied.new(message)
   end
 
-  def unauthorized_guest!(message = "Authentication required")
-    unauthorized!(message)
+  def unauthorize_guest!(message = "Authentication required")
+    unauthorized!(message) if current_user.guest?
   end
 
   def respond_not_found(msg = 'Not Found')

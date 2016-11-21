@@ -64,28 +64,60 @@ class Api::V8::ExercisesController < Api::V8::BaseController
     end
   end
 
-  def get_by_course
-    unauthorized_guest! if current_user.guest?
-    course = Course.find_by(id: params[:course_id]) || Course.find_by(name: "#{params[:slug]}-#{params[:course_name]}")
-    if course == nil
-      authorize! :read, nil
-      respond_not_found('Course not found!')
-    else
-      exercises = Exercise.includes(:available_points).where(course_id: course.id)
-      visible = exercises.select { |ex| ex.visible_to?(current_user) }
-      presentable = visible.map do |ex|
-        {
-            id: ex.id,
-            available_points: ex.available_points,
-            name: ex.name,
-            publish_time: ex.publish_time,
-            solution_visible_after: ex.solution_visible_after,
-            deadline: ex.deadline_for(current_user),
-            disabled: ex.disabled?
-        }
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/download' do
+    operation :get do
+      key :description, 'Download the exercise as a zip file'
+      key :operationId, 'downloadExercise'
+      key :produces, ['application/zip']
+      key :tags, ['exercise']
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      response 200 do
+        key :description, 'Exercise zip file'
+        schema do
+          key :type, :file
+        end
       end
-      authorize! :read, visible
-      present(presentable)
+      response 404 do
+        key :description, 'Course or exercise not found'
+        schema do
+          key :title, :errors
+          key :type, :json
+        end
+      end
     end
+  end
+
+  def get_by_course
+    unauthorize_guest!
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
+    exercises = Exercise.includes(:available_points).where(course_id: course.id)
+
+    visible = exercises.select { |ex| ex.visible_to?(current_user) }
+    presentable = visible.map do |ex|
+      {
+          id: ex.id,
+          available_points: ex.available_points,
+          name: ex.name,
+          publish_time: ex.publish_time,
+          solution_visible_after: ex.solution_visible_after,
+          deadline: ex.deadline_for(current_user),
+          disabled: ex.disabled?
+      }
+    end
+
+    authorize_collection :read, visible
+    present(presentable)
+
+  end
+
+  def download
+    course = Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
+    exercise = Exercise.find_by!(name: params[:exercise_name], course_id: course.id)
+
+    authorize! :download, exercise
+    send_file exercise.stub_zip_file_path
   end
 end

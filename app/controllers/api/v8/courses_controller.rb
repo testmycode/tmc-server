@@ -44,7 +44,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def find_by_name
-    unauthorized_guest! if current_user.guest?
+    unauthorize_guest!
     course_name = "#{params[:slug]}-#{params[:course_name]}"
     course = Course.find_by(name: course_name)
     raise ActiveRecord::RecordNotFound, "Couldn't find Course with name #{course_name}" unless course
@@ -52,7 +52,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
   end
 
   def find_by_id
-    unauthorized_guest! if current_user.guest?
+    unauthorize_guest!
     course_id = params[:course_id]
     course = Course.find_by_id(course_id)
     raise ActiveRecord::RecordNotFound, "Couldn't find Course with id #{course_id}" unless course

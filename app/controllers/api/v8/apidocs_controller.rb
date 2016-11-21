@@ -64,6 +64,13 @@ class Api::V8::ApidocsController < ActionController::Base
       key :required, true
       key :type, :integer
     end
+    parameter :path_exercise_name do
+      key :name, :exercise_name
+      key :in, :path
+      key :description, "Exercise's name"
+      key :required, true
+      key :type, :string
+    end
     response :error do
       key :description, "An error occurred"
       schema do

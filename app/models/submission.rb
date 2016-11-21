@@ -362,10 +362,6 @@ class Submission < ActiveRecord::Base
     user.administrator? || user.teacher?(self.course.organization) || user.assistant?(self.course) || self.user_id == user.id && self.exercise.visible_to?(user)
   end
 
-  def self.readable(user)
-    select { |submission| submission.readable_by?(user) }
-  end
-
   def set_paste_key_if_paste_available
     if self.paste_available?
       self.paste_key = SecureRandom.urlsafe_base64
