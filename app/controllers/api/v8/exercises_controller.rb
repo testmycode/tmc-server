@@ -21,14 +21,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -53,14 +47,8 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           end
         end
       end
-      response 403, '$ref': '#/responses/auth_required'
-      response 404 do
-        key :description, 'Course or organization not found'
-        schema do
-          key :title, :errors
-          key :type, :json
-        end
-      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -79,13 +67,168 @@ class Api::V8::ExercisesController < Api::V8::BaseController
           key :type, :file
         end
       end
-      response 404 do
-        key :description, 'Course or exercise not found'
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
+  swagger_path '/api/v8/courses/{course_id}/exercises/{exercise_name}/points' do
+    operation :get do
+      key :description, 'Returns all the awarded points of an excercise for all users'
+      key :operationId, 'findAllAwardedPointsByCourseIdAndExerciseName'
+      key :produces, ['application/json']
+      key :tags, ['points']
+      parameter '$ref': '#/parameters/path_course_id'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      response 200 do
+        key :description, 'Awarded points in json'
         schema do
-          key :title, :errors
-          key :type, :json
+          key :title, :points
+          key :required, [:points]
+          property :points do
+            key :type, :array
+            items do
+              key :'$ref', :AvailablePoint
+            end
+          end
         end
       end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
+  swagger_path '/api/v8/courses/{course_id}/exercises/{exercise_name}/points/user' do
+    operation :get do
+      key :description, 'Returns all the awarded points of an excercise for current user'
+      key :operationId, 'findCurrentUsersAwardedPointsByCourseIdAndExerciseName'
+      key :produces, ['application/json']
+      key :tags, ['points']
+      parameter '$ref': '#/parameters/path_course_id'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      response 200 do
+        key :description, 'Awarded points in json'
+        schema do
+          key :title, :points
+          key :required, [:points]
+          property :points do
+            key :type, :array
+            items do
+              key :'$ref', :AvailablePoint
+            end
+          end
+        end
+      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
+  swagger_path '/api/v8/courses/{course_id}/exercises/{exercise_name}/points/user/{user_id}' do
+    operation :get do
+      key :description, 'Returns all the awarded points of an excercise for the specified user'
+      key :operationId, 'findUsersAwardedPointsByCourseIdAndExerciseName'
+      key :produces, ['application/json']
+      key :tags, ['points']
+      parameter '$ref': '#/parameters/path_course_id'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      parameter '$ref': '#/parameters/path_user_id'
+      response 200 do
+        key :description, 'Awarded points in json'
+        schema do
+          key :title, :points
+          key :required, [:points]
+          property :points do
+            key :type, :array
+            items do
+              key :'$ref', :AvailablePoint
+            end
+          end
+        end
+      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/points' do
+    operation :get do
+      key :description, 'Returns all the awarded points of an excercise for all users'
+      key :operationId, 'findAllAwardedPointsByCourseNameAndExerciseName'
+      key :produces, ['application/json']
+      key :tags, ['points']
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      response 200 do
+        key :description, 'Awarded points in json'
+        schema do
+          key :title, :points
+          key :required, [:points]
+          property :points do
+            key :type, :array
+            items do
+              key :'$ref', :AvailablePoint
+            end
+          end
+        end
+      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/points/user' do
+    operation :get do
+      key :description, 'Returns all the awarded points of an excercise for current user'
+      key :operationId, 'findCurrentUsersAwardedPointsByCourseNameAndExerciseName'
+      key :produces, ['application/json']
+      key :tags, ['points']
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      response 200 do
+        key :description, 'Awarded points in json'
+        schema do
+          key :title, :points
+          key :required, [:points]
+          property :points do
+            key :type, :array
+            items do
+              key :'$ref', :AvailablePoint
+            end
+          end
+        end
+      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
+  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/points/user/{user_id}' do
+    operation :get do
+      key :description, 'Returns all the awarded points of an excercise for the specified user'
+      key :operationId, 'findUsersAwardedPointsByCourseNameAndExerciseName'
+      key :produces, ['application/json']
+      key :tags, ['points']
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_exercise_name'
+      parameter '$ref': '#/parameters/path_user_id'
+      response 200 do
+        key :description, 'Awarded points in json'
+        schema do
+          key :title, :points
+          key :required, [:points]
+          property :points do
+            key :type, :array
+            items do
+              key :'$ref', :AvailablePoint
+            end
+          end
+        end
+      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
     end
   end
 
@@ -119,5 +262,33 @@ class Api::V8::ExercisesController < Api::V8::BaseController
 
     authorize! :download, exercise
     send_file exercise.stub_zip_file_path
+  end
+
+  def get_points_user
+    unauthorize_guest!
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
+    params[:user_id] = current_user.id unless params[:user_id]
+
+    points = course.awarded_points.includes(:submission)
+      .where(submissions: {exercise_name: params[:exercise_name]},
+             course_id: course.id,
+             user_id: params[:user_id])
+
+    authorize! :read, points
+    present(points.as_json_with_exercise_ids(course.exercises))
+  end
+
+  def get_points_all
+    unauthorize_guest!
+    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course ||= Course.find_by!(name: "#{params[:slug]}-#{params[:course_name]}")
+
+    points = course.awarded_points.includes(:submission)
+                 .where(submissions: {exercise_name: params[:exercise_name]},
+                        course_id: course.id)
+
+    authorize! :read, points
+    present(points.as_json_with_exercise_ids(course.exercises))
   end
 end

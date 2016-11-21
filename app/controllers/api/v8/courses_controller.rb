@@ -68,10 +68,10 @@ class Api::V8::CoursesController < Api::V8::BaseController
       key :description, "Returns the course's points in a json format. Course is searched by name"
       key :produces, ['application/json']
       key :tags, ['points']
-      parameter '$ref': "#/parameters/path_organization_id"
-      parameter '$ref': "#/parameters/path_course_name"
-      response 403, '$ref': "#/responses/error"
-      response 404, '$ref': "#/responses/error"
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'Points in json'
         schema do
@@ -89,11 +89,11 @@ class Api::V8::CoursesController < Api::V8::BaseController
       key :description, "Returns the given user's points from the course in a json format. Course is searched by name"
       key :produces, ['application/json']
       key :tags, ['points']
-      parameter '$ref': "#/parameters/path_organization_id"
-      parameter '$ref': "#/parameters/path_course_name"
-      parameter '$ref': "#/parameters/path_user_id"
-      response 403, '$ref': "#/responses/error"
-      response 404, '$ref': "#/responses/error"
+      parameter '$ref': '#/parameters/path_organization_id'
+      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_user_id'
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'Points in json'
         schema do
@@ -134,7 +134,7 @@ class Api::V8::CoursesController < Api::V8::BaseController
       key :tags, ['course']
       parameter '$ref': '#/parameters/path_course_id'
       response 403, '$ref': '#/responses/error'
-      response 404, '$ref': '#/responses/erro'
+      response 404, '$ref': '#/responses/error'
       response 200 do
         key :description, 'Course in json'
         schema do
@@ -181,24 +181,6 @@ class Api::V8::CoursesController < Api::V8::BaseController
     points = course.awarded_points.includes(:submission).where(user_id: params[:user_id])
     authorize_collection :read, points
     present points.as_json_with_exercise_ids(course.exercises)
-  end
-
-  def points
-  end
-
-  def users_points
-  end
-
-  def current_users_points
-  end
-
-  def points_by_course_name
-  end
-
-  def users_points_by_course_name
-  end
-
-  def current_users_points_by_course_name
   end
 
   def get_course

@@ -18,6 +18,15 @@ describe Api::V8::ExercisesController, type: :controller do
   let(:admin) { FactoryGirl.create(:admin, password: 'xooxer') }
   let(:user) { FactoryGirl.create(:user, login: 'user', password: 'xooxer') }
   let(:guest) { Guest.new }
+  let(:submission1) { FactoryGirl.create(:submission, course: course, user: admin, exercise: exercise) }
+  let(:available_point1_name) { 'adminpoint' }
+  let(:available_point1) { FactoryGirl.create(:available_point, name: available_point1_name, exercise: exercise) }
+  let!(:awarded_point1) { FactoryGirl.create(:awarded_point, course: course, name: available_point.name, submission: submission1, user: admin) }
+  let(:submission2) { FactoryGirl.create(:submission, course: course, user: user, exercise: exercise) }
+  let(:available_point2_name) { 'userpoint' }
+  let(:available_point2) { FactoryGirl.create(:available_point, name: available_point2_name, exercise: exercise) }
+  let!(:awarded_point2) { FactoryGirl.create(:awarded_point, course: course, name: available_point2.name, submission: submission1, user: user) }
+  let!(:exercise_no_points) { FactoryGirl.create(:exercise, name: 'nopoints', course: course) }
 
   before :each do
     controller.stub(:doorkeeper_token) { token }
@@ -51,6 +60,26 @@ describe Api::V8::ExercisesController, type: :controller do
       it 'should show hidden exercises' do
         get :get_by_course, {course_name: course_name, slug: slug}
         expect(response.body).to have_content hidden_exercise.name
+      end
+    end
+    describe 'when searching for all users awarded points' do
+      describe 'using course id' do
+        it 'should return all users awarded points of the exercise' do
+          get :get_points_all, {course_id: course.id, exercise_name: exercise.name}
+          expect(response.body).to have_content awarded_point1.id
+          expect(response.body).to have_content awarded_point1.name
+          expect(response.body).to have_content awarded_point2.id
+          expect(response.body).to have_content awarded_point2.name
+        end
+      end
+      describe 'using course name' do
+        it 'should return all users awarded points of the exercise' do
+          get :get_points_all, {course_name: course_name, slug: slug, exercise_name: exercise.name}
+          expect(response.body).to have_content awarded_point1.id
+          expect(response.body).to have_content awarded_point1.name
+          expect(response.body).to have_content awarded_point2.id
+          expect(response.body).to have_content awarded_point2.name
+        end
       end
     end
   end
@@ -87,19 +116,60 @@ describe Api::V8::ExercisesController, type: :controller do
     end
   end
 
+  describe 'As a guest' do
+    let(:token) { nil }
+    describe 'when searching for exercises' do
+      it 'should show authentication error' do
+        get :get_by_course, course_id: course.id
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to have_content('Authentication required')
+      end
+    end
+    describe 'when searching for awarded points' do
+      it 'should show authentication error' do
+        get :get_points_all, {course_id: course.id, exercise_name: exercise.name}
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to have_content('Authentication required')
+      end
+    end
+  end
+
   describe 'As any user' do
+    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
     describe 'when course id could not be found' do
-      let(:token) { double resource_owner_id: admin.id, acceptable?: true }
       it 'should return error' do
         get :get_by_course, course_id: '123'
         expect(response).to have_http_status(:not_found)
       end
     end
     describe 'when course name could not be found' do
-      let(:token) { double resource_owner_id: admin.id, acceptable?: true }
       it 'should return error' do
         get :get_by_course, {course_name: 'null', slug: slug}
         expect(response).to have_http_status(:not_found)
+      end
+    end
+    describe 'when searching awarded points' do
+      describe 'and no points are found' do
+        it 'should return an empty array' do
+          get :get_points_all, {course_id: course.id, exercise_name: exercise_no_points.name}
+          expect(response.body).to have_content '[]'
+        end
+      end
+      describe 'and course is not found' do
+        it 'should return error message' do
+          get :get_points_all, {course_id: '123', exercise_name: exercise.name}
+          expect(response).to have_http_status(:not_found)
+          expect(response.body).to have_content "Couldn't find Course"
+        end
+      end
+    end
+    describe 'when searching for users awarded points by user id' do
+      describe 'and using course id' do
+        it 'should return only correct users awarded points' do
+          get :get_points_user, {course_id: course.id, exercise_name: exercise.name}
+          expect(response.body).to have_content awarded_point1.name
+          expect(response.body).not_to have_content awarded_point2.name
+        end
       end
     end
   end

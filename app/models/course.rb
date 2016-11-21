@@ -3,20 +3,16 @@ require 'course_refresher'
 require 'system_commands'
 require 'date_and_time_utils'
 
-# TODO: move this to someplace better and rename
-# Makes all properties required based on the default value and the
-# property's own 'required' key's value.
-def dorequire(swag, requiredByDefault = true)
-  key :required, data[:properties].data.select { |_, v|
-    v.data[:required] || (v.data[:required].nil? && requiredByDefault)
-  }.map { |k, _| k }
-end
-
 class Course < ActiveRecord::Base
   include SystemCommands
   include Swagger::Blocks
 
   swagger_schema :Course do
+    key :required, [ :name, :hide_after, :hidden, :cache_version, :spreadsheet_key, :hidden_if_registered_after,
+                     :refreshed_at, :locked_exercise_points_visible, :description, :paste_visibility, :formal_name,
+                     :certificate_downloadable, :certificate_unlock_spec, :organization_id, :disabled_status,
+                     :title, :material_url, :course_template_id, :hide_submission_results, :external_scoreboard_url,]
+
     property :name, type: :string, example: "courseid-coursename"
     property :hide_after, type: :string, example: "2016-10-10T13:22:19.554+03:00"
     property :hidden, type: :boolean, example: false
@@ -37,7 +33,6 @@ class Course < ActiveRecord::Base
     property :course_template_id, type: :integer, example: 1
     property :hide_submission_results, type: :boolean, example: false
     property :external_scoreboard_url, type: :string
-    dorequire(self)
   end
 
   def course_as_json

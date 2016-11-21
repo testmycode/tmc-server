@@ -49,6 +49,13 @@ TmcServer::Application.routes.draw do
               scope '/exercises' do
                 get '/' => 'exercises#get_by_course'
                 scope '/:exercise_name' do
+                  scope '/points' do
+                    get '/' => 'exercises#get_points_all'
+                    scope '/user' do
+                      get '/' => 'exercises#get_points_user'
+                      get '/:user_id' => 'exercises#get_points_user'
+                    end
+                  end
                   get '/download' => 'exercises#download'
                 end
               end
@@ -75,6 +82,15 @@ TmcServer::Application.routes.draw do
           get '/' => 'courses#get_course'
           scope '/exercises' do
             get '/' => 'exercises#get_by_course'
+            scope '/:exercise_name' do
+              scope '/points' do
+                get '/' => 'exercises#get_points_all'
+                scope '/user' do
+                  get '/' => 'exercises#get_points_user'
+                  get '/:user_id' => 'exercises#get_points_user'
+                end
+              end
+            end
             scope '/submissions' do
               get '/', to: 'submissions#get_submissions_all'
               scope '/user' do
