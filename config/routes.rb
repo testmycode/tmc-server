@@ -50,6 +50,13 @@ TmcServer::Application.routes.draw do
           resources :users, module: :courses, only: [] do
             resources :points, module: :users, only: :index
           end
+          resources :exercises, module: :courses, param: :name, only: :index do
+            resources :points, module: :exercises, only: :index
+            resources :users, module: :exercises, only: [] do
+              resources :points, module: :users, only: :index
+            end
+            get 'download', on: :member
+          end
         end
       end
       resources :courses, only: :show do
@@ -57,24 +64,18 @@ TmcServer::Application.routes.draw do
         resources :users, module: :courses, only: [] do
           resources :points, module: :users, only: :index
         end
+        resources :exercises, module: :courses, param: :name, only: :index do
+          resources :points, module: :exercises, only: :index
+          resources :users, module: :exercises, only: [] do
+            resources :points, module: :users, only: :index
+          end
+        end
       end
+
       scope '/org' do
         scope '/:slug' do
           scope '/courses' do
             scope '/:course_name' do
-              scope '/exercises' do
-                get '/' => 'exercises#get_by_course'
-                scope '/:exercise_name' do
-                  scope '/points' do
-                    get '/' => 'exercises#get_points_all'
-                    scope '/user' do
-                      get '/' => 'exercises#get_points_user'
-                      get '/:user_id' => 'exercises#get_points_user'
-                    end
-                  end
-                  get '/download' => 'exercises#download'
-                end
-              end
               scope '/submissions' do
                 get '/' => 'submissions#get_submissions_all'
                 scope '/user' do
@@ -88,17 +89,6 @@ TmcServer::Application.routes.draw do
       end
       scope '/courses' do
         scope '/:course_id' do
-          scope '/exercises' do
-            get '/' => 'exercises#get_by_course'
-            scope '/:exercise_name' do
-              scope '/points' do
-                get '/' => 'exercises#get_points_all'
-                scope '/user' do
-                  get '/' => 'exercises#get_points_user'
-                  get '/:user_id' => 'exercises#get_points_user'
-                end
-              end
-            end
             scope '/submissions' do
               get '/' => 'submissions#get_submissions_all'
               scope '/user' do
@@ -108,7 +98,6 @@ TmcServer::Application.routes.draw do
             end
           end
         end
-      end
     end
   end
   resources :organizations, except: [:destroy, :create, :edit, :update], path: 'org' do
