@@ -1,32 +1,7 @@
-class Api::V8::Users::BasicInfoController < Api::V8::BaseController
+class Api::V8::UsersController < Api::V8::BaseController
   include Swagger::Blocks
 
-  swagger_path '/api/v8/users/basic_info' do
-    operation :get do
-      key :description, 'Returns the current user\'s username and email'
-      key :operationId, 'findUsersBasicInfo'
-      key :produces, [
-          'application/json'
-      ]
-      key :tags, [
-          'user'
-      ]
-      response 200 do
-        key :description, 'User\'s username and email as json'
-        schema do
-          key :title, :user
-          key :required, [:user]
-          property :user do
-            key :'$ref', :UsersBasicInfo
-          end
-        end
-      end
-      response 403, '$ref': '#/responses/error'
-      response 404, '$ref': '#/responses/error'
-    end
-  end
-
-  swagger_path '/api/v8/users/{user_id}/basic_info' do
+  swagger_path '/api/v8/users/{user_id}' do
     operation :get do
       key :description, 'Returns the user\'s username and email by user id'
       key :operationId, 'findUsersBasicInfoById'
@@ -52,10 +27,35 @@ class Api::V8::Users::BasicInfoController < Api::V8::BaseController
     end
   end
 
+  swagger_path '/api/v8/users/current' do
+    operation :get do
+      key :description, 'Returns the current user\'s username and email'
+      key :operationId, 'findUsersBasicInfo'
+      key :produces, [
+          'application/json'
+      ]
+      key :tags, [
+          'user'
+      ]
+      response 200 do
+        key :description, 'User\'s username and email as json'
+        schema do
+          key :title, :user
+          key :required, [:user]
+          property :user do
+            key :'$ref', :UsersBasicInfo
+          end
+        end
+      end
+      response 403, '$ref': '#/responses/error'
+      response 404, '$ref': '#/responses/error'
+    end
+  end
+
   def show
     unauthorize_guest! if current_user.guest?
     user = current_user
-    user = User.find_by!(id: params[:user_id]) if params[:user_id]
+    user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
     authorize! :read, user
 
     present(
