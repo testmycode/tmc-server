@@ -1,7 +1,15 @@
 class User < ActiveRecord::Base
   include Comparable
   include Gravtastic
+  include Swagger::Blocks
   gravtastic
+
+  swagger_schema :UsersBasicInfo do
+    key :required, [:id, :username, :email]
+    property :id, type: :integer, example: 1
+    property :username, type: :string, example: 'student'
+    property :email, type: :string, example: 'student@example.com'
+  end
 
   has_many :submissions, dependent: :delete_all
   has_many :awarded_points, dependent: :delete_all

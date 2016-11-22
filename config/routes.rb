@@ -38,9 +38,15 @@ TmcServer::Application.routes.draw do
         end
       end
     end
-    
+
     namespace :v8, defaults: {format: 'json'} do
-      get '/documentation', to: 'apidocs#index'
+      get '/documentation' => 'apidocs#index'
+      namespace :users do
+        get '/basic_info' => 'basic_info#show'
+        scope '/:user_id' do
+          get '/basic_info' => 'basic_info#show'
+        end
+      end
       scope '/org' do
         scope '/:slug' do
           scope '/courses' do
@@ -60,10 +66,10 @@ TmcServer::Application.routes.draw do
                 end
               end
               scope '/submissions' do
-                get '/', to: 'submissions#get_submissions_all'
+                get '/' => 'submissions#get_submissions_all'
                 scope '/user' do
-                  get '/', to: 'submissions#get_submissions_user'
-                  get '/:user_id', to: 'submissions#get_submissions_user'
+                  get '/' => 'submissions#get_submissions_user'
+                  get '/:user_id' => 'submissions#get_submissions_user'
                 end
               end
               scope '/points' do
@@ -92,10 +98,10 @@ TmcServer::Application.routes.draw do
               end
             end
             scope '/submissions' do
-              get '/', to: 'submissions#get_submissions_all'
+              get '/' => 'submissions#get_submissions_all'
               scope '/user' do
-                get '/', to: 'submissions#get_submissions_user'
-                get '/:user_id', to: 'submissions#get_submissions_user'
+                get '/' => 'submissions#get_submissions_user'
+                get '/:user_id' => 'submissions#get_submissions_user'
               end
             end
           end

@@ -8,6 +8,7 @@ AllCops:
     - 'db/**/*'
     - 'ext/**/*'
     - 'tmp/**/*'
+  TargetRubyVersion: 2.2
 
 # Style
 
