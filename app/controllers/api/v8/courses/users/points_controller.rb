@@ -1,14 +1,13 @@
-class Api::V8::Organizations::Courses::Users::PointsController < Api::V8::BaseController
+class Api::V8::Courses::Users::PointsController < Api::V8::BaseController
 
   include Swagger::Blocks
 
-  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/users/{user_id}/points' do
+  swagger_path '/api/v8/courses/{course_id}/users/{user_id}/points' do
     operation :get do
-      key :description, "Returns the given user's points from the course in a json format. Course is searched by name"
+      key :description, "Returns the given user's points from the course in a json format. Course is searched by id"
       key :produces, ['application/json']
       key :tags, ['point']
-      parameter '$ref': '#/parameters/path_organization_id'
-      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_course_id'
       parameter '$ref': '#/parameters/path_user_id'
       response 403, '$ref': '#/responses/error'
       response 404, '$ref': '#/responses/error'
@@ -24,13 +23,12 @@ class Api::V8::Organizations::Courses::Users::PointsController < Api::V8::BaseCo
     end
   end
 
-  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/users/current/points' do
+  swagger_path '/api/v8/courses/{course_id}/users/current/points' do
     operation :get do
-      key :description, "Returns the current user's points from the course in a json format. Course is searched by name"
+      key :description, "Returns the current user's points from the course in a json format. Course is searched by id"
       key :produces, ['application/json']
       key :tags, ['point']
-      parameter '$ref': '#/parameters/path_organization_id'
-      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_course_id'
       response 403, '$ref': '#/responses/error'
       response 404, '$ref': '#/responses/error'
       response 200 do
@@ -46,7 +44,7 @@ class Api::V8::Organizations::Courses::Users::PointsController < Api::V8::BaseCo
   end
 
   def index
-    course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
+    course = Course.find_by!(id: params[:course_id])
     params[:user_id] = current_user.id if params[:user_id] == 'current'
     points = course.awarded_points.includes(:submission).where(user_id: params[:user_id])
     authorize_collection :read, points

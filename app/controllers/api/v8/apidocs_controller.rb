@@ -91,6 +91,11 @@ class Api::V8::ApidocsController < ActionController::Base
   # A list of all classes that have swagger_* declarations.
   SWAGGERED_CLASSES = [
     Api::V8::CoursesController,
+    Api::V8::Courses::PointsController,
+    Api::V8::Courses::Users::PointsController,
+    Api::V8::Organizations::CoursesController,
+    Api::V8::Organizations::Courses::PointsController,
+    Api::V8::Organizations::Courses::Users::PointsController,
     Api::V8::ExercisesController,
     Api::V8::SubmissionsController,
     Api::V8::UsersController,

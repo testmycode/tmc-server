@@ -52,11 +52,16 @@ TmcServer::Application.routes.draw do
           end
         end
       end
+      resources :courses, only: :show do
+        resources :points, module: :courses, only: :index
+        resources :users, module: :courses, only: [] do
+          resources :points, module: :users, only: :index
+        end
+      end
       scope '/org' do
         scope '/:slug' do
           scope '/courses' do
             scope '/:course_name' do
-
               scope '/exercises' do
                 get '/' => 'exercises#get_by_course'
                 scope '/:exercise_name' do
@@ -83,7 +88,6 @@ TmcServer::Application.routes.draw do
       end
       scope '/courses' do
         scope '/:course_id' do
-          get '/' => 'courses#get_course'
           scope '/exercises' do
             get '/' => 'exercises#get_by_course'
             scope '/:exercise_name' do
@@ -101,13 +105,6 @@ TmcServer::Application.routes.draw do
                 get '/' => 'submissions#get_submissions_user'
                 get '/:user_id' => 'submissions#get_submissions_user'
               end
-            end
-          end
-          scope '/points' do
-            get '/' => 'courses#get_points_all'
-            scope '/user' do
-              get '/' => 'courses#get_points_user'
-              get '/:user_id' => 'courses#get_points_user'
             end
           end
         end

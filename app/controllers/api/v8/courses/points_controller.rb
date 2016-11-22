@@ -1,14 +1,13 @@
-class Api::V8::Organizations::Courses::PointsController < Api::V8::BaseController
+class Api::V8::Courses::PointsController < Api::V8::BaseController
 
   include Swagger::Blocks
 
-  swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/points' do
+  swagger_path '/api/v8/courses/{course_id}/points' do
     operation :get do
-      key :description, "Returns the course's points in a json format. Course is searched by name"
+      key :description, "Returns the course's points in a json format. Course is searched by id"
       key :produces, ['application/json']
       key :tags, ['point']
-      parameter '$ref': '#/parameters/path_organization_id'
-      parameter '$ref': '#/parameters/path_course_name'
+      parameter '$ref': '#/parameters/path_course_id'
       response 403, '$ref': '#/responses/error'
       response 404, '$ref': '#/responses/error'
       response 200 do
@@ -24,7 +23,7 @@ class Api::V8::Organizations::Courses::PointsController < Api::V8::BaseControlle
   end
 
   def index
-    course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
+    course = Course.find_by!(id: params[:course_id])
     points = course.awarded_points.includes(:submission)
     authorize_collection :read, points
     present points.as_json_with_exercise_ids(course.exercises)

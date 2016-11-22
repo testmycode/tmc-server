@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V8::Organizations::Courses::Users::PointsController, type: :controller do
+describe Api::V8::Courses::Users::PointsController, type: :controller do
   let!(:organization) { FactoryGirl.create(:organization) }
   let!(:course_name) { 'testcourse' }
   let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}") }
@@ -23,9 +23,9 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
       let(:current_user) { FactoryGirl.create(:admin) }
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
 
-      describe 'when course name given' do
+      describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {organization_slug: organization.slug, course_name: course_name, user_id: 'current'}
+          get :index, {course_id: course.id, user_id:  'current'}
           expect(response).to have_http_status(:success)
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
@@ -33,9 +33,9 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
           expect(response.body).not_to include point.name
         end
       end
-      describe 'when invalid course name given' do
+      describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {organization_slug: organization.slug, course_name: 'bad', user_id: 'current'}
+          get :index, {course_id: -1, user_id:  'current'}
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include current_user_course_point.name
@@ -49,10 +49,10 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
     describe 'as user' do
       let(:current_user) { FactoryGirl.create(:user) }
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
-      
-      describe 'when course name given' do
+
+      describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {organization_slug: organization.slug, course_name: course_name, user_id: 'current'}
+          get :index, {course_id: course.id, user_id:  'current'}
           expect(response).to have_http_status(:success)
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
@@ -60,9 +60,9 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
           expect(response.body).not_to include point.name
         end
       end
-      describe 'when invalid course name given' do
+      describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {organization_slug: organization.slug, course_name: 'bad', user_id: 'current'}
+          get :index, {course_id: -1, user_id:  'current'}
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include current_user_course_point.name
@@ -76,17 +76,17 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
     describe 'as guest' do
       let(:current_user) { Guest.new }
       let(:token) { nil }
-      
-      describe 'when course name given' do
+
+      describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {organization_slug: organization.slug, course_name: course_name, user_id: 'current'}
+          get :index, {course_id: course.id, user_id:  'current'}
           expect(response).to have_http_status(:success)
           expect(response.body).to eq '[]'
         end
       end
-      describe 'when invalid course name given' do
+      describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {organization_slug: organization.slug, course_name: 'bad', user_id: 'current'}
+          get :index, {course_id: -1, user_id:  'current'}
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include course_point.name
@@ -100,20 +100,20 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
     describe 'as admin' do
       let(:current_user) { FactoryGirl.create(:admin) }
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
-      
-      describe 'when course name given' do
+
+      describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {organization_slug: organization.slug, course_name: course_name, user_id: course_point.user_id}
+          get :index, {course_id: point.course_id, user_id: point.user_id}
           expect(response).to have_http_status(:success)
-          expect(response.body).to include course_point.name
+          expect(response.body).to include point.name
           expect(response.body).not_to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
-          expect(response.body).not_to include point.name
+          expect(response.body).not_to include course_point.name
         end
       end
-      describe 'when invalid course name given' do
+      describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {organization_slug: organization.slug, course_name: 'bad', user_id: course_point.user_id}
+          get :index, {course_id: -1, user_id: point.user_id}
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
@@ -127,20 +127,20 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
     describe 'as user' do
       let(:current_user) { FactoryGirl.create(:user) }
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
-      
-      describe 'when course name given' do
+
+      describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {organization_slug: organization.slug, course_name: course_name, user_id: course_point.user_id}
+          get :index, {course_id: point.course_id, user_id: point.user_id}
           expect(response).to have_http_status(:success)
-          expect(response.body).to include course_point.name
+          expect(response.body).to include point.name
           expect(response.body).not_to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
-          expect(response.body).not_to include point.name
+          expect(response.body).not_to include course_point.name
         end
       end
-      describe 'when invalid course name given' do
+      describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {organization_slug: organization.slug, course_name: 'bad', user_id: course_point.user_id}
+          get :index, {course_id: -1, user_id: point.user_id}
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
@@ -154,18 +154,18 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
     describe 'as another user' do
       let(:current_user) { user2 }
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
-      
-      describe 'when course name given' do
+
+      describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {organization_slug: organization.slug, course_name: course_name, user_id: course_point.user_id}
+          get :index, {course_id: point.course_id, user_id: point.user_id}
           expect(response).to have_http_status(:success)
-          expect(response.body).to include course_point.name
-          expect(response.body).not_to include point.name
+          expect(response.body).to include point.name
+          expect(response.body).not_to include course_point.name
         end
       end
-      describe 'when invalid course name given' do
+      describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {organization_slug: organization.slug, course_name: 'bad', user_id: course_point.user_id}
+          get :index, {course_id: -1, user_id: point.user_id}
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
@@ -177,18 +177,18 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
     describe 'as guest' do
       let(:current_user) { Guest.new }
       let(:token) { nil }
-      
-      describe 'when course name given' do
+
+      describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {organization_slug: organization.slug, course_name: course_name, user_id: course_point.user_id}
+          get :index, {course_id: point.course_id, user_id: point.user_id}
           expect(response).to have_http_status(:success)
-          expect(response.body).to include course_point.name
-          expect(response.body).not_to include point.name
+          expect(response.body).to include point.name
+          expect(response.body).not_to include course_point.name
         end
       end
-      describe 'when invalid course name given' do
+      describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {organization_slug: organization.slug, course_name: 'bad', user_id: course_point.user_id}
+          get :index, {course_id: -1, user_id: point.user_id}
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
