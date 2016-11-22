@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V8::User::BasicInfoController, type: :controller do
+describe Api::V8::Users::BasicInfoController, type: :controller do
   let!(:user) { FactoryGirl.create(:user) }
   let!(:other_user) { FactoryGirl.create(:user) }
   let!(:admin) { FactoryGirl.create(:admin) }

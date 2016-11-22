@@ -41,7 +41,7 @@ TmcServer::Application.routes.draw do
 
     namespace :v8, defaults: {format: 'json'} do
       get '/documentation' => 'apidocs#index'
-      namespace :user do
+      namespace :users do
         get '/basic_info' => 'basic_info#show'
         scope '/:user_id' do
           get '/basic_info' => 'basic_info#show'

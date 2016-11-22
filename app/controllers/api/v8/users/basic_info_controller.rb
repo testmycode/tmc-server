@@ -1,7 +1,7 @@
-class Api::V8::User::BasicInfoController < Api::V8::BaseController
+class Api::V8::Users::BasicInfoController < Api::V8::BaseController
   include Swagger::Blocks
 
-  swagger_path '/api/v8/user/basic_info' do
+  swagger_path '/api/v8/users/basic_info' do
     operation :get do
       key :description, 'Returns the current user\'s username and email'
       key :operationId, 'findUsersBasicInfo'
@@ -26,7 +26,7 @@ class Api::V8::User::BasicInfoController < Api::V8::BaseController
     end
   end
 
-  swagger_path '/api/v8/user/{user_id}/basic_info' do
+  swagger_path '/api/v8/users/{user_id}/basic_info' do
     operation :get do
       key :description, 'Returns the user\'s username and email by user id'
       key :operationId, 'findUsersBasicInfoById'
@@ -59,6 +59,7 @@ class Api::V8::User::BasicInfoController < Api::V8::BaseController
     authorize! :read, user
 
     present(
+      id: user.id,
       username: user.login,
       email: user.email
     )
