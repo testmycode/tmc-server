@@ -5,7 +5,8 @@ class User < ActiveRecord::Base
   gravtastic
 
   swagger_schema :UsersBasicInfo do
-    key :required, [:username, :email]
+    key :required, [:id, :username, :email]
+    property :id, type: :integer, example: 1
     property :username, type: :string, example: 'student'
     property :email, type: :string, example: 'student@example.com'
   end
