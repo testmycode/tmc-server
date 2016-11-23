@@ -1,3 +1,5 @@
-module Api::V8
+module Api
+  module V8
 
+  end
 end

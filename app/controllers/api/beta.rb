@@ -1,3 +1,5 @@
-module Api::Beta
+module Api
+  module Beta
 
+  end
 end
