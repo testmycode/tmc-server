@@ -74,43 +74,10 @@ module Api
               course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
               params[:user_id] = current_user.id if params[:user_id] == 'current'
               submissions = Submission.where(course_id: course.id, user_id: params[:user_id])
-              readable = filter_fields(submissions.select { |sub| sub.readable_by?(current_user) })
+              readable = Submission.filter_fields(submissions.select { |sub| sub.readable_by?(current_user) })
 
               authorize_collection :read, readable
               present(readable)
-            end
-
-            private
-
-            def filter_fields(submissions)
-              submissions.map do |sub|
-                {
-                  id: sub.id,
-                  user_id: sub.user_id,
-                  pretest_error: sub.pretest_error,
-                  created_at: sub.created_at,
-                  exercise_name: sub.exercise_name,
-                  course_id: sub.course_id,
-                  processed: sub.processed,
-                  all_tests_passed: sub.all_tests_passed,
-                  points: sub.points,
-                  processing_tried_at: sub.processing_tried_at,
-                  processing_began_at: sub.processing_began_at,
-                  processing_completed_at: sub.processing_completed_at,
-                  times_sent_to_sandbox: sub.times_sent_to_sandbox,
-                  processing_attempts_started_at: sub.processing_attempts_started_at,
-                  params_json: sub.params_json,
-                  requires_review: sub.requires_review,
-                  requests_review: sub.requests_review,
-                  reviewed: sub.reviewed,
-                  message_for_reviewer: sub.message_for_reviewer,
-                  newer_submission_reviewed: sub.newer_submission_reviewed,
-                  review_dismissed: sub.review_dismissed,
-                  paste_available: sub.paste_available,
-                  message_for_paste: sub.message_for_paste,
-                  paste_key: sub.paste_key
-                }
-              end
             end
           end
         end
