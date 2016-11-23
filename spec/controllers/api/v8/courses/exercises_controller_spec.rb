@@ -1,18 +1,12 @@
 require 'spec_helper'
 
 describe Api::V8::Courses::ExercisesController, type: :controller do
-  let(:slug) { 'organ' }
-  let!(:organization) { FactoryGirl.create(:accepted_organization, slug: slug) }
-  let(:course_name) { 'testcourse' }
-  let(:course_name_with_slug) { "#{slug}-#{course_name}" }
-  let!(:course) { FactoryGirl.create(:course, name: course_name_with_slug, organization: organization) }
-  let(:exercise_name) { 'testexercise' }
-  let!(:exercise) { FactoryGirl.create(:exercise, name: exercise_name, course: course) }
-  let(:hidden_exercise_name) { 'hiddentestexercise' }
-  let!(:hidden_exercise) { FactoryGirl.create(:exercise, name: hidden_exercise_name, course: course, hidden: true) }
+  let!(:organization) { FactoryGirl.create(:accepted_organization) }
+  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-testcourse", organization: organization) }
+  let!(:exercise) { FactoryGirl.create(:exercise, name: 'testexercise', course: course) }
+  let!(:hidden_exercise) { FactoryGirl.create(:exercise, name: 'hiddentestexercise', course: course, hidden: true) }
   let(:admin) { FactoryGirl.create(:admin, password: 'xooxer') }
   let(:user) { FactoryGirl.create(:user, login: 'user', password: 'xooxer') }
-  let(:guest) { Guest.new }
 
   before :each do
     controller.stub(:doorkeeper_token) { token }

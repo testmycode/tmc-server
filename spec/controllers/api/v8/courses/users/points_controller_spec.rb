@@ -2,8 +2,7 @@ require 'spec_helper'
 
 describe Api::V8::Courses::Users::PointsController, type: :controller do
   let!(:organization) { FactoryGirl.create(:organization) }
-  let!(:course_name) { 'testcourse' }
-  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}") }
+  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-testcourse") }
   let(:user) { FactoryGirl.create(:user) }
   let(:user2) { FactoryGirl.create(:user) }
   let(:admin) { FactoryGirl.create(:admin) }

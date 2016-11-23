@@ -6,9 +6,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
   let!(:assistant) { FactoryGirl.create(:user) }
   let!(:admin) { FactoryGirl.create(:admin) }
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let(:course_name) { 'testcourse' }
-  let(:course_name_with_slug) { "#{organization.slug}-#{course_name}" }
-  let!(:course) { FactoryGirl.create(:course, name: course_name_with_slug.to_s, organization: organization) }
+  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-testcourse", organization: organization) }
   let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
   let!(:submission) do
     FactoryGirl.create(:submission,
@@ -145,20 +143,6 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
   end
 
   private
-
-  def get_two_subs_by_name
-    user1 = FactoryGirl.create(:user)
-    user2 = FactoryGirl.create(:user)
-    sub1 = FactoryGirl.create(:submission, user: user1, course: course)
-    sub2 = FactoryGirl.create(:submission, user: user2, course: course)
-
-    get :index, slug: organization.slug, course_name: course_name
-
-    r = JSON.parse response.body
-
-    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), 'incorrect submission or user id'
-    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
-  end
 
   def get_two_subs_by_id
     user1 = FactoryGirl.create(:user)

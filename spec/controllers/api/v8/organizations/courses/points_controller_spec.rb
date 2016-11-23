@@ -5,7 +5,6 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
   let!(:course_name) { 'testcourse' }
   let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}") }
   let(:user) { FactoryGirl.create(:user) }
-  let(:user2) { FactoryGirl.create(:user) }
   let(:admin) { FactoryGirl.create(:admin) }
 
   let!(:current_user_course_point) { FactoryGirl.create(:awarded_point, course: course, user: current_user) unless current_user.guest? }

@@ -7,8 +7,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
   let!(:admin) { FactoryGirl.create(:admin) }
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
-  let(:course_name_with_slug) { "#{organization.slug}-#{course_name}" }
-  let!(:course) { FactoryGirl.create(:course, name: course_name_with_slug.to_s, organization: organization) }
+  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization) }
   let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
   let!(:submission) do
     FactoryGirl.create(:submission,
