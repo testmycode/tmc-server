@@ -29,7 +29,7 @@ class Api::V8::Courses::Exercises::PointsController < Api::V8::BaseController
 
   def index
     unauthorize_guest!
-    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course = Course.find_by!(id: params[:course_id])
 
     points = course.awarded_points.includes(:submission)
                  .where(submissions: {exercise_name: params[:exercise_name]},

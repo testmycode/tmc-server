@@ -56,7 +56,7 @@ class Api::V8::Courses::Exercises::Users::PointsController < Api::V8::BaseContro
 
   def index
     unauthorize_guest!
-    course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+    course = Course.find_by!(id: params[:course_id])
     params[:user_id] = current_user.id if params[:user_id] == 'current'
 
     points = course.awarded_points.includes(:submission)
