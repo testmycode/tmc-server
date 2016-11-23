@@ -10,10 +10,10 @@ module Api
               key :description, 'Returns the submissions visible to the user in a json format'
               key :operationId, 'findUsersSubmissionsById'
               key :produces, [
-                  'application/json'
+                'application/json'
               ]
               key :tags, [
-                  'submission'
+                'submission'
               ]
               parameter '$ref': '#/parameters/path_course_id'
               parameter '$ref': '#/parameters/path_user_id'
@@ -40,10 +40,10 @@ module Api
               key :description, 'Returns the user\'s own submissions in a json format'
               key :operationId, 'findUsersOwnSubmissionsById'
               key :produces, [
-                  'application/json'
+                'application/json'
               ]
               key :tags, [
-                  'submission'
+                'submission'
               ]
               parameter '$ref': '#/parameters/path_course_id'
               response 403, '$ref': '#/responses/error'

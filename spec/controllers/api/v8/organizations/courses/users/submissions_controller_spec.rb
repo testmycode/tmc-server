@@ -31,7 +31,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           end
 
           it "should show given user's submissions" do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
         end
 
@@ -39,7 +39,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
           it "should show given user's submissions" do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
         end
       end
@@ -51,7 +51,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           end
 
           it "should show given user's submissions in my organizations" do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
           it 'should not show any submissions outside my organizations' do
@@ -63,7 +63,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it "should show given user's submissions in my organizations" do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
           it 'should not show any submissions outside my organizations' do
@@ -79,7 +79,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           end
 
           it "should show given user's submissions in my courses" do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
           it 'should not show any submissions outside my courses' do
@@ -91,7 +91,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it "should show given user's submissions in my courses" do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
           it 'should not show any submissions outside my courses' do
@@ -107,7 +107,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           end
 
           it 'should show my own submissions' do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
           it "should not show other users' submissions" do
@@ -119,7 +119,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
           it 'should show my own submissions' do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
           end
 
           it "should not show other users' submissions" do
@@ -152,7 +152,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           end
 
           it 'should show my own submissions' do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: 'current')
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: 'current')
           end
 
           it "should not show other users' submissions" do
@@ -164,7 +164,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
           it 'should show my own submissions' do
-            get_users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: 'current')
+            users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: 'current')
           end
 
           it "should not show other users' submissions" do
@@ -190,7 +190,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
 
   private
 
-  def get_users_own_subs(parameters)
+  def users_own_subs(parameters)
     get :index, parameters
 
     r = JSON.parse response.body

@@ -30,7 +30,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           end
 
           it 'should show all of the submissions' do
-            get_two_subs_by_id
+            two_subs_by_id
           end
         end
 
@@ -38,7 +38,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
           it 'should show all of the submissions' do
-            get_two_subs_by_id
+            two_subs_by_id
           end
         end
       end
@@ -50,7 +50,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           end
 
           it 'should show all of the submissions in my organizations' do
-            get_two_subs_by_id
+            two_subs_by_id
           end
 
           it 'should not show any submissions outside my organizations' do
@@ -62,7 +62,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
           it 'should show all of the submissions in my organizations' do
-            get_two_subs_by_id
+            two_subs_by_id
           end
 
           it 'should not show any submissions outside my organizations' do
@@ -78,7 +78,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           end
 
           it 'should show all of the submissions in my courses' do
-            get_two_subs_by_id
+            two_subs_by_id
           end
 
           it 'should not show any submissions outside my courses' do
@@ -90,7 +90,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
           it 'should show all of the submissions in my courses' do
-            get_two_subs_by_id
+            two_subs_by_id
           end
 
           it 'should not show any submissions outside my courses' do
@@ -106,7 +106,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           end
 
           it 'should show my own submissions' do
-            get_all_own_subs(course_id: course.id)
+            all_own_subs(course_id: course.id)
           end
 
           it "should not show other users' submissions" do
@@ -118,7 +118,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
           it 'should show my own submissions' do
-            get_all_own_subs(course_id: course.id)
+            all_own_subs(course_id: course.id)
           end
 
           it "should not show other users' submissions" do
@@ -144,7 +144,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
 
   private
 
-  def get_two_subs_by_id
+  def two_subs_by_id
     user1 = FactoryGirl.create(:user)
     user2 = FactoryGirl.create(:user)
     sub1 = FactoryGirl.create(:submission, user: user1, course: course)
@@ -158,7 +158,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
     expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
   end
 
-  def get_all_own_subs(parameters)
+  def all_own_subs(parameters)
     get :index, parameters
 
     r = JSON.parse response.body
