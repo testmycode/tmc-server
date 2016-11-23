@@ -8,10 +8,10 @@ module Api
           key :description, 'Returns the user\'s username and email by user id'
           key :operationId, 'findUsersBasicInfoById'
           key :produces, [
-              'application/json'
+            'application/json'
           ]
           key :tags, [
-              'user'
+            'user'
           ]
           parameter '$ref': '#/parameters/path_user_id'
           response 200 do
@@ -34,10 +34,10 @@ module Api
           key :description, 'Returns the current user\'s username and email'
           key :operationId, 'findUsersBasicInfo'
           key :produces, [
-              'application/json'
+            'application/json'
           ]
           key :tags, [
-              'user'
+            'user'
           ]
           response 200 do
             key :description, 'User\'s username and email as json'
@@ -61,9 +61,9 @@ module Api
         authorize! :read, user
 
         present(
-            id: user.id,
-            username: user.login,
-            email: user.email
+          id: user.id,
+          username: user.login,
+          email: user.email
         )
       end
     end

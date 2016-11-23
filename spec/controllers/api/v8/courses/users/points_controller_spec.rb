@@ -18,14 +18,13 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
   end
 
   describe "GET current user's points" do
-
     describe 'as admin' do
       let(:current_user) { FactoryGirl.create(:admin) }
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
 
       describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {course_id: course.id, user_id:  'current'}
+          get :index, course_id: course.id, user_id: 'current'
           expect(response).to have_http_status(:success)
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
@@ -35,7 +34,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {course_id: -1, user_id:  'current'}
+          get :index, course_id: -1, user_id: 'current'
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include current_user_course_point.name
@@ -52,7 +51,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
 
       describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {course_id: course.id, user_id:  'current'}
+          get :index, course_id: course.id, user_id: 'current'
           expect(response).to have_http_status(:success)
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
@@ -62,7 +61,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {course_id: -1, user_id:  'current'}
+          get :index, course_id: -1, user_id: 'current'
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include current_user_course_point.name
@@ -79,14 +78,14 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
 
       describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {course_id: course.id, user_id:  'current'}
+          get :index, course_id: course.id, user_id: 'current'
           expect(response).to have_http_status(:success)
           expect(response.body).to eq '[]'
         end
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {course_id: -1, user_id:  'current'}
+          get :index, course_id: -1, user_id: 'current'
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include course_point.name
@@ -103,7 +102,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
 
       describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {course_id: point.course_id, user_id: point.user_id}
+          get :index, course_id: point.course_id, user_id: point.user_id
           expect(response).to have_http_status(:success)
           expect(response.body).to include point.name
           expect(response.body).not_to include current_user_course_point.name
@@ -113,7 +112,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {course_id: -1, user_id: point.user_id}
+          get :index, course_id: -1, user_id: point.user_id
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
@@ -130,7 +129,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
 
       describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {course_id: point.course_id, user_id: point.user_id}
+          get :index, course_id: point.course_id, user_id: point.user_id
           expect(response).to have_http_status(:success)
           expect(response.body).to include point.name
           expect(response.body).not_to include current_user_course_point.name
@@ -140,7 +139,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {course_id: -1, user_id: point.user_id}
+          get :index, course_id: -1, user_id: point.user_id
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
@@ -157,7 +156,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
 
       describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {course_id: point.course_id, user_id: point.user_id}
+          get :index, course_id: point.course_id, user_id: point.user_id
           expect(response).to have_http_status(:success)
           expect(response.body).to include point.name
           expect(response.body).not_to include course_point.name
@@ -165,7 +164,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {course_id: -1, user_id: point.user_id}
+          get :index, course_id: -1, user_id: point.user_id
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
@@ -180,7 +179,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
 
       describe 'when course ID given' do
         it "shows only user's point information" do
-          get :index, {course_id: point.course_id, user_id: point.user_id}
+          get :index, course_id: point.course_id, user_id: point.user_id
           expect(response).to have_http_status(:success)
           expect(response.body).to include point.name
           expect(response.body).not_to include course_point.name
@@ -188,7 +187,7 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :index, {course_id: -1, user_id: point.user_id}
+          get :index, course_id: -1, user_id: point.user_id
           expect(response).to have_http_status(:missing)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
@@ -197,5 +196,4 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       end
     end
   end
-
 end

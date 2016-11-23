@@ -18,7 +18,7 @@ module Api
       end
 
       def present(hash)
-        if !!params[:pretty]
+        if params[:pretty]
           render json: JSON.pretty_generate(hash)
         else
           render json: hash.to_json
@@ -39,7 +39,7 @@ module Api
       attr_reader :current_user
 
       def errors_json(messages)
-        {errors: [*messages]}
+        { errors: [*messages] }
       end
     end
   end

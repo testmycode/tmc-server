@@ -27,15 +27,15 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
     let(:token) { double resource_owner_id: admin.id, acceptable?: true }
     describe 'when course name is given' do
       it 'should return successful response' do
-        get :index, {course_name: course_name, organization_slug: slug}
+        get :index, course_name: course_name, organization_slug: slug
         expect(response).to have_http_status(:success)
       end
       it 'should return the courses exercises' do
-        get :index, {course_name: course_name, organization_slug: slug}
+        get :index, course_name: course_name, organization_slug: slug
         expect(response.body).to have_content exercise.name
       end
       it 'should show hidden exercises' do
-        get :index, {course_name: course_name, organization_slug: slug}
+        get :index, course_name: course_name, organization_slug: slug
         expect(response.body).to have_content hidden_exercise.name
       end
     end
@@ -45,15 +45,15 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
     let(:token) { double resource_owner_id: user.id, acceptable?: true }
     describe 'when course name is given' do
       it 'should return successful response' do
-        get :index, {course_name: course_name, organization_slug: slug}
+        get :index, course_name: course_name, organization_slug: slug
         expect(response).to have_http_status(:success)
       end
       it 'should return the courses exercises' do
-        get :index, {course_name: course_name, organization_slug: slug}
+        get :index, course_name: course_name, organization_slug: slug
         expect(response.body).to have_content exercise.name
       end
       it 'should not show hidden exercises' do
-        get :index, {course_name: course_name, organization_slug: slug}
+        get :index, course_name: course_name, organization_slug: slug
         expect(response.body).not_to have_content hidden_exercise.name
       end
     end
@@ -63,12 +63,12 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
     let(:token) { double resource_owner_id: admin.id, acceptable?: true }
     describe 'when course name could not be found' do
       it 'should return error' do
-        get :index, {course_name: 'null', organization_slug: slug}
+        get :index, course_name: 'null', organization_slug: slug
         expect(response).to have_http_status(:not_found)
       end
     end
-  end  
-  
+  end
+
   describe 'Downloading an exercise zip' do
     describe 'as an unauthenticated user' do
       let(:token) { double resource_owner_id: guest.id, acceptable?: true }
@@ -80,10 +80,10 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
         course.refresh
 
         visit "/api/v8/org/#{slug}/courses/#{course_name}/exercises/zipexercise/download"
-        File.open("zipexercise.zip", 'wb') { |f| f.write(page.source) }
-        system!("unzip -qq zipexercise.zip")
-        expect(File).to be_a_directory("zipexercise")
-        expect(File).to exist("zipexercise/src/SimpleStuff.java")
+        File.open('zipexercise.zip', 'wb') { |f| f.write(page.source) }
+        system!('unzip -qq zipexercise.zip')
+        expect(File).to be_a_directory('zipexercise')
+        expect(File).to exist('zipexercise/src/SimpleStuff.java')
       end
       it "should fail if the course name doesn't exist", driver: :rack_test do
         repo = clone_course_repo(course)

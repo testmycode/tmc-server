@@ -38,8 +38,8 @@ module Api
               course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
 
               points = course.awarded_points.includes(:submission)
-                           .where(submissions: {exercise_name: params[:exercise_name]},
-                                  course_id: course.id)
+                             .where(submissions: { exercise_name: params[:exercise_name] },
+                                    course_id: course.id)
 
               authorize! :read, points
               present(points.as_json_with_exercise_ids(course.exercises))

@@ -13,7 +13,6 @@ describe Api::V8::CoursesController, type: :controller do
   end
 
   describe 'GET course by id' do
-
     describe 'as admin' do
       let(:current_user) { admin }
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
@@ -100,6 +99,5 @@ describe Api::V8::CoursesController, type: :controller do
         end
       end
     end
-
   end
 end

@@ -4,22 +4,22 @@ module Api
       include Swagger::Blocks
 
       swagger_root do
-        key :swagger, "2.0"
+        key :swagger, '2.0'
         info do
-          key :version, "8"
-          key :title, "TMC API documentation"
-          key :description, "TMC API documentation"
+          key :version, '8'
+          key :title, 'TMC API documentation'
+          key :description, 'TMC API documentation'
           contact do
-            key :name, "TestMyCode"
-            key :url, "https://cs.helsinki.fi"
+            key :name, 'TestMyCode'
+            key :url, 'https://cs.helsinki.fi'
           end
           license do
-            key :name, "MIT"
+            key :name, 'MIT'
           end
         end
         tag do
-          key :name, "api"
-          key :description, "API operations"
+          key :name, 'api'
+          key :description, 'API operations'
         end
 
         security_definition :api_key do
@@ -74,50 +74,50 @@ module Api
           key :type, :string
         end
         response :error do
-          key :description, "An error occurred"
+          key :description, 'An error occurred'
           schema do
             key :title, :errors
-            key :description, "A list of error messages"
+            key :description, 'A list of error messages'
             key :type, :array
             items do
               key :type, :string
             end
           end
         end
-        key :host, "localhost:3000"
-        key :schemes, ["http", "https"]
-        key :consumes, ["application/json"]
-        key :produces, ["application/json"]
+        key :host, 'localhost:3000'
+        key :schemes, %w(http https)
+        key :consumes, ['application/json']
+        key :produces, ['application/json']
       end
 
       # A list of all classes that have swagger_* declarations.
       SWAGGERED_CLASSES = [
-          Api::V8::CoursesController,
-          Api::V8::Courses::PointsController,
-          Api::V8::Courses::Users::PointsController,
-          Api::V8::Courses::ExercisesController,
-          Api::V8::Courses::Exercises::PointsController,
-          Api::V8::Courses::Exercises::Users::PointsController,
-          Api::V8::Courses::SubmissionsController,
-          Api::V8::Courses::Users::SubmissionsController,
-          Api::V8::Organizations::CoursesController,
-          Api::V8::Organizations::Courses::PointsController,
-          Api::V8::Organizations::Courses::Users::PointsController,
-          Api::V8::Organizations::Courses::ExercisesController,
-          Api::V8::Organizations::Courses::Exercises::PointsController,
-          Api::V8::Organizations::Courses::Exercises::Users::PointsController,
-          Api::V8::Organizations::Courses::SubmissionsController,
-          Api::V8::Organizations::Courses::Users::SubmissionsController,
-          Api::V8::ExercisesController,
-          Api::V8::SubmissionsController,
-          Api::V8::UsersController,
-          Course,
-          Exercise,
-          AvailablePoint,
-          Submission,
-          AwardedPoint,
-          User,
-          self
+        Api::V8::CoursesController,
+        Api::V8::Courses::PointsController,
+        Api::V8::Courses::Users::PointsController,
+        Api::V8::Courses::ExercisesController,
+        Api::V8::Courses::Exercises::PointsController,
+        Api::V8::Courses::Exercises::Users::PointsController,
+        Api::V8::Courses::SubmissionsController,
+        Api::V8::Courses::Users::SubmissionsController,
+        Api::V8::Organizations::CoursesController,
+        Api::V8::Organizations::Courses::PointsController,
+        Api::V8::Organizations::Courses::Users::PointsController,
+        Api::V8::Organizations::Courses::ExercisesController,
+        Api::V8::Organizations::Courses::Exercises::PointsController,
+        Api::V8::Organizations::Courses::Exercises::Users::PointsController,
+        Api::V8::Organizations::Courses::SubmissionsController,
+        Api::V8::Organizations::Courses::Users::SubmissionsController,
+        Api::V8::ExercisesController,
+        Api::V8::SubmissionsController,
+        Api::V8::UsersController,
+        Course,
+        Exercise,
+        AvailablePoint,
+        Submission,
+        AwardedPoint,
+        User,
+        self
       ].freeze
 
       def index

@@ -33,7 +33,7 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
     describe 'when searching for all users awarded points' do
       describe 'using course name' do
         it 'should return all users awarded points of the exercise' do
-          get :index, {course_id: course.id, exercise_name: exercise.name}
+          get :index, course_id: course.id, exercise_name: exercise.name
           expect(response.body).to have_content awarded_point1.id
           expect(response.body).to have_content awarded_point1.name
           expect(response.body).to have_content awarded_point2.id
@@ -47,7 +47,7 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
     let(:token) { nil }
     describe 'when searching for awarded points' do
       it 'should show authentication error' do
-        get :index, {course_id: course.id, exercise_name: exercise.name}
+        get :index, course_id: course.id, exercise_name: exercise.name
         expect(response).to have_http_status(:forbidden)
         expect(response.body).to have_content('Authentication required')
       end
@@ -59,13 +59,13 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
     describe 'when searching awarded points' do
       describe 'and no points are found' do
         it 'should return an empty array' do
-          get :index, {course_id: course.id, exercise_name: exercise_no_points.name}
+          get :index, course_id: course.id, exercise_name: exercise_no_points.name
           expect(response.body).to have_content '[]'
         end
       end
       describe 'and course is not found' do
         it 'should return error message' do
-          get :index, {course_id: '-1', exercise_name: exercise.name}
+          get :index, course_id: '-1', exercise_name: exercise.name
           expect(response).to have_http_status(:not_found)
           expect(response.body).to have_content "Couldn't find Course"
         end

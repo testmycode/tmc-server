@@ -8,12 +8,14 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
   let(:course_name_with_slug) { "#{organization.slug}-#{course_name}" }
-  let!(:course) { FactoryGirl.create(:course, name: "#{course_name_with_slug}", organization: organization) }
+  let!(:course) { FactoryGirl.create(:course, name: course_name_with_slug.to_s, organization: organization) }
   let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
-  let!(:submission) { FactoryGirl.create(:submission,
-                                         course: course,
-                                         user: user,
-                                         exercise: exercise) }
+  let!(:submission) do
+    FactoryGirl.create(:submission,
+                       course: course,
+                       user: user,
+                       exercise: exercise)
+  end
 
   before :each do
     controller.stub(:doorkeeper_token) { token }
@@ -208,7 +210,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
+    expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_courses_user_subs_for_assistant(parameters)
@@ -221,7 +223,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
+    expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_users_user_subs_for_student(parameters)
@@ -232,7 +234,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
+    expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 
   def no_other_users_own_subs_for_anyone(parameters)
@@ -243,6 +245,6 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
 
     r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
+    expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
   end
 end

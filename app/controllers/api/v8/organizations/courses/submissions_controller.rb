@@ -10,10 +10,10 @@ module Api
               key :description, 'Returns the submissions visible to the user in a json format'
               key :operationId, 'findSubmissions'
               key :produces, [
-                  'application/json'
+                'application/json'
               ]
               key :tags, [
-                  'submission'
+                'submission'
               ]
               parameter '$ref': '#/parameters/path_organization_id'
               parameter '$ref': '#/parameters/path_course_name'
@@ -52,30 +52,30 @@ module Api
           def filter_fields(submissions)
             submissions.map do |sub|
               {
-                  id: sub.id,
-                  user_id: sub.user_id,
-                  pretest_error: sub.pretest_error,
-                  created_at: sub.created_at,
-                  exercise_name: sub.exercise_name,
-                  course_id: sub.course_id,
-                  processed: sub.processed,
-                  all_tests_passed: sub.all_tests_passed,
-                  points: sub.points,
-                  processing_tried_at: sub.processing_tried_at,
-                  processing_began_at: sub.processing_began_at,
-                  processing_completed_at: sub.processing_completed_at,
-                  times_sent_to_sandbox: sub.times_sent_to_sandbox,
-                  processing_attempts_started_at: sub.processing_attempts_started_at,
-                  params_json: sub.params_json,
-                  requires_review: sub.requires_review,
-                  requests_review: sub.requests_review,
-                  reviewed: sub.reviewed,
-                  message_for_reviewer: sub.message_for_reviewer,
-                  newer_submission_reviewed: sub.newer_submission_reviewed,
-                  review_dismissed: sub.review_dismissed,
-                  paste_available: sub.paste_available,
-                  message_for_paste: sub.message_for_paste,
-                  paste_key: sub.paste_key
+                id: sub.id,
+                user_id: sub.user_id,
+                pretest_error: sub.pretest_error,
+                created_at: sub.created_at,
+                exercise_name: sub.exercise_name,
+                course_id: sub.course_id,
+                processed: sub.processed,
+                all_tests_passed: sub.all_tests_passed,
+                points: sub.points,
+                processing_tried_at: sub.processing_tried_at,
+                processing_began_at: sub.processing_began_at,
+                processing_completed_at: sub.processing_completed_at,
+                times_sent_to_sandbox: sub.times_sent_to_sandbox,
+                processing_attempts_started_at: sub.processing_attempts_started_at,
+                params_json: sub.params_json,
+                requires_review: sub.requires_review,
+                requests_review: sub.requests_review,
+                reviewed: sub.reviewed,
+                message_for_reviewer: sub.message_for_reviewer,
+                newer_submission_reviewed: sub.newer_submission_reviewed,
+                review_dismissed: sub.review_dismissed,
+                paste_available: sub.paste_available,
+                message_for_paste: sub.message_for_paste,
+                paste_key: sub.paste_key
               }
             end
           end

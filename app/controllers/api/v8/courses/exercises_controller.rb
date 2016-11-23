@@ -37,13 +37,13 @@ module Api
           visible = exercises.select { |ex| ex.visible_to?(current_user) }
           presentable = visible.map do |ex|
             {
-                id: ex.id,
-                available_points: ex.available_points,
-                name: ex.name,
-                publish_time: ex.publish_time,
-                solution_visible_after: ex.solution_visible_after,
-                deadline: ex.deadline_for(current_user),
-                disabled: ex.disabled?
+              id: ex.id,
+              available_points: ex.available_points,
+              name: ex.name,
+              publish_time: ex.publish_time,
+              solution_visible_after: ex.solution_visible_after,
+              deadline: ex.deadline_for(current_user),
+              disabled: ex.disabled?
             }
           end
 

@@ -2,7 +2,6 @@ module Api
   module V8
     module Organizations
       class CoursesController < Api::V8::BaseController
-
         include Swagger::Blocks
 
         swagger_path '/api/v8/org/{organization_id}/courses/{course_name}' do

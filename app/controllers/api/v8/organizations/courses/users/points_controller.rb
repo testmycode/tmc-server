@@ -4,7 +4,6 @@ module Api
       module Courses
         module Users
           class PointsController < Api::V8::BaseController
-
             include Swagger::Blocks
 
             swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/users/{user_id}/points' do

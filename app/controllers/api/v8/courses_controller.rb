@@ -1,7 +1,6 @@
 module Api
   module V8
     class CoursesController < Api::V8::BaseController
-
       include Swagger::Blocks
 
       swagger_path '/api/v8/courses/{course_id}' do
