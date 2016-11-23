@@ -45,7 +45,7 @@ The test environment builds hermetic images for each testrun by including all so
 
 Current maintainers of the project are
 - Martin Pärtel ([mpartel](https://github.com/mpartel))
-- Jarmo Isotalo ([jamox](https://github.com/jamox))
+- Jarmo Isotalo ([jamo](https://github.com/jamo))
 
 The project started as a Software Engineering Lab project at the [University of Helsinki CS Dept.](http://cs.helsinki.fi/) but has since been gradually almost completely rewritten. The original authors of the server component were
 
@@ -65,7 +65,7 @@ The course instructor and current maintainer of the project is Martin Pärtel ([
 
 The system was improved and C language support was added in another SE lab project by
 
-- Jarmo Isotalo ([jamox](https://github.com/jamox))
+- Jarmo Isotalo ([jamo](https://github.com/jamo))
 - Tony Kovanen ([rase-](https://github.com/rase-))
 - Kalle Viiri ([Kviiri](https://github.com/Kviiri))
 
@@ -73,7 +73,7 @@ Checkstyle-support was integrated by
 
 - Kenny Heinonen ([kennyhei](https://github.com/kennyhei/))
 - Kasper Hirvikoski ([kasper](https://github.com/kasper/))
-- Jarmo Isotalo ([jamox](https://github.com/jamox/))
+- Jarmo Isotalo ([jamo](https://github.com/jamo/))
 - Joni Salmi ([josalmi](https://github.com/josalmi/))
 
 ## License ##
