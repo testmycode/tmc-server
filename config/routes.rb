@@ -88,24 +88,21 @@ TmcServer::Application.routes.draw do
       namespace :core, defaults: {format: 'json'} do
         resources :courses, only: [:show] do
           resource :unlock, module: :courses, only: [:create]
-        end
-        resources :courses, only: [] do
           resources :reviews, module: :courses, only: [:index, :update]
         end
         resources :submissions, only: [] do
           resources :reviews, module: :submissions, only: [:create]
+          get 'download', on: :member
         end
-        resources :exercises, only: [] do
+        resources :exercises, only: [:show] do
           resource :solution, module: :exercises, only: [] do
             get 'download', on: :member
           end
           get 'download', on: :member
         end
-
-        resources :submissions, only: [] do
-          get 'download', on: :member
+        resources :organizations, param: :slug, path: 'org', only: [] do
+          resources :courses, module: :organizations, only: :index
         end
-        resources :exercises, param: :id, only: :show
       end
     end
   end
