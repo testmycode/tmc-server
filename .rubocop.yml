@@ -1,6 +1,4 @@
 AllCops:
-  Rails:
-    Enabled: true
   Include:
     - '**/config.ru'
     - '**/Rakefile'
@@ -9,6 +7,9 @@ AllCops:
     - 'ext/**/*'
     - 'tmp/**/*'
   TargetRubyVersion: 2.2
+
+Rails:
+  Enabled: true
 
 # Style
 
