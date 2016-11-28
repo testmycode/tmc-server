@@ -4,7 +4,7 @@ module Api
       class SubmissionsController < Api::V8::BaseController
         include Swagger::Blocks
 
-        swagger_path '/api/v8/courses/{course_id}/exercises/submissions' do
+        swagger_path '/api/v8/courses/{course_id}/submissions' do
           operation :get do
             key :description, 'Returns the submissions visible to the user in a json format'
             key :operationId, 'findSubmissionsById'
