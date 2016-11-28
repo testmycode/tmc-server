@@ -34,6 +34,7 @@ gem 'logstasher', '~> 0.9.0'
 gem 'pghero'
 
 gem 'swagger-blocks', '~> 1.3.4'
+gem 'json-schema', '~> 2.7.0'
 
 group :assets do
   gem 'sprockets-rails', require: 'sprockets/railtie'
