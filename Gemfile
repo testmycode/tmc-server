@@ -64,3 +64,7 @@ group :development, :test do
   gem 'simplecov'
   gem 'rubocop', '~> 0.35.0', require: false
 end
+
+group :test do
+  gem 'json-schema', '~> 2.7.0'
+end
