@@ -6,7 +6,8 @@ describe Api::V8::ApidocsController, type: :controller do
     get :index
     json = response.body
 
-    validation = JSON::Validator.validate(File.dirname(__FILE__) + '/swagger-schema.json', json)
+    schema = File.dirname(__FILE__) + '/swagger-schema.json'
+    validation = JSON::Validator.validate(schema, json)
     expect(validation).to be_truthy
   end
 end
