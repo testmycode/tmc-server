@@ -40,78 +40,48 @@ TmcServer::Application.routes.draw do
     end
 
     namespace :v8, defaults: {format: 'json'} do
-      get '/documentation' => 'apidocs#index'
-      namespace :users do
-        get '/basic_info' => 'basic_info#show'
-        scope '/:user_id' do
-          get '/basic_info' => 'basic_info#show'
-        end
-      end
-      scope '/org' do
-        scope '/:slug' do
-          scope '/courses' do
-            scope '/:course_name' do
-              get '/' => 'courses#get_course'
-              scope '/exercises' do
-                get '/' => 'exercises#get_by_course'
-                scope '/:exercise_name' do
-                  scope '/points' do
-                    get '/' => 'exercises#get_points_all'
-                    scope '/user' do
-                      get '/' => 'exercises#get_points_user'
-                      get '/:user_id' => 'exercises#get_points_user'
-                    end
-                  end
-                  get '/download' => 'exercises#download'
-                end
-              end
-              scope '/submissions' do
-                get '/' => 'submissions#get_submissions_all'
-                scope '/user' do
-                  get '/' => 'submissions#get_submissions_user'
-                  get '/:user_id' => 'submissions#get_submissions_user'
-                end
-              end
-              scope '/points' do
-                get '/' => 'courses#get_points_all'
-                scope 'user' do
-                  get '/' => 'courses#get_points_user'
-                  get '/:user_id' => 'courses#get_points_user'
-                end
-              end
+      resources :apidocs, only: :index, path: 'documentation'
+
+      resources :users, only: :show
+
+      resources :organizations, param: :slug, path: 'org', only: [] do
+        resources :courses, module: :organizations, param: :name, only: :show do
+          resources :points, module: :courses, only: :index
+          resources :users, module: :courses, only: [] do
+            resources :points, module: :users, only: :index
+          end
+
+          resources :exercises, module: :courses, param: :name, only: :index do
+            resources :points, module: :exercises, only: :index
+            resources :users, module: :exercises, only: [] do
+              resources :points, module: :users, only: :index
             end
+            get 'download', on: :member
+          end
+
+          resources :submissions, module: :courses, only: :index
+          resources :users, module: :courses, only: [] do
+            resources :submissions, module: :users, only: :index
           end
         end
       end
-      scope '/courses' do
-        scope '/:course_id' do
-          get '/' => 'courses#get_course'
-          scope '/exercises' do
-            get '/' => 'exercises#get_by_course'
-            scope '/:exercise_name' do
-              scope '/points' do
-                get '/' => 'exercises#get_points_all'
-                scope '/user' do
-                  get '/' => 'exercises#get_points_user'
-                  get '/:user_id' => 'exercises#get_points_user'
-                end
-              end
-            end
-            scope '/submissions' do
-              get '/' => 'submissions#get_submissions_all'
-              scope '/user' do
-                get '/' => 'submissions#get_submissions_user'
-                get '/:user_id' => 'submissions#get_submissions_user'
-              end
-            end
+
+      resources :courses, only: :show do
+        resources :points, module: :courses, only: :index
+        resources :users, module: :courses, only: [] do
+          resources :points, module: :users, only: :index
+        end
+
+        resources :exercises, module: :courses, param: :name, only: :index do
+          resources :points, module: :exercises, only: :index
+          resources :users, module: :exercises, only: [] do
+            resources :points, module: :users, only: :index
           end
-          scope '/points' do
-            get '/' => 'courses#get_points_all'
-            scope '/user' do
-              get '/' => 'courses#get_points_user'
-              get '/:user_id' => 'courses#get_points_user'
-            end
-          end
+        end
+
+        resources :submissions, module: :courses, only: :index
+        resources :users, module: :courses, only: [] do
+          resources :submissions, module: :users, only: :index
         end
       end
     end
