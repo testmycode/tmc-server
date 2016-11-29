@@ -97,6 +97,12 @@ TmcServer::Application.routes.draw do
         resources :submissions, only: [] do
           resources :reviews, module: :submissions, only: [:create]
         end
+        resources :exercises, only: [] do
+          resource :solution, module: :exercises, only: [] do
+            get 'download', on: :member
+          end
+          get 'download', on: :member
+        end
       end
     end
   end
