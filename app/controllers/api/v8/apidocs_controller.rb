@@ -73,6 +73,13 @@ module Api
           key :required, true
           key :type, :string
         end
+        parameter :path_submission_id do
+          key :name, :submission_id
+          key :in, :path
+          key :description, "Submission's id"
+          key :required, true
+          key :type, :integer
+        end
         response :error do
           key :description, 'An error occurred'
           schema do

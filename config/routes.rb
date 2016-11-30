@@ -89,7 +89,10 @@ TmcServer::Application.routes.draw do
         resources :organizations, param: :slug, path: 'org', only: [] do
 
         end
+      end
 
+      resources :submissions, only: [] do
+        get 'download', on: :member
       end
     end
   end
