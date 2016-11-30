@@ -104,6 +104,10 @@ TmcServer::Application.routes.draw do
           get 'download', on: :member
         end
       end
+
+      resources :submissions, only: [] do
+        get 'download', on: :member
+      end
     end
   end
 
