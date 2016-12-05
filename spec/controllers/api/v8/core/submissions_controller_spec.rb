@@ -27,10 +27,10 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
     describe 'as an admin' do
       let(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
-      it "should allow to download everyone's submissions", driver: :rack_test do
+      it "should allow to download everyone's submissions" do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/core/submissions/#{submission.id}/download"
-        expect(page.status_code).to be(200)
+        get :download, id: submission.id
+        expect(response.code).to eq('200')
         fail
       end
     end
@@ -42,8 +42,8 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it "should allow to download own organization's submissions" do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/core/submissions/#{submission.id}/download"
-        expect(page.status_code).to be(200)
+        get :download, id: submission.id
+        expect(response.code).to eq('200')
         fail
       end
       it "should not allow to download other organizations' submissions" do
@@ -53,8 +53,8 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        visit "/api/v8/core/submissions/#{other_guys_sub.id}/download"
-        expect(page.status_code).to be(403)
+        get :download, id: other_guys_sub.id
+        expect(response.code).to eq('403')
       end
     end
     describe 'as an assistant' do
@@ -65,8 +65,8 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it "should allow to download own course's submissions" do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/core/submissions/#{submission.id}/download"
-        expect(page.status_code).to be(200)
+        get :download, id: submission.id
+        expect(response.code).to eq('200')
         fail
       end
       it "should not allow to download other courses' submissions" do
@@ -75,8 +75,8 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        visit "/api/v8/core/submissions/#{other_guys_sub.id}/download"
-        expect(page.status_code).to be(403)
+        get :download, id: other_guys_sub.id
+        expect(response.code).to eq('403')
       end
     end
     describe 'as a student' do
@@ -84,8 +84,8 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it 'should allow to download own submissions' do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/core/submissions/#{submission.id}/download"
-        expect(page.status_code).to be(200)
+        get :download, id: submission.id
+        expect(response.code).to eq('200')
         fail
       end
       it "should not allow to download other students' submissions" do
@@ -94,16 +94,17 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        visit "/api/v8/core/submissions/#{other_guys_sub.id}/download"
-        expect(page.status_code).to be(403)
+        get :download, id: other_guys_sub.id
+        expect(response.code).to eq('403')
       end
     end
     describe 'as an unauthenticated user' do
-      let(:token) { double resource_owner_id: Guest.new.id, acceptable?: true }
+      let(:current_user) { Guest.new }
+      let(:token) { nil }
 
       it 'should not allow downloading' do
-        visit "/api/v8/core/submissions/#{submission.id}/download"
-        expect(page.status_code).to be(403)
+        get :download, id: submission.id
+        expect(response.code).to eq('403')
       end
     end
   end
