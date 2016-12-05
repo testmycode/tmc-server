@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Api::V8::SubmissionsController, type: :controller do
+describe Api::V8::Core::SubmissionsController, type: :controller do
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  repo_path = Dir.tmpdir + '/remote_repo'
+  repo_path = Dir.tmpdir + '/submission182376/remote_repo'
   FileUtils.rm_rf(repo_path)
   create_bare_repo(repo_path)
   let!(:course) { FactoryGirl.create(:course, organization: organization, source_backend: 'git', source_url: repo_path) }
@@ -29,7 +29,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
       it "should allow to download everyone's submissions", driver: :rack_test do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/submissions/#{submission.id}/download"
+        visit "/api/v8/core/submissions/#{submission.id}/download"
         expect(page.status_code).to be(200)
         fail
       end
@@ -42,7 +42,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
       it "should allow to download own organization's submissions" do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/submissions/#{submission.id}/download"
+        visit "/api/v8/core/submissions/#{submission.id}/download"
         expect(page.status_code).to be(200)
         fail
       end
@@ -53,7 +53,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        visit "/api/v8/submissions/#{other_guys_sub.id}/download"
+        visit "/api/v8/core/submissions/#{other_guys_sub.id}/download"
         expect(page.status_code).to be(403)
       end
     end
@@ -65,7 +65,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
       it "should allow to download own course's submissions" do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/submissions/#{submission.id}/download"
+        visit "/api/v8/core/submissions/#{submission.id}/download"
         expect(page.status_code).to be(200)
         fail
       end
@@ -75,7 +75,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        visit "/api/v8/submissions/#{other_guys_sub.id}/download"
+        visit "/api/v8/core/submissions/#{other_guys_sub.id}/download"
         expect(page.status_code).to be(403)
       end
     end
@@ -84,7 +84,7 @@ describe Api::V8::SubmissionsController, type: :controller do
 
       it 'should allow to download own submissions' do
         pending("test that submission zip's content is correct")
-        visit "/api/v8/submissions/#{submission.id}/download"
+        visit "/api/v8/core/submissions/#{submission.id}/download"
         expect(page.status_code).to be(200)
         fail
       end
@@ -94,7 +94,7 @@ describe Api::V8::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        visit "/api/v8/submissions/#{other_guys_sub.id}/download"
+        visit "/api/v8/core/submissions/#{other_guys_sub.id}/download"
         expect(page.status_code).to be(403)
       end
     end
@@ -102,7 +102,7 @@ describe Api::V8::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: Guest.new.id, acceptable?: true }
 
       it 'should not allow downloading' do
-        visit "/api/v8/submissions/#{submission.id}/download"
+        visit "/api/v8/core/submissions/#{submission.id}/download"
         expect(page.status_code).to be(403)
       end
     end
