@@ -84,6 +84,10 @@ TmcServer::Application.routes.draw do
           resources :submissions, module: :users, only: :index
         end
       end
+
+      namespace :core, defaults: {format: 'json'} do
+        
+      end
     end
   end
 
