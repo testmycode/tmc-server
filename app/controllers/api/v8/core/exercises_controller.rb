@@ -53,13 +53,12 @@ module Api
         end
 
         def show
+          unauthorize_guest!
           exercise = Exercise.find(params[:id])
           course = Course.find(exercise.course_id)
-          organization = course.organization
           authorize! :read, course
           authorize! :read, exercise
 
-          unauthorize_guest!
           submissions = exercise.submissions.order('submissions.created_at DESC')
           submissions = submissions.where(user_id: current_user.id) unless current_user.administrator?
           submissions = submissions.includes(:awarded_points).includes(:user)
