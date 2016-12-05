@@ -14,7 +14,7 @@ module Api
             key :url, 'https://cs.helsinki.fi'
           end
           license do
-            key :name, 'MIT'
+            key :name, 'GPLv2'
           end
         end
         tag do
