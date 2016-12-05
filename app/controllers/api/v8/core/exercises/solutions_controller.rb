@@ -2,7 +2,7 @@ module Api
   module V8
     module Core
       module Exercises
-        class SolutionsController < Api::V8::BaseController
+        class SolutionController < Api::V8::BaseController
           include Swagger::Blocks
 
           swagger_path '/api/v8/core/exercises/{exercise_id}/solution/download' do
