@@ -107,6 +107,7 @@ TmcServer::Application.routes.draw do
         resources :submissions, only: [] do
           get 'download', on: :member
         end
+        resources :exercises, param: :id, only: :show
       end
     end
   end

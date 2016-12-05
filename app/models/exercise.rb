@@ -23,6 +23,27 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  swagger_schema :CoreExercise do
+    key :required, [
+        :course_name, :course_id, :code_review_requests_enabled, :run_tests_locally_action_enabled,
+        :exercise_name, :exercise_id, :unlocked_at, :deadline, :submissions,
+    ]
+
+    property :course_name, type: :string, example: 'course'
+    property :course_id, type: :integer, example: 1
+    property :code_review_requests_enabled, type: :boolean, example: true
+    property :run_tests_locally_action_enabled, type: :boolean, example: true
+    property :exercise_name, type: :string, example: 'exercise'
+    property :exercise_id, type: :integer, example: 1
+    property :unlocked_at, type: :string, format: 'date-time', example: '2016-12-05T12:00:00.000+03:00'
+    property :deadline, type: :string, format: 'date-time', example: '2016-12-24T00:00:00.000+03:00'
+    property :submissions, type: :array do
+      items do
+        key :'$ref', :CoreSubmission
+      end
+    end
+  end
+
   belongs_to :course
 
   has_many :available_points, dependent: :delete_all
