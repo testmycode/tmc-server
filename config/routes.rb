@@ -86,7 +86,10 @@ TmcServer::Application.routes.draw do
       end
 
       namespace :core, defaults: {format: 'json'} do
-        
+        resources :organizations, param: :slug, path: 'org', only: [] do
+
+        end
+
       end
     end
   end
