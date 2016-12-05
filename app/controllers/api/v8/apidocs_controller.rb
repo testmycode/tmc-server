@@ -119,6 +119,7 @@ module Api
         Api::V8::SubmissionsController,
         Api::V8::UsersController,
         Api::V8::Core::SubmissionsController,
+        Api::V8::Core::ExercisesController,
         Course,
         Exercise,
         AvailablePoint,
