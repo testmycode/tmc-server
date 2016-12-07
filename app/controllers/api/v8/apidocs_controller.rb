@@ -15,6 +15,7 @@ module Api
           end
           license do
             key :name, 'GPLv2'
+            key :url, 'https://www.gnu.org/licenses/gpl-2.0.html'
           end
         end
         tag do
