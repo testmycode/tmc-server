@@ -49,14 +49,14 @@ describe Api::V8::Core::ExercisesController, type: :controller do
         get :show, id: exercise.id
         expect(response.body).to include course.name
         expect(response.body).to include 'submissions'
-        expect(response.body).to include 'http://test.host/submissions/1.zip'
+        expect(response.body).to include 'http://test.host/api/v8/core/submissions/1/download'
       end
     end
     describe 'and invalid exercise id is given' do
       it 'should show appropriate error' do
-        get :show, id: 741852963
+        get :show, id: 741
         expect(response).to have_http_status :not_found
-        expect(response.body).to include "Couldn't find Exercise with 'id'=741852963"
+        expect(response.body).to include "Couldn't find Exercise with 'id'=741"
       end
     end
   end

@@ -17,7 +17,7 @@ class SubmissionList
       created_at: submission.created_at,
       all_tests_passed: submission.all_tests_passed,
       points: submission.points,
-      submitted_zip_url: @helpers.submission_url(submission, format: :zip),
+      submitted_zip_url: @helpers.download_api_v8_core_submission_url(submission),
       paste_url: paste_url(submission),
       processing_time: submission.processing_time,
       reviewed: submission.reviewed?,

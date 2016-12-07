@@ -25,8 +25,8 @@ class Exercise < ActiveRecord::Base
 
   swagger_schema :CoreExercise do
     key :required, [
-        :course_name, :course_id, :code_review_requests_enabled, :run_tests_locally_action_enabled,
-        :exercise_name, :exercise_id, :unlocked_at, :deadline, :submissions,
+      :course_name, :course_id, :code_review_requests_enabled, :run_tests_locally_action_enabled,
+      :exercise_name, :exercise_id, :unlocked_at, :deadline, :submissions,
     ]
 
     property :course_name, type: :string, example: 'course'

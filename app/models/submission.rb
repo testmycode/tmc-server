@@ -5,11 +5,11 @@ class Submission < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :Submission do
-    key :required, [ :id, :user_id, :pretest_error, :created_at, :exercise_name, :course_id, :processed,
-                     :all_tests_passed, :points, :processing_tried_at, :processing_began_at, :processing_completed_at,
-                     :times_sent_to_sandbox, :processing_attempts_started_at, :params_json, :requires_review,
-                     :requests_review, :reviewed, :message_for_reviewer, :newer_submission_reviewed, :review_dismissed,
-                     :paste_available, :message_for_paste, :paste_key, ]
+    key :required, [:id, :user_id, :pretest_error, :created_at, :exercise_name, :course_id, :processed,
+                    :all_tests_passed, :points, :processing_tried_at, :processing_began_at, :processing_completed_at,
+                    :times_sent_to_sandbox, :processing_attempts_started_at, :params_json, :requires_review,
+                    :requests_review, :reviewed, :message_for_reviewer, :newer_submission_reviewed, :review_dismissed,
+                    :paste_available, :message_for_paste, :paste_key]
 
     property :id, type: :integer, example: 1
     property :user_id, type: :integer, example: 1
@@ -38,8 +38,8 @@ class Submission < ActiveRecord::Base
   end
 
   swagger_schema :CoreSubmission do
-    key :required, [ :exercise_name, :id, :user_id, :course_id, :created_at, :all_tests_passed, :points,
-                     :submitted_zip_url, :paste_url, :processing_time, :reviewed, :requests_review, ]
+    key :required, [:exercise_name, :id, :user_id, :course_id, :created_at, :all_tests_passed, :points,
+                    :submitted_zip_url, :paste_url, :processing_time, :reviewed, :requests_review]
 
     property :exercise_name, type: :string, example: 'exercise'
     property :id, type: :integer, example: 1
@@ -48,7 +48,7 @@ class Submission < ActiveRecord::Base
     property :created_at, type: :string, format: 'date-time', example: '2016-12-05T12:00:00.000+03:00'
     property :all_tests_passed, type: :boolean, example: true
     property :points, type: :string, example: 'point1'
-    property :submitted_zip_url, type: :string, example: 'http://example.com/submissions/1.zip'
+    property :submitted_zip_url, type: :string, example: 'http://example.com/api/v8/core/submissions/1/download'
     property :paste_url, type: :string, example: 'http://example.com/paste/qqbKk2Z7INqBH8cmaZ7i_A,'
     property :processing_time, type: :integer, example: 25
     property :reviewed, type: :boolean, example: false
