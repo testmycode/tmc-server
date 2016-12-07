@@ -123,6 +123,7 @@ module Api
         Api::V8::Courses::Exercises::Users::PointsController,
         Api::V8::Courses::SubmissionsController,
         Api::V8::Courses::Users::SubmissionsController,
+        Api::V8::Organizations::CourseDetailsController,
         Api::V8::Organizations::CoursesController,
         Api::V8::Organizations::Courses::PointsController,
         Api::V8::Organizations::Courses::Users::PointsController,

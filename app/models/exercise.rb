@@ -44,6 +44,43 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  swagger_schema :CoreExerciseDetails do
+    key :required, [ :id, :name, :locked, :deadline_description, :deadline, :checksum, :return_url, :zip_url, :returnable, :requires_review, :attempted,
+                     :completed, :reviewed, :all_review_point_given, :memory_limit, :runtime_params, :valgrind_strategy, :code_review_requests_enabled,
+                     :run_tests_locally_action_enabled, :exercise_submissions_url, ]
+
+    property :id, type: :integer, example: 1
+    property :name, type: :string, example: "Exercise name"
+    property :locked, type: :boolean, example: false
+    property :deadline_description, type: :string, example: "2016-02-29 23:59:00 +0200"
+    property :deadline, type: :string, format: 'date-time', example: "2016-02-29T23:59:00.000+02:00"
+    property :checksum, type: :string, example: "f25e139769b2688e213938456959eeaf"
+    property :return_url, type: :string, example: "https://tmc.mooc.fi/mooc/exercises/1337/submissions.json"
+    property :zip_url, type: :string, example: "https://tmc.mooc.fi/mooc/exercises/4272.zip"
+    property :returnable, type: :boolean, example: true
+    property :requires_review, type: :boolean, example: false
+    property :attempted, type: :boolean, example: false
+    property :completed, type: :boolean, example: false
+    property :reviewed, type: :boolean, example: false
+    property :all_review_points_given, type: :boolean, example: true
+    property :memory_limit, type: :integer, example: nil
+    property :runtime_params, type: :array do
+      items do
+        key :type, :string
+        key :example, "-Xss64M"
+      end
+    end
+    property :valgrind_strategy, type: :string, example: "fail"
+    property :code_review_requests_enabled, type: :boolean, example: false
+    property :run_tests_locally_action_enabled, type: :boolean, example: true
+    property :exercise_submissions_url, type: :string, example: "https://tmc.mooc.fi/mooc/exercises/1337.json?api_version=7"
+    #These are returned after submission
+    property :latest_submission_url, type: :string, example: "https://tmc.mooc.fi/mooc/submissions/1337.zip"
+    property :latest_submission_id, type: :integer, example: 13337
+    #This is returned if user == admin
+    property :solution_zip_url, type: :string, example: "http://tmc.mooc.fi/mooc/exercises/1337/solution.zip"
+  end
+
   belongs_to :course
 
   has_many :available_points, dependent: :delete_all

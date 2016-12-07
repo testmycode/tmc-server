@@ -35,6 +35,35 @@ class Course < ActiveRecord::Base
     property :external_scoreboard_url, type: :string
   end
 
+  swagger_schema :CoreCourseDetails do
+    key :required, [ :id, :name, :title, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls, :unlockables, :exercises, ]
+
+    property :id, type: :integer, example: 13
+    property :name, type: :string, example: "organizationid-coursename"
+    property :title, type: :string, example: "coursetitle"
+    property :details_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13"
+    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13/unlock"
+    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13/reviews"
+    property :comet_url, type: :string, example: "https://tmc.mooc.fi:8443/comet"
+    property :spyware_urls, type: :array do
+      items do
+        key :type, :string
+        key :example, "http://mooc.spyware.testmycode.net/"
+      end
+    end
+    property :unlockables, type: :array do
+      items do
+        key :type, :string
+        key :example, ""
+      end
+    end
+    property :exercises, type: :array do
+      items do
+        key :'$ref', :CoreExerciseDetails
+      end
+    end
+  end
+
   def course_as_json
     as_json only: [
         :name,
