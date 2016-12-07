@@ -92,6 +92,7 @@ module Api
 
       # A list of all classes that have swagger_* declarations.
       SWAGGERED_CLASSES = [
+        Api::V8::Core::Courses::ReviewsController,
         Api::V8::CoursesController,
         Api::V8::Courses::PointsController,
         Api::V8::Courses::Users::PointsController,
@@ -117,6 +118,7 @@ module Api
         Submission,
         AwardedPoint,
         User,
+        Review,
         self
       ].freeze
 

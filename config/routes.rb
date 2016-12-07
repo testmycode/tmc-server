@@ -90,6 +90,10 @@ TmcServer::Application.routes.draw do
 
         end
 
+        resources :courses, only: [] do
+          resources :reviews, module: :courses, only: :index
+        end
+
       end
     end
   end
