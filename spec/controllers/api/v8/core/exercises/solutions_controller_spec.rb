@@ -44,7 +44,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           FactoryGirl.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: true)
 
           get :download, exercise_id: exercise.id
-          expect(response.code).to eq('200')
+          expect(response).to have_http_status :ok
         end
         it 'should fail if I have not already solved it' do
           repo = clone_course_repo(course)
@@ -55,18 +55,13 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           FactoryGirl.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: false)
 
           get :download, exercise_id: exercise.id
-          expect(response.code).to eq('403')
+          expect(response).to have_http_status :forbidden
         end
       end
       describe 'if the course does not exist' do
         it 'should fail' do
-          repo = clone_course_repo(course)
-          repo.copy_simple_exercise(exercise.name)
-          repo.add_commit_push
-          course.refresh
-
-          get :download, exercise_id: 123456
-          expect(response.code).to eq('404')
+          get :download, exercise_id: 123
+          expect(response).to have_http_status :not_found
         end
       end
     end
