@@ -2,7 +2,7 @@ module Api
   module V8
     module Core
       module Exercises
-        class SolutionController < Api::V8::BaseController
+        class SolutionsController < Api::V8::BaseController
           include Swagger::Blocks
 
           swagger_path '/api/v8/core/exercises/{exercise_id}/solution/download' do
@@ -18,9 +18,12 @@ module Api
                   key :type, :file
                 end
               end
+              response 403, '$ref': '#/responses/error'
               response 404, '$ref': '#/responses/error'
             end
           end
+
+          around_action :wrap_transaction
 
           def download
             unauthorize_guest!

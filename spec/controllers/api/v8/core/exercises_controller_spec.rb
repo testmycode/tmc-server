@@ -4,7 +4,7 @@ require 'fileutils'
 describe Api::V8::Core::ExercisesController, type: :controller do
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
-  repo_path = Dir.tmpdir + '/exercise130479/remote_repo'
+  repo_path = Dir.tmpdir + '/api/v8/core/exercises/remote_repo'
   FileUtils.rm_rf(repo_path)
   create_bare_repo(repo_path)
   let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
