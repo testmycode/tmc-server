@@ -63,7 +63,7 @@ class Exercise < ActiveRecord::Base
     property :completed, type: :boolean, example: false
     property :reviewed, type: :boolean, example: false
     property :all_review_points_given, type: :boolean, example: true
-    property :memory_limit, type: :integer, example: nil
+    property :memory_limit, type: :integer, example: 1024
     property :runtime_params, type: :array do
       items do
         key :type, :string
