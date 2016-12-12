@@ -90,6 +90,10 @@ TmcServer::Application.routes.draw do
 
         end
 
+        resources :exercises, only: [] do
+          resources :submissions, only: [:create]
+        end
+
       end
     end
   end
