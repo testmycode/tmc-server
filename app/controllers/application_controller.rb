@@ -121,6 +121,10 @@ class ApplicationController < ActionController::Base
     unauthorized!(message) if current_user.guest?
   end
 
+  def authorization_skip!
+    authorize! :read, nil
+  end
+
   def respond_not_found(msg = 'Not Found')
     respond_with_error(msg, 404)
   end
