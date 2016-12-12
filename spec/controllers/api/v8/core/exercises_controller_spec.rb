@@ -10,7 +10,6 @@ describe Api::V8::Core::ExercisesController, type: :controller do
   create_bare_repo(repo_path)
   let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
   let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
-  let!(:submission) { FactoryGirl.create(:submission, course: course, user: user, exercise: exercise)}
 
   before :each do
     controller.stub(:doorkeeper_token) { token }
@@ -46,10 +45,11 @@ describe Api::V8::Core::ExercisesController, type: :controller do
     let(:token) { double resource_owner_id: user.id, acceptable?: true }
     describe 'and correct exercise id is given' do
       it 'should return correct data' do
+        submission = FactoryGirl.create(:submission, course: course, user: user, exercise: exercise)
         get :show, id: exercise.id
         expect(response.body).to include course.name
         expect(response.body).to include 'submissions'
-        expect(response.body).to include 'http://test.host/api/v8/core/submissions/1/download'
+        expect(response.body).to include "http://test.host/api/v8/core/submissions/#{submission.id}/download"
       end
     end
     describe 'and invalid exercise id is given' do
