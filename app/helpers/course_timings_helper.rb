@@ -1,15 +1,13 @@
 module CourseTimingsHelper
   def parse_percentage_from_unlock_condition(condition)
     if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
-      percentage = Integer($1)
+      percentage = Integer(Regexp.last_match(1))
     end
     percentage
   end
 
   def parse_group_from_unlock_condition(condition)
-    if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
-      condition.split.last
-    end
+    condition.split.last if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
   end
 
   def complex_unlock_conditions?(group)
