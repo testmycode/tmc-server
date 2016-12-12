@@ -37,18 +37,7 @@ class Setup::CourseDetailsController < Setup::SetupController
     if @course.save
       # Fast refresh without time-consuming tasks, like making solutions
       refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?, no_background_operations: true)
-
-      # Full refresh on background
-      Thread.new do
-        begin
-          logger.info("Starting background initial refresh on course #{@course.name} (id #{@course.id})")
-          refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?)
-          @course.initial_refresh_ready = true
-          @course.save!
-        rescue
-          logger.warn("Failed to do full initial refresh on course #{@course.name} (id #{@course.id})")
-        end
-      end
+      # Full refresh happens as background task
 
       update_setup_course(@course.id)
       redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
