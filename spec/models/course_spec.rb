@@ -51,6 +51,11 @@ describe Course, type: :model do
     end
   end
 
+  it 'should not be visible if initial refresh is not done' do
+    c = FactoryGirl.create(:course, initial_refresh_ready: false)
+    expect(c).not_to be_visible_to(user)
+  end
+
   it 'should be visible if not hidden and hide_after is nil' do
     c = FactoryGirl.create(:course, hidden: false, hide_after: nil)
     expect(c).to be_visible_to(user)

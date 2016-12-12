@@ -141,11 +141,9 @@ class Setup::CourseTimingsController < Setup::SetupController
   private
 
   def groups_as_array
-    names = ['']
-    @course.exercise_groups.each do |group|
-      names << group.name
+    @course.exercise_groups.each_with_object(['']) do |group, array|
+      array << group.name
     end
-    names
   end
 
   def group_params

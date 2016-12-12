@@ -12,7 +12,8 @@
     <%=pluralize(@courses_under_initial_refresh.count, 'course')%> under initial refresh!
     <ul>
       <% @courses_under_initial_refresh.each do |c| %>
-        <li><%= link_to(c.title, organization_course_path(c.organization, c))%> (started at: <%=c.created_at%>)</li>
+        <li><%= link_to(c.title, organization_course_path(c.organization, c))%>
+          (organization: <%=c.organization.name%>, started at: <%=c.created_at%>)</li>
       <% end %>
     </ul>
   </div>

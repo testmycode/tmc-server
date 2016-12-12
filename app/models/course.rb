@@ -170,6 +170,7 @@ class Course < ActiveRecord::Base
     user.administrator? ||
     user.teacher?(organization) ||
     user.assistant?(self) || (
+      initial_refresh_ready? &&
       !disabled? &&
       !hidden &&
       (hide_after.nil? || hide_after > Time.now) &&
