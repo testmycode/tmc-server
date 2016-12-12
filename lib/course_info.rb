@@ -1,3 +1,5 @@
+require 'natsort'
+
 # Builds /courses/:id.json
 class CourseInfo
   def initialize(user, helpers)
