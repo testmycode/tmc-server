@@ -15,7 +15,12 @@ module Api
               response 404, '$ref': '#/responses/error'
               response 200 do
                 schema do
-                  key :'$ref', :ReviewList
+                  key :required, [ :reviews ]
+                  property :reviews, type: :array do
+                    items do
+                      key :'$ref', :Review
+                    end
+                  end
                 end
               end
             end
@@ -29,7 +34,7 @@ module Api
                              .where('requests_review OR requires_review OR reviewed')
                              .order('created_at DESC')
 
-            present Review.course_reviews_json(course, my_reviews)
+            present Review.course_reviews_json(course, my_reviews, view_context)
           end
         end
       end
