@@ -60,6 +60,9 @@ module Api
         def create
           unauthorize_guest!
 
+          @exercise = Exercise.find(params[:exercise_id])
+          authorize! :read, @exercise
+
           if !params[:submission] || !params[:submission][:file]
             authorization_skip!
             return respond_not_found('No ZIP file selected or failed to receive it')
