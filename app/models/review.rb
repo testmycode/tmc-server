@@ -27,10 +27,10 @@ class Review < ActiveRecord::Base
     property :updated_at, type: :string, example: "2016-10-10T13:22:19.554+03:00"
   end
 
-  def self.course_reviews_json(course, reviews, view_context)
-    submissions = reviews.includes(reviews: [:reviewer, :submission])
+  def self.course_reviews_json(course, reviewed_submissions, view_context)
+    reviewed_submissions = reviewed_submissions.includes(reviews: [:reviewer, :submission])
     exercises = Hash[course.exercises.map { |e| [e.name, e] }]
-    submissions.map do |s|
+    reviewed_submissions.map do |s|
       s.reviews.map do |r|
         available_points = exercises[r.submission.exercise_name].available_points.where(requires_review: true).map(&:name)
         points_not_awarded = available_points - r.points_list

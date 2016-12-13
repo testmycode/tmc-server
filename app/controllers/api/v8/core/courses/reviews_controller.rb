@@ -7,7 +7,7 @@ module Api
 
           swagger_path '/api/v8/core/courses/{course_id}/reviews' do
             operation :get do
-              key :description, "Returns the course's review information for current user in a json format. Course is searched by id"
+              key :description, "Returns the course's review information for current user's submissions in a json format. Course is searched by id"
               key :produces, ['application/json']
               key :tags, ['review']
               parameter '$ref': '#/parameters/path_course_id'
@@ -27,14 +27,15 @@ module Api
           end
 
           def index
+            unauthorize_guest!
             course = Course.find_by!(id: params[:course_id])
             authorize! :read, course
-            my_reviews = course.submissions
+            users_reviewed_submissions = course.submissions
                              .where(user_id: current_user.id)
                              .where('requests_review OR requires_review OR reviewed')
                              .order('created_at DESC')
 
-            present Review.course_reviews_json(course, my_reviews, view_context)
+            present Review.course_reviews_json(course, users_reviewed_submissions, view_context)
           end
         end
       end
