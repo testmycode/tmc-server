@@ -52,6 +52,21 @@ class CourseList
       data
   end
 
+  def course_data_core_api(organization, course)
+    @course = course
+    data = {
+        id: course.id,
+        name: course.name,
+        title: course.title,
+        details_url: @helpers.api_v8_core_organization_course_url(organization, course, format: :json),
+        unlock_url: @helpers.api_v8_core_organization_course_unlock_url(organization, course, format: :json),
+        reviews_url: @helpers.api_v8_core_organization_course_reviews_url(organization, course, format: :json),
+        comet_url: CometServer.get.client_url,
+        spyware_urls: SiteSetting.value('spyware_servers'),
+    }
+    data
+  end
+
   private
   def exercises
     @exercises ||= @course.exercises.select { |e| e.points_visible_to?(@user) }

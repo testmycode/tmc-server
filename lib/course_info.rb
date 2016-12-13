@@ -30,6 +30,27 @@ class CourseInfo
                                                          exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
   end
 
+  def course_data_core_api(organization, course)
+    exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
+
+    @unlocked_exercises = course.unlocks
+                              .where(user_id: @user.id)
+                              .where(['valid_after IS NULL OR valid_after < ?', Time.now])
+                              .pluck(:exercise_name)
+
+    submissions_by_exercise = {}
+    Submission.where(course_id: course.id, user_id: @user.id).each do |sub|
+      submissions_by_exercise[sub.exercise_name] ||= []
+      submissions_by_exercise[sub.exercise_name] << sub
+    end
+    exercises.each do |ex|
+      ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
+    end
+
+    @course_list.course_data_core_api(organization, course).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
+                                                               exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
+  end
+
   private
 
   def exercise_data(exercise)

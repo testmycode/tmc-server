@@ -35,11 +35,7 @@ module Api
           course = Course.find_by!(id: params[:id])
           authorize! :read, course
           organization = Organization.find_by(slug: params[:organization_slug])
-          opts = {include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions]}
-          data = {
-              api_version: ApiVersion::API_VERSION,
-              course: CourseInfo.new(current_user, view_context).course_data(organization, course, opts)
-          }
+          data = {course: CourseInfo.new(current_user, view_context).course_data_core_api(organization, course)}
           present data
         end
 
