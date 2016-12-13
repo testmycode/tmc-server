@@ -90,7 +90,7 @@ TmcServer::Application.routes.draw do
           resource :unlock, module: :courses, only: [:create]
         end
         resources :courses, only: [] do
-          resources :reviews, module: :courses, only: :index
+          resources :reviews, module: :courses, only: [:index, :update]
         end
         resources :submissions, only: [] do
           resources :reviews, module: :submissions, only: [:create]

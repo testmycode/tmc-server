@@ -94,6 +94,34 @@ module Api
           key :description, 'Points for submission'
           key :type, :string
         end
+        parameter :path_review_id do
+          key :name, :review_id
+          key :in, :path
+          key :description, "Review's id"
+          key :required, true
+          key :type, :integer
+        end
+        parameter :header_update_review do
+          key :name, 'review[review_body]'
+          key :in, :formData
+          key :description, 'Update review text'
+          key :required, false
+          key :type, :string
+        end
+        parameter :header_mark_review_as_read do
+          key :name, :mark_as_read
+          key :in, :formData
+          key :description, 'Mark review as read'
+          key :required, false
+          key :type, :string
+        end
+        parameter :header_mark_review_as_unread do
+          key :name, :mark_as_unread
+          key :in, :formData
+          key :description, 'Mark review as unread'
+          key :required, false
+          key :type, :string
+        end
         response :error do
           key :description, 'An error occurred'
           schema do

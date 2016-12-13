@@ -1,3 +1,5 @@
+require 'natsort'
+
 class Review < ActiveRecord::Base
   include Swagger::Blocks
 
@@ -45,7 +47,7 @@ class Review < ActiveRecord::Base
             points: r.points_list.natsort,
             points_not_awarded: points_not_awarded.natsort,
             url: view_context.submission_reviews_url(r.submission_id),
-            update_url: view_context.review_url(r),
+            update_url: view_context.api_v8_core_course_review_url(course.id, r.id),
             created_at: r.created_at,
             updated_at: r.updated_at,
         }
