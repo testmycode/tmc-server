@@ -60,7 +60,8 @@ class CourseList
         title: course.title,
         details_url: @helpers.api_v8_core_organization_course_url(organization, course, format: :json),
         unlock_url: @helpers.api_v8_core_organization_course_unlock_url(organization, course, format: :json),
-        reviews_url: @helpers.api_v8_core_organization_course_reviews_url(organization, course, format: :json),
+        #Korjaa tama, kun voi
+        reviews_url: @helpers.organization_course_reviews_url(organization, course, format: :json),
         comet_url: CometServer.get.client_url,
         spyware_urls: SiteSetting.value('spyware_servers'),
     }

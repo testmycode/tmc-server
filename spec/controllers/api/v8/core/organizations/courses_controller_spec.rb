@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V8::Organizations::CourseDetailsController, type: :controller do
+describe Api::V8::Core::Organizations::CoursesController, type: :controller do
 
   before(:each) do
     @user = FactoryGirl.create(:user)
