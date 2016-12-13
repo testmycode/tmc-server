@@ -73,6 +73,13 @@ module Api
           key :required, true
           key :type, :string
         end
+        parameter :path_submission_id do
+          key :name, :submission_id
+          key :in, :path
+          key :description, "Submission's id"
+          key :required, true
+          key :type, :integer
+        end
         response :error do
           key :description, 'An error occurred'
           schema do
@@ -93,6 +100,7 @@ module Api
       # A list of all classes that have swagger_* declarations.
       SWAGGERED_CLASSES = [
         Api::V8::Core::Courses::ReviewsController,
+        Api::V8::Core::Submissions::ReviewsController,
         Api::V8::CoursesController,
         Api::V8::Courses::PointsController,
         Api::V8::Courses::Users::PointsController,
