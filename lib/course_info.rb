@@ -30,7 +30,7 @@ class CourseInfo
                                                          exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
   end
 
-  def course_data_core_api(organization, course)
+  def course_data_core_api(course)
     exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
 
     @unlocked_exercises = course.unlocks
@@ -47,7 +47,7 @@ class CourseInfo
       ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
     end
 
-    @course_list.course_data_core_api(organization, course).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
+    @course_list.course_data_core_api(course).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
                                                                exercises: exercises.map { |ex| exercise_data_core_api(ex) }.reject(&:nil?))
   end
 

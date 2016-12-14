@@ -1,30 +1,25 @@
 require 'spec_helper'
 
-describe Api::V8::Core::Organizations::CoursesController, type: :controller do
+describe Api::V8::Core::CoursesController, type: :controller do
 
+  let(:user) { FactoryGirl.create(:user) }
+  
   before(:each) do
-    @user = FactoryGirl.create(:user)
-    @organization = FactoryGirl.create(:accepted_organization)
     controller.stub(:doorkeeper_token) { token }
   end
 
   describe 'GET course details show' do
     describe 'in JSON format with valid token' do
-      let(:token) { double resource_owner_id: @user.id, acceptable?: true }
+      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:course) { FactoryGirl.create(:course, name: 'Course1') }
       before :each do
-        @course = FactoryGirl.create(:course, name: 'Course1')
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: @course)
+        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: course)
+        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: course)
+        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: course)
       end
 
       def get_show_json
-        options = {
-            api_version: ApiVersion::API_VERSION,
-            id: @course.id.to_s,
-            organization_slug: @organization.slug
-        }
-        get :show, options
+        get :show, id: course.id
         JSON.parse(response.body)
       end
 
@@ -34,15 +29,15 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
         exs = result['course']['exercises']
         expect(exs[0]['name']).to eq('Exercise1')
         expect(exs[1]['name']).to eq('Exercise2')
-        expect(exs[0]['zip_url']).to eq(download_api_v8_core_exercise_url(@course.exercises[0].id))
-        expect(exs[0]['return_url']).to eq(exercise_submissions_url(@course.exercises[0].id, format: 'json'))
+        expect(exs[0]['zip_url']).to eq(download_api_v8_core_exercise_url(course.exercises[0].id))
+        expect(exs[0]['return_url']).to eq(exercise_submissions_url(course.exercises[0].id, format: 'json'))
       end
 
       it 'should include only visible exercises' do
-        @course.exercises[0].hidden = true
-        @course.exercises[0].save!
-        @course.exercises[1].deadline_spec = [Date.yesterday.to_s].to_json
-        @course.exercises[1].save!
+        course.exercises[0].hidden = true
+        course.exercises[0].save!
+        course.exercises[1].deadline_spec = [Date.yesterday.to_s].to_json
+        course.exercises[1].save!
 
         result = get_show_json
 
@@ -53,8 +48,8 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       end
 
       it "should tell each the exercise's deadline" do
-        @course.exercises[0].deadline_spec = [Time.zone.parse('2011-11-16 23:59:59+0200').to_s].to_json
-        @course.exercises[0].save!
+        course.exercises[0].deadline_spec = [Time.zone.parse('2011-11-16 23:59:59+0200').to_s].to_json
+        course.exercises[0].save!
 
         result = get_show_json
 
@@ -62,7 +57,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been attempted' do
-        sub = FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user)
+        sub = FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user)
         FactoryGirl.create(:test_case_run, submission: sub, successful: false)
 
         result = get_show_json
@@ -73,7 +68,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been completed' do
-        FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user, all_tests_passed: true)
+        FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user, all_tests_passed: true)
 
         result = get_show_json
 

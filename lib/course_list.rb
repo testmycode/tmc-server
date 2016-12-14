@@ -52,16 +52,15 @@ class CourseList
       data
   end
 
-  def course_data_core_api(organization, course)
+  def course_data_core_api(course)
     @course = course
     data = {
         id: course.id,
         name: course.name,
         title: course.title,
-        details_url: @helpers.api_v8_core_organization_course_url(organization, course, format: :json),
-        unlock_url: @helpers.api_v8_core_organization_course_unlock_url(organization, course, format: :json),
-        #Korjaa tama, kun voi
-        reviews_url: @helpers.organization_course_reviews_url(organization, course, format: :json),
+        details_url: @helpers.api_v8_core_course_url(course),
+        unlock_url: @helpers.api_v8_core_course_unlock_url(course),
+        reviews_url: @helpers.api_v8_course_reviews_url(course),
         comet_url: CometServer.get.client_url,
         spyware_urls: SiteSetting.value('spyware_servers'),
     }

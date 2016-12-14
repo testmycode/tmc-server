@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::V8::Core::Organizations::Courses::UnlocksController, type: :controller do
+describe Api::V8::Core::Courses::UnlocksController, type: :controller do
   let!(:organization) { FactoryGirl.create(:accepted_organization) }
   let!(:course) { FactoryGirl.create(:course, organization: organization) }
   let!(:exercise) { FactoryGirl.create(:exercise, name: 'testexercise', course: course) }
