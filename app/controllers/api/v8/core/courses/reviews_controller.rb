@@ -9,13 +9,13 @@ module Api
             operation :get do
               key :description, "Returns the course's review information for current user's submissions in a json format. Course is searched by id"
               key :produces, ['application/json']
-              key :tags, ['review']
+              key :tags, ['core']
               parameter '$ref': '#/parameters/path_course_id'
               response 403, '$ref': '#/responses/error'
               response 404, '$ref': '#/responses/error'
               response 200 do
+                key :description, "List of reviews for current user's submissions"
                 schema do
-                  key :description, "List of reviews for current user's submissions"
                   key :required, [ :reviews ]
                   property :reviews, type: :array do
                     items do

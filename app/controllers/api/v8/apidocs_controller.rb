@@ -134,7 +134,7 @@ module Api
         Api::V8::Organizations::Courses::Users::SubmissionsController,
         Api::V8::SubmissionsController,
         Api::V8::UsersController,
-        Api::V8::Core::Organizations::Courses::UnlocksController,
+        Api::V8::Core::Courses::UnlocksController,
         Api::V8::Core::ExercisesController,
         Api::V8::Core::Exercises::SolutionsController,
         Api::V8::Core::SubmissionsController,

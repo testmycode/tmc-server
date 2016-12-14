@@ -10,7 +10,7 @@ module Api
               key :description, 'Unlocks the courses exercises'
               key :operationId, 'unlockCoursesExercises'
               key :produces, ['application/json']
-              key :tags, %w(unlock exercise)
+              key :tags, ['core']
               parameter '$ref': '#/parameters/path_course_id'
               response 200 do
                 key :description, 'status \'ok\' and unlocks exercises'

@@ -60,7 +60,7 @@ class CourseList
         title: course.title,
         details_url: @helpers.api_v8_core_course_url(course),
         unlock_url: @helpers.api_v8_core_course_unlock_url(course),
-        reviews_url: @helpers.api_v8_course_reviews_url(course),
+        reviews_url: @helpers.submission_reviews_url(course),
         comet_url: CometServer.get.client_url,
         spyware_urls: SiteSetting.value('spyware_servers'),
     }
