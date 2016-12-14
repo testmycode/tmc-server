@@ -19,6 +19,7 @@ class Api::Beta::ParticipantController < Api::Beta::BaseController
     present({
       username: user.login,
       email: user.email,
+      id: user.id
     })
   end
 
