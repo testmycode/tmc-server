@@ -34,7 +34,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
         exs = result['course']['exercises']
         expect(exs[0]['name']).to eq('Exercise1')
         expect(exs[1]['name']).to eq('Exercise2')
-        expect(exs[0]['zip_url']).to eq(exercise_url(@course.exercises[0].id, format: 'zip'))
+        expect(exs[0]['zip_url']).to eq(download_api_v8_core_exercise_url(@course.exercises[0].id))
         expect(exs[0]['return_url']).to eq(exercise_submissions_url(@course.exercises[0].id, format: 'json'))
       end
 
