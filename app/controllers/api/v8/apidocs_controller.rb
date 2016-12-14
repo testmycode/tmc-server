@@ -112,6 +112,7 @@ module Api
       end
 
       # A list of all classes that have swagger_* declarations.
+      # The order of the swagered_classes affects the order they are shown in swaggerUI
       SWAGGERED_CLASSES = [
         Api::V8::Core::Courses::ReviewsController,
         Api::V8::Core::Submissions::ReviewsController,
