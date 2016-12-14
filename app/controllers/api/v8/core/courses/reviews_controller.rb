@@ -15,6 +15,7 @@ module Api
               response 404, '$ref': '#/responses/error'
               response 200 do
                 schema do
+                  key :description, "List of reviews for current user's submissions"
                   key :required, [ :reviews ]
                   property :reviews, type: :array do
                     items do

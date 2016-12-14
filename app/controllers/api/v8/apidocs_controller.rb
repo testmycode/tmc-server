@@ -80,6 +80,19 @@ module Api
           key :required, true
           key :type, :integer
         end
+        parameter :review_body do
+          key :name, 'review[review_body]'
+          key :in, :formData
+          key :description, "Review's body"
+          key :required, true
+          key :type, :string
+        end
+        parameter :points do
+          key :name, 'review[points]'
+          key :in, :formData
+          key :description, 'Points for submission'
+          key :type, :string
+        end
         response :error do
           key :description, 'An error occurred'
           schema do

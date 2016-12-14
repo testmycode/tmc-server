@@ -10,8 +10,10 @@ module Api
               key :description, 'Submits a review for the submission'
               key :operationId, 'submitReview'
               key :produces, ['application/json']
-              key :tags, %w(submission review)
+              key :tags, ['core']
               parameter '$ref': '#/parameters/path_submission_id'
+              parameter '$ref': '#/parameters/review_body'
+              parameter '$ref': '#/parameters/points'
               response 200 do
                 key :description, 'Submits a new review'
                 schema do
@@ -27,15 +29,16 @@ module Api
 
           def create
             unauthorize_guest!
-            @submission = Submission.find(params[:submission_id])
-            authorize! :read, @submission
+            submission = Submission.find(params[:submission_id])
+            authorize! :read, submission
 
             @review = Review.new(
-              submission_id: @submission.id,
+              submission_id: submission.id,
               reviewer_id: current_user.id,
               review_body: params[:review][:review_body]
             )
-            authorize! :create_review, @submission.course
+
+            authorize! :create_review, submission.course
 
             begin
               ActiveRecord::Base.connection.transaction do
@@ -48,12 +51,9 @@ module Api
               ::Rails.logger.error($!)
               respond_with_error('Failed to save code review.')
             else
-              flash[:success] = 'Code review added.'
               notify_user_about_new_review
               send_email_about_new_review if params[:send_email]
-              @course = @submission.course
-              @organization = @course.organization
-              redirect_to organization_course_reviews_path(@organization, @course)
+              present(status: 'ok')
             end
           end
 
