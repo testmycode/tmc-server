@@ -107,14 +107,14 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def links_as_json(view_context, organization)
+  def links_as_json(view_context)
     {
         id: self.id,
         name: self.name,
         title: self.title,
-        details_url: view_context.api_v8_core_organization_course_url(organization, self),
-        unlock_url: view_context.api_v8_core_organization_course_unlock_url(organization, self),
-        reviews_url: view_context.api_v8_core_organization_course_reviews_url(organization, self),
+        details_url: view_context.api_v8_core_course_url(self),
+        unlock_url: view_context.api_v8_core_course_unlock_url(self),
+        reviews_url: view_context.api_v8_core_course_reviews_url(self),
         comet_url: CometServer.get.client_url,
         spyware_urls: SiteSetting.value('spyware_servers'),
     }.as_json
