@@ -142,8 +142,6 @@ module Api
       # A list of all classes that have swagger_* declarations.
       # The order of the swagered_classes affects the order they are shown in swaggerUI
       SWAGGERED_CLASSES = [
-        Api::V8::Core::Courses::ReviewsController,
-        Api::V8::Core::Submissions::ReviewsController,
         Api::V8::CoursesController,
         Api::V8::Courses::PointsController,
         Api::V8::Courses::Users::PointsController,
@@ -166,10 +164,11 @@ module Api
         Api::V8::Core::ExercisesController,
         Api::V8::Core::Exercises::SolutionsController,
         Api::V8::Core::Exercises::SubmissionsController,
-        Api::V8::Core::ExercisesController,
         Api::V8::Core::CoursesController,
         Api::V8::Core::Organizations::CoursesController,
         Api::V8::Core::SubmissionsController,
+        Api::V8::Core::Courses::ReviewsController,
+        Api::V8::Core::Submissions::ReviewsController,
         Course,
         Exercise,
         AvailablePoint,

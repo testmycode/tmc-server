@@ -5,7 +5,7 @@ module Api
         class SubmissionsController < Api::V8::BaseController
           include Swagger::Blocks
 
-          swagger_path 'api/v8/core/exercises/{exercise_id}/submissions' do
+          swagger_path '/api/v8/core/exercises/{exercise_id}/submissions' do
             operation :post do
               key :description, 'Create submission from a zip file'
               key :operationId, 'createSubmission'
