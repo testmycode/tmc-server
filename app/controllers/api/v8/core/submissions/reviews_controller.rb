@@ -17,7 +17,9 @@ module Api
               response 200 do
                 key :description, 'Submits a new review'
                 schema do
-                  key :'$ref', :Review
+                  key :title, :status
+                  key :required, [:status]
+                  property :status, type: :string, example: 'ok'
                 end
               end
               response 403, '$ref': '#/responses/error'

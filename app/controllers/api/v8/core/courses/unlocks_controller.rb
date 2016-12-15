@@ -13,7 +13,7 @@ module Api
               key :tags, ['core']
               parameter '$ref': '#/parameters/path_course_id'
               response 200 do
-                key :description, 'status \'ok\' and unlocks exercises'
+                key :description, "status 'ok' and unlocks exercises"
                 schema do
                   key :title, :status
                   key :required, [:status]
