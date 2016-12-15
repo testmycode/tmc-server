@@ -23,8 +23,8 @@ class Review < ActiveRecord::Base
         key :type, :string
       end
     end
-    property :url, type: :string, example: "http://localhost:3000/submissions/1/reviews"
-    property :update_url, type: :string, example: "http://localhost:3000/reviews"
+    property :url, type: :string, example: "http://localhost:3000/api/core/v8/submissions/1/reviews"
+    property :update_url, type: :string, example: "http://localhost:3000/api/v8/core/courses/1/reviews/1"
     property :created_at, type: :string, example: "2016-10-10T13:22:19.554+03:00"
     property :updated_at, type: :string, example: "2016-10-10T13:22:19.554+03:00"
   end

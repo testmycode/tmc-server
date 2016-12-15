@@ -55,8 +55,8 @@ class Exercise < ActiveRecord::Base
     property :deadline_description, type: :string, example: "2016-02-29 23:59:00 +0200"
     property :deadline, type: :string, format: 'date-time', example: "2016-02-29T23:59:00.000+02:00"
     property :checksum, type: :string, example: "f25e139769b2688e213938456959eeaf"
-    property :return_url, type: :string, example: "https://tmc.mooc.fi/mooc/exercises/1337/submissions.json"
-    property :zip_url, type: :string, example: "https://tmc.mooc.fi/mooc/exercises/4272.zip"
+    property :return_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337/submissions"
+    property :zip_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/4272/download"
     property :returnable, type: :boolean, example: true
     property :requires_review, type: :boolean, example: false
     property :attempted, type: :boolean, example: false
@@ -73,12 +73,12 @@ class Exercise < ActiveRecord::Base
     property :valgrind_strategy, type: :string, example: "fail"
     property :code_review_requests_enabled, type: :boolean, example: false
     property :run_tests_locally_action_enabled, type: :boolean, example: true
-    property :exercise_submissions_url, type: :string, example: "https://tmc.mooc.fi/mooc/exercises/1337.json?api_version=7"
+    property :exercise_submissions_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337/solution/download"
     #These are returned after submission
-    property :latest_submission_url, type: :string, example: "https://tmc.mooc.fi/mooc/submissions/1337.zip"
+    property :latest_submission_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337"
     property :latest_submission_id, type: :integer, example: 13337
     #This is returned if user == admin
-    property :solution_zip_url, type: :string, example: "http://tmc.mooc.fi/mooc/exercises/1337/solution.zip"
+    property :solution_zip_url, type: :string, example: "http://tmc.mooc.fi/api/v8/core/submissions/1337/download"
   end
 
   belongs_to :course

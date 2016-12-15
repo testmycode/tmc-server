@@ -16,9 +16,10 @@ module Api
               response 200 do
                 key :description, "Array containing each course's collection of links"
                 schema do
-                  key :title, :course
-                  key :required, [:course]
-                  property :course, '$ref': :CourseLinks
+                  key :type, :array
+                  items do
+                    key :'$ref', :CourseLinks
+                  end
                 end
               end
             end

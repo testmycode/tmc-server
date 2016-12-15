@@ -41,9 +41,9 @@ class Course < ActiveRecord::Base
     property :id, type: :integer, example: 13
     property :name, type: :string, example: "organizationid-coursename"
     property :title, type: :string, example: "coursetitle"
-    property :details_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13"
-    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13/unlock"
-    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13/reviews"
+    property :details_url, type: :string, example: "http://tmc.mooc.fi/api/v8/core/courses/13"
+    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
+    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
     property :comet_url, type: :string, example: "https://tmc.mooc.fi:8443/comet"
     property :spyware_urls, type: :array do
       items do
@@ -95,9 +95,9 @@ class Course < ActiveRecord::Base
     property :id, type: :integer, example: 13
     property :name, type: :string, example: "organizationid-coursename"
     property :title, type: :string, example: "coursetitle"
-    property :details_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13"
-    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13/unlock"
-    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/org/mooc/courses/13/reviews"
+    property :details_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13"
+    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
+    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
     property :comet_url, type: :string, example: "https://tmc.mooc.fi:8443/comet"
     property :spyware_urls, type: :array do
       items do

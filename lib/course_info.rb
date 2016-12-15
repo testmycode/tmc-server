@@ -106,7 +106,7 @@ class CourseInfo
         deadline_description: exercise.deadline_spec_obj.universal_description,
         deadline: exercise.deadline_for(@user),
         checksum: exercise.checksum,
-        return_url: exercise_return_url(exercise),
+        return_url: @helpers.api_v8_core_exercise_submissions_url(exercise),
         zip_url: @helpers.download_api_v8_core_exercise_url(exercise),
         returnable: exercise.returnable?,
         requires_review: exercise.requires_review?,
