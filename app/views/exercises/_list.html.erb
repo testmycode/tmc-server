@@ -40,7 +40,9 @@
           <% end %>
         </td>
         <td>
-          <%= link_to 'zip', exercise_zip_url(exercise) %>
+          <%= link_to_if @course.initial_refresh_ready?, 'zip', exercise_zip_url(exercise) do %>
+            zip not available yet
+          <% end %>
         </td>
       </tr>
     <% end %>

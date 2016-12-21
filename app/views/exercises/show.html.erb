@@ -2,7 +2,11 @@
 <h1><%= @exercise.name %></h1>
 
 <ul>
-  <li><%= link_to 'Download project template (zip)', exercise_zip_url(@exercise) %></li>
+  <li>
+    <%= link_to_if @course.initial_refresh_ready?, 'Download project template (zip)', exercise_zip_url(@exercise) do %>
+      Project template (zip) not available during refresh.
+    <% end %>
+  </li>
 
   <% if !@exercise.available_points.empty? && !@course.hide_submission_results?  %>
     <%
@@ -68,7 +72,11 @@
   <% end %>
 
   <% if @exercise.solution && can?(:read, @exercise.solution) %>
-    <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
+    <li>
+      <%= link_to_if @course.initial_refresh_ready?, 'View suggested solution', exercise_solution_path(@exercise) do %>
+        Solution not available during refresh.
+      <% end %>
+    </li>
   <% end %>
 
   <% if can? :read, FeedbackAnswer %>
