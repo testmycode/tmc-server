@@ -102,19 +102,19 @@ class FixtureExercise
 
     FileUtils.mkdir_p("#{path}/lib")
     Dir.glob("#{common_files_path}/lib/*.jar") do |file|
-      FileUtils.ln(file, "#{path}/lib/")
+      FileUtils.ln_s(file, "#{path}/lib/")
     end
-    FileUtils.ln(File.join(common_files_path,'build.xml'), File.join(path, 'build.xml'))
+    FileUtils.ln_s(File.join(common_files_path,'build.xml'), File.join(path, 'build.xml'))
     FileUtils.mkdir_p("#{path}/nbproject")
     Dir.glob("#{common_files_path}/nbproject/*") do |file|
-      FileUtils.ln(file, "#{path}/nbproject/")
+      FileUtils.ln_s(file, "#{path}/nbproject/")
     end
   end
 
   def copy_gitignore
     gitignore = File.join path, '.gitignore'
     FileUtils.rm_rf gitignore if File.exist? gitignore
-    FileUtils.ln("#{common_files_path}/.gitignore", gitignore)
+    FileUtils.ln_s("#{common_files_path}/.gitignore", gitignore)
   end
 
   def copy_src

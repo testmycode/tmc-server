@@ -29,3 +29,5 @@
 
 # Byebug history file
 .byebug_history
+
+.vagrant
