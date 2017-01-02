@@ -264,5 +264,17 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
+<h2>Monitoring background refreshes</h2>
+
+<p>
+  When a new course is made, first real-time refresh is made only partly, without generating available points for exercises. Because of that, full refresh is launched on background. As administrator, the front page shows if there are any ongoing background refreshes, and when they are made. Based on that, you can monitor possible problems, if certain course stays on the refresh list for too long time.
+</p>
+
+<%
+  course = FactoryGirl.create(:course, organization: organization, initial_refresh_ready: false)
+  visit '/'
+%>
+<%= screenshot %>
+
 </body>
 </html>
