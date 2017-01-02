@@ -1,6 +1,7 @@
 #course-setup-progress-bar {
     background-color: lightgray;
     padding: 8px 8px 8px 20px;
+    margin-top: 10px;
 }
 
 #course-setup-progress-bar .current {
@@ -10,4 +11,10 @@
 #course-setup-progress-bar .separator {
     margin-left:  20px;
     margin-right: 20px;
+}
+
+.course-timing-quick-fill {
+    background-color: #E4F1FE;
+    padding: 20px 50px;
+    border-radius: 5px;
 }

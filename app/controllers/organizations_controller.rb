@@ -42,8 +42,8 @@ class OrganizationsController < ApplicationController
     if !@organization.verified
       @organization.verified = true
       @organization.verified_at = DateTime.now
-      @organization.save
-      redirect_to list_requests_organizations_path, notice: 'Organization is now verified.'
+      @organization.save!
+      redirect_to organizations_path, notice: "Organization #{@organization.name} is now verified."
     else
       redirect_to organization_path(@organization)
     end

@@ -38,7 +38,7 @@ feature 'User can create new organization', feature: true do
     click_link 'Show'
     expect(page).to have_content @organization.name
     click_link 'Verify'
-    expect(page).to have_content 'Organization is now verified.'
+    expect(page).to have_content "Organization #{@organization.name} is now verified."
   end
 
   scenario 'Admin can disable unvefiried organization' do

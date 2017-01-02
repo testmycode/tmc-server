@@ -4,9 +4,10 @@
 
     <div>
       <% unless @course.initial_refresh_ready? %>
-        <p><strong>
-          Course is being updated! It doesn't accept any submissions yet. Please wait.
-        </strong></p>
+        <p class='course-initial-refresh-warning'><strong>
+          Course is being updated and it is not fully functional yet! Please wait.</strong>
+          <br>This operation usually takes about 15 minutes but it can take up to an hour.
+        </p>
       <% end %>
       <% unless @course.description.blank? %>
         <p><%= @course.description %></p>
