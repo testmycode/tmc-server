@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160804120140) do
+ActiveRecord::Schema.define(version: 20161024122339) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(version: 20160804120140) do
     t.integer  "course_template_id",                             null: false
     t.boolean  "hide_submission_results",        default: false
     t.string   "external_scoreboard_url"
+    t.boolean  "initial_refresh_ready",          default: false
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree

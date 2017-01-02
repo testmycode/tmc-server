@@ -327,7 +327,7 @@ class Exercise < ActiveRecord::Base
     if returnable_forced != nil
       returnable_forced # may be true or false
     else
-      has_tests?
+      has_tests? && course.initial_refresh_ready?
     end
   end
 

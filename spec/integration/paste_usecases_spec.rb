@@ -10,7 +10,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
     @teacher = FactoryGirl.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @course = Course.create!(name: 'mycourse', title: 'mycourse', source_backend: 'git', source_url: repo_path, organization: @organization)
+    @course = FactoryGirl.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push

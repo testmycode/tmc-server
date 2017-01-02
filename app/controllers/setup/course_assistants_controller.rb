@@ -26,6 +26,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
       if @assistantship.save
         redirect_to setup_organization_course_course_assistants_path, notice: "Assistant #{new_assistant.login} added"
       else
+        @setup_in_progress = setup_in_progress?
         @assistants = @course.assistants
         if setup_in_progress?
           print_setup_phases(4)

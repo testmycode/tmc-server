@@ -11,6 +11,8 @@ class Setup::CourseTimingsController < Setup::SetupController
       add_course_breadcrumb
       add_breadcrumb('Timing')
     end
+
+    @group_array = groups_as_array
   end
 
   def update
@@ -23,7 +25,12 @@ class Setup::CourseTimingsController < Setup::SetupController
       when 'no_unlocks'
         clear_all_unlocks
       when 'percent_from_previous'
-        unlocks_previous_set_completed(80)
+        percentage = params[:unlock_percentage]
+        unless percentage.to_i.between?(1, 100)
+          redirect_to setup_organization_course_course_timing_path, notice: 'Please insert correct unlock percentage'
+          return
+        end
+        unlocks_previous_set_completed(percentage)
       end
 
       first_set_date = params[:first_set_date]
@@ -72,9 +79,13 @@ class Setup::CourseTimingsController < Setup::SetupController
     authorize! :manage_unlocks, @course
 
     groups = group_params
-    groups.each do |name, conditions|
-      array = Array(conditions['0'])
-      @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
+    groups.each do |name, unlock_data|
+      if unlock_data[:_unlock_option] == 'no_unlock'
+        unlock_condition = ''
+      elsif unlock_data[:_unlock_option] == 'percentage_from'
+        unlock_condition = "#{unlock_data[:_percentage_required]}% from #{unlock_data[:_unlock_groupname]}"
+      end
+      @course.exercise_group_by_name(name).group_unlock_conditions = Array(unlock_condition).to_json
       UncomputedUnlock.create_all_for_course_eager(@course)
     end
   end
@@ -128,6 +139,12 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   private
+
+  def groups_as_array
+    @course.exercise_groups.each_with_object(['']) do |group, array|
+      array << group.name
+    end
+  end
 
   def group_params
     sliced = params.slice(:group, :empty_group)

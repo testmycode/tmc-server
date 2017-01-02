@@ -114,7 +114,7 @@ class CourseRefresher
           measure_and_log :delete_records_for_removed_exercises
           measure_and_log :update_exercise_options
           measure_and_log :set_has_tests_flags
-          measure_and_log :update_available_points
+          measure_and_log :update_available_points                unless options[:no_background_operations]
           measure_and_log :make_solutions                         unless options[:no_directory_changes]
           measure_and_log :make_stubs                             unless options[:no_directory_changes]
           measure_and_log :checksum_stubs
@@ -292,7 +292,7 @@ class CourseRefresher
           point_names += points_data.map { |x| x[:points] }.flatten
         else
           point_names += points_data.flatten
-	end
+        end
 
         point_names += review_points
 

@@ -56,7 +56,7 @@ feature 'Teacher creates course from course template', feature: true do
     click_button 'Continue'
 
     expect(page).to have_content('Course is ready!')
-    click_button 'Publish now'
+    click_button 'Finish'
 
     expect(page).to have_content('Custom Title')
     expect(page).to have_content('Custom description')

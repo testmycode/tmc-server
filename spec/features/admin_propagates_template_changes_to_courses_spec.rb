@@ -82,6 +82,9 @@ feature 'Admin propagates template changes to all courses cloned from template',
 
     Course.find_each do |c|
       c.exercises.first.enabled!
+      c.initial_refresh_ready = true
+      c.enabled!
+      c.save!
     end
 
     user = FactoryGirl.create :user, password: 'foobar'

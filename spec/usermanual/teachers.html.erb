@@ -82,7 +82,7 @@ require 'cgi' # for escapeHTML
     </p>
 
     <p>
-      To create a new organization, you have to be logged in at <a href="https://tmc.mooc.fi" target="_blank">https://tmc.mooc.fi</a>. Note that user accounts created for the public-for-all MOOC-version of the service (<a href="https://tmc.mooc.fi/mooc" target="_blank">https://tmc.mooc.fi/mooc</a>) are not available in this version of the service. If needed, click the <em>Sign up</em> link and create your personal account. When logged in, go to url </i>/org/new</i> in the TMC system, (for example <a href="http://tmc.mooc.fi/org/new" target="_blank">http://tmc.mooc.fi/org/new</a>).
+      To create a new organization, you have to be logged in at <a href="https://tmc.mooc.fi" target="_blank">https://tmc.mooc.fi</a>. If needed, click the <em>Sign up</em> link and create your personal account. When logged in, go to url </i>/org/new</i> in the TMC system, (for example <a href="http://tmc.mooc.fi/org/new" target="_blank">http://tmc.mooc.fi/org/new</a>).
     </p>
 
 <%
@@ -95,6 +95,7 @@ require 'cgi' # for escapeHTML
   visit '/setup/new'
   fill_in 'organization_name', with: 'Helsingin yliopisto'
   fill_in 'organization_information', with: 'University life'
+  fill_in 'organization_website', with: 'http://www.helsinki.fi'
   fill_in 'organization_slug', with: 'hy'
   fill_in 'organization_contact_information', with: 'Matti Meikäläinen'
   fill_in 'organization_phone', with: '+3584012345678'
@@ -106,10 +107,11 @@ require 'cgi' # for escapeHTML
 <p>
   You will then be presented with a form with following fields, all of which can be changed later:
   <ul>
-    <li><b>Name</b> of the organization that will be seen in the app</li>
-    <li><b>Description</b> of your organization, seen on this organization's page</li>
-    <li><b>Logo</b> for your organization, seen on this organization's page</li>
+    <li><b>Name</b> of the organization that will be seen in the TMC pages</li>
+    <li><b>Information</b>, a longer description of your organization, seen on this organization's page</li>
+    <li><b>Website</b> of your organization</li>
     <li><b>Organization ID</b>, a short word that will be part of your organization's url. You will have an opportunity to preview organization's url</li>
+    <li><b>Logo</b> for your organization, seen on this organization's page</li>
   </ul>
 </p>
 
@@ -156,7 +158,7 @@ require 'cgi' # for escapeHTML
 <h2>Adding new teachers</h2>
 
 <p>
-  As a teacher, you can list, add and remove teachers in your organization. From the organization front page, you can find link to list all the teachers. Remember that all teachers in the organization have same access rights as you. We recommend you add any Teaching Assistants etc. as <a href="#phase_4_assistants">Course assistants</a>.
+  As a teacher, you can list, add and remove teachers in your organization. From the organization front page, you can find link to list all the teachers. Remember that all teachers in the organization have same access rights as you. We recommend you add any Teaching Assistants etc. as <a href="#course_assistants">Course assistants</a>.
 </p>
 
 <%
@@ -257,15 +259,15 @@ require 'cgi' # for escapeHTML
 </p>
 
 <p>
-  The unlock condition states when the exercises are available. You can either have everything open from start, or have each set require that 80% of the previous set is completed.
+  The unlock condition states when the exercises are available. You can either have everything open from start, or have each set require that certain percentage of the previous set is completed.
 </p>
 
 <p>
-  Deadline is the moment, when the submissions has to be made. TMC refuses to accept any attempts after that. You can choose to have no deadlines at all, weekly deadlines or just single deadline for all exercises. Insert first set deadline if needed. You can also set "soft" deadlines later on using the advanced settings.
+  Deadline is the moment, when the submissions has to be made. By default, exact deadline time is the end of the day set. TMC refuses to accept any attempts after that. You can choose to have no deadlines at all, weekly deadlines or just single deadline for all exercises. Insert first set deadline if needed. You can also set "soft" deadlines later on using the advanced settings.
 </p>
 
 <p>
-  For example, you can choose to have 80% of previous unlock condition, and weekly deadlines starting from 1.1.2017. By clicking "Fill and preview", you will see the settings in the preview section.
+  For example, you can choose to have 80% of previous unlock condition, and weekly deadlines starting from 1.1.2017. By clicking 'Fill and preview', you will see the settings in the preview section.
 </p>
 
 <%
@@ -308,11 +310,14 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
 <p>
-  The course is now ready. You can choose to publish the course right away, or keep it hidden and disabled until it is ready to be published later. Click either of the buttons, and you will be redirected to the course main page.
+  The course creation is now ready. However, depending on the server load and chosen template, the exercises might be still under processing. This might take up to one hour to be completed. During that, course is not publicly visible and exercise zip files are not accessible. You can still progress to course main page, and access the settings. The course will stay hidden until you decide to publish it.
+</p>
+<p>
+  If the server-side process was fast and ready, you can choose to publish the course right away, or keep it hidden and disabled until it is ready to be published later. Click either of the buttons, and you will be redirected to the course main page.
 </p>
 
 <%
-  click_on 'Publish now'
+  click_on 'Finish'
 %>
   <h3>The course main page</h3>
 
@@ -347,6 +352,10 @@ require 'cgi' # for escapeHTML
 
 <p>
   If you want to use an external point awarding system, you can enter its URL to the 'Custom points URL' field. You can also use a template string that will generate the URL dynamically. For example, <code style='white-space: nowrap'>http://my-custom-points.io/%{user}</code> would show as <code style='white-space: nowrap'>http://my-custom-points.io/MyUsername</code> when viewed by the user <code>MyUsername</code>.
+</p>
+
+<p>
+  If external score board url is set, it is shown instead of general tmc points page, when students click 'View points' link in the course page.
 </p>
 
   <h2>Disabling the course</h2>

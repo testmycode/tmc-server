@@ -47,6 +47,7 @@ describe Setup::CourseDetailsController, type: :controller do
           expect do
             post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id }
           end.to change { Course.count }.by(1)
+          expect(Course.last.initial_refresh_ready).to be_falsey
         end
 
         it 'redirects to the created course' do

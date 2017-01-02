@@ -3,6 +3,11 @@
     <h1><%= @course.title %></h1>
 
     <div>
+      <% unless @course.initial_refresh_ready? %>
+        <p><strong>
+          Course is being updated! It doesn't accept any submissions yet. Please wait.
+        </strong></p>
+      <% end %>
       <% unless @course.description.blank? %>
         <p><%= @course.description %></p>
       <% end %>
