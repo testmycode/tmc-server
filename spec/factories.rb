@@ -45,6 +45,7 @@ FactoryGirl.define do
     source_backend 'git'
     git_branch 'master'
     initial_refresh_ready true
+    disabled_status 0
     organization
   end
 

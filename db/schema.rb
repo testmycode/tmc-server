@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161024122339) do
+ActiveRecord::Schema.define(version: 20170103094247) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -104,7 +104,7 @@ ActiveRecord::Schema.define(version: 20161024122339) do
     t.boolean  "certificate_downloadable",       default: false, null: false
     t.string   "certificate_unlock_spec"
     t.integer  "organization_id"
-    t.integer  "disabled_status",                default: 0
+    t.integer  "disabled_status",                default: 1
     t.string   "title"
     t.string   "material_url"
     t.integer  "course_template_id",                             null: false
