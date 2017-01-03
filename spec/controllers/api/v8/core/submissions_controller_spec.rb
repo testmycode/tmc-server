@@ -31,7 +31,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise fail
+        raise 'pending'
       end
     end
     describe 'as a teacher' do
@@ -44,7 +44,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise fail
+        raise 'pending'
       end
       it "should not allow to download other organizations' submissions" do
         other_organization = FactoryGirl.create(:accepted_organization)
@@ -67,7 +67,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise fail
+        raise 'pending'
       end
       it "should not allow to download other courses' submissions" do
         other_course = FactoryGirl.create(:course, organization: organization)
@@ -86,7 +86,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise fail
+        raise 'pending'
       end
       it "should not allow to download other students' submissions" do
         other_course = FactoryGirl.create(:course, organization: organization)

@@ -19,13 +19,13 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
         get :index, organization_slug: organization.slug
         json = JSON.parse response.body
         expect(response).to have_http_status(:success)
-        json[0]["id"].should == course.id
-        json[0]["name"].should == course.name
-        json[0]["title"].should == course.title
-        expect(json[0]).to have_key "details_url"
-        expect(json[0]).to have_key "reviews_url"
-        expect(json[0]).to have_key "comet_url"
-        expect(json[0]["spyware_urls"][0]).not_to be_empty
+        expect(json[0]['id']).to eq(course.id)
+        expect(json[0]['name']).to eq(course.name)
+        expect(json[0]['title']).to eq(course.title)
+        expect(json[0]).to have_key 'details_url'
+        expect(json[0]).to have_key 'reviews_url'
+        expect(json[0]).to have_key 'comet_url'
+        expect(json[0]['spyware_urls'][0]).not_to be_empty
       end
     end
     describe 'as user' do
@@ -33,13 +33,13 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       it 'shows a list of collections of course urls' do
         get :index, organization_slug: organization.slug
         json = JSON.parse response.body
-        json[0]["id"].should == course.id
-        json[0]["name"].should == course.name
-        json[0]["title"].should == course.title
-        expect(json[0]).to have_key "details_url"
-        expect(json[0]).to have_key "reviews_url"
-        expect(json[0]).to have_key "comet_url"
-        expect(json[0]["spyware_urls"][0]).not_to be_empty
+        expect(json[0]['id']).to eq(course.id)
+        expect(json[0]['name']).to eq(course.name)
+        expect(json[0]['title']).to eq(course.title)
+        expect(json[0]).to have_key 'details_url'
+        expect(json[0]).to have_key 'reviews_url'
+        expect(json[0]).to have_key 'comet_url'
+        expect(json[0]['spyware_urls'][0]).not_to be_empty
       end
     end
     describe 'as guest' do
