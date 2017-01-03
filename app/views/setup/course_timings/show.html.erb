@@ -48,32 +48,32 @@
     <% label_tag :start_date, 'Course start date: (not yet implemented)'%>
     <% date_field :start_date, nil  %>
     -->
+    <div class='course-timing-quick-fill'>
+      <h3>Deadlines</h3>
+      <%= label_tag :first_set_date, 'Deadline for first set:'%>
+      <%= date_field :first_set_date, nil  %>
+      <br>
+      Choose how incoming exercise set deadlines are set:<br>
+      <%= radio_button_tag :deadline_type, "no_deadlines" %>
+      <%= label_tag :deadline_type_no_deadlines, 'No deadlines', class: 'radio inline' %><br>
+      <%= radio_button_tag :deadline_type, "weekly_deadlines" %>
+      <%= label_tag :deadline_type_weekly_deadlines, 'Weekly', class: 'radio inline' %><br>
+      <%= radio_button_tag :deadline_type, "all_same_deadline" %>
+      <%= label_tag :deadline_type_all_same_deadline, 'All same', class: 'radio inline' %><br>
 
-    <h3>Deadlines</h3>
-    <%= label_tag :first_set_date, 'Deadline for first set:'%>
-    <%= date_field :first_set_date, nil  %>
-    <br>
-    Choose how incoming exercise set deadlines are set:<br>
-    <%= radio_button_tag :deadline_type, "no_deadlines" %>
-    <%= label_tag :deadline_type_no_deadlines, 'No deadlines', class: 'radio inline' %><br>
-    <%= radio_button_tag :deadline_type, "weekly_deadlines" %>
-    <%= label_tag :deadline_type_weekly_deadlines, 'Weekly', class: 'radio inline' %><br>
-    <%= radio_button_tag :deadline_type, "all_same_deadline" %>
-    <%= label_tag :deadline_type_all_same_deadline, 'All same', class: 'radio inline' %><br>
+      <h3>Unlocks</h3>
+      Choose the type, how the exercises are opened:<br>
+      <%= radio_button_tag :unlock_type, "no_unlocks", (params[:unlock_type] == "no_unlocks") %>
+      <%= label_tag :unlock_type_no_unlocks, 'Everything open at start', class: 'radio inline' %><br>
+        <%= radio_button_tag :unlock_type, "percent_from_previous", (params[:unlock_type] == "percent_from_previous") %>
+      <%= label_tag :unlock_type_percent_from_previous, 'Percentage from previous set completed', class: 'radio inline' %><br>
+      <div style="margin-left: 36px;">
+        <%= number_field_tag :unlock_percentage, '80', min: 0, max:100, style: "width: 3em", disabled: true %>% needed
+      </div>
 
-    <h3>Unlocks</h3>
-    Choose the type, how the exercises are opened:<br>
-    <%= radio_button_tag :unlock_type, "no_unlocks", (params[:unlock_type] == "no_unlocks") %>
-    <%= label_tag :unlock_type_no_unlocks, 'Everything open at start', class: 'radio inline' %><br>
-    <%= radio_button_tag :unlock_type, "percent_from_previous", (params[:unlock_type] == "percent_from_previous") %>
-    <%= label_tag :unlock_type_percent_from_previous, 'Percentage from previous set completed', class: 'radio inline' %><br>
-    <div style="margin-left: 36px;">
-      <%= number_field_tag :unlock_percentage, '80', min: 0, max:100, style: "width: 3em", disabled: true %>% needed
+      <br>
+      <%= submit_tag 'Fill and preview', class: 'btn' %>
     </div>
-
-    <br>
-    <%= submit_tag 'Fill and preview', class: 'btn' %>
-
     <hr>
 
   <h3>Preview</h3>
