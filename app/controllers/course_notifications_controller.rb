@@ -8,8 +8,8 @@ class CourseNotificationsController < ApplicationController
 
   def create
     course = Course.find(course_notification_params[:course_id])
-
     participants = User.course_students(course)
+    participants = participants.select { |p| p.last.field_value(OpenStruct.new(name: 'no_email_marketing')) != '1' } if params[:respect_no_email_preference]
     emails = participants.map(&:email).reject(&:blank?)
 
     notifier = course.course_notifications.create(course_notification_params[:course_notification].merge(sender_id: current_user.id))
