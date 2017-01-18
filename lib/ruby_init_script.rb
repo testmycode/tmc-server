@@ -25,6 +25,7 @@ class RubyInitScript
   end
 
   def script_source
+    # TODO: This breaks if rvm is not installed
     rvm_current = `rvm current`
     if $?.success?
       puts 'Using RVM.'
@@ -33,7 +34,7 @@ class RubyInitScript
       env = rvm_info[rvm_current]['environment']
     else
       puts "Not using RVM. Don't forget to invoke this with rvmsudo if you use RVM."
-      ruby_path = `which ruby`
+      ruby_path = `which ruby`.chomp
       env = {}
     end
 
