@@ -71,14 +71,14 @@ class OrganizationsController < ApplicationController
     authorize! :toggle_visibility, @organization
     @organization.hidden = !@organization.hidden
     @organization.save!
-    redirect_to organization_path, notice: "Organization is now #{@organization.hidden ? 'hidden to users':'visible to users'}"
+    redirect_to organization_path, notice: "Organization is now #{@organization.hidden ? 'hidden to users' : 'visible to users'}"
   end
 
   private
 
   def percent_completed_hash(courses, user)
     percent_completed = {}
-    all_awarded = user.awarded_points.map(&:course_id)
+    all_awarded = AwardedPoint.all_awarded(user)
     all_available = AvailablePoint.courses_points(courses).map(&:course_id)
     courses.each do |course|
       awarded = all_awarded.select { |id| id == course.id }.length.to_f
@@ -90,7 +90,7 @@ class OrganizationsController < ApplicationController
 
   def set_organization
     @organization = Organization.find_by(slug: params[:id])
-    fail ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
+    raise ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
   end
 
   def organization_params

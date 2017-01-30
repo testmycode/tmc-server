@@ -74,4 +74,11 @@ class ExercisesController < ApplicationController
     redirect_to manage_exercises_organization_course_path(@organization, @course),
                 notice: 'Exercises successfully updated.'
   end
+
+  def toggle_submission_result_visibility
+    @exercise = Exercise.find(params[:id])
+    authorize! :toggle_submission_result_visibility, @exercise.course
+    @exercise.toggle_submission_result_visiblity
+    redirect_to exercise_path(@exercise), notice: "Submission results are now #{@exercise.hide_submission_results ? 'hidden' : 'visible'}"
+  end
 end

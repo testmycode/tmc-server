@@ -65,6 +65,10 @@ FactoryGirl.define do
     exercise
     processed true
     after(:build) { |sub| sub.exercise.course = sub.course if sub.course }
+    after(:create) do |sub|
+      sub.exercise.course = sub.course if sub.course
+      sub.exercise.save
+    end
   end
 
   factory :submission_data do

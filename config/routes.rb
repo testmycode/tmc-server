@@ -90,6 +90,9 @@ TmcServer::Application.routes.draw do
   resources :organizations, except: [:destroy, :create, :edit, :update], path: 'org' do
 
     resources :exercises, only: [:show] do
+      member do
+        post 'toggle_submission_result_visibility'
+      end
       resources :submissions, only: [:create]
       resource :solution, only: [:show]
       resources :feedback_answers, only: [:index]

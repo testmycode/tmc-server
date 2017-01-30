@@ -23,7 +23,6 @@ describe SubmissionsController, type: :controller do
   end
 
   describe 'GET show as JSON ' do
-
     describe 'when still processing submission' do
       it "should return 'processing' status" do
         @submission.processed = false
@@ -61,7 +60,6 @@ describe SubmissionsController, type: :controller do
       end
     end
 
-
     describe 'when there is pretest error' do
       it "should return 'error' status and right field" do
         @submission.pretest_error = 'some funny error'
@@ -75,7 +73,7 @@ describe SubmissionsController, type: :controller do
       end
     end
 
-    describe 'when submission results are hidden' do
+    describe 'when submission results are hidden for the course' do
       before :each do
         @course.hide_submission_results = true
         @course.save!
@@ -93,7 +91,7 @@ describe SubmissionsController, type: :controller do
         expect(json['status']).to eq('hidden')
         expect(json['all_tests_passed']).to be nil
         expect(json['test_cases']).to be nil
-        expect(json['points']).to be nil
+        expect(json['points']).to be eq nil
         expect(json['validations']).to be nil
         expect(json['valgrind']).to be nil
       end
@@ -103,6 +101,28 @@ describe SubmissionsController, type: :controller do
         get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
         json = JSON.parse response.body
         expect(json['status']).to eq('hidden')
+      end
+    end
+
+    describe 'when submission results are hidden for the exercise' do
+      before :each do
+        @exercise.hide_submission_results = true
+        @exercise.save!
+      end
+
+      it "should return 'hidden' status and right field (processed and tests passed)" do
+        @submission.all_tests_passed = true
+        @submission.points = 'some points'
+        @submission.save!
+        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        json = JSON.parse response.body
+        check_common_keys(json)
+        expect(json).to have_key 'test_cases'
+        expect(json['all_tests_passed']).to be nil
+        expect(json['test_cases'][0]['name']).to eq 'TestResultsAreHidden test'
+        expect(json['points']).to eq []
+        expect(json['validations']).to be nil
+        expect(json['valgrind']).to be nil
       end
     end
   end

@@ -3,7 +3,7 @@ require 'shellwords'
 class Exercise < ActiveRecord::Base
   self.include_root_in_json = false
   include Swagger::Blocks
-  
+
   swagger_schema :ExerciseWithPoints do
     key :required, [
         :id, :name, :publish_time, :solution_visible_after,
@@ -139,7 +139,8 @@ class Exercise < ActiveRecord::Base
         !hidden? &&
         published? &&
         !disabled? &&
-        (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user))
+        (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user)) &&
+        !hide_submission_results
       )
   end
 
@@ -388,6 +389,11 @@ class Exercise < ActiveRecord::Base
     ensure
       results.clear
     end
+  end
+
+  def toggle_submission_result_visiblity
+    self.hide_submission_results = !hide_submission_results
+    save!
   end
 
   private
