@@ -57,7 +57,7 @@ module SubmissionsHelper
   end
 
   def format_exception_chain(exception)
-    return '' if exception.nil?
+    return '' if exception.nil? || exception.is_a?(Array)
     result = ActiveSupport::SafeBuffer.new('')
     result << exception['className'] << ': ' << exception['message'] << tag(:br)
     exception['stackTrace'].each do |line|
