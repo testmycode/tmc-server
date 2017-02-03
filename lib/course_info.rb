@@ -35,6 +35,8 @@ class CourseInfo
 
     # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
     locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
+    show_points = !exercise.hide_submission_results? && !exercise.course.hide_submission_results?
+    attempted = exercise.attempted_by?(@user)
 
     data = {
       id: exercise.id,
@@ -47,8 +49,8 @@ class CourseInfo
       zip_url: @helpers.exercise_zip_url(exercise),
       returnable: exercise.returnable?,
       requires_review: exercise.requires_review?,
-      attempted: exercise.attempted_by?(@user),
-      completed: exercise.completed_by?(@user),
+      attempted: attempted,
+      completed: show_points ? exercise.completed_by?(@user) : attempted,
       reviewed: exercise.reviewed_for?(@user),
       all_review_points_given: exercise.all_review_points_given_for?(@user),
       memory_limit: exercise.memory_limit,
