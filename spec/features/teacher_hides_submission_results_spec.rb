@@ -86,4 +86,25 @@ describe 'Teacher can hide submission results from users', feature: true do
     expect(find('tr', text: tcr.test_case_name).all('td').count).to eq(2)
     expect(find_by_id('myTab').all('li').count).to eq(2)
   end
+
+  context 'when submission results are hidden for an individual exercise' do
+    scenario 'In submission page user can not see results of submission' do
+      @course.hide_submission_results = false
+      @course.save!
+      @exercise.hide_submission_results = true
+      @exercise.save!
+      FactoryGirl.create :submission_data, submission: @submission
+      tcr = FactoryGirl.create :test_case_run, submission: @submission
+      log_in_as(@user.username, 'foobar')
+      visit_course
+      click_link('Details')
+      expect(page).to have_content('All tests done - results are hidden')
+      expect(page).to_not have_content('Got 1 out of 1 point')
+      expect(page).to_not have_link('View suggested solution')
+      click_link('Test Results')
+      expect(page).to have_content('Test Cases')
+      expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
+      expect(find('tr', text: tcr.test_case_name).all('td').count).to eq(2)
+    end
+  end
 end

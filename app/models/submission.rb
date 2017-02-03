@@ -148,10 +148,10 @@ class Submission < ActiveRecord::Base
   end
 
   def can_see_results?(user)
-    !(self.course.hide_submission_results? && (all_tests_passed? || tests_ran?)) ||
-        self.course.organization.teacher?(user) ||
-        self.course.assistant?(user) ||
-        user.administrator?
+    !((exercise.hide_submission_results? || course.hide_submission_results?) && (all_tests_passed? || tests_ran?)) ||
+      course.organization.teacher?(user) ||
+      course.assistant?(user) ||
+      user.administrator?
   end
 
   def points_list

@@ -258,6 +258,11 @@ class User < ActiveRecord::Base
     query.where(exercises[:hidden].eq(false))
   end
 
+  def without_hidden_points(query)
+    exercises = Exercise.arel_table
+    query.where(exercises[:hide_submission_results].eq(false))
+  end
+
   def submissions_exercises_and_points_for_user
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table

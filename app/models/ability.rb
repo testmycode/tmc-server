@@ -10,9 +10,7 @@ class Ability
       can :create, Course
       can :create, :custom_course
       cannot :refresh, Course
-      can :refresh, Course do |c|
-        c.custom?
-      end
+      can :refresh, Course, &:custom?
       can :view, :participants_list
 
       can :view, :unverified_organizations
@@ -55,7 +53,7 @@ class Ability
 
       can :refresh, Course do |c|
         c.taught_by?(user) &&
-            c.custom? # user can only refresh his/her custom course.
+          c.custom? # user can only refresh his/her custom course.
       end
 
       cannot :read, Exercise
@@ -64,6 +62,10 @@ class Ability
       end
       can :download, Exercise do |ex|
         ex.downloadable_by?(user)
+      end
+
+      can :see_points, Exercise do |ex|
+        (!ex.hide_submission_results? && !ex.course.hide_submission_results?) || can?(:teach, ex.course)
       end
 
       cannot :read, Submission
@@ -84,11 +86,11 @@ class Ability
       end
 
       can :download, Submission do |sub|
-        !sub.course.hide_submission_result? && can?(:read, sub)
+        !sub.course.hide_submission_results? && !sub.exercise.hide_submission_results? && can?(:read, sub)
       end
 
       can :read_results, Submission do |sub|
-        !sub.course.hide_submission_results? || (can? :teach, sub.course)
+        (!sub.course.hide_submission_results? && !sub.exercise.hide_submission_results?) || (can? :teach, sub.course)
       end
 
       cannot :manage_feedback_questions, Course
@@ -204,9 +206,7 @@ class Ability
       cannot :read, CourseTemplate
       can :prepare_course, CourseTemplate
 
-      can :clone, CourseTemplate do |ct|
-        ct.clonable?
-      end
+      can :clone, CourseTemplate, &:clonable?
 
       can :request, :organization
       cannot :request, :organization if user.guest?

@@ -8,20 +8,24 @@
     <% end %>
   </li>
 
-  <% if !@exercise.available_points.empty? && !@course.hide_submission_results?  %>
-    <%
-      available_points = @exercise.available_points.to_a.map(&:name)
-      awarded_points = @exercise.points_for(current_user)
-      nonawarded_points = available_points - awarded_points
-      all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
-      all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
-    %>
-    <li>
-      You have <%= awarded_points.size %> out of <%= pluralize(available_points.size, 'point') %> for this exercise
-      (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
-    </li>
+  <% if can? :see_points, @exercise %>
+    <% if @exercise.available_points.empty? %>
+      <li>No points available</li>
+    <% else %>
+      <%
+        available_points = @exercise.available_points.to_a.map(&:name)
+        awarded_points = @exercise.points_for(current_user)
+        nonawarded_points = available_points - awarded_points
+        all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
+        all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
+      %>
+      <li>
+        You have <%= awarded_points.size %> out of <%= pluralize(available_points.size, 'point') %> for this exercise
+        (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
+      </li>
+    <% end %>
   <% else %>
-    <li>No points available</li>
+    <li>Points hidden</li>
   <% end %>
 
   <% if @exercise.hidden? %>
@@ -84,6 +88,14 @@
   <% end %>
 </ul>
 
+<% if can? :toggle_submission_result_visibility, @exercise.course %>
+  <% if @exercise.hide_submission_results? %>
+    <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-primary btn-mini" %>
+  <% else %>
+    <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-warning btn-mini" %>
+  <% end %>
+<% end %>
+
 <% if @exercise.submittable_by?(current_user) %>
 <div class="row-fluid">
   <div class="span12">
@@ -92,7 +104,6 @@
   </div>
   </div>
 <% end %>
-
 
 <% if signed_in? %>
 <div class="row-fluid">
