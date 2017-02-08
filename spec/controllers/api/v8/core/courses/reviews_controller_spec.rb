@@ -7,7 +7,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
   let(:submission) { FactoryGirl.create(:submission, exercise: exercise, course: course, user: user, reviewed: true) }
   let(:submission2) { FactoryGirl.create(:submission, exercise: exercise, course: course, user: user2, reviewed: true) }
   let!(:review) { FactoryGirl.create(:review, reviewer: user, submission: submission) }
-  let!(:submission2_review) { FactoryGirl.create(:review, review_body: "submission2_review body", submission: submission2) }
+  let!(:submission2_review) { FactoryGirl.create(:review, review_body: 'submission2_review body', submission: submission2) }
 
   before(:each) do
     controller.stub(:doorkeeper_token) { token }
@@ -23,11 +23,11 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
           get :index, course_id: course.id
           expect(response).to have_http_status(:success)
           json = JSON.parse response.body
-          json[0]["submission_id"].should == review.submission.id
-          json[0]["exercise_name"].should == exercise.name
-          json[0]["id"].should == review.id
-          json[0]["reviewer_name"].should == user.username
-          json[0]["review_body"].should == review.review_body
+          json[0]['submission_id'].should eq(review.submission.id)
+          json[0]['exercise_name'].should eq(exercise.name)
+          json[0]['id'].should eq(review.id)
+          json[0]['reviewer_name'].should eq(user.username)
+          json[0]['review_body'].should eq(review.review_body)
           expect(response.body).not_to include submission2_review.review_body
         end
       end
@@ -51,11 +51,11 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
           get :index, course_id: course.id
           expect(response).to have_http_status(:success)
           json = JSON.parse response.body
-          json[0]["submission_id"].should == review.submission.id
-          json[0]["exercise_name"].should == exercise.name
-          json[0]["id"].should == review.id
-          json[0]["reviewer_name"].should == user.username
-          json[0]["review_body"].should == review.review_body
+          json[0]['submission_id'].should eq(review.submission.id)
+          json[0]['exercise_name'].should eq(exercise.name)
+          json[0]['id'].should eq(review.id)
+          json[0]['reviewer_name'].should eq(user.username)
+          json[0]['review_body'].should eq(review.review_body)
           expect(response.body).not_to include submission2_review.review_body
         end
       end
@@ -78,7 +78,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
         it "shows only user's submission's review information" do
           get :index, course_id: course.id
           expect(response).to have_http_status(403)
-          expect(response.body).to include "Authentication required"
+          expect(response.body).to include 'Authentication required'
           expect(response.body).not_to include review.review_body
           expect(response.body).not_to include submission2_review.review_body
         end
@@ -87,7 +87,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
         it 'shows error about finding course' do
           get :index, course_id: -1
           expect(response).to have_http_status(403)
-          expect(response.body).to include "Authentication required"
+          expect(response.body).to include 'Authentication required'
           expect(response.body).not_to include review.review_body
           expect(response.body).not_to include submission2_review.review_body
         end
@@ -105,7 +105,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       describe 'when correct course id and review id are given' do
         describe 'when review is edited' do
           it 'review text should be updated' do
-            put :update, course_id: course.id, id: submission.id, review: {review_body: 'Code looks ok'}
+            put :update, course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' }
             review.reload
             expect(response).to have_http_status :ok
             expect(review.review_body).to include('Code looks ok')
@@ -146,7 +146,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
         it 'should deny access' do
           FactoryGirl.create(:review, submission: submission)
           exercise.reload
-          put :update, course_id: course.id, id: submission.id, review: {review_body: 'Code looks ok'}
+          put :update, course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' }
           expect(response).to have_http_status(:forbidden)
           expect(response.body).to include('You are not authorized to access this page')
         end
@@ -154,4 +154,3 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
     end
   end
 end
-

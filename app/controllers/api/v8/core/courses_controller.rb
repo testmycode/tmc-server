@@ -32,10 +32,9 @@ module Api
           unauthorize_guest!
           course = Course.find_by!(id: params[:id])
           authorize! :read, course
-          data = {course: CourseInfo.new(current_user, view_context).course_data_core_api(course)}
+          data = { course: CourseInfo.new(current_user, view_context).course_data_core_api(course) }
           present data
         end
-
       end
     end
   end

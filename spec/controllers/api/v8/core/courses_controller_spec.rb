@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe Api::V8::Core::CoursesController, type: :controller do
-
   let(:user) { FactoryGirl.create(:user) }
-  
+
   before(:each) do
     controller.stub(:doorkeeper_token) { token }
   end
@@ -18,13 +17,13 @@ describe Api::V8::Core::CoursesController, type: :controller do
         course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: course)
       end
 
-      def get_show_json
+      def show_course
         get :show, id: course.id
         JSON.parse(response.body)
       end
 
       it 'should render the exercises for each course' do
-        result = get_show_json
+        result = show_course
 
         exs = result['course']['exercises']
         expect(exs[0]['name']).to eq('Exercise1')
@@ -39,7 +38,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
         course.exercises[1].deadline_spec = [Date.yesterday.to_s].to_json
         course.exercises[1].save!
 
-        result = get_show_json
+        result = show_course
 
         names = result['course']['exercises'].map { |ex| ex['name'] }
         expect(names).not_to include('Exercise1')
@@ -51,7 +50,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
         course.exercises[0].deadline_spec = [Time.zone.parse('2011-11-16 23:59:59+0200').to_s].to_json
         course.exercises[0].save!
 
-        result = get_show_json
+        result = show_course
 
         expect(result['course']['exercises'][0]['deadline']).to eq('2011-11-16T23:59:59.000+02:00')
       end
@@ -60,7 +59,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
         sub = FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user)
         FactoryGirl.create(:test_case_run, submission: sub, successful: false)
 
-        result = get_show_json
+        result = show_course
 
         exs = result['course']['exercises']
         expect(exs[0]['attempted']).to be_truthy
@@ -70,7 +69,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
       it 'should tell for each exercise whether it has been completed' do
         FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user, all_tests_passed: true)
 
-        result = get_show_json
+        result = show_course
 
         exs = result['course']['exercises']
         expect(exs[0]['completed']).to be_truthy
@@ -80,12 +79,10 @@ describe Api::V8::Core::CoursesController, type: :controller do
       describe 'and as guest user' do
         it 'should respond with a 403' do
           controller.current_user = Guest.new
-          get_show_json
+          show_course
           expect(response.code.to_i).to eq(403)
         end
       end
     end
   end
-
 end
-

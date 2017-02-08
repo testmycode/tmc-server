@@ -72,16 +72,16 @@ module Api
 
             new_points = []
             if params[:review][:points].respond_to?(:keys)
-              for point_name in params[:review][:points].keys
+              params[:review][:points].keys.each do |point_name|
                 unless exercise.available_points.where(name: point_name).any?
                   fail "Point does not exist: #{point_name}"
                 end
 
                 new_points << point_name
                 pt = submission.awarded_points.build(
-                course_id: submission.course_id,
-                user_id: submission.user_id,
-                name: point_name
+                  course_id: submission.course_id,
+                  user_id: submission.user_id,
+                  name: point_name
                 )
                 authorize! :create, pt
                 pt.save!
@@ -97,9 +97,9 @@ module Api
             sub.reviewed = true
             sub.review_dismissed = false
             sub.of_same_kind
-            .where('(requires_review OR requests_review) AND NOT reviewed')
-            .where(['created_at < ?', sub.created_at])
-            .update_all(newer_submission_reviewed: true)
+              .where('(requires_review OR requests_review) AND NOT reviewed')
+              .where(['created_at < ?', sub.created_at])
+              .update_all(newer_submission_reviewed: true)
           end
 
           def notify_user_about_new_review

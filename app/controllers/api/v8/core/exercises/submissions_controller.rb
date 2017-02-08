@@ -57,42 +57,38 @@ module Api
             end
 
             submission_params = {
-                error_msg_locale: params[:error_msg_locale]
+              error_msg_locale: params[:error_msg_locale]
             }
 
             unless errormsg
               @submission = Submission.new(
-                  user: current_user,
-                  course: @course,
-                  exercise: @exercise,
-                  return_file: file_contents,
-                  params_json: submission_params.to_json,
-                  requests_review: !!params[:request_review],
-                  paste_available: !!params[:paste],
-                  message_for_paste: if params[:paste] then
-                                       params[:message_for_paste] || ''
-                                     else
-                                       ''
-                                     end,
-                  message_for_reviewer: if params[:request_review] then
-                                          params[:message_for_reviewer] || ''
-                                        else
-                                          ''
-                                        end,
-                  client_time: if params[:client_time] then
-                                 Time.at(params[:client_time].to_i)
-                               else
-                                 nil
-                               end,
-                  client_nanotime: params[:client_nanotime],
-                  client_ip: request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip
+                user: current_user,
+                course: @course,
+                exercise: @exercise,
+                return_file: file_contents,
+                params_json: submission_params.to_json,
+                requests_review: !params[:request_review].nil?,
+                paste_available: !params[:paste].nil?,
+                message_for_paste: if params[:paste]
+                                     params[:message_for_paste] || ''
+                                   else
+                                     ''
+                                   end,
+                message_for_reviewer: if params[:request_review]
+                                        params[:message_for_reviewer] || ''
+                                      else
+                                        ''
+                                      end,
+                client_time: if params[:client_time]
+                               Time.at(params[:client_time].to_i)
+                             end,
+                client_nanotime: params[:client_nanotime],
+                client_ip: request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip
               )
 
               authorize! :create, @submission
 
-              unless @submission.save
-                errormsg = 'Failed to save submission.'
-              end
+              errormsg = 'Failed to save submission.' unless @submission.save
             end
 
             unless errormsg
@@ -100,14 +96,14 @@ module Api
             end
 
             if !errormsg
-              render json: {submission_url: submission_url(@submission, format: 'json', api_version: ApiVersion::API_VERSION),
-                            paste_url: if @submission.paste_key then
-                                         paste_url(@submission.paste_key)
-                                       else
-                                         ''
-                                       end}
+              render json: { submission_url: submission_url(@submission, format: 'json', api_version: ApiVersion::API_VERSION),
+                             paste_url: if @submission.paste_key
+                                          paste_url(@submission.paste_key)
+                                        else
+                                          ''
+                                        end }
             else
-              render json: {error: errormsg}
+              render json: { error: errormsg }
             end
           end
         end

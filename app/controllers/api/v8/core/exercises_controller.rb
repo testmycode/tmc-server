@@ -73,7 +73,7 @@ module Api
             exercise_id: exercise.id,
             unlocked_at: exercise.time_unlocked_for(current_user),
             deadline: exercise.deadline_for(current_user),
-            submissions: SubmissionList.new(current_user, view_context).submission_list_data(submissions),
+            submissions: SubmissionList.new(current_user, view_context).submission_list_data(submissions)
           }
           present data
         end

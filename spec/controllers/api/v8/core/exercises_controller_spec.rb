@@ -35,7 +35,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
         expect(File).to exist('zipexercise/src/SimpleStuff.java')
       end
       it "should fail if the exercise doesn't exist" do
-        get :download, id: 123456
+        get :download, id: 123_456
         expect(response.code).to eq('404')
       end
     end
