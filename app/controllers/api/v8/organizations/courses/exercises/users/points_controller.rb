@@ -68,9 +68,9 @@ module Api
                 params[:user_id] = current_user.id if params[:user_id] == 'current'
 
                 points = course.awarded_points.includes(:submission)
-                               .where(submissions: { exercise_name: params[:exercise_name] },
-                                      course_id: course.id,
-                                      user_id: params[:user_id])
+                         .where(submissions: { exercise_name: params[:exercise_name] },
+                                course_id: course.id,
+                                user_id: params[:user_id])
 
                 authorize! :read, points
                 present(points.as_json_with_exercise_ids(course.exercises))

@@ -31,7 +31,7 @@ module Api
         return @current_user if @current_user
         if doorkeeper_token
           @current_user ||= User.find_by_id(doorkeeper_token.resource_owner_id)
-          raise 'Invalid token' unless @current_user
+          fail 'Invalid token' unless @current_user
         end
         @current_user ||= user_from_session || Guest.new
       end

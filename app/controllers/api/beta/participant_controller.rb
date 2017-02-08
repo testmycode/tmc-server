@@ -1,6 +1,5 @@
 class Api::Beta::ParticipantController < Api::Beta::BaseController
-
-  before_action :doorkeeper_authorize!, :scopes => [:public]
+  before_action :doorkeeper_authorize!, scopes: [:public]
 
   def courses
     user = User.where(id: params[:id]).first || current_user
@@ -16,11 +15,8 @@ class Api::Beta::ParticipantController < Api::Beta::BaseController
 
   def index
     user = current_user
-    present({
-      username: user.login,
-      email: user.email,
-      id: user.id
-    })
+    present(username: user.login,
+            email: user.email,
+            id: user.id)
   end
-
 end

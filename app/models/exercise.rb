@@ -23,6 +23,64 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  swagger_schema :CoreExercise do
+    key :required, [
+      :course_name, :course_id, :code_review_requests_enabled, :run_tests_locally_action_enabled,
+      :exercise_name, :exercise_id, :unlocked_at, :deadline, :submissions,
+    ]
+
+    property :course_name, type: :string, example: 'course'
+    property :course_id, type: :integer, example: 1
+    property :code_review_requests_enabled, type: :boolean, example: true
+    property :run_tests_locally_action_enabled, type: :boolean, example: true
+    property :exercise_name, type: :string, example: 'exercise'
+    property :exercise_id, type: :integer, example: 1
+    property :unlocked_at, type: :string, format: 'date-time', example: '2016-12-05T12:00:00.000+03:00'
+    property :deadline, type: :string, format: 'date-time', example: '2016-12-24T00:00:00.000+03:00'
+    property :submissions, type: :array do
+      items do
+        key :'$ref', :CoreSubmission
+      end
+    end
+  end
+
+  swagger_schema :CoreExerciseDetails do
+    key :required, [ :id, :name, :locked, :deadline_description, :deadline, :checksum, :return_url, :zip_url, :returnable, :requires_review, :attempted,
+                     :completed, :reviewed, :all_review_point_given, :memory_limit, :runtime_params, :valgrind_strategy, :code_review_requests_enabled,
+                     :run_tests_locally_action_enabled, :exercise_submissions_url, ]
+
+    property :id, type: :integer, example: 1
+    property :name, type: :string, example: "Exercise name"
+    property :locked, type: :boolean, example: false
+    property :deadline_description, type: :string, example: "2016-02-29 23:59:00 +0200"
+    property :deadline, type: :string, format: 'date-time', example: "2016-02-29T23:59:00.000+02:00"
+    property :checksum, type: :string, example: "f25e139769b2688e213938456959eeaf"
+    property :return_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337/submissions"
+    property :zip_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/4272/download"
+    property :returnable, type: :boolean, example: true
+    property :requires_review, type: :boolean, example: false
+    property :attempted, type: :boolean, example: false
+    property :completed, type: :boolean, example: false
+    property :reviewed, type: :boolean, example: false
+    property :all_review_points_given, type: :boolean, example: true
+    property :memory_limit, type: :integer, example: 1024
+    property :runtime_params, type: :array do
+      items do
+        key :type, :string
+        key :example, "-Xss64M"
+      end
+    end
+    property :valgrind_strategy, type: :string, example: "fail"
+    property :code_review_requests_enabled, type: :boolean, example: false
+    property :run_tests_locally_action_enabled, type: :boolean, example: true
+    property :exercise_submissions_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337/solution/download"
+    #These are returned after submission
+    property :latest_submission_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337"
+    property :latest_submission_id, type: :integer, example: 13337
+    #This is returned if user == admin
+    property :solution_zip_url, type: :string, example: "http://tmc.mooc.fi/api/v8/core/submissions/1337/download"
+  end
+
   belongs_to :course
 
   has_many :available_points, dependent: :delete_all

@@ -13,7 +13,7 @@ class Course < ActiveRecord::Base
                      :certificate_downloadable, :certificate_unlock_spec, :organization_id, :disabled_status,
                      :title, :material_url, :course_template_id, :hide_submission_results, :external_scoreboard_url,]
 
-    property :name, type: :string, example: "courseid-coursename"
+    property :name, type: :string, example: "organizationid-coursename"
     property :hide_after, type: :string, example: "2016-10-10T13:22:19.554+03:00"
     property :hidden, type: :boolean, example: false
     property :cache_version, type: :integer, example: 1
@@ -33,6 +33,35 @@ class Course < ActiveRecord::Base
     property :course_template_id, type: :integer, example: 1
     property :hide_submission_results, type: :boolean, example: false
     property :external_scoreboard_url, type: :string
+  end
+
+  swagger_schema :CoreCourseDetails do
+    key :required, [ :id, :name, :title, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls, :unlockables, :exercises, ]
+
+    property :id, type: :integer, example: 13
+    property :name, type: :string, example: "organizationid-coursename"
+    property :title, type: :string, example: "coursetitle"
+    property :details_url, type: :string, example: "http://tmc.mooc.fi/api/v8/core/courses/13"
+    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
+    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
+    property :comet_url, type: :string, example: "https://tmc.mooc.fi:8443/comet"
+    property :spyware_urls, type: :array do
+      items do
+        key :type, :string
+        key :example, "http://mooc.spyware.testmycode.net/"
+      end
+    end
+    property :unlockables, type: :array do
+      items do
+        key :type, :string
+        key :example, ""
+      end
+    end
+    property :exercises, type: :array do
+      items do
+        key :'$ref', :CoreExerciseDetails
+      end
+    end
   end
 
   def course_as_json
@@ -58,6 +87,37 @@ class Course < ActiveRecord::Base
         :hide_submission_results,
         :external_scoreboard_url,
     ]
+  end
+
+  swagger_schema :CourseLinks do
+    key :required, [ :id, :name, :title, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls ]
+
+    property :id, type: :integer, example: 13
+    property :name, type: :string, example: "organizationid-coursename"
+    property :title, type: :string, example: "coursetitle"
+    property :details_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13"
+    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
+    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
+    property :comet_url, type: :string, example: "https://tmc.mooc.fi:8443/comet"
+    property :spyware_urls, type: :array do
+      items do
+        key :type, :string
+        key :example, "http://mooc.spyware.testmycode.net/"
+      end
+    end
+  end
+
+  def links_as_json(view_context)
+    {
+        id: self.id,
+        name: self.name,
+        title: self.title,
+        details_url: view_context.api_v8_core_course_url(self),
+        unlock_url: view_context.api_v8_core_course_unlock_url(self),
+        reviews_url: view_context.api_v8_core_course_reviews_url(self),
+        comet_url: CometServer.get.client_url,
+        spyware_urls: SiteSetting.value('spyware_servers'),
+    }.as_json
   end
 
   self.include_root_in_json = false

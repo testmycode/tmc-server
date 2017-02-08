@@ -5,36 +5,54 @@ class Submission < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :Submission do
-    key :required, [ :id, :user_id, :pretest_error, :created_at, :exercise_name, :course_id, :processed,
+     key :required, [:id, :user_id, :pretest_error, :created_at, :exercise_name, :course_id, :processed,
                      :all_tests_passed, :points, :processing_tried_at, :processing_began_at, :processing_completed_at,
                      :times_sent_to_sandbox, :processing_attempts_started_at, :params_json, :requires_review,
                      :requests_review, :reviewed, :message_for_reviewer, :newer_submission_reviewed, :review_dismissed,
-                     :paste_available, :message_for_paste, :paste_key, ]
+                     :paste_available, :message_for_paste, :paste_key]
 
+     property :id, type: :integer, example: 1
+     property :user_id, type: :integer, example: 1
+     property :pretest_error, type: :string, description: 'Can be null', example: 'Missing test output. Did you terminate your program with an exit() command?'
+     property :created_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
+     property :exercise_name, type: :string, example: 'trivial'
+     property :course_id, type: :integer, example: 1
+     property :processed, type: :boolean, example: true
+     property :all_tests_passed, type: :boolean, example: true
+     property :points, type: :string, description: 'Can be null'
+     property :processing_tried_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
+     property :processing_began_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
+     property :processing_completed_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
+     property :times_sent_to_sandbox, type: :integer, example: 1
+     property :processing_attempts_started_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
+     property :params_json, type: :string, example: '{"error_msg_locale":"en"}'
+     property :requires_review, type: :boolean, example: true
+     property :requests_review, type: :boolean, example: true
+     property :reviewed, type: :boolean, example: true
+     property :message_for_reviewer, type: :string, example: ''
+     property :newer_submission_reviewed, type: :boolean, example: true
+     property :review_dismissed, type: :boolean, example: true
+     property :paste_available, type: :boolean, example: true
+     property :message_for_paste, type: :string, example: ''
+     property :paste_key, type: :string, description: 'Can be null'
+  end
+
+  swagger_schema :CoreSubmission do
+    key :required, [:exercise_name, :id, :user_id, :course_id, :created_at, :all_tests_passed, :points,
+                    :submitted_zip_url, :paste_url, :processing_time, :reviewed, :requests_review]
+
+    property :exercise_name, type: :string, example: 'exercise'
     property :id, type: :integer, example: 1
     property :user_id, type: :integer, example: 1
-    property :pretest_error, type: :string, description: 'Can be null', example: 'Missing test output. Did you terminate your program with an exit() command?'
-    property :created_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
-    property :exercise_name, type: :string, example: 'trivial'
     property :course_id, type: :integer, example: 1
-    property :processed, type: :boolean, example: true
+    property :created_at, type: :string, format: 'date-time', example: '2016-12-05T12:00:00.000+03:00'
     property :all_tests_passed, type: :boolean, example: true
-    property :points, type: :string, description: 'Can be null'
-    property :processing_tried_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
-    property :processing_began_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
-    property :processing_completed_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
-    property :times_sent_to_sandbox, type: :integer, example: 1
-    property :processing_attempts_started_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
-    property :params_json, type: :string, example: '{"error_msg_locale":"en"}'
-    property :requires_review, type: :boolean, example: true
-    property :requests_review, type: :boolean, example: true
-    property :reviewed, type: :boolean, example: true
-    property :message_for_reviewer, type: :string, example: ''
-    property :newer_submission_reviewed, type: :boolean, example: true
-    property :review_dismissed, type: :boolean, example: true
-    property :paste_available, type: :boolean, example: true
-    property :message_for_paste, type: :string, example: ''
-    property :paste_key, type: :string, description: 'Can be null'
+    property :points, type: :string, example: 'point1'
+    property :submitted_zip_url, type: :string, example: 'http://example.com/api/v8/core/submissions/1/download'
+    property :paste_url, type: :string, example: 'http://example.com/paste/qqbKk2Z7INqBH8cmaZ7i_A,'
+    property :processing_time, type: :integer, example: 25
+    property :reviewed, type: :boolean, example: false
+    property :requests_review, type: :boolean, example: false
   end
 
   belongs_to :user

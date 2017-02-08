@@ -41,6 +41,11 @@ Once it's running run all tests by executing `env REPORT_URL=<IP OF DOCKER INTER
 The test environment builds hermetic images for each testrun by including all source files to the testrun container. Thus we need to use `--build` (or trust docker to detect changes in directories) to run tests for newest code.
 
 
+## API Documentation ##
+
+API documentation can be found at http://testmycode.github.io/tmc-server/
+
+
 ## Credits ##
 
 Current maintainers of the project are
@@ -79,4 +84,3 @@ Checkstyle-support was integrated by
 ## License ##
 
 [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html)
-
