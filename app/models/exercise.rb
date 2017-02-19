@@ -102,7 +102,7 @@ class Exercise < ActiveRecord::Base
   validates :gdocs_sheet, format: { without: /\A(MASTER|PUBLIC)\z/ }
 
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
-    where(course_id: course.id, gdocs_sheet: gdocs_sheet)
+    where(course_id: course.id, gdocs_sheet: gdocs_sheet, hide_submission_results: false)
   }
 
   enum disabled_status: [:enabled, :disabled]

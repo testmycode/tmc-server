@@ -13,14 +13,14 @@ class PointsController < ApplicationController
     only_for_user = User.find_by(login: params[:username])
 
     if only_for_user
-        exercises = @course.exercises.enabled.where(exercises: {hidden: false})
-        sheets = @course.gdocs_sheets(exercises).natsort
-        @summary = summary_hash(@course, exercises, sheets, only_for_user)
-        sort_summary(@summary, params[:sort_by]) if params[:sort_by]
-        @summary
+      exercises = @course.exercises.enabled.where(exercises: { hidden: false, hide_submission_results: false })
+      sheets = @course.gdocs_sheets(exercises).natsort
+      @summary = summary_hash(@course, exercises, sheets, only_for_user)
+      sort_summary(@summary, params[:sort_by]) if params[:sort_by]
+      @summary
     else
-      @summary = Rails.cache.fetch("points_#{@course.id}_admin_#{current_user.administrator?}/", expires_in: 1.minutes) do
-        exercises = @course.exercises.enabled.where(exercises: {hidden: false})
+      @summary = Rails.cache.fetch("points_#{@course.id}_admin_#{current_user.administrator?}/", expires_in: 1.minute) do
+        exercises = @course.exercises.enabled.where(exercises: { hidden: false, hide_submission_results: false })
         sheets = @course.gdocs_sheets(exercises).natsort
         @summary = summary_hash(@course, exercises, sheets)
 
