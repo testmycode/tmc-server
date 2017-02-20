@@ -20,7 +20,7 @@
         <li>
           <%
              awarded_points = @submission.points_list
-             available_points = @submission.exercise.available_points.to_a.sort.map(&:name)
+             available_points = @submission.exercise ? @submission.exercise.available_points.to_a.sort.map(&:name) : []
              nonawarded_points = available_points - awarded_points
              all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
              all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
@@ -50,7 +50,7 @@
         <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
       <% end %>
 
-      <% if can? :read, @exercise.solution %>
+      <% if !@exercise.nil? && can?(:read, @exercise.solution) %>
         <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
       <% end %>
 

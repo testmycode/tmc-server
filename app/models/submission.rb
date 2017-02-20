@@ -166,7 +166,7 @@ class Submission < ActiveRecord::Base
   end
 
   def can_see_results?(user)
-    !((exercise.hide_submission_results? || course.hide_submission_results?) && (all_tests_passed? || tests_ran?)) ||
+    !(((!exercise.nil? && exercise.hide_submission_results?) || course.hide_submission_results?) && (all_tests_passed? || tests_ran?)) ||
       course.organization.teacher?(user) ||
       course.assistant?(user) ||
       user.administrator?

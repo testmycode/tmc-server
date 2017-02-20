@@ -45,6 +45,8 @@ class SourceFileList
                 find_source_files_under(project_dir)
       end
 
+      return new([]) unless submission.exercise
+
       project_file = TmcProjectFile.for_project(submission.exercise.clone_path)
 
       if project_file
