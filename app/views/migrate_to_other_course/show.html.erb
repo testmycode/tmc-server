@@ -5,13 +5,13 @@
   By submitting form below, all of your submissions and points will be automatically copied over from <%= @old_course.name %> to <%= @to_course.name %>. This action can only be done <strong>once</strong> and once it's done it cannot be undone!
   <br />
   <br />
-    Use this form only when you need to migrate from an course to anoter, for e.g. cases where you missed a deadline and must migrate to a no deadline version of the course to continue.
+    Use this form only when you need to migrate from an course to another, for e.g. cases where you missed a deadline and must migrate to a no deadline version of the course to continue.
   <br />
   <br />
   You must update your client to use the new course!
   <br />
   <br />
-  This will take some time. Please wait without refreshing your browser.
+  This will take some time. Please wait without refreshing your browser. The request will most likely time out, don't try again, just wait.
   </p>
   <% unless @extra_alert_text.nil? %>
     <p class="alert">
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="control-group">
-        <%= label_tag "Name of the course where to migrate", nil, class: "control-label" %>
+        <%= label_tag "Your username", nil, class: "control-label" %>
         <div class="controls">
           <%= text_field_tag :username %>
         </div>

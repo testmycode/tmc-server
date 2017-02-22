@@ -26,7 +26,7 @@ class MigrateToOtherCourseController < ApplicationController
       flash[:notice] = "Successfully migrated over"
       redirect_to participant_path(current_user)
     else
-      flash[:alert] = "Inproper answers. Please try again"
+      flash[:alert] = "Improper answers. Please try again"
       render :show
     end
   end
