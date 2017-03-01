@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
     property :id, type: :integer, example: 1
     property :username, type: :string, example: 'student'
     property :email, type: :string, example: 'student@example.com'
+    property :administrator, type: :boolean, example: false
   end
 
   has_many :submissions, dependent: :delete_all

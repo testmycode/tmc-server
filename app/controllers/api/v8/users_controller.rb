@@ -5,7 +5,7 @@ module Api
 
       swagger_path '/api/v8/users/{user_id}' do
         operation :get do
-          key :description, 'Returns the user\'s username and email by user id'
+          key :description, 'Returns the user\'s username, email, and administrator status by user id'
           key :operationId, 'findUsersBasicInfoById'
           key :produces, [
             'application/json'
@@ -15,7 +15,7 @@ module Api
           ]
           parameter '$ref': '#/parameters/path_user_id'
           response 200 do
-            key :description, 'User\'s username and email by id as json'
+            key :description, 'User\'s username, email, and administrator status by id as json'
             schema do
               key :title, :user
               key :required, [:user]
@@ -31,7 +31,7 @@ module Api
 
       swagger_path '/api/v8/users/current' do
         operation :get do
-          key :description, 'Returns the current user\'s username and email'
+          key :description, 'Returns the current user\'s username, email, and administrator status'
           key :operationId, 'findUsersBasicInfo'
           key :produces, [
             'application/json'
@@ -40,7 +40,7 @@ module Api
             'user'
           ]
           response 200 do
-            key :description, 'User\'s username and email as json'
+            key :description, 'User\'s username, email, and administrator status as json'
             schema do
               key :title, :user
               key :required, [:user]
@@ -63,7 +63,8 @@ module Api
         present(
           id: user.id,
           username: user.login,
-          email: user.email
+          email: user.email,
+          administrator: user.administrator
         )
       end
     end

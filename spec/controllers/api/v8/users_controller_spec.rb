@@ -17,6 +17,7 @@ describe Api::V8::UsersController, type: :controller do
       expect(response).to have_http_status(:success)
       expect(response.body).to include(user.username)
       expect(response.body).to include(user.email)
+      expect(JSON.parse(response.body)['administrator']).to eq(false)
     end
     it "user doesn't see other users' infos" do
       get :show, id: 'current'
@@ -24,6 +25,15 @@ describe Api::V8::UsersController, type: :controller do
       expect(response).to have_http_status(200)
       expect(response.body).not_to include(other_user.username)
       expect(response.body).not_to include(other_user.email)
+    end
+
+    context 'as an administrator' do
+      let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+
+      it 'user sees own info' do
+        get :show, id: 'current'
+        expect(JSON.parse(response.body)['administrator']).to eq(true)
+      end
     end
   end
   describe "GET user's info with user id" do
