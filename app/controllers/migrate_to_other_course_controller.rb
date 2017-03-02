@@ -34,9 +34,9 @@ class MigrateToOtherCourseController < ApplicationController
   private
 
   def check_understanding!
-    params[:from_course_name] == @old_course.name &&
-    params[:to_course_name] == @to_course.name &&
-    params[:username] == current_user.login &&
+    params[:from_course_name].strip == @old_course.name &&
+    params[:to_course_name].strip == @to_course.name &&
+    params[:username].strip == current_user.login &&
     !!params[:im_sure] &&
     !already_migrated
   end
