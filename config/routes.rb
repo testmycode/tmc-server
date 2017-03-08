@@ -105,6 +105,10 @@ TmcServer::Application.routes.draw do
           resources :courses, module: :organizations, only: :index
         end
       end
+
+      resources :application, param: :name, only: [] do
+        resources :credentials, module: :application, only: :index
+      end
     end
   end
 
