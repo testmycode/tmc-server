@@ -69,10 +69,10 @@ class AwardedPoint < ActiveRecord::Base
     query = awarded_points
             .project(awarded_points[:id].count.as('count'))
             .where(awarded_points[:course_id].eq(course.id))
-            .where(exercises[:hide_submission_results].eq(false))
+            .where(exercises[:hide_submission_results].eq(false).or(exercises[:id].eq(nil)))
             .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
             .join(courses).on(submissions[:course_id].eq(courses[:id]))
-            .join(exercises).on(
+            .join(exercises, Arel::Nodes::OuterJoin).on(
               courses[:id].eq(exercises[:course_id])
                     .and(submissions[:exercise_name].eq(exercises[:name]))
             )
@@ -185,10 +185,10 @@ class AwardedPoint < ActiveRecord::Base
     awarded_query = awarded_points
                     .project(awarded_points[:id])
                     .where(awarded_points[:user_id].eq(user.id))
-                    .where(exercises[:hide_submission_results].eq(false))
+                    .where(exercises[:hide_submission_results].eq(false).or(exercises[:id].eq(nil)))
                     .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
                     .join(courses).on(submissions[:course_id].eq(courses[:id]))
-                    .join(exercises).on(
+                    .join(exercises, Arel::Nodes::OuterJoin).on(
                       courses[:id].eq(exercises[:course_id])
                             .and(submissions[:exercise_name].eq(exercises[:name]))
                     )
@@ -209,12 +209,12 @@ class AwardedPoint < ActiveRecord::Base
     awarded_points
       .join(users).on(awarded_points[:user_id].eq(users[:id]))
       .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
-      .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]))
+      .join(exercises, Arel::Nodes::OuterJoin).on(available_points[:exercise_id].eq(exercises[:id]))
       .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
       .where(awarded_points[:course_id].eq(course.id))
       .where(awarded_points[:user_id].eq(users[:id]))
       .where(exercises[:course_id].eq(course.id))
-      .where(exercises[:hide_submission_results].eq(false))
+      .where(exercises[:hide_submission_results].eq(false).or(exercises[:id].eq(nil)))
       .where(exercises[:gdocs_sheet].in(sheetnames))
       .where(submissions[:course_id].eq(course.id))
       .where(submissions[:user_id].eq(users[:id]))
