@@ -22,15 +22,16 @@ class AvailablePoint < ActiveRecord::Base
   validates :name, presence: true
   validate :name_must_not_contain_whitespace
 
-  def self.course_points_of_exercises(course, included_exercises)
+  def self.course_points_of_exercises(course, included_exercises, hidden = false)
     available_points = AvailablePoint.arel_table
     exercises = Exercise.arel_table
 
     query = available_points
             .project(available_points[:name].count.as('count'))
             .where(available_points[:exercise_id].in(included_exercises.map(&:id)))
-            .where(exercises[:hide_submission_results].eq(false))
             .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]))
+
+    query = query.where(exercises[:hide_submission_results].eq(false)) unless hidden
 
     res = ActiveRecord::Base.connection.execute(query.to_sql).to_a
     if !res.empty?

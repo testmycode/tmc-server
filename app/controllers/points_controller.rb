@@ -20,7 +20,8 @@ class PointsController < ApplicationController
       @summary
     else
       @summary = Rails.cache.fetch("points_#{@course.id}_admin_#{current_user.administrator?}/", expires_in: 1.minute) do
-        exercises = @course.exercises.enabled.where(exercises: { hidden: false, hide_submission_results: false })
+        exercises = @course.exercises.enabled.where(exercises: { hidden: false })
+        exercises = exercises.where(hide_submission_results: false) unless current_user.administrator?
         sheets = @course.gdocs_sheets(exercises).natsort
         @summary = summary_hash(@course, exercises, sheets)
 
@@ -55,8 +56,8 @@ class PointsController < ApplicationController
     add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
     add_breadcrumb @sheetname
 
-    @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname).includes(:available_points).order!
-    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps)
+    @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname, current_user.administrator?).includes(:available_points).order!
+    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps, hidden: current_user.administrator?)
 
     @users = User.course_sheet_students(@course, @sheetname).includes(:organizations)
     if params[:sort_by] == 'points'
@@ -81,7 +82,7 @@ class PointsController < ApplicationController
   private
 
   def summary_hash(course, visible_exercises, sheets, only_for_user = nil)
-    per_user_and_sheet = AwardedPoint.count_per_user_in_course_with_sheet(course, sheets, only_for_user)
+    per_user_and_sheet = AwardedPoint.count_per_user_in_course_with_sheet(course, sheets, only_for_user, current_user.administrator?)
 
     user_totals = {}
     for username, per_sheet in per_user_and_sheet
@@ -104,7 +105,7 @@ class PointsController < ApplicationController
           total_available: (total_available[sheet] || 0)
         }
       end,
-      total_awarded: AwardedPoint.course_points(course, include_admins),
+      total_awarded: AwardedPoint.course_points(course, include_admins, current_user.administrator?),
       total_available: AvailablePoint.course_points_of_exercises(course, visible_exercises),
       awarded_for_user_and_sheet: per_user_and_sheet,
       total_for_user: user_totals,
