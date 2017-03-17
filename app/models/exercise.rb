@@ -280,19 +280,12 @@ class Exercise < ActiveRecord::Base
 
   def unlock_spec=(spec)
     check_is_json_array_of_strings(spec)
-    if UnlockSpec.parsable?(spec, self)
-      super(spec)
-      @unlock_spec_obj = nil
-    end
+    @unlock_spec_obj = UnlockSpec.from_str(course, spec)
+    super(@unlock_spec_obj.empty? ? nil : spec)
   end
 
   def unlock_spec_obj
-    @unlock_spec_obj ||=
-      if self.unlock_spec
-        UnlockSpec.new(course, ActiveSupport::JSON.decode(self.unlock_spec))
-      else
-        UnlockSpec.new(course, [])
-      end
+    @unlock_spec_obj ||= UnlockSpec.from_str(course, unlock_spec)
   end
 
   def unlock_conditions
@@ -340,20 +333,20 @@ class Exercise < ActiveRecord::Base
   end
 
   def requires_unlock?
-    !unlock_spec_obj.empty?
+    !unlock_spec.nil?
   end
 
   def requires_explicit_unlock?
     deadline_spec_obj.depends_on_unlock_time?
   end
 
-  def time_unlocked_for(user)
-    UncomputedUnlock.resolve(course, user)
+  def time_unlocked_for(user, resolve_unlocks = true)
+    UncomputedUnlock.resolve(course, user) if resolve_unlocks
     self.unlocks.where(user_id: user).where('valid_after IS NULL OR valid_after < ?', Time.now).first.andand.created_at
   end
 
-  def unlocked_for?(user)
-    !requires_unlock? || time_unlocked_for(user)
+  def unlocked_for?(user, resolve_unlocks = true)
+    !requires_unlock? || time_unlocked_for(user, resolve_unlocks)
   end
 
   def unlockable_for?(user)
@@ -491,6 +484,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def check_is_json_array_of_strings(str)
+    return if str.nil?
     array = ActiveSupport::JSON.decode(str)
     raise "JSON array expected" if !array.is_a?(Array)
     raise "JSON array of strings expected" if array.any? {|a| !a.is_a?(String) }

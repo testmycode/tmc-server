@@ -14,7 +14,7 @@
 class Unlock < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
-  belongs_to :exercise, -> (unlock) { where(course: unlock.course) }, foreign_key: :exercise_name, primary_key: :name
+  belongs_to :exercise, ->(unlock) { where(course: unlock.course) }, foreign_key: :exercise_name, primary_key: :name
   # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
   def self.refresh_unlocks(course, user)
@@ -43,7 +43,7 @@ class Unlock < ActiveRecord::Base
   private
 
   def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
-    for exercise in course.exercises
+    course.exercises.each do |exercise|
       existing = user_unlocks_by_exercise_name[exercise.name]
       exists = !!existing
       may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
