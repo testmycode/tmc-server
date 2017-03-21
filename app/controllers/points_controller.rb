@@ -56,7 +56,7 @@ class PointsController < ApplicationController
     add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
     add_breadcrumb @sheetname
 
-    @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname, current_user.administrator?).includes(:available_points).order!
+    @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname, current_user.administrator?).includes(:available_points).order!(:name)
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps, hidden: current_user.administrator?)
 
     @users = User.course_sheet_students(@course, @sheetname).includes(:organizations)
