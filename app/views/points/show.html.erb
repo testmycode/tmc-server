@@ -59,7 +59,7 @@
               <% end %>
             </td>
             <% @exercises.each do |exercise| %>
-              <% exercise.available_points.each do |p| %>
+              <% exercise.available_points.sort.each do |p| %>
                 <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
               <% end %>
             <% end %>
