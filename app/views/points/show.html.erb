@@ -60,7 +60,13 @@
             </td>
             <% @exercises.each do |exercise| %>
               <% exercise.available_points.sort.each do |p| %>
-                <td><%= raw("&#x2714;") if user_points.include?(p.name) %></td>
+                <td>
+                  <% if user_points.include?(p.name) %>
+                    <%= raw("&#x2714;") %>
+                  <% elsif !params[:show_attempted].nil? && exercise.attempted_by?(user) %>
+                    <%= raw("&#x2718;") %>
+                  <% end %>
+                </td>
               <% end %>
             <% end %>
           </tr>

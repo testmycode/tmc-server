@@ -59,7 +59,11 @@ class PointsController < ApplicationController
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname, current_user.administrator?).includes(:available_points).order!(:name)
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps, hidden: current_user.administrator?)
 
-    @users = User.course_sheet_students(@course, @sheetname).includes(:organizations)
+    @users = if params[:show_attempted]
+               User.course_students(@course)
+             else
+               User.course_sheet_students(@course, @sheetname).includes(:organizations)
+             end
     if params[:sort_by] == 'points'
       @users = @users.sort_by do |u|
         [-@users_to_points[u.login].size, u.login.downcase]
@@ -117,7 +121,7 @@ class PointsController < ApplicationController
     if sorting == 'total_points'
       summary[:users] = summary[:users].sort_by { |user| [-summary[:total_for_user][user.login].to_i, user.login] }
     elsif sorting =~ /(.*)_points$/
-      sheet = $1
+      sheet = Regexp.last_match(1)
       summary[:users] = summary[:users].sort_by { |user| [-summary[:awarded_for_user_and_sheet][user.login][sheet].to_i, user.login] }
     end
   end
