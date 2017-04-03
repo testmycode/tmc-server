@@ -342,7 +342,7 @@ class Exercise < ActiveRecord::Base
 
   def time_unlocked_for(user, resolve_unlocks = true)
     UncomputedUnlock.resolve(course, user) if resolve_unlocks
-    self.unlocks.where(user_id: user).where('valid_after IS NULL OR valid_after < ?', Time.now).first.andand.created_at
+    unlocks.where(user_id: user).find_by('valid_after IS NULL OR valid_after < ?', Time.now).andand.created_at
   end
 
   def unlocked_for?(user, resolve_unlocks = true)

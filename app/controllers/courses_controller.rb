@@ -179,18 +179,19 @@ class CoursesController < ApplicationController
   end
 
   def assign_show_view_vars
-    @exercises = @course.exercises
-      .includes(:course)
-      .select { |ex| ex.visible_to?(current_user) }
-      .natsort_by(&:name)
+    @exercises = @course.exercises.includes(:course)
+    @exercises.preload(:unlocks).where(unlocks: { user: current_user })
+    @exercises = @exercises.select { |ex| ex.visible_to?(current_user) }
+                           .natsort_by(&:name)
     @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
+    @unlocks = current_user.unlocks.where(course: @course).where('valid_after IS NULL OR valid_after < ?', Time.zone.now).pluck(:exercise_name)
 
     unless current_user.guest?
       max_submissions = 100
       @submissions = @course.submissions
       @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
       @submissions = @submissions.order('created_at DESC').includes(:user)
-      @total_submissions = @submissions.where(user: User.legitimate_students).count
+      @total_submissions = @submissions.where.not(user: User.non_legitimate_students).count
       @submissions = @submissions.limit(max_submissions)
       Submission.eager_load_exercises(@submissions)
     end
