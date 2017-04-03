@@ -199,10 +199,11 @@
     <h2>All exercises</h2>
     <div>
       <%=
-          render :partial => 'exercises/list', :locals => {
-            :course => @course,
-            :exercises => @exercises,
-            :completion_status => @exercise_completion_status
+          render partial: 'exercises/list', locals: {
+            course: @course,
+            exercises: @exercises,
+            completion_status: @exercise_completion_status,
+            unlocks: @unlocks
           }
       %>
     </div>
