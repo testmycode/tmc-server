@@ -14,8 +14,8 @@ class MavenCacheSeeder
     clone_dir = Pathname(clone_dir).realpath
     Thread.start do
       pom_xmls = find_pom_xmls(clone_dir)
-      for pom_xml in pom_xmls
-        for server in servers
+      pom_xmls.each do |pom_xml|
+        servers.each do |server|
           server.try_to_seed_maven_cache(pom_xml)
         end
       end

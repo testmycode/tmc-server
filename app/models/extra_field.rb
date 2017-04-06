@@ -104,7 +104,7 @@ module ExtraField
         fail "Don't nest groups" if @group
         @group = group_name
         begin
-          block.call
+          yield
         ensure
           @group = nil
         end

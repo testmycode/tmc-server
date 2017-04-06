@@ -21,7 +21,7 @@ class CourseRefresher
     end
 
     def fix_line_endings(text)
-      text.gsub("\r", '')
+      text.delete("\r")
     end
 
     def remove_solution_blocks(text)
@@ -59,10 +59,8 @@ class CourseRefresher
     end
 
     def remove_stub_and_solution_comments(text)
-      for regex in [stub_regexp, begin_solution_regexp, end_solution_regexp, solution_file_regexp]
-        while text =~ regex
-          text = $~.pre_match + $~.post_match
-        end
+      [stub_regexp, begin_solution_regexp, end_solution_regexp, solution_file_regexp].each do |regex|
+        text = $~.pre_match + $~.post_match while text =~ regex
       end
       text
     end

@@ -7,14 +7,14 @@ module Enumerable
   end
 
   def natsort!
-    self.sort! { |a, b| Natcmp.natcmp(a, b) }
+    sort! { |a, b| Natcmp.natcmp(a, b) }
   end
 
-  def natsort_by(&block)
-    sort { |a, b| Natcmp.natcmp(block.call(a), block.call(b)) }
+  def natsort_by
+    sort { |a, b| Natcmp.natcmp(yield(a), yield(b)) }
   end
 
-  def natsort_by!(&block)
-    self.sort! { |a, b| Natcmp.natcmp(block.call(a), block.call(b)) }
+  def natsort_by!
+    sort! { |a, b| Natcmp.natcmp(yield(a), yield(b)) }
   end
 end

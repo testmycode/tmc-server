@@ -110,7 +110,7 @@ class Exercise < ActiveRecord::Base
   enum disabled_status: [:enabled, :disabled]
 
   def relative_path
-    name.gsub('-', '/')
+    name.tr('-', '/')
   end
 
   def exercise_group

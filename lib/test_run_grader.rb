@@ -90,17 +90,15 @@ module TestRunGrader
     awarded_points = AwardedPoint.course_user_points(course, user).map(&:name)
 
     points = []
-    for point_name in (available_points & points_from_test_results(results)) - review_points
-      if validations_passed?(submission.validations) && valgrind_passed?(submission)
-        points << point_name
-        unless awarded_points.include?(point_name)
-          submission.awarded_points << AwardedPoint.new(
-            name: point_name,
-            course: course,
-            user: user
-          )
-        end
-      end
+    ((available_points & points_from_test_results(results)) - review_points).each do |point_name|
+      next unless validations_passed?(submission.validations) && valgrind_passed?(submission)
+      points << point_name
+      next if awarded_points.include?(point_name)
+      submission.awarded_points << AwardedPoint.new(
+        name: point_name,
+        course: course,
+        user: user
+      )
     end
 
     old_review_points = submission.points_list.select { |pt| review_points.include?(pt) }
@@ -111,7 +109,7 @@ module TestRunGrader
 
   def self.points_from_test_results(results)
     point_status = {} # point -> true / false / nil i.e. ok so far / failed / unseen
-    for result in results
+    results.each do |result|
       result['pointNames'].each do |name|
         unless point_status[name].eql?(false) # skip if already failed
           point_status[name] = (result['status'] == 'PASSED')

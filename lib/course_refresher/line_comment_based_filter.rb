@@ -21,7 +21,7 @@ class CourseRefresher
     end
 
     def fix_line_endings(text)
-      text.gsub("\r", '')
+      text.delete("\r")
     end
 
     def remove_solution_blocks(text)
@@ -60,7 +60,7 @@ class CourseRefresher
 
     def remove_stub_and_solution_comments(text)
       result = []
-      for line in text.lines
+      text.lines.each do |line|
         match = [stub_regexp, begin_solution_regexp, end_solution_regexp, solution_file_regexp].any? do |regexp|
           line =~ regexp
         end

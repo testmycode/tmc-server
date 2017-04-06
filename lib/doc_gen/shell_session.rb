@@ -17,7 +17,7 @@ class DocGen
     # end
     def example(&block)
       example = ExampleBlock.new(self)
-      block.call(example)
+      yield(example)
       '<div class="shell">' + example.transcript + '</div>'
     end
 
