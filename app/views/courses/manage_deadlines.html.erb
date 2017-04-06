@@ -33,19 +33,14 @@
       <tr>
         <td><%= group_display_name %></td>
         <td>
-          <% exercises.each do |exercise| %>
-            <%= exercise.name %>
-            <%
-               notes = []
-               notes << 'hidden' if exercise.hidden?
-               notes << 'expired' if exercise.expired_for?(current_user)
-               notes << 'locked' unless exercise.unlocked_for?(current_user, false)
-            %>
-            <% unless notes.empty? %>
-              (<%= notes.join(', ') %>)
-            <% end %>
-            <br/>
-          <% end %>
+          <%= render partial: 'exercises/list_single',
+            collection: exercises,
+            as: :exercise,
+            layout: 'exercises/simple_list_layout',
+            locals: {
+              unlocks: @unlocks
+            }
+          %>
         </td>
         <td>
           <%=
