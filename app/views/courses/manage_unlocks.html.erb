@@ -45,10 +45,14 @@
           <%= group.name %><br/>
         </td>
         <td>
-          <% group.exercises(false).each do |exercise| %>
-            <%= render partial: 'exercises/list_single', locals: { exercise: exercise } %>
-            <br/>
-          <% end %>
+          <%= render partial: 'exercises/list_single',
+            collection: group.exercises(false),
+            as: :exercise,
+            layout: 'exercises/simple_list_layout',
+            locals: {
+              unlocks: @unlocks
+            }
+          %>
         </td>
         <td>
           <%

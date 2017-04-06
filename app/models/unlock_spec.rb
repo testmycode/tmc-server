@@ -20,6 +20,11 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     end
   end
 
+  def self.from_str(course, string)
+    return new(course, []) if string.nil?
+    new(course, ActiveSupport::JSON.decode(string))
+  end
+
   def empty? # No unlock conditions - no Unlock object required to be unlocked
     @conditions.empty? && @valid_after.nil?
   end
