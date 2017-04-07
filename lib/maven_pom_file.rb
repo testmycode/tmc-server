@@ -5,16 +5,14 @@ class MavenPomFile
     @data = XmlSimple.xml_in(file.to_s)
   end
 
-  def data
-    @data
-  end
+  attr_reader :data
 
   def artifact_id
     @data['artifactId'][0]
   end
 
   def artifact_version
-   maybe_from_parent('version')
+    maybe_from_parent('version')
   end
 
   def artifact_group_id
@@ -26,6 +24,7 @@ class MavenPomFile
   end
 
   private
+
   def maybe_from_parent(value)
     version = @data[value]
     if !version.nil?

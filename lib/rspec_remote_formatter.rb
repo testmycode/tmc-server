@@ -4,8 +4,7 @@ require 'json'
 class RspecRemoteFormatter
   RSpec::Core::Formatters.register self, :example_passed, :example_failed, :example_pending
 
-  def initialize(output)
-  end
+  def initialize(output); end
 
   # One of these per example, depending on outcome
   # ExampleNotification
@@ -14,7 +13,7 @@ class RspecRemoteFormatter
   end
 
   def host
-    @host ||= ENV.fetch('HOST', `hostname`.chomp)
+    @host ||= ENV.fetch('HOST') { `hostname`.chomp }
   end
 
   # FailedExampleNotification
@@ -38,7 +37,7 @@ class RspecRemoteFormatter
       exception: notification.example.exception.to_s || ex_res.exception.to_s,
       started_at: ex_res.started_at,
       finished_at: ex_res.finished_at,
-      run_time: ex_res.run_time.to_s,
+      run_time: ex_res.run_time.to_s
     }
   end
 
@@ -48,5 +47,4 @@ class RspecRemoteFormatter
     http = Net::HTTP.new(host, port)
     http.post("/#{rspec_method}.json", data.to_json)
   end
-
 end

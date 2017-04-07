@@ -351,7 +351,7 @@ class CourseRefresher
             available_points_content.pop
             available_points_content = available_points_content.drop(3)
             available_points_content.each do |line|
-              line = line.gsub(' ', '').chomp
+              line = line.delete(' ').chomp
               all_points << line
             end
           else
@@ -448,7 +448,7 @@ class CourseRefresher
       chgrp = SiteSetting.value(:git_repos_chgrp)
 
       parent_dirs = Course.cache_root.sub(::Rails.root.to_s, '').split('/').reject(&:blank?)
-      for i in 0..(parent_dirs.length)
+      (0..(parent_dirs.length)).each do |i|
         dir = "#{::Rails.root}/#{parent_dirs[0..i].join('/')}"
         sh!('chmod', chmod, dir) unless chmod.blank?
         sh!('chgrp', chgrp, dir) unless chgrp.blank?

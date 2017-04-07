@@ -41,7 +41,7 @@ class ExerciseDir
   end
 
   def name_based_on_path(base_path)
-    @path.to_s.sub(/^#{base_path}\//, '').gsub('/', '-')
+    @path.to_s.sub(/^#{base_path}\//, '').tr('/', '-')
   end
 
   def has_tests?

@@ -361,8 +361,8 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def self.filter_fields(submissions)
-    submissions.map do |sub|
+  def self.filter_fields!(submissions)
+    submissions.map! do |sub|
       {
         id: sub.id,
         user_id: sub.user_id,

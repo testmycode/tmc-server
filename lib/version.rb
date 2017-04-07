@@ -10,7 +10,7 @@ class Version
     elsif version.is_a?(Numeric)
       @parts = [version]
     else
-      fail "Invalid version number: #{version.inspect}"
+      raise "Invalid version number: #{version.inspect}"
     end
   end
 
@@ -22,7 +22,7 @@ class Version
       p2 = other.parts.clone
       p1 << 0 while p1.length < p2.length
       p2 << 0 while p2.length < p1.length
-      for n1, n2 in p1.zip(p2)
+      p1.zip(p2).each do |n1, n2|
         if n1 < n2
           return -1
         elsif n1 > n2
@@ -31,7 +31,7 @@ class Version
       end
       0
     else
-      fail ArgumentError.new("cannot compare Version with #{other.class}")
+      raise ArgumentError, "cannot compare Version with #{other.class}"
     end
   end
 
