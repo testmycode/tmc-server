@@ -1,6 +1,18 @@
 # Organisations (schools etc.) have teachers and their own customized courses.
 
 class Organization < ActiveRecord::Base
+  include Swagger::Blocks
+  
+  swagger_schema :Organization do
+    key :required, [:name, :information, :slug, :logo_path, :pinned]
+
+    property :name, type: :string, example: 'University of Helsinki'
+    property :information, type: :string, example: 'Organization for University of Helsinki'
+    property :slug, type: :string, example: 'hy'
+    property :logo_path, type: :string, example: '/logos/hy_logo.png'
+    property :pinned, type: :boolean, example: false
+  end
+
   validates :name,
             presence: true,
             length: { within: 2..40 },
@@ -31,6 +43,7 @@ class Organization < ActiveRecord::Base
   scope :assisted_organizations, ->(user) { joins(:courses, courses: :assistantships).where(assistantships: { user_id: user.id }) }
   scope :taught_organizations, ->(user) { joins(:teacherships).where(teacherships: { user_id: user.id }) }
   scope :participated_organizations, ->(user) { joins(:courses, courses: :awarded_points).where(awarded_points: { user_id: user.id }) }
+  scope :visible_organizations, -> { accepted_organizations.where(hidden: false) }
 
   def self.init(params, initial_user)
     organization = Organization.new(params.merge(verified: false, creator: initial_user))
