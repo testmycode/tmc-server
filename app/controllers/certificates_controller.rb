@@ -48,9 +48,7 @@ class CertificatesController < ApplicationController
   end
 
   def set_courses
-    @courses = current_user.administrator? ?
-      Course.order(:name) :
-      Course.with_certificates_for(@user)
+    @courses = current_user.administrator? ? Course.where(certificate_downloadable: true).order(:name) : Course.with_certificates_for(@user)
   end
 
   def add_certificate_breadcrumbs
