@@ -12,6 +12,12 @@
     <th>
       Email
     </th>
+    <th>
+      First name
+    </th>
+    <th>
+      Last name
+    </th>
   </tr>
   <% @students.each do |student| %>
     <tr>
@@ -20,6 +26,12 @@
       </td>
       <td>
         <%= mail_to(student.email) %>
+      </td>
+      <td>
+        <%= student.field_value(OpenStruct.new(name: 'first_name')) %>
+      </td>
+      <td>
+        <%= student.field_value(OpenStruct.new(name: 'last_name')) %>
       </td>
     </tr>
   <% end %>
