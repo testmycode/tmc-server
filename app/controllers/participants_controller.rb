@@ -76,7 +76,7 @@ class ParticipantsController < ApplicationController
     @percent_completed = {}
     for course_id in @awarded_points.keys
       course = Course.find(course_id)
-      if course.visible_to?(current_user)
+      if course.visible_to?(current_user) && !course.hide_submissions?
         @courses << course
 
         awarded = @awarded_points[course.id]
