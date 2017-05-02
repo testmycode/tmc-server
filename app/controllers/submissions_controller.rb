@@ -42,6 +42,7 @@ class SubmissionsController < ApplicationController
         @files = SourceFileList.for_submission(@submission)
       }
       format.zip {
+        respond_access_denied if @course.hide_submissions?
         send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip")
       }
       format.json do
