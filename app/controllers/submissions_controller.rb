@@ -19,6 +19,7 @@ class SubmissionsController < ApplicationController
         end
       end
       format.html do # uses AJAX
+        respond_access_denied if @course.hide_submissions?
         @organization = @course.organization
         add_course_breadcrumb
         add_breadcrumb 'All submissions'
@@ -30,12 +31,14 @@ class SubmissionsController < ApplicationController
     @course ||= @submission.course
     @exercise ||= @submission.exercise
     @organization = @course.organization
+
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
 
     respond_to do |format|
       format.html {
+        respond_access_denied if @course.hide_submissions?
         @files = SourceFileList.for_submission(@submission)
       }
       format.zip {
