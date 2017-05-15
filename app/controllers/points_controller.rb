@@ -60,7 +60,7 @@ class PointsController < ApplicationController
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps, hidden: current_user.administrator?)
 
     @users = if params[:show_attempted]
-               User.course_students(@course)
+               @course.users
              else
                User.course_sheet_students(@course, @sheetname).includes(:organizations)
              end
