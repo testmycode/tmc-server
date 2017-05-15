@@ -148,6 +148,7 @@ class Course < ActiveRecord::Base
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
+  has_many :users, through: :submissions
   has_many :available_points, through: :exercises
   has_many :awarded_points, dependent: :delete_all
   has_many :test_scanner_cache_entries, dependent: :delete_all
