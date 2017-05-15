@@ -19,7 +19,7 @@ class SubmissionsController < ApplicationController
         end
       end
       format.html do # uses AJAX
-        respond_access_denied if @course.hide_submissions?
+        respond_access_denied if !current_user.administrator? && @course.hide_submissions?
         @organization = @course.organization
         add_course_breadcrumb
         add_breadcrumb 'All submissions'
@@ -38,11 +38,11 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html {
-        respond_access_denied if @course.hide_submissions?
+        respond_access_denied if !current_user.administrator? && @course.hide_submissions?
         @files = SourceFileList.for_submission(@submission)
       }
       format.zip {
-        respond_access_denied if @course.hide_submissions?
+        respond_access_denied if !current_user.administrator? && @course.hide_submissions?
         send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip")
       }
       format.json do
