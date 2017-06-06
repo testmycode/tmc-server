@@ -101,7 +101,7 @@ module Api
             end
 
             if !errormsg
-              render json: { submission_url: submission_url(@submission, format: 'json', api_version: ApiVersion::API_VERSION),
+              render json: { submission_url: api_v8_core_submission_url(@submission),
                              paste_url: if @submission.paste_key
                                           paste_url(@submission.paste_key)
                                         else
