@@ -88,7 +88,10 @@ module Api
 
               authorize! :create, @submission
 
-              errormsg = 'Failed to save submission.' unless @submission.save
+              unless @submission.save
+                errormsg = 'Failed to save submission.'
+                errormsg += " Errors: #{@submission.errors.messages.to_s}"
+              end
             end
 
             unless errormsg
