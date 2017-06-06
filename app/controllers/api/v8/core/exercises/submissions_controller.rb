@@ -37,6 +37,8 @@ module Api
 
             @exercise = Exercise.find(params[:exercise_id])
             authorize! :read, @exercise
+            @course = @exercise.course
+            authorize! :read, @course
 
             if !params[:submission] || !params[:submission][:file]
               authorization_skip!
