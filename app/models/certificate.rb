@@ -12,7 +12,7 @@ class Certificate < ActiveRecord::Base
     data %= {
       time: Time.zone.now.to_f * 1000,
       name: name,
-      course: course.formal_name,
+      course: course.formal_name || course.title,
       weeks: course.exercise_groups.count,
       exercises: visible_exercises.count,
       points: AwardedPoint.course_user_points(course, user).count,
