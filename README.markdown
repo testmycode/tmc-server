@@ -48,7 +48,9 @@ API documentation can be found at http://testmycode.github.io/tmc-server/
 
 ## Credits ##
 
-Current maintainers of the project are
+The project is maintained by the Agile Education research group.
+
+The project used to be maintained by:
 - Martin Pärtel ([mpartel](https://github.com/mpartel))
 - Jarmo Isotalo ([jamo](https://github.com/jamo))
 
