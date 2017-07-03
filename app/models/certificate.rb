@@ -44,7 +44,7 @@ class Certificate < ActiveRecord::Base
 
   def visible_exercises_and_points_for
     visible_exercises = course.exercises.select { |e| e.points_visible_to?(user) }
-    total_available = AvailablePoint.course_points_of_exercises(course, visible_exercises)
+    total_available = AvailablePoint.course_points_of_exercises(course, visible_exercises, hidden: true)
     [visible_exercises, total_available]
   end
 end
