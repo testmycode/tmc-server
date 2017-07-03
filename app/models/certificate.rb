@@ -15,7 +15,10 @@ class Certificate < ActiveRecord::Base
       course: course.formal_name || course.title,
       weeks: course.exercise_groups.count,
       exercises: visible_exercises.count,
-      points: AwardedPoint.course_user_points(course, user).count,
+      points: AwardedPoint.course_user_points(course, user).reject do |p|
+        exercise = p.submission.exercise
+        exercise.nil? ? false : p.submission.exercise.hide_submission_results?
+      end.count,
       available_points: available_points,
       root: path
     }
