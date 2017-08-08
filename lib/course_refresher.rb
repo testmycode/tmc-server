@@ -169,6 +169,8 @@ class CourseRefresher
         sh!('git', 'remote', 'set-url', 'origin', @course.source_url)
         sh!('git', 'fetch', 'origin')
         sh!('git', 'checkout', 'origin/' + @course.git_branch)
+        sh!('git', 'clean', '-df')
+        sh!('git', 'checkout', '.')
       end
     end
 

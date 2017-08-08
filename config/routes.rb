@@ -44,7 +44,7 @@ TmcServer::Application.routes.draw do
 
       resources :users, only: :show
 
-      resources :organizations, param: :slug, path: 'org', only: [] do
+      resources :organizations, param: :slug, path: 'org', only: [:index] do
         resources :courses, module: :organizations, param: :name, only: :show do
           resources :points, module: :courses, only: :index
           resources :users, module: :courses, only: [] do
@@ -90,7 +90,7 @@ TmcServer::Application.routes.draw do
           resource :unlock, module: :courses, only: [:create]
           resources :reviews, module: :courses, only: [:index, :update]
         end
-        resources :submissions, only: [] do
+        resources :submissions, only: [:show] do
           resources :reviews, module: :submissions, only: [:create]
           get 'download', on: :member
         end
@@ -104,6 +104,10 @@ TmcServer::Application.routes.draw do
         resources :organizations, param: :slug, path: 'org', only: [] do
           resources :courses, module: :organizations, only: :index
         end
+      end
+
+      resources :application, param: :name, only: [] do
+        resources :credentials, module: :application, only: :index
       end
     end
   end

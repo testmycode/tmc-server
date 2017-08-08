@@ -37,6 +37,8 @@ module Api
 
             @exercise = Exercise.find(params[:exercise_id])
             authorize! :read, @exercise
+            @course = @exercise.course
+            authorize! :read, @course
 
             if !params[:submission] || !params[:submission][:file]
               authorization_skip!
@@ -88,7 +90,10 @@ module Api
 
               authorize! :create, @submission
 
-              errormsg = 'Failed to save submission.' unless @submission.save
+              unless @submission.save
+                errormsg = 'Failed to save submission.'
+                errormsg += " Errors: #{@submission.errors.messages.to_s}"
+              end
             end
 
             unless errormsg
@@ -96,7 +101,7 @@ module Api
             end
 
             if !errormsg
-              render json: { submission_url: submission_url(@submission, format: 'json', api_version: ApiVersion::API_VERSION),
+              render json: { submission_url: api_v8_core_submission_url(@submission),
                              paste_url: if @submission.paste_key
                                           paste_url(@submission.paste_key)
                                         else

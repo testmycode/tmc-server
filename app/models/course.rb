@@ -36,11 +36,12 @@ class Course < ActiveRecord::Base
   end
 
   swagger_schema :CoreCourseDetails do
-    key :required, [ :id, :name, :title, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls, :unlockables, :exercises, ]
+    key :required, [ :id, :name, :title, :description, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls, :unlockables, :exercises, ]
 
     property :id, type: :integer, example: 13
     property :name, type: :string, example: "organizationid-coursename"
     property :title, type: :string, example: "coursetitle"
+    property :description, type: :string, example: "description of the course"
     property :details_url, type: :string, example: "http://tmc.mooc.fi/api/v8/core/courses/13"
     property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
     property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
@@ -82,6 +83,7 @@ class Course < ActiveRecord::Base
         :organization_id,
         :disabled_status,
         :title,
+        :descrpition,
         :material_url,
         :course_template_id,
         :hide_submission_results,
@@ -90,11 +92,12 @@ class Course < ActiveRecord::Base
   end
 
   swagger_schema :CourseLinks do
-    key :required, [ :id, :name, :title, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls ]
+    key :required, [ :id, :name, :title, :description, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls ]
 
     property :id, type: :integer, example: 13
     property :name, type: :string, example: "organizationid-coursename"
     property :title, type: :string, example: "coursetitle"
+    property :description, type: :string, example: "description of the course"
     property :details_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13"
     property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
     property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
@@ -112,6 +115,7 @@ class Course < ActiveRecord::Base
         id: self.id,
         name: self.name,
         title: self.title,
+        description: self.description,
         details_url: view_context.api_v8_core_course_url(self),
         unlock_url: view_context.api_v8_core_course_unlock_url(self),
         reviews_url: view_context.api_v8_core_course_reviews_url(self),

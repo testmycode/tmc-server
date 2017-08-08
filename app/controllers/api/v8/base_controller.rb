@@ -8,6 +8,7 @@ module Api
 
       #  before_action :doorkeeper_authorize!
       before_action :authenticate_user!
+      skip_before_action :verify_authenticity_token
 
       rescue_from CanCan::AccessDenied do |e|
         render json: errors_json(e.message), status: :forbidden

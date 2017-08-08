@@ -236,6 +236,7 @@ ActiveRecord::Schema.define(version: 20170502055142) do
     t.text     "contact_information"
     t.string   "email"
     t.text     "website"
+    t.boolean  "pinned",              default: false, null: false
   end
 
   create_table "points_upload_queues", force: :cascade do |t|

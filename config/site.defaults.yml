@@ -110,6 +110,10 @@ pghero_enabled: true
 #   1. A backwards-incompatible change in the server protocol.
 #   2. A minimum version number setting here (if not empty).
 valid_clients:
+  - name: idea_plugin
+    min_version: 0.0.1
+  - name: tmc_cli
+    min_version: 0.0.1
   - name: netbeans_plugin
     min_version: 0.2.22
   - name: tmc.py
