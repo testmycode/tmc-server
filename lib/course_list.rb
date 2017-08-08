@@ -58,6 +58,7 @@ class CourseList
         id: course.id,
         name: course.name,
         title: course.title,
+        description: course.description,
         details_url: @helpers.api_v8_core_course_url(course),
         unlock_url: @helpers.api_v8_core_course_unlock_url(course),
         reviews_url: @helpers.api_v8_core_course_reviews_url(course),
