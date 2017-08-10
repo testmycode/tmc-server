@@ -85,7 +85,8 @@ class AvailablePoint < ActiveRecord::Base
       course_id: exercise.course_id,
       name: name,
       user_id: user.id,
-      submission: submission
+      submission: submission,
+      created_at: submission.created_at
     )
   rescue ActiveRecord::RecordNotUnique
   end
