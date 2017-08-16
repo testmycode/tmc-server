@@ -8,13 +8,14 @@ class AwardedPoint < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :AwardedPoint do
-    key :required, [:id, :course_id, :user_id, :submission_id, :name]
+    key :required, [:id, :course_id, :user_id, :submission_id, :name, :created_at]
 
     property :id, type: :integer, example: 1
     property :course_id, type: :integer, example: 1
     property :user_id, type: :integer, example: 1
     property :submission_id, type: :integer, example: 2
     property :name, type: :string, example: 'point name'
+    property :created_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
   end
 
   def point_as_json
@@ -23,7 +24,8 @@ class AwardedPoint < ActiveRecord::Base
       :course_id,
       :user_id,
       :submission_id,
-      :name
+      :name,
+      :created_at
     ]
   end
 
