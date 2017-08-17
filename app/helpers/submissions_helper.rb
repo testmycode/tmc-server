@@ -57,7 +57,8 @@ module SubmissionsHelper
   end
 
   def format_exception_chain(exception)
-    return '' if exception.nil? || exception.is_a?(Array)
+    return '' if exception.nil?
+    return handle_langs_chain(exception) if exception.is_a?(Array)
     result = ActiveSupport::SafeBuffer.new('')
     result << exception['className'] << ': ' << exception['message'] << tag(:br)
     exception['stackTrace'].each do |line|
@@ -65,6 +66,15 @@ module SubmissionsHelper
       result << tag(:br)
     end
     result << 'Caused by: ' << format_exception_chain(exception['cause']) if exception['cause']
+    result
+  end
+
+  def handle_langs_chain(exception)
+    result = ActiveSupport::SafeBuffer.new('')
+    exception.each do |line|
+      result << line
+      result << tag(:br)
+    end
     result
   end
 

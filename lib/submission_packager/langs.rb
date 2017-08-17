@@ -33,4 +33,3 @@ class SubmissionPackager
     end
   end
 end
-
