@@ -96,7 +96,7 @@ module SandboxResultsSaver
       when 'TESTS_FAILED', 'PASSED'
         output = test_output['testResults'].map do |result|
           result['className'], result['methodName'] = result['name'].split(/\s/)
-          result['message'] = result['errorMessage']
+          result['message'] = result['errorMessage'] if result['errorMessage']
           result['backtrace'] = result['backtrace'].join("\n") if result.has_key? 'backtrace'
           result['pointNames'] = result['points'] if result.has_key? 'points'
           result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
