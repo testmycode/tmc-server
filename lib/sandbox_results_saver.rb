@@ -99,7 +99,7 @@ module SandboxResultsSaver
           result['message'] = result['errorMessage'] if result['errorMessage']
           result['backtrace'] = result['backtrace'].join("\n") if result.has_key? 'backtrace'
           result['pointNames'] = result['points'] if result.has_key? 'points'
-          result['status'] = result['passed'] ? 'PASSED' : 'FAILED'
+          result['status'] = (result['passed'] || result['successful']) ? 'PASSED' : 'FAILED'
           result
         end
         results['old_test_output'] = results['test_output']
