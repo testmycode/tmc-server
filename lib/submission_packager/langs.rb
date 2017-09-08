@@ -14,7 +14,10 @@ class SubmissionPackager
 
       config = TmcLangs.get.get_exercise_config(exercise.clone_path)
       config['studentFilePaths'].each { |folder| FileUtils.cp_r(received + folder, dest + folder) }
-      config['exerciseFilePaths'].each { |folder| FileUtils.cp_r(tests + folder, dest + folder) }
+      config['exerciseFilePaths'].each do |folder|
+        src = tests + folder
+        FileUtils.cp_r(src, dest + folder) if FileTest.exist?(src)
+      end
 
       copy_files_in_dir_no_recursion(cloned, dest)
 
