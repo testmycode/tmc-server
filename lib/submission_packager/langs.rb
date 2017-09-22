@@ -13,7 +13,10 @@ class SubmissionPackager
       copy_libs(cloned, dest)
 
       config = TmcLangs.get.get_exercise_config(exercise.clone_path)
-      config['studentFilePaths'].each { |folder| FileUtils.cp_r(received + folder, dest + folder) }
+      config['studentFilePaths'].each do |folder|
+        src = received + folder
+        FileUtils.cp_r(src, dest + folder) if FileTest.exist?(src)
+      end
       config['exerciseFilePaths'].each do |folder|
         src = tests + folder
         FileUtils.cp_r(src, dest + folder) if FileTest.exist?(src)
