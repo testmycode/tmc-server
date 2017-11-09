@@ -1,4 +1,3 @@
-
 <h1>List of participants</h1>
 
 <%= form_tag(participants_path, :method => :get) do %>
@@ -11,7 +10,7 @@
   </div>
 
   <div style="clear: both; margin-bottom: 3em;">
-    <%= submit_tag 'Apply filter' %>
+    <%= submit_tag 'Apply filter', class: 'btn' %>
   </div>
 <% end %>
 
@@ -20,7 +19,6 @@
 <table class="participants">
   <thead>
     <tr>
-
       <% for field_name in @ordinary_fields %>
         <% if @visible_columns.include?(field_name) %>
           <th><%= field_name.humanize %></th>

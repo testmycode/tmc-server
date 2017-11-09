@@ -3,23 +3,23 @@
 
   <section>
     <h2>User account</h2>
-    <%= bs_labeled_field('Username (public)', f.text_field(:login, :disabled => !@user.new_record?)) %>
-    <%= bs_labeled_field('E-mail:', f.text_field(:email)) %>
-    <%= bs_labeled_field('Confirm e-mail:', f.text_field(:email_repeat, :value => '')) %>
+    <%= bs_labeled_field('Username (public)', f.text_field(:login, :disabled => !@user.new_record?, class: 'form-control')) %>
+    <%= bs_labeled_field('E-mail:', f.text_field(:email, class: 'form-control')) %>
+    <%= bs_labeled_field('Confirm e-mail:', f.text_field(:email_repeat, :value => '', class: 'form-control')) %>
   </section>
 
   <% if @user.new_record? %>
     <section>
       <h2>Password</h2>
-      <%= bs_labeled_field('Password:', f.password_field(:password, :value => '', :autocomplete => 'off')) %>
-      <%= bs_labeled_field('Confirm password:', f.password_field(:password_repeat, :value => '', :autocomplete => 'off')) %>
+      <%= bs_labeled_field('Password:', f.password_field(:password, :value => '', :autocomplete => 'off', class: 'form-control')) %>
+      <%= bs_labeled_field('Confirm password:', f.password_field(:password_repeat, :value => '', :autocomplete => 'off', class: 'form-control')) %>
     </section>
   <% else %>
     <section>
       <h2>Change password</h2>
-      <%= bs_labeled_field('Old password:', f.password_field(:old_password, :value => '')) %>
-      <%= bs_labeled_field('New password:', f.password_field(:password, :value => '')) %>
-      <%= bs_labeled_field('Confirm new password:', f.password_field(:password_repeat, :value => '')) %>
+      <%= bs_labeled_field('Old password:', f.password_field(:old_password, :value => '', class: 'form-control')) %>
+      <%= bs_labeled_field('New password:', f.password_field(:password, :value => '', class: 'form-control')) %>
+      <%= bs_labeled_field('Confirm new password:', f.password_field(:password_repeat, :value => '', class: 'form-control')) %>
     </section>
   <% end %>
 

@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <% title_extras = '<span class="small"><br>' + raw(SiteSetting.value(:site_subtitle)) + '</span>' unless SiteSetting.value(:site_subtitle).blank? %>
+  <% title = 'TestMyCode' %>
+  <% title += raw(title_extras) unless title_extras.blank? %>
+  <%= link_to raw(title), root_path, class: 'navbar-brand' %>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse my-2" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      <% if signed_in? %>
+        <% if current_user.administrator? %>
+          <li class="nav-item"><%= navigation_link 'Course templates', course_templates_path %></li>
+        <% end %>
+      <% end %>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <% if signed_in? %>
+        <li class="nav-item mr-3">
+          <%= navigation_link fa_icon("user lg", text: current_user.login), participant_path(current_user) %>
+        </li>
+        <li class="nav-item"><%= link_to 'Sign out', signout_path, method: :delete, id: 'logout-link', class: 'btn btn-danger' %></li>
+      <% else %>
+        <li class="nav-item"><%= link_to 'Log in', login_path, class: 'btn btn-info' %></li>
+      <% end %>
+    </ul>
+  </div>
+</nav>

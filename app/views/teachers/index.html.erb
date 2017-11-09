@@ -7,9 +7,11 @@
 
 <%= render 'form' %>
 
+<br>
+
 <h4>Current teachers</h4>
 
-<table class="table table-striped table-condensed">
+<table class="table table-striped table">
   <thead>
   <tr>
     <th>Name</th>
@@ -21,7 +23,7 @@
   <% @teachers.each do |teacher| %>
     <tr>
       <td><%= teacher.username %></td>
-      <td><%= link_to 'Remove', organization_teacher_path(@organization, teacher.teachership(@organization)), method: :delete, class: "btn btn-mini btn-warning", data: { confirm: 'Are you sure?' } %></td>
+      <td><%= link_to 'Remove', organization_teacher_path(@organization, teacher.teachership(@organization)), method: :delete, class: "btn btn-sm btn-danger", data: { confirm: 'Are you sure?' } %></td>
     </tr>
   <% end %>
   </tbody>

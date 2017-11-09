@@ -1,21 +1,19 @@
 <% if @breadcrumbs.present? %>
-  <ul class="breadcrumb">
-    <% separator = '/' %>
-    <% @breadcrumbs[0..-2].each do |crumb| %>
-      <li>
-        <%= link_to crumb[:name], crumb[:url], crumb[:options] %>
-        <span class="divider"><%= separator %></span>
-      </li>
-    <% end %>
-    <li class="active">
-      <%= @breadcrumbs.last[:name] %>
-    </li>
+  <nav aria-label="breadcrumb" role="navigation" class="breadcumb-nav">
+    <ol class="breadcrumb">
+      <% separator = '/' %>
+      <% @breadcrumbs[0..-2].each do |crumb| %>
+        <li class="breadcrumb-item"><%= link_to crumb[:name], crumb[:url], crumb[:options] %></li>
+      <% end %>
+      <li class="breadcrumb-item active"><%= @breadcrumbs.last[:name] %></li>
+
+    </ol>
     <% if current_user.administrator? %>
-      <li class="pull-right">[Role: Admin]</li>
+      <span>[Role: Admin]</span>
     <% elsif (defined? @organization) && can?(:teach, @organization) %>
-      <li class="pull-right">[Role: Teacher]</li>
+      <span>[Role: Teacher]</span>
     <% elsif (defined? @course) && can?(:teach, @course) %>
-      <li class="pull-right">[Role: Course-assistant]</li>
+      <span>[Role: Course-assistant]</span>
     <% end %>
-  </ul>
+  </nav>
 <% end %>

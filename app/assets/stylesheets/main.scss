@@ -324,7 +324,7 @@ table.points > * > tr > td {
 
 /* Bootstrap adjustments */
 
-#everything .accordion-group {
+#everything .panelpanel .panel-default {
   border: none;
 }
 
@@ -404,13 +404,6 @@ tr>.align-right {
     background-color: #dff0d8;
 }
 
-/* Login */
-.navbar .login-form {
-  float: right;
-  margin-bottom: 0;
-}
-
-.navbar .login-form input {
-  margin-bottom: 0;
-  margin-top: 5px;
+.navbar {
+  margin-bottom: 1rem;
 }

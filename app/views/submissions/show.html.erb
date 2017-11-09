@@ -27,8 +27,8 @@
   <li class="active"><a href="#files">Files</a></li>
 </ul>
 
-<div class="row-fluid">
-  <div class="span12">
+<div class="row">
+  <div class="col-md-12">
     <div class="tab-content">
       <% if @submission.feedback_answers.any? %>
         <div class="tab-pane" id="feedback">
@@ -68,8 +68,8 @@
       <% end %>
 
       <div class="tab-pane active" id="files">
-        <div class="row-fluid">
-          <div class="span11">
+        <div class="row">
+          <div class="col-md-11">
             <%= render :partial => 'files/files', :locals => {:files => @files} %>
           </div>
         </div>

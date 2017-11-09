@@ -18,7 +18,7 @@
           <%= link_to 'Down', feedback_question_position_path(question, direction: 'forward'), method: 'put' %>
         </td>
         <td>
-          <%= link_to 'Delete', feedback_question_path(question), method: :delete, class: 'btn btn-mini btn-danger', data: { confirm: 'Really delete question and all its answers?' } %>
+          <%= link_to 'Delete', feedback_question_path(question), method: :delete, class: 'btn btn-sm btn-danger', data: { confirm: 'Really delete question and all its answers?' } %>
         </td>
       </tr>
     <% end %>

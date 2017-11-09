@@ -1,5 +1,5 @@
-<div class="row-fluid">
-  <div class="span11">
+<div class="row">
+  <div class="col-md-11">
     <% if @submission.tests_ran? %>
       <% unless @submission.valgrind.blank?%>
         <p>Errors in Valgrind check. See <a href="#valgrind">Valgrind log</a>.</p>
@@ -84,7 +84,7 @@
   $(document).ready(function() {
     var createButtonTo = function() {
       var trace = this;
-      var button = $('<button class="btn btn-small btn-primary" style="float:right;">' + buttonText + "</button>")[0];
+      var button = $('<button class="btn btn-sm btn-primary" style="float:right;">' + buttonText + "</button>")[0];
       $(trace).before(button);
       $(trace).hide();
       $(button).click(function() {

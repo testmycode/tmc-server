@@ -5,6 +5,13 @@ module ApplicationHelper
     Tailoring.get
   end
 
+  def navigation_link(name, path, options = {})
+    class_name = options[:class] || ''
+    class_addition = request.path.start_with?(path) ? 'nav-link active' : 'nav-link'
+    options[:class] = "#{class_name} #{class_addition}"
+    link_to name, path, options
+  end
+
   def labeled(label, tags = nil, options = {}, &block)
     if tags.is_a?(Hash) && options.empty?
       options = tags
@@ -55,14 +62,15 @@ module ApplicationHelper
     type = options[:type] || :text
 
     label += ' *' if options[:required]
+    str = ''
     case type
     when :boolean
       str = '<label class="checkbox">'
       str << "  #{field}#{label}"
       str << '</label>'
     else
-      str = label_tag label, nil, class: 'control-label'
-      str += raw("<div class=\"controls\">" + raw(field) + '</div>')
+      label = label_tag label, nil, class: 'control-label'
+      str += raw("<div class=\"form-group\">" + raw(label) + raw(field) + '</div>')
     end
     raw(str)
   end

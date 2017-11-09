@@ -3,10 +3,11 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
-//= require jquery.dataTables.min
+//= require datatables.min
 //= require jquery.cookie
 //= require jquery.datetimepicker
-//= require bootstrap.min
+//= require popper
+//= require bootstrap
 //= require misc
 //= require naturalSort
 //= require comet_connection

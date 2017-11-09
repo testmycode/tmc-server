@@ -78,9 +78,5 @@
 <br>
 
 <% if current_user.administrator? %>
-    <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
-<% end %>
-
-<% if current_user.administrator? %>
-  <%= link_to 'Manage course templates', course_templates_path, class: "btn btn-mini btn-default" %>
+    <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-primary" %>
 <% end %>

@@ -1,5 +1,5 @@
-<div class="row-fluid">
-  <div class="span12">
+<div class="row">
+  <div class="col-md-12">
     <h1><%= @course.title %></h1>
 
     <div>
@@ -46,22 +46,22 @@
           <% if can?(:list_user_emails, @course) || can?(:send_mail_to_participants, @course) %>
             <li>
               <% if can?(:list_user_emails, @course) %>
-                <%= link_to 'View student emails', organization_emails_path, class: 'btn btn-mini' %>
+                <%= link_to 'View student emails', organization_emails_path, class: 'btn btn-sm' %>
               <% end %>
               <% if can? :send_mail_to_participants, @course %>
-                <%= link_to 'Send message to every participant', new_organization_course_course_notifications_path(@organization, @course), class: 'btn btn-mini' %>
+                <%= link_to 'Send message to every participant', new_organization_course_course_notifications_path(@organization, @course), class: 'btn btn-sm' %>
               <% end %>
             </li>
           <% end %>
 
           <% # Feedback questions %>
           <li>
-            <%= link_to 'View feedback', organization_course_feedback_answers_path(@organization, @course), class: 'btn btn-mini' %>
-            <%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course), class: 'btn btn-mini' %>
+            <%= link_to 'View feedback', organization_course_feedback_answers_path(@organization, @course), class: 'btn btn-sm' %>
+            <%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course), class: 'btn btn-sm' %>
           </li>
 
           <% if can? :view_code_reviews, @course %>
-            <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course), class: 'btn btn-mini' %></li>
+            <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course), class: 'btn btn-sm' %></li>
             <%
               reviews_required = @course.reviews_required.count
               reviews_requested = @course.reviews_requested.count
@@ -81,43 +81,43 @@
           <% # Course timing, deadlines, unlocks %>
           <% if can? :manage_deadlines, @course %>
             <li>
-              <%= link_to 'Manage basic timing', setup_organization_course_course_timing_path(@organization, @course), class: "btn tvn-default btn-mini" %>
-              <%= link_to 'Advanced deadlines management', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-mini" %>
-              <%= link_to 'Advanced unlock conditions management', manage_unlocks_organization_course_path, class: "btn btn-default btn-mini" %>
+              <%= link_to 'Manage basic timing', setup_organization_course_course_timing_path(@organization, @course), class: "btn tvn-default btn-sm" %>
+              <%= link_to 'Advanced deadlines management', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-sm" %>
+              <%= link_to 'Advanced unlock conditions management', manage_unlocks_organization_course_path, class: "btn btn-default btn-sm" %>
             </li>
           <% end %>
 
           <li>
             <% if can? :edit, @course %>
-              <%= link_to 'Edit course details', edit_setup_organization_course_course_details_path(@organization, @course), class: "btn btn-default btn-mini" %>
+              <%= link_to 'Edit course details', edit_setup_organization_course_course_details_path(@organization, @course), class: "btn btn-default btn-sm" %>
             <% end %>
             <% if can? :manage_exercises, @course %>
-              <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-default btn-mini" %>
+              <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-default btn-sm" %>
             <% end %>
             <% if can? :teach, @organization %>
-              <%= link_to 'Manage assistants', setup_organization_course_course_assistants_path(@organization, @course), class: "btn btn-default btn-mini" %>
+              <%= link_to 'Manage assistants', setup_organization_course_course_assistants_path(@organization, @course), class: "btn btn-default btn-sm" %>
             <% end %>
           </li>
 
           <li>
           <% if can? :toggle_submission_result_visibility, @course %>
             <% if @course.hide_submission_results? %>
-              <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-mini" %>
+              <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-sm" %>
             <% else %>
-              <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-mini" %>
+              <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-sm" %>
             <% end %>
           <% end %>
           <% if can? :refresh, @course %>
-            <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-mini" %>
+            <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-sm" %>
           <% end %>
           <% if @course.disabled? %>
             <%=
               link_to 'Enable Course', enable_organization_course_path(@organization, @course), method: :post,
-                      class: "btn btn-info btn-mini" %>
+                      class: "btn btn-info btn-sm" %>
           <% else %>
             <%=
               link_to 'Disable Course', disable_organization_course_path(@organization, @course), method: :post,
-                      class: "btn btn-danger btn-mini", data: { confirm: "Are you sure you want to disable the course?" } %>
+                      class: "btn btn-danger btn-sm", data: { confirm: "Are you sure you want to disable the course?" } %>
           <% end %>
           </li>
 

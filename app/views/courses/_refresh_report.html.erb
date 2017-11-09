@@ -5,7 +5,7 @@
   <% if report.successful? %>
     <p class="success">Refresh successful.</p>
   <% else %>
-    <div class="alert alert-error">
+    <div class="alert alert-danger">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>Refresh failed and rolled back.</h4>
     </div>
@@ -13,7 +13,7 @@
 
   <ul>
     <% if report.errors.any? %>
-      <div class="alert alert-error alert-block">
+      <div class="alert alert-danger alert-block">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <% for error in report.errors %>
           <li><%= simple_format error %></li>

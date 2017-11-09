@@ -12,15 +12,15 @@
 <% running_idx = 0 %>
 <div class="solution-files">
   <% for file in files %>
-    <div class="accordion-group">
-      <div class="accordion-heading">
+    <div class="panel panel-default">
+      <div class="panel-heading">
         <h2>
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#<%= running_idx += 1 %>">
+          <a class="panel-group-toggle" data-toggle="collapse" data-parent="#panel-group2" href="#<%= running_idx += 1 %>">
           <%= file.path %></a>
         </h2>
       </div>
-      <div id="<%= running_idx %>" class="accordion-body collapse in">
-        <div class="accordion-inner">
+      <div id="<%= running_idx %>" class="panel-collapse collapse in">
+        <div class="panel-body">
           <% if !just_one_html_prelude && file.html_prelude %>
             <%= raw(file.html_prelude) %>
           <% end %>
@@ -36,7 +36,7 @@
             else File.extname(file.path)[1..-1]
             end
           %>
-          <div class="span12 no-scroll">
+          <div class="col-md-12 no-scroll">
             <pre class="brush: <%= brush %>"><%= force_utf8_violently(file.contents) %></pre>
           </div>
         </div>

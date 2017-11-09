@@ -21,7 +21,7 @@
       "id='" + input_id + "' /> " +
       "<a href='javascript:void(0);'" +
       "onclick='remove_condition(this)'" +
-      "class='btn btn-mini btn-default remove-condition-button'>remove</a><br/>"
+      "class='btn btn-sm btn-default remove-condition-button'>remove</a><br/>"
     );
 
     unlock_condition_counts[group_param]++;
@@ -30,7 +30,7 @@
 
 <h1>Edit unlock conditions</h1>
 <%= form_tag save_unlocks_organization_course_path, method: :post do %>
-  <table class="exercise-list table table-hover table-condensed">
+  <table class="exercise-list table table-hover">
     <thead>
     <tr>
       <th>Exercise group</th>
@@ -72,13 +72,13 @@
             <% group_unlock_conditions.each_with_index do |condition, i| %>
               <%= text_field_tag "#{param_array}[#{i}]", condition %>
               <a href='javascript:void(0);' onclick='remove_condition(this)'
-                 class='btn btn-mini btn-default remove-condition-button'>remove</a><br/>
+                 class='btn btn-sm btn-default remove-condition-button'>remove</a><br/>
             <% end %>
           </div>
           <a id="add-condition-<%= group.name %>"
              href="javascript:void(0);"
              onclick="add_unlock_condition('#unlock-conditions-<%= group.name %>', '<%= param_array %>')"
-             class="add-condition-button btn btn-mini btn-default">Add a condition</a>
+             class="add-condition-button btn btn-sm btn-default">Add a condition</a>
         </td>
       </tr>
     <% end %>

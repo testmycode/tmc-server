@@ -47,32 +47,32 @@
           Visible
         <% end %>
         <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
-                    method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger' }", data: { confirm: "Are you sure?" } %>
+                    method: :post, class: "btn btn-sm #{@organization.hidden ? 'btn-info' : 'btn-danger' }", data: { confirm: "Are you sure?" } %>
       </li>
     <% end %>
 
     <% if can? :view_statistics, @organization %>
       <li>
-        <%= link_to 'Show statistics', organization_stats_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'Show statistics', organization_stats_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
 
 
     <% if can? :edit, @organization %>
       <li>
-        <%= link_to 'Edit organization info', edit_setup_organization_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'Edit organization info', edit_setup_organization_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
 
     <% if can? :view_participant_list, @organization%>
       <li>
-        <%= link_to 'List of registered users', organization_participants_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'List of registered users', organization_participants_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
 
     <% if can? :teach, @organization %>
       <li>
-        <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
     </ul>
