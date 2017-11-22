@@ -5,12 +5,12 @@ module Api
         class CoursesController < Api::V8::BaseController
           include Swagger::Blocks
 
-          swagger_path '/api/v8/core/org/{organization_id}/courses' do
+          swagger_path '/api/v8/core/org/{organization_slug}/courses' do
             operation :get do
               key :description, "Returns an array containing each course's collection of links"
               key :produces, ['application/json']
               key :tags, ['core']
-              parameter '$ref': '#/parameters/path_organization_id'
+              parameter '$ref': '#/parameters/path_organization_slug'
               response 403, '$ref': '#/responses/error'
               response 404, '$ref': '#/responses/error'
               response 200 do

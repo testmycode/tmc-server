@@ -32,10 +32,10 @@ module Api
           key :api_key, []
         end
 
-        parameter :path_organization_id do
-          key :name, :organization_id
+        parameter :path_organization_slug do
+          key :name, :organization_slug
           key :in, :path
-          key :description, "Organization's id"
+          key :description, "Organization's slug"
           key :required, true
           key :type, :string
         end

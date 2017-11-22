@@ -4,12 +4,12 @@ module Api
       class CoursesController < Api::V8::BaseController
         include Swagger::Blocks
 
-        swagger_path '/api/v8/org/{organization_id}/courses/{course_name}' do
+        swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}' do
           operation :get do
-            key :description, "Returns the course's information in a json format. Course is searched by organization id and course name"
+            key :description, "Returns the course's information in a json format. Course is searched by organization slug and course name"
             key :produces, ['application/json']
             key :tags, ['course']
-            parameter '$ref': '#/parameters/path_organization_id'
+            parameter '$ref': '#/parameters/path_organization_slug'
             parameter '$ref': '#/parameters/path_course_name'
             response 403, '$ref': '#/responses/error'
             response 404, '$ref': '#/responses/error'

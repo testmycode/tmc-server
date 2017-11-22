@@ -5,13 +5,13 @@ module Api
         class ExercisesController < Api::V8::BaseController
           include Swagger::Blocks
 
-          swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises' do
+          swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/exercises' do
             operation :get do
               key :description, 'Returns all exercises of the course as json. Course is searched by name'
               key :operationId, 'findExercisesByName'
               key :produces, ['application/json']
               key :tags, ['exercise']
-              parameter '$ref': '#/parameters/path_organization_id'
+              parameter '$ref': '#/parameters/path_organization_slug'
               parameter '$ref': '#/parameters/path_course_name'
               response 200 do
                 key :description, 'Exercises in json'
@@ -31,13 +31,13 @@ module Api
             end
           end
 
-          swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/download' do
+          swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/exercises/{exercise_name}/download' do
             operation :get do
               key :description, 'Download the exercise as a zip file'
               key :operationId, 'downloadExercise'
               key :produces, ['application/zip']
               key :tags, ['exercise']
-              parameter '$ref': '#/parameters/path_organization_id'
+              parameter '$ref': '#/parameters/path_organization_slug'
               parameter '$ref': '#/parameters/path_course_name'
               parameter '$ref': '#/parameters/path_exercise_name'
               response 200 do
