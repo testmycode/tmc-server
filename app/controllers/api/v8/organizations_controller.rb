@@ -50,7 +50,7 @@ module Api
       end
 
       def show
-        org = Organization.find_by!(slug: "#{params[:slug]}")
+        org = Organization.find_by!(slug: params[:slug])
         authorize! :read, org
         present org.org_as_json
       end

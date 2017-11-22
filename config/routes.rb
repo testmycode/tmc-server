@@ -44,7 +44,7 @@ TmcServer::Application.routes.draw do
 
       resources :users, only: :show
 
-      resources :organizations, param: :slug, path: 'org', only: [:index, :show] do
+      resources :organizations, param: :slug, path: 'org', only: %i{index show} do
         resources :courses, module: :organizations, param: :name, only: :show do
           resources :points, module: :courses, only: :index
           resources :users, module: :courses, only: [] do

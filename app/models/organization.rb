@@ -56,13 +56,7 @@ class Organization < ActiveRecord::Base
   end
 
   def org_as_json
-    as_json only: [
-        :name,
-        :information,
-        :slug,
-        :logo_path,
-        :pinned,
-    ]
+    as_json only: %i{name information slug logo_path pinned}
   end
 
   def teacher?(user)
