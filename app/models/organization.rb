@@ -2,7 +2,7 @@
 
 class Organization < ActiveRecord::Base
   include Swagger::Blocks
-  
+
   swagger_schema :Organization do
     key :required, [:name, :information, :slug, :logo_path, :pinned]
 
@@ -53,6 +53,16 @@ class Organization < ActiveRecord::Base
       teachership.destroy
     end
     organization
+  end
+
+  def org_as_json
+    as_json only: [
+        :name,
+        :information,
+        :slug,
+        :logo_path,
+        :pinned,
+    ]
   end
 
   def teacher?(user)
