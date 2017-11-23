@@ -6,12 +6,12 @@ module Api
           class PointsController < Api::V8::BaseController
             include Swagger::Blocks
 
-            swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/users/{user_id}/points' do
+            swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/users/{user_id}/points' do
               operation :get do
                 key :description, "Returns the given user's points from the course in a json format. Course is searched by name"
                 key :produces, ['application/json']
                 key :tags, ['point']
-                parameter '$ref': '#/parameters/path_organization_id'
+                parameter '$ref': '#/parameters/path_organization_slug'
                 parameter '$ref': '#/parameters/path_course_name'
                 parameter '$ref': '#/parameters/path_user_id'
                 response 403, '$ref': '#/responses/error'
@@ -28,12 +28,12 @@ module Api
               end
             end
 
-            swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/users/current/points' do
+            swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/users/current/points' do
               operation :get do
                 key :description, "Returns the current user's points from the course in a json format. Course is searched by name"
                 key :produces, ['application/json']
                 key :tags, ['point']
-                parameter '$ref': '#/parameters/path_organization_id'
+                parameter '$ref': '#/parameters/path_organization_slug'
                 parameter '$ref': '#/parameters/path_course_name'
                 response 403, '$ref': '#/responses/error'
                 response 404, '$ref': '#/responses/error'

@@ -6,7 +6,7 @@ module Api
           class SubmissionsController < Api::V8::BaseController
             include Swagger::Blocks
 
-            swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/users/{user_id}/submissions' do
+            swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/users/{user_id}/submissions' do
               operation :get do
                 key :description, 'Returns the submissions visible to the user in a json format'
                 key :operationId, 'findUsersSubmissionsByCourseName'
@@ -16,7 +16,7 @@ module Api
                 key :tags, [
                   'submission'
                 ]
-                parameter '$ref': '#/parameters/path_organization_id'
+                parameter '$ref': '#/parameters/path_organization_slug'
                 parameter '$ref': '#/parameters/path_course_name'
                 parameter '$ref': '#/parameters/path_user_id'
                 response 403, '$ref': '#/responses/error'
@@ -37,7 +37,7 @@ module Api
               end
             end
 
-            swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/users/current/submissions' do
+            swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/users/current/submissions' do
               operation :get do
                 key :description, 'Returns the user\'s own submissions in a json format'
                 key :operationId, 'findUsersOwnSubmissionsByCourseName'
@@ -47,7 +47,7 @@ module Api
                 key :tags, [
                   'submission'
                 ]
-                parameter '$ref': '#/parameters/path_organization_id'
+                parameter '$ref': '#/parameters/path_organization_slug'
                 parameter '$ref': '#/parameters/path_course_name'
                 response 403, '$ref': '#/responses/error'
                 response 404, '$ref': '#/responses/error'

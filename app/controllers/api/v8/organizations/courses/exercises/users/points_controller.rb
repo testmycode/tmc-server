@@ -7,13 +7,13 @@ module Api
             class PointsController < Api::V8::BaseController
               include Swagger::Blocks
 
-              swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/users/current/points' do
+              swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/exercises/{exercise_name}/users/current/points' do
                 operation :get do
                   key :description, 'Returns all the awarded points of an excercise for current user'
                   key :operationId, 'findCurrentUsersAwardedPointsByCourseNameAndExerciseName'
                   key :produces, ['application/json']
                   key :tags, ['point']
-                  parameter '$ref': '#/parameters/path_organization_id'
+                  parameter '$ref': '#/parameters/path_organization_slug'
                   parameter '$ref': '#/parameters/path_course_name'
                   parameter '$ref': '#/parameters/path_exercise_name'
                   response 200 do
@@ -34,13 +34,13 @@ module Api
                 end
               end
 
-              swagger_path '/api/v8/org/{organization_id}/courses/{course_name}/exercises/{exercise_name}/users/{user_id}/points' do
+              swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/exercises/{exercise_name}/users/{user_id}/points' do
                 operation :get do
                   key :description, 'Returns all the awarded points of an excercise for the specified user'
                   key :operationId, 'findUsersAwardedPointsByCourseNameAndExerciseName'
                   key :produces, ['application/json']
                   key :tags, ['point']
-                  parameter '$ref': '#/parameters/path_organization_id'
+                  parameter '$ref': '#/parameters/path_organization_slug'
                   parameter '$ref': '#/parameters/path_course_name'
                   parameter '$ref': '#/parameters/path_exercise_name'
                   parameter '$ref': '#/parameters/path_user_id'
