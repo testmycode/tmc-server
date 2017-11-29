@@ -92,7 +92,11 @@ module SandboxResultsSaver
       when 'COMPILE_FAILED', 'GENERIC_ERROR'
         results['status'] = 'failed'
         results['exit_code'] = '101'
-        results['test_output'] = test_output['logs'].map {|k,v|  "#{k}: #{v}"}.join("\n")
+        results['test_output'] = test_output['logs'].map do |k,v|
+          value = v
+          value = value.pack('c*').force_encoding('utf-8') if value.is_a?(Array)
+          "#{k}: #{value}"
+        end.join("\n")
       when 'TESTS_FAILED', 'PASSED'
         output = test_output['testResults'].map do |result|
           result['className'], result['methodName'] = result['name'].split(/\s/)
