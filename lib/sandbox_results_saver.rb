@@ -89,7 +89,7 @@ module SandboxResultsSaver
 
       end
       case test_output['status']
-      when 'COMPILE_FAILED'
+      when 'COMPILE_FAILED', 'GENERIC_ERROR'
         results['status'] = 'failed'
         results['exit_code'] = '101'
         results['test_output'] = test_output['logs'].map {|k,v|  "#{k}: #{v}"}.join("\n")
