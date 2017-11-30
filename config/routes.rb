@@ -80,6 +80,11 @@ TmcServer::Application.routes.draw do
         end
 
         resources :submissions, module: :courses, only: :index
+
+        namespace :submissions, module: :courses do
+          resources :last_hour, module: :submissions, only: :index
+        end
+
         resources :users, module: :courses, only: [] do
           resources :submissions, module: :users, only: :index
         end
