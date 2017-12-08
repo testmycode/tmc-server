@@ -14,8 +14,8 @@
   </p>
 
   <%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
-    <%= submit_tag('Publish now') %>
-    <%= submit_tag('Finish and publish later') %>
+    <%= submit_tag('Publish now', class: 'btn btn-primary') %>
+    <%= submit_tag('Finish and publish later', class: 'btn btn-primary') %>
   <% end %>
 <% else %>
   <p>
@@ -30,6 +30,6 @@
     The course will be on disabled status, so you have to later manually publish it, when you want students to have access on it.
   </p>
   <%= form_tag(setup_organization_course_course_finisher_index_path, method: 'post') do %>
-    <%= submit_tag('Finish') %>
+    <%= submit_tag('Finish', class: 'btn btn-primary') %>
   <% end %>
 <% end %>

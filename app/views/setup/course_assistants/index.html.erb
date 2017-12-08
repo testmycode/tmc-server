@@ -21,15 +21,15 @@
 
     <div class="field">
       <%= label_tag :username, "Enter assistant's username:" %>
-      <%= text_field_tag :username %>
+      <%= text_field_tag :username, class: 'form-control' %>
     </div>
     <div class="actions">
-      <%= submit_tag 'Add new assistant', class: 'btn' %>
+      <%= submit_tag 'Add new assistant', class: 'btn btn-secondary' %>
       <br><br>
       <% if @setup_in_progress %>
         <%= submit_tag 'Continue', class: 'btn btn-primary' %>
       <% else %>
-        <%= submit_tag 'Back to course main page', class: 'btn' %>
+        <%= submit_tag 'Back to course main page', class: 'btn btn-secondary' %>
       <% end %>
     </div>
 <% end %>
