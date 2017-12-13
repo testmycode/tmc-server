@@ -135,7 +135,8 @@ class SourceFileList
       name.end_with?('.h') ||
       name.end_with?('.rb') ||
       (dir.include?('/src') && name.end_with?('.py')) ||
-      dir.include?('/WEB-INF')
+      dir.include?('/WEB-INF') ||
+      name.end_with?('.R')
   end
 
   def self.should_skip_dir?(file)
