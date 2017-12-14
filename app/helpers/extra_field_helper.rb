@@ -17,7 +17,7 @@ module ExtraFieldHelper
     field_tag =
       case field.field_type
       when :text
-        text_field_tag(field_name, existing_value, common_attrs)
+        text_field_tag(field_name, existing_value, { class: 'form-control' }.merge(common_attrs))
       when :boolean
         check_box_tag(field_name, '1', !existing_value.blank?, common_attrs)
       else
@@ -43,7 +43,7 @@ module ExtraFieldHelper
     field_tag =
       case field.field_type
       when :text
-        text_field_tag(field_name, value)
+        text_field_tag(field_name, value, class: 'form-control')
       when :boolean
         check_box_tag(field_name, '1', !value.blank?)
       else
