@@ -19,26 +19,23 @@
   </div>
 <% end %>
 
-<% unless @my_organizations.empty? %>
-  <h2>My organizations</h2>
+<h2>Common Organizations</h2>
 
-  <table id="my-organizations-table" class="table">
-    <thead>
-    <tr>
-      <th>Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% @my_organizations.each do |organization| %>
-      <tr>
-        <td>
-          <%= link_to organization.name, organization_path(organization) %>
-          <% if !organization.verified? %> (unverified)<% end %>
-        </td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
+<% @pinned_organizations.each do |organization| %>
+  <% next if organization.hidden? && !can?(:view_hidden_organizations, nil) %>
+
+  <%= link_to organization do%>
+    <div class="card organization-card <%= organization.hidden? ? 'border-secondary' : 'border-dark' %>">
+      <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
+      <%= image_tag organization.logo.url(:small_logo) if organization.logo? %>
+        <div>
+          <h4 class="card-title"><%= organization.name %></h4>
+          <%= organization.information %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <br>
 <% end %>
 
 <% if @my_organizations.empty? %>

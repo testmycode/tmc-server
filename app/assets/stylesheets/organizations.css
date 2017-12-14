@@ -1,0 +1,15 @@
+.organization-card {
+  color: black;
+}
+
+.organization-card:hover {
+  text-decoration: none;
+}
+
+.organization-card .card-body {
+  display: flex;
+}
+
+.organization-card .card-body img {
+  margin-right: 1rem;
+}
