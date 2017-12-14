@@ -12,27 +12,28 @@
           <a class="panel-group-toggle" data-toggle="collapse" data-parent="#panel-group2" href="#<%= running_idx += 1 %>">
           <%= file.path %></a>
         </h2>
-      <div id="<%= running_idx %>" class="panel-collapse collapse show">
-        <div>
-          <% if !just_one_html_prelude && file.html_prelude %>
-            <%= raw(file.html_prelude) %>
-          <% end %>
-          <%
-            brush = case File.extname(file.path)
-            when '.txt' then 'plain'
-            when '.jsp' then 'html'
-            when '.less' then 'css'
-            when '.sass' then 'css'
-            when '.hpp' then 'h'
-            when '.properties' then 'plain'
-            when '.py' then 'python'
-            when '.R' then 'r'
-            when '' then 'markup'
-            else File.extname(file.path)[1..-1]
-            end
-          %>
-          <div class="col-md-12" class="file-container">
-            <pre><code class="brush"><%= force_utf8_violently(file.contents) %></code></pre>
+        <div id="<%= running_idx %>" class="panel-collapse collapse show">
+          <div>
+            <% if !just_one_html_prelude && file.html_prelude %>
+              <%= raw(file.html_prelude) %>
+            <% end %>
+            <%
+              brush = case File.extname(file.path)
+              when '.txt' then 'plain'
+              when '.jsp' then 'html'
+              when '.less' then 'css'
+              when '.sass' then 'css'
+              when '.hpp' then 'h'
+              when '.properties' then 'plain'
+              when '.py' then 'python'
+              when '.R' then 'r'
+              when '' then 'markup'
+              else File.extname(file.path)[1..-1]
+              end
+            %>
+            <div class="col-md-12" class="file-container">
+              <pre><code class="brush"><%= force_utf8_violently(file.contents) %></code></pre>
+            </div>
           </div>
         </div>
       </div>
