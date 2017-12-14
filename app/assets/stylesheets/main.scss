@@ -285,6 +285,10 @@ table.points > * > tr > td {
   width: 100px;
 }
 
+.exercise-status .green, .exercise-status .red {
+  height: 100%;
+}
+
 .exercise-status > * {
   float: left;
   height: 12pt;
