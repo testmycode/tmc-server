@@ -15,6 +15,14 @@
     margin-right: 20px;
 }
 
+#course-setup-progress-bar a {
+    color: white;
+}
+
+#course-setup-progress-bar .unavailable {
+    color: rgb(166, 173, 179);
+}
+
 .course-timing-quick-fill {
     background-color: #E4F1FE;
     padding: 20px 50px;

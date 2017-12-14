@@ -50,8 +50,8 @@
     -->
     <div class='course-timing-quick-fill'>
       <h3>Deadlines</h3>
-      <%= label_tag :first_set_date, 'Deadline for first set:'%>
-      <%= date_field :first_set_date, nil  %>
+      <%= label_tag :first_set_date, 'Deadline for first set:' %>
+      <%= date_field :first_set_date, nil, class: 'form-control' %>
       <br>
       Choose how incoming exercise set deadlines are set:<br>
       <%= radio_button_tag :deadline_type, "no_deadlines" %>
@@ -138,10 +138,9 @@
 
                 static_autofill = deadline.static_deadline_spec
                 #unlock_autofill = deadline.unlock_deadline_spec
-                field_class = nil
               %>
 
-              <%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: "#{field_class} datetime-picker" %><br/>
+              <%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: "form-control datetime-picker" %><br/>
             </td>
 
       <% end %>
