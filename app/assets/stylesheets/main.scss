@@ -407,3 +407,20 @@ tr>.align-right {
 .navbar {
   margin-bottom: 1rem;
 }
+
+td.hljs-ln-numbers {
+	user-select: none;
+
+	text-align: center;
+	color: #ccc;
+	//border-right: 1px solid #CCC;
+	vertical-align: top;
+	padding-right: 5px;
+
+	/* your custom style here */
+}
+
+/* for block of code */
+td.hljs-ln-code {
+	padding-left: 10px !important;
+}

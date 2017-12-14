@@ -22,10 +22,12 @@
     <li class="nav-item"><a class="nav-link" href="#valgrind" >Valgrind</a></li>
   <% end %>
   <% if !@submission.vm_log.blank? && (can? :read_vm_log, @submission) %>
-    <li class=""><a href="#logs">Logs</a></li>
+    <li class="nav-item"><a class="nav-link"  href="#logs">Logs</a></li>
   <% end %>
-  <li class="active nav-item"><a  class="nav-link" href="#files">Files</a></li>
+  <li class="active nav-item"><a class="nav-link" href="#files">Files</a></li>
 </ul>
+
+<br>
 
 <div class="row">
   <div class="col-md-12">

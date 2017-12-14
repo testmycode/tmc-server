@@ -1,5 +1,3 @@
-//= require sh
-
 var PagePresence = (function() {
   var changeCallbacks = [];
   var initialCallbacks = [];
