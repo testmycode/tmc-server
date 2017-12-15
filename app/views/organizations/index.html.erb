@@ -41,7 +41,7 @@
             <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
               <h6 class="card-title">
                 <%= organization.name %>
-                <small class="text-muted <%= /[[:upper:]]/.match(organization.name[-1]) ? 'text-bitup' : '' %>">
+                <small class="text-muted <%= /[[:upper:]]/.match(organization.name[-1]) ? 'text-littlebitup' : '' %>">
                   (<%= organization.slug %>)
                 </small>
               </h6>
