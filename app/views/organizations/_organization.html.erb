@@ -3,7 +3,12 @@
     <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
     <%= image_tag organization.logo.url(:small_logo) if organization.logo? %>
       <div>
-        <h4 class="card-title"><%= organization.name %></h4>
+        <h4 class="card-title">
+          <%= organization.name %>
+          <small class="text-muted <%= /[[:upper:]]/.match(organization.name[-1]) ? 'text-bitup' : '' %>">
+            (<%= organization.slug %>)
+          </small>
+        </h4>
         <%= organization.information %>
       </div>
     </div>

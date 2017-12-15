@@ -39,7 +39,12 @@
         <%= link_to organization_path(organization) do %>
           <div class="card">
             <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
-              <h6 class="card-title"><%= organization.name %></h6>
+              <h6 class="card-title">
+                <%= organization.name %>
+                <small class="text-muted <%= /[[:upper:]]/.match(organization.name[-1]) ? 'text-bitup' : '' %>">
+                  (<%= organization.slug %>)
+                </small>
+              </h6>
               <%= organization.information %>
             </div>
           </div>

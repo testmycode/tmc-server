@@ -2,7 +2,11 @@
   <%= link_to organization_course_path(@organization, course) do %>
     <div class="card course-card">
       <div class="card-body">
-        <h4 class="card-title"><% if course.hidden? || course.disabled? %>hidden-course<% end %> <%= course.name %></h4>
+        <h4 class="card-title">
+          <% if course.hidden? || course.disabled? %>hidden-course<% end %>
+          <%= course.title %>
+          <small class="text-muted">(<%= course.name %>)</small>
+        </h4>
         <%= course.description.presence || "A mysterious course without description." %>
       </div>
     </div>
