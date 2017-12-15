@@ -92,6 +92,11 @@ body.default {
   background-color: #fcfcfc;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 #page-presence {
   float: right;
 }

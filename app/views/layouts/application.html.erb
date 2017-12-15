@@ -27,23 +27,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css" integrity="sha256-aw9uGjVU5OJyMYN70Vu2kZ1DDVc1slcJCS2XvuPCPKo=" crossorigin="anonymous" />
   </head>
   <body class="default">
-    <%= render partial: 'layouts/navigation' %>
-    <div id="everything">
-      <div class="container container-fluid well-large" id="content-area">
-        <div id="breadcrumb">
-          <div class="row">
-            <div class="col-md-12">
-              <%= render 'twitter-bootstrap/breadcrumbs' %>
+    <div class="everything-wrapper">
+      <%= render partial: 'layouts/navigation' %>
+      <div id="everything">
+        <div class="container container-fluid well-large" id="content-area">
+          <div id="breadcrumb">
+            <div class="row">
+              <div class="col-md-12">
+                <%= render 'twitter-bootstrap/breadcrumbs' %>
+              </div>
             </div>
           </div>
+          <% if @show_page_presence %>
+            <div id="page-presence"></div>
+          <% end %>
+          <%= bootstrap_flash %>
+          <%= yield %>
         </div>
-        <% if @show_page_presence %>
-          <div id="page-presence"></div>
-        <% end %>
-        <%= bootstrap_flash %>
-        <%= yield %>
       </div>
+      <div class="everything-push">
     </div>
+    </div>
+    <%= render partial: 'layouts/footer' %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.1.0/highlightjs-line-numbers.min.js" integrity="sha256-ORy35NeVPhp5u86UDEs69WrNPjYJ899tayoT/y0NJ/I=" crossorigin="anonymous"></script>
     <script>

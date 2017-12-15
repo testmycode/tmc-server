@@ -31,13 +31,14 @@
         <%= yield %>
       </div>
     </div>
+    <%= render partial: 'layouts/footer' %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js" integrity="sha256-YqOIp4MygNx9/lcWr5lpcR88Ki/MNMWvJJkH0eK+fHM=" crossorigin="anonymous"></script>
     <script>
-    var options = {
-    valueNames: [ 'card-title' ]
-};
+      var options = {
+      valueNames: [ 'card-title' ]
+      };
 
-window.hackerList = new List('all-orgs-list', options);
+      new List('all-orgs-list', options);
     </script>
   </body>
 </html>
