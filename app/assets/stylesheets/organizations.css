@@ -1,5 +1,5 @@
-.organization-card {
-  color: black;
+.organization-card, #all-orgs-list a {
+  color: black !important;
 }
 
 .organization-card:hover {

@@ -29,33 +29,26 @@
 
 <h2>All organizations</h2>
 
-<table id="organization-table" class="table">
-  <thead>
-  <tr>
-    <th>Name</th>
-    <th>Information</th>
-    <% if current_user.administrator? %>
-      <th></th>
-    <% end %>
-  </tr>
-  </thead>
-
-  <tbody>
-  <% @organizations.each do |organization| %>
-    <% if !organization.hidden? || can?(:view_hidden_organizations, nil) %>
-      <tr class="<%= 'hidden-organization' if organization.hidden?  %>">
-        <td><%= link_to organization.name, organization_path(organization) %></td>
-        <td><%= organization.information %></td>
-        <% if current_user.administrator? %>
-          <td><%= link_to 'Edit', edit_setup_organization_path(organization) %></td>
+<div id="all-orgs-list">
+  <input class="search form-control" placeholder="Search" />
+  <br>
+  <ul class="list" style="list-style: none; padding-left: 0;">
+    <% @organizations.each do |organization| %>
+      <% next if organization.hidden? && !can?(:view_hidden_organizations, nil) %>
+      <li>
+        <%= link_to organization_path(organization) do %>
+          <div class="card">
+            <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
+              <h6 class="card-title"><%= organization.name %></h6>
+              <%= organization.information %>
+            </div>
+          </div>
         <% end %>
-      </tr>
+        <br>
+      </li>
     <% end %>
-  <% end %>
-  </tbody>
-</table>
-
-<%= use_datatables('#organization-table', bPaginate: false) %>
+  </ul>
+</div>
 
 <br>
 
