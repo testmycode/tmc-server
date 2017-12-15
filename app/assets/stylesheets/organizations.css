@@ -13,3 +13,25 @@
 .organization-card .card-body img {
   margin-right: 1rem;
 }
+
+.cover-content {
+  padding: 11rem;
+  padding-top: 7rem;
+  text-align: center;
+}
+
+.cover {
+  /*background-image: linear-gradient(85deg, var(--blue) 0%, #80d0c7 100%);*/
+  background-image: radial-gradient(farthest-corner at 40px 40px,
+  var(--blue) 0%, rgb(57, 66, 190) 100%);
+  /*background-color: var(--primary);*/
+
+  color: white;
+  position: relative;
+  top: 0px;
+}
+
+#everything h1, #everything h2 {
+  padding: 2rem 0;
+  text-align: center;
+}

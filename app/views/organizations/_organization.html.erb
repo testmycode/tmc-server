@@ -1,0 +1,12 @@
+<%= link_to organization do %>
+  <div class="card organization-card <%= organization.hidden? ? 'border-secondary' : 'border-dark' %>">
+    <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
+    <%= image_tag organization.logo.url(:small_logo) if organization.logo? %>
+      <div>
+        <h4 class="card-title"><%= organization.name %></h4>
+        <%= organization.information %>
+      </div>
+    </div>
+  </div>
+<% end %>
+<br>

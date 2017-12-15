@@ -7,13 +7,21 @@ class OrganizationsController < ApplicationController
 
   def index
     ordering = 'hidden, LOWER(name)'
-    @organizations = Organization.accepted_organizations.order(ordering)
+    @organizations = Organization
+      .accepted_organizations
+      .order(ordering)
+      .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil)}
     @my_organizations = Organization.taught_organizations(current_user)
     @my_organizations |= Organization.assisted_organizations(current_user)
     @my_organizations |= Organization.participated_organizations(current_user)
     @my_organizations.natsort_by!(&:name)
     @courses_under_initial_refresh = Course.where(initial_refresh_ready: false)
-    @pinned_organizations = Organization.accepted_organizations.where(pinned: true)
+    @pinned_organizations = Organization
+    .accepted_organizations
+    .where(pinned: true)
+    .order(ordering)
+    .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil)}
+    render layout: 'landing'
   end
 
   def show

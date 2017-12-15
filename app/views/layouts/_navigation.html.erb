@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark<%= local_assigns[:transparent] ? '' : ' bg-primary' %>">
   <% title_extras = '<span class="small"><br>' + raw(SiteSetting.value(:site_subtitle)) + '</span>' unless SiteSetting.value(:site_subtitle).blank? %>
   <% title = 'TestMyCode' %>
   <% title += raw(title_extras) unless title_extras.blank? %>
