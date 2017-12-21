@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-11">
+  <div style="width: 100%">
     <% if @submission.tests_ran? %>
       <% unless @submission.valgrind.blank?%>
         <p>Errors in Valgrind check. See <a href="#valgrind">Valgrind log</a>.</p>
