@@ -62,7 +62,7 @@ class ParticipantsController < ApplicationController
     @user = User.find(params[:id])
     authorize! :view_participant_information, @user
     # TODO: bit ugly
-    @awarded_points = Hash[AwardedPoint.where(id: AwardedPoint.where(user: User.find(3)).ids).to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
+    @awarded_points = Hash[AwardedPoint.where(id: AwardedPoint.all_awarded(@user)).to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
 
     if current_user.administrator?
       add_breadcrumb 'Participants', :participants_path
