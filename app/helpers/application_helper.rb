@@ -12,6 +12,15 @@ module ApplicationHelper
     link_to name, path, options
   end
 
+  def active_on_current_path_link_to(name, path, options = {})
+    if request.path == path
+      classes = options[:class] || ''
+      classes += ' active'
+      options[:class] = classes
+    end
+    return link_to(name, path, options)
+  end
+
   def labeled(label, tags = nil, options = {}, &block)
     if tags.is_a?(Hash) && options.empty?
       options = tags

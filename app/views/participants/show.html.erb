@@ -1,18 +1,22 @@
-<%= image_tag @user.gravatar_url(:rating => 'R', :secure => true, :size => 200, default: 'mm'), class: 'avatar' %>
-<h1><%= @user.login %></h1>
+<%= render partial: 'nav' %>
+<h2>My Account</h2>
 
-<section>
-  <ul>
-    <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
-    <% for field in UserField.all %>
-      <% if field.field_type != :html %>
-        <li><%= raw(field.name.humanize) %>: <%= extra_field_value(@user.field_value_record(field)) %></li>
+
+<div class="participant-details">
+  <%= image_tag @user.gravatar_url(:rating => 'R', :secure => true, :size => 200, default: 'mm'), class: 'avatar' %>
+
+  <section class="participant-entries">
+    <ul class="nobullets">
+      <li>Username: <%= @user.login %></li>
+      <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
+      <% for field in UserField.all %>
+        <% if field.field_type != :html %>
+          <li><%= raw(field.name.humanize) %>: <%= extra_field_value(@user.field_value_record(field)) %></li>
+        <% end %>
       <% end %>
-    <% end %>
-    <li><%= link_to "Certificates", participant_certificates_path(@user) %></li>
-    <li><%= link_to "Settings", user_path %></li>
-  </ul>
-</section>
+    </ul>
+  </section>
+</div>
 
 <section>
   <h2>Points</h2>
