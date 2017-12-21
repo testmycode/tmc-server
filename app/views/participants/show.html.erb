@@ -25,7 +25,13 @@
   <% for course in @courses %>
     <div class="card">
       <div class="card-body">
-        <h3 class="card-title"><%= link_to course.title, organization_course_path(course.organization, course) %></h3>
+        <h3 class="card-title">
+          <% if course.visible_to?(current_user) %>
+            <%= link_to course.title, organization_course_path(course.organization, course) %>
+          <% else %>
+            <%= course.title %>
+          <% end %>
+        </h3>
         <br>
         <% if can? :see_points, course %>
           <span class="progress-label">Awarded points</span>
