@@ -92,6 +92,24 @@ class ExerciseGroup
     end
   end
 
+  def available_point_names
+      conn = ActiveRecord::Base.connection
+
+      # FIXME: this bit is duplicated in MetadataValue in master branch.
+      # http://stackoverflow.com/questions/5709887/a-proper-way-to-escape-when-building-like-queries-in-rails-3-activerecord
+      pattern = (@name.gsub(/[!%_]/) { |x| '!' + x }) + '-%'
+
+      sql = <<-EOS
+        SELECT available_points.name
+        FROM exercises, available_points
+        WHERE exercises.course_id = #{conn.quote(@course.id)} AND
+              exercises.name LIKE #{conn.quote(pattern)} AND
+              exercises.id = available_points.exercise_id
+      EOS
+      available_points = conn.select_values(sql)
+      available_points
+  end
+
   private
 
   def group_deadline(method)

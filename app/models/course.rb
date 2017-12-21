@@ -469,18 +469,7 @@ class Course < ActiveRecord::Base
     for group in groups
       conn = ActiveRecord::Base.connection
 
-      # FIXME: this bit is duplicated in MetadataValue in master branch.
-      # http://stackoverflow.com/questions/5709887/a-proper-way-to-escape-when-building-like-queries-in-rails-3-activerecord
-      pattern = (group.gsub(/[!%_]/) { |x| '!' + x }) + '-%'
-
-      sql = <<-EOS
-        SELECT available_points.name
-        FROM exercises, available_points
-        WHERE exercises.course_id = #{conn.quote(id)} AND
-              exercises.name LIKE #{conn.quote(pattern)} AND
-              exercises.id = available_points.exercise_id
-      EOS
-      available_points = conn.select_values(sql)
+      available_points = ExerciseGroup.new(self, group).available_point_names
       next if available_points.empty?
 
       sql = <<-EOS
@@ -498,6 +487,34 @@ class Course < ActiveRecord::Base
       }
     end
     result
+  end
+
+  # Returns a hash of exercise group => {
+  #   :available_points => number of available points,
+  #   :points_by_user => {user_id => number_of_points}
+  # }
+  def exercise_group_completion_ratio_for_user(user)
+    # TODO: clean up exercise group discovery
+
+    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }.uniq
+
+    conn = ActiveRecord::Base.connection
+    groups.each_with_object({}) do |group, result|
+      available_points = ExerciseGroup.new(self, group).available_point_names
+      next if available_points.empty?
+
+      sql = <<-EOS
+        SELECT COUNT(*)
+        FROM awarded_points
+        WHERE course_id = #{conn.quote(id)} AND
+              name IN (#{available_points.map { |ap| conn.quote(ap) }.join(',')}) AND
+              user_id = #{conn.quote(user.id)}
+        GROUP BY user_id
+      EOS
+
+      res = conn.select_rows(sql)
+      result[group] = res.empty? ? 0 : res[0][0].to_f / available_points.length
+    end
   end
 
   def refreshed?
