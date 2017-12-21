@@ -24,7 +24,7 @@
           <li class="nav-item"><%= link_to 'Sign out', signout_path, method: :delete, id: 'logout-link', class: 'btn btn-danger' %></li>
         <% else %>
           <li class="nav-item"><%= link_to 'Sign up', new_user_path, class: 'nav-link', style: 'margin-right: .5rem' %></li>
-          <li class="nav-item"><%= link_to 'Log in', login_path, class: 'btn btn-info' %></li>
+          <li class="nav-item"><%= link_to 'Log in', login_path(return_to: return_to_link), class: 'btn btn-info' %></li>
         <% end %>
       </ul>
     </div>

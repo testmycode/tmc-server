@@ -95,4 +95,9 @@ EOS
   def link_back
     raw('<div class="link-back">' + link_to('Back', :back) + '</div>')
   end
+
+  def return_to_link
+    return nil if request.path == '/'
+    request.path
+  end
 end
