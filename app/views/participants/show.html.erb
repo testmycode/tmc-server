@@ -34,14 +34,16 @@
               <%= sprintf("%.0f", @percent_completed[course.id]) %>%
             </div>
           </div>
-          <br>
           <% if @group_completion_ratios[course.id] %>
             <% @group_completion_ratios[course.id].each do |group, ratio| %>
+              <br>
               <span class="progress-label">Awarded points for <%= group %></span>
               <div class="progress course-points-progress">
-                <div class="progress-bar bg-info" role="progressbar" style="width: <%= ratio * 100 %>%" aria-valuenow="<%= ratio * 100 %>" aria-valuemin="0" aria-valuemax="100">
-                  <%= sprintf("%.0f", ratio * 100) %>%
-                </div>
+                <% unless ratio.zero? %>
+                  <div class="progress-bar bg-info" role="progressbar" style="width: <%= ratio * 100 %>%" aria-valuenow="<%= ratio * 100 %>" aria-valuemin="0" aria-valuemax="100">
+                    <%= sprintf("%.0f", ratio * 100) %>%
+                  </div>
+                <% end %>
               </div>
             <% end %>
             <br>

@@ -496,7 +496,7 @@ class Course < ActiveRecord::Base
   def exercise_group_completion_ratio_for_user(user)
     # TODO: clean up exercise group discovery
 
-    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }.uniq
+    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }.uniq.sort
 
     conn = ActiveRecord::Base.connection
     groups.each_with_object({}) do |group, result|
