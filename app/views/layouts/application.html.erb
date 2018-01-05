@@ -25,12 +25,9 @@
     %>
   </head>
   <body class="default">
-    <% unless cookies[:cyber_warning] == "true" %>
       <div id="wrong-server-warning">
-        <%= fa_icon 'info-circle', class: 'fa-2x' %></span>If you're doing the Cyber Security Base with F-Secure course, you should use our new server <%= link_to 'https://tmc.mooc.fi/org/mooc', 'https://tmc.mooc.fi/org/mooc'  %> instead of this one.
-        <i class="fa fa-close fa-2x" onclick="document.cookie='cyber_warning=true'; document.getElementById('wrong-server-warning').style.display = 'none'"></i>
+        <%= fa_icon 'info-circle', class: 'fa-2x' %></span>We're migrating away from this server. All the courses are now in the <%= link_to 'https://tmc.mooc.fi/', 'https://tmc.mooc.fi/' %>'s  MOOC organization. The organization can be found here: <%= link_to 'https://tmc.mooc.fi/org/mooc', 'https://tmc.mooc.fi/org/mooc' %>. You need to create new a new account there and change your server address to <%= link_to 'https://tmc.mooc.fi/org/mooc', 'https://tmc.mooc.fi/org/mooc' %>. This server (https://tmc.mooc.fi/mooc) will be shut down on May 24th, 2018.
       </div>
-    <% end %>
     <div class="navbar navbar-inverse navbar-static-top">
       <div class="navbar-inner">
         <div class="container">
