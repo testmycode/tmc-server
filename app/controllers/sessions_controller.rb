@@ -21,7 +21,9 @@ class SessionsController < ApplicationController
 
     redirect_params = {}
     if user.nil?
-      redirect_params = { alert: 'Login or password incorrect. Try again.' }
+      msg = 'Login or password incorrect. Try again.'
+      msg = msg + " Please make sure that you're trying to log in with your username and NOT your email."
+      redirect_params = { alert: msg }
     else
       sign_in user
     end
