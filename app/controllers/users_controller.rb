@@ -37,8 +37,7 @@ class UsersController < ApplicationController
         redirect_to root_path
       end
     else
-      flash.now[:error] = 'Failed'
-      render action: :show, status: 403
+      render action: :new, status: 403
     end
   end
 
