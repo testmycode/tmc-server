@@ -170,6 +170,7 @@ module Api
         Api::V8::Core::Exercises::SubmissionsController,
         Api::V8::Core::Organizations::CoursesController,
         Api::V8::Core::SubmissionsController,
+        Api::V8::Core::Submissions::FeedbackController,
         Api::V8::Core::Submissions::ReviewsController,
         AvailablePoint,
         AwardedPoint,
