@@ -69,7 +69,7 @@ module Api
             when :ok then {
               test_cases: @submission.test_case_records,
               feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
-              feedback_answer_url: submission_feedback_answers_url(@submission, format: :json)
+              feedback_answer_url: api_v8_core_submission_feedback_index_url(@submission, format: :json)
             }
             when :fail then {
               test_cases: @submission.test_case_records
