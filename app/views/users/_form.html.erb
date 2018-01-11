@@ -3,7 +3,7 @@
 
   <section>
     <h2>User account</h2>
-    <%= bs_labeled_field('Username (public)', f.text_field(:login, :disabled => !@user.new_record?, class: 'form-control')) %>
+    <%= bs_labeled_field('Username (will be visible to everyone for example in scoreboards)', f.text_field(:login, :disabled => !@user.new_record?, class: 'form-control')) %>
     <%= bs_labeled_field('E-mail:', f.text_field(:email, class: 'form-control')) %>
     <%= bs_labeled_field('Confirm e-mail:', f.text_field(:email_repeat, :value => '', class: 'form-control')) %>
   </section>
@@ -46,3 +46,4 @@
     <% end %>
   </section>
 <% end %>
+<br>
