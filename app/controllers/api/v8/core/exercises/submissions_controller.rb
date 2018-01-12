@@ -35,6 +35,8 @@ module Api
           def create
             unauthorize_guest!
 
+            return render json: { error: "You need to update your client if you want to submit pastes. You can do that by selecting 'Help' -> 'Check for updates' and then following instructions." } if !params[:paste].nil? && params[:client] == 'netbeans_plugin' && params[:client_version] = '1.1.9'
+
             @exercise = Exercise.find(params[:exercise_id])
             authorize! :read, @exercise
             @course = @exercise.course
