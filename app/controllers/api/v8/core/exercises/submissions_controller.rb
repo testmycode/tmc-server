@@ -34,9 +34,9 @@ module Api
 
           def create
             unauthorize_guest!
-            if !params[:paste].nil? && params[:client] == 'netbeans_plugin' && params[:client_version] = '1.1.9'
+            if params[:client] == 'netbeans_plugin' && params[:client_version] = '1.1.9'
               authorization_skip!
-              return respond_with_error("You need to update your client if you want to submit pastes. You can do that by selecting 'Help' -> 'Check for updates' and then following instructions.", 404, nil, obsolete_client: true)
+              return respond_with_error("You need to update your client. You can do that by selecting 'Help' -> 'Check for updates' and then following instructions.", 404, nil, obsolete_client: true)
             end
 
             @exercise = Exercise.find(params[:exercise_id])
