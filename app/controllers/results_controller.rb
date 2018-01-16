@@ -15,6 +15,7 @@ class ResultsController < ApplicationController
     end]
 
     SandboxResultsSaver.save_results(submission, filtered_params)
+    Rails.cache.delete("api_v8_core_submission_show_#{submission_id}_user_#{submission.user.id}")
   rescue SandboxResultsSaver::InvalidTokenError
     respond_access_denied('Invalid or expired token')
   else
