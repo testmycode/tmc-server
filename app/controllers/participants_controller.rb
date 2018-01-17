@@ -77,7 +77,7 @@ class ParticipantsController < ApplicationController
     @group_completion_ratios = {}
     for course_id in @awarded_points.keys
       course = Course.find(course_id)
-      if !course.hidden? && !course.hide_submissions?
+      if !course.hide_submissions?
         @courses << course
 
         awarded = @awarded_points[course.id]
