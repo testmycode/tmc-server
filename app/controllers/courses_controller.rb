@@ -89,6 +89,12 @@ class CoursesController < ApplicationController
     redirect_to(organization_course_path(@organization, @course), notice: 'Course was successfully disabled.')
   end
 
+  def toggle_hidden
+    authorize! :teach, @organization
+    @course.update!(hidden: !@course.hidden)
+    redirect_to(organization_course_path(@organization, @course), notice: "Course is now #{@course.hidden? ? 'hidden' : 'visible'}.")
+  end
+
   def manage_deadlines
     authorize! :manage_deadlines, @course
     add_course_breadcrumb

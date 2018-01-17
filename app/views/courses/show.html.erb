@@ -119,6 +119,15 @@
               link_to 'Disable Course', disable_organization_course_path(@organization, @course), method: :post,
                       class: "btn btn-danger btn-sm", data: { confirm: "Are you sure you want to disable the course?" } %>
           <% end %>
+          <% if @course.hidden? %>
+            <%=
+              link_to 'Make Course visible', toggle_hidden_organization_course_path(@organization, @course), method: :post,
+                      class: "btn btn-info btn-sm" %>
+          <% else %>
+            <%=
+              link_to 'Hide Course', toggle_hidden_organization_course_path(@organization, @course), method: :post,
+                      class: "btn btn-danger btn-sm", data: { confirm: "Are you sure you want to hide the course?" } %>
+          <% end %>
           </li>
 
           <% unlockables = @course.unlockable_exercises_for(current_user) %>
@@ -138,8 +147,7 @@
           <% end %>
 
           <% if @course.hidden? %>
-            <li>The course is currently hidden. Unhide by editing
-            <code>course_options.yml</code></li>
+            <li>The course is currently <strong>hidden</strong>.</li>
           <% end %>
 
           <% if @course.hide_after != nil %>
