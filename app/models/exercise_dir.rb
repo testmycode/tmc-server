@@ -53,6 +53,11 @@ class ExerciseDir
     TmcLangs.get.find_exercise_dirs(path).sort.map {|dir| ExerciseDir.get(dir) }
   end
 
+  # subclass may set this to true
+  def safe_for_experimental_sandbox
+    false
+  end
+
   private
 
   # For now langs packages only java simple and any new formats. -jamo 5/1/2016

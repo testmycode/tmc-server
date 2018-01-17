@@ -26,5 +26,9 @@ class ExerciseDir
     def has_tests?
       true # why not to default like this
     end
+
+    def safe_for_experimental_sandbox
+      true
+    end
   end
 end

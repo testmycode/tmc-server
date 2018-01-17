@@ -39,6 +39,8 @@ baseurl_for_remote_sandboxes: http://<%= ENV.fetch('HOST', 'localhost') %>:3000/
 remote_sandboxes:
   - <%= ENV.fetch('SANDBOX_URL', 'http://localhost:3001/') %>
 
+experimental_sandboxes: []
+
 # List of spyware server URLs. See https://github.com/testmycode/tmc-spyware-server
 # The URLs should work from both clients and the server.
 # This list will be delivered to the client in /courses.json.

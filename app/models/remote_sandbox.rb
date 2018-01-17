@@ -15,7 +15,12 @@ class RemoteSandbox
   end
 
   def self.try_to_send_submission_to_free_server(submission, notify_url)
-    for server in all.shuffle # could be smarter about this
+    servers = if submission.exercise && ExerciseDir.get(submission.exercise.clone_path).safe_for_experimental_sandbox
+      all_experimental.shuffle + all.shuffle
+    else
+      all.shuffle
+    end
+    for server in servers # could be smarter about this
       begin
         server.send_submission(submission, notify_url)
       rescue SandboxUnavailableError=>e
@@ -80,6 +85,10 @@ class RemoteSandbox
 
   def self.all
     @all ||= SiteSetting.value('remote_sandboxes').map { |url| RemoteSandbox.new(url) }
+  end
+
+  def self.all_experimental
+    @all_experimental ||= SiteSetting.value('experimental_sandboxes').map { |url| RemoteSandbox.new(url) }
   end
 
   def self.total_capacity
