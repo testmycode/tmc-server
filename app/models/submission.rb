@@ -352,7 +352,7 @@ class Submission < ActiveRecord::Base
   end
 
   def readable_by?(user)
-    user.administrator? || user.teacher?(course.organization) || user.assistant?(course) || user_id == user.id && (exercise.nil? || exercise.visible_to?(user))
+    user.administrator? || user.teacher?(course.organization) || user.assistant?(course) || user_id == user.id
   end
 
   def set_paste_key_if_paste_available

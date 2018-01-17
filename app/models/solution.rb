@@ -21,11 +21,11 @@ class Solution
       true
     elsif user.guest?
       false
+    elsif @exercise.completed_by?(user)
+      true
     elsif !@exercise.course.visible_to?(user)
       false
     elsif !@exercise.visible_to?(user)
-      false
-    elsif @exercise.submittable_by?(user) && !@exercise.completed_by?(user)
       false
     elsif @exercise.course.hide_submission_results?
       false
