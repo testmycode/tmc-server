@@ -40,7 +40,18 @@ class Ability
 
       cannot :read, Course
       can :read, Course do |c|
-        c.visible_to?(user) || can?(:teach, c)
+        user.administrator? ||
+        user.teacher?(c.organization) ||
+        user.assistant?(c) ||
+        (
+          c.initial_refresh_ready? &&
+          !c.disabled? &&
+          (
+            c.hidden_if_registered_after.nil? ||
+            c.hidden_if_registered_after > Time.now ||
+            (!user.guest? && c.hidden_if_registered_after > user.created_at)
+          )
+        )
       end
 
       can :create, Course do |c|
