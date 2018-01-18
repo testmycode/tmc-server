@@ -33,8 +33,14 @@ module Api
         end
 
         def show
-          unauthorize_guest!
           @submission = Submission.find_by!(id: params[:id])
+          if !@submission.processed?
+            authorization_skip!
+            return render json: {
+              status: :processing
+            }
+          end
+          unauthorize_guest!
           authorize! :read, @submission
           # This gets invalidated for the submitter when the results arrive so that they see the results right away.
           output = Rails.cache.fetch("api_v8_core_submission_show_#{@submission.id}_user_#{current_user.id}", expires_in: 30.seconds) do
