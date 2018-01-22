@@ -10,6 +10,12 @@ class PointsController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Points'
 
+    if can?(:teach, @course)
+      @user_fields = UserField.all.select do |field|
+        field.show_in_participant_list?
+      end
+    end
+
     only_for_user = User.find_by(login: params[:username])
 
     if only_for_user
@@ -52,6 +58,12 @@ class PointsController < ApplicationController
     authorize! :see_points, @course
     show_timestamps = !!params[:timestamps]
 
+    if can?(:teach, @course)
+      @user_fields = UserField.all.select do |field|
+        field.show_in_participant_list?
+      end
+    end
+
     add_course_breadcrumb
     add_breadcrumb 'Points', organization_course_points_path(@organization, @course)
     add_breadcrumb @sheetname
@@ -60,9 +72,9 @@ class PointsController < ApplicationController
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps, hidden: current_user.administrator?)
 
     @users = if params[:show_attempted]
-               @course.users
+               @course.users.includes(:user_field_values)
              else
-               User.course_sheet_students(@course, @sheetname).includes(:organizations)
+               User.course_sheet_students(@course, @sheetname).includes(:organizations).includes(:user_field_values)
              end
     if params[:sort_by] == 'points'
       @users = @users.sort_by do |u|
@@ -95,7 +107,7 @@ class PointsController < ApplicationController
     end
 
     include_admins = current_user.administrator?
-    users = User.select('login, users.id, administrator').where(login: per_user_and_sheet.keys.sort_by(&:downcase)).includes(:organizations).order('login ASC')
+    users = User.select('login, users.id, administrator').where(login: per_user_and_sheet.keys.sort_by(&:downcase)).includes(:organizations).includes(:user_field_values).order('login ASC')
 
     users = users.where(administrator: false) unless include_admins
 

@@ -24,7 +24,12 @@
       <% if tailoring.show_exercise_names_in_points_table %>
         <tr>
           <th></th>
-          <th></th>
+          <th>Username</th>
+          <% if @user_fields %>
+            <% @user_fields.each do |field| %>
+              <th><%= field.label %></th>
+            <% end %>
+          <% end %>
           <% @exercises.each do |exercise| %>
             <% points = exercise.available_points.order! %>
             <% if points.size > 0 %>
@@ -34,8 +39,8 @@
         </tr>
       <% end %>
       <tr>
-        <th></th>
-        <th></th>
+        <th colspan="<%= 2 + (@user_fields ? @user_fields.length : 0) %>"></th>
+
         <% @exercises.each do |exercise| %>
           <% exercise.available_points.sort.each do |point| %>
             <th><%= point.name %></th>
@@ -58,6 +63,11 @@
                 <%= user.login %>
               <% end %>
             </td>
+            <% if @user_fields %>
+              <% @user_fields.each do |field| %>
+              <td><%= user.user_field_values.find { |o| o.field_name == field.name }.value %></td>
+              <% end %>
+            <% end %>
             <% @exercises.each do |exercise| %>
               <% exercise.available_points.sort.each do |p| %>
                 <td>

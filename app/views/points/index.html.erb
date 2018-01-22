@@ -44,6 +44,11 @@
             [sort]
           <% end %>
         </th>
+          <% if @user_fields %>
+            <% @user_fields.each do |field| %>
+              <th><%= field.label %></th>
+            <% end %>
+          <% end %>
         <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
           <th>
             <%= sheet %><br />
@@ -80,6 +85,11 @@
               <%= username %>
             <% end %>
           </td>
+          <% if @user_fields %>
+            <% @user_fields.each do |field| %>
+              <td><%= user.user_field_values.find { |o| o.field_name == field.name }.value %></td>
+            <% end %>
+          <% end %>
           <% @summary[:sheets].each do |sheet| %>
             <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>
             <td>
