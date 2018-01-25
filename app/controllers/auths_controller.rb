@@ -13,11 +13,11 @@ class AuthsController < ApplicationController
     if user
       if !params[:password].blank? && user.has_password?(params[:password])
         msg = 'OK'
-      elsif !params[:session_id].blank? 
-        if find_session_by_id(params[:session_id]).andand.belongs_to?(user)
+      elsif !params[:session_id].blank?
+        # Allows using oauth2 tokens of the new api for authenticating
+        if Doorkeeper::AccessToken.find_by(resource_owner_id: user.id, token: params[:session_id])
           msg = 'OK'
-        # Allows using oauth2 tokens of the new api for authenticating 
-        elsif Doorkeeper::AccessToken.find_by(resource_owner_id: user.id, token: params[:session_id])
+        elsif find_session_by_id(params[:session_id]).andand.belongs_to?(user)
           msg = 'OK'
         end
       end
@@ -28,7 +28,7 @@ class AuthsController < ApplicationController
         render text: msg
       end
       format.json do
-        render json: { status: msg }.to_json
+        render json: { status: msg }
       end
     end
   end
