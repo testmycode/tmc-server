@@ -31,24 +31,38 @@ class CourseInfo
   end
 
   def course_data_core_api(course)
-    exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
-
+    UncomputedUnlock.resolve(course, @user)
     @unlocked_exercises = course.unlocks
                               .where(user_id: @user.id)
                               .where(['valid_after IS NULL OR valid_after < ?', Time.now])
                               .pluck(:exercise_name)
 
-    submissions_by_exercise = {}
-    Submission.where(course_id: course.id, user_id: @user.id).each do |sub|
-      submissions_by_exercise[sub.exercise_name] ||= []
-      submissions_by_exercise[sub.exercise_name] << sub
-    end
-    exercises.each do |ex|
-      ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
+    exercises = course.exercises.includes(:course, :available_points)
+
+    unless @user.administrator? || @user.teacher?(course.organization) || @user.assistant?(course)
+      exercises = exercises.where(hidden: false, disabled_status: 0)
+      exercises = if @unlocked_exercises.empty?
+        exercises.where(unlock_spec: nil)
+      else
+        exercises.where(["unlock_spec IS NULL OR name IN (#{@unlocked_exercises.map {|_| '?'}.join(', ')})", *@unlocked_exercises])
+      end.select { |e| e._fast_visible_to?(@user)}
     end
 
-    @course_list.course_data_core_api(course).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
-                                                               exercises: exercises.map { |ex| exercise_data_core_api(ex) }.reject(&:nil?))
+    exercises = exercises.to_a.natsort_by(&:name)
+
+    {
+      id: course.id,
+      name: course.name,
+      title: course.title,
+      description: course.description,
+      details_url: @helpers.api_v8_core_course_url(course),
+      unlock_url: @helpers.api_v8_core_course_unlock_url(course),
+      reviews_url: @helpers.api_v8_core_course_reviews_url(course),
+      comet_url: CometServer.get.client_url,
+      spyware_urls: SiteSetting.value('spyware_servers'),
+      unlockables: [],
+      exercises: exercises.map { |ex| exercise_data_core_api(ex) }
+    }
   end
 
   private
@@ -94,8 +108,6 @@ class CourseInfo
   end
 
   def exercise_data_core_api(exercise)
-    return nil unless exercise.visible_to?(@user)
-
     # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
     locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
 
@@ -122,10 +134,6 @@ class CourseInfo
     }
 
     data[:solution_zip_url] = @helpers.download_api_v8_core_exercise_solution_url(exercise) if @user.administrator?
-    data[:exercise_submissions_url] = @helpers.api_v8_core_exercise_url(exercise, format: 'json')
-    last_submission = get_latest_submission(exercise)
-    data[:latest_submission_url] = @helpers.download_api_v8_core_submission_url(last_submission) unless last_submission.nil?
-    data[:latest_submission_id] = last_submission.id unless last_submission.nil?
 
     data
   end
