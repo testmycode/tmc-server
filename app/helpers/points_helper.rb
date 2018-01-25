@@ -1,3 +1,5 @@
+require 'natsort'
+
 module PointsHelper
   def github_repo_url_to_project_page_url(url)
     if url =~ /github.com[:\/]([^\/]*)\/([^\/]*)\.git/
@@ -19,6 +21,6 @@ module PointsHelper
   end
 
   def points_list(points)
-    points.map { |pt| h(pt) }.join('&nbsp; ').html_safe
+    points.to_a.natsort.map { |pt| h(pt) }.join('&nbsp; ').html_safe
   end
 end
