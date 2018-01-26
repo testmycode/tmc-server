@@ -87,7 +87,8 @@
           </td>
           <% if @user_fields %>
             <% @user_fields.each do |field| %>
-              <td><%= user.user_field_values.find { |o| o.field_name == field.name }.value %></td>
+              <% field_record = user.user_field_values.find { |o| o.field_name == field.name } %>
+              <td><%= field_record.value if field_record %></td>
             <% end %>
           <% end %>
           <% @summary[:sheets].each do |sheet| %>
