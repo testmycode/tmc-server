@@ -36,6 +36,6 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
       end
     end
 
-    sleep 5
+    sleep 0.1
   end
 end
