@@ -8,7 +8,7 @@ class SubmissionProcessor
     submission.processing_tried_at = Time.now
     submission.save!
 
-    if false && RemoteSandbox.try_to_send_submission_to_free_server(submission, submission.result_url)
+    if RemoteSandbox.try_to_send_submission_to_free_server(submission, submission.result_url)
       submission.processing_began_at = Time.now
       submission.times_sent_to_sandbox += 1
       submission.save!

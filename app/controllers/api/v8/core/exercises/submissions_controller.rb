@@ -101,7 +101,7 @@ module Api
             end
 
             unless errormsg
-              SubmissionProcessor.new.process_submission(@submission)
+              # SubmissionProcessor.new.process_submission(@submission)
             end
 
             if !errormsg

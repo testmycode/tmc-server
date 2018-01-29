@@ -148,7 +148,7 @@ class SubmissionsController < ApplicationController
     end
 
     unless errormsg
-      SubmissionProcessor.new.process_submission(@submission)
+      # SubmissionProcessor.new.process_submission(@submission)
     end
 
     respond_to do |format|
