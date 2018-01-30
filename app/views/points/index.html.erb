@@ -16,7 +16,7 @@
     <thead>
       <tr>
         <th></th>
-        <th colspan="<%= @user_fields.length + 1 %>">Number of students</th>
+        <th colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>">Number of students</th>
         <% if !@summary[:sheets].empty? %>
           <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
         <% end %>
@@ -28,7 +28,9 @@
         <td>-</td>
         <% nstudents = @summary[:users].length %>
         <td><%= nstudents %></td>
-        <td colspan="<%= @user_fields.length %>"></td>
+        <% if @user_fields %>
+          <td colspan="<%= @user_fields.length %>"></td>
+        <% end %>
         <% @summary[:sheets].each do |sheet| %>
           <td>
             <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
