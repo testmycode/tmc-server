@@ -164,12 +164,6 @@
              <%= link_to 'by hour', organization_course_stat_path(@organization, @course, 'submission_times') %>)
           </li>
 
-          <% if @course.spreadsheet_key %>
-            <li>
-              <%= link_to 'Points spreadsheet in Google Docs',
-              "http://spreadsheets.google.com/ccc?key=#{@course.spreadsheet_key}" %>
-            </li>
-          <% end %>
         </ul>
       </div>
     <% end # :teach, @course %>

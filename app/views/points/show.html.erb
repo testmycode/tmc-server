@@ -12,9 +12,7 @@
     <% end %>
   </li>
   <% if can? :refresh_gdocs_spreadsheet, @course %>
-    <li>
-      <%= link_to 'Refresh Google Docs worksheet', refresh_gdocs_organization_course_point_path(@organization, @course, @sheetname) %>
-    </li>
+      <% link_to 'Refresh Google Docs worksheet', refresh_gdocs_organization_course_point_path(@organization, @course, @sheetname) %>
   <% end %>
 </ul>
 
@@ -65,7 +63,8 @@
             </td>
             <% if @user_fields %>
               <% @user_fields.each do |field| %>
-              <td><%= user.user_field_values.find { |o| o.field_name == field.name }.value %></td>
+              <% value = user.user_field_values.find { |o| o.field_name == field.name }%>
+              <td><%= value.value if value %></td>
               <% end %>
             <% end %>
             <% @exercises.each do |exercise| %>

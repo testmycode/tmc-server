@@ -13,7 +13,7 @@
         <th></th>
         <th>Number of students</th>
         <% if !@summary[:sheets].empty? %>
-          <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
+          <th colspan="<%= @summary[:sheets].count + @user_fields.length %>">Total points/possible</th>
         <% end %>
         <% if show_total_column %>
           <th>Total</th>
@@ -23,6 +23,7 @@
         <td>-</td>
         <% nstudents = @summary[:users].length %>
         <td><%= nstudents %></td>
+        <td colspan="<%= @user_fields.length %>"></td>
         <% @summary[:sheets].each do |sheet| %>
           <td>
             <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
@@ -34,6 +35,9 @@
           </td>
         <% end %>
       </tr>
+      <% if can?(:teach, @course) %>
+        <div class="alternative-format-links"><%= link_to('Export as CSV', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv'), class: "btn btn-primary") %></div>
+      <% end %>
       <tr>
         <th></th>
         <th>
@@ -105,5 +109,3 @@
     </tbody>
   </table>
 <% end %>
-
-<div class="alternative-format-links">[<%= link_to('csv', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv')) %>]</div>
