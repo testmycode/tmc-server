@@ -127,3 +127,14 @@
     </div>
   </div>
 </div>
+
+<% if @submission.message_for_paste && !@submission.message_for_paste.empty? %>
+  <div class="row">
+    <div class="card" style="width: 100%; margin-bottom: 1rem;">
+      <div class="card-body">
+        <h5 class="card-title">Paste message</h5>
+            <%= @submission.message_for_paste %>
+      </div>
+    </div>
+  </div>
+<% end %>
