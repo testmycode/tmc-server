@@ -10,6 +10,6 @@ class SubmissionReprocessorTask
   end
 
   def wait_delay
-    0.1
+    1
   end
 end
