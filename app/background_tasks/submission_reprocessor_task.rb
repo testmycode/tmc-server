@@ -8,4 +8,8 @@ class SubmissionReprocessorTask
   def run
     @processor.reprocess_timed_out_submissions
   end
+
+  def wait_delay
+    0.1
+  end
 end

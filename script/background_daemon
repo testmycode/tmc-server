@@ -36,7 +36,7 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
           end
         end
       end
-      sleep 0.1
+      sleep task.wait_delay
     end
   end
   # TODO: we may not detect if only one of the threads dies.

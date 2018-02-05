@@ -8,4 +8,8 @@ class BackgroundCourseRefresherTask
   def run
     @refresher.do_refresh
   end
+
+  def wait_delay
+    5
+  end
 end
