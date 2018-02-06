@@ -152,7 +152,7 @@ class CoursesController < ApplicationController
     groups.each do |name, conditions|
       array = conditions.values.reject(&:blank?)
       @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
-      UncomputedUnlock.create_all_for_course_eager(@course)
+      UncomputedUnlock.create_all_for_course(@course)
     end
 
     redirect_to manage_unlocks_organization_course_path, notice: 'Successfully set unlock dates.'

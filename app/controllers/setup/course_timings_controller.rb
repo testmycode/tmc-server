@@ -86,7 +86,7 @@ class Setup::CourseTimingsController < Setup::SetupController
         unlock_condition = "#{unlock_data[:_percentage_required]}% from #{unlock_data[:_unlock_groupname]}"
       end
       @course.exercise_group_by_name(name).group_unlock_conditions = Array(unlock_condition).to_json
-      UncomputedUnlock.create_all_for_course_eager(@course)
+      UncomputedUnlock.create_all_for_course(@course)
     end
   end
 
