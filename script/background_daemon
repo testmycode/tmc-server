@@ -35,8 +35,8 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
             Rails.logger.error 'Failed to get rid of used db connections: ' + exception_to_str(e2)
           end
         end
+        sleep task.wait_delay
       end
-      sleep task.wait_delay
     end
   end
   # TODO: we may not detect if only one of the threads dies.
