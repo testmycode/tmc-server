@@ -20,6 +20,7 @@ describe Api::V8::CoursesController, type: :controller do
           get :show, id: course.id
           expect(response).to have_http_status(:success)
           expect(response.body).to include course.name
+          expect(response.body).to include course.organization.slug
         end
       end
       describe "when hidden course's ID given" do

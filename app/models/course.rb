@@ -33,6 +33,7 @@ class Course < ActiveRecord::Base
     property :course_template_id, type: :integer, example: 1
     property :hide_submission_results, type: :boolean, example: false
     property :external_scoreboard_url, type: :string
+    property :organization_slug, type: :string, example: "hy"
   end
 
   swagger_schema :CoreCourseDetails do
@@ -66,7 +67,7 @@ class Course < ActiveRecord::Base
   end
 
   def course_as_json
-    as_json only: [
+    as_json(only: [
         :name,
         :hide_after,
         :hidden,
@@ -88,7 +89,8 @@ class Course < ActiveRecord::Base
         :course_template_id,
         :hide_submission_results,
         :external_scoreboard_url,
-    ]
+    ],
+    methods: :organization_slug)
   end
 
   swagger_schema :CourseLinks do
@@ -209,6 +211,10 @@ class Course < ActiveRecord::Base
 
   def git_branch
     course_template_obj.git_branch
+  end
+
+  def organization_slug
+    organization.slug
   end
 
   def source_url
