@@ -370,7 +370,7 @@ class CourseRefresher
     def points_for(exercise, no_directory_changes = false)
       # TODO: cache this in the template
       if no_directory_changes
-        other_course = c.course_template.courses.where(initial_refresh_ready: true).first
+        other_course = exercise.course.course_template.courses.where(initial_refresh_ready: true).first
         if other_course && !other_course.available_points.count.zero? && exercise != other_exercise
           other_exercise = other_course.exercises.find_by(name: exercise.name)
           return other_exercise.available_points.pluck(:name) if other_exercise
