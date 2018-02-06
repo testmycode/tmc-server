@@ -51,8 +51,8 @@ class CourseRefresher
   class Impl
     include SystemCommands
 
-    def measure_and_log(method_name)
-      log(method_name, Benchmark.measure { send(method_name) })
+    def measure_and_log(method_name, *args)
+      log(method_name, Benchmark.measure { send(method_name, *args) })
     end
 
     def log(method_name, result)
@@ -114,7 +114,7 @@ class CourseRefresher
           measure_and_log :delete_records_for_removed_exercises
           measure_and_log :update_exercise_options
           measure_and_log :set_has_tests_flags
-          measure_and_log :update_available_points                unless options[:no_background_operations]
+          measure_and_log :update_available_points, options[:no_directory_changes] unless options[:no_background_operations]
           measure_and_log :make_solutions                         unless options[:no_directory_changes]
           measure_and_log :make_stubs                             unless options[:no_directory_changes]
           measure_and_log :checksum_stubs
@@ -283,13 +283,13 @@ class CourseRefresher
       end
     end
 
-    def update_available_points
+    def update_available_points(no_directory_changes = false)
       @course.exercises.each do |exercise|
         review_points = @review_points[exercise.name]
         point_names = Set.new
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
 
-        points_data = points_for(exercise)
+        points_data = points_for(exercise, no_directory_changes)
         if points_data[0].is_a? Hash
           point_names += points_data.map { |x| x[:points] }.flatten
         else
@@ -367,9 +367,9 @@ class CourseRefresher
       end
     end
 
-    def points_for(exercise)
+    def points_for(exercise, no_directory_changes = false)
       # TODO: cache this in the template
-      if options[:no_directory_changes]
+      if no_directory_changes
         other_course = c.course_template.courses.where(initial_refresh_ready: true).first
         if other_course && !other_course.available_points.count.zero? && exercise != other_exercise
           other_exercise = other_course.exercises.find_by(name: exercise.name)
