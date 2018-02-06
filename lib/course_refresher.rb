@@ -289,7 +289,7 @@ class CourseRefresher
         point_names = Set.new
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
 
-        points_data = test_case_methods(exercise)
+        points_data = points_for(exercise)
         if points_data[0].is_a? Hash
           point_names += points_data.map { |x| x[:points] }.flatten
         else
@@ -367,7 +367,15 @@ class CourseRefresher
       end
     end
 
-    def test_case_methods(exercise)
+    def points_for(exercise)
+      # TODO: cache this in the template
+      if options[:no_directory_changes]
+        other_course = c.course_template.courses.where(initial_refresh_ready: true).first
+        if other_course && !other_course.available_points.count.zero? && exercise != other_exercise
+          other_exercise = other_course.exercises.find_by(name: exercise.name)
+          return other_exercise.available_points.pluck(:name) if other_exercise
+        end
+      end
       path = File.join(@course.clone_path, exercise.relative_path)
       TestScanner.get_test_case_methods(@course, exercise.name, path)
     end
