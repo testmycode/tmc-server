@@ -11,7 +11,7 @@ gem 'daemons', '~> 1.2.3'
 gem 'google-spreadsheet-ruby'
 gem 'mimemagic', '~> 0.3.0'
 gem 'natcmp', '~> 1.4'
-gem 'newrelic_rpm'
+gem 'newrelic_rpm', '~> 4.8', '>= 4.8.0.341'
 gem 'paperclip', '~> 5.0'
 gem 'pdfkit', '~> 0.8.2'
 gem 'pg', '~> 0.19.0'
@@ -23,7 +23,7 @@ gem 'transaction_isolation', '~> 1.0.3'
 gem 'xml-simple', '~> 1.1.1'
 
 gem 'hiredis' # Redis for caching
-gem 'newrelic-redis'
+# gem 'newrelic-redis' blocks new relic updates
 gem 'readthis' # Redis for caching
 
 gem 'doorkeeper'
@@ -46,7 +46,7 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'capybara', '~> 2.5.0'
+  gem 'capybara', '~> 2.17'
   gem 'factory_girl_rails', '~> 4.5.0'
   gem 'poltergeist', '~> 1.7.0'
   gem 'rspec', '~> 3.5.0'
