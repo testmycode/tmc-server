@@ -25,6 +25,7 @@ gem 'xml-simple', '~> 1.1.1'
 gem 'hiredis' # Redis for caching
 # gem 'newrelic-redis' blocks new relic updates
 gem 'readthis' # Redis for caching
+gem 'redis', '~> 3.3.5'
 
 gem 'doorkeeper'
 gem 'gravtastic', '~> 3.2.6'
