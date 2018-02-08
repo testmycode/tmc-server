@@ -31,7 +31,7 @@ class OrganizationsController < ApplicationController
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
     @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
-    @my_courses_percent_completed = percent_completed_hash(@my_courses, current_user)
+    # @my_courses_percent_completed = percent_completed_hash(@my_courses, current_user)
     authorize! :read, @ongoing_courses
     authorize! :read, @expired_courses
   end
