@@ -32,10 +32,24 @@ module Api
         def index
           unauthorize_guest!
           course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+          authorize! :read, course
           exercises = Exercise.includes(:available_points).where(course_id: course.id)
 
-          visible = exercises.select { |ex| ex.visible_to?(current_user) }
-          presentable = visible.map do |ex|
+          unlocked_exercises = course.unlocks
+                                     .where(user_id: current_user.id)
+                                     .where(['valid_after IS NULL OR valid_after < ?', Time.now])
+                                     .pluck(:exercise_name)
+
+          unless current_user.administrator? || current_user.teacher?(course.organization) || current_user.assistant?(course)
+            exercises = exercises.where(hidden: false, disabled_status: 0)
+            exercises = if unlocked_exercises.empty?
+                          exercises.where(unlock_spec: nil)
+                        else
+                          exercises.where(["unlock_spec IS NULL OR name IN (#{unlocked_exercises.map { |_| '?' }.join(', ')})", *unlocked_exercises])
+                        end.select { |e| e._fast_visible_to?(current_user) }
+          end
+
+          presentable = exercises.map do |ex|
             {
               id: ex.id,
               available_points: ex.available_points,
@@ -47,8 +61,7 @@ module Api
             }
           end
 
-          authorize_collection :read, visible
-          present(presentable)
+          render json: presentable
         end
       end
     end
