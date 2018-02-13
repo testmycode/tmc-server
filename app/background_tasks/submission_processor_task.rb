@@ -44,12 +44,15 @@ class SubmissionProcessorTask
       next if !previous_enqueued_at.nil? && (previous_enqueued_at - Time.current) < 30.seconds
       @submission_enqueued_at[submission.id] = Time.current
       res = Concurrent::Promise.execute(executor: @pool) do
-        # While using timeouts is risky since it can raise an exception on any
-        # line, this is still worth the risk -- if this blocks it will hang
-        # all submissions.
-        Timeout.timeout(30) do
-          process_submission(submission)
-        end
+        # We have to spawn a new thread since this does chdirs
+        Thread.new do
+          # While using timeouts is risky since it can raise an exception on any
+          # line, this is still worth the risk -- if this blocks it will hang
+          # all submissions.
+          Timeout.timeout(30) do
+            process_submission(submission)
+          end
+        end.join
       end
 
       @submission_enqueued_at[submission.id] = nil unless res
