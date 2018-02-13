@@ -39,7 +39,7 @@ class SubmissionProcessorTask
     end
     Submission.to_be_reprocessed.limit(@limit).each do |submission|
       previous_enqueued_at = @submission_enqueued_at[submission.id]
-      next if previous_enqueued_at.nil? || (previous_enqueued_at - Time.current) < 30.seconds
+      next if !previous_enqueued_at.nil? && (previous_enqueued_at - Time.current) < 30.seconds
       @submission_enqueued_at[submission.id] = Time.current
       res = Concurrent::Promise.execute(executor: @pool) do
         # While using timeouts is risky since it can raise an exception on any
