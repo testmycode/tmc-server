@@ -21,6 +21,8 @@ class SubmissionProcessorTask
 
   def run
     process_submissions
+  rescue => e
+    logger.error("Failed to send submission: #{e}")
   end
 
   def wait_delay
