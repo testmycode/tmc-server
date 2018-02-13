@@ -32,7 +32,7 @@ class RemoteSandbox
         return true
       end
     end
-    Rails.logger.warn 'No free server to send submission to. Leaving to reprocessor daemon.'
+    Rails.logger.warn 'No free server to send submission to. Leaving to be processed later.'
     false
   end
 

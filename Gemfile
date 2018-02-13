@@ -40,6 +40,9 @@ gem 'sass-rails', '~> 5.0'
 gem 'bootstrap', '~> 4.0.0.beta2.1'
 gem "font-awesome-rails"
 
+gem 'concurrent-ruby', '~> 1.0', '>= 1.0.5'
+gem 'concurrent-ruby-ext', '~> 1.0', '>= 1.0.5'
+
 group :assets do
   gem 'jquery-rails', '~> 3.1.2'
   gem 'sprockets-rails', require: 'sprockets/railtie'

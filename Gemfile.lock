@@ -74,6 +74,8 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.2)
     concurrent-ruby (1.0.5)
+    concurrent-ruby-ext (1.0.5)
+      concurrent-ruby (= 1.0.5)
     connection_pool (2.2.1)
     crass (1.0.3)
     daemons (1.2.6)
@@ -365,6 +367,8 @@ DEPENDENCIES
   bundler-audit
   cancancan (~> 1.13.0)
   capybara (~> 2.17)
+  concurrent-ruby (~> 1.0, >= 1.0.5)
+  concurrent-ruby-ext (~> 1.0, >= 1.0.5)
   daemons (~> 1.2.3)
   database_cleaner (~> 1.5.0)
   doorkeeper
