@@ -60,8 +60,8 @@ class RemoteSandbox
         end
       rescue SandboxUnavailableError
         raise
-      rescue
-        Rails.logger.info "Submission #{submission.id} could not be packaged: #{$1}"
+      rescue => e
+        Rails.logger.info "Submission #{submission.id} could not be packaged: #{e}"
         Rails.logger.info "Marking submission #{submission.id} as failed."
         submission.pretest_error = 'Failed to process submission. Likely sent in incorrect format.'
         submission.processed = true
