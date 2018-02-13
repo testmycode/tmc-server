@@ -35,43 +35,39 @@ class SubmissionPackager
   #                        there is a toplevel directory with this name
   def package_submission(exercise, zip_path, return_file_path, extra_params = {}, config = {})
     Dir.mktmpdir do |dir|
-      Dir.chdir(dir) do
-        dest_name = config[:toplevel_dir_name] || 'dest'
-        FileUtils.mkdir_p('received')
-        FileUtils.mkdir_p(dest_name)
+      destination_path = File.join(dir, (config[:toplevel_dir_name] || 'dest'))
+      received_path = File.join(dir, 'received')
+      FileUtils.mkdir_p(received_path)
+      FileUtils.mkdir_p(destination_path)
 
-        Dir.chdir('received') do
-          SafeUnzipper.new.unzip(zip_path, '.')
-          remove_os_rubbish_files!
-        end
+      SafeUnzipper.new.unzip(zip_path, received_path)
+      remove_os_rubbish_files!(dir)
 
-        received = Pathname(find_received_project_root(Pathname('received')))
-        dest = Pathname(dest_name)
+      received = Pathname(find_received_project_root(Pathname(received_path)))
+      dest = Pathname(destination_path)
 
-        extra_params = if extra_params then extra_params.clone else {} end
-        extra_params['runtime_params'] = exercise.runtime_params_array
-        write_extra_params(dest + '.tmcparams', extra_params)
+      extra_params = extra_params ? extra_params.clone : {}
+      extra_params['runtime_params'] = exercise.runtime_params_array
+      write_extra_params(dest + '.tmcparams', extra_params)
 
-        #if config[:include_ide_files]
-          copy_ide_files(Pathname(exercise.clone_path), received, dest)
-        #end
+      # if config[:include_ide_files]
+      copy_ide_files(Pathname(exercise.clone_path), received, dest)
+      # end
 
-        # To get hidden tests etc, gsub stub with clone path...
-        if config[:tests_from_stub]
-          FileUtils.mkdir_p('stub')
-          Dir.chdir('stub') do
-            SafeUnzipper.new.unzip(exercise.stub_zip_file_path, '.')
-            remove_os_rubbish_files!
-          end
-          stub = Pathname(find_received_project_root(Pathname('stub')))
+      # To get hidden tests etc, gsub stub with clone path...
+      if config[:tests_from_stub]
+        stub_path = File.join(dir, stub)
+        FileUtils.mkdir_p(stub_path)
+        SafeUnzipper.new.unzip(exercise.stub_zip_file_path, stub_path)
+        remove_os_rubbish_files!(stub_path)
+        stub = Pathname(find_received_project_root(Pathname(stub_path)))
 
-          copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run])
-        else
-          copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run])
-        end
-
-        create_archive(dest, return_file_path, config[:format], !!config[:toplevel_dir_name])
+        copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run])
+      else
+        copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run])
       end
+
+      create_archive(dest, return_file_path, config[:format], !!config[:toplevel_dir_name])
     end
   end
 
@@ -86,8 +82,7 @@ class SubmissionPackager
                          include_ide_files: true,
                          format: :zip,
                          toplevel_dir_name: toplevel_dir_name,
-                         no_tmc_run: true
-      )
+                         no_tmc_run: true)
       File.read(return_zip_path)
     end
   end
@@ -97,19 +92,21 @@ class SubmissionPackager
   include SystemCommands
 
   def find_received_project_root(_received_root)
-    fail 'Implemented by subclass'
+    raise 'Implemented by subclass'
   end
 
   # Stupid OS X default zipper puts useless crap into zip files :[
   # Delete them or they might be mistaken for the actual source files later.
   # Let's clean up other similarly useless files while we're at it.
-  def remove_os_rubbish_files!
-    FileUtils.rm_f %w(.DS_Store desktop.ini Thumbs.db .directory __MACOSX)
+  def remove_os_rubbish_files!(dir)
+    %w[.DS_Store desktop.ini Thumbs.db .directory __MACOSX].each do |filename|
+      FileUtils.rm_f(File.join(dir, filename))
+    end
   end
 
   # All parameters are pathname objects
   def copy_files(_exercise, _received, _dest, _stub = nil, _opts = {})
-    fail 'Implemented by subclass'
+    raise 'Implemented by subclass'
   end
 
   def copy_ide_files(clone, received, dest)
@@ -136,9 +133,7 @@ class SubmissionPackager
   end
 
   def cp_r_if_exists(src, dest)
-    if !src.nil? && File.exist?(src)
-      FileUtils.cp_r(src, dest)
-    end
+    FileUtils.cp_r(src, dest) if !src.nil? && File.exist?(src)
   end
 
   # and tmc-langs
@@ -153,11 +148,10 @@ class SubmissionPackager
     tmc_project_file.extra_student_files.each do |rel_path|
       from = "#{received}/#{rel_path}"
       to = "#{dest}/#{rel_path}"
-      if File.exist?(from)
-        FileUtils.rm(to) if File.exist?(to)
-        FileUtils.mkdir_p(File.dirname(to))
-        FileUtils.cp(from, to)
-      end
+      next unless File.exist?(from)
+      FileUtils.rm(to) if File.exist?(to)
+      FileUtils.mkdir_p(File.dirname(to))
+      FileUtils.cp(from, to)
     end
   end
 
@@ -165,7 +159,7 @@ class SubmissionPackager
     File.open(file, 'wb') do |f|
       extra_params.each do |k, v|
         v = '' if v.nil?
-        escaped_v = if v.is_a?(Array) then SystemCommands.make_bash_array(v) else Shellwords.escape(v) end
+        escaped_v = v.is_a?(Array) ? SystemCommands.make_bash_array(v) : Shellwords.escape(v)
         f.puts 'export ' + Shellwords.escape(k) + '=' + escaped_v
       end
     end
@@ -181,12 +175,15 @@ class SubmissionPackager
       contents = '.'
     end
 
-    Dir.chdir(chdir) do
-      if format == :zip
-        sh! ['zip', '-r', archive_path, contents]
-      else
-        sh! ['tar', '-cpf', archive_path, contents]
+    # TODO: find out a way to do this without changing pwd
+    Thread.new do
+      Dir.chdir(chdir) do
+        if format == :zip
+          sh! ['zip', '-r', archive_path, contents]
+        else
+          sh! ['tar', '-cpf', archive_path, contents]
+        end
       end
-    end
+    end.join
   end
 end
