@@ -2,20 +2,37 @@
   color: black !important;
 }
 
-.organization-card:hover {
+.organization-card-link:hover {
   text-decoration: none;
 }
 
-.organization-card .card-body {
+.organization-card .card-body, .small-organization-card .card-body {
   display: flex;
+  align-items: center;
 }
+
+.organization-card:hover, .small-organization-card:hover {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+  filter: brightness(0.95);
+  transition: all .2s;
+}
+
+$image-size: 6rem;
 
 .organization-card .card-body img {
   margin-right: 1rem;
+  width: $image-size;
+  height: $image-size;
+}
+
+.small-organization-card .card-body img {
+  margin-right: 1rem;
+  width: $image-size/2;
+  height: $image-size/2;
 }
 
 .cover-content {
-  padding: 11rem;
+  padding-bottom: 11rem;
   padding-top: 7rem;
   text-align: center;
 }

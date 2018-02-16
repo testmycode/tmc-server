@@ -36,9 +36,11 @@
     <% @organizations.each do |organization| %>
       <% next if organization.hidden? && !can?(:view_hidden_organizations, nil) %>
       <li>
-        <%= link_to organization_path(organization) do %>
-          <div class="card">
+        <%= link_to organization_path(organization), class: "organization-card-link" do %>
+          <div class="card small-organization-card">
             <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
+              <%= image_tag(organization.logo.url(:small_logo), class: "img-fluid") %>
+              <div>
               <h6 class="card-title">
                 <%= organization.name %>
                 <small class="text-muted <%= /[[:upper:]]/.match(organization.name[-1]) ? 'text-littlebitup' : '' %>">
@@ -47,6 +49,7 @@
               </h6>
               <%= organization.information %>
             </div>
+          </div>
           </div>
         <% end %>
         <br>

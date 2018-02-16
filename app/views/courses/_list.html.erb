@@ -1,5 +1,5 @@
 <% locals[:courses].each do |course| %>
-  <%= link_to organization_course_path(@organization, course) do %>
+  <%= link_to organization_course_path(@organization, course), class: "course-card-link" do %>
     <div class="card course-card<% unless course.hidden? || course.disabled? %> border-secondary<% end %>">
       <div class="card-body<% if course.hidden? || course.disabled? %> text-secondary<% end %>">
         <h4 class="card-title">
