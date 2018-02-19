@@ -1,6 +1,7 @@
 class SubmissionPackager
   class Langs < SubmissionPackager
     private
+
     def find_received_project_root(received_root)
       src_dir_path = TmcDirUtils.find_dir_containing(received_root, 'src')
       src_dir_path = received_root if src_dir_path.nil?
@@ -15,6 +16,7 @@ class SubmissionPackager
       config = TmcLangs.get.get_exercise_config(exercise.clone_path)
       config['studentFilePaths'].each do |folder|
         src = received + folder
+        FileUtils.mkdir_p(dest + Pathname(folder).dirname) if folder.include?('/')
         FileUtils.cp_r(src, dest + folder) if FileTest.exist?(src)
       end
       config['exerciseFilePaths'].each do |folder|
@@ -31,7 +33,7 @@ class SubmissionPackager
     end
 
     def copy_libs(cloned, dest)
-      FileUtils.cp_r(cloned + 'lib', dest + 'lib') if File.exists?(cloned + 'lib')
+      FileUtils.cp_r(cloned + 'lib', dest + 'lib') if File.exist?(cloned + 'lib')
     end
 
     def tmc_run_path
