@@ -17,6 +17,8 @@ class Setup::OrganizationsController < Setup::SetupController
 
     if !@organization.errors.any?
       redirect_to organization_path(@organization), notice: 'Organization was successfully created.'
+      # TODO: Background task
+      NewOrganizationRequestMailer.request_email(@organization).deliver_now
     else
       render :new
     end
