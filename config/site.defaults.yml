@@ -78,6 +78,8 @@ emails:
   from: noreply@example.com
   email_code_reviews_by_default: false
 
+# Used for email notifications intended for site admins
+administrative_email: ""
 
 ### Enable or disable features ###
 
