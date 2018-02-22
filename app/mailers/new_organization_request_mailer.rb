@@ -6,6 +6,6 @@ class NewOrganizationRequestMailer < ActionMailer::Base
     end
     @organization = organization
     @creator = organization.creator
-    mail(to: email, subject: 'New TestMyCode Organization Request')
+    mail(from: SiteSetting.value('emails')['from'], to: email, subject: 'New TestMyCode Organization Request')
   end
 end
