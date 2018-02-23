@@ -8,7 +8,9 @@
     <% end %>
   </li>
 
-  <% if can? :see_points, @exercise %>
+  <% if @current_user.guest? %>
+    <li>Log in to see your points</li>
+  <% elsif can? :see_points, @exercise %>
     <% if @exercise.available_points.empty? %>
       <li>No points available</li>
     <% else %>
