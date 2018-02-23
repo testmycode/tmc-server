@@ -34,6 +34,8 @@ class User < ActiveRecord::Base
   validates :email, presence: true,
                     uniqueness: { case_sensitive: false }
 
+  validate :reject_common_login_mistakes, on: :create
+
   scope :legitimate_students, -> { where(legitimate_student: true) }
   scope :non_legitimate_students, -> { where(legitimate_student: false) }
 
@@ -296,5 +298,11 @@ class User < ActiveRecord::Base
 
   def secure_hash(string)
     Digest::SHA2.hexdigest(string)
+  end
+
+  def reject_common_login_mistakes
+    return if !login || login.empty?
+    errors.add(:login, "may not be your email address. Keep in mind that your username is public to everyone.") if login.include?('@')
+    errors.add(:login, "may not be a number. Use the organizational identifier field for your student number.") if login.scan(/\D/).empty?
   end
 end
