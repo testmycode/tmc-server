@@ -7,7 +7,7 @@ class SubmissionsController < ApplicationController
   before_action :get_course_and_exercise
 
   # Manually checked for #show and index
-  skip_authorization_check only: [:show, :index]
+  skip_authorization_check only: [:show, :index, :difference_with_solution]
 
   def index
     respond_to do |format|
@@ -195,6 +195,41 @@ class SubmissionsController < ApplicationController
     redirect_to exercise_path(@exercise), notice: 'Reruns scheduled'
   end
 
+  def difference_with_solution
+    respond_access_denied unless current_user.administrator?
+    @course ||= @submission.course
+    @exercise ||= @submission.exercise
+    @organization = @course.organization
+    add_course_breadcrumb
+    add_exercise_breadcrumb
+    add_submission_breadcrumb
+    add_breadcrumb 'Difference with model solution'
+
+    submission_files = SourceFileList.for_submission(@submission)
+    solution_files = SourceFileList.for_solution(@exercise.solution)
+    files_in_list = Set.new
+    @files = []
+    submission_files.each do |file|
+      # TODO: In some exercises files may be named differently. Some kind of
+      # similarity metric would be nice here
+      model = solution_files.find { |solution_file| file.path == solution_file.path}
+      @files << {
+        path: file.path,
+        submission_contents: file.contents,
+        model_contents: (model.nil? ? '' : model.contents)
+      }
+      files_in_list << file.path
+    end
+    solution_files.each do |file|
+      next if files_in_list.include?(file.path)
+      @files << {
+        path: file.path,
+        submission_contents: '',
+        model_contents: model.contents
+      }
+    end
+  end
+
   private
 
   def course_transaction
@@ -205,8 +240,9 @@ class SubmissionsController < ApplicationController
 
   # Ugly manual access control :/
   def get_course_and_exercise
-    if params[:id]
-      @submission = Submission.find(params[:id])
+    submission_id = params[:id] || params[:submission_id]
+    if submission_id
+      @submission = Submission.find(submission_id)
       authorize! :read, @submission
       @course = @submission.course
       @exercise = @submission.exercise

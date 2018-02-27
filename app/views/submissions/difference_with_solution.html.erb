@@ -1,0 +1,43 @@
+<h1>Submission difference</h1>
+
+<div class="alert alert-warning">
+  This is a naive and experimental feature that calculates the
+  difference between this submission and the model solution.
+  This may sometimes be helpful when trying to figure out what's wrong with
+  a submission.
+</div>
+
+<% @files.each do |file| %>
+  <div class="card">
+    <div class="card-body">
+    <h2><%= file[:path] %></h2>
+    <div class="code-pair" data-path="<%= file[:path] %>">
+      <div class="submission-code"><%= file[:submission_contents] %></div>
+      <div class="model-code"><%= file[:model_contents] %></div>
+    </div>
+    </div>
+  </div>
+  <br>
+<% end %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js" integrity="sha256-qsdlWiFdhEjZXZhx6NikCsPZqvONgasszEPBzSZ7j6M=" crossorigin="anonymous"></script>
+
+<script>
+  var dmp = new diff_match_patch();
+  document.querySelectorAll('.code-pair').forEach(function (pairElement) {
+    var path = pairElement.dataset.path;
+    var submissionCode = pairElement.querySelector('.submission-code').innerHTML;
+    var modelCode = pairElement.querySelector('.model-code').innerHTML;
+    var diff = dmp.diff_main(modelCode, submissionCode);
+    var outputHtml = dmp.diff_prettyHtml(diff).replace(/&para;/g, '');
+    pairElement.innerHTML = outputHtml;
+  });
+</script>
+
+<style>
+  ins, .code-pair span {
+    font-family: monospace;
+    white-space: pre;
+    text-decoration: none;
+  }
+</style>

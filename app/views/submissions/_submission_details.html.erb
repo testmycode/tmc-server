@@ -65,6 +65,7 @@
 
         <% if current_user.administrator? && @submission.sandbox  %>
           <li>Sandbox used: <%= @submission.sandbox %></li>
+          <li><%= link_to 'Difference with model solution', submission_difference_with_solution_path(@submission) %> (only for admins)</li>
         <% end %>
       </ul>
 

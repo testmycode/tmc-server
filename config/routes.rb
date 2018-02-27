@@ -248,6 +248,7 @@ TmcServer::Application.routes.draw do
     resources :files, only: [:index]
     resources :reviews, only: [:index, :new, :create]
     resources :full_zip, only: [:index]
+    get 'difference_with_solution', to: 'submissions#difference_with_solution'
   end
 
   get 'paste/:paste_key', to: 'submissions#show', as: 'paste'
