@@ -1,5 +1,11 @@
-<%= form_for :session, :url => sessions_path, html: { class: 'login-form' } do |f| %>
-  <%= f.text_field :login, class: 'span2', placeholder: 'Username' %>
-  <%= f.password_field :password, class: 'span2', placeholder: 'Password' %>
-  <%= f.submit "Sign in", class: "btn btn-primary" %>
+<%= form_for :session, :url => sessions_path, html: { class: '' } do |f| %>
+  <div class='form-group'>
+    <label for='username'>Username</label>
+    <%= f.text_field :login, class: 'form-control', id: 'username', placeholder: 'Username' %>
+  </div>
+  <div class='form-group'>
+  <label for='password'>Password</label>
+  <%= f.password_field :password, class: 'form-control', id: 'password', placeholder: 'Password' %>
+  </div>
+  <%= f.submit "Sign in", class: "btn btn-primary login-form-button" %>
 <% end %>

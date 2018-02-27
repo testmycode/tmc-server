@@ -10,31 +10,11 @@
   margin: 30px auto;
 }
 
-.login-container input {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-  margin: 15px 0;
-  height: 40px;
-}
-
-.login-container input:focus {
-  box-shadow: none;
-}
-
-.login-container input.btn {
-  background-color: #3498db !important;
-  background-image: none;
-  transition: background-color .4s;
-  font-weight: bold;
-}
-
-.login-container input.btn:hover {
-  background-color: #2980b9 !important;
-  background-image: none;
-}
-
 .login-container h1 {
+  margin-bottom: 20px;
+}
+
+.login-form-button {
+  width: 100%;
   margin-bottom: 20px;
 }
