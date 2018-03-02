@@ -225,7 +225,7 @@ class SubmissionsController < ApplicationController
       @files << {
         path: file.path,
         submission_contents: '',
-        model_contents: model.contents
+        model_contents: file.contents
       }
     end
   end
