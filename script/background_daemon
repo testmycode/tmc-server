@@ -21,8 +21,8 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
 
   # Tasks may be longrunning so we want each one in a thread so one task won't
   # block other ones.
-  threads = BackgroundTaskRegistry.all_tasks.map do |task|
-    Thread.new do
+  processes = BackgroundTaskRegistry.all_tasks.map do |task|
+    Process.fork do
       loop do
         begin
           task.run
@@ -40,5 +40,5 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
     end
   end
   # TODO: we may not detect if only one of the threads dies.
-  threads.each(&:join)
+  processes.each(&:wait)
 end
