@@ -35,7 +35,7 @@ class TmcLangs < MavenProject
   def scan_exercise(path)
     temp_file = ::Tempfile.new('langs')
     clean(path)
-    exec("scan-exercise", path, temp_file.path)
+    exec('scan-exercise', path, temp_file.path)
     clean(path)
     JSON.parse(File.read(temp_file))
   end
@@ -45,27 +45,36 @@ class TmcLangs < MavenProject
   end
 
   def make_stubs(from_dir, to_dir)
-    exec("prepare-stubs", from_dir, to_dir)
+    exec('prepare-stubs', from_dir, to_dir)
   end
 
   def make_solutions(from_dir, to_dir)
-    exec("prepare-solutions", from_dir, to_dir)
+    exec('prepare-solutions', from_dir, to_dir)
   end
 
   def clean(project)
-    exec("clean", project, "ignored")
+    exec('clean', project, 'ignored')
   end
 
   def get_exercise_config(from_dir)
     temp_file = ::Tempfile.new('langs')
-    exec("get-exercise-packaging-configuration", from_dir, temp_file.path)
+    exec('get-exercise-packaging-configuration', from_dir, temp_file.path)
     JSON.parse(File.read(temp_file))
   end
 
   private
+
   def exec(cmd, exercise_path, output_path)
     res = SystemCommands.sh!('java', '-jar', jar_path, cmd, '--exercisePath', exercise_path, '--outputPath', output_path)
     Rails.logger.debug(res)
     res
+  rescue StandardError => e
+    begin
+      langs_output = File.read(output_path)
+      Rails.logger.error("Executing tmc-langs failed! Tmc-langs output: #{langs_output}")
+    rescue StandardError => e
+      Rails.logger.error("Could not read tmc-langs results: #{e} ")
+    end
+    raise e
   end
 end
