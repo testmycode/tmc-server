@@ -21,7 +21,7 @@ class SubmissionPackager
       end
       config['exerciseFilePaths'].each do |folder|
         src = tests + folder
-        SystemCommands.sh!('cp', '-r', '--no-target-directory', src, dest + folder) if FileTest.exist?(src)
+        SystemCommands.sh!('cp', '-r', '--no-target-directory', '--no-clobber', src, dest + folder) if FileTest.exist?(src)
       end
 
       copy_files_in_dir_no_recursion(cloned, dest)
