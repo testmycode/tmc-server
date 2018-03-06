@@ -65,7 +65,7 @@ module ExtraFieldHelper
     return '' if field.field_type == :html
     field_name = prefix + field.name
     field_tag = check_box_tag(field_name, '1', !value.blank?)
-    bs_labeled_field(raw(field.name.humanize), field_tag, order: :label_last)
+    labeled_field(raw(field.name.humanize), field_tag, :order => :label_last, :super_class => "checkbox")
   end
 
   def extra_field_value(value_record)

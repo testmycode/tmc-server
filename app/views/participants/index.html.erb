@@ -1,6 +1,6 @@
 <h1>List of participants</h1>
 
-<%= form_tag(participants_path, :method => :get) do %>
+<%= form_tag(participants_path, :method => :get, :id => "filter-form") do %>
   <div style="float: left">
     <%= render :partial => 'participants/filter_controls' %>
   </div>

@@ -1,4 +1,6 @@
 /* Submissions status*/
+@import "_footer";
+
 .error,
 .failure,
 .fail {
@@ -144,8 +146,16 @@ div.stack-trace {
   font-family: monospace;
 }
 
+.scrollable-container {
+  width: 95vw;
+  height: 70vh;
+  align-self: left;
+}
+
 .scrollable {
   overflow: auto;
+  max-height: 100%;
+  max-width: 100%;
 }
 
 div.feedback-question {
@@ -459,4 +469,14 @@ td.hljs-ln-code {
   float: left;
   margin-right: 1rem;
   min-width: 200px;
+}
+
+#content-area {
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+}
+
+#filter-form input[type="checkbox"], select {
+  margin: 0.2rem;
 }
