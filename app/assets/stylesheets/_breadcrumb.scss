@@ -1,5 +1,7 @@
+$breadcrumb-grey: #e9ecef;
+
 .breadcumb-nav {
-  background-color: #e9ecef;
+  background-color: $breadcrumb-grey;
   border-radius: 0.25rem;
   display: flex;
   align-items: center;

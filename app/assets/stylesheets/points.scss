@@ -1,15 +1,14 @@
 .course-point-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-around;
+  align-content: center;
   align-items: center;
 }
 
 .point-cell {
   border: 1px solid black;
-  text-align: center;
 }
 
 .points-container {
   align-self: center;
 }
-

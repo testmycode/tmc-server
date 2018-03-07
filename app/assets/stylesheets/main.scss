@@ -1,5 +1,6 @@
 /* Submissions status*/
 @import "_footer";
+@import "_breadcrumb";
 
 .error,
 .failure,
@@ -146,16 +147,11 @@ div.stack-trace {
   font-family: monospace;
 }
 
-.scrollable-container {
+.scrollable {
   width: 95vw;
   height: 70vh;
   align-self: left;
-}
-
-.scrollable {
   overflow: auto;
-  max-height: 100%;
-  max-width: 100%;
 }
 
 div.feedback-question {
@@ -180,11 +176,15 @@ table {
 
 table > * > tr > td {
   padding: 6px 14px 6px 14px;
+  text-align: center;
 }
 
 table > * > tr > th {
   padding: 6px 4px 6px 4px;
   border: 0;
+  text-align: center;
+  max-width: 5rem;
+  word-wrap: break-word;
 }
 
 tr.table-totals > td {
@@ -194,7 +194,7 @@ tr.table-totals > td {
 /* Points tables */
 
 table.points {
-  width: auto;
+  min-width: 100%;
 }
 
 table.points tr.admin * {
@@ -203,6 +203,10 @@ table.points tr.admin * {
 
 table.points > * > tr > td {
   text-align: center;
+}
+
+table.points > tbody tr:nth-child(odd) {
+  background-color: lighten($breadcrumb-grey, 4%);
 }
 
 /* Code reviews */
