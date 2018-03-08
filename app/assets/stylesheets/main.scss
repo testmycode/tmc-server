@@ -176,15 +176,21 @@ table {
 
 table > * > tr > td {
   padding: 6px 14px 6px 14px;
-  text-align: center;
 }
 
 table > * > tr > th {
   padding: 6px 4px 6px 4px;
   border: 0;
+}
+
+table.points > * > tr > th {
   text-align: center;
   max-width: 5rem;
   word-wrap: break-word;
+}
+
+table.points > * > tr > td {
+  text-align: center;
 }
 
 tr.table-totals > td {

@@ -30,10 +30,7 @@
         <tr class="table-totals">
           <td>-</td>
           <% nstudents = @summary[:users].length %>
-          <td><%= nstudents %></td>
-          <% if @user_fields %>
-            <td colspan="<%= @user_fields.length %>"></td>
-          <% end %>
+          <td colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>"><%= nstudents %></td>
           <% @summary[:sheets].each do |sheet| %>
             <td>
               <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
