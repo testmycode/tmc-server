@@ -1,117 +1,117 @@
 <div class="points-container">
-  <% unless @bare_layout %>
-    <div class="course-point-header">
-    <h1>Summary of points for <%= @course.title %></h1>
-    <% if can?(:teach, @course) %>
-      <div class="alternative-format-links"><%= link_to('Export as CSV', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv'), class: "btn btn-primary") %></div>
-    <% end %>
-    </div>
+<% unless @bare_layout %>
+  <div class="course-point-header">
+  <h1>Summary of points for <%= @course.title %></h1>
+  <% if can?(:teach, @course) %>
+    <div class="alternative-format-links"><%= link_to('Export as CSV', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv'), class: "btn btn-primary") %></div>
   <% end %>
+  </div>
+<% end %>
 
-  <%
-    show_total_column = @summary[:sheets].size > 1
-  %>
+<%
+  show_total_column = @summary[:sheets].size > 1
+%>
+<% @user_fields_length = @user_fields ? @user_fields.length : 0 %>
+<% @exercises_length = @summary[:sheets] ? @summary[:sheets].length : 0 %>
 
-  <%= content_tag('div', :class => if @bare_layout then nil else 'scrollable' end) do %>
-    <% @user_fields_length = @user_fields ? @user_fields.length : 0 %>
-    <% @exercises_length = @summary[:sheets] ? @summary[:sheets].length : 0 %>
-    <table class="points" >
-      <thead>
-        <tr>
-          <th></th>
-          <th colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>">Number of students</th>
-          <% if !@summary[:sheets].empty? %>
-            <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
+<%= content_tag('div', :class => if @bare_layout then nil elsif @user_fields_length + @exercises_length >= 6 then 'scrollable' end) do %>
+  <table class="points" >
+    <thead>
+      <tr>
+        <th></th>
+        <th colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>">Number of students</th>
+        <% if !@summary[:sheets].empty? %>
+          <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
+        <% end %>
+        <% if show_total_column %>
+          <th>Total</th>
+        <% end %>
+      </tr>
+      <tr class="table-totals">
+        <td>-</td>
+        <% nstudents = @summary[:users].length %>
+        <td colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>"><%= nstudents %></td>
+        <% @summary[:sheets].each do |sheet| %>
+          <td>
+            <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
+          </td>
+        <% end %>
+        <% if show_total_column %>
+          <td>
+            <%= "#{@summary[:total_awarded]}/#{@summary[:total_available]*nstudents}" %>
+          </td>
+        <% end %>
+      </tr>
+      <tr>
+        <th></th>
+        <th>
+          Student<br />
+          <% unless params[:sort_by].blank? %>
+            [<%= link_to 'sort', organization_course_points_path(@organization, @course) %>]
+          <% else %>
+            [sort]
           <% end %>
-          <% if show_total_column %>
-            <th>Total</th>
+        </th>
+          <% if @user_fields %>
+            <% @user_fields.each do |field| %>
+              <th><%= field.label %></th>
+            <% end %>
           <% end %>
-        </tr>
-        <tr class="table-totals">
-          <td>-</td>
-          <% nstudents = @summary[:users].length %>
-          <td colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>"><%= nstudents %></td>
-          <% @summary[:sheets].each do |sheet| %>
-            <td>
-              <%= "#{sheet[:total_awarded]}/#{sheet[:total_available]*nstudents}" %>
-            </td>
-          <% end %>
-          <% if show_total_column %>
-            <td>
-              <%= "#{@summary[:total_awarded]}/#{@summary[:total_available]*nstudents}" %>
-            </td>
-          <% end %>
-        </tr>
-        <tr>
-          <th></th>
+        <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
           <th>
-            Student<br />
-            <% unless params[:sort_by].blank? %>
-              [<%= link_to 'sort', organization_course_points_path(@organization, @course) %>]
+            <%= sheet %><br />
+            [<%= link_to 'open', organization_course_point_path(@organization, @course, sheet) %>]
+            <br/>
+            <% unless params[:sort_by] == "#{sheet}_points" %>
+              [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "#{sheet}_points") %>]
             <% else %>
               [sort]
             <% end %>
           </th>
-            <% if @user_fields %>
-              <% @user_fields.each do |field| %>
-                <th><%= field.label %></th>
-              <% end %>
+        <% end %>
+        <% if show_total_column %>
+          <th>
+            Total<br />
+            <% unless params[:sort_by] == 'total_points' %>
+              [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "total_points") %>]
+            <% else %>
+              [sort]
             <% end %>
-          <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
-            <th>
-              <%= sheet %><br />
-              [<%= link_to 'open', organization_course_point_path(@organization, @course, sheet) %>]
-              <br/>
-              <% unless params[:sort_by] == "#{sheet}_points" %>
-                [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "#{sheet}_points") %>]
-              <% else %>
-                [sort]
-              <% end %>
-            </th>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @summary[:users].each_with_index do |user, index| %>
+        <% username = user.login %>
+        <% row_class = if user.administrator? || user.teacher?(@organization) then "admin" else "student" end %>
+        <tr class="<%= row_class %>">
+          <td><%= index + 1 %></td>
+          <td>
+            <% if current_user.id == user.id || can?(:teach, @course) %>
+              <%= link_to username, participant_path(user) %>
+            <% else %>
+              <%= username %>
+            <% end %>
+          </td>
+          <% if @user_fields %>
+            <% @user_fields.each do |field| %>
+              <% field_record = user.user_field_values.find { |o| o.field_name == field.name } %>
+              <td><%= field_record.value if field_record %></td>
+            <% end %>
+          <% end %>
+          <% @summary[:sheets].each do |sheet| %>
+            <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>
+            <td>
+              <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
+            </td>
           <% end %>
           <% if show_total_column %>
-            <th>
-              Total<br />
-              <% unless params[:sort_by] == 'total_points' %>
-                [<%= link_to 'sort', organization_course_points_path(@organization, @course, :sort_by => "total_points") %>]
-              <% else %>
-                [sort]
-              <% end %>
-            </th>
+            <td><%= "#{@summary[:total_for_user][username].to_i}/#{@summary[:total_available]}" %></td>
           <% end %>
         </tr>
-      </thead>
-      <tbody>
-        <% @summary[:users].each_with_index do |user, index| %>
-          <% username = user.login %>
-          <% row_class = if user.administrator? || user.teacher?(@organization) then "admin" else "student" end %>
-          <tr class="<%= row_class %>">
-            <td><%= index + 1 %></td>
-            <td>
-              <% if current_user.id == user.id || can?(:teach, @course) %>
-                <%= link_to username, participant_path(user) %>
-              <% else %>
-                <%= username %>
-              <% end %>
-            </td>
-            <% if @user_fields %>
-              <% @user_fields.each do |field| %>
-                <% field_record = user.user_field_values.find { |o| o.field_name == field.name } %>
-                <td><%= field_record.value if field_record %></td>
-              <% end %>
-            <% end %>
-            <% @summary[:sheets].each do |sheet| %>
-              <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>
-              <td>
-                <%= "#{user_points_for_this_sheet}/#{sheet[:total_available]}" %>
-              </td>
-            <% end %>
-            <% if show_total_column %>
-              <td><%= "#{@summary[:total_for_user][username].to_i}/#{@summary[:total_available]}" %></td>
-            <% end %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  <% end %>
-</div>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+<div>

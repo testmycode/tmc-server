@@ -1,6 +1,5 @@
 /* Submissions status*/
-@import "_footer";
-@import "_breadcrumb";
+@import "breadcrumb";
 
 .error,
 .failure,
@@ -150,7 +149,7 @@ div.stack-trace {
 .scrollable {
   width: 95vw;
   height: 70vh;
-  align-self: left;
+  align-self: center;
   overflow: auto;
 }
 
@@ -481,7 +480,7 @@ td.hljs-ln-code {
   min-width: 200px;
 }
 
-#content-area {
+.points-container {
   display: flex;
   flex-direction: column;
   align-content: stretch;

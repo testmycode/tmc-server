@@ -1,4 +1,4 @@
-FROM tmc-server-base
+FROM testmycode/tmc-server-base:latest
 LABEL name tmc-server
 
 ADD Gemfile /app/Gemfile
