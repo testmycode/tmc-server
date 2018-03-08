@@ -147,10 +147,10 @@ div.stack-trace {
 }
 
 .scrollable {
-  width: 95vw;
-  height: 70vh;
   align-self: center;
+  height: 70vh;
   overflow: auto;
+  width: 95vw;
 }
 
 div.feedback-question {
@@ -171,6 +171,19 @@ form.single-button {
 table {
   border-collapse: collapse;
   width: 100%;
+
+  &.points {
+    min-width: 100%;
+    text-align: center;
+    tbody tr:nth-child(odd) {
+      background-color: lighten($breadcrumb-grey, 4%);
+    }
+  }
+
+  &.points tr.admin * {
+    color: #808080;
+  }
+
 }
 
 table > * > tr > td {
@@ -194,24 +207,6 @@ table.points > * > tr > td {
 
 tr.table-totals > td {
   font-weight: bold;
-}
-
-/* Points tables */
-
-table.points {
-  min-width: 100%;
-}
-
-table.points tr.admin * {
-  color: gray;
-}
-
-table.points > * > tr > td {
-  text-align: center;
-}
-
-table.points > tbody tr:nth-child(odd) {
-  background-color: lighten($breadcrumb-grey, 4%);
 }
 
 /* Code reviews */
@@ -481,11 +476,12 @@ td.hljs-ln-code {
 }
 
 .points-container {
+  align-content: stretch;
   display: flex;
   flex-direction: column;
-  align-content: stretch;
 }
 
-#filter-form input[type="checkbox"], select {
+.filter-form input[type="checkbox"],
+ select {
   margin: 0.2rem;
 }
