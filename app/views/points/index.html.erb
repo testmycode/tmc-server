@@ -3,7 +3,7 @@
     <div class="course-point-header">
     <h1>Summary of points for <%= @course.title %></h1>
     <% if can?(:teach, @course) %>
-      <div class="alternative-format-links"><%= link_to('Export as CSV', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv'), class: "btn btn-primary") %></div>
+      <div class="alternative-options-links"><%= link_to('Export as CSV', organization_course_points_path(@organization, @course, :sort_by => params[:sort_by], :format => 'csv'), class: "btn btn-primary") %></div>
     <% end %>
     </div>
   <% end %>
