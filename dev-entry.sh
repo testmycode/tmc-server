@@ -12,5 +12,5 @@ if [ ! -z $cmd ]; then
 fi
 
 /app/script/background_daemon run &
-rails s -b 0.0.0.0
+bundle exec rails s -b 0.0.0.0
 

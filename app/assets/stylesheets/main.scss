@@ -1,4 +1,6 @@
 /* Submissions status*/
+@import "breadcrumb";
+
 .error,
 .failure,
 .fail {
@@ -145,7 +147,10 @@ div.stack-trace {
 }
 
 .scrollable {
+  align-self: center;
+  height: 70vh;
   overflow: auto;
+  width: 95vw;
 }
 
 div.feedback-question {
@@ -166,6 +171,19 @@ form.single-button {
 table {
   border-collapse: collapse;
   width: 100%;
+
+  &.points {
+    min-width: 100%;
+    text-align: center;
+    tbody tr:nth-child(odd) {
+      background-color: lighten($breadcrumb-grey, 4%);
+    }
+  }
+
+  &.points tr.admin * {
+    color: #808080;
+  }
+
 }
 
 table > * > tr > td {
@@ -177,22 +195,18 @@ table > * > tr > th {
   border: 0;
 }
 
-tr.table-totals > td {
-  font-weight: bold;
-}
-
-/* Points tables */
-
-table.points {
-  width: auto;
-}
-
-table.points tr.admin * {
-  color: gray;
+table.points > * > tr > th {
+  text-align: center;
+  max-width: 5rem;
+  word-wrap: break-word;
 }
 
 table.points > * > tr > td {
   text-align: center;
+}
+
+tr.table-totals > td {
+  font-weight: bold;
 }
 
 /* Code reviews */
@@ -459,4 +473,15 @@ td.hljs-ln-code {
   float: left;
   margin-right: 1rem;
   min-width: 200px;
+}
+
+.points-container {
+  align-content: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-form input[type="checkbox"],
+ select {
+  margin: 0.2rem;
 }

@@ -1,0 +1,11 @@
+@import "breadcrumb";
+
+.course-point-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.point-cell {
+  border: 1px solid darken($breadcrumb-grey, 5%);
+}

@@ -1,86 +1,90 @@
-
-<% unless @bare_layout %>
-  <h1>Points for <%= @sheetname %> of <%= @course.title %></h1>
-<% end %>
-
-<ul>
-  <li>
-    <% if params[:sort_by].blank? %>
-      <%= link_to 'Sort by points', organization_course_point_path(@organization, @course, @sheetname, :sort_by => 'points') %>
-    <% else %>
-      <%= link_to 'Sort by username', organization_course_point_path(@organization, @course, @sheetname) %>
+<div class="points-container">
+  <div class="course-point-header">
+    <% unless @bare_layout %>
+      <h1>Points for <%= @sheetname %> of <%= @course.title %></h1>
     <% end %>
-  </li>
-  <% if can? :refresh_gdocs_spreadsheet, @course %>
-      <% link_to 'Refresh Google Docs worksheet', refresh_gdocs_organization_course_point_path(@organization, @course, @sheetname) %>
-  <% end %>
-</ul>
 
-<%= content_tag('div', :class => if @bare_layout then nil else 'scrollable' end) do %>
-  <table class="points">
-    <thead>
-      <% if tailoring.show_exercise_names_in_points_table %>
-        <tr>
-          <th></th>
-          <th>Username</th>
-          <% if @user_fields %>
-            <% @user_fields.each do |field| %>
-              <th><%= field.label %></th>
-            <% end %>
-          <% end %>
-          <% @exercises.each do |exercise| %>
-            <% points = exercise.available_points.order! %>
-            <% if points.size > 0 %>
-              <th colspan="<%= points.size %>"><%= tailoring.exercise_name_for_points_table(exercise) %></th>
-            <% end %>
-          <% end %>
-        </tr>
+    <div class="alternative-format-links">
+      <% if params[:sort_by].blank? %>
+        <%= link_to 'Sort by points', organization_course_point_path(@organization, @course, @sheetname, :sort_by => 'points'),  class: "btn btn-primary" %>
+      <% else %>
+        <%= link_to 'Sort by username', organization_course_point_path(@organization, @course, @sheetname,  class: "btn btn-primary") %>
       <% end %>
-      <tr>
-        <th colspan="<%= 2 + (@user_fields ? @user_fields.length : 0) %>"></th>
+    </div>
+      <% if can? :refresh_gdocs_spreadsheet, @course %>
+        <% link_to 'Refresh Google Docs worksheet', refresh_gdocs_organization_course_point_path(@organization, @course, @sheetname), class: "btn btn-primary" %>
+      <% end %>
+  </div>
 
-        <% @exercises.each do |exercise| %>
-          <% exercise.available_points.sort.each do |point| %>
-            <th><%= point.name %></th>
-          <% end %>
-        <% end %>
-      </tr>
-    </thead>
+  <% @user_fields_length = @user_fields ? @user_fields.length : 0 %>
+  <% @exercises_length = @exercises? @exercises.length : 0 %>
 
-    <tbody>
-      <% @users.each_with_index do |user, index| %>
-        <% if !user.administrator? || current_user.administrator? %>
-          <% row_class = if user.administrator? then "admin" else "student" end %>
-          <% user_points = @users_to_points[user.login] %>
-          <tr class="<%= row_class %>">
-            <td><%= index + 1 %></td>
-            <td>
-              <% if current_user.id == user.id || can?(:teach, @course) %>
-                <%= link_to user.login, participant_path(user) %>
-              <% else %>
-                <%= user.login %>
-              <% end %>
-            </td>
+  <%= content_tag('div', :class => if @bare_layout then nil elsif @user_fields_length + @exercises_length >= 6 then 'scrollable' end) do %>
+    <table class="points">
+      <thead>
+        <% if tailoring.show_exercise_names_in_points_table %>
+          <tr>
+            <th></th>
+            <th>Username</th>
             <% if @user_fields %>
               <% @user_fields.each do |field| %>
-              <% value = user.user_field_values.find { |o| o.field_name == field.name }%>
-              <td><%= value.value if value %></td>
+                <th><%= field.label %></th>
               <% end %>
             <% end %>
             <% @exercises.each do |exercise| %>
-              <% exercise.available_points.sort.each do |p| %>
-                <td>
-                  <% if user_points.include?(p.name) %>
-                    <%= raw("&#x2714;") %>
-                  <% elsif !params[:show_attempted].nil? && exercise.attempted_by?(user) %>
-                    <%= raw("&#x2718;") %>
-                  <% end %>
-                </td>
+              <% points = exercise.available_points.order! %>
+              <% if points.size > 0 %>
+                <th class="point-cell" colspan="<%= points.size %>"><%= tailoring.exercise_name_for_points_table(exercise) %></th>
               <% end %>
             <% end %>
           </tr>
         <% end %>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+        <tr>
+          <th colspan="<%= 2 + (@user_fields ? @user_fields.length : 0) %>"></th>
+
+          <% @exercises.each do |exercise| %>
+            <% exercise.available_points.sort.each do |point| %>
+              <th class="point-cell"><%= point.name %></th>
+            <% end %>
+          <% end %>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @users.each_with_index do |user, index| %>
+          <% if !user.administrator? || current_user.administrator? %>
+            <% row_class = if user.administrator? then "admin" else "student" end %>
+            <% user_points = @users_to_points[user.login] %>
+            <tr class="<%= row_class %>">
+              <td><%= index + 1 %></td>
+              <td>
+                <% if current_user.id == user.id || can?(:teach, @course) %>
+                  <%= link_to user.login, participant_path(user) %>
+                <% else %>
+                  <%= user.login %>
+                <% end %>
+              </td>
+              <% if @user_fields %>
+                <% @user_fields.each do |field| %>
+                <% value = user.user_field_values.find { |o| o.field_name == field.name }%>
+                <td><%= value.value if value %></td>
+                <% end %>
+              <% end %>
+              <% @exercises.each do |exercise| %>
+                <% exercise.available_points.sort.each do |p| %>
+                  <td class="point-cell">
+                    <% if user_points.include?(p.name) %>
+                      <%= raw("&#x2714;") %>
+                    <% elsif !params[:show_attempted].nil? && exercise.attempted_by?(user) %>
+                      <%= raw("&#x2718;") %>
+                    <% end %>
+                  </td>
+                <% end %>
+              <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div>
