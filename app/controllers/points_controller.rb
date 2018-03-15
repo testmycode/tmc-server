@@ -71,11 +71,7 @@ class PointsController < ApplicationController
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname, current_user.administrator?).includes(:available_points).order!(:name)
     @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps, hidden: current_user.administrator?)
 
-    @users = if params[:show_attempted]
-               @course.users.includes(:user_field_values)
-             else
-               User.course_sheet_students(@course, @sheetname).includes(:organizations).includes(:user_field_values)
-             end
+    @users = @course.users.includes(:user_field_values)
     if params[:sort_by] == 'points'
       @users = @users.sort_by do |u|
         [-@users_to_points[u.login].size, u.login.downcase]
