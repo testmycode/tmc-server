@@ -1,41 +1,90 @@
 <div class="row">
   <div class="col-md-12">
+    <% if can? :edit, @course %>
+      <%= link_to 'Edit details', edit_setup_organization_course_course_details_path(@organization, @course), class: "btn btn-primary pull-right" %>
+    <% end %>
     <h1><%= @course.title %></h1>
 
-    <div>
-      <% unless @course.initial_refresh_ready? %>
-        <p class='course-initial-refresh-warning'><strong>
-          Course is being updated and it is not fully functional yet! Please wait.</strong>
-          <br>This operation usually takes about 15 minutes but it can take up to an hour.
-        </p>
-      <% end %>
+  <div class="card">
+    <div class="card-body">
       <% unless @course.description.blank? %>
-        <p><%= @course.description %></p>
+        <p class="card-text"><%= @course.description %></p>
       <% end %>
-      <ul>
-        <% unless @course.material_url.blank? %>
-          <li><%= link_to 'Course material', @course.material_url, target: '_blank' %></li>
-        <% end %>
-        <% if @course.has_external_scoreboard_url? %>
-          <% if can? :view_external_scoreboard_url, @course %>
-            <li>
-              <%= link_to 'View points', @course.parsed_external_scoreboard_url(@organization, @course, current_user), target: '_blank' %>
-            </li>
-          <% end %>
-        <% else %>
-          <% if can? :see_points, @course %>
-            <li><%= link_to 'View points', organization_course_points_path(@organization, @course) %></li>
-          <% end %>
-        <% end %>
-        <li>
-          <%= link_to 'View help page', organization_course_help_path(@organization, @course)%>
-        </li>
-      </ul>
     </div>
+  </div>
+  <br>
+
+  <div class="course-options-card">
+    <% unless @course.initial_refresh_ready? %>
+      <p class='course-initial-refresh-warning'><strong>
+        Course is being updated and it is not fully functional yet! Please wait.</strong>
+        <br>This operation usually takes about 15 minutes but it can take up to an hour.
+      </p>
+    <% end %>
+
+      <% unless @course.material_url.blank? %>
+        <%= link_to @course.material_url, target: '_blank', class: 'btn btn-primary' do %>
+          <%= fa_icon 'book', text: 'Course material' %>
+        <% end %>
+      <% end %>
+      <% if @course.has_external_scoreboard_url? %>
+        <% if can? :view_external_scoreboard_url, @course %>
+            <%= link_to @course.parsed_external_scoreboard_url(@organization, @course, current_user), target: '_blank', class: 'btn btn-primary' do %>
+              <%= fa_icon 'list', text: 'Points list' %>
+            <% end %>
+        <% end %>
+      <% else %>
+        <% if can? :see_points, @course %>
+          <%= link_to organization_course_points_path(@organization, @course), class: 'btn btn-primary' do %>
+            <%= fa_icon 'list', text: 'Points list' %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+    <br >
+
+    <% if @course.disabled? %>
+      <div class="card text-danger border-danger mb-3">
+        <div class="card-body">
+          <h3 class="card-title"><%= fa_icon 'warning', text: 'This course is disabled' %></h3>
+          <p class="card-text">
+            It is not possible to start this course while it is disabled and the course is hidden from the course list.
+            However, old results should still be visible.
+          </p>
+          <%= link_to 'Enable course', enable_organization_course_path(@organization, @course), method: :post, class: "btn btn-danger" if can? :teach, @course  %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if can? :teach, @course %>
+      <% if @course.hide_submission_results? %>
+        <div class="card text-danger border-danger mb-3">
+          <div class="card-body">
+            <h3 class="card-title"><%= fa_icon 'warning', text: 'Submission results are hidden' %></h3>
+            <p class="card-text">
+              This is rarely a good idea as this feature is usually used only for exams.
+            </p>
+            <%= link_to 'Make submission results visible', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-danger" if can? :teach, @course  %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @course.hidden? %>
+        <div class="card text-danger border-danger mb-3">
+          <div class="card-body">
+            <h3 class="card-title"><%= fa_icon 'warning', text: 'Course is hidden' %></h3>
+            <p class="card-text">
+              This is rarely a good idea. Consider disabling it instead.
+            </p>
+              <%= link_to 'Make course visible', toggle_hidden_organization_course_path(@organization, @course), method: :post, class: "btn btn-danger" if can? :teach, @course  %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
 
     <% if can? :teach, @course %>
       <div class="teacher-panel">
-        <h4>Teacher functions</h4>
+        <h4><%= fa_icon 'graduation-cap', text: 'Teacher functions' %></h4>
 
         <% if @refresh_report && (can? :refresh, @course) %>
           <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
@@ -102,7 +151,7 @@
           <li>
           <% if can? :toggle_submission_result_visibility, @course %>
             <% if @course.hide_submission_results? %>
-              <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-sm" %>
+              <%= link_to 'Make submission results visible', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-sm" %>
             <% else %>
               <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-sm" %>
             <% end %>
@@ -118,15 +167,6 @@
             <%=
               link_to 'Disable Course', disable_organization_course_path(@organization, @course), method: :post,
                       class: "btn btn-danger btn-sm", data: { confirm: "Are you sure you want to disable the course?" } %>
-          <% end %>
-          <% if @course.hidden? %>
-            <%=
-              link_to 'Make Course visible', toggle_hidden_organization_course_path(@organization, @course), method: :post,
-                      class: "btn btn-info btn-sm" %>
-          <% else %>
-            <%=
-              link_to 'Hide Course', toggle_hidden_organization_course_path(@organization, @course), method: :post,
-                      class: "btn btn-danger btn-sm", data: { confirm: "Are you sure you want to hide the course?" } %>
           <% end %>
           </li>
 
@@ -170,7 +210,7 @@
 
     <% if current_user.administrator? %>
       <div class="admin-panel">
-        <h4>Admin functions</h4>
+        <h4><%= fa_icon 'exclamation-circle', text: 'Admin functions' %></h4>
         <ul>
           <% if current_user.administrator? %>
             <li>Source type: <%= @course.source_backend.upcase %> </li>
@@ -192,10 +232,6 @@
           <% end %>
         </ul>
       </div>
-    <% end %>
-
-    <% if signed_in? %>
-      <div class="alternative-format-links">[<%= link_to 'json', "#{one_course_json_organization_course_path organization_id: @organization.slug, id: @course.id, api_version: ApiVersion::API_VERSION}" %>]</div>
     <% end %>
 
     <h2>All exercises</h2>

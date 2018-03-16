@@ -28,3 +28,8 @@ td.deadline-toggle-buttons a {
   padding: 20px;
   border-radius: 5px;
 }
+
+.course-options-card {
+  display: flex;
+  justify-content: space-around;
+}

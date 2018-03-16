@@ -14,5 +14,5 @@
 <% end %>
 
 <% if signed_in? %>
-  <div class="alternative-format-links">[<%= link_to "json", "#{organization_courses_path organization_id: @organization.slug, format: :json, api_version: ApiVersion::API_VERSION}" %>]</div>
+  <div class="alternative-options-links">[<%= link_to "json", "#{organization_courses_path organization_id: @organization.slug, format: :json, api_version: ApiVersion::API_VERSION}" %>]</div>
 <% end %>

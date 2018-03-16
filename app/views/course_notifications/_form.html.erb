@@ -1,11 +1,11 @@
 <%= form_for @notifier, url: organization_course_course_notifications_path do |f| %>
-  <%= f.label :topic %>
-  <br />
-  <%= f.text_field :topic %>
-  <br />
-  <%= f.label :message %>
-  <br />
-  <%= f.text_area :message %>
-  <br />
-  <%= f.submit 'Send email to every course participant', class: "btn btn-info", data: { confirm: "Do you really want to send this message to every participant?" } %>
+  <div class="form-group">
+    <%= f.label :topic %>
+    <%= f.text_field :topic, class: 'form-control' %>
+  </div>
+  <div class="form-group">
+    <%= f.label :message %>
+    <%= f.text_area :message, class: 'form-control', rows: 10 %>
+  </div>
+  <%= f.submit 'Send email to every course participant', class: "btn btn-danger", data: { confirm: "Do you really want to send this message to every participant?" } %>
 <% end %>
