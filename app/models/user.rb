@@ -304,6 +304,7 @@ class User < ActiveRecord::Base
     return if !login || login.empty?
     errors.add(:login, "may not be your email address. Keep in mind that your username is public to everyone.") if login.include?('@')
     errors.add(:login, "may not be a number. Use the organizational identifier field for your student number.") if login.scan(/\D/).empty?
-    errors.add(:email, 'may not end with "@ad.helsinki.fi". You cannot receive any emails with this address -- it\'s only used for your webmail login. Remove the "ad."-part of the address and try again.') if email.end_with?('@ad.helsinki.fi')
+    errors.add(:email, 'may not end with "@ad.helsinki.fi". You cannot receive any emails with this address -- it\'s only used for your webmail login. Figure out what your real email address is and try again. It is usually of the form firstname.lastname@helsinki.fi but verify this first.') if email.end_with?('@ad.helsinki.fi')
+    errors.add(:email, 'is incorrect. You probably meant firstname.lastname@helsinki.fi. Keep in mind that your email address does not contain your University of Helsinki username.') if email.end_with?('@helsinki.fi') && !/.*\..*@helsinki.fi/.match?(email)
   end
 end
