@@ -46,10 +46,16 @@ module Api
                           exercises.where(unlock_spec: nil)
                         else
                           exercises.where(["unlock_spec IS NULL OR name IN (#{unlocked_exercises.map { |_| '?' }.join(', ')})", *unlocked_exercises])
-                        end.select { |e| e._fast_visible_to?(current_user) }
+                        end
           end
 
-          presentable = exercises.map do |ex|
+          exercises = exercises.pluck(:id)
+
+          all_exercises = course.exercises
+                                .where(hidden: false, disabled_status: 0)
+                                .select { |ex| ex._fast_visible_to?(current_user) }
+
+          presentable = all_exercises.map do |ex|
             {
               id: ex.id,
               available_points: ex.available_points,
@@ -57,7 +63,8 @@ module Api
               publish_time: ex.publish_time,
               solution_visible_after: ex.solution_visible_after,
               deadline: ex.deadline_for(current_user),
-              disabled: ex.disabled?
+              disabled: ex.disabled?,
+              unlocked: exercises.include?(ex.id)
             }
           end
 
