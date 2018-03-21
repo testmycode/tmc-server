@@ -45,12 +45,12 @@ class Ability
         user.assistant?(c) ||
         (
           c.initial_refresh_ready? &&
-          !c.disabled? &&
+            (!c.disabled? &&
           (
             c.hidden_if_registered_after.nil? ||
             c.hidden_if_registered_after > Time.now ||
             (!user.guest? && c.hidden_if_registered_after > user.created_at)
-          )
+            ) || user.student_in_course?(c))
         )
       end
 
