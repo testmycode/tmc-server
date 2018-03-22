@@ -24,7 +24,7 @@ module TestRunGrader
   extend TestRunGrader
 
   def grade_results(submission, results)
-    fail "Exercise #{submission.exercise_name} was removed" unless submission.exercise
+    raise "Exercise #{submission.exercise_name} was removed" unless submission.exercise
 
     submission.test_case_runs.destroy_all
     create_test_case_runs(submission, results)
@@ -66,7 +66,7 @@ module TestRunGrader
   end
 
   def validations_passed?(validations)
-    if (!validations.nil?) && validations['strategy'] && validations['strategy'] == 'FAIL'
+    if !validations.nil? && validations['strategy'] && validations['strategy'] == 'FAIL'
       if validations['validationErrors'] && validations['validationErrors'].any?
         return false
       end
@@ -122,11 +122,7 @@ module TestRunGrader
   end
 
   def self.to_json_or_null(obj)
-    if !obj.nil?
-      ActiveSupport::JSON.encode(obj)
-    else
-      nil
-    end
+    ActiveSupport::JSON.encode(obj) unless obj.nil?
   end
 
   def should_flag_for_review?(submission, review_points)

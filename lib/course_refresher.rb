@@ -128,11 +128,11 @@ class CourseRefresher
           @course.save!
           @course.exercises.each &:save!
 
-          CourseRefresher.simulate_failure! if ::Rails.env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
+          CourseRefresher.simulate_failure! if ::Rails.env.test? && CourseRefresher.respond_to?('simulate_failure!')
         rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
           @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
           # Delete the new cache we were working on
-          FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
+          FileUtils.rm_rf(@course.cache_path) unless options[:no_directory_changes]
           raise ActiveRecord::Rollback
         end
       end
@@ -143,18 +143,18 @@ class CourseRefresher
       end
 
       course.reload # reload the record given as parameter
-      fail Failure.new(@report) unless @report.errors.empty?
+      raise Failure, @report unless @report.errors.empty?
       @report
     end
 
     def update_or_clone_repository
-      fail 'Source types other than git not yet implemented' if @course.source_backend != 'git'
+      raise 'Source types other than git not yet implemented' if @course.source_backend != 'git'
 
       if File.exist?("#{@old_cache_path}/clone/.git")
         begin
           # Try a fast path: copy old clone and git fetch new stuff
           copy_and_update_repository
-        rescue
+        rescue StandardError
           FileUtils.rm_rf(@course.clone_path)
           clone_repository
         end
@@ -164,7 +164,7 @@ class CourseRefresher
     end
 
     def copy_and_update_repository
-      FileUtils.cp_r("#{@old_cache_path}/clone", "#{@course.clone_path}")
+      FileUtils.cp_r("#{@old_cache_path}/clone", @course.clone_path.to_s)
       Dir.chdir(@course.clone_path) do
         sh!('git', 'remote', 'set-url', 'origin', @course.source_url)
         sh!('git', 'fetch', 'origin')
@@ -184,7 +184,7 @@ class CourseRefresher
       Find.find(@course.clone_path) do |path|
         relpath = path[@course.clone_path.length..-1]
         if File.directory?(path) && exdirs.any? { |exdir| exdir.start_with?(path) } && relpath.include?('-')
-          fail "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
+          raise "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
         end
       end
     end
@@ -248,9 +248,7 @@ class CourseRefresher
 
           e.options = metadata
 
-          if (e.new_record? && e.course.refreshed?)
-            e.disabled!
-          end
+          e.disabled! if e.new_record? && e.course.refreshed?
 
           e.save!
         rescue SyntaxError
@@ -290,11 +288,11 @@ class CourseRefresher
         clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
 
         points_data = points_for(exercise, no_directory_changes)
-        if points_data[0].is_a? Hash
-          point_names += points_data.map { |x| x[:points] }.flatten
-        else
-          point_names += points_data.flatten
-        end
+        point_names += if points_data[0].is_a? Hash
+                         points_data.map { |x| x[:points] }.flatten
+                       else
+                         points_data.flatten
+                       end
 
         point_names += review_points
 
@@ -302,11 +300,10 @@ class CourseRefresher
         removed = []
 
         point_names.each do |name|
-          if exercise.available_points.none? { |point| point.name == name }
-            added << name
-            point = AvailablePoint.create(name: name, exercise: exercise)
-            exercise.available_points << point
-          end
+          next unless exercise.available_points.none? { |point| point.name == name }
+          added << name
+          point = AvailablePoint.create(name: name, exercise: exercise)
+          exercise.available_points << point
         end
 
         exercise.available_points.to_a.clone.each do |point|
@@ -334,19 +331,19 @@ class CourseRefresher
       TestScannerCache.get_or_update(@course, exercise.name, hash) do
         all_points = Set.new
         Dir.chdir(full_path) do
-          sh!(%w(make test))
-          sh!(%w(make get-points > points.txt), {escape: false})
+          sh!(%w[make test])
+          sh!(%w[make get-points > points.txt], escape: false)
 
           tmc_available_points = File.join(full_path, 'test', 'tmc_available_points.txt')
-          if File.exists? tmc_available_points
+          if File.exist? tmc_available_points
             IO.readlines(tmc_available_points).map(&:strip).each do |line|
               if line =~ /\[.*\] \[.*\] (.*)/
-                $1.split(' ').map(&:strip).each { |p| all_points << p}
+                Regexp.last_match(1).split(' ').map(&:strip).each { |p| all_points << p }
               else
                 raise "Warning: weird line in available points file: #{line}"
               end
             end
-          elsif File.exists?(File.join(full_path, 'points.txt'))
+          elsif File.exist?(File.join(full_path, 'points.txt'))
             available_points_content = IO.readlines("#{full_path}/points.txt")
             # drop makefile output
             # This is how initial check tests used to work.
@@ -360,8 +357,8 @@ class CourseRefresher
             raise "Could not extract points for makefile exercise: #{exercise}"
           end
 
-          sh!(%w(make clean))
-          FileUtils.rm("#{full_path}/points.txt") if File.exists?(File.join(full_path, 'points.txt'))
+          sh!(%w[make clean])
+          FileUtils.rm("#{full_path}/points.txt") if File.exist?(File.join(full_path, 'points.txt'))
         end
         all_points
       end
@@ -461,12 +458,12 @@ class CourseRefresher
       parent_dirs = Course.cache_root.sub(::Rails.root.to_s, '').split('/').reject(&:blank?)
       (0..(parent_dirs.length)).each do |i|
         dir = "#{::Rails.root}/#{parent_dirs[0..i].join('/')}"
-        sh!('chmod', chmod, dir) unless chmod.blank?
-        sh!('chgrp', chgrp, dir) unless chgrp.blank?
+        sh!('chmod', chmod, dir) if chmod.present?
+        sh!('chgrp', chgrp, dir) if chgrp.present?
       end
 
-      sh!('chmod', '-R', chmod, @course.cache_path) unless chmod.blank?
-      sh!('chgrp', '-R', chgrp, @course.cache_path) unless chgrp.blank?
+      sh!('chmod', '-R', chmod, @course.cache_path) if chmod.present?
+      sh!('chgrp', '-R', chgrp, @course.cache_path) if chgrp.present?
     end
 
     def invalidate_unlocks

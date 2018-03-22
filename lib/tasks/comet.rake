@@ -1,7 +1,7 @@
 require 'fileutils'
 
 namespace :comet do
-  config_path = "ext/tmc-comet/config.properties"
+  config_path = 'ext/tmc-comet/config.properties'
   namespace :config do
     desc "Writes #{config_path} based on site.yml"
     task :update do

@@ -1,6 +1,5 @@
 # Used to migrate students between similar courses. This requires for the GIT repos to be checkout to same version to ensure safe transition
 class StudentSubmissionMigrator
-
   class CannotRefreshError < RuntimeError; end
   class RefreshFailedError < CannotRefreshError; end
   def initialize(old_course, new_course, user)
@@ -33,10 +32,9 @@ class StudentSubmissionMigrator
   private
 
   def validate_migration!
-    raise CannotRefreshError, "Cannot migrate with courses which have diffenent git revisions" unless @old_course.git_revision == @new_course.git_revision
-    raise CannotRefreshError, "Cannot migration between these courses is not allowed" unless migration_is_allowed
+    raise CannotRefreshError, 'Cannot migrate with courses which have diffenent git revisions' unless @old_course.git_revision == @new_course.git_revision
+    raise CannotRefreshError, 'Cannot migration between these courses is not allowed' unless migration_is_allowed
   end
-
 
   def migrate_submission_and_data(submission)
     new_submission = submission.dup
@@ -71,11 +69,10 @@ class StudentSubmissionMigrator
   def migrate_awarded_points(submission, new_submission)
     submission.awarded_points.each do |awarded_point|
       new_point = awarded_point.dup
-      unless AwardedPoint.find_by(course_id: @new_course.id, name: awarded_point.name, user_id: @user.id)
-        new_point.course = @new_course
-        new_point.submission = new_submission
-        new_point.save!
-      end
+      next if AwardedPoint.find_by(course_id: @new_course.id, name: awarded_point.name, user_id: @user.id)
+      new_point.course = @new_course
+      new_point.submission = new_submission
+      new_point.save!
     end
   end
 end

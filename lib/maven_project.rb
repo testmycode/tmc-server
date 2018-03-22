@@ -75,7 +75,7 @@ class MavenProject
         puts "Compiling #{project.package_path} ..."
         begin
           project.compile!
-        rescue
+        rescue StandardError
           puts "*** Failed to compile #{project.name} ***"
           puts '  Have you done `git submodule update --init`?'
           puts
@@ -96,7 +96,7 @@ class MavenProject
         end
 
         desc "Forces a recompile of #{project.package_path}"
-        task recompile: [:clean, :compile]
+        task recompile: %i[clean compile]
       end
 
       desc "Compiles #{project.package_path}"
@@ -113,15 +113,11 @@ class MavenProject
     file_path = "misc/#{pom_file.artifact_id}-build-classpath"
     begin
       too_old = FileStore.mtime(file_path) < File.mtime(package_path)
-    rescue # no such file most likely
+    rescue StandardError # no such file most likely
       too_old = true
     end
 
-    if !too_old
-      result = FileStore.try_get(file_path)
-    else
-      result = nil
-    end
+    result = (FileStore.try_get(file_path) unless too_old)
 
     unless result
       output = nil
@@ -129,10 +125,10 @@ class MavenProject
         output = `mvn org.apache.maven.plugins:maven-dependency-plugin:2.4:build-classpath`
       end
       if output =~ /\[INFO\] Dependencies classpath:\n(.*)\n/
-        result = $1.strip
+        result = Regexp.last_match(1).strip
         FileStore.put(file_path, result)
       else
-        fail 'Failed to get build classpath of tmc-junit-runner.'
+        raise 'Failed to get build classpath of tmc-junit-runner.'
       end
     end
     result

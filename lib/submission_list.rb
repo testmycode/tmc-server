@@ -26,10 +26,6 @@ class SubmissionList
   end
 
   def paste_url(submission)
-    if submission.paste_key
-      @helpers.paste_url(submission.paste_key)
-    else
-      nil
-    end
+    @helpers.paste_url(submission.paste_key) if submission.paste_key
   end
 end

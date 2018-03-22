@@ -9,7 +9,7 @@ class BackgroundCourseRefresher
         course.initial_refresh_ready = true
         course.save!
         Rails.logger.info "Finished background refresh on course id #{course.id}"
-      rescue => e
+      rescue StandardError => e
         Rails.logger.warn "Background refresh on course id #{course.id} failed!. Error #{e}"
       end
     end

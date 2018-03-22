@@ -5,7 +5,7 @@ class CourseList
     @helpers = helpers
   end
 
-  def course_list_data(organization, courses, opts={})
+  def course_list_data(organization, courses, opts = {})
     courses.map { |c| course_data(organization, c, opts) }
   end
 
@@ -13,7 +13,7 @@ class CourseList
     courses.map { |c| course_data(c.organization, c, opts) }
   end
 
-  def course_data(organization, course, opts={})
+  def course_data(organization, course, opts = {})
     @course = course
     data = {
       id: course.id,
@@ -23,7 +23,7 @@ class CourseList
       unlock_url: @helpers.organization_course_unlock_url(organization, course, format: :json),
       reviews_url: @helpers.organization_course_reviews_url(organization, course, format: :json),
       comet_url: CometServer.get.client_url,
-      spyware_urls: SiteSetting.value('spyware_servers'),
+      spyware_urls: SiteSetting.value('spyware_servers')
     }
 
     if opts[:include_points]
@@ -34,7 +34,7 @@ class CourseList
             total_available: AvailablePoint.course_sheet_points(course, sheet)
           }
         end,
-        total_available: AvailablePoint.course_points_of_exercises(course, exercises),
+        total_available: AvailablePoint.course_points_of_exercises(course, exercises)
       }
     end
 
@@ -43,16 +43,17 @@ class CourseList
         exercises.map do |ex|
           {
             name: ex.name,
-            conditions: JSON.parse(ex.unlock_spec),
+            conditions: JSON.parse(ex.unlock_spec)
           }
         end
       ]
     end
 
-      data
+    data
   end
 
   private
+
   def exercises
     @exercises ||= @course.exercises.select { |e| e.points_visible_to?(@user) }
   end

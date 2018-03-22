@@ -15,7 +15,7 @@ class RubyInitScript
   def default_options
     {
       name: nil,
-      erb_path: File.dirname(File.realpath(__FILE__)) + '/ruby_init_script/initscript.erb',
+      erb_path: __dir__ + '/ruby_init_script/initscript.erb',
       rails_env: 'production',
       working_dir: ::Rails.root,
       executable_path: nil,
@@ -38,9 +38,7 @@ class RubyInitScript
       env = {}
     end
 
-    if @options[:rails_env]
-      env['RAILS_ENV'] = @options[:rails_env]
-    end
+    env['RAILS_ENV'] = @options[:rails_env] if @options[:rails_env]
 
     def get_binding(_name, _working_dir, _executable_path, _ruby_path, _user, _env)
       binding
@@ -96,30 +94,28 @@ class RubyInitScript
 
   def preprocess_options
     @options.each_key do |k|
-      if @options[k].is_a? Pathname
-        @options[k] = @options[k].to_s
-      end
+      @options[k] = @options[k].to_s if @options[k].is_a? Pathname
     end
   end
 
   def check_options
-    fail ':name required' unless @options[:name]
-    fail ':erb_path required' unless @options[:erb_path]
-    fail ':working_dir required' unless @options[:working_dir]
-    fail ':executable_path required' unless @options[:executable_path]
+    raise ':name required' unless @options[:name]
+    raise ':erb_path required' unless @options[:erb_path]
+    raise ':working_dir required' unless @options[:working_dir]
+    raise ':executable_path required' unless @options[:executable_path]
   end
 
   def rvm_info
     @rvm_info ||= begin
       output = `rvm info 2>/dev/null` # We silence the "RVM is not a function" warning on stderr.
       # This can happen if one uses `sudo -i -u tmc` and then does `rvmsudo rvm info`.
-      potential_warning = <<EOS
-You need to change your terminal emulator preferences to allow login shell.
-Sometimes it is required to use `/bin/bash --login` as the command.
-Please visit https://rvm.io/integration/gnome-terminal/ for a example.
+      potential_warning = <<EOS.strip_heredoc
+        You need to change your terminal emulator preferences to allow login shell.
+        Sometimes it is required to use `/bin/bash --login` as the command.
+        Please visit https://rvm.io/integration/gnome-terminal/ for a example.
 EOS
       output = output.sub(potential_warning, '')
-      YAML.load(output)
+      YAML.safe_load(output)
     end
   end
 end

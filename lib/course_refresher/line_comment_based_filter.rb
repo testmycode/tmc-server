@@ -3,7 +3,7 @@ require 'pathname'
 class CourseRefresher
   class LineCommentBasedFilter # Abstract
     def applies_to?(_file_path)
-      fail 'abstract method'
+      raise 'abstract method'
     end
 
     def filter_for_stub(text)
@@ -52,8 +52,8 @@ class CourseRefresher
 
     def uncomment_stubs(text)
       text.gsub(stub_regexp) do
-        before = $1
-        after = $2
+        before = Regexp.last_match(1)
+        after = Regexp.last_match(2)
         before + after
       end
     end
@@ -86,7 +86,7 @@ class CourseRefresher
     end
 
     def comment_start
-      fail 'abstract method'
+      raise 'abstract method'
     end
 
     def resc(s)

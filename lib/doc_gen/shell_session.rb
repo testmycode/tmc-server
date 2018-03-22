@@ -15,7 +15,7 @@ class DocGen
     # shell.example do |sh|
     #   sh.run "ls"
     # end
-    def example(&block)
+    def example
       example = ExampleBlock.new(self)
       yield(example)
       '<div class="shell">' + example.transcript + '</div>'
@@ -42,7 +42,7 @@ class DocGen
           unless $?.success?
             error_msg = "Command `#{command}` failed with status #{$?}."
             error_msg << " The output was:\n#{output}" unless output.strip.empty?
-            fail error_msg
+            raise error_msg
           end
         end
 

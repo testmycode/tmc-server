@@ -6,20 +6,18 @@ module DateAndTimeUtils
     }.merge options
 
     d = input
-    if d.blank?
-      return nil
-    end
+    return nil if d.blank?
 
     d = parse_date_or_time(d) if d.is_a?(String)
 
     if d.is_a? Date
-      if options[:prefer_end_of_day]
-        d = d.end_of_day
-      else
-        d = d.beginning_of_day
-      end
+      d = if options[:prefer_end_of_day]
+            d.end_of_day
+          else
+            d.beginning_of_day
+          end
     elsif !d.is_a?(Time)
-      fail "Invalid date or time: #{input}"
+      raise "Invalid date or time: #{input}"
     end
     d
   end
@@ -27,9 +25,7 @@ module DateAndTimeUtils
   def self.parse_date_or_time(input)
     s = input.strip
 
-    if s =~ /^(\d+)\.(\d+)\.(\d+)(.*)$/
-      s = "#{$3}-#{$2}-#{$1}#{$4}"
-    end
+    s = "#{Regexp.last_match(3)}-#{Regexp.last_match(2)}-#{Regexp.last_match(1)}#{Regexp.last_match(4)}" if s =~ /^(\d+)\.(\d+)\.(\d+)(.*)$/
 
     result = nil
     begin
@@ -38,11 +34,11 @@ module DateAndTimeUtils
       elsif s =~ /^\d+-\d+-\d+\s+\d+:\d+(:?:\d+(:?\.\d+)?)?(:?\s+\S+)?$/
         result = Time.zone.parse(s)
       end
-    rescue
+    rescue StandardError
       raise "Invalid date/time: #{input}"
     end
 
-    fail "Cannot parse date/time: #{input}" unless result
+    raise "Cannot parse date/time: #{input}" unless result
 
     result
   end
@@ -58,7 +54,7 @@ module DateAndTimeUtils
 
   def self.looks_like_date_or_time(str)
     !!parse_date_or_time(str)
-  rescue
+  rescue StandardError
     false
   end
 end

@@ -22,11 +22,11 @@ namespace :spyware_server do
 end
 task spec: 'spyware_server:compile'
 
-desc "Compile all dependencies except for ext/tmc-sandbox."
+desc 'Compile all dependencies except for ext/tmc-sandbox.'
 task compile: ['checkstyle_runner:compile', 'comet:compile', 'spyware_server:compile', 'tmc-langs:compile']
 
-desc "Recompile all dependencies except for ext/tmc-sandbox."
+desc 'Recompile all dependencies except for ext/tmc-sandbox.'
 task recompile: ['checkstyle_runner:recompile', 'comet:recompile', 'spyware_server:recompile', 'tmc-langs:recompile']
 
-desc "Clean all dependencies except for ext/tmc-sandbox."
+desc 'Clean all dependencies except for ext/tmc-sandbox.'
 task clean: ['checkstyle_runner:clean', 'comet:clean', 'spyware_server:clean', 'tmc-langs:clean']

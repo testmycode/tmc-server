@@ -48,13 +48,13 @@ class SubmissionPackager
         received = Pathname(find_received_project_root(Pathname('received')))
         dest = Pathname(dest_name)
 
-        extra_params = if extra_params then extra_params.clone else {} end
+        extra_params = extra_params ? extra_params.clone : {}
         extra_params['runtime_params'] = exercise.runtime_params_array
         write_extra_params(dest + '.tmcparams', extra_params)
 
-        #if config[:include_ide_files]
-          copy_ide_files(Pathname(exercise.clone_path), received, dest)
-        #end
+        # if config[:include_ide_files]
+        copy_ide_files(Pathname(exercise.clone_path), received, dest)
+        # end
 
         # To get hidden tests etc, gsub stub with clone path...
         if config[:tests_from_stub]
@@ -86,8 +86,7 @@ class SubmissionPackager
                          include_ide_files: true,
                          format: :zip,
                          toplevel_dir_name: toplevel_dir_name,
-                         no_tmc_run: true
-      )
+                         no_tmc_run: true)
       File.read(return_zip_path)
     end
   end
@@ -97,19 +96,19 @@ class SubmissionPackager
   include SystemCommands
 
   def find_received_project_root(_received_root)
-    fail 'Implemented by subclass'
+    raise 'Implemented by subclass'
   end
 
   # Stupid OS X default zipper puts useless crap into zip files :[
   # Delete them or they might be mistaken for the actual source files later.
   # Let's clean up other similarly useless files while we're at it.
   def remove_os_rubbish_files!
-    FileUtils.rm_f %w(.DS_Store desktop.ini Thumbs.db .directory __MACOSX)
+    FileUtils.rm_f %w[.DS_Store desktop.ini Thumbs.db .directory __MACOSX]
   end
 
   # All parameters are pathname objects
   def copy_files(_exercise, _received, _dest, _stub = nil, _opts = {})
-    fail 'Implemented by subclass'
+    raise 'Implemented by subclass'
   end
 
   def copy_ide_files(clone, received, dest)
@@ -136,9 +135,7 @@ class SubmissionPackager
   end
 
   def cp_r_if_exists(src, dest)
-    if !src.nil? && File.exist?(src)
-      FileUtils.cp_r(src, dest)
-    end
+    FileUtils.cp_r(src, dest) if !src.nil? && File.exist?(src)
   end
 
   # and tmc-langs
@@ -153,11 +150,10 @@ class SubmissionPackager
     tmc_project_file.extra_student_files.each do |rel_path|
       from = "#{received}/#{rel_path}"
       to = "#{dest}/#{rel_path}"
-      if File.exist?(from)
-        FileUtils.rm(to) if File.exist?(to)
-        FileUtils.mkdir_p(File.dirname(to))
-        FileUtils.cp(from, to)
-      end
+      next unless File.exist?(from)
+      FileUtils.rm(to) if File.exist?(to)
+      FileUtils.mkdir_p(File.dirname(to))
+      FileUtils.cp(from, to)
     end
   end
 
@@ -165,7 +161,7 @@ class SubmissionPackager
     File.open(file, 'wb') do |f|
       extra_params.each do |k, v|
         v = '' if v.nil?
-        escaped_v = if v.is_a?(Array) then SystemCommands.make_bash_array(v) else Shellwords.escape(v) end
+        escaped_v = v.is_a?(Array) ? SystemCommands.make_bash_array(v) : Shellwords.escape(v)
         f.puts 'export ' + Shellwords.escape(k) + '=' + escaped_v
       end
     end

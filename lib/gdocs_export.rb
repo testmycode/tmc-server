@@ -2,14 +2,15 @@ require 'google_spreadsheet'
 
 module GDocsExport
   def self.authenticate(notifications)
-    notifications << 'gdocs_username undefined' and return nil unless
+    notifications << 'gdocs_username undefined' && (return nil) unless
       TmcServer::Application.config.gdocs_username
-    notifications << 'gdocs_password undefined' and return nil unless
+    notifications << 'gdocs_password undefined' && (return nil) unless
       TmcServer::Application.config.gdocs_password
 
     GoogleSpreadsheet.login(
       TmcServer::Application.config.gdocs_username,
-      TmcServer::Application.config.gdocs_password)
+      TmcServer::Application.config.gdocs_password
+    )
   end
 
   def self.refresh_course_worksheet_points(course, sheetname)
@@ -31,26 +32,24 @@ module GDocsExport
 
   def self.worksheet_points(notifications, ws, course, sheetname)
     points = AvailablePoint.course_sheet_points_list(course, sheetname).map(&:name)
-    points.reduce([]) do |result, point|
+    points.each_with_object([]) do |point, result|
       if point_col(ws, point) < 0
         notifications << "point #{point} not found on sheet #{sheetname}"
       else
         result << point
       end
-      result
     end
   end
 
   def self.worksheet_students(notifications, ws, course, sheetname)
     students = User.course_sheet_students(course, sheetname)
-    students.reduce([]) do |result, student|
+    students.each_with_object([]) do |student, result|
       if student_row(ws, student.login) < 0
         notifications << "student #{student.login} not found on sheet " +
-          sheetname
+                         sheetname
       else
         result << student
       end
-      result
     end
   end
 
@@ -70,12 +69,12 @@ module GDocsExport
   def self.write_points(ws, course, students, points)
     students.each do |student|
       row = student_row ws, student.login
-      fail "student #{student.login} not found" if row < 0
+      raise "student #{student.login} not found" if row < 0
       awarded = AwardedPoint.course_user_sheet_points(course, student, ws.title).map(&:name)
       points.each do |point|
         next unless awarded.include? point
         col = point_col ws, point
-        fail "point #{point.name} not found" if col < 0
+        raise "point #{point.name} not found" if col < 0
         ws[row, col] = '1' if ws[row, col] != '1'
       end
     end
@@ -106,9 +105,9 @@ module GDocsExport
   end
 
   def self.find_course_spreadsheet(gsession, course)
-    fail 'spreadsheet_key undefined' unless course.spreadsheet_key
+    raise 'spreadsheet_key undefined' unless course.spreadsheet_key
     ss = gsession.spreadsheet_by_key course.spreadsheet_key
-    fail 'spreadsheet not found' unless ss
+    raise 'spreadsheet not found' unless ss
     ss
   end
 

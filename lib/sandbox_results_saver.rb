@@ -6,7 +6,7 @@ module SandboxResultsSaver
 
   def self.save_results(submission, results)
     ActiveRecord::Base.transaction do
-      fail InvalidTokenError.new('Invalid or expired token') if results['token'] != submission.secret_token
+      raise InvalidTokenError, 'Invalid or expired token' if results['token'] != submission.secret_token
 
       maybe_tranform_results_from_tmc_langs!(results)
 
@@ -50,7 +50,7 @@ module SandboxResultsSaver
           submission.pretest_error = decoded_output.to_s
         end
       else
-        fail 'Unknown status: ' + results['status']
+        raise 'Unknown status: ' + results['status']
       end
 
       submission.secret_token = nil
@@ -65,21 +65,21 @@ module SandboxResultsSaver
   def self.maybe_tranform_results_from_tmc_langs!(results)
     # extract data from this -- it's JSON man
     results.delete('validations') if results['validations'] == 'null'
-    if results.has_key? 'test_output'
+    if results.key? 'test_output'
       begin
-        test_output = JSON.parse results["test_output"]
+        test_output = JSON.parse results['test_output']
       rescue JSON::ParserError
         return
       end
       return if test_output.is_a?(Array) # No need to parse as the data doesn't seem to be from langs.
-      if test_output.has_key? 'logs'
+      if test_output.key? 'logs'
         results['stdout'] = ''
         results['stderr'] = ''
-        if test_output['logs'].has_key? 'stdout'
+        if test_output['logs'].key? 'stdout'
           stdout = test_output['logs']['stdout'].pack('c*').force_encoding('utf-8')
           results['stdout'] = test_output['logs']['stdout'] = stdout
         end
-        if test_output['logs'].has_key? 'stderr'
+        if test_output['logs'].key? 'stderr'
           stderr = test_output['logs']['stderr'].pack('c*').force_encoding('utf-8')
           results['stderr'] = test_output['logs']['stderr'] = stderr
         end
@@ -92,7 +92,7 @@ module SandboxResultsSaver
       when 'COMPILE_FAILED', 'GENERIC_ERROR'
         results['status'] = 'failed'
         results['exit_code'] = '101'
-        results['test_output'] = test_output['logs'].map do |k,v|
+        results['test_output'] = test_output['logs'].map do |k, v|
           value = v
           value = value.pack('c*').force_encoding('utf-8') if value.is_a?(Array)
           "#{k}: #{value}"
@@ -101,9 +101,9 @@ module SandboxResultsSaver
         output = test_output['testResults'].map do |result|
           result['className'], result['methodName'] = result['name'].split(/\s/)
           result['message'] = result['errorMessage'] if result['errorMessage']
-          result['backtrace'] = result['backtrace'].join("\n") if result.has_key? 'backtrace'
-          result['pointNames'] = result['points'] if result.has_key? 'points'
-          result['status'] = (result['passed'] || result['successful']) ? 'PASSED' : 'FAILED'
+          result['backtrace'] = result['backtrace'].join("\n") if result.key? 'backtrace'
+          result['pointNames'] = result['points'] if result.key? 'points'
+          result['status'] = result['passed'] || result['successful'] ? 'PASSED' : 'FAILED'
           result
         end
         results['old_test_output'] = results['test_output']
@@ -137,9 +137,9 @@ module SandboxResultsSaver
                else
                  ActiveSupport::JSON.decode(test_output)
                end
-      fail unless result.is_a?(Enumerable)
+      raise unless result.is_a?(Enumerable)
       result
-    rescue
+    rescue StandardError
       if likely_out_of_memory
         'Out of memory.'
       else

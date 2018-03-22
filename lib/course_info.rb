@@ -13,9 +13,9 @@ class CourseInfo
     exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
 
     @unlocked_exercises = course.unlocks
-      .where(user_id: @user.id)
-      .where(['valid_after IS NULL OR valid_after < ?', Time.now])
-      .pluck(:exercise_name)
+                                .where(user_id: @user.id)
+                                .where(['valid_after IS NULL OR valid_after < ?', Time.now])
+                                .pluck(:exercise_name)
 
     submissions_by_exercise = {}
     Submission.where(course_id: course.id, user_id: @user.id).each do |sub|
@@ -27,25 +27,25 @@ class CourseInfo
     end
 
     @course_list.course_data(organization, course, opts).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
-                                                         exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
+                                                               exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
   end
 
   def course_data_core_api(course)
     UncomputedUnlock.resolve(course, @user)
     @unlocked_exercises = course.unlocks
-                              .where(user_id: @user.id)
-                              .where(['valid_after IS NULL OR valid_after < ?', Time.now])
-                              .pluck(:exercise_name)
+                                .where(user_id: @user.id)
+                                .where(['valid_after IS NULL OR valid_after < ?', Time.now])
+                                .pluck(:exercise_name)
 
     exercises = course.exercises.includes(:course, :available_points)
 
     unless @user.administrator? || @user.teacher?(course.organization) || @user.assistant?(course)
       exercises = exercises.where(hidden: false, disabled_status: 0)
       exercises = if @unlocked_exercises.empty?
-        exercises.where(unlock_spec: nil)
-      else
-        exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{@unlocked_exercises.map {|_| '?'}.join(', ')})", *@unlocked_exercises])
-      end.select { |e| e._fast_visible_to?(@user)}
+                    exercises.where(unlock_spec: nil)
+                  else
+                    exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{@unlocked_exercises.map { |_| '?' }.join(', ')})", *@unlocked_exercises])
+      end.select { |e| e._fast_visible_to?(@user) }
     end
 
     exercises = exercises.to_a.natsort_by(&:name)
@@ -94,7 +94,7 @@ class CourseInfo
       runtime_params: exercise.runtime_params_array,
       valgrind_strategy: exercise.valgrind_strategy,
       code_review_requests_enabled: exercise.code_review_requests_enabled?,
-      run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled?,
+      run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled?
     }
 
     data[:solution_zip_url] = @helpers.exercise_solution_zip_url(exercise) if @user.administrator?
@@ -112,25 +112,25 @@ class CourseInfo
     locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
 
     data = {
-        id: exercise.id,
-        name: exercise.name,
-        locked: locked,
-        deadline_description: exercise.deadline_spec_obj.universal_description,
-        deadline: exercise.deadline_for(@user),
-        checksum: exercise.checksum,
-        return_url: @helpers.api_v8_core_exercise_submissions_url(exercise),
-        zip_url: @helpers.download_api_v8_core_exercise_url(exercise),
-        returnable: exercise.returnable?,
-        requires_review: exercise.requires_review?,
-        attempted: exercise.attempted_by?(@user),
-        completed: exercise.completed_by?(@user),
-        reviewed: exercise.reviewed_for?(@user),
-        all_review_points_given: exercise.all_review_points_given_for?(@user),
-        memory_limit: exercise.memory_limit,
-        runtime_params: exercise.runtime_params_array,
-        valgrind_strategy: exercise.valgrind_strategy,
-        code_review_requests_enabled: exercise.code_review_requests_enabled?,
-        run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled?,
+      id: exercise.id,
+      name: exercise.name,
+      locked: locked,
+      deadline_description: exercise.deadline_spec_obj.universal_description,
+      deadline: exercise.deadline_for(@user),
+      checksum: exercise.checksum,
+      return_url: @helpers.api_v8_core_exercise_submissions_url(exercise),
+      zip_url: @helpers.download_api_v8_core_exercise_url(exercise),
+      returnable: exercise.returnable?,
+      requires_review: exercise.requires_review?,
+      attempted: exercise.attempted_by?(@user),
+      completed: exercise.completed_by?(@user),
+      reviewed: exercise.reviewed_for?(@user),
+      all_review_points_given: exercise.all_review_points_given_for?(@user),
+      memory_limit: exercise.memory_limit,
+      runtime_params: exercise.runtime_params_array,
+      valgrind_strategy: exercise.valgrind_strategy,
+      code_review_requests_enabled: exercise.code_review_requests_enabled?,
+      run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled?
     }
 
     data[:solution_zip_url] = @helpers.download_api_v8_core_exercise_solution_url(exercise) if @user.administrator?
@@ -147,7 +147,7 @@ class CourseInfo
   end
 
   def exercise_return_url(e)
-    "#{@helpers.exercise_submissions_url(e, format: 'json')}"
+    @helpers.exercise_submissions_url(e, format: 'json').to_s
   end
 
   def get_latest_submission(exercise)
