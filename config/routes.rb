@@ -226,6 +226,10 @@ TmcServer::Application.routes.draw do
     end
   end
 
+
+  get '/users/:user_id/verify/:id', to: 'users#confirm_email', as: 'confirm_email'
+  post '/users/:user_id/send_verification_email', to: 'users#send_verification_email', as: 'send_verification_email'
+
   resources :certificates, only: [:show, :create]
 
   resources :emails, only: [:index]

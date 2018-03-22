@@ -30,6 +30,7 @@ class UsersController < ApplicationController
     set_user_fields
 
     if @user.errors.empty? && @user.save
+      UserMailer.email_confirmation(@user).deliver_now
       if @bare_layout
         render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', layout: true
       else
@@ -75,6 +76,20 @@ class UsersController < ApplicationController
       flash.now[:error] = 'Failed to save profile'
       render action: :show, status: 403
     end
+  end
+
+  def confirm_email
+    token = VerificationToken.email.find_by!(user_id: params[:user_id], token: params[:id])
+    User.find(params[:user_id]).update!(email_verified: true)
+    redirect_to root_url, notice: 'Your email address has been verified!'
+  end
+
+  def send_verification_email
+    user = User.find(params[:user_id])
+    raise 'Access denied' if user != current_user && !current_user.admin?
+    raise 'Already verified' if user.email_verified?
+    UserMailer.email_confirmation(user).deliver_now
+    redirect_to root_path, notice: "Verification email sent to #{user.email}."
   end
 
   private

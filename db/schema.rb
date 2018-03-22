@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170809122816) do
+ActiveRecord::Schema.define(version: 20180322124723) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -396,9 +396,18 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.boolean  "administrator",      default: false, null: false
     t.text     "email",              default: "",    null: false
     t.boolean  "legitimate_student", default: true,  null: false
+    t.boolean  "email_verified",     default: false, null: false
   end
 
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
+
+  create_table "verification_tokens", force: :cascade do |t|
+    t.string   "token",      null: false
+    t.integer  "type",       null: false
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   add_foreign_key "action_tokens", "users", on_delete: :cascade
   add_foreign_key "available_points", "exercises", on_delete: :cascade

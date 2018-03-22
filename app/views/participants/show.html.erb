@@ -18,6 +18,12 @@
   </section>
 </div>
 
+<% unless @user.email_verified? %>
+  <div class="alert alert-warning" role="alert">
+    Your email address is not verified yet. <%= link_to 'Resend verification email', send_verification_email_path(@user), method: :post %>.
+  </div>
+<% end %>
+
 <section>
   <br>
   <h2>Points</h2>

@@ -28,6 +28,10 @@
     </div>
     <div id="everything">
       <div class="container container-fluid well-large" id="content-area">
+        <% unless flash.empty? %>
+          <br>
+          <%= bootstrap_flash %>
+        <% end %>
         <%= yield %>
         <br>
         <br>

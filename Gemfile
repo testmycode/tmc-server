@@ -70,6 +70,10 @@ group :development, :test do
   gem 'simplecov'
 end
 
+group :development do
+  gem 'letter_opener', '~> 1.6'
+end
+
 group :test do
   gem 'json-schema', '~> 2.7.0'
 end
