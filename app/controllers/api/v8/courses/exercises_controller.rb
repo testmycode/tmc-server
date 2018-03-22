@@ -53,7 +53,7 @@ module Api
 
           all_exercises = course.exercises
                                 .where(hidden: false, disabled_status: 0)
-                                .select { |ex| ex._fast_visible_to?(current_user) }
+                                .select { |ex| ex._fast_visible? }
 
           presentable = all_exercises.map do |ex|
             {

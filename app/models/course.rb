@@ -469,7 +469,12 @@ class Course < ActiveRecord::Base
   def exercise_group_completion_by_user
     # TODO: clean up exercise group discovery
 
-    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }.uniq
+    groups = exercises
+      .where(disabled_status: 0)
+      .select { |e| e._fast_visible? }
+      .map(&:name)
+      .map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }
+      .uniq
 
     result = {}
     for group in groups

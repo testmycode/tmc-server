@@ -45,7 +45,7 @@ class CourseInfo
                     exercises.where(unlock_spec: nil)
                   else
                     exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{@unlocked_exercises.map { |_| '?' }.join(', ')})", *@unlocked_exercises])
-      end.select { |e| e._fast_visible_to?(@user) }
+      end.select { |e| e._fast_visible? }
     end
 
     exercises = exercises.to_a.natsort_by(&:name)
