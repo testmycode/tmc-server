@@ -13,7 +13,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
   before :each do
     FileUtils.rm_rf(repo_path)
     create_bare_repo(repo_path)
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'Downloading an exercise solution zip' do

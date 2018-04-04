@@ -20,7 +20,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
   let!(:submission_data) { FactoryGirl.create(:submission_data, submission: submission) }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'Downloading a submission as zip' do

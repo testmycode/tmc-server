@@ -14,7 +14,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
   let(:user) { FactoryGirl.create(:user, login: 'user', password: 'xooxer') }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'As an admin' do

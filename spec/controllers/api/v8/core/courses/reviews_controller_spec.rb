@@ -10,7 +10,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
   let!(:submission2_review) { FactoryGirl.create(:review, review_body: 'submission2_review body', submission: submission2) }
 
   before(:each) do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe "GET reviews for a course for current user's submissions" do
@@ -23,11 +23,11 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
           get :index, course_id: course.id
           expect(response).to have_http_status(:success)
           json = JSON.parse response.body
-          json[0]['submission_id'].should eq(review.submission.id)
-          json[0]['exercise_name'].should eq(exercise.name)
-          json[0]['id'].should eq(review.id)
-          json[0]['reviewer_name'].should eq(user.username)
-          json[0]['review_body'].should eq(review.review_body)
+          expect(json[0]['submission_id']).to eq(review.submission.id)
+          expect(json[0]['exercise_name']).to eq(exercise.name)
+          expect(json[0]['id']).to eq(review.id)
+          expect(json[0]['reviewer_name']).to eq(user.username)
+          expect(json[0]['review_body']).to eq(review.review_body)
           expect(response.body).not_to include submission2_review.review_body
         end
       end
@@ -51,11 +51,11 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
           get :index, course_id: course.id
           expect(response).to have_http_status(:success)
           json = JSON.parse response.body
-          json[0]['submission_id'].should eq(review.submission.id)
-          json[0]['exercise_name'].should eq(exercise.name)
-          json[0]['id'].should eq(review.id)
-          json[0]['reviewer_name'].should eq(user.username)
-          json[0]['review_body'].should eq(review.review_body)
+          expect(json[0]['submission_id']).to eq(review.submission.id)
+          expect(json[0]['exercise_name']).to eq(exercise.name)
+          expect(json[0]['id']).to eq(review.id)
+          expect(json[0]['reviewer_name']).to eq(user.username)
+          expect(json[0]['review_body']).to eq(review.review_body)
           expect(response.body).not_to include submission2_review.review_body
         end
       end

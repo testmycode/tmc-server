@@ -14,7 +14,7 @@ describe Api::V8::Organizations::Courses::Exercises::Users::PointsController, ty
   let!(:awarded_point2) { FactoryGirl.create(:awarded_point, course: course, name: available_point2.name, submission: submission1, user: user) }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'As a guest' do

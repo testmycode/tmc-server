@@ -99,12 +99,13 @@ class RemoteSandboxForTesting
   end
 end
 
-RSpec.configure do |config|
-  config.before :each do
-    RemoteSandboxForTesting.init_stubs!
-  end
+# Disabled for now
+# RSpec.configure do |config|
+#   config.before :each do
+#     RemoteSandboxForTesting.init_stubs!
+#   end
 
-  config.after :suite do
-    RemoteSandboxForTesting.cleanup_after_all_tests!
-  end
-end
+#   config.after :suite do
+#     RemoteSandboxForTesting.cleanup_after_all_tests!
+#   end
+# end

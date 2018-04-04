@@ -16,7 +16,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
     let(:token) { nil }
 
     before :each do
-      controller.stub(:doorkeeper_token) { token }
+      allow(controller).to receive(:doorkeeper_token) { token }
       get :index
     end
 
@@ -33,7 +33,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
 
   describe 'authentication' do
     before :each do
-      controller.stub(:doorkeeper_token) { token }
+      allow(controller).to receive(:doorkeeper_token) { token }
     end
     context 'with a valid token having invalid user ID' do
       let(:token) { double resource_owner_id: -1, acceptable?: true }

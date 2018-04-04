@@ -14,7 +14,7 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
   let!(:point) { FactoryGirl.create(:awarded_point) }
 
   before(:each) do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe "GET current user's points" do

@@ -11,7 +11,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
   let!(:submission_3) { FactoryGirl.create(:submission, course: course, created_at: Time.current - 2.hours) }
 
   before(:each) do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'index' do

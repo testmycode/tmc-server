@@ -18,7 +18,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
   end
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
     Teachership.create(user: teacher, organization: organization)
     Assistantship.create(user: assistant, course: course)
   end

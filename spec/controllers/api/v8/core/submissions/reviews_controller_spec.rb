@@ -11,7 +11,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
 
   before :each do
     Teachership.create! user: teacher, organization: organization
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'POST create' do

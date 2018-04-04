@@ -16,7 +16,7 @@ describe Api::V8::Organizations::Courses::Exercises::PointsController, type: :co
   let!(:exercise_no_points) { FactoryGirl.create(:exercise, name: 'nopoints', course: course) }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'As an admin' do

@@ -7,7 +7,7 @@ describe Api::V8::Core::Courses::UnlocksController, type: :controller do
   let!(:user) { FactoryGirl.create(:user) }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'POST unlock exercises' do

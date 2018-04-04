@@ -1,0 +1,4 @@
+#!/bin/sh
+
+RSPEC_PATTERN="spec/controllers/api/v8/**/*.rb"
+bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --format documentation"

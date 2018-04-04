@@ -6,7 +6,7 @@ describe Api::V8::UsersController, type: :controller do
   let!(:admin) { FactoryGirl.create(:admin) }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe "GET current user's info with an access token" do

@@ -12,7 +12,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
   let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'Downloading an exercise zip' do
