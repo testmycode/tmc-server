@@ -6,7 +6,7 @@ services:
       - ./pg-data:/var/lib/postgresql
   web:
     build: .
-    entrypoint: ./dev-entry.sh
+    entrypoint: ./docker-wait-for-db.sh
     volumes:
       - .:/app
     ports:

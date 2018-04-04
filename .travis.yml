@@ -1,59 +1,18 @@
-sudo: required
-dist: precise
-group: legacy
-
-env:
-  matrix:
-    - CI_NODE=1 RSPEC=1 RSPEC_PATTERN="spec/{controllers,helpers,lib,mailers,models}/**/*.rb"
-    - CI_NODE=2 RSPEC=1 USERMANUAL=1 RSPEC_PATTERN="spec/{features,usermanual}/**/*.rb"
-    - CI_NODE=3 RSPEC=1 RSPEC_PATTERN="spec/integration/{running_tests,comet,feedback,requests}/**/*.rb"
-    - CI_NODE=4 RSPEC=1 RSPEC_PATTERN="spec/integration/{admin_usecases_spec.rb,broken_utf8_spec.rb,personal_deadlines_spec.rb,reset_password_spec.rb,stats_view_usecases_spec.rb,utf8_exercise_spec.rb}"
-    - CI_NODE=5 RSPEC=1 RSPEC_PATTERN="spec/integration/{student_usecases_spec.rb}"
-    - CI_NODE=6 RSPEC=1 RSPEC_PATTERN="spec/integration/{paste_usecases_spec.rb}"
-    - CI_NODE=7 BREAKMAN=1 AUDIT=1
-  global:
-    - secure: XC/0F2K3EyGYrOtS9G+YddR9iW0E/eUBCe7dyjIHT3bAuWmkNLbGaWFvRaRALGCLJaQBzksEwQE47+qv4nS72kuVElHws5S3YU7PYT3A4KENe4pdycx9YitLj1eh7F4ds4LUEJ2TmjRw1+fvlsAXJ//ZW/vqzAxeZPrJPOF52tY=
-
 language: ruby
-rvm:
-  - 2.2.0
-
+sudo: required
 git:
   submodules: false
-
-addons:
-  apt:
-    packages:
-      - valgrind
-      - check
-      - pkg-config
-      - gcc
-
-before_install:
-  - . ./setup-travis.sh
-
-install:
-  - bundle install --retry=3 --jobs=3 --deployment
-
+env:
+  global:
+    - RAILS_ENV=test
 services:
-  - postgresql
-
+  - docker
+before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
+install:
+  - docker-compose build
 before_script:
-  - createuser -U postgres -s tmc
-  - bundle exec rake db:reset
-
+  - docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
 script:
-  - if [ ! -z "$RSPEC" ]; then ./ext/tmc-sandbox/web/webapp.rb start; fi
-  - if [ ! -z "$RSPEC" ]; then bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --tag ~network -f d" SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001; fi
-  - if [ ! -z "$BREAKMAN" ]; then bundle --binstubs && ./bin/brakeman ; fi
-  - if [ ! -z "$AUDIT" ]; then bundle exec bundle-audit update && bundle exec bundle-audit check ; fi
-
-after_success:
-  - if [ ! -z "$USERMANUAL" ]; then ./.travis-update-usermanual.sh; fi
-
-after_failure:
-  - cat ext/tmc-sandbox/web/log/*
-
-notifications:
-  slack:
-    secure: YCiWybZYBoJ2JDjpPp5Idf4OvqScay5WfEuQMdvee42kgsSVolew6V5YUx41E29Of+2xAcQ+be5XImzO7SlTYuaGD6hf0JZvjjxO3gpycCljNSvDgFnBF9s4WuUQ31LozI6eQqo/9c5zUFxW9MGeeaRUWvurlW0rRHM3UKokAQk=
+  - docker-compose run web bin/spec_v8
