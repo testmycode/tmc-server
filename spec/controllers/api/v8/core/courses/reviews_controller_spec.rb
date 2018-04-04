@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Api::V8::Core::Courses::ReviewsController, type: :controller do

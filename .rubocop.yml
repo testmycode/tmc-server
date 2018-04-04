@@ -6,7 +6,7 @@ AllCops:
     - 'db/**/*'
     - 'ext/**/*'
     - 'tmp/**/*'
-  TargetRubyVersion: 2.2
+  TargetRubyVersion: 2.5
 
 Rails:
   Enabled: true

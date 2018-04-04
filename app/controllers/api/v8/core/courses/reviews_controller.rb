@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Core
@@ -54,9 +56,9 @@ module Api
             course = Course.find_by!(id: params[:course_id])
             authorize! :read, course
             users_reviewed_submissions = course.submissions
-                                         .where(user_id: current_user.id)
-                                         .where('requests_review OR requires_review OR reviewed')
-                                         .order('created_at DESC')
+                                               .where(user_id: current_user.id)
+                                               .where('requests_review OR requires_review OR reviewed')
+                                               .order('created_at DESC')
 
             present Review.course_reviews_json(course, users_reviewed_submissions, view_context)
           end
@@ -81,7 +83,7 @@ module Api
               award_points
               @review.submission.save!
               @review.save!
-            rescue
+            rescue StandardError
               ::Rails.logger.error($!)
               respond_with_error('Failed to save code review.')
             else
@@ -119,16 +121,16 @@ module Api
             sub.reviewed = true
             sub.review_dismissed = false
             sub.of_same_kind
-              .where('(requires_review OR requests_review) AND NOT reviewed')
-              .where(['created_at < ?', sub.created_at])
-              .update_all(newer_submission_reviewed: true)
+               .where('(requires_review OR requests_review) AND NOT reviewed')
+               .where(['created_at < ?', sub.created_at])
+               .update_all(newer_submission_reviewed: true)
           end
 
           def award_points
             submission = @review.submission
             exercise = submission.exercise
             course = exercise.course
-            fail 'Exercise of submission has been moved or deleted' unless exercise
+            raise 'Exercise of submission has been moved or deleted' unless exercise
 
             available_points = exercise.available_points.where(requires_review: true).map(&:name)
             previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
@@ -137,7 +139,7 @@ module Api
             if params[:review][:points].respond_to?(:keys)
               params[:review][:points].keys.each do |point_name|
                 unless exercise.available_points.where(name: point_name).any?
-                  fail "Point does not exist: #{point_name}"
+                  raise "Point does not exist: #{point_name}"
                 end
 
                 new_points << point_name

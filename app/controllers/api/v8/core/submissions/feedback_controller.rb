@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Core
@@ -50,7 +52,7 @@ module Api
               ActiveRecord::Base.connection.transaction(requires_new: true) do
                 answer_records.each(&:save!)
               end
-            rescue
+            rescue StandardError
               ::Rails.logger.warn "Failed to save feedback answer: #{$!}\n#{$!.backtrace.join("\n  ")}"
               return respond_with_error("Failed to save feedback answer: #{$!}")
             end

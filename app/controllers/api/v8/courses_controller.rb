@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     class CoursesController < Api::V8::BaseController

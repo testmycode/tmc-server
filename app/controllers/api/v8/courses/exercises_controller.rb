@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Courses
@@ -55,8 +57,8 @@ module Api
           all_exercises = course.exercises.where(disabled_status: 0)
           unless can_see_everything
             all_exercises = course.exercises
-              .where(hidden: false)
-              .select { |ex| ex._fast_visible? }
+                                  .where(hidden: false)
+                                  .select(&:_fast_visible?)
           end
 
           presentable = all_exercises.map do |ex|

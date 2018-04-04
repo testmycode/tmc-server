@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Core
@@ -34,7 +36,7 @@ module Api
 
         def show
           @submission = Submission.find_by!(id: params[:id])
-          if !@submission.processed?
+          unless @submission.processed?
             authorization_skip!
             return render json: {
               status: :processing

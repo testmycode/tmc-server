@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Core
@@ -96,7 +98,7 @@ module Api
 
               unless @submission.save
                 errormsg = 'Failed to save submission.'
-                errormsg += " Errors: #{@submission.errors.messages.to_s}"
+                errormsg += " Errors: #{@submission.errors.messages}"
               end
             end
 

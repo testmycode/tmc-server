@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     class ApidocsController < ActionController::Base
@@ -134,7 +136,7 @@ module Api
           end
         end
         key :host, 'localhost:3000'
-        key :schemes, %w(http https)
+        key :schemes, %w[http https]
         key :consumes, ['application/json']
         key :produces, ['application/json']
       end
