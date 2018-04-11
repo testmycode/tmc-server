@@ -21,7 +21,7 @@
     end
     @exercises.each do |exercise|
       exercise.available_points.sort.each do |p|
-        arr += user_points.include?(p.name) ? [1] : [nil]
+        arr += user_points.include?(p.name) ? [1] : [0]
       end
     end
     csv << arr

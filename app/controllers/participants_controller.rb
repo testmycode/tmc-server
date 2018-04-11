@@ -1,6 +1,7 @@
 require 'portable_csv'
 
 class ParticipantsController < ApplicationController
+  include PointVisualisation
   before_action :set_organization, only: [:index]
 
   def index
@@ -61,8 +62,6 @@ class ParticipantsController < ApplicationController
   def show
     @user = User.find(params[:id])
     authorize! :view_participant_information, @user
-    # TODO: bit ugly
-    @awarded_points = Hash[AwardedPoint.where(id: AwardedPoint.all_awarded(@user)).to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
 
     if current_user.administrator?
       add_breadcrumb 'Participants', :participants_path
@@ -71,27 +70,7 @@ class ParticipantsController < ApplicationController
       add_breadcrumb 'My stats', participant_path(@user)
     end
 
-    @courses = []
-    @missing_points = {}
-    @percent_completed = {}
-    @group_completion_ratios = {}
-    for course_id in @awarded_points.keys
-      course = Course.find(course_id)
-      if !course.hide_submissions?
-        @courses << course
-
-        awarded = @awarded_points[course.id]
-        missing = AvailablePoint.course_points(course).order!.map(&:name) - awarded
-        @missing_points[course_id] = missing
-
-        if awarded.size + missing.size > 0
-          @percent_completed[course_id] = 100 * (awarded.size.to_f / (awarded.size + missing.size))
-        else
-          @percent_completed[course_id] = 0
-        end
-        @group_completion_ratios[course_id] = course.exercise_group_completion_ratio_for_user(@user)
-      end
-    end
+    define_point_stats(@user)
 
     if current_user.administrator? || current_user.id == @user.id
       @submissions = @user.submissions.order('created_at DESC').includes(:user).includes(:course)
@@ -102,7 +81,6 @@ class ParticipantsController < ApplicationController
     @submissions = @submissions.limit(100) unless !!params[:view_all]
 
     Submission.eager_load_exercises(@submissions)
-
   end
 
   def me
