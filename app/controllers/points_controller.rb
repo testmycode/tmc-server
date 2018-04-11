@@ -81,6 +81,9 @@ class PointsController < ApplicationController
     end
     respond_to do |format|
       format.html
+      format.csv do
+        render_csv(filename: "#{@course.name}_#{@sheetname}_points.csv")
+      end
       format.json do
         output = {
           api_version: ApiVersion::API_VERSION,
