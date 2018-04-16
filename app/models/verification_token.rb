@@ -4,7 +4,7 @@ class VerificationToken < ActiveRecord::Base
 
   belongs_to :user
 
-  enum type: [:email]
+  enum type: [:email, :delete_user]
 
   validates :type, presence: true
   validates :user, presence: true
