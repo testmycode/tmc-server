@@ -77,6 +77,7 @@ RSpec.configure do |config|
   config.before(:each) do |context|
     allow(Tailoring).to receive_messages(get: Tailoring.new)
     SiteSetting.use_distribution_defaults!
+    SiteSetting.all_settings['administrative_email'] = 'test@example.com'
 
     if context.metadata[:integration] || context.metadata[:feature]
       # integration tests can't use transaction since the webserver must see the changes

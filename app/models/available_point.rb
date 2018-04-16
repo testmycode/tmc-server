@@ -81,12 +81,13 @@ class AvailablePoint < ActiveRecord::Base
   end
 
   def award_to(user, submission = nil)
+    point_awarded_at = submission ? submission.created_at : Time.zone.now
     AwardedPoint.create!(
       course_id: exercise.course_id,
       name: name,
       user_id: user.id,
       submission: submission,
-      created_at: submission.created_at
+      created_at: point_awarded_at
     )
   rescue ActiveRecord::RecordNotUnique
   end

@@ -12,7 +12,7 @@ describe Setup::OrganizationsController, type: :controller do
     {
       name: 'TestOrganization',
       slug: 'test-organization',
-      verified: true
+      verified: true,
     }
   end
 
@@ -28,7 +28,7 @@ describe Setup::OrganizationsController, type: :controller do
     {
       name: 'New organization name',
       information: 'New information',
-      website: 'http://newurl.net/'
+      website: 'http://newurl.net/',
     }
   end
 
