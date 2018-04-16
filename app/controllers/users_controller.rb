@@ -97,12 +97,17 @@ class UsersController < ApplicationController
   end
 
   def destroy_user
-    user = authenticate_current_user
-    token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
-    username = user.login
-    sign_out if current_user == user
-    user.destroy
-    redirect_to root_url, notice: "The account #{username} has been permanently destroyed."
+    im_sure = params[:id]
+    if im_sure != "1"
+      redirect_to verify_destroying_user_url, notice: "Please check the checkbox after you have read the instructions."
+    else
+      user = authenticate_current_user
+      token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
+      username = user.login
+      sign_out if current_user == user
+      user.destroy
+      redirect_to root_url, notice: "The account #{username} has been permanently destroyed."
+    end
   end
 
   def send_destroy_email
