@@ -21,10 +21,15 @@ class ApplicationController < ActionController::Base
   include BreadcrumbHelpers
   include EmbeddableHelper
   include AuthorizeCollectionHelper
+  include ApplicationHelper
   check_authorization
 
   rescue_from CanCan::AccessDenied do |_exception|
-    respond_access_denied
+    if current_user.guest?
+      redirect_to(login_path(return_to: return_to_link))
+    else
+      respond_access_denied
+    end
   end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|

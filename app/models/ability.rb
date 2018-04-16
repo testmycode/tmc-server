@@ -37,6 +37,11 @@ class Ability
       end
 
       can :create, User if SiteSetting.value(:enable_signup)
+      cannot :destroy, User
+      can :destroy, User do |u|
+        user.administrator? ||
+        u == user
+      end
 
       cannot :read, Course
       can :read, Course do |c|
