@@ -4,4 +4,6 @@
 
 <%= render :partial => 'users/form', :user => @user %>
 
-<%= button_to 'Request deleting account', send_destroy_email_path(@user.id), method: :post, class: 'btn btn-danger' %>
+<% if can? :destroy, @user %>
+  <%= button_to 'Request deleting account', send_destroy_email_path(@user.id), method: :post, class: 'btn btn-danger' %>
+<% end %>

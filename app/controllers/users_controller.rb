@@ -85,40 +85,46 @@ class UsersController < ApplicationController
   end
 
   def send_verification_email
-    user = authenticate_current_user
+    user = User.find(params[:user_id])
+    raise 'Access denied' if user != current_user && !current_user.admin?
     raise 'Already verified' if user.email_verified?
     UserMailer.email_confirmation(user).deliver_now
     redirect_to root_path, notice: "Verification email sent to #{user.email}."
   end
 
   def verify_destroying_user
-    @user = authenticate_current_user
+    @user = authenticate_current_user_destroy
     token = VerificationToken.delete_user.find_by!(user: @user, token: params[:id])
   end
 
   def destroy_user
-    im_sure = params[:id]
+    im_sure = params[:im_sure]
     if im_sure != "1"
       redirect_to verify_destroying_user_url, notice: "Please check the checkbox after you have read the instructions."
-    else
-      user = authenticate_current_user
-      token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
-      username = user.login
-      sign_out if current_user == user
-      user.destroy
-      redirect_to root_url, notice: "The account #{username} has been permanently destroyed."
+      return
     end
+    user = authenticate_current_user_destroy
+    user_authentication = User.authenticate(user.login, params[:user][:password])
+    if user_authentication.nil?
+      redirect_to verify_destroying_user_url, { alert: "The password was incorrect." }
+      return
+    end
+    token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
+    username = user.login
+    sign_out if current_user == user
+    user.destroy
+    redirect_to root_url, notice: "The account #{username} has been permanently destroyed."
   end
 
   def send_destroy_email
-    user = authenticate_current_user
+    user = authenticate_current_user_destroy
     UserMailer.destroy_confirmation(user).deliver_now
     redirect_to root_path, notice: "Verification email sent to #{user.email}."
   end
 
   private
 
-  def authenticate_current_user
+  def authenticate_current_user_destroy
     user = User.find(params[:user_id])
     authorize! :destroy, user
     user
