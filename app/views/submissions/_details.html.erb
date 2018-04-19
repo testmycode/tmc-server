@@ -56,7 +56,7 @@
                 </td>
                 <% if !@submission.all_tests_passed? && (can? :read_results, @submission) %>
                   <td>
-                    <%= tcr.message %>
+                    <pre class="no-style"><%= tcr.message %></pre>
                     <% if tcr.exception != nil %>
                       <div class="stack-trace">
                         <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
