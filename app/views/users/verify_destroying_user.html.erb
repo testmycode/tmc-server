@@ -1,0 +1,32 @@
+<h1>Deleting the account <%= @user.login %></h1>
+
+<div class="jumbotron hero-unit-alert alert-danger">
+  Deleting your account will have the following consequences:
+    <ul>
+      <li>You will lose all your acquired exercise points. We will not be able to recover them.</li>
+      <li>You will not be able to receive a grade from any course that uses TestMyCode.</li>
+      <li>We will not be able to verify the authenticity of any certificates that you have generated.</li>
+    <ul>
+</div>
+
+
+<%= form_tag(destroy_user_path, method: :delete, class: 'form-horizontal') do  %>
+  <div class="form-group">
+    <%= check_box_tag :im_sure %>
+    <%= label_tag "I've read the above and I'm sure I understand the consequences", nil, class: "control-label", for: :im_sure %>
+  </div>
+  <div class="form-group">
+    <%= bs_labeled_field("Your password", password_field(:user, :password, :autocomplete => 'off', class: 'form-control')) %>
+  </div>
+  <p><strong>Pressing the button below will permanently destroy your TestMyCode account.</strong></p>
+  <%= submit_tag("Destroy my account permanently", class: "btn btn-danger", data: { confirm: "Are you sure you want to delete the account #{@user.login}?"}, disabled: "disabled", id: :destroy_button) %>
+<% end %>
+
+
+<script>
+  var checkBox = document.getElementById('im_sure')
+  var destroyButton = document.getElementById('destroy_button')
+  checkBox.addEventListener("click", function() {
+    destroyButton.disabled = !checkBox.checked
+  })
+</script>

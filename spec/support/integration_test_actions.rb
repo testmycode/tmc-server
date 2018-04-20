@@ -15,7 +15,7 @@ module IntegrationTestActions
   end
 
   def log_out
-    click_link 'Sign out'
+    visit '/logout'
   end
 
   def create_new_course(options = {})

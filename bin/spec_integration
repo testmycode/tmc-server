@@ -1,4 +1,4 @@
 #!/bin/sh
 
-RSPEC_PATTERN="spec/integration/**/*.rb"
+RSPEC_PATTERN="spec/integration/destroying_user_spec.rb"
 bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --format documentation"

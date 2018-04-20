@@ -3,3 +3,7 @@
 <h1><%= @user.login %></h1>
 
 <%= render :partial => 'users/form', :user => @user %>
+
+<% if can? :destroy, @user %>
+  <%= button_to 'Request deleting account', send_destroy_email_path(@user.id), method: :post, class: 'btn btn-danger' %>
+<% end %>

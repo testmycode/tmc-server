@@ -92,7 +92,43 @@ class UsersController < ApplicationController
     redirect_to root_path, notice: "Verification email sent to #{user.email}."
   end
 
+  def verify_destroying_user
+    @user = authenticate_current_user_destroy
+    token = VerificationToken.delete_user.find_by!(user: @user, token: params[:id])
+  end
+
+  def destroy_user
+    im_sure = params[:im_sure]
+    if im_sure != "1"
+      redirect_to verify_destroying_user_url, notice: "Please check the checkbox after you have read the instructions."
+      return
+    end
+    user = authenticate_current_user_destroy
+    user_authentication = User.authenticate(user.login, params[:user][:password])
+    if user_authentication.nil?
+      redirect_to verify_destroying_user_url, { alert: "The password was incorrect." }
+      return
+    end
+    token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
+    username = user.login
+    sign_out if current_user == user
+    user.destroy
+    redirect_to root_url, notice: "The account #{username} has been permanently destroyed."
+  end
+
+  def send_destroy_email
+    user = authenticate_current_user_destroy
+    UserMailer.destroy_confirmation(user).deliver_now
+    redirect_to root_path, notice: "Verification email sent to #{user.email}."
+  end
+
   private
+
+  def authenticate_current_user_destroy
+    user = User.find(params[:user_id])
+    authorize! :destroy, user
+    user
+  end
 
   def set_email
     user_params = params[:user]
