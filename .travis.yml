@@ -3,8 +3,8 @@ sudo: required
 git:
   submodules: false
 env:
-  global:
-    - RAILS_ENV=test
+  - SPECS=bin/spec_v8
+  - SPECS=bin/spec_models
 services:
   - docker
 before_install:
@@ -15,4 +15,4 @@ install:
 before_script:
   - docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
 script:
-  - docker-compose run web bin/spec_v8
+  - docker-compose run web $SPECS
