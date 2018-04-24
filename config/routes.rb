@@ -241,6 +241,7 @@ TmcServer::Application.routes.draw do
   resources :stats, only: [:index]
 
   resources :password_reset_keys
+  get 'reset_password', to: 'password_reset_keys#new', as: 'reset_password_pretty'
   get '/reset_password/:token' => 'password_reset_keys#show', :as => 'reset_password'
   delete '/reset_password/:token' => 'password_reset_keys#destroy'
 
