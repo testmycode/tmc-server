@@ -89,6 +89,8 @@ module Api
             message: 'User created.'
           }
         else
+          errors = @user.errors
+          errors[:username] = errors.delete(:login) if errors.has_key?(:login)
           render json: {
             success: false,
             errors: @user.errors
