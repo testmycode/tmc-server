@@ -83,7 +83,8 @@ module Api
         set_extra_data
 
         if @user.errors.empty? && @user.save
-          UserMailer.email_confirmation(@user).deliver_now
+          # TODO: Whitelist origins
+          UserMailer.email_confirmation(@user, params[:origin]).deliver_now
           render json: {
             success: true,
             message: 'User created.'

@@ -6,7 +6,7 @@
 <body>
   <p>Hey there!</p>
 
-  <p>Please click the following link to confirm that this is your email address for the mooc.fi account "<%= @user.login %>".</p>
+  <p>Please click the following link to confirm that this is your email address for the mooc.fi account <%= @user.login %>.<%= @origin ? " The account was created from '#{@origin}'." : '' %> </p>
 
   <a href="<%= @url %>"><%= @url %></a>
 

@@ -1,5 +1,6 @@
 class UserMailer < ActionMailer::Base
-  def email_confirmation(user)
+  def email_confirmation(user, origin = nil)
+    @origin = origin
     @user = user
     token = user.verification_tokens.email.create!
     @url = base_url + confirm_email_path(@user.id, token.token)
