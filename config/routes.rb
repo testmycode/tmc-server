@@ -42,7 +42,7 @@ TmcServer::Application.routes.draw do
     namespace :v8, defaults: {format: 'json'} do
       resources :apidocs, only: :index, path: 'documentation'
 
-      resources :users, only: :show
+      resources :users, only: [:show, :create]
 
       resources :organizations, param: :slug, path: 'org', only: %i{index show} do
         resources :courses, module: :organizations, param: :name, only: :show do

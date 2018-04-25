@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180322124723) do
+ActiveRecord::Schema.define(version: 20180425091037) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -377,6 +377,18 @@ ActiveRecord::Schema.define(version: 20180322124723) do
 
   add_index "unlocks", ["user_id", "course_id", "exercise_name"], name: "index_unlocks_on_user_id_and_course_id_and_exercise_name", unique: true, using: :btree
 
+  create_table "user_app_data", force: :cascade do |t|
+    t.string   "field_name"
+    t.text     "value"
+    t.string   "namespace"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_app_data", ["user_id", "field_name", "namespace"], name: "index_user_app_data_on_user_id_and_field_name_and_namespace", unique: true, using: :btree
+  add_index "user_app_data", ["user_id"], name: "index_user_app_data_on_user_id", using: :btree
+
   create_table "user_field_values", force: :cascade do |t|
     t.integer  "user_id",    null: false
     t.string   "field_name", null: false
@@ -426,5 +438,6 @@ ActiveRecord::Schema.define(version: 20180322124723) do
   add_foreign_key "submissions", "users", on_delete: :cascade
   add_foreign_key "test_case_runs", "submissions", on_delete: :cascade
   add_foreign_key "test_scanner_cache_entries", "courses", on_delete: :cascade
+  add_foreign_key "user_app_data", "users"
   add_foreign_key "user_field_values", "users", on_delete: :cascade
 end

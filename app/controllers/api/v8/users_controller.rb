@@ -69,6 +69,82 @@ module Api
           administrator: user.administrator
         )
       end
+
+      def create
+        authorize! :create, User
+
+        @user = User.new
+
+        @user.login = params[:user][:username].to_s.strip
+
+        set_email
+        set_password
+        set_user_fields
+        set_extra_data
+
+        if @user.errors.empty? && @user.save
+          UserMailer.email_confirmation(@user).deliver_now
+          render json: {
+            success: true,
+            message: 'User created.'
+          }
+        else
+          render json: {
+            success: false,
+            errors: @user.errors
+          }
+        end
+      end
+
+      private
+
+      def set_email
+        user_params = params[:user]
+
+        return if !@user.new_record? && user_params[:email_confirmation].blank?
+
+        if user_params[:email].blank?
+          @user.errors.add(:email, 'needed')
+        elsif user_params[:email] != user_params[:email_confirmation]
+          @user.errors.add(:email_confirmation, 'did not match')
+        else
+          @user.email = user_params[:email].strip
+        end
+      end
+
+      def set_password
+        user_params = params[:user]
+        if user_params[:password].blank?
+          @user.errors.add(:password, 'needed')
+        elsif user_params[:password] != user_params[:password_confirmation]
+          @user.errors.add(:password_confirmation, 'did not match')
+        else
+          @user.password = user_params[:password]
+        end
+      end
+
+      def set_user_fields
+        return if params[:user_field].nil?
+        changes = {}
+        UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
+          value_record = @user.field_value_record(field)
+          old_value = value_record.ruby_value
+          value_record.set_from_form(params[:user_field][field.name])
+          new_value = value_record.ruby_value
+          changes[field.name] = { from: old_value, to: new_value } unless new_value == old_value
+        end
+        changes
+      end
+
+      def set_extra_data
+        extra_fields = params['user']['extra_fields']
+        return if extra_fields.nil?
+        namespace = extra_fields['namespace']
+        raise "Namespace not defined" unless namespace
+        extra_fields['data'].each do |record|
+          @user.user_app_data.new(namespace: namespace, field_name: record['field_name'], value: record[:value])
+        end
+      end
     end
   end
 end
