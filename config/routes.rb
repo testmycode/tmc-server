@@ -44,6 +44,10 @@ TmcServer::Application.routes.draw do
 
       resources :users, only: [:show, :create]
 
+      namespace :users do
+        resources :password_reset, only: [:create]
+      end
+
       resources :organizations, param: :slug, path: 'org', only: %i{index show} do
         resources :courses, module: :organizations, param: :name, only: :show do
           resources :points, module: :courses, only: :index
