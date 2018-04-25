@@ -101,12 +101,10 @@ module Api
       def set_email
         user_params = params[:user]
 
-        return if !@user.new_record? && user_params[:email_confirmation].blank?
+        return if !@user.new_record?
 
         if user_params[:email].blank?
           @user.errors.add(:email, 'needed')
-        elsif user_params[:email] != user_params[:email_confirmation]
-          @user.errors.add(:email_confirmation, 'did not match')
         else
           @user.email = user_params[:email].strip
         end
