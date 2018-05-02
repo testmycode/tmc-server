@@ -137,7 +137,7 @@ class Course < ActiveRecord::Base
             }
   validates :title,
             presence: true,
-            length: { within: 1..40 }
+            length: { within: 1..80 }
   validates :description, length: { maximum: 512 }
   validate :check_name_length
 
