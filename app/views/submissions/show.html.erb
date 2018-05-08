@@ -68,14 +68,15 @@
           <%= render 'submissions/logs' %>
         </div>
       <% end %>
-
-      <div class="tab-pane active" id="files">
-        <div class="row">
-          <div style="width: 100%">
-            <%= render :partial => 'files/files', :locals => {:files => @files} %>
+      <% if can? :read_results, @submission %>
+        <div class="tab-pane active" id="files">
+          <div class="row">
+            <div style="width: 100%">
+              <%= render :partial => 'files/files', :locals => {:files => @files} %>
+            </div>
           </div>
         </div>
-      </div>
+      <% end %>
     </div>
   </div>
 </div>
