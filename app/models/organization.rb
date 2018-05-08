@@ -72,7 +72,7 @@ class Organization < ActiveRecord::Base
   end
 
   def visibility_allowed?(request, user)
-    return true if current.user.administrator?
+    return true if user.administrator?
     return true unless whitelisted_ips
     whitelisted_ips.include?(request.remote_ip)
   end
