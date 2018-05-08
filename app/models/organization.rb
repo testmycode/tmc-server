@@ -71,6 +71,11 @@ class Organization < ActiveRecord::Base
     Organization.where(slug: slug)
   end
 
+  def visibility_allowed?(request)
+    return true unless whitelisted_ips
+    whitelisted_ips.include?(request.remote_ip)
+  end
+
   def valid_slug? # slug must not be an existing route (/org/new etc)
     errors.add(:slug, 'is a system reserved word') if %w(new list_requests).include? slug
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180425091037) do
+ActiveRecord::Schema.define(version: 20180508095009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -238,6 +238,7 @@ ActiveRecord::Schema.define(version: 20180425091037) do
     t.string   "email"
     t.text     "website"
     t.boolean  "pinned",              default: false, null: false
+    t.string   "whitelisted_ips",                                  array: true
   end
 
   create_table "points_upload_queues", force: :cascade do |t|
