@@ -205,7 +205,7 @@ class CoursesController < ApplicationController
 
   def set_organization
     @organization = Organization.find_by!(slug: params[:organization_id])
-    unauthorized! unless @organization.visibility_allowed?(request)
+    unauthorized! unless @organization.visibility_allowed?(request, current_user)
   end
 
   def set_course

@@ -48,7 +48,7 @@ module Api
       def index
         orgs = Organization
           .visible_organizations
-          .select { |org| org.visibility_allowed?(request) }
+          .select { |org| org.visibility_allowed?(request, current_user) }
           .map { |o| { name: o.name, information: o.information, slug: o.slug, logo_path: o.logo.url, pinned: o.pinned } }
         authorize! :read, orgs
         present(orgs)

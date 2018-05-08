@@ -71,7 +71,8 @@ class Organization < ActiveRecord::Base
     Organization.where(slug: slug)
   end
 
-  def visibility_allowed?(request)
+  def visibility_allowed?(request, user)
+    return true if current.user.administrator?
     return true unless whitelisted_ips
     whitelisted_ips.include?(request.remote_ip)
   end

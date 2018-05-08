@@ -10,17 +10,17 @@ class OrganizationsController < ApplicationController
     @organizations = Organization
       .accepted_organizations
       .order(ordering)
-      .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) || !org.visibility_allowed?(request) }
-    @my_organizations = Organization.taught_organizations(current_user).select { |org| org.visibility_allowed?(request) }
-    @my_organizations |= Organization.assisted_organizations(current_user).select { |org| org.visibility_allowed?(request) }
-    @my_organizations |= Organization.participated_organizations(current_user).select { |org| org.visibility_allowed?(request) }
+      .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) || !org.visibility_allowed?(request, current_user) }
+    @my_organizations = Organization.taught_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
+    @my_organizations |= Organization.assisted_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
+    @my_organizations |= Organization.participated_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
     @my_organizations.natsort_by!(&:name)
     @courses_under_initial_refresh = Course.where(initial_refresh_ready: false)
     @pinned_organizations = Organization
     .accepted_organizations
     .where(pinned: true)
     .order(ordering)
-    .select { |org| org.visibility_allowed?(request) }
+    .select { |org| org.visibility_allowed?(request, current_user) }
     .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil)}
     render layout: 'landing'
   end
@@ -100,7 +100,7 @@ class OrganizationsController < ApplicationController
 
   def set_organization
     @organization = Organization.find_by(slug: params[:id])
-    unauthorized! unless @organization.visibility_allowed?(request)
+    unauthorized! unless @organization.visibility_allowed?(request, current_user)
     raise ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
   end
 
