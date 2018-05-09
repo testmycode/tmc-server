@@ -142,8 +142,8 @@ module Api
         return if extra_fields.nil?
         namespace = extra_fields['namespace']
         raise "Namespace not defined" unless namespace
-        extra_fields['data'].each do |record|
-          @user.user_app_data.new(namespace: namespace, field_name: record['field_name'], value: record[:value])
+        extra_fields['data'].each do |key, value|
+          @user.user_app_data.new(namespace: namespace, field_name: key, value: value)
         end
       end
     end
