@@ -31,7 +31,7 @@ class User < ActiveRecord::Base
 
   validates :login, presence: true,
                     uniqueness: { case_sensitive: false },
-                    length: { within: 2..20 }
+                    length: { within: 2..50 }
 
   validates :email, presence: true,
                     uniqueness: { case_sensitive: false }
