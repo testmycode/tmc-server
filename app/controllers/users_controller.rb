@@ -80,8 +80,10 @@ class UsersController < ApplicationController
 
   def confirm_email
     token = VerificationToken.email.find_by!(user_id: params[:user_id], token: params[:id])
+    redirect_path = root_url
+    redirect_path = 'https://course.elementsofai.com' if params[:origin] == 'elements_of_ai'
     User.find(params[:user_id]).update!(email_verified: true)
-    redirect_to root_url, notice: 'Your email address has been verified!'
+    redirect_to redirect_path, notice: 'Your email address has been verified!'
   end
 
   def send_verification_email

@@ -1,3 +1,5 @@
+require 'cgi'
+
 class UserMailer < ActionMailer::Base
   def email_confirmation(user, origin = nil)
     @origin = origin
@@ -6,6 +8,10 @@ class UserMailer < ActionMailer::Base
     @url = base_url + confirm_email_path(@user.id, token.token)
     subject = "Confirm your mooc.fi account email address"
     subject = "#{origin}: #{subject}" if origin
+    if origin
+      origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
+      @url = @url + "?origin=#{CGI.escape(origin_name)}"
+    end
     mail(from: SiteSetting.value('emails')['from'], to: user.email, subject: subject)
   end
 
