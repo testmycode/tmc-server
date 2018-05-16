@@ -122,8 +122,8 @@ module Api
       def update
         unauthorize_guest! if current_user.guest?
 
-        user = current_user
-        user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
+        @user = current_user
+        @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
         authorize! :update, user
         set_user_fields
         set_extra_data
@@ -177,6 +177,7 @@ module Api
       end
 
       def set_extra_data
+        return unless params['user']
         extra_fields = params['user']['extra_fields']
         return if extra_fields.nil?
         namespace = extra_fields['namespace']
