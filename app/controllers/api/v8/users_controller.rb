@@ -62,12 +62,32 @@ module Api
         user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
         authorize! :read, user
 
-        present(
+        data = {
           id: user.id,
           username: user.login,
           email: user.email,
           administrator: user.administrator
-        )
+        }
+
+        if params[:show_user_fields]
+          user_field = {}
+          UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
+            value_record = @user.field_value_record(field)
+            value = value_record.ruby_value
+            user_field[field] = value
+          end
+          data[:user_field] = user_field
+        end
+
+        if params[:extra_fields]
+          extra_fields = {}
+          namespace = params[:extra_fields]
+          UserAppDatum.where(namespace: namespace, user: user).each do |datum|
+            extra_fields[datum.field_name] = datum.value
+          end
+          data[:extra_fields] = extra_fields
+        end
+        render json: data
       end
 
       def create
@@ -91,7 +111,7 @@ module Api
           }
         else
           errors = @user.errors
-          errors[:username] = errors.delete(:login) if errors.has_key?(:login)
+          errors[:username] = errors.delete(:login) if errors.key?(:login)
           render json: {
             success: false,
             errors: @user.errors
@@ -104,7 +124,7 @@ module Api
       def set_email
         user_params = params[:user]
 
-        return if !@user.new_record?
+        return unless @user.new_record?
 
         if user_params[:email].blank?
           @user.errors.add(:email, 'needed')
@@ -141,7 +161,7 @@ module Api
         extra_fields = params['user']['extra_fields']
         return if extra_fields.nil?
         namespace = extra_fields['namespace']
-        raise "Namespace not defined" unless namespace
+        raise 'Namespace not defined' unless namespace
         extra_fields['data'].each do |key, value|
           @user.user_app_data.new(namespace: namespace, field_name: key, value: value)
         end
