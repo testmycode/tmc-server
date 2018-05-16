@@ -119,6 +119,25 @@ module Api
         end
       end
 
+      def update
+        unauthorize_guest! if current_user.guest?
+
+        user = current_user
+        user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
+        authorize! :update, user
+        set_user_fields
+        set_extra_data
+        if @user.save
+          render json: {
+            message: 'User created.'
+          }
+        else
+          render json: {
+            errors: @user.errors
+          }, status: :bad_request
+        end
+      end
+
       private
 
       def set_email
@@ -163,7 +182,8 @@ module Api
         namespace = extra_fields['namespace']
         raise 'Namespace not defined' unless namespace
         extra_fields['data'].each do |key, value|
-          @user.user_app_data.new(namespace: namespace, field_name: key, value: value)
+          datum = @user.user_app_data.find_or_initialize_by(namespace: namespace, field_name: key)
+          datum.value = value
         end
       end
     end

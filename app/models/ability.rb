@@ -41,6 +41,10 @@ class Ability
       can :destroy, User do |u|
         u == user
       end
+      cannot :update, User
+      can :update, User do |u|
+        u == user
+      end
 
       cannot :read, Course
       can :read, Course do |c|
