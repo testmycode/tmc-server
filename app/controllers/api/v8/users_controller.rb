@@ -74,7 +74,7 @@ module Api
           UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
             value_record = user.field_value_record(field)
             value = value_record.ruby_value
-            user_field[field] = value
+            user_field[field.name] = value
           end
           data[:user_field] = user_field
         end
