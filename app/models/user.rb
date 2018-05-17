@@ -125,7 +125,7 @@ class User < ActiveRecord::Base
 
   def self.authenticate(login, submitted_password)
     user = find_by(login: login)
-    user = find_by(email: login) if user.nil?
+    user = find_by('lower(email) = ?', login.downcase) unless user
     return nil if user.nil?
     return user if user.has_password?(submitted_password)
   end
