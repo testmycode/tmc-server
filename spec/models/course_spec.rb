@@ -198,7 +198,7 @@ describe Course, type: :model do
     end
 
     it 'requires title to be reasonably short' do
-      should_be_invalid_params(valid_params.merge(title: 'a' * 41))
+      should_be_invalid_params(valid_params.merge(title: 'a' * 1141))
     end
 
     it 'requires a remote repo url' do
