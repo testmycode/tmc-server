@@ -15,7 +15,7 @@ module Api
             }
           end
 
-          user = User.find_by_email(@email)
+          user = User.find_by('lower(email) = ?', @email.downcase)
           unless user
             return render json: {
               success: false,

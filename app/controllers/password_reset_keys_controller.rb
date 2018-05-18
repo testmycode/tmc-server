@@ -12,7 +12,7 @@ class PasswordResetKeysController < ApplicationController
       return redirect_to(new_password_reset_key_path, alert: 'No e-mail address provided')
     end
 
-    user = User.find_by_email(@email)
+    user = User.find_by('lower(email) = ?', @email.downcase)
     unless user
       return redirect_to(new_password_reset_key_path, alert: 'No such e-mail address registered')
     end
