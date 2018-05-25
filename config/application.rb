@@ -37,7 +37,7 @@ module TmcServer
       allow do
         origins '*'
         resource '/oauth*', headers: :any, methods: :any
-        resource '/api*', headers: :any, methods: [:get, :post]
+        resource '/api*', headers: :any, methods: :any
       end
       allow do
         origins SiteSetting.all_settings['cors_origins']
