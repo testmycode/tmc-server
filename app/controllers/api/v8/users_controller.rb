@@ -129,7 +129,7 @@ module Api
         set_extra_data
         if @user.save
           render json: {
-            message: 'User created.'
+            message: 'User details updated.'
           }
         else
           render json: {
