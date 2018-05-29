@@ -11,6 +11,15 @@ class UserMailer < ActionMailer::Base
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
       @url = @url + "?origin=#{CGI.escape(origin_name)}"
+      template_path = Rails.root.join('config', 'email_templates', 'user_mailer', 'email_confirmation')
+      html_template_path = template_path.join("#{origin_name}.html.erb")
+      text_template_path = template_path.join("#{origin_name}.text.erb")
+      if File.exist?(html_template_path) && File.exist?(text_template_path)
+        return mail(from: SiteSetting.value('emails')['from'], to: user.email, subject: subject) do |format|
+          format.html { render file: html_template_path }
+          format.text { render file: text_template_path }
+        end
+      end
     end
     mail(from: SiteSetting.value('emails')['from'], to: user.email, subject: subject)
   end
