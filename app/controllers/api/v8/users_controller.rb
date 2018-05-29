@@ -127,7 +127,9 @@ module Api
         authorize! :update, @user
         set_user_fields
         set_extra_data
-        if @user.save
+        update_email
+        maybe_update_password
+        if @user.errors.empty? && @user.save
           render json: {
             message: 'User details updated.'
           }
@@ -152,6 +154,17 @@ module Api
         end
       end
 
+      def update_email
+        user_params = params[:user]
+        new_email = user_params[:email].strip
+        if new_email.blank?
+          @user.errors.add(:email, 'needed')
+        elsif @user.email.casecmp(new_email) != 0
+          @user.email = new_email
+          @user.email_verified = false
+        end
+      end
+
       def set_password
         user_params = params[:user]
         if user_params[:password].blank?
@@ -160,6 +173,20 @@ module Api
           @user.errors.add(:password_confirmation, 'did not match')
         else
           @user.password = user_params[:password]
+        end
+      end
+
+      def maybe_update_password
+        if params[:old_password].present? && params[:password].present?
+          if !@user.has_password?(params[:old_password])
+            @user.errors.add(:old_password, 'incorrect')
+          elsif params[:password] != params[:password_repeat]
+            @user.errors.add(:password_repeat, 'did not match')
+          elsif params[:password].blank?
+            @user.errors.add(:password, 'cannot be empty')
+          else
+            @user.password = params[:password]
+          end
         end
       end
 
