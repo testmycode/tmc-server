@@ -20,7 +20,7 @@ module Api
             return render json: {
               success: false,
               errors: 'No such email address registered'
-            }
+            }, status: :not_found
           end
 
           key = ActionToken.generate_password_reset_key_for(user)

@@ -18,7 +18,7 @@ class ActionToken < ActiveRecord::Base
     old_key = user.password_reset_key
     old_key.destroy if old_key
 
-    key = self.create!(user: user, action: :reset_password, expires_at: Time.now + 24.hours)
+    key = self.create!(user: user, action: :reset_password, expires_at: Time.now + 72.hours)
     user.action_tokens << key
     key
   end
