@@ -1,0 +1,29 @@
+<% require 'portable_csv' %>
+<%= PortableCSV.generate(:force_quotes => true) do |csv|
+  arr = ["Username"]
+  arr += @user_fields.map(&:label) if @user_fields
+  arr += @exercises.map{ |exercise| [exercise[:name]] + (exercise.available_points.length > 1 ? [nil] * (exercise.available_points.length-1) : []) }.flatten
+  csv << arr
+
+  arr = [nil]
+  arr += [nil] * @user_fields.length if @user_fields
+  arr += @exercises.map{|exercise| exercise.available_points.sort.map{|point| point.name }}.flatten
+  csv << arr
+
+  @users.each do |user, index|
+    user_points = @users_to_points[user.login]
+    arr = [user.login]
+    if @user_fields
+      @user_fields.each do |field|
+        value = user.user_field_values.find { |o| o.field_name == field.name }
+        arr += [value.value] if value
+      end
+    end
+    @exercises.each do |exercise|
+      exercise.available_points.sort.each do |p|
+        arr += user_points.include?(p.name) ? [1] : [0]
+      end
+    end
+    csv << arr
+  end
+end.html_safe %>

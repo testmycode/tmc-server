@@ -4,6 +4,7 @@ require 'course_list'
 require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
+  include PointVisualisation
   before_action :set_organization
   before_action :set_course, except: [:help, :index, :show_json]
 
@@ -40,6 +41,8 @@ class CoursesController < ApplicationController
 
     authorize! :read, @course
     UncomputedUnlock.resolve(@course, current_user)
+
+    define_point_stats(current_user)
 
     respond_to do |format|
       format.html do

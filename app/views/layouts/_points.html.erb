@@ -1,0 +1,70 @@
+<section>
+  <br>
+  <h2><%= title %></h2>
+  <br>
+  <% for course in courses %>
+    <% if course && @percent_completed[course.id] %>
+      <div class="card">
+        <div class="card-body">
+          <% if show_course_name %>
+            <h3 class="card-title">
+                <% if can? :read, course %>
+                  <%= link_to course.title, organization_course_path(course.organization, course) %>
+                <% else %>
+                  <%= course.title %>
+                <% end %>
+            </h3>
+          <br>
+          <% end %>
+          <% if can? :see_points, course%>
+            <span class="progress-label">Awarded points</span>
+            <div class="progress course-points-progress">
+              <div class="progress-bar" role="progressbar" style="width: <%= @percent_completed[course.id] %>%" aria-valuenow="<%= @percent_completed[course.id] %>" aria-valuemin="0" aria-valuemax="100">
+                <%= sprintf("%.0f", @percent_completed[course.id]) %>%
+              </div>
+            </div>
+            <% if @group_completion_ratios[course.id] %>
+              <% @group_completion_ratios[course.id].each do |group, ratio| %>
+                <br>
+                <span class="progress-label">Awarded points for <%= group %></span>
+                <div class="progress course-points-progress">
+                  <% unless ratio.zero? %>
+                    <div class="progress-bar bg-info" role="progressbar" style="width: <%= ratio * 100 %>%" aria-valuenow="<%= ratio * 100 %>" aria-valuemin="0" aria-valuemax="100">
+                      <%= sprintf("%.0f", ratio * 100) %>%
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+              <br>
+            <% end %>
+            <br>
+            <table class="table table-hover">
+              <thead class="">
+                <tr>
+                  <th></th>
+                  <th>Point names</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Awarded points</td>
+                  <td><%= points_list(@awarded_points[course.id]) %></td>
+                </tr>
+                <tr>
+                  <th scope="row">Missing points</td>
+                  <td><%= points_list(@missing_points[course.id]) %></td>
+                </tr>
+              </tbody>
+            </table>
+          <% else %>
+            For this course points are not visible.
+          <% end %>
+        </div>
+      </div>
+    <%else%>
+      You don't have any points for this course
+      <br>
+    <% end %>
+    <br>
+  <% end %>
+</section>
