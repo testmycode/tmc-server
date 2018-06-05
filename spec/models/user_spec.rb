@@ -134,14 +134,6 @@ describe User, type: :model do
       expect(user.errors[:login].size).to eq(1)
     end
 
-    it 'should fail with too long a login' do
-      @params[:login] = 'a' * 21
-
-      user = User.new(@params)
-      expect(user).not_to be_valid
-      expect(user.errors[:login].size).to eq(1)
-    end
-
     it 'should succeed without a password for new records' do
       @params.delete(:password)
       expect(User.new(@params)).to be_valid
