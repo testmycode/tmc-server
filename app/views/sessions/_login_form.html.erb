@@ -1,6 +1,6 @@
 <%= form_for :session, :url => sessions_path, html: { class: '' } do |f| %>
   <div class='form-group'>
-    <label for='username'>Username</label>
+    <label for='username'>Username or email</label>
     <%= f.text_field :login, class: 'form-control', id: 'username', placeholder: 'Username' %>
   </div>
   <div class='form-group'>
