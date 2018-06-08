@@ -124,12 +124,14 @@ module Api
 
         @user = current_user
         @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
+        @email_before = user.email
         authorize! :update, @user
         set_user_fields
         set_extra_data
         update_email
         maybe_update_password
         if @user.errors.empty? && @user.save
+          RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email) unless @email_before.casecmp(@user.email).zero?
           render json: {
             message: 'User details updated.'
           }

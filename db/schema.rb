@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180508095009) do
+ActiveRecord::Schema.define(version: 20180608084626) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -243,6 +243,14 @@ ActiveRecord::Schema.define(version: 20180508095009) do
 
   create_table "points_upload_queues", force: :cascade do |t|
     t.integer  "point_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "recently_changed_user_details", force: :cascade do |t|
+    t.integer  "change_type", null: false
+    t.string   "old_value"
+    t.string   "new_value",   null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
