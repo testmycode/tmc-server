@@ -18,7 +18,7 @@ gem 'pg', '~> 0.19.0'
 gem 'rack-cors'
 gem 'rake'
 gem 'responders', '~> 2.0'
-gem 'rest-client', '~> 1.8.0'
+gem 'rest-client', '~> 2.0.2'
 gem 'transaction_isolation', '~> 1.0.3'
 gem 'xml-simple', '~> 1.1.1'
 

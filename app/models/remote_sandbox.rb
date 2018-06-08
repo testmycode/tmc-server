@@ -54,7 +54,8 @@ class RemoteSandbox
             RestClient.post post_url, file: tar_file, notify: notify_url, token: submission.secret_token
             submission.sandbox = post_url
             submission.save!
-          rescue
+          rescue => e
+            puts e
             raise SandboxUnavailableError.new
           end
         end
