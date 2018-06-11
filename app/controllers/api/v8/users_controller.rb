@@ -124,7 +124,7 @@ module Api
 
         @user = current_user
         @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
-        @email_before = user.email
+        @email_before = @user.email
         authorize! :update, @user
         set_user_fields
         set_extra_data
