@@ -42,7 +42,9 @@ TmcServer::Application.routes.draw do
     namespace :v8, defaults: {format: 'json'} do
       resources :apidocs, only: :index, path: 'documentation'
 
-      resources :users, only: [:show, :create, :update]
+      resources :users, only: [:show, :create, :update] do
+        resources :request_deletion, only: [:create], module: :users
+      end
 
       namespace :users do
         resources :password_reset, only: [:create]

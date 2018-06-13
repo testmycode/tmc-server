@@ -114,8 +114,11 @@ class UsersController < ApplicationController
     token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
     username = user.login
     sign_out if current_user == user
+    email = user.email
+    username = user.login
     user.destroy
-    redirect_to root_url, notice: "The account #{username} has been permanently destroyed."
+    RecentlyChangedUserDetail.deleted.create!(old_value: false, new_value: true, email: email, username: username)
+    redirect_to root_url, notice: "Your account has been permanently destroyed."
   end
 
   def send_destroy_email

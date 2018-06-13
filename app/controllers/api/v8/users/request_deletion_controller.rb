@@ -7,7 +7,8 @@ module Api
         skip_authorization_check
 
         def create
-          user = User.find(params[:user_id])
+          user = current_user
+          user = User.find_by!(id: params[:user_id]) unless params[:user_id] == 'current'
           authorize! :destroy, user
           UserMailer.destroy_confirmation(user).deliver_now
           render json: {
