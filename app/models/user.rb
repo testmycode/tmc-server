@@ -246,6 +246,13 @@ class User < ActiveRecord::Base
     results
   end
 
+  def generate_password_reset_link
+    key = ActionToken.generate_password_reset_key_for(self)
+    settings = SiteSetting.value('emails')
+    url = settings['baseurl'].sub(/\/+$/, '') + '/reset_password/' + key.token
+    url
+  end
+
   private
 
   def course_ids_arel
