@@ -4,7 +4,7 @@ class SafeUnzipper
   def unzip(zip_path, dest_dir)
     dest_dir = File.absolute_path(dest_dir)
     # Ideally we'd protect against `unzip` exploits too by running in a sandbox
-    SystemCommands.sh!('unzip', '-qq', zip_path, '-d', dest_dir)
+    SystemCommands.sh!('unzip', '-qqu', zip_path, '-d', dest_dir)
     clean_up(dest_dir, dest_dir)
   end
 
