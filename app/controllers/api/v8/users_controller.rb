@@ -122,24 +122,26 @@ module Api
       def update
         unauthorize_guest! if current_user.guest?
 
-        @user = current_user
-        @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
-        @email_before = @user.email
-        authorize! :update, @user
-        set_user_fields
-        set_extra_data
-        update_email
-        maybe_update_password
-        if @user.errors.empty? && @user.save
+        User.transaction do
+          @user = current_user
+          @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
+          @email_before = @user.email
+          authorize! :update, @user
+          set_user_fields
+          set_extra_data(true)
+          update_email
+          maybe_update_password
+          if !@user.errors.empty? || !@user.save
+            raise ActiveRecord::Rollback
+          end
           RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email) unless @email_before.casecmp(@user.email).zero?
-          render json: {
+          return render json: {
             message: 'User details updated.'
           }
-        else
-          render json: {
-            errors: @user.errors
-          }, status: :bad_request
         end
+        render json: {
+          errors: @user.errors
+        }, status: :bad_request
       end
 
       private
@@ -206,7 +208,7 @@ module Api
         changes
       end
 
-      def set_extra_data
+      def set_extra_data(eager_save = false)
         return unless params['user']
         extra_fields = params['user']['extra_fields']
         return if extra_fields.nil?
@@ -215,6 +217,7 @@ module Api
         extra_fields['data'].each do |key, value|
           datum = @user.user_app_data.find_or_initialize_by(namespace: namespace, field_name: key)
           datum.value = value
+          datum.save! if eager_save
         end
       end
     end
