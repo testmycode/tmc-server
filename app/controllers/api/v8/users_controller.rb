@@ -158,6 +158,7 @@ module Api
 
       def update_email
         user_params = params[:user]
+        return unless user_params[:email]
         new_email = user_params[:email].strip
         if new_email.blank?
           @user.errors.add(:email, 'needed')
