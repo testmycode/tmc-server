@@ -10,6 +10,15 @@ module Api
           operation :post do
             key :description, 'Find all users\' basic infos with the posted json array of usernames'
             key :operationId, 'findUsersBasicInfoByUsernames'
+            parameter do
+              key :name, :usernames
+              key :in, :body
+              key :description, 'usernames for which to find basic infos'
+              key :required, true
+              schema do
+                key :'$ref', :UsernamesInput
+              end
+            end
             key :produces, [
               'application/json'
             ]
@@ -28,6 +37,22 @@ module Api
             end
             response 403, '$ref': '#/responses/error'
             response 404, '$ref': '#/responses/error'
+          end
+        end
+
+        swagger_schema :UsernamesInput do
+          allOf do
+            schema do
+              property :usernames do
+                key :type, :array
+                items do
+                  key :type, :string
+                  property :username do
+                    key :type, :string
+                  end
+                end
+              end
+            end
           end
         end
 

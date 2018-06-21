@@ -19,12 +19,18 @@ module Api
                 schema do
                   key :title, :status
                   key :required, [:status]
-                  property :status, type: :string, example: 'ok'
-                  key :answers, :array
-                  items do
-                    key :answer, :string
-                    key :answer, :integer
-                  end
+                  property :status do
+                    key :type, :array
+                    items do
+                      key :type, :object
+                      property :answer do
+                        key :type, :string
+                      end
+                      property :question_id do
+                        key :type, :integer
+                      end
+                    end
+          end
                 end
               end
               response 403, '$ref': '#/responses/error'
