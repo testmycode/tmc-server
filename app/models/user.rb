@@ -253,6 +253,11 @@ class User < ActiveRecord::Base
     url
   end
 
+  def self.search(query)
+    return User.none unless query
+    User.where('lower(email) LIKE ?', "%#{query.strip.downcase}%")
+  end
+
   private
 
   def course_ids_arel

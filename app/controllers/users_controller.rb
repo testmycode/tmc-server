@@ -6,6 +6,11 @@ class UsersController < ApplicationController
 
   after_action :remove_x_frame_options_header_when_bare_layout, only: [:new, :create, :show]
 
+  def index
+    respond_access_denied unless current_user.administrator?
+    @users = User.search(params[:search])
+  end
+
   def new
     add_breadcrumb 'Sign up', new_user_path
 
