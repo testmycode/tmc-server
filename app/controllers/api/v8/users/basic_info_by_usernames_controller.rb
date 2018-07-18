@@ -56,20 +56,29 @@ module Api
           end
         end
 
-
         skip_authorization_check
 
         def create
           respond_access_denied unless current_user.administrator?
-          users = params[:usernames]
+          users = User.where(login: params[:usernames])
+          user_id_to_extra_fields = nil
+          if params[:extra_fields]
+            namespace = params[:extra_fields]
+            user_id_to_extra_fields = UserAppDatum.where(namespace: namespace, user: users).group_by(&:user_id)
+          end
 
           data = User.where(login: users).map do |u|
-            {
+            d = {
               id: u.id,
               username: u.login,
               email: u.email,
               administrator: u.administrator
             }
+            if user_id_to_extra_fields
+              extra_fields = user_id_to_extra_fields[u.id] || []
+              d[:extra_fields] = extra_fields.map { |o| [o.field_name, o.value] }.to_h
+            end
+            d
           end
           render json: data
         end
