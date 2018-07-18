@@ -67,7 +67,7 @@ module Api
             user_id_to_extra_fields = UserAppDatum.where(namespace: namespace, user: users).group_by(&:user_id)
           end
 
-          data = User.where(login: users).map do |u|
+          data = users.map do |u|
             d = {
               id: u.id,
               username: u.login,
