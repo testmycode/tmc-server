@@ -12,6 +12,7 @@ class AuthsController < ApplicationController
   def show
     if params[:username].present? && params[:session_id].present?
       user = User.find_by(login: params[:username])
+      user = User.find_by('lower(email) = ?', params[:username].downcase) unless user
       # Allows using oauth2 tokens of the new api for authenticating
       res = if user && Doorkeeper::AccessToken.find_by(resource_owner_id: user.id, token: params[:session_id])
               OK_MESSAGE
