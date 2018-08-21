@@ -4,4 +4,10 @@
   Please enter the following information. Fields marked with * are mandatory.
 </p>
 
+<% unless current_user.email_verified? %>
+  <div class="alert alert-danger" role="alert">
+    Warning: your email address is not verified. Please naviagate to your profile and validate your email address before proceeding.
+  </div>
+<% end %>
+
 <%= render partial: 'form', locals: { url: setup_organizations_path, new: true } %>
