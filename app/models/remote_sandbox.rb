@@ -16,7 +16,7 @@ class RemoteSandbox
 
   def self.try_to_send_submission_to_free_server(submission, notify_url)
     servers = if submission.exercise && ExerciseDir.get(submission.exercise.clone_path).safe_for_experimental_sandbox
-      if ExerciseDir.exercise_type == "maven"
+      if ExerciseDir.exercise_type == "java_maven"
         all_experimental.shuffle
       else
         all_experimental.shuffle + all.shuffle
