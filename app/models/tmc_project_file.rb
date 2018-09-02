@@ -8,6 +8,7 @@ class TmcProjectFile
     return unless data.is_a?(Hash)
     @extra_student_files = data['extra_student_files'] if data['extra_student_files'].is_a?(Array)
     filter_extra_student_files!
+    @data = data
   end
 
   attr_reader :extra_student_files
@@ -17,6 +18,11 @@ class TmcProjectFile
     TmcProjectFile.new(YAML.load_file(file))
   rescue
     empty
+  end
+
+  def force_new_sandbox
+    return false if !@data
+    @data['force_new_sandbox']
   end
 
   private

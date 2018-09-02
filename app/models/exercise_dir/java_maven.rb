@@ -26,5 +26,9 @@ class ExerciseDir
       File.exist?("#{@path}/src/test/java") &&
         !(Dir.entries("#{@path}/src/test/java") - ['.', '..', '.gitkeep', '.gitignore']).empty?
     end
+
+    def safe_for_experimental_sandbox
+      TmcProjectFile.for_project(@path).force_new_sandbox
+    end
   end
 end
