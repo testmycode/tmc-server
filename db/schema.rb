@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180903074526) do
+ActiveRecord::Schema.define(version: 20180903081927) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -93,26 +93,27 @@ ActiveRecord::Schema.define(version: 20180903074526) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "hide_after"
-    t.boolean  "hidden",                         default: false, null: false
-    t.integer  "cache_version",                  default: 0,     null: false
+    t.boolean  "hidden",                                   default: false, null: false
+    t.integer  "cache_version",                            default: 0,     null: false
     t.string   "spreadsheet_key"
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
-    t.boolean  "locked_exercise_points_visible", default: true,  null: false
+    t.boolean  "locked_exercise_points_visible",           default: true,  null: false
     t.text     "description"
     t.string   "paste_visibility"
     t.string   "formal_name"
-    t.boolean  "certificate_downloadable",       default: false, null: false
+    t.boolean  "certificate_downloadable",                 default: false, null: false
     t.string   "certificate_unlock_spec"
     t.integer  "organization_id"
-    t.integer  "disabled_status",                default: 1
+    t.integer  "disabled_status",                          default: 1
     t.string   "title"
     t.string   "material_url"
-    t.integer  "course_template_id",                             null: false
-    t.boolean  "hide_submission_results",        default: false
+    t.integer  "course_template_id",                                       null: false
+    t.boolean  "hide_submission_results",                  default: false
     t.string   "external_scoreboard_url"
-    t.boolean  "initial_refresh_ready",          default: false
-    t.boolean  "hide_submissions",               default: false, null: false
+    t.boolean  "initial_refresh_ready",                    default: false
+    t.boolean  "hide_submissions",                         default: false, null: false
+    t.boolean  "model_solution_visible_before_completion", default: false, null: false
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree

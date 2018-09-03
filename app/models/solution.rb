@@ -21,6 +21,8 @@ class Solution
       true
     elsif user.guest?
       false
+    elsif @exercise.course.model_solution_visible_before_completion?
+      true
     elsif @exercise.completed_by?(user)
       true
     elsif !@exercise.course.visible_to?(user)
