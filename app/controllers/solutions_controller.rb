@@ -22,6 +22,8 @@ class SolutionsController < ApplicationController
       end
     end
 
+    ModelSolutionAccessLog.create!(user: current_user, course: @course, exercise_name: @exercise.name)
+
     respond_to do |format|
       format.html
       format.zip do

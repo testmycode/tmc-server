@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180613083429) do
+ActiveRecord::Schema.define(version: 20180903074526) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -176,6 +176,14 @@ ActiveRecord::Schema.define(version: 20180613083429) do
   end
 
   add_index "migrated_submissions", ["from_course_id", "to_course_id", "original_submission_id", "new_submission_id"], name: "unique_values", unique: true, using: :btree
+
+  create_table "model_solution_access_log", force: :cascade do |t|
+    t.integer  "user_id",       null: false
+    t.integer  "course_id",     null: false
+    t.string   "exercise_name", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
