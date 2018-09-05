@@ -2,7 +2,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
   before_action :set_course
 
   def index
-    authorize! :teach, @organization
+    authorize! :modify_assistants, @course
     @setup_in_progress = setup_in_progress?
 
     @assistants = @course.assistants
@@ -17,7 +17,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
   end
 
   def create
-    authorize! :teach, @organization
+    authorize! :modify_assistants, @course
 
     if params[:commit] == 'Add new assistant'
       new_assistant = User.find_by(login: assistant_params[:username])
@@ -43,7 +43,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
   end
 
   def destroy
-    authorize! :remove_assistant, @course
+    authorize! :modify_assistants, @course
     @assistantship = Assistantship.find(params[:id])
     destroyed_username = @assistantship.user.login
     @assistantship.destroy!

@@ -143,7 +143,7 @@
             <% if can? :manage_exercises, @course %>
               <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-default btn-sm" %>
             <% end %>
-            <% if can? :teach, @organization %>
+            <% if can? :modify_assistants, @course %>
               <%= link_to 'Manage assistants', setup_organization_course_course_assistants_path(@organization, @course), class: "btn btn-default btn-sm" %>
             <% end %>
           </li>

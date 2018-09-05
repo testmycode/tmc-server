@@ -239,8 +239,8 @@ class Ability
         can? :teach, o
       end
 
-      can :remove_assistant, Course do |c|
-        can? :teach, c.organization
+      can :modify_assistants, Course do |c|
+        can? :teach, c
       end
 
       can :edit, Organization do |o|
