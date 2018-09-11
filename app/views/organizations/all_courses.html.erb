@@ -1,0 +1,13 @@
+<h1>
+  <%= @organization.name %>
+  <%= image_tag @organization.logo.url(:small_logo) if @organization.logo? %>
+</h1>
+
+<p>
+  <%= @organization.information %>
+</p>
+
+
+<div>
+  <%= render template: 'courses/index', locals: { title: 'All courses' }  %>
+</div>

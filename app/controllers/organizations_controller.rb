@@ -1,32 +1,59 @@
+# frozen_string_literal: true
+
 require 'natsort'
 
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :destroy, :verify, :disable, :disable_reason_input, :toggle_visibility]
+  before_action :set_organization, only: %i[show destroy verify disable disable_reason_input toggle_visibility all_courses]
 
-  skip_authorization_check only: [:index, :new]
+  skip_authorization_check only: %i[index new]
 
   def index
     ordering = 'hidden, LOWER(name)'
     @organizations = Organization
-      .accepted_organizations
-      .order(ordering)
-      .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) || !org.visibility_allowed?(request, current_user) }
+                     .accepted_organizations
+                     .order(ordering)
+                     .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) || !org.visibility_allowed?(request, current_user) }
     @my_organizations = Organization.taught_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
     @my_organizations |= Organization.assisted_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
     @my_organizations |= Organization.participated_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
     @my_organizations.natsort_by!(&:name)
     @courses_under_initial_refresh = Course.where(initial_refresh_ready: false)
     @pinned_organizations = Organization
-    .accepted_organizations
-    .where(pinned: true)
-    .order(ordering)
-    .select { |org| org.visibility_allowed?(request, current_user) }
-    .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil)}
+                            .accepted_organizations
+                            .where(pinned: true)
+                            .order(ordering)
+                            .select { |org| org.visibility_allowed?(request, current_user) }
+                            .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) }
     render layout: 'landing'
   end
 
   def show
     add_organization_breadcrumb
+    ordering = 'hidden, disabled_status, LOWER(courses.name)'
+    @my_courses = Course.participated_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
+    @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
+    @ongoing_courses = @organization
+                       .courses
+                       .ongoing
+                       .enabled
+                       .order(ordering)
+                       .select { |c| c.visible_to?(current_user) }
+                       .to_a
+    if can? :teach, @organization
+      recently_updated_disabled_courses = @organization.courses
+                                                       .ongoing
+                                                       .disabled
+                                                       .where(updated_at: Time.current.all_quarter)
+                                                       .to_a
+      @ongoing_courses += recently_updated_disabled_courses
+    end
+    authorize! :read, @ongoing_courses
+  end
+
+  def all_courses
+    return respond_access_denied('Submissions for this exercise are no longer accepted.') unless current_user.administrator?
+    add_organization_breadcrumb
+    add_breadcrumb 'All Courses'
     ordering = 'hidden, disabled_status, LOWER(courses.name)'
     @my_courses = Course.participated_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }

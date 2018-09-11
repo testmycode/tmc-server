@@ -127,6 +127,20 @@ TmcServer::Application.routes.draw do
 
   resources :organizations, except: [:destroy, :create, :edit, :update], path: 'org' do
 
+    member do
+      post 'verify'
+      post 'disable'
+      get 'disable_reason_input'
+      post 'toggle_visibility'
+      get 'all_courses'
+    end
+
+    collection do
+      get 'list_requests'
+    end
+
+    get 'course_templates', to: 'course_templates#list_for_teachers'
+
     resources :exercises, only: [:show] do
       member do
         post 'toggle_submission_result_visibility'
@@ -135,22 +149,10 @@ TmcServer::Application.routes.draw do
       resource :solution, only: [:show]
       resources :feedback_answers, only: [:index]
     end
-    member do
-      post 'verify'
-      post 'disable'
-      get 'disable_reason_input'
-      post 'toggle_visibility'
-    end
-
-    collection do
-      get 'list_requests'
-    end
 
     resources :participants, only: [:index]
 
     resources :teachers, only: [:index, :create, :destroy]
-
-    get 'course_templates', to: 'course_templates#list_for_teachers'
 
     resources :courses, except: [:new, :create] do
       member do

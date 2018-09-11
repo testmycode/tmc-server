@@ -6,10 +6,10 @@
   <% end %>
 </h2>
 
-<% if can?(:teach, @organization) && !@expired_courses.empty? %>
+<% if can?(:teach, @organization) && @expired_courses && !@expired_courses.empty? %>
   <h3>Ongoing courses</h3>
 <% end %>
-<% unless @ongoing_courses.empty? %>
+<% if @ongoing_courses && !@ongoing_courses.empty? %>
   <div class="row">
     <div class="col-md-12">
       <%= render 'courses/list', :locals => { organization_id: @organization.slug, courses: @ongoing_courses, list_id: 'ongoing-courses' } %>
@@ -19,7 +19,7 @@
   <p>No available courses.</p>
 <% end %>
 
-<% if can?(:teach, @organization) && !@expired_courses.empty? %>
+<% if can?(:teach, @organization) && @expired_courses && !@expired_courses.empty? %>
   <h3>Expired courses</h3>
   <div class="row">
     <div class="col-md-12">

@@ -136,5 +136,11 @@
 <% all_courses_title = @my_courses.empty? && @my_assisted_courses.empty? ? 'Courses' : 'All courses' %>
 
 <div>
-  <%= render template: 'courses/index', locals: { title: all_courses_title }  %>
+  <%= render template: 'courses/index', locals: { title: 'Courses' }  %>
 </div>
+
+<% if can? :teach, @organization %>
+  <%= link_to 'View all courses', all_courses_organization_path(@organization), class: 'btn btn-secondary'%>
+<% end %>
+
+<br>
