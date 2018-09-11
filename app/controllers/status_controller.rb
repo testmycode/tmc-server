@@ -7,7 +7,7 @@ class StatusController < ApplicationController
     @unprocessed_submissions_count = Submission.where(processed: false).count
     @submissions_count = Submission.where(created_at: Time.current.all_day).count
     @submissions_count_week = Submission.where(created_at: Time.current.all_week).count
-    @sandboxes = RemoteSandbox.all
+    @sandboxes = RemoteSandbox.all + RemoteSandbox.all_experimental
   end
 
 end
