@@ -14,6 +14,7 @@
           <% if current_user.administrator? %>
             <li class="nav-item"><%= navigation_link 'Users', users_path %></li>
             <li class="nav-item"><%= navigation_link 'Course templates', course_templates_path %></li>
+            <li class="nav-item"><%= navigation_link 'Status', status_index_path %></li>
           <% end %>
         <% end %>
       </ul>

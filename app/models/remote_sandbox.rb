@@ -107,7 +107,16 @@ class RemoteSandbox
     rescue
       nil
     end
-    @capacity || 1
+    @capacity || 0
+  end
+
+  def busy_instances
+    @busy_instances ||= begin
+      get_status['busy_instances']
+    rescue
+      nil
+    end
+    @busy_instances || 0
   end
 
   private

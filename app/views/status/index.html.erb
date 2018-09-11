@@ -1,0 +1,50 @@
+<h1>Status</h1>
+
+<p>
+  Here is some adminsitrative information about this instance.
+</p>
+
+<h2>Submissions</h2>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Submission queue </th scope="row">
+      <td><%= @sandbox_queue_length %></td>
+    </tr>
+    <tr>
+      <th scope="row">Submissions, processing not complete</th>
+      <td><%= @unprocessed_submissions_count %></td>
+    </tr>
+    <tr>
+      <th scope="row">Submissions today</th>
+      <td><%= @submissions_count %></td>
+    </tr>
+    <tr>
+      <th scope="row">Submissions this week</th>
+      <td><%= @submissions_count_week %></td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2>Sandboxes</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Busy instances</th>
+      <th>Capacity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @sandboxes.each do |sandbox| %>
+      <tr>
+        <td><%= sandbox.baseurl %></td>
+        <td><%= sandbox.busy_instances %></td>
+        <td><%= sandbox.capacity %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

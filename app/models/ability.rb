@@ -23,7 +23,9 @@ class Ability
       end
       can :access_pghero
       can :read_vm_log, Submission
+      can :read_instance_state
     else
+      cannot :read_instance_state
       can :read, :all
 
       cannot :access_pghero
