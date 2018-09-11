@@ -8,7 +8,7 @@ class OrganizationsController < ApplicationController
   skip_authorization_check only: %i[index new]
 
   def index
-    ordering = 'hidden, LOWER(name)'
+    ordering = 'hidden, LOWER(title)'
     @organizations = Organization
                      .accepted_organizations
                      .order(ordering)
@@ -29,7 +29,7 @@ class OrganizationsController < ApplicationController
 
   def show
     add_organization_breadcrumb
-    ordering = 'hidden, disabled_status, LOWER(courses.name)'
+    ordering = 'hidden, disabled_status, LOWER(courses.title)'
     @my_courses = Course.participated_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization
@@ -55,7 +55,7 @@ class OrganizationsController < ApplicationController
     return respond_access_denied('Submissions for this exercise are no longer accepted.') unless current_user.administrator?
     add_organization_breadcrumb
     add_breadcrumb 'All Courses'
-    ordering = 'hidden, disabled_status, LOWER(courses.name)'
+    ordering = 'hidden, disabled_status, LOWER(courses.title)'
     @my_courses = Course.participated_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
