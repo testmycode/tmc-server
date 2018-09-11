@@ -36,6 +36,7 @@ class OrganizationsController < ApplicationController
                        .courses
                        .ongoing
                        .enabled
+                       .where(hidden: false)
                        .order(ordering)
                        .select { |c| c.visible_to?(current_user) }
                        .to_a
