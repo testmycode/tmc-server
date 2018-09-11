@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rest_client'
 require 'submission_packager'
 
@@ -17,18 +19,18 @@ class RemoteSandbox
   def self.try_to_send_submission_to_free_server(submission, notify_url)
     dir = ExerciseDir.get(submission.exercise.clone_path)
     servers = if submission.exercise && dir.safe_for_experimental_sandbox
-      if dir.type == "java_maven"
-        all_experimental.shuffle
-      else
-        all_experimental.shuffle + all.shuffle
-      end
-    else
-      all.shuffle
+                if dir.type == 'java_maven'
+                  all_experimental.shuffle
+                else
+                  all_experimental.shuffle + all.shuffle
+                end
+              else
+                all.shuffle
     end
     for server in servers # could be smarter about this
       begin
         server.send_submission(submission, notify_url)
-      rescue SandboxUnavailableError=>e
+      rescue SandboxUnavailableError => e
         Rails.logger.warn e
         # ignore
       else
@@ -44,42 +46,38 @@ class RemoteSandbox
   def send_submission(submission, notify_url)
     exercise = submission.exercise
 
-    fail 'Submission has no secret token' if submission.secret_token.blank?
-    fail "Exercise #{submission.exercise_name} for submission gone. Cannot resubmit." if exercise.nil?
+    raise 'Submission has no secret token' if submission.secret_token.blank?
+    raise "Exercise #{submission.exercise_name} for submission gone. Cannot resubmit." if exercise.nil?
 
     Dir.mktmpdir do |tmpdir|
-      begin
-        zip_path = "#{tmpdir}/submission.zip"
-        tar_path = "#{tmpdir}/submission.tar"
-        File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
-        SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params)
+      zip_path = "#{tmpdir}/submission.zip"
+      tar_path = "#{tmpdir}/submission.tar"
+      File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
+      SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params)
 
-        File.open(tar_path, 'r') do |tar_file|
-          begin
-            RestClient.post post_url, file: tar_file, notify: notify_url, token: submission.secret_token
-            submission.sandbox = post_url
-            submission.save!
-          rescue => e
-            puts e
-            raise SandboxUnavailableError.new
-          end
-        end
-      rescue SandboxUnavailableError
-        raise
-      rescue
-        Rails.logger.info "Submission #{submission.id} could not be packaged: #{$1}"
-        Rails.logger.info "Marking submission #{submission.id} as failed."
-        submission.pretest_error = 'Failed to process submission. Likely sent in incorrect format.'
-        submission.processed = true
+      File.open(tar_path, 'r') do |tar_file|
+        RestClient.post post_url, file: tar_file, notify: notify_url, token: submission.secret_token
+        submission.sandbox = post_url
         submission.save!
-        raise
+      rescue StandardError => e
+        puts e
+        raise SandboxUnavailableError
       end
+    rescue SandboxUnavailableError
+      raise
+    rescue StandardError
+      Rails.logger.info "Submission #{submission.id} could not be packaged: #{Regexp.last_match(1)}"
+      Rails.logger.info "Marking submission #{submission.id} as failed."
+      submission.pretest_error = 'Failed to process submission. Likely sent in incorrect format.'
+      submission.processed = true
+      submission.save!
+      raise
     end
   end
 
   def try_to_seed_maven_cache(file_path)
     seed_maven_cache(file_path)
-  rescue
+  rescue StandardError
     Rails.logger.warn "Failed to seed maven cache: #{$!}"
   end
 
@@ -104,19 +102,16 @@ class RemoteSandbox
   def capacity
     @capacity ||= begin
       get_status['total_instances']
-    rescue
+    rescue StandardError
       nil
     end
     @capacity || 0
   end
 
   def busy_instances
-    @busy_instances ||= begin
-      get_status['busy_instances']
-    rescue
-      nil
-    end
-    @busy_instances || 0
+    get_status['busy_instances']
+  rescue StandardError
+    0
   end
 
   private
