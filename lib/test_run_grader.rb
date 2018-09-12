@@ -88,7 +88,7 @@ module TestRunGrader
     course = exercise.course
     available_points = exercise.available_points.to_a.map(&:name)
     awarded_points = AwardedPoint.course_user_points(course, user).map(&:name)
-    soft_deadline = exercise.sosft_deadline_for(user)
+    soft_deadline = exercise.soft_deadline_for(user)
     awarded_after_soft_deadline = false
     awarded_after_soft_deadline = true if soft_deadline && Exercise.deadline_expired?(soft_deadline, submission.created_at)
 
