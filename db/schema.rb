@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180903081927) do
+ActiveRecord::Schema.define(version: 20180912080101) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,11 +43,12 @@ ActiveRecord::Schema.define(version: 20180903081927) do
   add_index "available_points", ["exercise_id", "name"], name: "index_available_points_on_exercise_id_and_name", unique: true, using: :btree
 
   create_table "awarded_points", force: :cascade do |t|
-    t.integer  "course_id",     null: false
-    t.integer  "user_id",       null: false
+    t.integer  "course_id",                                   null: false
+    t.integer  "user_id",                                     null: false
     t.integer  "submission_id"
-    t.string   "name",          null: false
+    t.string   "name",                                        null: false
     t.datetime "created_at"
+    t.boolean  "awarded_after_soft_deadline", default: false, null: false
   end
 
   add_index "awarded_points", ["course_id", "user_id", "name"], name: "index_awarded_points_on_course_id_and_user_id_and_name", unique: true, using: :btree
@@ -114,6 +115,7 @@ ActiveRecord::Schema.define(version: 20180903081927) do
     t.boolean  "initial_refresh_ready",                    default: false
     t.boolean  "hide_submissions",                         default: false, null: false
     t.boolean  "model_solution_visible_before_completion", default: false, null: false
+    t.float    "soft_deadline_point_multiplier",           default: 0.75,  null: false
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree

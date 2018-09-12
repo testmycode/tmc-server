@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'point_comparison'
 require 'natsort'
 
@@ -67,9 +69,7 @@ module TestRunGrader
 
   def validations_passed?(validations)
     if !validations.nil? && validations['strategy'] && validations['strategy'] == 'FAIL'
-      if validations['validationErrors'] && validations['validationErrors'].any?
-        return false
-      end
+      return false if validations['validationErrors']&.any?
     end
     true
   end
@@ -88,6 +88,9 @@ module TestRunGrader
     course = exercise.course
     available_points = exercise.available_points.to_a.map(&:name)
     awarded_points = AwardedPoint.course_user_points(course, user).map(&:name)
+    soft_deadline = exercise.sosft_deadline_for(user)
+    awarded_after_soft_deadline = false
+    awarded_after_soft_deadline = true if soft_deadline && Exercise.deadline_expired?(soft_deadline, submission.created_at)
 
     points = []
     ((available_points & points_from_test_results(results)) - review_points).each do |point_name|
@@ -97,7 +100,8 @@ module TestRunGrader
       submission.awarded_points << AwardedPoint.new(
         name: point_name,
         course: course,
-        user: user
+        user: user,
+        awarded_after_soft_deadline: awarded_after_soft_deadline
       )
     end
 

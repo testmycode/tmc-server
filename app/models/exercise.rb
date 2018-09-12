@@ -228,11 +228,11 @@ class Exercise < ActiveRecord::Base
 
   # Whether the deadline has passed
   def expired_for?(user)
-    deadline_expired?(deadline_for(user))
+    Exercise.deadline_expired?(deadline_for(user))
   end
 
   def soft_deadline_expired_for?(user)
-    deadline_expired?(soft_deadline_for(user))
+    Exercise.deadline_expired?(soft_deadline_for(user))
   end
 
   # Whether a user has made a submission for this exercise
@@ -453,6 +453,10 @@ class Exercise < ActiveRecord::Base
     save!
   end
 
+  def deadline_expired?(deadline, time = Time.now)
+    deadline != nil && deadline < time
+  end
+
   private
 
   def new_deadline_spec_obj(spec)
@@ -461,10 +465,6 @@ class Exercise < ActiveRecord::Base
     else
       DeadlineSpec.new(self, [])
     end
-  end
-
-  def deadline_expired?(deadline)
-    deadline != nil && deadline < Time.now
   end
 
   def new_gdocs_sheet(enabled, sheetname)
