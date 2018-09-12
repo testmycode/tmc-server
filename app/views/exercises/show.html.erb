@@ -57,19 +57,36 @@
     <% end %>
   <% end %>
 
+    <% if @exercise.soft_deadline_for(current_user) %>
+      <li>
+        Deadline: <%= @exercise._softdeadline_for(current_user) %>
+        <% if @exercise.soft_deadline_spec_obj.universal_description %>
+          (<%= @exercise.soft_deadline_spec_obj.universal_description %>)
+        <% end %>
+        <% if Exercise.deadline_expired?(@exercise.soft_deadline_for(current_user)) %>
+          <% if current_user.administrator? %>
+            (expired (if you weren't an admin))
+          <% else %>
+            (expired)
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+
   <% if @exercise.deadline_for(current_user) %>
     <li>
-      Deadline: <%= @exercise.deadline_for(current_user) %>
+      After the deadline has passed, you can still return the exercise until <%= @exercise.deadline_for(current_user) %>
       <% if @exercise.deadline_spec_obj.universal_description %>
         (<%= @exercise.deadline_spec_obj.universal_description %>)
       <% end %>
-      <% if @exercise.expired_for?(current_user) %>
+      <% if Exercise.deadline_expired?(@exercise.deadline_for(current_user)) %>
         <% if current_user.administrator? %>
           (expired (if you weren't an admin))
         <% else %>
           (expired)
         <% end %>
       <% end %>
+      <br>However, you will only get <%= @course.soft_deadline_point_multiplier * 100 %>% of the points.
     </li>
   <% end %>
 
