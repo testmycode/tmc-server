@@ -71,8 +71,14 @@
             <tbody>
               <tr>
                 <th scope="row">Awarded points</td>
-                <td><%= points_list(@awarded_points[course.id]) %></td>
+                <td><%= points_list(@awarded_points[course.id][:awarded]) %></td>
               </tr>
+              <% unless @awarded_points[course.id][:late].empty? %>
+                <tr>
+                  <th scope="row">Points awarded, but late</td>
+                  <td><%= points_list(@awarded_points[course.id][:late]) %></td>
+                </tr>
+              <% end %>
               <tr>
                 <th scope="row">Missing points</td>
                 <td><%= points_list(@missing_points[course.id]) %></td>

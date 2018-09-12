@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'portable_csv'
 
 class ParticipantsController < ApplicationController
@@ -16,7 +18,7 @@ class ParticipantsController < ApplicationController
     end
     add_breadcrumb 'Participants'
 
-    @ordinary_fields = %w(username email)
+    @ordinary_fields = %w[username email]
     @extra_fields = UserField.all
     valid_fields = @ordinary_fields + @extra_fields.map(&:name) + ['include_administrators']
 
@@ -34,7 +36,7 @@ class ParticipantsController < ApplicationController
 
     @courses = courses.order(:name).to_a
 
-    unless params['group_completion_course_id'].blank?
+    if params['group_completion_course_id'].present?
       @group_completion_course = courses.find(params['group_completion_course_id'])
       @group_completion = @group_completion_course.exercise_group_completion_by_user
     end
@@ -61,8 +63,18 @@ class ParticipantsController < ApplicationController
   def show
     @user = User.find(params[:id])
     authorize! :view_participant_information, @user
-    # TODO: bit ugly
-    @awarded_points = Hash[AwardedPoint.where(id: AwardedPoint.all_awarded(@user)).to_a.sort!.group_by(&:course_id).map { |k, v| [k, v.map(&:name)] }]
+    # TODO: bit ugly -- and now it's even worse!
+    @awarded_points = Hash[
+      AwardedPoint.where(id: AwardedPoint.all_awarded(@user))
+                  .to_a
+                  .sort!
+                  .group_by(&:course_id).map do |id, course_points|
+        [id, {
+          awarded: course_points.reject(&:awarded_after_soft_deadline?).map(&:name),
+          late: course_points.select(&:awarded_after_soft_deadline?).map(&:name)
+        }]
+      end
+  ]
 
     if current_user.administrator?
       add_breadcrumb 'Participants', :participants_path
@@ -77,32 +89,30 @@ class ParticipantsController < ApplicationController
     @group_completion_ratios = {}
     for course_id in @awarded_points.keys
       course = Course.find(course_id)
-      if !course.hide_submissions?
-        @courses << course
+      next if course.hide_submissions?
+      @courses << course
 
-        awarded = @awarded_points[course.id]
-        missing = AvailablePoint.course_points(course).order!.map(&:name) - awarded
-        @missing_points[course_id] = missing
+      awarded = @awarded_points[course.id]
+      missing = AvailablePoint.course_points(course).order!.map(&:name) - awarded[:awarded] - awarded[:late]
+      @missing_points[course_id] = missing
 
-        if awarded.size + missing.size > 0
-          @percent_completed[course_id] = 100 * (awarded.size.to_f / (awarded.size + missing.size))
-        else
-          @percent_completed[course_id] = 0
-        end
-        @group_completion_ratios[course_id] = course.exercise_group_completion_ratio_for_user(@user)
-      end
+      @percent_completed[course_id] = if awarded[:awarded].size + awarded[:late].size + missing.size > 0
+                                        100 * ((awarded[:awarded].size.to_f + awarded[:late].size.to_f * course.soft_deadline_point_multiplier) / (awarded[:awarded].size + awarded[:late].size + missing.size))
+                                      else
+                                        0
+                                      end
+      @group_completion_ratios[course_id] = course.exercise_group_completion_ratio_for_user(@user)
     end
 
-    if current_user.administrator? || current_user.id == @user.id
-      @submissions = @user.submissions.order('created_at DESC').includes(:user).includes(:course)
-    else # teacher and assistant sees only submissions for own teacherd courses
-      @submissions = @user.submissions.order('created_at DESC').includes(:user, :course).where(course: current_user.teaching_in_courses)
-    end
+    @submissions = if current_user.administrator? || current_user.id == @user.id
+                     @user.submissions.order('created_at DESC').includes(:user).includes(:course)
+                   else # teacher and assistant sees only submissions for own teacherd courses
+                     @user.submissions.order('created_at DESC').includes(:user, :course).where(course: current_user.teaching_in_courses)
+                   end
     @submission_count = @submissions.count
     @submissions = @submissions.limit(100) unless !!params[:view_all]
 
     Submission.eager_load_exercises(@submissions)
-
   end
 
   def me
@@ -155,9 +165,7 @@ class ParticipantsController < ApplicationController
       @participants.each do |user|
         row = []
         for field in @ordinary_fields
-          if @visible_columns.include?(field)
-            row << user.send(field)
-          end
+          row << user.send(field) if @visible_columns.include?(field)
         end
         for field in @extra_fields
           if @visible_columns.include?(field.name)
@@ -170,7 +178,7 @@ class ParticipantsController < ApplicationController
             group_data = @group_completion[group]
             points = group_data[:points_by_user][user.id] || 0
             total = group_data[:available_points]
-            percentage = sprintf('%.3f%%', (points.to_f / total.to_f) * 100)
+            percentage = format('%.3f%%', (points.to_f / total.to_f) * 100)
             row << percentage
           end
         end
@@ -183,6 +191,6 @@ class ParticipantsController < ApplicationController
   private
 
   def set_organization
-    @organization = Organization.find_by(slug:params[:organization_id]) unless params[:organization_id].nil?
+    @organization = Organization.find_by(slug: params[:organization_id]) unless params[:organization_id].nil?
   end
 end
