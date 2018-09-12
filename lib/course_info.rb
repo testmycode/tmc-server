@@ -117,6 +117,8 @@ class CourseInfo
       locked: locked,
       deadline_description: exercise.deadline_spec_obj.universal_description,
       deadline: exercise.deadline_for(@user),
+      soft_deadline: exercise.soft_deadline_for(@user),
+      soft_deadline_description: exercise.soft_deadline_spec_obj.universal_description,
       checksum: exercise.checksum,
       return_url: @helpers.api_v8_core_exercise_submissions_url(exercise),
       zip_url: @helpers.download_api_v8_core_exercise_url(exercise),
