@@ -59,7 +59,7 @@
 
     <% if @exercise.soft_deadline_for(current_user) %>
       <li>
-        Deadline: <%= @exercise._softdeadline_for(current_user) %>
+        Deadline: <%= @exercise.soft_deadline_for(current_user) %>
         <% if @exercise.soft_deadline_spec_obj.universal_description %>
           (<%= @exercise.soft_deadline_spec_obj.universal_description %>)
         <% end %>
