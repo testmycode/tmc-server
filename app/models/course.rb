@@ -501,8 +501,7 @@ class Course < ActiveRecord::Base
   end
 
   # Returns a hash of exercise group => {
-  #   :available_points => number of available points,
-  #   :points_by_user => {user_id => number_of_points}
+  #  { awarded: double, late: double }
   # }
   def exercise_group_completion_ratio_for_user(user)
     # TODO: clean up exercise group discovery
@@ -515,16 +514,19 @@ class Course < ActiveRecord::Base
       next if available_points.empty?
 
       sql = <<-EOS
-        SELECT COUNT(*)
+        SELECT awarded_after_soft_deadline, COUNT(*)
         FROM awarded_points
         WHERE course_id = #{conn.quote(id)} AND
               name IN (#{available_points.map { |ap| conn.quote(ap) }.join(',')}) AND
               user_id = #{conn.quote(user.id)}
-        GROUP BY user_id
+        GROUP BY awarded_after_soft_deadline
       EOS
 
-      res = conn.select_rows(sql)
-      result[group] = res.empty? ? 0 : res[0][0].to_f / available_points.length
+      res = conn.execute(sql).values.to_h
+      result[group] = {
+        awarded: res["f"].nil? ? 0 : res["f"].to_i,
+        late: res["t"].nil? ? 0 : res["t"].to_i,
+      }
     end
   end
 
