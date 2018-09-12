@@ -21,7 +21,7 @@
       <ul class="navbar-nav ml-auto">
         <% if signed_in? %>
           <li class="nav-item">
-            <%= link_to fa_icon("user lg", text: current_user.login), participant_path(current_user), class: 'btn btn-user' %>
+            <%= link_to fa_icon("user lg", text: current_user.email), participant_path(current_user), class: 'btn btn-user' %>
           </li>
           <li class="nav-item"><%= link_to 'Sign out', signout_path, method: :delete, id: 'logout-link', class: 'btn btn-danger' %></li>
         <% else %>
