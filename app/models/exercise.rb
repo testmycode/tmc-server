@@ -453,7 +453,7 @@ class Exercise < ActiveRecord::Base
     save!
   end
 
-  def deadline_expired?(deadline, time = Time.now)
+  def self.deadline_expired?(deadline, time = Time.now)
     deadline != nil && deadline < time
   end
 
