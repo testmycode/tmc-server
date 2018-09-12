@@ -68,6 +68,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/
       parse_condition("100% of #{$1}")
 
+    # TODO: This does not work well with soft deadlines
     elsif str =~ /^points?\s+(\S+.*)$/
       points = $1.split(' ').map(&:strip).reject(&:empty?)
       @depends_on_other_exercises = true
@@ -87,13 +88,13 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
-        available, awarded = available_and_awarded(@course, group, u)
-        awarded.count.to_f / available.count.to_f >= percentage - 0.0001
+        available, awarded, late = available_and_awarded_and_awarded_late(@course, group, u)
+        (awarded.count.to_f + late.count.to_f * @course.soft_deadline_point_multiplier) / available.count.to_f >= percentage - 0.0001
       end
       @universal_descriptions << "#{percentage_str}% from #{group}"
       @describers << lambda do |u|
-        available, awarded = available_and_awarded(@course, group, u)
-        remaining = ((percentage - 0.0001) * available.count.to_f).ceil - awarded.count
+        available, awarded, late = available_and_awarded_and_awarded_late(@course, group, u)
+        remaining = ((percentage - 0.0001) * available.count.to_f).ceil - (awarded.count.to_f + late.count.to_f * course.soft_deadline_point_multiplier).round(2)
         if remaining > 0
           "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
         else
@@ -127,12 +128,12 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
-        awarded = available_and_awarded(@course, group, u)[1]
+        awarded = available_and_awarded_and_awarded_late(@course, group, u)[1]
         awarded.count >= num_points
       end
       @universal_descriptions << "#{num_points} #{plural(num_points, 'point')} from #{group}"
       @describers << lambda do |u|
-        awarded = available_and_awarded(@course, group, u)[1]
+        awarded = available_and_awarded_and_awarded_late(@course, group, u)[1]
         remaining = num_points - awarded.count
         if remaining > 0
           "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
@@ -151,15 +152,16 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     end
   end
 
-  def available_and_awarded(course, group_or_exercise_name, user)
+  def available_and_awarded_and_awarded_late(course, group_or_exercise_name, user)
     required_exercises = course.exercises_by_name_or_group(group_or_exercise_name)
                                .select { |e| e.hide_submission_results == false && e.enabled? }
     available = AvailablePoint.course_points_of_exercises_list(course, required_exercises)
       .map(&:name)
-    awarded = AwardedPoint.course_user_points(course, user)
-      .map(&:name)
-      .select { |pt| available.include?(pt) }
-    [available, awarded]
+    awarded_and_late = AwardedPoint.course_user_points(course, user)
+      .select { |pt| available.include?(pt.name) }
+    awarded = awarded_and_late.select { |a| !a.awarded_after_soft_deadline? }
+    late = awarded_and_late.select { |a| a.awarded_after_soft_deadline? }
+    [available, awarded, late]
   end
 
   def plural(n, word)
