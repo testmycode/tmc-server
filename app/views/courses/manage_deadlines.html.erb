@@ -10,6 +10,11 @@
 <a id="toggle-advanced-deadline-options" class="btn btn-sm btn-default float-right" href="javascript:void(0);">Toggle advanced options</a>
 <div class="float-clear"></div>
 
+<div class="alert alert-primary" role="alert">
+  <p>Soft deadlines can be exceeded. Exercises can be submitted after the soft deadline has passed, but the students can receive only 75% of the exercise points.</p>
+  <p>Hard deadlines can not be exceeded. Students can't submit exercises after the hard deadline has passed.</p>
+</div>
+
 <%= form_tag save_deadlines_organization_course_url(@organization, @course), method: :post do %>
   <table class="exercise-list table">
     <thead>
