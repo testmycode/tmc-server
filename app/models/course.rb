@@ -503,7 +503,7 @@ class Course < ActiveRecord::Base
   # Returns a hash of exercise group => {
   #  { awarded: double, late: double }
   # }
-  def exercise_group_completion_ratio_for_user(user)
+  def exercise_group_completion_counts_for_user(user)
     # TODO: clean up exercise group discovery
 
     groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }.uniq.sort
@@ -526,6 +526,7 @@ class Course < ActiveRecord::Base
       result[group] = {
         awarded: res["f"].nil? ? 0 : res["f"].to_i,
         late: res["t"].nil? ? 0 : res["t"].to_i,
+        available_points: available_points.length
       }
     end
   end

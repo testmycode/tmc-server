@@ -46,13 +46,13 @@
               <%= sprintf("%.0f", @percent_completed[course.id]) %>%
             </div>
           </div>
-          <% if @group_completion_ratios[course.id] %>
-            <% @group_completion_ratios[course.id].each do |group, ratios| %>
+          <% if @group_completion_counts[course.id] %>
+            <% @group_completion_counts[course.id].each do |group, counts| %>
               <br>
               <span class="progress-label">Awarded points for <%= group %></span>
               <div class="progress course-points-progress">
-                <% unless (ratios[:awarded] + ratios[:late]).zero? %>
-                  <% calculated_ratio = ratios[:awarded] + ratios[:late] * course.soft_deadline_point_multiplier %>
+                <% unless (counts[:awarded] + counts[:late]).zero? %>
+                  <% calculated_ratio = (counts[:awarded] + counts[:late] * course.soft_deadline_point_multiplier).to_f / counts[:available_points] %>
                   <div class="progress-bar bg-info" role="progressbar" style="width: <%= calculated_ratio * 100 %>%" aria-valuenow="<%= calculated_ratio * 100 %>" aria-valuemin="0" aria-valuemax="100">
                     <%= sprintf("%.0f", calculated_ratio * 100) %>%
                   </div>

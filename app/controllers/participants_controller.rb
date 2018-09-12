@@ -86,7 +86,8 @@ class ParticipantsController < ApplicationController
     @courses = []
     @missing_points = {}
     @percent_completed = {}
-    @group_completion_ratios = {}
+    @group_completion_counts = {}
+    @group_available_points = {}
     for course_id in @awarded_points.keys
       course = Course.find(course_id)
       next if course.hide_submissions?
@@ -101,7 +102,7 @@ class ParticipantsController < ApplicationController
                                       else
                                         0
                                       end
-      @group_completion_ratios[course_id] = course.exercise_group_completion_ratio_for_user(@user)
+      @group_completion_counts[course_id] = course.exercise_group_completion_counts_for_user(@user)
     end
 
     @submissions = if current_user.administrator? || current_user.id == @user.id
