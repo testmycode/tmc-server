@@ -2,6 +2,7 @@
 
 require 'rest_client'
 require 'submission_packager'
+require 'timeout'
 
 # Represents a connection to a remote machine running the tmc-sandbox web service.
 #
@@ -57,9 +58,13 @@ class RemoteSandbox
 
       File.open(tar_path, 'r') do |tar_file|
         Rails.logger.info "Posting submission to #{post_url}"
-        RestClient::Request.execute(method: :post, url: post_url, timeout: 5, payload: {
-                                      file: tar_file, notify: notify_url, token: submission.secret_token
-                                    })
+        # While Timeout::timeout is considered dangerous, this is still necessary because if this happens to block it will bring the whole server down.
+        Timeout.timeout(10) do
+          # The timeout is only for open_timeout and read_timeout
+          RestClient::Request.execute(method: :post, url: post_url, timeout: 5, payload: {
+                                        file: tar_file, notify: notify_url, token: submission.secret_token
+                                      })
+        end
         submission.sandbox = post_url
         submission.save!
       rescue StandardError => e
