@@ -56,7 +56,10 @@ class RemoteSandbox
       SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params)
 
       File.open(tar_path, 'r') do |tar_file|
-        RestClient.post post_url, file: tar_file, notify: notify_url, token: submission.secret_token
+        Rails.logger.info "Posting submission to #{post_url}"
+        RestClient::Request.execute(method: :post, url: post_url, timeout: 5, payload: {
+                                      file: tar_file, notify: notify_url, token: submission.secret_token
+                                    })
         submission.sandbox = post_url
         submission.save!
       rescue StandardError => e
