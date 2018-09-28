@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BackgroundCourseRefresher
   # Called periodically by script/background_daemon, does full refresh on courses which
   # still need full initial refresh.

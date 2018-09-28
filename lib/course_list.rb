@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Builds /courses.json
 class CourseList
   def initialize(user, helpers)

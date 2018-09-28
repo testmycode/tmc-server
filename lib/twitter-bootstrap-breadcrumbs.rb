@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BreadCrumbs
   def self.included(base)
     base.extend(ClassMethods)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Reads yaml files such that settings in child dirs are
 # merged into settings from parent dirs.
 # Usage:

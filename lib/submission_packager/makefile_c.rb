@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubmissionPackager
   class MakefileC < SubmissionPackager
     private

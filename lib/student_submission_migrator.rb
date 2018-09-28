@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Used to migrate students between similar courses. This requires for the GIT repos to be checkout to same version to ensure safe transition
 class StudentSubmissionMigrator
   class CannotRefreshError < RuntimeError; end

@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 module DateAndTimeUtils
   def self.to_time(input, options = {})
     options = {
@@ -29,9 +31,9 @@ module DateAndTimeUtils
 
     result = nil
     begin
-      if s =~ /^\d+-\d+-\d+$/
+      if /^\d+-\d+-\d+$/.match?(s)
         result = Date.parse(s)
-      elsif s =~ /^\d+-\d+-\d+\s+\d+:\d+(:?:\d+(:?\.\d+)?)?(:?\s+\S+)?$/
+      elsif /^\d+-\d+-\d+\s+\d+:\d+(:?:\d+(:?\.\d+)?)?(:?\s+\S+)?$/.match?(s)
         result = Time.zone.parse(s)
       end
     rescue StandardError

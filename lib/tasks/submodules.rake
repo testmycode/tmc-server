@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'system_commands'
 require 'tmc_checkstyle_runner'
 require 'tmc_comet'

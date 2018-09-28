@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 require 'pathname'
 require 'recursive_yaml_reader'
@@ -97,44 +99,42 @@ class CourseRefresher
       # I prefer suggestion 1.
 
       Course.transaction(requires_new: true) do
-        begin
-          @course = Course.lock(true).find(course.id)
+        @course = Course.lock(true).find(course.id)
 
-          @old_cache_path = @course.cache_path
+        @old_cache_path = @course.cache_path
 
-          @course.increment_cache_version                         unless options[:no_directory_changes] # causes @course.*_path to return paths in the new cache
+        @course.increment_cache_version                         unless options[:no_directory_changes] # causes @course.*_path to return paths in the new cache
 
-          FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
-          FileUtils.mkdir_p(@course.cache_path)                   unless options[:no_directory_changes]
+        FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
+        FileUtils.mkdir_p(@course.cache_path)                   unless options[:no_directory_changes]
 
-          measure_and_log :update_or_clone_repository             unless options[:no_directory_changes]
-          measure_and_log :check_directory_names                  unless options[:no_directory_changes]
-          measure_and_log :update_course_options
-          measure_and_log :add_records_for_new_exercises
-          measure_and_log :delete_records_for_removed_exercises
-          measure_and_log :update_exercise_options
-          measure_and_log :set_has_tests_flags
-          measure_and_log :update_available_points, options[:no_directory_changes] unless options[:no_background_operations]
-          measure_and_log :make_solutions                         unless options[:no_directory_changes]
-          measure_and_log :make_stubs                             unless options[:no_directory_changes]
-          measure_and_log :checksum_stubs
-          measure_and_log :make_zips_of_stubs                     unless options[:no_directory_changes]
-          measure_and_log :make_zips_of_solutions                 unless options[:no_directory_changes]
-          measure_and_log :set_permissions                        unless options[:no_directory_changes]
-          measure_and_log :invalidate_unlocks
+        measure_and_log :update_or_clone_repository             unless options[:no_directory_changes]
+        measure_and_log :check_directory_names                  unless options[:no_directory_changes]
+        measure_and_log :update_course_options
+        measure_and_log :add_records_for_new_exercises
+        measure_and_log :delete_records_for_removed_exercises
+        measure_and_log :update_exercise_options
+        measure_and_log :set_has_tests_flags
+        measure_and_log :update_available_points, options[:no_directory_changes] unless options[:no_background_operations]
+        measure_and_log :make_solutions                         unless options[:no_directory_changes]
+        measure_and_log :make_stubs                             unless options[:no_directory_changes]
+        measure_and_log :checksum_stubs
+        measure_and_log :make_zips_of_stubs                     unless options[:no_directory_changes]
+        measure_and_log :make_zips_of_solutions                 unless options[:no_directory_changes]
+        measure_and_log :set_permissions                        unless options[:no_directory_changes]
+        measure_and_log :invalidate_unlocks
 
-          @course.course_template.save!
-          @course.refreshed_at = Time.now
-          @course.save!
-          @course.exercises.each &:save!
+        @course.course_template.save!
+        @course.refreshed_at = Time.now
+        @course.save!
+        @course.exercises.each &:save!
 
-          CourseRefresher.simulate_failure! if ::Rails.env.test? && CourseRefresher.respond_to?('simulate_failure!')
-        rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
-          @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
-          # Delete the new cache we were working on
-          FileUtils.rm_rf(@course.cache_path) unless options[:no_directory_changes]
-          raise ActiveRecord::Rollback
-        end
+        CourseRefresher.simulate_failure! if ::Rails.env.test? && CourseRefresher.respond_to?('simulate_failure!')
+      rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
+        @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
+        # Delete the new cache we were working on
+        FileUtils.rm_rf(@course.cache_path) unless options[:no_directory_changes]
+        raise ActiveRecord::Rollback
       end
 
       if @report.errors.empty? && !options[:no_directory_changes]
@@ -236,24 +236,22 @@ class CourseRefresher
       reader = RecursiveYamlReader.new
       @review_points = {}
       @course.exercises.each do |e|
-        begin
-          metadata = reader.read_settings(root_dir: @course.clone_path,
-                                          target_dir: File.join(@course.clone_path, e.relative_path),
-                                          file_name: 'metadata.yml',
-                                          defaults: Exercise.default_options,
-                                          file_preprocessor: proc do |opts|
-                                            merge_course_specific_suboptions(opts)
-                                          end)
-          @review_points[e.name] = parse_review_points(metadata['review_points'])
+        metadata = reader.read_settings(root_dir: @course.clone_path,
+                                        target_dir: File.join(@course.clone_path, e.relative_path),
+                                        file_name: 'metadata.yml',
+                                        defaults: Exercise.default_options,
+                                        file_preprocessor: proc do |opts|
+                                          merge_course_specific_suboptions(opts)
+                                        end)
+        @review_points[e.name] = parse_review_points(metadata['review_points'])
 
-          e.options = metadata
+        e.options = metadata
 
-          e.disabled! if e.new_record? && e.course.refreshed?
+        e.disabled! if e.new_record? && e.course.refreshed?
 
-          e.save!
-        rescue SyntaxError
-          @report.errors << "Failed to parse metadata: #{$!}"
-        end
+        e.save!
+      rescue SyntaxError
+        @report.errors << "Failed to parse metadata: #{$!}"
       end
     end
 

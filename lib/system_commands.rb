@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'shellwords'
 
 # Provides useful methods for working with the shell.
@@ -5,7 +7,7 @@ require 'shellwords'
 # Ruby's standard methods "system" and the backtick operator are
 # bad at capturing output and errors.
 module SystemCommands
-  extend self
+  module_function
 
   # Prefer sh! instead
   def system!(cmd)

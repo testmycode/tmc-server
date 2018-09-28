@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubmissionList
   def initialize(user, helpers)
     @user = user

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'ruby_init_script'
 require 'etc'
 
 namespace :background_daemon do
   namespace :init do
-    DEFAULT_NAME = 'tmc-background-daemon'.freeze
+    DEFAULT_NAME = 'tmc-background-daemon'
 
     def init_script(name = nil)
       name ||= DEFAULT_NAME

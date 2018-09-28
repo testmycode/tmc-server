@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BackgroundTaskRegistry
   def self.register(cls)
     classes << cls

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Represents a version number (e.g. 1.30.5).
 #
 # Provides a comparison operator that handles e.g. '1.21.0 > 1.3.5'.

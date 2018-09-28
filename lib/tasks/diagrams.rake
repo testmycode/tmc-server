@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :doc do
   # Using http://railroady.prestonlee.com/
   namespace :diagram do
