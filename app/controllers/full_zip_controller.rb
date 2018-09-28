@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FullZipController < ApplicationController
   def index
     submission = Submission.find(params[:submission_id])

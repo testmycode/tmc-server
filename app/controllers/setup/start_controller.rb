@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Setup::StartController < Setup::SetupController
   skip_authorization_check only: [:index]
 

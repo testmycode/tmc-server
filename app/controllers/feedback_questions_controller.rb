@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Handles the feedback question editing UI.
 class FeedbackQuestionsController < ApplicationController
   before_action :set_course
@@ -73,7 +75,7 @@ class FeedbackQuestionsController < ApplicationController
       @question.destroy
       flash[:success] = 'Question deleted.'
       redirect_to organization_course_feedback_questions_path(@organization, @course)
-    rescue
+    rescue StandardError
       flash[:error] = "Failed to delete question: #{$!}"
       redirect_to organization_course_feedback_questions_path(@organization, @course)
     end
@@ -82,7 +84,7 @@ class FeedbackQuestionsController < ApplicationController
   private
 
   def feedback_question_params
-    params.permit({ feedback_question: [:question, :title, :kind] }, :intrange_min, :intrange_max, :commit, :course_id)
+    params.permit({ feedback_question: %i[question title kind] }, :intrange_min, :intrange_max, :commit, :course_id)
   end
 
   def set_course

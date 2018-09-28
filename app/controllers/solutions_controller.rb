@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Returns the suggestion solution as a ZIP.
 class SolutionsController < ApplicationController
   def show

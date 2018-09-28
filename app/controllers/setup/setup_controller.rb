@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Setup::SetupController < ApplicationController
   before_action :set_organization, :add_setup_breadcrumb
 
@@ -63,7 +65,7 @@ class Setup::SetupController < ApplicationController
       end
       options = {}
       options = { pass_parameters: true } if setup_in_progress? && course_choosed?
-      add_phase (i+1).to_s+'. '+STEPS[i][:title], type, path, options
+      add_phase (i + 1).to_s + '. ' + STEPS[i][:title], type, path, options
     end
   end
 
@@ -81,9 +83,9 @@ class Setup::SetupController < ApplicationController
   def save_wizard_to_session(phase = 1)
     return if setup_in_progress?
     session[:ongoing_course_setup] = {
-        course_id: nil,
-        phase: phase,
-        started: Time.now
+      course_id: nil,
+      phase: phase,
+      started: Time.now
     }
   end
 
@@ -113,11 +115,11 @@ class Setup::SetupController < ApplicationController
 
   def update_setup_course(id = nil)
     return unless setup_in_progress?
-    if id.nil?
-      session[:ongoing_course_setup][:course_id] = @course.id
-    else
-      session[:ongoing_course_setup][:course_id] = id
-    end
+    session[:ongoing_course_setup][:course_id] = if id.nil?
+                                                   @course.id
+                                                 else
+                                                   id
+                                                 end
   end
 
   def set_organization

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Shows the various statistics under /stats.
 class StatsController < ApplicationController
   skip_authorization_check except: [:organization_stats_index]
@@ -36,9 +38,7 @@ class StatsController < ApplicationController
   private
 
   def get_vars
-    if params[:course_id]
-      @course = Course.find(params[:course_id])
-    end
+    @course = Course.find(params[:course_id]) if params[:course_id]
   end
 
   def course_stats_index
@@ -95,14 +95,14 @@ class StatsController < ApplicationController
       format.html { render template: 'courses/stats/submissions', layout: 'bare' }
       format.json do
         records = @course.submissions
-          .select(['COUNT(*) c', "date_trunc('#{@time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"])
-          .group('t')
-          .where('created_at >= ?', @start_time)
-          .where(user: User.legitimate_students)
-          .where('created_at < ?', @end_time)
+                         .select(['COUNT(*) c', "date_trunc('#{@time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"])
+                         .group('t')
+                         .where('created_at >= ?', @start_time)
+                         .where(user: User.legitimate_students)
+                         .where('created_at < ?', @end_time)
 
         date_format = '%Y-%m-%d %H:%M:%S' # query returns in this format, without timezone
-        #date_format = '%FT%T.%LZ' # query returns in this format, without timezone
+        # date_format = '%FT%T.%LZ' # query returns in this format, without timezone
 
         lookup = {}
         for r in records
@@ -129,9 +129,9 @@ class StatsController < ApplicationController
       format.html { render template: 'courses/stats/submission_times', layout: 'bare' }
       format.json do
         records = @course.submissions.where(user: User.legitimate_students).select([
-          'COUNT(*) c',
-          "EXTRACT(HOUR FROM #{expr_for_time_in_time_zone('created_at')}) h"
-        ]).group('h').order('h ASC')
+                                                                                     'COUNT(*) c',
+                                                                                     "EXTRACT(HOUR FROM #{expr_for_time_in_time_zone('created_at')}) h"
+                                                                                   ]).group('h').order('h ASC')
 
         lookup = {}
         for r in records
@@ -162,7 +162,7 @@ class StatsController < ApplicationController
     if valid_values.include?(params[name])
       params[name]
     else
-      fail "Invalid value for parameter #{name}"
+      raise "Invalid value for parameter #{name}"
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'natsort'
 # Shows the points summary table and exercise group-specific tables.
 class PointsController < ApplicationController
@@ -11,9 +13,7 @@ class PointsController < ApplicationController
     add_breadcrumb 'Points'
 
     if can?(:teach, @course)
-      @user_fields = UserField.all.select do |field|
-        field.show_in_participant_list?
-      end
+      @user_fields = UserField.all.select(&:show_in_participant_list?)
     end
 
     only_for_user = User.find_by(login: params[:username])
@@ -59,9 +59,7 @@ class PointsController < ApplicationController
     show_timestamps = !!params[:timestamps]
 
     if can?(:teach, @course)
-      @user_fields = UserField.all.select do |field|
-        field.show_in_participant_list?
-      end
+      @user_fields = UserField.all.select(&:show_in_participant_list?)
     end
 
     add_course_breadcrumb

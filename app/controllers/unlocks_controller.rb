@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Receives explicit unlock requests and shows a web UI for making them.
 class UnlocksController < ApplicationController
   def show

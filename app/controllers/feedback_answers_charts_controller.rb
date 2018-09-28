@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FeedbackAnswersChartsController < ApplicationController
   def show
     @course = Course.find(params[:course_id])

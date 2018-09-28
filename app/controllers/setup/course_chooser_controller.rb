@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Setup::CourseChooserController < Setup::SetupController
   before_action :set_course_from_session
 
@@ -7,7 +9,6 @@ class Setup::CourseChooserController < Setup::SetupController
     print_setup_phases(1)
     @course_templates = CourseTemplate.available.order('LOWER(title)')
     @setup_in_progress = setup_in_progress?
-
   end
 
   private

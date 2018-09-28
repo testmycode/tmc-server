@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 # Helper methods for making breadcrumbs.
 #
 # See https://github.com/weppos/breadcrumbs_on_rails
@@ -15,12 +17,12 @@ module BreadcrumbHelpers # Included in ApplicationController
   def add_exercise_breadcrumb
     if @exercise
       add_breadcrumb "Exercise #{@exercise.name}", exercise_path(@exercise)
-    elsif @submission && @submission.exercise
+    elsif @submission&.exercise
       add_breadcrumb "Exercise #{@submission.exercise.name}", exercise_path(@submission.exercise)
-    elsif @submission && @submission.exercise_name
+    elsif @submission&.exercise_name
       add_breadcrumb "(deleted exercise #{@submission.exercise_name}"
     else
-      fail 'Neither @exercise nor @submission.exercise_name set'
+      raise 'Neither @exercise nor @submission.exercise_name set'
     end
   end
 

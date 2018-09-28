@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 class PasswordResetKeysController < ApplicationController
   skip_authorization_check
 
-  add_breadcrumb 'Forgot password', ->(*_a) {}, only: [:new, :show]
+  add_breadcrumb 'Forgot password', ->(*_a) {}, only: %i[new show]
 
-  def new
-  end
+  def new; end
 
   def create
     @email = params['email'].to_s.strip
@@ -30,12 +31,12 @@ class PasswordResetKeysController < ApplicationController
 
     if params[:password] != params[:password_confirmation]
       flash.now[:alert] = 'Passwords did not match'
-      return render action: :show, status: 403
+      return render action: :show, status: :forbidden
     end
 
     if params[:password].blank?
       flash.now[:alert] = 'Password may not be empty'
-      return render action: :show, status: 403
+      return render action: :show, status: :forbidden
     end
 
     @user.password = params[:password]
@@ -44,12 +45,12 @@ class PasswordResetKeysController < ApplicationController
       flash[:success] = 'Your password has been reset.'
       redirect_to root_path
     else
-      if @user.errors[:password]
-        flash.now[:alert] = 'Password ' + @user.errors[:password].join(', ')
-      else
-        flash.now[:alert] = 'Failed to set password'
-      end
-      render action: :show, status: 403
+      flash.now[:alert] = if @user.errors[:password]
+                            'Password ' + @user.errors[:password].join(', ')
+                          else
+                            'Failed to set password'
+                          end
+      render action: :show, status: :forbidden
     end
   end
 
@@ -57,8 +58,8 @@ class PasswordResetKeysController < ApplicationController
 
   def find_key_and_user
     token = params['token']
-    @key = ActionToken.find_by_token(token)
-    fail ActiveRecord::RecordNotFound.new('Invalid password reset key') if @key.nil? || @key.expired?
+    @key = ActionToken.find_by(token: token)
+    raise ActiveRecord::RecordNotFound, 'Invalid password reset key' if @key.nil? || @key.expired?
     @user = @key.user
   end
 end

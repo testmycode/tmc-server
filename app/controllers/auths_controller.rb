@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 # Provides an authentication service.
 #
 # Lets external services such as tmc-comet check whether a given (username, password) or
 # (username, session_id) is valid.
 class AuthsController < ApplicationController
-  OK_MESSAGE = 'OK'.freeze
-  FAIL_MESSAGE = 'FAIL'.freeze
+  OK_MESSAGE = 'OK'
+  FAIL_MESSAGE = 'FAIL'
 
   skip_authorization_check
   skip_before_action :verify_authenticity_token
@@ -12,7 +14,7 @@ class AuthsController < ApplicationController
   def show
     if params[:username].present? && params[:session_id].present?
       user = User.find_by(login: params[:username])
-      user = User.find_by('lower(email) = ?', params[:username].downcase) unless user
+      user ||= User.find_by('lower(email) = ?', params[:username].downcase)
       # Allows using oauth2 tokens of the new api for authenticating
       res = if user && Doorkeeper::AccessToken.find_by(resource_owner_id: user.id, token: params[:session_id])
               OK_MESSAGE

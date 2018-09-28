@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CertificatesController < ApplicationController
   before_action :set_user, except: [:show]
   before_action :set_courses, except: [:show]
@@ -32,8 +34,8 @@ class CertificatesController < ApplicationController
     else
       render action: :new
     end
-    rescue Errno::ENOENT
-      redirect_to participant_certificates_path(@user), alert: "Cannot create certificate for this course."
+  rescue Errno::ENOENT
+    redirect_to participant_certificates_path(@user), alert: 'Cannot create certificate for this course.'
   end
 
   private

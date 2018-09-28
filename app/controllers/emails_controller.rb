@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Displays the raw list of participant e-mails, useful for mass-mailing scripts.
 class EmailsController < ApplicationController
   def index
@@ -38,7 +40,7 @@ class EmailsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.text { render text: @students.map { |s| "#{s.email}" }.join("\n") }
+      format.text { render text: @students.map { |s| s.email.to_s }.join("\n") }
       format.csv { render text: "Username,Email\n" + @students.map { |s| "#{s.username},#{s.email}" }.join("\n") }
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'course_refresher'
 require 'natsort'
 require 'course_list'
@@ -5,7 +7,7 @@ require 'exercise_completion_status_generator'
 
 class CoursesController < ApplicationController
   before_action :set_organization
-  before_action :set_course, except: [:help, :index, :show_json]
+  before_action :set_course, except: %i[help index show_json]
 
   skip_authorization_check only: [:index]
 
@@ -21,7 +23,7 @@ class CoursesController < ApplicationController
         courses = courses.select { |c| c.visible_to?(current_user) }
         authorize! :read, courses
         return respond_access_denied('Authentication required') if current_user.guest?
-        opts = {include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions]}
+        opts = { include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions] }
 
         data = {
           api_version: ApiVersion::API_VERSION,
@@ -48,7 +50,7 @@ class CoursesController < ApplicationController
       end
       format.json do
         return respond_access_denied('Authentication required') if current_user.guest?
-        opts = {include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions]}
+        opts = { include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions] }
         data = {
           api_version: ApiVersion::API_VERSION,
           course: CourseInfo.new(current_user, view_context).course_data(@organization, @course, opts)
@@ -65,8 +67,8 @@ class CoursesController < ApplicationController
     return respond_access_denied('Authentication required') if current_user.guest?
 
     data = {
-        api_version: ApiVersion::API_VERSION,
-        courses: CourseList.new(current_user, view_context).course_list_data(@organization, course)
+      api_version: ApiVersion::API_VERSION,
+      courses: CourseList.new(current_user, view_context).course_list_data(@organization, course)
     }
     render json: data.to_json
   end
@@ -119,11 +121,10 @@ class CoursesController < ApplicationController
       hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
 
       exercise = Exercise.where(course_id: @course.id).find_by(name: name)
-      unless exercise.nil?
-        exercise.soft_deadline_spec = soft_deadlines
-        exercise.deadline_spec = hard_deadlines
-        exercise.save!
-      end
+      next if exercise.nil?
+      exercise.soft_deadline_spec = soft_deadlines
+      exercise.deadline_spec = hard_deadlines
+      exercise.save!
     end
 
     redirect_to manage_deadlines_organization_course_path(@organization, @course), notice: 'Successfully saved deadlines.'
@@ -221,10 +222,8 @@ class CoursesController < ApplicationController
   end
 
   def refresh_course(course, options = {})
-    begin
-      session[:refresh_report] = course.refresh(options)
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
-    end
+    session[:refresh_report] = course.refresh(options)
+  rescue CourseRefresher::Failure => e
+    session[:refresh_report] = e.report
   end
 end

@@ -1,5 +1,6 @@
-class MigrateToOtherCourseController < ApplicationController
+# frozen_string_literal: true
 
+class MigrateToOtherCourseController < ApplicationController
   def show
     @old_course = Course.find(params[:course_id])
     @to_course = Course.find(params[:id])
@@ -10,8 +11,8 @@ class MigrateToOtherCourseController < ApplicationController
 
     @already_migrated = already_migrated
     @extra_alert_text = get_extra_text
-    return respond_with_error("Please login to continue") if current_user.guest?
-    return respond_with_error("This migration is not allowed") if !StudentSubmissionMigrator.new(@old_course, @to_course, current_user).migration_is_allowed
+    return respond_with_error('Please login to continue') if current_user.guest?
+    return respond_with_error('This migration is not allowed') unless StudentSubmissionMigrator.new(@old_course, @to_course, current_user).migration_is_allowed
   end
 
   def migrate
@@ -23,10 +24,10 @@ class MigrateToOtherCourseController < ApplicationController
 
     if check_understanding!
       StudentSubmissionMigrator.new(@old_course, @to_course, current_user).migrate!
-      flash[:notice] = "Successfully migrated over"
+      flash[:notice] = 'Successfully migrated over'
       redirect_to participant_path(current_user)
     else
-      flash[:alert] = "Improper answers. Please try again"
+      flash[:alert] = 'Improper answers. Please try again'
       render :show
     end
   end
@@ -35,10 +36,10 @@ class MigrateToOtherCourseController < ApplicationController
 
   def check_understanding!
     params[:from_course_name].strip == @old_course.name &&
-    params[:to_course_name].strip == @to_course.name &&
-    params[:username].strip == current_user.login &&
-    !!params[:im_sure] &&
-    !already_migrated
+      params[:to_course_name].strip == @to_course.name &&
+      params[:username].strip == current_user.login &&
+      !!params[:im_sure] &&
+      !already_migrated
   end
 
   def already_migrated

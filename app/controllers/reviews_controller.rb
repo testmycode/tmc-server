@@ -1,17 +1,19 @@
+# frozen_string_literal: true
+
 require 'natsort'
 
 # Presents the code review UI.
 class ReviewsController < ApplicationController
-  before_action :set_organization, except: [:new, :create]
+  before_action :set_organization, except: %i[new create]
 
   def index
     if params[:course_id]
       fetch :course
       @organization = @course.organization
       @my_reviews = @course.submissions
-        .where(user_id: current_user.id)
-        .where('requests_review OR requires_review OR reviewed')
-        .order('created_at DESC')
+                           .where(user_id: current_user.id)
+                           .where('requests_review OR requires_review OR reviewed')
+                           .order('created_at DESC')
 
       respond_to do |format|
         format.html do
@@ -25,7 +27,7 @@ class ReviewsController < ApplicationController
       end
     else
       fetch :submission, :files
-      fail "Submission's exercise has been moved or deleted" unless @submission.exercise
+      raise "Submission's exercise has been moved or deleted" unless @submission.exercise
 
       @course = @submission.course
       @organization = @course.organization
@@ -35,7 +37,7 @@ class ReviewsController < ApplicationController
           add_course_breadcrumb
           add_exercise_breadcrumb
           add_submission_breadcrumb
-          breadcrumb_label = if @submission.reviews.count == 1 then 'Code review' else 'Code reviews' end
+          breadcrumb_label = @submission.reviews.count == 1 ? 'Code review' : 'Code reviews'
           add_breadcrumb breadcrumb_label, submission_reviews_path(@submission)
           render 'reviews/submission_index'
         end
@@ -78,7 +80,7 @@ class ReviewsController < ApplicationController
         @review.submission.save!
         @review.save!
       end
-    rescue
+    rescue StandardError
       ::Rails.logger.error($!)
       respond_with_error('Failed to save code review.')
     else
@@ -115,7 +117,7 @@ class ReviewsController < ApplicationController
   private
 
   def course_reviews_json
-    submissions = @my_reviews.includes(reviews: [:reviewer, :submission])
+    submissions = @my_reviews.includes(reviews: %i[reviewer submission])
     exercises = Hash[@course.exercises.map { |e| [e.name, e] }]
     reviews = submissions.map do |s|
       s.reviews.map do |r|
@@ -180,7 +182,7 @@ class ReviewsController < ApplicationController
       award_points
       @review.submission.save!
       @review.save!
-    rescue
+    rescue StandardError
       ::Rails.logger.error($!)
       respond_with_error('Failed to save code review.')
     else
@@ -194,9 +196,9 @@ class ReviewsController < ApplicationController
     sub.reviewed = true
     sub.review_dismissed = false
     sub.of_same_kind
-      .where('(requires_review OR requests_review) AND NOT reviewed')
-      .where(['created_at < ?', sub.created_at])
-      .update_all(newer_submission_reviewed: true)
+       .where('(requires_review OR requests_review) AND NOT reviewed')
+       .where(['created_at < ?', sub.created_at])
+       .update_all(newer_submission_reviewed: true)
   end
 
   def fetch(*stuff)
@@ -212,9 +214,7 @@ class ReviewsController < ApplicationController
       @review = Review.find(params[:id])
       authorize! :read, @review
     end
-    if stuff.include? :files
-      @files = SourceFileList.for_submission(@submission)
-    end
+    @files = SourceFileList.for_submission(@submission) if stuff.include? :files
   end
 
   def notify_user_about_new_review
@@ -235,7 +235,7 @@ class ReviewsController < ApplicationController
     submission = @review.submission
     exercise = submission.exercise
     course = exercise.course
-    fail 'Exercise of submission has been moved or deleted' unless exercise
+    raise 'Exercise of submission has been moved or deleted' unless exercise
 
     available_points = exercise.available_points.where(requires_review: true).map(&:name)
     previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
@@ -244,7 +244,7 @@ class ReviewsController < ApplicationController
     if params[:review][:points].respond_to?(:keys)
       for point_name in params[:review][:points].keys
         unless exercise.available_points.where(name: point_name).any?
-          fail "Point does not exist: #{point_name}"
+          raise "Point does not exist: #{point_name}"
         end
 
         new_points << point_name

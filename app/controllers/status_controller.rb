@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 # Shows the various statistics under /stats.
 class StatusController < ApplicationController
-
   def index
     authorize! :read_instance_state, nil
     @sandbox_queue_length = Submission.to_be_reprocessed.count
@@ -9,5 +10,4 @@ class StatusController < ApplicationController
     @submissions_count_week = Submission.where(created_at: Time.current.all_week).count
     @sandboxes = RemoteSandbox.all + RemoteSandbox.all_experimental
   end
-
 end

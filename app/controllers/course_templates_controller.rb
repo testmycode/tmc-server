@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, except: [:index, :new, :create, :list_for_teachers]
+  before_action :set_course_template, except: %i[index new create list_for_teachers]
 
   def index
     authorize! :read, CourseTemplate
@@ -16,7 +18,7 @@ class CourseTemplatesController < ApplicationController
   def show
     authorize! :read, CourseTemplate
     add_breadcrumb 'Course templates', course_templates_path
-    add_breadcrumb "#{@course_template.title}"
+    add_breadcrumb @course_template.title.to_s
   end
 
   def new
@@ -53,7 +55,7 @@ class CourseTemplatesController < ApplicationController
   end
 
   def destroy
-    raise "One does not destroy a course template"
+    raise 'One does not destroy a course template'
   end
 
   def list_for_teachers

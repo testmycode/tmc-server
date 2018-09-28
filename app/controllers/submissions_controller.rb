@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'submission_processor'
 
 # Receives submissions and presents the full submission list and submission view.
@@ -7,7 +9,7 @@ class SubmissionsController < ApplicationController
   before_action :get_course_and_exercise
 
   # Manually checked for #show and index
-  skip_authorization_check only: [:show, :index, :difference_with_solution]
+  skip_authorization_check only: %i[show index difference_with_solution]
 
   def index
     respond_to do |format|
@@ -37,14 +39,14 @@ class SubmissionsController < ApplicationController
     add_submission_breadcrumb
 
     respond_to do |format|
-      format.html {
+      format.html do
         respond_access_denied if !current_user.administrator? && @course.hide_submissions?
         @files = SourceFileList.for_submission(@submission)
-      }
-      format.zip {
+      end
+      format.zip do
         respond_access_denied if !current_user.administrator? && @course.hide_submissions?
         send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip")
-      }
+      end
       format.json do
         output = {
           api_version: ApiVersion::API_VERSION,
@@ -69,33 +71,33 @@ class SubmissionsController < ApplicationController
 
         output = output.merge(
           case @submission.status(current_user)
-            when :processing then {
-              submissions_before_this: @submission.unprocessed_submissions_before_this,
-              total_unprocessed: Submission.unprocessed_count
-            }
-            when :ok then {
-              test_cases: @submission.test_case_records,
-              feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
-              feedback_answer_url: submission_feedback_answers_url(@submission, format: :json),
-            }
-            when :fail then {
-              test_cases: @submission.test_case_records
-            }
-            when :hidden then {
-              all_tests_passed:  nil,
-              test_cases: [{name:'TestResultsAreHidden test', successful:true, message:nil, exception:nil, detailed_message: nil} ],
-              points: [],
-              validations: nil,
-              valgrind: nil
-            }
-            when :error then {
-              error: @submission.pretest_error
-            }
+          when :processing then {
+            submissions_before_this: @submission.unprocessed_submissions_before_this,
+            total_unprocessed: Submission.unprocessed_count
+          }
+          when :ok then {
+            test_cases: @submission.test_case_records,
+            feedback_questions: @course.feedback_questions.order(:position).map(&:record_for_api),
+            feedback_answer_url: submission_feedback_answers_url(@submission, format: :json)
+          }
+          when :fail then {
+            test_cases: @submission.test_case_records
+          }
+          when :hidden then {
+            all_tests_passed:  nil,
+            test_cases: [{ name: 'TestResultsAreHidden test', successful: true, message: nil, exception: nil, detailed_message: nil }],
+            points: [],
+            validations: nil,
+            valgrind: nil
+          }
+          when :error then {
+            error: @submission.pretest_error
+          }
           end
         )
         output[:status] = :ok if output[:status] == :hidden
         if !!params[:include_files]
-          output[:files] = SourceFileList.for_submission(@submission).map{ |f| {path: f.path ,contents: f.contents} }
+          output[:files] = SourceFileList.for_submission(@submission).map { |f| { path: f.path, contents: f.contents } }
         end
 
         render json: output
@@ -133,18 +135,16 @@ class SubmissionsController < ApplicationController
         params_json: submission_params.to_json,
         requests_review: !!params[:request_review],
         paste_available: !!params[:paste],
-        message_for_paste: if params[:paste] then params[:message_for_paste] || '' else '' end,
-        message_for_reviewer: if params[:request_review] then params[:message_for_reviewer] || '' else '' end,
-        client_time: if params[:client_time] then Time.at(params[:client_time].to_i) else nil end,
+        message_for_paste: params[:paste] ? (params[:message_for_paste] || '') : '',
+        message_for_reviewer: params[:request_review] ? (params[:message_for_reviewer] || '') : '',
+        client_time: params[:client_time] ? Time.at(params[:client_time].to_i) : nil,
         client_nanotime: params[:client_nanotime],
         client_ip: request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip
       )
 
       authorize! :create, @submission
 
-      unless @submission.save
-        errormsg = 'Failed to save submission.'
-      end
+      errormsg = 'Failed to save submission.' unless @submission.save
     end
 
     unless errormsg
@@ -164,7 +164,7 @@ class SubmissionsController < ApplicationController
       format.json do
         if !errormsg
           render json: { submission_url: submission_url(@submission, format: 'json', api_version: ApiVersion::API_VERSION),
-                         paste_url: if @submission.paste_key then paste_url(@submission.paste_key) else '' end }
+                         paste_url: @submission.paste_key ? paste_url(@submission.paste_key) : '' }
         else
           render json: { error: errormsg }
         end
@@ -212,7 +212,7 @@ class SubmissionsController < ApplicationController
     submission_files.each do |file|
       # TODO: In some exercises files may be named differently. Some kind of
       # similarity metric would be nice here
-      model = solution_files.find { |solution_file| file.path == solution_file.path}
+      model = solution_files.find { |solution_file| file.path == solution_file.path }
       @files << {
         path: file.path,
         submission_contents: file.contents,
@@ -252,7 +252,7 @@ class SubmissionsController < ApplicationController
       authorize! :read, @course
       authorize! :read, @exercise
     elsif params[:paste_key]
-      @submission = Submission.find_by_paste_key!(params[:paste_key])
+      @submission = Submission.find_by!(paste_key: params[:paste_key])
       @exercise = @submission.exercise
       @course = @exercise.course
       @is_paste = true
@@ -304,7 +304,7 @@ class SubmissionsController < ApplicationController
     render json: {
       remaining: remaining,
       max_id: params[:max_id].to_i,
-      last_id: if submissions_limited.empty? then nil else submissions_limited.last.id.to_i end,
+      last_id: submissions_limited.empty? ? nil : submissions_limited.last.id.to_i,
       rows: view_context.submissions_for_datatables(submissions_limited)
     }
   end
@@ -315,7 +315,7 @@ class SubmissionsController < ApplicationController
     when 'protected'
       respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
     when 'no-tests-public'
-      respond_access_denied unless can?(:teach, @course) ||  @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
+      respond_access_denied unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
     else
       respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
     end

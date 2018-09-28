@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_run_grader'
 require 'sandbox_results_saver'
 

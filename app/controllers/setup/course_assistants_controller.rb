@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Setup::CourseAssistantsController < Setup::SetupController
   before_action :set_course
 
@@ -13,7 +15,6 @@ class Setup::CourseAssistantsController < Setup::SetupController
     else
       add_breadcrumb("Assistants for course #{@course.title}")
     end
-
   end
 
   def create

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FeedbackAnswersController < ApplicationController
   def index
     if params[:course_id]
@@ -35,12 +37,12 @@ class FeedbackAnswersController < ApplicationController
         authorize! :read_feedback_answers, @parent
 
         @text_answers = @parent.feedback_answers
-          .joins(:feedback_question)
-          .joins(:submission)
-          .joins(submission: :user) #.joins(:exercise) # fails due to :conditions of belongs_to receiving incorrect self :(
-          .where(feedback_questions: { kind: 'text' })
-          .order('created_at DESC')
-          .all
+                               .joins(:feedback_question)
+                               .joins(:submission)
+                               .joins(submission: :user) # .joins(:exercise) # fails due to :conditions of belongs_to receiving incorrect self :(
+                               .where(feedback_questions: { kind: 'text' })
+                               .order('created_at DESC')
+                               .all
       end
       format.json do
         authorize! :read, @parent
@@ -59,7 +61,7 @@ class FeedbackAnswersController < ApplicationController
             {
               exercise: {
                 id: ex.id,
-                name: ex.name,
+                name: ex.name
               },
               averages: averages,
               answer_count: answer_count,
@@ -93,13 +95,13 @@ class FeedbackAnswersController < ApplicationController
                          feedback_question_id: answer_hash[:question_id],
                          answer: answer_hash[:answer])
     end
-    answer_records.each {|record| authorize! :create, record }
+    answer_records.each { |record| authorize! :create, record }
 
     begin
       ActiveRecord::Base.connection.transaction(requires_new: true) do
         answer_records.each(&:save!)
       end
-    rescue
+    rescue StandardError
       ::Rails.logger.warn "Failed to save feedback answer: #{$!}\n#{$!.backtrace.join("\n  ")}"
       return respond_with_error("Failed to save feedback answer: #{$!}")
     end
@@ -110,7 +112,7 @@ class FeedbackAnswersController < ApplicationController
         redirect_to submission_path(submission)
       end
       format.json do
-        render json: {api_version: ApiVersion::API_VERSION, status: 'ok'}
+        render json: { api_version: ApiVersion::API_VERSION, status: 'ok' }
       end
     end
   end

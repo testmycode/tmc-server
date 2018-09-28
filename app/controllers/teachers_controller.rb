@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeachersController < ApplicationController
   before_action :set_organization
 
@@ -29,7 +31,7 @@ class TeachersController < ApplicationController
     @teachership = Teachership.find(params[:id])
     destroyed_username = @teachership.user.login
     @teachership.destroy!
-    redirect_to organization_teachers_path ,notice: "Teacher #{destroyed_username} removed from organization"
+    redirect_to organization_teachers_path, notice: "Teacher #{destroyed_username} removed from organization"
   end
 
   private

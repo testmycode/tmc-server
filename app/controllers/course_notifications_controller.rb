@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Handles emailing notification to every participant
 class CourseNotificationsController < ApplicationController
   before_action :set_organization
@@ -27,18 +29,16 @@ class CourseNotificationsController < ApplicationController
 
     failed_emails = []
     emails.each do |email|
-      begin
-        fail 'Invalid e-mail' unless email =~ /\S+@\S+/
-        CourseNotificationMailer.notification_email(
-          reply_to: current_user.email,
-          to: email,
-          topic: notifier.topic,
-          message: notifier.message
-        ).deliver_now
-      rescue
-        logger.info "Error sending course notification to email #{email}: #{$!}"
-        failed_emails << email
-      end
+      raise 'Invalid e-mail' unless email =~ /\S+@\S+/
+      CourseNotificationMailer.notification_email(
+        reply_to: current_user.email,
+        to: email,
+        topic: notifier.topic,
+        message: notifier.message
+      ).deliver_now
+    rescue StandardError
+      logger.info "Error sending course notification to email #{email}: #{$!}"
+      failed_emails << email
     end
     msg = 'Mail has been set succesfully'
     msg << " except for the following addresses: #{failed_emails.join(', ')}" unless failed_emails.empty?
@@ -48,7 +48,7 @@ class CourseNotificationsController < ApplicationController
   private
 
   def course_notification_params
-    params.permit(:commit, :course_id, course_notification: [:topic, :message])
+    params.permit(:commit, :course_id, course_notification: %i[topic message])
   end
 
   def set_organization

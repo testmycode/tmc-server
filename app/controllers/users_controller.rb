@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'spyware_client'
 
 # Presents the "register user" and "edit profile" views.
 class UsersController < ApplicationController
   skip_authorization_check
 
-  after_action :remove_x_frame_options_header_when_bare_layout, only: [:new, :create, :show]
+  after_action :remove_x_frame_options_header_when_bare_layout, only: %i[new create show]
 
   def index
     respond_access_denied unless current_user.administrator?
@@ -43,7 +45,7 @@ class UsersController < ApplicationController
         redirect_to root_path
       end
     else
-      render action: :new, status: 403
+      render action: :new, status: :forbidden
     end
   end
 
@@ -66,20 +68,19 @@ class UsersController < ApplicationController
 
     begin
       log_user_field_changes(user_field_changes)
-    rescue
-
+    rescue StandardError
     end
 
     if @user.errors.empty? && @user.save
-      if password_changed
-        flash[:notice] = 'Changes saved and password changed'
-      else
-        flash[:notice] = 'Changes saved'
-      end
+      flash[:notice] = if password_changed
+                         'Changes saved and password changed'
+                       else
+                         'Changes saved'
+                       end
       redirect_to user_path
     else
       flash.now[:error] = 'Failed to save profile'
-      render action: :show, status: 403
+      render action: :show, status: :forbidden
     end
   end
 
@@ -106,14 +107,14 @@ class UsersController < ApplicationController
 
   def destroy_user
     im_sure = params[:im_sure]
-    if im_sure != "1"
-      redirect_to verify_destroying_user_url, notice: "Please check the checkbox after you have read the instructions."
+    if im_sure != '1'
+      redirect_to verify_destroying_user_url, notice: 'Please check the checkbox after you have read the instructions.'
       return
     end
     user = authenticate_current_user_destroy
     user_authentication = User.authenticate(user.login, params[:user][:password])
     if user_authentication.nil?
-      redirect_to verify_destroying_user_url, { alert: "The password was incorrect." }
+      redirect_to verify_destroying_user_url, alert: 'The password was incorrect.'
       return
     end
     token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
@@ -123,7 +124,7 @@ class UsersController < ApplicationController
     username = user.login
     user.destroy
     RecentlyChangedUserDetail.deleted.create!(old_value: false, new_value: true, email: email, username: username)
-    redirect_to root_url, notice: "Your account has been permanently destroyed."
+    redirect_to root_url, notice: 'Your account has been permanently destroyed.'
   end
 
   def send_destroy_email
@@ -166,7 +167,7 @@ class UsersController < ApplicationController
   end
 
   def maybe_update_password(user, user_params)
-    if !user_params[:old_password].blank? || !user_params[:password].blank?
+    if user_params[:old_password].present? || user_params[:password].present?
       if !user.has_password?(user_params[:old_password])
         user.errors.add(:old_password, 'incorrect')
       elsif user_params[:password] != user_params[:password_repeat]
@@ -203,11 +204,9 @@ class UsersController < ApplicationController
         happenedAt: (Time.now.to_f * 1000).to_i
       }
       Thread.new do
-        begin
-          SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
-        rescue
-          logger.warn('Failed to send user field changes to spyware: ' + $!.message + "\n " + $!.backtrace.join("\n "))
-        end
+        SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
+      rescue StandardError
+        logger.warn('Failed to send user field changes to spyware: ' + $!.message + "\n " + $!.backtrace.join("\n "))
       end
     end
   end

@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class Setup::OrganizationsController < Setup::SetupController
-  skip_authorization_check only: [:index, :new]
+  skip_authorization_check only: %i[index new]
 
   def index
     redirect_to setup_start_index_path
   end
 
   def new
-    return respond_access_denied('Please log in first to create new organization') if !can? :request, :organization
+    return respond_access_denied('Please log in first to create new organization') unless can? :request, :organization
     add_breadcrumb 'Create new organization'
     @organization = Organization.new
   end
@@ -15,7 +17,7 @@ class Setup::OrganizationsController < Setup::SetupController
     authorize! :request, :organization
     @organization = Organization.init(organization_params, current_user)
 
-    if !@organization.errors.any?
+    if @organization.errors.none?
       redirect_to organization_path(@organization), notice: 'Organization was successfully created.'
       # TODO: Background task
       NewOrganizationRequestMailer.request_email(@organization).deliver_now

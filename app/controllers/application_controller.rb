@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'version'
 require 'twitter-bootstrap-breadcrumbs'
 
@@ -71,10 +73,10 @@ class ApplicationController < ActionController::Base
         return respond_with_error("Please update the TMC client. API version #{ApiVersion::API_VERSION} required but got #{params[:api_version]}", 404, nil, obsolete_client: true)
       end
 
-      unless params[:client].blank? # Client and client version checks are optional
+      if params[:client].present? # Client and client version checks are optional
         begin
           check_client_version(params[:client], params[:client_version])
-        rescue
+        rescue StandardError
           return respond_with_error($!.message, 404, nil, obsolete_client: true)
         end
       end
@@ -84,17 +86,17 @@ class ApplicationController < ActionController::Base
   def check_client_version(client_name, client_version)
     begin
       client_version = Version.new(client_version) unless client_version.nil?
-    rescue
-      fail "Invalid version string: #{client_version}"
+    rescue StandardError
+      raise "Invalid version string: #{client_version}"
     end
 
     valid_clients = SiteSetting.value('valid_clients')
     if valid_clients.is_a?(Enumerable)
       vc = valid_clients.find { |c| c['name'] == client_name }
-      fail 'Invalid TMC client.' if vc.nil?
+      raise 'Invalid TMC client.' if vc.nil?
 
-      if !client_version.nil? && !vc['min_version'].blank?
-        fail 'Please update the TMC client.' if client_version < Version.new(vc['min_version'])
+      if !client_version.nil? && vc['min_version'].present?
+        raise 'Please update the TMC client.' if client_version < Version.new(vc['min_version'])
       else
         return # without version check
       end
@@ -119,7 +121,7 @@ class ApplicationController < ActionController::Base
   end
 
   def unauthorized!(message = nil)
-    raise CanCan::AccessDenied.new(message)
+    raise CanCan::AccessDenied, message
   end
 
   def unauthorize_guest!(message = 'Authentication required')
@@ -140,10 +142,12 @@ class ApplicationController < ActionController::Base
 
   def respond_with_error(msg, code = 500, exception = nil, extra_json_keys = {})
     respond_to do |format|
-      format.html { render 'shared/respond_with_error',
-                           locals: { message: ERB::Util.html_escape(msg), exception: exception },
-                           layout: true,
-                           status: code }
+      format.html do
+        render 'shared/respond_with_error',
+               locals: { message: ERB::Util.html_escape(msg), exception: exception },
+               layout: true,
+               status: code
+      end
       format.json do
         if code == 401
           # To support older TmcNetBeans versions using faulty http basic auth
@@ -151,7 +155,7 @@ class ApplicationController < ActionController::Base
             response.headers['WWW-Authenticate'] = "Basic realm=\"#{msg}\""
             render json: { error: msg }.merge(extra_json_keys), status: code
           else
-            render json: { error: msg }.merge(extra_json_keys), status: 403
+            render json: { error: msg }.merge(extra_json_keys), status: :forbidden
           end
         else
           render json: { error: msg }.merge(extra_json_keys), status: code
@@ -167,8 +171,8 @@ class ApplicationController < ActionController::Base
     return true if params[:client].blank?
     client = params[:client]
     client_version = begin
-      Version.new(params['client_version']) unless params['client_version'].blank?
-    rescue
+      Version.new(params['client_version']) if params['client_version'].present?
+    rescue StandardError
     end
     !(client == 'netbeans_plugin' && client_version < Version.new('0.8.0'))
   end
@@ -189,7 +193,7 @@ class ApplicationController < ActionController::Base
     permitted = permitted.map { |f| prefix + f } unless permitted == :all
 
     result = Hash[params.select do |k, v|
-      k.start_with?(prefix) && !v.blank? && (permitted == :all || permitted.include?(k))
+      k.start_with?(prefix) && v.present? && (permitted == :all || permitted.include?(k))
     end]
     if options[:remove_prefix]
       result = Hash[result.map { |k, v| [k.sub(/^#{prefix}/, ''), v] }]
@@ -207,7 +211,7 @@ class ApplicationController < ActionController::Base
     headers['Cache-Control'] = 'no-cache, must-revalidate, post-check=0, pre-check=0'
     headers['Expires'] = 'Thu, 01 Dec 1994 16:00:00 GMT'
 
-    if request.env['HTTP_USER_AGENT'] =~ /msie/i
+    if /msie/i.match?(request.env['HTTP_USER_AGENT'])
       headers['Pragma'] = 'public'
       headers['Content-type'] = 'text/plain'
     else

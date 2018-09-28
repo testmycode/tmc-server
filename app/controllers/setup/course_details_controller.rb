@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Setup::CourseDetailsController < Setup::SetupController
-  before_action :set_course, except: [:new, :create]
+  before_action :set_course, except: %i[new create]
 
   def new
     authorize! :teach, @organization
@@ -79,11 +81,10 @@ class Setup::CourseDetailsController < Setup::SetupController
 
   def refresh_course(course, options = {})
     # TODO: Could include course ID
-    begin
-      session[:refresh_report] = course.refresh(options)
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
-    end
+
+    session[:refresh_report] = course.refresh(options)
+  rescue CourseRefresher::Failure => e
+    session[:refresh_report] = e.report
   end
 
   def course_params_for_create_from_template

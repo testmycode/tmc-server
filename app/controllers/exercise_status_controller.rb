@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExerciseStatusController < ApplicationController
   skip_authorization_check
 
@@ -16,13 +18,13 @@ class ExerciseStatusController < ApplicationController
     results = {}
     course.exercises.each do |ex|
       ex.set_submissions_by(user, user_subs[ex.name]) # used by completed_by? and attempted_by?
-      if ex.completed_by?(user)
-        results[ex.name] = 'completed'
-      elsif ex.attempted_by?(user)
-        results[ex.name] = 'attempted'
-      else
-        results[ex.name] = 'not_attempted'
-      end
+      results[ex.name] = if ex.completed_by?(user)
+                           'completed'
+                         elsif ex.attempted_by?(user)
+                           'attempted'
+                         else
+                           'not_attempted'
+                         end
     end
 
     respond_to do |format|
