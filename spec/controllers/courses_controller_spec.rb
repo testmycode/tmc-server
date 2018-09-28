@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe CoursesController, type: :controller do
@@ -43,7 +45,7 @@ describe CoursesController, type: :controller do
 
         result = get_index_json
 
-        expect(result['courses'].map { |c| c['name'] }).to eq(%w(Course1 Course2 Course3))
+        expect(result['courses'].map { |c| c['name'] }).to eq(%w[Course1 Course2 Course3])
       end
     end
   end
@@ -275,8 +277,8 @@ describe CoursesController, type: :controller do
            organization_id: @organization.slug,
            id: @course.id,
            empty_group: {
-               soft: { static: '1.1.2000', unlock: '' },
-               hard: { static: '', unlock: 'unlock + 2 weeks' }
+             soft: { static: '1.1.2000', unlock: '' },
+             hard: { static: '', unlock: 'unlock + 2 weeks' }
            }
 
       @course.exercise_group_by_name('').exercises(false).each do |e|
@@ -298,14 +300,14 @@ describe CoursesController, type: :controller do
            organization_id: @organization.slug,
            id: @course.id,
            group: {
-               group1: {
-                   soft: { static: '1.1.2000', unlock: 'unlock + 7 days' },
-                   hard: { static: '', unlock: 'unlock + 2 months' }
-               },
-               group2: {
-                   soft: { static: '2.2.2000', unlock: '' },
-                   hard: { static: '3.3.2000', unlock: '' }
-               }
+             group1: {
+               soft: { static: '1.1.2000', unlock: 'unlock + 7 days' },
+               hard: { static: '', unlock: 'unlock + 2 months' }
+             },
+             group2: {
+               soft: { static: '2.2.2000', unlock: '' },
+               hard: { static: '3.3.2000', unlock: '' }
+             }
            }
 
       @course.exercise_group_by_name('group1').exercises(false).each do |e|
@@ -392,7 +394,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e3')
 
         post :save_unlocks, organization_id: @organization.slug, id: @course.id,
-             empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' }
+                            empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           spec = e.unlock_spec_obj.raw_spec

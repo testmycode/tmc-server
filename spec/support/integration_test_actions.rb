@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require File.expand_path(File.join(File.dirname(__FILE__), 'git_test_actions.rb'))
 
@@ -20,7 +22,7 @@ module IntegrationTestActions
 
   def create_new_course(options = {})
     visit "/org/#{options[:organization_slug]}/courses"
-    #save_and_open_page
+    # save_and_open_page
     click_link 'Create New Course'
     click_link 'Create New Custom Course'
     fill_in 'course_name', with: options[:name]
@@ -81,22 +83,20 @@ module IntegrationTestActions
   end
 
   # :deprecated:
-  def wait_for_with_timeout(expected, timeout, &block)
-    wait_until(timeout: timeout) {
-      block.call == expected
-    }
+  def wait_for_with_timeout(expected, timeout)
+    wait_until(timeout: timeout) do
+      yield == expected
+    end
   end
 
-  def wait_until(options = {}, &block)
+  def wait_until(options = {})
     options = {
       timeout: 15,
       sleep_time: 0.1
     }.merge(options)
     start_time = Time.now
-    until block.call
-      if Time.now - start_time > options[:timeout]
-        fail 'timeout'
-      end
+    until yield
+      raise 'timeout' if Time.now - start_time > options[:timeout]
       sleep options[:sleep_time]
     end
   end
@@ -128,7 +128,7 @@ module IntegrationTestActions
       path
     ]
 
-    # todo: put these in the background and ensure they finish before in an after :suite block
+    # TODO: put these in the background and ensure they finish before in an after :suite block
     system!(cmd)
     system!(cmd2)
   end

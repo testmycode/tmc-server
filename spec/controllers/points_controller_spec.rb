@@ -1,4 +1,6 @@
-# encoding: UTF-8
+
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe PointsController, type: :controller do
@@ -43,7 +45,7 @@ describe PointsController, type: :controller do
     describe 'when user has participated in a course' do
       it 'should show a page' do
         get :show, organization_id: @organization.slug,
-            course_id: @course.id, id: @sheetname
+                   course_id: @course.id, id: @sheetname
         expect(response).to be_success
       end
 

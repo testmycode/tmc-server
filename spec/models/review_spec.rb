@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Review, type: :model do
@@ -32,12 +34,12 @@ describe Review, type: :model do
   it 'is not deleted when the reviewing user is destroyed' do
     review = mk_review
     @admin.destroy
-    expect(Review.find_by_id(review.id)).not_to be_nil
+    expect(Review.find_by(id: review.id)).not_to be_nil
   end
 
   it 'is deleted when the submission is destroyed' do
     review = mk_review
     @sub.destroy
-    expect(Review.find_by_id(review.id)).to be_nil
+    expect(Review.find_by(id: review.id)).to be_nil
   end
 end

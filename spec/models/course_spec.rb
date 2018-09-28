@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Course, type: :model do
@@ -37,11 +39,11 @@ describe Course, type: :model do
         expect(Course.send(path)).to match(/^\//)
       end
 
-      object_paths = [
-        :cache_path,
-        :stub_zip_path,
-        :solution_zip_path,
-        :clone_path
+      object_paths = %i[
+        cache_path
+        stub_zip_path
+        solution_zip_path
+        clone_path
       ]
 
       course = FactoryGirl.create :course
@@ -185,7 +187,7 @@ describe Course, type: :model do
 
     it 'forbids custom course\'s name to be same as some template\'s name' do
       template = FactoryGirl.create :course_template, name: 'someName'
-      expect{ Course.create!(valid_params.merge(name: 'someName')) }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { Course.create!(valid_params.merge(name: 'someName')) }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'forbids spaces in the name' do # this could eventually be lifted as long as everything else is made to tolerate spaces
@@ -208,7 +210,7 @@ describe Course, type: :model do
 
     it 'if course created from template, repo url can\'t be different from template\'s repo url' do
       template = FactoryGirl.create :course_template
-      expect{ Course.create!(valid_params.merge(course_template: template, source_url: template.source_url)) }.not_to raise_error
+      expect { Course.create!(valid_params.merge(course_template: template, source_url: template.source_url)) }.not_to raise_error
       should_be_invalid_params(valid_params.merge(course_template: template, source_url: "#{template.source_url}~"))
     end
 
@@ -299,7 +301,7 @@ describe Course, type: :model do
     end
 
     def assert_destroyed(obj)
-      expect(obj.class.find_by_id(obj.id)).to be_nil
+      expect(obj.class.find_by(id: obj.id)).to be_nil
     end
   end
 
@@ -317,7 +319,7 @@ describe Course, type: :model do
       @ex1.soft_deadline_spec = ['1.2.2000'].to_json
       @ex3.soft_deadline_spec = ['1.1.2000'].to_json
 
-      [@ex1, @ex2, @ex3].each { |e| e.save! }
+      [@ex1, @ex2, @ex3].each(&:save!)
 
       expect(@course.contains_unlock_deadlines?).to eq(false)
     end
@@ -328,7 +330,7 @@ describe Course, type: :model do
       @ex1.soft_deadline_spec = ['1.2.2000', 'unlock + 5 days'].to_json
       @ex3.soft_deadline_spec = ['1.1.2000'].to_json
 
-      [@ex1, @ex2, @ex3].each { |e| e.save! }
+      [@ex1, @ex2, @ex3].each(&:save!)
 
       expect(@course.contains_unlock_deadlines?).to eq(true)
     end
@@ -350,13 +352,13 @@ describe Course, type: :model do
     expect do
       course.increment_cache_version
       course.save!
-    end.to change{course.cache_version}.by(1)
+    end.to change { course.cache_version }.by(1)
   end
 
   it 'increments template\'s cache_version if templated' do
     template = FactoryGirl.create :course_template
     course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
-    expect{course.increment_cache_version}.to change{template.cache_version}.by(1)
+    expect { course.increment_cache_version }.to change { template.cache_version }.by(1)
   end
 
   it 'templated course\'s cache path is template\'s cache path, regardless of names' do

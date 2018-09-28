@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe UncomputedUnlock, type: :model do
@@ -17,15 +19,15 @@ describe UncomputedUnlock, type: :model do
 
     it 'creates entries for all students of a course' do
       UncomputedUnlock.create_all_for_course(@course)
-      expect(UncomputedUnlock.count).to be (1)
-      expect(UncomputedUnlock.first.course_id).to be (@course.id)
-      expect(UncomputedUnlock.first.user_id).to be (@user.id)
+      expect(UncomputedUnlock.count).to be 1
+      expect(UncomputedUnlock.first.course_id).to be @course.id
+      expect(UncomputedUnlock.first.user_id).to be @user.id
     end
 
     it 'tries to not create duplicate entries' do
       UncomputedUnlock.create_all_for_course(@course)
       UncomputedUnlock.create_all_for_course(@course)
-      expect(UncomputedUnlock.count).to be (1)
+      expect(UncomputedUnlock.count).to be 1
     end
   end
 end

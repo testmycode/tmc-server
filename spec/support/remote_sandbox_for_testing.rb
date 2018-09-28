@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'system_commands'
 
@@ -30,8 +32,8 @@ class RemoteSandboxForTesting
   end
 
   def self.init_servers_as_root!(actual_user, actual_group)
-    fail 'Root helper already started' if @root_helper
-    fail 'init_servers_as_root! should be called as root' if Process::Sys.geteuid != 0
+    raise 'Root helper already started' if @root_helper
+    raise 'init_servers_as_root! should be called as root' if Process::Sys.geteuid != 0
 
     server_ports.each do |port|
       copy_server_instance(port, actual_user, actual_group)
@@ -48,7 +50,7 @@ class RemoteSandboxForTesting
   end
 
   def self.cleanup_after_all_tests!
-    @root_helper.stop if @root_helper
+    @root_helper&.stop
     @root_helper = nil
 
     result_queue.cleanup!

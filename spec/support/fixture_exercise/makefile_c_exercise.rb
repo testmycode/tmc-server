@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise')
 
@@ -38,7 +40,7 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
 
   private
 
-  alias_method :old_copy_from_fixture, :copy_from_fixture
+  alias old_copy_from_fixture copy_from_fixture
 
   def copy_from_fixture
     old_copy_from_fixture

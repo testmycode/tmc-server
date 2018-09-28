@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe User, type: :model do
@@ -141,7 +143,7 @@ describe User, type: :model do
 
     it "should be valid after it's reloaded" do
       User.create!(@params)
-      user = User.find_by_login!(@params[:login])
+      user = User.find_by!(login: @params[:login])
       expect(user.password).to be_nil
       expect(user).to be_valid
       user.save!
@@ -152,27 +154,27 @@ describe User, type: :model do
     it 'should destroy its submissions' do
       sub = FactoryGirl.create(:submission)
       sub.user.destroy
-      expect(Submission.find_by_id(sub.id)).to be_nil
+      expect(Submission.find_by(id: sub.id)).to be_nil
     end
 
     it 'should destory its points' do
       point = FactoryGirl.create(:awarded_point)
       point.user.destroy
-      expect(AwardedPoint.find_by_id(point.id)).to be_nil
+      expect(AwardedPoint.find_by(id: point.id)).to be_nil
     end
 
     it 'should destroy any password reset key it has' do
       user = FactoryGirl.create(:user)
       key = ActionToken.create!(user: user, action: :reset_password)
       user.destroy
-      expect(ActionToken.find_by_id(key.id)).to be_nil
+      expect(ActionToken.find_by(id: key.id)).to be_nil
     end
 
     it 'should destroy any user field values' do
       user = FactoryGirl.create(:user)
       value = UserFieldValue.create!(field_name: 'foo', user: user, value: '')
       user.destroy
-      expect(UserFieldValue.find_by_id(value.id)).to be_nil
+      expect(UserFieldValue.find_by(id: value.id)).to be_nil
     end
   end
 
@@ -201,7 +203,7 @@ describe User, type: :model do
 
   it 'should hash the password on create' do
     User.create!(login: 'instructor', password: 'ilikecookies', email: 'instructor@example.com')
-    user = User.find_by_login!('instructor')
+    user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
     expect(user.password_hash).not_to be_nil
     expect(user).to have_password('ilikecookies')
@@ -211,11 +213,11 @@ describe User, type: :model do
   it 'should hash the password on update' do
     User.create!(login: 'instructor', password: 'ihatecookies', email: 'instructor@example.com')
 
-    user = User.find_by_login!('instructor')
+    user = User.find_by!(login: 'instructor')
     user.password = 'ilikecookies'
     user.save!
 
-    user = User.find_by_login!('instructor')
+    user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
     expect(user.password_hash).not_to be_nil
     expect(user).to have_password('ilikecookies')
@@ -227,7 +229,7 @@ describe User, type: :model do
     user.login = 'funny_person'
     user.save!
 
-    user = User.find_by_login!('funny_person')
+    user = User.find_by!(login: 'funny_person')
     expect(user).to have_password('ihatecookies')
   end
 

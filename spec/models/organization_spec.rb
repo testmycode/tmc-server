@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Organization, type: :model do
@@ -64,7 +66,7 @@ describe Organization, type: :model do
     it 'grants the requesting user teachership to the organization' do
       @user = FactoryGirl.create(:user)
       @org = Organization.init(valid_params, @user)
-      expect(@org.teachers.include? @user)
+      expect(@org.teachers.include?(@user))
     end
   end
 end

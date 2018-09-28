@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'The system (used by an instructor for administration)', type: :request, integration: true do
@@ -22,7 +24,7 @@ describe 'The system (used by an instructor for administration)', type: :request
 
   it "should show all exercises pushed to the course's git repo" do
     create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path, organization_slug: @organization.slug)
-    course = Course.find_by_name!("#{@organization.slug}-mycourse")
+    course = Course.find_by!(name: "#{@organization.slug}-mycourse")
 
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)

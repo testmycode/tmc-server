@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'system_commands'
 require File.expand_path 'spec/support/git_test_actions'
@@ -13,7 +15,6 @@ def make_repo_for_course_template
 end
 
 FactoryGirl.define do
-
   factory :course_template do
     sequence(:name) { |n| "template#{n}" }
     sequence(:title) { |n| "template title#{n}" }
@@ -40,7 +41,7 @@ FactoryGirl.define do
 
   factory :course, class: Course do
     sequence(:name) { |n| "course#{n}" }
-    sequence(:title) { |n| "Course #{n}"}
+    sequence(:title) { |n| "Course #{n}" }
     source_url { make_repo_for_course_template }
     source_backend 'git'
     git_branch 'master'
@@ -74,19 +75,17 @@ FactoryGirl.define do
   factory :submission_data do
     submission
     return_file do |n|
-      begin
-        base_name = "fake_submission#{n}"
-        zip_name = "#{base_name}.zip"
-        FileUtils.mkdir_p "#{base_name}/src"
-        File.open("#{base_name}/src/Foo.java", 'wb') do |f|
-          f.write('public class Foo { public static void main(String[] args) {} }')
-        end
-        SystemCommands.sh!(['zip', '-q', '-r', zip_name, base_name])
-        File.read(zip_name)
-      ensure
-        FileUtils.rm_rf base_name
-        FileUtils.rm_rf zip_name
+      base_name = "fake_submission#{n}"
+      zip_name = "#{base_name}.zip"
+      FileUtils.mkdir_p "#{base_name}/src"
+      File.open("#{base_name}/src/Foo.java", 'wb') do |f|
+        f.write('public class Foo { public static void main(String[] args) {} }')
       end
+      SystemCommands.sh!(['zip', '-q', '-r', zip_name, base_name])
+      File.read(zip_name)
+    ensure
+      FileUtils.rm_rf base_name
+      FileUtils.rm_rf zip_name
     end
   end
 
@@ -135,7 +134,7 @@ FactoryGirl.define do
     exercise
     event_type 'test_event'
     sequence(:data) { |n| "testdata#{n}" }
-    happened_at { || Time.now }
+    happened_at { Time.now }
     after_build { |ev| ev.exercise.course = ev.course }
   end
 

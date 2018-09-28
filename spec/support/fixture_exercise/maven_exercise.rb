@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise')
 require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise', 'simple_exercise')

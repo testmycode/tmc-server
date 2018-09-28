@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher disables exercises', feature: true do
@@ -53,7 +55,7 @@ feature 'Teacher disables exercises', feature: true do
     click_button 'Update exercises'
 
     [@ex1, @ex2, @ex3, @ex4].each do |ex|
-      expect(page).to have_content("#{ex.name}")
+      expect(page).to have_content(ex.name.to_s)
       expect(page).to_not have_content("#{ex.name} (disabled)")
     end
   end
@@ -78,10 +80,10 @@ feature 'Teacher disables exercises', feature: true do
     log_in_as(@user.login, @user.password)
     visit_course @course
 
-    expect(page).to have_content("#{@ex1.name}")
-    expect(page).to have_content("#{@ex2.name}")
-    expect(page).to_not have_content("#{@ex3.name}")
-    expect(page).to_not have_content("#{@ex4.name}")
+    expect(page).to have_content(@ex1.name.to_s)
+    expect(page).to have_content(@ex2.name.to_s)
+    expect(page).to_not have_content(@ex3.name.to_s)
+    expect(page).to_not have_content(@ex4.name.to_s)
   end
 
   scenario 'Student cannot access disabled exercise page' do

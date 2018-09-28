@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 require 'rspec/rails'
 require 'database_cleaner'
 require 'etc'
@@ -26,7 +28,7 @@ Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app, timeout: 60)
 end
 
- Capybara.default_driver = :poltergeist
+Capybara.default_driver = :poltergeist
 
 Capybara.server_port = FreePorts.take_next
 Capybara.default_max_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
@@ -43,29 +45,29 @@ end
 if ENV['M3_HOME'].blank?
   maven_home = get_m3_home
   warn "$M3_HOME is not set, trying with #{maven_home} - however, maven tests might be failing"
-  ENV['M3_HOME']= maven_home
+  ENV['M3_HOME'] = maven_home
 end
 
-def without_db_notices(&block)
+def without_db_notices
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
-  block.call
+  yield
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'notice'")
 end
 
 def host_ip
   @addr ||= ENV['HOST'] ||= if ENV['CI']
-              `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
-            else
-              '127.0.0.1'
+                              `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
+                            else
+                              '127.0.0.1'
             end
 end
 
 # This makes it visible to others
-if ENV['MULTI_HOST_SETUP']
-  Capybara.server_host = '0.0.0.0'
-else
-  Capybara.server_host = host_ip
-end
+Capybara.server_host = if ENV['MULTI_HOST_SETUP']
+                         '0.0.0.0'
+                       else
+                         host_ip
+                       end
 
 RSpec.configure do |config|
   config.mock_with :rspec

@@ -1,6 +1,4 @@
-# encoding: utf-8
-
-# -*- coding: UTF-8 -*-
+# frozen_string_literal: true
 
 require 'spec_helper'
 
@@ -57,28 +55,28 @@ describe Submission, type: :model do
     submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo2()', successful: true)
     submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo()', message: 'you fail', successful: false, detailed_message: 'trace')
     expect(submission.test_case_records).to eq([
-      {
-        name: 'Moo moo()',
-        successful: false,
-        message: 'you fail',
-        exception: { 'a' => 'b' },
-        detailed_message: nil
-      },
-      {
-        name: 'Moo moo2()',
-        successful: true,
-        message: nil,
-        exception: nil,
-        detailed_message: nil
-      },
-      {
-        name: 'Moo moo()',
-        successful: false,
-        message: 'you fail',
-        exception: nil,
-        detailed_message: 'trace'
-      }
-    ])
+                                                 {
+                                                   name: 'Moo moo()',
+                                                   successful: false,
+                                                   message: 'you fail',
+                                                   exception: { 'a' => 'b' },
+                                                   detailed_message: nil
+                                                 },
+                                                 {
+                                                   name: 'Moo moo2()',
+                                                   successful: true,
+                                                   message: nil,
+                                                   exception: nil,
+                                                   detailed_message: nil
+                                                 },
+                                                 {
+                                                   name: 'Moo moo()',
+                                                   successful: false,
+                                                   message: 'you fail',
+                                                   exception: nil,
+                                                   detailed_message: 'trace'
+                                                 }
+                                               ])
   end
 
   it 'can tell how many unprocessed submissions are in queue before itself' do
@@ -154,6 +152,6 @@ describe Submission, type: :model do
 
     id = s.id
     s.destroy
-    expect(SubmissionData.find_by_submission_id(id)).to be_nil
+    expect(SubmissionData.find_by(submission_id: id)).to be_nil
   end
 end

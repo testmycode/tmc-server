@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'tmpdir'
 require 'shellwords'
@@ -179,7 +181,7 @@ describe SubmissionPackager::JavaMaven do
 
   describe 'tmc-run script added to the archive' do
     it 'should run mvn tmc:test' do
-      pending "TMC-langs migration will make this irrelevant"
+      pending 'TMC-langs migration will make this irrelevant'
       @exercise_project.solve_all
       @exercise_project.make_zip(src_only: false)
 
@@ -191,7 +193,7 @@ describe SubmissionPackager::JavaMaven do
 
           begin
             sh! ['env', "JAVA_RAM_KB=#{64 * 1024}", './tmc-run']
-          rescue
+          rescue StandardError
             if File.exist?('test_output.txt')
               raise($!.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
             else
@@ -208,7 +210,7 @@ describe SubmissionPackager::JavaMaven do
     end
 
     it 'should report compilation errors in test_output.txt with exit code 101' do
-      pending "TMC-langs migration will make this irrelevant"
+      pending 'TMC-langs migration will make this irrelevant'
       @exercise_project.introduce_compilation_error
       @exercise_project.make_zip(src_only: false)
 

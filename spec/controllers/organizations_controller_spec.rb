@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe OrganizationsController, type: :controller do
@@ -31,14 +33,14 @@ describe OrganizationsController, type: :controller do
       it 'shows visible courses in order by name, split into ongoing and expired' do
         @organization = Organization.create! valid_attributes
         @courses = [
-            FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
-            FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
-            FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
+          FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
+          FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
+          FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
         ]
 
         get :show, id: @organization.slug
 
-        expect(assigns(:ongoing_courses).map(&:name)).to eq(%w(AnotherTestCourse SomeTestCourse))
+        expect(assigns(:ongoing_courses).map(&:name)).to eq(%w[AnotherTestCourse SomeTestCourse])
         expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
       end
     end

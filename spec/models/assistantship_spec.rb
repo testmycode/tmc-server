@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Assistantship, type: :model do
@@ -16,20 +18,20 @@ describe Assistantship, type: :model do
   it 'can\'t create assistantship if course is non-existant' do
     user = FactoryGirl.create :user
     course = FactoryGirl.create :course
-    expect {Assistantship.create! user_id: user.id, course_id: course.id + 1}.to raise_error("Validation failed: Course can't be blank")
+    expect { Assistantship.create! user_id: user.id, course_id: course.id + 1 }.to raise_error("Validation failed: Course can't be blank")
   end
 
   it 'can\'t create assistantship if user is non-existant' do
     user = FactoryGirl.create :user
     course = FactoryGirl.create :course
-    expect {Assistantship.create! user_id: user.id + 1, course_id: course.id}.to raise_error("Validation failed: User does not exist")
+    expect { Assistantship.create! user_id: user.id + 1, course_id: course.id }.to raise_error('Validation failed: User does not exist')
   end
 
   it 'can\'t create assistantship if user already assistant' do
     user = FactoryGirl.create :user
     course = FactoryGirl.create :course
     Assistantship.create! user: user, course: course
-    expect {Assistantship.create! user: user, course: course}.to raise_error("Validation failed: User is already an assistant for this course")
+    expect { Assistantship.create! user: user, course: course }.to raise_error('Validation failed: User is already an assistant for this course')
   end
 
   it 'leaves courses intact when user is destroyed, but courses don\'t have ghost assistants' do
@@ -70,9 +72,9 @@ describe Assistantship, type: :model do
     course1 = FactoryGirl.create :course
     course2 = FactoryGirl.create :course
     Assistantship.create! user: user1, course: course1
-    expect(user1.assistant? course1).to be true
-    expect(user1.assistant? course2).to be false
-    expect(course1.assistant? user1).to be true
-    expect(course1.assistant? user2).to be false
+    expect(user1.assistant?(course1)).to be true
+    expect(user1.assistant?(course2)).to be false
+    expect(course1.assistant?(user1)).to be true
+    expect(course1.assistant?(user2)).to be false
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe AvailablePoint, type: :model do
@@ -29,7 +31,7 @@ describe AvailablePoint, type: :model do
       expect(a.size).to eq(1)
       expect(a['s2']).to eq(1)
 
-      a = AvailablePoint.course_sheet_points(course, ['s1', 's2'])
+      a = AvailablePoint.course_sheet_points(course, %w[s1 s2])
       expect(a.size).to eq(2)
       expect(a['s1']).to eq(1)
       expect(a['s2']).to eq(1)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Exercise, type: :model do
@@ -112,7 +114,7 @@ describe Exercise, type: :model do
     set_soft_deadline(ex, '2011-04-19 13:55')
     [ex.deadline_for(user), ex.soft_deadline_for(user)].each do |dl|
       expect(dl.year).to eq(2011)
-      expect(dl.month).to eq(04)
+      expect(dl.month).to eq(0o4)
       expect(dl.day).to eq(19)
       expect(dl.hour).to eq(13)
       expect(dl.min).to eq(55)

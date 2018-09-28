@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Setup::OrganizationsController, type: :controller do
@@ -12,7 +14,7 @@ describe Setup::OrganizationsController, type: :controller do
     {
       name: 'TestOrganization',
       slug: 'test-organization',
-      verified: true,
+      verified: true
     }
   end
 
@@ -28,7 +30,7 @@ describe Setup::OrganizationsController, type: :controller do
     {
       name: 'New organization name',
       information: 'New information',
-      website: 'http://newurl.net/',
+      website: 'http://newurl.net/'
     }
   end
 
@@ -92,7 +94,7 @@ describe Setup::OrganizationsController, type: :controller do
     describe 'GET index' do
       it 'should redirect to setup start page' do
         get :index
-        expect(response).to redirect_to(redirect_to setup_start_index_path)
+        expect(response).to redirect_to(redirect_to(setup_start_index_path))
       end
     end
 

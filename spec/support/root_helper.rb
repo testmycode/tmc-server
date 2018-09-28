@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 
 class RootHelper
   def initialize
-    fail 'Should be root' if Process::Sys.geteuid != 0
+    raise 'Should be root' if Process::Sys.geteuid != 0
     p1_in, p1_out = IO.pipe
     p2_in, p2_out = IO.pipe
     @pid = Process.fork do
       $stdin.reopen('/dev/null')
-      signals = %w(TERM INT HUP USR1 USR2)
+      signals = %w[TERM INT HUP USR1 USR2]
       signals.each do |sig|
         Signal.trap(sig) do
           puts "Root helper exiting (SIG#{sig})"
@@ -34,7 +36,7 @@ class RootHelper
   end
 
   def stop
-    fail 'Not started' unless @pid
+    raise 'Not started' unless @pid
     @pipe_out.write("STOP\n")
     @pipe_in.read
     @pipe_out.close
@@ -46,9 +48,7 @@ class RootHelper
   def send_command(command)
     @pipe_out.write("#{command}\n")
     response = @pipe_in.readline.strip
-    if response =~ /^FAIL (.*)$/
-      fail "#{$1} (from RootHelper)"
-    end
+    raise "#{Regexp.last_match(1)} (from RootHelper)" if response =~ /^FAIL (.*)$/
     response
   end
 
@@ -59,25 +59,25 @@ class RootHelper
       command = @pipe_in.readline.strip
       begin
         response = execute_command(command)
-      rescue
-        response = "FAIL: #{$!.message.gsub("\n", ' ')}"
+      rescue StandardError
+        response = "FAIL: #{$!.message.tr("\n", ' ')}"
         debug(response)
       end
-      @pipe_out.write("#{response}\n") unless response.blank?
+      @pipe_out.write("#{response}\n") if response.present?
     end while command != 'STOP'
   end
 
   def execute_command(command)
     if command =~ /^START SERVERS? (\d+(?:\s*,\s*\d+)*)$/
-      fail 'Servers already started' unless @server_pids.empty?
-      ports = $1.split(',').map(&:strip).map(&:to_i)
+      raise 'Servers already started' unless @server_pids.empty?
+      ports = Regexp.last_match(1).split(',').map(&:strip).map(&:to_i)
       start_servers(ports)
       'OK'
     elsif command == 'STOP'
       stop_all_servers
       'BYE'
     else
-      fail "Invalid command: #{command}"
+      raise "Invalid command: #{command}"
     end
   end
 
@@ -101,21 +101,19 @@ class RootHelper
     debug("Starting server #{port}")
 
     instance_dir = "#{servers_parent_dir}/#{port}"
-    fail 'Server directory not created' unless File.exist?(instance_dir)
+    raise 'Server directory not created' unless File.exist?(instance_dir)
 
     Process.fork do
-      begin
-        $stdin.reopen('/dev/null', 'r')
-        $stdout.reopen("#{instance_dir}/web/work/master.log", 'w')
-        $stderr.reopen($stdout)
-        Dir.chdir "#{instance_dir}/web"
-        ENV.delete 'BUNDLE_GEMFILE'
-        Process.exec('ruby ./webapp.rb run')
-      rescue
-        puts 'Error starting webapp.rb: ' + e.class.to_s + ': ' + e.message
-      ensure
-        exit!(1)
-      end
+      $stdin.reopen('/dev/null', 'r')
+      $stdout.reopen("#{instance_dir}/web/work/master.log", 'w')
+      $stderr.reopen($stdout)
+      Dir.chdir "#{instance_dir}/web"
+      ENV.delete 'BUNDLE_GEMFILE'
+      Process.exec('ruby ./webapp.rb run')
+    rescue StandardError
+      puts 'Error starting webapp.rb: ' + e.class.to_s + ': ' + e.message
+    ensure
+      exit!(1)
     end
   end
 

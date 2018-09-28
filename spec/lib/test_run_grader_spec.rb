@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TestRunGrader do
@@ -298,7 +300,7 @@ describe TestRunGrader do
 
   describe 'when the exercise requires code review' do
     before :each do
-      ap = AvailablePoint.find_by_name('1.1')
+      ap = AvailablePoint.find_by(name: '1.1')
       ap.requires_review = true
       ap.save!
     end

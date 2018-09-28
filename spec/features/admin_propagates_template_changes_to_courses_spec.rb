@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Admin propagates template changes to all courses cloned from template', feature: true do
@@ -20,12 +22,12 @@ feature 'Admin propagates template changes to all courses cloned from template',
     FactoryGirl.create :course_template, name: 'template', title: 'template', source_url: @repo_path
 
     visit '/'
-    #log_in_as @teacher1.login, 'teacher1'
+    # log_in_as @teacher1.login, 'teacher1'
     log_in_as @admin.login, 'xooxer'
     create_course_from_template name: 'course', organization_slug: @organization1.slug
 
-    #log_out
-    #log_in_as @teacher2.login, 'teacher2'
+    # log_out
+    # log_in_as @teacher2.login, 'teacher2'
     create_course_from_template name: 'course', organization_slug: @organization2.slug
 
     log_out
@@ -117,7 +119,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
   private
 
   def add_exercise(exercise_name = 'MyExercise')
-    course = Course.find_by_name!(@organization1.slug + '-course')
+    course = Course.find_by!(name: @organization1.slug + '-course')
     repo = clone_course_repo(course)
     repo.copy_simple_exercise(exercise_name)
     repo.add_commit_push

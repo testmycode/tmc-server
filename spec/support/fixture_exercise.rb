@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 require 'shellwords'
 
@@ -33,7 +35,7 @@ class FixtureExercise
     FileUtils.rm_rf @path if File.exist? @path
 
     if @path.include?(self.class.fixture_exercises_root)
-      fail "Don't create #{self.class} to refer to the fixture. Give it a nonexistent path where it'll create a copy."
+      raise "Don't create #{self.class} to refer to the fixture. Give it a nonexistent path where it'll create a copy."
     end
 
     ensure_fixture_clean
@@ -104,7 +106,7 @@ class FixtureExercise
     Dir.glob("#{common_files_path}/lib/*.jar") do |file|
       FileUtils.ln(file, "#{path}/lib/")
     end
-    FileUtils.ln(File.join(common_files_path,'build.xml'), File.join(path, 'build.xml'))
+    FileUtils.ln(File.join(common_files_path, 'build.xml'), File.join(path, 'build.xml'))
     FileUtils.mkdir_p("#{path}/nbproject")
     Dir.glob("#{common_files_path}/nbproject/*") do |file|
       FileUtils.ln(file, "#{path}/nbproject/")
@@ -135,9 +137,11 @@ class FixtureExercise
   end
 
   def ensure_fixture_clean
-    Dir.chdir fixture_path do
-      system!('ant clean > /dev/null 2>&1')
-    end unless fixture_clean?
+    unless fixture_clean?
+      Dir.chdir fixture_path do
+        system!('ant clean > /dev/null 2>&1')
+      end
+    end
   end
 
   def fixture_clean?

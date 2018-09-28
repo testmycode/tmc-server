@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe UsersController, type: :controller do
@@ -55,7 +57,7 @@ describe UsersController, type: :controller do
       post :create, user: @valid_attrs
 
       expect(response).to redirect_to(root_path)
-      user = User.find_by_login(@valid_attrs[:login])
+      user = User.find_by(login: @valid_attrs[:login])
       expect(user).not_to be_nil
       expect(user.email).to eq(@valid_attrs[:email])
       expect(user).to have_password(@valid_attrs[:password])
@@ -112,7 +114,7 @@ describe UsersController, type: :controller do
       post :create, user: @valid_attrs, user_field: { 'field1' => 'foo', 'field2' => '1' }
       expect(User.count).to eq(1)
 
-      user = User.find_by_login(@valid_attrs[:login])
+      user = User.find_by(login: @valid_attrs[:login])
       expect(user.field_value_record(fields[0]).value).to eq('foo')
       expect(user.field_value_record(fields[1]).value).not_to be_blank
       expect(user.field_value_record(fields[2]).value).to be_blank

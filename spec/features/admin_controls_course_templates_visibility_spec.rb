@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Admin sets expiredate to course templates', feature: true do
@@ -11,10 +13,10 @@ feature 'Admin sets expiredate to course templates', feature: true do
     Teachership.create! user: @teacher, organization: @organization
 
     @ct = FactoryGirl.create :course_template, title: 'Template 1'
-    @ct_expired_visible = FactoryGirl.create :course_template, title: 'Template 2', expires_at: Time.now - 1.days
-    @ct_non_expired_visible = FactoryGirl.create :course_template, title: 'Template 3', expires_at: Time.now + 1.days, hidden: false
-    @ct_expired_hidden = FactoryGirl.create :course_template, title: 'Template 4', expires_at: Time.now - 1.days, hidden: true
-    @ct_non_expired_hidden = FactoryGirl.create :course_template, title: 'Template 5', expires_at: Time.now + 1.days, hidden: true
+    @ct_expired_visible = FactoryGirl.create :course_template, title: 'Template 2', expires_at: Time.now - 1.day
+    @ct_non_expired_visible = FactoryGirl.create :course_template, title: 'Template 3', expires_at: Time.now + 1.day, hidden: false
+    @ct_expired_hidden = FactoryGirl.create :course_template, title: 'Template 4', expires_at: Time.now - 1.day, hidden: true
+    @ct_non_expired_hidden = FactoryGirl.create :course_template, title: 'Template 5', expires_at: Time.now + 1.day, hidden: true
 
     visit '/'
   end

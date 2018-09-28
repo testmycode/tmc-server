@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-describe "Deleting own user", type: :request, integration: true do
+describe 'Deleting own user', type: :request, integration: true do
   include IntegrationTestActions
 
   it 'sending email should generate token' do
@@ -35,7 +37,7 @@ describe "Deleting own user", type: :request, integration: true do
 
     token = user.verification_tokens.delete_user[0]
 
-    visit"/users/#{user.id}/destroy/#{token.token}"
+    visit "/users/#{user.id}/destroy/#{token.token}"
 
     expect(page).to have_content("Deleting the account #{user.login}")
 
@@ -63,7 +65,7 @@ describe "Deleting own user", type: :request, integration: true do
 
     token = user.verification_tokens.delete_user[0]
 
-    visit"/users/#{user.id}/destroy/#{token.token}"
+    visit "/users/#{user.id}/destroy/#{token.token}"
 
     check "I've read the above and i'm sure i understand the consequences"
 
@@ -91,7 +93,7 @@ describe "Deleting own user", type: :request, integration: true do
 
     token = user.verification_tokens.delete_user[0]
 
-    visit"/users/#{user.id}/destroy/#{token.token}"
+    visit "/users/#{user.id}/destroy/#{token.token}"
 
     check "I've read the above and i'm sure i understand the consequences"
 
@@ -124,7 +126,6 @@ describe "Deleting own user", type: :request, integration: true do
 
     visit "/users/#{user1.id}/destroy/#{token.token}"
 
-    expect(page).to have_content("Access denied")
+    expect(page).to have_content('Access denied')
   end
-
 end

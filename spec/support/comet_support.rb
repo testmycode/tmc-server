@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tmc_comet'
 require 'system_commands'
 require 'socket'
@@ -27,7 +29,7 @@ module CometSupport
 
   def self.start!
     write_config_file
-    fail 'Already running' if @started
+    raise 'Already running' if @started
     Dir.chdir TmcComet.get.path.parent do
       @pid = Process.spawn("./tmc-comet-server.sh #{config_file_path} > #{log_file} 2>&1", pgroup: true)
     end
@@ -63,15 +65,13 @@ module CometSupport
 
   def self.wait_for_http_access
     30.times do
-      begin
-        sock = TCPSocket.open('localhost', port)
-        sock.close
-        return
-      rescue
-        sleep 0.5
-      end
+      sock = TCPSocket.open('localhost', port)
+      sock.close
+      return
+    rescue StandardError
+      sleep 0.5
     end
-    fail "Failed to access tmc-comet. Please check #{log_file}."
+    raise "Failed to access tmc-comet. Please check #{log_file}."
   end
 end
 

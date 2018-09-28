@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Teacher can hide submission results from users', feature: true do
@@ -41,7 +43,7 @@ describe 'Teacher can hide submission results from users', feature: true do
     log_in_as(@user.username, 'foobar')
     visit_course
     expect(page).to_not have_link('View points')
-    expect(page.find_by_id('submissions').find('tr', text: @user.username)).to have_content('Hidden')
+    expect(page.find_by(id: 'submissions').find('tr', text: @user.username)).to have_content('Hidden')
   end
 
   scenario 'In My stats page user can not see results of submission' do
@@ -49,7 +51,7 @@ describe 'Teacher can hide submission results from users', feature: true do
     visit_course
     click_link('My stats')
     expect(page).to have_content('For this course points are not visible')
-    expect(page.find_by_id('submissions').find('tr', text: @user.username)).to have_content('Hidden')
+    expect(page.find_by(id: 'submissions').find('tr', text: @user.username)).to have_content('Hidden')
   end
 
   scenario 'In submission page user can not see results of submission' do
@@ -84,7 +86,7 @@ describe 'Teacher can hide submission results from users', feature: true do
     expect(page).to have_content('Test Cases')
     expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
     expect(find('tr', text: tcr.test_case_name).all('td').count).to eq(2)
-    expect(find_by_id('myTab').all('li').count).to eq(2)
+    expect(find_by(id: 'myTab').all('li').count).to eq(2)
   end
 
   context 'when submission results are hidden for an individual exercise' do

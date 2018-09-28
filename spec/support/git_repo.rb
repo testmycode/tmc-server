@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 
 class GitRepo
@@ -40,12 +42,12 @@ class GitRepo
   end
 
   def mkdir(name)
-    fail 'Expected relative path' if name.start_with?('/')
+    raise 'Expected relative path' if name.start_with?('/')
     FileUtils.mkdir_p("#{@path}/#{name}")
   end
 
   def write_file(name, content)
-    fail 'Expected relative path' if name.start_with?('/')
+    raise 'Expected relative path' if name.start_with?('/')
     File.open("#{@path}/#{name}", 'wb') { |f| f.write(content) }
   end
 
@@ -78,9 +80,9 @@ class GitRepo
     end
   end
 
-  def chdir(&block)
+  def chdir
     Dir.chdir @path do
-      block.call
+      yield
     end
   end
 end

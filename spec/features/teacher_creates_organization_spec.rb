@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'User can create new organization', feature: true do
@@ -59,7 +61,7 @@ feature 'User can create new organization', feature: true do
     log_in_as(@user.login, 'foobar2')
     visit "/org/#{@organization.slug}"
     click_link 'hide organization'
-    expect(page).to have_content "Organization is now hidden to users"
+    expect(page).to have_content 'Organization is now hidden to users'
     expect(page).to have_content 'make organization visible'
   end
 end

@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Setup::CourseAssistantsController, type: :controller do
-
   before :each do
     @organization = FactoryGirl.create(:accepted_organization)
     @course = FactoryGirl.create(:course, organization: @organization)
@@ -30,24 +31,22 @@ describe Setup::CourseAssistantsController, type: :controller do
     describe 'post CREATE' do
       it 'creates a new assistant' do
         expect(@course.assistants.count).to eq(0)
-        post :create, {
+        post :create,
              organization_id: @organization.slug,
              course_id: @course.id,
              commit: 'Add new assistant',
              username: 'assi'
-        }
         expect(assigns(:course).assistants.first).to eq(@assistant)
         expect(Assistantship.count).to be(1)
       end
 
       it 'does not create assistant if user not found' do
         expect(@course.assistants.count).to eq(0)
-        post :create, {
-            organization_id: @organization.slug,
-            course_id: @course.id,
-            commit: 'Add new assistant',
-            username: 'notfound'
-        }
+        post :create,
+             organization_id: @organization.slug,
+             course_id: @course.id,
+             commit: 'Add new assistant',
+             username: 'notfound'
         expect(@course.assistants.count).to eq(0)
         expect(response).to render_template(:index)
       end
@@ -55,23 +54,22 @@ describe Setup::CourseAssistantsController, type: :controller do
       it 'does not create assistant if user is already assistant' do
         @course.assistants << @assistant
         expect(@course.assistants.count).to eq(1)
-        post :create, {
-            organization_id: @organization.slug,
-            course_id: @course.id,
-            commit: 'Add new assistant',
-            username: 'assi'
-        }
+        post :create,
+             organization_id: @organization.slug,
+             course_id: @course.id,
+             commit: 'Add new assistant',
+             username: 'assi'
         expect(@course.assistants.count).to eq(1)
         expect(response).to render_template(:index)
       end
 
       it 'continues to next step when in wizard mode' do
-        post :create, {organization_id: @organization.slug, course_id: @course.id, commit: 'Continue'}
+        post :create, organization_id: @organization.slug, course_id: @course.id, commit: 'Continue'
         expect(response).to redirect_to(setup_organization_course_course_finisher_index_path)
       end
 
       it 'continues to course main page when not in wizard' do
-        post :create, {organization_id: @organization.slug, course_id: @course.id, commit: 'Bach to course main page'}
+        post :create, organization_id: @organization.slug, course_id: @course.id, commit: 'Bach to course main page'
         expect(response).to redirect_to(organization_course_path(@organization, @course))
       end
     end
@@ -93,14 +91,13 @@ describe Setup::CourseAssistantsController, type: :controller do
     end
 
     it 'should not allow any access' do
-      get :index, {organization_id: @organization.slug, course_id: @course.id}
+      get :index, organization_id: @organization.slug, course_id: @course.id
       expect(response.code.to_i).to eq(401)
-      post :create, {
-          organization_id: @organization.slug,
-          course_id: @course.id,
-          commit: 'Add new assistant',
-          username: 'assi'
-      }
+      post :create,
+           organization_id: @organization.slug,
+           course_id: @course.id,
+           commit: 'Add new assistant',
+           username: 'assi'
       expect(response.code.to_i).to eq(401)
       @assistantship = Assistantship.create! user: @user, course: @course
       delete :destroy, organization_id: @organization.slug, course_id: @course.id, id: @assistantship.to_param

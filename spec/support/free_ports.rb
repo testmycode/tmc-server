@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 # Dispenses free TCP ports for tests
 module FreePorts
   FIRST = 3030

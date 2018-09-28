@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe "Resetting one's password by e-mail", type: :request, integration: true do

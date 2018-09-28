@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path(File.join(File.dirname(__FILE__), 'git_test_actions.rb'))
 
 # Aggregates everything needed to test checking a submission
@@ -34,7 +36,7 @@ class SubmissionTestSetup
 
     @exercise = @course.exercises.first
     unless @exercise
-      fail 'Exercise created from fixture was not recognized by course refresher'
+      raise 'Exercise created from fixture was not recognized by course refresher'
     end
 
     @exercise_project = FixtureExercise.get(exercise_name, exercise_dest)
@@ -45,9 +47,7 @@ class SubmissionTestSetup
       exercise: @exercise
     )
 
-    if should_solve
-      @exercise_project.solve_all
-    end
+    @exercise_project.solve_all if should_solve
 
     if should_save
       make_zip

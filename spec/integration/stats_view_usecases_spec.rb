@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'The system (used by an instructor for viewing statistics)', type: :request, integration: true do

@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 # We make Course use a temporary directory that we can nuke before
 # each test
 

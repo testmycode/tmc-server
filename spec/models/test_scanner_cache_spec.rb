@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TestScannerCache, type: :model do
@@ -15,14 +17,14 @@ describe TestScannerCache, type: :model do
     end).to eq(a: 'b')
 
     expect(cache.get_or_update(@course, 'name', 'hash123') do
-      fail 'this block should not get called'
+      raise 'this block should not get called'
     end).to eq(a: 'b')
   end
 
   it 'should propagate exceptions in the constructor block' do
     expect do
       cache.get_or_update(@course, 'name', 'hash123') do
-        fail 'some error'
+        raise 'some error'
       end
     end.to raise_error('some error')
   end
@@ -40,11 +42,11 @@ describe TestScannerCache, type: :model do
     end).to eq(c: 'd')
 
     expect(cache.get_or_update(course1, 'name', 'hash123') do
-      fail 'this block should not get called'
+      raise 'this block should not get called'
     end).to eq(a: 'b')
 
     expect(cache.get_or_update(course2, 'name', 'hash123') do
-      fail 'this block should not get called'
+      raise 'this block should not get called'
     end).to eq(c: 'd')
   end
 end

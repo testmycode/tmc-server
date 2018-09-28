@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Personal deadlines', type: :request, integration: true do
@@ -65,7 +67,7 @@ describe 'Personal deadlines', type: :request, integration: true do
       expect(page).to have_content('MyExercise2')
       expect(page).not_to have_content('(locked)')
 
-      dl = @course.exercises.find_by_name('MyExercise2').deadline_for(@user)
+      dl = @course.exercises.find_by(name: 'MyExercise2').deadline_for(@user)
       expect(dl).to be_within(10.minutes).of(Time.now + 1.week)
     end
   end

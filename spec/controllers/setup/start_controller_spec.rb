@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Setup::StartController, type: :controller do
-
   before :each do
     @organization1 = FactoryGirl.create(:accepted_organization)
     @organization2 = FactoryGirl.create(:accepted_organization)

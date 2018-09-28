@@ -1,4 +1,6 @@
-# -*- encoding: utf-8 -*-
+
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'The system, receiving submissions with UTF-8 special characters', type: :request, integration: true do

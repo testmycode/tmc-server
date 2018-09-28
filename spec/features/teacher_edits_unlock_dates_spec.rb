@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher edits unlock dates', feature: true do
@@ -51,7 +53,7 @@ feature 'Teacher edits unlock dates', feature: true do
     visit_course
     click_link 'Advanced unlock conditions management'
 
-    fill_in 'empty_group_0', with: "#{Time.now + 3.days}"
+    fill_in 'empty_group_0', with: (Time.now + 3.days).to_s
     click_button 'Save changes'
     expect(page).to have_content('Successfully set unlock dates.')
     expect(page).to have_content('(locked)')
@@ -62,7 +64,7 @@ feature 'Teacher edits unlock dates', feature: true do
     visit_course
     click_link 'Advanced unlock conditions management'
 
-    fill_in 'empty_group_0', with: "#{Time.now - 3.days}"
+    fill_in 'empty_group_0', with: (Time.now - 3.days).to_s
     click_button 'Save changes'
     expect(page).to have_content('Successfully set unlock dates.')
     expect(page).not_to have_content('(locked)')
@@ -92,7 +94,7 @@ feature 'Teacher edits unlock dates', feature: true do
   end
 
   scenario 'Teacher can set multiple unlock conditions' do
-    #pending 'Using wrong way of creating test courses'
+    # pending 'Using wrong way of creating test courses'
     log_in_as(@teacher.login, 'xooxer')
     visit_course
     click_link 'Advanced unlock conditions management'

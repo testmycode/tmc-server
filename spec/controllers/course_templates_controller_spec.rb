@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe CourseTemplatesController, type: :controller do
@@ -43,7 +45,7 @@ describe CourseTemplatesController, type: :controller do
       end
       it 'should show course templates' do
         get :index, {}
-        expect(assigns(:course_templates).map(&:name)).to eq(%w(template1 template2 template3))
+        expect(assigns(:course_templates).map(&:name)).to eq(%w[template1 template2 template3])
       end
     end
 
@@ -330,7 +332,7 @@ describe CourseTemplatesController, type: :controller do
 
       it 'should show course templates' do
         get :list_for_teachers, organization_id: @organization.slug
-        expect(assigns(:course_templates).map(&:name)).to eq(%w(template1 template2 template3))
+        expect(assigns(:course_templates).map(&:name)).to eq(%w[template1 template2 template3])
       end
     end
   end

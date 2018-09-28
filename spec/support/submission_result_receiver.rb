@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 # Receives incoming results from a remote sandbox during testing.
 # Used by RemoteSandboxForTesting
 class SubmissionResultReceiver
@@ -23,9 +25,9 @@ class SubmissionResultReceiver
 
   def host_ip
     @addr ||= ENV['HOST'] ||= if ENV['CI']
-                `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
-              else
-                '127.0.0.1'
+                                `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
+                              else
+                                '127.0.0.1'
               end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Unlock, type: :model do
@@ -39,7 +41,8 @@ describe Unlock, type: :model do
     it "doesn't recreate old unlocks" do
       Unlock.refresh_unlocks(@course, @user)
       u = Unlock.where(exercise_name: 'ex1').first
-      id, created_at = [u.id, u.created_at]
+      id = u.id
+      created_at = u.created_at
 
       Unlock.refresh_unlocks(@course, @user)
       u = Unlock.where(exercise_name: 'ex1').first

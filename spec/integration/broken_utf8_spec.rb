@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'The system, receiving submissions with broken UTF-8', type: :request, integration: true do

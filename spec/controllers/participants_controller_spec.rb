@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ParticipantsController, type: :controller do
@@ -7,7 +9,6 @@ describe ParticipantsController, type: :controller do
 
   describe 'GET /me' do
     describe 'when logged in' do
-
       before :each do
         controller.current_user = @user
       end
