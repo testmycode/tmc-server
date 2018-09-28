@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CourseTimingsHelper
   def parse_percentage_from_unlock_condition(condition)
     if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/

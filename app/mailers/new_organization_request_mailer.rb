@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NewOrganizationRequestMailer < ActionMailer::Base
   def request_email(organization)
     email = SiteSetting.value('administrative_email')

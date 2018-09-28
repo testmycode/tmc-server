@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tailoring'
 
 module ApplicationHelper
@@ -18,7 +20,7 @@ module ApplicationHelper
       classes += ' active'
       options[:class] = classes
     end
-    return link_to(name, path, options)
+    link_to(name, path, options)
   end
 
   def labeled(label, tags = nil, options = {}, &block)
@@ -36,9 +38,9 @@ module ApplicationHelper
     tags = tags.html_safe
 
     if tags =~ /id\s*=\s*"([^"]+)"/
-      target = ' for="' + $1 + '"'
+      target = ' for="' + Regexp.last_match(1) + '"'
     else
-      fail 'Cannot label a tag without an id'
+      raise 'Cannot label a tag without an id'
     end
 
     cls = []
@@ -56,7 +58,7 @@ module ApplicationHelper
     when :label_last
       label_start + tags + label_text + label_end
     else
-      fail 'invalid :order option for labeled()'
+      raise 'invalid :order option for labeled()'
     end
   end
 
@@ -79,7 +81,7 @@ module ApplicationHelper
       str << '</label>'
     else
       label = label_tag label, nil, class: 'control-label'
-      str += raw("<div class=\"form-group\">" + raw(label) + raw(field) + '</div>')
+      str += raw('<div class="form-group">' + raw(label) + raw(field) + '</div>')
     end
     raw(str)
   end
@@ -89,14 +91,14 @@ module ApplicationHelper
       bJQueryUI: true,
       bSort: false
     }.merge options
-    script = <<EOS
-<script type="text/javascript">
-<!--
-$(document).ready(function() {
-  $('#{escape_javascript table_selector}').dataTable(#{options.to_json});
-});
-//-->
-</script>
+    script = <<~EOS
+      <script type="text/javascript">
+      <!--
+      $(document).ready(function() {
+        $('#{escape_javascript table_selector}').dataTable(#{options.to_json});
+      });
+      //-->
+      </script>
 EOS
     raw(script)
   end

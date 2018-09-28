@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FeedbackAnswersHelper
   def render_feedback_answer(answer)
     if answer.feedback_question.intrange?

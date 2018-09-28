@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'submission_processor'
 
 class SubmissionReprocessorTask

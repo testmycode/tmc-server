@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module BootstrapFlashHelper
-  ALERT_TYPES = [:error, :info, :success, :danger]
+  ALERT_TYPES = %i[error info success danger].freeze
 
   def bootstrap_flash
     flash_messages = []
@@ -8,7 +10,7 @@ module BootstrapFlashHelper
       next if message.blank?
 
       type = :success if type.to_sym == :notice
-      type = :danger   if type.to_sym == :alert
+      type = :danger if type.to_sym == :alert
 
       next unless ALERT_TYPES.include?(type.to_sym)
 

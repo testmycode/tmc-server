@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ExtraFieldHelper
   def extra_field(field_value, method_options)
     field = field_value.field
@@ -19,9 +21,9 @@ module ExtraFieldHelper
       when :text
         text_field_tag(field_name, existing_value, { class: 'form-control' }.merge(common_attrs))
       when :boolean
-        check_box_tag(field_name, '1', !existing_value.blank?, common_attrs)
+        check_box_tag(field_name, '1', existing_value.present?, common_attrs)
       else
-        fail "Unknown extra field type: #{field.field_type}"
+        raise "Unknown extra field type: #{field.field_type}"
       end
 
     label_order =
@@ -45,9 +47,9 @@ module ExtraFieldHelper
       when :text
         text_field_tag(field_name, value, class: 'form-control')
       when :boolean
-        check_box_tag(field_name, '1', !value.blank?)
+        check_box_tag(field_name, '1', value.present?)
       else
-        fail "Unknown extra field type: #{field.field_type}"
+        raise "Unknown extra field type: #{field.field_type}"
       end
 
     label_order =
@@ -64,15 +66,15 @@ module ExtraFieldHelper
   def extra_field_checkbox(prefix, field, value)
     return '' if field.field_type == :html
     field_name = prefix + field.name
-    field_tag = check_box_tag(field_name, '1', !value.blank?)
-    labeled_field(raw(field.name.humanize), field_tag, :order => :label_last, :super_class => "checkbox")
+    field_tag = check_box_tag(field_name, '1', value.present?)
+    labeled_field(raw(field.name.humanize), field_tag, order: :label_last, super_class: 'checkbox')
   end
 
   def extra_field_value(value_record)
     field = value_record.field
     case field.field_type
     when :boolean
-      if value_record.value.blank? then 'No' else 'Yes' end
+      value_record.value.blank? ? 'No' : 'Yes'
     else
       value_record.value
     end

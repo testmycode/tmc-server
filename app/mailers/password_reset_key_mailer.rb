@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PasswordResetKeyMailer < ActionMailer::Base
   def reset_link_email(user, key, origin = nil)
     @user = user

@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 module BadUtf8Helper
   def force_utf8_violently(str)
     if str.encoding == Encoding.find('UTF-8') && str.valid_encoding?

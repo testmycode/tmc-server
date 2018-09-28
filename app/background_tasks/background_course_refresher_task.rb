@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'background_course_refresher'
 
 class BackgroundCourseRefresherTask

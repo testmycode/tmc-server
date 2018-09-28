@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SessionsHelper
   def sign_in(user)
     session[:user_id] = user.id
@@ -29,17 +31,13 @@ module SessionsHelper
   private
 
   def user_from_session
-    User.find_by_id(session[:user_id])
+    User.find_by(id: session[:user_id])
   end
 
   def user_from_basic_auth
-    if request && request.authorization
+    if request&.authorization
       username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
-      if username && password
-        User.authenticate(username, password)
-      else
-        nil
-      end
+      User.authenticate(username, password) if username && password
     end
   end
 end

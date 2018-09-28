@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SubmissionsHelper
   def show_submission_list(submissions, options = {})
     locals = {
@@ -80,11 +82,11 @@ module SubmissionsHelper
 
   def submissions_for_datatables(submissions)
     submissions.map do |sub|
-      if can? :read, sub.user
-        user_col = link_to sub.user.login, participant_path(sub.user)
-      else
-        user_col = sub.user.login
-      end
+      user_col = if can? :read, sub.user
+                   link_to sub.user.login, participant_path(sub.user)
+                 else
+                   sub.user.login
+                 end
       [
         sub.created_at.strftime('%Y-%m-%d %H:%M'),
         user_col,
