@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use (needs plugins)
   orm :active_record
@@ -6,20 +8,19 @@ Doorkeeper.configure do
   resource_owner_authenticator do
     # Put your resource owner authentication logic here.
     # Example implementation:
-    User.find_by_id(session[:user_id]) || redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
+    User.find_by(id: session[:user_id]) || redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
   admin_authenticator do
     # Put your admin authentication logic here.
-    user = User.find_by_id(session[:user_id])
+    user = User.find_by(id: session[:user_id])
     if user.nil? || !user.administrator?
-     redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
+      redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
     end
-
   end
 
-  resource_owner_from_credentials do |routes|
+  resource_owner_from_credentials do |_routes|
     User.authenticate(params[:username], params[:password])
   end
 
@@ -103,7 +104,7 @@ Doorkeeper.configure do
   #   http://tools.ietf.org/html/rfc6819#section-4.4.2
   #   http://tools.ietf.org/html/rfc6819#section-4.4.3
   #
-  grant_flows %w(authorization_code client_credentials password)
+  grant_flows %w[authorization_code client_credentials password]
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.

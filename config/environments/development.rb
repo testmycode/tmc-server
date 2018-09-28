@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   config.logstasher.enabled = true
 
@@ -40,12 +42,12 @@ Rails.application.configure do
   # Use a different cache store in production.
   if ENV['REDIS_URL']
     config.cache_store = :readthis_store, {
-        expires_in: 1.weeks.to_i, #default
-        namespace: 'cache',
-        redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
+      expires_in: 1.week.to_i, # default
+      namespace: 'cache',
+      redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
     }
     Readthis.fault_tolerant = true
   else
-    config.cache_store = :memory_store, { size: 64.megabytes } #
+    config.cache_store = :memory_store, { size: 64.megabytes }
   end
 end
