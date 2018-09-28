@@ -30,7 +30,7 @@ module Api
                         key :type, :integer
                       end
                     end
-          end
+                  end
                 end
               end
               response 403, '$ref': '#/responses/error'

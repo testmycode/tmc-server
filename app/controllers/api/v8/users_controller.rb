@@ -131,9 +131,7 @@ module Api
           set_extra_data(true)
           update_email
           maybe_update_password
-          if !@user.errors.empty? || !@user.save
-            raise ActiveRecord::Rollback
-          end
+          raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
           RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email) unless @email_before.casecmp(@user.email).zero?
           return render json: {
             message: 'User details updated.'

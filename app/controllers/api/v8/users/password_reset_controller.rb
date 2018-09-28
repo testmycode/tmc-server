@@ -30,7 +30,6 @@ module Api
             success: true
           }
         end
-
       end
     end
   end
