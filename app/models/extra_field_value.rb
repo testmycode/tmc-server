@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An abstract base for active record classes representing values for 'ExtraField's.
 #
 # See UserFieldValue for an example.
@@ -21,7 +23,7 @@ module ExtraFieldValue
   def ruby_value
     case field.field_type
     when :boolean
-      if value.blank? || value == '0' then false else true end
+      value.blank? || value == '0' ? false : true
     else
       value
     end

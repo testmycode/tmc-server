@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 # Stores what the student has answered to a single feedback question (for an exercise in a course).
 class FeedbackAnswer < ActiveRecord::Base
   belongs_to :feedback_question
   belongs_to :course
-  belongs_to :exercise, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
+  belongs_to :exercise, ->(exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
   belongs_to :submission
   has_many :reply_to_feedback_answers, dependent: :delete_all
 
@@ -64,8 +66,8 @@ class FeedbackAnswer < ActiveRecord::Base
     questions = FeedbackQuestion.arel_table
 
     answers.join(questions).on(answers[:feedback_question_id].eq(questions[:id]))
-      .where(questions[:kind].matches('intrange%'))
-      .where(answers[:course_id].eq(exercise.course_id))
-      .where(answers[:exercise_name].eq(exercise.name))
+           .where(questions[:kind].matches('intrange%'))
+           .where(answers[:course_id].eq(exercise.course_id))
+           .where(answers[:exercise_name].eq(exercise.name))
   end
 end

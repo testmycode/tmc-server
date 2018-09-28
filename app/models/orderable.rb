@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Provides operations for active records with a position field.
 #
 # Currently this is only used by FeedbackQuestion, and should probably
@@ -21,12 +23,12 @@ module Orderable
 
   def move_forward!
     other = self.class.where("position > #{quote(position)}").order('position ASC').first
-    self.move_after!(other) if other
+    move_after!(other) if other
   end
 
   def move_backward!
     other = self.class.where("position < #{quote(position)}").order('position DESC').first
-    self.move_before!(other) if other
+    move_before!(other) if other
   end
 
   def move_before!(other)
@@ -46,7 +48,7 @@ module Orderable
       conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE")
 
       other_pos = conn.select_value("SELECT position FROM #{tbl} WHERE id = #{other.id}")
-      fail 'Move target not found in database' if other_pos.nil?
+      raise 'Move target not found in database' if other_pos.nil?
       new_position = other_pos.to_i + delta
 
       if conn.select_value("SELECT 1 FROM #{tbl} WHERE position = #{new_position}")

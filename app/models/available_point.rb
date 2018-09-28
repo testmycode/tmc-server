@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Caches points that can be awarded from an exercise.
 # Awarded points don't have a hard reference to these because
 # these are recreated every time a course is refreshed.
@@ -7,8 +9,8 @@ class AvailablePoint < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :AvailablePoint do
-    key :required, [
-      :id, :exercise_id, :name, :require_review
+    key :required, %i[
+      id exercise_id name require_review
     ]
 
     property :id, type: :integer, example: 1

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rest_client'
 
 # Represents the configured tmc-comet server.
@@ -32,7 +34,7 @@ class CometServer
   def try_publish(channel, msg)
     publish(channel, msg)
     true
-  rescue
+  rescue StandardError
     ::Rails.logger.error "Failed to publish to #{publish_url}: #{$!}"
     false
   end

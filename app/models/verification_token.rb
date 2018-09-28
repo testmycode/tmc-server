@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class VerificationToken < ActiveRecord::Base
   # This class does not use single table inheritance
   self.inheritance_column = :_type_disabled
 
   belongs_to :user
 
-  enum type: [:email, :delete_user]
+  enum type: %i[email delete_user]
 
   validates :type, presence: true
   validates :user, presence: true

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Session < ActiveRecord::SessionStore::Session
   def self.delete_expired
     delete_all(['updated_at < ?', 1.month.ago])

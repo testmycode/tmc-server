@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Course stub to be copied by teachers for their own organisations
 
 require 'net/http'
@@ -84,7 +86,7 @@ class CourseTemplate < ActiveRecord::Base
     results = []
     firstcourse = true
     courses.each do |c|
-      results.push(c.refresh no_directory_changes: !firstcourse)
+      results.push(c.refresh(no_directory_changes: !firstcourse))
       reload
       firstcourse = false
     end

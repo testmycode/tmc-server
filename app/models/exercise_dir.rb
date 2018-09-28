@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pathname'
 require 'exercise_dir/java_simple'
 require 'exercise_dir/java_maven'
@@ -12,18 +14,14 @@ class ExerciseDir
     if dir
       dir
     else
-      fail "Not a valid exercise directory: #{path}"
+      raise "Not a valid exercise directory: #{path}"
     end
   end
 
   def self.try_get(path)
     path = Pathname(path)
     cls = exercise_type_impl(path)
-    if !cls.nil?
-      cls.new(path)
-    else
-      nil
-    end
+    cls&.new(path)
   end
 
   def self.exercise_type(path)
@@ -50,7 +48,7 @@ class ExerciseDir
 
   def self.find_exercise_dirs(path)
     path = Pathname(path)
-    TmcLangs.get.find_exercise_dirs(path).sort.map {|dir| ExerciseDir.get(dir) }
+    TmcLangs.get.find_exercise_dirs(path).sort.map { |dir| ExerciseDir.get(dir) }
   end
 
   # subclass may set this to true

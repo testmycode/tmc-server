@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RecentlyChangedUserDetail < ActiveRecord::Base
-  enum change_type: [:email_changed, :deleted]
+  enum change_type: %i[email_changed deleted]
 end

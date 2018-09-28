@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FeedbackQuestion < ActiveRecord::Base
   include Orderable
 
@@ -18,9 +20,9 @@ class FeedbackQuestion < ActiveRecord::Base
 
   def intrange
     if kind =~ intrange_regex
-      ($1.to_i)..($2.to_i)
+      (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
     else
-      fail 'not an intrange question'
+      raise 'not an intrange question'
     end
   end
 
@@ -43,8 +45,6 @@ class FeedbackQuestion < ActiveRecord::Base
   end
 
   def validate_kind
-    unless kind == 'text' || kind =~ intrange_regex
-      errors[:kind] << 'invalid'
-    end
+    errors[:kind] << 'invalid' unless kind == 'text' || kind =~ intrange_regex
   end
 end

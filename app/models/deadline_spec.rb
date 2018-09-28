@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Parses and abstracts specification in the "deadline" field of a `metadata.yml` file.
 class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
   class InvalidSyntaxError < StandardError; end
@@ -8,10 +10,10 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
     for i in 0...specs.size
       begin
         spec = specs[i].to_s.strip
-        parse_spec(spec) unless spec.blank?
+        parse_spec(spec) if spec.present?
       rescue InvalidSyntaxError
-        raise InvalidSyntaxError.new("Invalid syntax in deadline spec #{i + 1} (#{specs[i]})")
-      rescue
+        raise InvalidSyntaxError, "Invalid syntax in deadline spec #{i + 1} (#{specs[i]})"
+      rescue StandardError
         raise "Problem with unlock spec #{i + 1} (#{specs[i]}): #{$!.message}"
       end
     end
@@ -40,11 +42,11 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
   end
 
   def static_deadline_spec
-    @specs.select { |n| !n.nil? && DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
+    @specs.select { |n| !n.nil? && DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map(&:raw_spec).first
   end
 
   def unlock_deadline_spec
-    @specs.select { |n| !n.nil? && !DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map { |n| n.raw_spec }.first
+    @specs.select { |n| !n.nil? && !DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map(&:raw_spec).first
   end
 
   private
@@ -68,21 +70,17 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
     if DateAndTimeUtils.looks_like_date_or_time(spec)
       time = DateAndTimeUtils.to_time(spec, prefer_end_of_day: true)
       timefun = ->(_user) { time }
-      universal = "#{time}"
+      universal = time.to_s
       personal = ->(_u) { universal }
       @specs << SingleSpec.new(spec, timefun, universal, personal)
     elsif spec =~ /^unlock\s*[+]\s*(\d+)\s+(minutes?|hours?|days?|weeks?|months?|years?)$/
-      time_scalar = $1
-      time_unit = $2
+      time_scalar = Regexp.last_match(1)
+      time_unit = Regexp.last_match(2)
       time_delta = time_scalar.to_i.send(time_unit)
       @depends_on_unlock_time = true
       timefun = lambda do |user|
         unlock_time = @exercise.time_unlocked_for(user)
-        if unlock_time
-          unlock_time + time_delta
-        else
-          nil
-        end
+        unlock_time + time_delta if unlock_time
       end
       universal = "#{time_scalar} #{time_unit} after unlock"
       personal = lambda do |_user|
@@ -90,7 +88,7 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
       end
       @specs << SingleSpec.new(spec, timefun, universal, personal)
     else
-      fail InvalidSyntaxError.new('Invalid syntax')
+      raise InvalidSyntaxError, 'Invalid syntax'
     end
   end
 end

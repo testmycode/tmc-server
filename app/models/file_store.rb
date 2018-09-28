@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 
 # Provides an ad-hoc key/value store (db/files).
@@ -17,7 +19,7 @@ module FileStore
 
   def self.try_get(relpath)
     get(relpath)
-  rescue
+  rescue StandardError
     nil
   end
 
@@ -32,7 +34,7 @@ module FileStore
       # Note: rename is an all-or-nothing opeartion IF the source and dest are on the same filesystem
       # (which we try to ensure here). Even so, a concurrent operation may breifly see a missing file.
       File.rename(tmpfile.path, path)
-    rescue
+    rescue StandardError
       tmpfile.delete
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An abstract base for classes representing extra fields on a record.
 #
 # See UserField for an example.
@@ -23,7 +25,7 @@ module ExtraField
 
   def initialize(options = {})
     @options = default_options.merge(options)
-    fail 'Name missing' unless @options[:name]
+    raise 'Name missing' unless @options[:name]
     @value_class = Object.const_get(self.class.name + 'Value')
   end
 
@@ -92,7 +94,7 @@ module ExtraField
     cls_name = "#{kind.camelize}Field"
 
     cls = Object.const_get(cls_name)
-    fail "Field class not found: #{cls}" if cls.nil?
+    raise "Field class not found: #{cls}" if cls.nil?
 
     dsl = Object.new
     dsl.instance_variable_set('@cls', cls)
@@ -100,8 +102,8 @@ module ExtraField
     dsl.instance_variable_set('@html_count', 0)
 
     class << dsl
-      def group(group_name, &block)
-        fail "Don't nest groups" if @group
+      def group(group_name)
+        raise "Don't nest groups" if @group
         @group = group_name
         begin
           yield

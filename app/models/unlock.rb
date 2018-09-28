@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 # Stores whether and when an exercise has been unlocked for an user.
 #
 # An exercise is considered unlocked for a user if an unlock for

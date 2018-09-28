@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 # Each user may have 0..1 password reset keys.
@@ -12,13 +14,13 @@ class ActionToken < ActiveRecord::Base
 
   before_create :randomize_token
 
-  enum action: [:confirm_email, :reset_password, :enroll_course]
+  enum action: %i[confirm_email reset_password enroll_course]
 
   def self.generate_password_reset_key_for(user)
     old_key = user.password_reset_key
-    old_key.destroy if old_key
+    old_key&.destroy
 
-    key = self.create!(user: user, action: :reset_password, expires_at: Time.now + 72.hours)
+    key = create!(user: user, action: :reset_password, expires_at: Time.now + 72.hours)
     user.action_tokens << key
     key
   end

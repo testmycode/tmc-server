@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # CanCan ability definitions.
 #
 # See: https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities

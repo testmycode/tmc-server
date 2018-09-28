@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Stores large data such as the returned ZIP and compressed I/O logs for a submission.
 #
 # In addition to good old separation of concerns, it is useful to force these to be
@@ -9,92 +11,62 @@ class SubmissionData < ActiveRecord::Base
   belongs_to :submission
 
   def stdout
-    @stdout ||=
-      if !stdout_compressed.nil?
+    unless stdout_compressed.nil?
+      @stdout ||=
         uncompress(stdout_compressed)
-      else
-        nil
-      end
+    end
   end
 
   def stdout=(value)
-    if !value.nil?
-      self.stdout_compressed = compress(value)
-    else
-      self.stdout_compressed = nil
-    end
+    self.stdout_compressed = (compress(value) unless value.nil?)
     @stdout = value
   end
 
   def stderr
-    @stderr ||=
-      if !stderr_compressed.nil?
+    unless stderr_compressed.nil?
+      @stderr ||=
         uncompress(stderr_compressed)
-      else
-        nil
-      end
+    end
   end
 
   def stderr=(value)
-    if !value.nil?
-      self.stderr_compressed = compress(value)
-    else
-      self.stderr_compressed = nil
-    end
+    self.stderr_compressed = (compress(value) unless value.nil?)
     @stderr = value
   end
 
   def vm_log
-    @vm_log ||=
-      if !vm_log_compressed.nil?
+    unless vm_log_compressed.nil?
+      @vm_log ||=
         uncompress(vm_log_compressed)
-      else
-        nil
-      end
+    end
   end
 
   def vm_log=(value)
-    if !value.nil?
-      self.vm_log_compressed = compress(value)
-    else
-      self.vm_log_compressed = nil
-    end
+    self.vm_log_compressed = (compress(value) unless value.nil?)
     @vm_log = value
   end
 
   def valgrind
-    @valgrind ||=
-      if !valgrind_compressed.nil?
+    unless valgrind_compressed.nil?
+      @valgrind ||=
         uncompress(valgrind_compressed)
-      else
-        nil
-      end
+    end
   end
 
   def valgrind=(value)
-    if !value.nil?
-      self.valgrind_compressed = compress(value)
-    else
-      self.valgrind_compressed = nil
-    end
+    self.valgrind_compressed = (compress(value) unless value.nil?)
     @valgrind = value
   end
 
   def validations
-    @validations ||=
-      if !validations_compressed.nil?
+    unless validations_compressed.nil?
+      @validations ||=
         uncompress(validations_compressed)
-      else
-        nil
-      end
+    end
   end
 
   def validations=(value)
-    if !value.nil?
-      self.validations_compressed = compress(value)
-    else
-      self.validations_compressed = nil
-    end
+    self.validations_compressed = (compress(value) unless value.nil?)
     @validations = value
   end
 

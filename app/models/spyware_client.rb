@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'site_setting'
 require 'uri'
 require 'net/http'
@@ -6,9 +8,7 @@ require 'zlib'
 class SpywareClient
   def self.send_data_to_any(data, username, session_id)
     client = open
-    if client
-      client.send_data(data, username, session_id)
-    end
+    client&.send_data(data, username, session_id)
   end
 
   def self.open

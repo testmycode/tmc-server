@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pathname'
 
 # Represents a `.tmcproject.yml` file.
@@ -16,12 +18,12 @@ class TmcProjectFile
   def self.for_project(project_dir)
     file = Pathname(project_dir) + '.tmcproject.yml'
     TmcProjectFile.new(YAML.load_file(file))
-  rescue
+  rescue StandardError
     empty
   end
 
   def force_new_sandbox
-    return false if !@data
+    return false unless @data
     @data['force_new_sandbox']
   end
 

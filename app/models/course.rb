@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'gdocs_export'
 require 'course_refresher'
 require 'system_commands'
@@ -8,55 +10,55 @@ class Course < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :Course do
-    key :required, [ :name, :hide_after, :hidden, :cache_version, :spreadsheet_key, :hidden_if_registered_after,
-                     :refreshed_at, :locked_exercise_points_visible, :description, :paste_visibility, :formal_name,
-                     :certificate_downloadable, :certificate_unlock_spec, :organization_id, :disabled_status,
-                     :title, :material_url, :course_template_id, :hide_submission_results, :external_scoreboard_url,]
+    key :required, %i[name hide_after hidden cache_version spreadsheet_key hidden_if_registered_after
+                      refreshed_at locked_exercise_points_visible description paste_visibility formal_name
+                      certificate_downloadable certificate_unlock_spec organization_id disabled_status
+                      title material_url course_template_id hide_submission_results external_scoreboard_url]
 
-    property :name, type: :string, example: "organizationid-coursename"
-    property :hide_after, type: :string, example: "2016-10-10T13:22:19.554+03:00"
+    property :name, type: :string, example: 'organizationid-coursename'
+    property :hide_after, type: :string, example: '2016-10-10T13:22:19.554+03:00'
     property :hidden, type: :boolean, example: false
     property :cache_version, type: :integer, example: 1
     property :spreadsheet_key, type: :string
     property :hidden_if_registered_after, type: :string
-    property :refreshed_at, type: :string, example: "2016-10-10T13:22:36.871+03:00"
+    property :refreshed_at, type: :string, example: '2016-10-10T13:22:36.871+03:00'
     property :locked_exercise_points_visible, type: :boolean, example: true
-    property :description, type: :string, example: ""
+    property :description, type: :string, example: ''
     property :paste_visibility, type: :string
     property :formal_name, type: :string
     property :certificate_downloadable, type: :boolean, example: false
     property :certificate_unlock_spec, type: :string
     property :organization_id, type: :integer, example: 1
-    property :disabled_status, type: :string, example: "enabled"
-    property :title, type: :string, example: "testcourse"
-    property :material_url, type: :string, example: ""
+    property :disabled_status, type: :string, example: 'enabled'
+    property :title, type: :string, example: 'testcourse'
+    property :material_url, type: :string, example: ''
     property :course_template_id, type: :integer, example: 1
     property :hide_submission_results, type: :boolean, example: false
     property :external_scoreboard_url, type: :string
-    property :organization_slug, type: :string, example: "hy"
+    property :organization_slug, type: :string, example: 'hy'
   end
 
   swagger_schema :CoreCourseDetails do
-    key :required, [ :id, :name, :title, :description, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls, :unlockables, :exercises, ]
+    key :required, %i[id name title description details_url unlock_url reviews_url comet_url spyware_urls unlockables exercises]
 
     property :id, type: :integer, example: 13
-    property :name, type: :string, example: "organizationid-coursename"
-    property :title, type: :string, example: "coursetitle"
-    property :description, type: :string, example: "description of the course"
-    property :details_url, type: :string, example: "http://tmc.mooc.fi/api/v8/core/courses/13"
-    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
-    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
-    property :comet_url, type: :string, example: "https://tmc.mooc.fi:8443/comet"
+    property :name, type: :string, example: 'organizationid-coursename'
+    property :title, type: :string, example: 'coursetitle'
+    property :description, type: :string, example: 'description of the course'
+    property :details_url, type: :string, example: 'http://tmc.mooc.fi/api/v8/core/courses/13'
+    property :unlock_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/courses/13/unlock'
+    property :reviews_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/courses/13/reviews'
+    property :comet_url, type: :string, example: 'https://tmc.mooc.fi:8443/comet'
     property :spyware_urls, type: :array do
       items do
         key :type, :string
-        key :example, "http://mooc.spyware.testmycode.net/"
+        key :example, 'http://mooc.spyware.testmycode.net/'
       end
     end
     property :unlockables, type: :array do
       items do
         key :type, :string
-        key :example, ""
+        key :example, ''
       end
     end
     property :exercises, type: :array do
@@ -67,62 +69,62 @@ class Course < ActiveRecord::Base
   end
 
   def course_as_json
-    as_json(only: [
-        :name,
-        :hide_after,
-        :hidden,
-        :cache_version,
-        :spreadsheet_key,
-        :hidden_if_registered_after,
-        :refreshed_at,
-        :locked_exercise_points_visible,
-        :description,
-        :paste_visibility,
-        :formal_name,
-        :certificate_downloadable,
-        :certificate_unlock_spec,
-        :organization_id,
-        :disabled_status,
-        :title,
-        :descrpition,
-        :material_url,
-        :course_template_id,
-        :hide_submission_results,
-        :external_scoreboard_url,
-    ],
-    methods: :organization_slug)
+    as_json(only: %i[
+              name
+              hide_after
+              hidden
+              cache_version
+              spreadsheet_key
+              hidden_if_registered_after
+              refreshed_at
+              locked_exercise_points_visible
+              description
+              paste_visibility
+              formal_name
+              certificate_downloadable
+              certificate_unlock_spec
+              organization_id
+              disabled_status
+              title
+              descrpition
+              material_url
+              course_template_id
+              hide_submission_results
+              external_scoreboard_url
+            ],
+            methods: :organization_slug)
   end
 
   swagger_schema :CourseLinks do
-    key :required, [ :id, :name, :title, :description, :details_url, :unlock_url, :reviews_url, :comet_url, :spyware_urls ]
+    key :required, %i[id name title description details_url unlock_url reviews_url comet_url spyware_urls]
 
     property :id, type: :integer, example: 13
-    property :name, type: :string, example: "organizationid-coursename"
-    property :title, type: :string, example: "coursetitle"
-    property :description, type: :string, example: "description of the course"
-    property :details_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13"
-    property :unlock_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/unlock"
-    property :reviews_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/courses/13/reviews"
-    property :comet_url, type: :string, example: "https://tmc.mooc.fi:8443/comet"
+    property :name, type: :string, example: 'organizationid-coursename'
+    property :title, type: :string, example: 'coursetitle'
+    property :description, type: :string, example: 'description of the course'
+    property :details_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/courses/13'
+    property :unlock_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/courses/13/unlock'
+    property :reviews_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/courses/13/reviews'
+    property :comet_url, type: :string, example: 'https://tmc.mooc.fi:8443/comet'
     property :spyware_urls, type: :array do
       items do
         key :type, :string
-        key :example, "http://mooc.spyware.testmycode.net/"
+        key :example, 'http://mooc.spyware.testmycode.net/'
       end
     end
   end
 
   def links_as_json(view_context)
     {
-        id: self.id,
-        name: self.name,
-        title: self.title,
-        description: self.description,
-        details_url: view_context.api_v8_core_course_url(self),
-        unlock_url: view_context.api_v8_core_course_unlock_url(self),
-        reviews_url: view_context.api_v8_core_course_reviews_url(self),
-        comet_url: CometServer.get.client_url,
-        spyware_urls: SiteSetting.value('spyware_servers'),
+      id: id,
+      name: name,
+      title: title,
+      description: description,
+      details_url: view_context.api_v8_core_course_url(self),
+      unlock_url: view_context.api_v8_core_course_unlock_url(self),
+      reviews_url: view_context.api_v8_core_course_reviews_url(self),
+      comet_url: CometServer.get.client_url,
+      spyware_urls: SiteSetting.value('spyware_servers')
     }.as_json
   end
 
@@ -145,7 +147,7 @@ class Course < ActiveRecord::Base
   before_save :set_cache_version
   before_validation :save_template
   validates :source_url, presence: true
-  #validates :custom_points_url,
+  # validates :custom_points_url,
   #          format: {
   #            with: /(\Ahttps?:\/\/|\A\z|^$)/,
   #            message: 'should begin with http:// or https://'
@@ -172,7 +174,7 @@ class Course < ActiveRecord::Base
 
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
-  enum disabled_status: [ :enabled, :disabled ]
+  enum disabled_status: %i[enabled disabled]
 
   def destroy
     # Optimization: delete dependent objects quickly.
@@ -180,7 +182,7 @@ class Course < ActiveRecord::Base
     # Even self.association.delete_all first does a SELECT.
     # This relies on the database to cascade deletes.
     ActiveRecord::Base.connection.execute("DELETE FROM courses WHERE id = #{id}")
-    assistantships.each { |a| a.destroy! } # apparently this is not performed automatically with optimized destroy
+    assistantships.each(&:destroy!) # apparently this is not performed automatically with optimized destroy
 
     # Delete cache.
     delete_cache # Would be an after_destroy callback normally
@@ -209,38 +211,24 @@ class Course < ActiveRecord::Base
                course_template: course_template)
   end
 
-  def git_branch
-    course_template_obj.git_branch
-  end
+  delegate :git_branch, to: :course_template_obj
 
-  def organization_slug
-    organization.slug
-  end
+  delegate :slug, to: :organization, prefix: true
 
-  def source_url
-    course_template_obj.source_url
-  end
+  delegate :source_url, to: :course_template_obj
 
-  def source_backend
-    course_template_obj.source_backend
-  end
+  delegate :source_backend, to: :course_template_obj
 
-  def git_branch=(branch)
-    course_template_obj.git_branch = branch
-  end
+  delegate :git_branch=, to: :course_template_obj
 
-  def source_url=(url)
-    course_template_obj.source_url = url
-  end
+  delegate :source_url=, to: :course_template_obj
 
-  def source_backend=(backend)
-    course_template_obj.source_backend = backend
-  end
+  delegate :source_backend=, to: :course_template_obj
 
   def visible_to?(user)
     user.administrator? ||
-    user.teacher?(organization) ||
-    user.assistant?(self) || (
+      user.teacher?(organization) ||
+      user.assistant?(self) || (
       initial_refresh_ready? &&
       !disabled? &&
       !hidden &&
@@ -250,7 +238,7 @@ class Course < ActiveRecord::Base
         hidden_if_registered_after > Time.now ||
         (!user.guest? && hidden_if_registered_after > user.created_at)
       )
-    )
+      )
   end
 
   def hide_after=(x)
@@ -263,45 +251,29 @@ class Course < ActiveRecord::Base
 
   # This could eventually be made a hstore
   def options=(new_options)
-    if !new_options['hide_after'].blank?
-      self.hide_after = new_options['hide_after']
-    else
-      self.hide_after = nil
-    end
+    self.hide_after = new_options['hide_after'].presence
 
-    if !new_options['hidden_if_registered_after'].blank?
-      self.hidden_if_registered_after = new_options['hidden_if_registered_after']
-    else
-      self.hidden_if_registered_after = nil
-    end
+    self.hidden_if_registered_after = new_options['hidden_if_registered_after'].presence
 
     self.hidden = !!new_options['hidden']
     self.spreadsheet_key = new_options['spreadsheet_key']
 
     self.paste_visibility = new_options['paste_visibility']
-    if !new_options['locked_exercise_points_visible'].nil?
-      self.locked_exercise_points_visible = new_options['locked_exercise_points_visible']
-    else
-      self.locked_exercise_points_visible = true
-    end
+    self.locked_exercise_points_visible = if !new_options['locked_exercise_points_visible'].nil?
+                                            new_options['locked_exercise_points_visible']
+                                          else
+                                            true
+                                          end
 
-    if !new_options['formal_name'].blank?
-      self.formal_name = new_options['formal_name']
-    else
-      self.formal_name = nil
-    end
+    self.formal_name = new_options['formal_name'].presence
 
     self.certificate_downloadable = !!new_options['certificate_downloadable']
 
-    if !new_options['certificate_unlock_spec'].blank?
-      self.certificate_unlock_spec = new_options['certificate_unlock_spec']
-    else
-      self.certificate_unlock_spec = nil
-    end
+    self.certificate_unlock_spec = new_options['certificate_unlock_spec'].presence
   end
 
   def gdocs_sheets(exercises = nil)
-    exercises = self.exercises.select { |ex| !ex.hidden? && ex.published? } unless exercises
+    exercises ||= self.exercises.select { |ex| !ex.hidden? && ex.published? }
     exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
   end
 
@@ -313,13 +285,9 @@ class Course < ActiveRecord::Base
     "#{FileStore.root}/course"
   end
 
-  def increment_cache_version
-    course_template_obj.increment_cache_version
-  end
+  delegate :increment_cache_version, to: :course_template_obj
 
-  def cache_path
-    course_template_obj.cache_path
-  end
+  delegate :cache_path, to: :course_template_obj
 
   # Holds a clone of the course repository
   def clone_path
@@ -329,13 +297,9 @@ class Course < ActiveRecord::Base
   def git_revision
     Dir.chdir clone_path do
       output = `git rev-parse --verify HEAD`
-      if $?.success?
-        output.strip
-      else
-        nil
-      end
+      output.strip if $?.success?
     end
-  rescue
+  rescue StandardError
     nil
   end
 
@@ -359,7 +323,7 @@ class Course < ActiveRecord::Base
     @groups = nil if force_reload
     @groups ||= begin
       result = exercises.all.map(&:exercise_group_name).uniq
-        .map { |gname| ExerciseGroup.new(self, gname) }
+                        .map { |gname| ExerciseGroup.new(self, gname) }
 
       new_parents = []
       begin
@@ -411,20 +375,12 @@ class Course < ActiveRecord::Base
 
   def time_of_first_submission
     sub = submissions.order('created_at ASC').limit(1).first
-    if sub
-      sub.created_at
-    else
-      nil
-    end
+    sub&.created_at
   end
 
   def time_of_last_submission
     sub = submissions.order('created_at DESC').limit(1).first
-    if sub
-      sub.created_at
-    else
-      nil
-    end
+    sub&.created_at
   end
 
   def reviews_required
@@ -458,7 +414,7 @@ class Course < ActiveRecord::Base
   end
 
   def toggle_submission_result_visiblity
-    self.hide_submission_results = !self.hide_submission_results
+    self.hide_submission_results = !hide_submission_results
     save!
   end
 
@@ -470,11 +426,11 @@ class Course < ActiveRecord::Base
     # TODO: clean up exercise group discovery
 
     groups = exercises
-      .where(disabled_status: 0)
-      .select { |e| e._fast_visible? }
-      .map(&:name)
-      .map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }
-      .uniq
+             .where(disabled_status: 0)
+             .select(&:_fast_visible?)
+             .map(&:name)
+             .map { |name| name =~ /^(.+)-[^-]+$/ ? Regexp.last_match(1) : '' }
+             .uniq
 
     result = {}
     for group in groups
@@ -506,7 +462,7 @@ class Course < ActiveRecord::Base
   def exercise_group_completion_counts_for_user(user)
     # TODO: clean up exercise group discovery
 
-    groups = exercises.map(&:name).map { |name| if name =~ /^(.+)-[^-]+$/ then $1 else '' end }.uniq.sort
+    groups = exercises.map(&:name).map { |name| name =~ /^(.+)-[^-]+$/ ? Regexp.last_match(1) : '' }.uniq.sort
 
     conn = ActiveRecord::Base.connection
     groups.each_with_object({}) do |group, result|
@@ -524,8 +480,8 @@ class Course < ActiveRecord::Base
 
       res = conn.execute(sql).values.to_h
       result[group] = {
-        awarded: res["f"].nil? ? 0 : res["f"].to_i,
-        late: res["t"].nil? ? 0 : res["t"].to_i,
+        awarded: res['f'].nil? ? 0 : res['f'].to_i,
+        late: res['t'].nil? ? 0 : res['t'].to_i,
         available_points: available_points.length
       }
     end
@@ -544,14 +500,12 @@ class Course < ActiveRecord::Base
   end
 
   def contains_unlock_deadlines?
-    exercise_groups.any? { |group| group.contains_unlock_deadlines?}
+    exercise_groups.any?(&:contains_unlock_deadlines?)
   end
 
   def material_url=(material)
     return super('') if material.blank?
-    unless material =~ /^https?:\/\//
-      return super("http://#{material}")
-    end
+    return super("http://#{material}") unless /^https?:\/\//.match?(material)
     super(material)
   end
 
@@ -565,15 +519,15 @@ class Course < ActiveRecord::Base
   end
 
   def contains_unlock_deadlines?
-    exercise_groups.any? { |group| group.contains_unlock_deadlines?}
+    exercise_groups.any?(&:contains_unlock_deadlines?)
   end
 
   def has_external_scoreboard_url?
-    !external_scoreboard_url.blank?
+    external_scoreboard_url.present?
   end
 
   def parsed_external_scoreboard_url(organization, course, user)
-    external_scoreboard_url % { user: user.username, course: course.id.to_s, org: organization.slug }
+    format(external_scoreboard_url, user: user.username, course: course.id.to_s, org: organization.slug)
   end
 
   private
@@ -584,7 +538,7 @@ class Course < ActiveRecord::Base
 
   def save_template
     course_template_obj.save!
-  rescue => e
+  rescue StandardError => e
     course_template_obj.errors.full_messages.each do |msg|
       errors.add(:base, msg + e.message)
     end
@@ -597,13 +551,13 @@ class Course < ActiveRecord::Base
   def check_name_length
     # If name starts with organization slug (org-course1), then check that
     # the actual name (course1) is within range (for backward compatibility).
-    if !name.nil? && name.start_with?("#{organization.slug}-")
-      test_range = name_range_with_slug
-    else
-      test_range = name_range
-    end
+    test_range = if !name.nil? && name.start_with?("#{organization.slug}-")
+                   name_range_with_slug
+                 else
+                   name_range
+                 end
 
-    unless (!name.nil? && test_range.include?(name.length))
+    unless !name.nil? && test_range.include?(name.length)
       errors.add(:name, "must be between #{name_range} characters")
     end
   end
@@ -618,10 +572,8 @@ class Course < ActiveRecord::Base
   end
 
   def check_external_scoreboard_url
-    begin
-      external_scoreboard_url % { user: '', course: '', org: '' } unless external_scoreboard_url.blank?
-    rescue
-      errors.add(:external_scoreboard_url, 'contains invalid keys')
-    end
+    format(external_scoreboard_url, user: '', course: '', org: '') if external_scoreboard_url.present?
+  rescue StandardError
+    errors.add(:external_scoreboard_url, 'contains invalid keys')
   end
 end

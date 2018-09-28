@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Parses and abstracts specification in the "unlocked_after" field of a `metadata.yml` file.
 class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
   class InvalidSyntaxError < StandardError; end
@@ -10,13 +12,11 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     @describers = []
     @datetime_count = 0
     conditions.each_with_index do |condition, i|
-      begin
-        parse_condition(condition.to_s.strip) unless condition.to_s.blank?
-      rescue InvalidSyntaxError
-        raise InvalidSyntaxError.new("Invalid syntax in unlock condition #{i + 1} (#{condition})")
-      rescue
-        raise "Problem with unlock condition #{i + 1} (#{condition}): #{$!.message}"
-      end
+      parse_condition(condition.to_s.strip) if condition.to_s.present?
+    rescue InvalidSyntaxError
+      raise InvalidSyntaxError, "Invalid syntax in unlock condition #{i + 1} (#{condition})"
+    rescue StandardError
+      raise "Problem with unlock condition #{i + 1} (#{condition}): #{$!.message}"
     end
   end
 
@@ -35,15 +35,13 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
 
   def description_for(user)
     descrs = @describers.map { |d| d.call(user) }.reject(&:nil?)
-    if !descrs.empty?
+    unless descrs.empty?
       last = descrs.pop
       'To unlock this exercise, you must ' + if descrs.empty?
                                                last
                                              else
                                                "#{descrs.join(', ')} and #{last}"
       end + '.'
-    else
-      nil
     end
   end
 
@@ -60,17 +58,17 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   def parse_condition(str)
     if DateAndTimeUtils.looks_like_date_or_time(str)
       time = DateAndTimeUtils.to_time(str)
-      fail 'Date out of range' if time.year > 10000 || time.year < 1 # Prevent database datetime overflow
-      fail 'You can\'t have multiple unlock dates for the same exercise' if @datetime_count > 0 # Multiple unlock dates don't work correctly
+      raise 'Date out of range' if time.year > 10_000 || time.year < 1 # Prevent database datetime overflow
+      raise 'You can\'t have multiple unlock dates for the same exercise' if @datetime_count > 0 # Multiple unlock dates don't work correctly
       @datetime_count += 1
       @valid_after = DateAndTimeUtils.to_time(str)
 
     elsif str =~ /^exercise\s+(?:group\s+)?(\S+)$/
-      parse_condition("100% of #{$1}")
+      parse_condition("100% of #{Regexp.last_match(1)}")
 
     # TODO: This does not work well with soft deadlines
     elsif str =~ /^points?\s+(\S+.*)$/
-      points = $1.split(' ').map(&:strip).reject(&:empty?)
+      points = Regexp.last_match(1).split(' ').map(&:strip).reject(&:empty?)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
         AwardedPoint.where(user_id: u.id, course_id: @course.id, name: points).count == points.count
@@ -82,9 +80,9 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       end
 
     elsif str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
-      percentage_str = $1
+      percentage_str = Regexp.last_match(1)
       percentage = percentage_str.to_f / 100.0
-      group = $2
+      group = Regexp.last_match(2)
       check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
@@ -97,14 +95,12 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
         remaining = ((percentage - 0.0001) * available.count.to_f).ceil - (awarded.count.to_f + late.count.to_f * @course.soft_deadline_point_multiplier).round(2)
         if remaining > 0
           "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
-        else
-          nil
         end
       end
 
     elsif str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/
-      num_exercises = $1.to_i
-      group = $2
+      num_exercises = Regexp.last_match(1).to_i
+      group = Regexp.last_match(2)
       check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
@@ -117,14 +113,12 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
         remaining = num_exercises - required_exercises.count { |ex| ex.completed_by?(u) }
         if remaining > 0
           "complete #{remaining} more #{plural(remaining, 'exercise')} from #{group}"
-        else
-          nil
         end
       end
 
     elsif str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
-      num_points = $1.to_i
-      group = $2
+      num_points = Regexp.last_match(1).to_i
+      group = Regexp.last_match(2)
       check_group_or_exercise_exists(@course, group)
       @depends_on_other_exercises = true
       @conditions << lambda do |u|
@@ -137,18 +131,16 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
         remaining = num_points - awarded.count
         if remaining > 0
           "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
-        else
-          nil
         end
       end
     else
-      fail InvalidSyntaxError.new('Invalid syntax')
+      raise InvalidSyntaxError, 'Invalid syntax'
     end
   end
 
   def check_group_or_exercise_exists(course, group_or_exercise_name)
     if course.exercises_by_name_or_group(group_or_exercise_name, true).empty?
-      fail "No such exercise or exercise group: #{group_or_exercise_name}. Remember that exercises need to be specified with their full name including their group."
+      raise "No such exercise or exercise group: #{group_or_exercise_name}. Remember that exercises need to be specified with their full name including their group."
     end
   end
 
@@ -156,11 +148,11 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     required_exercises = course.exercises_by_name_or_group(group_or_exercise_name)
                                .select { |e| e.hide_submission_results == false && e.enabled? }
     available = AvailablePoint.course_points_of_exercises_list(course, required_exercises)
-      .map(&:name)
+                              .map(&:name)
     awarded_and_late = AwardedPoint.course_user_points(course, user)
-      .select { |pt| available.include?(pt.name) }
-    awarded = awarded_and_late.select { |a| !a.awarded_after_soft_deadline? }
-    late = awarded_and_late.select { |a| a.awarded_after_soft_deadline? }
+                                   .select { |pt| available.include?(pt.name) }
+    awarded = awarded_and_late.reject(&:awarded_after_soft_deadline?)
+    late = awarded_and_late.select(&:awarded_after_soft_deadline?)
     [available, awarded, late]
   end
 
@@ -177,7 +169,7 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     true
   rescue InvalidSyntaxError
     raise
-  rescue
-    raise InvalidSyntaxError.new $!
+  rescue StandardError
+    raise InvalidSyntaxError, $!
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Stores when a point (course_id, name) has been awared to a particular user.
 #
 # There is a reference to the submission that first awarded the point, but this
@@ -8,7 +10,7 @@ class AwardedPoint < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :AwardedPoint do
-    key :required, [:id, :course_id, :user_id, :submission_id, :name, :created_at]
+    key :required, %i[id course_id user_id submission_id name created_at]
 
     property :id, type: :integer, example: 1
     property :course_id, type: :integer, example: 1
@@ -19,18 +21,18 @@ class AwardedPoint < ActiveRecord::Base
   end
 
   def point_as_json
-    as_json only: [
-      :id,
-      :course_id,
-      :user_id,
-      :submission_id,
-      :name,
-      :created_at
+    as_json only: %i[
+      id
+      course_id
+      user_id
+      submission_id
+      name
+      created_at
     ]
   end
 
   swagger_schema :AwardedPointWithExerciseId do
-    key :required, [:awarded_point, :exercise_id]
+    key :required, %i[awarded_point exercise_id]
 
     property :awarded_point do
       key :"$ref", :AwardedPoint

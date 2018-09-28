@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ActiveRecord::Base
   include Comparable
   include Gravtastic
@@ -5,7 +7,7 @@ class User < ActiveRecord::Base
   gravtastic
 
   swagger_schema :UsersBasicInfo do
-    key :required, [:id, :username, :email]
+    key :required, %i[id username email]
     property :id, type: :integer, example: 1
     property :username, type: :string, example: 'student'
     property :email, type: :string, example: 'student@example.com'
@@ -97,20 +99,19 @@ class User < ActiveRecord::Base
     users = users.where(administrator: false) unless filter_params['include_administrators']
 
     for field in UserField.all
-      unless filter_params[field.name].blank?
-        expected_value =
-          case field.field_type
-          when :boolean
-            '1'
-          else
-            filter_params[field.name]
-          end
-        users = users.where(
-          'EXISTS (SELECT 1 FROM user_field_values WHERE user_id = users.id AND field_name = ? AND value = ?)',
-          field.name,
-          expected_value
-        )
-      end
+      next if filter_params[field.name].blank?
+      expected_value =
+        case field.field_type
+        when :boolean
+          '1'
+        else
+          filter_params[field.name]
+        end
+      users = users.where(
+        'EXISTS (SELECT 1 FROM user_field_values WHERE user_id = users.id AND field_name = ? AND value = ?)',
+        field.name,
+        expected_value
+      )
     end
     users
   end
@@ -125,13 +126,13 @@ class User < ActiveRecord::Base
 
   def self.authenticate(login, submitted_password)
     user = find_by(login: login)
-    user = find_by('lower(email) = ?', login.downcase) unless user
+    user ||= find_by('lower(email) = ?', login.downcase)
     return nil if user.nil?
     return user if user.has_password?(submitted_password)
   end
 
   def password_reset_key
-    self.action_tokens.find { |t| t.action == 'reset_password' }
+    action_tokens.find { |t| t.action == 'reset_password' }
   end
 
   def has_point?(course, point_name)
@@ -170,25 +171,25 @@ class User < ActiveRecord::Base
   def visible_to_teacher?(teacher)
     courses = Course.joins(organization: :teacherships).where(teacherships: { user_id: teacher.id })
     courses.each do |c|
-      return true if self.student_in_course?(c)
+      return true if student_in_course?(c)
     end
     false
   end
 
   def visible_to_assistant?(assistant)
     assistant.assisted_courses.each do |c|
-      return true if self.student_in_course?(c)
+      return true if student_in_course?(c)
     end
     false
   end
 
   def student_in_course?(c)
-    self.in?(User.course_students(c))
+    in?(User.course_students(c))
   end
 
   def student_in_organization?(organization)
     organization.courses.each do |c|
-      return true if self.student_in_course?(c)
+      return true if student_in_course?(c)
     end
     false
   end
@@ -213,7 +214,7 @@ class User < ActiveRecord::Base
     exercises = Exercise.arel_table
     submissions = Submission.arel_table
     sql =
-    query = submissions_exercises_and_points_for_user
+      query = submissions_exercises_and_points_for_user
     without_disabled(query)
     query
       .project(exercises[:course_id], exercises[:name], exercises[:id], submissions[:id].count, Arel::Nodes::SqlLiteral.new('bool_or(submissions.all_tests_passed)').as('all_tests_passed'), Arel::Nodes::SqlLiteral.new('ARRAY_AGG(DISTINCT available_points.name order by available_points.name) = ARRAY_AGG(DISTINCT awarded_points.name order by awarded_points.name)').as('got_all_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT available_points.name, ' ' order by available_points.name)").as('available_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT awarded_points.name, ' ' order by awarded_points.name)").as('awarded_points'))
@@ -231,7 +232,7 @@ class User < ActiveRecord::Base
         all_tests_passed: record['all_tests_passed'] == 't',
         got_all_points: record['got_all_points'] == 't',
         available_points: record['available_points'].nil? ? nil : record['available_points'].split(' '),
-        awarded_points: record['awarded_points'].nil? ? nil : record['awarded_points'].split(' '),
+        awarded_points: record['awarded_points'].nil? ? nil : record['awarded_points'].split(' ')
       }
     end
     result.default = []
@@ -264,10 +265,10 @@ class User < ActiveRecord::Base
     courses = Course.arel_table
     submissions = Submission.arel_table
     submissions.project(submissions[:course_id].as('course_id')).distinct
-      .join(courses).on(submissions[:course_id].eq(courses[:id]))
-      .where(courses[:disabled_status].eq(0))
-      .where(submissions[:user_id].eq(self.id))
-      .order(submissions[:course_id])
+               .join(courses).on(submissions[:course_id].eq(courses[:id]))
+               .where(courses[:disabled_status].eq(0))
+               .where(submissions[:user_id].eq(id))
+               .order(submissions[:course_id])
   end
 
   def without_disabled(query)
@@ -289,9 +290,9 @@ class User < ActiveRecord::Base
     submissions = Submission.arel_table
 
     exercises
-      .join(users, Arel::Nodes::OuterJoin).on(users[:id].eq(self.id))
+      .join(users, Arel::Nodes::OuterJoin).on(users[:id].eq(id))
       .join(available_points, Arel::Nodes::OuterJoin).on(available_points[:exercise_id].eq(exercises[:id]))
-      .join(submissions, Arel::Nodes::OuterJoin).on(submissions[:exercise_name].eq(exercises[:name]), submissions[:user_id].eq(self.id), submissions[:course_id].eq(exercises[:course_id]))
+      .join(submissions, Arel::Nodes::OuterJoin).on(submissions[:exercise_name].eq(exercises[:name]), submissions[:user_id].eq(id), submissions[:course_id].eq(exercises[:course_id]))
       .join(awarded_points, Arel::Nodes::OuterJoin).on(awarded_points[:submission_id].eq(submissions[:id]), awarded_points[:course_id].eq(submissions[:course_id]), awarded_points[:user_id].eq(users[:id]))
       .where(exercises[:course_id].in(course_ids_arel))
       .group(exercises[:name], exercises[:course_id], exercises[:id])
@@ -300,7 +301,7 @@ class User < ActiveRecord::Base
 
   def encrypt_password
     self.salt = make_salt if new_record?
-    self.password_hash = encrypt(password) unless password.blank?
+    self.password_hash = encrypt(password) if password.present?
   end
 
   def encrypt(string)
@@ -316,9 +317,9 @@ class User < ActiveRecord::Base
   end
 
   def reject_common_login_mistakes
-    return if !login || login.empty?
-    errors.add(:login, "may not be your email address. Keep in mind that your username is public to everyone.") if login.include?('@')
-    errors.add(:login, "may not be a number. Use the organizational identifier field for your student number.") if login.scan(/\D/).empty?
+    return if login.blank?
+    errors.add(:login, 'may not be your email address. Keep in mind that your username is public to everyone.') if login.include?('@')
+    errors.add(:login, 'may not be a number. Use the organizational identifier field for your student number.') if login.scan(/\D/).empty?
     errors.add(:email, 'may not end with "@ad.helsinki.fi". You cannot receive any emails with this address -- it\'s only used for your webmail login. Figure out what your real email address is and try again. It is usually of the form firstname.lastname@helsinki.fi but verify this first.') if email.end_with?('@ad.helsinki.fi')
     errors.add(:email, 'is incorrect. You probably meant firstname.lastname@helsinki.fi. Keep in mind that your email address does not contain your University of Helsinki username.') if email.end_with?('@helsinki.fi') && !/.*\..*@helsinki.fi/.match?(email)
   end

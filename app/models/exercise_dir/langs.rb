@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'exercise_dir'
 require 'tempfile'
 
 class ExerciseDir
   class Langs < ExerciseDir
     def library_jars
-      raise "not in langs"
+      raise 'not in langs'
       unless @jars
         Tempfile.open('classpath') do |tmpfile|
           Dir.chdir @path do
@@ -19,7 +21,7 @@ class ExerciseDir
 
     def clean!
       Dir.chdir @path do
-        raise "do in langs"
+        raise 'do in langs'
       end
     end
 

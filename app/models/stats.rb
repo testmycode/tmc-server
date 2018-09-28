@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Helpers for serving /stats.
 module Stats
   def self.courses(organization = nil)
@@ -10,11 +12,11 @@ module Stats
   end
 
   def self.for_course(course)
-    keys = [
-      :participants_with_submissions_count,
-      :completed_exercise_count,
-      :possible_completed_exercise_count,
-      :exercise_group_stats
+    keys = %i[
+      participants_with_submissions_count
+      completed_exercise_count
+      possible_completed_exercise_count
+      exercise_group_stats
     ]
     keys.reduce({}) { |h, k| h.merge(k => send(k, course)) }
   end
@@ -42,7 +44,7 @@ module Stats
 
   def self.participants_with_submissions_count(exercise_or_course = nil)
     exercises = get_exercises(exercise_or_course)
-    if exercises && !exercises.empty?
+    if exercises.present?
       exercise_keys = exercises.map { |e| "(#{e.course_id}, #{ActiveRecord::Base.quote_value(e.name, nil)})" }
       exercises_clause = "AND (course_id, exercise_name) IN (#{exercise_keys.join(',')})"
       all_regular_users.where("EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{exercises_clause})").count

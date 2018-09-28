@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 # Represents the contents of `config/site.yml`.
 class SiteSetting
   def self.value(key)
     key = key.to_s
-    fail "No such setting: #{key}" unless all_settings.key?(key)
+    raise "No such setting: #{key}" unless all_settings.key?(key)
     all_settings[key]
   end
 
@@ -19,12 +21,11 @@ class SiteSetting
   def self.settings_from_files(files)
     result = {}
     files.each do |path|
-      if File.exist?(path)
-        template = ERB.new File.new(path).read
-        data = YAML.load template.result(binding)
-        fail "Invalid configuration file #{path}" unless data.is_a? Hash
-        result = result.deep_merge(data)
-      end
+      next unless File.exist?(path)
+      template = ERB.new File.new(path).read
+      data = YAML.safe_load template.result(binding)
+      raise "Invalid configuration file #{path}" unless data.is_a? Hash
+      result = result.deep_merge(data)
     end
     result
   end

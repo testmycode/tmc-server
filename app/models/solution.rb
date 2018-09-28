@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 
 # Represents a solution (files prepared by CourseRefresher).

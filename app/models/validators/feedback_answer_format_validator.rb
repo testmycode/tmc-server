@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
   def validate(record)
     kind = record.feedback_question.kind
@@ -5,8 +7,8 @@ class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
     errors = record.errors[:answer]
 
     if kind =~ FeedbackQuestion.send(:intrange_regex)
-      range = ($1.to_i)..($2.to_i)
-      if !(ans =~ /^(-?\d+)$/)
+      range = (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
+      if !/^(-?\d+)$/.match?(ans)
         errors << 'is not an integer'
       elsif !range.include?(ans.to_i)
         errors << "is not between #{range.first}..#{range.last}"
