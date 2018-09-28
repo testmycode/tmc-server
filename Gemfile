@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 # source 'http://production.cf.rubygems.org/'
@@ -36,9 +38,9 @@ gem 'pghero'
 
 gem 'swagger-blocks', '~> 1.3.4'
 
-gem 'sass-rails', '~> 5.0'
 gem 'bootstrap', '~> 4.0.0.beta2.1'
-gem "font-awesome-rails"
+gem 'font-awesome-rails'
+gem 'sass-rails', '~> 5.0'
 
 group :assets do
   gem 'jquery-rails', '~> 3.1.2'
