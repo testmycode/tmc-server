@@ -38,8 +38,15 @@ module Api
           @submission = Submission.find_by!(id: params[:id])
           unless @submission.processed?
             authorization_skip!
+            sandbox_status = :created
+            if @submission.processing_began_at
+              sandbox_status = :processing_on_sandbox
+            elsif @submission.processing_tried_at
+              sandbox_status = :sending_to_sandbox
+            end
             return render json: {
-              status: :processing
+              status: :processing,
+              sandbox_status: sandbox_status
             }
           end
           unauthorize_guest!
