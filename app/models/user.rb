@@ -261,66 +261,66 @@ class User < ActiveRecord::Base
 
   private
 
-  def course_ids_arel
-    courses = Course.arel_table
-    submissions = Submission.arel_table
-    submissions.project(submissions[:course_id].as('course_id')).distinct
-               .join(courses).on(submissions[:course_id].eq(courses[:id]))
-               .where(courses[:disabled_status].eq(0))
-               .where(submissions[:user_id].eq(id))
-               .order(submissions[:course_id])
-  end
+    def course_ids_arel
+      courses = Course.arel_table
+      submissions = Submission.arel_table
+      submissions.project(submissions[:course_id].as('course_id')).distinct
+                 .join(courses).on(submissions[:course_id].eq(courses[:id]))
+                 .where(courses[:disabled_status].eq(0))
+                 .where(submissions[:user_id].eq(id))
+                 .order(submissions[:course_id])
+    end
 
-  def without_disabled(query)
-    exercises = Exercise.arel_table
-    query.where(exercises[:disabled_status].eq(0))
-    query.where(exercises[:hidden].eq(false))
-  end
+    def without_disabled(query)
+      exercises = Exercise.arel_table
+      query.where(exercises[:disabled_status].eq(0))
+      query.where(exercises[:hidden].eq(false))
+    end
 
-  def without_hidden_points(query)
-    exercises = Exercise.arel_table
-    query.where(exercises[:hide_submission_results].eq(false))
-  end
+    def without_hidden_points(query)
+      exercises = Exercise.arel_table
+      query.where(exercises[:hide_submission_results].eq(false))
+    end
 
-  def submissions_exercises_and_points_for_user
-    users = User.arel_table
-    awarded_points = AwardedPoint.arel_table
-    available_points = AvailablePoint.arel_table
-    exercises = Exercise.arel_table
-    submissions = Submission.arel_table
+    def submissions_exercises_and_points_for_user
+      users = User.arel_table
+      awarded_points = AwardedPoint.arel_table
+      available_points = AvailablePoint.arel_table
+      exercises = Exercise.arel_table
+      submissions = Submission.arel_table
 
-    exercises
-      .join(users, Arel::Nodes::OuterJoin).on(users[:id].eq(id))
-      .join(available_points, Arel::Nodes::OuterJoin).on(available_points[:exercise_id].eq(exercises[:id]))
-      .join(submissions, Arel::Nodes::OuterJoin).on(submissions[:exercise_name].eq(exercises[:name]), submissions[:user_id].eq(id), submissions[:course_id].eq(exercises[:course_id]))
-      .join(awarded_points, Arel::Nodes::OuterJoin).on(awarded_points[:submission_id].eq(submissions[:id]), awarded_points[:course_id].eq(submissions[:course_id]), awarded_points[:user_id].eq(users[:id]))
-      .where(exercises[:course_id].in(course_ids_arel))
-      .group(exercises[:name], exercises[:course_id], exercises[:id])
-      .order(exercises[:name], exercises[:course_id])
-  end
+      exercises
+        .join(users, Arel::Nodes::OuterJoin).on(users[:id].eq(id))
+        .join(available_points, Arel::Nodes::OuterJoin).on(available_points[:exercise_id].eq(exercises[:id]))
+        .join(submissions, Arel::Nodes::OuterJoin).on(submissions[:exercise_name].eq(exercises[:name]), submissions[:user_id].eq(id), submissions[:course_id].eq(exercises[:course_id]))
+        .join(awarded_points, Arel::Nodes::OuterJoin).on(awarded_points[:submission_id].eq(submissions[:id]), awarded_points[:course_id].eq(submissions[:course_id]), awarded_points[:user_id].eq(users[:id]))
+        .where(exercises[:course_id].in(course_ids_arel))
+        .group(exercises[:name], exercises[:course_id], exercises[:id])
+        .order(exercises[:name], exercises[:course_id])
+    end
 
-  def encrypt_password
-    self.salt = make_salt if new_record?
-    self.password_hash = encrypt(password) if password.present?
-  end
+    def encrypt_password
+      self.salt = make_salt if new_record?
+      self.password_hash = encrypt(password) if password.present?
+    end
 
-  def encrypt(string)
-    secure_hash("#{salt}--#{string}")
-  end
+    def encrypt(string)
+      secure_hash("#{salt}--#{string}")
+    end
 
-  def make_salt
-    secure_hash("#{Time.now.utc}--#{password}")
-  end
+    def make_salt
+      secure_hash("#{Time.now.utc}--#{password}")
+    end
 
-  def secure_hash(string)
-    Digest::SHA2.hexdigest(string)
-  end
+    def secure_hash(string)
+      Digest::SHA2.hexdigest(string)
+    end
 
-  def reject_common_login_mistakes
-    return if login.blank?
-    errors.add(:login, 'may not be your email address. Keep in mind that your username is public to everyone.') if login.include?('@')
-    errors.add(:login, 'may not be a number. Use the organizational identifier field for your student number.') if login.scan(/\D/).empty?
-    errors.add(:email, 'may not end with "@ad.helsinki.fi". You cannot receive any emails with this address -- it\'s only used for your webmail login. Figure out what your real email address is and try again. It is usually of the form firstname.lastname@helsinki.fi but verify this first.') if email.end_with?('@ad.helsinki.fi')
-    errors.add(:email, 'is incorrect. You probably meant firstname.lastname@helsinki.fi. Keep in mind that your email address does not contain your University of Helsinki username.') if email.end_with?('@helsinki.fi') && !/.*\..*@helsinki.fi/.match?(email)
-  end
+    def reject_common_login_mistakes
+      return if login.blank?
+      errors.add(:login, 'may not be your email address. Keep in mind that your username is public to everyone.') if login.include?('@')
+      errors.add(:login, 'may not be a number. Use the organizational identifier field for your student number.') if login.scan(/\D/).empty?
+      errors.add(:email, 'may not end with "@ad.helsinki.fi". You cannot receive any emails with this address -- it\'s only used for your webmail login. Figure out what your real email address is and try again. It is usually of the form firstname.lastname@helsinki.fi but verify this first.') if email.end_with?('@ad.helsinki.fi')
+      errors.add(:email, 'is incorrect. You probably meant firstname.lastname@helsinki.fi. Keep in mind that your email address does not contain your University of Helsinki username.') if email.end_with?('@helsinki.fi') && !/.*\..*@helsinki.fi/.match?(email)
+    end
 end

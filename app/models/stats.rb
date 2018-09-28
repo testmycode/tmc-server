@@ -65,21 +65,21 @@ module Stats
 
   private
 
-  def self.all_regular_users
-    User.where(administrator: false)
-  end
-
-  def self.all_nonhidden_exercises
-    Exercise.where(hidden: false)
-  end
-
-  def self.get_exercises(exercise_or_course = nil)
-    if exercise_or_course.nil?
-      all_nonhidden_exercises
-    elsif exercise_or_course.is_a?(Course)
-      exercise_or_course.exercises.where(hidden: false)
-    else
-      exercise_or_course
+    def self.all_regular_users
+      User.where(administrator: false)
     end
-  end
+
+    def self.all_nonhidden_exercises
+      Exercise.where(hidden: false)
+    end
+
+    def self.get_exercises(exercise_or_course = nil)
+      if exercise_or_course.nil?
+        all_nonhidden_exercises
+      elsif exercise_or_course.is_a?(Course)
+        exercise_or_course.exercises.where(hidden: false)
+      else
+        exercise_or_course
+      end
+    end
 end

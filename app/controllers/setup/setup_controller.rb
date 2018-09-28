@@ -80,53 +80,53 @@ class Setup::SetupController < ApplicationController
 
   private
 
-  def save_wizard_to_session(phase = 1)
-    return if setup_in_progress?
-    session[:ongoing_course_setup] = {
-      course_id: nil,
-      phase: phase,
-      started: Time.now
-    }
-  end
-
-  def setup_in_progress?
-    return false if session[:ongoing_course_setup].nil?
-    if !session[:ongoing_course_setup][:course_id].nil? && !@course.nil?
-      session[:ongoing_course_setup][:course_id] == @course.id
-    else
-      true
+    def save_wizard_to_session(phase = 1)
+      return if setup_in_progress?
+      session[:ongoing_course_setup] = {
+        course_id: nil,
+        phase: phase,
+        started: Time.now
+      }
     end
-  end
 
-  def course_choosed?
-    return false if session[:ongoing_course_setup].nil?
-    !session[:ongoing_course_setup][:course_id].nil?
-  end
-
-  def reset_setup_session
-    session[:ongoing_course_setup] = nil
-  end
-
-  def update_setup_phase(phase)
-    if setup_in_progress?
-      session[:ongoing_course_setup][:phase] = phase if session[:ongoing_course_setup][:phase] < phase
+    def setup_in_progress?
+      return false if session[:ongoing_course_setup].nil?
+      if !session[:ongoing_course_setup][:course_id].nil? && !@course.nil?
+        session[:ongoing_course_setup][:course_id] == @course.id
+      else
+        true
+      end
     end
-  end
 
-  def update_setup_course(id = nil)
-    return unless setup_in_progress?
-    session[:ongoing_course_setup][:course_id] = if id.nil?
-                                                   @course.id
-                                                 else
-                                                   id
-                                                 end
-  end
+    def course_choosed?
+      return false if session[:ongoing_course_setup].nil?
+      !session[:ongoing_course_setup][:course_id].nil?
+    end
 
-  def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id])
-  end
+    def reset_setup_session
+      session[:ongoing_course_setup] = nil
+    end
 
-  def set_course
-    @course = Course.find(params[:course_id]) unless params[:course_id].nil?
-  end
+    def update_setup_phase(phase)
+      if setup_in_progress?
+        session[:ongoing_course_setup][:phase] = phase if session[:ongoing_course_setup][:phase] < phase
+      end
+    end
+
+    def update_setup_course(id = nil)
+      return unless setup_in_progress?
+      session[:ongoing_course_setup][:course_id] = if id.nil?
+        @course.id
+      else
+        id
+      end
+    end
+
+    def set_organization
+      @organization = Organization.find_by(slug: params[:organization_id])
+    end
+
+    def set_course
+      @course = Course.find(params[:course_id]) unless params[:course_id].nil?
+    end
 end

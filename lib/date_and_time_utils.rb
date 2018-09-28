@@ -14,10 +14,10 @@ module DateAndTimeUtils
 
     if d.is_a? Date
       d = if options[:prefer_end_of_day]
-            d.end_of_day
-          else
-            d.beginning_of_day
-          end
+        d.end_of_day
+      else
+        d.beginning_of_day
+      end
     elsif !d.is_a?(Time)
       raise "Invalid date or time: #{input}"
     end

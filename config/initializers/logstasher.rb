@@ -6,10 +6,10 @@ if LogStasher.enabled?
     # so you have access to all controller methods
     begin
       fields[:user] = if current_user&.login
-                        current_user.login
-                      else
-                        'guest'
-                      end
+        current_user.login
+      else
+        'guest'
+      end
     rescue NameError
       fields[:user] = 'pghero/api?'
     end

@@ -8,7 +8,7 @@ module Api
 
         swagger_path '/api/v8/users/basic_info_by_usernames' do
           operation :post do
-            key :description, 'Find all users\' basic infos with the posted json array of usernames'
+            key :description, "Find all users' basic infos with the posted json array of usernames"
             key :operationId, 'findUsersBasicInfoByUsernames'
             parameter do
               key :name, :usernames
@@ -26,7 +26,7 @@ module Api
               'user'
             ]
             response 200 do
-              key :description, 'Users\' username, email, and administrator status by usernames as json'
+              key :description, "Users' username, email, and administrator status by usernames as json"
               schema do
                 key :title, :user
                 key :required, [:user]

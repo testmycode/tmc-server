@@ -26,11 +26,11 @@ class MavenCacheSeeder
 
   private
 
-  def self.find_pom_xmls(clone_dir)
-    result = []
-    clone_dir.find do |path|
-      result << path if path.basename.to_s == 'pom.xml'
+    def self.find_pom_xmls(clone_dir)
+      result = []
+      clone_dir.find do |path|
+        result << path if path.basename.to_s == 'pom.xml'
+      end
+      result
     end
-    result
-  end
 end

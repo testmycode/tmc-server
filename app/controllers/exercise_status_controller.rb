@@ -19,12 +19,12 @@ class ExerciseStatusController < ApplicationController
     course.exercises.each do |ex|
       ex.set_submissions_by(user, user_subs[ex.name]) # used by completed_by? and attempted_by?
       results[ex.name] = if ex.completed_by?(user)
-                           'completed'
-                         elsif ex.attempted_by?(user)
-                           'attempted'
-                         else
-                           'not_attempted'
-                         end
+        'completed'
+      elsif ex.attempted_by?(user)
+        'attempted'
+      else
+        'not_attempted'
+      end
     end
 
     respond_to do |format|

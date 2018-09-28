@@ -41,17 +41,17 @@ class DocGen
 
   private
 
-  def root_path
-    "#{Rails.root}/doc/usermanual"
-  end
+    def root_path
+      "#{Rails.root}/doc/usermanual"
+    end
 
-  def output_path
-    "#{root_path}/#{@doc_name}.html"
-  end
+    def output_path
+      "#{root_path}/#{@doc_name}.html"
+    end
 
-  def next_screenshot_name
-    @img_counter ||= 0
-    @img_counter += 1
-    "#{@doc_name}-#{@img_counter}.png"
-  end
+    def next_screenshot_name
+      @img_counter ||= 0
+      @img_counter += 1
+      "#{@doc_name}-#{@img_counter}.png"
+    end
 end

@@ -46,10 +46,10 @@ module Api
           unless can_see_everything
             exercises = exercises.where(hidden: false, disabled_status: 0)
             exercises = if unlocked_exercises.empty?
-                          exercises.where(unlock_spec: nil)
-                        else
-                          exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{unlocked_exercises.map { |_| '?' }.join(', ')})", *unlocked_exercises])
-                        end
+              exercises.where(unlock_spec: nil)
+            else
+              exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{unlocked_exercises.map { |_| '?' }.join(', ')})", *unlocked_exercises])
+            end
           end
 
           exercises = exercises.pluck(:id)

@@ -37,7 +37,7 @@ feature 'Teacher disables courses', feature: true do
     expect(page).to_not have_content('The course is currently disabled.')
   end
 
-  scenario 'Non-teacher doesn\'t succeed' do
+  scenario "Non-teacher doesn't succeed" do
     log_in_as(@user.login, '1234')
 
     visit '/org/slug/courses'
@@ -47,7 +47,7 @@ feature 'Teacher disables courses', feature: true do
     expect(page).to_not have_link('Disable Course')
   end
 
-  scenario 'Non-teacher can\'t access a disabled course' do
+  scenario "Non-teacher can't access a disabled course" do
     log_in_as(@user.login, '1234')
     @course.disabled!
 

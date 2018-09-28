@@ -36,15 +36,15 @@ class FeedbackQuestion < ActiveRecord::Base
 
   private
 
-  def intrange_regex
-    self.class.intrange_regex
-  end
+    def intrange_regex
+      self.class.intrange_regex
+    end
 
-  def self.intrange_regex
-    /^intrange\[(-?\d+)\.\.(-?\d+)\]$/
-  end
+    def self.intrange_regex
+      /^intrange\[(-?\d+)\.\.(-?\d+)\]$/
+    end
 
-  def validate_kind
-    errors[:kind] << 'invalid' unless kind == 'text' || kind =~ intrange_regex
-  end
+    def validate_kind
+      errors[:kind] << 'invalid' unless kind == 'text' || kind =~ intrange_regex
+    end
 end

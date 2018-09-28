@@ -46,20 +46,20 @@ class PasswordResetKeysController < ApplicationController
       redirect_to root_path
     else
       flash.now[:alert] = if @user.errors[:password]
-                            'Password ' + @user.errors[:password].join(', ')
-                          else
-                            'Failed to set password'
-                          end
+        'Password ' + @user.errors[:password].join(', ')
+      else
+        'Failed to set password'
+      end
       render action: :show, status: :forbidden
     end
   end
 
   private
 
-  def find_key_and_user
-    token = params['token']
-    @key = ActionToken.find_by(token: token)
-    raise ActiveRecord::RecordNotFound, 'Invalid password reset key' if @key.nil? || @key.expired?
-    @user = @key.user
-  end
+    def find_key_and_user
+      token = params['token']
+      @key = ActionToken.find_by(token: token)
+      raise ActiveRecord::RecordNotFound, 'Invalid password reset key' if @key.nil? || @key.expired?
+      @user = @key.user
+    end
 end

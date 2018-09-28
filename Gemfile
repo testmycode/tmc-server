@@ -67,7 +67,8 @@ group :development, :test do
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4.3'
   gem 'railroady' # for doc/diagrams
-  gem 'rubocop', '~> 0.35.0', require: false
+  gem 'rubocop', '~> 0.59.2', require: false
+  gem 'rubocop-rails_config', '~> 0.2.4'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
   gem 'simplecov'
 end

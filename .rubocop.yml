@@ -1,17 +1,14 @@
+inherit_gem:
+  rubocop-rails_config:
+    - config/rails.yml
+
 AllCops:
-  Include:
-    - '**/config.ru'
-    - '**/Rakefile'
-  Exclude:
-    - 'db/**/*'
-    - 'ext/**/*'
-    - 'tmp/**/*'
   TargetRubyVersion: 2.5
 
-Rails:
-  Enabled: true
-
 # Style
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
 
 Style/Documentation:
   Enabled: false

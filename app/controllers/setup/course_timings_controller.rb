@@ -76,82 +76,82 @@ class Setup::CourseTimingsController < Setup::SetupController
 
   private
 
-  def save_unlocks
-    authorize! :manage_unlocks, @course
+    def save_unlocks
+      authorize! :manage_unlocks, @course
 
-    groups = group_params
-    groups.each do |name, unlock_data|
-      if unlock_data[:_unlock_option] == 'no_unlock'
-        unlock_condition = ''
-      elsif unlock_data[:_unlock_option] == 'percentage_from'
-        unlock_condition = "#{unlock_data[:_percentage_required]}% from #{unlock_data[:_unlock_groupname]}"
+      groups = group_params
+      groups.each do |name, unlock_data|
+        if unlock_data[:_unlock_option] == 'no_unlock'
+          unlock_condition = ''
+        elsif unlock_data[:_unlock_option] == 'percentage_from'
+          unlock_condition = "#{unlock_data[:_percentage_required]}% from #{unlock_data[:_unlock_groupname]}"
+        end
+        @course.exercise_group_by_name(name).group_unlock_conditions = Array(unlock_condition).to_json
+        UncomputedUnlock.create_all_for_course(@course)
       end
-      @course.exercise_group_by_name(name).group_unlock_conditions = Array(unlock_condition).to_json
-      UncomputedUnlock.create_all_for_course(@course)
     end
-  end
 
-  def clear_all_unlocks
-    authorize! :manage_unlocks, @course
-    @course.exercise_groups.each do |eg|
-      eg.group_unlock_conditions = [''].to_json
+    def clear_all_unlocks
+      authorize! :manage_unlocks, @course
+      @course.exercise_groups.each do |eg|
+        eg.group_unlock_conditions = [''].to_json
+      end
     end
-  end
 
-  def unlocks_previous_set_completed(percentage = 80)
-    authorize! :manage_unlocks, @course
-    prevname = nil
-    @course.exercise_groups.each do |eg|
-      eg.group_unlock_conditions = Array("#{percentage}% from #{prevname}").to_json unless prevname.nil?
-      prevname = eg.name
+    def unlocks_previous_set_completed(percentage = 80)
+      authorize! :manage_unlocks, @course
+      prevname = nil
+      @course.exercise_groups.each do |eg|
+        eg.group_unlock_conditions = Array("#{percentage}% from #{prevname}").to_json unless prevname.nil?
+        prevname = eg.name
+      end
     end
-  end
 
-  def save_deadlines
-    authorize! :manage_deadlines, @course
-    groups = group_params
-    groups.each do |name, deadlines|
-      hard_deadlines = [deadlines[:hard][:static], ''].to_json
-      @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
+    def save_deadlines
+      authorize! :manage_deadlines, @course
+      groups = group_params
+      groups.each do |name, deadlines|
+        hard_deadlines = [deadlines[:hard][:static], ''].to_json
+        @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
+      end
     end
-  end
 
-  def clear_all_deadlines
-    authorize! :manage_deadlines, @course
-    @course.exercise_groups.each do |eg|
-      eg.hard_group_deadline = ['', ''].to_json
+    def clear_all_deadlines
+      authorize! :manage_deadlines, @course
+      @course.exercise_groups.each do |eg|
+        eg.hard_group_deadline = ['', ''].to_json
+      end
     end
-  end
 
-  def fill_deadlines_with_interval(first_date, days = 7)
-    authorize! :manage_deadlines, @course
-    date = first_date
-    @course.exercise_groups.each do |eg|
-      eg.hard_group_deadline = date.to_json
-      date = Array((DateTime.parse(date[0]) + days.days).strftime('%Y-%m-%d'))
+    def fill_deadlines_with_interval(first_date, days = 7)
+      authorize! :manage_deadlines, @course
+      date = first_date
+      @course.exercise_groups.each do |eg|
+        eg.hard_group_deadline = date.to_json
+        date = Array((DateTime.parse(date[0]) + days.days).strftime('%Y-%m-%d'))
+      end
     end
-  end
 
-  def fill_all_deadlines_with(date)
-    authorize! :manage_deadlines, @course
-    @course.exercise_groups.each do |eg|
-      eg.hard_group_deadline = date.to_json
+    def fill_all_deadlines_with(date)
+      authorize! :manage_deadlines, @course
+      @course.exercise_groups.each do |eg|
+        eg.hard_group_deadline = date.to_json
+      end
     end
-  end
 
   private
 
-  def groups_as_array
-    @course.exercise_groups.each_with_object(['']) do |group, array|
-      array << group.name
+    def groups_as_array
+      @course.exercise_groups.each_with_object(['']) do |group, array|
+        array << group.name
+      end
     end
-  end
 
-  def group_params
-    sliced = params.slice(:group, :empty_group)
-    groups = sliced[:group] || {}
-    empty_group = sliced[:empty_group] || {}
-    groups[''] = empty_group unless empty_group.empty?
-    groups
-  end
+    def group_params
+      sliced = params.slice(:group, :empty_group)
+      groups = sliced[:group] || {}
+      empty_group = sliced[:empty_group] || {}
+      groups[''] = empty_group unless empty_group.empty?
+      groups
+    end
 end

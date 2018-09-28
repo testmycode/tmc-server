@@ -58,14 +58,14 @@ class ExerciseDir
 
   private
 
-  # For now langs packages only java simple and any new formats. -jamo 5/1/2016
-  def self.exercise_type_impl(path)
-    if (path + 'pom.xml').exist?
-      JavaMaven
-    elsif (path + 'Makefile').exist? && (path + 'test/').exist?
-      MakefileC
-    else
-      Langs
+    # For now langs packages only java simple and any new formats. -jamo 5/1/2016
+    def self.exercise_type_impl(path)
+      if (path + 'pom.xml').exist?
+        JavaMaven
+      elsif (path + 'Makefile').exist? && (path + 'test/').exist?
+        MakefileC
+      else
+        Langs
+      end
     end
-  end
 end

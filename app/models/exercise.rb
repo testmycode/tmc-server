@@ -455,50 +455,50 @@ class Exercise < ActiveRecord::Base
 
   private
 
-  def new_deadline_spec_obj(spec)
-    if spec
-      DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
-    else
-      DeadlineSpec.new(self, [])
+    def new_deadline_spec_obj(spec)
+      if spec
+        DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
+      else
+        DeadlineSpec.new(self, [])
+      end
     end
-  end
 
-  def new_gdocs_sheet(enabled, sheetname)
-    return nil unless enabled
-    return sheetname.to_s if sheetname.present?
-    name_to_gdocs_sheet
-  end
-
-  def name_to_gdocs_sheet
-    sheetname = name.split('-')[0..-2].join('-')
-    sheetname.empty? ? 'root' : sheetname
-  end
-
-  def to_json_array(value)
-    if !value.nil?
-      value = [value] unless value.is_a?(Array)
-      value.to_json
-    else
-      '[]'
+    def new_gdocs_sheet(enabled, sheetname)
+      return nil unless enabled
+      return sheetname.to_s if sheetname.present?
+      name_to_gdocs_sheet
     end
-  end
 
-  def check_is_json_array_of_strings(str)
-    return if str.nil?
-    array = ActiveSupport::JSON.decode(str)
-    raise 'JSON array expected' unless array.is_a?(Array)
-    raise 'JSON array of strings expected' if array.any? { |a| !a.is_a?(String) }
-  end
-
-  def parse_runtime_params(raw_params)
-    if raw_params.nil?
-      '[]'
-    elsif raw_params.is_a?(String)
-      to_json_array(Shellwords.shellwords(raw_params))
-    elsif raw_params.is_a?(Array)
-      to_json_array(raw_params)
-    else
-      raise "Invalid runtime_params: #{raw_params.inspect}"
+    def name_to_gdocs_sheet
+      sheetname = name.split('-')[0..-2].join('-')
+      sheetname.empty? ? 'root' : sheetname
     end
-  end
+
+    def to_json_array(value)
+      if !value.nil?
+        value = [value] unless value.is_a?(Array)
+        value.to_json
+      else
+        '[]'
+      end
+    end
+
+    def check_is_json_array_of_strings(str)
+      return if str.nil?
+      array = ActiveSupport::JSON.decode(str)
+      raise 'JSON array expected' unless array.is_a?(Array)
+      raise 'JSON array of strings expected' if array.any? { |a| !a.is_a?(String) }
+    end
+
+    def parse_runtime_params(raw_params)
+      if raw_params.nil?
+        '[]'
+      elsif raw_params.is_a?(String)
+        to_json_array(Shellwords.shellwords(raw_params))
+      elsif raw_params.is_a?(Array)
+        to_json_array(raw_params)
+      else
+        raise "Invalid runtime_params: #{raw_params.inspect}"
+      end
+    end
 end

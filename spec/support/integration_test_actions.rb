@@ -114,22 +114,22 @@ module IntegrationTestActions
 
   private
 
-  def trim_image_edges(path)
-    cmd = mk_command [
-      'convert',
-      '-trim',
-      path,
-      path + '.tmp'
-    ]
-    cmd2 = mk_command [
-      'mv',
-      '-f',
-      path + '.tmp',
-      path
-    ]
+    def trim_image_edges(path)
+      cmd = mk_command [
+        'convert',
+        '-trim',
+        path,
+        path + '.tmp'
+      ]
+      cmd2 = mk_command [
+        'mv',
+        '-f',
+        path + '.tmp',
+        path
+      ]
 
-    # TODO: put these in the background and ensure they finish before in an after :suite block
-    system!(cmd)
-    system!(cmd2)
-  end
+      # TODO: put these in the background and ensure they finish before in an after :suite block
+      system!(cmd)
+      system!(cmd2)
+    end
 end

@@ -14,11 +14,11 @@ class PortableCSV
 
   private
 
-  def self.csv_engine
-    if const_defined?(:CSV) && !CSV.const_defined?(:Reader)
-      CSV # Ruby 1.9
-    else
-      FasterCSV # Ruby 1.8
+    def self.csv_engine
+      if const_defined?(:CSV) && !CSV.const_defined?(:Reader)
+        CSV # Ruby 1.9
+      else
+        FasterCSV # Ruby 1.8
+      end
     end
-  end
 end

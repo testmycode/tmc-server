@@ -7,7 +7,7 @@ module Api
 
       swagger_path '/api/v8/users/{user_id}' do
         operation :get do
-          key :description, 'Returns the user\'s username, email, and administrator status by user id'
+          key :description, "Returns the user's username, email, and administrator status by user id"
           key :operationId, 'findUsersBasicInfoById'
           key :produces, [
             'application/json'
@@ -17,7 +17,7 @@ module Api
           ]
           parameter '$ref': '#/parameters/path_user_id'
           response 200 do
-            key :description, 'User\'s username, email, and administrator status by id as json'
+            key :description, "User's username, email, and administrator status by id as json"
             schema do
               key :title, :user
               key :required, [:user]
@@ -33,7 +33,7 @@ module Api
 
       swagger_path '/api/v8/users/current' do
         operation :get do
-          key :description, 'Returns the current user\'s username, email, and administrator status'
+          key :description, "Returns the current user's username, email, and administrator status"
           key :operationId, 'findUsersBasicInfo'
           key :produces, [
             'application/json'
@@ -42,7 +42,7 @@ module Api
             'user'
           ]
           response 200 do
-            key :description, 'User\'s username, email, and administrator status as json'
+            key :description, "User's username, email, and administrator status as json"
             schema do
               key :title, :user
               key :required, [:user]
@@ -144,80 +144,80 @@ module Api
 
       private
 
-      def set_email
-        user_params = params[:user]
+        def set_email
+          user_params = params[:user]
 
-        return unless @user.new_record?
+          return unless @user.new_record?
 
-        if user_params[:email].blank?
-          @user.errors.add(:email, 'needed')
-        else
-          @user.email = user_params[:email].strip
-        end
-      end
-
-      def update_email
-        user_params = params[:user]
-        return unless user_params[:email]
-        new_email = user_params[:email].strip
-        if new_email.blank?
-          @user.errors.add(:email, 'needed')
-        elsif @user.email.casecmp(new_email) != 0
-          @user.email = new_email
-          @user.email_verified = false
-        end
-      end
-
-      def set_password
-        user_params = params[:user]
-        if user_params[:password].blank?
-          @user.errors.add(:password, 'needed')
-        elsif user_params[:password] != user_params[:password_confirmation]
-          @user.errors.add(:password_confirmation, 'did not match')
-        else
-          @user.password = user_params[:password]
-        end
-      end
-
-      def maybe_update_password
-        if params[:old_password].present? && params[:password].present?
-          if !@user.has_password?(params[:old_password])
-            @user.errors.add(:old_password, 'incorrect')
-          elsif params[:password] != params[:password_repeat]
-            @user.errors.add(:password_repeat, 'did not match')
-          elsif params[:password].blank?
-            @user.errors.add(:password, 'cannot be empty')
+          if user_params[:email].blank?
+            @user.errors.add(:email, 'needed')
           else
-            @user.password = params[:password]
+            @user.email = user_params[:email].strip
           end
         end
-      end
 
-      def set_user_fields
-        return if params[:user_field].nil?
-        changes = {}
-        UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
-          value_record = @user.field_value_record(field)
-          old_value = value_record.ruby_value
-          value_record.set_from_form(params[:user_field][field.name])
-          new_value = value_record.ruby_value
-          changes[field.name] = { from: old_value, to: new_value } unless new_value == old_value
+        def update_email
+          user_params = params[:user]
+          return unless user_params[:email]
+          new_email = user_params[:email].strip
+          if new_email.blank?
+            @user.errors.add(:email, 'needed')
+          elsif @user.email.casecmp(new_email) != 0
+            @user.email = new_email
+            @user.email_verified = false
+          end
         end
-        changes
-      end
 
-      def set_extra_data(eager_save = false)
-        return unless params['user']
-        extra_fields = params['user']['extra_fields']
-        return if extra_fields.nil?
-        namespace = extra_fields['namespace']
-        raise 'Namespace not defined' unless namespace
-        extra_fields['data'].each do |key, value|
-          datum = @user.user_app_data.find_or_initialize_by(namespace: namespace, field_name: key)
-          datum.value = value
-          datum.save! if eager_save
+        def set_password
+          user_params = params[:user]
+          if user_params[:password].blank?
+            @user.errors.add(:password, 'needed')
+          elsif user_params[:password] != user_params[:password_confirmation]
+            @user.errors.add(:password_confirmation, 'did not match')
+          else
+            @user.password = user_params[:password]
+          end
         end
-      end
+
+        def maybe_update_password
+          if params[:old_password].present? && params[:password].present?
+            if !@user.has_password?(params[:old_password])
+              @user.errors.add(:old_password, 'incorrect')
+            elsif params[:password] != params[:password_repeat]
+              @user.errors.add(:password_repeat, 'did not match')
+            elsif params[:password].blank?
+              @user.errors.add(:password, 'cannot be empty')
+            else
+              @user.password = params[:password]
+            end
+          end
+        end
+
+        def set_user_fields
+          return if params[:user_field].nil?
+          changes = {}
+          UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
+            value_record = @user.field_value_record(field)
+            old_value = value_record.ruby_value
+            value_record.set_from_form(params[:user_field][field.name])
+            new_value = value_record.ruby_value
+            changes[field.name] = { from: old_value, to: new_value } unless new_value == old_value
+          end
+          changes
+        end
+
+        def set_extra_data(eager_save = false)
+          return unless params['user']
+          extra_fields = params['user']['extra_fields']
+          return if extra_fields.nil?
+          namespace = extra_fields['namespace']
+          raise 'Namespace not defined' unless namespace
+          extra_fields['data'].each do |key, value|
+            datum = @user.user_app_data.find_or_initialize_by(namespace: namespace, field_name: key)
+            datum.value = value
+            datum.save! if eager_save
+          end
+        end
     end
   end
 end

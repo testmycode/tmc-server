@@ -31,7 +31,7 @@ class ActionToken < ActiveRecord::Base
 
   private
 
-  def randomize_token
-    self.token = SecureRandom.urlsafe_base64
-  end
+    def randomize_token
+      self.token = SecureRandom.urlsafe_base64
+    end
 end

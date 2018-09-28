@@ -29,19 +29,19 @@ class Api::Beta::BaseController < ApplicationController
 
   private
 
-  def authenticate_user!
-    if doorkeeper_token
-      @current_user = User.find(doorkeeper_token.resource_owner_id)
+    def authenticate_user!
+      if doorkeeper_token
+        @current_user = User.find(doorkeeper_token.resource_owner_id)
+      end
+
+      return if @current_user
+
+      render json: { errors: ['User is not authenticated!'] }, status: :unauthorized
     end
 
-    return if @current_user
+    attr_reader :current_user
 
-    render json: { errors: ['User is not authenticated!'] }, status: :unauthorized
-  end
-
-  attr_reader :current_user
-
-  def errors_json(messages)
-    { errors: [*messages] }
-  end
+    def errors_json(messages)
+      { errors: [*messages] }
+    end
 end

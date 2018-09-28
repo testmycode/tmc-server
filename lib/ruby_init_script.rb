@@ -94,30 +94,30 @@ class RubyInitScript
 
   private
 
-  def preprocess_options
-    @options.each_key do |k|
-      @options[k] = @options[k].to_s if @options[k].is_a? Pathname
+    def preprocess_options
+      @options.each_key do |k|
+        @options[k] = @options[k].to_s if @options[k].is_a? Pathname
+      end
     end
-  end
 
-  def check_options
-    raise ':name required' unless @options[:name]
-    raise ':erb_path required' unless @options[:erb_path]
-    raise ':working_dir required' unless @options[:working_dir]
-    raise ':executable_path required' unless @options[:executable_path]
-  end
+    def check_options
+      raise ':name required' unless @options[:name]
+      raise ':erb_path required' unless @options[:erb_path]
+      raise ':working_dir required' unless @options[:working_dir]
+      raise ':executable_path required' unless @options[:executable_path]
+    end
 
-  def rvm_info
-    @rvm_info ||= begin
-      output = `rvm info 2>/dev/null` # We silence the "RVM is not a function" warning on stderr.
-      # This can happen if one uses `sudo -i -u tmc` and then does `rvmsudo rvm info`.
-      potential_warning = <<EOS.strip_heredoc
+    def rvm_info
+      @rvm_info ||= begin
+        output = `rvm info 2>/dev/null` # We silence the "RVM is not a function" warning on stderr.
+        # This can happen if one uses `sudo -i -u tmc` and then does `rvmsudo rvm info`.
+        potential_warning = <<EOS.strip_heredoc
         You need to change your terminal emulator preferences to allow login shell.
         Sometimes it is required to use `/bin/bash --login` as the command.
         Please visit https://rvm.io/integration/gnome-terminal/ for a example.
 EOS
-      output = output.sub(potential_warning, '')
-      YAML.safe_load(output)
+        output = output.sub(potential_warning, '')
+        YAML.safe_load(output)
+      end
     end
-  end
 end

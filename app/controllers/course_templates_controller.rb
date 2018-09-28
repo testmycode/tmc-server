@@ -84,12 +84,12 @@ class CourseTemplatesController < ApplicationController
 
   private
 
-  def set_course_template
-    authorize! params[:action].to_sym, CourseTemplate
-    @course_template = CourseTemplate.find(params[:id])
-  end
+    def set_course_template
+      authorize! params[:action].to_sym, CourseTemplate
+      @course_template = CourseTemplate.find(params[:id])
+    end
 
-  def course_template_params
-    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at, :git_branch)
-  end
+    def course_template_params
+      params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at, :git_branch)
+    end
 end

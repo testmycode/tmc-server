@@ -63,60 +63,60 @@ module Api
 
           private
 
-          def award_points
-            submission = @review.submission
-            exercise = submission.exercise
-            course = exercise.course
-            raise 'Exercise of submission has been moved or deleted' unless exercise
+            def award_points
+              submission = @review.submission
+              exercise = submission.exercise
+              course = exercise.course
+              raise 'Exercise of submission has been moved or deleted' unless exercise
 
-            available_points = exercise.available_points.where(requires_review: true).map(&:name)
-            previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
+              available_points = exercise.available_points.where(requires_review: true).map(&:name)
+              previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
 
-            new_points = []
-            if params[:review][:points].respond_to?(:keys)
-              params[:review][:points].keys.each do |point_name|
-                unless exercise.available_points.where(name: point_name).any?
-                  raise "Point does not exist: #{point_name}"
+              new_points = []
+              if params[:review][:points].respond_to?(:keys)
+                params[:review][:points].keys.each do |point_name|
+                  unless exercise.available_points.where(name: point_name).any?
+                    raise "Point does not exist: #{point_name}"
+                  end
+
+                  new_points << point_name
+                  pt = submission.awarded_points.build(
+                    course_id: submission.course_id,
+                    user_id: submission.user_id,
+                    name: point_name
+                  )
+                  authorize! :create, pt
+                  pt.save!
                 end
-
-                new_points << point_name
-                pt = submission.awarded_points.build(
-                  course_id: submission.course_id,
-                  user_id: submission.user_id,
-                  name: point_name
-                )
-                authorize! :create, pt
-                pt.save!
               end
+
+              @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
+              submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
             end
 
-            @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
-            submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
-          end
+            def mark_as_reviewed
+              sub = @review.submission
+              sub.reviewed = true
+              sub.review_dismissed = false
+              sub.of_same_kind
+                 .where('(requires_review OR requests_review) AND NOT reviewed')
+                 .where(['created_at < ?', sub.created_at])
+                 .update_all(newer_submission_reviewed: true)
+            end
 
-          def mark_as_reviewed
-            sub = @review.submission
-            sub.reviewed = true
-            sub.review_dismissed = false
-            sub.of_same_kind
-               .where('(requires_review OR requests_review) AND NOT reviewed')
-               .where(['created_at < ?', sub.created_at])
-               .update_all(newer_submission_reviewed: true)
-          end
+            def notify_user_about_new_review
+              channel = '/broadcast/user/' + @review.submission.user.username + '/review-available'
+              data = {
+                exercise_name: @review.submission.exercise_name,
+                url: submission_reviews_url(@review.submission),
+                points: @review.points_list
+              }
+              CometServer.get.try_publish(channel, data)
+            end
 
-          def notify_user_about_new_review
-            channel = '/broadcast/user/' + @review.submission.user.username + '/review-available'
-            data = {
-              exercise_name: @review.submission.exercise_name,
-              url: submission_reviews_url(@review.submission),
-              points: @review.points_list
-            }
-            CometServer.get.try_publish(channel, data)
-          end
-
-          def send_email_about_new_review
-            ReviewMailer.review_email(@review).deliver
-          end
+            def send_email_about_new_review
+              ReviewMailer.review_email(@review).deliver
+            end
         end
       end
     end

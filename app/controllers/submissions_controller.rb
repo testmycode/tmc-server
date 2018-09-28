@@ -232,92 +232,92 @@ class SubmissionsController < ApplicationController
 
   private
 
-  def course_transaction
-    Course.transaction(requires_new: true) do
-      yield
-    end
-  end
-
-  # Ugly manual access control :/
-  def get_course_and_exercise
-    submission_id = params[:id] || params[:submission_id]
-    if submission_id
-      @submission = Submission.find(submission_id)
-      authorize! :read, @submission
-      @course = @submission.course
-      @exercise = @submission.exercise
-    elsif params[:exercise_id]
-      @exercise = Exercise.find(params[:exercise_id])
-      @course = Course.lock('FOR SHARE').find(@exercise.course_id)
-      authorize! :read, @course
-      authorize! :read, @exercise
-    elsif params[:paste_key]
-      @submission = Submission.find_by!(paste_key: params[:paste_key])
-      @exercise = @submission.exercise
-      @course = @exercise.course
-      @is_paste = true
-      check_access!
-    elsif params[:course_id]
-      @course = Course.lock('FOR SHARE').find(params[:course_id])
-      @organization = @course.organization
-      authorize! :read, @course
-    else
-      respond_access_denied
-    end
-  end
-
-  def schedule_for_rerun(submission, priority)
-    submission.set_to_be_reprocessed!(priority)
-  end
-
-  def index_json
-    return respond_access_denied unless current_user.administrator?
-
-    submissions = @course.submissions
-    if params[:user_id]
-      submissions = submissions.where(user_id: params[:user_id])
+    def course_transaction
+      Course.transaction(requires_new: true) do
+        yield
+      end
     end
 
-    render json: {
-      api_version: ApiVersion::API_VERSION,
-      json_url_schema: submission_url(id: ':id', format: 'json'),
-      zip_url_schema: submission_url(id: ':id', format: 'zip'),
-      submissions: submissions.map(&:id)
-    }
-  end
-
-  def index_json_datatables
-    submissions = @course.submissions
-
-    unless current_user.administrator?
-      submissions = submissions.where(user_id: current_user.id)
+    # Ugly manual access control :/
+    def get_course_and_exercise
+      submission_id = params[:id] || params[:submission_id]
+      if submission_id
+        @submission = Submission.find(submission_id)
+        authorize! :read, @submission
+        @course = @submission.course
+        @exercise = @submission.exercise
+      elsif params[:exercise_id]
+        @exercise = Exercise.find(params[:exercise_id])
+        @course = Course.lock('FOR SHARE').find(@exercise.course_id)
+        authorize! :read, @course
+        authorize! :read, @exercise
+      elsif params[:paste_key]
+        @submission = Submission.find_by!(paste_key: params[:paste_key])
+        @exercise = @submission.exercise
+        @course = @exercise.course
+        @is_paste = true
+        check_access!
+      elsif params[:course_id]
+        @course = Course.lock('FOR SHARE').find(params[:course_id])
+        @organization = @course.organization
+        authorize! :read, @course
+      else
+        respond_access_denied
+      end
     end
 
-    if params[:max_id]
-      submissions = submissions.where('id <= ?', params[:max_id])
+    def schedule_for_rerun(submission, priority)
+      submission.set_to_be_reprocessed!(priority)
     end
-    submissions = submissions.includes(:user).order('id DESC')
-    remaining = submissions.count
-    submissions_limited = submissions.limit(1000)
-    Submission.eager_load_exercises(submissions_limited)
 
-    render json: {
-      remaining: remaining,
-      max_id: params[:max_id].to_i,
-      last_id: submissions_limited.empty? ? nil : submissions_limited.last.id.to_i,
-      rows: view_context.submissions_for_datatables(submissions_limited)
-    }
-  end
+    def index_json
+      return respond_access_denied unless current_user.administrator?
 
-  def check_access!
-    paste_visibility = @course.paste_visibility || 'open'
-    case paste_visibility
-    when 'protected'
-      respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
-    when 'no-tests-public'
-      respond_access_denied unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
-    else
-      respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
+      submissions = @course.submissions
+      if params[:user_id]
+        submissions = submissions.where(user_id: params[:user_id])
+      end
+
+      render json: {
+        api_version: ApiVersion::API_VERSION,
+        json_url_schema: submission_url(id: ':id', format: 'json'),
+        zip_url_schema: submission_url(id: ':id', format: 'zip'),
+        submissions: submissions.map(&:id)
+      }
     end
-  end
+
+    def index_json_datatables
+      submissions = @course.submissions
+
+      unless current_user.administrator?
+        submissions = submissions.where(user_id: current_user.id)
+      end
+
+      if params[:max_id]
+        submissions = submissions.where('id <= ?', params[:max_id])
+      end
+      submissions = submissions.includes(:user).order('id DESC')
+      remaining = submissions.count
+      submissions_limited = submissions.limit(1000)
+      Submission.eager_load_exercises(submissions_limited)
+
+      render json: {
+        remaining: remaining,
+        max_id: params[:max_id].to_i,
+        last_id: submissions_limited.empty? ? nil : submissions_limited.last.id.to_i,
+        rows: view_context.submissions_for_datatables(submissions_limited)
+      }
+    end
+
+    def check_access!
+      paste_visibility = @course.paste_visibility || 'open'
+      case paste_visibility
+      when 'protected'
+        respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
+      when 'no-tests-public'
+        respond_access_denied unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
+      else
+        respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
+      end
+    end
 end

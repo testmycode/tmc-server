@@ -114,25 +114,25 @@ class OrganizationsController < ApplicationController
 
   private
 
-  def percent_completed_hash(courses, user)
-    percent_completed = {}
-    all_awarded = AwardedPoint.all_awarded(user)
-    all_available = AvailablePoint.courses_points(courses).map(&:course_id)
-    courses.each do |course|
-      awarded = all_awarded.select { |id| id == course.id }.length.to_f
-      available = all_available.select { |id| id == course.id }.length.to_f
-      percent_completed[course.id] = 100 * (awarded / available) unless course.hide_submission_results
+    def percent_completed_hash(courses, user)
+      percent_completed = {}
+      all_awarded = AwardedPoint.all_awarded(user)
+      all_available = AvailablePoint.courses_points(courses).map(&:course_id)
+      courses.each do |course|
+        awarded = all_awarded.select { |id| id == course.id }.length.to_f
+        available = all_available.select { |id| id == course.id }.length.to_f
+        percent_completed[course.id] = 100 * (awarded / available) unless course.hide_submission_results
+      end
+      percent_completed
     end
-    percent_completed
-  end
 
-  def set_organization
-    @organization = Organization.find_by(slug: params[:id])
-    unauthorized! unless @organization.visibility_allowed?(request, current_user)
-    raise ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
-  end
+    def set_organization
+      @organization = Organization.find_by(slug: params[:id])
+      unauthorized! unless @organization.visibility_allowed?(request, current_user)
+      raise ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
+    end
 
-  def organization_params
-    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
-  end
+    def organization_params
+      params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
+    end
 end

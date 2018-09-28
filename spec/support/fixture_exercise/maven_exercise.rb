@@ -26,26 +26,26 @@ class FixtureExercise::MavenExercise < FixtureExercise::SimpleExercise
 
   private
 
-  def copy_from_fixture
-    super
-    copy_pom_xml
-  end
+    def copy_from_fixture
+      super
+      copy_pom_xml
+    end
 
-  def copy_libs
-    # not for maven projects
-  end
+    def copy_libs
+      # not for maven projects
+    end
 
-  def copy_pom_xml
-    FileUtils.cp("#{fixture_path}/pom.xml", pom_xml_path)
-  end
+    def copy_pom_xml
+      FileUtils.cp("#{fixture_path}/pom.xml", pom_xml_path)
+    end
 
-  def copy_src
-    FileUtils.mkdir_p("#{path}/src")
-    FileUtils.cp_r("#{fixture_path}/src/main", "#{path}/src/main")
-  end
+    def copy_src
+      FileUtils.mkdir_p("#{path}/src")
+      FileUtils.cp_r("#{fixture_path}/src/main", "#{path}/src/main")
+    end
 
-  def copy_tests
-    FileUtils.mkdir_p("#{path}/src")
-    FileUtils.cp_r("#{fixture_path}/src/test", "#{path}/src/test")
-  end
+    def copy_tests
+      FileUtils.mkdir_p("#{path}/src")
+      FileUtils.cp_r("#{fixture_path}/src/test", "#{path}/src/test")
+    end
 end

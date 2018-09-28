@@ -49,7 +49,7 @@ module FileStore
 
   private
 
-  def self.tmpdir
-    "#{root}/tmp"
-  end
+    def self.tmpdir
+      "#{root}/tmp"
+    end
 end

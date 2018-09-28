@@ -40,26 +40,26 @@ class CertificatesController < ApplicationController
 
   private
 
-  def certificate_params
-    params.require(:certificate).permit(:name, :user_id, :course_id)
-  end
-
-  def set_user
-    id = params[:participant_id] || params[:certificate][:user_id]
-    @user = User.find(id)
-  end
-
-  def set_courses
-    @courses = current_user.administrator? ? Course.where(certificate_downloadable: true).order(:name) : Course.with_certificates_for(@user)
-  end
-
-  def add_certificate_breadcrumbs
-    if @user == current_user
-      add_breadcrumb 'My stats', participant_path(@user)
-    elsif current_user.administrator?
-      add_breadcrumb 'Participants', :participants_path
-      add_breadcrumb @user.display_name, participant_path(@user)
+    def certificate_params
+      params.require(:certificate).permit(:name, :user_id, :course_id)
     end
-    add_breadcrumb 'Certificate'
-  end
+
+    def set_user
+      id = params[:participant_id] || params[:certificate][:user_id]
+      @user = User.find(id)
+    end
+
+    def set_courses
+      @courses = current_user.administrator? ? Course.where(certificate_downloadable: true).order(:name) : Course.with_certificates_for(@user)
+    end
+
+    def add_certificate_breadcrumbs
+      if @user == current_user
+        add_breadcrumb 'My stats', participant_path(@user)
+      elsif current_user.administrator?
+        add_breadcrumb 'Participants', :participants_path
+        add_breadcrumb @user.display_name, participant_path(@user)
+      end
+      add_breadcrumb 'Certificate'
+    end
 end

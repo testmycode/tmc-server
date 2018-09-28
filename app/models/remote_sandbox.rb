@@ -20,13 +20,13 @@ class RemoteSandbox
   def self.try_to_send_submission_to_free_server(submission, notify_url)
     dir = ExerciseDir.get(submission.exercise.clone_path)
     servers = if submission.exercise && dir.safe_for_experimental_sandbox
-                if dir.type == 'java_maven'
-                  all_experimental.shuffle
-                else
-                  all_experimental.shuffle + all.shuffle
-                end
-              else
-                all.shuffle
+      if dir.type == 'java_maven'
+        all_experimental.shuffle
+      else
+        all_experimental.shuffle + all.shuffle
+      end
+    else
+      all.shuffle
     end
     for server in servers # could be smarter about this
       begin
@@ -124,19 +124,19 @@ class RemoteSandbox
 
   private
 
-  def get_status
-    ActiveSupport::JSON.decode(RestClient.get(status_url))
-  end
+    def get_status
+      ActiveSupport::JSON.decode(RestClient.get(status_url))
+    end
 
-  def post_url
-    "#{@baseurl}/tasks.json"
-  end
+    def post_url
+      "#{@baseurl}/tasks.json"
+    end
 
-  def status_url
-    "#{@baseurl}/status.json"
-  end
+    def status_url
+      "#{@baseurl}/status.json"
+    end
 
-  def maven_cache_populate_url
-    "#{@baseurl}/maven_cache/populate.json"
-  end
+    def maven_cache_populate_url
+      "#{@baseurl}/maven_cache/populate.json"
+    end
 end

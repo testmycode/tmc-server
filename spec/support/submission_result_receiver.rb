@@ -25,9 +25,9 @@ class SubmissionResultReceiver
 
   def host_ip
     @addr ||= ENV['HOST'] ||= if ENV['CI']
-                                `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
-                              else
-                                '127.0.0.1'
+                `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
+              else
+                '127.0.0.1'
               end
   end
 
@@ -37,13 +37,13 @@ class SubmissionResultReceiver
 
   private
 
-  def start_mimic_server!
-    queue = @queue # put in closure, blocks below have different `self`
-    Mimic.mimic(port: receiver_port, fork: true) do
-      post('/results') do
-        queue << params
-        [200, {}, ['OK']]
+    def start_mimic_server!
+      queue = @queue # put in closure, blocks below have different `self`
+      Mimic.mimic(port: receiver_port, fork: true) do
+        post('/results') do
+          queue << params
+          [200, {}, ['OK']]
+        end
       end
     end
-  end
 end

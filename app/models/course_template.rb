@@ -99,12 +99,12 @@ class CourseTemplate < ActiveRecord::Base
 
   private
 
-  def update_courses_sourcedata
-    courses.each do |c|
-      c.cache_version = cache_version
-      c.source_url = source_url
-      c.git_branch = git_branch
-      c.source_backend = source_backend
+    def update_courses_sourcedata
+      courses.each do |c|
+        c.cache_version = cache_version
+        c.source_url = source_url
+        c.git_branch = git_branch
+        c.source_backend = source_backend
+      end
     end
-  end
 end

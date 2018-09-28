@@ -150,10 +150,10 @@ class AwardedPoint < ActiveRecord::Base
     ActiveRecord::Base.connection.execute(sql).each do |record|
       result[record['username']] ||= []
       result[record['username']] << if opts[:show_timestamps]
-                                      { point: record['name'], time: record['time'] }
-                                    else
-                                      record['name']
-                                    end
+        { point: record['name'], time: record['time'] }
+      else
+        record['name']
+      end
     end
     result.default = []
     result

@@ -59,46 +59,46 @@ class RemoteSandboxForTesting
 
   private
 
-  def self.result_queue
-    @result_queue ||= SubmissionResultReceiver.new
-  end
-
-  def self.copy_server_instance(port, actual_user, actual_group)
-    instance_dir = "#{::Rails.root}/tmp/test-sandbox-server/#{port}"
-    maven_cache_dir = "#{::Rails.root}/tmp/test-maven-cache" # This we won't delete each time
-
-    FileUtils.mkdir_p(maven_cache_dir)
-    SystemCommands.sh!('chown', '-R', actual_user, maven_cache_dir)
-    SystemCommands.sh!('chgrp', '-R', actual_group, maven_cache_dir)
-
-    FileUtils.rm_rf instance_dir
-    FileUtils.mkdir_p instance_dir
-
-    source = "#{::Rails.root}/ext/tmc-sandbox"
-    FileUtils.ln_s "#{source}/misc", "#{instance_dir}/misc"
-    FileUtils.ln_s "#{source}/uml", "#{instance_dir}/uml"
-    FileUtils.cp_r "#{source}/web", instance_dir
-
-    FileUtils.rm_rf "#{instance_dir}/web/work"
-    FileUtils.mkdir_p "#{instance_dir}/web/work"
-    FileUtils.rm_rf "#{instance_dir}/web/log"
-    FileUtils.mkdir_p "#{instance_dir}/web/log"
-    FileUtils.rm_rf "#{instance_dir}/web/lock"
-    FileUtils.mkdir_p "#{instance_dir}/web/lock"
-
-    File.open("#{instance_dir}/web/site.yml", 'w') do |f|
-      f.puts "tmc_user: #{actual_user}"
-      f.puts "tmc_group: #{actual_group}"
-      f.puts "http_port: #{port}"
-
-      # Enable maven cache. It makes tests go faster when we run them often,
-      # and the cache gets some more testing too.
-      f.puts 'plugins:'
-      f.puts '  maven_cache:'
-      f.puts '    enabled: true'
-      f.puts "    alternate_work_dir: #{maven_cache_dir}"
+    def self.result_queue
+      @result_queue ||= SubmissionResultReceiver.new
     end
-  end
+
+    def self.copy_server_instance(port, actual_user, actual_group)
+      instance_dir = "#{::Rails.root}/tmp/test-sandbox-server/#{port}"
+      maven_cache_dir = "#{::Rails.root}/tmp/test-maven-cache" # This we won't delete each time
+
+      FileUtils.mkdir_p(maven_cache_dir)
+      SystemCommands.sh!('chown', '-R', actual_user, maven_cache_dir)
+      SystemCommands.sh!('chgrp', '-R', actual_group, maven_cache_dir)
+
+      FileUtils.rm_rf instance_dir
+      FileUtils.mkdir_p instance_dir
+
+      source = "#{::Rails.root}/ext/tmc-sandbox"
+      FileUtils.ln_s "#{source}/misc", "#{instance_dir}/misc"
+      FileUtils.ln_s "#{source}/uml", "#{instance_dir}/uml"
+      FileUtils.cp_r "#{source}/web", instance_dir
+
+      FileUtils.rm_rf "#{instance_dir}/web/work"
+      FileUtils.mkdir_p "#{instance_dir}/web/work"
+      FileUtils.rm_rf "#{instance_dir}/web/log"
+      FileUtils.mkdir_p "#{instance_dir}/web/log"
+      FileUtils.rm_rf "#{instance_dir}/web/lock"
+      FileUtils.mkdir_p "#{instance_dir}/web/lock"
+
+      File.open("#{instance_dir}/web/site.yml", 'w') do |f|
+        f.puts "tmc_user: #{actual_user}"
+        f.puts "tmc_group: #{actual_group}"
+        f.puts "http_port: #{port}"
+
+        # Enable maven cache. It makes tests go faster when we run them often,
+        # and the cache gets some more testing too.
+        f.puts 'plugins:'
+        f.puts '  maven_cache:'
+        f.puts '    enabled: true'
+        f.puts "    alternate_work_dir: #{maven_cache_dir}"
+      end
+    end
 end
 
 # Disabled for now

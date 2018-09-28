@@ -27,13 +27,13 @@ class MavenPomFile
 
   private
 
-  def maybe_from_parent(value)
-    version = @data[value]
-    if !version.nil?
-      version[0]
-    else
-      # For multimodule maven projects like langs
-      @data['parent'][0][value][0]
+    def maybe_from_parent(value)
+      version = @data[value]
+      if !version.nil?
+        version[0]
+      else
+        # For multimodule maven projects like langs
+        @data['parent'][0][value][0]
+      end
     end
-  end
 end

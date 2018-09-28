@@ -51,44 +51,44 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
 
   private
 
-  def min_spec(user)
-    @specs.map { |s| [s.timefun.call(user), s] }.reject { |p| p.first.nil? }.min_by(&:first).andand.map(&:second)
-  end
-
-  class SingleSpec
-    def initialize(spec, timefun, universal_description, personal_describer)
-      @raw_spec = spec
-      @timefun = timefun
-      @universal_description = universal_description
-      @personal_describer = personal_describer
+    def min_spec(user)
+      @specs.map { |s| [s.timefun.call(user), s] }.reject { |p| p.first.nil? }.min_by(&:first).andand.map(&:second)
     end
-    attr_accessor :raw_spec, :timefun, :universal_description, :personal_describer
-  end
 
-  def parse_spec(spec)
-    # A spec is a proc that takes a user and returns a Time object or nil
-    if DateAndTimeUtils.looks_like_date_or_time(spec)
-      time = DateAndTimeUtils.to_time(spec, prefer_end_of_day: true)
-      timefun = ->(_user) { time }
-      universal = time.to_s
-      personal = ->(_u) { universal }
-      @specs << SingleSpec.new(spec, timefun, universal, personal)
-    elsif spec =~ /^unlock\s*[+]\s*(\d+)\s+(minutes?|hours?|days?|weeks?|months?|years?)$/
-      time_scalar = Regexp.last_match(1)
-      time_unit = Regexp.last_match(2)
-      time_delta = time_scalar.to_i.send(time_unit)
-      @depends_on_unlock_time = true
-      timefun = lambda do |user|
-        unlock_time = @exercise.time_unlocked_for(user)
-        unlock_time + time_delta if unlock_time
+    class SingleSpec
+      def initialize(spec, timefun, universal_description, personal_describer)
+        @raw_spec = spec
+        @timefun = timefun
+        @universal_description = universal_description
+        @personal_describer = personal_describer
       end
-      universal = "#{time_scalar} #{time_unit} after unlock"
-      personal = lambda do |_user|
-        "#{time_scalar} #{time_unit} after unlock"
-      end
-      @specs << SingleSpec.new(spec, timefun, universal, personal)
-    else
-      raise InvalidSyntaxError, 'Invalid syntax'
+      attr_accessor :raw_spec, :timefun, :universal_description, :personal_describer
     end
-  end
+
+    def parse_spec(spec)
+      # A spec is a proc that takes a user and returns a Time object or nil
+      if DateAndTimeUtils.looks_like_date_or_time(spec)
+        time = DateAndTimeUtils.to_time(spec, prefer_end_of_day: true)
+        timefun = ->(_user) { time }
+        universal = time.to_s
+        personal = ->(_u) { universal }
+        @specs << SingleSpec.new(spec, timefun, universal, personal)
+      elsif spec =~ /^unlock\s*[+]\s*(\d+)\s+(minutes?|hours?|days?|weeks?|months?|years?)$/
+        time_scalar = Regexp.last_match(1)
+        time_unit = Regexp.last_match(2)
+        time_delta = time_scalar.to_i.send(time_unit)
+        @depends_on_unlock_time = true
+        timefun = lambda do |user|
+          unlock_time = @exercise.time_unlocked_for(user)
+          unlock_time + time_delta if unlock_time
+        end
+        universal = "#{time_scalar} #{time_unit} after unlock"
+        personal = lambda do |_user|
+          "#{time_scalar} #{time_unit} after unlock"
+        end
+        @specs << SingleSpec.new(spec, timefun, universal, personal)
+      else
+        raise InvalidSyntaxError, 'Invalid syntax'
+      end
+    end
 end

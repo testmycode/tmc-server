@@ -286,15 +286,15 @@ class Submission < ActiveRecord::Base
     unless pretest_error.nil?
       error = "Submission failed: #{pretest_error}."
       error << if stdout.blank?
-                 "\n\n(no stdout)"
-               else
-                 "\n\nStdout:\n#{stdout}"
-               end
+        "\n\n(no stdout)"
+      else
+        "\n\nStdout:\n#{stdout}"
+      end
       error << if stderr.blank?
-                 "\n\n(no stderr)"
-               else
-                 "\n\nStderr:\n#{stderr}"
-               end
+        "\n\n(no stderr)"
+      else
+        "\n\nStderr:\n#{stderr}"
+      end
       raise error
     end
   end
@@ -388,7 +388,7 @@ class Submission < ActiveRecord::Base
 
   private
 
-  def set_processing_attempts_started_at
-    self.processing_attempts_started_at = Time.now
-  end
+    def set_processing_attempts_started_at
+      self.processing_attempts_started_at = Time.now
+    end
 end

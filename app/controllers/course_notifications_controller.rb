@@ -47,11 +47,11 @@ class CourseNotificationsController < ApplicationController
 
   private
 
-  def course_notification_params
-    params.permit(:commit, :course_id, course_notification: %i[topic message])
-  end
+    def course_notification_params
+      params.permit(:commit, :course_id, course_notification: %i[topic message])
+    end
 
-  def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id])
-  end
+    def set_organization
+      @organization = Organization.find_by(slug: params[:organization_id])
+    end
 end

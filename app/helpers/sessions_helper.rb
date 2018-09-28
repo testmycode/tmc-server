@@ -30,14 +30,14 @@ module SessionsHelper
 
   private
 
-  def user_from_session
-    User.find_by(id: session[:user_id])
-  end
-
-  def user_from_basic_auth
-    if request&.authorization
-      username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
-      User.authenticate(username, password) if username && password
+    def user_from_session
+      User.find_by(id: session[:user_id])
     end
-  end
+
+    def user_from_basic_auth
+      if request&.authorization
+        username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
+        User.authenticate(username, password) if username && password
+      end
+    end
 end

@@ -66,17 +66,17 @@ class TmcLangs < MavenProject
 
   private
 
-  def exec(cmd, exercise_path, output_path)
-    res = SystemCommands.sh!('java', '-jar', jar_path, cmd, '--exercisePath', exercise_path, '--outputPath', output_path)
-    Rails.logger.debug(res)
-    res
-  rescue StandardError => e
-    begin
-      langs_output = File.read(output_path)
-      Rails.logger.error("Executing tmc-langs failed! Tmc-langs output: #{langs_output}")
+    def exec(cmd, exercise_path, output_path)
+      res = SystemCommands.sh!('java', '-jar', jar_path, cmd, '--exercisePath', exercise_path, '--outputPath', output_path)
+      Rails.logger.debug(res)
+      res
     rescue StandardError => e
-      Rails.logger.error("Could not read tmc-langs results: #{e} ")
+      begin
+        langs_output = File.read(output_path)
+        Rails.logger.error("Executing tmc-langs failed! Tmc-langs output: #{langs_output}")
+      rescue StandardError => e
+        Rails.logger.error("Could not read tmc-langs results: #{e} ")
+      end
+      raise e
     end
-    raise e
-  end
 end

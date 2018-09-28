@@ -44,24 +44,24 @@ class Unlock < ActiveRecord::Base
 
   private
 
-  def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
-    course.exercises.each do |exercise|
-      existing = user_unlocks_by_exercise_name[exercise.name]
-      exists = !!existing
-      may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
-      if !exists && may_exist && !exercise.requires_explicit_unlock?
-        Unlock.create!(
-          user: user,
-          course: course,
-          exercise: exercise,
-          valid_after: exercise.unlock_spec_obj.valid_after
-        )
-      elsif exists && !may_exist
-        user_unlocks_by_exercise_name[exercise.name].destroy
-      elsif exists && may_exist && exercise.unlock_spec_obj.valid_after != existing.valid_after
-        existing.valid_after = exercise.unlock_spec_obj.valid_after
-        existing.save!
+    def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
+      course.exercises.each do |exercise|
+        existing = user_unlocks_by_exercise_name[exercise.name]
+        exists = !!existing
+        may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
+        if !exists && may_exist && !exercise.requires_explicit_unlock?
+          Unlock.create!(
+            user: user,
+            course: course,
+            exercise: exercise,
+            valid_after: exercise.unlock_spec_obj.valid_after
+          )
+        elsif exists && !may_exist
+          user_unlocks_by_exercise_name[exercise.name].destroy
+        elsif exists && may_exist && exercise.unlock_spec_obj.valid_after != existing.valid_after
+          existing.valid_after = exercise.unlock_spec_obj.valid_after
+          existing.save!
+        end
       end
     end
-  end
 end

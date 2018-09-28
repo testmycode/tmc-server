@@ -79,27 +79,27 @@ class Setup::CourseDetailsController < Setup::SetupController
 
   private
 
-  def refresh_course(course, options = {})
-    # TODO: Could include course ID
+    def refresh_course(course, options = {})
+      # TODO: Could include course ID
 
-    session[:refresh_report] = course.refresh(options)
-  rescue CourseRefresher::Failure => e
-    session[:refresh_report] = e.report
-  end
-
-  def course_params_for_create_from_template
-    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
-  end
-
-  def course_params_for_create_custom
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
-  end
-
-  def course_params
-    if @course.custom?
-      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
-    else
-      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+      session[:refresh_report] = course.refresh(options)
+    rescue CourseRefresher::Failure => e
+      session[:refresh_report] = e.report
     end
-  end
+
+    def course_params_for_create_from_template
+      params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
+    end
+
+    def course_params_for_create_custom
+      params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
+    end
+
+    def course_params
+      if @course.custom?
+        params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
+      else
+        params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+      end
+    end
 end

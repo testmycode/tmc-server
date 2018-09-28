@@ -98,18 +98,18 @@ class ParticipantsController < ApplicationController
       @missing_points[course_id] = missing
 
       @percent_completed[course_id] = if awarded[:awarded].size + awarded[:late].size + missing.size > 0
-                                        100 * ((awarded[:awarded].size.to_f + awarded[:late].size.to_f * course.soft_deadline_point_multiplier) / (awarded[:awarded].size + awarded[:late].size + missing.size))
-                                      else
-                                        0
-                                      end
+        100 * ((awarded[:awarded].size.to_f + awarded[:late].size.to_f * course.soft_deadline_point_multiplier) / (awarded[:awarded].size + awarded[:late].size + missing.size))
+      else
+        0
+      end
       @group_completion_counts[course_id] = course.exercise_group_completion_counts_for_user(@user)
     end
 
     @submissions = if current_user.administrator? || current_user.id == @user.id
-                     @user.submissions.order('created_at DESC').includes(:user).includes(:course)
-                   else # teacher and assistant sees only submissions for own teacherd courses
-                     @user.submissions.order('created_at DESC').includes(:user, :course).where(course: current_user.teaching_in_courses)
-                   end
+      @user.submissions.order('created_at DESC').includes(:user).includes(:course)
+    else # teacher and assistant sees only submissions for own teacherd courses
+      @user.submissions.order('created_at DESC').includes(:user, :course).where(course: current_user.teaching_in_courses)
+    end
     @submission_count = @submissions.count
     @submissions = @submissions.limit(100) unless !!params[:view_all]
 
@@ -123,75 +123,75 @@ class ParticipantsController < ApplicationController
 
   private
 
-  def index_json_data
-    result = []
-    @participants.each do |user|
-      record = { id: user.id, username: user.login, email: user.email }
-      @extra_fields.each do |field|
-        if @visible_columns.include?(field.name)
-          record[field.name] = user.field_ruby_value(field)
-        end
-      end
-
-      if @group_completion
-        record[:groups] = {}
-        for group, group_data in @group_completion
-          record[:groups][group] = {
-            points: group_data[:points_by_user][user.id] || 0,
-            total: group_data[:available_points]
-          }
-        end
-      end
-
-      result << record
-    end
-
-    {
-      api_version: ApiVersion::API_VERSION,
-      participants: result
-    }
-  end
-
-  def index_csv
-    PortableCSV.generate(force_quotes: true) do |csv|
-      title_row = (@ordinary_fields + @extra_fields.map(&:name)).select { |f| @visible_columns.include?(f) }.map(&:humanize)
-
-      if @group_completion
-        completion_cols = @group_completion.keys.sort { |a, b| Natcmp.natcmp(a, b) }
-        title_row += completion_cols
-      end
-
-      csv << title_row
-
+    def index_json_data
+      result = []
       @participants.each do |user|
-        row = []
-        for field in @ordinary_fields
-          row << user.send(field) if @visible_columns.include?(field)
-        end
-        for field in @extra_fields
+        record = { id: user.id, username: user.login, email: user.email }
+        @extra_fields.each do |field|
           if @visible_columns.include?(field.name)
-            row << user.field_ruby_value(field)
+            record[field.name] = user.field_ruby_value(field)
           end
         end
 
         if @group_completion
-          for group in completion_cols
-            group_data = @group_completion[group]
-            points = group_data[:points_by_user][user.id] || 0
-            total = group_data[:available_points]
-            percentage = format('%.3f%%', (points.to_f / total.to_f) * 100)
-            row << percentage
+          record[:groups] = {}
+          for group, group_data in @group_completion
+            record[:groups][group] = {
+              points: group_data[:points_by_user][user.id] || 0,
+              total: group_data[:available_points]
+            }
           end
         end
 
-        csv << row
+        result << record
+      end
+
+      {
+        api_version: ApiVersion::API_VERSION,
+        participants: result
+      }
+    end
+
+    def index_csv
+      PortableCSV.generate(force_quotes: true) do |csv|
+        title_row = (@ordinary_fields + @extra_fields.map(&:name)).select { |f| @visible_columns.include?(f) }.map(&:humanize)
+
+        if @group_completion
+          completion_cols = @group_completion.keys.sort { |a, b| Natcmp.natcmp(a, b) }
+          title_row += completion_cols
+        end
+
+        csv << title_row
+
+        @participants.each do |user|
+          row = []
+          for field in @ordinary_fields
+            row << user.send(field) if @visible_columns.include?(field)
+          end
+          for field in @extra_fields
+            if @visible_columns.include?(field.name)
+              row << user.field_ruby_value(field)
+            end
+          end
+
+          if @group_completion
+            for group in completion_cols
+              group_data = @group_completion[group]
+              points = group_data[:points_by_user][user.id] || 0
+              total = group_data[:available_points]
+              percentage = format('%.3f%%', (points.to_f / total.to_f) * 100)
+              row << percentage
+            end
+          end
+
+          csv << row
+        end
       end
     end
-  end
 
   private
 
-  def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id]) unless params[:organization_id].nil?
-  end
+    def set_organization
+      @organization = Organization.find_by(slug: params[:organization_id]) unless params[:organization_id].nil?
+    end
 end

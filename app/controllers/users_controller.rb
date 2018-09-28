@@ -73,10 +73,10 @@ class UsersController < ApplicationController
 
     if @user.errors.empty? && @user.save
       flash[:notice] = if password_changed
-                         'Changes saved and password changed'
-                       else
-                         'Changes saved'
-                       end
+        'Changes saved and password changed'
+      else
+        'Changes saved'
+      end
       redirect_to user_path
     else
       flash.now[:error] = 'Failed to save profile'
@@ -135,79 +135,79 @@ class UsersController < ApplicationController
 
   private
 
-  def authenticate_current_user_destroy
-    user = User.find(params[:user_id])
-    authorize! :destroy, user
-    user
-  end
-
-  def set_email
-    user_params = params[:user]
-
-    return if !@user.new_record? && user_params[:email_repeat].blank?
-
-    if user_params[:email].blank?
-      @user.errors.add(:email, 'needed')
-    elsif user_params[:email] != user_params[:email_repeat]
-      @user.errors.add(:email_repeat, 'did not match')
-    else
-      @user.email = user_params[:email].strip
+    def authenticate_current_user_destroy
+      user = User.find(params[:user_id])
+      authorize! :destroy, user
+      user
     end
-  end
 
-  def set_password
-    user_params = params[:user]
-    if user_params[:password].blank?
-      @user.errors.add(:password, 'needed')
-    elsif user_params[:password] != user_params[:password_repeat]
-      @user.errors.add(:password_repeat, 'did not match')
-    else
-      @user.password = user_params[:password]
-    end
-  end
+    def set_email
+      user_params = params[:user]
 
-  def maybe_update_password(user, user_params)
-    if user_params[:old_password].present? || user_params[:password].present?
-      if !user.has_password?(user_params[:old_password])
-        user.errors.add(:old_password, 'incorrect')
-      elsif user_params[:password] != user_params[:password_repeat]
-        user.errors.add(:password_repeat, 'did not match')
-      elsif user_params[:password].blank?
-        user.errors.add(:password, 'cannot be empty')
+      return if !@user.new_record? && user_params[:email_repeat].blank?
+
+      if user_params[:email].blank?
+        @user.errors.add(:email, 'needed')
+      elsif user_params[:email] != user_params[:email_repeat]
+        @user.errors.add(:email_repeat, 'did not match')
       else
-        user.password = user_params[:password]
-      end
-      true
-    else
-      false
-    end
-  end
-
-  def set_user_fields
-    return if params[:user_field].nil?
-    changes = {}
-    UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
-      value_record = @user.field_value_record(field)
-      old_value = value_record.ruby_value
-      value_record.set_from_form(params[:user_field][field.name])
-      new_value = value_record.ruby_value
-      changes[field.name] = { from: old_value, to: new_value } unless new_value == old_value
-    end
-    changes
-  end
-
-  def log_user_field_changes(changes)
-    unless changes.empty?
-      data = {
-        eventType: 'user_fields_changed',
-        changes: changes.clone,
-        happenedAt: (Time.now.to_f * 1000).to_i
-      }
-      Thread.new do
-        SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
-      rescue StandardError
-        logger.warn('Failed to send user field changes to spyware: ' + $!.message + "\n " + $!.backtrace.join("\n "))
+        @user.email = user_params[:email].strip
       end
     end
-  end
+
+    def set_password
+      user_params = params[:user]
+      if user_params[:password].blank?
+        @user.errors.add(:password, 'needed')
+      elsif user_params[:password] != user_params[:password_repeat]
+        @user.errors.add(:password_repeat, 'did not match')
+      else
+        @user.password = user_params[:password]
+      end
+    end
+
+    def maybe_update_password(user, user_params)
+      if user_params[:old_password].present? || user_params[:password].present?
+        if !user.has_password?(user_params[:old_password])
+          user.errors.add(:old_password, 'incorrect')
+        elsif user_params[:password] != user_params[:password_repeat]
+          user.errors.add(:password_repeat, 'did not match')
+        elsif user_params[:password].blank?
+          user.errors.add(:password, 'cannot be empty')
+        else
+          user.password = user_params[:password]
+        end
+        true
+      else
+        false
+      end
+    end
+
+    def set_user_fields
+      return if params[:user_field].nil?
+      changes = {}
+      UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
+        value_record = @user.field_value_record(field)
+        old_value = value_record.ruby_value
+        value_record.set_from_form(params[:user_field][field.name])
+        new_value = value_record.ruby_value
+        changes[field.name] = { from: old_value, to: new_value } unless new_value == old_value
+      end
+      changes
+    end
+
+    def log_user_field_changes(changes)
+      unless changes.empty?
+        data = {
+          eventType: 'user_fields_changed',
+          changes: changes.clone,
+          happenedAt: (Time.now.to_f * 1000).to_i
+        }
+        Thread.new do
+          SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
+        rescue StandardError
+          logger.warn('Failed to send user field changes to spyware: ' + $!.message + "\n " + $!.backtrace.join("\n "))
+        end
+      end
+    end
 end

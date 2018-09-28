@@ -56,18 +56,18 @@ end
 
 def host_ip
   @addr ||= ENV['HOST'] ||= if ENV['CI']
-                              `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
-                            else
-                              '127.0.0.1'
+              `ip addr|awk '/eth0/ && /inet/ {gsub(/\\/[0-9][0-9]/,""); print $2}'`.chomp
+            else
+              '127.0.0.1'
             end
 end
 
 # This makes it visible to others
 Capybara.server_host = if ENV['MULTI_HOST_SETUP']
-                         '0.0.0.0'
-                       else
-                         host_ip
-                       end
+  '0.0.0.0'
+else
+  host_ip
+end
 
 RSpec.configure do |config|
   config.mock_with :rspec

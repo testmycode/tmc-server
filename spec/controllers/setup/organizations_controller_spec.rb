@@ -71,7 +71,7 @@ describe Setup::OrganizationsController, type: :controller do
           expect(assigns(:organization)).to eq(@organization)
         end
 
-        it 'should re-render the \'edit\' template' do
+        it "should re-render the 'edit' template" do
           put :update, id: @organization.to_param, organization: invalid_attributes.except(:slug)
           expect(response).to render_template('edit')
         end
@@ -137,7 +137,7 @@ describe Setup::OrganizationsController, type: :controller do
           end.not_to change(Organization, :count).from(1)
         end
 
-        it 're-renders the \'new\' template' do
+        it "re-renders the 'new' template" do
           post :create, organization: invalid_attributes
           expect(response).to render_template('new')
         end

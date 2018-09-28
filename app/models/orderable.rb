@@ -41,36 +41,36 @@ module Orderable
 
   private
 
-  def move!(other, op, delta)
-    tbl = self.class.quoted_table_name
-    conn = ActiveRecord::Base.connection
-    conn.transaction(requires_new: true) do
-      conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE")
-
-      other_pos = conn.select_value("SELECT position FROM #{tbl} WHERE id = #{other.id}")
-      raise 'Move target not found in database' if other_pos.nil?
-      new_position = other_pos.to_i + delta
-
-      if conn.select_value("SELECT 1 FROM #{tbl} WHERE position = #{new_position}")
-        conn.execute("UPDATE #{tbl} SET position = position + (#{delta}) WHERE position #{op} #{new_position}")
-      end
-
-      conn.execute("UPDATE #{tbl} SET position = #{new_position} WHERE id = #{id}")
-      self.position = new_position
-    end
-  end
-
-  def set_default_position
-    if position.nil?
+    def move!(other, op, delta)
       tbl = self.class.quoted_table_name
       conn = ActiveRecord::Base.connection
-      conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE") # applies to the rest of this transaction
-      max = conn.select_value("SELECT MAX(position) FROM #{tbl}").to_i
-      self.position = max + 1
-    end
-  end
+      conn.transaction(requires_new: true) do
+        conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE")
 
-  def quote(value)
-    self.class.connection.quote(value)
-  end
+        other_pos = conn.select_value("SELECT position FROM #{tbl} WHERE id = #{other.id}")
+        raise 'Move target not found in database' if other_pos.nil?
+        new_position = other_pos.to_i + delta
+
+        if conn.select_value("SELECT 1 FROM #{tbl} WHERE position = #{new_position}")
+          conn.execute("UPDATE #{tbl} SET position = position + (#{delta}) WHERE position #{op} #{new_position}")
+        end
+
+        conn.execute("UPDATE #{tbl} SET position = #{new_position} WHERE id = #{id}")
+        self.position = new_position
+      end
+    end
+
+    def set_default_position
+      if position.nil?
+        tbl = self.class.quoted_table_name
+        conn = ActiveRecord::Base.connection
+        conn.execute("LOCK #{tbl} IN ACCESS EXCLUSIVE MODE") # applies to the rest of this transaction
+        max = conn.select_value("SELECT MAX(position) FROM #{tbl}").to_i
+        self.position = max + 1
+      end
+    end
+
+    def quote(value)
+      self.class.connection.quote(value)
+    end
 end

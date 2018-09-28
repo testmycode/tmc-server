@@ -66,7 +66,7 @@ feature 'Teacher can add assistants to course', feature: true do
     expect(page).to have_field('empty_group_0', with: '4.6.2015')
   end
 
-  scenario 'Assistant can\'t access course resources if not assistant for the course' do
+  scenario "Assistant can't access course resources if not assistant for the course" do
     course2 = FactoryGirl.create :course, organization: @organization
 
     log_in_as(@teacher.username, 'foobar')

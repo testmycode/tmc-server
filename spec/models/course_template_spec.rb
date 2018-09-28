@@ -72,7 +72,7 @@ describe CourseTemplate, type: :model do
     end
   end
 
-  it 'refreshes all it\'s courses on refresh call' do
+  it "refreshes all it's courses on refresh call" do
     template = FactoryGirl.create :course_template
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
@@ -85,7 +85,7 @@ describe CourseTemplate, type: :model do
     expect(Course.all.pluck(:cache_version)).to eq([1, 1, 1])
   end
 
-  it 'keeps course\'s cache_versions synchronized' do
+  it "keeps course's cache_versions synchronized" do
     template = FactoryGirl.create :course_template
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
@@ -97,7 +97,7 @@ describe CourseTemplate, type: :model do
     expect(Course.all.pluck(:cache_version)).to eq([1, 1, 1])
   end
 
-  it 'keeps course\'s source url and git branch synchronized' do
+  it "keeps course's source url and git branch synchronized" do
     template = FactoryGirl.create :course_template
     course1 = FactoryGirl.create :course, course_template: template, source_url: template.source_url
     course2 = FactoryGirl.create :course, course_template: template, source_url: template.source_url

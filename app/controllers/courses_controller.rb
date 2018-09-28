@@ -177,53 +177,53 @@ class CoursesController < ApplicationController
 
   private
 
-  def course_params
-    if @course.custom?
-      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
-    else
-      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+    def course_params
+      if @course.custom?
+        params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
+      else
+        params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+      end
     end
-  end
 
-  def assign_show_view_vars
-    @exercises = @course.exercises.includes(:course)
-    @exercises.preload(:unlocks).where(unlocks: { user: current_user })
-    @exercises = @exercises.select { |ex| ex.visible_to?(current_user) }
-                           .natsort_by(&:name)
-    @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
-    @unlocks = current_user.unlocks.where(course: @course).where('valid_after IS NULL OR valid_after < ?', Time.zone.now).pluck(:exercise_name)
+    def assign_show_view_vars
+      @exercises = @course.exercises.includes(:course)
+      @exercises.preload(:unlocks).where(unlocks: { user: current_user })
+      @exercises = @exercises.select { |ex| ex.visible_to?(current_user) }
+                             .natsort_by(&:name)
+      @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
+      @unlocks = current_user.unlocks.where(course: @course).where('valid_after IS NULL OR valid_after < ?', Time.zone.now).pluck(:exercise_name)
 
-    unless current_user.guest?
-      max_submissions = 100
-      @submissions = @course.submissions
-      @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
-      @submissions = @submissions.order('created_at DESC').includes(:user)
-      @total_submissions = @submissions.where.not(user: User.non_legitimate_students).count
-      @submissions = @submissions.limit(max_submissions)
-      Submission.eager_load_exercises(@submissions)
+      unless current_user.guest?
+        max_submissions = 100
+        @submissions = @course.submissions
+        @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
+        @submissions = @submissions.order('created_at DESC').includes(:user)
+        @total_submissions = @submissions.where.not(user: User.non_legitimate_students).count
+        @submissions = @submissions.limit(max_submissions)
+        Submission.eager_load_exercises(@submissions)
+      end
     end
-  end
 
-  def set_organization
-    @organization = Organization.find_by!(slug: params[:organization_id])
-    unauthorized! unless @organization.visibility_allowed?(request, current_user)
-  end
+    def set_organization
+      @organization = Organization.find_by!(slug: params[:organization_id])
+      unauthorized! unless @organization.visibility_allowed?(request, current_user)
+    end
 
-  def set_course
-    @course = Course.find(params[:id])
-  end
+    def set_course
+      @course = Course.find(params[:id])
+    end
 
-  def group_params
-    sliced = params.slice(:group, :empty_group)
-    groups = sliced[:group] || {}
-    empty_group = sliced[:empty_group] || {}
-    groups[''] = empty_group unless empty_group.empty?
-    groups
-  end
+    def group_params
+      sliced = params.slice(:group, :empty_group)
+      groups = sliced[:group] || {}
+      empty_group = sliced[:empty_group] || {}
+      groups[''] = empty_group unless empty_group.empty?
+      groups
+    end
 
-  def refresh_course(course, options = {})
-    session[:refresh_report] = course.refresh(options)
-  rescue CourseRefresher::Failure => e
-    session[:refresh_report] = e.report
-  end
+    def refresh_course(course, options = {})
+      session[:refresh_report] = course.refresh(options)
+    rescue CourseRefresher::Failure => e
+      session[:refresh_report] = e.report
+    end
 end

@@ -260,10 +260,10 @@ class Course < ActiveRecord::Base
 
     self.paste_visibility = new_options['paste_visibility']
     self.locked_exercise_points_visible = if !new_options['locked_exercise_points_visible'].nil?
-                                            new_options['locked_exercise_points_visible']
-                                          else
-                                            true
-                                          end
+      new_options['locked_exercise_points_visible']
+    else
+      true
+    end
 
     self.formal_name = new_options['formal_name'].presence
 
@@ -532,48 +532,48 @@ class Course < ActiveRecord::Base
 
   private
 
-  def set_cache_version
-    self.cache_version = course_template_obj.cache_version
-  end
-
-  def save_template
-    course_template_obj.save!
-  rescue StandardError => e
-    course_template_obj.errors.full_messages.each do |msg|
-      errors.add(:base, msg + e.message)
+    def set_cache_version
+      self.cache_version = course_template_obj.cache_version
     end
-  end
 
-  def course_template_obj
-    self.course_template ||= CourseTemplate.new_dummy(self)
-  end
-
-  def check_name_length
-    # If name starts with organization slug (org-course1), then check that
-    # the actual name (course1) is within range (for backward compatibility).
-    test_range = if !name.nil? && name.start_with?("#{organization.slug}-")
-                   name_range_with_slug
-                 else
-                   name_range
-                 end
-
-    unless !name.nil? && test_range.include?(name.length)
-      errors.add(:name, "must be between #{name_range} characters")
+    def save_template
+      course_template_obj.save!
+    rescue StandardError => e
+      course_template_obj.errors.full_messages.each do |msg|
+        errors.add(:base, msg + e.message)
+      end
     end
-  end
 
-  def name_range
-    1..40
-  end
+    def course_template_obj
+      self.course_template ||= CourseTemplate.new_dummy(self)
+    end
 
-  def name_range_with_slug
-    add_length = organization.slug.length + 1
-    (name_range.first + add_length)..(name_range.last + add_length)
-  end
+    def check_name_length
+      # If name starts with organization slug (org-course1), then check that
+      # the actual name (course1) is within range (for backward compatibility).
+      test_range = if !name.nil? && name.start_with?("#{organization.slug}-")
+        name_range_with_slug
+      else
+        name_range
+      end
 
-  def check_external_scoreboard_url
-    format(external_scoreboard_url, user: '', course: '', org: '') if external_scoreboard_url.present?
-  rescue StandardError
-    errors.add(:external_scoreboard_url, 'contains invalid keys')
-  end
+      unless !name.nil? && test_range.include?(name.length)
+        errors.add(:name, "must be between #{name_range} characters")
+      end
+    end
+
+    def name_range
+      1..40
+    end
+
+    def name_range_with_slug
+      add_length = organization.slug.length + 1
+      (name_range.first + add_length)..(name_range.last + add_length)
+    end
+
+    def check_external_scoreboard_url
+      format(external_scoreboard_url, user: '', course: '', org: '') if external_scoreboard_url.present?
+    rescue StandardError
+      errors.add(:external_scoreboard_url, 'contains invalid keys')
+    end
 end

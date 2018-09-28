@@ -34,16 +34,16 @@ class TestScannerCache
 
   private
 
-  def self.try_save(entry)
-    entry.save!
-  rescue ActiveRecord::RecordNotUnique
-    result
-  rescue StandardError
-    ActiveRecord::Base.logger.warn('Failed to add entry to TestScannerCache.')
-    ActiveRecord::Base.logger.warn($!)
-  end
+    def self.try_save(entry)
+      entry.save!
+    rescue ActiveRecord::RecordNotUnique
+      result
+    rescue StandardError
+      ActiveRecord::Base.logger.warn('Failed to add entry to TestScannerCache.')
+      ActiveRecord::Base.logger.warn($!)
+    end
 
-  def self.decode_value(value)
-    JSON.parse(value, symbolize_names: true)
-  end
+    def self.decode_value(value)
+      JSON.parse(value, symbolize_names: true)
+    end
 end

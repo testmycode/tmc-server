@@ -31,7 +31,7 @@ describe TeachersController, type: :controller do
           end.to change(Teachership, :count).by(1)
         end
 
-        it 'with a invalid username doesn\'t create a new teachership' do
+        it "with a invalid username doesn't create a new teachership" do
           expect do
             post :create, organization_id: @organization.slug, username: 'invalid'
           end.to change(Teachership, :count).by(0)

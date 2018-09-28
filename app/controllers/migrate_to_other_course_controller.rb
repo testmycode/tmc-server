@@ -34,25 +34,25 @@ class MigrateToOtherCourseController < ApplicationController
 
   private
 
-  def check_understanding!
-    params[:from_course_name].strip == @old_course.name &&
-      params[:to_course_name].strip == @to_course.name &&
-      params[:username].strip == current_user.login &&
-      !!params[:im_sure] &&
-      !already_migrated
-  end
-
-  def already_migrated
-    MigratedSubmissions.where(to_course_id: @to_course.id, original_submission_id: current_user.submissions.where(course: @old_course).pluck(:id)).any?
-  end
-
-  def get_extra_text
-    allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
-    return nil if allowed_migrations.nil?
-    allowed_migrations.each do |allowed_pair|
-      puts allowed_pair
-      return allowed_pair['message'] if allowed_pair['from'] == @old_course.id && allowed_pair['to'] == @to_course.id
+    def check_understanding!
+      params[:from_course_name].strip == @old_course.name &&
+        params[:to_course_name].strip == @to_course.name &&
+        params[:username].strip == current_user.login &&
+        !!params[:im_sure] &&
+        !already_migrated
     end
-    nil
-  end
+
+    def already_migrated
+      MigratedSubmissions.where(to_course_id: @to_course.id, original_submission_id: current_user.submissions.where(course: @old_course).pluck(:id)).any?
+    end
+
+    def get_extra_text
+      allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
+      return nil if allowed_migrations.nil?
+      allowed_migrations.each do |allowed_pair|
+        puts allowed_pair
+        return allowed_pair['message'] if allowed_pair['from'] == @old_course.id && allowed_pair['to'] == @to_course.id
+      end
+      nil
+    end
 end

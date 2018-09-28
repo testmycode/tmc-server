@@ -30,20 +30,20 @@ module Api
 
       private
 
-      def authenticate_user!
-        return @current_user if @current_user
-        if doorkeeper_token
-          @current_user ||= User.find_by(id: doorkeeper_token.resource_owner_id)
-          raise 'Invalid token' unless @current_user
+        def authenticate_user!
+          return @current_user if @current_user
+          if doorkeeper_token
+            @current_user ||= User.find_by(id: doorkeeper_token.resource_owner_id)
+            raise 'Invalid token' unless @current_user
+          end
+          @current_user ||= user_from_session || Guest.new
         end
-        @current_user ||= user_from_session || Guest.new
-      end
 
-      attr_reader :current_user
+        attr_reader :current_user
 
-      def errors_json(messages)
-        { errors: [*messages] }
-      end
+        def errors_json(messages)
+          { errors: [*messages] }
+        end
     end
   end
 end

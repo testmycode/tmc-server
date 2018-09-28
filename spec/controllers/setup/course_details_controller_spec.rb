@@ -56,7 +56,7 @@ describe Setup::CourseDetailsController, type: :controller do
           expect(response).to redirect_to(setup_organization_course_course_timing_path(@organization, Course.last))
         end
 
-        it 'does directory changes when course is first created from template, but doesn\'t do changes when creating more courses from same template' do
+        it "does directory changes when course is first created from template, but doesn't do changes when creating more courses from same template" do
           expect(CourseTemplate.last.dummy).to be true
           expect(CourseTemplate.last.cache_version).to eq(0)
           post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id }
@@ -140,13 +140,13 @@ describe Setup::CourseDetailsController, type: :controller do
           expect(response).to render_template('edit')
         end
 
-        it 'can\'t update course name' do
+        it "can't update course name" do
           put :update, organization_id: @organization.to_param, course_id: @course.to_param,
                        course: { name: 'newName' }
           expect(Course.last.name).to eq('originalCourse')
         end
 
-        it 'can\'t update course template id' do
+        it "can't update course template id" do
           old_id = @course.course_template_id
           put :update, organization_id: @organization.to_param, course_id: @course.to_param,
                        course: { course_template_id: 2 }
@@ -161,7 +161,7 @@ describe Setup::CourseDetailsController, type: :controller do
           @course.save!
         end
 
-        it 'can\'t update source_url' do
+        it "can't update source_url" do
           @new_repo_path = @test_tmp_dir + '/new_fake_remote_repo'
           create_bare_repo(@new_repo_path)
           put :update, organization_id: @organization.to_param, course_id: @course.to_param,
@@ -169,7 +169,7 @@ describe Setup::CourseDetailsController, type: :controller do
           expect(Course.last.source_url).to eq(@ct.source_url)
         end
 
-        it 'can\'t update git_branch' do
+        it "can't update git_branch" do
           put :update, organization_id: @organization.to_param, course_id: @course.to_param,
                        course: { git_branch: 'ufobranch' }
           expect(Course.last.git_branch).to eq('master')

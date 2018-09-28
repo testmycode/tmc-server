@@ -148,63 +148,63 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
 
   private
 
-  def two_subs_by_name
-    user1 = FactoryGirl.create(:user)
-    user2 = FactoryGirl.create(:user)
-    sub1 = FactoryGirl.create(:submission, user: user1, course: course)
-    sub2 = FactoryGirl.create(:submission, user: user2, course: course)
+    def two_subs_by_name
+      user1 = FactoryGirl.create(:user)
+      user2 = FactoryGirl.create(:user)
+      sub1 = FactoryGirl.create(:submission, user: user1, course: course)
+      sub2 = FactoryGirl.create(:submission, user: user2, course: course)
 
-    get :index, organization_slug: organization.slug, course_name: course_name
+      get :index, organization_slug: organization.slug, course_name: course_name
 
-    r = JSON.parse response.body
+      r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), 'incorrect submission or user id'
-    expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
-  end
+      expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), 'incorrect submission or user id'
+      expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
+    end
 
-  def all_own_subs(parameters)
-    get :index, parameters
+    def all_own_subs(parameters)
+      get :index, parameters
 
-    r = JSON.parse response.body
+      r = JSON.parse response.body
 
-    expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), 'incorrect submission or user id'
-  end
+      expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), 'incorrect submission or user id'
+    end
 
-  def no_other_orgs_subs_for_teacher(parameters)
-    other_organization = FactoryGirl.create(:accepted_organization)
-    other_course = FactoryGirl.create(:course, organization: other_organization)
-    other_exercise = FactoryGirl.create(:exercise, course: other_course)
-    other_user = FactoryGirl.create(:user)
-    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+    def no_other_orgs_subs_for_teacher(parameters)
+      other_organization = FactoryGirl.create(:accepted_organization)
+      other_course = FactoryGirl.create(:course, organization: other_organization)
+      other_exercise = FactoryGirl.create(:exercise, course: other_course)
+      other_user = FactoryGirl.create(:user)
+      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-    get :index, parameters
+      get :index, parameters
 
-    r = JSON.parse response.body
+      r = JSON.parse response.body
 
-    expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
-  end
+      expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
+    end
 
-  def no_other_courses_subs_for_assistant(parameters)
-    other_course = FactoryGirl.create(:course, organization: organization)
-    other_exercise = FactoryGirl.create(:exercise, course: other_course)
-    other_user = FactoryGirl.create(:user)
-    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+    def no_other_courses_subs_for_assistant(parameters)
+      other_course = FactoryGirl.create(:course, organization: organization)
+      other_exercise = FactoryGirl.create(:exercise, course: other_course)
+      other_user = FactoryGirl.create(:user)
+      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-    get :index, parameters
+      get :index, parameters
 
-    r = JSON.parse response.body
+      r = JSON.parse response.body
 
-    expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
-  end
+      expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
+    end
 
-  def no_other_users_subs_for_student(parameters)
-    other_user = FactoryGirl.create(:user)
-    other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
+    def no_other_users_subs_for_student(parameters)
+      other_user = FactoryGirl.create(:user)
+      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-    get :index, parameters
+      get :index, parameters
 
-    r = JSON.parse response.body
+      r = JSON.parse response.body
 
-    expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
-  end
+      expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
+    end
 end

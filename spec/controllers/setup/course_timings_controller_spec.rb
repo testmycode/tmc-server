@@ -179,11 +179,11 @@ describe Setup::CourseTimingsController, type: :controller do
 
   private
 
-  def init_session
-    session[:ongoing_course_setup] = {
-      course_id: @course.id,
-      phase: 3,
-      started: Time.now
-    }
-  end
+    def init_session
+      session[:ongoing_course_setup] = {
+        course_id: @course.id,
+        phase: 3,
+        started: Time.now
+      }
+    end
 end

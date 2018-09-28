@@ -96,7 +96,7 @@ class AvailablePoint < ActiveRecord::Base
 
   private
 
-  def name_must_not_contain_whitespace
-    errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
-  end
+    def name_must_not_contain_whitespace
+      errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
+    end
 end

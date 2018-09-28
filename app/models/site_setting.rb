@@ -18,20 +18,20 @@ class SiteSetting
 
   private
 
-  def self.settings_from_files(files)
-    result = {}
-    files.each do |path|
-      next unless File.exist?(path)
-      template = ERB.new File.new(path).read
-      data = YAML.safe_load template.result(binding)
-      raise "Invalid configuration file #{path}" unless data.is_a? Hash
-      result = result.deep_merge(data)
+    def self.settings_from_files(files)
+      result = {}
+      files.each do |path|
+        next unless File.exist?(path)
+        template = ERB.new File.new(path).read
+        data = YAML.safe_load template.result(binding)
+        raise "Invalid configuration file #{path}" unless data.is_a? Hash
+        result = result.deep_merge(data)
+      end
+      result
     end
-    result
-  end
 
-  def self.settings_files
-    config_dir = "#{Rails.root}/config"
-    ["#{config_dir}/site.defaults.yml", "#{config_dir}/site.yml"]
-  end
+    def self.settings_files
+      config_dir = "#{Rails.root}/config"
+      ["#{config_dir}/site.defaults.yml", "#{config_dir}/site.yml"]
+    end
 end

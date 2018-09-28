@@ -83,21 +83,21 @@ class FeedbackQuestionsController < ApplicationController
 
   private
 
-  def feedback_question_params
-    params.permit({ feedback_question: %i[question title kind] }, :intrange_min, :intrange_max, :commit, :course_id)
-  end
+    def feedback_question_params
+      params.permit({ feedback_question: %i[question title kind] }, :intrange_min, :intrange_max, :commit, :course_id)
+    end
 
-  def set_course
-    @course = Course.find(params[:course_id]) if params[:course_id]
-    authorize! :read, @course
-  end
+    def set_course
+      @course = Course.find(params[:course_id]) if params[:course_id]
+      authorize! :read, @course
+    end
 
-  def fix_question_kind(question)
-    return unless question.kind == 'intrange'
-    question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
-  end
+    def fix_question_kind(question)
+      return unless question.kind == 'intrange'
+      question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
+    end
 
-  def set_organization
-    @organization = Organization.find_by(slug: params[:organization_id])
-  end
+    def set_organization
+      @organization = Organization.find_by(slug: params[:organization_id])
+    end
 end

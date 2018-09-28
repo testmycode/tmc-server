@@ -72,11 +72,11 @@ class SubmissionData < ActiveRecord::Base
 
   private
 
-  def compress(text)
-    Zlib::Deflate.deflate(text)
-  end
+    def compress(text)
+      Zlib::Deflate.deflate(text)
+    end
 
-  def uncompress(compressed_text)
-    Zlib::Inflate.inflate(compressed_text).force_encoding('UTF-8')
-  end
+    def uncompress(compressed_text)
+      Zlib::Inflate.inflate(compressed_text).force_encoding('UTF-8')
+    end
 end

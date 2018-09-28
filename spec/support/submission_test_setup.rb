@@ -74,7 +74,7 @@ class SubmissionTestSetup
 
   private
 
-  def create_user
-    FactoryGirl.create(:user, login: 'student', password: 'student')
-  end
+    def create_user
+      FactoryGirl.create(:user, login: 'student', password: 'student')
+    end
 end

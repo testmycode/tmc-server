@@ -108,14 +108,14 @@ class ExerciseGroup
 
   private
 
-  def group_deadline(method)
-    exercises(false).map { |n| n.send(method) }.first
-  end
-
-  def set_group_deadline(method, deadline)
-    exercises(false).each do |e|
-      e.send(method, deadline)
-      e.save!
+    def group_deadline(method)
+      exercises(false).map { |n| n.send(method) }.first
     end
-  end
+
+    def set_group_deadline(method, deadline)
+      exercises(false).each do |e|
+        e.send(method, deadline)
+        e.save!
+      end
+    end
 end

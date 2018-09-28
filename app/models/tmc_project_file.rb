@@ -29,11 +29,11 @@ class TmcProjectFile
 
   private
 
-  def self.empty
-    TmcProjectFile.new({})
-  end
+    def self.empty
+      TmcProjectFile.new({})
+    end
 
-  def filter_extra_student_files!
-    @extra_student_files.reject! { |path| path.include?('..') }
-  end
+    def filter_extra_student_files!
+      @extra_student_files.reject! { |path| path.include?('..') }
+    end
 end

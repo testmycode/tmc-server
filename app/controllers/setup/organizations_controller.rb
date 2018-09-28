@@ -50,11 +50,11 @@ class Setup::OrganizationsController < Setup::SetupController
 
   private
 
-  def set_organization
-    @organization = Organization.find_by(slug: params[:id]) unless params[:id].nil?
-  end
+    def set_organization
+      @organization = Organization.find_by(slug: params[:id]) unless params[:id].nil?
+    end
 
-  def organization_params
-    params.require(:organization).permit(:name, :information, :website, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
-  end
+    def organization_params
+      params.require(:organization).permit(:name, :information, :website, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
+    end
 end

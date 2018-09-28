@@ -39,20 +39,20 @@ class SessionsController < ApplicationController
 
   private
 
-  def try_to_redirect_back(redirect_params = {})
-    if session[:return_to].present?
-      return_to = session.delete(:return_to)
-      redirect_to return_to, redirect_params
-    elsif request.env['HTTP_REFERER'].present?
-      redirect_to :back, redirect_params
-    elsif request.referer.present?
-      redirect_to request.referer, redirect_params
-    else
-      redirect_to root_path, redirect_params
+    def try_to_redirect_back(redirect_params = {})
+      if session[:return_to].present?
+        return_to = session.delete(:return_to)
+        redirect_to return_to, redirect_params
+      elsif request.env['HTTP_REFERER'].present?
+        redirect_to :back, redirect_params
+      elsif request.referer.present?
+        redirect_to request.referer, redirect_params
+      else
+        redirect_to root_path, redirect_params
+      end
     end
-  end
 
-  def clear_expired_sessions
-    Session.delete_expired
-  end
+    def clear_expired_sessions
+      Session.delete_expired
+    end
 end

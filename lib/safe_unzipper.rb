@@ -12,24 +12,24 @@ class SafeUnzipper
 
   private
 
-  def clean_up(root_dir_abs, file)
-    if File.symlink?(file)
-      dest = File.absolute_path(File.readlink(file), File.dirname(file))
-      unless dest.start_with?(root_dir_abs)
-        ::Rails.logger.warn("Cleaning up external symlink to: #{dest}")
+    def clean_up(root_dir_abs, file)
+      if File.symlink?(file)
+        dest = File.absolute_path(File.readlink(file), File.dirname(file))
+        unless dest.start_with?(root_dir_abs)
+          ::Rails.logger.warn("Cleaning up external symlink to: #{dest}")
+          File.unlink(file)
+        end
+      elsif File.directory?(file)
+        Dir.entries(file).each do |entry|
+          if entry != '.' && entry != '..'
+            clean_up(root_dir_abs, file + '/' + entry)
+          end
+        end
+      elsif !File.file?(file)
+        # Not a symlink, directory or regular file. Nuke.
+        # Currently unzip should never create these, according to the man page.
+        ::Rails.logger.warn("Cleaning up unusual file: #{file}")
         File.unlink(file)
       end
-    elsif File.directory?(file)
-      Dir.entries(file).each do |entry|
-        if entry != '.' && entry != '..'
-          clean_up(root_dir_abs, file + '/' + entry)
-        end
-      end
-    elsif !File.file?(file)
-      # Not a symlink, directory or regular file. Nuke.
-      # Currently unzip should never create these, according to the man page.
-      ::Rails.logger.warn("Cleaning up unusual file: #{file}")
-      File.unlink(file)
     end
-  end
 end

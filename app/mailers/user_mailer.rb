@@ -35,10 +35,10 @@ class UserMailer < ActionMailer::Base
 
   private
 
-  def base_url
-    @base_url ||= begin
-      settings = SiteSetting.value('emails')
-      settings['baseurl'].sub(/\/+$/, '')
+    def base_url
+      @base_url ||= begin
+        settings = SiteSetting.value('emails')
+        settings['baseurl'].sub(/\/+$/, '')
+      end
     end
-  end
 end

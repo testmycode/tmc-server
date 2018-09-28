@@ -43,15 +43,15 @@ class RecursiveYamlReader
 
   private
 
-  def require_option(name)
-    raise "option :#{name} is required" if @opts[name].nil?
-  end
+    def require_option(name)
+      raise "option :#{name} is required" if @opts[name].nil?
+    end
 
-  def merge_file(path)
-    return unless FileTest.exists? path
-    file_data = YAML.load_file(path)
-    return unless file_data
-    file_data = yield(file_data)
-    @result = @result.deep_merge(file_data)
-  end
+    def merge_file(path)
+      return unless FileTest.exists? path
+      file_data = YAML.load_file(path)
+      return unless file_data
+      file_data = yield(file_data)
+      @result = @result.deep_merge(file_data)
+    end
 end

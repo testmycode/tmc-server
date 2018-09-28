@@ -56,11 +56,11 @@ class CourseList
 
   private
 
-  def exercises
-    @exercises ||= @course.exercises.select { |e| e.points_visible_to?(@user) }
-  end
+    def exercises
+      @exercises ||= @course.exercises.select { |e| e.points_visible_to?(@user) }
+    end
 
-  def sheets
-    @sheets ||= @course.gdocs_sheets(exercises).natsort
-  end
+    def sheets
+      @sheets ||= @course.gdocs_sheets(exercises).natsort
+    end
 end

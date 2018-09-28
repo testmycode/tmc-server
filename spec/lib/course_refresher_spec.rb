@@ -138,12 +138,12 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2000-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'deadline' => '2012-01-02 12:34' },
-      commit: true
+      { commit: true }
     )
 
     refresh_courses
@@ -159,11 +159,11 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2000-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file('MyExercise/metadata.yml',
                          { 'deadline' => '2012-01-02 12:34' },
-                         commit: true)
+                         { commit: true })
     refresh_courses
 
     # set soft dl
@@ -176,12 +176,12 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2013-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'gdocs_sheet' => 'foo' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
     expect(@course.exercises.first.soft_deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:33'))
@@ -223,7 +223,7 @@ describe CourseRefresher do
           }
         }
       },
-      commit: true
+      { commit: true }
     )
     @refresher.refresh_course @course
 
@@ -242,12 +242,12 @@ describe CourseRefresher do
           }
         }
       },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'deadline' => '2001-01-01 00:00' },
-      commit: true
+      { commit: true }
     )
     @refresher.refresh_course @course
 
@@ -266,7 +266,7 @@ describe CourseRefresher do
           }
         }
       },
-      commit: true
+      { commit: true }
     )
     @refresher.refresh_course @course
 
@@ -278,12 +278,12 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2001-01-01 00:00' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'deadline' => nil },
-      commit: true
+      { commit: true }
     )
     refresh_courses
 
@@ -307,7 +307,7 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'review_points' => 'addsub reviewonly' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
 
@@ -326,13 +326,13 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'review_points' => 'addsub reviewonly' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
     change_metadata_file(
       'metadata.yml',
       { 'review_points' => 'mul' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
 
@@ -718,7 +718,7 @@ describe CourseRefresher do
   end
 
   describe 'with no_directory_changes flag' do
-    it 'doesn\'t increment cache_version' do
+    it "doesn't increment cache_version" do
       refresh_courses
       expect(@template.cache_version).not_to eq(2)
       expect(@course.cache_version).not_to eq(2)
@@ -728,12 +728,12 @@ describe CourseRefresher do
       expect(@course2.cache_version).to eq(1)
     end
 
-    it 'doesn\'t create duplicate repository folder' do
+    it "doesn't create duplicate repository folder" do
       refresh_courses
       expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
     end
 
-    it 'doesn\'t remove any folders on fail' do
+    it "doesn't remove any folders on fail" do
       @refresher.refresh_course(@course)
       @template.reload
 
