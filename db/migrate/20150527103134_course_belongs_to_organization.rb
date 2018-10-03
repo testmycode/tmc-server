@@ -1,4 +1,4 @@
-class CourseBelongsToOrganization < ActiveRecord::Migration
+class CourseBelongsToOrganization < ActiveRecord::Migration[4.2]
 
   class Course < ActiveRecord::Base
     belongs_to :organization, :class_name => 'CourseBelongsToOrganization::Organization'

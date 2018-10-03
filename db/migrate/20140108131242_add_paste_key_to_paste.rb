@@ -1,4 +1,4 @@
-class AddPasteKeyToPaste < ActiveRecord::Migration
+class AddPasteKeyToPaste < ActiveRecord::Migration[4.2]
   def up
     add_column :submissions, :paste_key, :string, unique: true, index: true
     #add_index :submissions, [:paste_key], unique: true

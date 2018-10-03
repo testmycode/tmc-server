@@ -1,4 +1,4 @@
-class MakeExerciseCourseIdAndNameIndexUnique < ActiveRecord::Migration
+class MakeExerciseCourseIdAndNameIndexUnique < ActiveRecord::Migration[4.2]
   def up
     remove_index "exercises", ["course_id", "name"]
     add_index "exercises", ["course_id", "name"], unique: true

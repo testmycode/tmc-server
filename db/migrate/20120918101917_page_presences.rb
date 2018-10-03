@@ -1,4 +1,4 @@
-class PagePresences < ActiveRecord::Migration
+class PagePresences < ActiveRecord::Migration[4.2]
   def change
     create_table :page_presences do |t|
       t.string :path, null: false

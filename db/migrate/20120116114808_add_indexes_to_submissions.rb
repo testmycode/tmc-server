@@ -1,4 +1,4 @@
-class AddIndexesToSubmissions < ActiveRecord::Migration
+class AddIndexesToSubmissions < ActiveRecord::Migration[4.2]
   def change
     # This should help completed_by? queries
     add_index :submissions, [:user_id, :exercise_name]

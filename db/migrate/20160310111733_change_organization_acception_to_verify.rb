@@ -1,4 +1,4 @@
-class ChangeOrganizationAcceptionToVerify < ActiveRecord::Migration
+class ChangeOrganizationAcceptionToVerify < ActiveRecord::Migration[4.2]
 
   class Organization < ActiveRecord::Base
   end

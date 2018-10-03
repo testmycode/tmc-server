@@ -1,4 +1,4 @@
-class RemovePagePresence < ActiveRecord::Migration
+class RemovePagePresence < ActiveRecord::Migration[4.2]
   def up
     drop_table :page_presences
   end

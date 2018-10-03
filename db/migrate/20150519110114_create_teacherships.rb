@@ -1,4 +1,4 @@
-class CreateTeacherships < ActiveRecord::Migration
+class CreateTeacherships < ActiveRecord::Migration[4.2]
   def change
     create_table :teacherships do |t|
       t.references :user, dependent: :delete

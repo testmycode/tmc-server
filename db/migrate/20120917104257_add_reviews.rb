@@ -1,4 +1,4 @@
-class AddReviews < ActiveRecord::Migration
+class AddReviews < ActiveRecord::Migration[4.2]
   def change
     add_column :available_points, :requires_review, :boolean, default: false, null: false
 

@@ -1,4 +1,4 @@
-class AddModelSolutionAccessLog < ActiveRecord::Migration
+class AddModelSolutionAccessLog < ActiveRecord::Migration[4.2]
   def change
     create_table :model_solution_access_logs do |t|
       t.references :user, null: false

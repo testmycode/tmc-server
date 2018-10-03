@@ -1,4 +1,4 @@
-class DeadlinesAndUnlocks < ActiveRecord::Migration
+class DeadlinesAndUnlocks < ActiveRecord::Migration[4.2]
   def up
     deadlines = execute("SELECT id, deadline FROM exercises WHERE deadline IS NOT NULL").to_a
     remove_column :exercises, :deadline

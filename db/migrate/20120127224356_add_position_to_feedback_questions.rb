@@ -1,4 +1,4 @@
-class AddPositionToFeedbackQuestions < ActiveRecord::Migration
+class AddPositionToFeedbackQuestions < ActiveRecord::Migration[4.2]
   def up
     add_column :feedback_questions, :position, :int
     execute "UPDATE feedback_questions SET position = id"

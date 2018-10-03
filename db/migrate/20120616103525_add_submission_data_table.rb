@@ -1,4 +1,4 @@
-class AddSubmissionDataTable < ActiveRecord::Migration
+class AddSubmissionDataTable < ActiveRecord::Migration[4.2]
   def up
     create_table :submission_data, id: false do |t|
       t.integer :submission_id, null: false

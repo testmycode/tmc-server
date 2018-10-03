@@ -1,4 +1,4 @@
-class CommentAwardedPointsColumnAndTable < ActiveRecord::Migration
+class CommentAwardedPointsColumnAndTable < ActiveRecord::Migration[4.2]
   def up
     if respond_to?(:set_column_comment)
       set_table_comment :awarded_points, 'Stores points awarded to a user in a particular course. Each point is stored only once per user/course and each row refers to the first submission that awarded the point.'
