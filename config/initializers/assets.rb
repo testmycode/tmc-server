@@ -14,3 +14,5 @@ Rails.application.config.assets.precompile << proc do |path|
   full_path = Rails.application.assets.resolve(path).to_s
   full_path.include?('vendor/assets/images/')
 end
+
+Rails.application.config.assets.paths << Rails.root.join('node_modules')

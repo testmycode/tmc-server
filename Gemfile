@@ -4,6 +4,10 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 # source 'http://production.cf.rubygems.org/'
 
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+ruby '2.5.0'
+
 gem 'rails', '~> 5.2.1'
 
 gem 'activerecord-session_store', '~> 1.1.1'
@@ -42,6 +46,9 @@ gem 'bootstrap', '~> 4.0.0.beta2.1'
 gem 'font-awesome-rails'
 gem 'sass-rails', '~> 5.0'
 
+# Reduces boot times through caching; required in config/boot.rb
+gem 'bootsnap', '>= 1.1.0', require: false
+
 group :assets do
   gem 'jquery-rails', '~> 4.3.3'
   gem 'sprockets-rails', require: 'sprockets/railtie'
@@ -75,6 +82,7 @@ end
 
 group :development do
   gem 'letter_opener', '~> 1.6'
+  gem 'listen', '~> 3.1', '>= 3.1.5'
 end
 
 group :test do
