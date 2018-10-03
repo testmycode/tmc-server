@@ -6,7 +6,7 @@ require 'set'
 # A course refresh populates this table and the UnlockComputerTask background task
 # consumes it by calling Unlock.refresh_unlocks on the entries. All code that accesses
 # unlocks must ensure that UncomputedUnlock.resolve is called for the (course, user) first.
-class UncomputedUnlock < ActiveRecord::Base
+class UncomputedUnlock < ApplicationRecord
   belongs_to :course
   belongs_to :user
 

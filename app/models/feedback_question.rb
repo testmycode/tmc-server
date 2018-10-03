@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class FeedbackQuestion < ActiveRecord::Base
+class FeedbackQuestion < ApplicationRecord
   include Orderable
 
   belongs_to :course

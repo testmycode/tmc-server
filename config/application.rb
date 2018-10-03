@@ -33,6 +33,9 @@ module TmcServer
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.autoload_paths << Rails.root.join('lib')
 
+    # TODO: Enable this when ready
+    # ActiveSupport.halt_callback_chains_on_return_false = false
+
     config.relative_url_root = SiteSetting.value('base_path')
 
     config.middleware.insert_before 0, 'Rack::Cors', debug: true, logger: (-> { Rails.logger }) do
