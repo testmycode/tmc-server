@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180912080101) do
+ActiveRecord::Schema.define(version: 20181003103718) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -116,6 +116,7 @@ ActiveRecord::Schema.define(version: 20180912080101) do
     t.boolean  "hide_submissions",                         default: false, null: false
     t.boolean  "model_solution_visible_before_completion", default: false, null: false
     t.float    "soft_deadline_point_multiplier",           default: 0.75,  null: false
+    t.boolean  "code_review_requests_enabled",             default: true,  null: false
   end
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree

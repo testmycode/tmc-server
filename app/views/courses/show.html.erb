@@ -127,6 +127,13 @@
             <% end %>
           <% end %>
 
+            <li>
+              <% if @course.code_review_requests_enabled? %>
+                <%= link_to 'Disable code review requests', toggle_code_review_requests_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-sm" %>
+              <% else %>
+                <%= link_to 'Enable code review requests', toggle_code_review_requests_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-sm" %>
+            <% end %>
+            </li>
           <% # Course timing, deadlines, unlocks %>
           <% if can? :manage_deadlines, @course %>
             <li>

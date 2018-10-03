@@ -97,6 +97,12 @@ class CoursesController < ApplicationController
     redirect_to(organization_course_path(@organization, @course), notice: "Course is now #{@course.hidden? ? 'hidden' : 'visible'}.")
   end
 
+  def toggle_code_review_requests
+    authorize! :teach, @organization
+    @course.update!(code_review_requests_enabled: !@course.code_review_requests_enabled)
+    redirect_to(organization_course_path(@organization, @course), notice: "Code review requests are now #{@course.code_review_requests_enabled? ? 'enabled' : 'disabled'}.")
+  end
+
   def manage_deadlines
     authorize! :manage_deadlines, @course
     add_course_breadcrumb

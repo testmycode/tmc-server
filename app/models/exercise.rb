@@ -401,6 +401,10 @@ class Exercise < ActiveRecord::Base
     ActiveSupport::JSON.decode(runtime_params)
   end
 
+  def code_review_requests_enabled?
+    course.code_review_requests_enabled? && self[:code_review_requests_enabled]
+  end
+
   def self.default_options
     {
       'deadline' => nil,
