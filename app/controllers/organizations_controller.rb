@@ -127,9 +127,8 @@ class OrganizationsController < ApplicationController
     end
 
     def set_organization
-      @organization = Organization.find_by(slug: params[:id])
+      @organization = Organization.find_by!(slug: params[:id])
       unauthorized! unless @organization.visibility_allowed?(request, current_user)
-      raise ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
     end
 
     def organization_params
