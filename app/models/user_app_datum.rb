@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class UserAppDatum < ActiveRecord::Base
+class UserAppDatum < ApplicationRecord
   belongs_to :user
 end

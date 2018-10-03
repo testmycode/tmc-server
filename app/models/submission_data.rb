@@ -5,7 +5,7 @@
 # In addition to good old separation of concerns, it is useful to force these to be
 # loaded explicitly. If these fields were directly in Submission, a result set
 # (with default configuration) of Submission objects would easily consume quite a bit of memory.
-class SubmissionData < ActiveRecord::Base
+class SubmissionData < ApplicationRecord
   self.primary_key = 'submission_id'
 
   belongs_to :submission

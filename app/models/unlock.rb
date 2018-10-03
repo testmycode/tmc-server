@@ -13,7 +13,7 @@
 # we require the user to explicitly unlock the next set of exercises to avoid
 # starting the timer prematurely.
 #
-class Unlock < ActiveRecord::Base
+class Unlock < ApplicationRecord
   belongs_to :user
   belongs_to :course
   belongs_to :exercise, ->(unlock) { where(course: unlock.course) }, foreign_key: :exercise_name, primary_key: :name
