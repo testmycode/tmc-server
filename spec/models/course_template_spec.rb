@@ -77,24 +77,24 @@ describe CourseTemplate, type: :model do
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
-    expect(template.cache_version).to eq(0)
-    expect(Course.all.pluck(:cache_version)).to eq([0, 0, 0])
+    expect(template.cached_version).to eq(0)
+    expect(Course.all.pluck(:cached_version)).to eq([0, 0, 0])
 
     template.refresh
-    expect(template.cache_version).to eq(1)
-    expect(Course.all.pluck(:cache_version)).to eq([1, 1, 1])
+    expect(template.cached_version).to eq(1)
+    expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
   end
 
-  it "keeps course's cache_versions synchronized" do
+  it "keeps course's cached_versions synchronized" do
     template = FactoryGirl.create :course_template
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
-    expect(template.cache_version).to eq(0)
-    expect(Course.all.pluck(:cache_version)).to eq([0, 0])
+    expect(template.cached_version).to eq(0)
+    expect(Course.all.pluck(:cached_version)).to eq([0, 0])
     template.refresh
     template.courses << FactoryGirl.create(:course, course_template: template, source_url: template.source_url)
-    expect(template.cache_version).to eq(1)
-    expect(Course.all.pluck(:cache_version)).to eq([1, 1, 1])
+    expect(template.cached_version).to eq(1)
+    expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
   end
 
   it "keeps course's source url and git branch synchronized" do

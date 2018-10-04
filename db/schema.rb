@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181003103718) do
+ActiveRecord::Schema.define(version: 20181003140911) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20181003103718) do
     t.string   "source_url"
     t.boolean  "dummy",          default: false,    null: false
     t.boolean  "hidden",         default: false
-    t.integer  "cache_version",  default: 0,        null: false
+    t.integer  "cached_version", default: 0,        null: false
     t.string   "source_backend", default: "git",    null: false
     t.string   "git_branch",     default: "master", null: false
     t.datetime "expires_at"
@@ -95,7 +95,7 @@ ActiveRecord::Schema.define(version: 20181003103718) do
     t.datetime "updated_at"
     t.datetime "hide_after"
     t.boolean  "hidden",                                   default: false, null: false
-    t.integer  "cache_version",                            default: 0,     null: false
+    t.integer  "cached_version",                           default: 0,     null: false
     t.string   "spreadsheet_key"
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"

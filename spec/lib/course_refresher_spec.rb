@@ -678,7 +678,7 @@ describe CourseRefresher do
     end
 
     it 'should roll back any database changes' do
-      old_cache_version = @course.cache_version
+      old_cached_version = @course.cached_version
       old_exercises = Exercise.order(:id).to_a
       old_points = AvailablePoint.order(:id).to_a
 
@@ -686,11 +686,11 @@ describe CourseRefresher do
       expect { refresh_courses }.to raise_error
 
       @template.reload
-      expect(@template.cache_version).to eq(old_cache_version)
+      expect(@template.cached_version).to eq(old_cached_version)
       @course.reload
-      expect(@course.cache_version).to eq(old_cache_version)
+      expect(@course.cached_version).to eq(old_cached_version)
       @course2.reload
-      expect(@course2.cache_version).to eq(old_cache_version)
+      expect(@course2.cached_version).to eq(old_cached_version)
       expect(Exercise.order(:id).to_a).to eq(old_exercises)
       expect(AvailablePoint.order(:id).to_a).to eq(old_points)
     end
@@ -718,14 +718,14 @@ describe CourseRefresher do
   end
 
   describe 'with no_directory_changes flag' do
-    it "doesn't increment cache_version" do
+    it "doesn't increment cached_version" do
       refresh_courses
-      expect(@template.cache_version).not_to eq(2)
-      expect(@course.cache_version).not_to eq(2)
-      expect(@course2.cache_version).not_to eq(2)
-      expect(@template.cache_version).to eq(1)
-      expect(@course.cache_version).to eq(1)
-      expect(@course2.cache_version).to eq(1)
+      expect(@template.cached_version).not_to eq(2)
+      expect(@course.cached_version).not_to eq(2)
+      expect(@course2.cached_version).not_to eq(2)
+      expect(@template.cached_version).to eq(1)
+      expect(@course.cached_version).to eq(1)
+      expect(@course2.cached_version).to eq(1)
     end
 
     it "doesn't create duplicate repository folder" do

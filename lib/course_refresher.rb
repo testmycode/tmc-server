@@ -103,7 +103,7 @@ class CourseRefresher
 
           @old_cache_path = @course.cache_path
 
-          @course.increment_cache_version                         unless options[:no_directory_changes] # causes @course.*_path to return paths in the new cache
+          @course.increment_cached_version                         unless options[:no_directory_changes] # causes @course.*_path to return paths in the new cache
 
           FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
           FileUtils.mkdir_p(@course.cache_path)                   unless options[:no_directory_changes]

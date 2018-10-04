@@ -72,13 +72,13 @@ class CourseTemplate < ActiveRecord::Base
   end
 
   def cache_path
-    File.join(Course.cache_root, "#{name}-#{cache_version}")
+    File.join(Course.cache_root, "#{name}-#{cached_version}")
   end
 
-  def increment_cache_version
-    self.cache_version += 1
+  def increment_cached_version
+    self.cached_version += 1
     courses.each do |course|
-      course.cache_version = cache_version
+      course.cached_version = cached_version
     end
   end
 
@@ -101,7 +101,7 @@ class CourseTemplate < ActiveRecord::Base
 
     def update_courses_sourcedata
       courses.each do |c|
-        c.cache_version = cache_version
+        c.cached_version = cached_version
         c.source_url = source_url
         c.git_branch = git_branch
         c.source_backend = source_backend

@@ -69,30 +69,30 @@ class Course < ActiveRecord::Base
   end
 
   def course_as_json
-    as_json(only: %i[
-              name
-              hide_after
-              hidden
-              cache_version
-              spreadsheet_key
-              hidden_if_registered_after
-              refreshed_at
-              locked_exercise_points_visible
-              description
-              paste_visibility
-              formal_name
-              certificate_downloadable
-              certificate_unlock_spec
-              organization_id
-              disabled_status
-              title
-              descrpition
-              material_url
-              course_template_id
-              hide_submission_results
-              external_scoreboard_url
-            ],
-            methods: :organization_slug)
+    {
+      name: name,
+      hide_after: hide_after,
+      hidden: hidden,
+      cache_version: cached_version,
+      spreadsheet_key: spreadsheet_key,
+      hidden_if_registered_after: hidden_if_registered_after,
+      refreshed_at: refreshed_at,
+      locked_exercise_points_visible: locked_exercise_points_visible,
+      description: description,
+      paste_visibility: paste_visibility,
+      formal_name: formal_name,
+      certificate_downloadable: certificate_downloadable,
+      certificate_unlock_spec: certificate_unlock_spec,
+      organization_id: organization_id,
+      disabled_status: disabled_status,
+      title: title,
+      descrpition: descripition,
+      material_url: material_url,
+      course_template_id: course_template_id,
+      hide_submission_results: hide_submission_results,
+      external_scoreboard_url: external_scoreboard_url,
+      organization_slug: organization_slug,
+    }
   end
 
   swagger_schema :CourseLinks do
@@ -143,8 +143,8 @@ class Course < ActiveRecord::Base
   validates :description, length: { maximum: 512 }
   validate :check_name_length
 
-  # If made from template, make sure cache_version is not out of sync.
-  before_save :set_cache_version
+  # If made from template, make sure cached_version is not out of sync.
+  before_save :set_cached_version
   before_validation :save_template
   validates :source_url, presence: true
   # validates :custom_points_url,
@@ -207,7 +207,7 @@ class Course < ActiveRecord::Base
                title: course_template.title,
                description: course_template.description,
                material_url: course_template.material_url,
-               cache_version: course_template.cache_version,
+               cached_version: course_template.cached_version,
                course_template: course_template)
   end
 
@@ -285,7 +285,7 @@ class Course < ActiveRecord::Base
     "#{FileStore.root}/course"
   end
 
-  delegate :increment_cache_version, to: :course_template_obj
+  delegate :increment_cached_version, to: :course_template_obj
 
   delegate :cache_path, to: :course_template_obj
 
@@ -532,8 +532,8 @@ class Course < ActiveRecord::Base
 
   private
 
-    def set_cache_version
-      self.cache_version = course_template_obj.cache_version
+    def set_cached_version
+      self.cached_version = course_template_obj.cached_version
     end
 
     def save_template

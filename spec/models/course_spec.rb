@@ -347,18 +347,18 @@ describe Course, type: :model do
     end
   end
 
-  it 'increments own cache_version if custom course' do
+  it 'increments own cached_version if custom course' do
     course = FactoryGirl.create :course
     expect do
-      course.increment_cache_version
+      course.increment_cached_version
       course.save!
-    end.to change { course.cache_version }.by(1)
+    end.to change { course.cached_version }.by(1)
   end
 
-  it "increments template's cache_version if templated" do
+  it "increments template's cached_version if templated" do
     template = FactoryGirl.create :course_template
     course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
-    expect { course.increment_cache_version }.to change { template.cache_version }.by(1)
+    expect { course.increment_cached_version }.to change { template.cached_version }.by(1)
   end
 
   it "templated course's cache path is template's cache path, regardless of names" do
