@@ -68,7 +68,7 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
 
-  gem 'database_cleaner', '~> 1.5.0'
+  gem 'database_cleaner', '~> 1.7.0'
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4.3'
   gem 'railroady' # for doc/diagrams
