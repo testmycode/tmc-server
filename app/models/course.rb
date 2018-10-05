@@ -86,7 +86,7 @@ class Course < ActiveRecord::Base
       organization_id: organization_id,
       disabled_status: disabled_status,
       title: title,
-      descrpition: descripition,
+      description: description,
       material_url: material_url,
       course_template_id: course_template_id,
       hide_submission_results: hide_submission_results,
