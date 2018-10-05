@@ -46,8 +46,7 @@ module Api
             end
             return render json: {
               status: :processing,
-              sandbox_status: sandbox_status,
-              submission_url: view_context.submission_url(@submission)
+              sandbox_status: sandbox_status
             }
           end
           unauthorize_guest!
@@ -69,7 +68,6 @@ module Api
               validations: @submission.validations,
               valgrind: @submission.valgrind,
               solution_url: @exercise.solution.visible_to?(current_user) ? view_context.exercise_solution_url(@exercise) : nil,
-              submission_url: view_context.submission_url(@submission),
               submitted_at: @submission.created_at,
               processing_time: @submission.processing_time,
               reviewed: @submission.reviewed?,

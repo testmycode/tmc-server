@@ -108,11 +108,8 @@ module Api
 
             if !errormsg
               render json: { submission_url: api_v8_core_submission_url(@submission),
-                             paste_url: if @submission.paste_key
-                                          paste_url(@submission.paste_key)
-                                        else
-                                          ''
-                                        end }
+                             paste_url: @submission.paste_key ? paste_url(@submission.paste_key) : '',
+                             show_submission_url: submission_url(@submission) }
             else
               render json: { error: errormsg }
             end
