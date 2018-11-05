@@ -7,7 +7,9 @@
 
   <section class="participant-entries">
     <ul class="nobullets">
-      <li>Username: <%= @user.login %></li>
+      <% if current_user.administrator? %>
+      <li>Username: <%= @user.login %> (shown to you beacause you're an admin)</li>
+      <% end %>
       <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
       <% for field in UserField.all %>
         <% if field.field_type != :html %>

@@ -1,6 +1,6 @@
 <% require 'portable_csv' %>
 <%= PortableCSV.generate(:force_quotes => true) do |csv|
-  arr = ["Username"]
+  arr = []
   arr += @user_fields.map(&:label) if @user_fields
   arr += @summary[:sheets].map {|sheet| sheet[:name] } + ["Total"]
   csv << arr
@@ -10,7 +10,7 @@
       @summary[:awarded_for_user_and_sheet][user.login][sheet[:name]].to_i
     end
     total = @summary[:total_for_user][user.login].to_i
-    arr = [user.login]
+    arr = []
     if @user_fields
       @user_fields.each do |field|
         user_field_value = user.user_field_values.find { |o| o.field_name == field.name }

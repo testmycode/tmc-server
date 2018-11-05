@@ -44,14 +44,7 @@
         </tr>
         <tr>
           <th></th>
-          <th>
-            Student<br />
-            <% unless params[:sort_by].blank? %>
-              [<%= link_to 'sort', organization_course_points_path(@organization, @course) %>]
-            <% else %>
-              [sort]
-            <% end %>
-          </th>
+          <th></th>
             <% if @user_fields %>
               <% @user_fields.each do |field| %>
                 <th><%= field.label %></th>
@@ -89,9 +82,9 @@
             <td><%= index + 1 %></td>
             <td>
               <% if current_user.id == user.id || can?(:teach, @course) %>
-                <%= link_to username, participant_path(user) %>
+                <%= link_to 'Profile', participant_path(user) %>
               <% else %>
-                <%= username %>
+                &nbsp;
               <% end  %>
             </td>
             <% if @user_fields %>
