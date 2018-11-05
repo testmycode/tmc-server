@@ -1,8 +1,6 @@
 <%= render partial: 'participants/nav' %>
 
-<h1><%= @user.login %></h1>
-
-<%= render :partial => 'users/form', :user => @user %>
+<%= render :partial => 'users/form', :user => @user, locals: { hide_login: true } %>
 
 <% if can? :destroy, @user %>
   <%= button_to 'Request deleting account', send_destroy_email_path(@user.id), method: :post, class: 'btn btn-danger' %>

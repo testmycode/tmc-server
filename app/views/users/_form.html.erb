@@ -3,12 +3,14 @@
 
   <section>
     <h2>User account</h2>
-    <div class="alert alert-info" role="alert">
-      Your <i>username</i> will be visible to everyone for example in public scoreboards. <br>
-      Therefore it should <b>not</b> contain your student number or your
-      email address.
-    </div>
-    <%= bs_labeled_field('Username', f.text_field(:login, :disabled => !@user.new_record?, class: 'form-control')) %>
+    <% unless local_assigns[:hide_login] %>
+      <div class="alert alert-info" role="alert">
+        Your <i>username</i> will be visible to everyone for example in public scoreboards. <br>
+        Therefore it should <b>not</b> contain your student number or your
+        email address.
+      </div>
+      <%= bs_labeled_field('Username', f.text_field(:login, :disabled => !@user.new_record?, class: 'form-control')) %>
+    <% end%>
     <%= bs_labeled_field('E-mail:', f.text_field(:email, class: 'form-control')) %>
     <%= bs_labeled_field('Confirm e-mail:', f.text_field(:email_repeat, :value => '', class: 'form-control')) %>
   </section>
