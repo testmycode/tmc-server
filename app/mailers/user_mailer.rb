@@ -13,6 +13,7 @@ class UserMailer < ActionMailer::Base
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
+      origin_name += "_#{language}" if language
       @url = base_url + confirm_email_path(@user.id, token.token, language: language, origin: CGI.escape(origin_name))
       template_path = Rails.root.join('config', 'email_templates', 'user_mailer', 'email_confirmation')
       html_template_path = template_path.join("#{origin_name}.html.erb")
