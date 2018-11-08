@@ -104,7 +104,7 @@ module Api
 
         if @user.errors.empty? && @user.save
           # TODO: Whitelist origins
-          UserMailer.email_confirmation(@user, params[:origin]).deliver_now
+          UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now
           render json: {
             success: true,
             message: 'User created.'

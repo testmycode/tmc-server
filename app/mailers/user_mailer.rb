@@ -3,12 +3,13 @@
 require 'cgi'
 
 class UserMailer < ActionMailer::Base
-  def email_confirmation(user, origin = nil)
+  def email_confirmation(user, origin = nil, language = nil)
     @origin = origin
     @user = user
     token = user.verification_tokens.email.create!
-    @url = base_url + confirm_email_path(@user.id, token.token)
+    @url = base_url + confirm_email_path(@user.id, token.token, language: language)
     subject = 'Confirm your mooc.fi account email address'
+    subject = 'Varmista mooc.fi tunnuksesi sähköpostiosoite' if language == "fi"
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
