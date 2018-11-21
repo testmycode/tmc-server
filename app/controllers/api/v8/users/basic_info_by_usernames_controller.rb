@@ -78,6 +78,13 @@ module Api
               extra_fields = user_id_to_extra_fields[u.id] || []
               d[:extra_fields] = extra_fields.map { |o| [o.field_name, o.value] }.to_h
             end
+            if params[:user_fields]
+              user_fields = u.user_field_values.map {|o| [o.field_name, o.value]}.to_h
+              d[:user_fields] = user_fields
+              d[:student_number] = user_fields["organizational_id"]
+              d[:first_name] = user_fields["first_name"]
+              d[:last_name] = user_fields["last_name"]
+            end
             d
           end
           render json: data
