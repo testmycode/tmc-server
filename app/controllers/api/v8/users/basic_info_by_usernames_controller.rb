@@ -59,7 +59,7 @@ module Api
         skip_authorization_check
 
         def create
-          respond_access_denied unless current_user.administrator?
+          return respond_access_denied unless current_user.administrator?
           users = User.where(login: params[:usernames])
           user_id_to_extra_fields = nil
           if params[:extra_fields]
