@@ -83,9 +83,9 @@ module SubmissionsHelper
   def submissions_for_datatables(submissions)
     submissions.map do |sub|
       user_col = if can? :read, sub.user
-        link_to sub.user.login, participant_path(sub.user)
+        link_to sub.user.email, participant_path(sub.user)
       else
-        sub.user.login
+        'user'
       end
       [
         sub.created_at.strftime('%Y-%m-%d %H:%M'),

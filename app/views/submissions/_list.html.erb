@@ -35,9 +35,9 @@
         <% if show_student_column %>
           <td>
             <% if current_user.id == submission.user.id || can_teach %>
-              <%= link_to submission.user.login, participant_path(submission.user) %>
+              <%= link_to submission.user.email, participant_path(submission.user) %>
             <% else %>
-              <%= submission.user.login %>
+              user
             <% end %>
           </td>
         <% end %>
