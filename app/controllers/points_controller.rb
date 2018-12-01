@@ -101,7 +101,7 @@ class PointsController < ApplicationController
       end
 
       include_admins = current_user.administrator?
-      users = User.select('login, users.id, administrator').where(login: per_user_and_sheet.keys.sort_by(&:downcase)).includes(:organizations).includes(:user_field_values).order('login ASC')
+      users = User.select('login, email, users.id, administrator').where(login: per_user_and_sheet.keys.sort_by(&:downcase)).includes(:organizations).includes(:user_field_values).order('login ASC')
 
       users = users.where(administrator: false) unless include_admins
 

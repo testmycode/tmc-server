@@ -50,6 +50,9 @@
                 <th><%= field.label %></th>
               <% end %>
             <% end %>
+            <% if can?(:teach, @course) %>
+              <th>Email</th>
+            <% end %>
           <% @summary[:sheets].map{|s| s[:name]}.each do |sheet| %>
             <th>
               <%= sheet %><br />
@@ -92,6 +95,9 @@
                 <% field_record = user.user_field_values.find { |o| o.field_name == field.name } %>
                 <td><%= field_record.value if field_record %></td>
               <% end %>
+            <% end %>
+            <% if can?(:teach, @course) %>
+              <td><%= user.email %></td>
             <% end %>
             <% @summary[:sheets].each do |sheet| %>
               <% user_points_for_this_sheet = @summary[:awarded_for_user_and_sheet][username][sheet[:name]].to_i %>

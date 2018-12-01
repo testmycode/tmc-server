@@ -2,6 +2,7 @@
 <%= PortableCSV.generate(:force_quotes => true) do |csv|
   arr = []
   arr += @user_fields.map(&:label) if @user_fields
+  arr << :email if can?(:teach, @course)
   arr += @summary[:sheets].map {|sheet| sheet[:name] } + ["Total"]
   csv << arr
 
@@ -17,6 +18,7 @@
         arr << (user_field_value ? user_field_value.value : '')
       end
     end
+    arr << user.email if can?(:teach, @course)
     arr += points + [total]
     csv << arr
   end
