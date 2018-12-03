@@ -27,6 +27,7 @@ class AuthsController < ApplicationController
     end
 
     user = User.find_by(login: params[:username])
+    user ||= User.find_by('lower(email) = ?', params[:username].downcase)
     msg = if user && params[:password].present? && user.has_password?(params[:password])
       OK_MESSAGE
     else
