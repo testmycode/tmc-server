@@ -39,7 +39,7 @@ class User < ActiveRecord::Base
                     uniqueness: { case_sensitive: false },
                     format: {
                       with: URI::MailTo::EMAIL_REGEXP,
-                      message: 'Only valid emails allowed'
+                      message: 'does not look like an email'
                     }
 
   validate :reject_common_login_mistakes, on: :create
