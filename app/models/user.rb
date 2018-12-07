@@ -36,7 +36,11 @@ class User < ActiveRecord::Base
                     length: { within: 2..50 }
 
   validates :email, presence: true,
-                    uniqueness: { case_sensitive: false }
+                    uniqueness: { case_sensitive: false },
+                    format: {
+                      with: URI::MailTo::EMAIL_REGEXP,
+                      message: 'Only valid emails allowed'
+                    }
 
   validate :reject_common_login_mistakes, on: :create
 
