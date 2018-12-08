@@ -53,7 +53,7 @@ class UsersController < ApplicationController
     add_breadcrumb 'My account', user_path
 
     if current_user.guest?
-      respond_access_denied
+      raise CanCan::AccessDenied
     else
       @user = current_user
     end
