@@ -60,7 +60,7 @@ TmcServer::Application.routes.draw do
             resources :points, module: :users, only: :index
           end
 
-          resources :exercises, module: :courses, param: :name, only: :index do
+          resources :exercises, module: :courses, param: :name, only: %i[index show], constraints: { name: /.*/ } do
             resources :points, module: :exercises, only: :index
             resources :users, module: :exercises, only: [] do
               resources :points, module: :users, only: :index

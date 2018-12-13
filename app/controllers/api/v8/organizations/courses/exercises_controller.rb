@@ -74,6 +74,26 @@ module Api
             present(presentable)
           end
 
+          def show
+            unauthorize_guest!
+            organization = Organization.find_by!(slug: params[:organization_slug])
+            course = organization.courses.find_by(name: "#{params[:organization_slug]}-#{params[:course_name]}")
+            course = organization.courses.find_by!(name: params[:course_name]) unless course
+            ex = course.exercises.find_by!(name: params[:name])
+            authorize! :read, ex
+            present({
+              id: ex.id,
+              available_points: ex.available_points,
+              name: ex.name,
+              publish_time: ex.publish_time,
+              deadline: ex.deadline_for(current_user),
+              soft_deadline: ex.soft_deadline_for(current_user),
+              expired: ex.expired_for?(current_user),
+              disabled: ex.disabled?,
+              completed: ex.completed_by?(current_user)
+            })
+          end
+
           def download
             course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
             exercise = Exercise.find_by!(name: params[:name], course_id: course.id)
