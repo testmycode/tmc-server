@@ -81,7 +81,20 @@ module Api
             course = organization.courses.find_by!(name: params[:course_name]) unless course
             ex = course.exercises.find_by!(name: params[:name])
             authorize! :read, ex
-            present({
+
+            model_solution_token_used_on_this_exercise = tokens_used = ModelSolutionTokenUsed.where(user: current_user, course: course, exercise_name: ex.name).count > 0
+
+            total_model_solution_tokens = 0
+            grant_model_solution_token_every_nth_completed_exercise = course.grant_model_solution_token_every_nth_completed_exercise
+            if grant_model_solution_token_every_nth_completed_exercise && grant_model_solution_token_every_nth_completed_exercise > 0
+              completed_exercises_count = course.submissions.where(all_tests_passed: true, user: current_user).distinct.select(:exercise_name).count
+              total_model_solution_tokens = completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise
+
+              tokens_used = ModelSolutionTokenUsed.where(user: current_user, course: course).count
+              available_model_solution_tokens = total_model_solution_tokens - tokens_used
+            end
+
+            present(
               id: ex.id,
               available_points: ex.available_points,
               name: ex.name,
@@ -90,8 +103,14 @@ module Api
               soft_deadline: ex.soft_deadline_for(current_user),
               expired: ex.expired_for?(current_user),
               disabled: ex.disabled?,
-              completed: ex.completed_by?(current_user)
-            })
+              completed: ex.completed_by?(current_user),
+              model_solution_token_used_on_this_exercise: model_solution_token_used_on_this_exercise,
+              course: {
+                grant_model_solution_token_every_nth_completed_exercise: grant_model_solution_token_every_nth_completed_exercise,
+                total_model_solution_tokens: total_model_solution_tokens,
+                available_model_solution_tokens: available_model_solution_tokens,
+              }
+            )
           end
 
           def download

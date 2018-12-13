@@ -289,6 +289,8 @@ TmcServer::Application.routes.draw do
 
   resources :status, only: [:index]
 
+  resources :model_solution_token_useds, only: [:index, :show]
+
   if SiteSetting.value('pghero_enabled')
     constraints CanAccessPgHero do
       mount PgHero::Engine, at: 'pghero'

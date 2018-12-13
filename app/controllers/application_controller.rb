@@ -128,6 +128,10 @@ class ApplicationController < ActionController::Base
       unauthorized!(message) if current_user.guest?
     end
 
+    def only_admins!
+      unauthorized! unless current_user.administrator?
+    end
+
     def authorization_skip!
       authorize! :read, nil
     end

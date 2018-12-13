@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @model_solution_token_used.user %>
+</p>
+
+<p>
+  <strong>Course:</strong>
+  <%= @model_solution_token_used.course %>
+</p>
+
+<p>
+  <strong>Exercise name:</strong>
+  <%= @model_solution_token_used.exercise_name %>
+</p>
+
+<%= link_to 'Edit', edit_model_solution_token_used_path(@model_solution_token_used) %> |
+<%= link_to 'Back', model_solution_token_useds_path %>
