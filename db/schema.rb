@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181213161532) do
+ActiveRecord::Schema.define(version: 20181213163959) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -189,6 +189,17 @@ ActiveRecord::Schema.define(version: 20181213161532) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "model_solution_token_useds", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "course_id"
+    t.string   "exercise_name"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "model_solution_token_useds", ["course_id"], name: "index_model_solution_token_useds_on_course_id", using: :btree
+  add_index "model_solution_token_useds", ["user_id"], name: "index_model_solution_token_useds_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
@@ -455,6 +466,8 @@ ActiveRecord::Schema.define(version: 20181213161532) do
   add_foreign_key "feedback_answers", "feedback_questions", on_delete: :cascade
   add_foreign_key "feedback_answers", "submissions", on_delete: :nullify
   add_foreign_key "feedback_questions", "courses", on_delete: :cascade
+  add_foreign_key "model_solution_token_useds", "courses"
+  add_foreign_key "model_solution_token_useds", "users"
   add_foreign_key "reviews", "submissions", on_delete: :cascade
   add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "submission_data", "submissions", on_delete: :cascade
