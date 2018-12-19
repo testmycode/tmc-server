@@ -323,7 +323,7 @@ class SubmissionsController < ApplicationController
         respond_access_denied unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
       else
         return if can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s
-        if @submission.created_at < 2.hours.ago
+        if @submission.created_at > 2.hours.ago
           return
         else
           unless paste_visible
