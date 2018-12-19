@@ -324,6 +324,7 @@ class SubmissionsController < ApplicationController
       else
         return if can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s
         if @submission.created_at > 2.hours.ago
+          respond_access_denied("You cannot see this paste because all tests passed and you haven't completed this exercise.") unless paste_visible
           return
         else
           unless paste_visible
