@@ -32,11 +32,9 @@
         <% end %>
         <% if (can? :teach, @course) or not @is_paste %>
           <li>
-            Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
+            Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %>
             <% if can? :teach, @course %>
-              <%= link_to @submission.user.username, participant_path(@submission.user) %>.
-            <% else %>
-              <%= @submission.user.username %>.
+              by <%= link_to @submission.user.email, participant_path(@submission.user) %>.
             <% end %>
           </li>
         <% end %>
