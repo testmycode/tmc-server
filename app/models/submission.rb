@@ -343,8 +343,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def public?
-    paste_available && !all_tests_passed
+  def paste_visible_for?(user)
+    return false unless paste_available
+    return true if exercise && exercise.completed_by?(user)
+    !all_tests_passed
   end
 
   def readable_by?(user)

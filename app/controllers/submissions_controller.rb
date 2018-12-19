@@ -30,6 +30,10 @@ class SubmissionsController < ApplicationController
   end
 
   def show
+    if current_user.guest?
+      raise CanCan::AccessDenied
+    end
+
     @course ||= @submission.course
     @exercise ||= @submission.exercise
     @organization = @course.organization
@@ -310,14 +314,30 @@ class SubmissionsController < ApplicationController
     end
 
     def check_access!
+      paste_visible = @submission.paste_visible_for?(current_user)
       paste_visibility = @course.paste_visibility || 'open'
       case paste_visibility
       when 'protected'
-        respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.exercise.completed_by?(current_user))
+        respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || paste_visible
       when 'no-tests-public'
         respond_access_denied unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
       else
-        respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || (@submission.public? && @submission.created_at > 2.hours.ago)
+        return if can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s
+        if @submission.created_at < 2.hours.ago
+          return
+        else
+          unless paste_visible
+            if @submission.exercise && !@submission.exercise.completed_by?(current_user)
+              respond_access_denied("You cannot see this paste because you haven't completed this exercise.")
+              return
+            else
+              respond_access_denied("You cannot see this paste because it was created over 2 hours ago.")
+            end
+            return
+          end
+        end
+
+        respond_access_denied("You cannot see this paste because all tests passed.") unless paste_visible
       end
     end
 end
