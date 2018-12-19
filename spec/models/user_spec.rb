@@ -116,7 +116,7 @@ describe User, type: :model do
 
       user = User.new(@params)
       expect(user).not_to be_valid
-      expect(user.errors[:email].size).to eq(1)
+      expect(user.errors[:email].size).to be > 0
     end
 
     it 'should fail with duplicate email' do
