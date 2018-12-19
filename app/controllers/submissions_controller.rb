@@ -30,10 +30,6 @@ class SubmissionsController < ApplicationController
   end
 
   def show
-    if current_user.guest?
-      raise CanCan::AccessDenied
-    end
-
     @course ||= @submission.course
     @exercise ||= @submission.exercise
     @organization = @course.organization
@@ -314,6 +310,10 @@ class SubmissionsController < ApplicationController
     end
 
     def check_access!
+      if current_user.guest?
+        raise CanCan::AccessDenied
+      end
+
       paste_visible = @submission.paste_visible_for?(current_user)
       paste_visibility = @course.paste_visibility || 'open'
       case paste_visibility
