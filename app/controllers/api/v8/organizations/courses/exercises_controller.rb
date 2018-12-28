@@ -76,11 +76,11 @@ module Api
 
           def show
             unauthorize_guest!
+            authorization_skip!
             organization = Organization.find_by!(slug: params[:organization_slug])
             course = organization.courses.find_by(name: "#{params[:organization_slug]}-#{params[:course_name]}")
             course = organization.courses.find_by!(name: params[:course_name]) unless course
             ex = course.exercises.find_by!(name: params[:name])
-            authorize! :read, ex
 
             model_solution_token_used_on_this_exercise = tokens_used = ModelSolutionTokenUsed.where(user: current_user, course: course, exercise_name: ex.name).count > 0
 
