@@ -13,6 +13,7 @@ class StatusController < ApplicationController
     @submissions_count_today = Submission.where(created_at: Time.current.all_day).count
     @submissions_count_yesterday = Submission.where(created_at: Time.current.yesterday.all_day).count
     @submissions_count_week = Submission.where(created_at: Time.current.all_week).count
-    @sandboxes = RemoteSandbox.all + RemoteSandbox.all_experimental
+    @sandboxes = Rails.cache.fetch("sandbox-status-cache")
+    @sandboxes = JSON.parse(@sandboxes) if @sandboxes
   end
 end

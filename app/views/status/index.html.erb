@@ -50,21 +50,26 @@
 
 <h2>Sandboxes</h2>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Busy instances</th>
-      <th>Capacity</th>
-    </tr>
-  </thead>
-  <tbody>
+<% if @sandboxes %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Busy instances</th>
+        <th>Capacity</th>
+      </tr>
+    </thead>
+    <tbody>
+
     <% @sandboxes.each do |sandbox| %>
       <tr>
-        <td><%= sandbox.baseurl %></td>
-        <td><%= sandbox.busy_instances %></td>
-        <td><%= sandbox.capacity %></td>
+        <td><%= sandbox['baseurl'] %></td>
+        <td><%= sandbox['busy_instances'] %></td>
+        <td><%= sandbox['capacity'] %></td>
       </tr>
     <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
+<% else %>
+  <p>No sandbox statuses cached within the last minute. Check if the background daemon is running.</p>
+<% end %>
