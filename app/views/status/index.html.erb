@@ -9,7 +9,11 @@
 <table class="table">
   <tbody>
     <tr>
-      <th scope="row">Submission queue </th scope="row">
+      <th scope="row">High priority submissions in queue </th scope="row">
+      <td><%= @high_priority_submissions_count %></td>
+    </tr>
+    <tr>
+      <th scope="row">All submissions in queue</th scope="row">
       <td><%= @sandbox_queue_length %></td>
     </tr>
     <tr>
@@ -17,8 +21,24 @@
       <td><%= @unprocessed_submissions_count %></td>
     </tr>
     <tr>
+      <th scope="row">Submissions during the last minute</th>
+      <td><%= @submissions_count_minute %></td>
+    </tr>
+    <tr>
+      <th scope="row">Submissions during the last five minutes</th>
+      <td><%= @submissions_count_five_minutes %></td>
+    </tr>
+    <tr>
+      <th scope="row">Submissions during the latest hour</th>
+      <td><%= @submissions_count_hour %></td>
+    </tr>
+    <tr>
       <th scope="row">Submissions today</th>
-      <td><%= @submissions_count %></td>
+      <td><%= @submissions_count_today %></td>
+    </tr>
+    <tr>
+      <th scope="row">Submissions yesterday</th>
+      <td><%= @submissions_count_yesterday %></td>
     </tr>
     <tr>
       <th scope="row">Submissions this week</th>
