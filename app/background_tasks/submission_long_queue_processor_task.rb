@@ -14,7 +14,7 @@ class SubmissionLongQueueProcessorTask
     queue = Submission.to_be_reprocessed.where(processing_priority: 0).order(:created_at).reverse_order
     return if queue.length <= 10
     Rails.logger.info "#{queue.length} high priority submissions in queue, trying to process some of them in reverse order..."
-    queue.limit(RemoteSandbox.total_capacity).each do |sub|
+    queue.limit(10).each do |sub|
       Rails.logger.info "Processing submission #{sub} in from the front of the queue since submission queue is so long..."
       @processor.process_submission(sub)
       Rails.logger.info "Processing submission #{sub} done"
