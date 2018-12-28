@@ -2,6 +2,9 @@
 
 require 'submission_processor'
 
+# In case submission processor task fails, this task will help with sending
+# submissions to sandbox. This task uses reverse order in order to avoid
+# sending the same submission to sandbox multiple times
 class SubmissionLongQueueProcessorTask
   def initialize
     @processor = SubmissionProcessor.new

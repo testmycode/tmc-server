@@ -53,7 +53,7 @@ describe 'The system (used by an instructor for administration)', type: :request
 
     click_button 'Rerun submission'
     expect(page).to have_content('Rerun scheduled')
-    SubmissionProcessor.new.reprocess_timed_out_submissions
+    SubmissionProcessor.new.process_some_submissions
     wait_for_submission_to_be_processed
 
     expect(page).not_to have_content('some funny error')

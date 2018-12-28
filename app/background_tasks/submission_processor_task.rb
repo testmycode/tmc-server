@@ -2,13 +2,13 @@
 
 require 'submission_processor'
 
-class SubmissionReprocessorTask
+class SubmissionProcessorTask
   def initialize
     @processor = SubmissionProcessor.new
   end
 
   def run
-    @processor.reprocess_timed_out_submissions
+    @processor.process_some_submissions
   end
 
   def wait_delay
