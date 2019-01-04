@@ -13,7 +13,7 @@ module Api
           begin
             authorize! :read, solution
           rescue CanCan::AccessDenied
-            model_solution_token_used_on_this_exercise = tokens_used = ModelSolutionTokenUsed.where(user: current_user, course: course, exercise_name: exercise.name).count > 0
+            model_solution_token_used_on_this_exercise = ModelSolutionTokenUsed.where(user: current_user, course: course, exercise_name: exercise.name).count > 0
             grant_model_solution_token_every_nth_completed_exercise = course.grant_model_solution_token_every_nth_completed_exercise
             if grant_model_solution_token_every_nth_completed_exercise && grant_model_solution_token_every_nth_completed_exercise > 0
               completed_exercises_count = course.submissions.where(all_tests_passed: true, user: current_user).distinct.select(:exercise_name).count
@@ -24,7 +24,7 @@ module Api
               if available_model_solution_tokens > 0
                 ModelSolutionTokenUsed.create!(user: current_user, course: course, exercise_name: exercise.name)
               else
-                raise CanCan::AccessDenied
+                raise CanCan::AccessDenied unless model_solution_token_used_on_this_exercise
               end
             else
               raise CanCan::AccessDenied unless model_solution_token_used_on_this_exercise
