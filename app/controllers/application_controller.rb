@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
     end
 
     def setup_rack_mini_profiler
-      if current_user && current_user.administrator?
+      if current_user && current_user.administrator? && params[:profile]
         Rack::MiniProfiler.authorize_request
       end
     end
