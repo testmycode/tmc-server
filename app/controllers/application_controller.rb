@@ -120,6 +120,12 @@ class ApplicationController < ActionController::Base
       @action_name = action_name
     end
 
+    def setup_rack_mini_profiler
+      if current_user && current_user.administrator?
+        Rack::MiniProfiler.authorize_request
+      end
+    end
+
     def unauthorized!(message = nil)
       raise CanCan::AccessDenied, message
     end

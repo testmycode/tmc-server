@@ -42,6 +42,10 @@ gem 'bootstrap', '~> 4.0.0.beta2.1'
 gem 'font-awesome-rails'
 gem 'sass-rails', '~> 5.0'
 
+gem 'rack-mini-profiler', '~> 1.0', '>= 1.0.1'
+gem 'flamegraph', '~> 0.9.5'
+gem 'stackprof', '~> 0.2.12'
+
 group :assets do
   gem 'jquery-rails', '~> 3.1.2'
   gem 'sprockets-rails', require: 'sprockets/railtie'
