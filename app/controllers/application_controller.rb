@@ -122,7 +122,8 @@ class ApplicationController < ActionController::Base
     end
 
     def setup_rack_mini_profiler
-      if current_user && current_user.administrator? && params[:profile]
+      if current_user && current_user.administrator?
+        Rack::MiniProfiler.config.position = 'bottom-right'
         Rack::MiniProfiler.authorize_request
       end
     end
