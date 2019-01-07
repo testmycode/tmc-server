@@ -46,6 +46,7 @@ class ApplicationController < ActionController::Base
   before_action :check_api_version
   before_action :set_bare_layout
   before_action :set_controller_and_action_name
+  before_action :setup_rack_mini_profiler
 
   def url_options
     if @bare_layout
