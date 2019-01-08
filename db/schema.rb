@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181213163959) do
+ActiveRecord::Schema.define(version: 20190108233022) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -422,7 +422,6 @@ ActiveRecord::Schema.define(version: 20181213163959) do
   end
 
   add_index "user_app_data", ["user_id", "field_name", "namespace"], name: "index_user_app_data_on_user_id_and_field_name_and_namespace", unique: true, using: :btree
-  add_index "user_app_data", ["user_id"], name: "index_user_app_data_on_user_id", using: :btree
 
   create_table "user_field_values", force: :cascade do |t|
     t.integer  "user_id",    null: false
