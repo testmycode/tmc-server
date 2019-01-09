@@ -10,5 +10,3 @@
 //= require bootstrap
 //= require misc
 //= require naturalSort
-//= require comet_connection
-//= require review_notifications

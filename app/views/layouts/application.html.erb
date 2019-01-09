@@ -19,11 +19,6 @@
     <%= javascript_include_tag 'application' %>
     <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>
 
-    <%= javascript_include_tag(
-          comet_js_url('org/cometd.js'),
-          comet_js_url('jquery/jquery.cometd.js')
-        )
-    %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css" integrity="sha256-aw9uGjVU5OJyMYN70Vu2kZ1DDVc1slcJCS2XvuPCPKo=" crossorigin="anonymous" />
   </head>
   <body class="default">
@@ -57,4 +52,3 @@
     </script>
   </body>
 </html>
-
