@@ -479,10 +479,14 @@ class Course < ActiveRecord::Base
       EOS
 
       res = conn.execute(sql).values.to_h
+      awarded = res['f'].nil? ? 0 : res['f'].to_i
+      late = res['t'].nil? ? 0 : res['t'].to_i
+      calculated_ratio = (awarded + late * self.soft_deadline_point_multiplier).to_f / available_points.length
       result[group] = {
-        awarded: res['f'].nil? ? 0 : res['f'].to_i,
-        late: res['t'].nil? ? 0 : res['t'].to_i,
-        available_points: available_points.length
+        awarded: awarded,
+        late: late,
+        available_points: available_points.length,
+        progress: calculated_ratio.round_down(2)
       }
     end
   end
