@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190108233022) do
+ActiveRecord::Schema.define(version: 20190111144621) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -147,6 +147,7 @@ ActiveRecord::Schema.define(version: 20190108233022) do
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
   add_index "exercises", ["gdocs_sheet"], name: "index_exercises_on_gdocs_sheet", using: :btree
+  add_index "exercises", ["name"], name: "index_exercises_on_name", using: :btree
 
   create_table "feedback_answers", force: :cascade do |t|
     t.integer  "feedback_question_id", null: false
@@ -356,8 +357,11 @@ ActiveRecord::Schema.define(version: 20190108233022) do
     t.string   "sandbox"
   end
 
+  add_index "submissions", ["course_id", "created_at"], name: "index_submissions_on_course_id_and_created_at", using: :btree
   add_index "submissions", ["course_id", "exercise_name"], name: "index_submissions_on_course_id_and_exercise_name", using: :btree
   add_index "submissions", ["course_id", "user_id"], name: "index_submissions_on_course_id_and_user_id", using: :btree
+  add_index "submissions", ["exercise_name"], name: "index_submissions_on_exercise_name", using: :btree
+  add_index "submissions", ["paste_key"], name: "index_submissions_on_paste_key", using: :btree
   add_index "submissions", ["processed"], name: "index_submissions_on_processed", using: :btree
   add_index "submissions", ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name", using: :btree
 
