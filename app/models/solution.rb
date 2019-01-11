@@ -23,7 +23,7 @@ class Solution
       true
     elsif user.guest?
       false
-    elsif @exercise.course.model_solution_visible_before_completion?
+    elsif @exercise.course.model_solution_visible_before_completion? && @exercise.course.enabled?
       true
     elsif @exercise.completed_by?(user)
       true
