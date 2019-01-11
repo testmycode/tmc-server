@@ -7,7 +7,7 @@ class UncomputedUnlockComputorTask
   end
 
   def run
-    UncomputedUnlock.limit(10).each do |uncomputed_unlock|
+    UncomputedUnlock.order("id ASC").limit(10).each do |uncomputed_unlock|
       course = uncomputed_unlock.course
       user = uncomputed_unlock.user
       Rails.logger.info "Calculating unlocks for user #{user.id} and course #{course.name}. Queue length: #{UncomputedUnlock.count}."
