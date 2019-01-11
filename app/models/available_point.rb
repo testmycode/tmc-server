@@ -50,7 +50,7 @@ class AvailablePoint < ActiveRecord::Base
 
   def self.course_points(course)
     joins(:exercise)
-      .where(exercises: { course_id: course.id, hidden: false, hide_submission_results: false })
+      .where(exercises: { course_id: course.id, hidden: false, hide_submission_results: false, disabled_status: 0 })
   end
 
   # Selects all points for list of courses (with course_id for convenience)
