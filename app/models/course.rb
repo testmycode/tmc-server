@@ -486,7 +486,7 @@ class Course < ActiveRecord::Base
         awarded: awarded,
         late: late,
         available_points: available_points.length,
-        progress: calculated_ratio.round_down(2)
+        progress: calculated_ratio
       }
     end
   end
