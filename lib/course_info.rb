@@ -33,7 +33,7 @@ class CourseInfo
   end
 
   def course_data_core_api(course)
-    UncomputedUnlock.resolve(course, @user)
+    #UncomputedUnlock.resolve(course, @user)
     @unlocked_exercises = course.unlocks
                                 .where(user_id: @user.id)
                                 .where(['valid_after IS NULL OR valid_after < ?', Time.now])
