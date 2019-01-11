@@ -63,9 +63,9 @@ module Api
               by_group = progress_per_group.map do |group, info|
                 {
                   group: group,
-                  progress: info.progress,
-                  n_points: info.awarded + info.late,
-                  max_points: info.available_points,
+                  progress: info[:progress],
+                  n_points: info[:awarded] + info[:late],
+                  max_points: info[:available_points],
                 }
               end
 
