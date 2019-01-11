@@ -7,8 +7,8 @@ class UncomputedUnlockComputorTaskBackup
   end
 
   def run
-    return unless UncomputedUnlock.count > 15
-    UncomputedUnlock.order("id DESC").limit(10).each do |uncomputed_unlock|
+    return unless UncomputedUnlock.count > 3
+    UncomputedUnlock.order("id DESC").limit(1).each do |uncomputed_unlock|
       course = uncomputed_unlock.course
       user = uncomputed_unlock.user
       Rails.logger.info "Calculating unlocks for user #{user.id} and course #{course.name} with a backup task. Queue length: #{UncomputedUnlock.count}."
