@@ -58,19 +58,20 @@ module Api
               user = User.find(params[:user_id])
               authorize! :read, user
 
-              progress_per_part = course.exercise_group_completion_counts_for_user(user)
+              progress_per_group = course.exercise_group_completion_counts_for_user(user)
 
-              progress = {points_by_part:[]}
-
-              progress_per_part.each do |part|
-                progress.points_by_part[part] = {
-                  progress: part.progress,
-                  n_points: part.awarded + part.late,
-                  max_points: part.available_points,
+              by_group = progress_per_group.map do |group, info|
+                {
+                  group: group,
+                  progress: info.progress,
+                  n_points: info.awarded + info.late,
+                  max_points: info.available_points,
                 }
               end
 
-              present progress
+              render json: {
+                points_by_group: by_group
+              }
             end
           end
         end
