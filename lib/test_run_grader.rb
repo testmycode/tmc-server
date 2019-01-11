@@ -33,7 +33,8 @@ module TestRunGrader
 
     review_points = submission.exercise.available_points.where(requires_review: true).map(&:name)
     award_points(submission, results, review_points)
-    Unlock.refresh_unlocks(submission.course, submission.user)
+    UncomputedUnlock.create!(course: submission.course, user: submission.user)
+    # Unlock.refresh_unlocks(submission.course, submission.user)
 
     if should_flag_for_review?(submission, review_points)
       submission.requires_review = true

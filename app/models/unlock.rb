@@ -20,11 +20,12 @@ class Unlock < ActiveRecord::Base
   # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
   def self.refresh_unlocks(course, user)
+    time = Time.zone.now
     Unlock.transaction do
       unlocks = course.unlocks.where(user_id: user.id)
       by_exercise_name = Hash[unlocks.map { |u| [u.exercise_name, u] }]
       refresh_unlocks_impl(course, user, by_exercise_name)
-      UncomputedUnlock.where(course_id: course.id, user_id: user.id).delete_all
+      UncomputedUnlock.where(course_id: course.id, user_id: user.id).where("created_at < ?", time).delete_all
     end
   end
 
