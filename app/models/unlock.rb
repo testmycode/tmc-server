@@ -46,7 +46,7 @@ class Unlock < ActiveRecord::Base
   private
 
     def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
-      course.exercises.each do |exercise|
+      course.exercises.enabled.each do |exercise|
         existing = user_unlocks_by_exercise_name[exercise.name]
         exists = !!existing
         may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
