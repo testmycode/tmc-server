@@ -57,8 +57,20 @@ module Api
               params[:user_id] = current_user.id if params[:user_id] == 'current'
               user = User.find(params[:user_id])
               authorize! :read, user
+
               progress_per_part = course.exercise_group_completion_counts_for_user(user)
-              present progress_per_part
+
+              progress = {points_by_part:[]}
+
+              progress_per_part.each do |part|
+                progress.points_by_part[part] = {
+                  progress: part.progress,
+                  n_points: part.awarded + part.late,
+                  max_points: part.available_points,
+                }
+              end
+
+              present progress
             end
           end
         end
