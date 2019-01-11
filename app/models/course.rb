@@ -462,7 +462,7 @@ class Course < ActiveRecord::Base
   def exercise_group_completion_counts_for_user(user)
     # TODO: clean up exercise group discovery
 
-    groups = exercises.map(&:name).map { |name| name =~ /^(.+)-[^-]+$/ ? Regexp.last_match(1) : '' }.uniq.sort
+    groups = exercises.enabled.map(&:name).map { |name| name =~ /^(.+)-[^-]+$/ ? Regexp.last_match(1) : '' }.uniq.sort
 
     conn = ActiveRecord::Base.connection
     groups.each_with_object({}) do |group, result|
