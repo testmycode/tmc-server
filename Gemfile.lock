@@ -188,7 +188,7 @@ GEM
       ast (~> 2.4.0)
     pdfkit (0.8.2)
     pg (0.19.0)
-    pghero (2.1.0)
+    pghero (2.2.0)
       activerecord
     plist (3.1.0)
     poltergeist (1.7.0)
@@ -395,7 +395,7 @@ DEPENDENCIES
   paperclip (~> 5.0)
   pdfkit (~> 0.8.2)
   pg (~> 0.19.0)
-  pghero
+  pghero (~> 2.2)
   poltergeist (~> 1.7.0)
   pry
   pry-byebug

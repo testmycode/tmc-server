@@ -34,7 +34,7 @@ gem 'gravtastic', '~> 3.2.6'
 
 gem 'logstasher', '~> 0.9.0'
 
-gem 'pghero'
+gem 'pghero', '~> 2.2'
 
 gem 'swagger-blocks', '~> 1.3.4'
 
