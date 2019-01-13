@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190111144621) do
+ActiveRecord::Schema.define(version: 20190113155422) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,8 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.datetime "expires_at"
     t.datetime "updated_at"
   end
+
+  add_index "action_tokens", ["user_id"], name: "index_action_tokens_on_user_id", using: :btree
 
   create_table "assistantships", force: :cascade do |t|
     t.integer  "user_id"
@@ -64,6 +66,9 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.datetime "updated_at"
   end
 
+  add_index "certificates", ["course_id"], name: "index_certificates_on_course_id", using: :btree
+  add_index "certificates", ["user_id"], name: "index_certificates_on_user_id", using: :btree
+
   create_table "course_notifications", force: :cascade do |t|
     t.string   "topic"
     t.string   "message"
@@ -72,6 +77,8 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "course_notifications", ["course_id"], name: "index_course_notifications_on_course_id", using: :btree
 
   create_table "course_templates", force: :cascade do |t|
     t.string   "name"
@@ -120,6 +127,7 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.integer  "grant_model_solution_token_every_nth_completed_exercise"
   end
 
+  add_index "courses", ["course_template_id"], name: "index_courses_on_course_template_id", using: :btree
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
 
   create_table "exercises", force: :cascade do |t|
@@ -172,6 +180,8 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.text     "title"
   end
 
+  add_index "feedback_questions", ["course_id"], name: "index_feedback_questions_on_course_id", using: :btree
+
   create_table "migrated_submissions", id: false, force: :cascade do |t|
     t.integer  "from_course_id"
     t.integer  "to_course_id"
@@ -190,6 +200,9 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "model_solution_access_logs", ["course_id"], name: "index_model_solution_access_logs_on_course_id", using: :btree
+  add_index "model_solution_access_logs", ["user_id"], name: "index_model_solution_access_logs_on_user_id", using: :btree
 
   create_table "model_solution_token_useds", force: :cascade do |t|
     t.integer  "user_id"
@@ -213,6 +226,7 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.string   "scopes"
   end
 
+  add_index "oauth_access_grants", ["application_id"], name: "index_oauth_access_grants_on_application_id", using: :btree
   add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
 
   create_table "oauth_access_tokens", force: :cascade do |t|
@@ -226,6 +240,7 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.string   "scopes"
   end
 
+  add_index "oauth_access_tokens", ["application_id"], name: "index_oauth_access_tokens_on_application_id", using: :btree
   add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, using: :btree
   add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
@@ -266,6 +281,8 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.string   "whitelisted_ips",                                  array: true
   end
 
+  add_index "organizations", ["creator_id"], name: "index_organizations_on_creator_id", using: :btree
+
   create_table "points_upload_queues", force: :cascade do |t|
     t.integer  "point_id"
     t.datetime "created_at"
@@ -289,6 +306,8 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "reply_to_feedback_answers", ["feedback_answer_id"], name: "index_reply_to_feedback_answers_on_feedback_answer_id", using: :btree
 
   create_table "reviews", force: :cascade do |t|
     t.integer  "submission_id",                  null: false
@@ -458,6 +477,8 @@ ActiveRecord::Schema.define(version: 20190111144621) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "verification_tokens", ["user_id"], name: "index_verification_tokens_on_user_id", using: :btree
 
   add_foreign_key "action_tokens", "users", on_delete: :cascade
   add_foreign_key "available_points", "exercises", on_delete: :cascade
