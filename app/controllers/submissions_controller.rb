@@ -196,8 +196,8 @@ class SubmissionsController < ApplicationController
   end
 
   def difference_with_solution
-    respond_access_denied unless current_user.administrator?
     @course ||= @submission.course
+    authorize! :teach, @course
     @exercise ||= @submission.exercise
     @organization = @course.organization
     add_course_breadcrumb
