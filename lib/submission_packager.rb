@@ -58,7 +58,7 @@ class SubmissionPackager
         copy_ide_files(Pathname(exercise.clone_path), received, dest)
         # end
 
-        include_tmc_langs = config[:include_tmc_langs] || true
+        include_tmc_langs = config[:include_tmc_langs]
 
         # To get hidden tests etc, gsub stub with clone path...
         if config[:tests_from_stub]
