@@ -58,6 +58,8 @@ class SubmissionPackager
         copy_ide_files(Pathname(exercise.clone_path), received, dest)
         # end
 
+        include_tmc_langs = config[:include_tmc_langs] || true
+
         # To get hidden tests etc, gsub stub with clone path...
         if config[:tests_from_stub]
           FileUtils.mkdir_p('stub')
@@ -67,9 +69,9 @@ class SubmissionPackager
           end
           stub = Pathname(find_received_project_root(Pathname('stub')))
 
-          copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run])
+          copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run], include_tmc_langs: include_tmc_langs )
         else
-          copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run])
+          copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run], include_tmc_langs: include_tmc_langs)
         end
 
         create_archive(dest, return_file_path, config[:format], !!config[:toplevel_dir_name])
@@ -142,10 +144,12 @@ class SubmissionPackager
 
     # and tmc-langs
     def copy_and_chmod_tmcrun(dest)
-      FileUtils.cp(TmcLangs.get.jar_path, dest + 'tmc-langs.jar')
-
       FileUtils.cp(tmc_run_path, dest + 'tmc-run')
       sh! ['chmod', 'a+x', dest + 'tmc-run']
+    end
+
+    def copy_tmc_langs(dest)
+      FileUtils.cp(TmcLangs.get.jar_path, dest + 'tmc-langs.jar')
     end
 
     def copy_extra_student_files(tmc_project_file, received, dest)

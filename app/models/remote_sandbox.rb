@@ -12,9 +12,10 @@ class RemoteSandbox
 
   class SandboxUnavailableError < StandardError; end
 
-  def initialize(baseurl)
+  def initialize(baseurl, experimental = false)
     @baseurl = baseurl
     @baseurl = @baseurl.gsub(/\/+$/, '')
+    @experimental = experimental
   end
 
   def self.try_to_send_submission_to_free_server(submission, notify_url)
@@ -54,7 +55,7 @@ class RemoteSandbox
       zip_path = "#{tmpdir}/submission.zip"
       tar_path = "#{tmpdir}/submission.tar"
       File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
-      SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params)
+      SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params, include_tmc_langs: !@experimental)
 
       File.open(tar_path, 'r') do |tar_file|
         Rails.logger.info "Posting submission to #{post_url}"
@@ -100,7 +101,7 @@ class RemoteSandbox
   end
 
   def self.all_experimental
-    @all_experimental ||= SiteSetting.value('experimental_sandboxes').map { |url| RemoteSandbox.new(url) }
+    @all_experimental ||= SiteSetting.value('experimental_sandboxes').map { |url| RemoteSandbox.new(url, true) }
   end
 
   def self.total_capacity

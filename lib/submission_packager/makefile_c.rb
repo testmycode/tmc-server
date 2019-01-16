@@ -24,6 +24,7 @@ class SubmissionPackager
         copy_extra_student_files(tmc_project_file, received, dest)
 
         copy_and_chmod_tmcrun(dest) unless opts[:no_tmc_run]
+        copy_tmc_langs(dest) if opts[:include_tmc_langs]
       end
 
       def tmc_run_path

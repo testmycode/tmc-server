@@ -36,6 +36,7 @@ class SubmissionPackager
         end
 
         copy_and_chmod_tmcrun(dest) unless opts[:no_tmc_run]
+        copy_tmc_langs(dest) if opts[:include_tmc_langs]
       end
 
       def tmc_run_path
