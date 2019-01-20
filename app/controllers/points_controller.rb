@@ -9,6 +9,7 @@ class PointsController < ApplicationController
   def index
     @course = Course.find(params[:course_id])
     authorize! :see_points, @course
+    return respond_access_denied('Authentication required') if current_user.guest?
     add_course_breadcrumb
     add_breadcrumb 'Points'
 
@@ -17,6 +18,7 @@ class PointsController < ApplicationController
     end
 
     only_for_user = User.find_by(login: params[:username])
+    only_for_user = current_user unless can?(:teach, @course)
 
     if only_for_user
       exercises = @course.exercises.enabled.where(exercises: { hidden: false, hide_submission_results: false })

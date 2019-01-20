@@ -8,6 +8,12 @@
     </div>
   <% end %>
 
+  <% unless can?(:teach, @course) %>
+    <p>
+      Showing only your points because you're not a teacher in this organization and you're not an assistant in this course.
+    </p>
+  <% end %>
+
   <%
     show_total_column = @summary[:sheets].size > 1
   %>
