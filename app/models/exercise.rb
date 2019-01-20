@@ -165,7 +165,7 @@ class Exercise < ActiveRecord::Base
     Solution.new(self)
   end
 
-  def set_submissions_by(user, value)
+  def set_submissions_by!(user, value)
     @submissions_by ||= {}
     @submissions_by[user.id] = value
   end

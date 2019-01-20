@@ -25,7 +25,7 @@ class CourseInfo
       submissions_by_exercise[sub.exercise_name] << sub
     end
     exercises.each do |ex|
-      ex.set_submissions_by(@user, submissions_by_exercise[ex.name] || [])
+      ex.set_submissions_by!(@user, submissions_by_exercise[ex.name] || [])
     end
 
     @course_list.course_data(organization, course, opts).merge(unlockables: course.unlockable_exercises_for(@user).map(&:name).natsort,
@@ -33,7 +33,7 @@ class CourseInfo
   end
 
   def course_data_core_api(course)
-    #UncomputedUnlock.resolve(course, @user)
+    # UncomputedUnlock.resolve(course, @user)
     @unlocked_exercises = course.unlocks
                                 .where(user_id: @user.id)
                                 .where(['valid_after IS NULL OR valid_after < ?', Time.now])
@@ -51,6 +51,13 @@ class CourseInfo
     end
 
     exercises = exercises.to_a.natsort_by(&:name)
+
+    # Cache submissions so that we can calculate quickly whether the exercise
+    # was completed or attampted and so on...
+    submissions_by_exercise = Submission.where(course: course, user: @user).group_by { |submission| submission.exercise_name }
+    exercises.each do |ex|
+      ex.set_submissions_by!(@user, submissions_by_exercise[ex.name] || [])
+    end
 
     {
       id: course.id,
