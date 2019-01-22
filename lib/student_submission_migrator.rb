@@ -91,9 +91,9 @@ class StudentSubmissionMigrator
       app_data_updates.each do |adu|
         namespace = adu['namespace']
         adu['set_values'].each do |record|
-          key = adu['key']
+          field_name = adu['field_name']
           value = adu['value']
-          record = UserAppDatum.find_or_initialize_by(namespace: namespace, key: key)
+          record = UserAppDatum.find_or_initialize_by(namespace: namespace, field_name: key)
           record.value = value
           record.save!
         end
