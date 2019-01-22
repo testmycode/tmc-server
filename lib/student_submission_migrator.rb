@@ -88,14 +88,15 @@ class StudentSubmissionMigrator
       return unless migration_entry
       return unless migration_entry['update_app_data']
       app_data_updates = migration_entry['update_app_data']
-      app_data_updates.each |adu|
+      app_data_updates.each do |adu|
         namespace = adu['namespace']
-      set_values.each do |record|
-        key = adu['key']
-        value = adu['value']
-        record = UserAppDatum.find_or_initialize_by(namespace: namespace, key: key)
-        record.value = value
-        record.save!
+        set_values.each do |record|
+          key = adu['key']
+          value = adu['value']
+          record = UserAppDatum.find_or_initialize_by(namespace: namespace, key: key)
+          record.value = value
+          record.save!
+        end
       end
     end
 end
