@@ -42,7 +42,7 @@ class MigrateToOtherCourseController < ApplicationController
         !already_migrated
     end
 
-    def already_migrated
+    def already_migrated
       MigratedSubmissions.where(to_course_id: @to_course.id, original_submission_id: current_user.submissions.where(course: @old_course).pluck(:id)).any?
     end
 

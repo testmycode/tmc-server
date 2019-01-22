@@ -18,6 +18,7 @@ class StudentSubmissionMigrator
       to_be_migrated.each do |submission|
         migrate_submission_and_data(submission)
       end
+      update_app_data
     end
   end
 
@@ -35,7 +36,7 @@ class StudentSubmissionMigrator
 
     def validate_migration!
       raise CannotRefreshError, 'Cannot migrate with courses which have diffenent git revisions' unless @old_course.git_revision == @new_course.git_revision
-      raise CannotRefreshError, 'Cannot migration between these courses is not allowed' unless migration_is_allowed
+      raise CannotRefreshError, 'Migration between these courses is not allowed' unless migration_is_allowed
     end
 
     def migrate_submission_and_data(submission)
@@ -75,6 +76,27 @@ class StudentSubmissionMigrator
         new_point.course = @new_course
         new_point.submission = new_submission
         new_point.save!
+      end
+    end
+
+    def update_app_data
+      allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
+      return if allowed_migrations.nil?
+      migration_entry = allowed_migrations.find do |allowed_pair|
+        allowed_pair['from'] == @old_course.id && allowed_pair['to'] == @new_course.id
+      end
+      return unless migration_entry
+      return unless migration_entry['update_app_data']
+      app_data_updates = migration_entry['update_app_data']
+      app_data_updates.each |adu|
+        namespace = adu['namespace']
+        set_values.each do |record|
+          key = adu['key']
+          value = adu['value']
+          record = UserAppDatum.find_or_initialize_by(namespace: namespace, key: key)
+          record.value = value
+          record.save!
+        end
       end
     end
 end
