@@ -99,7 +99,7 @@ class CourseRefresher
         # I prefer suggestion 1.
 
         Course.transaction(requires_new: true) do
-          @course = Course.lock(true).find(course.id)
+          @course = Course.find(course.id)
 
           @old_cache_path = @course.cache_path
 
