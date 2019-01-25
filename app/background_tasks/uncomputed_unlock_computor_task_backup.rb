@@ -8,7 +8,7 @@ class UncomputedUnlockComputorTaskBackup
 
   def run
     count = UncomputedUnlock.count
-    return unless UncomputedUnlock.count > 3
+    return unless count > 3
     workers = UncomputedUnlock.order('id DESC').limit([5, count - 3].min).map do |uncomputed_unlock|
       Thread.new do
         course = uncomputed_unlock.course
