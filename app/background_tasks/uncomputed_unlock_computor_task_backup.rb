@@ -7,13 +7,17 @@ class UncomputedUnlockComputorTaskBackup
   end
 
   def run
+    count = UncomputedUnlock.count
     return unless UncomputedUnlock.count > 3
-    UncomputedUnlock.order("id DESC").limit(1).each do |uncomputed_unlock|
-      course = uncomputed_unlock.course
-      user = uncomputed_unlock.user
-      Rails.logger.info "Calculating unlocks for user #{user.id} and course #{course.name} with a backup task. Queue length: #{UncomputedUnlock.count}."
-      Unlock.refresh_unlocks(course, user)
+    workers = UncomputedUnlock.order('id DESC').limit([5, count - 3].min).map do |uncomputed_unlock|
+      Thread.new do
+        course = uncomputed_unlock.course
+        user = uncomputed_unlock.user
+        Rails.logger.info "Calculating unlocks for user #{user.id} and course #{course.name} with a backup task. Queue length: #{UncomputedUnlock.count}."
+        Unlock.refresh_unlocks(course, user)
+      end
     end
+    workers.map(&:join)
   end
 
   def wait_delay
