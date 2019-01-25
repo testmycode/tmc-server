@@ -9,12 +9,20 @@ class UncomputedUnlockComputorTaskBackup
   def run
     count = UncomputedUnlock.count
     return unless count > 3
-    workers = UncomputedUnlock.order('id DESC').limit([5, count - 3].min).map do |uncomputed_unlock|
+    threads = [7, count - 3].min
+    limit = [threads * 5, count - 3].min
+    a = UncomputedUnlock.order('id DESC').limit(limit)
+
+    Rails.logger.info "Creating #{threads} threads to compute unlocks."
+
+    workers = a.to_a.each_slice((a.size / threads.to_f).round).map do |uncomputed_unlocks|
       Thread.new do
-        course = uncomputed_unlock.course
-        user = uncomputed_unlock.user
-        Rails.logger.info "Calculating unlocks for user #{user.id} and course #{course.name} with a backup task. Queue length: #{UncomputedUnlock.count}."
-        Unlock.refresh_unlocks(course, user)
+        uncomputed_unlocks.each do |uncomputed_unlock|
+          course = uncomputed_unlock.course
+          user = uncomputed_unlock.user
+          Rails.logger.info "Calculating unlocks for user #{user.id} and course #{course.name} with a backup task. Queue length: #{UncomputedUnlock.count}."
+          Unlock.refresh_unlocks(course, user)
+        end
       end
     end
     workers.map(&:join)
