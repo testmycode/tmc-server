@@ -73,6 +73,8 @@ class ExercisesController < ApplicationController
     course_exercises.update_all(disabled_status: true)
     selected_exercises.update_all(disabled_status: false)
 
+    UncomputedUnlock.create_all_for_course(@course)
+
     redirect_to manage_exercises_organization_course_path(@organization, @course),
                 notice: 'Exercises successfully updated.'
   end

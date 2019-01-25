@@ -41,7 +41,6 @@ class CoursesController < ApplicationController
     end
 
     authorize! :read, @course
-    UncomputedUnlock.resolve(@course, current_user)
 
     respond_to do |format|
       format.html do
