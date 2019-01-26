@@ -65,4 +65,26 @@ class Unlock < ActiveRecord::Base
         end
       end
     end
+
+    def self.fast_refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
+      # We can share the calculation between the exercises that have the same condition
+      new_unlocks = []
+      course.exercises.enabled.group_by { |o| o.unlock_spec }.each do |_spec, exercises|
+        exercise = exercises.first
+        existing = user_unlocks_by_exercise_name[exercise.name]
+        exists = !!existing
+        may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
+        next unless !exists && may_exist && !exercise.requires_explicit_unlock?
+
+        exercises.select { |e| !user_unlocks_by_exercise_name[e.name] }.each do |exercise|
+          new_unlocks << Unlock.new(
+            user: user,
+            course: course,
+            exercise: exercise,
+            valid_after: exercise.unlock_spec_obj.valid_after
+          )
+        end
+      end
+      Unlock.import new_unlocks
+    end
 end

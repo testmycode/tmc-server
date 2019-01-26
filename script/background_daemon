@@ -21,7 +21,7 @@ Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: 
   require root_dir + '/config/environment'
   Rails.logger = Logger.new(Rails.root.join('log', 'background_daemon.log'))
   Rails.logger.auto_flushing = true if Rails.logger.respond_to? :auto_flushing=
-  ActiveRecord::Base.connection_config[:pool] = 20
+  ActiveRecord::Base.connection_config[:pool] = 25
 
   # Tasks may be longrunning so we want each one in a thread so one task won't
   # block other ones.
