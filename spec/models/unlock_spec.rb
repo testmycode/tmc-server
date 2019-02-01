@@ -49,33 +49,5 @@ describe Unlock, type: :model do
       expect(u.id).to eq(id)
       expect(u.created_at).to eq(created_at)
     end
-
-    it 'deletes unlocks whose conditions changed' do
-      Unlock.refresh_unlocks(@course, @user)
-      @ex1.unlock_spec = ['exercise ex2'].to_json
-      @ex1.save!
-      @course.reload
-      Unlock.refresh_unlocks(@course, @user)
-      expect(Unlock.where(exercise_name: 'ex1')).to be_empty
-    end
-
-    it 'updates unlocks whose unlock time changes' do
-      Unlock.refresh_unlocks(@course, @user)
-
-      @ex1.unlock_spec = [(Date.today + 3.days).to_s].to_json
-      @ex1.save!
-      @course.reload
-      Unlock.refresh_unlocks(@course, @user)
-      u = Unlock.where(exercise_name: 'ex1').first
-      expect(u.valid_after).to be > Date.today + 2.days
-
-      @ex1.unlock_spec = ['exercise ex2'].to_json
-      @ex1.save!
-      @course.reload
-      AwardedPoint.create!(user_id: @user.id, course_id: @course.id, name: @available_point2.name)
-      Unlock.refresh_unlocks(@course, @user)
-      u = Unlock.where(exercise_name: 'ex1').first
-      expect(u.valid_after).to be_nil
-    end
   end
 end
