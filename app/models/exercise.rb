@@ -190,7 +190,7 @@ class Exercise < ActiveRecord::Base
   # Whether a user may see all metadata about the exercise
   def visible_to?(user)
     user.administrator? || user.teacher?(course.organization) || user.assistant?(course) ||
-      _fast_visible? && unlock_spec_obj.permits_unlock_for?(user)
+      _fast_visible? && (unlocked_for?(user) || unlock_spec_obj.permits_unlock_for?(user))
   end
 
   def _fast_visible?
