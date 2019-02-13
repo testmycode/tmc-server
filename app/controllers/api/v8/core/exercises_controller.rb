@@ -64,7 +64,6 @@ module Api
           submissions = exercise.submissions.order('submissions.created_at DESC')
           submissions = submissions.where(user_id: current_user.id) unless current_user.administrator?
           submissions = submissions.includes(:awarded_points).includes(:user)
-          authorize! :read, submissions
 
           data = {
             course_name: course.name,
