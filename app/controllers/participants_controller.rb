@@ -79,7 +79,7 @@ class ParticipantsController < ApplicationController
     if current_user.administrator?
       add_breadcrumb 'Participants', :participants_path
       add_breadcrumb @user.username, participant_path(@user)
-      @app_data = JSON.pretty_generate(JSON.parse(current_user.user_app_data.to_json))
+      @app_data = JSON.pretty_generate(JSON.parse(@user.user_app_data.to_json))
     else
       add_breadcrumb 'My stats', participant_path(@user)
     end
