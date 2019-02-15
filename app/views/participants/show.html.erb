@@ -104,3 +104,10 @@
   <% end %>
   <%= show_submission_list(@submissions) %>
 </section>
+
+<% if @app_data %>
+  <section>
+    <h2>App data</h2>
+    <pre><%= @app_data %></pre>
+  <section>
+<% end %>
