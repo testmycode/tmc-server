@@ -315,6 +315,7 @@ class SubmissionsController < ApplicationController
       end
 
       paste_visible = @submission.paste_visible_for?(current_user)
+      return if paste_visible
       paste_visibility = @course.paste_visibility || 'open'
       case paste_visibility
       when 'protected'

@@ -346,6 +346,7 @@ class Submission < ActiveRecord::Base
   def paste_visible_for?(user)
     return false unless paste_available
     return true if exercise && exercise.completed_by?(user)
+    return true if user.submissions.where(exercise_name: exercise.name, pretest_error: nil, all_tests_passed: true).any?
     !all_tests_passed
   end
 
