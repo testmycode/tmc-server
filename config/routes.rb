@@ -240,6 +240,7 @@ TmcServer::Application.routes.draw do
       post 'dangerously_destroy_user', to: 'settings#dangerously_destroy_user'
       get 'verify_dangerously_destroying_user', to: 'settings#verify_dangerously_destroying_user'
       delete 'dangerously_destroy_user', to: 'settings#dangerously_destroy_user'
+      get 'user_has_submissions', to: 'settings#user_has_submissions'
     end
     resources :certificates, only: [:index]
     collection do

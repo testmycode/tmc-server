@@ -34,12 +34,16 @@ class SettingsController < ApplicationController
   end
 
   def dangerously_destroy_user
+    @user = authenticate_current_user_destroy
+    if @user.submissions.length != 0
+      redirect_to user_has_submissions_participant_settings_url
+      return
+    end
     im_sure = params[:im_sure]
     if im_sure != '1'
       redirect_to verify_dangerously_destroying_user_participant_settings_url, notice: 'Please check the checkbox after you have read the instructions.'
       return
     end
-    @user = authenticate_current_user_destroy
     username = @user.login
     sign_out if current_user == @user
     email = @user.email
@@ -50,6 +54,10 @@ class SettingsController < ApplicationController
   end
 
   def verify_dangerously_destroying_user
+    @user = authenticate_current_user_destroy
+  end
+
+  def user_has_submissions
     @user = authenticate_current_user_destroy
   end
 
