@@ -1,0 +1,24 @@
+<h1>Confirm deleting account: <%= @user.username %> (<%= @user.email %>)</h1>
+
+<div class="jumbotron hero-unit-alert alert-danger">
+  Before deleting this user, make sure they don't have any submissions. If they have submissions, advice them to delete their own account by pressing "Request deleting account" -button themselves from their User settings.
+</div>
+
+
+<%= form_tag(dangerously_destroy_user_participant_settings_path, method: :delete, class: 'form-horizontal') do  %>
+  <div class="form-group">
+    <%= check_box_tag :im_sure %>
+    <%= label_tag "I've read the above and I'm sure I understand the consequences", nil, class: "control-label", for: :im_sure %>
+  </div>
+  <p><strong>Pressing the button below will permanently destroy this mooc.fi account.</strong></p>
+  <%= submit_tag("Destroy this account permanently", class: "btn btn-danger", data: { confirm: "Are you sure you want to delete the account #{@user.login}?"}, disabled: "disabled", id: :destroy_button) %>
+<% end %>
+
+
+<script>
+  var checkBox = document.getElementById('im_sure')
+  var destroyButton = document.getElementById('destroy_button')
+  checkBox.addEventListener("click", function() {
+    destroyButton.disabled = !checkBox.checked
+  })
+</script>

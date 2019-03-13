@@ -1,0 +1,65 @@
+<%= form_for @user, url: { :action => :update, :class => "form-horizontal" }, autocomplete: "off" do |f| %>
+  <%= render 'shared/error_messages', :target => @user %>
+
+  <section>
+    <h2>User account</h2>
+    <% unless local_assigns[:hide_login] %>
+      <div class="alert alert-info" role="alert">
+        Your <i>username</i> will be visible to everyone for example in public scoreboards. <br>
+        Therefore it should <b>not</b> contain your student number or your
+        email address.
+      </div>
+      <%= bs_labeled_field('Username', f.text_field(:login, :disabled => !@user.new_record?, class: 'form-control')) %>
+    <% end%>
+    <%= bs_labeled_field('E-mail:', f.text_field(:email, class: 'form-control')) %>
+    <%= bs_labeled_field('Confirm e-mail:', f.text_field(:email_repeat, :value => '', class: 'form-control stop-autofilling', autocomplete: 'off', type: 'email')) %>
+  </section>
+
+  <% if @user.new_record? %>
+    <section>
+      <h2>Password</h2>
+      <%= bs_labeled_field('Password:', f.password_field(:password, :value => '', :autocomplete => 'off', class: 'form-control')) %>
+      <%= bs_labeled_field('Confirm password:', f.password_field(:password_repeat, :value => '', :autocomplete => 'off', class: 'form-control')) %>
+    </section>
+  <% else %>
+    <section>
+      <h2>Change password</h2>
+      <%= bs_labeled_field('Old password:', f.password_field(:old_password, :value => '', class: 'form-control stop-autofilling', autocomplete: 'off')) %>
+      <%= bs_labeled_field('New password:', f.password_field(:password, :value => '', class: 'form-control'), autocomplete: 'off') %>
+      <%= bs_labeled_field('Confirm new password:', f.password_field(:password_repeat, :value => '', class: 'form-control', autocomplete: 'off')) %>
+    </section>
+  <% end %>
+
+  <% if !UserField.all.empty? %>
+    <section>
+      <% for group in UserField.groups %>
+        <% if UserField.by_group(group).any? {|field| field.visible_to?(@user) } %>
+          <h2><%= group %></h2>
+          <% for field in UserField.by_group(group) %>
+            <% if field.visible_to?(@user) %>
+              <%= extra_field(@user.field_value_record(field), :form_scope => 'user_field') %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section>
+    <% if @user.new_record? %>
+      <%= f.submit "Sign up", class: "btn btn-primary" %>
+    <% else %>
+      <%= f.submit "Save", class: "btn btn-primary" %>
+    <% end %>
+  </section>
+<% end %>
+<br>
+
+
+<script>
+  setTimeout(function() {
+    document.querySelectorAll('.stop-autofilling').forEach(function(e) {
+      e.value = ""
+    })
+  }, 500)
+</script>

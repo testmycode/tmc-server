@@ -236,6 +236,11 @@ TmcServer::Application.routes.draw do
   resource :user
 
   resources :participants do
+    resource :settings, only: [:show, :update] do
+      post 'dangerously_destroy_user', to: 'settings#dangerously_destroy_user'
+      get 'verify_dangerously_destroying_user', to: 'settings#verify_dangerously_destroying_user'
+      delete 'dangerously_destroy_user', to: 'settings#dangerously_destroy_user'
+    end
     resources :certificates, only: [:index]
     collection do
       get 'me', to: 'participants#me'

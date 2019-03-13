@@ -1,0 +1,13 @@
+<%= render partial: 'participants/nav' %>
+
+<%= render :partial => 'settings/form', :user => @user, locals: { hide_login: true } %>
+
+<% if can? :destroy, @user %>
+  <%= button_to 'Request deleting account', send_destroy_email_path(@user.id), method: :post, class: 'btn btn-danger' %>
+<% end %>
+
+<br>
+
+<% if current_user.administrator? %>
+  <%= button_to 'Dangerously destroy account', dangerously_destroy_user_participant_settings_path(@user.id), method: :post, class: 'btn btn-danger' %>
+<% end %>
