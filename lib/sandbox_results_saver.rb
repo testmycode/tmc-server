@@ -128,7 +128,7 @@ module SandboxResultsSaver
         if likely_out_of_memory
           return 'Out of memory.'
         else
-          return 'Missing test output. Did you terminate your program with an exit() command?'
+          return 'Missing test output. Did you terminate your program with an exit() command? Also make sure your program did not run out of memory. For example excessive printing (thousands of lines) may cause this.'
         end
       end
 
