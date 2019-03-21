@@ -70,7 +70,7 @@
         <% end %>
 
         <% if can? :teach, @course %>
-          <li>Model solution coin used: <%= @model_solution_token_used ? @model_solution_token_used.created_at : 'no' %></li>
+          <li>Model solution coin used: <%= @model_solution_token_used.empty? ? 'no' : @model_solution_token_used.first.created_at %></li>
         <% end %>
       </ul>
 
