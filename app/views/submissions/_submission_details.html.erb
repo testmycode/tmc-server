@@ -68,6 +68,10 @@
         <% if can? :teach, @course %>
           <li><%= link_to 'Difference with model solution', submission_difference_with_solution_path(@submission) %> (only for teachers/assistants)</li>
         <% end %>
+
+        <% if can? :teach, @course %>
+          <li>Model solution coin used: <%= @model_solution_token_used ? @model_solution_token_used.created_at : 'no' %></li>
+        <% end %>
       </ul>
 
       <% if can? :rerun, @submission %>

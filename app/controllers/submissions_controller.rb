@@ -34,6 +34,8 @@ class SubmissionsController < ApplicationController
     @exercise ||= @submission.exercise
     @organization = @course.organization
 
+    @model_solution_token_used = ModelSolutionTokenUsed.where(course: @course, exercise_name: @exercise.name, user: @submission.user)
+
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
