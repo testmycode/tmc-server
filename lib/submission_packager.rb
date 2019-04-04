@@ -159,7 +159,7 @@ class SubmissionPackager
         next unless File.exist?(from)
         FileUtils.rm_rf(to, secure: true) if File.exist?(to)
         FileUtils.mkdir_p(File.dirname(to))
-        FileUtils.cp(from, to)
+        FileUtils.cp_r(from, to)
       end
     end
 
