@@ -153,7 +153,8 @@ class SubmissionPackager
     end
 
     def copy_extra_student_files(tmc_project_file, received, dest)
-      tmc_project_file.extra_student_files.each do |rel_path|
+      tmc_project_file.extra_student_files.each do |insecure_rel_path|
+        rel_path = insecure_rel_path.tr("..", "")
         from = "#{received}/#{rel_path}"
         to = "#{dest}/#{rel_path}"
         next unless File.exist?(from)
