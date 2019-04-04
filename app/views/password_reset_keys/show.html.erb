@@ -1,10 +1,9 @@
 <h1>Reset password</h1>
 
-<p>Resetting password for <%= @user.login %></p>
+<p>Resetting password for <%= @user.email %></p>
 
 <%= form_tag reset_password_path(key: @key.token), method: :delete do %>
   <%= labeled_field('New password: ', password_field_tag(:password)) %>
   <%= labeled_field('Confirm new password: ', password_field_tag(:password_confirmation)) %>
   <%= submit_tag 'Set password' %>
 <% end %>
-

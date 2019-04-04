@@ -157,7 +157,7 @@ class SubmissionPackager
         from = "#{received}/#{rel_path}"
         to = "#{dest}/#{rel_path}"
         next unless File.exist?(from)
-        FileUtils.rm(to) if File.exist?(to)
+        FileUtils.rm_rf(to, secure: true) if File.exist?(to)
         FileUtils.mkdir_p(File.dirname(to))
         FileUtils.cp(from, to)
       end
