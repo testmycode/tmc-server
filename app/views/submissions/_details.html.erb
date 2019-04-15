@@ -42,35 +42,37 @@
           </thead>
 
           <tbody>
-            <% @submission.test_case_runs.each do |tcr| %>
-              <tr>
-                <td><%= tcr.test_case_name %></td>
-                <td>
-                  <% if cannot? :read_results, @submission %>
-                      <span class="hidden_status">Hidden</span>
-                  <% elsif tcr.successful? %>
-                    <span class="success">Ok</span>
-                  <% else %>
-                    <span class="failure">Fail</span>
-                  <% end %>
-                </td>
-                <% if !@submission.all_tests_passed? && (can? :read_results, @submission) %>
+            <% if can? :read_results, @submission %>
+              <% @submission.test_case_runs.each do |tcr| %>
+                <tr>
+                  <td><%= tcr.test_case_name %></td>
                   <td>
-                    <%= tcr.message %>
-                    <% if tcr.exception != nil %>
-                      <div class="stack-trace">
-                        <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
-                      </div>
-                    <% end %>
-                    <% if tcr.detailed_message != nil %>
-                      <br />
-                      <div class="detailed-message">
-                        <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
-                      </div>
+                    <% if cannot? :read_results, @submission %>
+                        <span class="hidden_status">Hidden</span>
+                    <% elsif tcr.successful? %>
+                      <span class="success">Ok</span>
+                    <% else %>
+                      <span class="failure">Fail</span>
                     <% end %>
                   </td>
-                <% end %>
-              </tr>
+                  <% if !@submission.all_tests_passed? && (can? :read_results, @submission) %>
+                    <td>
+                      <%= tcr.message %>
+                      <% if tcr.exception != nil %>
+                        <div class="stack-trace">
+                          <%= format_exception_chain(ActiveSupport::JSON.decode(tcr.exception)) %>
+                        </div>
+                      <% end %>
+                      <% if tcr.detailed_message != nil %>
+                        <br />
+                        <div class="detailed-message">
+                          <%= raw( ("".html_safe + tcr.detailed_message).gsub("\n", "<br>") ) %>
+                        </div>
+                      <% end %>
+                    </td>
+                  <% end %>
+                </tr>
+              <% end %>
             <% end %>
           </tbody>
         </table>
