@@ -159,6 +159,7 @@ module Api
         Api::V8::Organizations::Courses::PointsController,
         Api::V8::Organizations::Courses::SubmissionsController,
         Api::V8::Organizations::Courses::ExercisesController,
+        Api::V8::Organizations::Courses::StudyrightEligibilityController,
         Api::V8::Organizations::Courses::Exercises::PointsController,
         Api::V8::Organizations::Courses::Exercises::Users::PointsController,
         Api::V8::Organizations::Courses::Users::PointsController,

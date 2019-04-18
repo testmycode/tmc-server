@@ -73,6 +73,8 @@ TmcServer::Application.routes.draw do
           resources :users, module: :courses, only: [] do
             resources :submissions, module: :users, only: :index
           end
+
+          get 'eligible_students', to: 'courses/studyright_eligibility#eligible_students'
         end
       end
 
