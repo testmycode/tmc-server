@@ -35,7 +35,7 @@ module SandboxResultsSaver
           when '104'
             "Checkstyle runner error:\n" + results['test_output']
           when '105'
-            'Missing test output. Did you terminate your program with an exit() command?'
+            "Missing test output. Did you terminate your program with an exit() command?\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
@@ -43,6 +43,10 @@ module SandboxResultsSaver
           else
             'Running the submission failed. Exit code: ' + results['exit_code'] + ' (did you use an exit() command?)'
           end
+          if submission.stdout.include?('Temporary failure in name resolution: Unknown host maven.mooc.fi')
+            submission.pretest_error = "Unable to run tests because this course's teacher has not configured this exercise template correctly.\nPlease contact your teacher so that they can fix the template and rerun your submission.\nIf your solution is correct, you'll get the points from this exercise once the teacher reruns your submission."
+          end
+
       when 'finished'
         decoded_output = decode_test_output(results['test_output'], results['stderr'])
         if decoded_output.is_a?(Enumerable)
