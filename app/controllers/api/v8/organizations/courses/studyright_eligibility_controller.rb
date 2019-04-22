@@ -37,35 +37,43 @@ module Api
 
             course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
 
-            authorize! :read, course
+            authorize! :teach, course
 
-            applied_students = UserAppDatum.where(field_name: 'applies_for_study_right', value: 't', namespace: 'ohjelmoinnin-mooc-2019').each { |datum| datum.user_id }
+            applied_students = UserAppDatum.where(field_name: 'applies_for_study_right', value: 't', namespace: 'ohjelmoinnin-mooc-2019').pluck(:user_id)
 
-            authorize! :read, applied_students
+            groups = course.exercise_groups[0..6] + course.exercise_groups[8..13]
 
-            eligible_student_ids = []
+            cbu = course.exercise_group_completion_by_user
 
-            applied_students.map do |user|
-              drop = false
-              course.exercise_group_completion_counts_for_user(user).map do |group, info|
-                if info[:progress] < 0.9
-                  drop = true
-                end
-              end
-              eligible_student_ids.push(user) unless drop
+            user_ids = groups.flat_map { |group| ap = cbu[group.name][:available_points]; cbu[group.name][:points_by_user].map { |k, v| { k => (v.to_f / ap) } } }.group_by { |o| o.keys.first }.map { |k, v| { k => v.map { |o2| o2[k] } } }.inject(:merge).select { |_k, v| v.length == groups.length }.select { |_k, v| v.all? { |o2| o2 >= 0.8995 } }.map { |k, _v| k }
+
+            eligble_ids = (user_ids & applied_students)
+            users = User.where(id: eligble_ids)
+
+            if params[:extra_fields]
+              namespace = params[:extra_fields]
+              user_id_to_extra_fields = UserAppDatum.where(namespace: namespace, user: users).group_by(&:user_id)
             end
 
-            eligible_students = []
-
-            eligible_student_ids.map do |user_id|
-              u = User.find(user_id)
-              info = {
+            eligible_students = users.map do |u|
+              d = {
                 id: u.id,
                 username: u.login,
                 email: u.email,
                 administrator: u.administrator
               }
-              eligible_students.push(info)
+              if user_id_to_extra_fields
+                extra_fields = user_id_to_extra_fields[u.id] || []
+                d[:extra_fields] = extra_fields.map { |o| [o.field_name, o.value] }.to_h
+              end
+              if params[:user_fields]
+                user_fields = u.user_field_values.map { |o| [o.field_name, o.value] }.to_h
+                d[:user_fields] = user_fields
+                d[:student_number] = user_fields['organizational_id']
+                d[:first_name] = user_fields['first_name']
+                d[:last_name] = user_fields['last_name']
+              end
+              d
             end
 
             render json: {
