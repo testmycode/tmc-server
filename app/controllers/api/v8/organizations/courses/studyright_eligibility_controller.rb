@@ -50,6 +50,8 @@ module Api
             eligble_ids = (user_ids & applied_students)
             users = User.where(id: eligble_ids)
 
+            user_id_to_extra_fields = nil
+
             if params[:extra_fields]
               namespace = params[:extra_fields]
               user_id_to_extra_fields = UserAppDatum.where(namespace: namespace, user: users).group_by(&:user_id)
