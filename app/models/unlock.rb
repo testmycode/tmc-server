@@ -71,7 +71,7 @@ class Unlock < ActiveRecord::Base
       new_unlocks = []
       course.exercises.enabled.group_by { |o| o.unlock_spec }.each do |_spec, exercises|
         exercise = exercises.first
-        existing = exercises.all? { |ex| user_unlocks_by_exercise_name[exercise.name] }
+        existing = exercises.all? { |ex| user_unlocks_by_exercise_name[ex.name] }
         exists = !!existing
         may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
         next unless !exists && may_exist && !exercise.requires_explicit_unlock?
