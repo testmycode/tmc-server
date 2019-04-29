@@ -41,7 +41,7 @@ module Api
 
             applied_students = UserAppDatum.where(field_name: 'applies_for_study_right', value: 't', namespace: 'ohjelmoinnin-mooc-2019').pluck(:user_id)
 
-            groups = course.exercise_groups[0..6] + course.exercise_groups[8..13]
+            groups = course.exercise_groups[0..6] + course.exercise_groups[7..13]
 
             cbu = course.exercise_group_completion_by_user
 
