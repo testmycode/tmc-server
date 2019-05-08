@@ -104,7 +104,7 @@ module Api
               }
               end
             )
-            output[:status] = :ok if output[:status] == :hidden && !can_handle_hidden_fields(params)
+            output[:status] = :ok if output[:status] == :hidden
             if !!params[:include_files]
               output[:files] = SourceFileList.for_submission(@submission).map { |f| { path: f.path, contents: f.contents } }
             end
@@ -113,20 +113,6 @@ module Api
 
           render json: output
         end
-
-        private
-
-          def can_handle_hidden_fields(params)
-            return false unless params[:client] == 'netbeans_plugin'
-            splitted = params[:client_version].split('.')
-            min_version = [1, 2, 5]
-            min_version.each_with_index do |version_number, i|
-              return false unless splitted[i]
-              return false if splitted[i].to_i < version_number
-              return true if splitted[i].to_i > version_number
-            end
-            true
-          end
       end
     end
   end
