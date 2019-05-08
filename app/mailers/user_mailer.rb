@@ -10,6 +10,7 @@ class UserMailer < ActionMailer::Base
     @url = base_url + confirm_email_path(@user.id, token.token, language: language)
     subject = 'Confirm your mooc.fi account email address'
     subject = 'Varmista mooc.fi tunnuksesi sähköpostiosoite' if language == "fi"
+    subject = 'Bekräfta e-postadressen till ditt mooc.fi-konto' if language == "se"
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
