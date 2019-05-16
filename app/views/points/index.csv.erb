@@ -3,6 +3,7 @@
   arr = []
   arr += @user_fields.map(&:label) if @user_fields
   arr << :email if can?(:teach, @course)
+  arr << :username if can?(:teach, @course) && params[:include_username]
   arr += @summary[:sheets].map {|sheet| sheet[:name] } + ["Total"]
   csv << arr
 
@@ -19,6 +20,7 @@
       end
     end
     arr << user.email if can?(:teach, @course)
+    arr << user.login if can?(:teach, @course) && params[:include_username]
     arr += points + [total]
     csv << arr
   end
