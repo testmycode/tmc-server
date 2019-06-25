@@ -129,6 +129,8 @@ class User < ActiveRecord::Base
   end
 
   def self.authenticate(login, submitted_password)
+    return nil unless login
+    login = login.strip
     user = find_by(login: login)
     user ||= find_by('lower(email) = ?', login.downcase)
     return nil if user.nil?
