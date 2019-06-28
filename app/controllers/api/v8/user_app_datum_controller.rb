@@ -6,6 +6,7 @@ module Api
 
       def index
         only_admins!
+        skip_authorization_check
         render json: UserAppDatum.all.to_json
       end
     end
