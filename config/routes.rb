@@ -53,6 +53,8 @@ TmcServer::Application.routes.draw do
         resources :request_deletion, only: [:create], module: :users
       end
 
+      resources :user_app_datum, only: [:index]
+
       resources :organizations, param: :slug, path: 'org', only: %i[index show] do
         resources :courses, module: :organizations, param: :name, only: :show do
           resources :points, module: :courses, only: :index
