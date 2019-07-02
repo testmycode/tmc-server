@@ -8,7 +8,13 @@ module Api
       def index
         only_admins!
 
-        render json: UserAppDatum.all.to_json
+        if params[:after]
+          timestamp = Time.zone.parse(params[:after])
+          data = UserAppDatum.where("created_at >= ? OR updated_at >= ?", timestamp, timestamp)
+          return render json: data
+        end
+
+        render json: UserAppDatum.all
       end
     end
   end
