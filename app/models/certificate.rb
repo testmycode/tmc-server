@@ -11,16 +11,18 @@ class Certificate < ActiveRecord::Base
     visible_exercises, available_points = visible_exercises_and_points_for
 
     data = File.read(File.join(path, 'certificate.html'))
+    awarded_points = AwardedPoint.course_user_points(course, user).reject do |p|
+      exercise = p.submission.exercise
+      exercise.nil? ? false : p.submission.exercise.hide_submission_results?
+    end
     data %= {
       time: Time.zone.now.to_f * 1000,
       name: name,
       course: course.formal_name || course.title,
       weeks: course.exercise_groups.count,
       exercises: visible_exercises.count,
-      points: AwardedPoint.course_user_points(course, user).reject do |p|
-        exercise = p.submission.exercise
-        exercise.nil? ? false : p.submission.exercise.hide_submission_results?
-      end.count,
+      points: awarded_points.count,
+      point_names: awarded_points.map(&:name).join(','),
       available_points: available_points,
       root: path
     }
