@@ -406,7 +406,8 @@ class Course < ActiveRecord::Base
   end
 
   def certificate_downloadable_for?(user)
-    user.administrator? || (
+    user.administrator? ||
+    user.teacher?(organization) || (
       !user.guest? &&
        certificate_downloadable &&
        (certificate_unlock_spec.nil? ||
