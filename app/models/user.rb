@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   has_many :action_tokens, dependent: :delete_all
   has_many :user_field_values, dependent: :delete_all, autosave: true
   has_many :user_app_data, dependent: :delete_all, autosave: true
+  has_many :model_solution_token_useds, dependent: :nullify
   has_many :unlocks, dependent: :delete_all
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :reviews, foreign_key: :reviewer_id, inverse_of: :reviewer, dependent: :nullify
