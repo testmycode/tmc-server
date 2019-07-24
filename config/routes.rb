@@ -47,6 +47,7 @@ TmcServer::Application.routes.draw do
       namespace :users do
         resources :password_reset, only: [:create]
         resources :basic_info_by_usernames, only: :create
+        resources :basic_info_by_emails, only: :create
       end
 
       resources :users, only: %i[show create update] do
