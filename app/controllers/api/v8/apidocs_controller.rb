@@ -165,6 +165,7 @@ module Api
         Api::V8::Organizations::Courses::Users::PointsController,
         Api::V8::Organizations::Courses::Users::SubmissionsController,
         Api::V8::Users::BasicInfoByUsernamesController,
+        Api::V8::Users::BasicInfoByEmailsController,
         Api::V8::Core::CoursesController,
         Api::V8::Core::Courses::ReviewsController,
         Api::V8::Core::Courses::UnlocksController,
