@@ -82,7 +82,7 @@ module Api
             ex = course.exercises.find_by!(name: params[:name])
 
             if current_user.guest?
-              render json: {
+              return render json: {
                 id: ex.id,
                 available_points: ex.available_points,
               }
