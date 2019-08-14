@@ -65,6 +65,7 @@ module Api
             {
               id: ex.id,
               available_points: ex.available_points,
+              awarded_points: ex.points_for(current_user),
               name: ex.name,
               publish_time: ex.publish_time,
               solution_visible_after: ex.solution_visible_after,
