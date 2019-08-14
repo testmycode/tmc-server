@@ -97,6 +97,7 @@ module Api
             present(
               id: ex.id,
               available_points: ex.available_points,
+              awarded_points: ex.points_for(current_user),
               name: ex.name,
               publish_time: ex.publish_time,
               deadline: ex.deadline_for(current_user),
