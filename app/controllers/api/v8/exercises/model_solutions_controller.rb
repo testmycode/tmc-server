@@ -17,7 +17,7 @@ module Api
             grant_model_solution_token_every_nth_completed_exercise = course.grant_model_solution_token_every_nth_completed_exercise
             if grant_model_solution_token_every_nth_completed_exercise && grant_model_solution_token_every_nth_completed_exercise > 0 && !model_solution_token_used_on_this_exercise
               completed_exercises_count = course.submissions.where(all_tests_passed: true, user: current_user).distinct.select(:exercise_name).count
-              total_model_solution_tokens = completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise
+              total_model_solution_tokens = (completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise) + course.initial_coin_stash
 
               tokens_used = ModelSolutionTokenUsed.where(user: current_user, course: course).count
               available_model_solution_tokens = total_model_solution_tokens - tokens_used

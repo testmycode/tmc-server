@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190113155422) do
+ActiveRecord::Schema.define(version: 20190903072551) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,8 @@ ActiveRecord::Schema.define(version: 20190113155422) do
     t.float    "soft_deadline_point_multiplier",                          default: 0.75,  null: false
     t.boolean  "code_review_requests_enabled",                            default: true,  null: false
     t.integer  "grant_model_solution_token_every_nth_completed_exercise"
+    t.integer  "initial_coin_stash"
+    t.boolean  "large_exercises_consume_more_coins",                      default: false
   end
 
   add_index "courses", ["course_template_id"], name: "index_courses_on_course_template_id", using: :btree
