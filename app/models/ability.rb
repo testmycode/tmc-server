@@ -75,7 +75,7 @@ class Ability
       end
 
       can :refresh, Course do |c|
-        c.taught_by?(user) &&
+        (c.taught_by?(user) || c.assistant?(user)) &&
           c.custom? # user can only refresh his/her custom course.
       end
 
