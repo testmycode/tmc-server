@@ -5,7 +5,6 @@ class MigrateToOtherCourseController < ApplicationController
     @old_course = Course.find(params[:course_id])
     @to_course = Course.find(params[:id])
 
-    authorize! :read, @old_course
     authorize! :read, @to_course
     authorize! :read, current_user
 
@@ -19,7 +18,6 @@ class MigrateToOtherCourseController < ApplicationController
     @old_course = Course.find(params[:course_id])
     @to_course = Course.find(params[:id])
 
-    authorize! :read, @old_course
     authorize! :read, @to_course
 
     if check_understanding!
