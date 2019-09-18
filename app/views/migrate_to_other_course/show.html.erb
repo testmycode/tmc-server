@@ -20,7 +20,7 @@
   <% end %>
 
   <% unless @already_migrated %>
-    <%= form_tag(migrate_organization_course_migrate_to_other_course_path, method: :post, class: 'form-horizontal') do  %>
+    <%= form_tag(migrate_course_migrate_to_other_course_path, method: :post, class: 'form-horizontal') do  %>
 
       <div class="form-group">
         <%= label_tag :from_course_name, "Name of the course from where to migrate", class: "control-label" %>

@@ -218,8 +218,8 @@ TmcServer::Application.routes.draw do
     resources :stats, only: [:index]
   end
 
-  namespace :courses do
-    resources :migrate_to_other_course, only: [:show] do
+  resources :courses do
+    resources :migrate_to_other_course, controller: 'migrate_to_other_course', only: [:show] do
       member do
         post :migrate
       end
