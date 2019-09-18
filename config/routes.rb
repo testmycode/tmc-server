@@ -218,6 +218,14 @@ TmcServer::Application.routes.draw do
     resources :stats, only: [:index]
   end
 
+  namespace :courses do
+    resources :migrate_to_other_course, only: [:show] do
+      member do
+        post :migrate
+      end
+    end
+  end
+
   resources :course_templates do
     member do
       post 'toggle_hidden', to: 'course_templates#toggle_hidden'
