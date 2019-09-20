@@ -53,7 +53,7 @@ class ExerciseDir
 
   # subclass may set this to true
   def safe_for_experimental_sandbox
-    false
+    TmcProjectFile.for_project(@path).force_new_sandbox
   end
 
   private
