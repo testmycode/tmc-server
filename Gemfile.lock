@@ -68,7 +68,7 @@ GEM
     coderay (1.1.2)
     concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
-    crass (1.0.3)
+    crass (1.0.4)
     daemons (1.2.5)
     database_cleaner (1.5.3)
     declarative (0.0.10)
@@ -141,7 +141,7 @@ GEM
       activesupport (>= 3.0)
       logstash-event (~> 1.2.0)
       request_store
-    loofah (2.1.1)
+    loofah (2.3.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.0)
@@ -157,7 +157,7 @@ GEM
       sinatra
       thin
     mini_mime (1.0.0)
-    mini_portile2 (2.3.0)
+    mini_portile2 (2.4.0)
     minitest (5.10.3)
     multi_json (1.12.2)
     multipart-post (2.0.0)
@@ -167,8 +167,8 @@ GEM
       newrelic_rpm (~> 3.11)
       redis (< 4.0)
     newrelic_rpm (3.18.1.330)
-    nokogiri (1.8.1)
-      mini_portile2 (~> 2.3.0)
+    nokogiri (1.10.4)
+      mini_portile2 (~> 2.4.0)
     os (0.9.6)
     paperclip (4.3.7)
       activemodel (>= 3.2.0)
