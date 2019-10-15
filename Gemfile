@@ -46,6 +46,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'rack-mini-profiler', '~> 1.0', '>= 1.0.1'
 gem 'flamegraph', '~> 0.9.5'
 gem 'stackprof', '~> 0.2.12'
+gem 'ruby-kafka', '~> 0.7.10'
 
 group :assets do
   gem 'jquery-rails', '~> 3.1.2'
@@ -62,6 +63,7 @@ group :development, :test do
   gem 'rspec-core', '~> 3.5.2'
   gem 'rspec-rails', '~> 3.5.1'
   # gem 'selenium-webdriver', '~> 2.44.0'
+  gem 'irb'
   gem 'brakeman', require: false
   gem 'bundler-audit'
   gem 'pry'
