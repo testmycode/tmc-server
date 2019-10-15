@@ -55,6 +55,7 @@ TmcServer::Application.routes.draw do
       end
 
       resources :user_app_datum, only: [:index]
+      resources :user_field_value, only: [:index]
 
       resources :organizations, param: :slug, path: 'org', only: %i[index show] do
         resources :courses, module: :organizations, param: :name, only: :show do
