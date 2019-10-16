@@ -10,7 +10,7 @@ module Api
 
         if params[:after]
           timestamp = Time.zone.parse(params[:after])
-          data = UserFieldValue.order(:updated_at).where("created_at >= ? OR updated_at >= ?", timestamp, timestamp).limit(10000)
+          data = UserFieldValue.order(:updated_at).where("created_at >= ? OR updated_at >= ?", timestamp, timestamp)
           return render json: data
         end
 
