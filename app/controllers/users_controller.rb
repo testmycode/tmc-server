@@ -16,7 +16,7 @@ class UsersController < ApplicationController
 
   def new
     authorize! :create, User
-    alternative_location = SiteSetting.value("signup_location")
+    alternative_location = SiteSetting.all_settings["signup_location"]
     return redirect_to alternative_location if alternative_location
     add_breadcrumb 'Sign up', new_user_path
 
