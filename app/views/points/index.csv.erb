@@ -1,6 +1,7 @@
 <% require 'portable_csv' %>
 <%= PortableCSV.generate(:force_quotes => true) do |csv|
   arr = []
+  arr << :id if can?(:teach, @course)
   arr += @user_fields.map(&:label) if @user_fields
   arr << :email if can?(:teach, @course)
   arr << :username if can?(:teach, @course) && params[:include_username]
@@ -13,6 +14,7 @@
     end
     total = @summary[:total_for_user][user.login].to_i
     arr = []
+    arr << user.id if can?(:teach, @course)
     if @user_fields
       @user_fields.each do |field|
         user_field_value = user.user_field_values.find { |o| o.field_name == field.name }
