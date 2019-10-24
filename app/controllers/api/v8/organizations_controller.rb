@@ -50,6 +50,8 @@ module Api
                .visible_organizations
                .select { |org| org.visibility_allowed?(request, current_user) }
 
+        orgs = Organization.all if current_user.administrator?
+
         unless current_user.administrator?
           orgs = orgs.map { |o| { name: o.name, information: o.information, slug: o.slug, logo_path: o.logo.url, pinned: o.pinned } }
         end
