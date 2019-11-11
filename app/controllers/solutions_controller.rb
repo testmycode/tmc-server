@@ -17,6 +17,8 @@ class SolutionsController < ApplicationController
     rescue CanCan::AccessDenied
       if current_user.guest?
         raise CanCan::AccessDenied
+      elsif !current_user.email_verified?
+        return respond_access_denied("Please verify your email address in order to see solutions.")
       elsif current_user.teacher?(@organization) || current_user.assistant?(@course)
         return respond_access_denied("You can't see model solutions until organization is verified by administrator")
       else

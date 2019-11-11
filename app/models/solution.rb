@@ -17,6 +17,8 @@ class Solution
   def visible_to?(user)
     if user.administrator?
       true
+    elsif !user.email_verified?
+      false
     elsif !@exercise.course.organization.verified
       false
     elsif user.teacher?(@exercise.course.organization) || user.assistant?(@exercise.course)
