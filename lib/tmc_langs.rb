@@ -43,6 +43,7 @@ class TmcLangs < MavenProject
   end
 
   def get_test_case_methods(exercise_path)
+    return [] unless File.exists?(exercise_path)
     scan_exercise(exercise_path)['tests']
   end
 
