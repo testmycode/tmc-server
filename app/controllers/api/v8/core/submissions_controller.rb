@@ -68,7 +68,7 @@ module Api
               validations: @submission.validations,
               valgrind: @submission.valgrind,
               submission_url: submission_url(@submission),
-              solution_url: @exercise.solution.visible_to?(current_user) ? view_context.exercise_solution_url(@exercise) : nil,
+              solution_url: @exercise.solution.visible_to?(current_user, true) ? view_context.exercise_solution_url(@exercise) : nil,
               submitted_at: @submission.created_at,
               processing_time: @submission.processing_time,
               reviewed: @submission.reviewed?,
