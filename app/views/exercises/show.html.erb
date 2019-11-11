@@ -135,8 +135,12 @@
 
   <% if @exercise.solution && can?(:read, @exercise.solution) %>
     <li>
-      <%= link_to_if @course.initial_refresh_ready?, 'View suggested solution', exercise_solution_path(@exercise) do %>
-        Solution not available during refresh.
+      <% if current_user.email_verified? %>
+        <%= link_to_if @course.initial_refresh_ready?, 'View suggested solution', exercise_solution_path(@exercise) do %>
+          Solution not available during refresh.
+        <% end %>
+      <% else %>
+        Suggested solution is unavailable because you haven't verified your email address.
       <% end %>
     </li>
   <% end %>
