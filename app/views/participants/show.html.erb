@@ -7,14 +7,15 @@
 
   <section class="participant-entries">
     <ul class="nobullets">
-      <% if current_user.administrator? %>
-      <li>Username: <%= @user.login %> (shown to you beacause you're an admin)</li>
-      <% end %>
       <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
       <% for field in UserField.all %>
         <% if field.field_type != :html %>
           <li><%= raw(field.name.humanize) %>: <%= extra_field_value(@user.field_value_record(field)) %></li>
         <% end %>
+      <% end %>
+      <% if current_user.administrator? %>
+        <li>Username: <%= @user.login %> (shown to you beacause you're an admin)</li>
+        <li>Account created: <%= @user.created_at %> (shown to you beacause you're an admin)</li>
       <% end %>
     </ul>
   </section>
