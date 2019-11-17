@@ -12,6 +12,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Varmista mooc.fi tunnuksesi sähköpostiosoite' if language == "fi"
     subject = 'Bekräfta e-postadressen till ditt mooc.fi-konto' if language == "se"
     subject = 'Bestätige deine E-Mail-Adresse, um mit dem Kurs zu beginnen' if language == "de"
+    subject = 'Palun kinnita oma e-posti aadress' if language == "ee"
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
