@@ -65,7 +65,12 @@ class SourceFileList
   end
 
   def self.for_solution(solution)
-    files = find_source_files_under(solution.path)
+    project_file = TmcProjectFile.for_project(solution.exercise.clone_path)
+    files = if project_file&.show_all_files_in_solution
+      find_all_files_under(solution.path)
+    else
+      find_source_files_under(solution.path)
+    end
     files.each do |file|
       html_file = Pathname("#{file.path}.html")
       file.html_prelude = html_file.read if html_file.exist?
