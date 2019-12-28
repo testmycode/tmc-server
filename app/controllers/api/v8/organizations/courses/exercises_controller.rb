@@ -112,6 +112,7 @@ module Api
               disabled: ex.disabled?,
               completed: ex.completed_by?(current_user),
               model_solution_token_used_on_this_exercise: model_solution_token_used_on_this_exercise,
+              large_exercises_consume_more_coins: course.large_exercises_consume_more_coins?,
               email_verified: current_user.email_verified?,
               course: {
                 grant_model_solution_token_every_nth_completed_exercise: grant_model_solution_token_every_nth_completed_exercise,
