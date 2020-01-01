@@ -89,7 +89,7 @@ class UsersController < ApplicationController
 
   def confirm_email
     language = params[:language]
-    token = VerificationToken.email.find_by!(user_id: params[:user_id], token: params[:id])
+    token = VerificationToken.unscoped.email.find_by!(user_id: params[:user_id], token: params[:id])
     redirect_path = root_url
     redirect_path = "https://course.elementsofai.com/#{language ? "#{language}/" : ''}email-verification" if params[:origin] && params[:origin].start_with?('elements_of_ai')
     User.find(params[:user_id]).update!(email_verified: true)
