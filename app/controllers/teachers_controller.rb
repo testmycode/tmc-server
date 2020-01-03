@@ -41,6 +41,6 @@ class TeachersController < ApplicationController
     end
 
     def teacher_params
-      params.permit(:username)
+      params.permit(:email)
     end
 end
