@@ -22,7 +22,7 @@
   <tbody>
   <% @teachers.each do |teacher| %>
     <tr>
-      <td><%= teacher.username %></td>
+      <td><%= teacher.email %></td>
       <td><%= link_to 'Remove', organization_teacher_path(@organization, teacher.teachership(@organization)), method: :delete, class: "btn btn-sm btn-danger", data: { confirm: 'Are you sure?' } %></td>
     </tr>
   <% end %>

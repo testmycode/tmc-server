@@ -15,11 +15,11 @@ class TeachersController < ApplicationController
   def create
     authorize! :teach, @organization
 
-    user = User.find_by(login: teacher_params[:username])
+    user = User.find_by(email: teacher_params[:email])
     @teachership = Teachership.new(user: user, organization: @organization)
 
     if @teachership.save
-      redirect_to organization_teachers_path, notice: "Teacher #{user.login} added to organization"
+      redirect_to organization_teachers_path, notice: "Teacher #{user.email} added to organization"
     else
       @teachers = @organization.teachers
       render :index
