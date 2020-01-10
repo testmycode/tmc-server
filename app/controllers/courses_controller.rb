@@ -203,7 +203,7 @@ class CoursesController < ApplicationController
         @submissions = @course.submissions
         @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
         @submissions = @submissions.order('created_at DESC').includes(:user)
-        @total_submissions = @submissions.where.not(user: User.non_legitimate_students).count
+        @total_submissions = @submissions.count
         @submissions = @submissions.limit(max_submissions)
         Submission.eager_load_exercises(@submissions)
       end
