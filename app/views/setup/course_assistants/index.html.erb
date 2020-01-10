@@ -20,8 +20,8 @@
     <%= render 'shared/error_messages', target: @assistantship %>
 
     <div class="field">
-      <%= label_tag :username, "Enter assistant's username:" %>
-      <%= text_field_tag :username, nil, class: 'form-control' %>
+      <%= label_tag :email, "Enter assistant's email:" %>
+      <%= text_field_tag :email, nil, class: 'form-control' %>
     </div>
     <br>
     <div class="actions">
@@ -50,7 +50,7 @@
     <tbody>
     <% @assistants.each do |assistant| %>
         <tr>
-          <td><%= link_to assistant.username, participant_path(assistant) %></td>
+          <td><%= link_to assistant.email, participant_path(assistant) %></td>
           <td><%= link_to 'Remove', setup_organization_course_course_assistant_path(@course.organization, @course, assistant.assistantship(@course)), method: :delete, class: "btn btn-sm btn-warning", data: { confirm: 'Are you sure?' } %></td>
         </tr>
     <% end %>

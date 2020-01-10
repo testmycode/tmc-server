@@ -21,7 +21,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
     authorize! :modify_assistants, @course
 
     if params[:commit] == 'Add new assistant'
-      new_assistant = User.find_by(login: assistant_params[:username])
+      new_assistant = User.find_by('lower(email) = ?', assistant_params[:email].downcase)
       @assistantship = Assistantship.new(user: new_assistant, course: @course)
 
       if @assistantship.save
@@ -54,6 +54,6 @@ class Setup::CourseAssistantsController < Setup::SetupController
   private
 
     def assistant_params
-      params.permit(:username)
+      params.permit(:email)
     end
 end
