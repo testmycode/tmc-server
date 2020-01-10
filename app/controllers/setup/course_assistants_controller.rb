@@ -25,7 +25,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
       @assistantship = Assistantship.new(user: new_assistant, course: @course)
 
       if @assistantship.save
-        redirect_to setup_organization_course_course_assistants_path, notice: "Assistant #{new_assistant.login} added"
+        redirect_to setup_organization_course_course_assistants_path, notice: "Assistant #{new_assistant.email} added"
       else
         @setup_in_progress = setup_in_progress?
         @assistants = @course.assistants
@@ -46,9 +46,9 @@ class Setup::CourseAssistantsController < Setup::SetupController
   def destroy
     authorize! :modify_assistants, @course
     @assistantship = Assistantship.find(params[:id])
-    destroyed_username = @assistantship.user.login
+    destroyed_email = @assistantship.user.email
     @assistantship.destroy!
-    redirect_to setup_organization_course_course_assistants_path, notice: "Assistant #{destroyed_username} removed from course."
+    redirect_to setup_organization_course_course_assistants_path, notice: "Assistant #{destroyed_email} removed from course."
   end
 
   private
