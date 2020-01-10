@@ -109,7 +109,7 @@
             <%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course), class: 'btn btn-sm' %>
           </li>
 
-          <% if can? :view_code_reviews, @course %>
+          <% if @course.code_review_requests_enabled? && can?(:view_code_reviews, @course) %>
             <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course), class: 'btn btn-sm' %></li>
             <%
               reviews_required = @course.reviews_required.count
