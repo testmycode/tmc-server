@@ -126,7 +126,7 @@
   %>
 <% end %>
 
-<% unless @my_courses.empty? %>
+<% unless current_user.guest? %>
   <%=
       render partial: 'courses/list_my_courses',
              locals: { courses: @my_courses, title: 'My courses', percent_completed: @my_courses_percent_completed }
