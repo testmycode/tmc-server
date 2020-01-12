@@ -60,7 +60,11 @@ module Api
 
         def create
           return respond_access_denied unless current_user.administrator?
-          users = User.where(login: params[:usernames])
+          users = if params[:extra_fields]
+            User.eager_load(:user_field_values).where(login: params[:usernames])
+          else
+            User.where(login: params[:usernames])
+          end
           user_id_to_extra_fields = nil
           if params[:extra_fields]
             namespace = params[:extra_fields]
