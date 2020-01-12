@@ -58,7 +58,7 @@ class Submission < ActiveRecord::Base
   end
 
   belongs_to :user
-  belongs_to :course
+  belongs_to :course, counter_cache: true
 
   belongs_to :exercise,
              (lambda do |submission|

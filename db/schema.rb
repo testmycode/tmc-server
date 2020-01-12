@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190903072551) do
+ActiveRecord::Schema.define(version: 20200112230121) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -127,6 +127,8 @@ ActiveRecord::Schema.define(version: 20190903072551) do
     t.integer  "grant_model_solution_token_every_nth_completed_exercise"
     t.integer  "initial_coin_stash"
     t.boolean  "large_exercises_consume_more_coins",                      default: false
+    t.string   "moocfi_id"
+    t.integer  "submissions_count",                                       default: 0,     null: false
   end
 
   add_index "courses", ["course_template_id"], name: "index_courses_on_course_template_id", using: :btree
@@ -184,6 +186,14 @@ ActiveRecord::Schema.define(version: 20190903072551) do
 
   add_index "feedback_questions", ["course_id"], name: "index_feedback_questions_on_course_id", using: :btree
 
+  create_table "kafka_batch_update_points", force: :cascade do |t|
+    t.integer  "course_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "kafka_batch_update_points", ["course_id"], name: "index_kafka_batch_update_points_on_course_id", using: :btree
+
   create_table "migrated_submissions", id: false, force: :cascade do |t|
     t.integer  "from_course_id"
     t.integer  "to_course_id"
@@ -210,8 +220,9 @@ ActiveRecord::Schema.define(version: 20190903072551) do
     t.integer  "user_id"
     t.integer  "course_id"
     t.string   "exercise_name"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "cost",          default: 1, null: false
   end
 
   add_index "model_solution_token_useds", ["course_id"], name: "index_model_solution_token_useds_on_course_id", using: :btree
@@ -492,6 +503,7 @@ ActiveRecord::Schema.define(version: 20190903072551) do
   add_foreign_key "feedback_answers", "feedback_questions", on_delete: :cascade
   add_foreign_key "feedback_answers", "submissions", on_delete: :nullify
   add_foreign_key "feedback_questions", "courses", on_delete: :cascade
+  add_foreign_key "kafka_batch_update_points", "courses"
   add_foreign_key "model_solution_token_useds", "courses"
   add_foreign_key "model_solution_token_useds", "users"
   add_foreign_key "reviews", "submissions", on_delete: :cascade
