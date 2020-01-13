@@ -18,9 +18,9 @@ class KafkaBatchUpdatePointsTask
         Rails.logger.error 'Cannot publish points because moocfi id is not specified'
         next
       end
-      points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, course.gdocs_sheets)
-      parts = course.exercise_groups.map(&:name)
-      Rails.logger.info("Found points for #{parts.keys.length} users")
+      parts = course.gdocs_sheets
+      points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts)
+      Rails.logger.info("Found points for #{points_per_user.keys.length} users")
       available_points = AvailablePoint.course_sheet_points(course, parts)
       points_per_user.each do |username, points_by_group|
         user = User.find_by(login: username)
