@@ -44,6 +44,7 @@ class KafkaBatchUpdatePointsTask
         RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user_course_progress', payload: message }.to_json, { content_type: :json })
       end
       task.destroy!
+      puts "Batch publish finished for #{course.name}"
     end
   end
 
