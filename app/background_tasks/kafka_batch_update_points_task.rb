@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
-require 'kafka'
+require 'rest-client'
 
 class KafkaBatchUpdatePointsTask
   def initialize
-    seed_brokers = SiteSetting.value('kafka_seed_brokers')
-    @service_id = SiteSetting.value('kafka_service_id')
-    @kafka = seed_brokers && Kafka.new(seed_brokers, client_id: 'tmc-server')
+    @kafka_bridge_url = SiteSetting.value('kafka_bridge_url')
+    @kafka_bridge_secret = SiteSetting.value('kafka_bridge_secret')
+    @service_id = SiteSetting.value('moocfi_service_id')
   end
 
   def run
-    return unless @kafka && @service_id
-    producer = @kafka.producer
+    return unless @kafka_bridge_url && @kafka_bridge_secret && @service_id
     KafkaBatchUpdatePoints.all.each do |task|
       course = task.course
       Rails.logger.info("Batch publishing points for course #{course.name} with moocfi id: #{course.moocfi_id}.")
@@ -42,8 +41,9 @@ class KafkaBatchUpdatePointsTask
           progress: progress,
           message_format_version: 1
         }
-        producer.deliver_message(message, topic: 'user-course-progress')
+        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user_course_progress', payload: message }.to_json, { content_type: :json })
       end
+      task.destroy!
     end
   end
 
