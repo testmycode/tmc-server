@@ -43,7 +43,7 @@ class KafkaBatchUpdatePointsTask
           progress: progress,
           message_format_version: 1
         }
-        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user_course_progress', payload: message }.to_json, { content_type: :json, authorization: "Basic #{@kafka_bridge_secret}" })
+        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-progress', payload: message }.to_json, { content_type: :json, authorization: "Basic #{@kafka_bridge_secret}" })
       end
       task.destroy!
       Rails.logger.info "Batch publish finished for #{course.name}"
