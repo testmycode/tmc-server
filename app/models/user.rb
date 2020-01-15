@@ -126,7 +126,16 @@ class User < ActiveRecord::Base
   end
 
   def has_password?(submitted_password)
-    password_hash == encrypt(submitted_password)
+    if !salt
+      return Argon2::Password.verify_password(submitted_password, argon_hash)
+    end
+    result = Argon2::Password.verify_password(old_encrypt(submitted_password), argon_hash)
+    if result && salt
+      self.argon_hash = generate_argon(submitted_password)
+      self.salt = nil
+      save
+    end
+    result
   end
 
   def self.authenticate(login, submitted_password)
@@ -307,11 +316,13 @@ class User < ActiveRecord::Base
     end
 
     def encrypt_password
-      self.salt = make_salt if new_record?
-      self.password_hash = encrypt(password) if password.present?
+      if password.present?
+        self.argon_hash = generate_argon(password)
+        self.salt = nil
+      end
     end
 
-    def encrypt(string)
+    def old_encrypt(string)
       secure_hash("#{salt}--#{string}")
     end
 
@@ -331,7 +342,7 @@ class User < ActiveRecord::Base
       errors.add(:email, 'is incorrect. You probably meant firstname.lastname@helsinki.fi. Keep in mind that your email address does not contain your University of Helsinki username.') if email.end_with?('@helsinki.fi') && !/.*\..*@helsinki.fi/.match?(email)
     end
 
-    def _generate_argon
-      update(argon_hash: Argon2::Password.new(t_cost: 4, m_cost: 15).create(password_hash))
+    def generate_argon(input)
+      Argon2::Password.new(t_cost: 4, m_cost: 15).create(input)
     end
 end
