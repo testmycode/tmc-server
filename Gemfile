@@ -47,6 +47,7 @@ gem 'rack-mini-profiler', '~> 1.0', '>= 1.0.1'
 gem 'flamegraph', '~> 0.9.5'
 gem 'stackprof', '~> 0.2.12'
 gem 'ruby-kafka', '~> 0.7.10'
+gem 'argon2', '~> 2.0', '>= 2.0.2'
 
 group :assets do
   gem 'jquery-rails', '~> 3.1.2'

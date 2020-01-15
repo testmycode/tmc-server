@@ -330,4 +330,8 @@ class User < ActiveRecord::Base
       errors.add(:email, 'may not end with "@ad.helsinki.fi". You cannot receive any emails with this address -- it\'s only used for your webmail login. Figure out what your real email address is and try again. It is usually of the form firstname.lastname@helsinki.fi but verify this first.') if email.end_with?('@ad.helsinki.fi')
       errors.add(:email, 'is incorrect. You probably meant firstname.lastname@helsinki.fi. Keep in mind that your email address does not contain your University of Helsinki username.') if email.end_with?('@helsinki.fi') && !/.*\..*@helsinki.fi/.match?(email)
     end
+
+    def _generate_argon
+      update(argon_hash: Argon2::Password.new(t_cost: 4, m_cost: 15).create(password_hash))
+    end
 end
