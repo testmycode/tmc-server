@@ -27,7 +27,7 @@ class KafkaBatchUpdatePointsTask
         Rails.logger.info("Publishing points for user #{user.id}")
         progress = points_by_group.map do |group_name, awareded_points|
           max_points = available_points[group_name] || 0
-          stupid_name = "osa#{group_name.tr('^0-9', '')}"
+          stupid_name = "osa#{group_name.tr('^0-9', '').rjust(2, "0")}"
           {
             group: stupid_name,
             n_points: awareded_points,
