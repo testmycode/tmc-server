@@ -4,12 +4,14 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
-  <p>Hey there!</p>
+  <p>Welcome to the course!</p>
 
-  <p>Please click the following link to confirm that this is your email address for the mooc.fi account <%= @user.login %>.<%= @origin ? " The account was created from '#{@origin}'." : '' %> </p>
+  <p>Please click the following link to confirm that this is your email address for the mooc.fi account <%= @user.email %>.<%= @origin ? " The account was created from '#{@origin}'." : '' %> </p>
 
   <a href="<%= @url %>"><%= @url %></a>
 
-  <p>If this email doesn't make any sense, just ignore this message.</p>
+  <p>Best regards,<br />
+MOOC team<br />
+University of Helsinki</p>
 </body>
 </html>
