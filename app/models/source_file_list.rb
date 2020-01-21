@@ -121,7 +121,7 @@ class SourceFileList
       dir = file.parent.to_s
       name = file.basename.to_s
       name.end_with?('.java', '.jsp') ||
-        (name.end_with?('.xml') && name != 'build.xml' && name != 'pom.xml' && !name.end_with?('checkstyle.xml')) ||
+        (name.end_with?('.xml') && name != 'build.xml' && name != 'pom.xml' && name != 'nbactions.xml' && !name.end_with?('checkstyle.xml')) ||
         name.end_with?('.properties') ||
         name.end_with?('.txt') ||
         name.end_with?('.html') ||
