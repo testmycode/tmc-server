@@ -26,7 +26,7 @@ module Api
               end
               available_model_solution_tokens = total_model_solution_tokens - tokens_used
               if available_model_solution_tokens > 0
-                ModelSolutionTokenUsed.create!(user: current_user, course: course, exercise_name: exercise.name)
+                ModelSolutionTokenUsed.create!(user: current_user, course: course, exercise_name: exercise.name, cost: exercise.available_points.count)
               else
                 raise CanCan::AccessDenied
               end
