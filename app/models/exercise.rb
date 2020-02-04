@@ -17,6 +17,7 @@ class Exercise < ActiveRecord::Base
     property :publish_time, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
     property :solution_visible_after, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
     property :deadline, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
+    property :soft_deadline, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
     property :disabled, type: :boolean, example: false
     property :available_points, type: :array do
       items do

@@ -70,6 +70,7 @@ module Api
               publish_time: ex.publish_time,
               solution_visible_after: ex.solution_visible_after,
               deadline: ex.deadline_for(current_user),
+              soft_deadline: ex.soft_deadline_for(current_user),
               disabled: ex.disabled?,
               unlocked: exercises.include?(ex.id)
             }
