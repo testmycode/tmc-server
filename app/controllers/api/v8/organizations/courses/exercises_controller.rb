@@ -92,6 +92,13 @@ module Api
 
             total_model_solution_tokens = 0
             grant_model_solution_token_every_nth_completed_exercise = course.grant_model_solution_token_every_nth_completed_exercise
+            begin
+              authorize! :read, ex
+            rescue CanCan::AccessDenied
+              # If the exercise is not accessible, the user most likely has
+              # a wrong course in the course settigns
+              grant_model_solution_token_every_nth_completed_exercise = nil
+            end
             if grant_model_solution_token_every_nth_completed_exercise && grant_model_solution_token_every_nth_completed_exercise > 0
               completed_exercises_count = course.submissions.where(all_tests_passed: true, user: current_user).distinct.select(:exercise_name).count
               total_model_solution_tokens = completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise + (course.initial_coin_stash || 0)
