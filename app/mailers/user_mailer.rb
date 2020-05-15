@@ -15,6 +15,8 @@ class UserMailer < ActionMailer::Base
     subject = 'Palun kinnita oma e-posti aadress' if language == "ee"
     subject = 'Bekreft email adressen din' if language == "no"
     subject = 'Apstipriniet savu e-pasta adresi, lai sāktu darbu ar AI' if language == "lv"
+    subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr"
+    subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr-be"
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
