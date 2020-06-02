@@ -108,6 +108,9 @@ TmcServer::Application.routes.draw do
 
       resources :exercises, only: [] do
         resources :model_solutions, only: [:index], module: :exercises
+        resources :users, module: :exercises, only: [] do
+          resources :submissions, module: :users, only: :index
+        end
       end
 
       namespace :core, defaults: { format: 'json' } do
