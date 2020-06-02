@@ -154,6 +154,7 @@ module Api
         Api::V8::Courses::Submissions::LastHourController,
         Api::V8::Courses::Users::PointsController,
         Api::V8::Courses::Users::SubmissionsController,
+        Api::V8::Exercises::Users::SubmissionsController,
         Api::V8::OrganizationsController,
         Api::V8::Organizations::CoursesController,
         Api::V8::Organizations::Courses::PointsController,
