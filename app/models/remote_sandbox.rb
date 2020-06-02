@@ -62,9 +62,12 @@ class RemoteSandbox
         # While Timeout::timeout is considered dangerous, this is still necessary because if this happens to block it will bring the whole server down.
         Timeout.timeout(10) do
           # The timeout is only for open_timeout and read_timeout
-          RestClient::Request.execute(method: :post, url: post_url, timeout: 5, payload: {
-                                        file: tar_file, notify: notify_url, token: submission.secret_token
-                                      })
+          payload = {
+            file: tar_file, notify: notify_url, token: submission.secret_token
+          }
+          payload[:docker_image] = exercise.docker_image if exercise.docker_image
+
+          RestClient::Request.execute(method: :post, url: post_url, timeout: 5, payload: payload)
         end
         submission.sandbox = post_url
         submission.save!

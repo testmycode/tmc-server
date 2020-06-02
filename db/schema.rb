@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200115143302) do
+ActiveRecord::Schema.define(version: 20200602112646) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -155,6 +155,7 @@ ActiveRecord::Schema.define(version: 20200115143302) do
     t.text     "soft_deadline_spec"
     t.integer  "disabled_status",                  default: 0
     t.boolean  "hide_submission_results",          default: false
+    t.string   "docker_image"
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree

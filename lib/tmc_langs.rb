@@ -21,11 +21,11 @@ class TmcLangs < MavenProject
   end
 
   def package_path
-    path + 'tmc-langs-cli/target' + package_file_name
+    path + 'target' + package_file_name
   end
 
   def jar_path
-    path + 'tmc-langs-cli/target' + package_file_name
+    path + 'target' + package_file_name
   end
 
   def find_exercise_dirs(path)
