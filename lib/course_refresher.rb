@@ -166,11 +166,12 @@ class CourseRefresher
       def copy_and_update_repository
         FileUtils.cp_r("#{@old_cache_path}/clone", @course.clone_path.to_s)
         Dir.chdir(@course.clone_path) do
-          sh!('git', 'remote', 'set-url', 'origin', @course.source_url)
-          sh!('git', 'fetch', 'origin')
-          sh!('git', 'checkout', 'origin/' + @course.git_branch)
-          sh!('git', 'clean', '-df')
-          sh!('git', 'checkout', '.')
+          # TODO if a command fails, abort
+          sh!('git', '-C', @course.clone_path, 'remote', 'set-url', 'origin', @course.source_url)
+          sh!('git', '-C', @course.clone_path, 'fetch', 'origin')
+          sh!('git', '-C', @course.clone_path, 'checkout', 'origin/' + @course.git_branch)
+          sh!('git', '-C', @course.clone_path, 'clean', '-df')
+          sh!('git', '-C', @course.clone_path, 'checkout', '.')
         end
       end
 
