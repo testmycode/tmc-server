@@ -12,27 +12,28 @@ class KafkaBatchUpdatePointsTask
   def run
     return unless @kafka_bridge_url && @kafka_bridge_secret && @service_id
     KafkaBatchUpdatePoints.all.each do |task|
+      user = task.user_id.persent? ? User.find(task.user_id) : nil
       course = task.course
-      Rails.logger.info("Batch publishing points for course #{course.name} with moocfi id: #{course.moocfi_id}.")
+      Rails.logger.info("Batch publishing points for #{user.present? ? "user #{user.id}" : "course #{course.name}"} with moocfi id: #{course.moocfi_id}.")
       if !course.moocfi_id
         Rails.logger.error 'Cannot publish points because moocfi id is not specified'
         next
       end
       parts = course.gdocs_sheets
-      points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts)
-      Rails.logger.info("Found points for #{points_per_user.keys.length} users")
+      points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts, user)
+      Rails.logger.info("Found points for #{points_per_user.keys.length} users") unless user
       available_points = AvailablePoint.course_sheet_points(course, parts)
       points_per_user.each do |username, points_by_group|
-        user = User.find_by(login: username)
-        Rails.logger.info("Publishing points for user #{user.id}")
-        progress = points_by_group.map do |group_name, awareded_points|
+        user = User.find_by(login: username) unless user
+        Rails.logger.info("Publishing points for user #{user.id}") unless user
+        progress = points_by_group.map do |group_name, awarded_points|
           max_points = available_points[group_name] || 0
           stupid_name = "osa#{group_name.tr('^0-9', '').rjust(2, "0")}"
           {
             group: stupid_name,
-            n_points: awareded_points,
+            n_points: awarded_points,
             max_points: max_points,
-            progress: (awareded_points / max_points.to_f).floor(2)
+            progress: (awarded_points / max_points.to_f).floor(2)
           }
         end
         message = {
@@ -43,10 +44,10 @@ class KafkaBatchUpdatePointsTask
           progress: progress,
           message_format_version: 1
         }
-        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-progress', payload: message }.to_json, { content_type: :json, authorization: "Basic #{@kafka_bridge_secret}" })
+        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-progress', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
       end
       task.destroy!
-      Rails.logger.info "Batch publish finished for #{course.name}"
+      Rails.logger.info "Batch publish finished for #{user.present? ? "user #{user.id}" : "course #{course.name}"}"
     end
   end
 

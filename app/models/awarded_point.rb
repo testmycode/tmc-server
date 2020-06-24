@@ -51,6 +51,9 @@ class AwardedPoint < ActiveRecord::Base
   belongs_to :user
   belongs_to :submission
 
+  after_save :kafka_update_points
+  after_destroy :kafka_update_points
+
   def self.exercise_user_points(exercise, user)
     return none if exercise.hide_submission_results
     where(course_id: exercise.course_id, user_id: user.id)
@@ -225,4 +228,10 @@ class AwardedPoint < ActiveRecord::Base
     q = q.where(exercises[:hide_submission_results].eq(false).or(exercises[:id].eq(nil))) unless hidden
     q
   end
+
+  private
+
+    def kafka_update_points
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id)
+    end
 end
