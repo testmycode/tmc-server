@@ -12,7 +12,7 @@ class KafkaBatchUpdatePointsTask
   def run
     return unless @kafka_bridge_url && @kafka_bridge_secret && @service_id
     KafkaBatchUpdatePoints.all.each do |task|
-      user = task.user_id.persent? ? User.find(task.user_id) : nil
+      user = task.user_id.present? ? User.find(task.user_id) : nil
       course = task.course
       Rails.logger.info("Batch publishing points for #{user.present? ? "user #{user.id}" : "course #{course.name}"} with moocfi id: #{course.moocfi_id}.")
       if !course.moocfi_id
