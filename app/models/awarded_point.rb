@@ -232,6 +232,7 @@ class AwardedPoint < ActiveRecord::Base
   private
 
     def kafka_update_points
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id)
+      course = Course.find(self.course_id)
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id) if course.moocfi_id
     end
 end
