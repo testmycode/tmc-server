@@ -17,6 +17,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Apstipriniet savu e-pasta adresi, lai sāktu darbu ar AI' if language == "lv"
     subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr"
     subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr-be"
+    subject = 'Hagyd jóvá az email-címed az Elements of AI/Az MI alapjai -kurzus megkezdéséhez' if language == "hu"
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
