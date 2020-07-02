@@ -126,6 +126,14 @@ class Exercise < ActiveRecord::Base
     parts.join('-')
   end
 
+  def part
+    begin
+      return exercise.group_name.tr('^0-9', '').to_i
+    rescue => ex
+      return 0
+    end
+  end
+
   def belongs_to_exercise_group?(group)
     group.course.id == course_id && (exercise_group_name + '-').start_with?(group.name + '-')
   end

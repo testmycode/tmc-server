@@ -123,6 +123,7 @@ class CourseRefresher
           measure_and_log :make_zips_of_solutions                 unless options[:no_directory_changes]
           measure_and_log :set_permissions                        unless options[:no_directory_changes]
           measure_and_log :invalidate_unlocks
+          measure_and_log :kafka_publish_exercises
 
           @course.course_template.save!
           @course.refreshed_at = Time.now
@@ -471,6 +472,10 @@ class CourseRefresher
 
       def seed_maven_cache
         MavenCacheSeeder.start(@course.clone_path, RemoteSandbox.all)
+      end
+
+      def kafka_publish_exercises
+        KafkaBatchUpdatePoints.create!(course_id: @course_id, task_type: 'exercises') if @course.moocfi_id
       end
     end
 end
