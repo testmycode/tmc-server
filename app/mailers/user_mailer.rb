@@ -11,12 +11,11 @@ class UserMailer < ActionMailer::Base
     subject = 'Confirm your mooc.fi account email address'
     subject = 'Varmista mooc.fi tunnuksesi sähköpostiosoite' if language == "fi"
     subject = 'Bekräfta e-postadressen till ditt mooc.fi-konto' if language == "se"
-    subject = 'Bestätige deine E-Mail-Adresse, um mit dem Kurs zu beginnen' if language == "de"
+    subject = 'Bestätige deine E-Mail-Adresse, um mit dem Kurs zu beginnen' if language == "de" || "de-at"
     subject = 'Palun kinnita oma e-posti aadress' if language == "ee"
     subject = 'Bekreft email adressen din' if language == "no"
     subject = 'Apstipriniet savu e-pasta adresi, lai sāktu darbu ar AI' if language == "lv"
-    subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr"
-    subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr-be"
+    subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr" || "fr-be"
     subject = 'Hagyd jóvá az email-címed az Elements of AI/Az MI alapjai -kurzus megkezdéséhez' if language == "hu"
     subject = "#{origin}: #{subject}" if origin
     if origin
