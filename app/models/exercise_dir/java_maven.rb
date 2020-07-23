@@ -30,7 +30,7 @@ class ExerciseDir
     end
 
     def safe_for_experimental_sandbox
-      TmcProjectFile.for_project(@path).force_new_sandbox
+      true
     end
   end
 end
