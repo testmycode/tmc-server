@@ -215,7 +215,8 @@ class Exercise < ActiveRecord::Base
         published? &&
         !disabled? &&
         (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user)) &&
-        !hide_submission_results
+        !hide_submission_results &&
+        !course.hide_submission_results
       )
   end
 
