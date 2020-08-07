@@ -62,10 +62,11 @@ module Api
           end
 
           presentable = all_exercises.map do |ex|
+            points_visible = ex.points_visible_to?(current_user)
             {
               id: ex.id,
-              available_points: ex.available_points,
-              awarded_points: ex.points_for(current_user),
+              available_points: points_visible ? ex.available_points : [],
+              awarded_points: points_visible ? ex.points_for(current_user) : [],
               name: ex.name,
               publish_time: ex.publish_time,
               solution_visible_after: ex.solution_visible_after,

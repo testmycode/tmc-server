@@ -44,8 +44,10 @@ module Api
             elsif @submission.processing_tried_at
               sandbox_status = :sending_to_sandbox
             end
+            status = :processing
+            status = :hidden unless @submission.can_see_results?(current_user)
             return render json: {
-              status: :processing,
+              status: status,
               sandbox_status: sandbox_status
             }
           end
