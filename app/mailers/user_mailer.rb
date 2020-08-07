@@ -8,7 +8,7 @@ class UserMailer < ActionMailer::Base
     @user = user
     token = user.verification_tokens.email.create!
     @url = base_url + confirm_email_path(@user.id, token.token, language: language)
-    subject = 'Confirm your mooc.fi account email address'
+    subject = 'Confirm your mooc.fi account email address' if language == "en"
     subject = 'Varmista mooc.fi tunnuksesi sähköpostiosoite' if language == "fi"
     subject = 'Bekräfta e-postadressen till ditt mooc.fi-konto' if language == "se"
     subject = 'Bestätige deine E-Mail-Adresse, um mit dem Kurs zu beginnen' if language == "de" || "de-at"
