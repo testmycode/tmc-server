@@ -475,7 +475,7 @@ class CourseRefresher
       end
 
       def kafka_publish_exercises
-        KafkaBatchUpdatePoints.create!(course_id: @course_id, task_type: 'exercises') if @course.moocfi_id
+        KafkaBatchUpdatePoints.create!(course_id: @course.id, task_type: 'exercises') if @course.moocfi_id
       end
     end
 end
