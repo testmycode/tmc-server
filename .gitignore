@@ -20,6 +20,7 @@
 .DS_Store
 
 /vendor/bundle
+/vendor/tmc-langs-rust
 
 # Eclipse
 /.project
