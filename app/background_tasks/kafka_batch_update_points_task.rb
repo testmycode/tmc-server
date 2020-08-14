@@ -11,7 +11,6 @@ class KafkaBatchUpdatePointsTask
 
   def run
     return unless @kafka_bridge_url && @kafka_bridge_secret && @service_id
-    return if @kafka_bridge_url.empty? || @kafka_bridge_secret.empty? || @service_id.empty?
     KafkaBatchUpdatePoints.all.each do |task|
       finished_successfully = false
       type = task_type(task)
