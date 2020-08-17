@@ -11,7 +11,7 @@ module RustLangsCliExecutor
     Rails.logger.info command_output
 
     Dir.mkdir('rust-testing')
-    FileUtils.cp(output_path, 'rust-testing/submission.tar')
+    FileUtils.cp(submission_path, 'rust-testing/submission.zip')
 
     result = self.process_command_output(command_output)
 
