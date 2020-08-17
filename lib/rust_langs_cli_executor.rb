@@ -6,6 +6,7 @@ require 'fileutils'
 
 module RustLangsCliExecutor
   def self.prepare_submission(clone_path, output_path, submission_path)
+    `RUST_LOG=debug`
     command = "vendor/tmc-langs-rust/current prepare-submission --clone-path #{clone_path} --output-path #{output_path} --submission-path #{submission_path}"
     command_output = `#{command}`
     Rails.logger.info command_output
@@ -13,7 +14,7 @@ module RustLangsCliExecutor
     result = self.process_command_output(command_output)
 
     if result['result'] == 'error'
-      Rails.logger.info 'Preparing submission failed: ' + result
+      Rails.logger.info 'Preparing submission failed: ' + result.to_s
     end
 
     result
