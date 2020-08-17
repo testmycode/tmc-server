@@ -6,7 +6,7 @@ require 'fileutils'
 
 module RustLangsCliExecutor
   def self.prepare_submission(clone_path, output_path, submission_path)
-    `RUST_LOG=debug`
+    ENV['RUST_LOG']='debug'
     command = "vendor/tmc-langs-rust/current prepare-submission --clone-path #{clone_path} --output-path #{output_path} --submission-path #{submission_path}"
     command_output = `#{command}`
     Rails.logger.info command_output
