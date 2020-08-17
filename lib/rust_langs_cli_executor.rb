@@ -10,6 +10,9 @@ module RustLangsCliExecutor
     command_output = `#{command}`
     Rails.logger.info command_output
 
+    Dir.mkdir('rust-testing')
+    FileUtils.cp(output_path, 'rust-testing/submission.tar')
+
     result = self.process_command_output(command_output)
 
     if result['result'] == 'error'
