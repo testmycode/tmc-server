@@ -11,6 +11,7 @@ class KafkaBatchUpdatePointsTask
 
   def run
     return unless @kafka_bridge_url && @kafka_bridge_secret && @service_id
+    return if @kafka_bridge_url.empty? || @kafka_bridge_secret.empty? || @service_id.empty?
     KafkaBatchUpdatePoints.all.each do |task|
       finished_successfully = false
       type = task_type(task)
@@ -42,7 +43,7 @@ class KafkaBatchUpdatePointsTask
     def update_progress(task)
       finished_successfully = false
       user = task.user_id.present? ? User.find(task.user_id) : nil
-      course = task.course
+      course = Course.find(task.course_id)
       Rails.logger.info("Batch publishing progress for #{user.present? ? "user #{user.id}" : "course #{course.name}"} with moocfi id: #{course.moocfi_id}.")
       if !course.moocfi_id
         Rails.logger.error 'Cannot publish progress because moocfi id is not specified'
@@ -84,7 +85,7 @@ class KafkaBatchUpdatePointsTask
 
     def update_user_points(task)
       finished_successfully = false
-      course = task.course
+      course = Course.find(task.course_id)
       user = User.find(task.user_id)
       Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
       if !course.moocfi_id
@@ -113,7 +114,7 @@ class KafkaBatchUpdatePointsTask
 
     def update_exercises(task)
       finished_successfully = false
-      course = task.course
+      course = Course.find(task.course_id)
       Rails.logger.info("Batch publishing exercises for course #{course.name} with moocfi id: #{course.moocfi_id}.")
       if !course.moocfi_id
         Rails.logger.error 'Cannot publish points because moocfi id is not specified'
