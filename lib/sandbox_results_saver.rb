@@ -82,12 +82,12 @@ module SandboxResultsSaver
           results['stderr'] = ''
           if test_output['logs'].key? 'stdout'
             stdout = test_output['logs']['stdout']
-            stdout = stdout.pack('c*').force_encoding('utf-8') if is_byte_array?(stdout)
+            stdout = stdout.pack('c*').force_encoding('utf-8') if stdout.is_a?(Array)
             results['stdout'] = test_output['logs']['stdout'] = stdout
           end
           if test_output['logs'].key? 'stderr'
             stderr = test_output['logs']['stderr']
-            stderr = stderr.pack('c*').force_encoding('utf-8') if is_byte_array?(stderr)
+            stderr = stderr.pack('c*').force_encoding('utf-8') if stderr.is_a?(Array)
             results['stderr'] = test_output['logs']['stderr'] = stderr
           end
           test_output['stdout'] = results['stdout']
@@ -101,7 +101,7 @@ module SandboxResultsSaver
           results['exit_code'] = '101'
           results['test_output'] = test_output['logs'].map do |k, v|
             value = v
-            value = value.pack('c*').force_encoding('utf-8') if is_byte_array?(value)
+            value = value.pack('c*').force_encoding('utf-8') if value.is_a?(Array)
             "#{k}: #{value}"
           end.join("\n")
         when 'TESTS_FAILED', 'PASSED'
@@ -153,9 +153,5 @@ module SandboxResultsSaver
           'Unknown error while running tests.'
         end
       end
-    end
-
-    def self.is_byte_array?(arr)
-      arr.is_a?(Array) && arr.first.is_a?(Integer)
     end
 end
