@@ -17,14 +17,6 @@ class UserMailer < ActionMailer::Base
     subject = 'Apstipriniet savu e-pasta adresi, lai sāktu darbu ar AI' if language == "lv"
     subject = 'Confirmez votre adresse électronique pour commencer avec les éléments de l&#39;IA.' if language == "fr" || language == "fr-be"
     subject = 'Hagyd jóvá az email-címed az Elements of AI/Az MI alapjai -kurzus megkezdéséhez' if language == "hu"
-    subject = 'Potvrdenie e-mailovej adresy pred začiatkom kurzu Prvky umelej inteligencie' if language == "sk"
-    subject = 'Confirmați adresa dumneavoastră de e-mail pentru a începe cursul „Elemente de IA”.' if language == "ro"
-    subject = 'Ikkonferma l-indirizz elettroniku tiegħek għall-kors Elementi tal-IA' if language == "mt"
-    subject = 'Aby rozpocząć kurs „Podstawy sztucznej inteligencji” potwierdź Twój adres e-mail.' if language == "pl"
-    subject = 'Confirme o seu endereço eletrónico para iniciar o curso «Elementos de IA»' if language == "pt"
-    subject = 'Confirma tu dirección de correo electrónico para empezar a trabajar con Elementos de la IA' if language = "es"
-    subject = 'Deimhnigh do sheoladh ríomhphoist chun tús a chur leis an gcúrsa Elements of AI' if language == "ga"
-    subject = 'Bevestig je e-mailadres om te beginnen aan Elementen van KI' if language == "nl"
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
