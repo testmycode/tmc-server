@@ -69,7 +69,7 @@ class SubmissionPackager
           end
           stub = Pathname(find_received_project_root(Pathname('stub')))
 
-          copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run], include_tmc_langs: include_tmc_langs)
+          copy_files(exercise, received, dest, stub, no_tmc_run: config[:no_tmc_run], include_tmc_langs: include_tmc_langs )
         else
           copy_files(exercise, received, dest, nil, no_tmc_run: config[:no_tmc_run], include_tmc_langs: include_tmc_langs)
         end
@@ -85,16 +85,12 @@ class SubmissionPackager
       zip_path = "#{tmpdir}/submission.zip"
       return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
       File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
-      RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, return_zip_path, zip_path, submission.params,
-                                              tests_from_stub: submission.exercise.stub_zip_file_path,
-                                              format: :zip,
-                                              toplevel_dir_name: toplevel_dir_name) if exercise.docker_image
       package_submission(exercise, zip_path, return_zip_path, submission.params,
                          tests_from_stub: true,
                          include_ide_files: true,
                          format: :zip,
                          toplevel_dir_name: toplevel_dir_name,
-                         no_tmc_run: true) unless exercise.docker_image
+                         no_tmc_run: true)
       File.read(return_zip_path)
     end
   end
