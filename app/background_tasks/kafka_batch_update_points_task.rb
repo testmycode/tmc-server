@@ -131,7 +131,7 @@ class KafkaBatchUpdatePointsTask
           section: 0,
           max_points: max_points
         }
-        data.push(exerciseData)
+        exerciseData
       end
       message = {
         timestamp: Time.zone.now.iso8601,
