@@ -54,9 +54,10 @@ class KafkaBatchUpdatePointsTask
       Rails.logger.info("Found points for #{points_per_user.keys.length} users") unless user
       available_points = AvailablePoint.course_sheet_points(course, parts)
       points_per_user.each do |username, points_by_group|
+        current_user = user
         if !user
-          user = User.find_by(login: username)
-          Rails.logger.info("Publishing points for user #{user.id}")
+          current_user = User.find_by(login: username)
+          Rails.logger.info("Publishing points for user #{current_user.id}")
         end
         progress = points_by_group.map do |group_name, awarded_points|
           max_points = available_points[group_name] || 0
@@ -70,7 +71,7 @@ class KafkaBatchUpdatePointsTask
         end
         message = {
           timestamp: Time.zone.now.iso8601,
-          user_id: user.id,
+          user_id: current_user.id,
           course_id: course.moocfi_id,
           service_id: @service_id,
           progress: progress,
