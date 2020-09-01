@@ -98,7 +98,7 @@ class KafkaBatchUpdatePointsTask
       completed = exercise.completed_by?(user)
       message = {
         timestamp: Time.zone.now.iso8601,
-        exercise_id: exercise.id,
+        exercise_id: exercise.id.to_s,
         n_points: awarded_points.length,
         completed: completed,
         user_id: user.id,
@@ -127,7 +127,7 @@ class KafkaBatchUpdatePointsTask
         part = exercise.part
         exerciseData = {
           name: exercise.name,
-          id: exercise.id,
+          id: exercise.id.to_s,
           part: part,
           section: 0,
           max_points: max_points
