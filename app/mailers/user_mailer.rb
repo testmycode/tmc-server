@@ -30,6 +30,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Jei norite pradėti kursą „Dirbtinio intelekto pradmenys“, patvirtinkite savo e. pašto adresą.' if language == "lt"
     subject = 'Επιβεβαιώστε την ηλεκτρονική σας διεύθυνση για να ξεκινήσετε τον κύκλο μαθημάτων «Στοιχεία τεχνητής νοημοσύνης».' if language == "el"
     subject = 'Потвърдете своя имейл, за да започнете курса „Елементи на ИИ“.' if language == "bg"
+    subject = 'Conferma il tuo indirizzo e-mail per cominciare il corso Elementi di IA' if language == "it"
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
