@@ -22,7 +22,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Ikkonferma l-indirizz elettroniku tiegħek għall-kors Elementi tal-IA' if language == "mt"
     subject = 'Aby rozpocząć kurs „Podstawy sztucznej inteligencji” potwierdź Twój adres e-mail.' if language == "pl"
     subject = 'Confirme o seu endereço eletrónico para iniciar o curso «Elementos de IA»' if language == "pt"
-    subject = 'Confirma tu dirección de correo electrónico para empezar a trabajar con Elementos de la IA' if language = "es"
+    subject = 'Confirma tu dirección de correo electrónico para empezar a trabajar con Elementos de la IA' if language == "es"
     subject = 'Deimhnigh do sheoladh ríomhphoist chun tús a chur leis an gcúrsa Elements of AI' if language == "ga"
     subject = 'Bevestig je e-mailadres om te beginnen aan Elementen van KI' if language == "nl"
     subject = 'Da biste započeli s tečajem Elementi umjetne inteligencije, potvrdite svoju e-adresu.' if language == "hr"
