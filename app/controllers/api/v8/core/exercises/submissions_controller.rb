@@ -41,7 +41,7 @@ module Api
               return respond_with_error("You need to update your client. You can do that by selecting 'Help' -> 'Check for updates' and then following instructions.", 404, nil, obsolete_client: true)
             end
 
-            if params[:client] == 'vscode_plugin' && params[:client_version] == '0.0.0' && !params[:paste].nil?
+            if params[:client] == 'vscode_plugin' && params[:client_version] == '0.0.0'
               authorization_skip!
               return respond_with_error("You need to update your client.", 404, nil, obsolete_client: true)
             end
