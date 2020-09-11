@@ -121,7 +121,7 @@ class KafkaBatchUpdatePointsTask
         Rails.logger.error 'Cannot publish points because moocfi id is not specified'
         return finished_successfully
       end
-      exercises = Exercise.where(course_id: course.id)
+      exercises = Exercise.where(course_id: course.id).where(disabled_status: 0)
       data = exercises.map do |exercise|
         max_points = AvailablePoint.where(exercise_id: exercise.id).count
         part = exercise.part
