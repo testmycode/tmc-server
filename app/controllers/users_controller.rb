@@ -10,7 +10,7 @@ class UsersController < ApplicationController
 
   def index
     raise CanCan::AccessDenied if current_user.guest?
-    respond_access_denied unless current_user.administrator?
+    respond_forbidden unless current_user.administrator?
     @users = User.search(params[:search])
   end
 

@@ -51,7 +51,7 @@ class OrganizationsController < ApplicationController
   end
 
   def all_courses
-    return respond_access_denied('Submissions for this exercise are no longer accepted.') unless current_user.administrator?
+    return respond_forbidden('Submissions for this exercise are no longer accepted.') unless current_user.administrator?
     add_organization_breadcrumb
     add_breadcrumb 'All Courses'
     ordering = 'hidden, disabled_status, LOWER(courses.title)'

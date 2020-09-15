@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
     if current_user.guest?
       redirect_to(login_path(return_to: return_to_link))
     else
-      respond_access_denied
+      respond_forbidden
     end
   end
 
@@ -147,7 +147,11 @@ class ApplicationController < ActionController::Base
       respond_with_error(msg, 404)
     end
 
-    def respond_access_denied(msg = 'Access denied')
+    def respond_forbidden(msg = 'Forbidden')
+      respond_with_error(msg, 403)
+    end
+
+    def respond_unauthorized(msg = 'Authentication required')
       respond_with_error(msg, 401)
     end
 
@@ -160,13 +164,14 @@ class ApplicationController < ActionController::Base
                  status: code
         end
         format.json do
-          if code == 401
+          if code == 401 || code == 403
             # To support older TmcNetBeans versions using faulty http basic auth
             if client_supports_http_basic_auth?
               response.headers['WWW-Authenticate'] = "Basic realm=\"#{msg}\""
               render json: { error: msg }.merge(extra_json_keys), status: code
             else
-              render json: { error: msg }.merge(extra_json_keys), status: :forbidden
+              render json: { error: msg }.merge(extra_json_keys), status: :forbidden if code == 403
+              render json: { error: msg }.merge(extra_json_keys), status: :unauthorized if code == 401
             end
           else
             render json: { error: msg }.merge(extra_json_keys), status: code

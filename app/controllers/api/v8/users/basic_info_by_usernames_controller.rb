@@ -59,7 +59,7 @@ module Api
         skip_authorization_check
 
         def create
-          return respond_access_denied unless current_user.administrator?
+          return respond_forbidden unless current_user.administrator?
           users = if params[:extra_fields]
             User.eager_load(:user_field_values).where(login: params[:usernames])
           else

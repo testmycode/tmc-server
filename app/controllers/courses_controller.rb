@@ -22,7 +22,7 @@ class CoursesController < ApplicationController
         courses = @organization.courses.ongoing.order(ordering)
         courses = courses.select { |c| c.visible_to?(current_user) }
         authorize! :read, courses
-        return respond_access_denied('Authentication required') if current_user.guest?
+        return respond_unauthorized('Authentication required') if current_user.guest?
         opts = { include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions] }
 
         data = {
@@ -48,7 +48,7 @@ class CoursesController < ApplicationController
         add_course_breadcrumb
       end
       format.json do
-        return respond_access_denied('Authentication required') if current_user.guest?
+        return respond_unauthorized('Authentication required') if current_user.guest?
         opts = { include_points: !!params[:show_points], include_unlock_conditions: !!params[:show_unlock_conditions] }
         data = {
           api_version: ApiVersion::API_VERSION,
@@ -63,7 +63,7 @@ class CoursesController < ApplicationController
   def show_json
     course = [Course.find(params[:id])]
     authorize! :read, course
-    return respond_access_denied('Authentication required') if current_user.guest?
+    return respond_unauthorized('Authentication required') if current_user.guest?
 
     data = {
       api_version: ApiVersion::API_VERSION,

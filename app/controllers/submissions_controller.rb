@@ -21,7 +21,7 @@ class SubmissionsController < ApplicationController
         end
       end
       format.html do # uses AJAX
-        respond_access_denied if !current_user.administrator? && @course.hide_submissions?
+        respond_forbidden if !current_user.administrator? && @course.hide_submissions?
         @organization = @course.organization
         add_course_breadcrumb
         add_breadcrumb 'All submissions'
@@ -42,11 +42,11 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        respond_access_denied if !current_user.administrator? && @course.hide_submissions?
+        respond_forbidden if !current_user.administrator? && @course.hide_submissions?
         @files = SourceFileList.for_submission(@submission)
       end
       format.zip do
-        respond_access_denied if !current_user.administrator? && @course.hide_submissions?
+        respond_forbidden if !current_user.administrator? && @course.hide_submissions?
         send_data(@submission.return_file, filename: "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip")
       end
       format.json do
@@ -113,7 +113,7 @@ class SubmissionsController < ApplicationController
     end
 
     unless @exercise.submittable_by?(current_user)
-      return respond_access_denied('Submissions for this exercise are no longer accepted.')
+      return respond_forbidden('Submissions for this exercise are no longer accepted.')
     end
 
     file_contents = File.read(params[:submission][:file].tempfile.path)
@@ -264,7 +264,7 @@ class SubmissionsController < ApplicationController
         @organization = @course.organization
         authorize! :read, @course
       else
-        respond_access_denied
+        respond_forbidden
       end
     end
 
@@ -273,7 +273,7 @@ class SubmissionsController < ApplicationController
     end
 
     def index_json
-      return respond_access_denied unless current_user.administrator?
+      return respond_forbidden unless current_user.administrator?
 
       submissions = @course.submissions
       if params[:user_id]
@@ -321,27 +321,27 @@ class SubmissionsController < ApplicationController
       paste_visibility = @course.paste_visibility || 'open'
       case paste_visibility
       when 'protected'
-        respond_access_denied unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || paste_visible
+        respond_forbidden unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || paste_visible
       when 'no-tests-public'
-        respond_access_denied unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
+        respond_forbidden unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
       else
         return if can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s
         if @submission.created_at > 2.hours.ago
-          respond_access_denied("You cannot see this paste because all tests passed and you haven't completed this exercise.") unless paste_visible
+          respond_forbidden("You cannot see this paste because all tests passed and you haven't completed this exercise.") unless paste_visible
           return
         else
           unless paste_visible
             if @submission.exercise && !@submission.exercise.completed_by?(current_user)
-              respond_access_denied("You cannot see this paste because you haven't completed this exercise.")
+              respond_forbidden("You cannot see this paste because you haven't completed this exercise.")
               return
             else
-              respond_access_denied("You cannot see this paste because it was created over 2 hours ago.")
+              respond_forbidden("You cannot see this paste because it was created over 2 hours ago.")
             end
             return
           end
         end
 
-        respond_access_denied("You cannot see this paste because all tests passed.") unless paste_visible
+        respond_forbidden("You cannot see this paste because all tests passed.") unless paste_visible
       end
     end
 end

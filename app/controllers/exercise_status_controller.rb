@@ -10,7 +10,7 @@ class ExerciseStatusController < ApplicationController
     course = Course.where(id: course_id).first || Course.where(name: course_id).first
     user = User.where(id: user_id).first || User.where(login: user_id).first
 
-    return respond_access_denied unless course.visible_to?(Guest.new) || current_user.administrator?
+    return respond_forbidden unless course.visible_to?(Guest.new) || current_user.administrator?
 
     user_subs = user.submissions.where(course_id: course.id).to_a.group_by(&:exercise_name)
     user_subs.default = []

@@ -30,7 +30,7 @@ module Api
           skip_authorization_check
 
           def index
-            return respond_access_denied unless current_user.administrator?
+            return respond_forbidden unless current_user.administrator?
             course = Course.find(params[:course_id])
 
             current_time = Time.current

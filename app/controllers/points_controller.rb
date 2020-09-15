@@ -9,7 +9,7 @@ class PointsController < ApplicationController
   def index
     @course = Course.find(params[:course_id])
     authorize! :see_points, @course
-    return respond_access_denied('Authentication required') if current_user.guest?
+    return respond_unauthorized('Authentication required') if current_user.guest?
     add_course_breadcrumb
     add_breadcrumb 'Points'
 

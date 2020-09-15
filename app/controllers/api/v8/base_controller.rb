@@ -12,10 +12,6 @@ module Api
       before_action :authenticate_user!
       skip_before_action :verify_authenticity_token
 
-      rescue_from CanCan::AccessDenied do |e|
-        render json: errors_json(e.message), status: :forbidden
-      end
-
       rescue_from ActiveRecord::RecordNotFound do |e|
         render json: errors_json(e.message), status: :not_found
       end

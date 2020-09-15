@@ -8,7 +8,7 @@ class Setup::OrganizationsController < Setup::SetupController
   end
 
   def new
-    return respond_access_denied('Please log in first to create new organization') unless can? :request, :organization
+    return respond_unauthorized('Please log in first to create new organization') unless can? :request, :organization
     add_breadcrumb 'Create new organization'
     @organization = Organization.new
   end

@@ -58,7 +58,7 @@ module Api
 
             unless @exercise.submittable_by?(current_user)
               authorization_skip!
-              return respond_access_denied('Submissions for this exercise are no longer accepted.')
+              return respond_forbidden('Submissions for this exercise are no longer accepted.')
             end
 
             file_contents = File.read(params[:submission][:file].tempfile.path)

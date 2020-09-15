@@ -59,7 +59,7 @@ module Api
         skip_authorization_check
 
         def create
-          return respond_access_denied unless current_user.administrator?
+          return respond_forbidden unless current_user.administrator?
           users = params[:emails].map do |email|
             User.find_by('lower(email) = ?', email.downcase)
           end.compact
