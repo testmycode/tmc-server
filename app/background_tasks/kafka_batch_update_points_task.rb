@@ -126,7 +126,7 @@ class KafkaBatchUpdatePointsTask
         return finished_successfully
       end
       parts = course.gdocs_sheets
-      points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts, user)
+      points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts)
       Rails.logger.info("Found points for #{points_per_user.keys.length} users")
       exercises = Exercise.where(course_id: course.id)
       points_per_user.each do |username, points_by_group|
