@@ -147,7 +147,6 @@ class KafkaBatchUpdatePointsTask
             message_format_version: 1
           }
           RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-points-2', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
-          Rails.logger.info("Publishing points finished for user #{current_user.id} for exercise #{exercise.id}")
         end
         Rails.logger.info("Publishing points finished for user #{current_user.id}")
       end
