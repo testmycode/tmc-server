@@ -24,7 +24,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Confirme o seu endereço eletrónico para iniciar o curso «Elements of AI»' if language == "pt"
     subject = 'Confirma tu dirección de correo electrónico para empezar a trabajar con Elements of AI' if language == "es"
     subject = 'Deimhnigh do sheoladh ríomhphoist chun tús a chur leis an gcúrsa Elements of AI' if language == "ga"
-    subject = 'Bevestig je e-mailadres om te beginnen aan Elements of AI' if language == "nl"
+    subject = 'Bevestig je e-mailadres om te beginnen aan Elements of AI' if language == "nl" || language == "nl-be"
     subject = 'Da biste započeli s tečajem Elements of AI, potvrdite svoju e-adresu.' if language == "hr"
     subject = 'Potrdite svoj e-naslov za začetek tečaja Elements of AI.' if language == "sl"
     subject = 'Jei norite pradėti kursą „Elements of AI“, patvirtinkite savo e. pašto adresą.' if language == "lt"
