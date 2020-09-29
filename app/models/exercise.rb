@@ -47,6 +47,11 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  swagger_schema :CoreExerciseQueryDetails do
+    property :id, type: :integer, example: 1
+    property :checksum, type: :string, example: 'f25e139769b2688e213938456959eeaf'
+  end
+
   swagger_schema :CoreExerciseDetails do
     key :required, %i[id name locked deadline_description deadline checksum return_url zip_url returnable requires_review attempted
                       completed reviewed all_review_point_given memory_limit runtime_params valgrind_strategy code_review_requests_enabled

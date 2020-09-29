@@ -124,6 +124,9 @@ TmcServer::Application.routes.draw do
           resources :feedback, module: :submissions, only: [:create]
           get 'download', on: :member
         end
+        namespace :exercises, defaults: { format: 'json' } do
+          resource :details, only: [:show]
+        end
         resources :exercises, only: [:show] do
           resources :submissions, module: :exercises, only: [:create]
           resource :solution, module: :exercises, only: [] do
