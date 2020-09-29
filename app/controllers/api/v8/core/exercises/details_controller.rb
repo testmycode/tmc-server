@@ -49,7 +49,7 @@ module Api
               exercise_ids = params[:ids]
               return respond_not_found('Query param ids is empty. Example: ?ids=1,2,3') if !exercise_ids.present? || exercise_ids.empty?
 
-              exercises = Exercise.find(exercise_ids.split(","))
+              exercises = Exercise.where(id: exercise_ids.split(","))
               authorize! :read, exercises
               data = exercises.map do |exercise|
                 {
