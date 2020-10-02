@@ -235,7 +235,7 @@ class AwardedPoint < ActiveRecord::Base
       course = Course.find(self.course_id)
       return unless course.moocfi_id
       submission = Submission.find(self.submission_id)
-      exercise = Exercise.find_by(name: submission.exercise_name)
+      exercise = submission.exercise
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'progress')
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'points')
     end
