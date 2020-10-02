@@ -105,6 +105,7 @@ class KafkaBatchUpdatePointsTask
         exercise_id: exercise.id.to_s,
         n_points: awarded_points.length,
         completed: completed,
+        attempted: true,
         user_id: user.id,
         course_id: course.moocfi_id,
         service_id: @service_id,
@@ -128,18 +129,20 @@ class KafkaBatchUpdatePointsTask
       parts = course.gdocs_sheets
       points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts)
       Rails.logger.info("Found points for #{points_per_user.keys.length} users")
-      exercises = Exercise.where(course_id: course.id)
+      exercises = Exercise.where(course_id: course.id).where(disabled_status: 0)
       points_per_user.each do |username, points_by_group|
         current_user = User.find_by(login: username)
         Rails.logger.info("Publishing points for user #{current_user.id}")
         exercises.map do |exercise|
           awarded_points = exercise.points_for(current_user)
           completed = exercise.completed_by?(current_user)
+          attempted = !exercise.submissions_by(current_user).empty?
           message = {
             timestamp: Time.zone.now.iso8601,
             exercise_id: exercise.id.to_s,
             n_points: awarded_points.length,
             completed: completed,
+            attempted: attempted,
             user_id: current_user.id,
             course_id: course.moocfi_id,
             service_id: @service_id,

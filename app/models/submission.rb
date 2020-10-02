@@ -89,6 +89,9 @@ class Submission < ActiveRecord::Base
   before_create :set_processing_attempts_started_at
   before_create :set_paste_key_if_paste_available
 
+  after_save :kafka_update_progress
+  after_destroy :kafka_update_progress
+
   def processing_time
     if processing_completed_at.nil? || processing_completed_at.nil?
       nil
@@ -394,5 +397,12 @@ class Submission < ActiveRecord::Base
 
     def set_processing_attempts_started_at
       self.processing_attempts_started_at = Time.now
+    end
+
+    def kafka_update_progress
+      return unless self.processed
+      return unless self.course.moocfi_id
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'progress')
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'points')
     end
 end
