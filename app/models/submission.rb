@@ -400,8 +400,7 @@ class Submission < ActiveRecord::Base
     end
 
     def kafka_update_progress
-      return unless self.processed
-      return unless self.course.moocfi_id
+      return unless self.course.moocfi_id && self.processed
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'progress')
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'points')
     end
