@@ -13,7 +13,7 @@ class RemoteSandbox
 
   class SandboxUnavailableError < StandardError; end
 
-  def initialize(baseurl, experimental = false)
+  def initialize(baseurl, experimental = true)
     @baseurl = baseurl
     @baseurl = @baseurl.gsub(/\/+$/, '')
     @experimental = experimental
@@ -21,15 +21,16 @@ class RemoteSandbox
 
   def self.try_to_send_submission_to_free_server(submission, notify_url)
     dir = ExerciseDir.get(submission.exercise.clone_path)
-    servers = if submission.exercise && dir.safe_for_experimental_sandbox
-      if dir.type == 'java_maven'
-        all_experimental.shuffle
-      else
-        all_experimental.shuffle + all.shuffle
-      end
-    else
-      all.shuffle
-    end
+    # servers = if submission.exercise && dir.safe_for_experimental_sandbox
+    #   if dir.type == 'java_maven'
+    #     all_experimental.shuffle
+    #   else
+    #     all_experimental.shuffle + all.shuffle
+    #   end
+    # else
+    #   all.shuffle
+    # end
+    servers = all.shuffle
     for server in servers # could be smarter about this
       begin
         server.send_submission(submission, notify_url)
