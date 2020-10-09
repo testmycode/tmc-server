@@ -14,10 +14,13 @@
         <% end %>
       <% end %>
       <% if current_user.administrator? %>
-        <li>Username: <%= @user.login %> (shown to you beacause you're an admin)</li>
-        <li>Account created: <%= @user.created_at %> (shown to you beacause you're an admin)</li>
+        <li>Username: <%= @user.login %> (shown to you because you're an admin)</li>
+        <li>Account created: <%= @user.created_at %> (shown to you because you're an admin)</li>
       <% end %>
-    </ul>
+      <% if current_user.administrator? && !@user.administrator? %>
+        <li>Password reset link: <%= link_to @password_reset_link, @password_reset_link %> (shown to you because you're an admin)</li>
+      <% end %>
+      </ul>
   </section>
 </div>
 
