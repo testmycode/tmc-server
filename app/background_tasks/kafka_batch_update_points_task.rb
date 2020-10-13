@@ -16,16 +16,16 @@ class KafkaBatchUpdatePointsTask
       finished_successfully = false
       type = task_type(task)
       case type
-      when 'progress'
-        finished_successfully = update_progress(task)
-      when 'points'
-        finished_successfully = update_user_points(task)
+      when 'user_progress'
+        finished_successfully = update_user_progress(task)
+      when 'course_progress'
+        finished_successfully = update_course_progress(task)
       when 'user_points'
         finished_successfully = update_user_points(task)
-      when 'exercises'
-        finished_successfully = update_exercises(task)
       when 'course_points'
         finished_successfully = update_course_points(task)
+      when 'exercises'
+        finished_successfully = update_exercises(task)
       else
         Rails.logger.error("Cannot process task #{task.id} because task.task_type is not defined")
       end
@@ -44,25 +44,57 @@ class KafkaBatchUpdatePointsTask
       'unknown'
     end
 
-    def update_progress(task)
+    def update_user_progress(task)
       finished_successfully = false
-      user = task.user_id.present? ? User.find(task.user_id) : nil
+      user = User.find(task.user_id)
       course = Course.find(task.course_id)
-      Rails.logger.info("Batch publishing progress for #{user.present? ? "user #{user.id}" : "course #{course.name}"} with moocfi id: #{course.moocfi_id}.")
+      Rails.logger.info("Publishing progress for user #{user.id} with moocfi id: #{course.moocfi_id}.")
       if !course.moocfi_id
         Rails.logger.error('Cannot publish progress because moocfi id is not specified')
         return finished_successfully
       end
       parts = course.gdocs_sheets
       points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts, user)
-      Rails.logger.info("Found points for #{points_per_user.keys.length} users") unless user
+      available_points = AvailablePoint.course_sheet_points(course, parts)
+      progress = points_per_user[user.username].map do |group_name, awarded_points|
+        max_points = available_points[group_name] || 0
+        stupid_name = "osa#{group_name.tr('^0-9', '').rjust(2, "0")}"
+        {
+          group: stupid_name,
+          n_points: awarded_points,
+          max_points: max_points,
+          progress: (awarded_points / max_points.to_f).floor(2)
+        }
+      end
+      message = {
+        timestamp: Time.zone.now.iso8601,
+        user_id: user.id,
+        course_id: course.moocfi_id,
+        service_id: @service_id,
+        progress: progress,
+        message_format_version: 1
+      }
+      RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-progress-realtime', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
+      Rails.logger.info("Publishing progress finished for user #{user.id}")
+      finished_successfully = true
+      finished_successfully
+    end
+
+    def update_course_progress(task)
+      finished_successfully = false
+      course = Course.find(task.course_id)
+      Rails.logger.info("Batch publishing progress for course #{course.name} with moocfi id: #{course.moocfi_id}.")
+      if !course.moocfi_id
+        Rails.logger.error('Cannot publish progress because moocfi id is not specified')
+        return finished_successfully
+      end
+      parts = course.gdocs_sheets
+      points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts)
+      Rails.logger.info("Found points for #{points_per_user.keys.length} users")
       available_points = AvailablePoint.course_sheet_points(course, parts)
       points_per_user.each do |username, points_by_group|
-        current_user = user
-        if !user
-          current_user = User.find_by(login: username)
-          Rails.logger.info("Publishing points for user #{current_user.id}")
-        end
+        current_user = User.find_by(login: username)
+        Rails.logger.info("Publishing progress for user #{current_user.id}")
         progress = points_by_group.map do |group_name, awarded_points|
           max_points = available_points[group_name] || 0
           stupid_name = "osa#{group_name.tr('^0-9', '').rjust(2, "0")}"
@@ -82,8 +114,9 @@ class KafkaBatchUpdatePointsTask
           message_format_version: 1
         }
         RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-progress', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
+        Rails.logger.info("Publishing progress finished for user #{current_user.id}")
       end
-      Rails.logger.info("Batch publish finished for #{user.present? ? "user #{user.id}" : "course #{course.name}"}")
+      Rails.logger.info("Batch publishing progress finished for course #{course.name}")
       finished_successfully = true
       finished_successfully
     end
@@ -113,7 +146,7 @@ class KafkaBatchUpdatePointsTask
         message_format_version: 1
       }
       RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-points-realtime', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
-      Rails.logger.info("Batch publishing points finished for user #{user.id}")
+      Rails.logger.info("Publishing points finished for user #{user.id}")
       finished_successfully = true
       finished_successfully
     end
@@ -123,7 +156,7 @@ class KafkaBatchUpdatePointsTask
       course = Course.find(task.course_id)
       Rails.logger.info("Batch publishing points for course #{course.name} with moocfi id: #{course.moocfi_id}")
       if !course.moocfi_id
-        Rails.logger.error('Cannot publish progress because moocfi id is not specified')
+        Rails.logger.error('Cannot publish points because moocfi id is not specified')
         return finished_successfully
       end
       parts = course.gdocs_sheets
@@ -153,7 +186,7 @@ class KafkaBatchUpdatePointsTask
         end
         Rails.logger.info("Publishing points finished for user #{current_user.id}")
       end
-      Rails.logger.info("Batch publishing exercises finished for course #{course.name}")
+      Rails.logger.info("Batch publishing points finished for course #{course.name}")
       finished_successfully = true
       finished_successfully
     end
@@ -163,17 +196,17 @@ class KafkaBatchUpdatePointsTask
       course = Course.find(task.course_id)
       Rails.logger.info("Batch publishing exercises for course #{course.name} with moocfi id: #{course.moocfi_id}.")
       if !course.moocfi_id
-        Rails.logger.error('Cannot publish points because moocfi id is not specified')
+        Rails.logger.error('Cannot publish exercises because moocfi id is not specified')
         return finished_successfully
       end
       exercises = Exercise.where(course_id: course.id).where(disabled_status: 0)
       data = exercises.map do |exercise|
         max_points = AvailablePoint.where(exercise_id: exercise.id).count
-        part = exercise.part
+        stupid_name = "osa#{exercise.gdocs_sheet.tr('^0-9', '').rjust(2, "0")}"
         exerciseData = {
           name: exercise.name,
           id: exercise.id.to_s,
-          part: part,
+          part: stupid_name,
           section: 0,
           max_points: max_points
         }
