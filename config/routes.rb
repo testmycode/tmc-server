@@ -267,6 +267,9 @@ TmcServer::Application.routes.draw do
     collection do
       get 'me', to: 'participants#me'
     end
+    member do
+      get 'password_reset_link', to: 'participants#password_reset_link'
+    end
   end
 
   get '/users/:user_id/verify/:id', to: 'users#confirm_email', as: 'confirm_email'

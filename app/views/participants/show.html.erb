@@ -18,7 +18,7 @@
         <li>Account created: <%= @user.created_at %> (shown to you because you're an admin)</li>
       <% end %>
       <% if current_user.administrator? && !@user.administrator? %>
-        <li>Password reset link: <%= link_to @password_reset_link, @password_reset_link %> (shown to you because you're an admin)</li>
+        <li><%= link_to 'Generate password reset link', password_reset_link_participant_path, class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
       <% end %>
       </ul>
   </section>
