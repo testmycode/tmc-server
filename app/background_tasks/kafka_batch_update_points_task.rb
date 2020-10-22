@@ -14,20 +14,24 @@ class KafkaBatchUpdatePointsTask
     return if @kafka_bridge_url.empty? || @kafka_bridge_secret.empty? || @service_id.empty?
     KafkaBatchUpdatePoints.all.each do |task|
       finished_successfully = false
-      type = task_type(task)
-      case type
-      when 'user_progress'
-        finished_successfully = update_user_progress(task)
-      when 'course_progress'
-        finished_successfully = update_course_progress(task)
-      when 'user_points'
-        finished_successfully = update_user_points(task)
-      when 'course_points'
-        finished_successfully = update_course_points(task)
-      when 'exercises'
-        finished_successfully = update_exercises(task)
-      else
-        Rails.logger.error("Cannot process task #{task.id} because task.task_type is not defined")
+      begin
+        type = task_type(task)
+        case type
+        when 'user_progress'
+          finished_successfully = update_user_progress(task)
+        when 'course_progress'
+          finished_successfully = update_course_progress(task)
+        when 'user_points'
+          finished_successfully = update_user_points(task)
+        when 'course_points'
+          finished_successfully = update_course_points(task)
+        when 'exercises'
+          finished_successfully = update_exercises(task)
+        else
+          Rails.logger.error("Cannot process task #{task.id} because task.task_type is not defined")
+        end
+      rescue => e
+        Rails.logger.error("Task failed: #{e}")
       end
       task.destroy! if finished_successfully
     end
