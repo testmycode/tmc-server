@@ -62,7 +62,7 @@ class KafkaBatchUpdatePointsTask
       available_points = AvailablePoint.course_sheet_points(course, parts)
       unless points_per_user[user.username]
         Rails.logger.info("No points found. Skipping")
-        return
+        return true
       end
       progress = points_per_user[user.username].map do |group_name, awarded_points|
         max_points = available_points[group_name] || 0
