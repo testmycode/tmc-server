@@ -85,6 +85,9 @@ module Api
               return render json: {
                 id: ex.id,
                 available_points: ex.available_points,
+                deadline: ex.deadline_for(current_user),
+                soft_deadline: ex.soft_deadline_for(current_user),
+                expired: ex.expired_for?(current_user),
               }
             end
 
