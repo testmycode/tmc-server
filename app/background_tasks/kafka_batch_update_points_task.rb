@@ -121,7 +121,7 @@ class KafkaBatchUpdatePointsTask
           progress: progress,
           message_format_version: 1
         }
-        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-progress', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
+        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-progress-batch', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
         Rails.logger.info("Publishing progress finished for user #{current_user.id}")
       end
       Rails.logger.info("Batch publishing progress finished for course #{course.name}")
@@ -171,7 +171,7 @@ class KafkaBatchUpdatePointsTask
       points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts)
       Rails.logger.info("Found points for #{points_per_user.keys.length} users")
       exercises = Exercise.where(course_id: course.id).where(disabled_status: 0)
-      points_per_user.each do |username, points_by_group|
+      points_per_user.each do |username, _points_by_group|
         current_user = User.find_by(login: username)
         Rails.logger.info("Publishing points for user #{current_user.id}")
         exercises.map do |exercise|
@@ -190,7 +190,7 @@ class KafkaBatchUpdatePointsTask
             required_actions: [],
             message_format_version: 1
           }
-          RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-points-2', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
+          RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-points-batch', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
         end
         Rails.logger.info("Publishing points finished for user #{current_user.id}")
       end
