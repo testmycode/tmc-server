@@ -401,7 +401,8 @@ class Submission < ActiveRecord::Base
 
     def kafka_update_progress
       return unless self.course.moocfi_id && self.processed
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_progress')
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_points')
+      realtime = self.created_at > 1.hour.ago
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_progress', realtime: realtime)
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_points', realtime: realtime)
     end
 end

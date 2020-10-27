@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200702072243) do
+ActiveRecord::Schema.define(version: 20201027122534) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -194,6 +194,7 @@ ActiveRecord::Schema.define(version: 20200702072243) do
     t.integer  "user_id"
     t.integer  "exercise_id"
     t.string   "task_type",   default: "progress", null: false
+    t.boolean  "realtime",    default: true
   end
 
   add_index "kafka_batch_update_points", ["course_id"], name: "index_kafka_batch_update_points_on_course_id", using: :btree
