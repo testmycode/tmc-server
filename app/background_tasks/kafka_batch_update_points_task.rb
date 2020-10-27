@@ -82,7 +82,7 @@ class KafkaBatchUpdatePointsTask
         progress: progress,
         message_format_version: 1
       }
-      topic = task.realtime ? 'user-course-progress-realtime' : 'user-course-progress'
+      topic = task.realtime ? 'user-course-progress-realtime' : 'user-course-progress-batch'
       RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: topic, payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
       Rails.logger.info("Publishing progress finished for user #{user.id}")
       finished_successfully = true
@@ -154,7 +154,7 @@ class KafkaBatchUpdatePointsTask
         required_actions: [],
         message_format_version: 1
       }
-      topic = task.realtime ? 'user-points-realtime' : 'user-points-2'
+      topic = task.realtime ? 'user-points-realtime' : 'user-points-batch'
       RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: topic, payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}")
       Rails.logger.info("Publishing points finished for user #{user.id}")
       finished_successfully = true
