@@ -13,26 +13,28 @@ describe TestRunGrader do
   end
 
   def half_successful_results
-    [
       {
-        'className' => 'MyTest',
-        'methodName' => 'testSomethingEasy',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1', '1.2']
-      },
-      {
-        'className' => 'MyTest',
-        'methodName' => 'testSomethingDifficult',
-        'status' => 'FAILED',
-        'pointNames' => ['1.2'],
-        'exception' => { 'a' => 'b' }
+        'status' => 'TESTS_FAILED',
+        'testResults' => [
+          {
+            'name' => 'MyTest testSomethingEasy',
+            'successful' => true,
+            'points' => ['1.1', '1.2']
+          },
+          {
+            'name' => 'MyTest testSomethingDifficult',
+            'successful' => false,
+            'points' => ['1.2'],
+            'exception' => { 'a' => 'b' }
+          }
+        ],
       }
-    ]
   end
 
   def successful_results
     results = half_successful_results
-    results[1]['status'] = 'PASSED'
+    results['testResults'][1]['successful'] = true
+    results['status'] = 'PASSED'
     results
   end
 
@@ -52,14 +54,17 @@ describe TestRunGrader do
   end
 
   it 'should not create multiple test case runs for the same test method even if it is involved in multiple points' do
-    results = [
-      {
-        'className' => 'MyTest',
-        'methodName' => 'testSomething',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1', '1.2']
-      }
-    ]
+    results = 
+    {
+      'status' => 'PASSED',
+      'testResults' => [
+        {
+          'name' => 'MyTest testSomething',
+          'successful' => true,
+          'points' => ['1.1', '1.2']
+        }
+      ]
+    }
 
     TestRunGrader.grade_results(@submission, results)
 
@@ -77,7 +82,9 @@ describe TestRunGrader do
     @submission = FactoryGirl.create(:submission, course: @submission.course,
                                                   exercise: @submission.exercise,
                                                   processed: false)
-    TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+    
+    half_successful_results['testResults'].reverse
+    TestRunGrader.grade_results(@submission, half_successful_results)
 
     points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
     expect(points).to include('1.1')
@@ -88,14 +95,17 @@ describe TestRunGrader do
     other_exercise = FactoryGirl.create(:exercise, course_id: @submission.course_id)
     FactoryGirl.create(:available_point, exercise_id: other_exercise.id, name: '1.3')
 
-    results = [
-      {
-        'className' => 'MyTest',
-        'methodName' => 'testSomething',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1', '1.2', '1.3']
-      }
-    ]
+    results = 
+    {
+      'status' => 'PASSED',
+      'testResults' => [
+        {
+          'name' => 'MyTest testSomething',
+          'successful' => true,
+          'points' => ['1.1', '1.2', '1.3']
+        }
+      ]
+    }
 
     TestRunGrader.grade_results(@submission, results)
 
@@ -126,25 +136,27 @@ describe TestRunGrader do
   end
 
   it 'should only ever award more points, never delete old points' do
-    results = [
-      {
-        'className' => 'MyTest',
-        'methodName' => 'one',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1']
-      },
-      {
-        'className' => 'MyTest',
-        'methodName' => 'two',
-        'status' => 'FAILED',
-        'pointNames' => ['1.2']
-      }
-    ]
+    results = 
+    {
+      'status' => 'TESTS_FAILED',
+      'testResults' => [
+        {
+          'name' => 'MyTest one',
+          'successful' => true,
+          'points' => ['1.1']
+        },
+        {
+          'name' => 'MyTest two',
+          'successful' => false,
+          'points' => ['1.2']
+        }
+      ]
+    }
 
     TestRunGrader.grade_results(@submission, results)
 
-    results[0]['status'] = 'FAILED'
-    results[1]['status'] = 'PASSED'
+    results['testResults'][0]['successful'] = false
+    results['testResults'][1]['successful'] = true
 
     @submission = Submission.new(
       user: @submission.user,
@@ -237,7 +249,8 @@ describe TestRunGrader do
 
       @submission = FactoryGirl.create(:submission, processed: false)
       @submission.validations = failing_validations.to_json.to_s
-      TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+      half_successful_results['testResults'].reverse
+      TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).not_to include('1.1')
