@@ -11,8 +11,6 @@ module SandboxResultsSaver
       raise InvalidTokenError, 'Invalid or expired token' if results['token'] != submission.secret_token
       
       submission.all_tests_passed = false
-      # Rails.logger.info(results)
-      # Set sandbox stdout and stderr
       submission.stdout = results['stdout']
       submission.stderr = results['stderr']
       submission.vm_log = results['vm_log']
@@ -20,8 +18,6 @@ module SandboxResultsSaver
       submission.validations = results['validations']
       
       tmc_langs_response = decode_test_output(results['test_output'])
-      handle_tmc_langs_output(submission, tmc_langs_response)
-      
 
       case results['status']
       when 'timeout'
@@ -30,7 +26,9 @@ module SandboxResultsSaver
         submission.pretest_error =
           case results['exit_code']
           when '110'
-            "Executing tests with tmc-langs-rust failed:\n" + results['test_output']
+            "Executing tests with tmc-langs-rust failed:\n" + 
+            tmc_langs_response['message'] + "\n" +
+            tmc_langs_response['data']['trace'].join("\n")
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
@@ -38,17 +36,13 @@ module SandboxResultsSaver
           else
             'Running the submission failed. Exit code: ' + results['exit_code'] + ' (did you use an exit() command?)'
           end
+          # Move to tmc-langs-rust
           if submission.stdout.include?('Temporary failure in name resolution: Unknown host maven.mooc.fi')
             submission.pretest_error = "Unable to run tests because this course's teacher has not configured this exercise template correctly.\nPlease contact your teacher so that they can fix the template and rerun your submission.\nIf your solution is correct, you'll get the points from this exercise once the teacher reruns your submission."
           end
-
       when 'finished'
-        # decoded_output = decode_test_output(results['test_output'])
-        # if decoded_output.is_a?(Enumerable)
+        handle_tmc_langs_output(submission, tmc_langs_response)
         TestRunGrader.grade_results(submission, tmc_langs_response)
-        # else
-        #   submission.pretest_error = decoded_output.to_s
-        # end
       else
         raise 'Unknown status: ' + results['status']
       end
