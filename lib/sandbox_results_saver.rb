@@ -9,16 +9,19 @@ module SandboxResultsSaver
   def self.save_results(submission, results)
     ActiveRecord::Base.transaction do
       raise InvalidTokenError, 'Invalid or expired token' if results['token'] != submission.secret_token
-      maybe_tranform_results_from_tmc_langs!(results)
-
+      
       submission.all_tests_passed = false
-      submission.pretest_error = nil
-
+      # Rails.logger.info(results)
+      # Set sandbox stdout and stderr
       submission.stdout = results['stdout']
       submission.stderr = results['stderr']
       submission.vm_log = results['vm_log']
       submission.valgrind = results['valgrind']
       submission.validations = results['validations']
+      
+      tmc_langs_response = decode_test_output(results['test_output'])
+      handle_tmc_langs_output(submission, tmc_langs_response)
+      
 
       case results['status']
       when 'timeout'
@@ -26,18 +29,8 @@ module SandboxResultsSaver
       when 'failed'
         submission.pretest_error =
           case results['exit_code']
-          when '101'
-            "Compilation error:\n" + results['test_output']
-          when '102'
-            "Test compilation error:\n" + results['test_output']
-          when '103'
-            "Test preparation error:\n" + results['test_output']
-          when '104'
-            "Checkstyle runner error:\n" + results['test_output']
-          when '105'
-            "Missing test output. Did you terminate your program with an exit() command?\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
           when '110'
-            "Executing tests failed:\n" + results['test_output']
+            "Executing tests with tmc-langs-rust failed:\n" + results['test_output']
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
@@ -50,12 +43,12 @@ module SandboxResultsSaver
           end
 
       when 'finished'
-        decoded_output = decode_test_output(results['test_output'], results['stderr'])
-        if decoded_output.is_a?(Enumerable)
-          TestRunGrader.grade_results(submission, decoded_output)
-        else
-          submission.pretest_error = decoded_output.to_s
-        end
+        # decoded_output = decode_test_output(results['test_output'])
+        # if decoded_output.is_a?(Enumerable)
+        TestRunGrader.grade_results(submission, tmc_langs_response)
+        # else
+        #   submission.pretest_error = decoded_output.to_s
+        # end
       else
         raise 'Unknown status: ' + results['status']
       end
@@ -68,76 +61,33 @@ module SandboxResultsSaver
   end
 
   private
-
-    def self.maybe_tranform_results_from_tmc_langs!(results)
-      # extract data from this -- it's JSON man
-      results.delete('validations') if results['validations'] == 'null'
-      if results.key? 'test_output'
-        begin
-          test_output = JSON.parse results['test_output']
-        rescue JSON::ParserError
-          return
+    def self.handle_tmc_langs_output(submission, test_output)
+      if test_output.key? 'logs'
+        if test_output['logs'].key? 'stdout'
+          submission.stdout = test_output['logs']['stdout']
         end
-        return if test_output.is_a?(Array) # No need to parse as the data doesn't seem to be from langs.
-        if test_output.key? 'logs'
-          results['stdout'] = ''
-          results['stderr'] = ''
-          if test_output['logs'].key? 'stdout'
-            stdout = test_output['logs']['stdout']
-            stdout = stdout.pack('c*').force_encoding('utf-8') if stdout.is_a?(Array)
-            results['stdout'] = test_output['logs']['stdout'] = stdout
-          end
-          if test_output['logs'].key? 'stderr'
-            stderr = test_output['logs']['stderr']
-            stderr = stderr.pack('c*').force_encoding('utf-8') if stderr.is_a?(Array)
-            results['stderr'] = test_output['logs']['stderr'] = stderr
-          end
-          test_output['stdout'] = results['stdout']
-          test_output['stderr'] = results['stderr']
-          results['test_output'] = test_output.to_json
-
+        if test_output['logs'].key? 'stderr'
+          submission.stderr = test_output['logs']['stderr']
         end
-        case test_output['status']
-        when 'COMPILE_FAILED', 'GENERIC_ERROR'
-          results['status'] = 'failed'
-          results['exit_code'] = '101'
-          results['test_output'] = test_output['logs'].map do |k, v|
-            value = v
-            value = value.pack('c*').force_encoding('utf-8') if value.is_a?(Array)
-            "#{k}: #{value}"
-          end.join("\n")
-        when 'TESTS_FAILED', 'PASSED'
-          output = test_output['testResults'].map do |result|
-            result['className'], result['methodName'] = result['name'].split(/\s/)
-            result['message'] = result['errorMessage'] if result['errorMessage']
-            result['backtrace'] = result['backtrace'].join("\n") if result.key? 'backtrace'
-            result['pointNames'] = result['points'] if result.key? 'points'
-            result['status'] = result['passed'] || result['successful'] ? 'PASSED' : 'FAILED'
-            result
-          end
-          results['old_test_output'] = results['test_output']
-          results['test_output'] = output.empty? ? '[]' : output # To allow tests to have no tests.
-        when 'TESTRUN_INTERRUPTED'
-          results['status'] = 'failed'
-          results['exit_code'] = '105'
-        else
-          raise "Unknown result type: #{test_output}"
-        end
+      end
 
+      case test_output['status']
+      when 'COMPILE_FAILED'
+        submission.pretest_error = "Compilation error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
+      when 'GENERIC_ERROR'
+        submission.pretest_error = "Generic error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
+      when 'TESTS_FAILED', 'PASSED'
+        submission.pretest_error = nil
+      when 'TESTRUN_INTERRUPTED'
+        submission.pretest_error = "Missing test output. Did you terminate your program with an exit() command?\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
       else
-        raise "Missing key 'test_output': #{test_output}"
+        raise "Unknown result type from tmc-langs: #{test_output}"
       end
     end
 
-    def self.decode_test_output(test_output, stderr)
-      likely_out_of_memory = stderr.include?('java.lang.OutOfMemoryError')
-
+    def self.decode_test_output(test_output)
       if test_output.blank?
-        if likely_out_of_memory
-          return 'Out of memory.'
-        else
-          return 'Missing test output. Did you terminate your program with an exit() command? Also make sure your program did not run out of memory. For example excessive printing (thousands of lines) may cause this.'
-        end
+        return 'Missing test output. Did you terminate your program with an exit() command? Also make sure your program did not run out of memory. For example excessive printing (thousands of lines) may cause this.'
       end
 
       begin
@@ -149,11 +99,7 @@ module SandboxResultsSaver
         raise unless result.is_a?(Enumerable)
         result
       rescue StandardError
-        if likely_out_of_memory
-          'Out of memory.'
-        else
-          'Unknown error while running tests.'
-        end
+        'Unknown error while running tests.'
       end
     end
 end
