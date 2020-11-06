@@ -26,8 +26,8 @@ module SandboxResultsSaver
         submission.pretest_error =
           case results['exit_code']
           when '110'
-            "Executing tests with tmc-langs-rust failed:\n" + 
-            tmc_langs_response['trace'].join("\n")
+            tmc_langs_response['message'] + "\n" + 
+            tmc_langs_response['data']['trace'].join("\n")
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
