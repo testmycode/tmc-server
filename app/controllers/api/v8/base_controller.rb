@@ -52,12 +52,10 @@ module Api
 
         def check_client_version_api_v8
           if should_check_for_client_version?
-            if params[:client].present? && params[:client_version].present?
-              begin
-                check_client_minimum_version(params[:client], params[:client_version])
-              rescue StandardError
-                return respond_with_error($!.message, 404, nil, obsolete_client: true)
-              end
+            begin
+              check_client_minimum_version(params[:client], params[:client_version])
+            rescue StandardError
+              return respond_with_error($!.message, 404, nil, obsolete_client: true)
             end
 
             netbeans_plugin_blacklist = ['1.1.9']
@@ -77,6 +75,7 @@ module Api
 
         def should_check_for_client_version?
           params[:format] == 'json' &&
+            (params[:client].present? && params[:client_version].present?) &&
             (controller_path.starts_with? 'api') &&
             (controller_name == 'submissions' && action_name == 'create')
         end
