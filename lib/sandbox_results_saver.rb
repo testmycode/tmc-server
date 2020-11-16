@@ -36,6 +36,8 @@ module SandboxResultsSaver
             "Checkstyle runner error:\n" + results['test_output']
           when '105'
             "Missing test output. Did you terminate your program with an exit() command?\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
+          when '110'
+            "Executing tests failed:\n" + results['test_output']
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil

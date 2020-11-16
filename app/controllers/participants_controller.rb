@@ -122,6 +122,14 @@ class ParticipantsController < ApplicationController
     redirect_to participant_path(current_user)
   end
 
+  def password_reset_link
+    @user = User.find(params[:id])
+    authorize! :view_participant_information, @user
+    return respond_forbidden('This feature is disabled for admin accounts') if @user.administrator?
+
+    @password_reset_link = @user.generate_password_reset_link
+  end
+
   private
 
     def index_json_data

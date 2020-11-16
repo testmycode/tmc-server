@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200702072243) do
+ActiveRecord::Schema.define(version: 20201027122534) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -141,21 +141,21 @@ ActiveRecord::Schema.define(version: 20200702072243) do
     t.integer  "course_id"
     t.datetime "publish_time"
     t.string   "gdocs_sheet"
-    t.boolean  "hidden",                           default: false, null: false
+    t.boolean  "hidden",                           default: false,                                                null: false
     t.boolean  "returnable_forced"
-    t.string   "checksum",                         default: "",    null: false
+    t.string   "checksum",                         default: "",                                                   null: false
     t.datetime "solution_visible_after"
-    t.boolean  "has_tests",                        default: false, null: false
+    t.boolean  "has_tests",                        default: false,                                                null: false
     t.text     "deadline_spec"
     t.text     "unlock_spec"
-    t.string   "runtime_params",                   default: "[]",  null: false
+    t.string   "runtime_params",                   default: "[]",                                                 null: false
     t.string   "valgrind_strategy"
-    t.boolean  "code_review_requests_enabled",     default: false, null: false
-    t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
+    t.boolean  "code_review_requests_enabled",     default: false,                                                null: false
+    t.boolean  "run_tests_locally_action_enabled", default: true,                                                 null: false
     t.text     "soft_deadline_spec"
     t.integer  "disabled_status",                  default: 0
     t.boolean  "hide_submission_results",          default: false
-    t.string   "docker_image"
+    t.string   "docker_image",                     default: "eu.gcr.io/moocfi-public/tmc-sandbox-tmc-langs-rust"
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
@@ -194,6 +194,7 @@ ActiveRecord::Schema.define(version: 20200702072243) do
     t.integer  "user_id"
     t.integer  "exercise_id"
     t.string   "task_type",   default: "progress", null: false
+    t.boolean  "realtime",    default: true
   end
 
   add_index "kafka_batch_update_points", ["course_id"], name: "index_kafka_batch_update_points_on_course_id", using: :btree

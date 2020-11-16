@@ -171,6 +171,7 @@ module Api
         Api::V8::Core::Courses::ReviewsController,
         Api::V8::Core::Courses::UnlocksController,
         Api::V8::Core::ExercisesController,
+        Api::V8::Core::Exercises::DetailsController,
         Api::V8::Core::Exercises::SolutionsController,
         Api::V8::Core::Exercises::SubmissionsController,
         Api::V8::Core::Organizations::CoursesController,
