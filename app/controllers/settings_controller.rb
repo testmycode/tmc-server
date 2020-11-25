@@ -95,6 +95,8 @@ class SettingsController < ApplicationController
           user.errors.add(:password_repeat, 'did not match')
         elsif user_params[:password].blank?
           user.errors.add(:password, 'cannot be empty')
+        elsif user_params[:password].length > 1000
+          user.errors.add(:password, 'cannot be over 1000 characters')
         else
           user.password = user_params[:password]
         end
