@@ -60,11 +60,12 @@ module Api
 
         def create
           return respond_forbidden unless current_user.administrator?
-          users = if params[:extra_fields]
-            User.eager_load(:user_field_values).where(login: params[:usernames])
-          else
-            User.where(login: params[:usernames])
-          end
+          # users = if params[:extra_fields]
+          #   User.eager_load(:user_field_values).where(login: params[:usernames])
+          # else
+          #   User.where(login: params[:usernames])
+          # end
+          users = User.where(login: params[:usernames])
           user_id_to_extra_fields = nil
           if params[:extra_fields]
             namespace = params[:extra_fields]
