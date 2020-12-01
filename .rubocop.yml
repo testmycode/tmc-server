@@ -4,6 +4,9 @@ inherit_gem:
 
 AllCops:
   TargetRubyVersion: 2.5
+  Exclude:
+    - 'ext/**/*'
+    - 'db/**/*'
 
 # Style
 Style/StringLiterals:
