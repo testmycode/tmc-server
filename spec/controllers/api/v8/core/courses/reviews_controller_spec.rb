@@ -79,7 +79,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       describe 'when course id given' do
         it "shows only user's submission's review information" do
           get :index, course_id: course.id
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
           expect(response.body).not_to include review.review_body
           expect(response.body).not_to include submission2_review.review_body
@@ -88,7 +88,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       describe 'when invalid course id given' do
         it 'shows error about finding course' do
           get :index, course_id: -1
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
           expect(response.body).not_to include review.review_body
           expect(response.body).not_to include submission2_review.review_body

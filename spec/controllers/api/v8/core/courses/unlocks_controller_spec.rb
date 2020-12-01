@@ -30,7 +30,7 @@ describe Api::V8::Core::Courses::UnlocksController, type: :controller do
       it 'should not allow unlocking exercises' do
         post :create, organization_slug: organization.id, course_id: course.id
 
-        expect(response.code).to eq('403')
+        expect(response.code).to eq('401')
         expect(response.body).to include('Authentication required')
       end
     end

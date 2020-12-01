@@ -22,7 +22,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
 
       it 'should not allow access' do
         get :index, course_id: course.id
-        expect(response).to have_http_status(:unauthorized)
+        expect(response).to have_http_status(:forbidden)
       end
     end
 

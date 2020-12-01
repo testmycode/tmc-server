@@ -48,7 +48,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       let(:token) { nil }
       it 'shows authentication error' do
         get :index, organization_slug: organization.slug
-        expect(response).to have_http_status(403)
+        expect(response).to have_http_status(401)
         expect(response.body).to include 'Authentication required'
       end
     end

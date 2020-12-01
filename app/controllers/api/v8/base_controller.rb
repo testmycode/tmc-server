@@ -50,6 +50,33 @@ module Api
           { errors: [*messages] }
         end
 
+        def respond_not_found(msg = 'Not Found')
+          respond_with_error(msg, 404)
+        end
+    
+        def respond_forbidden(msg = 'Forbidden')
+          respond_with_error(msg, 403)
+        end
+    
+        def respond_unauthorized(msg = 'Authentication required')
+          respond_with_error(msg, 401)
+        end
+    
+        def respond_with_error(msg, code = 500, exception = nil, extra_json_keys = {})
+          respond_to do |format|
+            format.html do
+              render json: errors_json(msg), status: code
+            end
+            format.json do
+              render json: { error: msg }.merge(extra_json_keys), status: :forbidden if code == 403
+              render json: { error: msg }.merge(extra_json_keys), status: :unauthorized if code == 401
+              render json: { error: msg }.merge(extra_json_keys), status: code
+            end
+            format.text { render text: 'ERROR: ' + msg, status: code }
+            format.zip { render text: msg, status: code, content_type: 'text/plain' }
+          end
+        end
+
         def check_client_version_api_v8
           if should_check_for_client_version?
             begin

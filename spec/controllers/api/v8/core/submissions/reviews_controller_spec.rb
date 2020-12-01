@@ -57,7 +57,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
         expect do
           post :create, submission_id: submission.id, review: { review_body: 'Code looks ok' }
         end.to change(Review, :count).by(0)
-        expect(response.code.to_i).to eq(403)
+        expect(response.code.to_i).to eq(401)
       end
     end
   end

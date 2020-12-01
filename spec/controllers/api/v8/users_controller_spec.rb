@@ -116,7 +116,7 @@ describe Api::V8::UsersController, type: :controller do
       it 'they get an error message' do
         get :show, id: user.id
 
-        expect(response).to have_http_status(403)
+        expect(response).to have_http_status(401)
         expect(response.body).to include('Authentication required')
       end
     end

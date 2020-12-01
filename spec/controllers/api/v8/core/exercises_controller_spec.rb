@@ -68,7 +68,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
     let(:token) { nil }
     it 'should show authentication error' do
       get :show, id: exercise.id
-      expect(response).to have_http_status :forbidden
+      expect(response).to have_http_status :unauthorized
       expect(response.body).to include 'Authentication required'
     end
   end

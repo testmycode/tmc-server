@@ -106,7 +106,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it 'should not allow downloading' do
         get :download, id: submission.id
-        expect(response.code).to eq('403')
+        expect(response.code).to eq('401')
       end
     end
   end
