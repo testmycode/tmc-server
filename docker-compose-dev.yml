@@ -7,7 +7,7 @@ services:
     volumes:
       - /tmp:/dev/shm
   db:
-    image: postgres:11.10
+    image: postgres:9.4
     volumes:
       - ./pg-data:/var/lib/postgresql
   dev:

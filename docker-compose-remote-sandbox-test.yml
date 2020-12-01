@@ -1,7 +1,7 @@
 version: '2'
 services:
   db_test:
-    image: postgres:11.10
+    image: postgres:9.4
   web_test:
     build: .
     entrypoint: ./entry.sh
