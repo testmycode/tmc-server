@@ -53,10 +53,10 @@ module TestRunGrader
 
     def self.create_test_case_runs(submission, results)
       all_passed = true
-      results.each do |test_result|
-        passed = test_result['status'] == 'PASSED'
+      results['testResults'].each do |test_result|
+        passed = test_result['successful']
         tcr = TestCaseRun.new(
-          test_case_name: "#{test_result['className']} #{test_result['methodName']}".strip,
+          test_case_name: test_result['name'],
           message: test_result['message'],
           successful: passed,
           exception: to_json_or_null(test_result['exception']),
@@ -114,10 +114,10 @@ module TestRunGrader
 
     def self.points_from_test_results(results)
       point_status = {} # point -> true / false / nil i.e. ok so far / failed / unseen
-      results.each do |result|
-        result['pointNames'].each do |name|
+      results['testResults'].each do |result|
+        result['points'].each do |name|
           unless point_status[name].eql?(false) # skip if already failed
-            point_status[name] = (result['status'] == 'PASSED')
+            point_status[name] = result['successful']
           end
         end
       end
