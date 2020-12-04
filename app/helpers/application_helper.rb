@@ -76,7 +76,7 @@ module ApplicationHelper
     str = ''
     case type
     when :boolean
-      str = '<label class="checkbox">'.dup
+      str = +'<label class="checkbox">'
       str << "  #{field}#{label}"
       str << '</label>'
     else
