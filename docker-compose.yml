@@ -9,13 +9,11 @@ services:
   web:
     build: .
     entrypoint: ./docker-wait-for-db.sh
-    tty: true
     volumes:
       - .:/app
     ports:
       - "3000:3000"
     environment:
       - DB_HOST=db
-      - TERM=xterm-256color
     depends_on:
       - db
