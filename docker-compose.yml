@@ -2,6 +2,8 @@ version: '2'
 services:
   db:
     image: postgres:9.4
+    environment: 
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - ./pg-data:/var/lib/postgresql
   web:
