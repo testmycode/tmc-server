@@ -1,8 +1,19 @@
 class Rack::Attack
-    # Ban login spammers for 15 minutes after 20 attempts in a minute, regardless of whether login credentials were correct or not
-    Rack::Attack.blocklist('login spammers') do |req|
-        Rack::Attack::Allow2Ban.filter(req.ip, maxretry: 21, findtime: 1.minutes, bantime: 15.minutes) do
-            req.path == '/sessions' && req.post?
-        end
+    # Return 500 Internal Server Error for throttles
+    self.throttled_response = lambda do |env|
+        [ 500, # status
+          {}, # headers
+          ["Internal Server Error\n"] # body
+        ]
+    end
+
+    # Limit the number of logins to 20 attempts in a minute
+    throttle('login attempts', limit: 20, period: 1.minutes) do |req|
+        req.ip if req.path == '/sessions' && req.post?
+    end
+
+    # Limit the number of account creations to 15 accounts per minute
+    throttle('account creations', limit: 15, period: 1.minutes) do |req|
+        req.ip if req.path == '/user' && req.post?
     end
 end
