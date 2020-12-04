@@ -104,5 +104,5 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.wkhtmltopdf = "xvfb-run wkhtmltopdf"
+  config.wkhtmltopdf = 'xvfb-run wkhtmltopdf'
 end

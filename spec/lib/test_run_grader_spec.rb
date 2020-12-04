@@ -13,22 +13,22 @@ describe TestRunGrader do
   end
 
   def half_successful_results
-      {
-        'status' => 'TESTS_FAILED',
-        'testResults' => [
-          {
-            'name' => 'MyTest testSomethingEasy',
-            'successful' => true,
-            'points' => ['1.1', '1.2']
-          },
-          {
-            'name' => 'MyTest testSomethingDifficult',
-            'successful' => false,
-            'points' => ['1.2'],
-            'exception' => { 'a' => 'b' }
-          }
-        ],
-      }
+    {
+      'status' => 'TESTS_FAILED',
+      'testResults' => [
+        {
+          'name' => 'MyTest testSomethingEasy',
+          'successful' => true,
+          'points' => ['1.1', '1.2']
+        },
+        {
+          'name' => 'MyTest testSomethingDifficult',
+          'successful' => false,
+          'points' => ['1.2'],
+          'exception' => { 'a' => 'b' }
+        }
+      ],
+    }
   end
 
   def successful_results
@@ -54,7 +54,7 @@ describe TestRunGrader do
   end
 
   it 'should not create multiple test case runs for the same test method even if it is involved in multiple points' do
-    results = 
+    results =
     {
       'status' => 'PASSED',
       'testResults' => [
@@ -82,7 +82,7 @@ describe TestRunGrader do
     @submission = FactoryGirl.create(:submission, course: @submission.course,
                                                   exercise: @submission.exercise,
                                                   processed: false)
-    
+
     half_successful_results['testResults'].reverse
     TestRunGrader.grade_results(@submission, half_successful_results)
 
@@ -95,7 +95,7 @@ describe TestRunGrader do
     other_exercise = FactoryGirl.create(:exercise, course_id: @submission.course_id)
     FactoryGirl.create(:available_point, exercise_id: other_exercise.id, name: '1.3')
 
-    results = 
+    results =
     {
       'status' => 'PASSED',
       'testResults' => [
@@ -136,7 +136,7 @@ describe TestRunGrader do
   end
 
   it 'should only ever award more points, never delete old points' do
-    results = 
+    results =
     {
       'status' => 'TESTS_FAILED',
       'testResults' => [

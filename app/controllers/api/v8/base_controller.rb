@@ -53,15 +53,15 @@ module Api
         def respond_not_found(msg = 'Not Found')
           respond_with_error(msg, 404)
         end
-    
+
         def respond_forbidden(msg = 'Forbidden')
           respond_with_error(msg, 403)
         end
-    
+
         def respond_unauthorized(msg = 'Authentication required')
           respond_with_error(msg, 401)
         end
-    
+
         def respond_with_error(msg, code = 500, exception = nil, extra_json_keys = {})
           respond_to do |format|
             format.html do

@@ -14,7 +14,7 @@ class Solution
     @exercise.solution_path
   end
 
-  def visible_to?(user, ignore_email_verification=false)
+  def visible_to?(user, ignore_email_verification = false)
     if user.administrator?
       true
     elsif !ignore_email_verification && !user.email_verified?
