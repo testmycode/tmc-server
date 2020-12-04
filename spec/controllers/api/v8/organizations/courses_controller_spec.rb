@@ -108,7 +108,7 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
       describe 'when organization id and course name given' do
         it 'shows authentication error' do
           get :show, organization_slug: organization.slug, name: course_name
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
@@ -117,28 +117,28 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
           course.hidden = true
           course.save!
           get :show, organization_slug: organization.slug, name: course_name
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when invalid organization id and valid course name given' do
         it 'shows authentication error' do
           get :show, organization_slug: 'bad', name: course_name
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when valid organization id and invalid course name given' do
         it 'shows authentication error' do
           get :show, organization_slug: organization.slug, name: 'bad'
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when invalid organization id and invalid course name given' do
         it 'shows authentication error' do
           get :show, organization_slug: 'bad', name: 'bad'
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end

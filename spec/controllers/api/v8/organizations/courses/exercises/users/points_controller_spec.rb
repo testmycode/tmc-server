@@ -24,7 +24,7 @@ describe Api::V8::Organizations::Courses::Exercises::Users::PointsController, ty
     describe 'when searching for awarded points' do
       it 'should show authentication error' do
         get :index, course_name: course_name, organization_slug: organization.slug, user_id: 'current', exercise_name: exercise.name
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
         expect(response.body).to have_content('Authentication required')
       end
     end

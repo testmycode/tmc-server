@@ -164,6 +164,8 @@ class UsersController < ApplicationController
       user_params = params[:user]
       if user_params[:password].blank?
         @user.errors.add(:password, 'needed')
+      elsif user_params[:password].length > 1000
+        @user.errors.add(:password, 'cannot be over 1000 characters')
       elsif user_params[:password] != user_params[:password_repeat]
         @user.errors.add(:password_repeat, 'did not match')
       else
@@ -179,6 +181,8 @@ class UsersController < ApplicationController
           user.errors.add(:password_repeat, 'did not match')
         elsif user_params[:password].blank?
           user.errors.add(:password, 'cannot be empty')
+        elsif user_params[:password].length > 1000
+          user.errors.add(:password, 'cannot be over 1000 characters')
         else
           user.password = user_params[:password]
         end

@@ -19,10 +19,10 @@ describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
       let(:token) { double resource_owner_id: student.id, acceptable?: true }
 
       it 'can give feedback' do
-        pending 'Failing for some reason'
-        expect do
-          post :create, params: { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
-        end.to change(FeedbackAnswer, :count).by(1)
+        # pending 'Failing for some reason'
+        expect {
+          post :create, { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
+        }.to change(FeedbackAnswer, :count).by(1)
         expect(response.code.to_i).to eq(302)
       end
     end
@@ -31,11 +31,11 @@ describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
       let(:token) { nil }
 
       it "can't give feedback" do
-        pending 'Failing for some reason'
+        # pending 'Failing for some reason'
         expect do
-          post :create, params: { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
+          post :create, { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
         end.to change(FeedbackAnswer, :count).by(0)
-        expect(response.code.to_i).to eq(403)
+        expect(response.code.to_i).to eq(401)
       end
     end
   end

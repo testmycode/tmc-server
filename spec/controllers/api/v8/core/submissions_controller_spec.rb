@@ -30,10 +30,10 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
       it "should allow to download everyone's submissions" do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise 'pending'
+        # raise 'pending'
       end
     end
     describe 'as a teacher' do
@@ -43,10 +43,10 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
       it "should allow to download own organization's submissions" do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise 'pending'
+        # raise 'pending'
       end
       it "should not allow to download other organizations' submissions" do
         other_organization = FactoryGirl.create(:accepted_organization)
@@ -66,10 +66,10 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
       it "should allow to download own course's submissions" do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise 'pending'
+        # raise 'pending'
       end
       it "should not allow to download other courses' submissions" do
         other_course = FactoryGirl.create(:course, organization: organization)
@@ -85,10 +85,10 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
 
       it 'should allow to download own submissions' do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
-        raise 'pending'
+        # raise 'pending'
       end
       it "should not allow to download other students' submissions" do
         other_course = FactoryGirl.create(:course, organization: organization)
@@ -106,7 +106,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it 'should not allow downloading' do
         get :download, id: submission.id
-        expect(response.code).to eq('403')
+        expect(response.code).to eq('401')
       end
     end
   end
