@@ -30,7 +30,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
       it "should allow to download everyone's submissions" do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
         # raise 'pending'
@@ -43,7 +43,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
       it "should allow to download own organization's submissions" do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
         # raise 'pending'
@@ -66,7 +66,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
       it "should allow to download own course's submissions" do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
         # raise 'pending'
@@ -85,7 +85,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
 
       it 'should allow to download own submissions' do
-        pending("test that submission zip's content is correct")
+        # pending("test that submission zip's content is correct")
         get :download, id: submission.id
         expect(response.code).to eq('200')
         # raise 'pending'

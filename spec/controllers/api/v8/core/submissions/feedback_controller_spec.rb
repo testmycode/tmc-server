@@ -20,9 +20,9 @@ describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
 
       it 'can give feedback' do
         # pending 'Failing for some reason'
-        expect do
-          post :create, params: { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
-        end.to change(FeedbackAnswer, :count).by(1)
+        expect {
+          post :create, { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
+        }.to change(FeedbackAnswer, :count).by(1)
         expect(response.code.to_i).to eq(302)
       end
     end
@@ -33,9 +33,9 @@ describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
       it "can't give feedback" do
         # pending 'Failing for some reason'
         expect do
-          post :create, params: { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
+          post :create, { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
         end.to change(FeedbackAnswer, :count).by(0)
-        expect(response.code.to_i).to eq(403)
+        expect(response.code.to_i).to eq(401)
       end
     end
   end
