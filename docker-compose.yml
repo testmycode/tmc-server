@@ -9,6 +9,7 @@ services:
   web:
     build: .
     entrypoint: ./docker-wait-for-db.sh
+    tty: true
     volumes:
       - .:/app
     ports:
