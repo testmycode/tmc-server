@@ -197,15 +197,17 @@ describe User, type: :model do
 
   it 'should not allow authentication with an empty password' do
     User.create!(login: 'user', email: 'user@example.com')
-    u = User.authenticate('user', '')
-    expect(u).to be_nil
+    expect { User.authenticate('user', '') }.to raise_error(Argon2::ArgonHashFail)
+    # u = User.authenticate('user', '')
+    # expect(u).to be_nil
   end
 
   it 'should hash the password on create' do
     User.create!(login: 'instructor', password: 'ilikecookies', email: 'instructor@example.com')
     user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
-    expect(user.password_hash).not_to be_nil
+    expect(user.password_hash).to be_nil
+    expect(user.argon_hash).to_not be_nil
     expect(user).to have_password('ilikecookies')
     expect(user).not_to have_password('ihatecookies')
   end
@@ -219,7 +221,8 @@ describe User, type: :model do
 
     user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
-    expect(user.password_hash).not_to be_nil
+    expect(user.password_hash).to be_nil
+    expect(user.argon_hash).to_not be_nil
     expect(user).to have_password('ilikecookies')
     expect(user).not_to have_password('ihatecookies')
   end

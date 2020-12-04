@@ -55,7 +55,7 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
     describe 'when searching for exercises' do
       it 'should show authentication error' do
         get :index, course_id: course.id
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
         expect(response.body).to have_content('Authentication required')
       end
     end

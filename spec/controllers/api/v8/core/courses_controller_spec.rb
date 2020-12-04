@@ -79,10 +79,10 @@ describe Api::V8::Core::CoursesController, type: :controller do
       end
 
       describe 'and as guest user' do
-        it 'should respond with a 403' do
+        it 'should respond with a 401' do
           controller.current_user = Guest.new
           show_course
-          expect(response.code.to_i).to eq(403)
+          expect(response.code.to_i).to eq(401)
         end
       end
     end

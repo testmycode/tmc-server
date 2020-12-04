@@ -138,7 +138,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
         it 'should not show any submissions' do
           get :index, course_id: course.id, user_id: user.id
 
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to have_content('Authentication required')
         end
       end
@@ -183,7 +183,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
         it 'should not show any submissions' do
           get :index, course_id: course.id, user_id: 'current'
 
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to have_content('Authentication required')
         end
       end

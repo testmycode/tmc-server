@@ -79,7 +79,7 @@ describe Api::V8::CoursesController, type: :controller do
       describe 'when course ID given' do
         it 'shows authentication error' do
           get :show, id: course.id
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
@@ -88,14 +88,14 @@ describe Api::V8::CoursesController, type: :controller do
           course.hidden = true
           course.save!
           get :show, id: course.id
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when invalid course ID given' do
         it 'shows authentication error' do
           get :show, id: -1
-          expect(response).to have_http_status(403)
+          expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
