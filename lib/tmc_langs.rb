@@ -78,6 +78,6 @@ class TmcLangs < MavenProject
       rescue StandardError => e
         Rails.logger.error("Could not read tmc-langs results: #{e} ")
       end
-      raise "Running #{cmd} operation for #{exercise_path} failed!\n\n#{e.to_s}"
+      raise "Running #{cmd} operation for #{exercise_path} failed!\n\n#{e}"
     end
 end

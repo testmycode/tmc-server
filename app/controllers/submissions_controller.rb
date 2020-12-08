@@ -339,13 +339,13 @@ class SubmissionsController < ApplicationController
               respond_forbidden("You cannot see this paste because you haven't completed this exercise.")
               return
             else
-              respond_forbidden("You cannot see this paste because it was created over 2 hours ago.")
+              respond_forbidden('You cannot see this paste because it was created over 2 hours ago.')
             end
             return
           end
         end
 
-        respond_forbidden("You cannot see this paste because all tests passed.") unless paste_visible
+        respond_forbidden('You cannot see this paste because all tests passed.') unless paste_visible
       end
     end
 end

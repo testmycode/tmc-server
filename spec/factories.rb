@@ -29,7 +29,7 @@ FactoryGirl.define do
     sequence(:login) { |n| "user#{n}" }
     sequence(:password) { |n| "userpass#{n}" }
     sequence(:email) { |n| "user#{n}@example.com" }
-    sequence(:email_verified) { |n| "true" }
+    sequence(:email_verified) { |n| 'true' }
     administrator false
   end
 

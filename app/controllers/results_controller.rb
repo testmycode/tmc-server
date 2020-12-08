@@ -12,7 +12,7 @@ class ResultsController < ApplicationController
 
     # The sandbox output may contain broken characters e.g. if the student
     # pointed a C char* towards some patch of interesting memory :)
-    filtered_params = Hash[(params.keys-["result"]).map do |k|
+    filtered_params = Hash[(params.keys - ['result']).map do |k|
       [k, view_context.force_utf8_violently(params[k])]
     end]
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StatsFetcherTask
   def initialize
   end
@@ -14,7 +16,7 @@ class StatsFetcherTask
       submissions_count_yesterday: Submission.where(created_at: Time.current.yesterday.all_day).count,
       submissions_count_week: Submission.where(created_at: Time.current.all_week).count,
     }
-    Rails.cache.write("stats-cache", data.to_json, expires_in: 1.minute)
+    Rails.cache.write('stats-cache', data.to_json, expires_in: 1.minute)
   end
 
   def wait_delay

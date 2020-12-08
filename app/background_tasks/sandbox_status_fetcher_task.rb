@@ -22,7 +22,7 @@ class SandboxStatusFetcherTask
       data[:fetching_time] = fetching_time.real.round(2)
       data
     end
-    Rails.cache.write("sandbox-status-cache", data.to_json, expires_in: 1.minute)
+    Rails.cache.write('sandbox-status-cache', data.to_json, expires_in: 1.minute)
   end
 
   def wait_delay

@@ -5,5 +5,5 @@
 require ::File.expand_path('../config/environment', __FILE__)
 run TmcServer::Application
 
-require "rack/attack"
+require 'rack/attack'
 use Rack::Attack
