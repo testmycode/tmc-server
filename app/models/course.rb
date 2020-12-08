@@ -24,7 +24,7 @@ class Course < ActiveRecord::Base
     property :refreshed_at, type: :string, example: '2016-10-10T13:22:36.871+03:00'
     property :locked_exercise_points_visible, type: :boolean, example: true
     property :description, type: :string, example: ''
-    property :paste_visibility, type: :string
+    property :paste_visibility, type: :integer
     property :formal_name, type: :string
     property :certificate_downloadable, type: :boolean, example: false
     property :certificate_unlock_spec, type: :string
@@ -175,6 +175,7 @@ class Course < ActiveRecord::Base
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
   enum disabled_status: %i[enabled disabled]
+  enum paste_visibility: %i[open secured no-tests-public everyone]
 
   def destroy
     # Optimization: delete dependent objects quickly.

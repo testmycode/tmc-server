@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201204135121) do
+ActiveRecord::Schema.define(version: 20201208125737) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 20201204135121) do
     t.datetime "refreshed_at"
     t.boolean  "locked_exercise_points_visible",                          default: true,  null: false
     t.text     "description"
-    t.string   "paste_visibility"
+    t.integer  "paste_visibility"
     t.string   "formal_name"
     t.boolean  "certificate_downloadable",                                default: false, null: false
     t.string   "certificate_unlock_spec"
