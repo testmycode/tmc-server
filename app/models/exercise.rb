@@ -116,6 +116,7 @@ class Exercise < ActiveRecord::Base
   }
 
   enum disabled_status: %i[enabled disabled]
+  enum paste_visibility: %i[open secured no-tests-public everyone]
 
   def relative_path
     name.tr('-', '/')
