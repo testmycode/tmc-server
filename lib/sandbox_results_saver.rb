@@ -22,6 +22,10 @@ module SandboxResultsSaver
       case results['status']
       when 'timeout'
         submission.pretest_error = "Timed out. Check your program for infinite loops.\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
+      when 'crashed'
+        submission.pretest_error = 'Running the submission crashed.'
+      when 'out-of-memory'
+        submission.pretest_error = 'Your submission ran out of memory. Please try to reduce the memory usage of your code.'
       when 'failed'
         submission.pretest_error =
           case results['exit_code']
