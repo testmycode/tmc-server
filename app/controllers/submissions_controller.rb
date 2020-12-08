@@ -319,8 +319,8 @@ class SubmissionsController < ApplicationController
       paste_visible = @submission.paste_visible_for?(current_user)
       return if paste_visible
       paste_visibility = @exercise.paste_visibility
-      paste_visibility ||= @course.paste_visibility
-      paste_visibility ||= 'open'
+      paste_visibility = @course.paste_visibility unless paste_visibility
+      paste_visibility = 'open' unless paste_visibility
       case paste_visibility
       when 'protected'
         respond_forbidden unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || paste_visible
