@@ -70,7 +70,7 @@ module Api
             format.json do
               render json: { error: msg }.merge(extra_json_keys), status: :forbidden if code == 403
               render json: { error: msg }.merge(extra_json_keys), status: :unauthorized if code == 401
-              render json: { error: msg }.merge(extra_json_keys), status: code
+              #render json: { error: msg }.merge(extra_json_keys), status: code
             end
             format.text { render text: 'ERROR: ' + msg, status: code }
             format.zip { render text: msg, status: code, content_type: 'text/plain' }
