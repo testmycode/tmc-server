@@ -1,9 +1,9 @@
 class Rack::Attack
     # Return 500 Internal Server Error for throttles
     self.throttled_response = lambda do |env|
-        [ 500, # status
+        [ 503, # status
           {}, # headers
-          ["Internal Server Error\n"] # body
+          ["Service Unavailable\n"] # body
         ]
     end
 
