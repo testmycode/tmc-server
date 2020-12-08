@@ -322,7 +322,7 @@ class SubmissionsController < ApplicationController
       paste_visibility = @course.paste_visibility unless paste_visibility
       paste_visibility = 'open' unless paste_visibility
       case paste_visibility
-      when 'protected'
+      when 'protected' || 'secured'
         respond_forbidden unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || paste_visible
       when 'no-tests-public'
         respond_forbidden unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
