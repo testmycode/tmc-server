@@ -66,7 +66,7 @@ class RemoteSandbox
         Timeout.timeout(10) do
           # The timeout is only for open_timeout and read_timeout
           payload = {
-            file: tar_file, notify: notify_url, token: submission.secret_token
+            file: tar_file, notify: notify_url, token: submission.secret_token, submission_id: submission.id
           }
           payload[:docker_image] = exercise.docker_image if exercise.docker_image
 
