@@ -5,6 +5,7 @@ require 'spec_helper'
 describe SubmissionsController, type: :controller do
   before :each do
     @user = FactoryGirl.create(:user)
+    @user2 = FactoryGirl.create(:user)
     @organization = FactoryGirl.create(:accepted_organization)
     @course = FactoryGirl.create :course, organization: @organization
     @exercise = FactoryGirl.create(:exercise, course: @course, gdocs_sheet: @sheetname)
@@ -81,8 +82,8 @@ describe SubmissionsController, type: :controller do
         @course.save!
       end
 
-      it "should return 'hidden' status and right field (processed and tests passed)" do
-        pending('Waiting for clients to be updated')
+      it "when all_tests_passed and points given should return 'ok' status, test_cases as 'TestResultsAreHidden' and no points" do
+        # pending('Waiting for clients to be updated')
         @submission.all_tests_passed = true
         @submission.points = 'some points'
         @submission.save!
@@ -90,19 +91,25 @@ describe SubmissionsController, type: :controller do
         json = JSON.parse response.body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
-        expect(json['status']).to eq('hidden')
+        expect(json['status']).to eq('ok')
         expect(json['all_tests_passed']).to be nil
-        expect(json['test_cases']).to be nil
-        expect(json['points']).to be eq nil
+        expect(json['test_cases'][0]['name']).to include("TestResultsAreHidden")
+        expect(json['points']).to eq([])
         expect(json['validations']).to be nil
         expect(json['valgrind']).to be nil
       end
 
-      it "should return 'hidden' status (processed but failed tests)" do
-        pending('Waiting for clients to be updated')
+      it "when all_tests_passed is false and no points should return 'ok' status and 'TestResultsAreHidden' and empty points array" do
+        # pending('Waiting for clients to be updated')
         get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
         json = JSON.parse response.body
-        expect(json['status']).to eq('hidden')
+        expect(json).to have_key 'test_cases'
+        expect(json['status']).to eq('ok')
+        expect(json['all_tests_passed']).to be nil
+        expect(json['test_cases'][0]['name']).to include("TestResultsAreHidden")
+        expect(json['points']).to eq([])
+        expect(json['validations']).to be nil
+        expect(json['valgrind']).to be nil
       end
     end
 

@@ -27,7 +27,7 @@ describe TeachersController, type: :controller do
       describe 'POST create' do
         it 'with a valid username creates a new teachership' do
           expect do
-            post :create, organization_id: @organization.slug, username: @user.username
+            post :create, organization_id: @organization.slug, username: @user.username, email: @user.email
           end.to change(Teachership, :count).by(1)
         end
 
@@ -64,21 +64,21 @@ describe TeachersController, type: :controller do
     describe 'GET index' do
       it 'denies access' do
         get :index, organization_id: @organization.slug
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
     describe 'POST create' do
       it 'denies access' do
         post :create, organization_id: @organization.slug
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
     describe 'DELETE destroy' do
       it 'denies access' do
         delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

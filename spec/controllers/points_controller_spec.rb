@@ -36,7 +36,7 @@ describe PointsController, type: :controller do
         @course.hide_submission_results = true
         @course.save!
         get :index, organization_id: @organization.slug, course_id: @course.id
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end
@@ -68,7 +68,7 @@ describe PointsController, type: :controller do
         @course.hide_submission_results = true
         @course.save!
         get :show, organization_id: @organization.slug, course_id: @course.id, id: @sheetname
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

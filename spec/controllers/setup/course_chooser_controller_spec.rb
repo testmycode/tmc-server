@@ -34,7 +34,7 @@ describe Setup::CourseChooserController, type: :controller do
     describe 'GET index' do
       it 'should not allow access' do
         get :index, organization_id: @organization.slug
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

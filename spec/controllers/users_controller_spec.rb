@@ -9,15 +9,16 @@ describe UsersController, type: :controller do
         expect(controller.current_user).to be_guest
       end
 
-      it 'should not deny access' do
+      it 'should redirect to login page' do
         get :show
-        expect(response.status).to eq(401)
+        expect(response.status).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fuser")
       end
 
       it 'should deny access if signup is disabled in site settings' do
         SiteSetting.all_settings['enable_signup'] = false
         get :show
-        expect(response.status).to eq(401)
+        expect(response.status).to eq(302)
         expect(response.headers).to include 'X-Frame-Options'
       end
 
@@ -131,19 +132,19 @@ describe UsersController, type: :controller do
 
   describe 'PUT update' do
     before :each do
-      @user = FactoryGirl.create(:user, email: 'oldemail')
+      @user = FactoryGirl.create(:user, email: 'oldemail@valid.com')
       controller.current_user = @user
     end
 
     it 'should save the email field' do
-      put :update, user: { email: 'newemail', email_repeat: 'newemail' }
+      put :update, user: { email: 'newemail@valid.com', email_repeat: 'newemail@valid.com' }
       expect(response).to redirect_to(user_path)
-      expect(@user.reload.email).to eq('newemail')
+      expect(@user.reload.email).to eq('newemail@valid.com')
     end
 
     it 'should not allow changing the login' do
       old_login = @user.login
-      put :update, user: { email: 'newemail', login: 'newlogin' }
+      put :update, user: { email: 'newemail@valid.com', login: 'newlogin' }
       expect(response).to redirect_to(user_path)
       expect(@user.reload.login).to eq(old_login)
     end
@@ -165,7 +166,7 @@ describe UsersController, type: :controller do
     end
 
     describe 'changing the password' do
-      let(:params) { { email: 'newemail' } }
+      let(:params) { { email: 'newemail@valid.com' } }
 
       before :each do
         @user.password = 'oldpassword'

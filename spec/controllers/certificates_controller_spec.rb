@@ -26,7 +26,7 @@ describe CertificatesController, type: :controller do
         other_user = FactoryGirl.create(:user)
 
         get :index, participant_id: other_user.id
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 

@@ -78,7 +78,6 @@ class Course < ActiveRecord::Base
       hidden_if_registered_after: hidden_if_registered_after,
       refreshed_at: refreshed_at,
       locked_exercise_points_visible: locked_exercise_points_visible,
-      description: description,
       paste_visibility: paste_visibility,
       formal_name: formal_name,
       certificate_downloadable: certificate_downloadable,

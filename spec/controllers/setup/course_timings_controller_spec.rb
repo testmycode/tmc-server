@@ -171,9 +171,9 @@ describe Setup::CourseTimingsController, type: :controller do
 
     it 'should not allow any access' do
       get :show, organization_id: @organization.slug, course_id: @course.id
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
       put :update, organization_id: @organization.slug, course_id: @course.id, commit: 'Fill and preview', unlock_type: '1'
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
     end
   end
 

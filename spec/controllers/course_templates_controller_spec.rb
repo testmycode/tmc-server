@@ -146,9 +146,9 @@ describe CourseTemplatesController, type: :controller do
     end
 
     describe 'GET index' do
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         get :index, {}
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
@@ -157,16 +157,16 @@ describe CourseTemplatesController, type: :controller do
         @course_template = FactoryGirl.create :course_template
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         get :edit, id: @course_template.to_param
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
     describe 'GET new' do
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         get :new, {}
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
@@ -175,9 +175,9 @@ describe CourseTemplatesController, type: :controller do
         @course_template = FactoryGirl.create :course_template
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         get :edit, id: @course_template.to_param
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
@@ -188,9 +188,9 @@ describe CourseTemplatesController, type: :controller do
         end.to change(CourseTemplate, :count).by(0)
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         post :create, course_template: valid_attributes
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
@@ -204,9 +204,9 @@ describe CourseTemplatesController, type: :controller do
         expect(CourseTemplate.last.name).to eq('oldName')
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         put :update, id: @course_template.to_param, course_template: invalid_attributes
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
@@ -221,9 +221,9 @@ describe CourseTemplatesController, type: :controller do
         end.to change(CourseTemplate, :count).by(0)
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         delete :destroy, id: @course_template.to_param
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end
@@ -234,9 +234,10 @@ describe CourseTemplatesController, type: :controller do
     end
 
     describe 'GET index' do
-      it 'should respond with a 401' do
+      it 'should respond with a 302 and redirect to login with correct return_to param' do
         get :index, {}
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fcourse_templates")
       end
     end
 
@@ -245,16 +246,18 @@ describe CourseTemplatesController, type: :controller do
         @course_template = FactoryGirl.create :course_template
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 302 and redirect to login with correct return_to param' do
         get :edit, id: @course_template.to_param
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fcourse_templates")
       end
     end
 
     describe 'GET new' do
-      it 'should respond with a 401' do
+      it 'should respond with a 302 and redirect to login with correct return_to param' do
         get :new, {}
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fcourse_templates")
       end
     end
 
@@ -263,9 +266,10 @@ describe CourseTemplatesController, type: :controller do
         @course_template = FactoryGirl.create :course_template
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 302 and redirect to login with correct return_to param' do
         get :edit, id: @course_template.to_param
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fcourse_templates")
       end
     end
 
@@ -276,9 +280,10 @@ describe CourseTemplatesController, type: :controller do
         end.to change(CourseTemplate, :count).by(0)
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 302 and redirect to login with correct return_to param' do
         post :create, course_template: valid_attributes
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fcourse_templates")
       end
     end
 
@@ -292,9 +297,10 @@ describe CourseTemplatesController, type: :controller do
         expect(CourseTemplate.last.name).to eq('oldName')
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 302 and redirect to login with correct return_to param' do
         put :update, id: @course_template.to_param, course_template: invalid_attributes
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fcourse_templates")
       end
     end
 
@@ -309,9 +315,10 @@ describe CourseTemplatesController, type: :controller do
         end.to change(CourseTemplate, :count).by(0)
       end
 
-      it 'should respond with a 401' do
+      it 'should respond with a 302 and redirect to login with correct return_to param' do
         delete :destroy, id: @course_template.to_param
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(302)
+        expect(response.body).to include("/login?return_to=%2F%2Fcourse_templates")
       end
     end
   end
@@ -345,9 +352,9 @@ describe CourseTemplatesController, type: :controller do
     end
 
     describe 'GET list_for_teachers' do
-      it 'should respond with a 401' do
+      it 'should respond with a 403' do
         get :list_for_teachers, organization_id: @organization.slug
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

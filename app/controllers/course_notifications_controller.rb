@@ -40,7 +40,7 @@ class CourseNotificationsController < ApplicationController
       logger.info "Error sending course notification to email #{email}: #{$!}"
       failed_emails << email
     end
-    msg = 'Mail has been set succesfully'
+    msg = +'Mail has been set succesfully'
     msg << " except for the following addresses: #{failed_emails.join(', ')}" unless failed_emails.empty?
     redirect_to organization_course_path(@organization, course), notice: msg
   end

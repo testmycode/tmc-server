@@ -62,12 +62,12 @@ describe Setup::CourseFinisherController, type: :controller do
 
     it 'should not allow any access' do
       get :index, organization_id: @organization.slug, course_id: @course.id
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
       post :create,
            organization_id: @organization.slug,
            course_id: @course.id,
            commit: 'Publish now'
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
     end
   end
 
