@@ -6,7 +6,7 @@ on:
     branches: [ master, bs4 ]
   workflow_dispatch:
 jobs:
-  spec_v8 & spec_models:
+  spec_v8_and_spec_models:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
