@@ -1,31 +1,20 @@
-# This is a basic workflow to help you get started with Actions
 name: CI
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master, bs4 ]
   pull_request:
     branches: [ master, bs4 ]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  tests:
-    # The type of runner that the job will run on
+  spec_v8 & spec_models:
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
         uses: actions/checkout@v2
-      # Runs a single command using the runners shell
       - name: Setup git submodules
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
-      # Runs a set of commands using the runners shell
       - name: Docker compose build
         run: docker-compose build
       - name: Setup database & test env
@@ -34,3 +23,18 @@ jobs:
         run: docker-compose run web bin/spec_v8
       - name: Run spec_models tests
         run: docker-compose run web bin/spec_models
+  spec_controllers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_controllerstests
+        run: docker-compose run web bin/spec_controllers
