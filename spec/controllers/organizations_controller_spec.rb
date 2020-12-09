@@ -41,7 +41,7 @@ describe OrganizationsController, type: :controller do
         get :show, id: @organization.slug
 
         expect(assigns(:ongoing_courses).map(&:name)).to eq(%w[SomeTestCourse AnotherTestCourse])
-        #expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
+        # expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
       end
     end
 

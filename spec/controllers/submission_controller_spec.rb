@@ -93,7 +93,7 @@ describe SubmissionsController, type: :controller do
         expect(json).to have_key 'test_cases'
         expect(json['status']).to eq('ok')
         expect(json['all_tests_passed']).to be nil
-        expect(json['test_cases'][0]['name']).to include("TestResultsAreHidden")
+        expect(json['test_cases'][0]['name']).to include('TestResultsAreHidden')
         expect(json['points']).to eq([])
         expect(json['validations']).to be nil
         expect(json['valgrind']).to be nil
@@ -106,7 +106,7 @@ describe SubmissionsController, type: :controller do
         expect(json).to have_key 'test_cases'
         expect(json['status']).to eq('ok')
         expect(json['all_tests_passed']).to be nil
-        expect(json['test_cases'][0]['name']).to include("TestResultsAreHidden")
+        expect(json['test_cases'][0]['name']).to include('TestResultsAreHidden')
         expect(json['points']).to eq([])
         expect(json['validations']).to be nil
         expect(json['valgrind']).to be nil
