@@ -6,7 +6,7 @@ on:
     branches: [ master, bs4 ]
   workflow_dispatch:
 jobs:
-  spec_v8_and_spec_models:
+  spec_v8:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -21,8 +21,23 @@ jobs:
         run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
       - name: Run spec_v8 tests
         run: docker-compose run web bin/spec_v8
+
+  spec_models:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
       - name: Run spec_models tests
         run: docker-compose run web bin/spec_models
+
   spec_controllers:
     runs-on: ubuntu-latest
     steps:
@@ -36,5 +51,5 @@ jobs:
         run: docker-compose build
       - name: Setup database & test env
         run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
-      - name: Run spec_controllerstests
+      - name: Run spec_controller stests
         run: docker-compose run web bin/spec_controllers
