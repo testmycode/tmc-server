@@ -24,11 +24,11 @@ feature 'Admin propagates template changes to all courses cloned from template',
     visit '/'
     # log_in_as @teacher1.login, 'teacher1'
     log_in_as @admin.login, 'xooxer'
-    create_course_from_template name: 'course', organization_slug: @organization1.slug
+    create_course_from_template name: 'course1', organization_slug: @organization1.slug
 
     # log_out
     # log_in_as @teacher2.login, 'teacher2'
-    create_course_from_template name: 'course', organization_slug: @organization2.slug
+    create_course_from_template name: 'course2', organization_slug: @organization2.slug
 
     log_out
   end
@@ -42,12 +42,12 @@ feature 'Admin propagates template changes to all courses cloned from template',
 
     visit '/'
     click_link @organization1.name
-    click_link 'course'
+    click_link 'course1'
     expect(page).to have_content('MyExercise')
 
     visit '/'
     click_link @organization2.name
-    click_link 'course'
+    click_link 'course2'
     expect(page).to have_content('MyExercise')
   end
 
@@ -66,7 +66,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
 
     visit '/'
     click_link @organization1.name
-    click_link 'course'
+    click_link 'course1'
     expect(page).not_to have_content('MyExercise (disabled)')
     expect(page).to have_content('MyAnotherExercise (disabled)')
   end
@@ -96,21 +96,21 @@ feature 'Admin propagates template changes to all courses cloned from template',
 
     visit '/'
     click_link @organization1.name
-    click_link 'course'
+    click_link 'course1'
     click_link 'MyExercise'
     attach_file('Zipped project', 'MyExercise.zip')
     click_button 'Submit'
 
     visit '/'
     click_link @organization1.name
-    click_link 'course'
+    click_link 'course1'
     first(:link, 'MyExercise').click
     expect(page).to have_content('Showing 1 to 1 of 1 entries')
     expect(page).not_to have_content('No submissions yet.')
 
     visit '/'
     click_link @organization2.name
-    click_link 'course'
+    click_link 'course2'
     first(:link, 'MyExercise').click
     expect(page).not_to have_content('Showing 1 to 1 of 1 entries')
     expect(page).to have_content('No submissions yet.')
@@ -118,8 +118,8 @@ feature 'Admin propagates template changes to all courses cloned from template',
 
   private
 
-    def add_exercise(exercise_name = 'MyExercise')
-      course = Course.find_by!(name: @organization1.slug + '-course')
+    def add_exercise(exercise_name = 'MyExercise', course_name = 'course1')
+      course = Course.find_by!(name: @organization1.slug + '-' + course_name)
       repo = clone_course_repo(course)
       repo.copy_simple_exercise(exercise_name)
       repo.add_commit_push
