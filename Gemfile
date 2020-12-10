@@ -59,7 +59,7 @@ end
 group :development, :test do
   gem 'capybara', '~> 2.17'
   gem 'factory_girl_rails', '~> 4.5.0'
-  gem 'poltergeist', '~> 1.7.0'
+  gem 'poltergeist', '~> 1.8.1'
   gem 'rspec', '~> 3.5.0'
   gem 'rspec-activemodel-mocks', '~> 1.0.0'
   gem 'rspec-core', '~> 3.5.2'

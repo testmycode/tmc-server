@@ -22,7 +22,7 @@ feature 'Admin sets expiredate to course templates', feature: true do
   end
 
   scenario 'Admin succeeds at setting expiredate' do
-    log_in_as(@admin.login, 'xooxer')
+    log_in_as(@admin.email, 'xooxer')
     visit('/course_templates')
 
     find('tr', text: 'Template 2').click_link('Edit')
@@ -34,7 +34,7 @@ feature 'Admin sets expiredate to course templates', feature: true do
   end
 
   scenario 'Admin succeeds at toggling between hidden and non-hidden' do
-    log_in_as(@admin.login, 'xooxer')
+    log_in_as(@admin.email, 'xooxer')
     visit('/course_templates')
 
     find('tr', text: 'Template 2').click_link('hide')
@@ -44,7 +44,7 @@ feature 'Admin sets expiredate to course templates', feature: true do
   end
 
   scenario "Teacher doesn't see expired or hidden course templates" do
-    log_in_as(@teacher.login, 'xooxer')
+    log_in_as(@teacher.email, 'xooxer')
     visit('/org/slug/course_templates')
 
     expect(page).to have_content('Template 1')
@@ -55,14 +55,14 @@ feature 'Admin sets expiredate to course templates', feature: true do
   end
 
   scenario "Teacher can't create course from expired template" do
-    log_in_as(@teacher.login, 'xooxer')
+    log_in_as(@teacher.email, 'xooxer')
     visit("/setup/slug/course/new/#{@ct_expired_visible.id}")
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 
   scenario "Teacher can't create course from hidden template" do
-    log_in_as(@teacher.login, 'xooxer')
+    log_in_as(@teacher.email, 'xooxer')
     visit("/setup/slug/course/new/#{@ct_expired_visible.id}")
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 end
