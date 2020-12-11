@@ -97,7 +97,7 @@ describe StudentSubmissionMigrator do
   def expect_awarded_points(new_awarded_points, old_awarded_points)
     s1 = new_awarded_points.attributes
     s2 = old_awarded_points.attributes
-    %w[course_id submission_id id].each do |field|
+    %w[course_id created_at submission_id id].each do |field|
       s1.delete(field)
       s2.delete(field)
     end
