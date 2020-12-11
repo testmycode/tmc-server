@@ -9,6 +9,7 @@ describe "Resetting one's password by e-mail", type: :request, integration: true
     user = User.create!(login: 'theuser', password: 'forgot_this', email: 'theuser@example.com')
 
     visit '/'
+    find(:link, @user.email).trigger('click')
     click_link 'Forgot password'
     fill_in 'email', with: 'theuser@example.com'
     click_button 'Send password reset link'

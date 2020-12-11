@@ -29,7 +29,7 @@ describe 'Personal deadlines', type: :request, integration: true do
   specify 'doing one exercise should unlock the other' do
     @course.refresh
     visit '/org/slug/courses'
-    within '#ongoing-courses' do click_link 'mycourse' end
+    within '#ongoing-courses' do find(:link, 'mycourse').trigger('click') end
 
     expect(page).to have_content('MyExercise1')
     expect(page).not_to have_content('MyExercise2')

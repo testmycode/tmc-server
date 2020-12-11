@@ -24,7 +24,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
 
     visit '/org/slug/courses'
     log_in_as(@user.login, 'xooxer')
-    click_link 'mycourse'
+    find(:link, 'mycourse').trigger('click')
+    # click_link 'mycourse'
   end
 
   describe 'pastes' do

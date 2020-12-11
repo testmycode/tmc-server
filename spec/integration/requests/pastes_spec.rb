@@ -34,7 +34,7 @@ describe 'Paste JSON api', type: :request, integration: true do
   def create_paste_submission(solve = false, user = nil, time = Time.now)
     visit '/org/slug/courses'
     log_in_as(user.login, 'xooxer')
-    click_link 'mycourse'
+    find(:link, 'mycourse').trigger('click')
     ex = FixtureExercise::SimpleExercise.new('MyExercise')
     ex.solve_all if solve
     ex.make_zip

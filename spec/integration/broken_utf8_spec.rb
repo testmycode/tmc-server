@@ -9,7 +9,7 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @teacher = FactoryGirl.create(:verified_user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
     @course = FactoryGirl.create(:course, name: 'mycourse', title: 'My Course', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
@@ -18,11 +18,12 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
 
     @course.refresh
 
-    @user = FactoryGirl.create(:user, password: 'xooxer')
+    @user = FactoryGirl.create(:verified_user, password: 'xooxer')
 
     visit '/org/slug/courses'
     log_in_as(@user.login, 'xooxer')
-    click_link 'My Course'
+    find(:link, 'My Course').trigger('click')
+    #click_link 'My Course'
 
     ex = FixtureExercise.get('MakefileC', 'BrokenUtf8', fixture_name: 'BrokenUtf8')
     ex.make_zip src_only: false
