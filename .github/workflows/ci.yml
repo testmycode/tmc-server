@@ -51,5 +51,21 @@ jobs:
         run: docker-compose build
       - name: Setup database & test env
         run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
-      - name: Run spec_controller stests
+      - name: Run spec_controllers tests
         run: docker-compose run web bin/spec_controllers
+
+  spec_features:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_features tests
+        run: docker-compose run web bin/spec_features
