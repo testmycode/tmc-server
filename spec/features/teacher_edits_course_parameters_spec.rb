@@ -6,8 +6,8 @@ feature 'Teacher can edit course parameters', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @user = FactoryGirl.create :user, password: 'xooxer'
-    @teacher = FactoryGirl.create :user, password: 'foobar'
+    @user = FactoryGirl.create :verified_user, password: 'xooxer'
+    @teacher = FactoryGirl.create :verified_user, password: 'foobar'
     @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
     @course = FactoryGirl.create :course, name: 'oldTitle', title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial.com', organization: @organization
     FactoryGirl.create :course, title: 'dontchange', organization: @organization
@@ -67,7 +67,7 @@ feature 'Teacher can edit course parameters', feature: true do
     visit '/org/slug'
     link = find(:link, 'oldTitle')
     link.trigger('click')
-    expect(page).not_to have_button 'Update Course'
+    expect(page).not_to have_button 'Edit details'
   end
 
   describe 'Teacher sets custom points URL with dynamic parameters' do

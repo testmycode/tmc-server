@@ -49,7 +49,8 @@ describe 'Teacher can hide submission results from users', feature: true do
   scenario 'In My stats page user can not see results of submission' do
     log_in_as(@user.login, 'foobar')
     visit_course
-    first(:link, @user.email).click
+    link = find(:link, @user.email).first
+    link.trigger('click')
     expect(page).to have_content('For this course points are not visible')
     expect(page.find_by_id('submissions').find('tr', text: @user.username)).to have_content('Hidden')
   end
