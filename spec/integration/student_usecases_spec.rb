@@ -10,7 +10,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @teacher = FactoryGirl.create(:verified_user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
     @course = FactoryGirl.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
@@ -19,11 +19,12 @@ describe 'The system (used by a student)', type: :request, integration: true do
 
     @course.refresh
 
-    @user = FactoryGirl.create(:user, password: 'xooxer')
+    @user = FactoryGirl.create(:verified_user, password: 'xooxer')
     @ability = Ability.new(@user)
-
+    visit '/'
+    
+    log_in_as(@user.email, 'xooxer')
     visit '/org/slug/courses'
-    log_in_as(@user.login, 'xooxer')
     click_link 'mycourse'
   end
 
