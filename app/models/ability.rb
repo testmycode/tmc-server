@@ -270,7 +270,7 @@ class Ability
 
       cannot :teach, Course
       can :teach, Course do |c|
-        can? :teach, c.organization || c.assistant?(user)
+        can?(:teach, c.organization) || c.assistant?(user)
         # c.organization.teacher?(user) || c.assistant?(user)
       end
 
