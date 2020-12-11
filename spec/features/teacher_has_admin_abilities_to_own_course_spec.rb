@@ -71,7 +71,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
     expect(page).to have_content('1 code review requested')
     click_link '1 code review requested'
     click_link 'Requested'
-    click_link 'Start code review'
+    # click_link 'Start code review'
 
     fill_in('review_review_body', with: 'Code looks ok')
 
