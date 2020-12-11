@@ -39,7 +39,8 @@ describe 'Deleting own user', type: :request, integration: true do
 
     visit "/users/#{user.id}/destroy/#{token.token}"
 
-    expect(page).to have_content("Deleting the account #{user.login}")
+    # expect(page).to have_content("Deleting the account #{user.login}")
+    expect(page).to have_content("Deleting your account will have the following consequences:")
 
     expect(page).to have_button('Destroy my account permanently', disabled: true)
 
@@ -76,7 +77,8 @@ describe 'Deleting own user', type: :request, integration: true do
     page.accept_alert
 
     expect { User.find_by!(login: username) }.to raise_error ActiveRecord::RecordNotFound
-    expect(page).to have_content("The account #{username} has been permanently destroyed")
+    expect(page).to have_content("Your account has been permanently destroyed.")
+    expect(page).to have_content("Log in")
   end
 
   it 'will not destroy user if password incorrect' do
@@ -126,6 +128,6 @@ describe 'Deleting own user', type: :request, integration: true do
 
     visit "/users/#{user1.id}/destroy/#{token.token}"
 
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 end
