@@ -7,9 +7,9 @@ feature 'Teacher has admin abilities to own course', feature: true do
 
   before :each do
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
+    @teacher = FactoryGirl.create :verified_user, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
-    @student = FactoryGirl.create :user, password: 'foobar'
+    @student = FactoryGirl.create :verified_user, password: 'foobar'
     @admin = FactoryGirl.create :admin, password: 'admin'
 
     repo_path = Dir.pwd + '/remote_repo'
@@ -59,7 +59,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
     available_point = FactoryGirl.create :available_point, exercise: @exercise1
     available_point.award_to(@student, @submission)
     visit '/org/slug/courses/1'
-    click_link 'View points'
+    click_link 'Points list'
 
     expect(page).to have_content('1/6')
     expect(page).not_to have_content('0/6')

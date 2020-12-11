@@ -18,9 +18,11 @@
 <% end %>
 
 <% unless @my_organizations.empty? %>
-  <h2>My Organizations</h2>
+  <div id="my-orgs-list">
+    <h2>My Organizations</h2>
 
-  <%= render @my_organizations %>
+    <%= render @my_organizations %>
+  </div>
 <% end %>
 
 <h2>Frequently Used Organizations</h2>
