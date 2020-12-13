@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with: 
+          submodules: false
       - name: Setup git submodules
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
@@ -27,6 +29,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with: 
+          submodules: false
       - name: Setup git submodules
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
@@ -43,6 +47,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with: 
+          submodules: false
       - name: Setup git submodules
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
@@ -59,6 +65,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with: 
+          submodules: false
       - name: Setup git submodules
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
@@ -75,6 +83,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with: 
+          submodules: false
       - name: Setup git submodules
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
@@ -91,6 +101,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with: 
+          submodules: false
       - name: Setup git submodules
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
