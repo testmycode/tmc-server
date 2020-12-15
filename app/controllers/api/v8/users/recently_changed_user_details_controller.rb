@@ -3,7 +3,7 @@
 module Api
   module V8
     module Users
-      class RequestDeletionController < Api::V8::BaseController
+      class RecentlyChangedUserDetailsController < Api::V8::BaseController
         skip_authorization_check
 
         def index
