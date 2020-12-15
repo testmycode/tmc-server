@@ -22,8 +22,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @user = FactoryGirl.create(:user, password: 'xooxer')
     @ability = Ability.new(@user)
 
-    visit '/org/slug/courses'
     log_in_as(@user.login, 'xooxer')
+    visit '/org/slug/courses'
     find(:link, 'mycourse').trigger('click')
     # click_link 'mycourse'
   end

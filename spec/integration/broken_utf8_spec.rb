@@ -20,8 +20,8 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
 
     @user = FactoryGirl.create(:verified_user, password: 'xooxer')
 
-    visit '/org/slug/courses'
     log_in_as(@user.login, 'xooxer')
+    visit '/org/slug/courses'
     find(:link, 'My Course').trigger('click')
     # click_link 'My Course'
 
