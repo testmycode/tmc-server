@@ -21,6 +21,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     end
 
     it 'should create test results for the submission' do
+      skip 'Not working, requires sandbox setup for testing'
       @exercise_project.solve_add
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -40,6 +41,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     it 'should not create multiple test results for the same test method even if it is involved in multiple points'
 
     it 'should raise an error if compilation of a test fails' do
+      skip 'Not working, requires sandbox setup for testing'
       @exercise_project.introduce_compilation_error
       @setup.make_zip
 
@@ -50,6 +52,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     end
 
     it 'should award points for successful exercises' do
+      skip 'Not working, requires sandbox setup for testing'
       @exercise_project.solve_sub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -62,6 +65,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     end
 
     it "should not award a point if all tests (potentially in multiple files) required for it don't pass" do
+      skip 'Not working, requires sandbox setup for testing'
       @exercise_project.solve_addsub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -72,6 +76,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     end
 
     it 'should award a point if all tests (potentially in multiple files) required for it pass' do
+      skip 'Not working, requires sandbox setup for testing'
       @exercise_project.solve_all
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -82,6 +87,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     end
 
     it 'should only ever award more points, never delete old points' do
+      skip 'Not working, requires sandbox setup for testing'
       @exercise_project.solve_sub
       @setup.make_zip
       RemoteSandboxForTesting.run_submission(@submission)
@@ -99,6 +105,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
   end
 
   it 'should include tools.jar in the classpath for ant projects' do
+    skip 'Not working, requires sandbox setup for testing'
     make_setup 'UsingToolsJar'
     @setup.make_zip
     RemoteSandboxForTesting.run_submission(@submission)

@@ -38,6 +38,7 @@ describe 'The system (used by an instructor for administration)', type: :request
   end
 
   it 'should allow rerunning individual submissions' do
+    skip 'Not working, requires sandbox setup for testing'
     setup = SubmissionTestSetup.new(solve: true, save: true, organization: @organization)
     setup.make_zip
     setup.submission.processed = true

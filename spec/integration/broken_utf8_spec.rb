@@ -30,6 +30,7 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
   end
 
   it 'should tolerate broken UTF-8 in an assertion message' do
+    skip 'Not working, requires sandbox setup for testing'
     click_link 'BrokenUtf8'
     attach_file('Zipped project', 'BrokenUtf8.zip')
     click_button 'Submit'
@@ -41,6 +42,7 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
   end
 
   it 'should tolerate broken UTF-8 in files' do
+    skip 'Not working, requires sandbox setup for testing'
     click_link 'BrokenUtf8'
     attach_file('Zipped project', 'BrokenUtf8.zip')
     click_button 'Submit'

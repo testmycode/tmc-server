@@ -96,20 +96,20 @@ jobs:
       - name: Run spec_lib tests
         run: docker-compose run web bin/spec_lib
 
-#  spec_integration:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#        with: 
-#          submodules: false
-#      - name: Setup git submodules
-#        run: |
-#          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-#          git submodule update --init --recursive
-#      - name: Docker compose build
-#        run: docker-compose build
-#      - name: Setup database & test env
-#        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
-#      - name: Run spec_integration tests
-#        run: docker-compose run web bin/spec_integration
+  spec_integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_integration tests
+        run: docker-compose run web bin/spec_integration

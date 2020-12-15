@@ -5,6 +5,7 @@ require 'spec_helper'
 # FIXME: might not work as expected, tests are not final...
 describe RemoteSandboxForTesting, type: :request, integration: true do
   specify 'running makefile_c tests' do
+    skip 'Not working, requires sandbox setup for testing'
     setup = SubmissionTestSetup.new(exercise_name: 'MakefileC')
     submission = setup.submission
 
@@ -29,6 +30,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
   end
 
   specify 'C compilation failures' do
+    skip 'Not working, requires sandbox setup for testing'
     setup = SubmissionTestSetup.new(exercise_name: 'MakefileC')
     submission = setup.submission
 
