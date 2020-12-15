@@ -4,7 +4,7 @@
       <% unless @submission.valgrind.blank?%>
         <p>Errors in Valgrind check. See <a href="#valgrind">Valgrind log</a>.</p>
       <% end %>
-      <% if @submission.validations && @submission.validations['validationErrors'].any? %>
+      <% if @submission.validations && @submission.validations['validationErrors'] && @submission.validations['validationErrors'].any? %>
         <div>
           <h3 class="text-info underlined">Validation Cases</h3>
           <% @submission.validations['validationErrors'].each do |file, errors| %>
