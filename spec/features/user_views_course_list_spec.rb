@@ -33,7 +33,7 @@ feature 'User views organization list', feature: true do
   scenario 'User can see only own submissions for his courses in course_id/submissions view' do
     log_in_as(@student.email, 'foobar')
     visit '/org/slug/courses/1/submissions'
-  
+
     expect(page).to have_content('All submissions for mycourse')
     expect(page).not_to have_content('No data available in table')
     expect(page).to have_content('Showing 1 to 1 of 1 entries')
@@ -56,5 +56,4 @@ feature 'User views organization list', feature: true do
     expect(page).not_to have_content('Forbidden')
     expect(page).not_to have_content(@student2.email)
   end
-
 end

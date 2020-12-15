@@ -65,7 +65,7 @@ FactoryGirl.define do
     sequence(:name) { |n| "exercise#{n}" }
     sequence(:gdocs_sheet) { |n| "exercise#{n}" }
     docker_image 'eu.gcr.io/moocfi-public/tmc-sandbox-tmc-langs-rust'
-  end 
+  end
 
   factory :returnable_exercise, parent: :exercise do
     returnable_forced true

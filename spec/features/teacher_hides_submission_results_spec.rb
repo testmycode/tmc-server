@@ -66,7 +66,7 @@ describe 'Teacher can hide submission results from users', feature: true do
     expect(page).to_not have_link('View suggested solution')
     click_link('Test Results')
     expect(page).to have_content('Test Cases')
-    #expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
+    # expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
     expect(find('tr').all('td').count).to eq(0)
   end
 
@@ -107,8 +107,8 @@ describe 'Teacher can hide submission results from users', feature: true do
       click_link('Test Results')
       expect(page).to have_content('Test Cases')
       expect(find('tr').all('td').count).to eq(0)
-      #expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
-      #expect(find('tr', text: tcr.test_case_name).all('td').count).to eq(2)
+      # expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
+      # expect(find('tr', text: tcr.test_case_name).all('td').count).to eq(2)
     end
   end
 end

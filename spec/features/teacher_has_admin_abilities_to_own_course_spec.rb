@@ -57,7 +57,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
 
   scenario 'Teacher can see all submissions for his organization courses in course_id/submissions view' do
     visit '/org/slug/courses/1/submissions'
-    
+
     expect(page).to have_content('All submissions for mycourse')
     expect(page).not_to have_content('No data available in table')
     expect(page).to have_content('Showing 1 to 1 of 1 entries')

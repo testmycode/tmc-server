@@ -20,7 +20,7 @@ feature 'Teacher can edit course parameters', feature: true do
     visit '/org/slug'
     link = find(:link, 'oldTitle')
     link.trigger('click')
-    #click_link 'oldTitle'
+    # click_link 'oldTitle'
     click_link 'Edit course details'
 
     fill_in 'course_title', with: 'newTitle'

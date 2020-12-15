@@ -22,7 +22,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @user = FactoryGirl.create(:verified_user, password: 'xooxer')
     @ability = Ability.new(@user)
     visit '/'
-    
+
     log_in_as(@user.email, 'xooxer')
     visit '/org/slug/courses'
     click_link 'mycourse'

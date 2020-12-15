@@ -23,7 +23,7 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
     visit '/org/slug/courses'
     log_in_as(@user.login, 'xooxer')
     find(:link, 'My Course').trigger('click')
-    #click_link 'My Course'
+    # click_link 'My Course'
 
     ex = FixtureExercise.get('MakefileC', 'BrokenUtf8', fixture_name: 'BrokenUtf8')
     ex.make_zip src_only: false
