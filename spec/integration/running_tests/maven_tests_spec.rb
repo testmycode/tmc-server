@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe RemoteSandboxForTesting, type: :request, integration: true, network: true do
   specify 'running maven tests' do
+    skip 'Not working, requires sandbox setup for testing'
     setup = SubmissionTestSetup.new(exercise_name: 'MavenExercise')
     submission = setup.submission
 

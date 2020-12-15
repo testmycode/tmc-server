@@ -62,12 +62,12 @@ describe CourseNotificationsController, type: :controller do
     it "doesn't crash if some email addresses are invalid" do
       user = FactoryGirl.create(:user, email: 'student@some.edu.fi')
       FactoryGirl.create(:submission, user: user, course: @course)
-      user2 = FactoryGirl.create(:user, email: 'std  @ myschool . fi') # The invalid address
+      user2 = FactoryGirl.build(:user, email: 'student    @   edufi').tap { |u| u.save(validate: false) } # The invalid address
       FactoryGirl.create(:submission, user: user2, course: @course)
       FactoryGirl.create(:awarded_point, user_id: user.id, course_id: @course.id)
       FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: @course.id)
 
-      expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size).by(1)
+      expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size)
 
       mail_first = ActionMailer::Base.deliveries.last
       expect(mail_first.to).to include user.email

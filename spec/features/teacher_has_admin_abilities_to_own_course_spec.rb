@@ -7,9 +7,9 @@ feature 'Teacher has admin abilities to own course', feature: true do
 
   before :each do
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
+    @teacher = FactoryGirl.create :verified_user, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
-    @student = FactoryGirl.create :user, password: 'foobar'
+    @student = FactoryGirl.create :verified_user, password: 'foobar'
     @admin = FactoryGirl.create :admin, password: 'admin'
 
     repo_path = Dir.pwd + '/remote_repo'
@@ -52,14 +52,22 @@ feature 'Teacher has admin abilities to own course', feature: true do
     expect(page).to have_content('Submission 1')
     expect(page).to have_content('Submitted at')
     expect(page).to have_content('Test Results')
-    expect(page).not_to have_content('Access denied')
+    expect(page).not_to have_content('Forbidden')
+  end
+
+  scenario 'Teacher can see all submissions for his organization courses in course_id/submissions view' do
+    visit '/org/slug/courses/1/submissions'
+
+    expect(page).to have_content('All submissions for mycourse')
+    expect(page).not_to have_content('No data available in table')
+    expect(page).to have_content('Showing 1 to 1 of 1 entries')
   end
 
   scenario 'Teacher can see users points from his own courses' do
     available_point = FactoryGirl.create :available_point, exercise: @exercise1
     available_point.award_to(@student, @submission)
     visit '/org/slug/courses/1'
-    click_link 'View points'
+    click_link 'Points list'
 
     expect(page).to have_content('1/6')
     expect(page).not_to have_content('0/6')
@@ -71,6 +79,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
     expect(page).to have_content('1 code review requested')
     click_link '1 code review requested'
     click_link 'Requested'
+    # click_link 'Start code review'
 
     fill_in('review_review_body', with: 'Code looks ok')
 

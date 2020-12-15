@@ -93,7 +93,7 @@ feature 'Teacher disables exercises', feature: true do
 
     visit "/exercises/#{@ex1.id}"
 
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 
   def visit_course(course)

@@ -35,7 +35,8 @@ describe Setup::CourseAssistantsController, type: :controller do
              organization_id: @organization.slug,
              course_id: @course.id,
              commit: 'Add new assistant',
-             username: 'assi'
+             username: 'assi',
+             email: @assistant.email
         expect(assigns(:course).assistants.first).to eq(@assistant)
         expect(Assistantship.count).to be(1)
       end
@@ -46,7 +47,8 @@ describe Setup::CourseAssistantsController, type: :controller do
              organization_id: @organization.slug,
              course_id: @course.id,
              commit: 'Add new assistant',
-             username: 'notfound'
+             username: 'notfound',
+             email: 'assi@absintti.org'
         expect(@course.assistants.count).to eq(0)
         expect(response).to render_template(:index)
       end
@@ -58,7 +60,8 @@ describe Setup::CourseAssistantsController, type: :controller do
              organization_id: @organization.slug,
              course_id: @course.id,
              commit: 'Add new assistant',
-             username: 'assi'
+             username: 'assi',
+             email: @assistant.email
         expect(@course.assistants.count).to eq(1)
         expect(response).to render_template(:index)
       end
@@ -92,16 +95,16 @@ describe Setup::CourseAssistantsController, type: :controller do
 
     it 'should not allow any access' do
       get :index, organization_id: @organization.slug, course_id: @course.id
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
       post :create,
            organization_id: @organization.slug,
            course_id: @course.id,
            commit: 'Add new assistant',
            username: 'assi'
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
       @assistantship = Assistantship.create! user: @user, course: @course
       delete :destroy, organization_id: @organization.slug, course_id: @course.id, id: @assistantship.to_param
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(302)
     end
   end
 end

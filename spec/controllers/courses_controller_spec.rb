@@ -213,7 +213,7 @@ describe CoursesController, type: :controller do
     it "can't refresh if course created from template" do
       @course = FactoryGirl.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
       post :refresh, organization_id: @organization.slug, id: @course.id
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
     end
   end
 
@@ -234,7 +234,7 @@ describe CoursesController, type: :controller do
       it 'denies access' do
         controller.current_user = @user
         post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end
@@ -256,7 +256,7 @@ describe CoursesController, type: :controller do
       it 'denies access' do
         controller.current_user = @user
         post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end
@@ -327,12 +327,12 @@ describe CoursesController, type: :controller do
   end
 
   describe 'GET manage_unlocks' do
-    it 'when non-teacher should respond with a 401' do
+    it 'when non-teacher should respond with a 403' do
       @course = FactoryGirl.create :course
       @course.organization = @organization
       controller.current_user = @user
       get :manage_unlocks, organization_id: @organization.slug, id: @course.id
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
     end
   end
 
@@ -405,10 +405,10 @@ describe CoursesController, type: :controller do
       end
     end
 
-    it 'when non-teacher should respond with a 401' do
+    it 'when non-teacher should respond with a 403' do
       @course.exercises.create(name: 'e')
       post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
     end
   end
 
@@ -443,7 +443,7 @@ describe CoursesController, type: :controller do
         controller.current_user = @user
         post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
         @course.reload
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

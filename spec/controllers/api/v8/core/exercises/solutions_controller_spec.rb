@@ -9,7 +9,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
   repo_path = Dir.tmpdir + '/api/v8/core/exercises/solutions/remote_repo'
   let(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
   let(:exercise) { FactoryGirl.create(:exercise, name: 'testexercise', course: course) }
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryGirl.create(:verified_user) }
   let(:admin) { FactoryGirl.create(:admin) }
 
   before :each do

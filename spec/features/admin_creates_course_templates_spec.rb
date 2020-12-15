@@ -16,7 +16,7 @@ feature 'Admin creates course templates', feature: true do
     repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(repo_path)
 
-    log_in_as(@admin.login, 'xooxer')
+    log_in_as(@admin.email, 'xooxer')
     visit '/course_templates'
 
     click_link 'New Course template'
@@ -33,7 +33,7 @@ feature 'Admin creates course templates', feature: true do
   end
 
   scenario 'Admin doesnt succeed if parameters are invalid' do
-    log_in_as(@admin.login, 'xooxer')
+    log_in_as(@admin.email, 'xooxer')
     visit '/course_templates'
 
     click_link 'New Course template'
@@ -51,9 +51,9 @@ feature 'Admin creates course templates', feature: true do
   end
 
   scenario 'Non-admin doesnt succeed' do
-    log_in_as(@user.login, 'foobar')
+    log_in_as(@user.email, 'foobar')
     visit '/course_templates'
 
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 end

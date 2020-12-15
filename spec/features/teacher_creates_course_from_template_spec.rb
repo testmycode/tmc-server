@@ -11,7 +11,7 @@ feature 'Teacher creates course from course template', feature: true do
     @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
     @teacher = FactoryGirl.create :user, password: 'xooxer'
     @user = FactoryGirl.create :user, password: 'foobar'
-    @assistant = FactoryGirl.create :user, login: 'assi', password: 'assi'
+    @assistant = FactoryGirl.create :user, login: 'assi', password: 'assi', email: 'assi@passi.fi'
     Teachership.create! user: @teacher, organization: @organization
 
     repo_path = @test_tmp_dir + '/fake_remote_repo'
@@ -52,9 +52,9 @@ feature 'Teacher creates course from course template', feature: true do
     click_button 'Accept and continue'
 
     expect(page).to have_content('Phase 4 - Course assistants')
-    fill_in 'username', with: 'assi'
+    fill_in 'email', with: 'assi@passi.fi'
     click_button 'Add new assistant'
-    expect(page).to have_content('Assistant assi added')
+    expect(page).to have_content('Assistant assi@passi.fi added')
     click_button 'Continue'
 
     expect(page).to have_content('Course is ready!')

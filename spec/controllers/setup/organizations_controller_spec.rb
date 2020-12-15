@@ -80,7 +80,7 @@ describe Setup::OrganizationsController, type: :controller do
       describe 'with trying to change slug' do
         it 'should deny access' do
           put :update, id: @organization.to_param, organization: new_attributes.merge(slug: 'newslug')
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(403)
         end
       end
     end
@@ -147,14 +147,14 @@ describe Setup::OrganizationsController, type: :controller do
     describe 'GET edit' do
       it 'should deny access' do
         get :edit, id: @organization.to_param
-        expect(response.status).to eq(401)
+        expect(response.status).to eq(403)
       end
     end
 
     describe 'PUT update' do
       it 'should deny access' do
         put :update, id: @organization.to_param, organization: new_attributes
-        expect(response.status).to eq(401)
+        expect(response.status).to eq(403)
       end
     end
   end

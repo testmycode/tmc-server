@@ -291,7 +291,7 @@ class SubmissionsController < ApplicationController
     def index_json_datatables
       submissions = @course.submissions
 
-      unless current_user.administrator?
+      unless current_user.administrator? || can?(:teach, @course)
         submissions = submissions.where(user_id: current_user.id)
       end
 

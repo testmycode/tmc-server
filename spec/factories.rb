@@ -29,6 +29,14 @@ FactoryGirl.define do
     sequence(:login) { |n| "user#{n}" }
     sequence(:password) { |n| "userpass#{n}" }
     sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:email_verified) { |n| 'false' }
+    administrator false
+  end
+
+  factory :verified_user, class: User do
+    sequence(:login) { |n| "ver_user#{n}" }
+    sequence(:password) { |n| "ver_userpass#{n}" }
+    sequence(:email) { |n| "ver_user#{n}@example.com" }
     sequence(:email_verified) { |n| 'true' }
     administrator false
   end
@@ -37,6 +45,7 @@ FactoryGirl.define do
     sequence(:login) { |n| "admin#{n}" }
     sequence(:password) { |n| "adminpass#{n}" }
     sequence(:email) { |n| "admin#{n}@example.com" }
+    sequence(:email_verified) { |n| 'true' }
     administrator true
   end
 
@@ -55,6 +64,7 @@ FactoryGirl.define do
     course
     sequence(:name) { |n| "exercise#{n}" }
     sequence(:gdocs_sheet) { |n| "exercise#{n}" }
+    docker_image 'eu.gcr.io/moocfi-public/tmc-sandbox-tmc-langs-rust'
   end
 
   factory :returnable_exercise, parent: :exercise do

@@ -136,7 +136,7 @@ describe Setup::CourseDetailsController, type: :controller do
       describe 'with invalid parameters' do
         it 'renders form again with invalid parameters' do
           post :update, organization_id: @organization.to_param, course_id: @course.to_param,
-                        course: { title: 'a' * 41 }
+                        course: { title: 'a' * 81 }
           expect(response).to render_template('edit')
         end
 
@@ -220,9 +220,9 @@ describe Setup::CourseDetailsController, type: :controller do
 
     it 'should not allow any access' do
       get :new, organization_id: @organization.slug, template_id: @ct.id
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
       post :create, organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path, course_template_id: @ct.id }
-      expect(response.code.to_i).to eq(401)
+      expect(response.code.to_i).to eq(403)
       ## TODO: Rest of the actions
     end
   end

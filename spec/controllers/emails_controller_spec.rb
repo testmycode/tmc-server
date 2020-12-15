@@ -25,7 +25,7 @@ describe EmailsController, type: :controller do
       it 'denies access for non-admins' do
         controller.current_user = @teacher
         get :index, format: :text
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
 
@@ -58,7 +58,7 @@ describe EmailsController, type: :controller do
       it 'denies access for non-teachers' do
         controller.current_user = @user
         get :index, organization_id: @organization.slug, id: @course.id
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

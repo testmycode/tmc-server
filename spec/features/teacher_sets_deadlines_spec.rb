@@ -7,7 +7,7 @@ feature 'Teacher sets deadlines', feature: true do
 
   before :each do
     organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @teacher = FactoryGirl.create :user, password: '1234'
+    @teacher = FactoryGirl.create :verified_user, password: '1234'
     @admin = FactoryGirl.create :admin, password: '1234'
 
     repo_path = @test_tmp_dir + '/fake_remote_repo'

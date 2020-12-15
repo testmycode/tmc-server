@@ -22,7 +22,7 @@ class SubmissionTestSetup
     exercise_dest = options[:exercise_dest] || exercise_name
     should_solve = options[:solve]
     should_save = options[:save]
-    @user = options[:user] || create_user
+    @user = options[:verified_user] || create_user
 
     @test_tmp_dir = "#{::Rails.root}/tmp/tests"
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
@@ -75,6 +75,6 @@ class SubmissionTestSetup
   private
 
     def create_user
-      FactoryGirl.create(:user, login: 'student', password: 'student')
+      FactoryGirl.create(:verified_user, login: 'student', password: 'student')
     end
 end
