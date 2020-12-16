@@ -89,11 +89,11 @@ RSpec.configure do |config|
       SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://#{host_ip}:3000/"
       SiteSetting.all_settings['remote_sandboxes'] = ["http://#{host_ip}:3232/"]
       SiteSetting.all_settings['emails']['email_code_reviews_by_default'] = false
-      SiteSetting.all_settings['comet_server'] = {
-        'url' => "http://localhost:#{CometSupport.port}/",
-        'backend_key' => CometSupport.backend_key,
-        'my_baseurl' => "http://localhost:#{Capybara.server_port}/"
-      }
+      # SiteSetting.all_settings['comet_server'] = {
+      #   'url' => "http://localhost:#{CometSupport.port}/",
+      #   'backend_key' => CometSupport.backend_key,
+      #   'my_baseurl' => "http://localhost:#{Capybara.server_port}/"
+      # }
     else
       DatabaseCleaner.strategy = :transaction
     end
