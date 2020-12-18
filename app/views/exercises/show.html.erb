@@ -152,9 +152,9 @@
 
 <% if can? :toggle_submission_result_visibility, @exercise.course %>
   <% if @exercise.hide_submission_results? %>
-    <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-primary btn-sm" %>
+    <%= link_to 'Disable exercise exam mode', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-primary btn-sm" %>
   <% else %>
-    <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-warning btn-sm" %>
+    <%= link_to 'Enable exercise exam mode', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-warning btn-sm" %>
   <% end %>
 <% end %>
 

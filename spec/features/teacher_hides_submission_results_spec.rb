@@ -33,10 +33,10 @@ describe 'Teacher can hide submission results from users', feature: true do
     visit "/org/#{@organization.slug}/courses/#{@course.id}"
   end
 
-  scenario "Teacher can see button 'Make submission results visible' when result are hidden" do
+  scenario "Teacher can see button 'Disable exam mode' when result are hidden" do
     log_in_as(@teacher.login, 'xooxer')
     visit_course
-    expect(page).to have_content('Make submission results visible')
+    expect(page).to have_content('Disable exam mode')
   end
 
   scenario 'In course page user can not see results of submission and link to points page' do
@@ -70,12 +70,29 @@ describe 'Teacher can hide submission results from users', feature: true do
     expect(find('tr').all('td').count).to eq(0)
   end
 
+  scenario 'In submission page user can not see model solution when all tests passed' do
+    FactoryGirl.create :submission_data, submission: @submission
+    tcr = FactoryGirl.create :test_case_run, submission: @submission
+    @submission.stdout = 'some stdout text'
+    @submission.stderr = 'some stderr text'
+    @submission.valgrind = 'some valgrind text'
+    @submission.all_tests_passed = true
+    @submission.save!
+    log_in_as(@user.login, 'foobar')
+    visit_course
+    click_link('Details')
+    expect(page).to have_content('All tests done - results are hidden')
+    expect(page).to_not have_content('Got 1 out of 1 point')
+    expect(page).to_not have_link('View suggested solution')
+  end
+
   scenario 'when c language exercise then in submission page user can not see results of submission' do
     FactoryGirl.create :submission_data, submission: @submission
     tcr = FactoryGirl.create :test_case_run, submission: @submission
     @submission.stdout = 'some stdout text'
     @submission.stderr = 'some stderr text'
     @submission.valgrind = 'some valgrind text'
+    @submission.all_tests_passed = true
     @submission.save!
     log_in_as(@user.login, 'foobar')
     visit_course
@@ -96,6 +113,8 @@ describe 'Teacher can hide submission results from users', feature: true do
       @course.save!
       @exercise.hide_submission_results = true
       @exercise.save!
+      @submission.all_tests_passed = true
+      @submission.save!
       FactoryGirl.create :submission_data, submission: @submission
       tcr = FactoryGirl.create :test_case_run, submission: @submission
       log_in_as(@user.login, 'foobar')

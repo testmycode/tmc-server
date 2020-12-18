@@ -177,7 +177,7 @@ class CoursesController < ApplicationController
   def toggle_submission_result_visibility
     authorize! :toggle_submission_result_visibility, @course
     @course.toggle_submission_result_visiblity
-    redirect_to organization_course_path(@organization, @course), notice: "Submission results are now #{@course.hide_submission_results ? 'hidden' : 'visible'}"
+    redirect_to organization_course_path(@organization, @course), notice: "Exam mode is now #{@course.hide_submission_results ? 'enabled' : 'disabled'}"
   end
 
   private
