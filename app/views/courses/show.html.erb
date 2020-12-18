@@ -60,11 +60,16 @@
       <% if @course.hide_submission_results? %>
         <div class="card text-danger border-danger mb-3">
           <div class="card-body">
-            <h3 class="card-title"><%= fa_icon 'warning', text: 'Submission results are hidden' %></h3>
+            <h3 class="card-title"><%= fa_icon 'warning', text: 'Exam mode enabled' %></h3>
             <p class="card-text">
-              This is rarely a good idea as this feature is usually used only for exams.
+              This course is marked as an exam.
+              <ul>
+                <li>Submission results will not be visible to users.</li>
+                <li>Model solutions are not accessible.</li>
+                <li>Points are hidden.</li>
+              </ul>
             </p>
-            <%= link_to 'Make submission results visible', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-danger" if can? :teach, @course  %>
+            <%= link_to 'Disable exam mode', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-danger" if can? :teach, @course  %>
           </div>
         </div>
       <% end %>
@@ -158,9 +163,9 @@
           <li>
           <% if can? :toggle_submission_result_visibility, @course %>
             <% if @course.hide_submission_results? %>
-              <%= link_to 'Make submission results visible', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-sm" %>
+              <%= link_to 'Disable exam mode', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-primary btn-sm" %>
             <% else %>
-              <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-sm" %>
+              <%= link_to 'Enable exam mode', toggle_submission_result_visibility_organization_course_path(@organization, @course), method: :post, class: "btn btn-warning btn-sm" %>
             <% end %>
           <% end %>
           <% if can? :refresh, @course %>
