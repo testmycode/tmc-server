@@ -33,7 +33,7 @@ class UsersController < ApplicationController
 
     @user = User.new
 
-    @user.login = params[:user][:login].to_s.strip
+    @user.login = SecureRandom.uuid
 
     set_email
     set_password

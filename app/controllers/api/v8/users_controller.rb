@@ -95,7 +95,7 @@ module Api
 
         @user = User.new
 
-        @user.login = params[:user][:username].to_s.strip
+        @user.login = SecureRandom.uuid
 
         set_email
         set_password
