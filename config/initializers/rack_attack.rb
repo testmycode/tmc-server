@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Rack::Attack
-
   # Return 503 Service Unavailable for throttles
   self.throttled_response = lambda do |env|
     [ 503, # status
