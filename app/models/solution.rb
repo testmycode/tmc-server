@@ -25,6 +25,8 @@ class Solution
       true
     elsif user.guest?
       false
+    elsif @exercise.course.hide_submission_results? || @exercise.hide_submission_results?
+      false
     elsif @exercise.course.model_solution_visible_before_completion? && @exercise.course.enabled?
       true
     elsif @exercise.completed_by?(user)
@@ -32,8 +34,6 @@ class Solution
     elsif !@exercise.course.visible_to?(user)
       false
     elsif !@exercise.visible_to?(user)
-      false
-    elsif @exercise.course.hide_submission_results?
       false
     else
       show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')

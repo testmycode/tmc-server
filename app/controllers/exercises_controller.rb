@@ -83,6 +83,12 @@ class ExercisesController < ApplicationController
     @exercise = Exercise.find(params[:id])
     authorize! :toggle_submission_result_visibility, @exercise.course
     @exercise.toggle_submission_result_visiblity
-    redirect_to exercise_path(@exercise), notice: "Submission results are now #{@exercise.hide_submission_results ? 'hidden' : 'visible'}"
+    status = @exercise.hide_submission_results ? '<b>hidden</b>' : '<b>visible</b>'
+    redirect_to exercise_path(@exercise), notice: "<h4>Exercise status update:</h4>
+    <ul>
+      <li>Submission results are now #{status}</li>
+      <li>Points are now #{status}</li>
+      <li>Model solutions is now #{status}</li>
+    </ul>"
   end
 end
