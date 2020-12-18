@@ -32,3 +32,6 @@
 
 # Byebug history file
 .byebug_history
+
+# Node_modules
+/ext/sandbox/node_modules

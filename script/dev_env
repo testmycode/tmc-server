@@ -12,12 +12,8 @@ title "rails server"
 screen bundle exec script/background_daemon run
 title "background"
 
-#screen bundle exec rake dev:comet:run
-#title "comet"
+screen tail -f log/background_daemon.log
+title "background log"
 
-#screen ext/tmc-spyware-server/dev.rb
-#title "spyware"
-
-#screen ./rubysudo ext/tmc-sandbox/web/webapp.rb run
-#title "sandbox"
-
+screen -d -m bash -c "cd ext/sandbox; npm run dev"
+title "sandbox"

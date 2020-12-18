@@ -122,6 +122,8 @@ valid_clients:
     min_version: 0.2.22
   - name: tmc.py
     min_version: 0.3.0
+  - name: vscode_plugin
+    min_version: 1.4.0
 
 ## Cross Origin Requests for /auth ##
 
