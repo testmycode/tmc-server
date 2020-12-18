@@ -72,6 +72,7 @@ end
 RSpec.configure do |config|
   config.mock_with :rspec
 
+  config.raise_errors_for_deprecations!
   config.use_transactional_fixtures = false
   config.include FactoryGirl::Syntax::Methods
   config.include Capybara::DSL
