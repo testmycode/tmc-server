@@ -21,10 +21,8 @@ class SolutionsController < ApplicationController
         return respond_forbidden('Please verify your email address in order to see solutions.')
       elsif current_user.teacher?(@organization) || current_user.assistant?(@course)
         return respond_forbidden("You can't see model solutions until organization is verified by administrator")
-      elsif @course.hide_submission_results?
+      elsif @course.hide_submission_results? || @exercise.hide_submission_results?
         return respond_forbidden('Exercise is part of an exam, and thus model solution is unavailable.')
-      elsif @exercise.hide_submission_results?
-        return respond_forbidden('Exercise submission results are hidden, and thus model solution is unavailable.')
       else
         return respond_forbidden("It seems you haven't solved the exercise yourself yet.")
       end
