@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class Rack::Attack
+  def self.user_identifier_discriminator(access_token)
+    db_token = Doorkeeper::AccessToken.find_by(token: access_token)
+    return access_token unless db_token
+    db_token.resource_owner_id
+  end
+
   # Return 503 Service Unavailable for throttles
   self.throttled_response = lambda do |env|
     [ 503, # status
@@ -32,11 +38,39 @@ class Rack::Attack
 
   # Limit the number of account creations to 15 accounts per minute
   throttle('account creations per minute', limit: 15, period: 1.minute) do |req|
-    req.ip if req.path == '/user' && req.post?
+    req.ip if req.path == '/user' ||
+    req.path == 'api/v8/users' &&
+    req.post?
   end
 
   # Limit the number of account creations to 1000 per day
   throttle('account creations per day', limit: 1000, period: 1.day) do |req|
-    req.ip if req.path == '/user' && req.post?
+    req.ip if req.path == '/user' ||
+    req.path == 'api/v8/users' &&
+    req.post?
+  end
+
+  # Limit the number of submissions per ip to 15 per 10 minutes
+  throttle('submissions per ip per 10 minutes', limit: 15, period: 10.minutes) do |req|
+    req.ip if req.path =~ %r{^/exercises/\d+/submissions$} ||
+    req.path =~ %r{^/org/\d+/exercises/\d+/submissions$} ||
+    req.path =~ %r{^/api/v8/core/exercises/\d+/submissions$} &&
+    req.post?
+  end
+
+  # Limit the number of submissions per ip to 200 per day to api v7 endpoints
+  throttle('submissions per ip per day to api v7', limit: 200, period: 1.day) do |req|
+    req.ip if req.path =~ %r{^/exercises/\d+/submissions$} ||
+    req.path =~ %r{^/org/\d+/exercises/\d+/submissions$} &&
+    req.post?
+  end
+
+  # Limit the number of submissions per user to 250 per day to the api v8 endpoint
+  throttle('submissions per user per day to api v8', limit: 250, period: 1.day) do |req|
+    if req.path =~ %r{^/api/v8/core/exercises/\d+/submissions$} && req.post?
+      token = req.params['access_token']
+      discriminator = user_identifier_discriminator(token)
+      discriminator
+    end
   end
 end
