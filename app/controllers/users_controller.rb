@@ -64,6 +64,7 @@ class UsersController < ApplicationController
 
   def update
     @user = current_user
+    @email_before = @user.email
 
     set_email
     password_changed = maybe_update_password(@user, params[:user])
@@ -75,6 +76,7 @@ class UsersController < ApplicationController
     end
 
     if @user.errors.empty? && @user.save
+      RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login) unless @email_before.casecmp(@user.email).zero?
       flash[:notice] = if password_changed
         'Changes saved and password changed'
       else
