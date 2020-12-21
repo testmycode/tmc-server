@@ -7,7 +7,7 @@ describe Api::Beta::ParticipantController, type: :request do
     @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
     @admin = FactoryGirl.create(:admin, password: 'xooxer')
     @user = FactoryGirl.create(:user, login: 'user', password: 'xooxer')
-    SiteSetting.stub(:value).with('valid_clients')
+    allow(SiteSetting).to receive(:value).with('valid_clients')
                .and_return([{ 'name' => 'cli', 'min_version' => '0.1.1' }])
   end
 
