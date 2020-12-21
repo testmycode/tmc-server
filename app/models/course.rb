@@ -5,7 +5,7 @@ require 'course_refresher'
 require 'system_commands'
 require 'date_and_time_utils'
 
-class Course < ApplicationController
+class Course < ApplicationRecord
   include SystemCommands
   include Swagger::Blocks
 

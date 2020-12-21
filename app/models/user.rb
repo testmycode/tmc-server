@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class User < ApplicationController
+class User < ApplicationRecord
   include Comparable
   include Gravtastic
   include Swagger::Blocks

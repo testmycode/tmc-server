@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Assistantship < ApplicationController
+class Assistantship < ApplicationRecord
   belongs_to :user
   belongs_to :course
 

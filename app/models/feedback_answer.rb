@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Stores what the student has answered to a single feedback question (for an exercise in a course).
-class FeedbackAnswer < ApplicationController
+class FeedbackAnswer < ApplicationRecord
   belongs_to :feedback_question
   belongs_to :course
   belongs_to :exercise, ->(exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name

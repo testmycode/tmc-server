@@ -2,7 +2,7 @@
 
 require 'shellwords'
 
-class Exercise < ApplicationController
+class Exercise < ApplicationRecord
   self.include_root_in_json = false
   include Swagger::Blocks
 

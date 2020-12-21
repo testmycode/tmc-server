@@ -7,7 +7,7 @@ require 'securerandom'
 # The password reset key may be generated and sent by e-mail and
 # may be used once to set a new password.
 # A password reset key is valid for a limited time and may safely be left unused.
-class ActionToken < ApplicationController
+class ActionToken < ApplicationRecord
   belongs_to :user
   validates :user_id, presence: true, uniqueness: true
   validates :token, uniqueness: true # this going wrong should be extremely unlikely

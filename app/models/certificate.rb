@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Certificate < ApplicationController
+class Certificate < ApplicationRecord
   belongs_to :user
   belongs_to :course
 

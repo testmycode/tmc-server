@@ -5,7 +5,7 @@
 require 'net/http'
 require 'course_refresher'
 
-class CourseTemplate < ApplicationController
+class CourseTemplate < ApplicationRecord
   include SystemCommands
 
   validates :name,

@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class ReplyToFeedbackAnswer < ApplicationController
+class ReplyToFeedbackAnswer < ApplicationRecord
   belongs_to :feedback_answer
 end

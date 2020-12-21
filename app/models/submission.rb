@@ -3,7 +3,7 @@
 require 'zlib'
 require 'securerandom'
 
-class Submission < ApplicationController
+class Submission < ApplicationRecord
   include Swagger::Blocks
 
   swagger_schema :Submission do

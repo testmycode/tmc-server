@@ -2,7 +2,7 @@
 
 require 'natsort'
 
-class Review < ApplicationController
+class Review < ApplicationRecord
   include Swagger::Blocks
 
   swagger_schema :Review do
