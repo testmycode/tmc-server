@@ -42,7 +42,7 @@ describe ExerciseStatusController, type: :controller do
       end
 
       def do_get
-        get :show, organization_id: @organization.slug, course_id: @course.id, id: @user.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @user.id, format: :json, api_version: ApiVersion::API_VERSION }
       end
 
       it 'should show completition status for submitted exercises' do

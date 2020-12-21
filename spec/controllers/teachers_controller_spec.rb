@@ -19,7 +19,7 @@ describe TeachersController, type: :controller do
 
       describe 'GET index' do
         it 'lists teachers in organization' do
-          get :index, organization_id: @organization.slug
+          get :index, params: { organization_id: @organization.slug }
           expect(assigns(:teachers)).to eq([@teacher])
         end
       end
@@ -63,7 +63,7 @@ describe TeachersController, type: :controller do
 
     describe 'GET index' do
       it 'denies access' do
-        get :index, organization_id: @organization.slug
+        get :index, params: { organization_id: @organization.slug }
         expect(response.code.to_i).to eq(403)
       end
     end

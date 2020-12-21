@@ -19,7 +19,7 @@ describe CoursesController, type: :controller do
 
   describe 'GET index' do
     it 'shows visible courses in order by name, split into ongoing and expired' do
-      get :index, organization_id: @organization.slug
+      get :index, params: { organization_id: @organization.slug }
       expect(response.code.to_i).to eq(302)
       expect(response).to redirect_to(organization_path(@organization))
     end
@@ -32,7 +32,7 @@ describe CoursesController, type: :controller do
           organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = 'Basic ' + Base64.encode64("#{@user.login}:#{@user.password}")
-        get :index, options
+        get :index, params: options
         JSON.parse(response.body)
       end
 
@@ -66,7 +66,7 @@ describe CoursesController, type: :controller do
         sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
         sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.id
+        get :show, params: { organization_id: @organization.slug, id: @course.id }
 
         expect(assigns['submissions']).to include(sub1)
         expect(assigns['submissions']).to include(sub2)
@@ -82,7 +82,7 @@ describe CoursesController, type: :controller do
         FactoryGirl.create(:submission, course: @course)
         FactoryGirl.create(:submission, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.id
+        get :show, params: { organization_id: @organization.slug, id: @course.id }
 
         expect(assigns['submissions']).to be_nil
       end
@@ -97,7 +97,7 @@ describe CoursesController, type: :controller do
         my_sub = FactoryGirl.create(:submission, user: @user, course: @course)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.id
+        get :show, params: { organization_id: @organization.slug, id: @course.id }
 
         expect(assigns['submissions']).to include(my_sub)
         expect(assigns['submissions']).not_to include(other_guys_sub)
@@ -120,7 +120,7 @@ describe CoursesController, type: :controller do
           organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
-        get :show, options
+        get :show, params: options
         if parse_json
           JSON.parse(response.body)
         else

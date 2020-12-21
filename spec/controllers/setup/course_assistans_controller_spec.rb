@@ -23,7 +23,7 @@ describe Setup::CourseAssistantsController, type: :controller do
         user2 = FactoryGirl.create(:user)
         user3 = FactoryGirl.create(:user)
         @course.assistants << [user1, user2, user3]
-        get :index, organization_id: @organization.slug, course_id: @course.id
+        get :index, params: { organization_id: @organization.slug, course_id: @course.id }
         expect(assigns(:assistants)).to eq([user1, user2, user3])
       end
     end
@@ -94,7 +94,7 @@ describe Setup::CourseAssistantsController, type: :controller do
     end
 
     it 'should not allow any access' do
-      get :index, organization_id: @organization.slug, course_id: @course.id
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id }
       expect(response.code.to_i).to eq(403)
       post :create,
            organization_id: @organization.slug,

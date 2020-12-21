@@ -17,7 +17,7 @@ describe CertificatesController, type: :controller do
         my_cert = FactoryGirl.create(:certificate, user: @user, course: @course)
         other_guys_cert = FactoryGirl.create(:certificate, user: other_user, course: @course)
 
-        get :index, participant_id: @user.id
+        get :index, params: { participant_id: @user.id }
 
         expect(assigns(:user).certificates).to include(my_cert)
         expect(assigns(:user).certificates).not_to include(other_guys_cert)
@@ -25,7 +25,7 @@ describe CertificatesController, type: :controller do
       it "should not have access to other user's certificates" do
         other_user = FactoryGirl.create(:user)
 
-        get :index, participant_id: other_user.id
+        get :index, params: { participant_id: other_user.id }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -39,7 +39,7 @@ describe CertificatesController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_cert = FactoryGirl.create(:certificate, user: other_user, course: @course)
 
-        get :index, participant_id: other_user.id
+        get :index, params: { participant_id: other_user.id }
         expect(assigns(:user).certificates).to include(other_guys_cert)
       end
     end

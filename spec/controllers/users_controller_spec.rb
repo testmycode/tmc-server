@@ -138,14 +138,14 @@ describe UsersController, type: :controller do
     end
 
     it 'should save the email field' do
-      put :update, user: { email: 'newemail@valid.com', email_repeat: 'newemail@valid.com' }
+      put :update, params: { user: { email: 'newemail@valid.com', email_repeat: 'newemail@valid.com' } }
       expect(response).to redirect_to(user_path)
       expect(@user.reload.email).to eq('newemail@valid.com')
     end
 
     it 'should not allow changing the login' do
       old_login = @user.login
-      put :update, user: { email: 'newemail@valid.com', login: 'newlogin' }
+      put :update, params: { user: { email: 'newemail@valid.com', login: 'newlogin' } }
       expect(response).to redirect_to(user_path)
       expect(@user.reload.login).to eq(old_login)
     end
@@ -159,7 +159,7 @@ describe UsersController, type: :controller do
       allow(UserField).to receive_messages(all: fields)
       allow(ExtraField).to receive(:by_kind).with(:user).and_return(fields)
 
-      put :update, user: { email: @user.email }, user_field: { 'field1' => 'foo', 'field2' => '1' }
+      put :update, params: { user: { email: @user.email }, user_field: { 'field1' => 'foo', 'field2' => '1' } }
 
       expect(@user.field_value_record(fields[0]).value).to eq('foo')
       expect(@user.field_value_record(fields[1]).value).not_to be_blank
@@ -176,13 +176,13 @@ describe UsersController, type: :controller do
       end
 
       it 'should not try to change the password unless specified' do
-        put :update, user: params
+        put :update, params: { user: params }
         expect(response).to redirect_to(user_path)
         expect(@user.reload).to have_password('oldpassword')
       end
 
       it 'should change the password if the old password matched and both new password fields were the same' do
-        put :update, user: params.merge(old_password: 'oldpassword',
+        put :update, params: { user: params.merge(old_password: 'oldpassword', }
                                         password: 'newpassword',
                                         password_repeat: 'newpassword')
         expect(response).to redirect_to(user_path)
@@ -190,7 +190,7 @@ describe UsersController, type: :controller do
       end
 
       it 'should not change the password if the old password was wrong' do
-        put :update, user: params.merge(old_password: 'wrongpassword',
+        put :update, params: { user: params.merge(old_password: 'wrongpassword', }
                                         password: 'newpassword',
                                         password_repeat: 'newpassword')
         expect(response.status).to eq(403)
@@ -198,7 +198,7 @@ describe UsersController, type: :controller do
       end
 
       it 'should not change the password if the new password fields were not the same' do
-        put :update, user: params.merge(old_password: 'oldpassword',
+        put :update, params: { user: params.merge(old_password: 'oldpassword', }
                                         password: 'newpassword',
                                         password_repeat: 'foo')
         expect(response.status).to eq(403)
@@ -206,7 +206,7 @@ describe UsersController, type: :controller do
       end
 
       it 'should not allow changing to a blank password' do
-        put :update, user: params.merge(old_password: 'oldpassword',
+        put :update, params: { user: params.merge(old_password: 'oldpassword', }
                                         password: '',
                                         password_repeat: '')
         expect(response.status).to eq(403)

@@ -30,7 +30,7 @@ describe SubmissionsController, type: :controller do
       it "should return 'processing' status" do
         @submission.processed = false
         @submission.save!
-        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
         json = JSON.parse response.body
         check_common_keys(json)
         expect(json).to have_key 'submissions_before_this'
@@ -43,7 +43,7 @@ describe SubmissionsController, type: :controller do
       it "should return 'ok' status and right fields" do
         @submission.all_tests_passed = true
         @submission.save!
-        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
         json = JSON.parse response.body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
@@ -55,7 +55,7 @@ describe SubmissionsController, type: :controller do
 
     describe 'when test failed' do
       it "should return 'fail' status and right field" do
-        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
         json = JSON.parse response.body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
@@ -67,7 +67,7 @@ describe SubmissionsController, type: :controller do
       it "should return 'error' status and right field" do
         @submission.pretest_error = 'some funny error'
         @submission.save!
-        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
         json = JSON.parse response.body
         check_common_keys(json)
         expect(json).to have_key 'error'
@@ -87,7 +87,7 @@ describe SubmissionsController, type: :controller do
         @submission.all_tests_passed = true
         @submission.points = 'some points'
         @submission.save!
-        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
         json = JSON.parse response.body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
@@ -101,7 +101,7 @@ describe SubmissionsController, type: :controller do
 
       it "when all_tests_passed is false and no points should return 'ok' status and 'TestResultsAreHidden' and empty points array" do
         # pending('Waiting for clients to be updated')
-        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
         json = JSON.parse response.body
         expect(json).to have_key 'test_cases'
         expect(json['status']).to eq('ok')
@@ -123,7 +123,7 @@ describe SubmissionsController, type: :controller do
         @submission.all_tests_passed = true
         @submission.points = 'some points'
         @submission.save!
-        get :show, id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
         json = JSON.parse response.body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'

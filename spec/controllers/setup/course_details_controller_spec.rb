@@ -102,7 +102,7 @@ describe Setup::CourseDetailsController, type: :controller do
       it 'should save the updates' do
         @new_repo_path = @test_tmp_dir + '/new_fake_remote_repo'
         create_bare_repo(@new_repo_path)
-        put :update, organization_id: @organization.slug, course_id: @course.id,
+        put :update, params: { organization_id: @organization.slug, course_id: @course.id, }
                      course: {
                        title: 'New title',
                        description: 'New description',
@@ -119,7 +119,7 @@ describe Setup::CourseDetailsController, type: :controller do
       describe 'when in wizard mode' do
         it 'redirects to next wizard page' do
           init_session
-          put :update, organization_id: @organization.slug, course_id: @course.id,
+          put :update, params: { organization_id: @organization.slug, course_id: @course.id, }
                        course: { title: 'New title', description: 'New description', material_url: 'http://new.url' }
           expect(response).to redirect_to(setup_organization_course_course_timing_path(@organization, Course.find(@course.id)))
         end
@@ -127,7 +127,7 @@ describe Setup::CourseDetailsController, type: :controller do
 
       describe 'when updating without wizard' do
         it 'redirects to course page' do
-          put :update, organization_id: @organization.slug, course_id: @course.id,
+          put :update, params: { organization_id: @organization.slug, course_id: @course.id, }
                        course: { title: 'New title', description: 'New description', material_url: 'http://new.url' }
           expect(response).to redirect_to(organization_course_path(@organization, Course.find(@course.id)))
         end
@@ -141,14 +141,14 @@ describe Setup::CourseDetailsController, type: :controller do
         end
 
         it "can't update course name" do
-          put :update, organization_id: @organization.to_param, course_id: @course.to_param,
+          put :update, params: { organization_id: @organization.to_param, course_id: @course.to_param, }
                        course: { name: 'newName' }
           expect(Course.last.name).to eq('originalCourse')
         end
 
         it "can't update course template id" do
           old_id = @course.course_template_id
-          put :update, organization_id: @organization.to_param, course_id: @course.to_param,
+          put :update, params: { organization_id: @organization.to_param, course_id: @course.to_param, }
                        course: { course_template_id: 2 }
           expect(Course.last.course_template_id).to eq(old_id)
         end
@@ -164,13 +164,13 @@ describe Setup::CourseDetailsController, type: :controller do
         it "can't update source_url" do
           @new_repo_path = @test_tmp_dir + '/new_fake_remote_repo'
           create_bare_repo(@new_repo_path)
-          put :update, organization_id: @organization.to_param, course_id: @course.to_param,
+          put :update, params: { organization_id: @organization.to_param, course_id: @course.to_param, }
                        course: { source_url: @new_repo_path }
           expect(Course.last.source_url).to eq(@ct.source_url)
         end
 
         it "can't update git_branch" do
-          put :update, organization_id: @organization.to_param, course_id: @course.to_param,
+          put :update, params: { organization_id: @organization.to_param, course_id: @course.to_param, }
                        course: { git_branch: 'ufobranch' }
           expect(Course.last.git_branch).to eq('master')
         end
@@ -178,7 +178,7 @@ describe Setup::CourseDetailsController, type: :controller do
 
       it 'should not update without teacher permissions' do
         controller.current_user = @user
-        put :update, organization_id: @organization.to_param, course_id: @course.to_param,
+        put :update, params: { organization_id: @organization.to_param, course_id: @course.to_param, }
                      course: { title: 'newTitle', description: 'newDescription', material_url: 'http://newMaterial.com' }
         course = Course.last
         expect(course.title).to eq('originalTitle')

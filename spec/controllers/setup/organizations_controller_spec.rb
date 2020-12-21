@@ -48,7 +48,7 @@ describe Setup::OrganizationsController, type: :controller do
 
     describe 'PUT update' do
       it 'should update organization' do
-        put :update, id: @organization.to_param, organization: new_attributes
+        put :update, params: { id: @organization.to_param, organization: new_attributes }
         org = Organization.find_by slug: @organization.slug
         expect(org.name).to eq('New organization name')
         expect(org.information).to eq('New information')
@@ -56,30 +56,30 @@ describe Setup::OrganizationsController, type: :controller do
       end
 
       it 'should assign the requested organization as @organization' do
-        put :update, id: @organization.to_param, organization: new_attributes
+        put :update, params: { id: @organization.to_param, organization: new_attributes }
         expect(assigns(:organization)).to eq(@organization)
       end
 
       it 'should redirects to the organization' do
-        put :update, id: @organization.to_param, organization: new_attributes
+        put :update, params: { id: @organization.to_param, organization: new_attributes }
         expect(response).to redirect_to(@organization)
       end
 
       describe 'with invalid params' do
         it 'should assign the organization as @organization' do
-          put :update, id: @organization.to_param, organization: invalid_attributes
+          put :update, params: { id: @organization.to_param, organization: invalid_attributes }
           expect(assigns(:organization)).to eq(@organization)
         end
 
         it "should re-render the 'edit' template" do
-          put :update, id: @organization.to_param, organization: invalid_attributes.except(:slug)
+          put :update, params: { id: @organization.to_param, organization: invalid_attributes.except(:slug) }
           expect(response).to render_template('edit')
         end
       end
 
       describe 'with trying to change slug' do
         it 'should deny access' do
-          put :update, id: @organization.to_param, organization: new_attributes.merge(slug: 'newslug')
+          put :update, params: { id: @organization.to_param, organization: new_attributes.merge(slug: 'newslug') }
           expect(response.status).to eq(403)
         end
       end
@@ -153,7 +153,7 @@ describe Setup::OrganizationsController, type: :controller do
 
     describe 'PUT update' do
       it 'should deny access' do
-        put :update, id: @organization.to_param, organization: new_attributes
+        put :update, params: { id: @organization.to_param, organization: new_attributes }
         expect(response.status).to eq(403)
       end
     end

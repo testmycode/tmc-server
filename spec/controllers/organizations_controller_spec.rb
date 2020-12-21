@@ -38,7 +38,7 @@ describe OrganizationsController, type: :controller do
           FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
         ]
 
-        get :show, id: @organization.slug
+        get :show, params: { id: @organization.slug }
 
         expect(assigns(:ongoing_courses).map(&:name)).to eq(%w[SomeTestCourse AnotherTestCourse])
         # expect(assigns(:expired_courses).map(&:name)).to eq(['ExpiredCourse'])
@@ -102,7 +102,7 @@ describe OrganizationsController, type: :controller do
     describe 'GET index' do
       it 'assigns all organizations as @organizations' do
         organization = Organization.create! valid_attributes
-        get :index, {}
+        get :index, params: { }
         expect(assigns(:organizations)).to eq([organization])
       end
     end
@@ -110,7 +110,7 @@ describe OrganizationsController, type: :controller do
     describe 'GET show' do
       it 'assigns the requested organization as @organization' do
         organization = Organization.create! valid_attributes
-        get :show, id: organization.to_param
+        get :show, params: { id: organization.to_param }
         expect(assigns(:organization)).to eq(organization)
       end
     end

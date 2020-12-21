@@ -16,7 +16,7 @@ describe EmailsController, type: :controller do
     describe 'global list' do
       it 'lists all users in the system if current user is admin' do
         controller.current_user = @admin
-        get :index, format: :text
+        get :index, params: { format: :text }
         User.all.each do |user|
           expect(assigns(:emails)).to include(user.email)
         end
@@ -24,7 +24,7 @@ describe EmailsController, type: :controller do
 
       it 'denies access for non-admins' do
         controller.current_user = @teacher
-        get :index, format: :text
+        get :index, params: { format: :text }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -49,7 +49,7 @@ describe EmailsController, type: :controller do
 
       it 'assigns users in @students array if they have submitted exercises to the course if current user is teacher' do
         controller.current_user = @teacher
-        get :index, organization_id: @organization.slug, id: @course.id
+        get :index, params: { organization_id: @organization.slug, id: @course.id }
         expect(assigns(:students)).to include(@user1)
         expect(assigns(:students)).to include(@user2)
         expect(assigns(:students)).to_not include(@user3)
@@ -57,7 +57,7 @@ describe EmailsController, type: :controller do
 
       it 'denies access for non-teachers' do
         controller.current_user = @user
-        get :index, organization_id: @organization.slug, id: @course.id
+        get :index, params: { organization_id: @organization.slug, id: @course.id }
         expect(response.code.to_i).to eq(403)
       end
     end

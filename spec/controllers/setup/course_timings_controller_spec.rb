@@ -18,18 +18,18 @@ describe Setup::CourseTimingsController, type: :controller do
 
     describe 'GET show' do
       it 'show the right course' do
-        get :show, organization_id: @organization.slug, course_id: @course.id
+        get :show, params: { organization_id: @organization.slug, course_id: @course.id }
         expect(assigns(:organization)).to eq(@organization)
       end
 
       it 'should show wizard bar correctly' do
         init_session
-        get :show, organization_id: @organization.slug, course_id: @course.id
+        get :show, params: { organization_id: @organization.slug, course_id: @course.id }
         expect(assigns(:course_setup_phases)).not_to be_nil
       end
 
       it 'should not show wizard bar when not in wizard mode' do
-        get :show, organization_id: @organization.slug, course_id: @course.id
+        get :show, params: { organization_id: @organization.slug, course_id: @course.id }
         expect(assigns(:course_setup_phases)).to be_nil
       end
     end
@@ -170,9 +170,9 @@ describe Setup::CourseTimingsController, type: :controller do
     end
 
     it 'should not allow any access' do
-      get :show, organization_id: @organization.slug, course_id: @course.id
+      get :show, params: { organization_id: @organization.slug, course_id: @course.id }
       expect(response.code.to_i).to eq(403)
-      put :update, organization_id: @organization.slug, course_id: @course.id, commit: 'Fill and preview', unlock_type: '1'
+      put :update, params: { organization_id: @organization.slug, course_id: @course.id, commit: 'Fill and preview', unlock_type: '1' }
       expect(response.code.to_i).to eq(403)
     end
   end

@@ -18,7 +18,7 @@ describe Setup::CourseFinisherController, type: :controller do
 
     describe 'GET index' do
       it 'redirects to setup root if not setup wizard active' do
-        get :index, organization_id: @organization.slug, course_id: @course.id
+        get :index, params: { organization_id: @organization.slug, course_id: @course.id }
         expect(session[:ongoing_course_setup]).to be_nil
         expect(response).to redirect_to(setup_start_index_path)
       end
@@ -61,7 +61,7 @@ describe Setup::CourseFinisherController, type: :controller do
     end
 
     it 'should not allow any access' do
-      get :index, organization_id: @organization.slug, course_id: @course.id
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id }
       expect(response.code.to_i).to eq(403)
       post :create,
            organization_id: @organization.slug,

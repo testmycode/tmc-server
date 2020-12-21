@@ -44,7 +44,7 @@ describe CourseTemplatesController, type: :controller do
         FactoryGirl.create :course_template, name: 'template3'
       end
       it 'should show course templates' do
-        get :index, {}
+        get :index, params: { }
         expect(assigns(:course_templates).map(&:name)).to eq(%w[template1 template2 template3])
       end
     end
@@ -96,24 +96,24 @@ describe CourseTemplatesController, type: :controller do
 
       describe 'with valid params' do
         it 'updates the course template' do
-          put :update, id: @course_template.to_param, course_template: valid_attributes
+          put :update, params: { id: @course_template.to_param, course_template: valid_attributes }
           expect(CourseTemplate.last.name).to eq('TestTemplateCourse')
         end
 
         it 'redirects to the course templates list' do
-          put :update, id: @course_template.to_param, course_template: valid_attributes
+          put :update, params: { id: @course_template.to_param, course_template: valid_attributes }
           expect(response).to redirect_to(course_templates_url)
         end
       end
 
       describe 'with invalid params' do
         it "doesn't update the course template" do
-          put :update, id: @course_template.to_param, course_template: invalid_attributes
+          put :update, params: { id: @course_template.to_param, course_template: invalid_attributes }
           expect(CourseTemplate.last.name).to eq('oldName')
         end
 
         it "re-renders the 'edit' template" do
-          put :update, id: @course_template.to_param, course_template: invalid_attributes
+          put :update, params: { id: @course_template.to_param, course_template: invalid_attributes }
           expect(response).to render_template('edit')
         end
       end
@@ -147,7 +147,7 @@ describe CourseTemplatesController, type: :controller do
 
     describe 'GET index' do
       it 'should respond with a 403' do
-        get :index, {}
+        get :index, params: { }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -200,12 +200,12 @@ describe CourseTemplatesController, type: :controller do
       end
 
       it "doesn't update the course template" do
-        put :update, id: @course_template.to_param, course_template: invalid_attributes
+        put :update, params: { id: @course_template.to_param, course_template: invalid_attributes }
         expect(CourseTemplate.last.name).to eq('oldName')
       end
 
       it 'should respond with a 403' do
-        put :update, id: @course_template.to_param, course_template: invalid_attributes
+        put :update, params: { id: @course_template.to_param, course_template: invalid_attributes }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -235,7 +235,7 @@ describe CourseTemplatesController, type: :controller do
 
     describe 'GET index' do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
-        get :index, {}
+        get :index, params: { }
         expect(response.code.to_i).to eq(302)
         expect(response.body).to include('/login?return_to=%2F%2Fcourse_templates')
       end
@@ -293,12 +293,12 @@ describe CourseTemplatesController, type: :controller do
       end
 
       it "doesn't update the course template" do
-        put :update, id: @course_template.to_param, course_template: invalid_attributes
+        put :update, params: { id: @course_template.to_param, course_template: invalid_attributes }
         expect(CourseTemplate.last.name).to eq('oldName')
       end
 
       it 'should respond with a 302 and redirect to login with correct return_to param' do
-        put :update, id: @course_template.to_param, course_template: invalid_attributes
+        put :update, params: { id: @course_template.to_param, course_template: invalid_attributes }
         expect(response.code.to_i).to eq(302)
         expect(response.body).to include('/login?return_to=%2F%2Fcourse_templates')
       end

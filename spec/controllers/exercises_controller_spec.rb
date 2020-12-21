@@ -12,7 +12,7 @@ describe ExercisesController, type: :controller do
     let!(:exercise) { FactoryGirl.create(:exercise, course: @course) }
 
     def get_show
-      get :show, organization_id: @organization.slug, id: exercise.id
+      get :show, params: { organization_id: @organization.slug, id: exercise.id }
     end
 
     describe 'for guests' do
