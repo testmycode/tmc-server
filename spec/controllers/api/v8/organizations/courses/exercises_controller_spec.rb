@@ -23,15 +23,15 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
     let(:token) { double resource_owner_id: admin.id, acceptable?: true }
     describe 'when course name is given' do
       it 'should return successful response' do
-        get :index, course_name: course_name, organization_slug: organization.slug
-        expect(response).to have_http_status(:success)
+        get :index, params: { course_name: course_name, organization_slug: organization.slug }
+        expect(response).to have_http_status(200)
       end
       it 'should return the courses exercises' do
-        get :index, course_name: course_name, organization_slug: organization.slug
+        get :index, params: { course_name: course_name, organization_slug: organization.slug }
         expect(response.body).to have_content exercise.name
       end
       it 'should show hidden exercises' do
-        get :index, course_name: course_name, organization_slug: organization.slug
+        get :index, params: { course_name: course_name, organization_slug: organization.slug }
         expect(response.body).to have_content hidden_exercise.name
       end
     end
@@ -41,15 +41,15 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
     let(:token) { double resource_owner_id: user.id, acceptable?: true }
     describe 'when course name is given' do
       it 'should return successful response' do
-        get :index, course_name: course_name, organization_slug: organization.slug
-        expect(response).to have_http_status(:success)
+        get :index, params: { course_name: course_name, organization_slug: organization.slug }
+        expect(response).to have_http_status(200)
       end
       it 'should return the courses exercises' do
-        get :index, course_name: course_name, organization_slug: organization.slug
+        get :index, params: { course_name: course_name, organization_slug: organization.slug }
         expect(response.body).to have_content exercise.name
       end
       it 'should not show hidden exercises' do
-        get :index, course_name: course_name, organization_slug: organization.slug
+        get :index, params: { course_name: course_name, organization_slug: organization.slug }
         expect(response.body).not_to have_content hidden_exercise.name
       end
     end
@@ -59,7 +59,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
     let(:token) { double resource_owner_id: admin.id, acceptable?: true }
     describe 'when course name could not be found' do
       it 'should return error' do
-        get :index, course_name: 'null', organization_slug: organization.slug
+        get :index, params: { course_name: 'null', organization_slug: organization.slug }
         expect(response).to have_http_status(:not_found)
       end
     end

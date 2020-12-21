@@ -20,7 +20,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
       end
 
       def show_course
-        get :show, id: course.id
+        get :show, params: { id: course.id }
         JSON.parse(response.body)
       end
 

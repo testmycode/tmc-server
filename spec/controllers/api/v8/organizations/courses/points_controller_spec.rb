@@ -25,8 +25,8 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
 
       describe 'when course name given' do
         it "shows only user's point information" do
-          get :index, organization_slug: organization.slug, course_name: course_name
-          expect(response).to have_http_status(:success)
+          get :index, params: { organization_slug: organization.slug, course_name: course_name }
+          expect(response).to have_http_status(200)
           expect(response.body).not_to include point.name
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
@@ -35,8 +35,8 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
       end
       describe 'when invalid course name given' do
         it 'shows error about finding course' do
-          get :index, organization_slug: organization.slug, course_name: 'bad'
-          expect(response).to have_http_status(:missing)
+          get :index, params: { organization_slug: organization.slug, course_name: 'bad' }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
           expect(response.body).not_to include current_user_course_point.name
@@ -52,8 +52,8 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
 
       describe 'when course name given' do
         it "shows only user's point information" do
-          get :index, organization_slug: organization.slug, course_name: course_name
-          expect(response).to have_http_status(:success)
+          get :index, params: { organization_slug: organization.slug, course_name: course_name }
+          expect(response).to have_http_status(200)
           expect(response.body).not_to include point.name
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
@@ -62,8 +62,8 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
       end
       describe 'when invalid course name given' do
         it 'shows error about finding course' do
-          get :index, organization_slug: organization.slug, course_name: 'bad'
-          expect(response).to have_http_status(:missing)
+          get :index, params: { organization_slug: organization.slug, course_name: 'bad' }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
           expect(response.body).not_to include current_user_course_point.name
@@ -79,16 +79,16 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
 
       describe 'when course name given' do
         it "shows only user's point information" do
-          get :index, organization_slug: organization.slug, course_name: course_name
-          expect(response).to have_http_status(:success)
+          get :index, params: { organization_slug: organization.slug, course_name: course_name }
+          expect(response).to have_http_status(200)
           expect(response.body).not_to include point.name
           expect(response.body).to include course_point.name
         end
       end
       describe 'when invalid course name given' do
         it 'shows error about finding course' do
-          get :index, organization_slug: organization.slug, course_name: 'bad'
-          expect(response).to have_http_status(:missing)
+          get :index, params: { organization_slug: organization.slug, course_name: 'bad' }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include point.name
           expect(response.body).not_to include course_point.name

@@ -18,9 +18,9 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
     describe 'as admin' do
       let(:token) { double resource_owner_id: admin.id, acceptable?: true }
       it 'shows a list of collections of course urls' do
-        get :index, organization_slug: organization.slug
+        get :index, params: { organization_slug: organization.slug }
         json = JSON.parse response.body
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(json[0]['id']).to eq(course.id)
         expect(json[0]['name']).to eq(course.name)
         expect(json[0]['title']).to eq(course.title)
@@ -33,7 +33,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
     describe 'as user' do
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
       it 'shows a list of collections of course urls' do
-        get :index, organization_slug: organization.slug
+        get :index, params: { organization_slug: organization.slug }
         json = JSON.parse response.body
         expect(json[0]['id']).to eq(course.id)
         expect(json[0]['name']).to eq(course.name)
@@ -47,7 +47,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
     describe 'as guest' do
       let(:token) { nil }
       it 'shows authentication error' do
-        get :index, organization_slug: organization.slug
+        get :index, params: { organization_slug: organization.slug }
         expect(response).to have_http_status(401)
         expect(response.body).to include 'Authentication required'
       end

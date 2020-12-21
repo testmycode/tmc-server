@@ -21,8 +21,8 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
 
       describe 'when organization id and course name given' do
         it 'shows course information' do
-          get :show, organization_slug: organization.slug, name: course_name
-          expect(response).to have_http_status(:success)
+          get :show, params: { organization_slug: organization.slug, name: course_name }
+          expect(response).to have_http_status(200)
           expect(response.body).to include course.name
         end
       end
@@ -30,29 +30,29 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
         it 'shows course information' do
           course.hidden = true
           course.save!
-          get :show, organization_slug: organization.slug, name: course_name
-          expect(response).to have_http_status(:success)
+          get :show, params: { organization_slug: organization.slug, name: course_name }
+          expect(response).to have_http_status(200)
           expect(response.body).to include course.name
         end
       end
       describe 'when invalid organization id and valid course name given' do
         it 'error about finding course' do
-          get :show, organization_slug: 'bad', name: course_name
-          expect(response).to have_http_status(:missing)
+          get :show, params: { organization_slug: 'bad', name: course_name }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
       describe 'when valid organization id and invalid course name given' do
         it 'error about finding course' do
-          get :show, organization_slug: organization.slug, name: 'bad'
-          expect(response).to have_http_status(:missing)
+          get :show, params: { organization_slug: organization.slug, name: 'bad' }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
       describe 'when invalid organization id and invalid course name given' do
         it 'error about finding course' do
-          get :show, organization_slug: 'bad', name: 'bad'
-          expect(response).to have_http_status(:missing)
+          get :show, params: { organization_slug: 'bad', name: 'bad' }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
@@ -64,8 +64,8 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
 
       describe 'when organization id and course name given' do
         it 'shows course information' do
-          get :show, organization_slug: organization.slug, name: course_name
-          expect(response).to have_http_status(:success)
+          get :show, params: { organization_slug: organization.slug, name: course_name }
+          expect(response).to have_http_status(200)
           expect(response.body).to include course.name
         end
       end
@@ -73,29 +73,29 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
         it 'shows authorization error' do
           course.hidden = true
           course.save!
-          get :show, organization_slug: organization.slug, name: course_name
+          get :show, params: { organization_slug: organization.slug, name: course_name }
           expect(response).to have_http_status(403)
           expect(response.body).to include 'You are not authorized'
         end
       end
       describe 'when invalid organization id and valid course name given' do
         it 'shows error about finding course' do
-          get :show, organization_slug: 'bad', name: course_name
-          expect(response).to have_http_status(:missing)
+          get :show, params: { organization_slug: 'bad', name: course_name }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
       describe 'when valid organization id and invalid course name given' do
         it 'error about finding course' do
-          get :show, organization_slug: organization.slug, name: 'bad'
-          expect(response).to have_http_status(:missing)
+          get :show, params: { organization_slug: organization.slug, name: 'bad' }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
       describe 'when invalid organization id and invalid course name given' do
         it 'error about finding course' do
-          get :show, organization_slug: 'bad', name: 'bad'
-          expect(response).to have_http_status(:missing)
+          get :show, params: { organization_slug: 'bad', name: 'bad' }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
@@ -107,7 +107,7 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
 
       describe 'when organization id and course name given' do
         it 'shows authentication error' do
-          get :show, organization_slug: organization.slug, name: course_name
+          get :show, params: { organization_slug: organization.slug, name: course_name }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
@@ -116,28 +116,28 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
         it 'shows authentication error' do
           course.hidden = true
           course.save!
-          get :show, organization_slug: organization.slug, name: course_name
+          get :show, params: { organization_slug: organization.slug, name: course_name }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when invalid organization id and valid course name given' do
         it 'shows authentication error' do
-          get :show, organization_slug: 'bad', name: course_name
+          get :show, params: { organization_slug: 'bad', name: course_name }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when valid organization id and invalid course name given' do
         it 'shows authentication error' do
-          get :show, organization_slug: organization.slug, name: 'bad'
+          get :show, params: { organization_slug: organization.slug, name: 'bad' }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when invalid organization id and invalid course name given' do
         it 'shows authentication error' do
-          get :show, organization_slug: 'bad', name: 'bad'
+          get :show, params: { organization_slug: 'bad', name: 'bad' }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end

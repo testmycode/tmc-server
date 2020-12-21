@@ -22,8 +22,8 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
       describe 'when course id given' do
         it "shows only user's submission's review information" do
-          get :index, course_id: course.id
-          expect(response).to have_http_status(:success)
+          get :index, params: { course_id: course.id }
+          expect(response).to have_http_status(200)
           json = JSON.parse response.body
           expect(json[0]['submission_id']).to eq(review.submission.id)
           expect(json[0]['exercise_name']).to eq(exercise.name)
@@ -35,8 +35,8 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       end
       describe 'when invalid course id given' do
         it 'shows error about finding course' do
-          get :index, course_id: -1
-          expect(response).to have_http_status(:missing)
+          get :index, params: { course_id: -1 }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include review.review_body
           expect(response.body).not_to include submission2_review.review_body
@@ -50,8 +50,8 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
       describe 'when course id given' do
         it "shows only user's submission's review information" do
-          get :index, course_id: course.id
-          expect(response).to have_http_status(:success)
+          get :index, params: { course_id: course.id }
+          expect(response).to have_http_status(200)
           json = JSON.parse response.body
           expect(json[0]['submission_id']).to eq(review.submission.id)
           expect(json[0]['exercise_name']).to eq(exercise.name)
@@ -63,8 +63,8 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       end
       describe 'when invalid course id given' do
         it 'shows error about finding course' do
-          get :index, course_id: -1
-          expect(response).to have_http_status(:missing)
+          get :index, params: { course_id: -1 }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
           expect(response.body).not_to include review.review_body
           expect(response.body).not_to include submission2_review.review_body
@@ -78,7 +78,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
       describe 'when course id given' do
         it "shows only user's submission's review information" do
-          get :index, course_id: course.id
+          get :index, params: { course_id: course.id }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
           expect(response.body).not_to include review.review_body
@@ -87,7 +87,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       end
       describe 'when invalid course id given' do
         it 'shows error about finding course' do
-          get :index, course_id: -1
+          get :index, params: { course_id: -1 }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
           expect(response.body).not_to include review.review_body
@@ -149,7 +149,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
           FactoryGirl.create(:review, submission: submission)
           exercise.reload
           put :update, course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' }
-          expect(response).to have_http_status(:forbidden)
+          expect(response).to have_http_status(403)
           expect(response.body).to include('You are not authorized to access this page')
         end
       end

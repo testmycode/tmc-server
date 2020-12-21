@@ -31,7 +31,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it "should allow to download everyone's submissions" do
         # pending("test that submission zip's content is correct")
-        get :download, id: submission.id
+        get :download, params: { id: submission.id }
         expect(response.code).to eq('200')
         # raise 'pending'
       end
@@ -44,7 +44,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it "should allow to download own organization's submissions" do
         # pending("test that submission zip's content is correct")
-        get :download, id: submission.id
+        get :download, params: { id: submission.id }
         expect(response.code).to eq('200')
         # raise 'pending'
       end
@@ -55,7 +55,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        get :download, id: other_guys_sub.id
+        get :download, params: { id: other_guys_sub.id }
         expect(response.code).to eq('403')
       end
     end
@@ -67,7 +67,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it "should allow to download own course's submissions" do
         # pending("test that submission zip's content is correct")
-        get :download, id: submission.id
+        get :download, params: { id: submission.id }
         expect(response.code).to eq('200')
         # raise 'pending'
       end
@@ -77,7 +77,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        get :download, id: other_guys_sub.id
+        get :download, params: { id: other_guys_sub.id }
         expect(response.code).to eq('403')
       end
     end
@@ -86,7 +86,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
       it 'should allow to download own submissions' do
         # pending("test that submission zip's content is correct")
-        get :download, id: submission.id
+        get :download, params: { id: submission.id }
         expect(response.code).to eq('200')
         # raise 'pending'
       end
@@ -96,7 +96,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         other_user = FactoryGirl.create(:user)
         other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-        get :download, id: other_guys_sub.id
+        get :download, params: { id: other_guys_sub.id }
         expect(response.code).to eq('403')
       end
     end
@@ -105,7 +105,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       let(:token) { nil }
 
       it 'should not allow downloading' do
-        get :download, id: submission.id
+        get :download, params: { id: submission.id }
         expect(response.code).to eq('401')
       end
     end

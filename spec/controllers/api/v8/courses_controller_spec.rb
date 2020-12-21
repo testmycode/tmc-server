@@ -19,8 +19,8 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe 'when course ID given' do
         it 'shows course information' do
-          get :show, id: course.id
-          expect(response).to have_http_status(:success)
+          get :show, params: { id: course.id }
+          expect(response).to have_http_status(200)
           expect(response.body).to include course.name
           expect(response.body).to include course.organization.slug
         end
@@ -29,15 +29,15 @@ describe Api::V8::CoursesController, type: :controller do
         it 'shows course information' do
           course.hidden = true
           course.save!
-          get :show, id: course.id
-          expect(response).to have_http_status(:success)
+          get :show, params: { id: course.id }
+          expect(response).to have_http_status(200)
           expect(response.body).to include course.name
         end
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :show, id: -1
-          expect(response).to have_http_status(:missing)
+          get :show, params: { id: -1 }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
@@ -49,8 +49,8 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe 'when course ID given' do
         it 'shows course information' do
-          get :show, id: course.id
-          expect(response).to have_http_status(:success)
+          get :show, params: { id: course.id }
+          expect(response).to have_http_status(200)
           expect(response.body).to include course.name
         end
       end
@@ -58,15 +58,15 @@ describe Api::V8::CoursesController, type: :controller do
         it 'shows authorization error' do
           course.hidden = true
           course.save!
-          get :show, id: course.id
+          get :show, params: { id: course.id }
           expect(response).to have_http_status(403)
           expect(response.body).to include 'You are not authorized'
         end
       end
       describe 'when invalid course ID given' do
         it 'shows error about finding course' do
-          get :show, id: -1
-          expect(response).to have_http_status(:missing)
+          get :show, params: { id: -1 }
+          expect(response).to have_http_status(404)
           expect(response.body).to include "Couldn't find Course"
         end
       end
@@ -78,7 +78,7 @@ describe Api::V8::CoursesController, type: :controller do
 
       describe 'when course ID given' do
         it 'shows authentication error' do
-          get :show, id: course.id
+          get :show, params: { id: course.id }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
@@ -87,14 +87,14 @@ describe Api::V8::CoursesController, type: :controller do
         it 'shows authentication error' do
           course.hidden = true
           course.save!
-          get :show, id: course.id
+          get :show, params: { id: course.id }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end
       end
       describe 'when invalid course ID given' do
         it 'shows authentication error' do
-          get :show, id: -1
+          get :show, params: { id: -1 }
           expect(response).to have_http_status(401)
           expect(response.body).to include 'Authentication required'
         end

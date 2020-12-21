@@ -21,8 +21,8 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
       let!(:token) { double resource_owner_id: regular_user.id, acceptable?: true }
 
       it 'should not allow access' do
-        get :index, course_id: course.id
-        expect(response).to have_http_status(:forbidden)
+        get :index, params: { course_id: course.id }
+        expect(response).to have_http_status(403)
       end
     end
 
@@ -30,7 +30,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
       let!(:token) { double resource_owner_id: admin_user.id, acceptable?: true }
 
       it 'gives submission ids for the last hour' do
-        get :index, course_id: course.id
+        get :index, params: { course_id: course.id }
         expect(response).to have_http_status(:ok)
         res = JSON.parse(response.body)
         expect(res.length).to eq(2)

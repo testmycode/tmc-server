@@ -28,7 +28,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
         repo.add_commit_push
         course.refresh
 
-        get :download, exercise_id: exercise.id
+        get :download, params: { exercise_id: exercise.id }
         expect(response.code).to eq('200')
       end
     end
@@ -45,7 +45,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
 
           FactoryGirl.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: true)
 
-          get :download, exercise_id: exercise.id
+          get :download, params: { exercise_id: exercise.id }
           expect(response).to have_http_status :ok
         end
         it 'should fail if I have not already solved it' do
@@ -56,13 +56,13 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
 
           FactoryGirl.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: false)
 
-          get :download, exercise_id: exercise.id
+          get :download, params: { exercise_id: exercise.id }
           expect(response).to have_http_status :forbidden
         end
       end
       describe 'if the course does not exist' do
         it 'should fail' do
-          get :download, exercise_id: 123
+          get :download, params: { exercise_id: 123 }
           expect(response).to have_http_status :not_found
         end
       end

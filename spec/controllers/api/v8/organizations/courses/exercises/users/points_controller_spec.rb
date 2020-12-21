@@ -23,7 +23,7 @@ describe Api::V8::Organizations::Courses::Exercises::Users::PointsController, ty
     let(:token) { nil }
     describe 'when searching for awarded points' do
       it 'should show authentication error' do
-        get :index, course_name: course_name, organization_slug: organization.slug, user_id: 'current', exercise_name: exercise.name
+        get :index, params: { course_name: course_name, organization_slug: organization.slug, user_id: 'current', exercise_name: exercise.name }
         expect(response).to have_http_status(:unauthorized)
         expect(response.body).to have_content('Authentication required')
       end
@@ -35,7 +35,7 @@ describe Api::V8::Organizations::Courses::Exercises::Users::PointsController, ty
     describe 'when searching for users awarded points by user id' do
       describe 'and using course id' do
         it 'should return only correct users awarded points' do
-          get :index, course_name: course_name, organization_slug: organization.slug, user_id: 'current', exercise_name: exercise.name
+          get :index, params: { course_name: course_name, organization_slug: organization.slug, user_id: 'current', exercise_name: exercise.name }
           expect(response.body).to have_content awarded_point1.name
           expect(response.body).not_to have_content awarded_point2.name
         end

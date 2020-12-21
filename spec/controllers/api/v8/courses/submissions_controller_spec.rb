@@ -135,7 +135,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
         end
 
         it 'should not show any submissions' do
-          get :index, course_id: course.id
+          get :index, params: { course_id: course.id }
 
           expect(response).to have_http_status(401)
           expect(response.body).to have_content('Authentication required')
@@ -152,7 +152,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
       sub1 = FactoryGirl.create(:submission, user: user1, course: course)
       sub2 = FactoryGirl.create(:submission, user: user2, course: course)
 
-      get :index, course_id: course.id
+      get :index, params: { course_id: course.id }
 
       r = JSON.parse response.body
 
@@ -161,7 +161,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
     end
 
     def all_own_subs(parameters)
-      get :index, parameters
+      get :index, params: { parameters }
 
       r = JSON.parse response.body
 
@@ -175,7 +175,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      get :index, parameters
+      get :index, params: { parameters }
 
       r = JSON.parse response.body
 
@@ -188,7 +188,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      get :index, parameters
+      get :index, params: { parameters }
 
       r = JSON.parse response.body
 
@@ -199,7 +199,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-      get :index, parameters
+      get :index, params: { parameters }
 
       r = JSON.parse response.body
 
