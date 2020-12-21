@@ -4,9 +4,9 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 # source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 4.2.0'
+gem 'rails', '~> 5.2.1'
 
-gem 'activerecord-session_store', '~> 1.0.0'
+gem 'activerecord-session_store', '~> 1.1.1'
 gem 'andand'
 gem 'cancancan', '~> 1.13.0'
 gem 'daemons', '~> 1.2.3'
@@ -21,7 +21,7 @@ gem 'activerecord-import', '~> 0.28.1'
 gem 'rack-attack'
 gem 'rack-cors'
 gem 'rake'
-gem 'responders', '~> 2.0'
+gem 'responders', '~> 2.4'
 gem 'rest-client', '~> 2.0.2'
 gem 'transaction_isolation', '~> 1.0.3'
 gem 'xml-simple', '~> 1.1.1'
@@ -51,7 +51,7 @@ gem 'ruby-kafka', '~> 0.7.10'
 gem 'argon2', '~> 2.0', '>= 2.0.2'
 
 group :assets do
-  gem 'jquery-rails', '~> 3.1.2'
+  gem 'jquery-rails', '~> 4.3.3'
   gem 'sprockets-rails', require: 'sprockets/railtie'
   gem 'uglifier', '~> 2.7.0'
 end

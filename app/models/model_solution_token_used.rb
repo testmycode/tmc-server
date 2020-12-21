@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ModelSolutionTokenUsed < ActiveRecord::Base
+class ModelSolutionTokenUsed < ApplicationController
   belongs_to :user
   belongs_to :course
 

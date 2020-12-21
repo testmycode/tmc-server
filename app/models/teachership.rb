@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Teachership < ActiveRecord::Base
+class Teachership < ApplicationController
   belongs_to :user
   belongs_to :organization
 

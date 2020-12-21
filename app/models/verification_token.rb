@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class VerificationToken < ActiveRecord::Base
+class VerificationToken < ApplicationController
   # This class does not use single table inheritance
   self.inheritance_column = :_type_disabled
 

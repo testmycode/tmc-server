@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class KafkaBatchUpdatePoints < ActiveRecord::Base
+class KafkaBatchUpdatePoints < ApplicationController
   belongs_to :course
 end

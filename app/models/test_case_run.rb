@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class TestCaseRun < ActiveRecord::Base
+class TestCaseRun < ApplicationController
   belongs_to :submission
 end

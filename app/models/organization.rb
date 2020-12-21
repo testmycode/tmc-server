@@ -2,7 +2,7 @@
 
 # Organisations (schools etc.) have teachers and their own customized courses.
 
-class Organization < ActiveRecord::Base
+class Organization < ApplicationController
   include Swagger::Blocks
 
   swagger_schema :Organization do

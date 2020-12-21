@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UserFieldValue < ActiveRecord::Base
+class UserFieldValue < ApplicationController
   include ExtraFieldValue
 
   belongs_to :user

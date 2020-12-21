@@ -4,7 +4,7 @@
 # Awarded points don't have a hard reference to these because
 # these are recreated every time a course is refreshed.
 # Instead they are always searched for (course_id, name).
-class AvailablePoint < ActiveRecord::Base
+class AvailablePoint < ApplicationController
   include PointComparison
   include Swagger::Blocks
 
