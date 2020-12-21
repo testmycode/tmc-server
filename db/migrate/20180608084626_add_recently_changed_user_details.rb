@@ -1,4 +1,4 @@
-class AddRecentlyChangedUserDetails < ActiveRecord::Migration
+class AddRecentlyChangedUserDetails < ActiveRecord::Migration[4.2]
   def change
     create_table :recently_changed_user_details do |t|
       t.integer :change_type, null: false

@@ -1,4 +1,4 @@
-class AddCreatedAtToAwardedPoint < ActiveRecord::Migration
+class AddCreatedAtToAwardedPoint < ActiveRecord::Migration[4.2]
   def change
     add_column :awarded_points, :created_at, :datetime
     AwardedPoint.find_each do |awarded_point|

@@ -1,4 +1,4 @@
-class Baseline < ActiveRecord::Migration
+class Baseline < ActiveRecord::Migration[4.2]
   def self.up
     create_table "available_points", force: true do |t|
       t.integer "exercise_id", null: false

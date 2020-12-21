@@ -1,4 +1,4 @@
-class AddCourseRegistrations < ActiveRecord::Migration
+class AddCourseRegistrations < ActiveRecord::Migration[4.2]
   def change
     add_column :courses, :requires_registration, :boolean, null: false, default: false
 

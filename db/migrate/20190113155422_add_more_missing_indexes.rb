@@ -1,4 +1,4 @@
-class AddMoreMissingIndexes < ActiveRecord::Migration
+class AddMoreMissingIndexes < ActiveRecord::Migration[4.2]
   def change
     add_index :action_tokens, :user_id
     add_index :certificates, :course_id

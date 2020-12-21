@@ -1,4 +1,4 @@
-class AddAwardedPointsToReviews < ActiveRecord::Migration
+class AddAwardedPointsToReviews < ActiveRecord::Migration[4.2]
   def up
     add_column :reviews, :points, :text
     if respond_to?(:set_column_comment)

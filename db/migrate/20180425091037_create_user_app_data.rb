@@ -1,4 +1,4 @@
-class CreateUserAppData < ActiveRecord::Migration
+class CreateUserAppData < ActiveRecord::Migration[4.2]
   def change
     create_table :user_app_data do |t|
       t.string :field_name

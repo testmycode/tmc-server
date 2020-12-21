@@ -1,4 +1,4 @@
-class AddNeededIndexes < ActiveRecord::Migration
+class AddNeededIndexes < ActiveRecord::Migration[4.2]
   def change
     add_index :submissions, :paste_key
     add_index :submissions, [:course_id, :created_at]

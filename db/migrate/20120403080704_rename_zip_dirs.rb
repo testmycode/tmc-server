@@ -1,7 +1,7 @@
 require 'pathname'
 require 'fileutils'
 
-class RenameZipDirs < ActiveRecord::Migration
+class RenameZipDirs < ActiveRecord::Migration[4.2]
   def up
     for_each_course_dir do |course_dir|
       FileUtils.mv(course_dir + 'zip', course_dir + 'stub_zip') if (course_dir + 'zip').directory?

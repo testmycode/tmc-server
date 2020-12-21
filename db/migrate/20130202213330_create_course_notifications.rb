@@ -1,4 +1,4 @@
-class CreateCourseNotifications < ActiveRecord::Migration
+class CreateCourseNotifications < ActiveRecord::Migration[4.2]
   def up
     create_table :course_notifications do |t|
       t.string :topic

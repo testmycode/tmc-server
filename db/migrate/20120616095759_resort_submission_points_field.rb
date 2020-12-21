@@ -1,6 +1,6 @@
 require 'natcmp'
 
-class ResortSubmissionPointsField < ActiveRecord::Migration
+class ResortSubmissionPointsField < ActiveRecord::Migration[4.2]
   def up
     result = execute("SELECT id, points FROM submissions")
     result.each do |row|

@@ -1,4 +1,4 @@
-class AddMultipleSourceBackendsToCourse < ActiveRecord::Migration
+class AddMultipleSourceBackendsToCourse < ActiveRecord::Migration[4.2]
   def up
     add_column :courses, :source_backend, :string
     add_column :courses, :source_url, :string

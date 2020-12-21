@@ -1,4 +1,4 @@
-class AddUserFields < ActiveRecord::Migration
+class AddUserFields < ActiveRecord::Migration[4.2]
   def change
     create_table :user_field_values do |t|
       t.integer :user_id, null: false

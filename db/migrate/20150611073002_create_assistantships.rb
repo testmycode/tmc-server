@@ -1,4 +1,4 @@
-class CreateAssistantships < ActiveRecord::Migration
+class CreateAssistantships < ActiveRecord::Migration[4.2]
   def change
     create_table :assistantships do |t|
       t.references :user, dependent: :delete

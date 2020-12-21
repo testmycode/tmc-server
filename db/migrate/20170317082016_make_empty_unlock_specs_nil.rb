@@ -1,4 +1,4 @@
-class MakeEmptyUnlockSpecsNil < ActiveRecord::Migration
+class MakeEmptyUnlockSpecsNil < ActiveRecord::Migration[4.2]
   def up
     Exercise.transaction do
       Exercise.find_each do |exercise|
