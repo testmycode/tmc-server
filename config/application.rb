@@ -33,7 +33,7 @@ module TmcServer
 
     config.relative_url_root = SiteSetting.value('base_path')
 
-    config.middleware.insert_before 0, 'Rack::Cors', debug: true, logger: (-> { Rails.logger }) do
+    config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
       allow do
         origins '*'
         resource '/oauth*', headers: :any, methods: :any
