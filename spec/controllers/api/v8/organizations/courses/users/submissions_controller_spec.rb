@@ -193,7 +193,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
   private
 
     def users_own_subs(parameters)
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
@@ -207,7 +207,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
@@ -220,7 +220,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
@@ -231,7 +231,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
@@ -242,7 +242,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 

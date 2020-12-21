@@ -448,7 +448,7 @@ class Exercise < ApplicationRecord
     s = Submission.arel_table
 
     user_ids = users.map(&:id)
-    exercise_keys = exercises.map { |e| "(#{e.course_id}, #{quote_value(e.name, nil)})" }
+    exercise_keys = exercises.map { |e| "(#{e.course_id}, #{Exercise.connection.quote(e.name)})" }
 
     query = s.project(Arel.sql('COUNT(DISTINCT (course_id, exercise_name, user_id))').as('count'))
              .where(s[:user_id].in(user_ids))

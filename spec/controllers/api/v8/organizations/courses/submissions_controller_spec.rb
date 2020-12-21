@@ -163,7 +163,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
     end
 
     def all_own_subs(parameters)
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
@@ -177,7 +177,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
@@ -190,7 +190,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
@@ -201,7 +201,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
       other_user = FactoryGirl.create(:user)
       other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
 
-      get :index, params: { parameters }
+      get :index, params: parameters
 
       r = JSON.parse response.body
 
