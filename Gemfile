@@ -8,7 +8,7 @@ gem 'rails', '~> 5.2.1'
 
 gem 'activerecord-session_store', '~> 1.1.1'
 gem 'andand'
-gem 'cancancan', '~> 1.13.0'
+gem 'cancancan', '~> 2.3.0'
 gem 'daemons', '~> 1.2.3'
 gem 'google-spreadsheet-ruby'
 gem 'mimemagic', '~> 0.3.0'
