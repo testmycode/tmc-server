@@ -85,7 +85,7 @@ GEM
     connection_pool (2.2.3)
     crass (1.0.6)
     daemons (1.2.6)
-    database_cleaner (1.5.3)
+    database_cleaner (1.8.5)
     declarative (0.0.20)
     declarative-option (0.1.0)
     diff-lcs (1.4.4)
@@ -411,7 +411,7 @@ DEPENDENCIES
   cancancan (~> 2.3.0)
   capybara (~> 2.17)
   daemons (~> 1.2.3)
-  database_cleaner (~> 1.5.0)
+  database_cleaner (~> 1.8.5)
   doorkeeper
   factory_girl_rails (~> 4.5.0)
   flamegraph (~> 0.9.5)
