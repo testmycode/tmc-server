@@ -28,7 +28,7 @@ describe CourseNotificationsController, type: :controller do
     @user = FactoryGirl.create(:user)
     controller.current_user = @user
 
-    expect { post :create, params }.to raise_error(CanCan::AccessDenied)
+    expect { post :create, params: params }.to raise_error(CanCan::AccessDenied)
   end
 
   describe 'for an admin user' do
@@ -38,7 +38,7 @@ describe CourseNotificationsController, type: :controller do
     end
 
     it 'redirects to the course page' do
-      post :create, params
+      post :create, params: params
       expect(response).to redirect_to(organization_course_path(@organization, @course))
     end
 
@@ -51,7 +51,7 @@ describe CourseNotificationsController, type: :controller do
       FactoryGirl.create(:awarded_point, user_id: user.id, course_id: @course.id)
       FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: @course.id)
 
-      expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size).by(2)
+      expect { post :create, params: params }.to change(ActionMailer::Base.deliveries, :size).by(2)
 
       recipients = ActionMailer::Base.deliveries.flat_map(&:to)
       expect(recipients).to include user.email
@@ -67,7 +67,7 @@ describe CourseNotificationsController, type: :controller do
       FactoryGirl.create(:awarded_point, user_id: user.id, course_id: @course.id)
       FactoryGirl.create(:awarded_point, user_id: user2.id, course_id: @course.id)
 
-      expect { post :create, params }.to change(ActionMailer::Base.deliveries, :size)
+      expect { post :create, params: params }.to change(ActionMailer::Base.deliveries, :size)
 
       mail_first = ActionMailer::Base.deliveries.last
       expect(mail_first.to).to include user.email
@@ -76,7 +76,7 @@ describe CourseNotificationsController, type: :controller do
 
     it 'refuses to send a blank message' do
       params[:course_notification][:message] = ''
-      post :create, params
+      post :create, params: params
       expect(response).to redirect_to(new_organization_course_course_notifications_path(@organization, @course))
       expect(flash[:error]).not_to be_empty
     end
@@ -88,7 +88,7 @@ describe CourseNotificationsController, type: :controller do
       Teachership.create(user: @teacher, organization: @organization)
       controller.current_user = @teacher
 
-      post :create, params
+      post :create, params: params
       expect(response).to redirect_to(organization_course_path(@organization, @course))
     end
   end

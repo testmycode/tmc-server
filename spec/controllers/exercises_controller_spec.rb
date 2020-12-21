@@ -70,13 +70,9 @@ describe ExercisesController, type: :controller do
       controller.current_user = @teacher
     end
 
-    def post_set_disabled_statuses(options = {})
-      post :set_disabled_statuses, options.merge(organization_id: @organization.slug, course_id: @course.id)
-    end
-
     describe 'as a teacher' do
       it 'disables not selected exercises' do
-        post_set_disabled_statuses course: { exercises: [@ex2.id] }
+        post :set_disabled_statuses, params: { course: { exercises: [@ex2.id] }, organization_id: @organization.slug, course_id: @course.id }
         @ex1.reload
         @ex2.reload
         @ex3.reload
@@ -87,7 +83,7 @@ describe ExercisesController, type: :controller do
 
       it 'enables all selected' do
         @ex3.disabled!
-        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id, @ex3.id] }
+        post :set_disabled_statuses, params: { course: { exercises: [@ex1.id, @ex2.id, @ex3.id] }, organization_id: @organization.slug, course_id: @course.id }
         @ex1.reload
         @ex2.reload
         @ex3.reload
@@ -98,7 +94,7 @@ describe ExercisesController, type: :controller do
 
       it 'does not fail if no parameters are given' do
         expect do
-          post_set_disabled_statuses course: { exercises: [] } # Form still sends an empty array
+          post :set_disabled_statuses, params: { course: { exercises: [] }, organization_id: @organization.slug, course_id: @course.id }
         end.to_not raise_error
       end
     end

@@ -41,7 +41,7 @@ describe Setup::OrganizationsController, type: :controller do
 
     describe 'GET edit' do
       it 'assigns the requested organization as @organization' do
-        get :edit, id: @organization.to_param
+        get :edit, params: { id: @organization.to_param }
         expect(assigns(:organization)).to eq(@organization)
       end
     end
@@ -109,36 +109,36 @@ describe Setup::OrganizationsController, type: :controller do
       describe 'with valid params' do
         it 'creates a new Organization' do
           expect do
-            post :create, organization: valid_attributes
+            post :create, params: { organization: valid_attributes }
           end.to change(Organization, :count).by(1)
         end
 
         it 'assigns a newly created organization as @organization' do
-          post :create, organization: valid_attributes
+          post :create, params: { organization: valid_attributes }
           expect(assigns(:organization)).to be_a(Organization)
           expect(assigns(:organization)).to be_persisted
         end
 
         it 'redirects to the created organization' do
-          post :create, organization: valid_attributes
+          post :create, params: { organization: valid_attributes }
           expect(response).to redirect_to(Organization.last)
         end
       end
 
       describe 'with invalid params' do
         it 'assigns a newly created but unsaved organization as @organization' do
-          post :create, organization: invalid_attributes
+          post :create, params: { organization: invalid_attributes }
           expect(assigns(:organization)).to be_a_new(Organization)
         end
 
         it 'does not save organization' do
           expect do
-            post :create, organization: invalid_attributes
+            post :create, params: { organization: invalid_attributes }
           end.not_to change(Organization, :count).from(1)
         end
 
         it "re-renders the 'new' template" do
-          post :create, organization: invalid_attributes
+          post :create, params: { organization: invalid_attributes }
           expect(response).to render_template('new')
         end
       end
@@ -146,7 +146,7 @@ describe Setup::OrganizationsController, type: :controller do
 
     describe 'GET edit' do
       it 'should deny access' do
-        get :edit, id: @organization.to_param
+        get :edit, params: { id: @organization.to_param }
         expect(response.status).to eq(403)
       end
     end

@@ -61,7 +61,7 @@ describe OrganizationsController, type: :controller do
     describe 'POST verify' do
       it 'verifies the organization' do
         org = Organization.init(valid_attributes, @user)
-        post :verify, id: org.to_param
+        post :verify, params: { id: org.to_param }
         org.reload
         expect(org.verified).to eq(true)
       end
@@ -70,7 +70,7 @@ describe OrganizationsController, type: :controller do
     describe 'POST disable' do
       it 'sets the organization disabled flag to true' do
         org = Organization.init(valid_attributes, @user)
-        post :disable, id: org.to_param, organization: { disabled_reason: 'reason' }
+        post :disable, params: { id: org.to_param, organization: { disabled_reason: 'reason' } }
         org.reload
         expect(org.disabled).to eq(true)
       end
@@ -86,7 +86,7 @@ describe OrganizationsController, type: :controller do
       it 'toggles value of hidden field between true and false' do
         org = FactoryGirl.create(:accepted_organization)
         Teachership.create(user_id: @user.id, organization_id: org.id)
-        post :toggle_visibility, id: org.to_param
+        post :toggle_visibility, params: { id: org.to_param }
         org.reload
         expect(org.hidden).to be true
         expect(response).to redirect_to(organization_path)
@@ -132,7 +132,7 @@ describe OrganizationsController, type: :controller do
     describe 'POST verify' do
       it 'denies access' do
         org = Organization.init(valid_attributes, @user)
-        post :verify, id: org.to_param
+        post :verify, params: {id: org.to_param}
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -140,7 +140,7 @@ describe OrganizationsController, type: :controller do
     describe 'POST disable' do
       it 'denies access' do
         org = Organization.init(valid_attributes, @user)
-        post :disable, id: org.to_param
+        post :disable, params: { id: org.to_param }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -148,7 +148,7 @@ describe OrganizationsController, type: :controller do
     describe 'POST toggle_visibility' do
       it 'denies access' do
         org = FactoryGirl.create(:accepted_organization)
-        post :toggle_visibility, id: org.to_param
+        post :toggle_visibility, params: { id: org.to_param }
         expect(response.code.to_i).to eq(403)
       end
     end

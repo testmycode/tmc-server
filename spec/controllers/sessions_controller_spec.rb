@@ -15,7 +15,7 @@ describe SessionsController, type: :controller do
       login: 'instructor',
       password: 'correct_password'
     }
-    post :create, session: session_attrs
+    post :create, params: { session: session_attrs }
   end
 
   describe 'GET new' do

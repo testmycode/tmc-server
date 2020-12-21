@@ -64,6 +64,7 @@ group :development, :test do
   gem 'rspec-activemodel-mocks', '~> 1.0.0'
   gem 'rspec-core', '~> 3.5.2'
   gem 'rspec-rails', '~> 3.5.1'
+  gem 'rails-controller-testing'
   # gem 'selenium-webdriver', '~> 2.44.0'
   gem 'irb'
   gem 'brakeman', require: false

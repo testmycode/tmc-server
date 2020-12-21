@@ -29,7 +29,7 @@ describe FeedbackAnswersController, type: :controller do
     end
 
     it "should accept answers to all questions associated to the submission's course at once" do
-      post :create, @valid_params
+      post :create, params: @valid_params
 
       expect(response).to be_successful
 
@@ -45,7 +45,7 @@ describe FeedbackAnswersController, type: :controller do
       params = @valid_params.clone
       params[:answers][1][:answer] = 'something invalid'
 
-      post :create, params
+      post :create, params: params
 
       expect(response).not_to be_successful
       expect(FeedbackAnswer.all.count).to eq(0)
@@ -77,7 +77,7 @@ describe FeedbackAnswersController, type: :controller do
       # Check if user can create FeedbackAnswer to submission
       answer_records.each { |record| expect(ability).not_to be_able_to(:create, record) }
 
-      expect { post :create, params }.to raise_error(CanCan::AccessDenied)
+      expect { post :create, params: params }.to raise_error(CanCan::AccessDenied)
     end
   end
 end

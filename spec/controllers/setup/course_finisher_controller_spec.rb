@@ -26,19 +26,21 @@ describe Setup::CourseFinisherController, type: :controller do
 
     describe 'POST create' do
       it 'makes course enabled' do
-        post :create,
+        post :create, params: {
              organization_id: @organization.slug,
              course_id: @course.id,
              commit: 'Publish now'
+        }
         expect(assigns(:course).enabled?).to be(true)
         expect(response).to redirect_to(redirect_to(organization_course_path(@organization, @course)))
       end
 
       it 'makes course disabled' do
-        post :create,
+        post :create, params: {
              organization_id: @organization.slug,
              course_id: @course.id,
              commit: 'Finish and publish later'
+        }
         expect(assigns(:course).disabled?).to be(true)
         expect(response).to redirect_to(redirect_to(organization_course_path(@organization, @course)))
       end
@@ -46,10 +48,11 @@ describe Setup::CourseFinisherController, type: :controller do
       it 'resets ongoing course setup session' do
         init_session
         expect(session[:ongoing_course_setup]).not_to be_nil
-        post :create,
+        post :create, params: {
              organization_id: @organization.slug,
              course_id: @course.id,
              commit: 'Publish now'
+        }
         expect(session[:ongoing_course_setup]).to be_nil
       end
     end
@@ -63,10 +66,11 @@ describe Setup::CourseFinisherController, type: :controller do
     it 'should not allow any access' do
       get :index, params: { organization_id: @organization.slug, course_id: @course.id }
       expect(response.code.to_i).to eq(403)
-      post :create,
+      post :create, params: {
            organization_id: @organization.slug,
            course_id: @course.id,
            commit: 'Publish now'
+      }
       expect(response.code.to_i).to eq(403)
     end
   end

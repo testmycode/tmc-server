@@ -44,8 +44,8 @@ describe PointsController, type: :controller do
   describe 'GET show' do
     describe 'when user has participated in a course' do
       it 'should show a page' do
-        get :show, params: { organization_id: @organization.slug, }
-                   course_id: @course.id, id: @sheetname
+        get :show, params: { organization_id: @organization.slug,
+                   course_id: @course.id, id: @sheetname }
         expect(response).to be_success
       end
 

@@ -225,7 +225,7 @@ describe CoursesController, type: :controller do
     describe 'As a teacher' do
       it 'disables the course' do
         controller.current_user = @teacher
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        post :disable, params: { organization_id: @organization.slug, id: @course.id.to_s }
         expect(Course.find(@course.id).disabled?).to eq(true)
       end
     end
@@ -233,7 +233,7 @@ describe CoursesController, type: :controller do
     describe 'As a student' do
       it 'denies access' do
         controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        post :disable, params: {  organization_id: @organization.slug, id: @course.id.to_s }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -247,7 +247,7 @@ describe CoursesController, type: :controller do
     describe 'As a teacher' do
       it 'enables the course' do
         controller.current_user = @teacher
-        post :enable, organization_id: @organization.slug, id: @course.id.to_s
+        post :enable, params: { organization_id: @organization.slug, id: @course.id.to_s }
         expect(Course.find(@course.id).disabled?).to eq(false)
       end
     end
@@ -255,7 +255,7 @@ describe CoursesController, type: :controller do
     describe 'As a student' do
       it 'denies access' do
         controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        post :disable, params: { organization_id: @organization.slug, id: @course.id.to_s }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -273,13 +273,14 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'e2')
       @course.exercises.create(name: 'e3')
 
-      post :save_deadlines,
+      post :save_deadlines, params: {
            organization_id: @organization.slug,
            id: @course.id,
            empty_group: {
              soft: { static: '1.1.2000', unlock: '' },
              hard: { static: '', unlock: 'unlock + 2 weeks' }
            }
+        }
 
       @course.exercise_group_by_name('').exercises(false).each do |e|
         expect(e.soft_static_deadline).to eq('1.1.2000')
@@ -296,7 +297,7 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'group2-e1')
       @course.exercises.create(name: 'group2-e2')
 
-      post :save_deadlines,
+      post :save_deadlines, params: {
            organization_id: @organization.slug,
            id: @course.id,
            group: {
@@ -309,6 +310,7 @@ describe CoursesController, type: :controller do
                hard: { static: '3.3.2000', unlock: '' }
              }
            }
+          }
 
       @course.exercise_group_by_name('group1').exercises(false).each do |e|
         expect(e.soft_static_deadline).to eq('1.1.2000')
@@ -331,7 +333,7 @@ describe CoursesController, type: :controller do
       @course = FactoryGirl.create :course
       @course.organization = @organization
       controller.current_user = @user
-      get :manage_unlocks, organization_id: @organization.slug, id: @course.id
+      get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
       expect(response.code.to_i).to eq(403)
     end
   end
@@ -352,7 +354,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0' => '1.2.2000' }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { '0' => '1.2.2000' } }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -365,7 +367,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'group1-e3')
         @course.exercises.create(name: 'group2-e1')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, group: { group1: { '0' => '1.2.2000' } }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, group: { group1: { '0' => '1.2.2000' } } }
 
         @course.exercise_group_by_name('group1').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -380,8 +382,8 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '' }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' } }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '' } }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_nil
@@ -393,8 +395,8 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id,
-                            empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id,
+                            empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' } }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           spec = e.unlock_spec_obj.raw_spec
@@ -407,7 +409,7 @@ describe CoursesController, type: :controller do
 
     it 'when non-teacher should respond with a 403' do
       @course.exercises.create(name: 'e')
-      post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
+      post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' } }
       expect(response.code.to_i).to eq(403)
     end
   end
@@ -420,7 +422,7 @@ describe CoursesController, type: :controller do
     describe 'when teacher' do
       it 'toggles visibility of submsission results' do
         controller.current_user = @teacher
-        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        post :toggle_submission_result_visibility, params: { organization_id: @organization.slug, id: @course.id }
         @course.reload
         expect(@course.hide_submission_results).to be true
         expect(response).to redirect_to(organization_course_path)
@@ -431,7 +433,7 @@ describe CoursesController, type: :controller do
       it 'toggles visibility of submsission results' do
         Assistantship.create(user: @user, course: @course)
         controller.current_user = @user
-        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        post :toggle_submission_result_visibility, params: { organization_id: @organization.slug, id: @course.id }
         @course.reload
         expect(@course.hide_submission_results).to be true
         expect(response).to redirect_to(organization_course_path)
@@ -441,7 +443,7 @@ describe CoursesController, type: :controller do
     describe 'when non-teacher or non-admin' do
       it 'acces denied' do
         controller.current_user = @user
-        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        post :toggle_submission_result_visibility, params: { organization_id: @organization.slug, id: @course.id }
         @course.reload
         expect(response.code.to_i).to eq(403)
       end

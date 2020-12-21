@@ -255,6 +255,10 @@ GEM
       bundler (>= 1.3.0)
       railties (= 5.2.4.4)
       sprockets-rails (>= 2.0.0)
+    rails-controller-testing (1.0.5)
+      actionpack (>= 5.0.1.rc1)
+      actionview (>= 5.0.1.rc1)
+      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -442,6 +446,7 @@ DEPENDENCIES
   rack-mini-profiler (~> 1.0, >= 1.0.1)
   railroady
   rails (~> 5.2.1)
+  rails-controller-testing
   rake
   readthis
   redis (~> 3.3.5)
@@ -465,4 +470,4 @@ DEPENDENCIES
   xml-simple (~> 1.1.1)
 
 BUNDLED WITH
-   1.16.1
+   1.17.3

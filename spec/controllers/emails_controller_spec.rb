@@ -16,7 +16,7 @@ describe EmailsController, type: :controller do
     describe 'global list' do
       it 'lists all users in the system if current user is admin' do
         controller.current_user = @admin
-        get :index, params: { format: :text }
+        get :index, format: :text
         User.all.each do |user|
           expect(assigns(:emails)).to include(user.email)
         end
@@ -24,7 +24,7 @@ describe EmailsController, type: :controller do
 
       it 'denies access for non-admins' do
         controller.current_user = @teacher
-        get :index, params: { format: :text }
+        get :index, format: :text
         expect(response.code.to_i).to eq(403)
       end
     end

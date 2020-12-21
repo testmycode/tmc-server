@@ -27,19 +27,19 @@ describe TeachersController, type: :controller do
       describe 'POST create' do
         it 'with a valid username creates a new teachership' do
           expect do
-            post :create, organization_id: @organization.slug, username: @user.username, email: @user.email
+            post :create, params: { organization_id: @organization.slug, username: @user.username, email: @user.email }
           end.to change(Teachership, :count).by(1)
         end
 
         it "with a invalid username doesn't create a new teachership" do
           expect do
-            post :create, organization_id: @organization.slug, username: 'invalid'
+            post :create, params: { organization_id: @organization.slug, username: 'invalid' }
           end.to change(Teachership, :count).by(0)
         end
 
         it 'with a username that already is a teacher in the organization' do
           expect do
-            post :create, organization_id: @organization.slug, username: @teacher.username
+            post :create, params: { organization_id: @organization.slug, username: @teacher.username }
           end.to change(Teachership, :count).by(0)
         end
       end
@@ -47,7 +47,7 @@ describe TeachersController, type: :controller do
       describe 'DELETE destroy' do
         it 'destroys teachership' do
           expect do
-            delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
+            delete :destroy, params: { organization_id: @organization.slug, id: @teachership.to_param }
           end.to change(Teachership, :count).by(-1)
         end
       end
@@ -70,14 +70,14 @@ describe TeachersController, type: :controller do
 
     describe 'POST create' do
       it 'denies access' do
-        post :create, organization_id: @organization.slug
+        post :create, params: { organization_id: @organization.slug }
         expect(response.code.to_i).to eq(403)
       end
     end
 
     describe 'DELETE destroy' do
       it 'denies access' do
-        delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
+        delete :destroy, params: { organization_id: @organization.slug, id: @teachership.to_param }
         expect(response.code.to_i).to eq(403)
       end
     end

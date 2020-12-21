@@ -23,7 +23,7 @@ describe ReviewsController, type: :controller do
       it 'can make new review' do
         controller.current_user = @admin
         expect do
-          post :create, submission_id: @submission.id, review: { review_body: 'Code looks ok' }
+          post :create, params: { submission_id: @submission.id, review: { review_body: 'Code looks ok' } }
         end.to change(Review, :count).by(1)
         expect(Review.last.review_body).to eq('Code looks ok')
       end
@@ -33,7 +33,7 @@ describe ReviewsController, type: :controller do
       it 'can make new review' do
         controller.current_user = @teacher
         expect do
-          post :create, submission_id: @submission.id, review: { review_body: 'Code looks ok' }
+          post :create, params: { submission_id: @submission.id, review: { review_body: 'Code looks ok' } }
         end.to change(Review, :count).by(1)
         expect(Review.last.review_body).to eq('Code looks ok')
       end
@@ -43,7 +43,7 @@ describe ReviewsController, type: :controller do
       it "can't make new review" do
         controller.current_user = @student
         expect do
-          post :create, submission_id: @submission.id, review: { review_body: 'Code looks ok' }
+          post :create, params: { submission_id: @submission.id, review: { review_body: 'Code looks ok' } }
         end.to change(Review, :count).by(0)
         expect(response.code.to_i).to eq(403)
       end

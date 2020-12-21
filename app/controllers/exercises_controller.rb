@@ -70,8 +70,8 @@ class ExercisesController < ApplicationController
     course_exercises = Exercise.where(course: @course)
     selected_exercises = Exercise.where(id: selected_exercise_ids, course: @course)
 
-    course_exercises.update_all(disabled_status: true)
-    selected_exercises.update_all(disabled_status: false)
+    course_exercises.update_all(disabled_status: 1)
+    selected_exercises.update_all(disabled_status: 0)
 
     UncomputedUnlock.create_all_for_course(@course)
 
