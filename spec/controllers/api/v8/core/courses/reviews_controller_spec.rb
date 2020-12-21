@@ -107,7 +107,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       describe 'when correct course id and review id are given' do
         describe 'when review is edited' do
           it 'review text should be updated' do
-            put :update, course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' }
+            put :update, params: { course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' } }
             review.reload
             expect(response).to have_http_status :ok
             expect(review.review_body).to include('Code looks ok')
@@ -116,7 +116,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
         describe 'when review is marked as read' do
           it "review's marked_as_read status should change accordingly" do
-            put :update, course_id: course.id, id: submission.id, mark_as_read: 1
+            put :update, params: { course_id: course.id, id: submission.id, mark_as_read: 1 }
             review.reload
             expect(response).to have_http_status :ok
             expect(review.marked_as_read).to be_truthy
@@ -125,7 +125,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
         describe 'when review is marked as unread' do
           it "review's marked_as_read status should change accordingly" do
-            put :update, course_id: course.id, id: submission.id, mark_as_unread: 1
+            put :update, params: { course_id: course.id, id: submission.id, mark_as_unread: 1 }
             review.reload
             expect(response).to have_http_status :ok
             expect(review.marked_as_read).to be_falsey
@@ -134,7 +134,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       end
       describe 'when review could not be found' do
         it 'error message is shown' do
-          put :update, course_id: course.id, id: 741, mark_as_read: 1
+          put :update, params: { course_id: course.id, id: 741, mark_as_read: 1 }
           expect(response).to have_http_status(:not_found)
           expect(response.body).to include("Couldn't find Review")
         end
@@ -148,7 +148,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
         it 'should deny access' do
           FactoryGirl.create(:review, submission: submission)
           exercise.reload
-          put :update, course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' }
+          put :update, params: { course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' } }
           expect(response).to have_http_status(403)
           expect(response.body).to include('You are not authorized to access this page')
         end

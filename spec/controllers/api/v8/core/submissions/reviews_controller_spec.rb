@@ -22,7 +22,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
 
       it 'can make new review' do
         expect do
-          post :create, submission_id: submission.id, review: { review_body: 'Code looks ok' }
+          post :create, params: { submission_id: submission.id, review: { review_body: 'Code looks ok' } }
         end.to change(Review, :count).by(1)
         expect(Review.last.review_body).to eq('Code looks ok')
       end
@@ -33,7 +33,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
 
       it 'can make new review' do
         expect do
-          post :create, submission_id: submission.id, review: { review_body: 'Code looks ok' }
+          post :create, params: { submission_id: submission.id, review: { review_body: 'Code looks ok' } }
         end.to change(Review, :count).by(1)
         expect(Review.last.review_body).to eq('Code looks ok')
       end
@@ -44,7 +44,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
 
       it "can't make new review" do
         expect do
-          post :create, submission_id: submission.id, review: { review_body: 'Code looks ok' }
+          post :create, params: { submission_id: submission.id, review: { review_body: 'Code looks ok' } }
         end.to change(Review, :count).by(0)
         expect(response.code.to_i).to eq(403)
       end
@@ -55,7 +55,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
 
       it "can't make new review" do
         expect do
-          post :create, submission_id: submission.id, review: { review_body: 'Code looks ok' }
+          post :create, params: { submission_id: submission.id, review: { review_body: 'Code looks ok' } }
         end.to change(Review, :count).by(0)
         expect(response.code.to_i).to eq(401)
       end
