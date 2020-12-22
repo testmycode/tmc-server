@@ -109,7 +109,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
           it 'review text should be updated' do
             put :update, params: { course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' } }
             review.reload
-            expect(response).to have_http_status :ok
+            expect(response).to have_http_status(200)
             expect(review.review_body).to include('Code looks ok')
           end
         end

@@ -64,7 +64,9 @@ module Api
           end
 
           def update
-            if params[:review].is_a?(Hash)
+            fetch :review
+            authorize! :update, @review
+            if params[:review].present? && params[:review].has_key?(:review_body)
               update_review
             elsif params[:mark_as_read]
               mark_as_read(true)

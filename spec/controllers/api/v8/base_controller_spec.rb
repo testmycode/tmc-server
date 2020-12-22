@@ -9,7 +9,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
   controller UselessController do
     skip_authorization_check # skip cancan because we dont test it here
     def index
-      render text: 'Success'
+      # render text: 'Success'
     end
   end
 
@@ -19,7 +19,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
 
     before :each do
       allow(controller).to receive(:doorkeeper_token) { token }
-      get :index
+      get :index, format: text
     end
 
     context 'when not logged in' do
