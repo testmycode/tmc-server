@@ -70,8 +70,8 @@ module Api
             format.json do
               render json: { error: msg }.merge(extra_json_keys), status: code
             end
-            format.text { render text: 'ERROR: ' + msg, status: code }
-            format.zip { render text: msg, status: code, content_type: 'text/plain' }
+            format.text { render plain: 'ERROR: ' + msg, status: code }
+            format.zip { render plain: msg, status: code, content_type: 'text/plain' }
           end
         end
 

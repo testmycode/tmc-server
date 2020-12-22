@@ -158,7 +158,7 @@ FactoryGirl.define do
     course
     sequence(:name) { |n| "certificate#{n}" }
 
-    after(:build) { |cert| cert.class.skip_callback(:save, :generate) }
+    after(:build) { |cert| cert.class.skip_callback(:save, :generate, raise: false) }
   end
 
   factory :organization do

@@ -42,7 +42,7 @@ class UsersController < ApplicationController
     if @user.errors.empty? && @user.save
       UserMailer.email_confirmation(@user).deliver_now
       if @bare_layout
-        render text: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', layout: true
+        render plain: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', layout: true
       else
         flash[:notice] = 'User account created. You can now log in.'
         redirect_to root_path

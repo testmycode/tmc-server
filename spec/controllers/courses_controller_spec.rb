@@ -212,7 +212,7 @@ describe CoursesController, type: :controller do
 
     it "can't refresh if course created from template" do
       @course = FactoryGirl.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
-      post :refresh, organization_id: @organization.slug, id: @course.id
+      post :refresh, params: { organization_id: @organization.slug, id: @course.id }
       expect(response.code.to_i).to eq(403)
     end
   end

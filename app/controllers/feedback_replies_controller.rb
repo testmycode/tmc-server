@@ -14,6 +14,6 @@ class FeedbackRepliesController < ApplicationController
       answer.exercise_name
     ).deliver_now
 
-    redirect_to :back, notice: 'Reply to a review was mailed'
+    redirect_back fallback_location: root_path, notice: 'Reply to a review was mailed'
   end
 end

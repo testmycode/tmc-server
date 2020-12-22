@@ -23,7 +23,7 @@ class AuthsController < ApplicationController
       else
         FAIL_MESSAGE
       end
-      return render text: res
+      return render plain: res
     end
 
     user = User.find_by(login: params[:username])
@@ -36,7 +36,7 @@ class AuthsController < ApplicationController
 
     respond_to do |format|
       format.any(:html, :text) do # Work around bug in HTTP library used by tmc-comet and accept HTML mime type
-        render text: msg
+        render plain: msg
       end
       format.json do
         render json: { status: msg }

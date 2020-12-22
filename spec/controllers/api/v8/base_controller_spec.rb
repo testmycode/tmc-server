@@ -9,7 +9,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
   controller UselessController do
     skip_authorization_check # skip cancan because we dont test it here
     def index
-      # render text: 'Success'
+      render plain: 'Success'
     end
   end
 
