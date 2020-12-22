@@ -7,7 +7,7 @@ class UserMailer < ActionMailer::Base
     @origin = origin
     @user = user
     token = user.verification_tokens.email.create!
-    @url = base_url + confirm_email_path(@user.id, token.token, language: language)
+    @url = confirm_email_url(@user.id, token.token, language: language)
     subject = 'Confirm your mooc.fi account email address' if language == 'en' || language == 'en-lu'
     subject = 'Varmista mooc.fi tunnuksesi sähköpostiosoite' if language == 'fi'
     subject = 'Bekräfta e-postadressen till ditt mooc.fi-konto' if language == 'se'
@@ -35,7 +35,7 @@ class UserMailer < ActionMailer::Base
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
       origin_name += "_#{language}" if language
-      @url = base_url + confirm_email_path(@user.id, token.token, language: language, origin: CGI.escape(origin_name))
+      @url = confirm_email_url(@user.id, token.token, language: language, origin: CGI.escape(origin_name))
       template_path = Rails.root.join('config', 'email_templates', 'user_mailer', 'email_confirmation')
       html_template_path = template_path.join("#{origin_name}.html.erb")
       text_template_path = template_path.join("#{origin_name}.text.erb")

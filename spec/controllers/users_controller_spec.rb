@@ -38,7 +38,7 @@ describe UsersController, type: :controller do
 
       it 'should show the profile page' do
         get :show
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end

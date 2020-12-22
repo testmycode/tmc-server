@@ -44,7 +44,7 @@ class SessionsController < ApplicationController
         return_to = session.delete(:return_to)
         redirect_to return_to, redirect_params
       elsif request.env['HTTP_REFERER'].present?
-        redirect_to :back, redirect_params
+        redirect_back fallback_location: root_path
       elsif request.referer.present?
         redirect_to request.referer, redirect_params
       else
