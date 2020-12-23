@@ -22,7 +22,7 @@ class EmailsController < ApplicationController
       @emails = User.filter_by(filter_params).order(:email).map(&:email)
       respond_to do |format|
         format.text do
-          render text: @emails.join("\n")
+          render plain: @emails.join("\n")
         end
       end
     end
@@ -40,8 +40,8 @@ class EmailsController < ApplicationController
 
       respond_to do |format|
         format.html
-        format.text { render text: @students.map { |s| s.email.to_s }.join("\n") }
-        format.csv { render text: "Username,Email\n" + @students.map { |s| "#{s.username},#{s.email}" }.join("\n") }
+        format.text { render plain: @students.map { |s| s.email.to_s }.join("\n") }
+        format.csv { render plain: "Username,Email\n" + @students.map { |s| "#{s.username},#{s.email}" }.join("\n") }
       end
     end
 end

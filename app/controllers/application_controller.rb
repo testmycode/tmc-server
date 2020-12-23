@@ -210,7 +210,7 @@ class ApplicationController < ActionController::Base
 
       result = Hash[params.select do |k, v|
         k.start_with?(prefix) && v.present? && (permitted == :all || permitted.include?(k))
-      end]
+      end.permit(permitted)]
       if options[:remove_prefix]
         result = Hash[result.map { |k, v| [k.sub(/^#{prefix}/, ''), v] }]
       end
