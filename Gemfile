@@ -60,10 +60,10 @@ group :development, :test do
   gem 'capybara', '~> 2.17'
   gem 'factory_girl_rails', '~> 4.5.0'
   gem 'poltergeist', '~> 1.8.1'
-  gem 'rspec', '~> 3.5.0'
+  gem 'rspec', '~> 3.10'
   gem 'rspec-activemodel-mocks', '~> 1.0.0'
-  gem 'rspec-core', '~> 3.5.2'
-  gem 'rspec-rails', '~> 3.5.1'
+  gem 'rspec-core', '~> 3.10'
+  gem 'rspec-rails', '~> 4.0'
   gem 'rails-controller-testing'
   # gem 'selenium-webdriver', '~> 2.44.0'
   gem 'irb'
@@ -77,8 +77,8 @@ group :development, :test do
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4.3'
   gem 'railroady' # for doc/diagrams
-  gem 'rubocop', '~> 0.59.2', require: false
-  gem 'rubocop-rails_config', '~> 0.2.4'
+  gem 'rubocop', '~> 1.5.2', require: false
+  gem 'rubocop-rails_config', '~> 1.1'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
   gem 'simplecov'
 end

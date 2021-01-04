@@ -3,6 +3,7 @@ inherit_gem:
     - config/rails.yml
 
 AllCops:
+  SuggestExtensions: false
   TargetRubyVersion: 2.5
   Exclude:
     - 'ext/**/*'
@@ -33,7 +34,7 @@ Metrics/ClassLength:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 
 Metrics/MethodLength:
