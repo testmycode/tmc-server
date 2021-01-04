@@ -57,11 +57,11 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'capybara', '~> 2.17'
-  gem 'factory_girl_rails', '~> 4.5.0'
-  gem 'poltergeist', '~> 1.8.1'
+  gem 'capybara', '~> 3.34'
+  gem 'factory_girl_rails', '~> 4.9'
+  gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
-  gem 'rspec-activemodel-mocks', '~> 1.0.0'
+  gem 'rspec-activemodel-mocks', '~> 1.1'
   gem 'rspec-core', '~> 3.10'
   gem 'rspec-rails', '~> 4.0'
   gem 'rails-controller-testing'
@@ -73,20 +73,20 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
 
-  gem 'database_cleaner', '~> 1.8.5'
+  gem 'database_cleaner', '~> 1.8'
   gem 'launchy' # for capybara's save_and_open_page
-  gem 'mimic', '~> 0.4.3'
+  gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
   gem 'rubocop', '~> 1.5.2', require: false
   gem 'rubocop-rails_config', '~> 1.1'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
-  gem 'simplecov'
+  gem 'simplecov', require: false
 end
 
 group :development do
-  gem 'letter_opener', '~> 1.6'
+  gem 'letter_opener', '~> 1.7'
 end
 
 group :test do
-  gem 'json-schema', '~> 2.7.0'
+  gem 'json-schema', '~> 2.8'
 end

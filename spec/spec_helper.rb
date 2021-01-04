@@ -8,9 +8,13 @@ require 'database_cleaner'
 require 'etc'
 require 'fileutils'
 require 'capybara/poltergeist'
-# require 'simplecov'
+require 'simplecov'
 # require 'rspec_remote_formatter'
-# SimpleCov.start 'rails'
+SimpleCov.start 'rails' do
+  add_filter '/bin/'
+  add_filter '/db/'
+  add_filter '/spec/'
+end
 
 Rack::Attack.enabled = false
 
@@ -32,6 +36,7 @@ end
 
 Capybara.default_driver = :poltergeist
 
+Capybara.server = :webrick
 Capybara.server_port = FreePorts.take_next
 Capybara.default_max_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
