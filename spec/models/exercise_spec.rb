@@ -314,7 +314,7 @@ describe Exercise, type: :model do
   it 'can tell which review point are missing for a user' do
     exercise = FactoryBot.create(:exercise, course: course)
     FactoryBot.create(:available_point, exercise: exercise, requires_review: false)
-    FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
+    pt2 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
     pt3 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
 
     submission = FactoryBot.create(:submission, course: course, exercise: exercise, user: user)
