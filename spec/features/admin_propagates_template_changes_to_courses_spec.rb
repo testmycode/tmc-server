@@ -6,12 +6,12 @@ feature 'Admin propagates template changes to all courses cloned from template',
   include IntegrationTestActions
 
   before :each do
-    @organization1 = FactoryGirl.create(:accepted_organization, slug: 'slug1')
-    @organization2 = FactoryGirl.create(:accepted_organization, slug: 'slug2')
+    @organization1 = FactoryBot.create(:accepted_organization, slug: 'slug1')
+    @organization2 = FactoryBot.create(:accepted_organization, slug: 'slug2')
 
-    @admin = FactoryGirl.create :admin, password: 'xooxer'
-    @teacher1 = FactoryGirl.create :user, password: 'teacher1'
-    @teacher2 = FactoryGirl.create :user, password: 'teacher2'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
+    @teacher1 = FactoryBot.create :user, password: 'teacher1'
+    @teacher2 = FactoryBot.create :user, password: 'teacher2'
 
     Teachership.create! user: @teacher1, organization: @organization1
     Teachership.create! user: @teacher2, organization: @organization2
@@ -19,7 +19,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
 
-    FactoryGirl.create :course_template, name: 'template', title: 'template', source_url: @repo_path
+    FactoryBot.create :course_template, name: 'template', title: 'template', source_url: @repo_path
 
     visit '/'
     # log_in_as @teacher1.login, 'teacher1'
@@ -89,7 +89,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
       c.save!
     end
 
-    user = FactoryGirl.create :user, password: 'foobar'
+    user = FactoryBot.create :user, password: 'foobar'
 
     log_out
     log_in_as user.login, 'foobar'

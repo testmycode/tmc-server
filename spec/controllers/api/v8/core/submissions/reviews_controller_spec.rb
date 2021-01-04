@@ -3,13 +3,13 @@
 require 'spec_helper'
 
 describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let!(:teacher) { FactoryGirl.create(:user) }
-  let!(:admin) { FactoryGirl.create(:admin) }
-  let!(:student) { FactoryGirl.create(:user) }
-  let!(:course) { FactoryGirl.create(:course, organization: organization) }
-  let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
-  let!(:submission) { FactoryGirl.create(:submission, course: course, user: student, exercise: exercise, requests_review: true) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
+  let!(:teacher) { FactoryBot.create(:user) }
+  let!(:admin) { FactoryBot.create(:admin) }
+  let!(:student) { FactoryBot.create(:user) }
+  let!(:course) { FactoryBot.create(:course, organization: organization) }
+  let!(:exercise) { FactoryBot.create(:exercise, course: course) }
+  let!(:submission) { FactoryBot.create(:submission, course: course, user: student, exercise: exercise, requests_review: true) }
 
   before :each do
     Teachership.create! user: teacher, organization: organization

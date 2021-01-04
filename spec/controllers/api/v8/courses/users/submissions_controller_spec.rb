@@ -3,16 +3,16 @@
 require 'spec_helper'
 
 describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
-  let!(:user) { FactoryGirl.create(:user) }
-  let!(:teacher) { FactoryGirl.create(:user) }
-  let!(:assistant) { FactoryGirl.create(:user) }
-  let!(:admin) { FactoryGirl.create(:admin) }
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
+  let!(:user) { FactoryBot.create(:user) }
+  let!(:teacher) { FactoryBot.create(:user) }
+  let!(:assistant) { FactoryBot.create(:user) }
+  let!(:admin) { FactoryBot.create(:admin) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
   let(:course_name_with_slug) { "#{organization.slug}-testcourse" }
-  let!(:course) { FactoryGirl.create(:course, name: course_name_with_slug.to_s, organization: organization) }
-  let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
+  let!(:course) { FactoryBot.create(:course, name: course_name_with_slug.to_s, organization: organization) }
+  let!(:exercise) { FactoryBot.create(:exercise, course: course) }
   let!(:submission) do
-    FactoryGirl.create(:submission,
+    FactoryBot.create(:submission,
                        course: course,
                        user: user,
                        exercise: exercise)
@@ -201,11 +201,11 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
     end
 
     def no_other_orgs_user_subs_for_teacher(parameters)
-      other_organization = FactoryGirl.create(:accepted_organization)
-      other_course = FactoryGirl.create(:course, organization: other_organization)
-      other_exercise = FactoryGirl.create(:exercise, course: other_course)
-      other_user = FactoryGirl.create(:user)
-      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+      other_organization = FactoryBot.create(:accepted_organization)
+      other_course = FactoryBot.create(:course, organization: other_organization)
+      other_exercise = FactoryBot.create(:exercise, course: other_course)
+      other_user = FactoryBot.create(:user)
+      other_guys_sub = FactoryBot.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
       get :index, params: parameters
 
@@ -215,10 +215,10 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
     end
 
     def no_other_courses_user_subs_for_assistant(parameters)
-      other_course = FactoryGirl.create(:course, organization: organization)
-      other_exercise = FactoryGirl.create(:exercise, course: other_course)
-      other_user = FactoryGirl.create(:user)
-      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+      other_course = FactoryBot.create(:course, organization: organization)
+      other_exercise = FactoryBot.create(:exercise, course: other_course)
+      other_user = FactoryBot.create(:user)
+      other_guys_sub = FactoryBot.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
       get :index, params: parameters
 
@@ -228,8 +228,8 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
     end
 
     def no_other_users_user_subs_for_student(parameters)
-      other_user = FactoryGirl.create(:user)
-      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
+      other_user = FactoryBot.create(:user)
+      other_guys_sub = FactoryBot.create(:submission, user: other_user, course: course)
 
       get :index, params: parameters
 
@@ -239,8 +239,8 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
     end
 
     def no_other_users_own_subs_for_anyone(parameters)
-      other_user = FactoryGirl.create(:user)
-      other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: course)
+      other_user = FactoryBot.create(:user)
+      other_guys_sub = FactoryBot.create(:submission, user: other_user, course: course)
 
       get :index, params: parameters
 

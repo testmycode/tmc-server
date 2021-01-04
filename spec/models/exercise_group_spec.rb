@@ -3,14 +3,14 @@
 require 'spec_helper'
 
 describe ExerciseGroup, type: :model do
-  let(:course) { FactoryGirl.create(:course) }
+  let(:course) { FactoryBot.create(:course) }
 
   specify '#exercises' do
-    ex = FactoryGirl.create(:exercise, course: course, name: 'foo-bar-baz')
-    ex2 = FactoryGirl.create(:exercise, course: course, name: 'foo-bar-xaz')
-    ex3 = FactoryGirl.create(:exercise, course: course, name: 'xoo-bar-baz')
-    another_course = FactoryGirl.create(:course)
-    ex4 = FactoryGirl.create(:exercise, course: another_course, name: 'foo-bar-baz')
+    ex = FactoryBot.create(:exercise, course: course, name: 'foo-bar-baz')
+    ex2 = FactoryBot.create(:exercise, course: course, name: 'foo-bar-xaz')
+    ex3 = FactoryBot.create(:exercise, course: course, name: 'xoo-bar-baz')
+    another_course = FactoryBot.create(:course)
+    ex4 = FactoryBot.create(:exercise, course: another_course, name: 'foo-bar-baz')
 
     expect(ex.exercise_group.exercises(false)).to include(ex)
     expect(ex.exercise_group.exercises(true)).to include(ex)

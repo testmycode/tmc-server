@@ -8,18 +8,18 @@ describe Course, type: :model do
     create_bare_repo(@source_path)
   end
   let(:source_url) { "file://#{@source_path}" }
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   describe 'gdocs_sheets' do
     it 'should list all unique gdocs_sheets of a course' do
-      course = FactoryGirl.create(:course)
-      ex1 = FactoryGirl.create(:exercise, course: course,
+      course = FactoryBot.create(:course)
+      ex1 = FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: 'sheet1')
-      ex2 = FactoryGirl.create(:exercise, course: course,
+      ex2 = FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: 'sheet1')
-      ex3 = FactoryGirl.create(:exercise, course: course,
+      ex3 = FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: 'sheet2')
-      ex4 = FactoryGirl.create(:exercise, course: course,
+      ex4 = FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: nil)
       worksheets = course.gdocs_sheets
 
@@ -46,7 +46,7 @@ describe Course, type: :model do
         clone_path
       ]
 
-      course = FactoryGirl.create :course
+      course = FactoryBot.create :course
       for path in object_paths
         expect(course.send(path)).to match(/^\//)
       end
@@ -54,59 +54,59 @@ describe Course, type: :model do
   end
 
   it 'should not be visible if initial refresh is not done' do
-    c = FactoryGirl.create(:course, initial_refresh_ready: false)
+    c = FactoryBot.create(:course, initial_refresh_ready: false)
     expect(c).not_to be_visible_to(user)
   end
 
   it 'should be visible if not hidden and hide_after is nil' do
-    c = FactoryGirl.create(:course, hidden: false, hide_after: nil)
+    c = FactoryBot.create(:course, hidden: false, hide_after: nil)
     expect(c).to be_visible_to(user)
   end
 
   it 'should be visible if not hidden and hide_after has not passed' do
-    c = FactoryGirl.create(:course, hidden: false, hide_after: Time.now + 2.minutes)
+    c = FactoryBot.create(:course, hidden: false, hide_after: Time.now + 2.minutes)
     expect(c).to be_visible_to(user)
   end
 
   it 'should not be visible if hidden' do
-    c = FactoryGirl.create(:course, hidden: true, hide_after: nil)
+    c = FactoryBot.create(:course, hidden: true, hide_after: nil)
     expect(c).not_to be_visible_to(user)
   end
 
   it 'should not be visible if hide_after has passed' do
-    c = FactoryGirl.create(:course, hidden: false, hide_after: Time.now - 2.minutes)
+    c = FactoryBot.create(:course, hidden: false, hide_after: Time.now - 2.minutes)
     expect(c).not_to be_visible_to(user)
   end
 
   it 'should always be visible to administrators' do
-    admin = FactoryGirl.create(:admin)
-    c = FactoryGirl.create(:course, hidden: true, hide_after: Time.now - 2.minutes)
+    admin = FactoryBot.create(:admin)
+    c = FactoryBot.create(:course, hidden: true, hide_after: Time.now - 2.minutes)
     expect(c).to be_visible_to(admin)
   end
 
   it 'should always be visible to organization teachers' do
-    organization = FactoryGirl.create(:accepted_organization)
+    organization = FactoryBot.create(:accepted_organization)
     Teachership.create!(user: user, organization: organization)
-    c = FactoryGirl.create(:course, hidden: true, hide_after: Time.now - 2.minutes, organization: organization)
+    c = FactoryBot.create(:course, hidden: true, hide_after: Time.now - 2.minutes, organization: organization)
     expect(c).to be_visible_to(user)
   end
 
   it 'should be visible if user has registered before the hidden_if_registered_after setting' do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = FactoryGirl.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-03'))
+    c = FactoryBot.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-03'))
     expect(c).to be_visible_to(user)
   end
 
   it 'should not be visible if user has registered after the hidden_if_registered_after setting' do
     user.created_at = Time.zone.parse('2010-01-02')
     user.save!
-    c = FactoryGirl.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-01'))
+    c = FactoryBot.create(:course, hidden_if_registered_after: Time.zone.parse('2010-01-01'))
     expect(c).not_to be_visible_to(user)
   end
 
   it 'should accept Finnish dates and datetimes for hide_after' do
-    c = FactoryGirl.create(:course)
+    c = FactoryBot.create(:course)
     c.hide_after = '19.8.2012'
     expect(c.hide_after.day).to eq(19)
     expect(c.hide_after.month).to eq(8)
@@ -120,19 +120,19 @@ describe Course, type: :model do
   end
 
   it 'should consider a hide_after date without time to mean the end of that day' do
-    c = FactoryGirl.create(:course, hide_after: '18.11.2013')
+    c = FactoryBot.create(:course, hide_after: '18.11.2013')
     expect(c.hide_after.hour).to eq(23)
     expect(c.hide_after.min).to eq(59)
   end
 
   it 'should know the exercise groups of its exercises' do
-    c = FactoryGirl.create(:course)
+    c = FactoryBot.create(:course)
     exercises = [
-      FactoryGirl.build(:exercise, course: c, name: 'foo-ex1'),
-      FactoryGirl.build(:exercise, course: c, name: 'bar-ex1'),
-      FactoryGirl.build(:exercise, course: c, name: 'foo-ex2'),
-      FactoryGirl.build(:exercise, course: c, name: 'zoox-zaax-ex1'),
-      FactoryGirl.build(:exercise, course: c, name: 'zoox-zoox-ex1')
+      FactoryBot.build(:exercise, course: c, name: 'foo-ex1'),
+      FactoryBot.build(:exercise, course: c, name: 'bar-ex1'),
+      FactoryBot.build(:exercise, course: c, name: 'foo-ex2'),
+      FactoryBot.build(:exercise, course: c, name: 'zoox-zaax-ex1'),
+      FactoryBot.build(:exercise, course: c, name: 'zoox-zoox-ex1')
     ]
     exercises.each { |ex| c.exercises << ex }
 
@@ -158,7 +158,7 @@ describe Course, type: :model do
 
   describe 'validation' do
     before :each do
-      @organization = FactoryGirl.create :accepted_organization
+      @organization = FactoryBot.create :accepted_organization
     end
 
     let(:valid_params) do
@@ -179,14 +179,14 @@ describe Course, type: :model do
     end
 
     it 'requires name to be unique' do
-      FactoryGirl.create :course, name: 'Unique'
+      FactoryBot.create :course, name: 'Unique'
       expect do
-        FactoryGirl.create :course, name: 'Unique'
+        FactoryBot.create :course, name: 'Unique'
       end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "forbids custom course's name to be same as some template's name" do
-      template = FactoryGirl.create :course_template, name: 'someName'
+      template = FactoryBot.create :course_template, name: 'someName'
       expect { Course.create!(valid_params.merge(name: 'someName')) }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
@@ -209,7 +209,7 @@ describe Course, type: :model do
     end
 
     it "if course created from template, repo url can't be different from template's repo url" do
-      template = FactoryGirl.create :course_template
+      template = FactoryBot.create :course_template
       expect { Course.create!(valid_params.merge(course_template: template, source_url: template.source_url)) }.not_to raise_error
       should_be_invalid_params(valid_params.merge(course_template: template, source_url: "#{template.source_url}~"))
     end
@@ -236,12 +236,12 @@ describe Course, type: :model do
 
   describe 'destruction' do
     before :each do
-      @template = FactoryGirl.create :course_template
-      @templated_course = FactoryGirl.create :course, course_template: @template, source_url: @template.source_url
+      @template = FactoryBot.create :course_template
+      @templated_course = FactoryBot.create :course, course_template: @template, source_url: @template.source_url
     end
 
     it 'deletes its cache directory' do
-      c = FactoryGirl.create :course
+      c = FactoryBot.create :course
       FileUtils.mkdir_p(c.cache_path)
       FileUtils.touch("#{c.cache_path}/foo.txt")
 
@@ -263,19 +263,19 @@ describe Course, type: :model do
     end
 
     it 'deletes dependent exercises' do
-      ex = FactoryGirl.create :exercise, course: @templated_course
+      ex = FactoryBot.create :exercise, course: @templated_course
       ex.course.destroy
       assert_destroyed(ex)
     end
 
     it 'deletes dependent submissions' do
-      sub = FactoryGirl.create :submission, course: @templated_course
+      sub = FactoryBot.create :submission, course: @templated_course
       sub.course.destroy
       assert_destroyed(sub)
     end
 
     it 'deletes dependent feedback questions and answers' do
-      a = FactoryGirl.create :feedback_answer, course: @templated_course
+      a = FactoryBot.create :feedback_answer, course: @templated_course
       q = a.feedback_question
       q.course.destroy
       assert_destroyed(a)
@@ -283,19 +283,19 @@ describe Course, type: :model do
     end
 
     it 'deletes available points' do
-      pt = FactoryGirl.create :available_point, course: @templated_course
+      pt = FactoryBot.create :available_point, course: @templated_course
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it 'deletes awarded points' do
-      pt = FactoryGirl.create :awarded_point, course: @templated_course
+      pt = FactoryBot.create :awarded_point, course: @templated_course
       pt.course.destroy
       assert_destroyed(pt)
     end
 
     it 'deletes test scanner cache entries' do
-      ent = FactoryGirl.create :test_scanner_cache_entry, course: @templated_course
+      ent = FactoryBot.create :test_scanner_cache_entry, course: @templated_course
       ent.course.destroy
       assert_destroyed(ent)
     end
@@ -307,10 +307,10 @@ describe Course, type: :model do
 
   describe 'contains_unlock_deadlines?' do
     before :each do
-      @course = FactoryGirl.create(:course)
-      @ex1 = FactoryGirl.create(:exercise, course: @course)
-      @ex2 = FactoryGirl.create(:exercise, course: @course)
-      @ex3 = FactoryGirl.create(:exercise, course: @course)
+      @course = FactoryBot.create(:course)
+      @ex1 = FactoryBot.create(:exercise, course: @course)
+      @ex2 = FactoryBot.create(:exercise, course: @course)
+      @ex3 = FactoryBot.create(:exercise, course: @course)
     end
 
     it 'returns false if no exercise in the course has unlock-based deadlines' do
@@ -336,7 +336,7 @@ describe Course, type: :model do
     end
 
     it 'assigns material_url with http:// prepended to it' do
-      course = FactoryGirl.create :course, material_url: 'google.com'
+      course = FactoryBot.create :course, material_url: 'google.com'
       expect(course.material_url).to eq('http://google.com')
       course.material_url = ''
       expect(course.material_url).to eq('')
@@ -348,7 +348,7 @@ describe Course, type: :model do
   end
 
   it 'increments own cached_version if custom course' do
-    course = FactoryGirl.create :course
+    course = FactoryBot.create :course
     expect do
       course.increment_cached_version
       course.save!
@@ -356,14 +356,14 @@ describe Course, type: :model do
   end
 
   it "increments template's cached_version if templated" do
-    template = FactoryGirl.create :course_template
-    course = FactoryGirl.create :course, course_template: template, source_url: template.source_url
+    template = FactoryBot.create :course_template
+    course = FactoryBot.create :course, course_template: template, source_url: template.source_url
     expect { course.increment_cached_version }.to change { template.cached_version }.by(1)
   end
 
   it "templated course's cache path is template's cache path, regardless of names" do
-    template = FactoryGirl.create :course_template, name: 'templatesName'
-    course = FactoryGirl.create :course, name: 'coursesName', course_template: template, source_url: template.source_url
+    template = FactoryBot.create :course_template, name: 'templatesName'
+    course = FactoryBot.create :course, name: 'coursesName', course_template: template, source_url: template.source_url
     expect(course.cache_path).to eq(template.cache_path)
   end
 end

@@ -4,9 +4,9 @@ require 'spec_helper'
 
 describe Api::Beta::ParticipantController, type: :request do
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @admin = FactoryGirl.create(:admin, password: 'xooxer')
-    @user = FactoryGirl.create(:user, login: 'user', password: 'xooxer')
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @admin = FactoryBot.create(:admin, password: 'xooxer')
+    @user = FactoryBot.create(:user, login: 'user', password: 'xooxer')
     allow(SiteSetting).to receive(:value).with('valid_clients')
                .and_return([{ 'name' => 'cli', 'min_version' => '0.1.1' }])
   end

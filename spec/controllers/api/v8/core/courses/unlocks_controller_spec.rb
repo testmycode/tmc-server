@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Api::V8::Core::Courses::UnlocksController, type: :controller do
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let!(:course) { FactoryGirl.create(:course, organization: organization) }
-  let!(:exercise) { FactoryGirl.create(:exercise, name: 'testexercise', course: course) }
-  let!(:user) { FactoryGirl.create(:user) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
+  let!(:course) { FactoryBot.create(:course, organization: organization) }
+  let!(:exercise) { FactoryBot.create(:exercise, name: 'testexercise', course: course) }
+  let!(:user) { FactoryBot.create(:user) }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }

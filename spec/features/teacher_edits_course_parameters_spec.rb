@@ -6,11 +6,11 @@ feature 'Teacher can edit course parameters', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @user = FactoryGirl.create :verified_user, password: 'xooxer'
-    @teacher = FactoryGirl.create :verified_user, password: 'foobar'
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @course = FactoryGirl.create :course, name: 'oldTitle', title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial.com', organization: @organization
-    FactoryGirl.create :course, title: 'dontchange', organization: @organization
+    @user = FactoryBot.create :verified_user, password: 'xooxer'
+    @teacher = FactoryBot.create :verified_user, password: 'foobar'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @course = FactoryBot.create :course, name: 'oldTitle', title: 'oldTitle', description: 'oldDescription', material_url: 'oldMaterial.com', organization: @organization
+    FactoryBot.create :course, title: 'dontchange', organization: @organization
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
   end
@@ -114,9 +114,9 @@ feature 'Teacher can edit course parameters', feature: true do
     end
 
     scenario 'Student can see the custom URL correctly if they have submissions in the course' do
-      exercise = FactoryGirl.create(:exercise, course: @course)
-      submission = FactoryGirl.create(:submission, course: @course, user: @user, exercise: exercise)
-      FactoryGirl.create(:awarded_point, course: @course, user: @user, submission: submission)
+      exercise = FactoryBot.create(:exercise, course: @course)
+      submission = FactoryBot.create(:submission, course: @course, user: @user, exercise: exercise)
+      FactoryBot.create(:awarded_point, course: @course, user: @user, submission: submission)
 
       log_in_as @user.email, 'xooxer'
       visit '/org/slug'

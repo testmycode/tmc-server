@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Solution, type: :model do
   it 'should be visible if solution_visible_after has passed' do
-    user = FactoryGirl.create(:verified_user)
-    ex = FactoryGirl.create(:exercise)
+    user = FactoryBot.create(:verified_user)
+    ex = FactoryBot.create(:exercise)
     sol = ex.solution
     ex.course.organization.verified = true
 
@@ -14,8 +14,8 @@ describe Solution, type: :model do
   end
 
   it 'should not be visibile if solution_visible_after has passed and user email not verified' do
-    user = FactoryGirl.create(:user)
-    ex = FactoryGirl.create(:exercise)
+    user = FactoryBot.create(:user)
+    ex = FactoryBot.create(:exercise)
     sol = ex.solution
     ex.course.organization.verified = true
 
@@ -27,8 +27,8 @@ describe Solution, type: :model do
     show_when_completed(true)
     show_when_expired(true)
 
-    user = FactoryGirl.create(:user)
-    ex = FactoryGirl.create(:exercise)
+    user = FactoryBot.create(:user)
+    ex = FactoryBot.create(:exercise)
     sol = ex.solution
 
     allow(ex).to receive(:submittable_by?).and_return(true)
@@ -39,8 +39,8 @@ describe Solution, type: :model do
     show_when_completed(true)
     show_when_expired(true)
 
-    user = FactoryGirl.create(:verified_user)
-    ex = FactoryGirl.create(:exercise)
+    user = FactoryBot.create(:verified_user)
+    ex = FactoryBot.create(:exercise)
     sol = ex.solution
     ex.course.organization.verified = true
 
@@ -52,8 +52,8 @@ describe Solution, type: :model do
   end
 
   it 'should not be visible for teacher if organization is not verified' do
-    teacher = FactoryGirl.create(:user)
-    ex = FactoryGirl.create(:exercise)
+    teacher = FactoryBot.create(:user)
+    ex = FactoryBot.create(:exercise)
     sol = ex.solution
     Teachership.create!(user: teacher, organization: ex.course.organization)
 

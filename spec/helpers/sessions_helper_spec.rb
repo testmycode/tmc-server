@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe SessionsHelper, type: :helper do
-  let!(:user) { FactoryGirl.create(:user) }
+  let!(:user) { FactoryBot.create(:user) }
 
   describe '#sign_in' do
     it 'should assign user to @current_user' do

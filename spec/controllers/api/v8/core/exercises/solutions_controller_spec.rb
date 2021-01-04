@@ -4,13 +4,13 @@ require 'spec_helper'
 require 'fileutils'
 
 describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
-  let(:organization) { FactoryGirl.create(:accepted_organization) }
+  let(:organization) { FactoryBot.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
   repo_path = Dir.tmpdir + '/api/v8/core/exercises/solutions/remote_repo'
-  let(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
-  let(:exercise) { FactoryGirl.create(:exercise, name: 'testexercise', course: course) }
-  let(:user) { FactoryGirl.create(:verified_user) }
-  let(:admin) { FactoryGirl.create(:admin) }
+  let(:course) { FactoryBot.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
+  let(:exercise) { FactoryBot.create(:exercise, name: 'testexercise', course: course) }
+  let(:user) { FactoryBot.create(:verified_user) }
+  let(:admin) { FactoryBot.create(:admin) }
 
   before :each do
     FileUtils.rm_rf(repo_path)
@@ -43,7 +43,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           repo.add_commit_push
           course.refresh
 
-          FactoryGirl.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: true)
+          FactoryBot.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: true)
 
           get :download, params: { exercise_id: exercise.id }
           expect(response).to have_http_status :ok
@@ -54,7 +54,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           repo.add_commit_push
           course.refresh
 
-          FactoryGirl.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: false)
+          FactoryBot.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: false)
 
           get :download, params: { exercise_id: exercise.id }
           expect(response).to have_http_status :forbidden

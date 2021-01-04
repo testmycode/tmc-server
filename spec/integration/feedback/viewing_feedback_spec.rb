@@ -6,22 +6,22 @@ describe 'Viewing feedback', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @user = FactoryGirl.create(:admin, password: 'xooxer')
+    @user = FactoryBot.create(:admin, password: 'xooxer')
     visit '/'
     log_in_as(@user.login, 'xooxer')
 
-    @course = FactoryGirl.create(:course, organization: @organization)
-    @question = FactoryGirl.create(:feedback_question, course: @course)
+    @course = FactoryBot.create(:course, organization: @organization)
+    @question = FactoryBot.create(:feedback_question, course: @course)
 
     visit '/org/slug/courses'
   end
 
   it 'should be possible per-course' do
-    @exercise = FactoryGirl.create(:exercise, course: @course)
-    @answer = FactoryGirl.create(:feedback_answer, feedback_question: @question, course: @course, exercise: @exercise, answer: 'this is the answer')
+    @exercise = FactoryBot.create(:exercise, course: @course)
+    @answer = FactoryBot.create(:feedback_answer, feedback_question: @question, course: @course, exercise: @exercise, answer: 'this is the answer')
 
     click_link @course.title
     click_link 'View feedback'
@@ -29,9 +29,9 @@ describe 'Viewing feedback', type: :request, integration: true do
   end
 
   it 'should be possible per-exercise' do
-    @ex1 = FactoryGirl.create(:exercise, course: @course)
-    @ex2 = FactoryGirl.create(:exercise, course: @course)
-    @answer = FactoryGirl.create(:feedback_answer, course: @course, exercise: @ex1, answer: 'this is the answer')
+    @ex1 = FactoryBot.create(:exercise, course: @course)
+    @ex2 = FactoryBot.create(:exercise, course: @course)
+    @answer = FactoryBot.create(:feedback_answer, course: @course, exercise: @ex1, answer: 'this is the answer')
 
     click_link @course.title
     click_link @ex1.name

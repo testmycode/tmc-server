@@ -3,23 +3,23 @@
 require 'spec_helper'
 
 describe Api::V8::Core::SubmissionsController, type: :controller do
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
   repo_path = Dir.tmpdir + '/api/v8/core/submissions/remote_repo'
   FileUtils.rm_rf(repo_path)
   create_bare_repo(repo_path)
-  let!(:course) { FactoryGirl.create(:course, organization: organization, source_backend: 'git', source_url: repo_path) }
-  let!(:admin) { FactoryGirl.create(:admin) }
-  let!(:teacher) { FactoryGirl.create(:user) }
-  let!(:assistant) { FactoryGirl.create(:user) }
-  let!(:user) { FactoryGirl.create(:user) }
-  let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
+  let!(:course) { FactoryBot.create(:course, organization: organization, source_backend: 'git', source_url: repo_path) }
+  let!(:admin) { FactoryBot.create(:admin) }
+  let!(:teacher) { FactoryBot.create(:user) }
+  let!(:assistant) { FactoryBot.create(:user) }
+  let!(:user) { FactoryBot.create(:user) }
+  let!(:exercise) { FactoryBot.create(:exercise, course: course) }
   let!(:submission) do
-    FactoryGirl.create(:submission,
+    FactoryBot.create(:submission,
                        course: course,
                        user: user,
                        exercise: exercise)
   end
-  let!(:submission_data) { FactoryGirl.create(:submission_data, submission: submission) }
+  let!(:submission_data) { FactoryBot.create(:submission_data, submission: submission) }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }
@@ -49,11 +49,11 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         # raise 'pending'
       end
       it "should not allow to download other organizations' submissions" do
-        other_organization = FactoryGirl.create(:accepted_organization)
-        other_course = FactoryGirl.create(:course, organization: other_organization)
-        other_exercise = FactoryGirl.create(:exercise, course: other_course)
-        other_user = FactoryGirl.create(:user)
-        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+        other_organization = FactoryBot.create(:accepted_organization)
+        other_course = FactoryBot.create(:course, organization: other_organization)
+        other_exercise = FactoryBot.create(:exercise, course: other_course)
+        other_user = FactoryBot.create(:user)
+        other_guys_sub = FactoryBot.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
         get :download, params: { id: other_guys_sub.id }
         expect(response.code).to eq('403')
@@ -72,10 +72,10 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         # raise 'pending'
       end
       it "should not allow to download other courses' submissions" do
-        other_course = FactoryGirl.create(:course, organization: organization)
-        other_exercise = FactoryGirl.create(:exercise, course: other_course)
-        other_user = FactoryGirl.create(:user)
-        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+        other_course = FactoryBot.create(:course, organization: organization)
+        other_exercise = FactoryBot.create(:exercise, course: other_course)
+        other_user = FactoryBot.create(:user)
+        other_guys_sub = FactoryBot.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
         get :download, params: { id: other_guys_sub.id }
         expect(response.code).to eq('403')
@@ -91,10 +91,10 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
         # raise 'pending'
       end
       it "should not allow to download other students' submissions" do
-        other_course = FactoryGirl.create(:course, organization: organization)
-        other_exercise = FactoryGirl.create(:exercise, course: other_course)
-        other_user = FactoryGirl.create(:user)
-        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
+        other_course = FactoryBot.create(:course, organization: organization)
+        other_exercise = FactoryBot.create(:exercise, course: other_course)
+        other_user = FactoryBot.create(:user)
+        other_guys_sub = FactoryBot.create(:submission, user: other_user, course: other_course, exercise: other_exercise)
 
         get :download, params: { id: other_guys_sub.id }
         expect(response.code).to eq('403')

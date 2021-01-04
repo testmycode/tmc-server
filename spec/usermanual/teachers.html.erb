@@ -33,11 +33,11 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
-    FactoryGirl.create :user, login: 'teacher', password: 'teacher'
-    FactoryGirl.create :user, login: 'professor', password: 'professor'
-    FactoryGirl.create :user, login: 'oldassistant', password: 'oldassistant'
-    FactoryGirl.create :admin, login: 'admin', password: 'admin'
-    FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
+    FactoryBot.create :user, login: 'teacher', password: 'teacher'
+    FactoryBot.create :user, login: 'professor', password: 'professor'
+    FactoryBot.create :user, login: 'oldassistant', password: 'oldassistant'
+    FactoryBot.create :admin, login: 'admin', password: 'admin'
+    FactoryBot.create :accepted_organization, name: 'Some organization', information: 'Some information'
 
     repo_path = "#{::Rails.root}/tmp/tests/fake_remote_repo"
     create_bare_repo(repo_path)
@@ -49,9 +49,9 @@ require 'cgi' # for escapeHTML
     repo.copy_simple_exercise('Week2/HelloWorldAdvanced')
     repo.add_commit_push
 
-    FactoryGirl.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_path
-    FactoryGirl.create :course_template, name: 'prog102', title: 'Programming 102', source_url: repo_path
-    FactoryGirl.create :course_template, name: 'skynet', title: 'Skynet laboratory', source_url: repo_path
+    FactoryBot.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_path
+    FactoryBot.create :course_template, name: 'prog102', title: 'Programming 102', source_url: repo_path
+    FactoryBot.create :course_template, name: 'skynet', title: 'Skynet laboratory', source_url: repo_path
   %>
 
   <h1>Teacher Manual</h1>
@@ -618,12 +618,12 @@ Some common examples:
 
 
 <%
-   student = FactoryGirl.create :user, login: 'student'
+   student = FactoryBot.create :user, login: 'student'
    course = Course.find(1)
    exercise1 = course.exercises.find_by(name: 'Week1-HelloWorld')
-   submission = FactoryGirl.create :submission, course: course, user: student, exercise: exercise1, requests_review: true
-   submission_data = FactoryGirl.create :submission_data, submission: submission
-   available_point = FactoryGirl.create :available_point, exercise: exercise1
+   submission = FactoryBot.create :submission, course: course, user: student, exercise: exercise1, requests_review: true
+   submission_data = FactoryBot.create :submission_data, submission: submission
+   available_point = FactoryBot.create :available_point, exercise: exercise1
    available_point.award_to(student, submission)
 
    visit '/org/hy/courses/1/'

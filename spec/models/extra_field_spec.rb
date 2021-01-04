@@ -20,7 +20,7 @@ EOS
   end
 
   before :each do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     UserField.instance_variable_set('@all', nil)
     ExtraField.instance_variable_set('@fields', nil)
   end

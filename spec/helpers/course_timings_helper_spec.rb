@@ -32,10 +32,10 @@ describe CourseTimingsHelper, type: :helper do
 
   describe 'complex condition check' do
     before(:each) do
-      @course = FactoryGirl.create :course, name: 'test-course-1', title: 'Test Course 1'
-      @ex1 = FactoryGirl.create :exercise, name: 'Module_1-ex1', course: @course
-      @ex2 = FactoryGirl.create :exercise, name: 'Module_1-ex2', course: @course
-      @ex3 = FactoryGirl.create :exercise, name: 'Module_2-ex2', course: @course
+      @course = FactoryBot.create :course, name: 'test-course-1', title: 'Test Course 1'
+      @ex1 = FactoryBot.create :exercise, name: 'Module_1-ex1', course: @course
+      @ex2 = FactoryBot.create :exercise, name: 'Module_1-ex2', course: @course
+      @ex3 = FactoryBot.create :exercise, name: 'Module_2-ex2', course: @course
       @group = @course.exercise_group_by_name('Module_1')
     end
 

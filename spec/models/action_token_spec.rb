@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ActionToken, type: :model do
   before :each do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     @way_in_the_past = Time.now - 3.days
   end
 

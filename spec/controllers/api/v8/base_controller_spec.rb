@@ -27,7 +27,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
     end
 
     context 'when logged in' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
       it { expect(subject.id).to be user.id }
     end

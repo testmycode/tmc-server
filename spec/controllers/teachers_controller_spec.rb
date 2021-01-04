@@ -4,15 +4,15 @@ require 'spec_helper'
 
 describe TeachersController, type: :controller do
   before :each do
-    @user = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
-    @teacher = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
+    @admin = FactoryBot.create(:admin)
+    @teacher = FactoryBot.create(:user)
   end
 
   describe 'As a teacher' do
     describe 'with an accepted organization' do
       before :each do
-        @organization = FactoryGirl.create(:accepted_organization)
+        @organization = FactoryBot.create(:accepted_organization)
         @teachership = Teachership.create!(user: @teacher, organization: @organization)
         controller.current_user = @teacher
       end
@@ -56,7 +56,7 @@ describe TeachersController, type: :controller do
 
   describe 'As a user' do
     before :each do
-      @organization = FactoryGirl.create(:accepted_organization)
+      @organization = FactoryBot.create(:accepted_organization)
       @teachership = Teachership.create!(user: @teacher, organization: @organization)
       controller.current_user = @user
     end

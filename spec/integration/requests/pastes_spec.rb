@@ -8,19 +8,19 @@ describe 'Paste JSON api', type: :request, integration: true do
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:verified_user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:verified_user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @course = FactoryGirl.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
+    @course = FactoryBot.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
     @course.refresh
 
-    @admin = FactoryGirl.create(:admin, password: 'xooxer')
-    @user = FactoryGirl.create(:verified_user, login: 'user', password: 'xooxer')
-    @viewer = FactoryGirl.create(:verified_user, login: 'viewer', password: 'xooxer')
+    @admin = FactoryBot.create(:admin, password: 'xooxer')
+    @user = FactoryBot.create(:verified_user, login: 'user', password: 'xooxer')
+    @viewer = FactoryBot.create(:verified_user, login: 'viewer', password: 'xooxer')
   end
 
   def get_paste(id, user)

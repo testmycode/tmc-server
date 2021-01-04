@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ParticipantsController, type: :controller do
   before :each do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
   end
 
   describe 'GET /me' do

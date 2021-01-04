@@ -5,9 +5,9 @@ require 'spec_helper'
 describe User, type: :model do
   describe 'sorting' do
     it 'should sort by name' do
-      a = [FactoryGirl.create(:user, login: 'aa'),
-           FactoryGirl.create(:user, login: 'cc'),
-           FactoryGirl.create(:user, login: 'bb')].sort!
+      a = [FactoryBot.create(:user, login: 'aa'),
+           FactoryBot.create(:user, login: 'cc'),
+           FactoryBot.create(:user, login: 'bb')].sort!
       expect(a.first.login).to eq('aa')
       expect(a.last.login).to eq('cc')
     end
@@ -15,26 +15,26 @@ describe User, type: :model do
 
   describe 'scopes' do
     before :each do
-      @user1 = FactoryGirl.create(:user)
-      @user2 = FactoryGirl.create(:user)
-      @course1 = FactoryGirl.create(:course)
-      @course2 = FactoryGirl.create(:course)
-      @ex1 = FactoryGirl.create(:exercise, course: @course1,
+      @user1 = FactoryBot.create(:user)
+      @user2 = FactoryBot.create(:user)
+      @course1 = FactoryBot.create(:course)
+      @course2 = FactoryBot.create(:course)
+      @ex1 = FactoryBot.create(:exercise, course: @course1,
                                            gdocs_sheet: 's1')
-      @ex2 = FactoryGirl.create(:exercise, course: @course2,
+      @ex2 = FactoryBot.create(:exercise, course: @course2,
                                            gdocs_sheet: 's2')
-      @sub1 = FactoryGirl.create(:submission, user: @user1,
+      @sub1 = FactoryBot.create(:submission, user: @user1,
                                               course: @course1, exercise: @ex1)
-      @sub2 = FactoryGirl.create(:submission, user: @user2,
+      @sub2 = FactoryBot.create(:submission, user: @user2,
                                               course: @course2, exercise: @ex2)
-      @avp1 = FactoryGirl.create(:available_point, course: @course1,
+      @avp1 = FactoryBot.create(:available_point, course: @course1,
                                                    exercise: @ex1, name: 'p1')
-      @avp2 = FactoryGirl.create(:available_point, course: @course2,
+      @avp2 = FactoryBot.create(:available_point, course: @course2,
                                                    exercise: @ex2, name: 'p2')
-      @awp1 = FactoryGirl.create(:awarded_point, course: @course1,
+      @awp1 = FactoryBot.create(:awarded_point, course: @course1,
                                                  submission: @sub1, user: @user1,
                                                  name: 'p1')
-      @awp2 = FactoryGirl.create(:awarded_point, course: @course2,
+      @awp2 = FactoryBot.create(:awarded_point, course: @course2,
                                                  submission: @sub2, user: @user2,
                                                  name: 'p2')
     end
@@ -50,8 +50,8 @@ describe User, type: :model do
     end
 
     it 'organization_students' do
-      organization1 = FactoryGirl.create :accepted_organization, slug: 'slug1'
-      organization2 = FactoryGirl.create :accepted_organization, slug: 'slug2'
+      organization1 = FactoryBot.create :accepted_organization, slug: 'slug1'
+      organization2 = FactoryBot.create :accepted_organization, slug: 'slug2'
       @course1.update(organization: organization1)
       @course2.update(organization: organization2)
 
@@ -152,26 +152,26 @@ describe User, type: :model do
 
   describe 'destruction' do
     it 'should destroy its submissions' do
-      sub = FactoryGirl.create(:submission)
+      sub = FactoryBot.create(:submission)
       sub.user.destroy
       expect(Submission.find_by(id: sub.id)).to be_nil
     end
 
     it 'should destory its points' do
-      point = FactoryGirl.create(:awarded_point)
+      point = FactoryBot.create(:awarded_point)
       point.user.destroy
       expect(AwardedPoint.find_by(id: point.id)).to be_nil
     end
 
     it 'should destroy any password reset key it has' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       key = ActionToken.create!(user: user, action: :reset_password)
       user.destroy
       expect(ActionToken.find_by(id: key.id)).to be_nil
     end
 
     it 'should destroy any user field values' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       value = UserFieldValue.create!(field_name: 'foo', user: user, value: '')
       user.destroy
       expect(UserFieldValue.find_by(id: value.id)).to be_nil
@@ -245,36 +245,36 @@ describe User, type: :model do
 
   describe 'visibility' do
     before :each do
-      @organization1 = FactoryGirl.create :accepted_organization, slug: 'slug1'
-      @organization2 = FactoryGirl.create :accepted_organization, slug: 'slug2'
-      @user1 = FactoryGirl.create :user
-      @user2 = FactoryGirl.create :user
-      @user3 = FactoryGirl.create :user
-      @course1 = FactoryGirl.create :course, organization: @organization1
-      @course2 = FactoryGirl.create :course, organization: @organization2
-      @course3 = FactoryGirl.create :course, organization: @organization1
-      @ex1 = FactoryGirl.create :exercise, course: @course
-      @ex2 = FactoryGirl.create :exercise, course: @course2
-      @ex3 = FactoryGirl.create :exercise, course: @course3
-      @sub1 = FactoryGirl.create :submission, user: @user1,
+      @organization1 = FactoryBot.create :accepted_organization, slug: 'slug1'
+      @organization2 = FactoryBot.create :accepted_organization, slug: 'slug2'
+      @user1 = FactoryBot.create :user
+      @user2 = FactoryBot.create :user
+      @user3 = FactoryBot.create :user
+      @course1 = FactoryBot.create :course, organization: @organization1
+      @course2 = FactoryBot.create :course, organization: @organization2
+      @course3 = FactoryBot.create :course, organization: @organization1
+      @ex1 = FactoryBot.create :exercise, course: @course
+      @ex2 = FactoryBot.create :exercise, course: @course2
+      @ex3 = FactoryBot.create :exercise, course: @course3
+      @sub1 = FactoryBot.create :submission, user: @user1,
                                               course: @course1, exercise: @ex1
-      @sub2 = FactoryGirl.create :submission, user: @user2,
+      @sub2 = FactoryBot.create :submission, user: @user2,
                                               course: @course2, exercise: @ex2
-      @sub3 = FactoryGirl.create :submission, user: @user3,
+      @sub3 = FactoryBot.create :submission, user: @user3,
                                               course: @course3, exercise: @ex3
-      @avp1 = FactoryGirl.create :available_point, course: @course1,
+      @avp1 = FactoryBot.create :available_point, course: @course1,
                                                    exercise: @ex1, name: 'p1'
-      @avp2 = FactoryGirl.create :available_point, course: @course2,
+      @avp2 = FactoryBot.create :available_point, course: @course2,
                                                    exercise: @ex2, name: 'p2'
-      @avp3 = FactoryGirl.create :available_point, course: @course3,
+      @avp3 = FactoryBot.create :available_point, course: @course3,
                                                    exercise: @ex3, name: 'p3'
-      @awp1 = FactoryGirl.create :awarded_point, course: @course1,
+      @awp1 = FactoryBot.create :awarded_point, course: @course1,
                                                  submission: @sub1, user: @user1,
                                                  name: 'p1'
-      @awp2 = FactoryGirl.create :awarded_point, course: @course2,
+      @awp2 = FactoryBot.create :awarded_point, course: @course2,
                                                  submission: @sub2, user: @user2,
                                                  name: 'p2'
-      @awp3 = FactoryGirl.create :awarded_point, course: @course3,
+      @awp3 = FactoryBot.create :awarded_point, course: @course3,
                                                  submission: @sub3, user: @user3, name: 'p3'
     end
 
@@ -294,7 +294,7 @@ describe User, type: :model do
 
     describe 'teacher' do
       before :each do
-        @teacher = FactoryGirl.create :user
+        @teacher = FactoryBot.create :user
         Teachership.create! user: @teacher, organization: @organization1
       end
 
@@ -310,7 +310,7 @@ describe User, type: :model do
 
     describe 'assistant' do
       before :each do
-        @assistant = FactoryGirl.create :user
+        @assistant = FactoryBot.create :user
         Assistantship.create! user: @assistant, course: @course1
       end
 

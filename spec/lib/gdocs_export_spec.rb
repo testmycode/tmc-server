@@ -11,7 +11,7 @@ describe GDocsExport, gdocs: true do
   end
 
   before :each do
-    @course = FactoryGirl.create(:course)
+    @course = FactoryBot.create(:course)
   end
 
   describe 'finding stuff' do

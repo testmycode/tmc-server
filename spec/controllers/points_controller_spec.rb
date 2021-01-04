@@ -7,17 +7,17 @@ describe PointsController, type: :controller do
   render_views
 
   before :each do
-    @user = FactoryGirl.create(:user)
-    @organization = FactoryGirl.create(:accepted_organization)
-    @course = FactoryGirl.create :course, organization: @organization
+    @user = FactoryBot.create(:user)
+    @organization = FactoryBot.create(:accepted_organization)
+    @course = FactoryBot.create :course, organization: @organization
     @sheetname = 'testsheet'
-    @exercise = FactoryGirl.create(:exercise, course: @course, gdocs_sheet: @sheetname)
-    @submission = FactoryGirl.create(:submission,
+    @exercise = FactoryBot.create(:exercise, course: @course, gdocs_sheet: @sheetname)
+    @submission = FactoryBot.create(:submission,
                                      course: @course,
                                      user: @user,
                                      exercise: @exercise)
-    @available_point = FactoryGirl.create(:available_point, exercise: @exercise)
-    @awarded_point = FactoryGirl.create(:awarded_point,
+    @available_point = FactoryBot.create(:available_point, exercise: @exercise)
+    @awarded_point = FactoryBot.create(:awarded_point,
                                         course: @course,
                                         name: @available_point.name,
                                         submission: @submission,

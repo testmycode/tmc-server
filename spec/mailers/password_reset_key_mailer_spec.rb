@@ -9,7 +9,7 @@ describe PasswordResetKeyMailer, type: :mailer do
     settings['from'] = 'noreply@example.com'
   end
 
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
   let(:key) { ActionToken.create!(user: user, action: :reset_password) }
 
   it 'should e-mail a password reset key' do

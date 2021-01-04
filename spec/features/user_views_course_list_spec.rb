@@ -6,14 +6,14 @@ feature 'User views organization list', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @student = FactoryGirl.create :verified_user, password: 'foobar'
-    @student2 = FactoryGirl.create :verified_user, password: 'foobar2'
-    @admin = FactoryGirl.create :admin, password: 'admin'
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @student = FactoryBot.create :verified_user, password: 'foobar'
+    @student2 = FactoryBot.create :verified_user, password: 'foobar2'
+    @admin = FactoryBot.create :admin, password: 'admin'
 
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = FactoryGirl.create :course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization
+    @course = FactoryBot.create :course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization
 
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
@@ -22,10 +22,10 @@ feature 'User views organization list', feature: true do
     @course.refresh
 
     @exercise1 = @course.exercises.first
-    @submission = FactoryGirl.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true
-    @submission_data = FactoryGirl.create :submission_data, submission: @submission
-    @submission2 = FactoryGirl.create :submission, course: @course, user: @student2, exercise: @exercise1, requests_review: true
-    @submission_data2 = FactoryGirl.create :submission_data, submission: @submission2
+    @submission = FactoryBot.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true
+    @submission_data = FactoryBot.create :submission_data, submission: @submission
+    @submission2 = FactoryBot.create :submission, course: @course, user: @student2, exercise: @exercise1, requests_review: true
+    @submission_data2 = FactoryBot.create :submission_data, submission: @submission2
 
     visit '/'
   end

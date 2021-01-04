@@ -4,13 +4,13 @@ require 'spec_helper'
 require 'json'
 
 describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
-  let!(:course) { FactoryGirl.create(:course) }
-  let(:regular_user) { FactoryGirl.create(:user) }
-  let(:admin_user) { FactoryGirl.create(:admin) }
+  let!(:course) { FactoryBot.create(:course) }
+  let(:regular_user) { FactoryBot.create(:user) }
+  let(:admin_user) { FactoryBot.create(:admin) }
 
-  let!(:submission_1) { FactoryGirl.create(:submission, course: course) }
-  let!(:submission_2) { FactoryGirl.create(:submission, course: course) }
-  let!(:submission_3) { FactoryGirl.create(:submission, course: course, created_at: Time.current - 2.hours) }
+  let!(:submission_1) { FactoryBot.create(:submission, course: course) }
+  let!(:submission_2) { FactoryBot.create(:submission, course: course) }
+  let!(:submission_3) { FactoryBot.create(:submission, course: course, created_at: Time.current - 2.hours) }
 
   before(:each) do
     allow(controller).to receive(:doorkeeper_token) { token }

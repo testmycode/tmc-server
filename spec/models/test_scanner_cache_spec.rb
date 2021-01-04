@@ -8,7 +8,7 @@ describe TestScannerCache, type: :model do
   end
 
   before :each do
-    @course = FactoryGirl.create(:course)
+    @course = FactoryBot.create(:course)
   end
 
   it 'should store missing entries in the cache' do
@@ -30,8 +30,8 @@ describe TestScannerCache, type: :model do
   end
 
   it 'should differentiate between courses' do
-    course1 = FactoryGirl.create(:course)
-    course2 = FactoryGirl.create(:course)
+    course1 = FactoryBot.create(:course)
+    course2 = FactoryBot.create(:course)
 
     expect(cache.get_or_update(course1, 'name', 'hash123') do
       { a: 'b' }

@@ -6,16 +6,16 @@ feature 'User lists own organization courses', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
-    @assistant = FactoryGirl.create :user, password: 'foobar'
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :user, password: 'xooxer'
+    @assistant = FactoryBot.create :user, password: 'foobar'
+    @user = FactoryBot.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create :course, name: 'course_1', title: 'Course 1', organization: @organization
-    FactoryGirl.create :course, name: 'course_2', title: 'Course 2', organization: @organization
-    FactoryGirl.create :course, name: 'course_3', title: 'Course 3', organization: @organization, hide_after: Time.now - 2.minutes
-    FactoryGirl.create :course, name: 'course_4', title: 'Course 4', organization: @organization, disabled_status: 1
+    FactoryBot.create :course, name: 'course_1', title: 'Course 1', organization: @organization
+    FactoryBot.create :course, name: 'course_2', title: 'Course 2', organization: @organization
+    FactoryBot.create :course, name: 'course_3', title: 'Course 3', organization: @organization, hide_after: Time.now - 2.minutes
+    FactoryBot.create :course, name: 'course_4', title: 'Course 4', organization: @organization, disabled_status: 1
 
     visit '/'
   end
@@ -56,9 +56,9 @@ feature 'User lists own organization courses', feature: true do
 
   describe 'Student' do
     before :each do
-      FactoryGirl.create :awarded_point, user: @user, course: Course.find_by(name: 'course_1')
-      FactoryGirl.create :awarded_point, user: @user, course: Course.find_by(name: 'course_2')
-      FactoryGirl.create :awarded_point, user: @user, course: Course.find_by(name: 'course_4')
+      FactoryBot.create :awarded_point, user: @user, course: Course.find_by(name: 'course_1')
+      FactoryBot.create :awarded_point, user: @user, course: Course.find_by(name: 'course_2')
+      FactoryBot.create :awarded_point, user: @user, course: Course.find_by(name: 'course_4')
 
       log_in_as(@user.login, 'foobar')
       visit '/org/slug'

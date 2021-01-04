@@ -14,15 +14,15 @@ def make_repo_for_course_template
   repo_path
 end
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :course_template do
     sequence(:name) { |n| "template#{n}" }
     sequence(:title) { |n| "template title#{n}" }
     sequence(:description) { |n| "course description#{n}" }
     sequence(:material_url) { |n| "http://www.material#{n}.com" }
     source_url { make_repo_for_course_template }
-    source_backend 'git'
-    git_branch 'master'
+    source_backend { 'git' }
+    git_branch { 'master' }
   end
 
   factory :user do
@@ -30,7 +30,7 @@ FactoryGirl.define do
     sequence(:password) { |n| "userpass#{n}" }
     sequence(:email) { |n| "user#{n}@example.com" }
     sequence(:email_verified) { |n| 'false' }
-    administrator false
+    administrator { false }
   end
 
   factory :verified_user, class: User do
@@ -38,7 +38,7 @@ FactoryGirl.define do
     sequence(:password) { |n| "ver_userpass#{n}" }
     sequence(:email) { |n| "ver_user#{n}@example.com" }
     sequence(:email_verified) { |n| 'true' }
-    administrator false
+    administrator { false }
   end
 
   factory :admin, class: User do
@@ -46,17 +46,17 @@ FactoryGirl.define do
     sequence(:password) { |n| "adminpass#{n}" }
     sequence(:email) { |n| "admin#{n}@example.com" }
     sequence(:email_verified) { |n| 'true' }
-    administrator true
+    administrator { true }
   end
 
   factory :course, class: Course do
     sequence(:name) { |n| "course#{n}" }
     sequence(:title) { |n| "Course #{n}" }
     source_url { make_repo_for_course_template }
-    source_backend 'git'
-    git_branch 'master'
-    initial_refresh_ready true
-    disabled_status 0
+    source_backend { 'git' }
+    git_branch { 'master' }
+    initial_refresh_ready { true }
+    disabled_status { 0 }
     organization
   end
 
@@ -64,18 +64,18 @@ FactoryGirl.define do
     course
     sequence(:name) { |n| "exercise#{n}" }
     sequence(:gdocs_sheet) { |n| "exercise#{n}" }
-    docker_image 'eu.gcr.io/moocfi-public/tmc-sandbox-tmc-langs-rust'
+    docker_image { 'eu.gcr.io/moocfi-public/tmc-sandbox-tmc-langs-rust' }
   end
 
   factory :returnable_exercise, parent: :exercise do
-    returnable_forced true
+    returnable_forced { true }
   end
 
   factory :submission do
     course
     user
     exercise
-    processed true
+    processed { true }
     after(:build) { |sub| sub.exercise.course = sub.course if sub.course }
     after(:create) do |sub|
       sub.exercise.course = sub.course if sub.course
@@ -116,19 +116,19 @@ FactoryGirl.define do
   factory :review do
     submission
     reviewer factory: :user
-    review_body 'This is a review'
+    review_body { 'This is a review' }
   end
 
   factory :test_case_run do
     sequence(:test_case_name) { |n| "test case #{n}" }
     submission
-    successful false
+    successful { false }
   end
 
   factory :feedback_question do
     course
     sequence(:question) { |n| "feedback question #{n}" }
-    kind 'text'
+    kind { 'text' }
   end
 
   factory :feedback_answer do
@@ -143,7 +143,7 @@ FactoryGirl.define do
     user
     course
     exercise
-    event_type 'test_event'
+    event_type { 'test_event' }
     sequence(:data) { |n| "testdata#{n}" }
     happened_at { Time.now }
     after_build { |ev| ev.exercise.course = ev.course }
@@ -165,13 +165,13 @@ FactoryGirl.define do
     sequence(:name) { |n| "organization#{n}" }
     sequence(:information) { |n| "information#{n}" }
     sequence(:slug) { |n| "organization#{n}" }
-    verified false
+    verified { false }
   end
 
   factory :accepted_organization, class: Organization do
     sequence(:name) { |n| "a_organization#{n}" }
     sequence(:information) { |n| "a_information#{n}" }
     sequence(:slug) { |n| "a_organization#{n}" }
-    verified true
+    verified { true }
   end
 end

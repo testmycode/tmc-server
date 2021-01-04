@@ -10,10 +10,10 @@ describe CoursesController, type: :controller do
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     @source_url = "file://#{@source_path}"
     create_bare_repo(@repo_path)
-    @user = FactoryGirl.create(:user)
-    @teacher = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
-    @organization = FactoryGirl.create(:accepted_organization)
+    @user = FactoryBot.create(:user)
+    @teacher = FactoryBot.create(:user)
+    @admin = FactoryBot.create(:admin)
+    @organization = FactoryBot.create(:accepted_organization)
     Teachership.create(user: @teacher, organization: @organization)
   end
 
@@ -37,11 +37,11 @@ describe CoursesController, type: :controller do
       end
 
       it 'renders all non-hidden courses in order by name' do
-        FactoryGirl.create(:course, name: 'Course1', organization: @organization)
-        FactoryGirl.create(:course, name: 'Course2', organization: @organization, hide_after: Time.now + 1.week)
-        FactoryGirl.create(:course, name: 'Course3', organization: @organization)
-        FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
-        FactoryGirl.create(:course, name: 'HiddenCourse', hidden: true)
+        FactoryBot.create(:course, name: 'Course1', organization: @organization)
+        FactoryBot.create(:course, name: 'Course2', organization: @organization, hide_after: Time.now + 1.week)
+        FactoryBot.create(:course, name: 'Course3', organization: @organization)
+        FactoryBot.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
+        FactoryBot.create(:course, name: 'HiddenCourse', hidden: true)
 
         result = get_index_json
 
@@ -52,7 +52,7 @@ describe CoursesController, type: :controller do
 
   describe 'GET show' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryBot.create(:course)
     end
 
     describe 'for administrators' do
@@ -61,10 +61,10 @@ describe CoursesController, type: :controller do
       end
 
       it "should show everyone's submissions" do
-        user1 = FactoryGirl.create(:user)
-        user2 = FactoryGirl.create(:user)
-        sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
-        sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+        user1 = FactoryBot.create(:user)
+        user2 = FactoryBot.create(:user)
+        sub1 = FactoryBot.create(:submission, user: user1, course: @course)
+        sub2 = FactoryBot.create(:submission, user: user2, course: @course)
 
         get :show, params: { organization_id: @organization.slug, id: @course.id }
 
@@ -79,8 +79,8 @@ describe CoursesController, type: :controller do
       end
 
       it 'should show no submissions' do
-        FactoryGirl.create(:submission, course: @course)
-        FactoryGirl.create(:submission, course: @course)
+        FactoryBot.create(:submission, course: @course)
+        FactoryBot.create(:submission, course: @course)
 
         get :show, params: { organization_id: @organization.slug, id: @course.id }
 
@@ -93,9 +93,9 @@ describe CoursesController, type: :controller do
         controller.current_user = @user
       end
       it "should show only the current user's submissions" do
-        other_user = FactoryGirl.create(:user)
-        my_sub = FactoryGirl.create(:submission, user: @user, course: @course)
-        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
+        other_user = FactoryBot.create(:user)
+        my_sub = FactoryBot.create(:submission, user: @user, course: @course)
+        other_guys_sub = FactoryBot.create(:submission, user: other_user, course: @course)
 
         get :show, params: { organization_id: @organization.slug, id: @course.id }
 
@@ -106,10 +106,10 @@ describe CoursesController, type: :controller do
 
     describe 'in JSON format' do
       before :each do
-        @course = FactoryGirl.create(:course, name: 'Course1')
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: @course)
+        @course = FactoryBot.create(:course, name: 'Course1')
+        @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: @course)
+        @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise2', course: @course)
+        @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise3', course: @course)
       end
 
       def get_show_json(options = {}, parse_json = true)
@@ -162,8 +162,8 @@ describe CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been attempted' do
-        sub = FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user)
-        FactoryGirl.create(:test_case_run, submission: sub, successful: false)
+        sub = FactoryBot.create(:submission, course: @course, exercise: @course.exercises[0], user: @user)
+        FactoryBot.create(:test_case_run, submission: sub, successful: false)
 
         result = get_show_json
 
@@ -173,7 +173,7 @@ describe CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been completed' do
-        FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user, all_tests_passed: true)
+        FactoryBot.create(:submission, course: @course, exercise: @course.exercises[0], user: @user, all_tests_passed: true)
 
         result = get_show_json
 
@@ -205,13 +205,13 @@ describe CoursesController, type: :controller do
 
   describe 'POST refresh' do
     before :each do
-      controller.current_user = FactoryGirl.create :user
+      controller.current_user = FactoryBot.create :user
       Teachership.create user: controller.current_user, organization: @organization
-      @template = FactoryGirl.create :course_template
+      @template = FactoryBot.create :course_template
     end
 
     it "can't refresh if course created from template" do
-      @course = FactoryGirl.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
+      @course = FactoryBot.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
       post :refresh, params: { organization_id: @organization.slug, id: @course.id }
       expect(response.code.to_i).to eq(403)
     end
@@ -219,7 +219,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST disable' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryBot.create(:course)
     end
 
     describe 'As a teacher' do
@@ -241,7 +241,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST enable' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryBot.create(:course)
     end
 
     describe 'As a teacher' do
@@ -263,7 +263,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST save_deadlines' do
     before :each do
-      @course = FactoryGirl.create :course, organization: @organization
+      @course = FactoryBot.create :course, organization: @organization
       Teachership.create(user: @user, organization: @organization)
       controller.current_user = @user
     end
@@ -330,7 +330,7 @@ describe CoursesController, type: :controller do
 
   describe 'GET manage_unlocks' do
     it 'when non-teacher should respond with a 403' do
-      @course = FactoryGirl.create :course
+      @course = FactoryBot.create :course
       @course.organization = @organization
       controller.current_user = @user
       get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
@@ -340,7 +340,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST save_unlocks' do
     before :each do
-      @course = FactoryGirl.create :course, organization: @organization
+      @course = FactoryBot.create :course, organization: @organization
       controller.current_user = @user
     end
 
@@ -416,7 +416,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST toggle_submission_result_visibility' do
     before :each do
-      @course = FactoryGirl.create :course, organization: @organization
+      @course = FactoryBot.create :course, organization: @organization
     end
 
     describe 'when teacher' do

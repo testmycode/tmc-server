@@ -6,15 +6,15 @@ describe CourseRefresher do
   include GitTestActions
 
   before :each do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
 
     repo_path = "#{@test_tmp_dir}/fake_remote_repo"
     @repo_url = "file://#{repo_path}"
     create_bare_repo(repo_path)
 
-    @template = FactoryGirl.create :course_template, name: 'Template', source_url: @repo_url
-    @course = FactoryGirl.create :course, name: 'TestCourse', title: 'TestCourse', source_backend: 'git', course_template: @template, source_url: @repo_url
-    @course2 = FactoryGirl.create :course, name: 'TestCourse2', title: 'TestCourse2', source_backend: 'git', course_template: @template, source_url: @repo_url
+    @template = FactoryBot.create :course_template, name: 'Template', source_url: @repo_url
+    @course = FactoryBot.create :course, name: 'TestCourse', title: 'TestCourse', source_backend: 'git', course_template: @template, source_url: @repo_url
+    @course2 = FactoryBot.create :course, name: 'TestCourse2', title: 'TestCourse2', source_backend: 'git', course_template: @template, source_url: @repo_url
 
     @local_clone = clone_course_repo(@course)
 
@@ -408,7 +408,7 @@ describe CourseRefresher do
     refresh_courses
 
     exercise = @course.exercises.first
-    sub = FactoryGirl.create(:submission, course: @course, exercise_name: exercise.name)
+    sub = FactoryBot.create(:submission, course: @course, exercise_name: exercise.name)
     awarded_point = AwardedPoint.create!(course: @course,
                                          user: sub.user,
                                          submission: sub,
@@ -618,7 +618,7 @@ describe CourseRefresher do
 
   describe 'when done twice' do
     it 'should be able to use a different repo' do
-      course = FactoryGirl.create :course, source_url: @repo_url
+      course = FactoryBot.create :course, source_url: @repo_url
       @refresher.refresh_course course
 
       repo_path = "#{@test_tmp_dir}/another_fake_remote_repo"

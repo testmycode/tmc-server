@@ -6,12 +6,12 @@ describe 'The system (used by an instructor for administration)', type: :request
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
 
     visit '/'
-    @user = FactoryGirl.create(:admin, password: 'xooxer')
+    @user = FactoryBot.create(:admin, password: 'xooxer')
     log_in_as(@user.login, 'xooxer')
 
     @repo_path = @test_tmp_dir + '/fake_remote_repo'

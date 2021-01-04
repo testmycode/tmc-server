@@ -13,7 +13,7 @@ describe SubmissionProcessor do
 
   describe 'reprocessing submissions' do
     before :each do
-      @sub = FactoryGirl.create(:submission, processed: false)
+      @sub = FactoryBot.create(:submission, processed: false)
     end
 
     it 'should reprocess when no sandbox was available a short while ago' do
@@ -59,7 +59,7 @@ describe SubmissionProcessor do
       end
 
       it 'should mark it as processed and having an error' do
-        user = FactoryGirl.create :user
+        user = FactoryBot.create :user
         SubmissionProcessor.new.process_some_submissions
         @sub.reload
         expect(@sub).to be_processed

@@ -6,20 +6,20 @@ feature 'User views organization list', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization1 = FactoryGirl.create :accepted_organization, name: 'Organization One'
-    @organization2 = FactoryGirl.create :accepted_organization, name: 'Organization Two'
-    @organization3 = FactoryGirl.create :accepted_organization, name: 'Organization Three'
-    @organization4 = FactoryGirl.create :accepted_organization, name: 'Organization Four'
-    @organization5 = FactoryGirl.create :accepted_organization, name: 'Organization Five'
+    @organization1 = FactoryBot.create :accepted_organization, name: 'Organization One'
+    @organization2 = FactoryBot.create :accepted_organization, name: 'Organization Two'
+    @organization3 = FactoryBot.create :accepted_organization, name: 'Organization Three'
+    @organization4 = FactoryBot.create :accepted_organization, name: 'Organization Four'
+    @organization5 = FactoryBot.create :accepted_organization, name: 'Organization Five'
 
-    @course1 = FactoryGirl.create :course, name: 'org1course1', organization: @organization1
-    @course2 = FactoryGirl.create :course, name: 'org3course1', organization: @organization3
-    @course3 = FactoryGirl.create :course, name: 'org4course1', organization: @organization4
-    @course4 = FactoryGirl.create :course, name: 'org4course2', organization: @organization4
+    @course1 = FactoryBot.create :course, name: 'org1course1', organization: @organization1
+    @course2 = FactoryBot.create :course, name: 'org3course1', organization: @organization3
+    @course3 = FactoryBot.create :course, name: 'org4course1', organization: @organization4
+    @course4 = FactoryBot.create :course, name: 'org4course2', organization: @organization4
 
-    @user = FactoryGirl.create :verified_user, password: 'foobar'
-    @teacher = FactoryGirl.create :verified_user, password: 'foobar'
-    @assistant = FactoryGirl.create :verified_user, password: 'foobar'
+    @user = FactoryBot.create :verified_user, password: 'foobar'
+    @teacher = FactoryBot.create :verified_user, password: 'foobar'
+    @assistant = FactoryBot.create :verified_user, password: 'foobar'
 
     Teachership.create! user: @teacher, organization: @organization1
     Teachership.create! user: @teacher, organization: @organization2
@@ -27,9 +27,9 @@ feature 'User views organization list', feature: true do
     Assistantship.create! user: @assistant, course: @course1
     Assistantship.create! user: @assistant, course: @course2
 
-    FactoryGirl.create :awarded_point, course: @course1, user: @user
-    FactoryGirl.create :awarded_point, course: @course3, user: @user
-    FactoryGirl.create :awarded_point, course: @course4, user: @user
+    FactoryBot.create :awarded_point, course: @course1, user: @user
+    FactoryBot.create :awarded_point, course: @course3, user: @user
+    FactoryBot.create :awarded_point, course: @course4, user: @user
 
     visit '/'
   end
@@ -78,10 +78,10 @@ feature 'User views organization list', feature: true do
   end
 
   scenario 'User with multiple own organizations with different conditions sees them all' do
-    user = FactoryGirl.create :verified_user, password: 'foobar'
+    user = FactoryBot.create :verified_user, password: 'foobar'
     Teachership.create! user: user, organization: @organization1
     Assistantship.create! user: user, course: @course2
-    FactoryGirl.create :awarded_point, course: @course3, user: user
+    FactoryBot.create :awarded_point, course: @course3, user: user
 
     log_in_as(user.login, 'foobar')
     expect(page).to have_content('My Organization')
@@ -96,7 +96,7 @@ feature 'User views organization list', feature: true do
   end
 
   scenario 'Hidden organization is not visible to user in organization list' do
-    @organization = FactoryGirl.create :accepted_organization
+    @organization = FactoryBot.create :accepted_organization
     @organization.hidden = true
     @organization.save!
     log_in_as(@user.login, 'foobar')

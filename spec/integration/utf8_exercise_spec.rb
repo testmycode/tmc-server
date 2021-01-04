@@ -9,17 +9,17 @@ describe 'The system, receiving submissions with UTF-8 special characters', type
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @course = FactoryGirl.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
+    @course = FactoryBot.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy(FixtureExercise.fixture_exercises_root + '/Utf8')
     @repo.add_commit_push
 
     @course.refresh
 
-    @user = FactoryGirl.create(:user, password: 'xooxer')
+    @user = FactoryBot.create(:user, password: 'xooxer')
 
     log_in_as(@user.login, 'xooxer')
     visit '/org/slug/courses'

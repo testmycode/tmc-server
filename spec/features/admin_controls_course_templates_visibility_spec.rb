@@ -6,17 +6,17 @@ feature 'Admin sets expiredate to course templates', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @user = FactoryGirl.create :user, password: 'foobar'
-    @admin = FactoryGirl.create :admin, password: 'xooxer'
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @user = FactoryBot.create :user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
+    @teacher = FactoryBot.create :user, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
 
-    @ct = FactoryGirl.create :course_template, title: 'Template 1'
-    @ct_expired_visible = FactoryGirl.create :course_template, title: 'Template 2', expires_at: Time.now - 1.day
-    @ct_non_expired_visible = FactoryGirl.create :course_template, title: 'Template 3', expires_at: Time.now + 1.day, hidden: false
-    @ct_expired_hidden = FactoryGirl.create :course_template, title: 'Template 4', expires_at: Time.now - 1.day, hidden: true
-    @ct_non_expired_hidden = FactoryGirl.create :course_template, title: 'Template 5', expires_at: Time.now + 1.day, hidden: true
+    @ct = FactoryBot.create :course_template, title: 'Template 1'
+    @ct_expired_visible = FactoryBot.create :course_template, title: 'Template 2', expires_at: Time.now - 1.day
+    @ct_non_expired_visible = FactoryBot.create :course_template, title: 'Template 3', expires_at: Time.now + 1.day, hidden: false
+    @ct_expired_hidden = FactoryBot.create :course_template, title: 'Template 4', expires_at: Time.now - 1.day, hidden: true
+    @ct_non_expired_hidden = FactoryBot.create :course_template, title: 'Template 5', expires_at: Time.now + 1.day, hidden: true
 
     visit '/'
   end

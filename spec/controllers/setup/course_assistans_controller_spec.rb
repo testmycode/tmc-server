@@ -4,11 +4,11 @@ require 'spec_helper'
 
 describe Setup::CourseAssistantsController, type: :controller do
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization)
-    @course = FactoryGirl.create(:course, organization: @organization)
-    @teacher = FactoryGirl.create(:user)
-    @user = FactoryGirl.create(:user)
-    @assistant = FactoryGirl.create(:user, login: 'assi')
+    @organization = FactoryBot.create(:accepted_organization)
+    @course = FactoryBot.create(:course, organization: @organization)
+    @teacher = FactoryBot.create(:user)
+    @user = FactoryBot.create(:user)
+    @assistant = FactoryBot.create(:user, login: 'assi')
     Teachership.create!(user: @teacher, organization: @organization)
   end
 
@@ -19,9 +19,9 @@ describe Setup::CourseAssistantsController, type: :controller do
 
     describe 'GET index' do
       it 'lists assistants in course' do
-        user1 = FactoryGirl.create(:user)
-        user2 = FactoryGirl.create(:user)
-        user3 = FactoryGirl.create(:user)
+        user1 = FactoryBot.create(:user)
+        user2 = FactoryBot.create(:user)
+        user3 = FactoryBot.create(:user)
         @course.assistants << [user1, user2, user3]
         get :index, params: { organization_id: @organization.slug, course_id: @course.id }
         expect(assigns(:assistants)).to eq([user1, user2, user3])

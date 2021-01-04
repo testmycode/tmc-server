@@ -6,20 +6,20 @@ describe Setup::CourseDetailsController, type: :controller do
   include GitTestActions
 
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization)
-    @teacher = FactoryGirl.create(:user)
-    @user = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
+    @organization = FactoryBot.create(:accepted_organization)
+    @teacher = FactoryBot.create(:user)
+    @user = FactoryBot.create(:user)
+    @admin = FactoryBot.create(:admin)
     Teachership.create!(user: @teacher, organization: @organization)
 
-    @ct = FactoryGirl.create(:course_template)
+    @ct = FactoryBot.create(:course_template)
 
     @source_path = "#{@test_tmp_dir}/fake_source"
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     @source_url = "file://#{@source_path}"
     create_bare_repo(@repo_path)
 
-    @course = FactoryGirl.create(:course,
+    @course = FactoryBot.create(:course,
                                  organization: @organization,
                                  name: 'originalCourse',
                                  title: 'originalTitle',

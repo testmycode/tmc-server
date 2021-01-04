@@ -9,17 +9,17 @@ describe 'The system (used by a student)', type: :request, integration: true do
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:verified_user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:verified_user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @course = FactoryGirl.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
+    @course = FactoryBot.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
     @course.refresh
 
-    @user = FactoryGirl.create(:verified_user, password: 'xooxer')
+    @user = FactoryBot.create(:verified_user, password: 'xooxer')
     @ability = Ability.new(@user)
     visit '/'
 
@@ -186,7 +186,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
 
   it 'should not count submissions made by non legitimate_students in submission counts' do
     pending 'Counts all submissions for some reason'
-    @fake_user = FactoryGirl.create(:admin, login: 'uuseri', password: 'xooxer', legitimate_student: false)
+    @fake_user = FactoryBot.create(:admin, login: 'uuseri', password: 'xooxer', legitimate_student: false)
     log_out
     log_in_as(@fake_user.login, 'xooxer')
     visit '/org/slug/courses'
@@ -220,7 +220,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     log_out
     expect(page).not_to have_content('src/SimpleStuff.java')
     expect(page).to have_content('Goodbye')
-    @other_user = FactoryGirl.create(:user, login: 'uuseri', password: 'xooxer')
+    @other_user = FactoryBot.create(:user, login: 'uuseri', password: 'xooxer')
 
     visit '/org/slug/courses'
     log_in_as(@other_user.login, 'xooxer')

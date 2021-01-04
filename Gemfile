@@ -58,7 +58,7 @@ end
 
 group :development, :test do
   gem 'capybara', '~> 3.34'
-  gem 'factory_girl_rails', '~> 4.9'
+  gem 'factory_bot_rails', '~> 6.1'
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
   gem 'rspec-activemodel-mocks', '~> 1.1'
@@ -78,6 +78,8 @@ group :development, :test do
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
   gem 'rubocop', '~> 1.5.2', require: false
+  gem 'rubocop-rspec', require: false
+  gem 'rubocop-rake', require: false
   gem 'rubocop-rails_config', '~> 1.1'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
   gem 'simplecov', require: false

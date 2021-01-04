@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Api::V8::Core::CoursesController, type: :controller do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   before(:each) do
     allow(controller).to receive(:doorkeeper_token) { token }
@@ -12,11 +12,11 @@ describe Api::V8::Core::CoursesController, type: :controller do
   describe 'GET course details show' do
     describe 'in JSON format with valid token' do
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
-      let(:course) { FactoryGirl.create(:course, name: 'Course1') }
+      let(:course) { FactoryBot.create(:course, name: 'Course1') }
       before :each do
-        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: course)
-        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: course)
-        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: course)
+        course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: course)
+        course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise2', course: course)
+        course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise3', course: course)
       end
 
       def show_course
@@ -58,8 +58,8 @@ describe Api::V8::Core::CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been attempted' do
-        sub = FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user)
-        FactoryGirl.create(:test_case_run, submission: sub, successful: false)
+        sub = FactoryBot.create(:submission, course: course, exercise: course.exercises[0], user: user)
+        FactoryBot.create(:test_case_run, submission: sub, successful: false)
 
         result = show_course
 
@@ -69,7 +69,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been completed' do
-        FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user, all_tests_passed: true)
+        FactoryBot.create(:submission, course: course, exercise: course.exercises[0], user: user, all_tests_passed: true)
 
         result = show_course
 

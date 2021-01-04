@@ -6,15 +6,15 @@ feature 'Teacher disables exercises', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @teacher = FactoryGirl.create :user
-    @user = FactoryGirl.create :user
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :user
+    @user = FactoryBot.create :user
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
     Teachership.create!(user: @teacher, organization: @organization)
-    @course = FactoryGirl.create(:course, organization: @organization)
-    @ex1 = FactoryGirl.create(:exercise, course: @course)
-    @ex2 = FactoryGirl.create(:exercise, course: @course)
-    @ex3 = FactoryGirl.create(:exercise, course: @course)
-    @ex4 = FactoryGirl.create(:exercise, course: @course)
+    @course = FactoryBot.create(:course, organization: @organization)
+    @ex1 = FactoryBot.create(:exercise, course: @course)
+    @ex2 = FactoryBot.create(:exercise, course: @course)
+    @ex3 = FactoryBot.create(:exercise, course: @course)
+    @ex4 = FactoryBot.create(:exercise, course: @course)
 
     visit '/'
   end

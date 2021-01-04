@@ -6,7 +6,7 @@ describe "Resetting one's password by e-mail", type: :request, integration: true
   include IntegrationTestActions
 
   it 'should be possible' do
-    user = FactoryGirl.create(:verified_user, login: 'theuser', password: 'forgot_this', email: 'theuser@example.com')
+    user = FactoryBot.create(:verified_user, login: 'theuser', password: 'forgot_this', email: 'theuser@example.com')
 
     visit '/'
     find(:link, 'Log in').trigger('click')

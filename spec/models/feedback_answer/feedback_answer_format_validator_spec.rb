@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Validators::FeedbackAnswerFormatValidator, type: :model do
   it 'should validate integer ranges' do
-    answer = FactoryGirl.create(:feedback_answer)
+    answer = FactoryBot.create(:feedback_answer)
     answer.feedback_question.kind = 'intrange[-5..5]'
 
     answer.answer = '3'
@@ -31,7 +31,7 @@ describe Validators::FeedbackAnswerFormatValidator, type: :model do
   end
 
   it 'should accept non-empty text answers' do
-    answer = FactoryGirl.create(:feedback_answer)
+    answer = FactoryBot.create(:feedback_answer)
     answer.feedback_question.kind = 'text'
 
     answer.answer = 'foo'
@@ -44,7 +44,7 @@ describe Validators::FeedbackAnswerFormatValidator, type: :model do
   end
 
   it 'should not anything when question kind is invalid' do
-    answer = FactoryGirl.create(:feedback_answer)
+    answer = FactoryBot.create(:feedback_answer)
     answer.feedback_question.kind = 'an invalid kind'
 
     answer.answer = 'foo'

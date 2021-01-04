@@ -5,17 +5,17 @@ require 'spec_helper'
 describe Unlock, type: :model do
   describe '#refresh_unlocks' do
     before :each do
-      @course = FactoryGirl.create(:course)
-      @ex1 = FactoryGirl.create(:exercise, course: @course, name: 'ex1')
-      @ex2 = FactoryGirl.create(:exercise, course: @course, name: 'ex2')
+      @course = FactoryBot.create(:course)
+      @ex1 = FactoryBot.create(:exercise, course: @course, name: 'ex1')
+      @ex2 = FactoryBot.create(:exercise, course: @course, name: 'ex2')
       @ex1.unlock_spec = ['11.11.2011'].to_json
       @ex2.unlock_spec = ['2011-11-22', 'exercise ex1'].to_json
       @ex1.save!
       @ex2.save!
 
-      @user = FactoryGirl.create(:user)
-      @available_point = FactoryGirl.create(:available_point, exercise_id: @ex1.id)
-      @available_point2 = FactoryGirl.create(:available_point, exercise_id: @ex2.id)
+      @user = FactoryBot.create(:user)
+      @available_point = FactoryBot.create(:available_point, exercise_id: @ex1.id)
+      @available_point2 = FactoryBot.create(:available_point, exercise_id: @ex2.id)
 
       @course.reload
     end

@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Api::V8::UsersController, type: :controller do
-  let!(:user) { FactoryGirl.create(:user) }
-  let!(:other_user) { FactoryGirl.create(:user) }
-  let!(:admin) { FactoryGirl.create(:admin) }
+  let!(:user) { FactoryBot.create(:user) }
+  let!(:other_user) { FactoryBot.create(:user) }
+  let!(:admin) { FactoryBot.create(:admin) }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }

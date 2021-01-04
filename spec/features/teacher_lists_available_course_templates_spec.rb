@@ -6,14 +6,14 @@ feature 'Teacher lists available course templates', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :user, password: 'xooxer'
+    @user = FactoryBot.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create :course_template, title: 'template1'
-    FactoryGirl.create :course_template, title: 'template2'
-    FactoryGirl.create :course_template, title: 'template3'
+    FactoryBot.create :course_template, title: 'template1'
+    FactoryBot.create :course_template, title: 'template2'
+    FactoryBot.create :course_template, title: 'template3'
 
     visit '/'
   end

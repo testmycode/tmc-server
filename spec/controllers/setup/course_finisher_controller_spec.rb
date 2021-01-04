@@ -4,10 +4,10 @@ require 'spec_helper'
 
 describe Setup::CourseFinisherController, type: :controller do
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization)
-    @course = FactoryGirl.create(:course, organization: @organization)
-    @teacher = FactoryGirl.create(:user)
-    @user = FactoryGirl.create(:user)
+    @organization = FactoryBot.create(:accepted_organization)
+    @course = FactoryBot.create(:course, organization: @organization)
+    @teacher = FactoryBot.create(:user)
+    @user = FactoryBot.create(:user)
     Teachership.create!(user: @teacher, organization: @organization)
   end
 

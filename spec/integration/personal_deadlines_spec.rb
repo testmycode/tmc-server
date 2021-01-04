@@ -8,10 +8,10 @@ describe 'Personal deadlines', type: :request, integration: true do
   before :each do
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @course = FactoryGirl.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
+    @course = FactoryBot.create(:course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization)
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise1')
     @repo.copy_simple_exercise('MyExercise2')
@@ -20,7 +20,7 @@ describe 'Personal deadlines', type: :request, integration: true do
     end
     @repo.add_commit_push
 
-    @user = FactoryGirl.create(:user, password: 'xooxer')
+    @user = FactoryBot.create(:user, password: 'xooxer')
 
     visit '/'
     log_in_as(@user.login, @user.password)

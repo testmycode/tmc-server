@@ -4,19 +4,19 @@ require 'spec_helper'
 
 describe ReviewsController, type: :controller do
   before :each do
-    @organization = FactoryGirl.create :accepted_organization
-    @teacher = FactoryGirl.create :user
-    @admin = FactoryGirl.create(:admin)
-    @student = FactoryGirl.create :user, password: 'foobar'
+    @organization = FactoryBot.create :accepted_organization
+    @teacher = FactoryBot.create :user
+    @admin = FactoryBot.create(:admin)
+    @student = FactoryBot.create :user, password: 'foobar'
     Teachership.create! user: @teacher, organization: @organization
   end
 
   describe 'POST create' do
     before :each do
-      @student = FactoryGirl.create :user, password: 'foobar'
-      @course = FactoryGirl.create :course, organization: @organization
-      @exercise = FactoryGirl.create :exercise, course: @course
-      @submission = FactoryGirl.create :submission, course: @course, user: @student, exercise: @exercise, requests_review: true
+      @student = FactoryBot.create :user, password: 'foobar'
+      @course = FactoryBot.create :course, organization: @organization
+      @exercise = FactoryBot.create :exercise, course: @course
+      @submission = FactoryBot.create :submission, course: @course, user: @student, exercise: @exercise, requests_review: true
     end
 
     describe 'As an admin' do

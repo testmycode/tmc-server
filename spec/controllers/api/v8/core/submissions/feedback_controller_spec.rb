@@ -3,12 +3,12 @@
 require 'spec_helper'
 
 describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let!(:student) { FactoryGirl.create(:user) }
-  let!(:course) { FactoryGirl.create(:course, organization: organization) }
-  let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
-  let!(:submission) { FactoryGirl.create(:submission, course: course, user: student, exercise: exercise, requests_review: true) }
-  let(:question) { FactoryGirl.create(:feedback_question, course: course) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
+  let!(:student) { FactoryBot.create(:user) }
+  let!(:course) { FactoryBot.create(:course, organization: organization) }
+  let!(:exercise) { FactoryBot.create(:exercise, course: course) }
+  let!(:submission) { FactoryBot.create(:submission, course: course, user: student, exercise: exercise, requests_review: true) }
+  let(:question) { FactoryBot.create(:feedback_question, course: course) }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }

@@ -6,15 +6,15 @@ feature 'Teacher lists own organization courses', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @teacher = FactoryGirl.create :verified_user, password: 'xooxer'
-    @user = FactoryGirl.create :verified_user, password: 'foobar'
-    @admin = FactoryGirl.create :admin, password: 'xooxer'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :verified_user, password: 'xooxer'
+    @user = FactoryBot.create :verified_user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create :course, name: 'course_1', title: 'Course 1', organization: @organization
-    FactoryGirl.create :course, name: 'course_2', title: 'Course 2', organization: @organization
-    FactoryGirl.create :course, name: 'course_old', title: 'Old Course', organization: @organization, disabled_status: 1
+    FactoryBot.create :course, name: 'course_1', title: 'Course 1', organization: @organization
+    FactoryBot.create :course, name: 'course_2', title: 'Course 2', organization: @organization
+    FactoryBot.create :course, name: 'course_old', title: 'Old Course', organization: @organization, disabled_status: 1
 
     visit '/'
   end

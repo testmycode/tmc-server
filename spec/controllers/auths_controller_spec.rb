@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe AuthsController, type: :controller do
   before :each do
-    @user = FactoryGirl.create(:user, login: 'foo', password: 'bar')
+    @user = FactoryBot.create(:user, login: 'foo', password: 'bar')
   end
 
   it 'tells whether the given user/password is valid or not' do

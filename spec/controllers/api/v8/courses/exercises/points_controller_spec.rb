@@ -3,17 +3,17 @@
 require 'spec_helper'
 
 describe Api::V8::Courses::Exercises::PointsController, type: :controller do
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-testcourse", organization: organization) }
-  let!(:exercise) { FactoryGirl.create(:exercise, name: 'testexercise', course: course) }
-  let!(:available_point) { FactoryGirl.create(:available_point, exercise: exercise) }
-  let(:admin) { FactoryGirl.create(:admin, password: 'xooxer') }
-  let(:user) { FactoryGirl.create(:user, login: 'user', password: 'xooxer') }
-  let(:submission1) { FactoryGirl.create(:submission, course: course, user: admin, exercise: exercise) }
-  let!(:awarded_point1) { FactoryGirl.create(:awarded_point, course: course, name: available_point.name, submission: submission1, user: admin) }
-  let(:available_point2) { FactoryGirl.create(:available_point, name: 'userpoint', exercise: exercise) }
-  let!(:awarded_point2) { FactoryGirl.create(:awarded_point, course: course, name: available_point2.name, submission: submission1, user: user) }
-  let!(:exercise_no_points) { FactoryGirl.create(:exercise, name: 'nopoints', course: course) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
+  let!(:course) { FactoryBot.create(:course, name: "#{organization.slug}-testcourse", organization: organization) }
+  let!(:exercise) { FactoryBot.create(:exercise, name: 'testexercise', course: course) }
+  let!(:available_point) { FactoryBot.create(:available_point, exercise: exercise) }
+  let(:admin) { FactoryBot.create(:admin, password: 'xooxer') }
+  let(:user) { FactoryBot.create(:user, login: 'user', password: 'xooxer') }
+  let(:submission1) { FactoryBot.create(:submission, course: course, user: admin, exercise: exercise) }
+  let!(:awarded_point1) { FactoryBot.create(:awarded_point, course: course, name: available_point.name, submission: submission1, user: admin) }
+  let(:available_point2) { FactoryBot.create(:available_point, name: 'userpoint', exercise: exercise) }
+  let!(:awarded_point2) { FactoryBot.create(:awarded_point, course: course, name: available_point2.name, submission: submission1, user: user) }
+  let!(:exercise_no_points) { FactoryBot.create(:exercise, name: 'nopoints', course: course) }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }

@@ -4,10 +4,10 @@ require 'spec_helper'
 
 describe Setup::StartController, type: :controller do
   before :each do
-    @organization1 = FactoryGirl.create(:accepted_organization)
-    @organization2 = FactoryGirl.create(:accepted_organization)
-    @teacher1 = FactoryGirl.create(:user)
-    @teacher2 = FactoryGirl.create(:user)
+    @organization1 = FactoryBot.create(:accepted_organization)
+    @organization2 = FactoryBot.create(:accepted_organization)
+    @teacher1 = FactoryBot.create(:user)
+    @teacher2 = FactoryBot.create(:user)
     Teachership.create!(user: @teacher1, organization: @organization1)
     Teachership.create!(user: @teacher2, organization: @organization1)
     Teachership.create!(user: @teacher2, organization: @organization2)

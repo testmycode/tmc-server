@@ -75,6 +75,6 @@ class SubmissionTestSetup
   private
 
     def create_user
-      FactoryGirl.create(:verified_user, login: 'student', password: 'student')
+      FactoryBot.create(:verified_user, login: 'student', password: 'student')
     end
 end

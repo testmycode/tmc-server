@@ -6,12 +6,12 @@ feature 'Teacher can add assistants to course', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @teacher = FactoryGirl.create :user, password: 'foobar'
-    @assistant = FactoryGirl.create :user, password: 'newfoobar'
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :user, password: 'foobar'
+    @assistant = FactoryBot.create :user, password: 'newfoobar'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
-    @course = FactoryGirl.create :course, source_url: @repo_path, organization: @organization
+    @course = FactoryBot.create :course, source_url: @repo_path, organization: @organization
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
@@ -67,7 +67,7 @@ feature 'Teacher can add assistants to course', feature: true do
   end
 
   scenario "Assistant can't access course resources if not assistant for the course" do
-    course2 = FactoryGirl.create :course, organization: @organization
+    course2 = FactoryBot.create :course, organization: @organization
 
     log_in_as(@teacher.username, 'foobar')
     add_assistant @assistant.email, @course

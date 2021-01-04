@@ -6,11 +6,11 @@ feature 'Admin edits course templates', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @admin = FactoryGirl.create :admin, password: 'xooxer'
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
+    @user = FactoryBot.create :user, password: 'foobar'
 
-    FactoryGirl.create :course_template, name: 'dontchange', title: 'dontchange', description: 'dontchange', material_url: 'dontchange'
-    FactoryGirl.create :course_template, name: 'oldname', title: 'oldtitle', description: 'olddescription', material_url: 'oldmaterial'
+    FactoryBot.create :course_template, name: 'dontchange', title: 'dontchange', description: 'dontchange', material_url: 'dontchange'
+    FactoryBot.create :course_template, name: 'oldname', title: 'oldtitle', description: 'olddescription', material_url: 'oldmaterial'
 
     visit '/'
   end

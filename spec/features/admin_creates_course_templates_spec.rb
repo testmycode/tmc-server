@@ -6,8 +6,8 @@ feature 'Admin creates course templates', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @admin = FactoryGirl.create :admin, password: 'xooxer'
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
+    @user = FactoryBot.create :user, password: 'foobar'
 
     visit '/'
   end

@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Api::V8::OrganizationsController, type: :controller do
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let!(:unaccepted_organization) { FactoryGirl.create(:organization) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
+  let!(:unaccepted_organization) { FactoryBot.create(:organization) }
 
   describe 'GET organizations' do
     it 'should show correct fields from the visible organizations' do

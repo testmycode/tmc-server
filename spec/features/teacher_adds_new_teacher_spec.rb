@@ -6,9 +6,9 @@ feature 'Teacher can add new teacher to an organization', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @teacher = FactoryGirl.create :user, password: 'foobar'
-    @new_teacher = FactoryGirl.create :user, password: 'newfoobar'
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :user, password: 'foobar'
+    @new_teacher = FactoryBot.create :user, password: 'newfoobar'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
   end

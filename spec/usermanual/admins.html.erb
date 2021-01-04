@@ -33,12 +33,12 @@ require 'cgi' # for escapeHTML
 %>
 
 <%
-  FactoryGirl.create(:admin, :login => 'admin', :password => 'admin')
-  ct1 = FactoryGirl.create(:course_template)
-  ct2 = FactoryGirl.create(:course_template)
-  ct3 = FactoryGirl.create(:course_template)
-  organization = FactoryGirl.create :accepted_organization, name: 'Some organization', information: 'Some information'
-  course = FactoryGirl.create(:course, organization: organization)
+  FactoryBot.create(:admin, :login => 'admin', :password => 'admin')
+  ct1 = FactoryBot.create(:course_template)
+  ct2 = FactoryBot.create(:course_template)
+  ct3 = FactoryBot.create(:course_template)
+  organization = FactoryBot.create :accepted_organization, name: 'Some organization', information: 'Some information'
+  course = FactoryBot.create(:course, organization: organization)
   course.course_template = ct3
   course.save!
 %>
@@ -171,7 +171,7 @@ require 'cgi' # for escapeHTML
   <p>Administrator will see this notice on the front page when there are any unverified new organizations:</p>
 
 <%
-  FactoryGirl.create :user, login: 'user', password: 'user'
+  FactoryBot.create :user, login: 'user', password: 'user'
 
   click_on 'Sign out'
   fill_in 'session_login', with: 'user'
@@ -271,7 +271,7 @@ require 'cgi' # for escapeHTML
 </p>
 
 <%
-  course = FactoryGirl.create(:course, organization: organization, initial_refresh_ready: false)
+  course = FactoryBot.create(:course, organization: organization, initial_refresh_ready: false)
   visit '/'
 %>
 <%= screenshot %>

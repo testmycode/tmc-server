@@ -3,13 +3,13 @@
 require 'spec_helper'
 
 describe Api::V8::Core::Courses::ReviewsController, type: :controller do
-  let(:course) { FactoryGirl.create(:course) }
-  let(:exercise) { FactoryGirl.create(:exercise, course: course) }
-  let(:user2) { FactoryGirl.create(:user) }
-  let(:submission) { FactoryGirl.create(:submission, exercise: exercise, course: course, user: user, reviewed: true) }
-  let(:submission2) { FactoryGirl.create(:submission, exercise: exercise, course: course, user: user2, reviewed: true) }
-  let!(:review) { FactoryGirl.create(:review, reviewer: user, submission: submission) }
-  let!(:submission2_review) { FactoryGirl.create(:review, review_body: 'submission2_review body', submission: submission2) }
+  let(:course) { FactoryBot.create(:course) }
+  let(:exercise) { FactoryBot.create(:exercise, course: course) }
+  let(:user2) { FactoryBot.create(:user) }
+  let(:submission) { FactoryBot.create(:submission, exercise: exercise, course: course, user: user, reviewed: true) }
+  let(:submission2) { FactoryBot.create(:submission, exercise: exercise, course: course, user: user2, reviewed: true) }
+  let!(:review) { FactoryBot.create(:review, reviewer: user, submission: submission) }
+  let!(:submission2_review) { FactoryBot.create(:review, review_body: 'submission2_review body', submission: submission2) }
 
   before(:each) do
     allow(controller).to receive(:doorkeeper_token) { token }
@@ -17,7 +17,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
   describe "GET reviews for a course for current user's submissions" do
     describe 'as admin' do
-      let(:user) { FactoryGirl.create(:admin) }
+      let(:user) { FactoryBot.create(:admin) }
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
 
       describe 'when course id given' do
@@ -45,7 +45,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
     end
 
     describe 'as user' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
 
       describe 'when course id given' do
@@ -99,7 +99,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
   describe 'Update review info' do
     describe 'As an admin' do
-      let(:user) { FactoryGirl.create(:admin) }
+      let(:user) { FactoryBot.create(:admin) }
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
       before :each do
         controller.current_user = user
@@ -143,10 +143,10 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
     describe 'As an user' do
       describe 'when trying to edit review' do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         let(:token) { double resource_owner_id: user.id, acceptable?: true }
         it 'should deny access' do
-          FactoryGirl.create(:review, submission: submission)
+          FactoryBot.create(:review, submission: submission)
           exercise.reload
           put :update, params: { course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' } }
           expect(response).to have_http_status(403)

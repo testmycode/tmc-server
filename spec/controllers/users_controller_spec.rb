@@ -33,7 +33,7 @@ describe UsersController, type: :controller do
 
     describe 'when accessed as a logged in user' do
       before :each do
-        controller.current_user = FactoryGirl.create(:user)
+        controller.current_user = FactoryBot.create(:user)
       end
 
       it 'should show the profile page' do
@@ -133,7 +133,7 @@ describe UsersController, type: :controller do
 
   describe 'PUT update' do
     before :each do
-      @user = FactoryGirl.create(:user, email: 'oldemail@valid.com')
+      @user = FactoryBot.create(:user, email: 'oldemail@valid.com')
       controller.current_user = @user
     end
 

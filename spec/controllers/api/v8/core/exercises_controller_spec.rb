@@ -4,14 +4,14 @@ require 'spec_helper'
 require 'fileutils'
 
 describe Api::V8::Core::ExercisesController, type: :controller do
-  let!(:user) { FactoryGirl.create(:user) }
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
+  let!(:user) { FactoryBot.create(:user) }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
   repo_path = Dir.tmpdir + '/api/v8/core/exercises/remote_repo'
   FileUtils.rm_rf(repo_path)
   create_bare_repo(repo_path)
-  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
-  let!(:exercise) { FactoryGirl.create(:exercise, course: course) }
+  let!(:course) { FactoryBot.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
+  let!(:exercise) { FactoryBot.create(:exercise, course: course) }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }
@@ -47,7 +47,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
     let(:token) { double resource_owner_id: user.id, acceptable?: true }
     describe 'and correct exercise id is given' do
       it 'should return correct data' do
-        submission = FactoryGirl.create(:submission, course: course, user: user, exercise: exercise)
+        submission = FactoryBot.create(:submission, course: course, user: user, exercise: exercise)
         get :show, params: { id: exercise.id }
         expect(response.body).to include course.name
         expect(response.body).to include 'submissions'

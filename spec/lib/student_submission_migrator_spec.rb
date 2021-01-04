@@ -5,40 +5,40 @@ require 'student_submission_migrator'
 
 describe StudentSubmissionMigrator do
   before :each do
-    @course = FactoryGirl.create(:course)
+    @course = FactoryBot.create(:course)
     allow(@course).to receive(:git_revision) { 'same' }
     @other_course = @course.dup
     @other_course.name = @other_course.name + '1'
     @other_course.save!
     allow(@other_course).to receive(:git_revision) { 'same' }
 
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
 
     @sheet1 = 'sheet1'
     @sheet2 = 'sheet2'
 
-    @ex1 = FactoryGirl.create(:exercise, course: @course,
+    @ex1 = FactoryBot.create(:exercise, course: @course,
                                          gdocs_sheet: @sheet1)
-    @ex2 = FactoryGirl.create(:exercise, course: @course,
+    @ex2 = FactoryBot.create(:exercise, course: @course,
                                          gdocs_sheet: @sheet2)
 
-    @sub1 = FactoryGirl.create(:submission, course: @course,
+    @sub1 = FactoryBot.create(:submission, course: @course,
                                             user: @user,
                                             exercise: @ex1)
-    @sub2 = FactoryGirl.create(:submission, course: @course,
+    @sub2 = FactoryBot.create(:submission, course: @course,
                                             user: @user,
                                             exercise: @ex2)
 
-    @sub1.submission_data = FactoryGirl.create(:submission_data, submission: @sub1)
-    @sub2.submission_data = FactoryGirl.create(:submission_data, submission: @sub2)
+    @sub1.submission_data = FactoryBot.create(:submission_data, submission: @sub1)
+    @sub2.submission_data = FactoryBot.create(:submission_data, submission: @sub2)
 
-    FactoryGirl.create(:available_point, exercise: @ex1, name: 'ap')
-    FactoryGirl.create(:available_point, exercise: @ex2, name: 'ap2')
+    FactoryBot.create(:available_point, exercise: @ex1, name: 'ap')
+    FactoryBot.create(:available_point, exercise: @ex2, name: 'ap2')
 
-    @ap = FactoryGirl.create(:awarded_point, course: @course,
+    @ap = FactoryBot.create(:awarded_point, course: @course,
                                              user: @user, name: 'ap',
                                              submission: @sub1)
-    @ap2 = FactoryGirl.create(:awarded_point, course: @course,
+    @ap2 = FactoryBot.create(:awarded_point, course: @course,
                                               user: @user, name: 'ap2',
                                               submission: @sub2)
     allow(SiteSetting).to receive(:value).and_return([{ 'from' => @course.id, 'to' => @other_course.id }])
@@ -61,7 +61,7 @@ describe StudentSubmissionMigrator do
   end
 
   it 'throws exception if it cannot be migrated safely' do
-    bad_course = FactoryGirl.create(:course)
+    bad_course = FactoryBot.create(:course)
     allow(bad_course).to receive(:git_revision) { 'other' }
     migrator = StudentSubmissionMigrator.new(@course, bad_course, @user)
     expect { migrator.migrate! }.to raise_exception(StudentSubmissionMigrator::CannotRefreshError)

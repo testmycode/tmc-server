@@ -4,17 +4,17 @@ require 'spec_helper'
 
 describe SubmissionsController, type: :controller do
   before :each do
-    @user = FactoryGirl.create(:user)
-    @user2 = FactoryGirl.create(:user)
-    @organization = FactoryGirl.create(:accepted_organization)
-    @course = FactoryGirl.create :course, organization: @organization
-    @exercise = FactoryGirl.create(:exercise, course: @course, gdocs_sheet: @sheetname)
-    @available_point = FactoryGirl.create(:available_point, exercise: @exercise)
-    @submission = FactoryGirl.create(:submission,
+    @user = FactoryBot.create(:user)
+    @user2 = FactoryBot.create(:user)
+    @organization = FactoryBot.create(:accepted_organization)
+    @course = FactoryBot.create :course, organization: @organization
+    @exercise = FactoryBot.create(:exercise, course: @course, gdocs_sheet: @sheetname)
+    @available_point = FactoryBot.create(:available_point, exercise: @exercise)
+    @submission = FactoryBot.create(:submission,
                                      course: @course,
                                      user: @user,
                                      exercise: @exercise)
-    @awarded_point = FactoryGirl.create(:awarded_point,
+    @awarded_point = FactoryBot.create(:awarded_point,
                                         course: @course,
                                         name: @available_point.name,
                                         submission: @submission,

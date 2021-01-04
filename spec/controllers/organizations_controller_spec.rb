@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe OrganizationsController, type: :controller do
   before :each do
-    @user = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
+    @user = FactoryBot.create(:user)
+    @admin = FactoryBot.create(:admin)
   end
 
   let(:valid_attributes) do
@@ -33,9 +33,9 @@ describe OrganizationsController, type: :controller do
       it 'shows visible courses in order by name, split into ongoing and expired' do
         @organization = Organization.create! valid_attributes
         @courses = [
-          FactoryGirl.create(:course, name: 'SomeTestCourse', organization: @organization),
-          FactoryGirl.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
-          FactoryGirl.create(:course, name: 'AnotherTestCourse', organization: @organization)
+          FactoryBot.create(:course, name: 'SomeTestCourse', organization: @organization),
+          FactoryBot.create(:course, name: 'ExpiredCourse', organization: @organization, hide_after: Time.now - 1.week),
+          FactoryBot.create(:course, name: 'AnotherTestCourse', organization: @organization)
         ]
 
         get :show, params: { id: @organization.slug }
@@ -47,9 +47,9 @@ describe OrganizationsController, type: :controller do
 
     describe 'GET list_requests' do
       before :each do
-        @org1 = FactoryGirl.create(:organization)
-        @org2 = FactoryGirl.create(:accepted_organization)
-        @org3 = FactoryGirl.create(:organization)
+        @org1 = FactoryBot.create(:organization)
+        @org2 = FactoryBot.create(:accepted_organization)
+        @org3 = FactoryBot.create(:organization)
       end
 
       it 'lists only pending organization requests' do
@@ -84,7 +84,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST toggle_visibility' do
       it 'toggles value of hidden field between true and false' do
-        org = FactoryGirl.create(:accepted_organization)
+        org = FactoryBot.create(:accepted_organization)
         Teachership.create(user_id: @user.id, organization_id: org.id)
         post :toggle_visibility, params: { id: org.to_param }
         org.reload
@@ -147,7 +147,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'POST toggle_visibility' do
       it 'denies access' do
-        org = FactoryGirl.create(:accepted_organization)
+        org = FactoryBot.create(:accepted_organization)
         post :toggle_visibility, params: { id: org.to_param }
         expect(response.code.to_i).to eq(403)
       end

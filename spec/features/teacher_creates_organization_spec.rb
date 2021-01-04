@@ -6,8 +6,8 @@ feature 'User can create new organization', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @admin = FactoryGirl.create :admin, password: 'foobar'
-    @user = FactoryGirl.create :user, password: 'foobar2'
+    @admin = FactoryBot.create :admin, password: 'foobar'
+    @user = FactoryBot.create :user, password: 'foobar2'
     visit '/org'
   end
 
@@ -34,7 +34,7 @@ feature 'User can create new organization', feature: true do
   end
 
   scenario 'Admin can verify pending organizations' do
-    @organization = FactoryGirl.create :organization
+    @organization = FactoryBot.create :organization
     Teachership.create!(user: @user, organization: @organization)
     log_in_as(@admin.login, 'foobar')
     click_link 'Show'
@@ -44,7 +44,7 @@ feature 'User can create new organization', feature: true do
   end
 
   scenario 'Admin can disable unvefiried organization' do
-    @organization = FactoryGirl.create :organization
+    @organization = FactoryBot.create :organization
     Teachership.create!(user: @user, organization: @organization)
     log_in_as(@admin.login, 'foobar')
     click_link 'Show'
@@ -56,7 +56,7 @@ feature 'User can create new organization', feature: true do
   end
 
   scenario 'Teacher can hide organization' do
-    @organization = FactoryGirl.create :accepted_organization
+    @organization = FactoryBot.create :accepted_organization
     Teachership.create!(user: @user, organization: @organization)
     log_in_as(@user.login, 'foobar2')
     visit "/org/#{@organization.slug}"

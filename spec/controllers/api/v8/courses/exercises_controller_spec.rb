@@ -3,12 +3,12 @@
 require 'spec_helper'
 
 describe Api::V8::Courses::ExercisesController, type: :controller do
-  let!(:organization) { FactoryGirl.create(:accepted_organization) }
-  let!(:course) { FactoryGirl.create(:course, name: "#{organization.slug}-testcourse", organization: organization) }
-  let!(:exercise) { FactoryGirl.create(:exercise, name: 'testexercise', course: course) }
-  let!(:hidden_exercise) { FactoryGirl.create(:exercise, name: 'hiddentestexercise', course: course, hidden: true) }
-  let(:admin) { FactoryGirl.create(:admin, password: 'xooxer') }
-  let(:user) { FactoryGirl.create(:user, login: 'user', password: 'xooxer') }
+  let!(:organization) { FactoryBot.create(:accepted_organization) }
+  let!(:course) { FactoryBot.create(:course, name: "#{organization.slug}-testcourse", organization: organization) }
+  let!(:exercise) { FactoryBot.create(:exercise, name: 'testexercise', course: course) }
+  let!(:hidden_exercise) { FactoryBot.create(:exercise, name: 'hiddentestexercise', course: course, hidden: true) }
+  let(:admin) { FactoryBot.create(:admin, password: 'xooxer') }
+  let(:user) { FactoryBot.create(:user, login: 'user', password: 'xooxer') }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }
