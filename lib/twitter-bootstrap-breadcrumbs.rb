@@ -19,7 +19,7 @@ module BreadCrumbs
     def add_breadcrumb(name, url = '', options = {})
       @breadcrumbs ||= []
       name = translate_breadcrumb(name, self.class.name) if name.is_a?(Symbol)
-      url = eval(url.to_s) if /_path|_url|@/.match?(url)
+      url = eval(url.to_s) if url =~ /_path|_url|@/ # rubocop:disable Performance/RegexpMatch
       @breadcrumbs << { name: name, url: url, options: options }
     end
 
