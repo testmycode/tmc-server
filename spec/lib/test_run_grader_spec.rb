@@ -42,12 +42,12 @@ describe TestRunGrader do
     TestRunGrader.grade_results(@submission, half_successful_results)
 
     expect(@submission.test_case_runs).not_to be_empty
-    tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'MyTest testSomethingEasy' }
+    tcr = @submission.test_case_runs.to_a.find { |t| t.test_case_name == 'MyTest testSomethingEasy' }
     expect(tcr).not_to be_nil
     expect(tcr).to be_successful
     expect(tcr.exception).to be_nil
 
-    tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'MyTest testSomethingDifficult' }
+    tcr = @submission.test_case_runs.to_a.find { |t| t.test_case_name == 'MyTest testSomethingDifficult' }
     expect(tcr).not_to be_nil
     expect(tcr).not_to be_successful
     expect(ActiveSupport::JSON.decode(tcr.exception)).to eq('a' => 'b')

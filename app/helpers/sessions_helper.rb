@@ -29,7 +29,6 @@ module SessionsHelper
   end
 
   private
-
     def user_from_session
       User.find_by(id: session[:user_id])
     end

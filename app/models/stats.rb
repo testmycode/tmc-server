@@ -64,7 +64,6 @@ module Stats
   end
 
   private
-
     def self.all_regular_users
       User.where(administrator: false)
     end

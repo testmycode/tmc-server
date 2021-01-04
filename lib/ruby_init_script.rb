@@ -93,7 +93,6 @@ class RubyInitScript
   end
 
   private
-
     def preprocess_options
       @options.each_key do |k|
         @options[k] = @options[k].to_s if @options[k].is_a? Pathname

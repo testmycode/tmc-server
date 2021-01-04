@@ -117,7 +117,6 @@ feature 'Admin propagates template changes to all courses cloned from template',
   end
 
   private
-
     def add_exercise(exercise_name = 'MyExercise', course_name = 'course1')
       course = Course.find_by!(name: @organization1.slug + '-' + course_name)
       repo = clone_course_repo(course)

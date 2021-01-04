@@ -50,7 +50,6 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
   end
 
   private
-
     def min_spec(user)
       @specs.map { |s| [s.timefun.call(user), s] }.reject { |p| p.first.nil? }.min_by(&:first).andand.map(&:second)
     end

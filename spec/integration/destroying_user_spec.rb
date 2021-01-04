@@ -111,7 +111,7 @@ describe 'Deleting own user', type: :request, integration: true do
 
   it 'cannot be verified by another user' do
     user1 = User.create!(login: 'user1', password: 'password1', email: 'user1@example.com')
-    user2 = User.create!(login: 'user2', password: 'password2', email: 'user2@example.com')
+    User.create!(login: 'user2', password: 'password2', email: 'user2@example.com')
 
     visit '/'
     log_in_as('user1', 'password1')

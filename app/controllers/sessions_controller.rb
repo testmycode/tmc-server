@@ -38,7 +38,6 @@ class SessionsController < ApplicationController
   end
 
   private
-
     def try_to_redirect_back(redirect_params = {})
       if session[:return_to].present?
         return_to = session.delete(:return_to)

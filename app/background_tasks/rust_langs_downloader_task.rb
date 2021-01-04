@@ -14,9 +14,9 @@ class RustLangsDownloaderTask
 
     executable = "vendor/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}"
 
-    unless File.exists?(executable)
+    unless File.exist?(executable)
       previous = nil
-      previous = File.readlink('vendor/tmc-langs-rust/current') if File.exists? 'vendor/tmc-langs-rust/current'
+      previous = File.readlink('vendor/tmc-langs-rust/current') if File.exist? 'vendor/tmc-langs-rust/current'
       previous = nil if previous == executable
 
       Rails.logger.info("Downloading tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}")

@@ -53,7 +53,6 @@ class RootHelper
   end
 
   private
-
     def main_loop
       begin
         command = @pipe_in.readline.strip
@@ -96,7 +95,6 @@ class RootHelper
     end
 
   private
-
     def start_server(port)
       debug("Starting server #{port}")
 

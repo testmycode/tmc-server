@@ -78,7 +78,6 @@ class Setup::CourseDetailsController < Setup::SetupController
   end
 
   private
-
     def refresh_course(course, options = {})
       # TODO: Could include course ID
 

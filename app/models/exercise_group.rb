@@ -101,13 +101,12 @@ class ExerciseGroup
         WHERE exercises.course_id = #{conn.quote(@course.id)} AND
               exercises.name LIKE #{conn.quote(pattern)} AND
               exercises.id = available_points.exercise_id
-      EOS
+    EOS
     available_points = conn.select_values(sql)
     available_points
   end
 
   private
-
     def group_deadline(method)
       exercises(false).map { |n| n.send(method) }.first
     end

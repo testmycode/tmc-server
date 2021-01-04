@@ -74,12 +74,11 @@ class Setup::SetupController < ApplicationController
     if options[:pass_parameters]
       url = url.to_s + "('#{@organization.slug}', #{@course.id})"
     end
-    url = eval(url.to_s) if url =~ /_path|_url|@/
+    url = eval(url.to_s) if /_path|_url|@/.match?(url)
     @course_setup_phases << { name: name, url: url, type: type }
   end
 
   private
-
     def save_wizard_to_session(phase = 1)
       return if setup_in_progress?
       session[:ongoing_course_setup] = {

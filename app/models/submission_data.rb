@@ -71,7 +71,6 @@ class SubmissionData < ApplicationRecord
   end
 
   private
-
     def compress(text)
       Zlib::Deflate.deflate(text)
     end

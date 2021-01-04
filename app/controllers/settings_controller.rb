@@ -44,7 +44,6 @@ class SettingsController < ApplicationController
       redirect_to verify_dangerously_destroying_user_participant_settings_url, notice: 'Please check the checkbox after you have read the instructions.'
       return
     end
-    username = @user.login
     sign_out if current_user == @user
     email = @user.email
     username = @user.login
@@ -62,7 +61,6 @@ class SettingsController < ApplicationController
   end
 
   private
-
     def authenticate_current_user_destroy
       user = User.find(params[:participant_id])
       authorize! :destroy, user

@@ -42,7 +42,6 @@ class RecursiveYamlReader
   end
 
   private
-
     def require_option(name)
       raise "option :#{name} is required" if @opts[name].nil?
     end

@@ -14,7 +14,6 @@ class EmailsController < ApplicationController
   end
 
   private
-
     def index_global
       authorize! :view, :emails
       filter_params = params_starting_with('filter_', :all, remove_prefix: true)

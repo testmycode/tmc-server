@@ -171,7 +171,7 @@ class CoursesController < ApplicationController
     add_course_breadcrumb
     add_breadcrumb 'Manage exercises'
     @exercises = @course.exercises.natsort_by(&:name)
-    @exercises_id_map = @exercises.map { |e| [e.id, e] }.to_h
+    @exercises_id_map = @exercises.index_by { |e| e.id }
   end
 
   def toggle_submission_result_visibility
@@ -181,7 +181,6 @@ class CoursesController < ApplicationController
   end
 
   private
-
     def course_params
       if @course.custom?
         params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)

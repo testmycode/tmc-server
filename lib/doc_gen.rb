@@ -40,7 +40,6 @@ class DocGen
   end
 
   private
-
     def root_path
       "#{Rails.root}/doc/usermanual"
     end

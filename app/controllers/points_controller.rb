@@ -92,7 +92,6 @@ class PointsController < ApplicationController
   end
 
   private
-
     def summary_hash(course, visible_exercises, sheets, only_for_user = nil)
       per_user_and_sheet = AwardedPoint.count_per_user_in_course_with_sheet(course, sheets, only_for_user, current_user.administrator?)
 

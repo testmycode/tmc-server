@@ -64,17 +64,17 @@ class ParticipantsController < ApplicationController
     @user = User.find(params[:id])
     authorize! :view_participant_information, @user
     # TODO: bit ugly -- and now it's even worse!
-    @awarded_points = Hash[
+    @awarded_points =
       AwardedPoint.where(id: AwardedPoint.all_awarded(@user))
                   .to_a
                   .sort!
-                  .group_by(&:course_id).map do |id, course_points|
-        [id, {
+                  .group_by(&:course_id).transform_values do |course_points|
+        {
           awarded: course_points.reject(&:awarded_after_soft_deadline?).map(&:name),
           late: course_points.select(&:awarded_after_soft_deadline?).map(&:name)
-        }]
+        }
       end
-  ]
+
 
     if current_user.administrator?
       add_breadcrumb 'Participants', :participants_path
@@ -131,7 +131,6 @@ class ParticipantsController < ApplicationController
   end
 
   private
-
     def index_json_data
       result = []
       @participants.each do |user|
@@ -199,7 +198,6 @@ class ParticipantsController < ApplicationController
     end
 
   private
-
     def set_organization
       @organization = Organization.find_by(slug: params[:organization_id]) unless params[:organization_id].nil?
     end

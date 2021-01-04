@@ -30,7 +30,6 @@ class ActionToken < ApplicationRecord
   end
 
   private
-
     def randomize_token
       self.token = SecureRandom.urlsafe_base64
     end

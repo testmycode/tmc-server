@@ -35,7 +35,6 @@ class TeachersController < ApplicationController
   end
 
   private
-
     def set_organization
       @organization = Organization.find_by(slug: params[:organization_id])
     end

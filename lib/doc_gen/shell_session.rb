@@ -24,7 +24,6 @@ class DocGen
     end
 
     private
-
       class ExampleBlock
         attr_reader :transcript
 

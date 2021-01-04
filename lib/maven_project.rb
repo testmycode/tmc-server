@@ -110,7 +110,6 @@ class MavenProject
   end
 
   protected
-
     def build_classpath
       file_path = "misc/#{pom_file.artifact_id}-build-classpath"
       begin

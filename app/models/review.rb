@@ -33,7 +33,7 @@ class Review < ApplicationRecord
 
   def self.course_reviews_json(course, reviewed_submissions, view_context)
     reviewed_submissions = reviewed_submissions.includes(reviews: %i[reviewer submission])
-    exercises = Hash[course.exercises.map { |e| [e.name, e] }]
+    exercises = course.exercises.index_by { |e| e.name }
     reviewed_submissions.map do |s|
       s.reviews.map do |r|
         available_points = exercises[r.submission.exercise_name].available_points.where(requires_review: true).map(&:name)

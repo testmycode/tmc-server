@@ -30,7 +30,6 @@ class TmcProjectFile
   end
 
   private
-
     def self.empty
       TmcProjectFile.new({})
     end

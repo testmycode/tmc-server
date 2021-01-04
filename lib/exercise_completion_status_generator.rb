@@ -23,7 +23,6 @@ class ExerciseCompletionStatusGenerator
   end
 
   private
-
     def self.completion_status_of_exercise(required_points, awarded_points, attempted)
       return nil if required_points.empty?
       return nil if required_points == (required_points - awarded_points) && !attempted

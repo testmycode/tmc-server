@@ -191,7 +191,6 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
   end
 
   private
-
     def users_own_subs(parameters)
       get :index, params: parameters
 

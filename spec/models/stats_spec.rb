@@ -10,11 +10,11 @@ describe Stats, type: :model do
     cat1ex2 = FactoryBot.create(:exercise, course: course1, name: 'cat1-ex2')
     cat2ex1 = FactoryBot.create(:exercise, course: course1, name: 'cat2-ex1')
     cat3ex1 = FactoryBot.create(:exercise, course: course2, name: 'cat3-ex1')
-    hiddenex = FactoryBot.create(:exercise, course: course1, name: 'cat1-hiddenex', hidden: true)
+    FactoryBot.create(:exercise, course: course1, name: 'cat1-hiddenex', hidden: true)
 
     user1 = FactoryBot.create(:user)
     user2 = FactoryBot.create(:user)
-    user3 = FactoryBot.create(:user)
+    FactoryBot.create(:user)
     create_successful_submission(course: course1, exercise: cat1ex1, user: user1)
     create_successful_submission(course: course1, exercise: cat1ex1, user: user2)
     create_successful_submission(course: course1, exercise: cat1ex2, user: user1)

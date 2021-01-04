@@ -83,7 +83,6 @@ class CourseTemplatesController < ApplicationController
   end
 
   private
-
     def set_course_template
       authorize! params[:action].to_sym, CourseTemplate
       @course_template = CourseTemplate.find(params[:id])

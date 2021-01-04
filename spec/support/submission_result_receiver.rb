@@ -36,7 +36,6 @@ class SubmissionResultReceiver
   end
 
   private
-
     def start_mimic_server!
       queue = @queue # put in closure, blocks below have different `self`
       Mimic.mimic(port: 3000, fork: true) do

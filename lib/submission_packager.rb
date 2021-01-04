@@ -100,7 +100,6 @@ class SubmissionPackager
   end
 
   private
-
     include SystemCommands
 
     def find_received_project_root(_received_root)

@@ -230,7 +230,6 @@ class AwardedPoint < ApplicationRecord
   end
 
   private
-
     def kafka_update_points
       return unless self.course.moocfi_id
       exercise = self.submission.exercise

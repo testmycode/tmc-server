@@ -49,7 +49,6 @@ class CourseRefresher
   end
 
   private
-
     class Impl
       include SystemCommands
 
@@ -128,7 +127,7 @@ class CourseRefresher
           @course.course_template.save!
           @course.refreshed_at = Time.now
           @course.save!
-          @course.exercises.each &:save!
+          @course.exercises.each(&:save!)
 
           CourseRefresher.simulate_failure! if ::Rails.env.test? && CourseRefresher.respond_to?('simulate_failure!')
         rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
@@ -285,7 +284,6 @@ class CourseRefresher
         @course.exercises.each do |exercise|
           review_points = @review_points[exercise.name]
           point_names = Set.new
-          clone_path = Pathname("#{@course.clone_path}/#{exercise.relative_path}")
 
           points_data = points_for(exercise, no_directory_changes)
           point_names += if points_data[0].is_a? Hash

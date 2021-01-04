@@ -26,7 +26,6 @@ module CometSupport
   end
 
   private
-
     def self.start!
       write_config_file
       raise 'Already running' if @started

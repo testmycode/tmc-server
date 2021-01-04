@@ -75,7 +75,6 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   private
-
     def save_unlocks
       authorize! :manage_unlocks, @course
 
@@ -140,7 +139,6 @@ class Setup::CourseTimingsController < Setup::SetupController
     end
 
   private
-
     def groups_as_array
       @course.exercise_groups.each_with_object(['']) do |group, array|
         array << group.name

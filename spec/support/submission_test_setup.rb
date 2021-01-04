@@ -73,7 +73,6 @@ class SubmissionTestSetup
   end
 
   private
-
     def create_user
       FactoryBot.create(:verified_user, login: 'student', password: 'student')
     end

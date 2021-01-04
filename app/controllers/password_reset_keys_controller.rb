@@ -55,7 +55,6 @@ class PasswordResetKeysController < ApplicationController
   end
 
   private
-
     def find_key_and_user
       token = params['token']
       @key = ActionToken.find_by(token: token)

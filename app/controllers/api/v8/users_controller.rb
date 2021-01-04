@@ -143,7 +143,6 @@ module Api
       end
 
       private
-
         def set_email
           user_params = params[:user]
 

@@ -35,7 +35,6 @@ class FeedbackQuestion < ApplicationRecord
   end
 
   private
-
     def intrange_regex
       self.class.intrange_regex
     end

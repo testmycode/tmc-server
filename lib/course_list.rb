@@ -55,7 +55,6 @@ class CourseList
   end
 
   private
-
     def exercises
       @exercises ||= @course.exercises.select { |e| e.points_visible_to?(@user) }
     end

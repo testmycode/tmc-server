@@ -147,7 +147,6 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
   end
 
   private
-
     def two_subs_by_name
       user1 = FactoryBot.create(:user)
       user2 = FactoryBot.create(:user)

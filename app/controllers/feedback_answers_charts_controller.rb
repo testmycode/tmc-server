@@ -25,7 +25,6 @@ class FeedbackAnswersChartsController < ApplicationController
   end
 
   private
-
     def show_scatterplot
       @questions = @course.feedback_questions.select(&:intrange?).sort_by(&:position)
       if @questions.size == 2

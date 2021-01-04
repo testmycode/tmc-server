@@ -23,7 +23,7 @@ class Unlock < ApplicationRecord
     time = Time.zone.now
     Unlock.transaction do
       unlocks = course.unlocks.where(user_id: user.id)
-      by_exercise_name = Hash[unlocks.map { |u| [u.exercise_name, u] }]
+      by_exercise_name = unlocks.index_by { |u| u.exercise_name }
       fast_refresh_unlocks_impl(course, user, by_exercise_name)
       UncomputedUnlock.where(course_id: course.id, user_id: user.id).where('created_at < ?', time).delete_all
     end
@@ -44,7 +44,6 @@ class Unlock < ApplicationRecord
   end
 
   private
-
     def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
       course.exercises.enabled.each do |exercise|
         existing = user_unlocks_by_exercise_name[exercise.name]
@@ -76,12 +75,12 @@ class Unlock < ApplicationRecord
         may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)
         next unless !exists && may_exist && !exercise.requires_explicit_unlock?
 
-        exercises.select { |e| !user_unlocks_by_exercise_name[e.name] }.each do |exercise|
+        exercises.select { |e| !user_unlocks_by_exercise_name[e.name] }.each do |ex|
           new_unlocks << Unlock.new(
             user: user,
             course: course,
-            exercise: exercise,
-            valid_after: exercise.unlock_spec_obj.valid_after
+            exercise: ex,
+            valid_after: ex.unlock_spec_obj.valid_after
           )
         end
       end

@@ -34,7 +34,6 @@ module Api
       end
 
       private
-
         def authenticate_user!
           return @current_user if @current_user
           if doorkeeper_token
@@ -93,7 +92,7 @@ module Api
 
             if params[:client] == 'vscode_plugin' && (vscode_plugin_blacklist.include? params[:client_version])
               authorization_skip!
-              return respond_with_error("\nThis version of the TMC extension contains bugs.\nYou need to update your TMC extension.", 404, nil, obsolete_client: true)
+              respond_with_error("\nThis version of the TMC extension contains bugs.\nYou need to update your TMC extension.", 404, nil, obsolete_client: true)
             end
           end
         end
@@ -122,7 +121,7 @@ module Api
                 raise "\nPlease update the TMC client.\nYour client version #{client_version} for #{client_name} is not supported by the server.\nMinimum version requirement: #{vc['min_version']}."
               end
             else
-              return # without version check
+              nil # without version check
             end
           end
         end

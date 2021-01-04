@@ -39,7 +39,6 @@ class CertificatesController < ApplicationController
   end
 
   private
-
     def certificate_params
       params.require(:certificate).permit(:name, :user_id, :course_id)
     end

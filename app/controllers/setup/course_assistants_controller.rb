@@ -52,7 +52,6 @@ class Setup::CourseAssistantsController < Setup::SetupController
   end
 
   private
-
     def assistant_params
       params.permit(:email)
     end

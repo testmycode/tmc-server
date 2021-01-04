@@ -25,7 +25,6 @@ class MavenCacheSeeder
   end
 
   private
-
     def self.find_pom_xmls(clone_dir)
       result = []
       clone_dir.find do |path|

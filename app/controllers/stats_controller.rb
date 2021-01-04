@@ -36,7 +36,6 @@ class StatsController < ApplicationController
   end
 
   private
-
     def get_vars
       @course = Course.find(params[:course_id]) if params[:course_id]
     end
@@ -167,7 +166,6 @@ class StatsController < ApplicationController
     end
 
   private
-
     def set_organization
       @organization = Organization.find_by(slug: params[:organization_id])
     end

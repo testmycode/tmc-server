@@ -17,7 +17,6 @@ class SiteSetting
   end
 
   private
-
     def self.settings_from_files(files)
       result = {}
       files.each do |path|

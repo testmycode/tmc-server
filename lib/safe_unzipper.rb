@@ -11,7 +11,6 @@ class SafeUnzipper
   end
 
   private
-
     def clean_up(root_dir_abs, file)
       if File.symlink?(file)
         dest = File.absolute_path(File.readlink(file), File.dirname(file))

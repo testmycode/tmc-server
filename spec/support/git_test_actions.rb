@@ -45,7 +45,6 @@ module GitTestActions
   end
 
   private
-
     def pick_free_file_name(base_name)
       return base_name unless File.exist?(base_name)
 

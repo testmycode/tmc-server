@@ -81,7 +81,6 @@ class FixtureExercise
   end
 
   private
-
     def copy_from_fixture
       FileUtils.mkdir_p(path)
 

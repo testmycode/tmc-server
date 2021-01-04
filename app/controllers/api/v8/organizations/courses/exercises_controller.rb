@@ -91,7 +91,7 @@ module Api
               }
             end
 
-            model_solution_token_used_on_this_exercise = tokens_used = ModelSolutionTokenUsed.where(user: current_user, course: course, exercise_name: ex.name).count > 0
+            model_solution_token_used_on_this_exercise = ModelSolutionTokenUsed.where(user: current_user, course: course, exercise_name: ex.name).count > 0
 
             total_model_solution_tokens = 0
             grant_model_solution_token_every_nth_completed_exercise = course.grant_model_solution_token_every_nth_completed_exercise

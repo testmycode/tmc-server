@@ -55,10 +55,10 @@ describe CourseRefresher do
 
     expect(@course.exercises.size).to eq(2)
     expect(@course2.exercises.size).to eq(2)
-    names = @course.exercises.map &:name
+    names = @course.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
-    names = @course2.exercises.map &:name
+    names = @course2.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
   end
@@ -70,10 +70,10 @@ describe CourseRefresher do
     refresh_courses
     expect(@course.exercises.size).to eq(2)
     expect(@course2.exercises.size).to eq(2)
-    names = @course.exercises.map &:name
+    names = @course.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
-    names = @course2.exercises.map &:name
+    names = @course2.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
 

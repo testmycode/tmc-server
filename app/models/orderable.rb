@@ -40,7 +40,6 @@ module Orderable
   end
 
   private
-
     def move!(other, op, delta)
       tbl = self.class.quoted_table_name
       conn = ActiveRecord::Base.connection

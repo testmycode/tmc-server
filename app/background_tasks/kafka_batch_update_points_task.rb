@@ -42,7 +42,6 @@ class KafkaBatchUpdatePointsTask
   end
 
   private
-
     def task_type(task)
       return task.task_type if task.task_type.present?
       'unknown'

@@ -519,7 +519,7 @@ class Course < ApplicationRecord
   end
 
   def external_scoreboard_url=(url)
-    return super("http://#{url}") unless url =~ /^(https?:\/\/|$)/
+    return super("http://#{url}") unless /^(https?:\/\/|$)/.match?(url)
     super(url)
   end
 
@@ -536,7 +536,6 @@ class Course < ApplicationRecord
   end
 
   private
-
     def set_cached_version
       self.cached_version = course_template_obj.cached_version
     end

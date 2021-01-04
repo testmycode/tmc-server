@@ -33,7 +33,6 @@ class TestScannerCache
   end
 
   private
-
     def self.try_save(entry)
       entry.save!
     rescue ActiveRecord::RecordNotUnique

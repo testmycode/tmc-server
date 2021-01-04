@@ -31,15 +31,12 @@ module RustLangsCliExecutor
   end
 
   private
-
     def self.process_command_output(command_output)
       output_lines = command_output.split("\n")
       valid_lines = output_lines.map do |line|
-        begin
-          JSON.parse line
-        rescue => exception
-          nil
-        end
+        JSON.parse line
+      rescue
+        nil
       end.select { |line| !!line }
 
       last_line = valid_lines.last

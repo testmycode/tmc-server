@@ -33,7 +33,6 @@ class StudentSubmissionMigrator
   end
 
   private
-
     def validate_migration!
       raise CannotRefreshError, 'Cannot migrate with courses which have diffenent git revisions' unless @old_course.git_revision == @new_course.git_revision
       raise CannotRefreshError, 'Migration between these courses is not allowed' unless migration_is_allowed

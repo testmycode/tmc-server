@@ -54,7 +54,6 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   end
 
   private
-
     def parse_condition(str)
       if DateAndTimeUtils.looks_like_date_or_time(str)
         time = DateAndTimeUtils.to_time(str)

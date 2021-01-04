@@ -57,7 +57,6 @@ class ExerciseDir
   end
 
   private
-
     # For now langs packages only java simple and any new formats. -jamo 5/1/2016
     def self.exercise_type_impl(path)
       if (path + 'pom.xml').exist?

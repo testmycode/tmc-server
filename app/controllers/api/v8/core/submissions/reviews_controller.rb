@@ -62,7 +62,6 @@ module Api
           end
 
           private
-
             def award_points
               submission = @review.submission
               exercise = submission.exercise

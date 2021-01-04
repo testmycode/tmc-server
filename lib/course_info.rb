@@ -75,7 +75,6 @@ class CourseInfo
   end
 
   private
-
     def exercise_data(exercise)
       return nil unless exercise.visible_to?(@user)
 

@@ -39,7 +39,6 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
   end
 
   private
-
     alias old_copy_from_fixture copy_from_fixture
 
     def copy_from_fixture

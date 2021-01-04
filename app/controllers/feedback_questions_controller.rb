@@ -82,7 +82,6 @@ class FeedbackQuestionsController < ApplicationController
   end
 
   private
-
     def feedback_question_params
       params.permit({ feedback_question: %i[question title kind] }, :intrange_min, :intrange_max, :commit, :course_id)
     end

@@ -111,7 +111,6 @@ class OrganizationsController < ApplicationController
   end
 
   private
-
     def percent_completed_hash(courses, user)
       percent_completed = {}
       all_awarded = AwardedPoint.all_awarded(user)

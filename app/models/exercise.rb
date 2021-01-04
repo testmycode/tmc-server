@@ -133,11 +133,9 @@ class Exercise < ApplicationRecord
   end
 
   def part
-    begin
-      return exercise.group_name.tr('^0-9', '').to_i
-    rescue => ex
-      return 0
-    end
+    exercise.group_name.tr('^0-9', '').to_i
+  rescue
+    0
   end
 
   def belongs_to_exercise_group?(group)
@@ -474,7 +472,6 @@ class Exercise < ApplicationRecord
   end
 
   private
-
     def new_deadline_spec_obj(spec)
       if spec
         DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))

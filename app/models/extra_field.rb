@@ -80,7 +80,6 @@ module ExtraField
   end
 
   private
-
     def self.config_files
       Dir.glob("#{::Rails.root}/config/extra_fields/*_fields.rb")
     end

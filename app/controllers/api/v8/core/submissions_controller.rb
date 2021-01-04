@@ -117,7 +117,6 @@ module Api
         end
 
         private
-
           def can_handle_hidden_fields(params)
             return false unless params[:client] == 'netbeans_plugin'
             splitted = params[:client_version].split('.')

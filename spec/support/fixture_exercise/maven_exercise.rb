@@ -25,7 +25,6 @@ class FixtureExercise::MavenExercise < FixtureExercise::SimpleExercise
   end
 
   private
-
     def copy_from_fixture
       super
       copy_pom_xml

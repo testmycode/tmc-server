@@ -35,11 +35,11 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
-    respond_with_error(message = 'Not found', 404, exception)
+    respond_with_error('Not found', 404, exception)
   end
 
   rescue_from ActionController::MissingFile do |exception|
-    respond_with_error(message = 'File not found', 404, exception)
+    respond_with_error('File not found', 404, exception)
   end
 
   before_action :set_default_url_options
@@ -57,7 +57,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
     def current_ability
       @current_ability ||= ::Ability.new(current_user)
     end
@@ -78,7 +77,7 @@ class ApplicationController < ActionController::Base
           begin
             check_client_version(params[:client], params[:client_version])
           rescue StandardError
-            return respond_with_error($!.message, 404, nil, obsolete_client: true)
+            respond_with_error($!.message, 404, nil, obsolete_client: true)
           end
         end
       end
@@ -99,7 +98,7 @@ class ApplicationController < ActionController::Base
         if !client_version.nil? && vc['min_version'].present?
           raise 'Please update the TMC client.' if client_version < Version.new(vc['min_version'])
         else
-          return # without version check
+          nil # without version check
         end
       end
     end
@@ -212,7 +211,7 @@ class ApplicationController < ActionController::Base
         k.start_with?(prefix) && v.present? && (permitted == :all || permitted.include?(k))
       end.permit(permitted)]
       if options[:remove_prefix]
-        result = Hash[result.map { |k, v| [k.sub(/^#{prefix}/, ''), v] }]
+        result = result.transform_keys { |k| k.sub(/^#{prefix}/, '') }
       end
       result
     end

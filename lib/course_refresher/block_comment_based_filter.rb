@@ -9,7 +9,7 @@ class CourseRefresher
     end
 
     def filter_for_stub(text)
-      return nil if text =~ solution_file_regexp
+      return nil if text&.match?(solution_file_regexp)
       text = fix_line_endings(text)
       text = remove_solution_blocks(text)
       text = uncomment_stubs(text)

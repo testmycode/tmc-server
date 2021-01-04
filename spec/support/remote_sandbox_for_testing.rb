@@ -58,7 +58,6 @@ class RemoteSandboxForTesting
   end
 
   private
-
     def self.result_queue
       @result_queue ||= SubmissionResultReceiver.new
     end

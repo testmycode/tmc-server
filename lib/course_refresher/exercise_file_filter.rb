@@ -38,7 +38,6 @@ class CourseRefresher
     end
 
     private
-
       def clean_empty_dirs_in_project(project_dir)
         clean_empty_dirs_under(project_dir + 'src') if (project_dir + 'src').directory?
         clean_empty_dirs_under(project_dir + 'test') if (project_dir + 'test').directory?

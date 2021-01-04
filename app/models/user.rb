@@ -229,8 +229,7 @@ class User < ApplicationRecord
   def courses_with_submissions
     exercises = Exercise.arel_table
     submissions = Submission.arel_table
-    sql =
-      query = submissions_exercises_and_points_for_user
+    query = submissions_exercises_and_points_for_user
     without_disabled(query)
     query
       .project(exercises[:course_id], exercises[:name], exercises[:id], submissions[:id].count, Arel::Nodes::SqlLiteral.new('bool_or(submissions.all_tests_passed)').as('all_tests_passed'), Arel::Nodes::SqlLiteral.new('ARRAY_AGG(DISTINCT available_points.name order by available_points.name) = ARRAY_AGG(DISTINCT awarded_points.name order by awarded_points.name)').as('got_all_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT available_points.name, ' ' order by available_points.name)").as('available_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT awarded_points.name, ' ' order by awarded_points.name)").as('awarded_points'))
@@ -276,7 +275,6 @@ class User < ApplicationRecord
   end
 
   private
-
     def course_ids_arel
       courses = Course.arel_table
       submissions = Submission.arel_table

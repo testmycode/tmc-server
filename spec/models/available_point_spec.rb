@@ -20,8 +20,8 @@ describe AvailablePoint, type: :model do
       ex1 = FactoryBot.create(:exercise, course: course, gdocs_sheet: 's1')
       ex2 = FactoryBot.create(:exercise, course: course, gdocs_sheet: 's2')
 
-      ap1 = FactoryBot.create(:available_point, exercise: ex1)
-      ap2 = FactoryBot.create(:available_point, exercise: ex2)
+      FactoryBot.create(:available_point, exercise: ex1)
+      FactoryBot.create(:available_point, exercise: ex2)
 
       a = AvailablePoint.course_sheet_points(course, 's1')
       expect(a.size).to eq(1)
@@ -83,7 +83,7 @@ describe AvailablePoint, type: :model do
       ap.award_to(user)
 
       expect(user.awarded_points.size).to eq(1)
-      aw = expect(user.awarded_points.first.name).to eq(ap.name)
+      expect(user.awarded_points.first.name).to eq(ap.name)
     end
   end
 end

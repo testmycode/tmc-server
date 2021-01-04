@@ -16,7 +16,6 @@ class VerificationToken < ApplicationRecord
   before_create :generate_token
 
   private
-
     def generate_token
       self.token = SecureRandom.urlsafe_base64.to_s
     end

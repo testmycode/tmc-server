@@ -37,7 +37,6 @@ class FeedbackAnswer < ApplicationRecord
   end
 
   private
-
     def self.numeric_answers_query(exercise)
       questions = FeedbackQuestion.arel_table
       answers = FeedbackAnswer.arel_table

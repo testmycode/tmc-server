@@ -233,7 +233,6 @@ class SubmissionsController < ApplicationController
   end
 
   private
-
     def course_transaction
       Course.transaction(requires_new: true) do
         yield
@@ -327,7 +326,7 @@ class SubmissionsController < ApplicationController
       when 'no-tests-public'
         respond_forbidden unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
       when 'everyone'
-        return
+        nil
       else
         return if can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s
         if @submission.created_at > 2.hours.ago

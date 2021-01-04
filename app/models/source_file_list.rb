@@ -84,7 +84,6 @@ class SourceFileList
   end
 
   private
-
     def self.find_source_files_under(root_dir)
       files = []
       total_size = 0

@@ -270,19 +270,19 @@ describe Exercise, type: :model do
     expect(exercise).not_to be_completed_by(user)
 
     other_user = FactoryBot.create(:user)
-    other_user_sub = Submission.create!(user: other_user, course: course, exercise_name: exercise.name, all_tests_passed: true)
+    Submission.create!(user: other_user, course: course, exercise_name: exercise.name, all_tests_passed: true)
     expect(exercise).not_to be_completed_by(user)
 
     Submission.create!(user: user, course: course, exercise_name: exercise.name, pretest_error: 'oops', all_tests_passed: true) # in reality all_tests_passed should always be false if pretest_error is not null
     expect(exercise).not_to be_completed_by(user)
 
-    sub = Submission.create!(user: user, course: course, exercise_name: exercise.name, all_tests_passed: false)
+    Submission.create!(user: user, course: course, exercise_name: exercise.name, all_tests_passed: false)
     expect(exercise).not_to be_completed_by(user)
   end
 
   it 'can tell its available review points' do
     exercise = FactoryBot.create(:exercise, course: course)
-    pt1 = FactoryBot.create(:available_point, exercise: exercise, requires_review: false)
+    FactoryBot.create(:available_point, exercise: exercise, requires_review: false)
     pt2 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
     pt3 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
 
@@ -301,7 +301,7 @@ describe Exercise, type: :model do
 
   it 'can tell if all review points have been given to a user' do
     exercise = FactoryBot.create(:exercise, course: course)
-    pt1 = FactoryBot.create(:available_point, exercise: exercise, requires_review: false)
+    FactoryBot.create(:available_point, exercise: exercise, requires_review: false)
     pt2 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
     pt3 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
 
@@ -313,8 +313,8 @@ describe Exercise, type: :model do
 
   it 'can tell which review point are missing for a user' do
     exercise = FactoryBot.create(:exercise, course: course)
-    pt1 = FactoryBot.create(:available_point, exercise: exercise, requires_review: false)
-    pt2 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
+    FactoryBot.create(:available_point, exercise: exercise, requires_review: false)
+    FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
     pt3 = FactoryBot.create(:available_point, exercise: exercise, requires_review: true)
 
     submission = FactoryBot.create(:submission, course: course, exercise: exercise, user: user)

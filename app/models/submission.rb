@@ -340,7 +340,7 @@ class Submission < ApplicationRecord
     return if keys.empty?
 
     exercises = Exercise.where('(course_id, name) IN (' + keys.join(',') + ')')
-    by_key = Hash[exercises.map { |e| [[e.course_id, e.name], e] }]
+    by_key = exercises.index_by { |e| [e.course_id, e.name] }
     for sub in submissions
       ex = by_key[[sub.course_id, sub.exercise_name]]
       sub.exercise = ex
@@ -394,7 +394,6 @@ class Submission < ApplicationRecord
   end
 
   private
-
     def set_processing_attempts_started_at
       self.processing_attempts_started_at = Time.now
     end

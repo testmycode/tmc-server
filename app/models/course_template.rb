@@ -98,7 +98,6 @@ class CourseTemplate < ApplicationRecord
   end
 
   private
-
     def update_courses_sourcedata
       courses.each do |c|
         c.cached_version = cached_version

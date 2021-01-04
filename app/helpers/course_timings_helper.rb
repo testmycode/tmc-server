@@ -9,14 +9,14 @@ module CourseTimingsHelper
   end
 
   def parse_group_from_unlock_condition(condition)
-    condition.split.last if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
+    condition.split.last if /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/.match?(condition)
   end
 
   def complex_unlock_conditions?(group)
     return false if group.group_unlock_conditions.empty?
     return true if group.group_unlock_conditions.length > 1
     return false if group.group_unlock_conditions.first.empty?
-    return true unless group.group_unlock_conditions.first =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
+    return true unless /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/.match?(group.group_unlock_conditions.first)
     false
   end
 end

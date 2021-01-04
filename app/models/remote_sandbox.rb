@@ -20,7 +20,7 @@ class RemoteSandbox
   end
 
   def self.try_to_send_submission_to_free_server(submission, notify_url)
-    dir = ExerciseDir.get(submission.exercise.clone_path)
+    # dir = ExerciseDir.get(submission.exercise.clone_path)
     # servers = if submission.exercise && dir.safe_for_experimental_sandbox
     #   if dir.type == 'java_maven'
     #     all_experimental.shuffle
@@ -130,7 +130,6 @@ class RemoteSandbox
   end
 
   private
-
     def get_status
       ActiveSupport::JSON.decode(RestClient.get(status_url))
     end

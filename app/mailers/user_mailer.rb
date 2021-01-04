@@ -33,7 +33,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Conferma il tuo indirizzo e-mail per cominciare il corso Elements of AI' if language == 'it'
     subject = "#{origin}: #{subject}" if origin
     if origin
-      origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
+      origin_name = origin.downcase.tr(' ', '_').gsub(/[.\/]/, '')
       origin_name += "_#{language}" if language
       @url = confirm_email_url(@user.id, token.token, language: language, origin: CGI.escape(origin_name))
       template_path = Rails.root.join('config', 'email_templates', 'user_mailer', 'email_confirmation')
@@ -57,7 +57,6 @@ class UserMailer < ActionMailer::Base
   end
 
   private
-
     def base_url
       @base_url ||= begin
         settings = SiteSetting.value('emails')

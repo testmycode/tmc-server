@@ -50,7 +50,6 @@ module TestRunGrader
   end
 
   private
-
     def self.create_test_case_runs(submission, results)
       all_passed = true
       results['testResults'].each do |test_result|

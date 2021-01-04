@@ -115,10 +115,9 @@ class ReviewsController < ApplicationController
   end
 
   private
-
     def course_reviews_json
       submissions = @my_reviews.includes(reviews: %i[reviewer submission])
-      exercises = Hash[@course.exercises.map { |e| [e.name, e] }]
+      exercises = @course.exercises.index_by { |e| e.name }
       reviews = submissions.map do |s|
         s.reviews.map do |r|
           {
@@ -263,7 +262,6 @@ class ReviewsController < ApplicationController
     end
 
   private
-
     def set_organization
       @organization = Organization.find_by(slug: params[:organization_id])
     end

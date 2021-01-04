@@ -16,7 +16,7 @@ describe ExtraField, type: :model do
         field(:name => 'one', :field_type => 'text', :label => 'Field One')
         field(:name => 'two', :field_type => 'boolean')
       end
-EOS
+    EOS
   end
 
   before :each do
@@ -80,7 +80,7 @@ EOS
           field(:name => 'one', :field_type => 'text', :disabled => true)
           field(:name => 'two', :field_type => 'boolean', :hidden => true)
         end
-EOS
+      EOS
 
       textfield = ExtraField.by_kind(:user)[0]
       boolfield = ExtraField.by_kind(:user)[1]

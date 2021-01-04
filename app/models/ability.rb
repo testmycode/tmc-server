@@ -147,7 +147,7 @@ class Ability
 
       cannot :read, Solution
       can :read, Solution do |sol|
-        course = sol.exercise.course
+        # course = sol.exercise.course
         sol.visible_to?(user)
       end
 

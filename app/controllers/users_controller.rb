@@ -91,7 +91,7 @@ class UsersController < ApplicationController
 
   def confirm_email
     language = params[:language]
-    token = VerificationToken.unscoped.email.find_by!(user_id: params[:user_id], token: params[:id])
+    VerificationToken.unscoped.email.find_by!(user_id: params[:user_id], token: params[:id])
     redirect_path = root_url
     redirect_path = "https://course.elementsofai.com/#{language ? "#{language}/" : ''}email-verification" if params[:origin] && params[:origin].start_with?('elements_of_ai')
     redirect_path = "https://buildingai.elementsofai.com/#{language ? "#{language}/" : ''}email-verified" if params[:origin] && params[:origin].start_with?('building_ai')
@@ -109,7 +109,7 @@ class UsersController < ApplicationController
 
   def verify_destroying_user
     @user = authenticate_current_user_destroy
-    token = VerificationToken.delete_user.find_by!(user: @user, token: params[:id])
+    VerificationToken.delete_user.find_by!(user: @user, token: params[:id])
   end
 
   def destroy_user
@@ -124,8 +124,7 @@ class UsersController < ApplicationController
       redirect_to verify_destroying_user_url, alert: 'The password was incorrect.'
       return
     end
-    token = VerificationToken.delete_user.find_by!(user: user, token: params[:id])
-    username = user.login
+    VerificationToken.delete_user.find_by!(user: user, token: params[:id])
     sign_out if current_user == user
     email = user.email
     username = user.login
@@ -141,7 +140,6 @@ class UsersController < ApplicationController
   end
 
   private
-
     def authenticate_current_user_destroy
       user = User.find(params[:user_id])
       authorize! :destroy, user

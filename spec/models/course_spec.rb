@@ -13,13 +13,13 @@ describe Course, type: :model do
   describe 'gdocs_sheets' do
     it 'should list all unique gdocs_sheets of a course' do
       course = FactoryBot.create(:course)
-      ex1 = FactoryBot.create(:exercise, course: course,
+      FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: 'sheet1')
-      ex2 = FactoryBot.create(:exercise, course: course,
+      FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: 'sheet1')
-      ex3 = FactoryBot.create(:exercise, course: course,
+      FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: 'sheet2')
-      ex4 = FactoryBot.create(:exercise, course: course,
+      FactoryBot.create(:exercise, course: course,
                                           gdocs_sheet: nil)
       worksheets = course.gdocs_sheets
 
@@ -186,7 +186,7 @@ describe Course, type: :model do
     end
 
     it "forbids custom course's name to be same as some template's name" do
-      template = FactoryBot.create :course_template, name: 'someName'
+      FactoryBot.create :course_template, name: 'someName'
       expect { Course.create!(valid_params.merge(name: 'someName')) }.to raise_error(ActiveRecord::RecordInvalid)
     end
 

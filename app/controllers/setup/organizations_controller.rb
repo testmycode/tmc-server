@@ -49,7 +49,6 @@ class Setup::OrganizationsController < Setup::SetupController
   end
 
   private
-
     def set_organization
       @organization = Organization.find_by(slug: params[:id]) unless params[:id].nil?
     end

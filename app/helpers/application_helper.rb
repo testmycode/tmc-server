@@ -99,7 +99,7 @@ module ApplicationHelper
       });
       //-->
       </script>
-EOS
+    EOS
     raw(script)
   end
 

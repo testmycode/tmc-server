@@ -113,7 +113,6 @@ module IntegrationTestActions
   end
 
   private
-
     def trim_image_edges(path)
       cmd = mk_command [
         'convert',

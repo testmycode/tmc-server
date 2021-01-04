@@ -26,7 +26,6 @@ class MavenPomFile
   end
 
   private
-
     def maybe_from_parent(value)
       version = @data[value]
       if !version.nil?

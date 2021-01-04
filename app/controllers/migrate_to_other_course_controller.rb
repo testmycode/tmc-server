@@ -31,7 +31,6 @@ class MigrateToOtherCourseController < ApplicationController
   end
 
   private
-
     def check_understanding!
       params[:from_course_name].strip == @old_course.name &&
         params[:to_course_name].strip == @to_course.name &&

@@ -187,7 +187,6 @@ describe Setup::CourseTimingsController, type: :controller do
   end
 
   private
-
     def init_session
       session[:ongoing_course_setup] = {
         course_id: @course.id,

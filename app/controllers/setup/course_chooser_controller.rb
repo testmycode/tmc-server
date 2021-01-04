@@ -12,7 +12,6 @@ class Setup::CourseChooserController < Setup::SetupController
   end
 
   private
-
     def set_course_from_session
       if setup_in_progress? && !session[:ongoing_course_setup][:course_id].nil?
         @course = Course.find(session[:ongoing_course_setup][:course_id])

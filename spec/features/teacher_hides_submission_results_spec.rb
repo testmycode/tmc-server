@@ -57,7 +57,7 @@ describe 'Teacher can hide submission results from users', feature: true do
 
   scenario 'In submission page user can not see results of submission' do
     FactoryBot.create :submission_data, submission: @submission
-    tcr = FactoryBot.create :test_case_run, submission: @submission
+    FactoryBot.create :test_case_run, submission: @submission
     log_in_as(@user.login, 'foobar')
     visit_course
     click_link('Details')
@@ -72,7 +72,7 @@ describe 'Teacher can hide submission results from users', feature: true do
 
   scenario 'In submission page user can not see model solution when all tests passed' do
     FactoryBot.create :submission_data, submission: @submission
-    tcr = FactoryBot.create :test_case_run, submission: @submission
+    FactoryBot.create :test_case_run, submission: @submission
     @submission.stdout = 'some stdout text'
     @submission.stderr = 'some stderr text'
     @submission.valgrind = 'some valgrind text'
@@ -88,7 +88,7 @@ describe 'Teacher can hide submission results from users', feature: true do
 
   scenario 'when c language exercise then in submission page user can not see results of submission' do
     FactoryBot.create :submission_data, submission: @submission
-    tcr = FactoryBot.create :test_case_run, submission: @submission
+    FactoryBot.create :test_case_run, submission: @submission
     @submission.stdout = 'some stdout text'
     @submission.stderr = 'some stderr text'
     @submission.valgrind = 'some valgrind text'
@@ -116,7 +116,7 @@ describe 'Teacher can hide submission results from users', feature: true do
       @submission.all_tests_passed = true
       @submission.save!
       FactoryBot.create :submission_data, submission: @submission
-      tcr = FactoryBot.create :test_case_run, submission: @submission
+      FactoryBot.create :test_case_run, submission: @submission
       log_in_as(@user.login, 'foobar')
       visit_course
       click_link('Details')

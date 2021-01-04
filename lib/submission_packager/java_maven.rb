@@ -3,7 +3,6 @@
 class SubmissionPackager
   class JavaMaven < SubmissionPackager
     private
-
       def find_received_project_root(received_root)
         src_dir_path = TmcDirUtils.find_dir_containing(received_root, 'src')
         raise 'No src directory' if src_dir_path.nil?

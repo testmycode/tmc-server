@@ -16,7 +16,6 @@ class Guest < User
   end
 
   private
-
     def reject_save
       raise 'The guest user cannot be saved!'
     end
