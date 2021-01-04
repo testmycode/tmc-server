@@ -8,45 +8,45 @@ gem 'rails', '~> 5.2.1'
 
 gem 'activerecord-session_store'
 gem 'andand'
-gem 'cancancan', '~> 2.3.0'
+gem 'cancancan', '~> 3.2.1'
 gem 'daemons', '~> 1.3.1'
 gem 'google-spreadsheet-ruby'
-gem 'mimemagic', '~> 0.3.0'
+gem 'mimemagic', '~> 0.3'
 gem 'natcmp', '~> 1.4'
 gem 'newrelic_rpm', '~> 6.14.0'
 gem 'paperclip', '~> 6.1'
 gem 'pdfkit', '~> 0.8.4'
-gem 'pg', '~> 1.2.3'
-gem 'activerecord-import', '~> 1.0.7'
+gem 'pg', '~> 1.2'
+gem 'activerecord-import', '~> 1.0'
 gem 'rack-attack'
 gem 'rack-cors'
 gem 'rake'
-gem 'responders', '~> 2.4'
-gem 'rest-client', '~> 2.1.0'
-gem 'transaction_isolation', '~> 1.0.3'
-gem 'xml-simple', '~> 1.1.1'
+gem 'responders', '~> 3.0'
+gem 'rest-client', '~> 2.1'
+gem 'transaction_isolation', '~> 1.0'
+gem 'xml-simple', '~> 1.1'
 
 gem 'hiredis' # Redis for caching
 # gem 'newrelic-redis' blocks new relic updates
 gem 'readthis' # Redis for caching
-gem 'redis', '~> 3.3.5'
+gem 'redis', '~> 4.2'
 
 gem 'doorkeeper'
-gem 'gravtastic', '~> 3.2.6'
+gem 'gravtastic', '~> 3.2'
 
-gem 'logstasher', '~> 0.9.0'
+gem 'logstasher', '~> 2.1'
 
-gem 'pghero', '~> 2.2'
+gem 'pghero', '~> 2.7'
 
-gem 'swagger-blocks', '~> 1.3.4'
+gem 'swagger-blocks', '~> 3.0'
 
-gem 'bootstrap', '~> 4.0.0.beta2.1'
+gem 'bootstrap', '~> 4.5'
 gem 'font-awesome-rails'
 gem 'sass-rails', '~> 5.0'
 
-gem 'rack-mini-profiler', '~> 1.0', '>= 1.0.1'
-gem 'flamegraph', '~> 0.9.5'
-gem 'stackprof', '~> 0.2.12'
+gem 'rack-mini-profiler', '~> 2.3s'
+gem 'flamegraph', '~> 0.9'
+gem 'stackprof', '~> 0.2'
 gem 'ruby-kafka', '~> 0.7.10'
 gem 'argon2', '~> 2.0', '>= 2.0.2'
 

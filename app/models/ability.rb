@@ -23,14 +23,14 @@ class Ability
       can :refresh_gdocs_spreadsheet, Course do |c|
         c.spreadsheet_key.present?
       end
-      can :access_pghero
+      can :access, :pghero
       can :read_vm_log, Submission
-      can :read_instance_state
+      can :read, :instance_state
     else
-      cannot :read_instance_state
+      cannot :read, :instance_state
       can :read, :all
 
-      cannot :access_pghero
+      cannot :access, :pghero
       cannot :read, User
       cannot :read, :code_reviews
       cannot :read, :course_information

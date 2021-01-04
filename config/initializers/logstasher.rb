@@ -25,6 +25,6 @@ if LogStasher.enabled?
     fields[:site] = /^\/api/.match?(request.path) ? 'api' : 'user'
 
     # If you are using custom instrumentation, just add it to logstasher custom fields
-    LogStasher.custom_fields << :myapi_runtime
+    LogStasher::CustomFields.add(:myapi_runtime)
   end
 end
