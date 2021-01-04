@@ -63,7 +63,7 @@ describe Setup::CourseAssistantsController, type: :controller do
              course_id: @course.id,
              commit: 'Add new assistant',
              username: 'assi',
-             email: @assistant.email 
+             email: @assistant.email
         }
         expect(@course.assistants.count).to eq(1)
         expect(response).to render_template(:index)

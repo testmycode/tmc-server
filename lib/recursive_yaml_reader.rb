@@ -23,7 +23,7 @@ class RecursiveYamlReader
     root_dir = @opts[:root_dir]
     target_dir = @opts[:target_dir]
     file_name = @opts[:file_name]
-    preprocessor = @opts[:file_preprocessor] || proc {}
+    preprocessor = @opts[:file_preprocessor] || proc { }
 
     subdirs = target_dir.gsub(/^#{@opts[:root_dir]}\//, '').split('/')
 

@@ -44,7 +44,7 @@ describe CourseTemplatesController, type: :controller do
         FactoryGirl.create :course_template, name: 'template3'
       end
       it 'should show course templates' do
-        get :index, params: { }
+        get :index, params: {}
         expect(assigns(:course_templates).map(&:name)).to eq(%w[template1 template2 template3])
       end
     end
@@ -147,7 +147,7 @@ describe CourseTemplatesController, type: :controller do
 
     describe 'GET index' do
       it 'should respond with a 403' do
-        get :index, params: { }
+        get :index, params: {}
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -235,7 +235,7 @@ describe CourseTemplatesController, type: :controller do
 
     describe 'GET index' do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
-        get :index, params: { }
+        get :index, params: {}
         expect(response.code.to_i).to eq(302)
         expect(response.body).to include('/login?return_to=%2Fcourse_templates')
       end

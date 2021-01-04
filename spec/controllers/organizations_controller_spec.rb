@@ -102,7 +102,7 @@ describe OrganizationsController, type: :controller do
     describe 'GET index' do
       it 'assigns all organizations as @organizations' do
         organization = Organization.create! valid_attributes
-        get :index, params: { }
+        get :index, params: {}
         expect(assigns(:organizations)).to eq([organization])
       end
     end
@@ -132,7 +132,7 @@ describe OrganizationsController, type: :controller do
     describe 'POST verify' do
       it 'denies access' do
         org = Organization.init(valid_attributes, @user)
-        post :verify, params: {id: org.to_param}
+        post :verify, params: { id: org.to_param }
         expect(response.code.to_i).to eq(403)
       end
     end
