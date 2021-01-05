@@ -73,8 +73,6 @@ group :development, :test do
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
   gem 'rubocop', '~> 1.5.2', require: false
-  gem 'rubocop-rspec', require: false
-  gem 'rubocop-rake', require: false
   gem 'rubocop-rails_config', '~> 1.1'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
   gem 'simplecov', require: false
