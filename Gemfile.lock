@@ -52,7 +52,6 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    andand (1.3.3)
     arel (9.0.0)
     argon2 (2.0.3)
       ffi (~> 1.14)
@@ -437,7 +436,6 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import (~> 1.0)
   activerecord-session_store (~> 1.1)
-  andand (~> 1.3)
   argon2 (~> 2.0)
   bootstrap (~> 4.5)
   brakeman

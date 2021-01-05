@@ -18,7 +18,7 @@ class AuthsController < ApplicationController
       # Allows using oauth2 tokens of the new api for authenticating
       res = if user && Doorkeeper::AccessToken.find_by(resource_owner_id: user.id, token: params[:session_id])
         OK_MESSAGE
-      elsif user && find_session_by_id(params[:session_id]).andand.belongs_to?(user)
+      elsif user && find_session_by_id(params[:session_id])&.belongs_to?(user)
         OK_MESSAGE
       else
         FAIL_MESSAGE

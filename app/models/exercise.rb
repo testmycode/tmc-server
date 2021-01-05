@@ -360,7 +360,7 @@ class Exercise < ApplicationRecord
 
   def time_unlocked_for(user, resolve_unlocks = true)
     UncomputedUnlock.resolve(course, user) if resolve_unlocks
-    unlocks.where(user_id: user).find_by('valid_after IS NULL OR valid_after < ?', Time.now).andand.created_at
+    unlocks.where(user_id: user).find_by('valid_after IS NULL OR valid_after < ?', Time.now)&.created_at
   end
 
   def unlocked_for?(user, resolve_unlocks = true)

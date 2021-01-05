@@ -30,7 +30,7 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
   end
 
   def description_for(user)
-    min_spec(user).andand.personal_describer.andand.call(user) || 'none'
+    min_spec(user)&.personal_describer&.call(user) || 'none'
   end
 
   def deadline_for(user)
@@ -51,7 +51,7 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
 
   private
     def min_spec(user)
-      @specs.map { |s| [s.timefun.call(user), s] }.reject { |p| p.first.nil? }.min_by(&:first).andand.map(&:second)
+      @specs.map { |s| [s.timefun.call(user), s] }.reject { |p| p.first.nil? }.min_by(&:first)&.map(&:second)
     end
 
     class SingleSpec

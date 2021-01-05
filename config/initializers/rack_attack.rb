@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rack/attack'
+
 class Rack::Attack
   def self.user_identifier_discriminator(access_token)
     db_token = Doorkeeper::AccessToken.find_by(token: access_token)
