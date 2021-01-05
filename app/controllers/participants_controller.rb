@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'portable_csv'
+require 'natcmp'
 
 class ParticipantsController < ApplicationController
   before_action :set_organization, only: [:index]

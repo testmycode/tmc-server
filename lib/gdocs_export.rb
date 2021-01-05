@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'google_spreadsheet'
+require 'google_drive'
 
 module GDocsExport
   def self.authenticate(notifications)
@@ -9,7 +9,7 @@ module GDocsExport
     notifications << 'gdocs_password undefined' && (return nil) unless
       TmcServer::Application.config.gdocs_password
 
-    GoogleSpreadsheet.login(
+    GoogleDrive.login(
       TmcServer::Application.config.gdocs_username,
       TmcServer::Application.config.gdocs_password
     )

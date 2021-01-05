@@ -113,7 +113,6 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
-    flamegraph (0.9.5)
     font-awesome-rails (4.7.0.6)
       railties (>= 3.2, < 6.2)
     globalid (0.4.2)
@@ -127,8 +126,6 @@ GEM
       retriable (>= 2.0, < 4.0)
       rexml
       signet (~> 0.12)
-    google-spreadsheet-ruby (0.3.1)
-      google_drive (>= 0.3.0)
     google_drive (3.0.6)
       google-api-client (>= 0.11.0, < 1.0.0)
       googleauth (>= 0.5.0, < 1.0.0)
@@ -401,7 +398,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    stackprof (0.2.16)
     swagger-blocks (3.0.0)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
@@ -412,8 +408,6 @@ GEM
     thor (1.0.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    transaction_isolation (1.0.5)
-      activerecord (>= 3.0.11)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
     uber (0.1.0)
@@ -426,7 +420,6 @@ GEM
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    xml-simple (1.1.8)
     xpath (3.2.0)
       nokogiri (~> 1.8)
 
@@ -446,9 +439,8 @@ DEPENDENCIES
   database_cleaner (~> 1.8)
   doorkeeper (~> 5.4)
   factory_bot_rails (~> 6.1)
-  flamegraph (~> 0.9)
   font-awesome-rails
-  google-spreadsheet-ruby (~> 0.3)
+  google_drive (~> 3.0)
   gravtastic (~> 3.2)
   hiredis (~> 0.6)
   irb
@@ -457,7 +449,6 @@ DEPENDENCIES
   launchy
   letter_opener (~> 1.7)
   logstasher (~> 2.1)
-  mimemagic (~> 0.3)
   mimic (~> 0.4)
   natcmp (~> 1.4)
   newrelic_rpm (~> 6.14)
@@ -493,11 +484,8 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   simplecov
   sprockets-rails
-  stackprof (~> 0.2)
   swagger-blocks (~> 3.0)
-  transaction_isolation (~> 1.0)
   uglifier (~> 4.2)
-  xml-simple (~> 1.1)
 
 BUNDLED WITH
    1.17.3

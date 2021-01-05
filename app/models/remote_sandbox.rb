@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rest_client'
+require 'rest-client'
 require 'submission_packager'
 require 'timeout'
 require 'rust_langs_cli_executor'

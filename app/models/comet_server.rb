@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rest_client'
+require 'rest-client'
 
 # Represents the configured tmc-comet server.
 #
