@@ -21,6 +21,7 @@ gem 'rack-cors', '~> 1.1'
 gem 'rake'
 gem 'responders', '~> 3.0'
 gem 'rest-client', '~> 2.1', require: false
+gem 'xml-simple', '~> 1.1', require: false
 
 gem 'hiredis', '~> 0.6' # Redis for caching
 # gem 'newrelic-redis' blocks new relic updates

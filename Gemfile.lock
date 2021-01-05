@@ -420,6 +420,7 @@ GEM
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    xml-simple (1.1.8)
     xpath (3.2.0)
       nokogiri (~> 1.8)
 
@@ -486,6 +487,7 @@ DEPENDENCIES
   sprockets-rails
   swagger-blocks (~> 3.0)
   uglifier (~> 4.2)
+  xml-simple (~> 1.1)
 
 BUNDLED WITH
    1.17.3
