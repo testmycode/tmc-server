@@ -96,7 +96,7 @@ module GDocsExport
 
     (header_row + 1..ws.num_rows).each do |row|
       cell = ws[row, student_col]
-      break if /^=counta/.match?(cell)
+      break if cell =~ /^=counta/
       return row if cell == student_name || cell == stripped
     end
     -1

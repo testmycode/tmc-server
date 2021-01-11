@@ -45,3 +45,6 @@ Metrics/ParameterLists:
 
 Metrics/PerceivedComplexity:
   Enabled: false
+
+Performance/RegexpMatch:
+  Enabled: false

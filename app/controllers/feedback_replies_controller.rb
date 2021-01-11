@@ -14,6 +14,10 @@ class FeedbackRepliesController < ApplicationController
       answer.exercise_name
     ).deliver_now
 
-    redirect_back fallback_location: root_path, notice: 'Reply to a review was mailed'
+    if request.referer.present?
+      redirect_to request.referer, params: { notice: 'Reply to a review was mailed' }
+    else
+      redirect_back fallback_location: root_path
+    end
   end
 end

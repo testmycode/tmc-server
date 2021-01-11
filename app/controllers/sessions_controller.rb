@@ -25,6 +25,7 @@ class SessionsController < ApplicationController
     if user.nil?
       msg = 'Invalid credentials. Try again.'
       redirect_params = { alert: msg }
+      return try_to_redirect_incorrect_login(redirect_params)
     else
       sign_in user
     end
@@ -43,11 +44,21 @@ class SessionsController < ApplicationController
         return_to = session.delete(:return_to)
         redirect_to return_to, redirect_params
       elsif request.env['HTTP_REFERER'].present?
-        redirect_back fallback_location: root_path
+        redirect_to request.env['HTTP_REFERER'], redirect_params
       elsif request.referer.present?
         redirect_to request.referer, redirect_params
       else
         redirect_to root_path, redirect_params
+      end
+    end
+
+    def try_to_redirect_incorrect_login(redirect_params = {})
+      if request.referer.present?
+        redirect_to request.referer, redirect_params
+      elsif request.env['HTTP_REFERER'].present?
+        redirect_to request.env['HTTP_REFERER'], redirect_params
+      else
+        redirect_to login_path, redirect_params
       end
     end
 

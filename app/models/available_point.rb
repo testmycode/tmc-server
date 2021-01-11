@@ -96,6 +96,6 @@ class AvailablePoint < ApplicationRecord
 
   private
     def name_must_not_contain_whitespace
-      errors.add(:name, "can't contain whitespace") if /\s+/.match?(name)
+      errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
     end
 end

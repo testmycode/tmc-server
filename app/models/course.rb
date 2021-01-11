@@ -519,7 +519,7 @@ class Course < ApplicationRecord
   end
 
   def external_scoreboard_url=(url)
-    return super("http://#{url}") unless /^(https?:\/\/|$)/.match?(url)
+    return super("http://#{url}") unless url =~ /^(https?:\/\/|$)/
     super(url)
   end
 

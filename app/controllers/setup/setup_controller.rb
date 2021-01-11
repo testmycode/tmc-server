@@ -74,7 +74,7 @@ class Setup::SetupController < ApplicationController
     if options[:pass_parameters]
       url = url.to_s + "('#{@organization.slug}', #{@course.id})"
     end
-    url = eval(url.to_s) if /_path|_url|@/.match?(url)
+    url = eval(url.to_s) if url =~ /_path|_url|@/
     @course_setup_phases << { name: name, url: url, type: type }
   end
 
