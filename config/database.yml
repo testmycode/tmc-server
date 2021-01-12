@@ -3,6 +3,7 @@ development:
   username: tmc
   password: tmc
   database: tmc-development
+  pool: 25
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -12,19 +13,21 @@ test:
   username: tmc
   password: tmc
   database: tmc-test
+  pool: 25
 
 production:
   adapter: postgresql
   username: tmc
   password: tmc
   database: tmc
+  pool: 25
 
 <% if ENV['DB_HOST'] %>
 development:
   adapter: postgresql
   encoding: utf8
   database: postgres
-  pool: 5
+  pool: 15
   username: postgres
   password:
   host: <%= ENV.fetch('DB_HOST', 'db') %>
@@ -33,7 +36,7 @@ test:
   adapter: postgresql
   encoding: utf8
   database: postgres
-  pool: 5
+  pool: 15
   username: postgres
   password:
   host: <%= ENV.fetch('DB_HOST', 'db') %>
