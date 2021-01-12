@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 # source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 5.2'
+gem 'rails', '~> 6.1'
 
 gem 'activerecord-session_store', '~> 1.1'
 gem 'cancancan', '~> 3.2'
