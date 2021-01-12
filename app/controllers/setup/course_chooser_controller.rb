@@ -7,7 +7,7 @@ class Setup::CourseChooserController < Setup::SetupController
     authorize! :teach, @organization
     save_wizard_to_session(1)
     print_setup_phases(1)
-    @course_templates = CourseTemplate.available.order('LOWER(title)')
+    @course_templates = CourseTemplate.available.order(Arel.sql('LOWER(title)'))
     @setup_in_progress = setup_in_progress?
   end
 

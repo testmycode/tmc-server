@@ -5,7 +5,7 @@ class CourseTemplatesController < ApplicationController
 
   def index
     authorize! :read, CourseTemplate
-    ordering = 'LOWER(name)'
+    ordering = Arel.sql('LOWER(name)')
     add_breadcrumb 'Course templates', course_templates_path
     @course_templates = CourseTemplate.not_hidden.not_dummy.order(ordering)
     @hidden_course_templates = CourseTemplate.hidden.not_dummy.order(ordering)
@@ -63,7 +63,7 @@ class CourseTemplatesController < ApplicationController
     authorize! :teach, @organization
     add_organization_breadcrumb
     add_breadcrumb 'Course templates'
-    @course_templates = CourseTemplate.available.order('LOWER(title)')
+    @course_templates = CourseTemplate.available.order(Arel.sql('LOWER(title)'))
   end
 
   def toggle_hidden

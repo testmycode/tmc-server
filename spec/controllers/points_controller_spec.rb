@@ -29,7 +29,7 @@ describe PointsController, type: :controller do
     describe 'when user has participated in a course' do
       it 'should show a page' do
         get :index, params: { organization_id: @organization.slug, course_id: @course.id }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'should not show a page when submission result are hidden' do
@@ -46,7 +46,7 @@ describe PointsController, type: :controller do
       it 'should show a page' do
         get :show, params: { organization_id: @organization.slug,
                    course_id: @course.id, id: @sheetname }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'should contain @user login' do

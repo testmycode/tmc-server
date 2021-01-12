@@ -5,7 +5,7 @@ class TeachersController < ApplicationController
 
   def index
     authorize! :teach, @organization
-    ordering = 'LOWER(login)'
+    ordering = Arel.sql('LOWER(login)')
     @teachers = @organization.teachers.order(ordering)
     @teachership = Teachership.new
     add_organization_breadcrumb

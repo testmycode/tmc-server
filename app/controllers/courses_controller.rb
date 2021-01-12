@@ -12,7 +12,7 @@ class CoursesController < ApplicationController
   skip_authorization_check only: [:index]
 
   def index
-    ordering = 'hidden, disabled_status, LOWER(name)'
+    ordering = Arel.sql('hidden, disabled_status, LOWER(name)')
 
     respond_to do |format|
       format.html do

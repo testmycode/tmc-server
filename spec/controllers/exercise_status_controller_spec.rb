@@ -47,7 +47,7 @@ describe ExerciseStatusController, type: :controller do
 
       it 'should show completition status for submitted exercises' do
         do_get
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse response.body
         expect(json).to have_key @exercise.name
         expect(json).to have_key @exercise2.name
@@ -58,7 +58,7 @@ describe ExerciseStatusController, type: :controller do
 
       it 'should work when using course and user name instrad of id:s' do
         do_get
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse response.body
         expect(json).to have_key @exercise.name
         expect(json).to have_key @exercise2.name

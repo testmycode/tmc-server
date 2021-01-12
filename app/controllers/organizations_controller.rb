@@ -8,7 +8,7 @@ class OrganizationsController < ApplicationController
   skip_authorization_check only: %i[index new]
 
   def index
-    ordering = 'hidden, LOWER(name)'
+    ordering = Arel.sql('hidden, LOWER(name)')
     @organizations = Organization
                      .accepted_organizations
                      .order(ordering)
@@ -29,7 +29,7 @@ class OrganizationsController < ApplicationController
 
   def show
     add_organization_breadcrumb
-    ordering = 'hidden, disabled_status, LOWER(courses.title)'
+    ordering = Arel.sql('hidden, disabled_status, LOWER(courses.title)')
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization
                        .courses
