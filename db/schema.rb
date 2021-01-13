@@ -80,6 +80,27 @@ ActiveRecord::Schema.define(version: 20201208125737) do
 
   add_index "course_notifications", ["course_id"], name: "index_course_notifications_on_course_id", using: :btree
 
+  create_table "course_refresh_phase_timings", force: :cascade do |t|
+    t.string  "phase_name",        null: false
+    t.integer "time_ms",           null: false
+    t.integer "course_refresh_id", null: false
+  end
+
+  add_index "course_refresh_phase_timings", ["course_refresh_id"], name: "index_course_refresh_phase_timings_on_course_refresh_id", using: :btree
+
+  create_table "course_refreshes", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "status",                   default: 0,     null: false
+    t.boolean  "no_background_operations", default: false
+    t.boolean  "no_directory_changes",     default: false
+    t.integer  "user_id",                                  null: false
+    t.integer  "course_template_id",                       null: false
+  end
+
+  add_index "course_refreshes", ["course_template_id"], name: "index_course_refreshes_on_course_template_id", using: :btree
+  add_index "course_refreshes", ["user_id"], name: "index_course_refreshes_on_user_id", using: :btree
+
   create_table "course_templates", force: :cascade do |t|
     t.string   "name"
     t.string   "title"
@@ -505,6 +526,9 @@ ActiveRecord::Schema.define(version: 20201208125737) do
   add_foreign_key "awarded_points", "courses", on_delete: :cascade
   add_foreign_key "awarded_points", "submissions", on_delete: :nullify
   add_foreign_key "awarded_points", "users", on_delete: :cascade
+  add_foreign_key "course_refresh_phase_timings", "course_refreshes"
+  add_foreign_key "course_refreshes", "course_templates"
+  add_foreign_key "course_refreshes", "users"
   add_foreign_key "courses", "organizations"
   add_foreign_key "exercises", "courses", on_delete: :cascade
   add_foreign_key "feedback_answers", "feedback_questions", on_delete: :cascade

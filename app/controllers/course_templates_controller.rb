@@ -75,7 +75,7 @@ class CourseTemplatesController < ApplicationController
   def refresh
     notice = 'Course template successfully refreshed'
     begin
-      session[:template_refresh_report] = @course_template.refresh
+      session[:template_refresh_report] = @course_template.refresh(current_user.id)
     rescue CourseRefresher::Failure => e
       notice = "Refresh failed, something went wrong:<br><br>#{e}"
     end

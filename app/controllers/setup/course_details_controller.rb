@@ -81,7 +81,7 @@ class Setup::CourseDetailsController < Setup::SetupController
     def refresh_course(course, options = {})
       # TODO: Could include course ID
 
-      session[:refresh_report] = course.refresh(options)
+      session[:refresh_report] = course.refresh(options, current_user)
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
     end

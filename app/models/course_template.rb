@@ -82,11 +82,11 @@ class CourseTemplate < ApplicationRecord
     end
   end
 
-  def refresh
+  def refresh(current_user_id)
     results = []
     firstcourse = true
     courses.each do |c|
-      results.push(c.refresh(no_directory_changes: !firstcourse))
+      results.push(c.refresh({ no_directory_changes: !firstcourse }, current_user_id))
       reload
       firstcourse = false
     end
