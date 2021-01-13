@@ -49,26 +49,17 @@ module RustLangsCliExecutor
 
     command = command + '--no-directory-changes' if no_directory_changes
 
-    File.open('course_refresh.txt', 'w') do |file|
-      file.puts(`#{command}`)
-    end
-    command_output = File.open('course_refresh.txt').read
-    
-    @@refresh_logger ||= Logger.new("#{Rails.root}/log/course_refresh.log")
-
-    @@refresh_logger.info(`#{command}`)
-
-    Rails.logger.info(command_output)
-
-    result = self.process_command_output(command_output)
-
-    if result['result'] == 'error'
-      Rails.logger.error("Refreshing course #{course.name} failed: " + result.to_s)
+    Open3.popen2(command) do |stdin, stdout, status_thread|
+      stdout.each_line do |line|
+        Rails.logger.info(line)
+        data = parse_as_JSON(line)
+        return unless data
+        parsed_data = process_command_output_realtime(data)
+        Rails.logger.info(parsed_data)
+      end
     end
 
-    File.delete('course_refresh.txt')
-
-    result
+    nil
   end
 
   private
@@ -91,16 +82,28 @@ module RustLangsCliExecutor
       last_line
     end
 
-    # from https://stackoverflow.com/questions/1293695/watch-read-a-growing-log-file
-    def self.watch_for(file, pattern)
-      f = File.open(file,"r")
-      f.seek(0,IO::SEEK_END)
-      while true do
-        select([f])
-        line = f.gets
-        puts "Found it! #{line}" if line=~pattern
+    def self.parse_as_JSON(output)
+      begin
+        return JSON.parse output
+      rescue StandardError => e
+        Rails.logger.info("Could not parse output line. #{e}")
       end
     end
-    
-    
+
+    def self.process_command_output_realtime(command_output)
+      data = command_output['data']
+      if command_output['status'] == 'crashed'
+        Rails.logger.info('TMC-langs-rust crashed')
+        Rails.logger.info(data)
+        raise 'TMC-langs-rust crashed: ' + data
+      elsif command_output['output-kind'] == 'status-update'
+        return {
+          message: command_output['message'],
+          percent_done: command_output['percent-done'],
+          time: command_output['time'],
+        }
+      elsif command_output['status'] == 'finished'
+        return data
+      end
+    end    
 end

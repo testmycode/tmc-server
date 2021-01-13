@@ -84,6 +84,7 @@ ActiveRecord::Schema.define(version: 2020_12_08_125737) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "status", default: 0, null: false
+    t.decimal "percent_done", default: "0.0", null: false
     t.boolean "no_background_operations", default: false
     t.boolean "no_directory_changes", default: false
     t.integer "user_id", null: false

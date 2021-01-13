@@ -19,6 +19,7 @@ class RefreshCourseTask
                 end
             rescue => e
                 Rails.logger.error("Task failed: #{e}")
+                Rails.logger.error(e.backtrace.join("\n"))
             end
             task.destroy! if finished_successfully
         end
