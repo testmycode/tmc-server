@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 # See
 # http://stackoverflow.com/questions/12243694/getting-error-exceeded-available-parameter-key-space
 # or

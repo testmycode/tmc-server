@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'rubygems'
 require 'daemons'
 require 'fileutils'
@@ -17,25 +19,32 @@ end
 Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: log_dir, log_output: false) do
   Dir.chdir root_dir
   require root_dir + '/config/environment'
-  if Rails.logger.respond_to? :auto_flushing=
-    Rails.logger.auto_flushing = true
-  end
+  Rails.logger = Logger.new(Rails.root.join('log', 'background_daemon.log'))
+  Rails.logger.auto_flushing = true if Rails.logger.respond_to? :auto_flushing=
+  # ActiveRecord::Base.connection_config[:pool] = 25
 
-  loop do
-    BackgroundTaskRegistry.all_tasks.each do |task|
-      begin
-        task.run
-      rescue => e
-        Rails.logger.error "#{task.class.name} exception: " + exception_to_str(e)
-
+  # Tasks may be longrunning so we want each one in a thread so one task won't
+  # block other ones.
+  processes = BackgroundTaskRegistry.all_tasks.map do |task|
+    Process.fork do
+      loop do
         begin
-          ActiveRecord::Base.verify_active_connections!
-        rescue => e2
-          Rails.logger.error 'Failed to verify DB connection: ' + exception_to_str(e2)
+          task.run
+        rescue StandardError => e
+          Rails.logger.error "#{task.class.name} exception: " + exception_to_str(e)
+
+          begin
+            ActiveRecord::Base.clear_active_connections!
+          rescue StandardError => e2
+            Rails.logger.error 'Failed to get rid of used db connections: ' + exception_to_str(e2)
+          end
         end
+        sleep task.wait_delay
       end
     end
-
-    sleep 5
+  end
+  # TODO: we may not detect if only one of the threads dies.
+  processes.each do |pid|
+    Process.wait(pid)
   end
 end

@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher has admin abilities to own course', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create :verified_user, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
-    @student = FactoryGirl.create :user, password: 'foobar'
-    @admin = FactoryGirl.create :admin, password: 'admin'
+    @student = FactoryBot.create :verified_user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'admin'
 
     repo_path = Dir.pwd + '/remote_repo'
     create_bare_repo(repo_path)
-    @course = FactoryGirl.create :course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization
+    @course = FactoryBot.create :course, name: 'mycourse', title: 'mycourse', source_url: repo_path, organization: @organization
 
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
@@ -21,8 +23,8 @@ feature 'Teacher has admin abilities to own course', feature: true do
     @course.refresh
 
     @exercise1 = @course.exercises.first
-    @submission = FactoryGirl.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true
-    @submission_data = FactoryGirl.create :submission_data, submission: @submission
+    @submission = FactoryBot.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true
+    @submission_data = FactoryBot.create :submission_data, submission: @submission
 
     visit '/'
     log_in_as(@teacher.login, 'xooxer')
@@ -50,14 +52,22 @@ feature 'Teacher has admin abilities to own course', feature: true do
     expect(page).to have_content('Submission 1')
     expect(page).to have_content('Submitted at')
     expect(page).to have_content('Test Results')
-    expect(page).not_to have_content('Access denied')
+    expect(page).not_to have_content('Forbidden')
+  end
+
+  scenario 'Teacher can see all submissions for his organization courses in course_id/submissions view' do
+    visit '/org/slug/courses/1/submissions'
+
+    expect(page).to have_content('All submissions for mycourse')
+    expect(page).not_to have_content('No data available in table')
+    expect(page).to have_content('Showing 1 to 1 of 1 entries')
   end
 
   scenario 'Teacher can see users points from his own courses' do
-    available_point = FactoryGirl.create :available_point, exercise: @exercise1
+    available_point = FactoryBot.create :available_point, exercise: @exercise1
     available_point.award_to(@student, @submission)
     visit '/org/slug/courses/1'
-    click_link 'View points'
+    click_link 'Points list'
 
     expect(page).to have_content('1/6')
     expect(page).not_to have_content('0/6')
@@ -69,6 +79,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
     expect(page).to have_content('1 code review requested')
     click_link '1 code review requested'
     click_link 'Requested'
+    # click_link 'Start code review'
 
     fill_in('review_review_body', with: 'Code looks ok')
 
@@ -101,8 +112,8 @@ feature 'Teacher has admin abilities to own course', feature: true do
   end
 
   scenario 'Teacher can view course feedback answers' do
-    question = FactoryGirl.create :feedback_question, course: @course, question: 'Meaning of life?'
-    answer = FactoryGirl.create :feedback_answer, feedback_question: question, course: @course, exercise: @exercise1, submission: @submission, answer: 'no idea'
+    question = FactoryBot.create :feedback_question, course: @course, question: 'Meaning of life?'
+    answer = FactoryBot.create :feedback_answer, feedback_question: question, course: @course, exercise: @exercise1, submission: @submission, answer: 'no idea'
 
     visit '/org/slug/courses/1'
     click_link 'View feedback'

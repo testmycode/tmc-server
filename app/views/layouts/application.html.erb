@@ -19,74 +19,36 @@
     <%= javascript_include_tag 'application' %>
     <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>
 
-    <%= javascript_include_tag(
-          comet_js_url('org/cometd.js'),
-          comet_js_url('jquery/jquery.cometd.js')
-        )
-    %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css" integrity="sha256-aw9uGjVU5OJyMYN70Vu2kZ1DDVc1slcJCS2XvuPCPKo=" crossorigin="anonymous" />
   </head>
   <body class="default">
-    <div class="navbar navbar-inverse navbar-static-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" id="collapse-toggle" data-toggle='collapse' data-target='.nav-collapse'>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <% title_extras = '<span class="small"><br>' + raw(SiteSetting.value(:site_subtitle)) + '</span>' unless SiteSetting.value(:site_subtitle).blank? %>
-          <% title = 'TestMyCode server' %>
-          <% title += raw(title_extras) unless title_extras.blank? %>
-          <%= link_to raw(title), root_path, class: 'brand' %>
-          <div class="collapse nav-collapse">
-            <ul class="nav pull-right">
-              <% if signed_in? %>
-                <% if current_user.administrator? %>
-                  <li>
-                    <%= link_to 'Course templates', course_templates_path %>
-                  </li>
-                <% end %>
-                <li>
-                  <%= link_to "My account (#{current_user.username})", user_path %>
-                </li>
-                <li>
-                  <%= link_to 'My stats', participant_path(current_user) %>
-                </li>
-                <li>
-                  <%= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link' %>
-                </li>
-              <% elsif !(params[:controller] == 'sessions' && params[:action] == 'new') %>
-                <%= render 'sessions/login_form' %>
-                <% if can? :create, User %>
-                  <li>
-                    <%= link_to 'Sign up', new_user_path %>
-                  </li>
-                  <li>
-                    <%= link_to 'Forgot password', new_password_reset_key_path %>
-                  </li>
-                <% end %>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="everything">
-      <div class="container container-fluid well-large" id="content-area">
-        <div id="breadcrumb">
-          <div class="row-fluid">
-            <div class="span12">
-              <%= render 'twitter-bootstrap/breadcrumbs' %>
+    <div class="everything-wrapper">
+      <%= render partial: 'layouts/navigation' %>
+        <div id="everything">
+          <div class="container container-fluid well-large" id="content-area">
+            <div id="breadcrumb">
+              <div class="row">
+                <div class="col-md-12">
+                  <%= render 'twitter-bootstrap/breadcrumbs' %>
+                </div>
+              </div>
             </div>
+            <% if @show_page_presence %>
+              <div id="page-presence"></div>
+            <% end %>
+            <%= bootstrap_flash %>
+            <%= yield %>
+            <br>
           </div>
         </div>
-        <% if @show_page_presence %>
-          <div id="page-presence"></div>
-        <% end %>
-        <%= bootstrap_flash %>
-        <%= yield %>
+        <div class="everything-push"></div>
       </div>
-    </div>
+    <%= render partial: 'layouts/footer' %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.1.0/highlightjs-line-numbers.min.js" integrity="sha256-ORy35NeVPhp5u86UDEs69WrNPjYJ899tayoT/y0NJ/I=" crossorigin="anonymous"></script>
+    <script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+    </script>
   </body>
 </html>
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ExtraField, type: :model do
@@ -9,16 +11,16 @@ describe ExtraField, type: :model do
   end
 
   def use_default_config
-    use_config <<EOS
-group 'Grp' do
-  field(:name => 'one', :field_type => 'text', :label => 'Field One')
-  field(:name => 'two', :field_type => 'boolean')
-end
-EOS
+    use_config <<~EOS
+      group 'Grp' do
+        field(:name => 'one', :field_type => 'text', :label => 'Field One')
+        field(:name => 'two', :field_type => 'boolean')
+      end
+    EOS
   end
 
   before :each do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     UserField.instance_variable_set('@all', nil)
     ExtraField.instance_variable_set('@fields', nil)
   end
@@ -73,12 +75,12 @@ EOS
     end
 
     it "won't take their values from forms if disabled or hidden" do
-      use_config <<EOS
-group 'Grp' do
-  field(:name => 'one', :field_type => 'text', :disabled => true)
-  field(:name => 'two', :field_type => 'boolean', :hidden => true)
-end
-EOS
+      use_config <<~EOS
+        group 'Grp' do
+          field(:name => 'one', :field_type => 'text', :disabled => true)
+          field(:name => 'two', :field_type => 'boolean', :hidden => true)
+        end
+      EOS
 
       textfield = ExtraField.by_kind(:user)[0]
       boolfield = ExtraField.by_kind(:user)[1]

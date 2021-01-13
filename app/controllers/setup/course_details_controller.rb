@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Setup::CourseDetailsController < Setup::SetupController
-  before_action :set_course, except: [:new, :create]
+  before_action :set_course, except: %i[new create]
 
   def new
     authorize! :teach, @organization
@@ -76,29 +78,27 @@ class Setup::CourseDetailsController < Setup::SetupController
   end
 
   private
+    def refresh_course(course, options = {})
+      # TODO: Could include course ID
 
-  def refresh_course(course, options = {})
-    # TODO: Could include course ID
-    begin
       session[:refresh_report] = course.refresh(options)
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
     end
-  end
 
-  def course_params_for_create_from_template
-    params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
-  end
-
-  def course_params_for_create_custom
-    params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
-  end
-
-  def course_params
-    if @course.custom?
-      params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
-    else
-      params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+    def course_params_for_create_from_template
+      params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
     end
-  end
+
+    def course_params_for_create_custom
+      params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
+    end
+
+    def course_params
+      if @course.custom?
+        params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
+      else
+        params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+      end
+    end
 end

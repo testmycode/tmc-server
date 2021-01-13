@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReviewMailer < ActionMailer::Base
   def review_email(review)
     settings = SiteSetting.value('emails')

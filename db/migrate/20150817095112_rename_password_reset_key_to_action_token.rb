@@ -1,4 +1,4 @@
-class RenamePasswordResetKeyToActionToken < ActiveRecord::Migration
+class RenamePasswordResetKeyToActionToken < ActiveRecord::Migration[4.2]
 
   class ActionToken < ActiveRecord::Base
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 require 'shellwords'
 
@@ -33,7 +35,7 @@ class FixtureExercise
     FileUtils.rm_rf @path if File.exist? @path
 
     if @path.include?(self.class.fixture_exercises_root)
-      fail "Don't create #{self.class} to refer to the fixture. Give it a nonexistent path where it'll create a copy."
+      raise "Don't create #{self.class} to refer to the fixture. Give it a nonexistent path where it'll create a copy."
     end
 
     ensure_fixture_clean
@@ -79,76 +81,77 @@ class FixtureExercise
   end
 
   private
+    def copy_from_fixture
+      FileUtils.mkdir_p(path)
 
-  def copy_from_fixture
-    FileUtils.mkdir_p(path)
-
-    copy_libs
-    copy_gitignore
-    copy_src
-    copy_tests
-    copy_tmcproject
-  end
-
-  def common_files_path
-    "#{self.class.fixture_exercises_root}/common_files"
-  end
-
-  def copy_libs
-    # hard link instead as a small optimization
-
-    FileUtils.rm_rf("#{path}/lib")
-    FileUtils.rm_rf("#{path}/nbproject")
-
-    FileUtils.mkdir_p("#{path}/lib")
-    Dir.glob("#{common_files_path}/lib/*.jar") do |file|
-      FileUtils.ln(file, "#{path}/lib/")
+      copy_libs
+      copy_gitignore
+      copy_src
+      copy_tests
+      copy_tmcproject
     end
-    FileUtils.ln(File.join(common_files_path,'build.xml'), File.join(path, 'build.xml'))
-    FileUtils.mkdir_p("#{path}/nbproject")
-    Dir.glob("#{common_files_path}/nbproject/*") do |file|
-      FileUtils.ln(file, "#{path}/nbproject/")
+
+    def common_files_path
+      "#{self.class.fixture_exercises_root}/common_files"
     end
-  end
 
-  def copy_gitignore
-    gitignore = File.join path, '.gitignore'
-    FileUtils.rm_rf gitignore if File.exist? gitignore
-    FileUtils.ln("#{common_files_path}/.gitignore", gitignore)
-  end
+    def copy_libs
+      # hard link instead as a small optimization
 
-  def copy_src
-    FileUtils.cp_r("#{fixture_path}/src", "#{path}/src")
-  end
+      FileUtils.rm_rf("#{path}/lib")
+      FileUtils.rm_rf("#{path}/nbproject")
 
-  def copy_tests
-    FileUtils.cp_r("#{fixture_path}/test", "#{path}/test")
-  end
-
-  def copy_tmcproject
-    copy_if_exists("#{fixture_path}/.tmcproject.json", "#{path}/.tmcproject.json")
-    copy_if_exists("#{fixture_path}/.tmcproject.yml", "#{path}/.tmcproject.yml")
-  end
-
-  def copy_if_exists(from, to)
-    FileUtils.cp(from, to) if File.exist?(from)
-  end
-
-  def ensure_fixture_clean
-    Dir.chdir fixture_path do
-      system!('ant clean > /dev/null 2>&1')
-    end unless fixture_clean?
-  end
-
-  def fixture_clean?
-    @@clean_fixtures ||= {}
-    @@clean_fixtures[fixture_path] ||= !fixture_contains_class_files?
-  end
-
-  def fixture_contains_class_files?
-    Find.find(fixture_path) do |file|
-      return true if file.end_with?('.class')
+      FileUtils.mkdir_p("#{path}/lib")
+      Dir.glob("#{common_files_path}/lib/*.jar") do |file|
+        FileUtils.ln(file, "#{path}/lib/")
+      end
+      FileUtils.ln(File.join(common_files_path, 'build.xml'), File.join(path, 'build.xml'))
+      FileUtils.mkdir_p("#{path}/nbproject")
+      Dir.glob("#{common_files_path}/nbproject/*") do |file|
+        FileUtils.ln(file, "#{path}/nbproject/")
+      end
     end
-    false
-  end
+
+    def copy_gitignore
+      gitignore = File.join path, '.gitignore'
+      FileUtils.rm_rf gitignore if File.exist? gitignore
+      FileUtils.ln("#{common_files_path}/.gitignore", gitignore)
+    end
+
+    def copy_src
+      FileUtils.cp_r("#{fixture_path}/src", "#{path}/src")
+    end
+
+    def copy_tests
+      FileUtils.cp_r("#{fixture_path}/test", "#{path}/test")
+    end
+
+    def copy_tmcproject
+      copy_if_exists("#{fixture_path}/.tmcproject.json", "#{path}/.tmcproject.json")
+      copy_if_exists("#{fixture_path}/.tmcproject.yml", "#{path}/.tmcproject.yml")
+    end
+
+    def copy_if_exists(from, to)
+      FileUtils.cp(from, to) if File.exist?(from)
+    end
+
+    def ensure_fixture_clean
+      unless fixture_clean?
+        Dir.chdir fixture_path do
+          system!('ant clean > /dev/null 2>&1')
+        end
+      end
+    end
+
+    def fixture_clean?
+      @@clean_fixtures ||= {}
+      @@clean_fixtures[fixture_path] ||= !fixture_contains_class_files?
+    end
+
+    def fixture_contains_class_files?
+      Find.find(fixture_path) do |file|
+        return true if file.end_with?('.class')
+      end
+      false
+    end
 end

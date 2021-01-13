@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BackgroundCourseRefresher
   # Called periodically by script/background_daemon, does full refresh on courses which
   # still need full initial refresh.
@@ -9,7 +11,7 @@ class BackgroundCourseRefresher
         course.initial_refresh_ready = true
         course.save!
         Rails.logger.info "Finished background refresh on course id #{course.id}"
-      rescue => e
+      rescue StandardError => e
         Rails.logger.warn "Background refresh on course id #{course.id} failed!. Error #{e}"
       end
     end

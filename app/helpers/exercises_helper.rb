@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module ExercisesHelper
   def exercise_zip_url(e)
-    "#{exercise_url(e, format: 'zip')}"
+    exercise_url(e, format: 'zip').to_s
   end
 
   def exercise_solution_zip_url(e)
-    "#{exercise_solution_url(e, format: 'zip')}"
+    exercise_solution_url(e, format: 'zip').to_s
   end
 
   def green(percentage)

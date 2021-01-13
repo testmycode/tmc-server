@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'exercise_dir'
 require 'tempfile'
 
@@ -25,6 +27,10 @@ class ExerciseDir
     def has_tests?
       File.exist?("#{@path}/src/test/java") &&
         !(Dir.entries("#{@path}/src/test/java") - ['.', '..', '.gitkeep', '.gitignore']).empty?
+    end
+
+    def safe_for_experimental_sandbox
+      true
     end
   end
 end

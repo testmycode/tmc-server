@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise')
 
@@ -37,27 +39,26 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
   end
 
   private
+    alias old_copy_from_fixture copy_from_fixture
 
-  alias_method :old_copy_from_fixture, :copy_from_fixture
-
-  def copy_from_fixture
-    old_copy_from_fixture
-    copy_makefile
-  end
-
-  def copy_makefile
-    FileUtils.cp_r("#{fixture_path}/Makefile", "#{path}/Makefile")
-  end
-
-  def replace_method_body_in_file(path, method, body)
-    lines = IO.readlines(path)
-    lines = lines.map do |line|
-      if line.include? "METHOD BODY #{method}"
-        body + " // METHOD BODY #{method}\n"
-      else
-        line
-      end
+    def copy_from_fixture
+      old_copy_from_fixture
+      copy_makefile
     end
-    File.open(path, 'wb') { |f| f.write(lines.join) }
-  end
+
+    def copy_makefile
+      FileUtils.cp_r("#{fixture_path}/Makefile", "#{path}/Makefile")
+    end
+
+    def replace_method_body_in_file(path, method, body)
+      lines = IO.readlines(path)
+      lines = lines.map do |line|
+        if line.include? "METHOD BODY #{method}"
+          body + " // METHOD BODY #{method}\n"
+        else
+          line
+        end
+      end
+      File.open(path, 'wb') { |f| f.write(lines.join) }
+    end
 end

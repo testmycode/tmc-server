@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ActionToken, type: :model do
   before :each do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     @way_in_the_past = Time.now - 3.days
   end
 
@@ -29,7 +31,7 @@ describe ActionToken, type: :model do
       expect(ActionToken.where(id: key_id)).to be_empty
     end
 
-    it "should be expired when expires_at time is passed" do
+    it 'should be expired when expires_at time is passed' do
       key = ActionToken.create!(user: @user, action: :reset_password, expires_at: Time.now + 24.hours)
       expect(key).not_to be_expired
       key.expires_at = Time.now - 1.minute

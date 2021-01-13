@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Organizations
@@ -22,7 +24,7 @@ module Api
                 response 403, '$ref': '#/responses/error'
                 response 404, '$ref': '#/responses/error'
                 response 200 do
-                  key :description, 'User\'s submissions in json'
+                  key :description, "User's submissions in json"
                   schema do
                     key :title, :submissions
                     key :required, [:submissions]
@@ -39,7 +41,7 @@ module Api
 
             swagger_path '/api/v8/org/{organization_slug}/courses/{course_name}/users/current/submissions' do
               operation :get do
-                key :description, 'Returns the user\'s own submissions in a json format'
+                key :description, "Returns the user's own submissions in a json format"
                 key :operationId, 'findUsersOwnSubmissionsByCourseName'
                 key :produces, [
                   'application/json'
@@ -52,7 +54,7 @@ module Api
                 response 403, '$ref': '#/responses/error'
                 response 404, '$ref': '#/responses/error'
                 response 200 do
-                  key :description, 'User\'s own submissions in json'
+                  key :description, "User's own submissions in json"
                   schema do
                     key :title, :submissions
                     key :required, [:submissions]

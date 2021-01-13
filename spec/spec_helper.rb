@@ -1,47 +1,28 @@
+# frozen_string_literal: true
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 require 'rspec/rails'
 require 'database_cleaner'
 require 'etc'
 require 'fileutils'
 require 'capybara/poltergeist'
 require 'simplecov'
-require 'rspec_remote_formatter'
-SimpleCov.start 'rails'
+# require 'rspec_remote_formatter'
+SimpleCov.start 'rails' do
+  add_filter '/bin/'
+  add_filter '/db/'
+  add_filter '/spec/'
+end
+
+Rack::Attack.enabled = false
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
-
 # Require everything in lib too.
-Dir[Rails.root.join('lib/**/*.rb')].each { |f| require f }
-
-# Sandboxes must be started as root.
-# We infer the actual user from Etc.getlogin or the owner of ::Rails.root.
-proc do
-  if ENV['SANDBOX_HOST'] && ENV['SANDBOX_PORT']
-    RemoteSandboxForTesting.use_server_at(ENV['SANDBOX_HOST'], ENV['SANDBOX_PORT'])
-  else
-    fail 'Please run tests under sudo (or rvmsudo)' if Process.uid != 0
-
-    user = File.stat(::Rails.root).uid
-    group = Etc.getpwuid(user).gid
-
-    RemoteSandboxForTesting.init_servers_as_root!(user, group)
-
-    # Ensure tmp and tmp/tests are created with correct permissions
-    FileUtils.mkdir_p('tmp/tests')
-    FileUtils.chown(user, group, 'tmp')
-    FileUtils.chown(user, group, 'tmp/tests')
-    FileUtils.chown(user, group, 'log')
-    FileUtils.chown(user, group, 'log/test.log') if File.exist? 'log/test.log'
-    FileUtils.chown(user, group, 'log/test_cometd.log') if File.exist? 'log/test_cometd.log'
-
-    # Drop root
-    Process::Sys.setreuid(user, user)
-  end
-end.call
+# Dir[Rails.root.join('lib/**/*.rb')].each { |f| require f }
 
 # Use :selenium this if you want to see what's going on and don't feel like screenshotting
 # Otherwise :poltergeist with PhantomJS is somewhat faster and doesn't pop up in your face.
@@ -53,8 +34,9 @@ Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app, timeout: 60)
 end
 
- Capybara.default_driver = :poltergeist
+Capybara.default_driver = :poltergeist
 
+Capybara.server = :webrick
 Capybara.server_port = FreePorts.take_next
 Capybara.default_max_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
@@ -70,12 +52,12 @@ end
 if ENV['M3_HOME'].blank?
   maven_home = get_m3_home
   warn "$M3_HOME is not set, trying with #{maven_home} - however, maven tests might be failing"
-  ENV['M3_HOME']= maven_home
+  ENV['M3_HOME'] = maven_home
 end
 
-def without_db_notices(&block)
+def without_db_notices
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
-  block.call
+  yield
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'notice'")
 end
 
@@ -88,34 +70,33 @@ def host_ip
 end
 
 # This makes it visible to others
-if ENV['MULTI_HOST_SETUP']
-  Capybara.server_host = '0.0.0.0'
+Capybara.server_host = if ENV['MULTI_HOST_SETUP']
+  '0.0.0.0'
 else
-  Capybara.server_host = host_ip
+  host_ip
 end
 
 RSpec.configure do |config|
   config.mock_with :rspec
 
+  config.raise_errors_for_deprecations!
   config.use_transactional_fixtures = false
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
   config.include Capybara::DSL
 
   config.before(:each) do |context|
     allow(Tailoring).to receive_messages(get: Tailoring.new)
     SiteSetting.use_distribution_defaults!
+    SiteSetting.all_settings['administrative_email'] = 'test@example.com'
 
     if context.metadata[:integration] || context.metadata[:feature]
       # integration tests can't use transaction since the webserver must see the changes
       DatabaseCleaner.strategy = :truncation
 
-      SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://#{host_ip}:#{Capybara.server_port}"
+      # SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://#{host_ip}:#{Capybara.server_port}"
+      SiteSetting.all_settings['baseurl_for_remote_sandboxes'] = "http://#{host_ip}:3000/"
+      SiteSetting.all_settings['remote_sandboxes'] = ["http://#{host_ip}:3232/"]
       SiteSetting.all_settings['emails']['email_code_reviews_by_default'] = false
-      SiteSetting.all_settings['comet_server'] = {
-        'url' => "http://localhost:#{CometSupport.port}/",
-        'backend_key' => CometSupport.backend_key,
-        'my_baseurl' => "http://localhost:#{Capybara.server_port}/"
-      }
     else
       DatabaseCleaner.strategy = :transaction
     end
@@ -134,7 +115,7 @@ RSpec.configure do |config|
 end
 
 # Ensure the DB is clean
-DatabaseCleaner.strategy = :truncation
+DatabaseCleaner.strategy = :truncation # May cause problems with multiple processes
 DatabaseCleaner.start
 without_db_notices do
   DatabaseCleaner.clean

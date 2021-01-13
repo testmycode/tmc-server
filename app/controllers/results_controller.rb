@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_run_grader'
 require 'sandbox_results_saver'
 
@@ -10,13 +12,14 @@ class ResultsController < ApplicationController
 
     # The sandbox output may contain broken characters e.g. if the student
     # pointed a C char* towards some patch of interesting memory :)
-    filtered_params = Hash[params.map do |k, v|
-      [k, view_context.force_utf8_violently(v)]
+    filtered_params = Hash[(params.keys - ['result']).map do |k|
+      [k, view_context.force_utf8_violently(params[k])]
     end]
 
     SandboxResultsSaver.save_results(submission, filtered_params)
+    Rails.cache.delete("api_v8_core_submission_show_#{submission.id}_user_#{submission.user.id}")
   rescue SandboxResultsSaver::InvalidTokenError
-    respond_access_denied('Invalid or expired token')
+    respond_unauthorized('Invalid or expired token')
   else
     render json: 'OK', layout: false
   end

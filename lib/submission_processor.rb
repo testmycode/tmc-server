@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Attempts to send submissions for processing to a free tmc-sandbox.
 # Also called by the reprocessor background task to attempt reprocessing if
 # the sandbox was previously unavailable.
@@ -12,15 +14,15 @@ class SubmissionProcessor
       submission.processing_began_at = Time.now
       submission.times_sent_to_sandbox += 1
       submission.save!
+      Rails.logger.info "Submission #{submission.id} sent to sandbox."
     end
   end
 
   # Called periodically by script/background_daemon.
-  # It tries to resend submissions to a sandbox if enough time has passed
-  # since the last attempt.
-  def reprocess_timed_out_submissions
-    Submission.to_be_reprocessed.limit(RemoteSandbox.total_capacity).each do |submission|
-      Rails.logger.info "Attempting to reprocess submission #{submission.id}"
+  # It tries to send submissions to a sandbox
+  def process_some_submissions
+    Submission.to_be_reprocessed.limit(2).each do |submission|
+      Rails.logger.info "Attempting to process submission #{submission.id}"
 
       if submission.times_sent_to_sandbox < Submission.max_attempts_at_processing
         process_submission(submission)

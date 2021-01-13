@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 # Stores when a point (course_id, name) has been awared to a particular user.
 #
 # There is a reference to the submission that first awarded the point, but this
 # reference can be nil if the submission has been deleted.
 
-class AwardedPoint < ActiveRecord::Base
+class AwardedPoint < ApplicationRecord
   include PointComparison
   include Swagger::Blocks
 
   swagger_schema :AwardedPoint do
-    key :required, [:id, :course_id, :user_id, :submission_id, :name, :created_at]
+    key :required, %i[id course_id user_id submission_id name created_at]
 
     property :id, type: :integer, example: 1
     property :course_id, type: :integer, example: 1
@@ -19,18 +21,18 @@ class AwardedPoint < ActiveRecord::Base
   end
 
   def point_as_json
-    as_json only: [
-      :id,
-      :course_id,
-      :user_id,
-      :submission_id,
-      :name,
-      :created_at
+    as_json only: %i[
+      id
+      course_id
+      user_id
+      submission_id
+      name
+      created_at
     ]
   end
 
   swagger_schema :AwardedPointWithExerciseId do
-    key :required, [:awarded_point, :exercise_id]
+    key :required, %i[awarded_point exercise_id]
 
     property :awarded_point do
       key :"$ref", :AwardedPoint
@@ -48,6 +50,9 @@ class AwardedPoint < ActiveRecord::Base
   belongs_to :course
   belongs_to :user
   belongs_to :submission
+
+  after_save :kafka_update_points
+  after_destroy :kafka_update_points
 
   def self.exercise_user_points(exercise, user)
     return none if exercise.hide_submission_results
@@ -148,10 +153,10 @@ class AwardedPoint < ActiveRecord::Base
     ActiveRecord::Base.connection.execute(sql).each do |record|
       result[record['username']] ||= []
       result[record['username']] << if opts[:show_timestamps]
-                                      { point: record['name'], time: record['time'] }
-                                    else
-                                      record['name']
-                                    end
+        { point: record['name'], time: record['time'] }
+      else
+        record['name']
+      end
     end
     result.default = []
     result
@@ -223,4 +228,12 @@ class AwardedPoint < ActiveRecord::Base
     q = q.where(exercises[:hide_submission_results].eq(false).or(exercises[:id].eq(nil))) unless hidden
     q
   end
+
+  private
+    def kafka_update_points
+      return unless self.course.moocfi_id
+      exercise = self.submission.exercise
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_progress')
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_points')
+    end
 end

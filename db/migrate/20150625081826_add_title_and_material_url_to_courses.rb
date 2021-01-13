@@ -1,4 +1,4 @@
-class AddTitleAndMaterialUrlToCourses < ActiveRecord::Migration
+class AddTitleAndMaterialUrlToCourses < ActiveRecord::Migration[4.2]
 
   class Course < ActiveRecord::Base
   end

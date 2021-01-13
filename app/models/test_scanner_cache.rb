@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Caches results from scanning for tests.
 #
 # CourseRefresher needs to find the available points in the tests.
@@ -10,10 +12,10 @@ class TestScannerCache
     entries = course.test_scanner_cache_entries.where(exercise_name: exercise_name)
     if entries.size == 1
       entry = entries.first
-    elsif entries.size == 0
+    elsif entries.empty?
       entry = TestScannerCacheEntry.new(course: course, exercise_name: exercise_name)
     else
-      fail 'TestScannerCache has a duplicate entry. Uniqueness has not been enforced.'
+      raise 'TestScannerCache has a duplicate entry. Uniqueness has not been enforced.'
     end
 
     if entry.files_hash == files_hash
@@ -31,17 +33,16 @@ class TestScannerCache
   end
 
   private
+    def self.try_save(entry)
+      entry.save!
+    rescue ActiveRecord::RecordNotUnique
+      result
+    rescue StandardError
+      ActiveRecord::Base.logger.warn('Failed to add entry to TestScannerCache.')
+      ActiveRecord::Base.logger.warn($!)
+    end
 
-  def self.try_save(entry)
-    entry.save!
-  rescue ActiveRecord::RecordNotUnique
-    result
-  rescue
-    ActiveRecord::Base.logger.warn('Failed to add entry to TestScannerCache.')
-    ActiveRecord::Base.logger.warn($!)
-  end
-
-  def self.decode_value(value)
-    JSON.parse(value, symbolize_names: true)
-  end
+    def self.decode_value(value)
+      JSON.parse(value, symbolize_names: true)
+    end
 end

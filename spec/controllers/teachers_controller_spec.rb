@@ -1,23 +1,25 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TeachersController, type: :controller do
   before :each do
-    @user = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
-    @teacher = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
+    @admin = FactoryBot.create(:admin)
+    @teacher = FactoryBot.create(:user)
   end
 
   describe 'As a teacher' do
     describe 'with an accepted organization' do
       before :each do
-        @organization = FactoryGirl.create(:accepted_organization)
+        @organization = FactoryBot.create(:accepted_organization)
         @teachership = Teachership.create!(user: @teacher, organization: @organization)
         controller.current_user = @teacher
       end
 
       describe 'GET index' do
         it 'lists teachers in organization' do
-          get :index, organization_id: @organization.slug
+          get :index, params: { organization_id: @organization.slug }
           expect(assigns(:teachers)).to eq([@teacher])
         end
       end
@@ -25,19 +27,19 @@ describe TeachersController, type: :controller do
       describe 'POST create' do
         it 'with a valid username creates a new teachership' do
           expect do
-            post :create, organization_id: @organization.slug, username: @user.username
+            post :create, params: { organization_id: @organization.slug, username: @user.username, email: @user.email }
           end.to change(Teachership, :count).by(1)
         end
 
-        it 'with a invalid username doesn\'t create a new teachership' do
+        it "with a invalid username doesn't create a new teachership" do
           expect do
-            post :create, organization_id: @organization.slug, username: 'invalid'
+            post :create, params: { organization_id: @organization.slug, username: 'invalid' }
           end.to change(Teachership, :count).by(0)
         end
 
         it 'with a username that already is a teacher in the organization' do
           expect do
-            post :create, organization_id: @organization.slug, username: @teacher.username
+            post :create, params: { organization_id: @organization.slug, username: @teacher.username }
           end.to change(Teachership, :count).by(0)
         end
       end
@@ -45,7 +47,7 @@ describe TeachersController, type: :controller do
       describe 'DELETE destroy' do
         it 'destroys teachership' do
           expect do
-            delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
+            delete :destroy, params: { organization_id: @organization.slug, id: @teachership.to_param }
           end.to change(Teachership, :count).by(-1)
         end
       end
@@ -54,29 +56,29 @@ describe TeachersController, type: :controller do
 
   describe 'As a user' do
     before :each do
-      @organization = FactoryGirl.create(:accepted_organization)
+      @organization = FactoryBot.create(:accepted_organization)
       @teachership = Teachership.create!(user: @teacher, organization: @organization)
       controller.current_user = @user
     end
 
     describe 'GET index' do
       it 'denies access' do
-        get :index, organization_id: @organization.slug
-        expect(response.code.to_i).to eq(401)
+        get :index, params: { organization_id: @organization.slug }
+        expect(response.code.to_i).to eq(403)
       end
     end
 
     describe 'POST create' do
       it 'denies access' do
-        post :create, organization_id: @organization.slug
-        expect(response.code.to_i).to eq(401)
+        post :create, params: { organization_id: @organization.slug }
+        expect(response.code.to_i).to eq(403)
       end
     end
 
     describe 'DELETE destroy' do
       it 'denies access' do
-        delete :destroy, organization_id: @organization.slug, id: @teachership.to_param
-        expect(response.code.to_i).to eq(401)
+        delete :destroy, params: { organization_id: @organization.slug, id: @teachership.to_param }
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

@@ -1,4 +1,6 @@
-class FeedbackQuestion < ActiveRecord::Base
+# frozen_string_literal: true
+
+class FeedbackQuestion < ApplicationRecord
   include Orderable
 
   belongs_to :course
@@ -18,9 +20,9 @@ class FeedbackQuestion < ActiveRecord::Base
 
   def intrange
     if kind =~ intrange_regex
-      ($1.to_i)..($2.to_i)
+      (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
     else
-      fail 'not an intrange question'
+      raise 'not an intrange question'
     end
   end
 
@@ -33,18 +35,15 @@ class FeedbackQuestion < ActiveRecord::Base
   end
 
   private
-
-  def intrange_regex
-    self.class.intrange_regex
-  end
-
-  def self.intrange_regex
-    /^intrange\[(-?\d+)\.\.(-?\d+)\]$/
-  end
-
-  def validate_kind
-    unless kind == 'text' || kind =~ intrange_regex
-      errors[:kind] << 'invalid'
+    def intrange_regex
+      self.class.intrange_regex
     end
-  end
+
+    def self.intrange_regex
+      /^intrange\[(-?\d+)\.\.(-?\d+)\]$/
+    end
+
+    def validate_kind
+      errors[:kind] << 'invalid' unless kind == 'text' || kind =~ intrange_regex
+    end
 end

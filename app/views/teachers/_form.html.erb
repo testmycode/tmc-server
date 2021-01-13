@@ -1,12 +1,13 @@
-<h4>Add a new teacher (give username)</h4>
+<h4>Add a new teacher</h4>
 
 <%= form_tag :organization_teachers do %>
   <%= render 'shared/error_messages', target: @teachership %>
 
-  <div class="field">
-    <%= text_field_tag :username %>
+  <div class="form-group">
+    <%= label nil, :email %>
+    <%= text_field_tag :email, nil, class: 'form-control' %>
   </div>
   <div class="actions">
-    <%= submit_tag 'Add a new teacher', class: 'btn btn-mini' %>
+    <%= submit_tag 'Add a new teacher', class: 'btn btn-primary' %>
   </div>
 <% end %>

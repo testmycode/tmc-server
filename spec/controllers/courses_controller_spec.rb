@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe CoursesController, type: :controller do
@@ -8,16 +10,16 @@ describe CoursesController, type: :controller do
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     @source_url = "file://#{@source_path}"
     create_bare_repo(@repo_path)
-    @user = FactoryGirl.create(:user)
-    @teacher = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
-    @organization = FactoryGirl.create(:accepted_organization)
+    @user = FactoryBot.create(:user)
+    @teacher = FactoryBot.create(:user)
+    @admin = FactoryBot.create(:admin)
+    @organization = FactoryBot.create(:accepted_organization)
     Teachership.create(user: @teacher, organization: @organization)
   end
 
   describe 'GET index' do
     it 'shows visible courses in order by name, split into ongoing and expired' do
-      get :index, organization_id: @organization.slug
+      get :index, params: { organization_id: @organization.slug }
       expect(response.code.to_i).to eq(302)
       expect(response).to redirect_to(organization_path(@organization))
     end
@@ -30,27 +32,27 @@ describe CoursesController, type: :controller do
           organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = 'Basic ' + Base64.encode64("#{@user.login}:#{@user.password}")
-        get :index, options
+        get :index, params: options
         JSON.parse(response.body)
       end
 
       it 'renders all non-hidden courses in order by name' do
-        FactoryGirl.create(:course, name: 'Course1', organization: @organization)
-        FactoryGirl.create(:course, name: 'Course2', organization: @organization, hide_after: Time.now + 1.week)
-        FactoryGirl.create(:course, name: 'Course3', organization: @organization)
-        FactoryGirl.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
-        FactoryGirl.create(:course, name: 'HiddenCourse', hidden: true)
+        FactoryBot.create(:course, name: 'Course1', organization: @organization)
+        FactoryBot.create(:course, name: 'Course2', organization: @organization, hide_after: Time.now + 1.week)
+        FactoryBot.create(:course, name: 'Course3', organization: @organization)
+        FactoryBot.create(:course, name: 'ExpiredCourse', hide_after: Time.now - 1.week)
+        FactoryBot.create(:course, name: 'HiddenCourse', hidden: true)
 
         result = get_index_json
 
-        expect(result['courses'].map { |c| c['name'] }).to eq(%w(Course1 Course2 Course3))
+        expect(result['courses'].map { |c| c['name'] }).to eq(%w[Course1 Course2 Course3])
       end
     end
   end
 
   describe 'GET show' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryBot.create(:course)
     end
 
     describe 'for administrators' do
@@ -59,12 +61,12 @@ describe CoursesController, type: :controller do
       end
 
       it "should show everyone's submissions" do
-        user1 = FactoryGirl.create(:user)
-        user2 = FactoryGirl.create(:user)
-        sub1 = FactoryGirl.create(:submission, user: user1, course: @course)
-        sub2 = FactoryGirl.create(:submission, user: user2, course: @course)
+        user1 = FactoryBot.create(:user)
+        user2 = FactoryBot.create(:user)
+        sub1 = FactoryBot.create(:submission, user: user1, course: @course)
+        sub2 = FactoryBot.create(:submission, user: user2, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.id
+        get :show, params: { organization_id: @organization.slug, id: @course.id }
 
         expect(assigns['submissions']).to include(sub1)
         expect(assigns['submissions']).to include(sub2)
@@ -77,10 +79,10 @@ describe CoursesController, type: :controller do
       end
 
       it 'should show no submissions' do
-        FactoryGirl.create(:submission, course: @course)
-        FactoryGirl.create(:submission, course: @course)
+        FactoryBot.create(:submission, course: @course)
+        FactoryBot.create(:submission, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.id
+        get :show, params: { organization_id: @organization.slug, id: @course.id }
 
         expect(assigns['submissions']).to be_nil
       end
@@ -91,11 +93,11 @@ describe CoursesController, type: :controller do
         controller.current_user = @user
       end
       it "should show only the current user's submissions" do
-        other_user = FactoryGirl.create(:user)
-        my_sub = FactoryGirl.create(:submission, user: @user, course: @course)
-        other_guys_sub = FactoryGirl.create(:submission, user: other_user, course: @course)
+        other_user = FactoryBot.create(:user)
+        my_sub = FactoryBot.create(:submission, user: @user, course: @course)
+        other_guys_sub = FactoryBot.create(:submission, user: other_user, course: @course)
 
-        get :show, organization_id: @organization.slug, id: @course.id
+        get :show, params: { organization_id: @organization.slug, id: @course.id }
 
         expect(assigns['submissions']).to include(my_sub)
         expect(assigns['submissions']).not_to include(other_guys_sub)
@@ -104,10 +106,10 @@ describe CoursesController, type: :controller do
 
     describe 'in JSON format' do
       before :each do
-        @course = FactoryGirl.create(:course, name: 'Course1')
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: @course)
-        @course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: @course)
+        @course = FactoryBot.create(:course, name: 'Course1')
+        @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: @course)
+        @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise2', course: @course)
+        @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise3', course: @course)
       end
 
       def get_show_json(options = {}, parse_json = true)
@@ -118,7 +120,7 @@ describe CoursesController, type: :controller do
           organization_id: @organization.slug
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
-        get :show, options
+        get :show, params: options
         if parse_json
           JSON.parse(response.body)
         else
@@ -160,8 +162,8 @@ describe CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been attempted' do
-        sub = FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user)
-        FactoryGirl.create(:test_case_run, submission: sub, successful: false)
+        sub = FactoryBot.create(:submission, course: @course, exercise: @course.exercises[0], user: @user)
+        FactoryBot.create(:test_case_run, submission: sub, successful: false)
 
         result = get_show_json
 
@@ -171,7 +173,7 @@ describe CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been completed' do
-        FactoryGirl.create(:submission, course: @course, exercise: @course.exercises[0], user: @user, all_tests_passed: true)
+        FactoryBot.create(:submission, course: @course, exercise: @course.exercises[0], user: @user, all_tests_passed: true)
 
         result = get_show_json
 
@@ -203,27 +205,27 @@ describe CoursesController, type: :controller do
 
   describe 'POST refresh' do
     before :each do
-      controller.current_user = FactoryGirl.create :user
+      controller.current_user = FactoryBot.create :user
       Teachership.create user: controller.current_user, organization: @organization
-      @template = FactoryGirl.create :course_template
+      @template = FactoryBot.create :course_template
     end
 
-    it 'can\'t refresh if course created from template' do
-      @course = FactoryGirl.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
-      post :refresh, organization_id: @organization.slug, id: @course.id
-      expect(response.code.to_i).to eq(401)
+    it "can't refresh if course created from template" do
+      @course = FactoryBot.create :course, organization: @organization, course_template: @template, source_url: @template.source_url
+      post :refresh, params: { organization_id: @organization.slug, id: @course.id }
+      expect(response.code.to_i).to eq(403)
     end
   end
 
   describe 'POST disable' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryBot.create(:course)
     end
 
     describe 'As a teacher' do
       it 'disables the course' do
         controller.current_user = @teacher
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
+        post :disable, params: { organization_id: @organization.slug, id: @course.id.to_s }
         expect(Course.find(@course.id).disabled?).to eq(true)
       end
     end
@@ -231,21 +233,21 @@ describe CoursesController, type: :controller do
     describe 'As a student' do
       it 'denies access' do
         controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(response.code.to_i).to eq(401)
+        post :disable, params: {  organization_id: @organization.slug, id: @course.id.to_s }
+        expect(response.code.to_i).to eq(403)
       end
     end
   end
 
   describe 'POST enable' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryBot.create(:course)
     end
 
     describe 'As a teacher' do
       it 'enables the course' do
         controller.current_user = @teacher
-        post :enable, organization_id: @organization.slug, id: @course.id.to_s
+        post :enable, params: { organization_id: @organization.slug, id: @course.id.to_s }
         expect(Course.find(@course.id).disabled?).to eq(false)
       end
     end
@@ -253,15 +255,15 @@ describe CoursesController, type: :controller do
     describe 'As a student' do
       it 'denies access' do
         controller.current_user = @user
-        post :disable, organization_id: @organization.slug, id: @course.id.to_s
-        expect(response.code.to_i).to eq(401)
+        post :disable, params: { organization_id: @organization.slug, id: @course.id.to_s }
+        expect(response.code.to_i).to eq(403)
       end
     end
   end
 
   describe 'POST save_deadlines' do
     before :each do
-      @course = FactoryGirl.create :course, organization: @organization
+      @course = FactoryBot.create :course, organization: @organization
       Teachership.create(user: @user, organization: @organization)
       controller.current_user = @user
     end
@@ -271,13 +273,14 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'e2')
       @course.exercises.create(name: 'e3')
 
-      post :save_deadlines,
+      post :save_deadlines, params: {
            organization_id: @organization.slug,
            id: @course.id,
            empty_group: {
-               soft: { static: '1.1.2000', unlock: '' },
-               hard: { static: '', unlock: 'unlock + 2 weeks' }
+             soft: { static: '1.1.2000', unlock: '' },
+             hard: { static: '', unlock: 'unlock + 2 weeks' }
            }
+        }
 
       @course.exercise_group_by_name('').exercises(false).each do |e|
         expect(e.soft_static_deadline).to eq('1.1.2000')
@@ -294,19 +297,20 @@ describe CoursesController, type: :controller do
       @course.exercises.create(name: 'group2-e1')
       @course.exercises.create(name: 'group2-e2')
 
-      post :save_deadlines,
+      post :save_deadlines, params: {
            organization_id: @organization.slug,
            id: @course.id,
            group: {
-               group1: {
-                   soft: { static: '1.1.2000', unlock: 'unlock + 7 days' },
-                   hard: { static: '', unlock: 'unlock + 2 months' }
-               },
-               group2: {
-                   soft: { static: '2.2.2000', unlock: '' },
-                   hard: { static: '3.3.2000', unlock: '' }
-               }
+             group1: {
+               soft: { static: '1.1.2000', unlock: 'unlock + 7 days' },
+               hard: { static: '', unlock: 'unlock + 2 months' }
+             },
+             group2: {
+               soft: { static: '2.2.2000', unlock: '' },
+               hard: { static: '3.3.2000', unlock: '' }
+             }
            }
+          }
 
       @course.exercise_group_by_name('group1').exercises(false).each do |e|
         expect(e.soft_static_deadline).to eq('1.1.2000')
@@ -325,18 +329,18 @@ describe CoursesController, type: :controller do
   end
 
   describe 'GET manage_unlocks' do
-    it 'when non-teacher should respond with a 401' do
-      @course = FactoryGirl.create :course
+    it 'when non-teacher should respond with a 403' do
+      @course = FactoryBot.create :course
       @course.organization = @organization
       controller.current_user = @user
-      get :manage_unlocks, organization_id: @organization.slug, id: @course.id
-      expect(response.code.to_i).to eq(401)
+      get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
+      expect(response.code.to_i).to eq(403)
     end
   end
 
   describe 'POST save_unlocks' do
     before :each do
-      @course = FactoryGirl.create :course, organization: @organization
+      @course = FactoryBot.create :course, organization: @organization
       controller.current_user = @user
     end
 
@@ -350,7 +354,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { '0' => '1.2.2000' }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { '0' => '1.2.2000' } }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -363,7 +367,7 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'group1-e3')
         @course.exercises.create(name: 'group2-e1')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, group: { group1: { '0' => '1.2.2000' } }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, group: { group1: { '0' => '1.2.2000' } } }
 
         @course.exercise_group_by_name('group1').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_within(1.day).of Time.new(2000, 2, 1)
@@ -378,8 +382,8 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '' }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' } }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '' } }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           expect(e.unlock_spec_obj.valid_after).to be_nil
@@ -391,8 +395,8 @@ describe CoursesController, type: :controller do
         @course.exercises.create(name: 'e2')
         @course.exercises.create(name: 'e3')
 
-        post :save_unlocks, organization_id: @organization.slug, id: @course.id,
-             empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' }
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id,
+                            empty_group: { '0' => '1.2.2000', '1' => 'exercise e1', '2' => '5% of e2' } }
 
         @course.exercise_group_by_name('').exercises(false).each do |e|
           spec = e.unlock_spec_obj.raw_spec
@@ -403,22 +407,22 @@ describe CoursesController, type: :controller do
       end
     end
 
-    it 'when non-teacher should respond with a 401' do
+    it 'when non-teacher should respond with a 403' do
       @course.exercises.create(name: 'e')
-      post :save_unlocks, organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' }
-      expect(response.code.to_i).to eq(401)
+      post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, empty_group: { 0 => '1.2.2000' } }
+      expect(response.code.to_i).to eq(403)
     end
   end
 
   describe 'POST toggle_submission_result_visibility' do
     before :each do
-      @course = FactoryGirl.create :course, organization: @organization
+      @course = FactoryBot.create :course, organization: @organization
     end
 
     describe 'when teacher' do
       it 'toggles visibility of submsission results' do
         controller.current_user = @teacher
-        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        post :toggle_submission_result_visibility, params: { organization_id: @organization.slug, id: @course.id }
         @course.reload
         expect(@course.hide_submission_results).to be true
         expect(response).to redirect_to(organization_course_path)
@@ -429,7 +433,7 @@ describe CoursesController, type: :controller do
       it 'toggles visibility of submsission results' do
         Assistantship.create(user: @user, course: @course)
         controller.current_user = @user
-        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        post :toggle_submission_result_visibility, params: { organization_id: @organization.slug, id: @course.id }
         @course.reload
         expect(@course.hide_submission_results).to be true
         expect(response).to redirect_to(organization_course_path)
@@ -439,9 +443,9 @@ describe CoursesController, type: :controller do
     describe 'when non-teacher or non-admin' do
       it 'acces denied' do
         controller.current_user = @user
-        post :toggle_submission_result_visibility, organization_id: @organization.slug, id: @course.id
+        post :toggle_submission_result_visibility, params: { organization_id: @organization.slug, id: @course.id }
         @course.reload
-        expect(response.code.to_i).to eq(401)
+        expect(response.code.to_i).to eq(403)
       end
     end
   end

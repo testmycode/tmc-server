@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 
 # Represents a solution (files prepared by CourseRefresher).
@@ -12,22 +14,26 @@ class Solution
     @exercise.solution_path
   end
 
-  def visible_to?(user)
+  def visible_to?(user, ignore_email_verification = false)
     if user.administrator?
       true
+    elsif !ignore_email_verification && !user.email_verified?
+      false
     elsif !@exercise.course.organization.verified
       false
     elsif user.teacher?(@exercise.course.organization) || user.assistant?(@exercise.course)
       true
     elsif user.guest?
       false
+    elsif @exercise.course.hide_submission_results? || @exercise.hide_submission_results?
+      false
+    elsif @exercise.course.model_solution_visible_before_completion? && @exercise.course.enabled?
+      true
+    elsif @exercise.completed_by?(user)
+      true
     elsif !@exercise.course.visible_to?(user)
       false
     elsif !@exercise.visible_to?(user)
-      false
-    elsif @exercise.submittable_by?(user) && !@exercise.completed_by?(user)
-      false
-    elsif @exercise.course.hide_submission_results?
       false
     else
       show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')

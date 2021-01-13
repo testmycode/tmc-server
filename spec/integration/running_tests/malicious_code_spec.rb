@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe RemoteSandboxForTesting, type: :request, integration: true do
@@ -13,6 +15,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
 
   describe "when the student's code attempts to delete tests" do
     it 'should not leave tests unrun' do
+      skip 'Not working, requires sandbox setup for testing'
       setup = setup_and_run('malicious/TestDeleter')
       submission = setup.submission
 
@@ -29,6 +32,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
 
   describe "when the student's code does System.exit(0)" do
     it 'should report this as a likely cause for missing test results' do
+      skip 'Not working, requires sandbox setup for testing'
       setup = setup_and_run('malicious/Exit0')
       submission = setup.submission
 
@@ -38,6 +42,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
 
   describe "when the student's code does System.exit(1)" do
     it 'should report this as a likely cause for missing test results' do
+      skip 'Not working, requires sandbox setup for testing'
       setup = setup_and_run('malicious/Exit1')
       submission = setup.submission
 

@@ -1,6 +1,6 @@
 <h2>Migrate submissions from <%= @old_course.name %> to <%= @to_course.name %> ?</h2>
 
-<div class="hero-unit hero-unit-alert">
+<div class="jumbotron hero-unit-alert">
   <p class="alert alert-danger">
   By submitting form below, all of your submissions and points will be automatically copied over from <%= @old_course.name %> to <%= @to_course.name %>. This action can only be done <strong>once</strong> and once it's done it cannot be undone!
   <br />
@@ -14,33 +14,27 @@
   This will take some time. Please wait without refreshing your browser. The request will most likely time out, don't try again, just wait.
   </p>
   <% unless @extra_alert_text.nil? %>
-    <p class="alert">
+    <p class="alert alert-warning">
       <%= raw @extra_alert_text %>
     </p>
   <% end %>
 
   <% unless @already_migrated %>
-    <%= form_tag(migrate_organization_course_migrate_to_other_course_path, method: :post, class: 'form-horizontal') do  %>
+    <%= form_tag(migrate_course_migrate_to_other_course_path, method: :post, class: 'form-horizontal') do  %>
 
-      <div class="control-group">
+      <div class="form-group">
         <%= label_tag :from_course_name, "Name of the course from where to migrate", class: "control-label" %>
         <div class="controls">
           <%= text_field_tag :from_course_name %>
         </div>
       </div>
-      <div class="control-group">
+      <div class="form-group">
         <%= label_tag :to_course_name, "Name of the course where to migrate", class: "control-label" %>
         <div class="controls">
           <%= text_field_tag :to_course_name %>
         </div>
       </div>
-      <div class="control-group">
-        <%= label_tag "Your username", nil, class: "control-label" %>
-        <div class="controls">
-          <%= text_field_tag :username %>
-        </div>
-      </div>
-      <div class="control-group">
+      <div class="form-group">
         <%= label_tag "I've read the above and I'm sure I understand the consequences", nil, class: "control-label" %>
         <div class="controls">
           <%= check_box_tag :im_sure %>

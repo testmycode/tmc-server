@@ -1,28 +1,64 @@
+# frozen_string_literal: true
+
 require 'natsort'
 
 class OrganizationsController < ApplicationController
-  before_action :set_organization, only: [:show, :destroy, :verify, :disable, :disable_reason_input, :toggle_visibility]
+  before_action :set_organization, only: %i[show destroy verify disable disable_reason_input toggle_visibility all_courses]
 
-  skip_authorization_check only: [:index, :new]
+  skip_authorization_check only: %i[index new]
 
   def index
-    ordering = 'hidden, LOWER(name)'
-    @organizations = Organization.accepted_organizations.order(ordering)
-    @my_organizations = Organization.taught_organizations(current_user)
-    @my_organizations |= Organization.assisted_organizations(current_user)
-    @my_organizations |= Organization.participated_organizations(current_user)
+    ordering = Arel.sql('hidden, LOWER(name)')
+    @organizations = Organization
+                     .accepted_organizations
+                     .order(ordering)
+                     .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) || !org.visibility_allowed?(request, current_user) }
+    @my_organizations = Organization.taught_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
+    @my_organizations |= Organization.assisted_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
+    @my_organizations |= Organization.participated_organizations(current_user).select { |org| org.visibility_allowed?(request, current_user) }
     @my_organizations.natsort_by!(&:name)
     @courses_under_initial_refresh = Course.where(initial_refresh_ready: false)
+    @pinned_organizations = Organization
+                            .accepted_organizations
+                            .where(pinned: true)
+                            .order(ordering)
+                            .select { |org| org.visibility_allowed?(request, current_user) }
+                            .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) }
+    render layout: 'landing'
   end
 
   def show
     add_organization_breadcrumb
-    ordering = 'hidden, disabled_status, LOWER(courses.name)'
-    @my_courses = Course.participated_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
+    ordering = Arel.sql('hidden, disabled_status, LOWER(courses.title)')
+    @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
+    @ongoing_courses = @organization
+                       .courses
+                       .ongoing
+                       .enabled
+                       .where(hidden: false)
+                       .order(ordering)
+                       .select { |c| c.visible_to?(current_user) }
+                       .to_a
+    if can? :teach, @organization
+      recently_updated_disabled_courses = @organization.courses
+                                                       .ongoing
+                                                       .disabled
+                                                       .where(updated_at: Time.current.all_quarter)
+                                                       .to_a
+      @ongoing_courses += recently_updated_disabled_courses
+    end
+    authorize! :read, @ongoing_courses
+  end
+
+  def all_courses
+    return respond_forbidden('Submissions for this exercise are no longer accepted.') unless current_user.administrator?
+    add_organization_breadcrumb
+    add_breadcrumb 'All Courses'
+    ordering = 'hidden, disabled_status, LOWER(courses.title)'
+
     @my_assisted_courses = Course.assisted_courses(current_user, @organization).order(ordering).select { |c| c.visible_to?(current_user) }
     @ongoing_courses = @organization.courses.ongoing.order(ordering).select { |c| c.visible_to?(current_user) }
     @expired_courses = @organization.courses.expired.order(ordering).select { |c| c.visible_to?(current_user) }
-    @my_courses_percent_completed = percent_completed_hash(@my_courses, current_user)
     authorize! :read, @ongoing_courses
     authorize! :read, @expired_courses
   end
@@ -75,25 +111,24 @@ class OrganizationsController < ApplicationController
   end
 
   private
-
-  def percent_completed_hash(courses, user)
-    percent_completed = {}
-    all_awarded = AwardedPoint.all_awarded(user)
-    all_available = AvailablePoint.courses_points(courses).map(&:course_id)
-    courses.each do |course|
-      awarded = all_awarded.select { |id| id == course.id }.length.to_f
-      available = all_available.select { |id| id == course.id }.length.to_f
-      percent_completed[course.id] = 100 * (awarded / available) unless course.hide_submission_results
+    def percent_completed_hash(courses, user)
+      percent_completed = {}
+      all_awarded = AwardedPoint.all_awarded(user)
+      all_available = AvailablePoint.courses_points(courses).map(&:course_id)
+      courses.each do |course|
+        awarded = all_awarded.select { |id| id == course.id }.length.to_f
+        available = all_available.select { |id| id == course.id }.length.to_f
+        percent_completed[course.id] = 100 * (awarded / available) unless course.hide_submission_results
+      end
+      percent_completed
     end
-    percent_completed
-  end
 
-  def set_organization
-    @organization = Organization.find_by(slug: params[:id])
-    raise ActiveRecord::RecordNotFound, 'Invalid organization id' if @organization.nil?
-  end
+    def set_organization
+      @organization = Organization.find_by!(slug: params[:id])
+      unauthorized! unless @organization.visibility_allowed?(request, current_user)
+    end
 
-  def organization_params
-    params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
-  end
+    def organization_params
+      params.require(:organization).permit(:name, :information, :logo, :slug, :contact_information, :phone, :email, :disabled_reason)
+    end
 end

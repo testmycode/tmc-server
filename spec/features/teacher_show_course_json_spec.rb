@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher lists json for courses', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
 
-    @course = FactoryGirl.create :course, name: 'course_1', organization: @organization
-    FactoryGirl.create :course, name: 'course_2', organization: @organization
-    FactoryGirl.create :course, name: 'course_3', organization: @organization
+    @course = FactoryBot.create :course, name: 'course_1', organization: @organization
+    FactoryBot.create :course, name: 'course_2', organization: @organization
+    FactoryBot.create :course, name: 'course_3', organization: @organization
 
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @user = FactoryBot.create :user, password: 'foobar'
 
     visit '/'
     log_in_as(@user.login, 'foobar')

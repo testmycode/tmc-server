@@ -1,4 +1,4 @@
-class AddAllTestsSuccessfulToSubmissions < ActiveRecord::Migration
+class AddAllTestsSuccessfulToSubmissions < ActiveRecord::Migration[4.2]
   def up
     add_column :submissions, :all_tests_passed, :boolean, null: false, default: false
     execute <<SQL

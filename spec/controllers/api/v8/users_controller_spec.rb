@@ -1,26 +1,28 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Api::V8::UsersController, type: :controller do
-  let!(:user) { FactoryGirl.create(:user) }
-  let!(:other_user) { FactoryGirl.create(:user) }
-  let!(:admin) { FactoryGirl.create(:admin) }
+  let!(:user) { FactoryBot.create(:user) }
+  let!(:other_user) { FactoryBot.create(:user) }
+  let!(:admin) { FactoryBot.create(:admin) }
 
   before :each do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe "GET current user's info with an access token" do
     let!(:token) { double resource_owner_id: user.id, acceptable?: true }
     it 'user sees own info' do
-      get :show, id: 'current'
+      get :show, params: { id: 'current' }
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
       expect(response.body).to include(user.username)
       expect(response.body).to include(user.email)
       expect(JSON.parse(response.body)['administrator']).to eq(false)
     end
     it "user doesn't see other users' infos" do
-      get :show, id: 'current'
+      get :show, params: { id: 'current' }
 
       expect(response).to have_http_status(200)
       expect(response.body).not_to include(other_user.username)
@@ -31,7 +33,7 @@ describe Api::V8::UsersController, type: :controller do
       let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
       it 'user sees own info' do
-        get :show, id: 'current'
+        get :show, params: { id: 'current' }
         expect(JSON.parse(response.body)['administrator']).to eq(true)
       end
     end
@@ -40,14 +42,14 @@ describe Api::V8::UsersController, type: :controller do
     describe 'using user token' do
       let!(:token) { double resource_owner_id: user.id, acceptable?: true }
       it 'user sees own info' do
-        get :show, id: user.id
+        get :show, params: { id: user.id }
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.body).to include(user.username)
         expect(response.body).to include(user.email)
       end
       it "user doesn't see other users' infos" do
-        get :show, id: other_user.id
+        get :show, params: { id: other_user.id }
 
         expect(response).to have_http_status(403)
         expect(response.body).not_to include(other_user.username)
@@ -57,15 +59,15 @@ describe Api::V8::UsersController, type: :controller do
     describe 'using admin token' do
       let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
       it "admin can see everyone's infos" do
-        get :show, id: user.id
+        get :show, params: { id: user.id }
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.body).to include(user.username)
         expect(response.body).to include(user.email)
 
-        get :show, id: other_user.id
+        get :show, params: { id: other_user.id }
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.body).to include(other_user.username)
         expect(response.body).to include(other_user.email)
       end
@@ -75,15 +77,15 @@ describe Api::V8::UsersController, type: :controller do
         controller.current_user = admin
       end
       it "they can see users' infos" do
-        get :show, id: user.id
+        get :show, params: { id: user.id }
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.body).to include(user.username)
         expect(response.body).to include(user.email)
 
-        get :show, id: other_user.id
+        get :show, params: { id: other_user.id }
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.body).to include(other_user.username)
         expect(response.body).to include(other_user.email)
       end
@@ -93,14 +95,14 @@ describe Api::V8::UsersController, type: :controller do
         controller.current_user = user
       end
       it 'they can see their own info' do
-        get :show, id: user.id
+        get :show, params: { id: user.id }
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.body).to include(user.username)
         expect(response.body).to include(user.email)
       end
       it "they can't see other users' infos" do
-        get :show, id: other_user.id
+        get :show, params: { id: other_user.id }
 
         expect(response).to have_http_status(403)
         expect(response.body).not_to include(other_user.username)
@@ -112,9 +114,9 @@ describe Api::V8::UsersController, type: :controller do
         controller.current_user = Guest.new
       end
       it 'they get an error message' do
-        get :show, id: user.id
+        get :show, params: { id: user.id }
 
-        expect(response).to have_http_status(403)
+        expect(response).to have_http_status(401)
         expect(response.body).to include('Authentication required')
       end
     end

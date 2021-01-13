@@ -1,31 +1,103 @@
-<%= image_tag @user.gravatar_url(:rating => 'R', :secure => true, :size => 200, default: 'mm'), class: 'avatar' %>
-<h1><%= @user.login %></h1>
+<%= render partial: 'nav' %>
+<h2>My Account</h2>
 
-<section>
-  <ul>
-    <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
-    <% for field in UserField.all %>
-      <% if field.field_type != :html %>
-        <li><%= raw(field.name.humanize) %>: <%= extra_field_value(@user.field_value_record(field)) %></li>
+
+<div class="participant-details">
+  <%= image_tag @user.gravatar_url(:rating => 'R', :secure => true, :size => 200, default: 'mm'), class: 'avatar' %>
+
+  <section class="participant-entries">
+    <ul class="nobullets">
+      <li>E-mail: <%= mail_to(@user.email, @user.email) %></li>
+      <% for field in UserField.all %>
+        <% if field.field_type != :html %>
+          <li><%= raw(field.name.humanize) %>: <%= extra_field_value(@user.field_value_record(field)) %></li>
+        <% end %>
       <% end %>
-    <% end %>
-    <li><%= link_to "Certificates", participant_certificates_path(@user) %></li>
-  </ul>
-</section>
+      <% if current_user.administrator? %>
+        <li>Username: <%= @user.login %> (shown to you because you're an admin)</li>
+        <li>Account created: <%= @user.created_at %> (shown to you because you're an admin)</li>
+      <% end %>
+      <% if current_user.administrator? && !@user.administrator? %>
+        <li><%= link_to 'Generate password reset link', password_reset_link_participant_path, class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
+      <% end %>
+      </ul>
+  </section>
+</div>
+
+<% unless @user.email_verified? %>
+  <div class="alert alert-warning" role="alert">
+    Your email address is not verified yet. <%= link_to 'Resend verification email', send_verification_email_path(@user), method: :post %>.
+  </div>
+<% end %>
 
 <section>
+  <br>
   <h2>Points</h2>
+  <br>
   <% for course in @courses %>
-    <h3><%= course.title %></h3>
-    <% if can? :see_points, course %>
-      <ul>
-        <li>Completed: <%= sprintf("%.0f", @percent_completed[course.id]) %>%</li>
-        <li>Awarded points: <%= points_list(@awarded_points[course.id]) %></li>
-        <li>Missing points: <%= points_list(@missing_points[course.id]) %></li>
-      </ul>
-    <% else %>
-      For this course points are not visible.
-    <% end %>
+    <div class="card">
+      <div class="card-body">
+        <h3 class="card-title">
+          <% if can? :read, course %>
+            <%= link_to course.title, organization_course_path(course.organization, course) %>
+          <% else %>
+            <%= course.title %>
+          <% end %>
+        </h3>
+        <br>
+        <% if can? :see_points, course %>
+          <span class="progress-label">Awarded points</span>
+          <div class="progress course-points-progress">
+            <div class="progress-bar" role="progressbar" style="width: <%= @percent_completed[course.id] %>%" aria-valuenow="<%= @percent_completed[course.id] %>" aria-valuemin="0" aria-valuemax="100">
+              <%= @percent_completed[course.id].floor(0) %>%
+            </div>
+          </div>
+          <% if @group_completion_counts[course.id] %>
+            <% @group_completion_counts[course.id].each do |group, counts| %>
+              <br>
+              <span class="progress-label">Awarded points for <%= group %></span>
+              <div class="progress course-points-progress">
+                <% unless (counts[:awarded] + counts[:late]).zero? %>
+                  <% calculated_ratio = (counts[:awarded] + counts[:late] * course.soft_deadline_point_multiplier).to_f / counts[:available_points] %>
+                  <div class="progress-bar bg-info" role="progressbar" style="width: <%= calculated_ratio * 100 %>%" aria-valuenow="<%= calculated_ratio * 100 %>" aria-valuemin="0" aria-valuemax="100">
+                    <%= (calculated_ratio * 100).floor(0) %>%
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+            <br>
+          <% end %>
+          <br>
+          <table class="table table-hover">
+            <thead class="">
+              <tr>
+                <th></th>
+                <th>Point names</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Awarded points</td>
+                <td><%= points_list(@awarded_points[course.id][:awarded]) %></td>
+              </tr>
+              <% unless @awarded_points[course.id][:late].empty? %>
+                <tr>
+                  <th scope="row">Points awarded, but late</td>
+                  <td><%= points_list(@awarded_points[course.id][:late]) %></td>
+                </tr>
+              <% end %>
+              <tr>
+                <th scope="row">Missing points</td>
+                <td><%= points_list(@missing_points[course.id]) %></td>
+              </tr>
+            </tbody>
+          </table>
+        <% else %>
+          For this course points are not visible.
+        <% end %>
+      </div>
+    </div>
+    <br>
   <% end %>
 </section>
 
@@ -36,3 +108,10 @@
   <% end %>
   <%= show_submission_list(@submissions) %>
 </section>
+
+<% if @app_data %>
+  <section>
+    <h2>App data</h2>
+    <pre><%= @app_data %></pre>
+  <section>
+<% end %>

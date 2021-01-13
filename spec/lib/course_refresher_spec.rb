@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe CourseRefresher do
   include GitTestActions
 
   before :each do
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
 
     repo_path = "#{@test_tmp_dir}/fake_remote_repo"
     @repo_url = "file://#{repo_path}"
     create_bare_repo(repo_path)
 
-    @template = FactoryGirl.create :course_template, name: 'Template', source_url: @repo_url
-    @course = FactoryGirl.create :course, name: 'TestCourse', title: 'TestCourse', source_backend: 'git', course_template: @template, source_url: @repo_url
-    @course2 = FactoryGirl.create :course, name: 'TestCourse2', title: 'TestCourse2', source_backend: 'git', course_template: @template, source_url: @repo_url
+    @template = FactoryBot.create :course_template, name: 'Template', source_url: @repo_url
+    @course = FactoryBot.create :course, name: 'TestCourse', title: 'TestCourse', source_backend: 'git', course_template: @template, source_url: @repo_url
+    @course2 = FactoryBot.create :course, name: 'TestCourse2', title: 'TestCourse2', source_backend: 'git', course_template: @template, source_url: @repo_url
 
     @local_clone = clone_course_repo(@course)
 
@@ -53,10 +55,10 @@ describe CourseRefresher do
 
     expect(@course.exercises.size).to eq(2)
     expect(@course2.exercises.size).to eq(2)
-    names = @course.exercises.map &:name
+    names = @course.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
-    names = @course2.exercises.map &:name
+    names = @course2.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
   end
@@ -68,10 +70,10 @@ describe CourseRefresher do
     refresh_courses
     expect(@course.exercises.size).to eq(2)
     expect(@course2.exercises.size).to eq(2)
-    names = @course.exercises.map &:name
+    names = @course.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
-    names = @course2.exercises.map &:name
+    names = @course2.exercises.map(&:name)
     expect(names).to include('MyCategory-MyExercise')
     expect(names).to include('MyCategory-MySubcategory-MyExercise')
 
@@ -136,12 +138,12 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2000-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'deadline' => '2012-01-02 12:34' },
-      commit: true
+      { commit: true }
     )
 
     refresh_courses
@@ -157,31 +159,29 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2000-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file('MyExercise/metadata.yml',
                          { 'deadline' => '2012-01-02 12:34' },
-                         commit: true
-    )
+                         { commit: true })
     refresh_courses
 
     # set soft dl
     expect(ActiveSupport::JSON.decode(@course.exercises.first.soft_deadline_spec)).to be_empty
     ex = @course.exercises.first
-    ex.soft_deadline_spec = "[\"02.01.2012 12:33\",\"\"]"
+    ex.soft_deadline_spec = '["02.01.2012 12:33",""]'
     ex.save!
     expect(@course.exercises.first.soft_deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:33'))
-
 
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2013-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'gdocs_sheet' => 'foo' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
     expect(@course.exercises.first.soft_deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:33'))
@@ -223,7 +223,7 @@ describe CourseRefresher do
           }
         }
       },
-      commit: true
+      { commit: true }
     )
     @refresher.refresh_course @course
 
@@ -242,12 +242,12 @@ describe CourseRefresher do
           }
         }
       },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'deadline' => '2001-01-01 00:00' },
-      commit: true
+      { commit: true }
     )
     @refresher.refresh_course @course
 
@@ -266,7 +266,7 @@ describe CourseRefresher do
           }
         }
       },
-      commit: true
+      { commit: true }
     )
     @refresher.refresh_course @course
 
@@ -278,12 +278,12 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'deadline' => '2001-01-01 00:00' },
-      commit: false
+      { commit: false }
     )
     change_metadata_file(
       'MyExercise/metadata.yml',
       { 'deadline' => nil },
-      commit: true
+      { commit: true }
     )
     refresh_courses
 
@@ -307,18 +307,18 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'review_points' => 'addsub reviewonly' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
 
-    expect(@course.available_points.find_by_name('addsub')).to require_review
-    expect(@course.available_points.find_by_name('reviewonly')).not_to be_nil
-    expect(@course.available_points.find_by_name('reviewonly')).to require_review
-    expect(@course.available_points.find_by_name('mul')).not_to require_review
-    expect(@course2.available_points.find_by_name('addsub')).to require_review
-    expect(@course2.available_points.find_by_name('reviewonly')).not_to be_nil
-    expect(@course2.available_points.find_by_name('reviewonly')).to require_review
-    expect(@course2.available_points.find_by_name('mul')).not_to require_review
+    expect(@course.available_points.find_by(name: 'addsub')).to require_review
+    expect(@course.available_points.find_by(name: 'reviewonly')).not_to be_nil
+    expect(@course.available_points.find_by(name: 'reviewonly')).to require_review
+    expect(@course.available_points.find_by(name: 'mul')).not_to require_review
+    expect(@course2.available_points.find_by(name: 'addsub')).to require_review
+    expect(@course2.available_points.find_by(name: 'reviewonly')).not_to be_nil
+    expect(@course2.available_points.find_by(name: 'reviewonly')).to require_review
+    expect(@course2.available_points.find_by(name: 'mul')).not_to require_review
   end
 
   it "should change available points' requiring review state after second refresh" do
@@ -326,22 +326,22 @@ describe CourseRefresher do
     change_metadata_file(
       'metadata.yml',
       { 'review_points' => 'addsub reviewonly' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
     change_metadata_file(
       'metadata.yml',
       { 'review_points' => 'mul' },
-      commit: true
+      { commit: true }
     )
     refresh_courses
 
-    expect(@course.available_points.find_by_name('addsub')).not_to require_review
-    expect(@course.available_points.find_by_name('reviewonly')).to be_nil
-    expect(@course.available_points.find_by_name('mul')).to require_review
-    expect(@course2.available_points.find_by_name('addsub')).not_to require_review
-    expect(@course2.available_points.find_by_name('reviewonly')).to be_nil
-    expect(@course2.available_points.find_by_name('mul')).to require_review
+    expect(@course.available_points.find_by(name: 'addsub')).not_to require_review
+    expect(@course.available_points.find_by(name: 'reviewonly')).to be_nil
+    expect(@course.available_points.find_by(name: 'mul')).to require_review
+    expect(@course2.available_points.find_by(name: 'addsub')).not_to require_review
+    expect(@course2.available_points.find_by(name: 'reviewonly')).to be_nil
+    expect(@course2.available_points.find_by(name: 'mul')).to require_review
   end
 
   it 'should ignore exercises under directories with a .tmcignore file' do
@@ -408,7 +408,7 @@ describe CourseRefresher do
     refresh_courses
 
     exercise = @course.exercises.first
-    sub = FactoryGirl.create(:submission, course: @course, exercise_name: exercise.name)
+    sub = FactoryBot.create(:submission, course: @course, exercise_name: exercise.name)
     awarded_point = AwardedPoint.create!(course: @course,
                                          user: sub.user,
                                          submission: sub,
@@ -426,7 +426,7 @@ describe CourseRefresher do
 
     refresh_courses
 
-    stub = Exercise.find_by_name('MyExercise').stub_path
+    stub = Exercise.find_by(name: 'MyExercise').stub_path
 
     simple_stuff = File.read(stub + '/src/SimpleStuff.java')
     expect(simple_stuff).not_to include('return a + b;')
@@ -439,7 +439,6 @@ describe CourseRefresher do
     expect(File).to exist(stub + '/lib/testrunner/tmc-junit-runner.jar')
     # TmcJunitRunner is a uber jar
     expect((Dir.new(stub + '/lib/testrunner').entries - ['.', '..']).size).to eq(1)
-
   end
 
   it 'should generate solution versions of exercises' do
@@ -448,7 +447,7 @@ describe CourseRefresher do
 
     refresh_courses
 
-    solution = Exercise.find_by_name('MyExercise').solution_path
+    solution = Exercise.find_by(name: 'MyExercise').solution_path
 
     simple_stuff = File.read(solution + '/src/SimpleStuff.java')
     expect(simple_stuff).to include('return a + b;')
@@ -470,7 +469,7 @@ describe CourseRefresher do
 
     refresh_courses
 
-    solution = Exercise.find_by_name('MyExercise').solution_path
+    solution = Exercise.find_by(name: 'MyExercise').solution_path
     simple_stuff = File.read(solution + '/src/SimpleStuff.java')
     expect(simple_stuff).to include('return b + a;')
   end
@@ -543,7 +542,7 @@ describe CourseRefresher do
   end
 
   it 'should overwrite the new cache directory if it happens to exist' do
-    expected_path = @course.cache_path.gsub('0', '1')
+    expected_path = @course.cache_path.tr('0', '1')
     FileUtils.mkdir_p(expected_path)
     FileUtils.touch(expected_path + '/foo.txt')
 
@@ -619,7 +618,7 @@ describe CourseRefresher do
 
   describe 'when done twice' do
     it 'should be able to use a different repo' do
-      course = FactoryGirl.create :course, source_url: @repo_url
+      course = FactoryBot.create :course, source_url: @repo_url
       @refresher.refresh_course course
 
       repo_path = "#{@test_tmp_dir}/another_fake_remote_repo"
@@ -635,7 +634,7 @@ describe CourseRefresher do
       expect(course.exercises.first.name).to eq('NewEx')
     end
 
-    it 'should be able to use a different repo for templated courses' #do
+    it 'should be able to use a different repo for templated courses' # do
     ##
     #  refresh_courses
 
@@ -652,7 +651,7 @@ describe CourseRefresher do
     #  expect(@course.exercises.first.name).to eq('NewEx')
     #  expect(@course2.exercises.size).to eq(1)
     #  expect(@course2.exercises.first.name).to eq('NewEx')
-    #end
+    # end
   end
 
   describe 'on failure' do
@@ -679,7 +678,7 @@ describe CourseRefresher do
     end
 
     it 'should roll back any database changes' do
-      old_cache_version = @course.cache_version
+      old_cached_version = @course.cached_version
       old_exercises = Exercise.order(:id).to_a
       old_points = AvailablePoint.order(:id).to_a
 
@@ -687,11 +686,11 @@ describe CourseRefresher do
       expect { refresh_courses }.to raise_error
 
       @template.reload
-      expect(@template.cache_version).to eq(old_cache_version)
+      expect(@template.cached_version).to eq(old_cached_version)
       @course.reload
-      expect(@course.cache_version).to eq(old_cache_version)
+      expect(@course.cached_version).to eq(old_cached_version)
       @course2.reload
-      expect(@course2.cache_version).to eq(old_cache_version)
+      expect(@course2.cached_version).to eq(old_cached_version)
       expect(Exercise.order(:id).to_a).to eq(old_exercises)
       expect(AvailablePoint.order(:id).to_a).to eq(old_points)
     end
@@ -719,27 +718,27 @@ describe CourseRefresher do
   end
 
   describe 'with no_directory_changes flag' do
-    it 'doesn\'t increment cache_version' do
+    it "doesn't increment cached_version" do
       refresh_courses
-      expect(@template.cache_version).not_to eq(2)
-      expect(@course.cache_version).not_to eq(2)
-      expect(@course2.cache_version).not_to eq(2)
-      expect(@template.cache_version).to eq(1)
-      expect(@course.cache_version).to eq(1)
-      expect(@course2.cache_version).to eq(1)
+      expect(@template.cached_version).not_to eq(2)
+      expect(@course.cached_version).not_to eq(2)
+      expect(@course2.cached_version).not_to eq(2)
+      expect(@template.cached_version).to eq(1)
+      expect(@course.cached_version).to eq(1)
+      expect(@course2.cached_version).to eq(1)
     end
 
-    it 'doesn\'t create duplicate repository folder' do
+    it "doesn't create duplicate repository folder" do
       refresh_courses
       expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
     end
 
-    it 'doesn\'t remove any folders on fail' do
+    it "doesn't remove any folders on fail" do
       @refresher.refresh_course(@course)
       @template.reload
 
       expect(CourseRefresher).to receive(:simulate_failure!).and_raise('simulated failure')
-      expect{ @refresher.refresh_course(@course2, no_directory_changes: true) }.to raise_error
+      expect { @refresher.refresh_course(@course2, no_directory_changes: true) }.to raise_error
 
       expect(File).to exist(@template.cache_path)
       expect(File).to exist(@course.cache_path)

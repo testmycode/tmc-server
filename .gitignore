@@ -14,10 +14,13 @@
 /config/site_tailoring.rb
 /config/extra_fields/*.rb
 !/config/extra_fields/*.example.rb
+/config/email_templates
+
 /coverage
 .DS_Store
 
 /vendor/bundle
+/vendor/tmc-langs-rust
 
 # Eclipse
 /.project
@@ -29,3 +32,6 @@
 
 # Byebug history file
 .byebug_history
+
+# Node_modules
+/ext/sandbox/node_modules

@@ -6,12 +6,12 @@
   <% end %>
 </h2>
 
-<% if can?(:teach, @organization) && !@expired_courses.empty? %>
+<% if can?(:teach, @organization) && @expired_courses && !@expired_courses.empty? %>
   <h3>Ongoing courses</h3>
 <% end %>
-<% unless @ongoing_courses.empty? %>
-  <div class="row-fluid">
-    <div class="span12">
+<% if @ongoing_courses && !@ongoing_courses.empty? %>
+  <div class="row">
+    <div class="col-md-12">
       <%= render 'courses/list', :locals => { organization_id: @organization.slug, courses: @ongoing_courses, list_id: 'ongoing-courses' } %>
     </div>
   </div>
@@ -19,21 +19,21 @@
   <p>No available courses.</p>
 <% end %>
 
-<% if can?(:teach, @organization) && !@expired_courses.empty? %>
+<% if can?(:teach, @organization) && @expired_courses && !@expired_courses.empty? %>
   <h3>Expired courses</h3>
-  <div class="row-fluid">
-    <div class="span12">
+  <div class="row">
+    <div class="col-md-12">
       <%= render 'courses/list', :locals => { organization_id: @organization.slug, courses: @expired_courses, list_id: 'expired-courses' } %>
     </div>
   </div>
 <% end %>
 
 <% if can? :teach, @organization %>
-  <%= link_to 'Create New Course', setup_organization_course_chooser_index_path(@organization), class: "btn btn-warning" %>
+  <%= link_to 'Create New Course', setup_organization_course_chooser_index_path(@organization), class: "btn btn-primary" %>
 <% end %>
 
 <% if can? :create, :custom_course %>
     <br><br>
-    <%= link_to 'Create Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+    <%= link_to 'Create Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-sm btn-danger" %>
 <% end %>
 </p>

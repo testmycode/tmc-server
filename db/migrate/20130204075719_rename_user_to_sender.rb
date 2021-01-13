@@ -1,4 +1,4 @@
-class RenameUserToSender < ActiveRecord::Migration
+class RenameUserToSender < ActiveRecord::Migration[4.2]
   def up
     rename_column :course_notifications, :user_id, :sender_id
   end

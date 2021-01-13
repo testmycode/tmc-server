@@ -1,4 +1,4 @@
-class CreateUncomputedUnlocks < ActiveRecord::Migration
+class CreateUncomputedUnlocks < ActiveRecord::Migration[4.2]
   def change
     create_table :uncomputed_unlocks do |t|
       t.integer :course_id, null: false

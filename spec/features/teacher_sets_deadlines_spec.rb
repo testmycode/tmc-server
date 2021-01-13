@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher sets deadlines', feature: true do
   include IntegrationTestActions
 
   before :each do
-    organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @teacher = FactoryGirl.create :user, password: '1234'
-    @admin = FactoryGirl.create :admin, password: '1234'
+    organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :verified_user, password: '1234'
+    @admin = FactoryBot.create :admin, password: '1234'
 
     repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(repo_path)
-    @course = FactoryGirl.create :course,
+    @course = FactoryBot.create :course,
                                  source_url: repo_path,
                                  organization: organization
 
@@ -21,9 +23,9 @@ feature 'Teacher sets deadlines', feature: true do
     @course.refresh
     Teachership.create! user: @teacher, organization: organization
 
-    FactoryGirl.create(:exercise, course: @course)
-    FactoryGirl.create(:exercise, course: @course)
-    FactoryGirl.create(:exercise, course: @course)
+    FactoryBot.create(:exercise, course: @course)
+    FactoryBot.create(:exercise, course: @course)
+    FactoryBot.create(:exercise, course: @course)
 
     visit '/'
   end

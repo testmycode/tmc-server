@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+    <title>
+      <%= content_for?(:title) ? yield(:title) : "TestMyCode" %>
+    </title>
+    <meta name="description"/>
+    <meta name="author"/>
+    <%= render "layouts/metadata" %>
+    <%= yield(:head) %>
+
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_link_tag 'application-test', media: 'all' if Rails.env == 'test' %>
+    <%= stylesheet_link_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.css") %>
+
+    <%= javascript_include_tag 'application' %>
+    <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>
+  </head>
+  <body class="default">
+    <div class="cover">
+      <%= render partial: 'layouts/navigation', locals: { transparent: true} %>
+      <div class="cover-content container">
+        <h1>TestMyCode</h1>
+        <h2>Programming assignment evaluator</h2>
+      </div>
+    </div>
+    <div id="everything">
+      <div class="container container-fluid well-large" id="content-area">
+        <% unless flash.empty? %>
+          <br>
+          <%= bootstrap_flash %>
+        <% end %>
+        <%= yield %>
+        <br>
+        <br>
+      </div>
+    </div>
+    <%= render partial: 'layouts/footer' %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js" integrity="sha256-YqOIp4MygNx9/lcWr5lpcR88Ki/MNMWvJJkH0eK+fHM=" crossorigin="anonymous"></script>
+    <script>
+      var options = {
+      valueNames: [ 'card-title' ]
+      };
+
+      new List('all-orgs-list', options);
+    </script>
+  </body>
+</html>
+

@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'The system (used by an instructor for administration)', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
 
     visit '/'
-    @user = FactoryGirl.create(:admin, password: 'xooxer')
+    @user = FactoryBot.create(:admin, password: 'xooxer')
     log_in_as(@user.login, 'xooxer')
 
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
@@ -22,7 +24,7 @@ describe 'The system (used by an instructor for administration)', type: :request
 
   it "should show all exercises pushed to the course's git repo" do
     create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path, organization_slug: @organization.slug)
-    course = Course.find_by_name!("#{@organization.slug}-mycourse")
+    course = Course.find_by!(name: "#{@organization.slug}-mycourse")
 
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)
@@ -36,6 +38,7 @@ describe 'The system (used by an instructor for administration)', type: :request
   end
 
   it 'should allow rerunning individual submissions' do
+    skip 'Not working, requires sandbox setup for testing'
     setup = SubmissionTestSetup.new(solve: true, save: true, organization: @organization)
     setup.make_zip
     setup.submission.processed = true
@@ -51,7 +54,7 @@ describe 'The system (used by an instructor for administration)', type: :request
 
     click_button 'Rerun submission'
     expect(page).to have_content('Rerun scheduled')
-    SubmissionProcessor.new.reprocess_timed_out_submissions
+    SubmissionProcessor.new.process_some_submissions
     wait_for_submission_to_be_processed
 
     expect(page).not_to have_content('some funny error')

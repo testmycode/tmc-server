@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Core
@@ -46,7 +48,7 @@ module Api
         end
 
         def download
-          exercise = Exercise.find_by!(id: params[:id])
+          exercise = Exercise.find(params[:id])
 
           authorize! :download, exercise
           send_file exercise.stub_zip_file_path
@@ -62,7 +64,6 @@ module Api
           submissions = exercise.submissions.order('submissions.created_at DESC')
           submissions = submissions.where(user_id: current_user.id) unless current_user.administrator?
           submissions = submissions.includes(:awarded_points).includes(:user)
-          authorize! :read, submissions
 
           data = {
             course_name: course.name,

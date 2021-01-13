@@ -3,12 +3,20 @@
 
 <ul>
   <li>
-    <%= link_to_if @course.initial_refresh_ready?, 'Download project template (zip)', exercise_zip_url(@exercise) do %>
+  <% if params[:use_clients] %>
+    Download the project using our plugins (such as the Netbeans plugin). See your course material for instructions.
+  <% else%>
+    <% if @course.initial_refresh_ready? %>
+      <%= link_to 'Download project template (zip)', exercise_zip_url(@exercise) %>. Please download the exercises using using our plugins (such as the Netbeans plugin).
+    <% else %>
       Project template (zip) not available during refresh.
     <% end %>
+  <%end %>
   </li>
 
-  <% if can? :see_points, @exercise %>
+  <% if @current_user.guest? %>
+    <li>Log in to see your points</li>
+  <% elsif can? :see_points, @exercise %>
     <% if @exercise.available_points.empty? %>
       <li>No points available</li>
     <% else %>
@@ -55,13 +63,63 @@
     <% end %>
   <% end %>
 
-  <% if @exercise.deadline_for(current_user) %>
+  <% if @exercise.soft_deadline_for(current_user) && @exercise.deadline_for(current_user) %>
     <li>
-      Deadline: <%= @exercise.deadline_for(current_user) %>
-      <% if @exercise.deadline_spec_obj.universal_description %>
-        (<%= @exercise.deadline_spec_obj.universal_description %>)
+      Deadline:
+      <% if @exercise.soft_deadline_spec_obj.universal_description %>
+        <%= @exercise.soft_deadline_spec_obj.universal_description %>
+      <% else %>
+        <%= @exercise.soft_deadline_for(current_user) %>
       <% end %>
-      <% if @exercise.expired_for?(current_user) %>
+      <% if Exercise.deadline_expired?(@exercise.soft_deadline_for(current_user)) %>
+        <% if current_user.administrator? %>
+          (expired (if you weren't an admin))
+        <% else %>
+          (expired)
+        <% end %>
+      <% end %>
+      <br>After the deadline has passed, you can still return the exercise until
+      <% if @exercise.deadline_spec_obj.universal_description %>
+        <%= @exercise.deadline_spec_obj.universal_description %>
+      <% else %>
+        <%= @exercise.deadline_for(current_user) %>
+      <% end %>
+      <% if Exercise.deadline_expired?(@exercise.deadline_for(current_user)) %>
+        <% if current_user.administrator? %>
+          (expired (if you weren't an admin))
+        <% else %>
+          (expired)
+        <% end %>
+      <% end %>
+      <br>However, you will only get <%= @course.soft_deadline_point_multiplier * 100 %>% of the points.
+    </li>
+  <% elsif @exercise.soft_deadline_for(current_user) %>
+     <li>
+      Deadline:
+      <% if @exercise.soft_deadline_spec_obj.universal_description %>
+        <%= @exercise.soft_deadline_spec_obj.universal_description %>
+      <% else %>
+        <%= @exercise.soft_deadline_for(current_user) %>
+      <% end %>
+      <% if Exercise.deadline_expired?(@exercise.soft_deadline_for(current_user)) %>
+        <% if current_user.administrator? %>
+          (expired (if you weren't an admin))
+        <% else %>
+          (expired)
+        <% end %>
+      <% end %>
+      <br>After the deadline has passed, you can still return the exercise.
+      <br>However, you will only get <%= @course.soft_deadline_point_multiplier * 100 %>% of the points.
+    </li>
+  <% elsif @exercise.deadline_for(current_user) %>
+    <li>
+      Deadline:
+      <% if @exercise.deadline_spec_obj.universal_description %>
+        <%= @exercise.deadline_spec_obj.universal_description %>
+      <% else %>
+        <%= @exercise.deadline_for(current_user) %>
+      <% end %>
+      <% if Exercise.deadline_expired?(@exercise.deadline_for(current_user)) %>
         <% if current_user.administrator? %>
           (expired (if you weren't an admin))
         <% else %>
@@ -77,8 +135,12 @@
 
   <% if @exercise.solution && can?(:read, @exercise.solution) %>
     <li>
-      <%= link_to_if @course.initial_refresh_ready?, 'View suggested solution', exercise_solution_path(@exercise) do %>
-        Solution not available during refresh.
+      <% if current_user.email_verified? %>
+        <%= link_to_if @course.initial_refresh_ready?, 'View suggested solution', exercise_solution_path(@exercise) do %>
+          Solution not available during refresh.
+        <% end %>
+      <% else %>
+        Suggested solution is unavailable because you haven't verified your email address.
       <% end %>
     </li>
   <% end %>
@@ -90,24 +152,32 @@
 
 <% if can? :toggle_submission_result_visibility, @exercise.course %>
   <% if @exercise.hide_submission_results? %>
-    <%= link_to 'Unhide submission results', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-primary btn-mini" %>
+    <%= link_to 'Disable exercise exam mode', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-primary btn-sm" %>
   <% else %>
-    <%= link_to 'Hide submission results', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-warning btn-mini" %>
+    <%= link_to 'Enable exercise exam mode', toggle_submission_result_visibility_organization_exercise_path(@organization, @exercise), method: :post, class: "btn btn-warning btn-sm" %>
   <% end %>
 <% end %>
 
-<% if @exercise.submittable_by?(current_user) %>
-<div class="row-fluid">
-  <div class="span12">
-  <h2>Submit answer</h2>
-    <%= render :partial => 'submissions/form', :locals => { :submission => @new_submission } %>
-  </div>
-  </div>
+<% if params[:use_clients] %>
+  <h2>Submitting your answer</h2>
+  Submit your answer using our plugins (such as the Netbeans plugin). See your course material for instructions. You may submit your answer using the plugin as many times as you like.
+<% else%>
+  <% if @exercise.submittable_by?(current_user) %>
+  <div class="row">
+    <div class="col-md-12">
+    <h2>Submit answer manually</h2>
+      <div class="alert alert-danger">
+        Only submit using this as a last resort! You should always submit the exercise using our plugins (such as the Netbeans plugin). See your course material for submitting instructions.
+      </div>
+      <%= render :partial => 'submissions/form', :locals => { :submission => @new_submission } %>
+    </div>
+    </div>
+  <% end %>
 <% end %>
 
 <% if signed_in?  && !@course.hide_submissions? %>
-<div class="row-fluid">
-  <div class="span12">
+<div class="row">
+  <div class="col-md-12">
   <h2>Submissions</h2>
     <% if !@submissions.empty? %>
       <% if @submissions.size < @submission_count %>
@@ -122,8 +192,8 @@
 <% end %>
 
 <% if can? :rerun, @submissions and @submissions.any? %>
-  <div class="row-fluid">
-    <div class="span12">
+  <div class="row">
+    <div class="col-md-12">
       <%
         if @submissions.count > 10
           confirm_msg = "Really rerun all #{@submissions.count} submissions?\nIt may take a while."

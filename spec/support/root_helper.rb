@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 
 class RootHelper
   def initialize
-    fail 'Should be root' if Process::Sys.geteuid != 0
+    raise 'Should be root' if Process::Sys.geteuid != 0
     p1_in, p1_out = IO.pipe
     p2_in, p2_out = IO.pipe
     @pid = Process.fork do
       $stdin.reopen('/dev/null')
-      signals = %w(TERM INT HUP USR1 USR2)
+      signals = %w[TERM INT HUP USR1 USR2]
       signals.each do |sig|
         Signal.trap(sig) do
           puts "Root helper exiting (SIG#{sig})"
@@ -34,7 +36,7 @@ class RootHelper
   end
 
   def stop
-    fail 'Not started' unless @pid
+    raise 'Not started' unless @pid
     @pipe_out.write("STOP\n")
     @pipe_in.read
     @pipe_out.close
@@ -46,84 +48,78 @@ class RootHelper
   def send_command(command)
     @pipe_out.write("#{command}\n")
     response = @pipe_in.readline.strip
-    if response =~ /^FAIL (.*)$/
-      fail "#{$1} (from RootHelper)"
-    end
+    raise "#{Regexp.last_match(1)} (from RootHelper)" if response =~ /^FAIL (.*)$/
     response
   end
 
   private
-
-  def main_loop
-    begin
-      command = @pipe_in.readline.strip
+    def main_loop
       begin
-        response = execute_command(command)
-      rescue
-        response = "FAIL: #{$!.message.gsub("\n", ' ')}"
-        debug(response)
+        command = @pipe_in.readline.strip
+        begin
+          response = execute_command(command)
+        rescue StandardError
+          response = "FAIL: #{$!.message.tr("\n", ' ')}"
+          debug(response)
+        end
+        @pipe_out.write("#{response}\n") if response.present?
+      end while command != 'STOP'
+    end
+
+    def execute_command(command)
+      if command =~ /^START SERVERS? (\d+(?:\s*,\s*\d+)*)$/
+        raise 'Servers already started' unless @server_pids.empty?
+        ports = Regexp.last_match(1).split(',').map(&:strip).map(&:to_i)
+        start_servers(ports)
+        'OK'
+      elsif command == 'STOP'
+        stop_all_servers
+        'BYE'
+      else
+        raise "Invalid command: #{command}"
       end
-      @pipe_out.write("#{response}\n") unless response.blank?
-    end while command != 'STOP'
-  end
-
-  def execute_command(command)
-    if command =~ /^START SERVERS? (\d+(?:\s*,\s*\d+)*)$/
-      fail 'Servers already started' unless @server_pids.empty?
-      ports = $1.split(',').map(&:strip).map(&:to_i)
-      start_servers(ports)
-      'OK'
-    elsif command == 'STOP'
-      stop_all_servers
-      'BYE'
-    else
-      fail "Invalid command: #{command}"
     end
-  end
 
-  def start_servers(ports)
-    @server_pids = ports.map { |port| start_server(port.to_i) }
-    sleep 5 # Wait for servers to start. Haxy, slow, error-prone :(
-  end
-
-  def stop_all_servers
-    debug("Starting stopping all servers (pids #{@server_pids.join(',')})")
-    for server_pid in @server_pids
-      Process.kill('TERM', server_pid)
-      Process.waitpid(server_pid)
+    def start_servers(ports)
+      @server_pids = ports.map { |port| start_server(port.to_i) }
+      sleep 5 # Wait for servers to start. Haxy, slow, error-prone :(
     end
-    @server_pids = []
-  end
+
+    def stop_all_servers
+      debug("Starting stopping all servers (pids #{@server_pids.join(',')})")
+      for server_pid in @server_pids
+        Process.kill('TERM', server_pid)
+        Process.waitpid(server_pid)
+      end
+      @server_pids = []
+    end
 
   private
+    def start_server(port)
+      debug("Starting server #{port}")
 
-  def start_server(port)
-    debug("Starting server #{port}")
+      instance_dir = "#{servers_parent_dir}/#{port}"
+      raise 'Server directory not created' unless File.exist?(instance_dir)
 
-    instance_dir = "#{servers_parent_dir}/#{port}"
-    fail 'Server directory not created' unless File.exist?(instance_dir)
-
-    Process.fork do
-      begin
+      Process.fork do
         $stdin.reopen('/dev/null', 'r')
         $stdout.reopen("#{instance_dir}/web/work/master.log", 'w')
         $stderr.reopen($stdout)
         Dir.chdir "#{instance_dir}/web"
         ENV.delete 'BUNDLE_GEMFILE'
         Process.exec('ruby ./webapp.rb run')
-      rescue
+      rescue StandardError
         puts 'Error starting webapp.rb: ' + e.class.to_s + ': ' + e.message
       ensure
         exit!(1)
       end
     end
-  end
 
-  def servers_parent_dir
-    "#{::Rails.root}/tmp/test-sandbox-server"
-  end
+    def servers_parent_dir
+      "#{::Rails.root}/tmp/test-sandbox-server"
+    end
 
-  def debug(_msg)
-    # puts "Root helper: #{msg}"
-  end
+    def debug(_msg)
+      # puts "Root helper: #{msg}"
+    end
 end

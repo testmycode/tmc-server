@@ -1,0 +1,76 @@
+<h1>Submission difference</h1>
+
+<div class="alert alert-warning">
+  This is a naive and experimental feature that calculates the
+  difference between this submission and the model solution.
+  This may sometimes be helpful when trying to figure out what's wrong with
+  a submission.
+</div>
+
+<% @files.each do |file| %>
+  <div class="card">
+    <div class="card-body">
+    <h2><%= file[:path] %></h2>
+    <div class="code-pair" data-path="<%= file[:path] %>">
+      <pre class="submission-code"><%= file[:submission_contents] %></pre>
+      <pre class="model-code"><%= file[:model_contents] %></pre>
+    </div>
+    </div>
+  </div>
+  <br>
+<% end %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.10.1/min/vs/loader.js" integrity="sha256-PwMxLuduSzsT9fefu+Nz/M8z0sYHV9Pp77VxsOxk1Pc=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.10.1/min/vs/editor/editor.main.css" integrity="sha256-2HiLV16hBsfTgFEvAitDCQkXtBIyBROeLVntVZrKBJg=" crossorigin="anonymous" />
+
+<script>
+	require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.10.1/min/vs/' }});
+
+	// Before loading vs/editor/editor.main, define a global MonacoEnvironment that overwrites
+	// the default worker url location (used when creating WebWorkers). The problem here is that
+	// HTML5 does not allow cross-domain web workers, so we need to proxy the instantiation of
+	// a web worker through a same-domain script
+	window.MonacoEnvironment = {
+		getWorkerUrl: function(workerId, label) {
+			return '/monaco-editor-worker-loader-proxy.js';
+		}
+	};
+
+	require(["vs/editor/editor.main"], function () {
+    document.querySelectorAll('.code-pair').forEach(function (pairElement) {
+
+      var path = pairElement.dataset.path;
+      var submissionElement = pairElement.querySelector('.submission-code');
+      var submissionCode = submissionElement.innerHTML;
+      var modelElement = pairElement.querySelector('.model-code');
+      var modelCode = modelElement.innerHTML;
+
+      var submissionHeight = submissionElement.clientHeight;
+      var modelHeight = modelElement.clientHeight;
+
+      var height;
+      if (submissionHeight > modelHeight) {
+        height = submissionHeight;
+      } else {
+        height = modelHeight;
+      }
+      pairElement.style.height = height + "px";
+
+
+      pairElement.innerHTML = "";
+      var diffEditor = monaco.editor.createDiffEditor(pairElement, {
+        enableSplitViewResizing: true,
+        scrollBeyondLastLine: false,
+        readOnly: true,
+        renderSideBySide: false,
+        language: 'java', // TODO: detect from file extension
+      });
+      diffEditor.setModel({
+        original: monaco.editor.createModel(modelCode, "text/plain"),
+        modified: monaco.editor.createModel(submissionCode, "text/plain"),
+      });
+    });
+	});
+</script>
+
+

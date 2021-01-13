@@ -1,26 +1,28 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Admin sets expiredate to course templates', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @user = FactoryGirl.create :user, password: 'foobar'
-    @admin = FactoryGirl.create :admin, password: 'xooxer'
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @user = FactoryBot.create :user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
+    @teacher = FactoryBot.create :user, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
 
-    @ct = FactoryGirl.create :course_template, title: 'Template 1'
-    @ct_expired_visible = FactoryGirl.create :course_template, title: 'Template 2', expires_at: Time.now - 1.days
-    @ct_non_expired_visible = FactoryGirl.create :course_template, title: 'Template 3', expires_at: Time.now + 1.days, hidden: false
-    @ct_expired_hidden = FactoryGirl.create :course_template, title: 'Template 4', expires_at: Time.now - 1.days, hidden: true
-    @ct_non_expired_hidden = FactoryGirl.create :course_template, title: 'Template 5', expires_at: Time.now + 1.days, hidden: true
+    @ct = FactoryBot.create :course_template, title: 'Template 1'
+    @ct_expired_visible = FactoryBot.create :course_template, title: 'Template 2', expires_at: Time.now - 1.day
+    @ct_non_expired_visible = FactoryBot.create :course_template, title: 'Template 3', expires_at: Time.now + 1.day, hidden: false
+    @ct_expired_hidden = FactoryBot.create :course_template, title: 'Template 4', expires_at: Time.now - 1.day, hidden: true
+    @ct_non_expired_hidden = FactoryBot.create :course_template, title: 'Template 5', expires_at: Time.now + 1.day, hidden: true
 
     visit '/'
   end
 
   scenario 'Admin succeeds at setting expiredate' do
-    log_in_as(@admin.login, 'xooxer')
+    log_in_as(@admin.email, 'xooxer')
     visit('/course_templates')
 
     find('tr', text: 'Template 2').click_link('Edit')
@@ -32,7 +34,7 @@ feature 'Admin sets expiredate to course templates', feature: true do
   end
 
   scenario 'Admin succeeds at toggling between hidden and non-hidden' do
-    log_in_as(@admin.login, 'xooxer')
+    log_in_as(@admin.email, 'xooxer')
     visit('/course_templates')
 
     find('tr', text: 'Template 2').click_link('hide')
@@ -42,7 +44,7 @@ feature 'Admin sets expiredate to course templates', feature: true do
   end
 
   scenario "Teacher doesn't see expired or hidden course templates" do
-    log_in_as(@teacher.login, 'xooxer')
+    log_in_as(@teacher.email, 'xooxer')
     visit('/org/slug/course_templates')
 
     expect(page).to have_content('Template 1')
@@ -53,14 +55,14 @@ feature 'Admin sets expiredate to course templates', feature: true do
   end
 
   scenario "Teacher can't create course from expired template" do
-    log_in_as(@teacher.login, 'xooxer')
+    log_in_as(@teacher.email, 'xooxer')
     visit("/setup/slug/course/new/#{@ct_expired_visible.id}")
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 
   scenario "Teacher can't create course from hidden template" do
-    log_in_as(@teacher.login, 'xooxer')
+    log_in_as(@teacher.email, 'xooxer')
     visit("/setup/slug/course/new/#{@ct_expired_visible.id}")
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 end

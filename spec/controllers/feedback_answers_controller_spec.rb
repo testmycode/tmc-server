@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'cancan/matchers'
 
 describe FeedbackAnswersController, type: :controller do
   before :each do
-    @exercise = FactoryGirl.create(:exercise)
+    @exercise = FactoryBot.create(:exercise)
     @course = @exercise.course
-    @user = FactoryGirl.create(:user)
-    @submission = FactoryGirl.create(:submission, course: @course, exercise: @exercise, user: @user)
-    @q1 = FactoryGirl.create(:feedback_question, kind: 'text', course: @course)
-    @q2 = FactoryGirl.create(:feedback_question, kind: 'intrange[1..5]', course: @course)
+    @user = FactoryBot.create(:user)
+    @submission = FactoryBot.create(:submission, course: @course, exercise: @exercise, user: @user)
+    @q1 = FactoryBot.create(:feedback_question, kind: 'text', course: @course)
+    @q2 = FactoryBot.create(:feedback_question, kind: 'intrange[1..5]', course: @course)
 
     controller.current_user = @submission.user
   end
@@ -27,7 +29,7 @@ describe FeedbackAnswersController, type: :controller do
     end
 
     it "should accept answers to all questions associated to the submission's course at once" do
-      post :create, @valid_params
+      post :create, params: @valid_params
 
       expect(response).to be_successful
 
@@ -43,7 +45,7 @@ describe FeedbackAnswersController, type: :controller do
       params = @valid_params.clone
       params[:answers][1][:answer] = 'something invalid'
 
-      post :create, params
+      post :create, params: params
 
       expect(response).not_to be_successful
       expect(FeedbackAnswer.all.count).to eq(0)
@@ -52,8 +54,8 @@ describe FeedbackAnswersController, type: :controller do
     it 'should not allow answering on behalf of another user' do
       bypass_rescue
 
-      another_user = FactoryGirl.create(:user)
-      another_submission = FactoryGirl.create(:submission, course: @course, exercise: @exercise, user: another_user)
+      another_user = FactoryBot.create(:user)
+      another_submission = FactoryBot.create(:submission, course: @course, exercise: @exercise, user: another_user)
       params = @valid_params.clone
       params[:submission_id] = another_submission.id
 
@@ -75,7 +77,7 @@ describe FeedbackAnswersController, type: :controller do
       # Check if user can create FeedbackAnswer to submission
       answer_records.each { |record| expect(ability).not_to be_able_to(:create, record) }
 
-      expect { post :create, params }.to raise_error(CanCan::AccessDenied)
+      expect { post :create, params: params }.to raise_error(CanCan::AccessDenied)
     end
   end
 end

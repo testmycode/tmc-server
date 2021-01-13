@@ -1,5 +1,5 @@
 <h1><%= @title %>
-    <% if @submission.public? and current_user.administrator? %>
+    <% if @submission.paste_visible_for?(current_user) and current_user.administrator? %>
     - <span class="error"> This submission is public</span>
     <% end %>
 </h1>
@@ -15,24 +15,24 @@
 </ul>
 
   <% unless @submission.message_for_paste.blank? %>
-  <div class="row-fluid ">
-    <div class="span12 well">
+  <div class="row ">
+    <div class="col-md-12 card">
       <h3>Message for paste</h3>
       <%= @submission.message_for_paste %>
     </div>
   </div>
   <% end %>
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="accordion" id="testResultsAccordion">
-        <div class="accordion-group">
-          <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#testResultsAccordion" href="#collapseOne">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel-group" id="testResultspanel-group">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <a class="panel-group-toggle" data-toggle="collapse" data-parent="#testResultspanel-group" href="#collapseOne">
               <h2 class="">Test results</h2>
             </a>
           </div>
-          <div id="collapseOne" class="accordion-body collapse out">
-            <div class="accordion-inner">
+          <div id="collapseOne" class="panel-collapse collapse out">
+            <div class="panel-body">
               <%= render 'submissions/details' %>
             </div>
           </div>

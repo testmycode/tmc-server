@@ -1,0 +1,16 @@
+$breadcrumb-grey: #e9ecef;
+
+.breadcumb-nav {
+  align-items: center;
+  background-color: $breadcrumb-grey;
+  border-radius: 0.25rem;
+  display: flex;
+  padding-right: 1rem;
+
+  .breadcrumb {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  margin-bottom: 1rem;
+}

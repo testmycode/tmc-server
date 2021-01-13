@@ -1,7 +1,6 @@
-
 <h1>List of participants</h1>
 
-<%= form_tag(participants_path, :method => :get) do %>
+<%= form_tag(participants_path, :method => :get, :class => "filter-form") do %>
   <div style="float: left">
     <%= render :partial => 'participants/filter_controls' %>
   </div>
@@ -11,7 +10,7 @@
   </div>
 
   <div style="clear: both; margin-bottom: 3em;">
-    <%= submit_tag 'Apply filter' %>
+    <%= submit_tag 'Apply filter', class: 'btn' %>
   </div>
 <% end %>
 
@@ -20,7 +19,6 @@
 <table class="participants">
   <thead>
     <tr>
-
       <% for field_name in @ordinary_fields %>
         <% if @visible_columns.include?(field_name) %>
           <th><%= field_name.humanize %></th>
@@ -74,7 +72,7 @@
     <% end %>
   </tbody>
 </table>
-<div class="alternative-format-links">
+<div class="alternative-options-links">
   [
   <%= link_to "json", "#{participants_path params.merge(:format => :json, :api_version => ApiVersion::API_VERSION)}" %>
   |

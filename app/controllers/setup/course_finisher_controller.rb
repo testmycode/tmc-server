@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Setup::CourseFinisherController < Setup::SetupController
   before_action :set_course
 

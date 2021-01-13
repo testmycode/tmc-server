@@ -1,0 +1,17 @@
+<%= link_to organization, class: "organization-card-link" do %>
+  <div class="card organization-card <%= organization.hidden? ? 'border-secondary' : 'border-dark' %>">
+    <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
+    <%= image_tag(organization.logo.url(:small_logo), class: "img-fluid") %>
+      <div>
+        <h4 class="card-title">
+          <%= organization.name %>
+          <small class="text-muted <%= /[[:upper:]]/.match(organization.name[-1]) ? 'text-bitup' : '' %>">
+            (<%= organization.slug %>)
+          </small>
+        </h4>
+        <%= organization.information %>
+      </div>
+    </div>
+  </div>
+<% end %>
+<br>

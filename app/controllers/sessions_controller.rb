@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Handles login and logout.
 class SessionsController < ApplicationController
   skip_authorization_check
@@ -13,7 +15,7 @@ class SessionsController < ApplicationController
   def create
     begin
       clear_expired_sessions
-    rescue
+    rescue StandardError
     end
 
     user = User.authenticate(params[:session][:login],
@@ -21,7 +23,9 @@ class SessionsController < ApplicationController
 
     redirect_params = {}
     if user.nil?
-      redirect_params = { alert: 'Login or password incorrect. Try again.' }
+      msg = 'Invalid credentials. Try again.'
+      redirect_params = { alert: msg }
+      return try_to_redirect_incorrect_login(redirect_params)
     else
       sign_in user
     end
@@ -35,21 +39,30 @@ class SessionsController < ApplicationController
   end
 
   private
-
-  def try_to_redirect_back(redirect_params = {})
-    if !session[:return_to].blank?
-      return_to = session.delete(:return_to)
-      redirect_to return_to, redirect_params
-    elsif !request.env['HTTP_REFERER'].blank?
-      redirect_to :back, redirect_params
-    elsif !request.referrer.blank?
-      redirect_to request.referrer, redirect_params
-    else
-      redirect_to root_path, redirect_params
+    def try_to_redirect_back(redirect_params = {})
+      if session[:return_to].present?
+        return_to = session.delete(:return_to)
+        redirect_to return_to, redirect_params
+      elsif request.env['HTTP_REFERER'].present?
+        redirect_to request.env['HTTP_REFERER'], redirect_params
+      elsif request.referer.present?
+        redirect_to request.referer, redirect_params
+      else
+        redirect_to root_path, redirect_params
+      end
     end
-  end
 
-  def clear_expired_sessions
-    Session.delete_expired
-  end
+    def try_to_redirect_incorrect_login(redirect_params = {})
+      if request.referer.present?
+        redirect_to request.referer, redirect_params
+      elsif request.env['HTTP_REFERER'].present?
+        redirect_to request.env['HTTP_REFERER'], redirect_params
+      else
+        redirect_to login_path, redirect_params
+      end
+    end
+
+    def clear_expired_sessions
+      Session.delete_expired
+    end
 end

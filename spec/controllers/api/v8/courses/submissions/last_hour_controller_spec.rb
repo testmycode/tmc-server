@@ -1,17 +1,19 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'json'
 
 describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
-  let!(:course) { FactoryGirl.create(:course) }
-  let(:regular_user) { FactoryGirl.create(:user) }
-  let(:admin_user) { FactoryGirl.create(:admin) }
+  let!(:course) { FactoryBot.create(:course) }
+  let(:regular_user) { FactoryBot.create(:user) }
+  let(:admin_user) { FactoryBot.create(:admin) }
 
-  let!(:submission_1) { FactoryGirl.create(:submission, course: course) }
-  let!(:submission_2) { FactoryGirl.create(:submission, course: course) }
-  let!(:submission_3) { FactoryGirl.create(:submission, course: course, created_at: Time.current - 2.hours) }
+  let!(:submission_1) { FactoryBot.create(:submission, course: course) }
+  let!(:submission_2) { FactoryBot.create(:submission, course: course) }
+  let!(:submission_3) { FactoryBot.create(:submission, course: course, created_at: Time.current - 2.hours) }
 
   before(:each) do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'index' do
@@ -19,8 +21,8 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
       let!(:token) { double resource_owner_id: regular_user.id, acceptable?: true }
 
       it 'should not allow access' do
-        get :index, course_id: course.id
-        expect(response).to have_http_status(:unauthorized)
+        get :index, params: { course_id: course.id }
+        expect(response).to have_http_status(403)
       end
     end
 
@@ -28,7 +30,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
       let!(:token) { double resource_owner_id: admin_user.id, acceptable?: true }
 
       it 'gives submission ids for the last hour' do
-        get :index, course_id: course.id
+        get :index, params: { course_id: course.id }
         expect(response).to have_http_status(:ok)
         res = JSON.parse(response.body)
         expect(res.length).to eq(2)

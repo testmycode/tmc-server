@@ -50,23 +50,23 @@
     -->
     <div class='course-timing-quick-fill'>
       <h3>Deadlines</h3>
-      <%= label_tag :first_set_date, 'Deadline for first set:'%>
-      <%= date_field :first_set_date, nil  %>
+      <%= label_tag :first_set_date, 'Deadline for first set:' %>
+      <%= date_field :first_set_date, nil, class: 'form-control' %>
       <br>
       Choose how incoming exercise set deadlines are set:<br>
       <%= radio_button_tag :deadline_type, "no_deadlines" %>
-      <%= label_tag :deadline_type_no_deadlines, 'No deadlines', class: 'radio inline' %><br>
+      <%= label_tag :deadline_type_no_deadlines, 'No deadlines', class: 'radio-inline' %><br>
       <%= radio_button_tag :deadline_type, "weekly_deadlines" %>
-      <%= label_tag :deadline_type_weekly_deadlines, 'Weekly', class: 'radio inline' %><br>
+      <%= label_tag :deadline_type_weekly_deadlines, 'Weekly', class: 'radio-inline' %><br>
       <%= radio_button_tag :deadline_type, "all_same_deadline" %>
-      <%= label_tag :deadline_type_all_same_deadline, 'All same', class: 'radio inline' %><br>
+      <%= label_tag :deadline_type_all_same_deadline, 'All same', class: 'radio-inline' %><br>
 
       <h3>Unlocks</h3>
       Choose the type, how the exercises are opened:<br>
       <%= radio_button_tag :unlock_type, "no_unlocks", (params[:unlock_type] == "no_unlocks") %>
-      <%= label_tag :unlock_type_no_unlocks, 'Everything open at start', class: 'radio inline' %><br>
+      <%= label_tag :unlock_type_no_unlocks, 'Everything open at start', class: 'radio-inline' %><br>
         <%= radio_button_tag :unlock_type, "percent_from_previous", (params[:unlock_type] == "percent_from_previous") %>
-      <%= label_tag :unlock_type_percent_from_previous, 'Percentage from previous set completed', class: 'radio inline' %><br>
+      <%= label_tag :unlock_type_percent_from_previous, 'Percentage from previous set completed', class: 'radio-inline' %><br>
       <div style="margin-left: 36px;">
         <%= number_field_tag :unlock_percentage, '80', min: 0, max:100, style: "width: 3em", disabled: true %>% needed
       </div>
@@ -80,7 +80,7 @@
 
     <%= submit_tag 'Accept and continue', class: 'btn btn-primary' %>
 
-    <table class="exercise-list table table-condensed">
+    <table class="exercise-list table">
       <thead>
       <tr>
         <th>Exercise group</th>
@@ -118,10 +118,10 @@
                 <div id="unlock-condition-<%= group.name %>">
                   <% condition = group_unlock_conditions.first %>
                   <%= radio_button_tag "#{param_array}_unlock_option", 'no_unlock', condition.blank? %>
-                  <%= label_tag "#{param_array}_unlock_option_no_unlock", "No unlock", class: 'radio inline' %>
+                  <%= label_tag "#{param_array}_unlock_option_no_unlock", "No unlock", class: 'radio-inline' %>
                   <br>
                   <%= radio_button_tag "#{param_array}_unlock_option", 'percentage_from', !condition.blank? %>
-                  <%= label_tag "#{param_array}_unlock_option_percentage from", 'Requires ', class: 'radio inline' %>
+                  <%= label_tag "#{param_array}_unlock_option_percentage from", 'Requires ', class: 'radio-inline' %>
                   <%= number_field_tag "#{param_array}_percentage_required", '80', min: 1, max:100, style: "width: 3em", value: parse_percentage_from_unlock_condition(condition) %>
                   % from
                   <%= select_tag "#{param_array}_unlock_groupname", options_for_select(@group_array, selected: parse_group_from_unlock_condition(condition)) %>
@@ -138,10 +138,9 @@
 
                 static_autofill = deadline.static_deadline_spec
                 #unlock_autofill = deadline.unlock_deadline_spec
-                field_class = nil
               %>
 
-              <%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: "#{field_class} datetime-picker" %><br/>
+              <%= text_field_tag "#{param_name}[#{deadline_type}][static]", static_autofill, disabled: disabled, class: "form-control datetime-picker" %><br/>
             </td>
 
       <% end %>

@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ExercisesController, type: :controller do
   describe 'GET show' do
     before :each do
-      @organization = FactoryGirl.create(:accepted_organization)
-      @course = FactoryGirl.create(:course)
+      @organization = FactoryBot.create(:accepted_organization)
+      @course = FactoryBot.create(:course)
       @course.organization = @organization
     end
-    let!(:exercise) { FactoryGirl.create(:exercise, course: @course) }
+    let!(:exercise) { FactoryBot.create(:exercise, course: @course) }
 
     def get_show
-      get :show, organization_id: @organization.slug, id: exercise.id
+      get :show, params: { organization_id: @organization.slug, id: exercise.id }
     end
 
     describe 'for guests' do
@@ -21,13 +23,13 @@ describe ExercisesController, type: :controller do
     end
 
     describe 'for users' do
-      let!(:user) { FactoryGirl.create(:user) }
+      let!(:user) { FactoryBot.create(:user) }
       before :each do
         controller.current_user = user
       end
       it "should not show the user's submissions" do
-        s1 = FactoryGirl.create(:submission, course: @course, exercise: exercise, user: user)
-        s2 = FactoryGirl.create(:submission, course: @course, exercise: exercise)
+        s1 = FactoryBot.create(:submission, course: @course, exercise: exercise, user: user)
+        s2 = FactoryBot.create(:submission, course: @course, exercise: exercise)
 
         get_show
 
@@ -39,12 +41,12 @@ describe ExercisesController, type: :controller do
 
     describe 'for administrators' do
       before :each do
-        controller.current_user = FactoryGirl.create(:admin)
+        controller.current_user = FactoryBot.create(:admin)
       end
       it 'should show all submissions' do
-        s1 = FactoryGirl.create(:submission, course: @course, exercise: exercise)
-        s2 = FactoryGirl.create(:submission, course: @course, exercise: exercise)
-        irrelevant = FactoryGirl.create(:submission)
+        s1 = FactoryBot.create(:submission, course: @course, exercise: exercise)
+        s2 = FactoryBot.create(:submission, course: @course, exercise: exercise)
+        irrelevant = FactoryBot.create(:submission)
 
         get_show
 
@@ -58,23 +60,19 @@ describe ExercisesController, type: :controller do
 
   describe 'POST set_disabled_statuses' do
     before :each do
-      @organization = FactoryGirl.create(:accepted_organization)
-      @course = FactoryGirl.create(:course, organization: @organization)
-      @ex1 = FactoryGirl.create(:exercise, course: @course)
-      @ex2 = FactoryGirl.create(:exercise, course: @course)
-      @ex3 = FactoryGirl.create(:exercise, course: @course)
-      @teacher = FactoryGirl.create(:user)
+      @organization = FactoryBot.create(:accepted_organization)
+      @course = FactoryBot.create(:course, organization: @organization)
+      @ex1 = FactoryBot.create(:exercise, course: @course)
+      @ex2 = FactoryBot.create(:exercise, course: @course)
+      @ex3 = FactoryBot.create(:exercise, course: @course)
+      @teacher = FactoryBot.create(:user)
       Teachership.create!(organization: @organization, user: @teacher)
       controller.current_user = @teacher
     end
 
-    def post_set_disabled_statuses(options = {})
-      post :set_disabled_statuses, options.merge(organization_id: @organization.slug, course_id: @course.id)
-    end
-
     describe 'as a teacher' do
       it 'disables not selected exercises' do
-        post_set_disabled_statuses course: { exercises: [@ex2.id] }
+        post :set_disabled_statuses, params: { course: { exercises: [@ex2.id] }, organization_id: @organization.slug, course_id: @course.id }
         @ex1.reload
         @ex2.reload
         @ex3.reload
@@ -85,7 +83,7 @@ describe ExercisesController, type: :controller do
 
       it 'enables all selected' do
         @ex3.disabled!
-        post_set_disabled_statuses course: { exercises: [@ex1.id, @ex2.id, @ex3.id] }
+        post :set_disabled_statuses, params: { course: { exercises: [@ex1.id, @ex2.id, @ex3.id] }, organization_id: @organization.slug, course_id: @course.id }
         @ex1.reload
         @ex2.reload
         @ex3.reload
@@ -96,7 +94,7 @@ describe ExercisesController, type: :controller do
 
       it 'does not fail if no parameters are given' do
         expect do
-          post_set_disabled_statuses course: { exercises: [] } # Form still sends an empty array
+          post :set_disabled_statuses, params: { course: { exercises: [''] }, organization_id: @organization.slug, course_id: @course.id }
         end.to_not raise_error
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Optionally inherited by config/site_tailoring.rb
 class Tailoring
   # If false, only show bare point names in points table

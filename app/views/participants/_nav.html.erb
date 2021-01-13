@@ -1,0 +1,7 @@
+<nav class="nav nav-tabs nav-justified">
+  <%= active_on_current_path_link_to fa_icon("user lg", text: 'Overview'), participant_path(@user), class: 'nav-item nav-link' %>
+  <%= active_on_current_path_link_to fa_icon("certificate lg", text: 'Certificates'), participant_certificates_path(@user), class: 'nav-item nav-link' %>
+  <%= active_on_current_path_link_to fa_icon("cog lg", text: 'Settings'), participant_settings_path(@user), class: 'nav-item nav-link' %>
+</nav>
+
+<br>

@@ -1,13 +1,16 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe "Resetting one's password by e-mail", type: :request, integration: true do
   include IntegrationTestActions
 
   it 'should be possible' do
-    user = User.create!(login: 'theuser', password: 'forgot_this', email: 'theuser@example.com')
+    user = FactoryBot.create(:verified_user, login: 'theuser', password: 'forgot_this', email: 'theuser@example.com')
 
     visit '/'
-    click_link 'Forgot password'
+    find(:link, 'Log in').trigger('click')
+    click_link 'I forgot my password'
     fill_in 'email', with: 'theuser@example.com'
     click_button 'Send password reset link'
 

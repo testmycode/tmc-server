@@ -24,9 +24,9 @@
 </table>
 
 <% if parent.is_a?(Course) %>
-  <div class="alternative-format-links">[<%= link_to "json", "#{organization_course_feedback_answers_path @organization, @parent, :format => :json}" %>]</div>
+  <div class="alternative-options-links">[<%= link_to "json", "#{organization_course_feedback_answers_path @organization, @parent, :format => :json}" %>]</div>
 <% elsif parent.is_a?(Exercise) %>
-  <div class="alternative-format-links">[<%= link_to "json", "#{organization_exercise_feedback_answers_path @organization, @parent, :format => :json}" %>]</div>
+  <div class="alternative-options-links">[<%= link_to "json", "#{organization_exercise_feedback_answers_path @organization, @parent, :format => :json}" %>]</div>
 <% end %>
 
 <div class="footnote">

@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # FIXME: might not work as expected, tests are not final...
 describe RemoteSandboxForTesting, type: :request, integration: true do
   specify 'running makefile_c tests' do
+    skip 'Not working, requires sandbox setup for testing'
     setup = SubmissionTestSetup.new(exercise_name: 'MakefileC')
     submission = setup.submission
 
@@ -13,12 +16,12 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     expect(submission).to be_processed
     submission.raise_pretest_error_if_any
 
-    tcr = submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'my-suite test_bar' }
+    tcr = submission.test_case_runs.to_a.find { |t| t.test_case_name == 'my-suite test_bar' }
     expect(tcr).not_to be_nil
     expect(tcr).not_to be_successful
 
     expect(submission.test_case_runs).not_to be_empty
-    tcr = submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'my-suite test_foo' }
+    tcr = submission.test_case_runs.to_a.find { |t| t.test_case_name == 'my-suite test_foo' }
     expect(tcr).not_to be_nil
     expect(tcr).to be_successful
 
@@ -27,6 +30,7 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
   end
 
   specify 'C compilation failures' do
+    skip 'Not working, requires sandbox setup for testing'
     setup = SubmissionTestSetup.new(exercise_name: 'MakefileC')
     submission = setup.submission
 

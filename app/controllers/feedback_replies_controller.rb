@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Handles replying to a feedback answer by e-mail.
 class FeedbackRepliesController < ApplicationController
   def create
@@ -12,6 +14,10 @@ class FeedbackRepliesController < ApplicationController
       answer.exercise_name
     ).deliver_now
 
-    redirect_to :back, notice: 'Reply to a review was mailed'
+    if request.referer.present?
+      redirect_to request.referer, params: { notice: 'Reply to a review was mailed' }
+    else
+      redirect_back fallback_location: root_path
+    end
   end
 end

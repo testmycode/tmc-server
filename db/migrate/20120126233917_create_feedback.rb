@@ -1,4 +1,4 @@
-class CreateFeedback < ActiveRecord::Migration
+class CreateFeedback < ActiveRecord::Migration[4.2]
   def change
     create_table :feedback_questions do |t|
       t.integer :course_id, null: false

@@ -1,128 +1,150 @@
-<div class="row-fluid">
-  <div class="well span6">
-    <div class="submission-summary">
-      <% if !@submission.processed? %>
-        <p>Processing...</p>
-        <p class="processing-status"><!-- for JS to fill in --></p>
-      <% elsif !@submission.can_see_results?(current_user) %>
-        <p class="hidden_status">All tests done - results are hidden</p>
-      <% elsif @submission.all_tests_passed? %>
-        <p class="success">All tests successful</p>
-      <% elsif @submission.tests_ran? %>
-        <p class="failure">Some tests failed</p>
-      <% else %>
-        <p class="failure">Failed to run tests</p>
-      <% end %>
-    </div>
-
-    <ul>
-      <% if (can? :read_results, @submission) && (!@submission.points_list.empty? || !@submission.exercise.nil?) %>
-        <li>
-          <%
-             awarded_points = @submission.points_list
-             available_points = @submission.exercise ? @submission.exercise.available_points.to_a.sort.map(&:name) : []
-             nonawarded_points = available_points - awarded_points
-             all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
-             all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
-          %>
-          Got <%= awarded_points.size %> out of <%= pluralize(available_points.size, 'point') %>
-          (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
-        </li>
-      <% end %>
-      <% if (can? :teach, @course) or not @is_paste %>
-        <li>
-          Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
-          <% if can? :teach, @course %>
-            <%= link_to @submission.user.username, participant_path(@submission.user) %>.
-          <% else %>
-            <%= @submission.user.username %>.
-          <% end %>
-        </li>
-      <% end %>
-      <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
-        <li>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</li>
-      <% end %>
-      <% if @submission.times_sent_to_sandbox > 1 %>
-        <li>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</li>
-      <% end %>
-
-      <% if can? :read, @submission %>
-        <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
-      <% end %>
-
-      <% if !@exercise.nil? && can?(:read, @exercise.solution) %>
-        <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
-      <% end %>
-
-      <% if can? :create_review, @course %>
-        <li><%= link_to "Start code review", new_submission_review_path(@submission) %></li>
-      <% end %>
-
-      <% if @submission.paste_available? and not @submission.all_tests_passed? and not @is_paste %>
-        <li><%= link_to "Show Paste", paste_path(@submission.paste_key) %></li>
-      <% end %>
-
-      <% if current_user.administrator? && @submission.sandbox  %>
-        <li>Sandbox used: <%= @submission.sandbox %></li>
-      <% end %>
-    </ul>
-
-    <% if can? :rerun, @submission %>
-      <br/>
-      <div>
-        <%= form_tag submission_path(@submission), :method => :put, :class => 'single-button' do %>
-          <%= hidden_field_tag('rerun', '1') %>
-          <div>
-            <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
-          </div>
-          (may add points; never deletes points)
+<div class="row">
+  <div class="card" style="width: 100%; margin-bottom: 1rem;">
+    <div class="card-body">
+      <div class="submission-summary">
+        <% if !@submission.processed? %>
+          <p>Processing...</p>
+          <p class="processing-status"><!-- for JS to fill in --></p>
+        <% elsif !@submission.can_see_results?(current_user) %>
+          <p class="hidden_status">All tests done - results are hidden</p>
+        <% elsif @submission.all_tests_passed? %>
+          <p class="success">All tests successful</p>
+        <% elsif @submission.tests_ran? %>
+          <p class="failure">Some tests failed</p>
+        <% else %>
+          <p class="failure">Failed to run tests</p>
         <% end %>
       </div>
-    <% end %>
 
-    <% if !@submission.processed? %>
-      <script type="text/javascript">
-      $(document).ready(function() {
-        // Animate the "Processing..." text
-        var dots = '...'
-        setInterval(function() {
-          if (dots == '...') {
-            dots = '';
-          } else {
-            dots += '.';
-          }
-          $('.submission-summary p:first').text('Processing' + dots);
-        }, 700);
-
-        // Refresh status until processed, then refresh page
-        <% if @is_paste %>
-            var url = '<%= j paste_url(@submission.paste_key, :format => :json, :api_version => ApiVersion::API_VERSION) %>';
-        <% else %>
-            var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApiVersion::API_VERSION) %>';
+      <ul>
+        <% if (can? :read_results, @submission) && (!@submission.points_list.empty? || !@submission.exercise.nil?) %>
+          <li>
+            <%
+              awarded_points = @submission.points_list
+              available_points = @submission.exercise ? @submission.exercise.available_points.to_a.sort.map(&:name) : []
+              nonawarded_points = available_points - awarded_points
+              all_points = awarded_points.map {|pt| [pt, 'success']} + nonawarded_points.map {|pt| [pt, 'failure']}
+              all_points = all_points.sort {|pt1, pt2| Natcmp.natcmp(pt1[0], pt2[0]) }
+            %>
+            Got <%= awarded_points.size %> out of <%= pluralize(available_points.size, 'point') %>
+            (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
+          </li>
         <% end %>
-        var refreshCooldown = 2500;
-        function refreshStatus() {
-          $.ajax({
-            url: url,
-            dataType: 'json',
-            success: function(data) {
-              if (data.status == 'processing') {
-                status =
-                  'Place in queue: ' + (data.submissions_before_this + 1) +
-                  ' / ' + data.total_unprocessed
-                $('.processing-status').text(status);
-              } else {
-                window.location.reload();
-              }
-            },
-            complete: function() {
-              setTimeout(refreshStatus, refreshCooldown);
+        <% if (can? :teach, @course) or not @is_paste %>
+          <li>
+            Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %>
+            <% if can? :teach, @course %>
+              by <%= link_to @submission.user.email, participant_path(@submission.user) %>.
+            <% end %>
+          </li>
+        <% end %>
+        <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
+          <li>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</li>
+        <% end %>
+        <% if @submission.times_sent_to_sandbox > 1 %>
+          <li>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</li>
+        <% end %>
+
+        <% if can? :read, @submission %>
+          <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
+        <% end %>
+
+        <% if !@exercise.nil? && can?(:read, @exercise.solution) %>
+          <li><%= link_to 'View suggested solution', exercise_solution_path(@exercise) %></li>
+        <% end %>
+
+        <% if !current_user.email_verified? && !@exercise.nil? && !can?(:read, @exercise.solution) %>
+          <li>Suggested solution is unavailable because you haven't verified your email address.</li>
+        <% end %>
+
+        <% if can? :create_review, @course %>
+          <li><%= link_to "Start code review", new_submission_review_path(@submission) %></li>
+        <% end %>
+
+        <% if @submission.paste_available? and not @submission.all_tests_passed? and not @is_paste %>
+          <li><%= link_to "Show Paste", paste_path(@submission.paste_key) %></li>
+        <% end %>
+
+        <% if current_user.administrator? && @submission.sandbox  %>
+          <li>Sandbox used: <%= @submission.sandbox %></li>
+        <% end %>
+
+        <% if can? :teach, @course %>
+          <li><%= link_to 'Difference with model solution', submission_difference_with_solution_path(@submission) %> (only for teachers/assistants)</li>
+        <% end %>
+
+        <% if can? :teach, @course %>
+          <li>Model solution coin used: <%= @model_solution_token_used.empty? ? 'no' : @model_solution_token_used.first.created_at %></li>
+        <% end %>
+      </ul>
+
+      <% if can? :rerun, @submission %>
+        <div>
+          <%= form_tag submission_path(@submission), :method => :put, :class => 'single-button' do %>
+            <%= hidden_field_tag('rerun', '1') %>
+            <div>
+              <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
+            </div>
+            (may add points; never deletes points)
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if !@submission.processed? %>
+        <script type="text/javascript">
+        $(document).ready(function() {
+          // Animate the "Processing..." text
+          var dots = '...'
+          setInterval(function() {
+            if (dots == '...') {
+              dots = '';
+            } else {
+              dots += '.';
             }
-          });
-        }
-        refreshStatus();
-      });
-      </script>
-    <% end %>
+            $('.submission-summary p:first').text('Processing' + dots);
+          }, 700);
+
+          // Refresh status until processed, then refresh page
+          <% if @is_paste %>
+              var url = '<%= j paste_url(@submission.paste_key, :format => :json, :api_version => ApiVersion::API_VERSION) %>';
+          <% else %>
+              var url = '<%= j submission_url(@submission, :format => :json, :api_version => ApiVersion::API_VERSION) %>';
+          <% end %>
+          var refreshCooldown = 2500;
+          function refreshStatus() {
+            $.ajax({
+              url: url,
+              dataType: 'json',
+              success: function(data) {
+                if (data.status == 'processing') {
+                  status =
+                    'Place in queue: ' + (data.submissions_before_this + 1) +
+                    ' / ' + data.total_unprocessed
+                  $('.processing-status').text(status);
+                } else {
+                  window.location.reload();
+                }
+              },
+              complete: function() {
+                setTimeout(refreshStatus, refreshCooldown);
+              }
+            });
+          }
+          refreshStatus();
+        });
+        </script>
+      <% end %>
+    </div>
   </div>
 </div>
+
+<% if @submission.message_for_paste && !@submission.message_for_paste.empty? %>
+  <div class="row">
+    <div class="card" style="width: 100%; margin-bottom: 1rem;">
+      <div class="card-body">
+        <h5 class="card-title">Paste message</h5>
+            <%= @submission.message_for_paste %>
+      </div>
+    </div>
+  </div>
+<% end %>

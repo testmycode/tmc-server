@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 require File.join(File.dirname(File.dirname(__FILE__)), 'fixture_exercise')
 
@@ -65,16 +67,15 @@ class FixtureExercise::SimpleExercise < FixtureExercise
   end
 
   private
-
-  def replace_method_body_in_file(path, method, body)
-    lines = IO.readlines(path)
-    lines = lines.map do |line|
-      if line.include? "METHOD BODY #{method}"
-        body + " // METHOD BODY #{method}\n"
-      else
-        line
+    def replace_method_body_in_file(path, method, body)
+      lines = IO.readlines(path)
+      lines = lines.map do |line|
+        if line.include? "METHOD BODY #{method}"
+          body + " // METHOD BODY #{method}\n"
+        else
+          line
+        end
       end
+      File.open(path, 'wb') { |f| f.write(lines.join) }
     end
-    File.open(path, 'wb') { |f| f.write(lines.join) }
-  end
 end

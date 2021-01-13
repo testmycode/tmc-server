@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Core
@@ -28,7 +30,7 @@ module Api
           def index
             unauthorize_guest!
             organization = Organization.find_by!(slug: params[:organization_slug])
-            ordering = 'hidden, disabled_status, LOWER(name)'
+            ordering = Arel.sql('hidden, disabled_status, LOWER(name)')
             courses = organization.courses.ongoing.order(ordering)
             courses = courses.select { |c| c.visible_to?(current_user) }
             authorize! :read, courses

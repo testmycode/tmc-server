@@ -5,30 +5,32 @@
   <%= render 'pretest_error' %>
 <% end %>
 
-<ul class="nav nav-tabs" id="myTab">
+<ul class="nav nav-tabs nav-justified" id="myTab">
   <% if @submission.feedback_answers.any? %>
-    <li><a href="#feedback" >Feedback</a></li>
+    <li class="nav-item"><a class="nav-link" href="#feedback" >Feedback</a></li>
   <% end %>
   <% if @submission.tests_ran? %>
-    <li><a href="#testResults">Test Results</a></li>
+    <li class="nav-item"><a class="nav-link" href="#testResults">Test Results</a></li>
   <% end %>
   <% if !@submission.stdout.blank? && (can? :read_results, @submission) %>
-    <li><a href="#stdout" >Stdout</a></li>
+    <li class="nav-item"><a class="nav-link" href="#stdout" >Stdout</a></li>
   <% end %>
   <% if !@submission.stderr.blank? && (can? :read_results, @submission) %>
-    <li><a href="#stderr" >Stderr</a></li>
+    <li class="nav-item"><a class="nav-link" href="#stderr" >Stderr</a></li>
   <% end %>
   <% if !@submission.valgrind.blank? && (can? :read_results, @submission) %>
-    <li><a href="#valgrind" >Valgrind</a></li>
+    <li class="nav-item"><a class="nav-link" href="#valgrind" >Valgrind</a></li>
   <% end %>
   <% if !@submission.vm_log.blank? && (can? :read_vm_log, @submission) %>
-    <li class=""><a href="#logs">Logs</a></li>
+    <li class="nav-item"><a class="nav-link"  href="#logs">Logs</a></li>
   <% end %>
-  <li class="active"><a href="#files">Files</a></li>
+  <li class="active nav-item"><a class="nav-link" href="#files">Files</a></li>
 </ul>
 
-<div class="row-fluid">
-  <div class="span12">
+<br>
+
+<div class="row">
+  <div class="col-md-12">
     <div class="tab-content">
       <% if @submission.feedback_answers.any? %>
         <div class="tab-pane" id="feedback">
@@ -66,14 +68,15 @@
           <%= render 'submissions/logs' %>
         </div>
       <% end %>
-
-      <div class="tab-pane active" id="files">
-        <div class="row-fluid">
-          <div class="span11">
-            <%= render :partial => 'files/files', :locals => {:files => @files} %>
+      <% if can? :read_results, @submission %>
+        <div class="tab-pane active" id="files">
+          <div class="row">
+            <div style="width: 100%">
+              <%= render :partial => 'files/files', :locals => {:files => @files} %>
+            </div>
           </div>
         </div>
-      </div>
+      <% end %>
     </div>
   </div>
 </div>

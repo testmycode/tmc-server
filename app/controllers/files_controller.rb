@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Shows the files of a submission.
 class FilesController < ApplicationController
   skip_authorization_check

@@ -1,4 +1,4 @@
-class CreateCourseTemplates < ActiveRecord::Migration
+class CreateCourseTemplates < ActiveRecord::Migration[4.2]
   def change
     create_table :course_templates do |t|
       t.string :name, unique: true

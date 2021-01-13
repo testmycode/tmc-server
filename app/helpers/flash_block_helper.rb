@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FlashBlockHelper
   def flash_block
     output = ''

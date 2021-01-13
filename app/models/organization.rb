@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 # Organisations (schools etc.) have teachers and their own customized courses.
 
-class Organization < ActiveRecord::Base
+class Organization < ApplicationRecord
   include Swagger::Blocks
 
   swagger_schema :Organization do
-    key :required, [:name, :information, :slug, :logo_path, :pinned]
+    key :required, %i[name information slug logo_path pinned]
 
     property :name, type: :string, example: 'University of Helsinki'
     property :information, type: :string, example: 'Organization for University of Helsinki'
@@ -38,7 +40,7 @@ class Organization < ActiveRecord::Base
   has_attached_file :logo, styles: { small_logo: '100x100>' }
   validates_attachment_content_type :logo, content_type: /\Aimage\/.*\Z/
 
-  scope :accepted_organizations, -> { where(verified: true).where(disabled: false)}
+  scope :accepted_organizations, -> { where(verified: true).where(disabled: false) }
   scope :pending_organizations, -> { where(verified: false).where(disabled: false) }
   scope :assisted_organizations, ->(user) { joins(:courses, courses: :assistantships).where(assistantships: { user_id: user.id }) }
   scope :taught_organizations, ->(user) { joins(:teacherships).where(teacherships: { user_id: user.id }) }
@@ -71,7 +73,13 @@ class Organization < ActiveRecord::Base
     Organization.where(slug: slug)
   end
 
+  def visibility_allowed?(request, user)
+    return true if user.administrator?
+    return true unless whitelisted_ips
+    whitelisted_ips.include?(request.remote_ip)
+  end
+
   def valid_slug? # slug must not be an existing route (/org/new etc)
-    errors.add(:slug, 'is a system reserved word') if %w(new list_requests).include? slug
+    errors.add(:slug, 'is a system reserved word') if %w[new list_requests].include? slug
   end
 end

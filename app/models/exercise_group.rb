@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'natcmp'
 
 # Abstracts a subdirectory containing exercises in the repository.
@@ -15,11 +17,7 @@ class ExerciseGroup
   attr_reader :name
 
   def parent
-    if parent_name
-      course.exercise_group_by_name(parent_name)
-    else
-      nil
-    end
+    course.exercise_group_by_name(parent_name) if parent_name
   end
 
   def parent_name
@@ -28,8 +26,6 @@ class ExerciseGroup
       if parts.size > 1
         parts.pop
         parts.join('-')
-      else
-        nil
       end
     end
   end
@@ -70,7 +66,7 @@ class ExerciseGroup
   end
 
   def contains_unlock_deadlines?
-    exercises(false).any? { |e| e.has_unlock_deadline?}
+    exercises(false).any?(&:has_unlock_deadline?)
   end
 
   def hard_group_deadline=(deadline)
@@ -82,7 +78,7 @@ class ExerciseGroup
   end
 
   def group_unlock_conditions
-    exercises(false).map { |n| n.unlock_conditions }.first
+    exercises(false).map(&:unlock_conditions).first
   end
 
   def group_unlock_conditions=(unlock_conditions)
@@ -92,16 +88,33 @@ class ExerciseGroup
     end
   end
 
+  def available_point_names
+    conn = ActiveRecord::Base.connection
+
+    # FIXME: this bit is duplicated in MetadataValue in master branch.
+    # http://stackoverflow.com/questions/5709887/a-proper-way-to-escape-when-building-like-queries-in-rails-3-activerecord
+    pattern = (@name.gsub(/[!%_]/) { |x| '!' + x }) + '-%'
+
+    sql = <<-EOS
+        SELECT available_points.name
+        FROM exercises, available_points
+        WHERE exercises.course_id = #{conn.quote(@course.id)} AND
+              exercises.name LIKE #{conn.quote(pattern)} AND
+              exercises.id = available_points.exercise_id
+    EOS
+    available_points = conn.select_values(sql)
+    available_points
+  end
+
   private
-
-  def group_deadline(method)
-    exercises(false).map { |n| n.send(method) }.first
-  end
-
-  def set_group_deadline(method, deadline)
-    exercises(false).each do |e|
-      e.send(method, deadline)
-      e.save!
+    def group_deadline(method)
+      exercises(false).map { |n| n.send(method) }.first
     end
-  end
+
+    def set_group_deadline(method, deadline)
+      exercises(false).each do |e|
+        e.send(method, deadline)
+        e.save!
+      end
+    end
 end

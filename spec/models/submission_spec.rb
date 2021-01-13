@@ -1,6 +1,4 @@
-# encoding: utf-8
-
-# -*- coding: UTF-8 -*-
+# frozen_string_literal: true
 
 require 'spec_helper'
 
@@ -57,49 +55,49 @@ describe Submission, type: :model do
     submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo2()', successful: true)
     submission.test_case_runs << TestCaseRun.new(test_case_name: 'Moo moo()', message: 'you fail', successful: false, detailed_message: 'trace')
     expect(submission.test_case_records).to eq([
-      {
-        name: 'Moo moo()',
-        successful: false,
-        message: 'you fail',
-        exception: { 'a' => 'b' },
-        detailed_message: nil
-      },
-      {
-        name: 'Moo moo2()',
-        successful: true,
-        message: nil,
-        exception: nil,
-        detailed_message: nil
-      },
-      {
-        name: 'Moo moo()',
-        successful: false,
-        message: 'you fail',
-        exception: nil,
-        detailed_message: 'trace'
-      }
-    ])
+                                                 {
+                                                   name: 'Moo moo()',
+                                                   successful: false,
+                                                   message: 'you fail',
+                                                   exception: { 'a' => 'b' },
+                                                   detailed_message: nil
+                                                 },
+                                                 {
+                                                   name: 'Moo moo2()',
+                                                   successful: true,
+                                                   message: nil,
+                                                   exception: nil,
+                                                   detailed_message: nil
+                                                 },
+                                                 {
+                                                   name: 'Moo moo()',
+                                                   successful: false,
+                                                   message: 'you fail',
+                                                   exception: nil,
+                                                   detailed_message: 'trace'
+                                                 }
+                                               ])
   end
 
   it 'can tell how many unprocessed submissions are in queue before itself' do
     t = Time.now
-    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 10.seconds)
-    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 9.seconds)
-    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 8.seconds, processing_priority: -2)
-    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 7.seconds)
-    s = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 6.seconds)
-    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 5.seconds)
-    FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 4.seconds)
+    FactoryBot.create(:submission, processed: false, processing_tried_at: t - 10.seconds)
+    FactoryBot.create(:submission, processed: false, processing_tried_at: t - 9.seconds)
+    FactoryBot.create(:submission, processed: false, processing_tried_at: t - 8.seconds, processing_priority: -2)
+    FactoryBot.create(:submission, processed: false, processing_tried_at: t - 7.seconds)
+    s = FactoryBot.create(:submission, processed: false, processing_tried_at: t - 6.seconds)
+    FactoryBot.create(:submission, processed: false, processing_tried_at: t - 5.seconds)
+    FactoryBot.create(:submission, processed: false, processing_tried_at: t - 4.seconds)
 
     expect(s.unprocessed_submissions_before_this).to eq(3)
   end
 
   it 'orders unprocessed submissions by priority, then by last processing attempt time' do
     t = Time.now
-    s1 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 7.seconds)
-    s2 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 8.seconds)
-    s3 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 9.seconds, processing_priority: 1)
-    s4 = FactoryGirl.create(:submission, processed: false, processing_tried_at: t - 10.seconds)
+    s1 = FactoryBot.create(:submission, processed: false, processing_tried_at: t - 7.seconds)
+    s2 = FactoryBot.create(:submission, processed: false, processing_tried_at: t - 8.seconds)
+    s3 = FactoryBot.create(:submission, processed: false, processing_tried_at: t - 9.seconds, processing_priority: 1)
+    s4 = FactoryBot.create(:submission, processed: false, processing_tried_at: t - 10.seconds)
 
     expected_order = [s3, s4, s2, s1]
 
@@ -107,7 +105,7 @@ describe Submission, type: :model do
   end
 
   it 'stores stdout and stderr compressed' do
-    s = FactoryGirl.create(:submission)
+    s = FactoryBot.create(:submission)
     s.stdout = 'hello'
     expect(s.submission_data.stdout_compressed).not_to be_empty
     s.stderr = 'world'
@@ -120,7 +118,7 @@ describe Submission, type: :model do
   end
 
   it 'can have null stdout and stderr' do
-    s = FactoryGirl.create(:submission)
+    s = FactoryBot.create(:submission)
     s.stdout = 'hello'
     s.stderr = 'world'
     s.stdout = nil
@@ -133,7 +131,7 @@ describe Submission, type: :model do
   end
 
   it 'allows utf-8 caharacters in stdout, stderr and vm_log' do
-    s = FactoryGirl.create(:submission)
+    s = FactoryBot.create(:submission)
     s.stdout = 'mää'
     s.stderr = 'möö'
     s.vm_log = 'måå'
@@ -148,12 +146,12 @@ describe Submission, type: :model do
   end
 
   it 'deletes submission data when destroyed' do
-    s = FactoryGirl.create(:submission)
+    s = FactoryBot.create(:submission)
     s.stdout = 'hello'
     s.save!
 
     id = s.id
     s.destroy
-    expect(SubmissionData.find_by_submission_id(id)).to be_nil
+    expect(SubmissionData.find_by(submission_id: id)).to be_nil
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExercisesController < ApplicationController
   def show
     @exercise = Exercise.find(params[:id])
@@ -34,7 +36,7 @@ class ExercisesController < ApplicationController
       end
       format.json do
         # This is used by (at least) tmc.py at the moment
-        return render json: { error: 'Authentication required' }, status: 403 if current_user.guest?
+        return render json: { error: 'Authentication required' }, status: :forbidden if current_user.guest?
 
         @submissions = @exercise.submissions.order('submissions.created_at DESC')
         @submissions = @submissions.where(user_id: current_user.id) unless current_user.administrator?
@@ -50,7 +52,7 @@ class ExercisesController < ApplicationController
           exercise_id:                      @exercise.id,
           unlocked_at:                      @exercise.time_unlocked_for(current_user),
           deadline:                         @exercise.deadline_for(current_user),
-          submissions:                      SubmissionList.new(current_user, view_context).submission_list_data(@submissions),
+          submissions:                      SubmissionList.new(current_user, view_context).submission_list_data(@submissions)
         }
         render json: data.to_json
       end
@@ -68,8 +70,10 @@ class ExercisesController < ApplicationController
     course_exercises = Exercise.where(course: @course)
     selected_exercises = Exercise.where(id: selected_exercise_ids, course: @course)
 
-    course_exercises.update_all(disabled_status: true)
-    selected_exercises.update_all(disabled_status: false)
+    course_exercises.update_all(disabled_status: 1)
+    selected_exercises.update_all(disabled_status: 0)
+
+    UncomputedUnlock.create_all_for_course(@course)
 
     redirect_to manage_exercises_organization_course_path(@organization, @course),
                 notice: 'Exercises successfully updated.'
@@ -79,6 +83,12 @@ class ExercisesController < ApplicationController
     @exercise = Exercise.find(params[:id])
     authorize! :toggle_submission_result_visibility, @exercise.course
     @exercise.toggle_submission_result_visiblity
-    redirect_to exercise_path(@exercise), notice: "Submission results are now #{@exercise.hide_submission_results ? 'hidden' : 'visible'}"
+    status = @exercise.hide_submission_results ? '<b>hidden</b>' : '<b>visible</b>'
+    redirect_to exercise_path(@exercise), notice: "<h4>Exercise status update:</h4>
+    <ul>
+      <li>Submission results are now #{status}</li>
+      <li>Points are now #{status}</li>
+      <li>Model solutions is now #{status}</li>
+    </ul>"
   end
 end

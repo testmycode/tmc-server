@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170809122816) do
+ActiveRecord::Schema.define(version: 20201208125737) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,8 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.datetime "expires_at"
     t.datetime "updated_at"
   end
+
+  add_index "action_tokens", ["user_id"], name: "index_action_tokens_on_user_id", using: :btree
 
   create_table "assistantships", force: :cascade do |t|
     t.integer  "user_id"
@@ -43,11 +45,12 @@ ActiveRecord::Schema.define(version: 20170809122816) do
   add_index "available_points", ["exercise_id", "name"], name: "index_available_points_on_exercise_id_and_name", unique: true, using: :btree
 
   create_table "awarded_points", force: :cascade do |t|
-    t.integer  "course_id",     null: false
-    t.integer  "user_id",       null: false
+    t.integer  "course_id",                                   null: false
+    t.integer  "user_id",                                     null: false
     t.integer  "submission_id"
-    t.string   "name",          null: false
+    t.string   "name",                                        null: false
     t.datetime "created_at"
+    t.boolean  "awarded_after_soft_deadline", default: false, null: false
   end
 
   add_index "awarded_points", ["course_id", "user_id", "name"], name: "index_awarded_points_on_course_id_and_user_id_and_name", unique: true, using: :btree
@@ -63,6 +66,9 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.datetime "updated_at"
   end
 
+  add_index "certificates", ["course_id"], name: "index_certificates_on_course_id", using: :btree
+  add_index "certificates", ["user_id"], name: "index_certificates_on_user_id", using: :btree
+
   create_table "course_notifications", force: :cascade do |t|
     t.string   "topic"
     t.string   "message"
@@ -72,6 +78,8 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.datetime "updated_at"
   end
 
+  add_index "course_notifications", ["course_id"], name: "index_course_notifications_on_course_id", using: :btree
+
   create_table "course_templates", force: :cascade do |t|
     t.string   "name"
     t.string   "title"
@@ -80,7 +88,7 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.string   "source_url"
     t.boolean  "dummy",          default: false,    null: false
     t.boolean  "hidden",         default: false
-    t.integer  "cache_version",  default: 0,        null: false
+    t.integer  "cached_version", default: 0,        null: false
     t.string   "source_backend", default: "git",    null: false
     t.string   "git_branch",     default: "master", null: false
     t.datetime "expires_at"
@@ -93,28 +101,37 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "hide_after"
-    t.boolean  "hidden",                         default: false, null: false
-    t.integer  "cache_version",                  default: 0,     null: false
+    t.boolean  "hidden",                                                  default: false, null: false
+    t.integer  "cached_version",                                          default: 0,     null: false
     t.string   "spreadsheet_key"
     t.datetime "hidden_if_registered_after"
     t.datetime "refreshed_at"
-    t.boolean  "locked_exercise_points_visible", default: true,  null: false
+    t.boolean  "locked_exercise_points_visible",                          default: true,  null: false
     t.text     "description"
-    t.string   "paste_visibility"
+    t.integer  "paste_visibility"
     t.string   "formal_name"
-    t.boolean  "certificate_downloadable",       default: false, null: false
+    t.boolean  "certificate_downloadable",                                default: false, null: false
     t.string   "certificate_unlock_spec"
     t.integer  "organization_id"
-    t.integer  "disabled_status",                default: 1
+    t.integer  "disabled_status",                                         default: 1
     t.string   "title"
     t.string   "material_url"
-    t.integer  "course_template_id",                             null: false
-    t.boolean  "hide_submission_results",        default: false
+    t.integer  "course_template_id",                                                      null: false
+    t.boolean  "hide_submission_results",                                 default: false
     t.string   "external_scoreboard_url"
-    t.boolean  "initial_refresh_ready",          default: false
-    t.boolean  "hide_submissions",               default: false, null: false
+    t.boolean  "initial_refresh_ready",                                   default: false
+    t.boolean  "hide_submissions",                                        default: false, null: false
+    t.boolean  "model_solution_visible_before_completion",                default: false, null: false
+    t.float    "soft_deadline_point_multiplier",                          default: 0.75,  null: false
+    t.boolean  "code_review_requests_enabled",                            default: true,  null: false
+    t.integer  "grant_model_solution_token_every_nth_completed_exercise"
+    t.integer  "initial_coin_stash"
+    t.boolean  "large_exercises_consume_more_coins",                      default: false
+    t.string   "moocfi_id"
+    t.integer  "submissions_count",                                       default: 0,     null: false
   end
 
+  add_index "courses", ["course_template_id"], name: "index_courses_on_course_template_id", using: :btree
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
 
   create_table "exercises", force: :cascade do |t|
@@ -124,24 +141,27 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.integer  "course_id"
     t.datetime "publish_time"
     t.string   "gdocs_sheet"
-    t.boolean  "hidden",                           default: false, null: false
+    t.boolean  "hidden",                           default: false,                                                null: false
     t.boolean  "returnable_forced"
-    t.string   "checksum",                         default: "",    null: false
+    t.string   "checksum",                         default: "",                                                   null: false
     t.datetime "solution_visible_after"
-    t.boolean  "has_tests",                        default: false, null: false
+    t.boolean  "has_tests",                        default: false,                                                null: false
     t.text     "deadline_spec"
     t.text     "unlock_spec"
-    t.string   "runtime_params",                   default: "[]",  null: false
+    t.string   "runtime_params",                   default: "[]",                                                 null: false
     t.string   "valgrind_strategy"
-    t.boolean  "code_review_requests_enabled",     default: false, null: false
-    t.boolean  "run_tests_locally_action_enabled", default: true,  null: false
+    t.boolean  "code_review_requests_enabled",     default: false,                                                null: false
+    t.boolean  "run_tests_locally_action_enabled", default: true,                                                 null: false
     t.text     "soft_deadline_spec"
     t.integer  "disabled_status",                  default: 0
     t.boolean  "hide_submission_results",          default: false
+    t.string   "docker_image",                     default: "eu.gcr.io/moocfi-public/tmc-sandbox-tmc-langs-rust"
+    t.integer  "paste_visibility"
   end
 
   add_index "exercises", ["course_id", "name"], name: "index_exercises_on_course_id_and_name", unique: true, using: :btree
   add_index "exercises", ["gdocs_sheet"], name: "index_exercises_on_gdocs_sheet", using: :btree
+  add_index "exercises", ["name"], name: "index_exercises_on_name", using: :btree
 
   create_table "feedback_answers", force: :cascade do |t|
     t.integer  "feedback_question_id", null: false
@@ -166,6 +186,20 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.text     "title"
   end
 
+  add_index "feedback_questions", ["course_id"], name: "index_feedback_questions_on_course_id", using: :btree
+
+  create_table "kafka_batch_update_points", force: :cascade do |t|
+    t.integer  "course_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "user_id"
+    t.integer  "exercise_id"
+    t.string   "task_type",   default: "progress", null: false
+    t.boolean  "realtime",    default: true
+  end
+
+  add_index "kafka_batch_update_points", ["course_id"], name: "index_kafka_batch_update_points_on_course_id", using: :btree
+
   create_table "migrated_submissions", id: false, force: :cascade do |t|
     t.integer  "from_course_id"
     t.integer  "to_course_id"
@@ -176,6 +210,29 @@ ActiveRecord::Schema.define(version: 20170809122816) do
   end
 
   add_index "migrated_submissions", ["from_course_id", "to_course_id", "original_submission_id", "new_submission_id"], name: "unique_values", unique: true, using: :btree
+
+  create_table "model_solution_access_logs", force: :cascade do |t|
+    t.integer  "user_id",       null: false
+    t.integer  "course_id",     null: false
+    t.string   "exercise_name", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "model_solution_access_logs", ["course_id"], name: "index_model_solution_access_logs_on_course_id", using: :btree
+  add_index "model_solution_access_logs", ["user_id"], name: "index_model_solution_access_logs_on_user_id", using: :btree
+
+  create_table "model_solution_token_useds", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "course_id"
+    t.string   "exercise_name"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "cost",          default: 1, null: false
+  end
+
+  add_index "model_solution_token_useds", ["course_id"], name: "index_model_solution_token_useds_on_course_id", using: :btree
+  add_index "model_solution_token_useds", ["user_id"], name: "index_model_solution_token_useds_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
@@ -188,6 +245,7 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.string   "scopes"
   end
 
+  add_index "oauth_access_grants", ["application_id"], name: "index_oauth_access_grants_on_application_id", using: :btree
   add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
 
   create_table "oauth_access_tokens", force: :cascade do |t|
@@ -201,6 +259,7 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.string   "scopes"
   end
 
+  add_index "oauth_access_tokens", ["application_id"], name: "index_oauth_access_tokens_on_application_id", using: :btree
   add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, using: :btree
   add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
@@ -238,12 +297,25 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.string   "email"
     t.text     "website"
     t.boolean  "pinned",              default: false, null: false
+    t.string   "whitelisted_ips",                                  array: true
   end
+
+  add_index "organizations", ["creator_id"], name: "index_organizations_on_creator_id", using: :btree
 
   create_table "points_upload_queues", force: :cascade do |t|
     t.integer  "point_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "recently_changed_user_details", force: :cascade do |t|
+    t.integer  "change_type", null: false
+    t.string   "old_value"
+    t.string   "new_value",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "username"
+    t.string   "email"
   end
 
   create_table "reply_to_feedback_answers", force: :cascade do |t|
@@ -253,6 +325,8 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "reply_to_feedback_answers", ["feedback_answer_id"], name: "index_reply_to_feedback_answers_on_feedback_answer_id", using: :btree
 
   create_table "reviews", force: :cascade do |t|
     t.integer  "submission_id",                  null: false
@@ -321,8 +395,11 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.string   "sandbox"
   end
 
+  add_index "submissions", ["course_id", "created_at"], name: "index_submissions_on_course_id_and_created_at", using: :btree
   add_index "submissions", ["course_id", "exercise_name"], name: "index_submissions_on_course_id_and_exercise_name", using: :btree
   add_index "submissions", ["course_id", "user_id"], name: "index_submissions_on_course_id_and_user_id", using: :btree
+  add_index "submissions", ["exercise_name"], name: "index_submissions_on_exercise_name", using: :btree
+  add_index "submissions", ["paste_key"], name: "index_submissions_on_paste_key", using: :btree
   add_index "submissions", ["processed"], name: "index_submissions_on_processed", using: :btree
   add_index "submissions", ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name", using: :btree
 
@@ -377,6 +454,17 @@ ActiveRecord::Schema.define(version: 20170809122816) do
 
   add_index "unlocks", ["user_id", "course_id", "exercise_name"], name: "index_unlocks_on_user_id_and_course_id_and_exercise_name", unique: true, using: :btree
 
+  create_table "user_app_data", force: :cascade do |t|
+    t.string   "field_name"
+    t.text     "value"
+    t.string   "namespace"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_app_data", ["user_id", "field_name", "namespace"], name: "index_user_app_data_on_user_id_and_field_name_and_namespace", unique: true, using: :btree
+
   create_table "user_field_values", force: :cascade do |t|
     t.integer  "user_id",    null: false
     t.string   "field_name", null: false
@@ -396,9 +484,21 @@ ActiveRecord::Schema.define(version: 20170809122816) do
     t.boolean  "administrator",      default: false, null: false
     t.text     "email",              default: "",    null: false
     t.boolean  "legitimate_student", default: true,  null: false
+    t.boolean  "email_verified",     default: false, null: false
+    t.string   "argon_hash"
   end
 
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
+
+  create_table "verification_tokens", force: :cascade do |t|
+    t.string   "token",      null: false
+    t.integer  "type",       null: false
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "verification_tokens", ["user_id"], name: "index_verification_tokens_on_user_id", using: :btree
 
   add_foreign_key "action_tokens", "users", on_delete: :cascade
   add_foreign_key "available_points", "exercises", on_delete: :cascade
@@ -410,6 +510,9 @@ ActiveRecord::Schema.define(version: 20170809122816) do
   add_foreign_key "feedback_answers", "feedback_questions", on_delete: :cascade
   add_foreign_key "feedback_answers", "submissions", on_delete: :nullify
   add_foreign_key "feedback_questions", "courses", on_delete: :cascade
+  add_foreign_key "kafka_batch_update_points", "courses"
+  add_foreign_key "model_solution_token_useds", "courses"
+  add_foreign_key "model_solution_token_useds", "users"
   add_foreign_key "reviews", "submissions", on_delete: :cascade
   add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "submission_data", "submissions", on_delete: :cascade
@@ -417,5 +520,6 @@ ActiveRecord::Schema.define(version: 20170809122816) do
   add_foreign_key "submissions", "users", on_delete: :cascade
   add_foreign_key "test_case_runs", "submissions", on_delete: :cascade
   add_foreign_key "test_scanner_cache_entries", "courses", on_delete: :cascade
+  add_foreign_key "user_app_data", "users"
   add_foreign_key "user_field_values", "users", on_delete: :cascade
 end

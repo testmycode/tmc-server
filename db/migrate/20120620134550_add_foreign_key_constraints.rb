@@ -1,4 +1,4 @@
-class AddForeignKeyConstraints < ActiveRecord::Migration
+class AddForeignKeyConstraints < ActiveRecord::Migration[4.2]
   def change
     add_foreign_key "exercises", "courses", on_delete: :cascade
     add_foreign_key "submissions", "courses", on_delete: :cascade

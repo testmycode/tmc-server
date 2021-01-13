@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe DateAndTimeUtils do
@@ -13,8 +15,8 @@ describe DateAndTimeUtils do
       t = DateAndTimeUtils.to_time('15.07.2011')
       expect(t).to be_a(Time)
       expect(t.day).to eq(15)
-      expect(t.hour).to eq(00)
-      expect(t.min).to eq(00)
+      expect(t.hour).to eq(0o0)
+      expect(t.min).to eq(0o0)
     end
 
     it 'should can convert dates to local end of day time' do
@@ -41,7 +43,7 @@ describe DateAndTimeUtils do
       d = DateAndTimeUtils.parse_date_or_time('2011-07-13')
       expect(d).to be_a(Date)
       expect(d.day).to eq(13)
-      expect(d.month).to eq(07)
+      expect(d.month).to eq(0o7)
       expect(d.year).to eq(2011)
     end
 
@@ -49,18 +51,18 @@ describe DateAndTimeUtils do
       t = DateAndTimeUtils.parse_date_or_time('2011-07-13 13:45')
       expect(t).to be_a(Time)
       expect(t.day).to eq(13)
-      expect(t.month).to eq(07)
+      expect(t.month).to eq(0o7)
       expect(t.year).to eq(2011)
       expect(t.hour).to eq(13)
       expect(t.min).to eq(45)
-      expect(t.sec).to eq(00)
+      expect(t.sec).to eq(0o0)
     end
 
     it 'should accept (local time) SQL-like yyyy-mm-dd hh:ii datetime strings' do
       t = DateAndTimeUtils.parse_date_or_time('2011-07-13 13:45:21')
       expect(t).to be_a(Time)
       expect(t.day).to eq(13)
-      expect(t.month).to eq(07)
+      expect(t.month).to eq(0o7)
       expect(t.year).to eq(2011)
       expect(t.hour).to eq(13)
       expect(t.min).to eq(45)
@@ -71,24 +73,24 @@ describe DateAndTimeUtils do
       d = DateAndTimeUtils.parse_date_or_time('13.07.2011')
       expect(d).to be_a(Date)
       expect(d.day).to eq(13)
-      expect(d.month).to eq(07)
+      expect(d.month).to eq(0o7)
       expect(d.year).to eq(2011)
     end
 
     it 'should accept (local time) Finnish dd.mm.yyyy hh:ii datetime strings' do
       t = DateAndTimeUtils.parse_date_or_time('13.07.2011 13:45')
       expect(t.day).to eq(13)
-      expect(t.month).to eq(07)
+      expect(t.month).to eq(0o7)
       expect(t.year).to eq(2011)
       expect(t.hour).to eq(13)
       expect(t.min).to eq(45)
-      expect(t.sec).to eq(00)
+      expect(t.sec).to eq(0o0)
     end
 
     it 'should accept (local time) Finnish dd.mm.yyyy hh:ii:ss datetime strings' do
       t = DateAndTimeUtils.parse_date_or_time('13.07.2011 13:45:21')
       expect(t.day).to eq(13)
-      expect(t.month).to eq(07)
+      expect(t.month).to eq(0o7)
       expect(t.year).to eq(2011)
       expect(t.hour).to eq(13)
       expect(t.min).to eq(45)
@@ -98,11 +100,11 @@ describe DateAndTimeUtils do
     it 'should disregard whitespace around the input' do
       t = DateAndTimeUtils.parse_date_or_time(" 13.07.2011 13:45 \n")
       expect(t.day).to eq(13)
-      expect(t.month).to eq(07)
+      expect(t.month).to eq(0o7)
       expect(t.year).to eq(2011)
       expect(t.hour).to eq(13)
       expect(t.min).to eq(45)
-      expect(t.sec).to eq(00)
+      expect(t.sec).to eq(0o0)
     end
 
     it 'should raise an exception if it cannot parse the string' do

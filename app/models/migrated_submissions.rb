@@ -1,3 +1,4 @@
-class MigratedSubmissions < ActiveRecord::Base
-end
+# frozen_string_literal: true
 
+class MigratedSubmissions < ApplicationRecord
+end

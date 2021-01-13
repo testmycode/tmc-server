@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Api::Beta::ParticipantController < Api::Beta::BaseController
   before_action :doorkeeper_authorize!, scopes: [:public]
 

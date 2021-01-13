@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # CanCan ability definitions.
 #
 # See: https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
@@ -19,14 +21,16 @@ class Ability
 
       can :rerun, Submission
       can :refresh_gdocs_spreadsheet, Course do |c|
-        !c.spreadsheet_key.blank?
+        c.spreadsheet_key.present?
       end
-      can :access_pghero
+      can :access, :pghero
       can :read_vm_log, Submission
+      can :read, :instance_state
     else
+      cannot :read, :instance_state
       can :read, :all
 
-      cannot :access_pghero
+      cannot :access, :pghero
       cannot :read, User
       cannot :read, :code_reviews
       cannot :read, :course_information
@@ -37,10 +41,29 @@ class Ability
       end
 
       can :create, User if SiteSetting.value(:enable_signup)
+      cannot :destroy, User
+      can :destroy, User do |u|
+        u == user
+      end
+      cannot :update, User
+      can :update, User do |u|
+        u == user
+      end
 
       cannot :read, Course
       can :read, Course do |c|
-        c.visible_to?(user) || can?(:teach, c)
+        user.administrator? ||
+          user.teacher?(c.organization) ||
+          user.assistant?(c) ||
+          (
+            c.initial_refresh_ready? &&
+              (!c.disabled? && !c.hidden? &&
+            (
+              c.hidden_if_registered_after.nil? ||
+              c.hidden_if_registered_after > Time.now ||
+              (!user.guest? && c.hidden_if_registered_after > user.created_at)
+            ) || user.student_in_course?(c))
+          )
       end
 
       can :create, Course do |c|
@@ -52,7 +75,7 @@ class Ability
       end
 
       can :refresh, Course do |c|
-        c.taught_by?(user) &&
+        (c.taught_by?(user) || c.assistant?(user)) &&
           c.custom? # user can only refresh his/her custom course.
       end
 
@@ -124,7 +147,7 @@ class Ability
 
       cannot :read, Solution
       can :read, Solution do |sol|
-        course = sol.exercise.course
+        # course = sol.exercise.course
         sol.visible_to?(user)
       end
 
@@ -220,8 +243,8 @@ class Ability
         can? :teach, o
       end
 
-      can :remove_assistant, Course do |c|
-        can? :teach, c.organization
+      can :modify_assistants, Course do |c|
+        can? :teach, c
       end
 
       can :edit, Organization do |o|
@@ -247,7 +270,8 @@ class Ability
 
       cannot :teach, Course
       can :teach, Course do |c|
-        c.organization.teacher?(user) || c.assistant?(user)
+        can?(:teach, c.organization) || c.assistant?(user)
+        # c.organization.teacher?(user) || c.assistant?(user)
       end
 
       cannot :email, CourseNotification

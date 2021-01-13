@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'natcmp'
 
 # Provides an ordering for AvailablePoint and AwardedPoint based on natcmp'ing their names.

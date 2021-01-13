@@ -1,4 +1,6 @@
 
+# frozen_string_literal: true
+
 class CourseNotificationMailer < ActionMailer::Base
   include ActionView::Helpers::SanitizeHelper
   def notification_email(params = {})

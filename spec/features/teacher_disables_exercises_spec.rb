@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher disables exercises', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @teacher = FactoryGirl.create :user
-    @user = FactoryGirl.create :user
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :user
+    @user = FactoryBot.create :user
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
     Teachership.create!(user: @teacher, organization: @organization)
-    @course = FactoryGirl.create(:course, organization: @organization)
-    @ex1 = FactoryGirl.create(:exercise, course: @course)
-    @ex2 = FactoryGirl.create(:exercise, course: @course)
-    @ex3 = FactoryGirl.create(:exercise, course: @course)
-    @ex4 = FactoryGirl.create(:exercise, course: @course)
+    @course = FactoryBot.create(:course, organization: @organization)
+    @ex1 = FactoryBot.create(:exercise, course: @course)
+    @ex2 = FactoryBot.create(:exercise, course: @course)
+    @ex3 = FactoryBot.create(:exercise, course: @course)
+    @ex4 = FactoryBot.create(:exercise, course: @course)
 
     visit '/'
   end
@@ -53,7 +55,7 @@ feature 'Teacher disables exercises', feature: true do
     click_button 'Update exercises'
 
     [@ex1, @ex2, @ex3, @ex4].each do |ex|
-      expect(page).to have_content("#{ex.name}")
+      expect(page).to have_content(ex.name.to_s)
       expect(page).to_not have_content("#{ex.name} (disabled)")
     end
   end
@@ -78,10 +80,10 @@ feature 'Teacher disables exercises', feature: true do
     log_in_as(@user.login, @user.password)
     visit_course @course
 
-    expect(page).to have_content("#{@ex1.name}")
-    expect(page).to have_content("#{@ex2.name}")
-    expect(page).to_not have_content("#{@ex3.name}")
-    expect(page).to_not have_content("#{@ex4.name}")
+    expect(page).to have_content(@ex1.name.to_s)
+    expect(page).to have_content(@ex2.name.to_s)
+    expect(page).to_not have_content(@ex3.name.to_s)
+    expect(page).to_not have_content(@ex4.name.to_s)
   end
 
   scenario 'Student cannot access disabled exercise page' do
@@ -91,7 +93,7 @@ feature 'Teacher disables exercises', feature: true do
 
     visit "/exercises/#{@ex1.id}"
 
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 
   def visit_course(course)

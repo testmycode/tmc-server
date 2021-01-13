@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class CourseTemplatesController < ApplicationController
-  before_action :set_course_template, except: [:index, :new, :create, :list_for_teachers]
+  before_action :set_course_template, except: %i[index new create list_for_teachers]
 
   def index
     authorize! :read, CourseTemplate
-    ordering = 'LOWER(name)'
+    ordering = Arel.sql('LOWER(name)')
     add_breadcrumb 'Course templates', course_templates_path
     @course_templates = CourseTemplate.not_hidden.not_dummy.order(ordering)
     @hidden_course_templates = CourseTemplate.hidden.not_dummy.order(ordering)
@@ -16,7 +18,7 @@ class CourseTemplatesController < ApplicationController
   def show
     authorize! :read, CourseTemplate
     add_breadcrumb 'Course templates', course_templates_path
-    add_breadcrumb "#{@course_template.title}"
+    add_breadcrumb @course_template.title.to_s
   end
 
   def new
@@ -53,7 +55,7 @@ class CourseTemplatesController < ApplicationController
   end
 
   def destroy
-    raise "One does not destroy a course template"
+    raise 'One does not destroy a course template'
   end
 
   def list_for_teachers
@@ -61,7 +63,7 @@ class CourseTemplatesController < ApplicationController
     authorize! :teach, @organization
     add_organization_breadcrumb
     add_breadcrumb 'Course templates'
-    @course_templates = CourseTemplate.available.order('LOWER(title)')
+    @course_templates = CourseTemplate.available.order(Arel.sql('LOWER(title)'))
   end
 
   def toggle_hidden
@@ -81,13 +83,12 @@ class CourseTemplatesController < ApplicationController
   end
 
   private
+    def set_course_template
+      authorize! params[:action].to_sym, CourseTemplate
+      @course_template = CourseTemplate.find(params[:id])
+    end
 
-  def set_course_template
-    authorize! params[:action].to_sym, CourseTemplate
-    @course_template = CourseTemplate.find(params[:id])
-  end
-
-  def course_template_params
-    params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at, :git_branch)
-  end
+    def course_template_params
+      params.require(:course_template).permit(:name, :title, :description, :material_url, :source_url, :expires_at, :git_branch)
+    end
 end

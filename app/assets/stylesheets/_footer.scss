@@ -1,0 +1,15 @@
+$footer-height: 5rem;
+
+.footer {
+  height: $footer-height;
+  background-color: rgb(54, 116, 214);
+}
+
+.everything-wrapper {
+  min-height: 100%;
+  margin-bottom: -5rem;
+}
+
+.everything-push {
+  height: 5rem;
+}

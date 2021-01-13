@@ -1,20 +1,23 @@
+# frozen_string_literal: true
+
 require 'shellwords'
 
-class Exercise < ActiveRecord::Base
+class Exercise < ApplicationRecord
   self.include_root_in_json = false
   include Swagger::Blocks
 
   swagger_schema :ExerciseWithPoints do
-    key :required, [
-        :id, :name, :publish_time, :solution_visible_after,
-        :deadline, :disabled, :available_points,
+    key :required, %i[
+      id name publish_time solution_visible_after
+      deadline disabled available_points
     ]
 
     property :id, type: :integer, example: 1
-    property :name, type: :string, example: "Exercise name"
-    property :publish_time, type: :string, format: 'date-time', example: "2016-10-24T14:06:36.730+03:00"
-    property :solution_visible_after, type: :string, format: 'date-time', example: "2016-10-24T14:06:36.730+03:00"
-    property :deadline, type: :string, format: 'date-time', example: "2016-10-24T14:06:36.730+03:00"
+    property :name, type: :string, example: 'Exercise name'
+    property :publish_time, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
+    property :solution_visible_after, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
+    property :deadline, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
+    property :soft_deadline, type: :string, format: 'date-time', example: '2016-10-24T14:06:36.730+03:00'
     property :disabled, type: :boolean, example: false
     property :available_points, type: :array do
       items do
@@ -24,9 +27,9 @@ class Exercise < ActiveRecord::Base
   end
 
   swagger_schema :CoreExercise do
-    key :required, [
-      :course_name, :course_id, :code_review_requests_enabled, :run_tests_locally_action_enabled,
-      :exercise_name, :exercise_id, :unlocked_at, :deadline, :submissions,
+    key :required, %i[
+      course_name course_id code_review_requests_enabled run_tests_locally_action_enabled
+      exercise_name exercise_id unlocked_at deadline submissions
     ]
 
     property :course_name, type: :string, example: 'course'
@@ -44,19 +47,24 @@ class Exercise < ActiveRecord::Base
     end
   end
 
+  swagger_schema :CoreExerciseQueryDetails do
+    property :id, type: :integer, example: 1
+    property :checksum, type: :string, example: 'f25e139769b2688e213938456959eeaf'
+  end
+
   swagger_schema :CoreExerciseDetails do
-    key :required, [ :id, :name, :locked, :deadline_description, :deadline, :checksum, :return_url, :zip_url, :returnable, :requires_review, :attempted,
-                     :completed, :reviewed, :all_review_point_given, :memory_limit, :runtime_params, :valgrind_strategy, :code_review_requests_enabled,
-                     :run_tests_locally_action_enabled, :exercise_submissions_url, ]
+    key :required, %i[id name locked deadline_description deadline checksum return_url zip_url returnable requires_review attempted
+                      completed reviewed all_review_point_given memory_limit runtime_params valgrind_strategy code_review_requests_enabled
+                      run_tests_locally_action_enabled exercise_submissions_url]
 
     property :id, type: :integer, example: 1
-    property :name, type: :string, example: "Exercise name"
+    property :name, type: :string, example: 'Exercise name'
     property :locked, type: :boolean, example: false
-    property :deadline_description, type: :string, example: "2016-02-29 23:59:00 +0200"
-    property :deadline, type: :string, format: 'date-time', example: "2016-02-29T23:59:00.000+02:00"
-    property :checksum, type: :string, example: "f25e139769b2688e213938456959eeaf"
-    property :return_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337/submissions"
-    property :zip_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/4272/download"
+    property :deadline_description, type: :string, example: '2016-02-29 23:59:00 +0200'
+    property :deadline, type: :string, format: 'date-time', example: '2016-02-29T23:59:00.000+02:00'
+    property :checksum, type: :string, example: 'f25e139769b2688e213938456959eeaf'
+    property :return_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/exercises/1337/submissions'
+    property :zip_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/exercises/4272/download'
     property :returnable, type: :boolean, example: true
     property :requires_review, type: :boolean, example: false
     property :attempted, type: :boolean, example: false
@@ -67,18 +75,18 @@ class Exercise < ActiveRecord::Base
     property :runtime_params, type: :array do
       items do
         key :type, :string
-        key :example, "-Xss64M"
+        key :example, '-Xss64M'
       end
     end
-    property :valgrind_strategy, type: :string, example: "fail"
+    property :valgrind_strategy, type: :string, example: 'fail'
     property :code_review_requests_enabled, type: :boolean, example: false
     property :run_tests_locally_action_enabled, type: :boolean, example: true
-    property :exercise_submissions_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337/solution/download"
-    #These are returned after submission
-    property :latest_submission_url, type: :string, example: "https://tmc.mooc.fi/api/v8/core/exercises/1337"
-    property :latest_submission_id, type: :integer, example: 13337
-    #This is returned if user == admin
-    property :solution_zip_url, type: :string, example: "http://tmc.mooc.fi/api/v8/core/submissions/1337/download"
+    property :exercise_submissions_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/exercises/1337/solution/download'
+    # These are returned after submission
+    property :latest_submission_url, type: :string, example: 'https://tmc.mooc.fi/api/v8/core/exercises/1337'
+    property :latest_submission_id, type: :integer, example: 13_337
+    # This is returned if user == admin
+    property :solution_zip_url, type: :string, example: 'http://tmc.mooc.fi/api/v8/core/submissions/1337/download'
   end
 
   belongs_to :course
@@ -86,18 +94,18 @@ class Exercise < ActiveRecord::Base
   has_many :available_points, dependent: :delete_all
 
   has_many :submissions,
-    (lambda do |exercise|
-      if exercise.respond_to?(:course_id)
-        # Used when doing exercise.submissions
-        where(course: exercise.course)
-      else
-        # Used when doing exercises.includes(:submissions)
-        Submission.joins(:exercise)
-      end
-    end), foreign_key: :exercise_name, primary_key: :name
+           (lambda do |exercise|
+             if exercise.respond_to?(:course_id)
+               # Used when doing exercise.submissions
+               where(course: exercise.course)
+             else
+               # Used when doing exercises.includes(:submissions)
+               Submission.joins(:exercise)
+             end
+           end), foreign_key: :exercise_name, primary_key: :name
 
-  has_many :feedback_answers, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
-  has_many :unlocks, -> (exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
+  has_many :feedback_answers, ->(exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
+  has_many :unlocks, ->(exercise) { where(course: exercise.course) }, foreign_key: :exercise_name, primary_key: :name
 
   validates :gdocs_sheet, format: { without: /\A(MASTER|PUBLIC)\z/ }
 
@@ -107,14 +115,15 @@ class Exercise < ActiveRecord::Base
     res
   }
 
-  enum disabled_status: [:enabled, :disabled]
+  enum disabled_status: %i[enabled disabled]
+  enum paste_visibility: %i[open secured no-tests-public everyone]
 
   def relative_path
     name.tr('-', '/')
   end
 
   def exercise_group
-    self.course.exercise_group_by_name(self.exercise_group_name)
+    course.exercise_group_by_name(exercise_group_name)
   end
 
   def exercise_group_name
@@ -123,12 +132,18 @@ class Exercise < ActiveRecord::Base
     parts.join('-')
   end
 
+  def part
+    exercise.group_name.tr('^0-9', '').to_i
+  rescue
+    0
+  end
+
   def belongs_to_exercise_group?(group)
-    group.course.id == self.course_id && (self.exercise_group_name + '-').start_with?(group.name + '-')
+    group.course.id == course_id && (exercise_group_name + '-').start_with?(group.name + '-')
   end
 
   def clone_path
-    "#{course.clone_path}/#{self.relative_path}"
+    "#{course.clone_path}/#{relative_path}"
   end
 
   def exercise_dir
@@ -144,26 +159,26 @@ class Exercise < ActiveRecord::Base
   end
 
   def solution_path
-    "#{course.solution_path}/#{self.relative_path}"
+    "#{course.solution_path}/#{relative_path}"
   end
 
   def stub_path
-    "#{course.stub_path}/#{self.relative_path}"
+    "#{course.stub_path}/#{relative_path}"
   end
 
   def stub_zip_file_path
-    "#{course.stub_zip_path}/#{self.name}.zip"
+    "#{course.stub_zip_path}/#{name}.zip"
   end
 
   def solution_zip_file_path
-    "#{course.solution_zip_path}/#{self.name}.zip"
+    "#{course.solution_zip_path}/#{name}.zip"
   end
 
   def solution
     Solution.new(self)
   end
 
-  def set_submissions_by(user, value)
+  def set_submissions_by!(user, value)
     @submissions_by ||= {}
     @submissions_by[user.id] = value
   end
@@ -188,19 +203,24 @@ class Exercise < ActiveRecord::Base
   # Whether a user may see all metadata about the exercise
   def visible_to?(user)
     user.administrator? || user.teacher?(course.organization) || user.assistant?(course) ||
-      (!hidden? && !disabled? && published? && unlock_spec_obj.permits_unlock_for?(user))
+      _fast_visible? && (unlocked_for?(user) || unlock_spec_obj.permits_unlock_for?(user))
+  end
+
+  def _fast_visible?
+    !hidden? && !disabled? && published?
   end
 
   # Whether the user may see the scoreboard for the exercise
   def points_visible_to?(user)
     user.administrator? ||
-    user.teacher?(course.organization) ||
+      user.teacher?(course.organization) ||
       (
         !hidden? &&
         published? &&
         !disabled? &&
         (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user)) &&
-        !hide_submission_results
+        !hide_submission_results &&
+        !course.hide_submission_results
       )
   end
 
@@ -214,9 +234,7 @@ class Exercise < ActiveRecord::Base
     !publish_time || publish_time <= Time.now
   end
 
-  def deadline_for(user)
-    deadline_spec_obj.deadline_for(user)
-  end
+  delegate :deadline_for, to: :deadline_spec_obj
 
   def soft_deadline_for(user)
     soft_deadline_spec_obj.deadline_for(user)
@@ -224,11 +242,11 @@ class Exercise < ActiveRecord::Base
 
   # Whether the deadline has passed
   def expired_for?(user)
-    deadline_expired?(deadline_for(user))
+    Exercise.deadline_expired?(deadline_for(user))
   end
 
   def soft_deadline_expired_for?(user)
-    deadline_expired?(soft_deadline_for(user))
+    Exercise.deadline_expired?(soft_deadline_for(user))
   end
 
   # Whether a user has made a submission for this exercise
@@ -239,7 +257,7 @@ class Exercise < ActiveRecord::Base
   # Whether a user has made a submission with all test cases passing
   def completed_by?(user)
     submissions_by(user).any? do |s|
-      s.pretest_error == nil && s.all_tests_passed?
+      s.pretest_error.nil? && s.all_tests_passed?
     end
   end
 
@@ -249,12 +267,12 @@ class Exercise < ActiveRecord::Base
 
   # Whether a code review for this exercise exists for a submission made by 'user'.
   def reviewed_for?(user)
-    self.submissions_by(user).any?(&:reviewed)
+    submissions_by(user).any?(&:reviewed)
   end
 
   # Returns all reviewed submissions for this exercise for 'user'
   def reviewed_submissions_for(user)
-    self.submissions_by(user).select(&:reviewed)
+    submissions_by(user).select(&:reviewed)
   end
 
   # Whether all of the required code review points have been given.
@@ -305,11 +323,11 @@ class Exercise < ActiveRecord::Base
   end
 
   def deadline_spec_obj
-    @deadline_spec_obj ||= new_deadline_spec_obj(self.deadline_spec)
+    @deadline_spec_obj ||= new_deadline_spec_obj(deadline_spec)
   end
 
   def soft_deadline_spec_obj
-    @soft_deadline_spec_obj ||= new_deadline_spec_obj(self.soft_deadline_spec)
+    @soft_deadline_spec_obj ||= new_deadline_spec_obj(soft_deadline_spec)
   end
 
   def static_deadline
@@ -329,7 +347,7 @@ class Exercise < ActiveRecord::Base
   end
 
   def has_unlock_deadline?
-    !unlock_deadline.blank? || !soft_unlock_deadline.blank?
+    unlock_deadline.present? || soft_unlock_deadline.present?
   end
 
   def requires_unlock?
@@ -342,7 +360,7 @@ class Exercise < ActiveRecord::Base
 
   def time_unlocked_for(user, resolve_unlocks = true)
     UncomputedUnlock.resolve(course, user) if resolve_unlocks
-    unlocks.where(user_id: user).find_by('valid_after IS NULL OR valid_after < ?', Time.now).andand.created_at
+    unlocks.where(user_id: user).find_by('valid_after IS NULL OR valid_after < ?', Time.now)&.created_at
   end
 
   def unlocked_for?(user, resolve_unlocks = true)
@@ -361,24 +379,24 @@ class Exercise < ActiveRecord::Base
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
 
-    self.deadline_spec = to_json_array(new_options["deadline"]) if deadline_spec.nil?
-    self.soft_deadline_spec = to_json_array(new_options["soft_deadline"]) if self.soft_deadline_spec.nil?
-    self.unlock_spec = to_json_array(new_options["unlocked_after"]) if self.unlock_spec.nil?
-    self.publish_time = new_options["publish_time"]
-    self.gdocs_sheet = new_gdocs_sheet(new_options["points_visible"], new_options["gdocs_sheet"])
-    self.hidden = new_options["hidden"]
-    self.returnable_forced = new_options["returnable"]
-    self.solution_visible_after = new_options["solution_visible_after"]
-    self.runtime_params = parse_runtime_params(new_options["runtime_params"])
-    self.valgrind_strategy = new_options["valgrind_strategy"]
-    self.code_review_requests_enabled = new_options["code_review_requests_enabled"]
-    self.run_tests_locally_action_enabled = new_options["run_tests_locally_action_enabled"]
+    self.deadline_spec = to_json_array(new_options['deadline']) if deadline_spec.nil?
+    self.soft_deadline_spec = to_json_array(new_options['soft_deadline']) if soft_deadline_spec.nil?
+    self.unlock_spec = to_json_array(new_options['unlocked_after']) if unlock_spec.nil?
+    self.publish_time = new_options['publish_time']
+    self.gdocs_sheet = new_gdocs_sheet(new_options['points_visible'], new_options['gdocs_sheet'])
+    self.hidden = new_options['hidden']
+    self.returnable_forced = new_options['returnable']
+    self.solution_visible_after = new_options['solution_visible_after']
+    self.runtime_params = parse_runtime_params(new_options['runtime_params'])
+    self.valgrind_strategy = new_options['valgrind_strategy']
+    self.code_review_requests_enabled = new_options['code_review_requests_enabled']
+    self.run_tests_locally_action_enabled = new_options['run_tests_locally_action_enabled']
   end
 
   # Whether this exercise accepts submissions at all.
   # TMC may be used to distribute exercise templates without tests.
   def returnable?
-    if returnable_forced != nil
+    if !returnable_forced.nil?
       returnable_forced # may be true or false
     else
       has_tests? && course.initial_refresh_ready?
@@ -390,31 +408,31 @@ class Exercise < ActiveRecord::Base
   # Not configurable per-exercise yet but possibly in the future.
   def memory_limit
     global_limit = SiteSetting.value('memory_limit')
-    if global_limit != nil
-      global_limit.to_i
-    else
-      nil
-    end
+    global_limit&.to_i
   end
 
   def runtime_params_array
     ActiveSupport::JSON.decode(runtime_params)
   end
 
+  def code_review_requests_enabled?
+    course.code_review_requests_enabled? && self[:code_review_requests_enabled]
+  end
+
   def self.default_options
     {
-      "deadline" => nil,
-      "soft_deadline" => nil,
-      "publish_time" => nil,
-      "gdocs_sheet" => nil,
-      "points_visible" => true,
-      "hidden" => false,
-      "returnable" => nil,
-      "solution_visible_after" => nil,
-      "valgrind_strategy" => "fail".freeze,
-      "runtime_params" => nil,
-      "code_review_requests_enabled" => true,
-      "run_tests_locally_action_enabled" => true,
+      'deadline' => nil,
+      'soft_deadline' => nil,
+      'publish_time' => nil,
+      'gdocs_sheet' => nil,
+      'points_visible' => true,
+      'hidden' => false,
+      'returnable' => nil,
+      'solution_visible_after' => nil,
+      'valgrind_strategy' => 'fail',
+      'runtime_params' => nil,
+      'code_review_requests_enabled' => true,
+      'run_tests_locally_action_enabled' => true
     }
   end
 
@@ -428,13 +446,13 @@ class Exercise < ActiveRecord::Base
     s = Submission.arel_table
 
     user_ids = users.map(&:id)
-    exercise_keys = exercises.map {|e| "(#{e.course_id}, #{quote_value(e.name, nil)})" }
+    exercise_keys = exercises.map { |e| "(#{e.course_id}, #{Exercise.connection.quote(e.name)})" }
 
     query = s.project(Arel.sql('COUNT(DISTINCT (course_id, exercise_name, user_id))').as('count'))
-      .where(s[:user_id].in(user_ids))
-      .where(Arel.sql("(course_id, exercise_name) IN (#{exercise_keys.join(',')})"))
-      .where(s[:pretest_error].eq(nil))
-      .where(s[:all_tests_passed].eq(true))
+             .where(s[:user_id].in(user_ids))
+             .where(Arel.sql("(course_id, exercise_name) IN (#{exercise_keys.join(',')})"))
+             .where(s[:pretest_error].eq(nil))
+             .where(s[:all_tests_passed].eq(true))
 
     results = connection.execute(query.to_sql)
     begin
@@ -449,57 +467,55 @@ class Exercise < ActiveRecord::Base
     save!
   end
 
+  def self.deadline_expired?(deadline, time = Time.now)
+    !deadline.nil? && deadline < time
+  end
+
   private
-
-  def new_deadline_spec_obj(spec)
-    if spec
-      DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
-    else
-      DeadlineSpec.new(self, [])
+    def new_deadline_spec_obj(spec)
+      if spec
+        DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
+      else
+        DeadlineSpec.new(self, [])
+      end
     end
-  end
 
-  def deadline_expired?(deadline)
-    deadline != nil && deadline < Time.now
-  end
-
-  def new_gdocs_sheet(enabled, sheetname)
-    return nil unless enabled
-    return sheetname.to_s unless sheetname.blank?
-    return name_to_gdocs_sheet
-  end
-
-  def name_to_gdocs_sheet
-    sheetname = self.name.split('-')[0..-2].join('-')
-    sheetname.empty? ? "root" : sheetname
-  end
-
-  def to_json_array(value)
-    if value != nil
-      value = [value] unless value.is_a?(Array)
-      value.to_json
-    else
-      "[]"
+    def new_gdocs_sheet(enabled, sheetname)
+      return nil unless enabled
+      return sheetname.to_s if sheetname.present?
+      name_to_gdocs_sheet
     end
-  end
 
-  def check_is_json_array_of_strings(str)
-    return if str.nil?
-    array = ActiveSupport::JSON.decode(str)
-    raise "JSON array expected" if !array.is_a?(Array)
-    raise "JSON array of strings expected" if array.any? {|a| !a.is_a?(String) }
-  end
-
-  def parse_runtime_params(raw_params)
-    if raw_params == nil
-      "[]"
-    elsif raw_params.is_a?(String)
-      to_json_array(Shellwords.shellwords(raw_params))
-    elsif raw_params.is_a?(Array)
-      to_json_array(raw_params)
-    else
-      raise "Invalid runtime_params: #{raw_params.inspect}"
+    def name_to_gdocs_sheet
+      sheetname = name.split('-')[0..-2].join('-')
+      sheetname.empty? ? 'root' : sheetname
     end
-  end
 
+    def to_json_array(value)
+      if !value.nil?
+        value = [value] unless value.is_a?(Array)
+        value.to_json
+      else
+        '[]'
+      end
+    end
+
+    def check_is_json_array_of_strings(str)
+      return if str.nil?
+      array = ActiveSupport::JSON.decode(str)
+      raise 'JSON array expected' unless array.is_a?(Array)
+      raise 'JSON array of strings expected' if array.any? { |a| !a.is_a?(String) }
+    end
+
+    def parse_runtime_params(raw_params)
+      if raw_params.nil?
+        '[]'
+      elsif raw_params.is_a?(String)
+        to_json_array(Shellwords.shellwords(raw_params))
+      elsif raw_params.is_a?(Array)
+        to_json_array(raw_params)
+      else
+        raise "Invalid runtime_params: #{raw_params.inspect}"
+      end
+    end
 end

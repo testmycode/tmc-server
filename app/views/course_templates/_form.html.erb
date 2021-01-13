@@ -11,33 +11,33 @@
     </div>
   <% end %>
 
-  <div class="field">
+  <div class="form-group">
     <%= f.label :name %><br>
-    <%= f.text_field :name %>
+    <%= f.text_field :name, class: 'form-control' %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :title %><br>
-    <%= f.text_field :title %>
+    <%= f.text_field :title, class: 'form-control' %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :description %><br>
-    <%= f.text_field :description %>
+    <%= f.text_field :description, class: 'form-control' %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :material_url %><br>
-    <%= f.text_field :material_url %>
+    <%= f.text_field :material_url, class: 'form-control' %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :source_url %><br>
-    <%= f.text_field :source_url %>
+    <%= f.text_field :source_url, class: 'form-control' %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :git_branch %>
-    <%= f.text_field :git_branch, :default => 'master' %>
+    <%= f.text_field :git_branch, :default => 'master', class: 'form-control' %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :expires_at %><br>
-    <%= f.date_field :expires_at %>
+    <%= f.date_field :expires_at, class: 'form-control' %>
   </div>
   <div class="actions">
     <%= f.submit class: "btn btn-info" %>

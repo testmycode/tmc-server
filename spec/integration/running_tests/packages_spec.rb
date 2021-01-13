@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe RemoteSandboxForTesting, type: :request, integration: true do
   describe 'when the exercise has source and test classes in packages' do
     it 'should have no problems' do
+      skip 'Not working, requires sandbox setup for testing'
       setup = SubmissionTestSetup.new(exercise_name: 'ExerciseWithPackages')
       submission = setup.submission
 

@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 if LogStasher.enabled?
   LogStasher.add_custom_fields do |fields|
     # This block is run in application_controller context,
     # so you have access to all controller methods
     begin
-      if current_user && current_user.login
-        fields[:user] = current_user.login
+      fields[:user] = if current_user&.login
+        current_user.login
       else
-        fields[:user] = 'guest'
+        'guest'
       end
     rescue NameError
       fields[:user] = 'pghero/api?'
@@ -20,9 +22,9 @@ if LogStasher.enabled?
     rescue NameError
     end
 
-    fields[:site] = request.path =~ /^\/api/ ? 'api' : 'user'
+    fields[:site] = /^\/api/.match?(request.path) ? 'api' : 'user'
 
     # If you are using custom instrumentation, just add it to logstasher custom fields
-    LogStasher.custom_fields << :myapi_runtime
+    LogStasher::CustomFields.add(:myapi_runtime)
   end
 end

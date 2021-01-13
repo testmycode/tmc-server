@@ -1,22 +1,25 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher lists own organization courses', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :verified_user, password: 'xooxer'
+    @user = FactoryBot.create :verified_user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
     Teachership.create! user: @teacher, organization: @organization
 
-    FactoryGirl.create :course, name: 'course_1', title: 'Course 1', organization: @organization
-    FactoryGirl.create :course, name: 'course_2', title: 'Course 2', organization: @organization
-    FactoryGirl.create :course, name: 'course_old', title: 'Old Course', organization: @organization, hide_after: Time.now - 2.minutes
+    FactoryBot.create :course, name: 'course_1', title: 'Course 1', organization: @organization
+    FactoryBot.create :course, name: 'course_2', title: 'Course 2', organization: @organization
+    FactoryBot.create :course, name: 'course_old', title: 'Old Course', organization: @organization, disabled_status: 1
 
     visit '/'
   end
 
-  scenario 'Teacher sees both active and retired courses' do
+  scenario 'Teacher see active and disabled courses' do
     log_in_as(@teacher.login, 'xooxer')
 
     visit '/org/slug'
@@ -26,7 +29,7 @@ feature 'Teacher lists own organization courses', feature: true do
     expect(page).to have_content('Old Course')
   end
 
-  scenario 'Non-teacher sees only active courses' do
+  scenario 'Non-teacher see only active courses' do
     log_in_as(@user.login, 'foobar')
     visit '/org/slug'
 

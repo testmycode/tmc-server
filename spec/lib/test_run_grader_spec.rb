@@ -1,36 +1,40 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TestRunGrader do
   include GitTestActions
 
   before :each do
-    @submission = FactoryGirl.create(:submission, processed: false)
+    @submission = FactoryBot.create(:submission, processed: false)
     ['1.1', '1.2'].each do |name|
-      FactoryGirl.create(:available_point, exercise_id: @submission.exercise.id, name: name)
+      FactoryBot.create(:available_point, exercise_id: @submission.exercise.id, name: name)
     end
   end
 
   def half_successful_results
-    [
-      {
-        'className' => 'MyTest',
-        'methodName' => 'testSomethingEasy',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1', '1.2']
-      },
-      {
-        'className' => 'MyTest',
-        'methodName' => 'testSomethingDifficult',
-        'status' => 'FAILED',
-        'pointNames' => ['1.2'],
-        'exception' => { 'a' => 'b' }
-      }
-    ]
+    {
+      'status' => 'TESTS_FAILED',
+      'testResults' => [
+        {
+          'name' => 'MyTest testSomethingEasy',
+          'successful' => true,
+          'points' => ['1.1', '1.2']
+        },
+        {
+          'name' => 'MyTest testSomethingDifficult',
+          'successful' => false,
+          'points' => ['1.2'],
+          'exception' => { 'a' => 'b' }
+        }
+      ],
+    }
   end
 
   def successful_results
     results = half_successful_results
-    results[1]['status'] = 'PASSED'
+    results['testResults'][1]['successful'] = true
+    results['status'] = 'PASSED'
     results
   end
 
@@ -38,26 +42,29 @@ describe TestRunGrader do
     TestRunGrader.grade_results(@submission, half_successful_results)
 
     expect(@submission.test_case_runs).not_to be_empty
-    tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'MyTest testSomethingEasy' }
+    tcr = @submission.test_case_runs.to_a.find { |t| t.test_case_name == 'MyTest testSomethingEasy' }
     expect(tcr).not_to be_nil
     expect(tcr).to be_successful
     expect(tcr.exception).to be_nil
 
-    tcr = @submission.test_case_runs.to_a.find { |tcr| tcr.test_case_name == 'MyTest testSomethingDifficult' }
+    tcr = @submission.test_case_runs.to_a.find { |t| t.test_case_name == 'MyTest testSomethingDifficult' }
     expect(tcr).not_to be_nil
     expect(tcr).not_to be_successful
     expect(ActiveSupport::JSON.decode(tcr.exception)).to eq('a' => 'b')
   end
 
   it 'should not create multiple test case runs for the same test method even if it is involved in multiple points' do
-    results = [
-      {
-        'className' => 'MyTest',
-        'methodName' => 'testSomething',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1', '1.2']
-      }
-    ]
+    results =
+    {
+      'status' => 'PASSED',
+      'testResults' => [
+        {
+          'name' => 'MyTest testSomething',
+          'successful' => true,
+          'points' => ['1.1', '1.2']
+        }
+      ]
+    }
 
     TestRunGrader.grade_results(@submission, results)
 
@@ -72,10 +79,12 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
 
     # Should not depend on result order, so let's try the same in reverse order
-    @submission = FactoryGirl.create(:submission, course: @submission.course,
+    @submission = FactoryBot.create(:submission, course: @submission.course,
                                                   exercise: @submission.exercise,
                                                   processed: false)
-    TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+
+    half_successful_results['testResults'].reverse
+    TestRunGrader.grade_results(@submission, half_successful_results)
 
     points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
     expect(points).to include('1.1')
@@ -83,17 +92,20 @@ describe TestRunGrader do
   end
 
   it 'should only award points which are available from the exercise' do
-    other_exercise = FactoryGirl.create(:exercise, course_id: @submission.course_id)
-    FactoryGirl.create(:available_point, exercise_id: other_exercise.id, name: '1.3')
+    other_exercise = FactoryBot.create(:exercise, course_id: @submission.course_id)
+    FactoryBot.create(:available_point, exercise_id: other_exercise.id, name: '1.3')
 
-    results = [
-      {
-        'className' => 'MyTest',
-        'methodName' => 'testSomething',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1', '1.2', '1.3']
-      }
-    ]
+    results =
+    {
+      'status' => 'PASSED',
+      'testResults' => [
+        {
+          'name' => 'MyTest testSomething',
+          'successful' => true,
+          'points' => ['1.1', '1.2', '1.3']
+        }
+      ]
+    }
 
     TestRunGrader.grade_results(@submission, results)
 
@@ -111,7 +123,7 @@ describe TestRunGrader do
     expect(points).not_to include('1.2')
     expect(@submission.points).to eq('1.1')
 
-    @submission = FactoryGirl.create(:submission, course: @submission.course,
+    @submission = FactoryBot.create(:submission, course: @submission.course,
                                                   exercise: @submission.exercise,
                                                   user: @submission.user,
                                                   processed: false)
@@ -124,25 +136,27 @@ describe TestRunGrader do
   end
 
   it 'should only ever award more points, never delete old points' do
-    results = [
-      {
-        'className' => 'MyTest',
-        'methodName' => 'one',
-        'status' => 'PASSED',
-        'pointNames' => ['1.1']
-      },
-      {
-        'className' => 'MyTest',
-        'methodName' => 'two',
-        'status' => 'FAILED',
-        'pointNames' => ['1.2']
-      }
-    ]
+    results =
+    {
+      'status' => 'TESTS_FAILED',
+      'testResults' => [
+        {
+          'name' => 'MyTest one',
+          'successful' => true,
+          'points' => ['1.1']
+        },
+        {
+          'name' => 'MyTest two',
+          'successful' => false,
+          'points' => ['1.2']
+        }
+      ]
+    }
 
     TestRunGrader.grade_results(@submission, results)
 
-    results[0]['status'] = 'FAILED'
-    results[1]['status'] = 'PASSED'
+    results['testResults'][0]['successful'] = false
+    results['testResults'][1]['successful'] = true
 
     @submission = Submission.new(
       user: @submission.user,
@@ -164,7 +178,7 @@ describe TestRunGrader do
 
     TestRunGrader.grade_results(@submission, half_successful_results)
     exercise.update_attribute(:name, 'another_name')
-    new_submission = FactoryGirl.create(:submission, user: user, exercise_name: exercise.name, course: course, processed: false)
+    new_submission = FactoryBot.create(:submission, user: user, exercise_name: exercise.name, course: course, processed: false)
     TestRunGrader.grade_results(new_submission, successful_results)
 
     points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
@@ -233,9 +247,10 @@ describe TestRunGrader do
 
       # Should not depend on result order, so let's try the same in reverse order
 
-      @submission = FactoryGirl.create(:submission, processed: false)
+      @submission = FactoryBot.create(:submission, processed: false)
       @submission.validations = failing_validations.to_json.to_s
-      TestRunGrader.grade_results(@submission, half_successful_results.reverse)
+      half_successful_results['testResults'].reverse
+      TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
       expect(points).not_to include('1.1')
@@ -298,7 +313,7 @@ describe TestRunGrader do
 
   describe 'when the exercise requires code review' do
     before :each do
-      ap = AvailablePoint.find_by_name('1.1')
+      ap = AvailablePoint.find_by(name: '1.1')
       ap.requires_review = true
       ap.save!
     end
@@ -335,11 +350,11 @@ describe TestRunGrader do
       other_exercise_sub = Submission.create!(
         user: @submission.user,
         course: @submission.course,
-        exercise: FactoryGirl.create(:exercise, course: @submission.course),
+        exercise: FactoryBot.create(:exercise, course: @submission.course),
         requires_review: true
       )
       other_user_sub = Submission.create!(
-        user: FactoryGirl.create(:user),
+        user: FactoryBot.create(:user),
         course: @submission.course,
         exercise: @submission.exercise,
         requires_review: true

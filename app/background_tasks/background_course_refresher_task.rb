@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'background_course_refresher'
 
 class BackgroundCourseRefresherTask
@@ -7,5 +9,9 @@ class BackgroundCourseRefresherTask
 
   def run
     @refresher.do_refresh
+  end
+
+  def wait_delay
+    5
   end
 end

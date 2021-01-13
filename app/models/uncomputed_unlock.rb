@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'set'
 
 # Keeps track of whether a (course, user)'s unlocks have yet to be computed, enabling lazy computation.
 # A course refresh populates this table and the UnlockComputerTask background task
 # consumes it by calling Unlock.refresh_unlocks on the entries. All code that accesses
 # unlocks must ensure that UncomputedUnlock.resolve is called for the (course, user) first.
-class UncomputedUnlock < ActiveRecord::Base
+class UncomputedUnlock < ApplicationRecord
   belongs_to :course
   belongs_to :user
 
@@ -32,7 +34,7 @@ class UncomputedUnlock < ActiveRecord::Base
   end
 
   def self.resolve(course, user)
-    if find_by_course_id_and_user_id(course, user)
+    if find_by(course_id: course, user_id: user)
       Unlock.refresh_unlocks(course, user)
     end
   end

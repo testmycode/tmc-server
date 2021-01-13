@@ -1,3 +1,5 @@
+<%= render partial: 'participants/nav' %>
+
 <h1>My Certificates</h1>
 <% if @certificates.any? %>
   <section>
@@ -33,8 +35,8 @@
   <p> No certificates</p>
 <% end %>
 <% if @courses.any? %>
-  <div class="row-fluid">
-    <div class="span12">
+  <div class="row">
+    <div class="col-md-12">
       <h2>Request certificate</h2>
       <%= render partial: 'form' %>
     </div>

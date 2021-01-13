@@ -1,0 +1,115 @@
+name: CI
+on:
+  push:
+    branches: [ master, bs4 ]
+  pull_request:
+    branches: [ master, bs4 ]
+  workflow_dispatch:
+jobs:
+  spec_v8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_v8 tests
+        run: docker-compose run web bin/spec_v8
+
+  spec_models:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_models tests
+        run: docker-compose run web bin/spec_models
+
+  spec_controllers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_controllers tests
+        run: docker-compose run web bin/spec_controllers
+
+  spec_features:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_features tests
+        run: docker-compose run web bin/spec_features
+
+  spec_lib:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_lib tests
+        run: docker-compose run web bin/spec_lib
+
+  spec_integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Docker compose build
+        run: docker-compose build
+      - name: Setup database & test env
+        run: docker-compose run web bin/rake db:create db:migrate RAILS_ENV=test
+      - name: Run spec_integration tests
+        run: docker-compose run web bin/spec_integration

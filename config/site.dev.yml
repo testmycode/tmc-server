@@ -1,0 +1,22 @@
+base_path: /
+baseurl_for_remote_sandboxes: http://localhost:3000
+remote_sandboxes:
+  - http://localhost:3232
+experimental_sandboxes: []
+enable_signup: true
+show_model_solutions_when_exercise_completed: true
+show_model_solutions_when_exercise_expired: false
+valid_clients:
+  - name: idea_plugin
+    min_version: 0.0.1
+  - name: tmc_cli
+    min_version: 0.0.1
+  - name: netbeans_plugin
+    min_version: 0.2.22
+  - name: tmc.py
+    min_version: 0.3.0
+  - name: vscode_plugin
+    min_version: 1.4.0
+kafka_bridge_url: "test"
+kafka_bridge_secret: "test"
+moocfi_service_id: "test"

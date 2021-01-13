@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Review, type: :model do
   before :each do
-    @course = FactoryGirl.create(:course)
-    @admin = FactoryGirl.create(:admin)
-    @user = FactoryGirl.create(:user)
-    @ex = FactoryGirl.create(:exercise, course: @course)
+    @course = FactoryBot.create(:course)
+    @admin = FactoryBot.create(:admin)
+    @user = FactoryBot.create(:user)
+    @ex = FactoryBot.create(:exercise, course: @course)
     AvailablePoint.create(course: @course, exercise: @ex, name: '1')
     AvailablePoint.create(course: @course, exercise: @ex, name: '2')
     @ex.save!
-    @sub = FactoryGirl.create(:submission, course: @course, exercise_name: @ex.name, user: @user)
+    @sub = FactoryBot.create(:submission, course: @course, exercise_name: @ex.name, user: @user)
   end
 
   def mk_review(body = 'This is a review. Of your code.')
@@ -32,12 +34,12 @@ describe Review, type: :model do
   it 'is not deleted when the reviewing user is destroyed' do
     review = mk_review
     @admin.destroy
-    expect(Review.find_by_id(review.id)).not_to be_nil
+    expect(Review.find_by(id: review.id)).not_to be_nil
   end
 
   it 'is deleted when the submission is destroyed' do
     review = mk_review
     @sub.destroy
-    expect(Review.find_by_id(review.id)).to be_nil
+    expect(Review.find_by(id: review.id)).to be_nil
   end
 end

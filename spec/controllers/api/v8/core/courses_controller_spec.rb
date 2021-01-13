@@ -1,24 +1,26 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Api::V8::Core::CoursesController, type: :controller do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   before(:each) do
-    controller.stub(:doorkeeper_token) { token }
+    allow(controller).to receive(:doorkeeper_token) { token }
   end
 
   describe 'GET course details show' do
     describe 'in JSON format with valid token' do
       let(:token) { double resource_owner_id: user.id, acceptable?: true }
-      let(:course) { FactoryGirl.create(:course, name: 'Course1') }
+      let(:course) { FactoryBot.create(:course, name: 'Course1') }
       before :each do
-        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise1', course: course)
-        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise2', course: course)
-        course.exercises << FactoryGirl.create(:returnable_exercise, name: 'Exercise3', course: course)
+        course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: course)
+        course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise2', course: course)
+        course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise3', course: course)
       end
 
       def show_course
-        get :show, id: course.id
+        get :show, params: { id: course.id }
         JSON.parse(response.body)
       end
 
@@ -56,8 +58,8 @@ describe Api::V8::Core::CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been attempted' do
-        sub = FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user)
-        FactoryGirl.create(:test_case_run, submission: sub, successful: false)
+        sub = FactoryBot.create(:submission, course: course, exercise: course.exercises[0], user: user)
+        FactoryBot.create(:test_case_run, submission: sub, successful: false)
 
         result = show_course
 
@@ -67,7 +69,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
       end
 
       it 'should tell for each exercise whether it has been completed' do
-        FactoryGirl.create(:submission, course: course, exercise: course.exercises[0], user: user, all_tests_passed: true)
+        FactoryBot.create(:submission, course: course, exercise: course.exercises[0], user: user, all_tests_passed: true)
 
         result = show_course
 
@@ -77,10 +79,10 @@ describe Api::V8::Core::CoursesController, type: :controller do
       end
 
       describe 'and as guest user' do
-        it 'should respond with a 403' do
+        it 'should respond with a 401' do
           controller.current_user = Guest.new
           show_course
-          expect(response.code.to_i).to eq(403)
+          expect(response.code.to_i).to eq(401)
         end
       end
     end

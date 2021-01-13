@@ -9,16 +9,16 @@
   <% refreshable = course_template.courses.count > 0 %>
   <td>
     <%= link_to_if(refreshable, 'Refresh', refresh_course_template_path(course_template),
-                   class: "btn btn-mini btn-primary",
+                   class: "btn btn-sm btn-primary",
                    data: { confirm: 'Are you sure? This will refresh all courses made from this template.' },
                    method: :post) {'-'} %>
   </td>
-  <td><%= link_to 'Edit', edit_course_template_path(course_template), class: "btn btn-mini btn-info" %></td>
+  <td><%= link_to 'Edit', edit_course_template_path(course_template), class: "btn btn-sm btn-info" %></td>
   <td>
     <% if course_template.hidden %>
-      <%= link_to 'unhide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-mini btn-danger" %>
+      <%= link_to 'unhide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-sm btn-danger" %>
     <% else %>
-      <%= link_to 'hide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-mini btn-success" %>
+      <%= link_to 'hide', toggle_hidden_course_template_path(course_template), method: :post, class: "btn btn-sm btn-success" %>
     <% end %>
   </td>
 </tr>

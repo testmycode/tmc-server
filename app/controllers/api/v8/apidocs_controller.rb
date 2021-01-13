@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     class ApidocsController < ActionController::Base
@@ -134,7 +136,7 @@ module Api
           end
         end
         key :host, 'localhost:3000'
-        key :schemes, %w(http https)
+        key :schemes, %w[http https]
         key :consumes, ['application/json']
         key :produces, ['application/json']
       end
@@ -142,7 +144,6 @@ module Api
       # A list of all classes that have swagger_* declarations.
       # The order of the swagered_classes affects the order they are shown in swaggerUI
       SWAGGERED_CLASSES = [
-        Api::V8::SubmissionsController,
         Api::V8::UsersController,
         Api::V8::CoursesController,
         Api::V8::Courses::PointsController,
@@ -153,23 +154,29 @@ module Api
         Api::V8::Courses::Submissions::LastHourController,
         Api::V8::Courses::Users::PointsController,
         Api::V8::Courses::Users::SubmissionsController,
+        Api::V8::Exercises::Users::SubmissionsController,
         Api::V8::OrganizationsController,
         Api::V8::Organizations::CoursesController,
         Api::V8::Organizations::Courses::PointsController,
         Api::V8::Organizations::Courses::SubmissionsController,
         Api::V8::Organizations::Courses::ExercisesController,
+        Api::V8::Organizations::Courses::StudyrightEligibilityController,
         Api::V8::Organizations::Courses::Exercises::PointsController,
         Api::V8::Organizations::Courses::Exercises::Users::PointsController,
         Api::V8::Organizations::Courses::Users::PointsController,
         Api::V8::Organizations::Courses::Users::SubmissionsController,
+        Api::V8::Users::BasicInfoByUsernamesController,
+        Api::V8::Users::BasicInfoByEmailsController,
         Api::V8::Core::CoursesController,
         Api::V8::Core::Courses::ReviewsController,
         Api::V8::Core::Courses::UnlocksController,
         Api::V8::Core::ExercisesController,
+        Api::V8::Core::Exercises::DetailsController,
         Api::V8::Core::Exercises::SolutionsController,
         Api::V8::Core::Exercises::SubmissionsController,
         Api::V8::Core::Organizations::CoursesController,
         Api::V8::Core::SubmissionsController,
+        Api::V8::Core::Submissions::FeedbackController,
         Api::V8::Core::Submissions::ReviewsController,
         AvailablePoint,
         AwardedPoint,

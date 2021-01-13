@@ -1,4 +1,4 @@
-class RenameValgrindTraceToBacktrace < ActiveRecord::Migration
+class RenameValgrindTraceToBacktrace < ActiveRecord::Migration[4.2]
   def up
     rename_column :test_case_runs, :valgrind_trace, :backtrace
   end

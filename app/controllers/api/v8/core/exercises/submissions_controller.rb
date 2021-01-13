@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V8
     module Core
@@ -47,7 +49,7 @@ module Api
 
             unless @exercise.submittable_by?(current_user)
               authorization_skip!
-              return respond_access_denied('Submissions for this exercise are no longer accepted.')
+              return respond_forbidden('Submissions for this exercise are no longer accepted.')
             end
 
             file_contents = File.read(params[:submission][:file].tempfile.path)
@@ -92,21 +94,18 @@ module Api
 
               unless @submission.save
                 errormsg = 'Failed to save submission.'
-                errormsg += " Errors: #{@submission.errors.messages.to_s}"
+                errormsg += " Errors: #{@submission.errors.messages}"
               end
             end
 
             unless errormsg
-              SubmissionProcessor.new.process_submission(@submission)
+              # SubmissionProcessor.new.process_submission(@submission)
             end
 
             if !errormsg
               render json: { submission_url: api_v8_core_submission_url(@submission),
-                             paste_url: if @submission.paste_key
-                                          paste_url(@submission.paste_key)
-                                        else
-                                          ''
-                                        end }
+                             paste_url: @submission.paste_key ? paste_url(@submission.paste_key) : '',
+                             show_submission_url: submission_url(@submission) }
             else
               render json: { error: errormsg }
             end

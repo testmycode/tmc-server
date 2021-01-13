@@ -1,15 +1,6 @@
-[submodule "ext/tmc-sandbox"]
-	path = ext/tmc-sandbox
-	url = git@github.com:testmycode/tmc-sandbox.git
-[submodule "ext/tmc-comet"]
-	path = ext/tmc-comet
-	url = git@github.com:testmycode/tmc-comet.git
-[submodule "ext/tmc-spyware-server"]
-	path = ext/tmc-spyware-server
-	url = git@github.com:testmycode/tmc-spyware-server.git
-[submodule "ext/tmc-checkstyle-runner"]
-	path = ext/tmc-checkstyle-runner
-	url = git@github.com:testmycode/tmc-checkstyle-runner.git
 [submodule "ext/tmc-langs"]
 	path = ext/tmc-langs
 	url = git@github.com:testmycode/tmc-langs.git
+[submodule "ext/sandbox"]
+	path = ext/sandbox
+	url = git@github.com:rage/sandbox.git

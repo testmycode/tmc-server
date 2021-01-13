@@ -1,24 +1,18 @@
-<table id="<%= locals[:list_id] %>" class="course-list table table-striped table-bordered table-hover">
-  <thead>
-    <tr>
-      <th>
-        Course
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <% locals[:courses].each do |course| %>
-      <tr class="course <% if course.hidden? || course.disabled? %>hidden-course<% end %>">
-        <td>
-          <%= link_to course.title, organization_course_path(@organization, course) %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<!--%= use_datatables('table.course-list#' + locals[:list_id], :bPaginate => false, :bFilter => false) %-->
+<% locals[:courses].each do |course| %>
+  <%= link_to organization_course_path(@organization, course), class: "course-card-link" do %>
+    <div class="card course-card<% unless course.hidden? || course.disabled? %> border-secondary<% end %>">
+      <div class="card-body<% if course.hidden? || course.disabled? %> text-secondary<% end %>">
+        <h4 class="card-title">
+          <%= course.title %>
+          <small class="text-muted">(<%= course.name %>)</small>
+        </h4>
+        <%= course.description.presence || "A mysterious course without description." %>
+      </div>
+    </div>
+  <% end %>
+  <br>
+<% end %>
 
 <% if signed_in? %>
-  <div class="alternative-format-links">[<%= link_to "json", "#{organization_courses_path organization_id: @organization.slug, format: :json, api_version: ApiVersion::API_VERSION}" %>]</div>
+  <div class="alternative-options-links">[<%= link_to "json", "#{organization_courses_path organization_id: @organization.slug, format: :json, api_version: ApiVersion::API_VERSION}" %>]</div>
 <% end %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'gdocs_export'
 
@@ -9,7 +11,7 @@ describe GDocsExport, gdocs: true do
   end
 
   before :each do
-    @course = FactoryGirl.create(:course)
+    @course = FactoryBot.create(:course)
   end
 
   describe 'finding stuff' do

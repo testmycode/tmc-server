@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pathname'
 require 'exercise_dir/java_simple'
 require 'exercise_dir/java_maven'
@@ -12,18 +14,14 @@ class ExerciseDir
     if dir
       dir
     else
-      fail "Not a valid exercise directory: #{path}"
+      raise "Not a valid exercise directory: #{path}"
     end
   end
 
   def self.try_get(path)
     path = Pathname(path)
     cls = exercise_type_impl(path)
-    if !cls.nil?
-      cls.new(path)
-    else
-      nil
-    end
+    cls&.new(path)
   end
 
   def self.exercise_type(path)
@@ -50,19 +48,23 @@ class ExerciseDir
 
   def self.find_exercise_dirs(path)
     path = Pathname(path)
-    TmcLangs.get.find_exercise_dirs(path).sort.map {|dir| ExerciseDir.get(dir) }
+    TmcLangs.get.find_exercise_dirs(path).sort.map { |dir| ExerciseDir.get(dir) }
+  end
+
+  # subclass may set this to true
+  def safe_for_experimental_sandbox
+    TmcProjectFile.for_project(@path).force_new_sandbox
   end
 
   private
-
-  # For now langs packages only java simple and any new formats. -jamo 5/1/2016
-  def self.exercise_type_impl(path)
-    if (path + 'pom.xml').exist?
-      JavaMaven
-    elsif (path + 'Makefile').exist? && (path + 'test/').exist?
-      MakefileC
-    else
-      Langs
+    # For now langs packages only java simple and any new formats. -jamo 5/1/2016
+    def self.exercise_type_impl(path)
+      if (path + 'pom.xml').exist?
+        JavaMaven
+      elsif (path + 'Makefile').exist? && (path + 'test/').exist?
+        MakefileC
+      else
+        Langs
+      end
     end
-  end
 end

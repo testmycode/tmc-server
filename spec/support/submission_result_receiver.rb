@@ -1,10 +1,12 @@
 
+# frozen_string_literal: true
+
 # Receives incoming results from a remote sandbox during testing.
 # Used by RemoteSandboxForTesting
 class SubmissionResultReceiver
   def initialize
     @queue = Queue.new
-    @port = FreePorts.take_next
+    @port = 3000
     start_mimic_server!
   end
 
@@ -30,18 +32,17 @@ class SubmissionResultReceiver
   end
 
   def receiver_url
-    "http://#{host_ip}:#{receiver_port}/results"
+    "http://#{host_ip}:3000/results"
   end
 
   private
-
-  def start_mimic_server!
-    queue = @queue # put in closure, blocks below have different `self`
-    Mimic.mimic(port: receiver_port, fork: true) do
-      post('/results') do
-        queue << params
-        [200, {}, ['OK']]
+    def start_mimic_server!
+      queue = @queue # put in closure, blocks below have different `self`
+      Mimic.mimic(port: 3000, fork: true) do
+        post('/results') do
+          queue << params
+          [200, {}, ['OK']]
+        end
       end
     end
-  end
 end

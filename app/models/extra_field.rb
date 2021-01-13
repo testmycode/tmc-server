@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An abstract base for classes representing extra fields on a record.
 #
 # See UserField for an example.
@@ -23,7 +25,7 @@ module ExtraField
 
   def initialize(options = {})
     @options = default_options.merge(options)
-    fail 'Name missing' unless @options[:name]
+    raise 'Name missing' unless @options[:name]
     @value_class = Object.const_get(self.class.name + 'Value')
   end
 
@@ -78,54 +80,53 @@ module ExtraField
   end
 
   private
+    def self.config_files
+      Dir.glob("#{::Rails.root}/config/extra_fields/*_fields.rb")
+    end
 
-  def self.config_files
-    Dir.glob("#{::Rails.root}/config/extra_fields/*_fields.rb")
-  end
+    def self.load_fields(kind, config_file_path)
+      return [] unless File.exist?(config_file_path)
 
-  def self.load_fields(kind, config_file_path)
-    return [] unless File.exist?(config_file_path)
+      kind = kind.to_s
 
-    kind = kind.to_s
+      require "#{kind}_field"
+      cls_name = "#{kind.camelize}Field"
 
-    require "#{kind}_field"
-    cls_name = "#{kind.camelize}Field"
+      cls = Object.const_get(cls_name)
+      raise "Field class not found: #{cls}" if cls.nil?
 
-    cls = Object.const_get(cls_name)
-    fail "Field class not found: #{cls}" if cls.nil?
+      dsl = Object.new
+      dsl.instance_variable_set('@cls', cls)
+      dsl.instance_variable_set('@fields', [])
+      dsl.instance_variable_set('@html_count', 0)
 
-    dsl = Object.new
-    dsl.instance_variable_set('@cls', cls)
-    dsl.instance_variable_set('@fields', [])
-    dsl.instance_variable_set('@html_count', 0)
+      class << dsl
+        def group(group_name)
+          raise "Don't nest groups" if @group
+          @group = group_name
+          begin
+            yield
+          ensure
+            @group = nil
+          end
+        end
 
-    class << dsl
-      def group(group_name, &block)
-        fail "Don't nest groups" if @group
-        @group = group_name
-        begin
-          yield
-        ensure
-          @group = nil
+        def field(options)
+          @fields << @cls.new({ group: @group }.merge(options))
+        end
+
+        def html(text, options = {})
+          @html_count += 1
+          @fields << @cls.new({
+            name: "html#{@html_count}",
+            group: @group,
+            field_type: :html,
+            label: text
+          }.merge(options))
         end
       end
 
-      def field(options)
-        @fields << @cls.new({ group: @group }.merge(options))
-      end
-
-      def html(text, options = {})
-        @html_count += 1
-        @fields << @cls.new({
-          name: "html#{@html_count}",
-          group: @group,
-          field_type: :html,
-          label: text
-        }.merge(options))
-      end
+      dsl.instance_eval(File.read(config_file_path))
+      dsl.instance_variable_get('@fields')
     end
-
-    dsl.instance_eval(File.read(config_file_path))
-    dsl.instance_variable_get('@fields')
-  end
 end

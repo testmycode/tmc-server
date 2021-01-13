@@ -1,6 +1,6 @@
 require 'fileutils'
 
-class MoveFileStore < ActiveRecord::Migration
+class MoveFileStore < ActiveRecord::Migration[4.2]
   def up
     return true if 1==1
     FileUtils.mkdir_p("#{::Rails.root}/db")

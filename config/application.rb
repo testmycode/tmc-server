@@ -1,5 +1,7 @@
-require File.expand_path('../boot', __FILE__)
-require File.expand_path('../../app/models/site_setting.rb', __FILE__)
+# frozen_string_literal: true
+
+require File.expand_path('boot', __dir__)
+require File.expand_path('../app/models/site_setting.rb', __dir__)
 
 require 'rails/all'
 
@@ -24,29 +26,27 @@ module TmcServer
     # config.i18n.default_locale = :de
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password, :api_password, :submission_file, :return_file, :test_output, :stdout, :stderr, :vm_log]
-
-    config.active_record.raise_in_transactional_callbacks = true
+    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log]
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.autoload_paths << Rails.root.join('lib')
 
     config.relative_url_root = SiteSetting.value('base_path')
 
-    config.middleware.insert_before 0, "Rack::Cors", :debug => true, :logger => (-> { Rails.logger }) do
+    config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
       allow do
         origins '*'
         resource '/oauth*', headers: :any, methods: :any
-        resource '/api*', headers: :any, methods: [:get, :post]
+        resource '/api*', headers: :any, methods: :any
       end
       allow do
         origins SiteSetting.all_settings['cors_origins']
-        resource '/auth*', headers: :any, methods: [:get, :post]
+        resource '/auth*', headers: :any, methods: %i[get post]
         resource '/paste/*', headers: :any, methods: [:get]
         resource '/courses', headers: :any, methods: [:get]
         resource '/courses/*', headers: :any, methods: [:get]
         resource '/courses/*/points*', headers: :any, methods: [:get]
-        resource '/exercises/*', headers: :any, methods: [:get, :post]
+        resource '/exercises/*', headers: :any, methods: %i[get post]
         resource '/org/*/courses.json', headers: :any, methods: [:get]
         resource '/org/*/courses/*', headers: :any, methods: [:get]
         resource '/org/*/courses/*/points*', headers: :any, methods: [:get]

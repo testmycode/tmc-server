@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Handles feedback questions reordering
 #
 # This is poorly named. Also, as noted in FeedbackQuestionsController,

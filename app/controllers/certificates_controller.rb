@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CertificatesController < ApplicationController
   before_action :set_user, except: [:show]
   before_action :set_courses, except: [:show]
@@ -32,32 +34,31 @@ class CertificatesController < ApplicationController
     else
       render action: :new
     end
-    rescue Errno::ENOENT
-      redirect_to participant_certificates_path(@user), alert: "Cannot create certificate for this course."
+  rescue Errno::ENOENT
+    redirect_to participant_certificates_path(@user), alert: 'Cannot create certificate for this course.'
   end
 
   private
-
-  def certificate_params
-    params.require(:certificate).permit(:name, :user_id, :course_id)
-  end
-
-  def set_user
-    id = params[:participant_id] || params[:certificate][:user_id]
-    @user = User.find(id)
-  end
-
-  def set_courses
-    @courses = current_user.administrator? ? Course.where(certificate_downloadable: true).order(:name) : Course.with_certificates_for(@user)
-  end
-
-  def add_certificate_breadcrumbs
-    if @user == current_user
-      add_breadcrumb 'My stats', participant_path(@user)
-    elsif current_user.administrator?
-      add_breadcrumb 'Participants', :participants_path
-      add_breadcrumb @user.display_name, participant_path(@user)
+    def certificate_params
+      params.require(:certificate).permit(:name, :user_id, :course_id)
     end
-    add_breadcrumb 'Certificate'
-  end
+
+    def set_user
+      id = params[:participant_id] || params[:certificate][:user_id]
+      @user = User.find(id)
+    end
+
+    def set_courses
+      @courses = current_user.administrator? ? Course.where(certificate_downloadable: true).order(:name) : Course.with_certificates_for(@user)
+    end
+
+    def add_certificate_breadcrumbs
+      if @user == current_user
+        add_breadcrumb 'My stats', participant_path(@user)
+      elsif current_user.administrator?
+        add_breadcrumb 'Participants', :participants_path
+        add_breadcrumb @user.display_name, participant_path(@user)
+      end
+      add_breadcrumb 'Certificate'
+    end
 end

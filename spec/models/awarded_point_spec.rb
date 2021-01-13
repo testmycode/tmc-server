@@ -1,47 +1,49 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe AwardedPoint, type: :model do
   describe 'scopes' do
     before :each do
-      @course = FactoryGirl.create(:course)
+      @course = FactoryBot.create(:course)
 
-      @user = FactoryGirl.create(:user)
-      @user2 = FactoryGirl.create(:user)
-      @admin = FactoryGirl.create(:admin)
+      @user = FactoryBot.create(:user)
+      @user2 = FactoryBot.create(:user)
+      @admin = FactoryBot.create(:admin)
 
       @sheet1 = 'sheet1'
       @sheet2 = 'sheet2'
 
-      @ex1 = FactoryGirl.create(:exercise, course: @course,
+      @ex1 = FactoryBot.create(:exercise, course: @course,
                                            gdocs_sheet: @sheet1)
-      @ex2 = FactoryGirl.create(:exercise, course: @course,
+      @ex2 = FactoryBot.create(:exercise, course: @course,
                                            gdocs_sheet: @sheet2)
 
-      @sub1 = FactoryGirl.create(:submission, course: @course,
+      @sub1 = FactoryBot.create(:submission, course: @course,
                                               user: @user,
                                               exercise: @ex1)
-      @sub2 = FactoryGirl.create(:submission, course: @course,
+      @sub2 = FactoryBot.create(:submission, course: @course,
                                               user: @user2,
                                               exercise: @ex2)
-      @sub_admin = FactoryGirl.create(:submission, course: @course,
+      @sub_admin = FactoryBot.create(:submission, course: @course,
                                                    user: @admin,
                                                    exercise: @ex1)
 
-      FactoryGirl.create(:available_point, exercise: @ex1, name: 'ap')
-      FactoryGirl.create(:available_point, exercise: @ex2, name: 'ap2')
-      FactoryGirl.create(:available_point, exercise: @ex1, name: 'ap3')
-      FactoryGirl.create(:available_point, exercise: @ex1, name: 'ap_admin')
+      FactoryBot.create(:available_point, exercise: @ex1, name: 'ap')
+      FactoryBot.create(:available_point, exercise: @ex2, name: 'ap2')
+      FactoryBot.create(:available_point, exercise: @ex1, name: 'ap3')
+      FactoryBot.create(:available_point, exercise: @ex1, name: 'ap_admin')
 
-      @ap = FactoryGirl.create(:awarded_point, course: @course,
+      @ap = FactoryBot.create(:awarded_point, course: @course,
                                                user: @user, name: 'ap',
                                                submission: @sub1)
-      @ap2 = FactoryGirl.create(:awarded_point, course: @course,
+      @ap2 = FactoryBot.create(:awarded_point, course: @course,
                                                 user: @user2, name: 'ap2',
                                                 submission: @sub2)
-      @ap3 = FactoryGirl.create(:awarded_point, course: @course,
+      @ap3 = FactoryBot.create(:awarded_point, course: @course,
                                                 user: @user, name: 'ap3',
                                                 submission: @sub1)
-      @ap_admin = FactoryGirl.create(:awarded_point, course: @course,
+      @ap_admin = FactoryBot.create(:awarded_point, course: @course,
                                                      user: @admin, name: 'ap_admin',
                                                      submission: @sub_admin)
     end

@@ -1,0 +1,81 @@
+<h1>Status</h1>
+
+<p>
+  Here is some adminsitrative information about this instance.
+</p>
+
+<h2>Submissions</h2>
+
+<% if @stats %>
+  <table class="table">
+    <tbody>
+      <tr>
+        <th scope="row">High priority submissions in queue </th scope="row">
+        <td><%= @stats['high_priority_submissions_count'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">All submissions in queue</th scope="row">
+        <td><%= @stats['sandbox_queue_length'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">Submissions, processing not complete</th>
+        <td><%= @stats['unprocessed_submissions_count'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">Submissions during the last minute</th>
+        <td><%= @stats['submissions_count_minute'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">Submissions during the last five minutes</th>
+        <td><%= @stats['submissions_count_five_minutes'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">Submissions during the latest hour</th>
+        <td><%= @stats['submissions_count_hour'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">Submissions today</th>
+        <td><%= @stats['submissions_count_today'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">Submissions yesterday</th>
+        <td><%= @stats['submissions_count_yesterday'] %></td>
+      </tr>
+      <tr>
+        <th scope="row">Submissions this week</th>
+        <td><%= @stats['submissions_count_week'] %></td>
+      </tr>
+    </tbody>
+  </table>
+<% else %>
+  <p>No stats cached within the last minute. Check if the background daemon is running.</p>
+<% end %>
+
+
+<h2>Sandboxes</h2>
+
+<% if @sandboxes %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Busy instances</th>
+        <th>Capacity</th>
+        <th>Time spent fetching this information</th>
+      </tr>
+    </thead>
+    <tbody>
+
+    <% @sandboxes.each do |sandbox| %>
+      <tr>
+        <td><%= sandbox['baseurl'] %></td>
+        <td><%= sandbox['busy_instances'] %></td>
+        <td><%= sandbox['capacity'] %></td>
+        <td><%= sandbox['fetching_time'] %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No sandbox statuses cached within the last minute. Check if the background daemon is running.</p>
+<% end %>

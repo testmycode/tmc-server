@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'file_tree_hasher'
 require 'test_scanner_cache'
 

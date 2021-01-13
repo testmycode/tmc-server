@@ -1,4 +1,4 @@
-class AddLegitimateStudentToUsers < ActiveRecord::Migration
+class AddLegitimateStudentToUsers < ActiveRecord::Migration[4.2]
   def up
     add_column :users, :legitimate_student, :boolean, null: false, default: true
 

@@ -1,0 +1,3 @@
+#!/bin/sh
+RSPEC_PATTERN="spec/features/**/*.rb"
+bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --format documentation"

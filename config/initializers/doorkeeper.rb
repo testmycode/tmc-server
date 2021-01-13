@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use (needs plugins)
   orm :active_record
@@ -6,20 +8,19 @@ Doorkeeper.configure do
   resource_owner_authenticator do
     # Put your resource owner authentication logic here.
     # Example implementation:
-    User.find_by_id(session[:user_id]) || redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
+    User.find_by(id: session[:user_id]) || redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
   admin_authenticator do
     # Put your admin authentication logic here.
-    user = User.find_by_id(session[:user_id])
+    user = User.find_by(id: session[:user_id])
     if user.nil? || !user.administrator?
-     redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
+      redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
     end
-
   end
 
-  resource_owner_from_credentials do |routes|
+  resource_owner_from_credentials do |_routes|
     User.authenticate(params[:username], params[:password])
   end
 
@@ -78,14 +79,14 @@ Doorkeeper.configure do
   # When clients register with the following redirect uri, they won't be redirected to any server and the authorization code will be displayed within the provider
   # The value can be any string. Use nil to disable this feature. When disabled, clients must provide a valid URL
   # (Similar behaviour: https://developers.google.com/accounts/docs/OAuth2InstalledApp#choosingredirecturi)
-  #
-  native_redirect_uri 'urn:ietf:wg:oauth:2.0:oob'
+  # SEE: https://github.com/doorkeeper-gem/doorkeeper/pull/1238#issuecomment-494254554
+  # native_redirect_uri 'urn:ietf:wg:oauth:2.0:oob'
 
   # Forces the usage of the HTTPS protocol in non-native redirect uris (enabled
   # by default in non-development environments). OAuth2 delegates security in
   # communication to the HTTPS protocol so it is wise to keep this enabled.
   #
-  # force_ssl_in_redirect_uri !Rails.env.development?
+  force_ssl_in_redirect_uri false
 
   # Specify what grant flows are enabled in array of Strings. The valid
   # strings and the flows they enable are:
@@ -103,7 +104,7 @@ Doorkeeper.configure do
   #   http://tools.ietf.org/html/rfc6819#section-4.4.2
   #   http://tools.ietf.org/html/rfc6819#section-4.4.3
   #
-  grant_flows %w(authorization_code client_credentials password)
+  grant_flows %w[authorization_code client_credentials password]
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.

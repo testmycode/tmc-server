@@ -1,4 +1,4 @@
-class RemovePgComments < ActiveRecord::Migration
+class RemovePgComments < ActiveRecord::Migration[4.2]
   def change
     if respond_to?(:remove_table_comment)
       remove_table_comment :awarded_points

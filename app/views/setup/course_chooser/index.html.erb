@@ -26,7 +26,7 @@
           <td><%= course_template.title %></td>
           <td><%= course_template.description %></td>
           <td><%= link_to course_template.material_url, course_template.material_url, target: '_blank' unless course_template.material_url.nil? %></td>
-          <td><%= link_to 'Choose', new_setup_organization_course_path(@organization, course_template.id), class: "btn btn-mini btn-primary" %></td>
+          <td><%= link_to 'Choose', new_setup_organization_course_path(@organization, course_template.id), class: "btn btn-sm btn-primary" %></td>
         </tr>
     <% end %>
     </tbody>
@@ -35,7 +35,7 @@
 
   <% if can? :create, :custom_course %>
       <h3>Create custom course (advanced mode)</h3>
-      <%= link_to 'Create New Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-mini btn-warning" %>
+      <%= link_to 'Create New Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-danger" %>
   <% end %>
 
 <% else %>

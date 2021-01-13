@@ -13,15 +13,12 @@ The following packages should be installed first: `ruby` (and `bundler` gem), `p
 
 1. Download submodules with `git submodule update --init --recursive`
 2. Install dependencies with `bundle install`
-3. Edit `config/site.yml`, based on `config/site.defaults.yml`.
+3. Rename `config/site.dev.yml` to `config/site.yml`.
 4. Setup PostgreSQL based on `config/database.yml` or configure `config/database.local.yml` according to your current postgres settings.
 5. Initialize rails database with `rake db:create db:migrate`
-6. Go to `ext/tmc-sandbox` and compile with `sudo make`. More information from [tmc-sandbox page](https://github.com/testmycode/tmc-sandbox).
-7. Go to `ext/tmc-sandbox/web` and install dependencies with `bundle install`. Compile extensions with `rake ext` and run tests with `rvmsudo rake test`.
-8. Compile the other stuff in `ext` by doing `rake compile`
-9. Install [tmc-check](https://github.com/testmycode/tmc-check) by running `rvmsudo make rubygems install clean` in `ext/tmc-sandbox/uml/output/tmc-check`.
-10. Run the test suite with `rvmsudo rake spec`.
-11. Verify code style with `bundle exec rubocop`.
+6. Go to `ext/sandbox` and run `npm ci`. More information from [sandbox page](https://github.com/rage/sandbox).
+7. Run the test suite with `rvmsudo rake spec`.
+8. Verify code style with `bundle exec rubocop`.
 
 After you get the test suite to pass see [post-install instructions](#post-install-instructions).
 
@@ -151,35 +148,11 @@ You can view the site settings from the file `config/site.defaults.yml`. If you 
 Initialize the database with `rake db:create db:migrate`
 Note: run `rake db:seed` to initialize admin account
 
-#### Build sandbox
+#### Install sandbox dependencies
 
 ```bash
-$ cd ext/tmc-sandbox
-$ sudo make
-```
-
-#### Install tmc-sandbox web dependencies
-
-```bash
-$ cd web
-$ bundle install
-$ rake ext
-$ rvmsudo rake test
-```
-
-#### Compile rest of the externals
-
-```bash
-$ cd -
-$ rake compile
-```
-
-#### Install tmc-check
-
-```bash
-$ sudo apt-get install check
-$ cd tmc-sandbox/uml/output/tmc-check
-$ rvmsudo make rubygems install clean
+$ cd ext/sandbox
+$ npm ci
 ```
 
 #### Run the test suite

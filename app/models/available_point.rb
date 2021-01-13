@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 # Caches points that can be awarded from an exercise.
 # Awarded points don't have a hard reference to these because
 # these are recreated every time a course is refreshed.
 # Instead they are always searched for (course_id, name).
-class AvailablePoint < ActiveRecord::Base
+class AvailablePoint < ApplicationRecord
   include PointComparison
   include Swagger::Blocks
 
   swagger_schema :AvailablePoint do
-    key :required, [
-      :id, :exercise_id, :name, :require_review
+    key :required, %i[
+      id exercise_id name require_review
     ]
 
     property :id, type: :integer, example: 1
@@ -48,7 +50,7 @@ class AvailablePoint < ActiveRecord::Base
 
   def self.course_points(course)
     joins(:exercise)
-      .where(exercises: { course_id: course.id, hidden: false, hide_submission_results: false })
+      .where(exercises: { course_id: course.id, hidden: false, hide_submission_results: false, disabled_status: 0 })
   end
 
   # Selects all points for list of courses (with course_id for convenience)
@@ -81,19 +83,19 @@ class AvailablePoint < ActiveRecord::Base
   end
 
   def award_to(user, submission = nil)
+    point_awarded_at = submission ? submission.created_at : Time.zone.now
     AwardedPoint.create!(
       course_id: exercise.course_id,
       name: name,
       user_id: user.id,
       submission: submission,
-      created_at: submission.created_at
+      created_at: point_awarded_at
     )
   rescue ActiveRecord::RecordNotUnique
   end
 
   private
-
-  def name_must_not_contain_whitespace
-    errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
-  end
+    def name_must_not_contain_whitespace
+      errors.add(:name, "can't contain whitespace") if /\s+/ =~ name
+    end
 end

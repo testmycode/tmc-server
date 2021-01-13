@@ -1,4 +1,8 @@
-class Certificate < ActiveRecord::Base
+# frozen_string_literal: true
+
+require 'pdfkit'
+
+class Certificate < ApplicationRecord
   belongs_to :user
   belongs_to :course
 
@@ -9,16 +13,18 @@ class Certificate < ActiveRecord::Base
     visible_exercises, available_points = visible_exercises_and_points_for
 
     data = File.read(File.join(path, 'certificate.html'))
+    awarded_points = AwardedPoint.course_user_points(course, user).reject do |p|
+      exercise = p.submission.exercise
+      exercise.nil? ? false : p.submission.exercise.hide_submission_results?
+    end
     data %= {
       time: Time.zone.now.to_f * 1000,
       name: name,
       course: course.formal_name || course.title,
       weeks: course.exercise_groups.count,
       exercises: visible_exercises.count,
-      points: AwardedPoint.course_user_points(course, user).reject do |p|
-        exercise = p.submission.exercise
-        exercise.nil? ? false : p.submission.exercise.hide_submission_results?
-      end.count,
+      points: awarded_points.count,
+      point_names: awarded_points.map(&:name).join(','),
       available_points: available_points,
       root: path
     }
@@ -35,8 +41,7 @@ class Certificate < ActiveRecord::Base
                           margin_bottom: '0.20in',
                           margin_left: '0.20in',
                           image_quality: 100,
-                          image_dpi: 300,
-                         ).to_pdf
+                          image_dpi: 300).to_pdf
   end
 
   def path
@@ -44,10 +49,9 @@ class Certificate < ActiveRecord::Base
   end
 
   private
-
-  def visible_exercises_and_points_for
-    visible_exercises = course.exercises.select { |e| e.points_visible_to?(user) }
-    total_available = AvailablePoint.course_points_of_exercises(course, visible_exercises, hidden: true)
-    [visible_exercises, total_available]
-  end
+    def visible_exercises_and_points_for
+      visible_exercises = course.exercises.select { |e| e.points_visible_to?(user) }
+      total_available = AvailablePoint.course_points_of_exercises(course, visible_exercises, hidden: true)
+      [visible_exercises, total_available]
+    end
 end

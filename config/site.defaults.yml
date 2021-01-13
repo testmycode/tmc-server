@@ -39,6 +39,8 @@ baseurl_for_remote_sandboxes: http://<%= ENV.fetch('HOST', 'localhost') %>:3000/
 remote_sandboxes:
   - <%= ENV.fetch('SANDBOX_URL', 'http://localhost:3001/') %>
 
+experimental_sandboxes: []
+
 # List of spyware server URLs. See https://github.com/testmycode/tmc-spyware-server
 # The URLs should work from both clients and the server.
 # This list will be delivered to the client in /courses.json.
@@ -76,6 +78,8 @@ emails:
   from: noreply@example.com
   email_code_reviews_by_default: false
 
+# Used for email notifications intended for site admins
+administrative_email: ""
 
 ### Enable or disable features ###
 
@@ -118,6 +122,8 @@ valid_clients:
     min_version: 0.2.22
   - name: tmc.py
     min_version: 0.3.0
+  - name: vscode_plugin
+    min_version: 1.4.0
 
 ## Cross Origin Requests for /auth ##
 

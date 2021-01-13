@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Admin edits course templates', feature: true do
   include IntegrationTestActions
 
   before :each do
-    @admin = FactoryGirl.create :admin, password: 'xooxer'
-    @user = FactoryGirl.create :user, password: 'foobar'
+    @admin = FactoryBot.create :admin, password: 'xooxer'
+    @user = FactoryBot.create :user, password: 'foobar'
 
-    FactoryGirl.create :course_template, name: 'dontchange', title: 'dontchange', description: 'dontchange', material_url: 'dontchange'
-    FactoryGirl.create :course_template, name: 'oldname', title: 'oldtitle', description: 'olddescription', material_url: 'oldmaterial'
+    FactoryBot.create :course_template, name: 'dontchange', title: 'dontchange', description: 'dontchange', material_url: 'dontchange'
+    FactoryBot.create :course_template, name: 'oldname', title: 'oldtitle', description: 'olddescription', material_url: 'oldmaterial'
 
     visit '/'
   end
@@ -17,7 +19,7 @@ feature 'Admin edits course templates', feature: true do
     repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(repo_path)
 
-    log_in_as(@admin.login, 'xooxer')
+    log_in_as(@admin.email, 'xooxer')
     visit '/course_templates'
 
     find('table').find('tr:nth-child(2)').click_link('Edit')
@@ -33,9 +35,9 @@ feature 'Admin edits course templates', feature: true do
   end
 
   scenario 'Non-admin doesnt succeed' do
-    log_in_as(@user.login, 'foobar')
+    log_in_as(@user.email, 'foobar')
     visit '/course_templates'
 
-    expect(page).to have_content('Access denied')
+    expect(page).to have_content('Forbidden')
   end
 end

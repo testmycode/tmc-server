@@ -1,28 +1,22 @@
+# frozen_string_literal: true
+
 require 'pathname'
 require 'course_refresher/line_comment_based_filter'
 
 class CourseRefresher
   class MakefileCFilter < BlockCommentBasedFilter
     def applies_to?(file_path)
-      %w(.c .h).include? Pathname(file_path).extname
+      %w[.c .h].include? Pathname(file_path).extname
     end
 
     def filter_for_stub(text)
       text = super(text)
-      if text
-        remove_html_comments(text)
-      else
-        nil
-      end
+      remove_html_comments(text) if text
     end
 
     def filter_for_solution(text)
       text = super(text)
-      if text
-        remove_html_comments(text)
-      else
-        nil
-      end
+      remove_html_comments(text) if text
     end
 
     def remove_html_comments(text)

@@ -1,4 +1,4 @@
-class MoveCourseRepoInfoToCourseTemplate < ActiveRecord::Migration
+class MoveCourseRepoInfoToCourseTemplate < ActiveRecord::Migration[4.2]
 
   class Course < ActiveRecord::Base
     belongs_to :course_template, :class_name => 'MoveCourseRepoInfoToCourseTemplate::CourseTemplate'

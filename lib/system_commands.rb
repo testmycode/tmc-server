@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'shellwords'
 
 # Provides useful methods for working with the shell.
@@ -5,12 +7,12 @@ require 'shellwords'
 # Ruby's standard methods "system" and the backtick operator are
 # bad at capturing output and errors.
 module SystemCommands
-  extend self
+  module_function
 
   # Prefer sh! instead
   def system!(cmd)
     ok = system(cmd)
-    fail "Command `#{cmd}` failed with status #{$?.inspect}" unless ok
+    raise "Command `#{cmd}` failed with status #{$?.inspect}" unless ok
   end
 
   def sh!(*args)
@@ -19,9 +21,7 @@ module SystemCommands
       escape: true,
       timeout: nil
     }
-    if args.last.is_a?(Hash)
-      options = options.merge(args.pop)
-    end
+    options = options.merge(args.pop) if args.last.is_a?(Hash)
 
     if options[:escape]
       cmd = mk_command(args.flatten)
@@ -30,20 +30,18 @@ module SystemCommands
         cmd = args[0]
         cmd = cmd.join(' ') if cmd.is_a?(Array)
       else
-        fail 'Expected a single string argument when :escape => true'
+        raise 'Expected a single string argument when :escape => true'
       end
     end
 
-    unless options[:timeout].nil?
-      cmd = "timeout #{options[:timeout]} #{cmd}"
-    end
+    cmd = "timeout #{options[:timeout]} #{cmd}" unless options[:timeout].nil?
 
     output = `#{cmd} 2>&1`
     status = $?
 
-    fail "Command '#{cmd}' timed out, status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
-    fail "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
-    fail "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
+    raise "Command '#{cmd}' timed out, status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
+    raise "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
+    raise "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 
     {
       status: status,

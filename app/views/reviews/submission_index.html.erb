@@ -4,8 +4,8 @@
   submission <%= @submission.id %>
 </h1>
 
-<div class="row-fluid">
-  <div class="span12">
+<div class="row">
+  <div class="col-md-12">
     <% if !@new_review && can?(:create_review, @course) %>
       <p><%= link_to 'Open review editor', new_submission_review_path(@submission) %></p>
     <% end %>
@@ -17,7 +17,7 @@
 
     <% newest_sub = @submission.newest_of_same_kind %>
     <% if newest_sub %>
-      <div class="alert alert-error">
+      <div class="alert alert-danger">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <p> NOTE: There is a <%= link_to "newer submission", new_submission_review_path(newest_sub) %>.</p>
       </div>
@@ -58,10 +58,10 @@
         <div class="review-body"><%= simple_format(review.review_body) %></div>
         <div class="buttons">
           <% if action_name == 'new' && can?(:update, review) %>
-            <button class="edit-review btn btn-warning"><span class="icon-pencil"></span>&nbsp;Edit</button>
+            <button class="edit-review btn btn-warning"><span class="glyphicon-pencil"></span>&nbsp;Edit</button>
           <% end %>
           <% if action_name == 'new' && can?(:delete, review) %>
-            <button class="delete-review btn btn-danger"><span class="icon-remove"></span>&nbsp;Delete</button>
+            <button class="delete-review btn btn-danger"><span class="glyphicon-remove"></span>&nbsp;Delete</button>
             <div class="ui-helper-hidden">
               <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>
             </div>
@@ -73,10 +73,10 @@
             <%= form_tag review_path(review), :method => 'put' do %>
               <% if review.marked_as_read? %>
                 <input type="hidden" name="mark_as_unread" value="1" />
-                <button type="submit" class="btn btn-primary"><i class="icon-eye-close"></i>&nbsp;Mark as unread</button>
+                <button type="submit" class="btn btn-primary"><i class="glyphicon-eye-close"></i>&nbsp;Mark as unread</button>
               <% else %>
                 <input type="hidden" name="mark_as_read" value="1" />
-                <button type="submit" class="btn btn-primary"><i class="icon-eye-close"></i>&nbsp;Mark as read</button>
+                <button type="submit" class="btn btn-primary"><i class="glyphicon-eye-close"></i>&nbsp;Mark as read</button>
               <% end %>
             <% end %>
           </div>
@@ -89,8 +89,8 @@
 </div>
 
 <% if @new_review %>
-  <div class="row-fluid">
-    <div class="span12">
+  <div class="row">
+    <div class="col-md-12">
       <div id="review-form-dialog" class="ui-helper-hidden">
         <div id="review-form">
           <%= form_for @new_review, :url => submission_reviews_path(@submission) do |f| %>
@@ -126,7 +126,7 @@
               <label for="send_notification">Notify in IDE</label>
             </div>
             <div class="buttons">
-              <button type="submit" class="btn btn-primary"><span class="icon-hdd"></span>&nbsp;Save review</button>
+              <button type="submit" class="btn btn-primary"><span class="glyphicon-hdd"></span>&nbsp;Save review</button>
             </div>
           <% end %>
         </div>
@@ -143,17 +143,17 @@
     </section>
   <% end %>
 
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="accordion" id="testResultsAccordion">
-        <div class="accordion-group">
-          <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#testResultsAccordion" href="#collapseOne">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel-group" id="testResultspanel-group">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <a class="panel-group-toggle" data-toggle="collapse" data-parent="#testResultspanel-group" href="#collapseOne">
               <h3>Test results</h3>
             </a>
           </div>
-          <div id="collapseOne" style="overflow: scroll;" class="accordion-body collapse out">
-            <div class="accordion-inner">
+          <div id="collapseOne" style="overflow: scroll;" class="panel-collapse collapse out">
+            <div class="panel-body">
               <%= render 'submissions/details' %>
             </div>
           </div>
@@ -162,16 +162,16 @@
     </div>
   </div>
 
-  <div class="row-fluid">
-    <div class="span12">
+  <div class="row">
+    <div class="col-md-12">
       <% new_button_text = if @submission.reviews.count == 0 then 'Start code review' else 'Add another code review' end %>
-      <button id="new-review" class="btn btn-primary"><i class="icon-file"></i>&nbsp;<%= new_button_text %></button>
+      <button id="new-review" class="btn btn-primary"><i class="glyphicon-file"></i>&nbsp;<%= new_button_text %></button>
       <% if @submission.review_dismissable? %>
         <div id="dismiss-review-form">
           <% if @submission.reviews.count == 0 %>
             <%= form_tag submission_path(@submission), :method => :put do %>
               <input type="hidden" name="dismiss_review" value="1" />
-              <button type="submit" id="dismiss-review" data-confirm="Confirm removing submission from list of pending reviews? Note that you don't need to do this manually for old submissions."><span class="icon-remove"></span>&nbsp;Dismiss</button>
+              <button type="submit" id="dismiss-review" data-confirm="Confirm removing submission from list of pending reviews? Note that you don't need to do this manually for old submissions."><span class="glyphicon-remove"></span>&nbsp;Dismiss</button>
             <% end %>
           <% end %>
         </div>
@@ -179,14 +179,14 @@
 
       <div id="review-form-reopen-handle" class="ui-helper-hidden">
         <button>
-          <i class="icon-hdd"></i>&nbsp;Code review
+          <i class="glyphicon-hdd"></i>&nbsp;Code review
         </button>
       </div>
     </div>
   </div>
 <% end %>
-<div class="row-fluid">
-  <div class="span12">
+<div class="row">
+  <div class="col-md-12">
 <%= render :partial => 'files/files', :locals => {:files => @files} %>
 </div>
 </div>
@@ -290,12 +290,12 @@
         return true;
       });
 
-      PagePresence.initial(function(users) {
-        var otherUsers = _.without(users, getMeta('username'));
-        if (otherUsers.length > 0) {
-          alert('Note: ' + _.first(otherUsers) + ' is already on this page.');
-        }
-      });
+      // PagePresence.initial(function(users) {
+      //   var otherUsers = _.without(users, getMeta('username'));
+      //   if (otherUsers.length > 0) {
+      //     alert('Note: ' + _.first(otherUsers) + ' is already on this page.');
+      //   }
+      // });
     });
   </script>
 <% end %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   config.logstasher.enabled = true
   #
@@ -22,7 +24,7 @@ Rails.application.configure do
   # config.action_dispatch.rack_cache = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this).
-  config.serve_static_assets = false
+  config.serve_static_files = false
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
@@ -48,7 +50,7 @@ Rails.application.configure do
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
-  config.log_tags = [ :uuid ]
+  config.log_tags = [:uuid]
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
@@ -56,13 +58,13 @@ Rails.application.configure do
   # Use a different cache store in production.
   if ENV['REDIS_URL']
     config.cache_store = :readthis_store, {
-        expires_in: 1.weeks.to_i, #default
-        namespace: 'cache',
-        redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
+      expires_in: 1.week.to_i, # default
+      namespace: 'cache',
+      redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
     }
     Readthis.fault_tolerant = true
   else
-    config.cache_store = :memory_store, { size: 64.megabytes } #
+    config.cache_store = :memory_store, { size: 64.megabytes }
   end
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
@@ -73,11 +75,25 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Mail delivery method
-  config.action_mailer.delivery_method = :sendmail
+  if ENV['USE_SMTP']
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address:              ENV['SMTP_ADDRESS'],
+      port:                 ENV['SMTP_PORT'],
+      domain:               ENV['SMTP_DOMAIN'],
+      user_name:            ENV['SMTP_USERNAME'],
+      password:             ENV['SMTP_PASSWORD'],
+      authentication:       ENV['SMTP_AUTHENTICATION'],
+      enable_starttls_auto: true
+    }
+  else
+    config.action_mailer.delivery_method = :sendmail
+  end
+
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
-  config.i18n.fallbacks = true
+  config.i18n.fallbacks = [I18n.default_locale]
 
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify
@@ -87,4 +103,6 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  config.wkhtmltopdf = 'xvfb-run wkhtmltopdf'
 end

@@ -1,5 +1,3 @@
-<h1>Welcome to TMC</h1>
-
 <% if current_user.administrator? && !Organization.pending_organizations.empty? %>
   <div class="alert alert-warning" role="alert">
     <%= pluralize(Organization.pending_organizations.size, 'new organization to verify') %>.
@@ -20,67 +18,50 @@
 <% end %>
 
 <% unless @my_organizations.empty? %>
-  <h2>My organizations</h2>
+  <div id="my-orgs-list">
+    <h2>My Organizations</h2>
 
-  <table id="my-organizations-table" class="table">
-    <thead>
-    <tr>
-      <th>Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% @my_organizations.each do |organization| %>
-      <tr>
-        <td>
-          <%= link_to organization.name, organization_path(organization) %>
-          <% if !organization.verified? %> (unverified)<% end %>
-        </td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
+    <%= render @my_organizations %>
+  </div>
 <% end %>
 
-<% if @my_organizations.empty? %>
-  <h2>Organizations</h2>
-<% else %>
-  <h2>All organizations</h2>
-<% end %>
+<h2>Frequently Used Organizations</h2>
 
-<table id="organization-table" class="table">
-  <thead>
-  <tr>
-    <th>Name</th>
-    <th>Information</th>
-    <% if current_user.administrator? %>
-      <th></th>
-    <% end %>
-  </tr>
-  </thead>
+<%= render @pinned_organizations %>
 
-  <tbody>
-  <% @organizations.each do |organization| %>
-    <% if !organization.hidden? || can?(:view_hidden_organizations, nil) %>
-      <tr class="<%= 'hidden-organization' if organization.hidden?  %>">
-        <td><%= link_to organization.name, organization_path(organization) %></td>
-        <td><%= organization.information %></td>
-        <% if current_user.administrator? %>
-          <td><%= link_to 'Edit', edit_setup_organization_path(organization) %></td>
+<h2>All organizations</h2>
+
+<div id="all-orgs-list">
+  <input class="search form-control" placeholder="Search" />
+  <br>
+  <ul class="list" style="list-style: none; padding-left: 0;">
+    <% @organizations.each do |organization| %>
+      <% next if organization.hidden? && !can?(:view_hidden_organizations, nil) %>
+      <li>
+        <%= link_to organization_path(organization), class: "organization-card-link" do %>
+          <div class="card small-organization-card">
+            <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
+              <%= image_tag(organization.logo.url(:small_logo), class: "img-fluid") %>
+              <div>
+              <h6 class="card-title">
+                <%= organization.name %>
+                <small class="text-muted <%= /[[:upper:]]/.match(organization.name[-1]) ? 'text-littlebitup' : '' %>">
+                  (<%= organization.slug %>)
+                </small>
+              </h6>
+              <%= organization.information %>
+            </div>
+          </div>
+          </div>
         <% end %>
-      </tr>
+        <br>
+      </li>
     <% end %>
-  <% end %>
-  </tbody>
-</table>
-
-<%= use_datatables('#organization-table', bPaginate: false) %>
+  </ul>
+</div>
 
 <br>
 
 <% if current_user.administrator? %>
-    <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-mini btn-warning" %>
-<% end %>
-
-<% if current_user.administrator? %>
-  <%= link_to 'Manage course templates', course_templates_path, class: "btn btn-mini btn-default" %>
+    <%= link_to 'Request a new organization', new_organization_path, class: "btn btn-primary" %>
 <% end %>

@@ -47,32 +47,32 @@
           Visible
         <% end %>
         <%= link_to "#{@organization.hidden ? 'make organization visible' : 'hide organization'}", toggle_visibility_organization_path(@organization),
-                    method: :post, class: "btn btn-mini #{@organization.hidden ? 'btn-info' : 'btn-danger' }", data: { confirm: "Are you sure?" } %>
+                    method: :post, class: "btn btn-sm #{@organization.hidden ? 'btn-info' : 'btn-danger' }", data: { confirm: "Are you sure?" } %>
       </li>
     <% end %>
 
     <% if can? :view_statistics, @organization %>
       <li>
-        <%= link_to 'Show statistics', organization_stats_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'Show statistics', organization_stats_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
 
 
     <% if can? :edit, @organization %>
       <li>
-        <%= link_to 'Edit organization info', edit_setup_organization_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'Edit organization info', edit_setup_organization_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
 
     <% if can? :view_participant_list, @organization%>
       <li>
-        <%= link_to 'List of registered users', organization_participants_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'List of registered users', organization_participants_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
 
     <% if can? :teach, @organization %>
       <li>
-        <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization), class: 'btn btn-mini' %>
+        <%= link_to 'Show teachers in this organization', organization_teachers_path(@organization), class: 'btn btn-sm' %>
       </li>
     <% end %>
     </ul>
@@ -126,15 +126,19 @@
   %>
 <% end %>
 
-<% unless @my_courses.empty? %>
+<% unless current_user.guest? %>
   <%=
       render partial: 'courses/list_my_courses',
              locals: { courses: @my_courses, title: 'My courses', percent_completed: @my_courses_percent_completed }
   %>
 <% end %>
 
-<% all_courses_title = @my_courses.empty? && @my_assisted_courses.empty? ? 'Courses' : 'All courses' %>
-
 <div>
-  <%= render template: 'courses/index', locals: { title: all_courses_title }  %>
+  <%= render template: 'courses/index', locals: { title: 'Courses' }  %>
 </div>
+
+<% if can? :teach, @organization %>
+  <%= link_to 'View all courses', all_courses_organization_path(@organization), class: 'btn btn-secondary'%>
+<% end %>
+
+<br>

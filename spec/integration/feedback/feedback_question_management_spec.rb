@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Feedback question management', type: :request, integration: true do
   include IntegrationTestActions
 
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization, slug: 'slug')
-    @teacher = FactoryGirl.create(:user)
+    @organization = FactoryBot.create(:accepted_organization, slug: 'slug')
+    @teacher = FactoryBot.create(:user)
     Teachership.create user_id: @teacher.id, organization_id: @organization.id
-    @user = FactoryGirl.create(:admin, password: 'xooxer')
+    @user = FactoryBot.create(:admin, password: 'xooxer')
     visit '/'
     log_in_as(@user.login, 'xooxer')
 

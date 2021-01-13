@@ -1,51 +1,53 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ExerciseStatusController, type: :controller do
   before :each do
-    @organization = FactoryGirl.create(:accepted_organization)
-    @course = FactoryGirl.create(:course)
+    @organization = FactoryBot.create(:accepted_organization)
+    @course = FactoryBot.create(:course)
     @course.organization = @organization
-    @exercise = FactoryGirl.create(:exercise, course: @course)
-    @exercise2 = FactoryGirl.create(:exercise, course: @course)
-    @exercise3 = FactoryGirl.create(:exercise, course: @course)
+    @exercise = FactoryBot.create(:exercise, course: @course)
+    @exercise2 = FactoryBot.create(:exercise, course: @course)
+    @exercise3 = FactoryBot.create(:exercise, course: @course)
   end
 
   describe 'GET show' do
     describe 'when user has participated in a course' do
       before :each do
-        @user = FactoryGirl.create(:user)
-        @submission = FactoryGirl.create(:submission,
+        @user = FactoryBot.create(:user)
+        @submission = FactoryBot.create(:submission,
                                          course: @course,
                                          user: @user,
                                          exercise: @exercise,
                                          all_tests_passed: true)
-        @available_point = FactoryGirl.create(:available_point,
+        @available_point = FactoryBot.create(:available_point,
                                               exercise: @exercise)
 
-        @awarded_point = FactoryGirl.create(:awarded_point,
+        @awarded_point = FactoryBot.create(:awarded_point,
                                             course: @course,
                                             name: @available_point.name,
                                             submission: @submission,
                                             user: @user)
 
-        @submission2 = FactoryGirl.create(:submission,
+        @submission2 = FactoryBot.create(:submission,
                                           course: @course,
                                           user: @user,
                                           exercise: @exercise2,
                                           all_tests_passed: false)
-        @available_point2 = FactoryGirl.create(:available_point,
+        @available_point2 = FactoryBot.create(:available_point,
                                                exercise: @exercise2)
-        @available_point22 = FactoryGirl.create(:available_point,
+        @available_point22 = FactoryBot.create(:available_point,
                                                 exercise: @exercise2)
       end
 
       def do_get
-        get :show, organization_id: @organization.slug, course_id: @course.id, id: @user.id, format: :json, api_version: ApiVersion::API_VERSION
+        get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @user.id, format: :json, api_version: ApiVersion::API_VERSION }
       end
 
       it 'should show completition status for submitted exercises' do
         do_get
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse response.body
         expect(json).to have_key @exercise.name
         expect(json).to have_key @exercise2.name
@@ -56,7 +58,7 @@ describe ExerciseStatusController, type: :controller do
 
       it 'should work when using course and user name instrad of id:s' do
         do_get
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse response.body
         expect(json).to have_key @exercise.name
         expect(json).to have_key @exercise2.name

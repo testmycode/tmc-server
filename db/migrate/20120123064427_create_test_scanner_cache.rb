@@ -1,4 +1,4 @@
-class CreateTestScannerCache < ActiveRecord::Migration
+class CreateTestScannerCache < ActiveRecord::Migration[4.2]
   def up
     create_table :test_scanner_cache_entries do |t|
       t.integer :course_id, null: false

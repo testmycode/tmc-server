@@ -4,7 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
-  <p>Please go to the following URL to change your password</p>
+  <p>Someone requested a password reset for your mooc.fi account <%= @user.email %>.<%= @origin ? " The request originated from '#{@origin}'." : '' %> Please proceed to the following URL to change your password</p>
 
   <a href="<%= @url %>"><%= @url %></a>
 

@@ -106,12 +106,10 @@ echo "Running tests..."
 case $PROJECT_TYPE in
   langs)
     export JVM_OPTIONS="-Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K ${runtime_params[@]}"
-    java -jar tmc-langs.jar run-tests --exercisePath . --outputPath test_output.txt > stdout.txt 2> stderr.txt || exit 103
-    cat stdout.txt
-    cat stderr.txt
-    java -jar tmc-langs.jar checkstyle --exercisePath . --outputPath validations.json --locale $error_msg_locale > stdout.txt 2> stderr.txt || exit 104
-    cat stdout.txt
-    cat stderr.txt
+    java -jar tmc-langs.jar run-tests --exercisePath . --outputPath test_output.txt  > >(tee -a stdout.log) 2> >(tee -a stderr.log >&2) || exit 103
+    echo "Running checkstyle"
+    java -jar tmc-langs.jar checkstyle --exercisePath . --outputPath validations.json --locale $error_msg_locale  > >(tee -a stdout.log) 2> >(tee -a stderr.log >&2) || exit 104
+    echo "All the files in the current folder:"
     ls -laR
   ;;
 

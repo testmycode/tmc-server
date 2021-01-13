@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 feature 'Teacher creates course from course template', feature: true do
@@ -6,10 +8,10 @@ feature 'Teacher creates course from course template', feature: true do
   create_course_button_text = 'Create New Course'
 
   before :each do
-    @organization = FactoryGirl.create :accepted_organization, slug: 'slug'
-    @teacher = FactoryGirl.create :user, password: 'xooxer'
-    @user = FactoryGirl.create :user, password: 'foobar'
-    @assistant = FactoryGirl.create :user, login: 'assi', password: 'assi'
+    @organization = FactoryBot.create :accepted_organization, slug: 'slug'
+    @teacher = FactoryBot.create :user, password: 'xooxer'
+    @user = FactoryBot.create :user, password: 'foobar'
+    @assistant = FactoryBot.create :user, login: 'assi', password: 'assi', email: 'assi@passi.fi'
     Teachership.create! user: @teacher, organization: @organization
 
     repo_path = @test_tmp_dir + '/fake_remote_repo'
@@ -20,7 +22,7 @@ feature 'Teacher creates course from course template', feature: true do
     repo.copy_simple_exercise('MyExercise')
     repo.add_commit_push
 
-    FactoryGirl.create :course_template, name: 'template', title: 'template', source_url: repo_path
+    FactoryBot.create :course_template, name: 'template', title: 'template', source_url: repo_path
 
     visit '/'
   end
@@ -50,9 +52,9 @@ feature 'Teacher creates course from course template', feature: true do
     click_button 'Accept and continue'
 
     expect(page).to have_content('Phase 4 - Course assistants')
-    fill_in 'username', with: 'assi'
+    fill_in 'email', with: 'assi@passi.fi'
     click_button 'Add new assistant'
-    expect(page).to have_content('Assistant assi added')
+    expect(page).to have_content('Assistant assi@passi.fi added')
     click_button 'Continue'
 
     expect(page).to have_content('Course is ready!')

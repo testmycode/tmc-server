@@ -1,0 +1,29 @@
+/* ...
+*= require_self
+*= require jquery-ui-1.8.23.smoothness-theme.custom
+*= require main
+*= require jquery.datetimepicker
+*= require datatables.min
+*/
+@import "theme-colors";
+@import "bootstrap";
+@import "font-awesome";
+@import "breadcrumb";
+@import "footer";
+
+$user-button-color: white;
+
+.btn-user {
+  @extend .btn-light;
+  &.nav-link {
+    color: black !important;
+    background-color: $user-button-color;
+  }
+  &:hover {
+    background-color: darken($user-button-color, 15%)
+  }
+}
+
+.nav-item {
+  margin: 0 0.4rem 0.4rem 0;
+}

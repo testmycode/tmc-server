@@ -1,8 +1,26 @@
+# frozen_string_literal: true
+
 require 'tailoring'
 
 module ApplicationHelper
   def tailoring
     Tailoring.get
+  end
+
+  def navigation_link(name, path, options = {})
+    class_name = options[:class] || ''
+    class_addition = request.path.start_with?(path) ? 'nav-link active' : 'nav-link'
+    options[:class] = "#{class_name} #{class_addition}"
+    link_to name, path, options
+  end
+
+  def active_on_current_path_link_to(name, path, options = {})
+    if request.path == path
+      classes = options[:class] || ''
+      classes += ' active'
+      options[:class] = classes
+    end
+    link_to(name, path, options)
   end
 
   def labeled(label, tags = nil, options = {}, &block)
@@ -20,9 +38,9 @@ module ApplicationHelper
     tags = tags.html_safe
 
     if tags =~ /id\s*=\s*"([^"]+)"/
-      target = ' for="' + $1 + '"'
+      target = ' for="' + Regexp.last_match(1) + '"'
     else
-      fail 'Cannot label a tag without an id'
+      raise 'Cannot label a tag without an id'
     end
 
     cls = []
@@ -40,7 +58,7 @@ module ApplicationHelper
     when :label_last
       label_start + tags + label_text + label_end
     else
-      fail 'invalid :order option for labeled()'
+      raise 'invalid :order option for labeled()'
     end
   end
 
@@ -55,14 +73,15 @@ module ApplicationHelper
     type = options[:type] || :text
 
     label += ' *' if options[:required]
+    str = ''
     case type
     when :boolean
-      str = '<label class="checkbox">'
+      str = +'<label class="checkbox">'
       str << "  #{field}#{label}"
       str << '</label>'
     else
-      str = label_tag label, nil, class: 'control-label'
-      str += raw("<div class=\"controls\">" + raw(field) + '</div>')
+      label = label_tag label, nil, class: 'control-label'
+      str += raw('<div class="form-group">' + raw(label) + raw(field) + '</div>')
     end
     raw(str)
   end
@@ -72,19 +91,24 @@ module ApplicationHelper
       bJQueryUI: true,
       bSort: false
     }.merge options
-    script = <<EOS
-<script type="text/javascript">
-<!--
-$(document).ready(function() {
-  $('#{escape_javascript table_selector}').dataTable(#{options.to_json});
-});
-//-->
-</script>
-EOS
+    script = <<~EOS
+      <script type="text/javascript">
+      <!--
+      $(document).ready(function() {
+        $('#{escape_javascript table_selector}').dataTable(#{options.to_json});
+      });
+      //-->
+      </script>
+    EOS
     raw(script)
   end
 
   def link_back
     raw('<div class="link-back">' + link_to('Back', :back) + '</div>')
+  end
+
+  def return_to_link
+    return nil if request.path == '/'
+    request.path
   end
 end

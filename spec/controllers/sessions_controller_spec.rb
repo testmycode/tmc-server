@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe SessionsController, type: :controller do
@@ -13,7 +15,7 @@ describe SessionsController, type: :controller do
       login: 'instructor',
       password: 'correct_password'
     }
-    post :create, session: session_attrs
+    post :create, params: { session: session_attrs }
   end
 
   describe 'GET new' do
@@ -73,10 +75,10 @@ describe SessionsController, type: :controller do
         expect(response).to redirect_to('/xooxers')
       end
 
-      it 'should redirect to the home page if there is no referer' do
+      it 'should redirect to the login page if there is no referer' do
         request.env['HTTP_REFERER'] = nil
         post_create
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(login_path)
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExerciseStatusController < ApplicationController
   skip_authorization_check
 
@@ -8,20 +10,20 @@ class ExerciseStatusController < ApplicationController
     course = Course.where(id: course_id).first || Course.where(name: course_id).first
     user = User.where(id: user_id).first || User.where(login: user_id).first
 
-    return respond_access_denied unless course.visible_to?(Guest.new) || current_user.administrator?
+    return respond_forbidden unless course.visible_to?(Guest.new) || current_user.administrator?
 
     user_subs = user.submissions.where(course_id: course.id).to_a.group_by(&:exercise_name)
     user_subs.default = []
 
     results = {}
     course.exercises.each do |ex|
-      ex.set_submissions_by(user, user_subs[ex.name]) # used by completed_by? and attempted_by?
-      if ex.completed_by?(user)
-        results[ex.name] = 'completed'
+      ex.set_submissions_by!(user, user_subs[ex.name]) # used by completed_by? and attempted_by?
+      results[ex.name] = if ex.completed_by?(user)
+        'completed'
       elsif ex.attempted_by?(user)
-        results[ex.name] = 'attempted'
+        'attempted'
       else
-        results[ex.name] = 'not_attempted'
+        'not_attempted'
       end
     end
 
