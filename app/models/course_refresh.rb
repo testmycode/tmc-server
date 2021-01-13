@@ -1,4 +1,4 @@
-class CourseRefresh < ActiveRecord::Base
+class CourseRefresh < ApplicationRecord
   belongs_to :user
   belongs_to :course_template
   has_many :course_refresh_phase_timings, dependent: :delete_all
