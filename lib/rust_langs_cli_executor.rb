@@ -49,14 +49,14 @@ module RustLangsCliExecutor
 
     command = command + '--no-directory-changes' if no_directory_changes
 
-    # File.open('course_refresh.txt', 'w') do |file|
-    #   file.puts(`#{command}`)
-    # end
-    #command_output = File.open('course_refresh.txt').read
+    File.open('course_refresh.txt', 'w') do |file|
+      file.puts(`#{command}`)
+    end
+    command_output = File.open('course_refresh.txt').read
     
     @@refresh_logger ||= Logger.new("#{Rails.root}/log/course_refresh.log")
 
-    @@refresh_logger.logger.info(`#{command}`)
+    @@refresh_logger.info(`#{command}`)
 
     Rails.logger.info(command_output)
 
@@ -66,7 +66,7 @@ module RustLangsCliExecutor
       Rails.logger.error("Refreshing course #{course.name} failed: " + result.to_s)
     end
 
-    #File.delete('course_refresh.txt')
+    File.delete('course_refresh.txt')
 
     result
   end
