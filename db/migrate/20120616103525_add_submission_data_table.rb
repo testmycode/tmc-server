@@ -12,7 +12,7 @@ class AddSubmissionDataTable < ActiveRecord::Migration[4.2]
       INSERT INTO submission_data (submission_id, return_file, stdout_compressed, stderr_compressed)
       SELECT id, return_file, stdout_compressed, stderr_compressed FROM submissions
 EOS
-    remove_column :submissions, :return_file, :stdout_compressed, :stderr_compressed
+    remove_columns :submissions, :return_file, :stdout_compressed, :stderr_compressed
   end
 
   def down
