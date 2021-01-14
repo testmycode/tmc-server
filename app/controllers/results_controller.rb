@@ -12,9 +12,9 @@ class ResultsController < ApplicationController
 
     # The sandbox output may contain broken characters e.g. if the student
     # pointed a C char* towards some patch of interesting memory :)
-    filtered_params = Hash[(params.keys - ['result']).map do |k|
-      [k, view_context.force_utf8_violently(params[k])]
-    end]
+    filtered_params = (params.keys - ['result']).index_with do |k|
+      view_context.force_utf8_violently(params[k])
+    end
 
     SandboxResultsSaver.save_results(submission, filtered_params)
     Rails.cache.delete("api_v8_core_submission_show_#{submission.id}_user_#{submission.user.id}")
