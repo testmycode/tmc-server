@@ -4,16 +4,15 @@ const cable = ActionCable.createConsumer()
 
 const connection = cable.subscriptions.create('CourseRefreshChannel', {
     connected() {
-        console.log("Hello")
+        console.log("Socket connected")
     },
 
     disconnected() {
-        console.log("Disconnect")
         connection.unsubscribe()
+        console.log("Socket disconnected")
     },
 
     received(data) {
-        console.log("Hello data")
         console.log(data)
     }
 })
