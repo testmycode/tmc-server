@@ -7,7 +7,7 @@ Rails.application.config.assets.version = '1.0'
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-Rails.application.config.assets.precompile += %w[application-bare.css application-bare.js application-test.css courses.js courses.css solutions.css solutions.js submissions.css submissions.js reviews.css sessions.css reviews.js migrate_to_other_course.css migrate_to_other_course.js setup/setup.css setup/organizations.css setup/organizations.js organizations.css participants.css points.css]
+Rails.application.config.assets.precompile += %w[application-bare.css application-bare.js application-test.css courses.js courses.css solutions.css solutions.js submissions.css submissions.js reviews.css sessions.css reviews.js migrate_to_other_course.css migrate_to_other_course.js setup/setup.css setup/organizations.css setup/organizations.js organizations.css participants.css points.css course-refresh.js]
 
 # Include vendor images
 Rails.application.config.assets.precompile << proc do |path|
