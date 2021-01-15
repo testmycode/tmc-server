@@ -8,10 +8,12 @@ const connection = cable.subscriptions.create('CourseRefreshChannel', {
     },
 
     disconnected() {
+        console.log("Disconnect")
         connection.unsubscribe()
     },
 
     received(data) {
+        console.log("Hello data")
         console.log(data)
     }
 })

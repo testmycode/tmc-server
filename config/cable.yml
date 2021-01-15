@@ -1,5 +1,5 @@
 development:
-  adapter: async
+  adapter: postgresql
 
 test:
   adapter: async

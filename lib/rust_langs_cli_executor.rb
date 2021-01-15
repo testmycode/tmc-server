@@ -60,7 +60,7 @@ module RustLangsCliExecutor
           return unless data
 
           parsed_data = process_command_output_realtime(data)
-          ActionCable.server.broadcast("CourseRefresh_user_1", parsed_data)
+          ActionCable.server.broadcast("CourseRefreshChannel", parsed_data)
           if data['output-kind'] == 'status-update'
             @course_refresh.percent_done = parsed_data[:percent_done]
             @course_refresh.create_phase(parsed_data[:message], parsed_data[:time])

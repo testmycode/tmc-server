@@ -54,6 +54,7 @@ end
 group :development, :test do
   gem 'capybara', '~> 3.34'
   gem 'factory_bot_rails', '~> 6.1'
+  gem 'puma', '~> 5.1'
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
   gem 'rspec-activemodel-mocks', '~> 1.1'
