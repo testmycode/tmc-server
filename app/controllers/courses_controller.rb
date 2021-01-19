@@ -230,7 +230,7 @@ class CoursesController < ApplicationController
     end
 
     def refresh_course(course, options = {})
-      course.refresh(options, current_user.id)
+      session[:refresh_report] = course.refresh(options, current_user.id)
     rescue CourseRefresher::Failure => e
       session[:refresh_report] = e.report
     end

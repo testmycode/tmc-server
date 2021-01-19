@@ -60,16 +60,16 @@ module RustLangsCliExecutor
           return unless data
 
           parsed_data = process_command_output_realtime(data)
-          ActionCable.server.broadcast('CourseRefreshChannel', parsed_data)
           if data['output-kind'] == 'status-update'
+            ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", parsed_data)
             @course_refresh.percent_done = parsed_data[:percent_done]
             @course_refresh.create_phase(parsed_data[:message], parsed_data[:time])
           elsif data['output-kind'] == 'output-data'
+            CourseRefresher.new.refresh_course(course, parsed_data)
             @course_refresh.percent_done = 1
             @course_refresh.status = :complete
           end
           @course_refresh.save!
-          # Rails.logger.info(CourseRefresh.find(course_refresh_task_id))
         end
       end
     rescue StandardError => e
@@ -120,7 +120,7 @@ module RustLangsCliExecutor
       elsif command_output['status'] == 'finished'
         if command_output['result'] == 'error'
           raise "Refresh failed: \n#{data['trace'].join("\n")}"
-        elsif command_output['executed-command']
+        elsif command_output['result'] == 'executed-command'
           data
         end
       end

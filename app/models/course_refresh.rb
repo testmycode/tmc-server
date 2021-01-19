@@ -14,6 +14,6 @@ class CourseRefresh < ApplicationRecord
 
   private
     def create_first_course_refresh_phase_timing
-      CourseRefreshPhaseTiming.create(course_refresh: self, phase_name: 'not started', time_ms: 1)
+      CourseRefreshPhaseTiming.create(course_refresh: self, phase_name: 'Refresh initialized', time_ms: 1)
     end
 end

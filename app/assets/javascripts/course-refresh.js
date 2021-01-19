@@ -1,18 +1,25 @@
 //= require action_cable
-console.log("Course refresh")
-const cable = ActionCable.createConsumer()
+$(document).ready(function() {
+    console.log("Course refresh");
+    var cable = ActionCable.createConsumer();
+    var connection = cable.subscriptions.create(
+        { 
+            channel: `CourseRefreshChannel`, 
+            courseId: `${window.courseId}`
+        }, 
+        {
+            connected() {
+                console.log("Socket connected");
+            },
 
-const connection = cable.subscriptions.create('CourseRefreshChannel', {
-    connected() {
-        console.log("Socket connected")
-    },
+            disconnected() {
+                connection.unsubscribe();
+                console.log("Socket disconnected");
+            },
 
-    disconnected() {
-        connection.unsubscribe()
-        console.log("Socket disconnected")
-    },
-
-    received(data) {
-        console.log(data)
-    }
-})
+            received(data) {
+                console.log(data);
+            }
+        }
+    );
+});
