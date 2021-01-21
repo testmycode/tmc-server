@@ -1,6 +1,5 @@
 //= require action_cable
 $(document).ready(function() {
-    console.log("Course refresh");
     var cable = ActionCable.createConsumer();
     var connection = cable.subscriptions.create(
         { 

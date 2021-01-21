@@ -86,7 +86,7 @@ class CourseTemplate < ApplicationRecord
     results = []
     firstcourse = true
     courses.each do |c|
-      results.push(c.refresh({ no_directory_changes: !firstcourse }, current_user_id))
+      results.push(c.refresh(current_user_id, { no_directory_changes: !firstcourse }))
       reload
       firstcourse = false
     end

@@ -357,7 +357,7 @@ class Course < ApplicationRecord
     @groups = nil
   end
 
-  def refresh(options = {}, current_user_id)
+  def refresh(current_user_id, options = {})
     # CourseRefresher.new.refresh_course(self, options)
     CourseRefresh.create!(user_id: current_user_id, course_template_id: self.course_template_id, no_background_operations: !!options[:no_background_operations], no_directory_changes: !!options[:no_directory_changes])
   end

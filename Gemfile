@@ -42,7 +42,6 @@ gem 'font-awesome-rails'
 gem 'sass-rails', '~> 5.0'
 
 gem 'rack-mini-profiler', '~> 2.3'
-gem 'ruby-kafka', '~> 1.3'
 gem 'argon2', '~> 2.0'
 
 group :assets do
@@ -55,6 +54,7 @@ group :development, :test do
   gem 'capybara', '~> 3.34'
   gem 'factory_bot_rails', '~> 6.1'
   gem 'puma', '~> 5.1'
+  # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
   gem 'rspec-activemodel-mocks', '~> 1.1'
