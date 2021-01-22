@@ -1,6 +1,7 @@
 <% if can? :teach, @course %>
   <%= javascript_tag do %>
     window.courseId = "<%=j @course.id %>";
+    window.userId = "<%=j session[:user_id] %>";
   <% end %>
   <%= javascript_include_tag 'course-refresh' %>
 <% end %>
@@ -96,6 +97,21 @@
     <% if can? :teach, @course %>
       <div class="teacher-panel">
         <h4><%= fa_icon 'graduation-cap', text: 'Teacher functions' %></h4>
+
+        <% if can? :refresh, @course %>
+          <div class="container my-2" id="refresh-progress-div" style="display: none">
+            <h5>Refresh progress:</h5>
+            <div class="progress my-2">
+              <div id="refresh-progress-bar" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0 %</div>
+            </div>
+            <div id="refresh-progress-row" class="row">
+            </div>
+          </div>
+        <% end %>
+
+        <% if @refresh_report && (can? :refresh, @course) %>
+          <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
+        <% end %>
 
         <ul>
           <% # User mails %>

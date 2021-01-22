@@ -1,9 +1,12 @@
-  <% unless report.course.nil? %>
-      <h3><%=report.course.name%> (<%=report.course.organization.name%>)</h3>
+  <% unless report['course'].nil? %>
+      <h3><%=report['course']['name']%></h3>
   <% end %>
 
-  <% if report.successful? %>
-    <p class="success">Refresh successful.</p>
+  <% if report['errors'].empty? %>
+    <div class="alert alert-block">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4 class="success">Refresh successful.</h4>
+    </div>
   <% else %>
     <div class="alert alert-danger">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -12,31 +15,31 @@
   <% end %>
 
   <ul>
-    <% if report.errors.any? %>
+    <% if report['errors'].any? %>
       <div class="alert alert-danger alert-block">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <% for error in report.errors %>
+        <% for error in report['errors'] %>
           <li><%= simple_format error %></li>
         <% end %>
       </div>
     <% end %>
-    <% if report.warnings.any? %>
+    <% if report['warnings'].any? %>
       <div class="alert alert-block">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <% for warning in report.warnings %>
+        <% for warning in report['warnings'] %>
           <li><%= simple_format warning %></li>
         <% end %>
       </div>
     <% end %>
-    <% if report.notices.any? %>
+    <% if report['notices'].any? %>
       <div class="alert alert-info alert-block">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <% for notice in report.notices %>
+        <% for notice in report['notices'] %>
           <li><%= simple_format notice %></li>
         <% end %>
       </div>
     <% end %>
-    <% if report.timings.any? %>
+    <% if report['timings'].any? %>
       <div class="alert alert-info alert-block">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Time used by each phase</h4>
@@ -51,13 +54,13 @@
             </tr>
           </thead>
           <tbody>
-            <% report.timings.each do |k,v| %>
+            <% report['timings'].each do |k,v| %>
               <tr>
                 <td><%=k%></td>
-                <td class="align-right"><%= "%.3f" % v.cutime %></td>
-                <td class="align-right"><%= "%.3f" % v.cstime %></td>
-                <td class="align-right"><%= "%.3f" % v.total%></td>
-                <td class="align-right"><%= "%.3f" % v.real%></td>
+                <td class="align-right"><%= "%.3f" % v['cutime'] %></td>
+                <td class="align-right"><%= "%.3f" % v['cstime'] %></td>
+                <td class="align-right"><%= "%.3f" % v['total']%></td>
+                <td class="align-right"><%= "%.3f" % v['real']%></td>
               <% end %>
             </tbody>
           </table>

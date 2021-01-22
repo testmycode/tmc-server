@@ -10,7 +10,8 @@ module ApplicationCable
 
     private
       def find_verified_user
-        if verified_user = User.find_by(id: 1)
+        # How secure is this?
+        if verified_user = User.find_by(id: @request.params[:user_id])
           verified_user
         else
           reject_unauthorized_connection

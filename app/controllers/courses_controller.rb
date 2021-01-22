@@ -4,6 +4,7 @@ require 'course_refresher'
 require 'natsort'
 require 'course_list'
 require 'exercise_completion_status_generator'
+require 'json'
 
 class CoursesController < ApplicationController
   before_action :set_organization
@@ -35,9 +36,9 @@ class CoursesController < ApplicationController
   end
 
   def show
-    if session[:refresh_report]
-      @refresh_report = session[:refresh_report]
-      session.delete(:refresh_report)
+    if request.params['report']
+      @refresh_report = JSON.parse(request.params['report'])
+      # session.delete(:refresh_report)
     end
 
     authorize! :read, @course
@@ -75,7 +76,7 @@ class CoursesController < ApplicationController
   def refresh
     authorize! :refresh, @course
     refresh_course(@course)
-    redirect_to organization_course_path
+    redirect_to(organization_course_path(@organization, @course), notice: 'Refresh initialized, please wait')
   end
 
   def enable

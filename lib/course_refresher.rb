@@ -16,7 +16,13 @@ require 'benchmark'
 # TODO: split this into submodules
 class CourseRefresher
   def refresh_course(course, refreshed_course_data, options = {})
-    ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", refreshed_course_data)
+    ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}",
+      {
+        message: 'Updating server database',
+        percent_done: 0.95,
+        time: '-',
+      }
+    )
     Impl.new.refresh_course(course, refreshed_course_data, options)
   end
 
@@ -83,7 +89,7 @@ class CourseRefresher
           measure_and_log :update_course_options
           measure_and_log :add_records_for_new_exercises
           measure_and_log :delete_records_for_removed_exercises
-          measure_and_log :update_exercise_options
+          # measure_and_log :update_exercise_options
           measure_and_log :set_has_tests_flags
           measure_and_log :update_available_points, options[:no_directory_changes] unless options[:no_background_operations]
           # measure_and_log :make_solutions                         unless options[:no_directory_changes]
@@ -116,18 +122,6 @@ class CourseRefresher
         course.reload # reload the record given as parameter
         raise Failure, @report unless @report.errors.empty?
         @report
-      end
-
-      # Depr, is in langs-rust?
-      def check_directory_names
-        exdirs = exercise_dirs.map { |exdir| Pathname(exdir.path).realpath.to_s }
-
-        Find.find(@course.clone_path) do |path|
-          relpath = path[@course.clone_path.length..-1]
-          if File.directory?(path) && exdirs.any? { |exdir| exdir.start_with?(path) } && relpath.include?('-')
-            raise "The directory #{path} contains a dash (-). Currently that is forbidden. Sorry."
-          end
-        end
       end
 
       # Implement from Rust data
@@ -176,30 +170,6 @@ class CourseRefresher
         end
       end
 
-      # Metadata?
-      def update_exercise_options
-        # reader = RecursiveYamlReader.new
-        # @review_points = {}
-        # @course.exercises.each do |e|
-        #   metadata = reader.read_settings(root_dir: @course.clone_path,
-        #                                   target_dir: File.join(@course.clone_path, e.relative_path),
-        #                                   file_name: 'metadata.yml',
-        #                                   defaults: Exercise.default_options,
-        #                                   file_preprocessor: proc do |opts|
-        #                                     merge_course_specific_suboptions(opts)
-        #                                   end)
-        #   @review_points[e.name] = parse_review_points(metadata['review_points'])
-
-        #   e.options = metadata
-        #   # e.options = data['']
-        #   e.disabled! if e.new_record? && e.course.refreshed?
-
-        #   e.save!
-        # rescue SyntaxError
-        #   @report.errors << "Failed to parse metadata: #{$!}"
-        # end
-      end
-
       def parse_review_points(data)
         if data.nil?
           []
@@ -225,10 +195,8 @@ class CourseRefresher
         end
       end
 
-      # Should be done, get a list of all points from rust, check which to remove and add
       def update_available_points(no_directory_changes = false)
         @course.exercises.each do |exercise|
-          # review_points = @review_points[exercise.name]
           point_names = Set.new
 
           points_data = points_for(exercise, no_directory_changes)
@@ -237,8 +205,6 @@ class CourseRefresher
           else
             points_data.flatten
           end
-
-          # point_names += review_points
 
           added = []
           removed = []
@@ -256,7 +222,8 @@ class CourseRefresher
               point.destroy
               exercise.available_points.destroy(point)
             else
-              # point.requires_review = review_points.include?(point.name)
+              # Review_points and metadata.yml reading deprecated
+              point.requires_review = false
               point.save!
             end
           end

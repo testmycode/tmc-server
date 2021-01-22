@@ -45,6 +45,22 @@ module RustLangsCliExecutor
     " --stub-path #{course.stub_path}"\
     " --stub-zip-path #{course.stub_zip_path}"
 
+    # command = 'vendor/tmc-langs-rust/current refresh-course'\
+    # " --cache-path #{course.cache_path}"\ # db/files/courses/kurssi-nimi-# <-inkrementoidaan +1
+    # " --cache-root #{Course.cache_root}"\ # db/files/courses
+    # #" --clone-path #{course.clone_path}"\ cache_path/clone
+    # " --course-name #{course.name}"\
+    # " --git-branch #{course.git_branch}"\
+    # #" --rails-root #{Rails.root}"\ # /tmc-server/
+    # #" --chmod-bits #{SiteSetting.value(:git_repos_chmod)}"\ # git_repos_chmod: a+rX
+    # #" --chgrp-uid #{SiteSettings.value(:git_repos_chgrp)}"\
+    # #" --solution-path #{course.solution_path}"\ cache_path/solution
+    # #" --solution-zip-path #{course.solution_zip_path}"\ cache_path/solution_zip
+    # #" --source-backend #{course.source_backend}"\ default GIT?
+    # " --source-url #{course.source_url}"\ # GIT source url
+    # #" --stub-path #{course.stub_path}"\ cache_path/stub
+    # #" --stub-zip-path #{course.stub_zip_path}" cache_path/stub_zip
+
     command = command + '--no-background-operations' if no_background_operations
     command = command + '--no-directory-changes' if no_directory_changes
     # ENV['RUST_BACKTRACE'] = 'full'
@@ -65,13 +81,19 @@ module RustLangsCliExecutor
             @course_refresh.percent_done = parsed_data[:percent_done]
             @course_refresh.create_phase(parsed_data[:message], parsed_data[:time])
           elsif data['output-kind'] == 'output-data'
-            CourseRefresher.new.refresh_course(course, parsed_data)
+            @report = CourseRefresher.new.refresh_course(course, parsed_data)
             @course_refresh.percent_done = 1
             @course_refresh.status = :complete
+            ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", {
+              message: 'Generating refresh report & Refreshing page',
+              percent_done: 1,
+              time: '-',
+            })
+            ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", @report)
           end
-          @course_refresh.save!
         end
       end
+      @course_refresh.save!
     rescue StandardError => e
       Rails.logger.error("Error while executing tmc-langs: \n#{e}")
       @course_refresh.status = :crashed
