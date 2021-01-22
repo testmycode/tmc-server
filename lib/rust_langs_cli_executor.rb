@@ -30,7 +30,7 @@ module RustLangsCliExecutor
     result
   end
 
-  def self.refresh(course, course_refresh_task_id, no_background_operations, no_directory_changes)
+  def self.refresh(course, course_refresh_task_id, options = {})
     command = 'vendor/tmc-langs-rust/current refresh-course'\
     " --cache-path #{course.cache_path}"\
     " --cache-root #{Course.cache_root}"\
@@ -61,8 +61,8 @@ module RustLangsCliExecutor
     # #" --stub-path #{course.stub_path}"\ cache_path/stub
     # #" --stub-zip-path #{course.stub_zip_path}" cache_path/stub_zip
 
-    command = command + '--no-background-operations' if no_background_operations
-    command = command + '--no-directory-changes' if no_directory_changes
+    command = command + '--no-background-operations' if options[:no_background_operations]
+    command = command + '--no-directory-changes' if options[:no_directory_changes]
     # ENV['RUST_BACKTRACE'] = 'full'
 
     @course_refresh = CourseRefresh.find(course_refresh_task_id)
