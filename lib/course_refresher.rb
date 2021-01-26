@@ -12,8 +12,6 @@ require 'set'
 require 'fileutils'
 require 'benchmark'
 
-# Safely refreshes a course from a git repository
-# TODO: split this into submodules
 class CourseRefresher
   def refresh_course(course, refreshed_course_data, options = {})
     ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}",
@@ -27,24 +25,17 @@ class CourseRefresher
   end
 
   class Report
-    def initialize(course = nil)
-      @course = course
+    def initialize
       @errors = []
       @warnings = []
       @notices = []
       @timings = {}
     end
 
-    attr_reader :course
-
     attr_reader :errors
     attr_reader :warnings
     attr_reader :notices
     attr_reader :timings
-
-    def successful?
-      @errors.empty?
-    end
   end
 
   class Failure < StandardError
@@ -69,7 +60,7 @@ class CourseRefresher
       end
 
       def refresh_course(course, data, options)
-        @report = Report.new(course)
+        @report = Report.new
         @rust_data = data
         Course.transaction(requires_new: true) do
           @course = Course.find(course.id)

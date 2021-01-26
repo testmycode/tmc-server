@@ -4,7 +4,8 @@ class CourseRefresh < ApplicationRecord
   belongs_to :user
   belongs_to :course_template
   has_many :course_refresh_phase_timings, dependent: :delete_all
-  after_save :create_first_course_refresh_phase_timing
+  has_one :course_refresh_report, dependent: :destroy
+  after_create :create_first_course_refresh_phase_timing
 
   enum status: %i[not_started in_progress complete crashed]
 

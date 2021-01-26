@@ -67,40 +67,39 @@ module RustLangsCliExecutor
 
     @course_refresh = CourseRefresh.find(course_refresh_task_id)
     @course_refresh.status = :in_progress
-    @course_refresh.save!
-    begin
-      Open3.popen2(command) do |stdin, stdout, status_thread|
-        stdout.each_line do |line|
-          Rails.logger.info(line)
-          data = parse_as_JSON(line)
-          return unless data
 
-          parsed_data = process_command_output_realtime(data)
-          if data['output-kind'] == 'status-update'
-            ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", parsed_data)
-            @course_refresh.percent_done = parsed_data[:percent_done]
-            @course_refresh.create_phase(parsed_data[:message], parsed_data[:time])
-          elsif data['output-kind'] == 'output-data'
-            @report = CourseRefresher.new.refresh_course(course, parsed_data)
-            @course_refresh.percent_done = 1
-            @course_refresh.status = :complete
-            ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", {
-              message: 'Generating refresh report & Refreshing page',
-              percent_done: 1,
-              time: '-',
-            })
-            ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", @report)
-          end
+    # begin
+    Open3.popen2(command) do |stdin, stdout, status_thread|
+      stdout.each_line do |line|
+        # Rails.logger.info(line)
+        data = parse_as_JSON(line)
+        return unless data
+
+        @parsed_data = process_command_output_realtime(data)
+        if data['output-kind'] == 'status-update'
+          ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", @parsed_data)
+          @course_refresh.percent_done = @parsed_data[:percent_done]
+          @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
+          # elsif data['output-kind'] == 'output-data'
+          # @report = CourseRefresher.new.refresh_course(course, parsed_data)
+          # ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", {
+          #   message: 'Generating refresh report & Refreshing page',
+          #   percent_done: 1,
+          #   time: '-',
+          # })
         end
       end
-      @course_refresh.save!
-    rescue StandardError => e
-      Rails.logger.error("Error while executing tmc-langs: \n#{e}")
-      @course_refresh.status = :crashed
-      @course_refresh.percent_done = 0
-      @course_refresh.create_phase(e, 0)
-      @course_refresh.save!
     end
+    @course_refresh.percent_done = 0.95
+    @course_refresh.save!
+    @parsed_data
+    # rescue StandardError => e
+    # Rails.logger.error("Error while executing tmc-langs: \n#{e}")
+    # @course_refresh.status = :crashed
+    # @course_refresh.percent_done = 0
+    # @course_refresh.create_phase(e, 0)
+    # @course_refresh.save!
+    # end
   end
 
   private

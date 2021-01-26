@@ -28,6 +28,7 @@ class CourseTemplate < ApplicationRecord
   after_initialize :set_default_source_backend
 
   has_many :courses
+  has_many :course_refresh_reports
 
   scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
   scope :not_hidden, -> { where(hidden: false) }
@@ -82,6 +83,7 @@ class CourseTemplate < ApplicationRecord
     end
   end
 
+  # Redo once background refresh done.
   def refresh(current_user_id)
     results = []
     firstcourse = true

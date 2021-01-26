@@ -36,9 +36,8 @@ class CoursesController < ApplicationController
   end
 
   def show
-    if request.params['report']
-      @refresh_report = JSON.parse(request.params['report'])
-      # session.delete(:refresh_report)
+    if (request.params['generate_report']) && (can? :refresh, @course)
+      @refresh_report = CourseRefresh.find(request.params['generate_report'])
     end
 
     authorize! :read, @course
@@ -231,8 +230,6 @@ class CoursesController < ApplicationController
     end
 
     def refresh_course(course, options = {})
-      session[:refresh_report] = course.refresh(current_user.id, options)
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
+      course.refresh(current_user.id, options)
     end
 end

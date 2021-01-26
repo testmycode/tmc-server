@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_08_125737) do
+ActiveRecord::Schema.define(version: 2021_01_25_111125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -80,11 +80,20 @@ ActiveRecord::Schema.define(version: 2020_12_08_125737) do
     t.index ["course_refresh_id"], name: "index_course_refresh_phase_timings_on_course_refresh_id"
   end
 
+  create_table "course_refresh_reports", force: :cascade do |t|
+    t.text "refresh_errors"
+    t.text "refresh_warnings"
+    t.text "refresh_notices"
+    t.text "refresh_timings"
+    t.bigint "course_refresh_id", null: false
+    t.index ["course_refresh_id"], name: "index_course_refresh_reports_on_course_refresh_id"
+  end
+
   create_table "course_refreshes", id: :serial, force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "status", default: 0, null: false
-    t.decimal "percent_done", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "percent_done", precision: 10, scale: 4, default: "0.0", null: false
     t.boolean "no_background_operations", default: false
     t.boolean "no_directory_changes", default: false
     t.integer "user_id", null: false
@@ -494,6 +503,7 @@ ActiveRecord::Schema.define(version: 2020_12_08_125737) do
   add_foreign_key "awarded_points", "submissions", on_delete: :nullify
   add_foreign_key "awarded_points", "users", on_delete: :cascade
   add_foreign_key "course_refresh_phase_timings", "course_refreshes"
+  add_foreign_key "course_refresh_reports", "course_refreshes"
   add_foreign_key "course_refreshes", "course_templates"
   add_foreign_key "course_refreshes", "users"
   add_foreign_key "courses", "organizations"

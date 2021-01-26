@@ -79,11 +79,7 @@ class Setup::CourseDetailsController < Setup::SetupController
 
   private
     def refresh_course(course, options = {})
-      # TODO: Could include course ID
-
-      session[:refresh_report] = course.refresh(current_user, options)
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
+      course.refresh(current_user.id, options)
     end
 
     def course_params_for_create_from_template

@@ -17,38 +17,31 @@ $(document).ready(function() {
                 console.log("Socket disconnected");
             },
 
-            received(rustData) {
+            received(cableData) {
                 var refreshDiv = document.getElementById("refresh-progress-div");
                 refreshDiv.style.display = "initial";
 
-                if(rustData['message']) {
+                if(cableData['message']) {
                     var refreshRow = document.createElement("DIV");
                     refreshRow.classList.add('row');
                     refreshRow.innerHTML = `<div class='col-md-4'>
-                                                ${rustData['message']}
+                                                ${cableData.message}
                                             </div>
                                             <div class='col-md'>
-                                                time (ms): ${rustData['time']}
+                                                time (ms): ${cableData.time}
                                             </div>
                                             `;
                     refreshDiv.appendChild(refreshRow);
 
                     var progressBar = document.getElementById('refresh-progress-bar');
-                    var newPcg = Math.floor(Number(rustData['percent_done'])*100);
+                    var newPcg = Math.floor(Number(cableData.percent_done)*100);
                     progressBar.setAttribute('aria-valuenow', newPcg);
                     progressBar.setAttribute('style', 'width:'+ newPcg + '%');
                     progressBar.innerHTML = newPcg + ' %';
-                } else {
-                    // $.ajax({
-                    //     method: "GET",
-                    //     cache: false,
-                    //     url: window.location.href,
-                    //     data: { report: rustData },
-                    // })
-                    window.location.href = window.location.href + `?report=${JSON.stringify(rustData)}`;
                 }
-
-                console.log(rustData);
+                if (Number(cableData.percent_done) === 1) {
+                    window.location.href = window.location.href + `?generate_report=${cableData['course_refresh_id']}`;
+                }
             }
         }
     );
