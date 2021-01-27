@@ -44,8 +44,8 @@ module SandboxResultsSaver
           submission.pretest_error = "Unable to run tests because this course's teacher has not configured this exercise template correctly.\nPlease contact your teacher so that they can fix the template and rerun your submission.\nIf your solution is correct, you'll get the points from this exercise once the teacher reruns your submission."
         end
       when 'finished'
-        handle_tmc_langs_output(submission, tmc_langs_response)
         TestRunGrader.grade_results(submission, tmc_langs_response)
+        handle_tmc_langs_output(submission, tmc_langs_response)
       else
         raise 'Unknown status: ' + results['status']
       end
@@ -71,12 +71,15 @@ module SandboxResultsSaver
       case test_output['status']
       when 'COMPILE_FAILED'
         submission.pretest_error = "Compilation error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
+        submission.all_tests_passed = false
       when 'GENERIC_ERROR'
         submission.pretest_error = "Generic error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
+        submission.all_tests_passed = false
       when 'TESTS_FAILED', 'PASSED'
         submission.pretest_error = nil
       when 'TESTRUN_INTERRUPTED'
         submission.pretest_error = "Missing test output. Did you terminate your program with an exit() command?\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
+        submission.all_tests_passed = false
       else
         raise "Unknown result type from tmc-langs: #{test_output}"
       end
