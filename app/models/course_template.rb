@@ -28,13 +28,14 @@ class CourseTemplate < ApplicationRecord
   after_initialize :set_default_source_backend
 
   has_many :courses
-  has_many :course_refresh_reports
+  has_many :course_template_refresh_reports
 
   scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
   scope :not_hidden, -> { where(hidden: false) }
   scope :hidden, -> { where(hidden: true) }
   scope :not_dummy, -> { where(dummy: false) }
   scope :available, -> { not_expired.not_hidden.not_dummy }
+  # scope :latest_report, -> { course_template_refresh_reports.latest }
 
   after_save :update_courses_sourcedata
 
@@ -83,16 +84,8 @@ class CourseTemplate < ApplicationRecord
     end
   end
 
-  # Redo once background refresh done.
   def refresh(current_user_id)
-    results = []
-    firstcourse = true
-    courses.each do |c|
-      results.push(c.refresh(current_user_id, { no_directory_changes: !firstcourse }))
-      reload
-      firstcourse = false
-    end
-    results
+    CourseTemplateRefresh.create!(user_id: current_user_id, course_template_id: self.id)
   end
 
   def cache_exists?

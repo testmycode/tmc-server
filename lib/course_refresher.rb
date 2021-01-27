@@ -14,13 +14,6 @@ require 'benchmark'
 
 class CourseRefresher
   def refresh_course(course, refreshed_course_data, options = {})
-    ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}",
-      {
-        message: 'Updating server database',
-        percent_done: 0.95,
-        time: '-',
-      }
-    )
     Impl.new.refresh_course(course, refreshed_course_data, options)
   end
 

@@ -7,32 +7,34 @@ class RefreshCourseTask
   end
 
   def run
-    CourseRefresh.where(status: :not_started).each do |task|
+    CourseTemplateRefresh.where(status: :not_started).each do |task|
       courses = Course.where(course_template_id: task.course_template_id)
       Rails.logger.info("Refreshing courses created from template #{task.course_template_id}")
-      # Where to handle options for each course. i.e. only first course does directory changes
-      courses.each do |course|
-        Rails.logger.info("Refreshing course #{course.name}")
-        rust_output = RustLangsCliExecutor.refresh(course, task.id,
-          {
-            no_background_operations: task.no_background_operations,
-            no_directory_changes: task.no_directory_changes
-          })
+      rust_output = RustLangsCliExecutor.refresh(courses.first, task.id)
 
-        refresh = CourseRefresher.new.refresh_course(course, rust_output)
-        ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", {
-            message: 'Generating refresh report',
-            percent_done: 0.99,
-            time: '-',
-          })
-        CourseRefreshReport.create(course_refresh_id: task.id, refresh_errors: refresh.errors, refresh_warnings: refresh.warnings, refresh_notices: refresh.notices, refresh_timings: refresh.timings)
-        ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", {
-          message: 'Refresh completed',
-          percent_done: 1,
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{task.course_template_id}",
+        {
+          message: 'Updating database',
+          percent_done: 0.95,
           time: '-',
-          course_refresh_id: task.id,
-        })
+        }
+      )
+      courses.each do |course|
+        @refresh = CourseRefresher.new.refresh_course(course, rust_output)
       end
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{task.course_template_id}", {
+          message: 'Generating refresh report',
+          percent_done: 0.99,
+          time: '-',
+        })
+      CourseTemplateRefreshReport.create(course_template_refresh_id: task.id, refresh_errors: @refresh.errors, refresh_warnings: @refresh.warnings, refresh_notices: @refresh.notices, refresh_timings: @refresh.timings)
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{task.course_template_id}", {
+        message: 'Refresh completed',
+        percent_done: 1,
+        time: '-',
+        course_template_refresh_id: task.id,
+      })
+
       task.status = :complete
       task.percent_done = 1
       task.save!

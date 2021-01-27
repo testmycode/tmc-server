@@ -1,11 +1,11 @@
 //= require action_cable
 $(document).ready(function() {
     var hostCableUrl = window.location.origin + "/cable"
-    var cable = ActionCable.createConsumer(`${hostCableUrl}?user_id=${window.userId}`);
+    var cable = ActionCable.createConsumer(hostCableUrl);
     var connection = cable.subscriptions.create(
         { 
-            channel: `CourseRefreshChannel`, 
-            courseId: `${window.courseId}`
+            channel: `CourseTemplateRefreshChannel`, 
+            courseTemplateId: `${window.courseTemplateId}`
         }, 
         {
             connected() {
@@ -21,7 +21,7 @@ $(document).ready(function() {
                 var refreshDiv = document.getElementById("refresh-progress-div");
                 refreshDiv.style.display = "initial";
 
-                if(cableData['message']) {
+                if(cableData.message) {
                     var refreshRow = document.createElement("DIV");
                     refreshRow.classList.add('row');
                     refreshRow.innerHTML = `<div class='col-md-4'>
@@ -40,7 +40,7 @@ $(document).ready(function() {
                     progressBar.innerHTML = newPcg + ' %';
                 }
                 if (Number(cableData.percent_done) === 1) {
-                    window.location.href = window.location.href + `?generate_report=${cableData['course_refresh_id']}`;
+                    window.location.href = window.location.href + `?generate_report=${cableData.course_template_refresh_id}`;
                 }
             }
         }

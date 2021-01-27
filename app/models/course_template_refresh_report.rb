@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class CourseRefreshReport < ApplicationRecord
-  belongs_to :course_refresh
+class CourseTemplateRefreshReport < ApplicationRecord
+  belongs_to :course_template_refresh
   serialize :refresh_errors, Array
   serialize :refresh_warnings, Array
   serialize :refresh_notices, Array

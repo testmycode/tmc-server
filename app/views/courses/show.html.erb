@@ -1,7 +1,6 @@
 <% if can? :teach, @course %>
   <%= javascript_tag do %>
-    window.courseId = "<%=j @course.id %>";
-    window.userId = "<%=j session[:user_id] %>";
+    window.courseTemplateId = "<%=j @course.course_template.id %>";
   <% end %>
   <%= javascript_include_tag 'course-refresh' %>
 <% end %>

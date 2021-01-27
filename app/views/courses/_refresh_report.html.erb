@@ -10,40 +10,40 @@
 <% end %>
 
   
-  <% if report.course_refresh_report['refresh_errors'].any? %>
+  <% if report.course_template_refresh_report['refresh_errors'].any? %>
     <div class="alert alert-danger alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <ul>
-      <% for error in report.course_refresh_report['errors'] %>
+      <% for error in report.course_template_refresh_report['errors'] %>
         <li><%= simple_format error %></li>
       <% end %>
       </ul>
     </div>
   <% end %>
 
-  <% if report.course_refresh_report['refresh_warnings'].any? %>
+  <% if report.course_template_refresh_report['refresh_warnings'].any? %>
     <div class="alert alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <ul>
-      <% for warning in report.course_refresh_report['refresh_warnings'] %>
+      <% for warning in report.course_template_refresh_report['refresh_warnings'] %>
         <li><%= simple_format warning %></li>
       <% end %>
       </ul>
     </div>
   <% end %>
 
-  <% if report.course_refresh_report['refresh_notices'].any? %>
+  <% if report.course_template_refresh_report['refresh_notices'].any? %>
     <div class="alert alert-info alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <ul>
-      <% for notice in report.course_refresh_report['refresh_notices'] %>
+      <% for notice in report.course_template_refresh_report['refresh_notices'] %>
         <li><%= simple_format notice %></li>
       <% end %>
       </ul>
     </div>
   <% end %>
 
-  <% if report.course_refresh_phase_timings.any? %>
+  <% if report.course_template_refresh_phases.any? %>
     <div class="alert alert-info alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>Background task phases</h4>
@@ -55,7 +55,7 @@
           </tr>
         </thead>
         <tbody>
-          <% for phase in report.course_refresh_phase_timings %>
+          <% for phase in report.course_template_refresh_phases %>
             <tr>
               <td class="py-1"><%= phase.phase_name %></td>
               <td class="py-1 align-right"><%= phase.time_ms %></td>
@@ -66,7 +66,7 @@
     </div>
   <% end %>
 
-  <% if report.course_refresh_report['refresh_timings'].any? %>
+  <% if report.course_template_refresh_report['refresh_timings'].any? %>
     <div class="alert alert-info alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>Time used to update database</h4>
@@ -78,7 +78,7 @@
           </tr>
         </thead>
         <tbody>
-          <% report.course_refresh_report['refresh_timings'].each do |k,v| %>
+          <% report.course_template_refresh_report['refresh_timings'].each do |k,v| %>
             <tr>
               <td class="py-1"><%=k.to_s.split("_").join(" ").capitalize()%></td>
               <td class="py-1 align-right"><%= "%.3f" % v.real %></td>

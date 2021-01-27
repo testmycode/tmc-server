@@ -37,10 +37,6 @@ class Setup::CourseDetailsController < Setup::SetupController
     @course.organization = @organization
 
     if @course.save
-      # Fast refresh without time-consuming tasks, like making solutions
-      refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?, no_background_operations: true)
-      # Full refresh happens as background task
-
       update_setup_course(@course.id)
       redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
     else

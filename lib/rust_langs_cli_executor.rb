@@ -30,7 +30,7 @@ module RustLangsCliExecutor
     result
   end
 
-  def self.refresh(course, course_refresh_task_id, options = {})
+  def self.refresh(course, course_template_refresh_task_id)
     command = 'vendor/tmc-langs-rust/current refresh-course'\
     " --cache-path #{course.cache_path}"\
     " --cache-root #{Course.cache_root}"\
@@ -61,11 +61,11 @@ module RustLangsCliExecutor
     # #" --stub-path #{course.stub_path}"\ cache_path/stub
     # #" --stub-zip-path #{course.stub_zip_path}" cache_path/stub_zip
 
-    command = command + '--no-background-operations' if options[:no_background_operations]
-    command = command + '--no-directory-changes' if options[:no_directory_changes]
+    # command = command + '--no-background-operations' if options[:no_background_operations]
+    # command = command + '--no-directory-changes' if options[:no_directory_changes]
     # ENV['RUST_BACKTRACE'] = 'full'
 
-    @course_refresh = CourseRefresh.find(course_refresh_task_id)
+    @course_refresh = CourseTemplateRefresh.find(course_template_refresh_task_id)
     @course_refresh.status = :in_progress
 
     # begin
@@ -77,7 +77,7 @@ module RustLangsCliExecutor
 
         @parsed_data = process_command_output_realtime(data)
         if data['output-kind'] == 'status-update'
-          ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", @parsed_data)
+          ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{course.course_template_id}", @parsed_data)
           @course_refresh.percent_done = @parsed_data[:percent_done]
           @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
           # elsif data['output-kind'] == 'output-data'

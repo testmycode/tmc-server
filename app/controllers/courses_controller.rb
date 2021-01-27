@@ -36,8 +36,8 @@ class CoursesController < ApplicationController
   end
 
   def show
-    if (request.params['generate_report']) && (can? :refresh, @course)
-      @refresh_report = CourseRefresh.find(request.params['generate_report'])
+    if (request.params[:generate_report]) && (can? :refresh, @course)
+      @refresh_report = CourseTemplateRefresh.find(request.params[:generate_report])
     end
 
     authorize! :read, @course
@@ -229,7 +229,7 @@ class CoursesController < ApplicationController
       groups
     end
 
-    def refresh_course(course, options = {})
-      course.refresh(current_user.id, options)
+    def refresh_course(course)
+      course.refresh(current_user.id)
     end
 end
