@@ -71,35 +71,21 @@ module RustLangsCliExecutor
     # begin
     Open3.popen2(command) do |stdin, stdout, status_thread|
       stdout.each_line do |line|
-        # Rails.logger.info(line)
+        Rails.logger.info("Rust Refresh output \n#{line}")
         data = parse_as_JSON(line)
         return unless data
 
-        @parsed_data = process_command_output_realtime(data)
+        @parsed_data = process_refresh_command_output(data)
         if data['output-kind'] == 'status-update'
           ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{course.course_template_id}", @parsed_data)
           @course_refresh.percent_done = @parsed_data[:percent_done]
           @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
-          # elsif data['output-kind'] == 'output-data'
-          # @report = CourseRefresher.new.refresh_course(course, parsed_data)
-          # ActionCable.server.broadcast("CourseRefreshChannel-course-id-#{course.id}", {
-          #   message: 'Generating refresh report & Refreshing page',
-          #   percent_done: 1,
-          #   time: '-',
-          # })
         end
       end
     end
     @course_refresh.percent_done = 0.95
     @course_refresh.save!
     @parsed_data
-    # rescue StandardError => e
-    # Rails.logger.error("Error while executing tmc-langs: \n#{e}")
-    # @course_refresh.status = :crashed
-    # @course_refresh.percent_done = 0
-    # @course_refresh.create_phase(e, 0)
-    # @course_refresh.save!
-    # end
   end
 
   private
@@ -128,7 +114,7 @@ module RustLangsCliExecutor
       Rails.logger.info("Could not parse output line. #{e}")
     end
 
-    def self.process_command_output_realtime(command_output)
+    def self.process_refresh_command_output(command_output)
       data = command_output['data']
       if command_output['status'] == 'crashed'
         raise "TMC-langs-rust crashed: \n#{data}"

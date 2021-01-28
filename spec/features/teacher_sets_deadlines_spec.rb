@@ -20,7 +20,7 @@ feature 'Teacher sets deadlines', feature: true do
     repo.copy_simple_exercise('MyExercise')
     repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(user.id)
     Teachership.create! user: @teacher, organization: organization
 
     FactoryBot.create(:exercise, course: @course)

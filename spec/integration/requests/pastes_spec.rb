@@ -16,7 +16,7 @@ describe 'Paste JSON api', type: :request, integration: true do
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(user.id)
 
     @admin = FactoryBot.create(:admin, password: 'xooxer')
     @user = FactoryBot.create(:verified_user, login: 'user', password: 'xooxer')

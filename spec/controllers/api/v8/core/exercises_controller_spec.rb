@@ -27,7 +27,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
         repo = clone_course_repo(course)
         repo.copy_simple_exercise(exercise_name)
         repo.add_commit_push
-        course.refresh
+        course.refresh(user.id)
 
         get :download, params: { id: Exercise.find_by(name: exercise_name).id }
         expect(response).to have_http_status :ok

@@ -16,7 +16,7 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
     @repo.copy(FixtureExercise.fixture_exercises_root + '/BrokenUtf8')
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(user.id)
 
     @user = FactoryBot.create(:verified_user, password: 'xooxer')
 

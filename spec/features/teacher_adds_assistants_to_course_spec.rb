@@ -15,7 +15,7 @@ feature 'Teacher can add assistants to course', feature: true do
     @repo = clone_course_repo(@course)
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
-    @course.refresh
+    @course.refresh(user.id)
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
     click_link @course.title
@@ -42,7 +42,7 @@ feature 'Teacher can add assistants to course', feature: true do
   end
 
   scenario 'Assistant accesses same resources as teacher for the course' do
-    @course.refresh
+    @course.refresh(user.id)
 
     log_in_as(@teacher.username, 'foobar')
     add_assistant @assistant.email, @course

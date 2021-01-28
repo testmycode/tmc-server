@@ -17,7 +17,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(user.id)
 
     @user = FactoryBot.create(:verified_user, password: 'xooxer')
     @ability = Ability.new(@user)
@@ -88,7 +88,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
   it 'should not show exercises that have been explicitly hidden' do
     @repo.set_metadata_in('MyExercise', 'hidden' => true)
     @repo.add_commit_push
-    @course.refresh
+    @course.refresh(user.id)
 
     visit '/org/slug/courses'
     click_link 'mycourse'
@@ -126,7 +126,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     exx.write_file('.tmcproject.yml', "extra_student_files:\n  - test/extraFile.java\n")
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(user.id)
 
     ex.write_file('test/extraFile.java', 'extra_file')
     ex.make_zip(src_only: false)
@@ -239,7 +239,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     skip 'Not working, requires sandbox setup for testing'
     @repo.copy_fixture_exercise('SimpleExerciseWithValidationErrors', 'MyValidationExercise')
     @repo.add_commit_push
-    @course.refresh
+    @course.refresh(user.id)
     @course.exercises.find_by(name: 'MyValidationExercise').enabled!
     visit current_path
 

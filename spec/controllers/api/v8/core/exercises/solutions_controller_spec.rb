@@ -26,7 +26,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
         repo = clone_course_repo(course)
         repo.copy_simple_exercise(exercise.name)
         repo.add_commit_push
-        course.refresh
+        course.refresh(user.id)
 
         get :download, params: { exercise_id: exercise.id }
         expect(response.code).to eq('200')
@@ -41,7 +41,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           repo = clone_course_repo(course)
           repo.copy_simple_exercise(exercise.name)
           repo.add_commit_push
-          course.refresh
+          course.refresh(user.id)
 
           FactoryBot.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: true)
 
@@ -52,7 +52,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           repo = clone_course_repo(course)
           repo.copy_simple_exercise(exercise.name)
           repo.add_commit_push
-          course.refresh
+          course.refresh(user.id)
 
           FactoryBot.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: false)
 

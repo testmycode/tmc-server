@@ -17,7 +17,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(user.id)
 
     @user = FactoryBot.create(:user, password: 'xooxer')
     @ability = Ability.new(@user)
