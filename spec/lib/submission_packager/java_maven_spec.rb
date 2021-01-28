@@ -160,7 +160,7 @@ describe SubmissionPackager::JavaMaven do
   it 'includes files in the root dir from the repo' do
     @repo.write_file('MavenExercise/foo.txt', 'repohello')
     @repo.add_commit_push
-    @course.refresh(user.id)
+    @course.refresh(@teacher.id)
 
     @exercise_project.solve_all
     File.open("#{@exercise_project.path}/foo.txt", 'w') do |f|
