@@ -98,6 +98,9 @@
         <h4><%= fa_icon 'graduation-cap', text: 'Teacher functions' %></h4>
 
         <% if can? :refresh, @course %>
+          <% if @refresh_initialized  %>
+            <h2>Refresh has been initialized</h2>
+          <% end %>
           <div class="container my-2" id="refresh-progress-div" style="display: none">
             <h5>Refresh progress:</h5>
             <div class="progress my-2">
@@ -186,7 +189,7 @@
             <% end %>
           <% end %>
           <% if can? :refresh, @course %>
-            <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-sm" %>
+            <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-sm #{@refresh_initialized ? ' disabled' : nil}", data: { disable_with: "Refreshing..." }  %>
           <% end %>
           <% if @course.disabled? %>
             <%=
@@ -208,7 +211,11 @@
 
           <% # General info %>
           <% if @course.refreshed_at %>
-            <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
+            <li>
+              Last refreshed at <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %> 
+              by <%= @course.course_template.course_template_refreshes.last.user.email %>
+              <%= link_to 'Show last report', organization_course_path(@organization, @course, generate_report: @course.course_template.course_template_refreshes.last.id) %>
+            </li>
           <% end %>
 
           <% if @course.disabled? %>

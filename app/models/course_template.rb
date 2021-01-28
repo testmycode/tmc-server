@@ -3,7 +3,6 @@
 # Course stub to be copied by teachers for their own organisations
 
 require 'net/http'
-require 'course_refresher'
 
 class CourseTemplate < ApplicationRecord
   include SystemCommands
@@ -28,14 +27,13 @@ class CourseTemplate < ApplicationRecord
   after_initialize :set_default_source_backend
 
   has_many :courses
-  has_many :course_template_refresh_reports
+  has_many :course_template_refreshes
 
   scope :not_expired, -> { where('expires_at IS NULL OR expires_at > ?', Time.now) }
   scope :not_hidden, -> { where(hidden: false) }
   scope :hidden, -> { where(hidden: true) }
   scope :not_dummy, -> { where(dummy: false) }
   scope :available, -> { not_expired.not_hidden.not_dummy }
-  # scope :latest_report, -> { course_template_refresh_reports.latest }
 
   after_save :update_courses_sourcedata
 

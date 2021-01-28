@@ -14,7 +14,7 @@
     <div class="alert alert-danger alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <ul>
-      <% for error in report.course_template_refresh_report['errors'] %>
+      <% for error in report.course_template_refresh_report['refresh_errors'] %>
         <li><%= simple_format error %></li>
       <% end %>
       </ul>

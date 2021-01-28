@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'course_refresher'
 require 'natsort'
 require 'course_list'
 require 'exercise_completion_status_generator'
@@ -197,6 +196,10 @@ class CoursesController < ApplicationController
       @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
       @unlocks = current_user.unlocks.where(course: @course).where('valid_after IS NULL OR valid_after < ?', Time.zone.now).pluck(:exercise_name)
 
+      if can?(:teach, @course)
+        last_refresh = @course.course_template.course_template_refreshes.last
+        @refresh_initialized = last_refresh.status == 'in_progress' || last_refresh.status == 'not_started' if last_refresh
+      end
       unless current_user.guest?
         max_submissions = 100
         @submissions = @course.submissions

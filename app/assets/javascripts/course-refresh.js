@@ -39,7 +39,7 @@ $(document).ready(function() {
                     progressBar.setAttribute('style', 'width:'+ newPcg + '%');
                     progressBar.innerHTML = newPcg + ' %';
                 }
-                if (Number(cableData.percent_done) === 1) {
+                if (Number(cableData.percent_done) === 1 || Number(cableData.percent_done) === 0) {
                     window.location.href = window.location.href + `?generate_report=${cableData.course_template_refresh_id}`;
                 }
             }

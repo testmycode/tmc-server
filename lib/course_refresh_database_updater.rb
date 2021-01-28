@@ -12,9 +12,9 @@ require 'set'
 require 'fileutils'
 require 'benchmark'
 
-class CourseRefresher
-  def refresh_course(course, refreshed_course_data, options = {})
-    Impl.new.refresh_course(course, refreshed_course_data, options)
+class CourseRefreshDatabaseUpdater
+  def refresh_course(course, refreshed_course_data)
+    Impl.new.refresh_course(course, refreshed_course_data)
   end
 
   class Report
@@ -52,7 +52,7 @@ class CourseRefresher
         @report.timings[method_name] = result
       end
 
-      def refresh_course(course, data, options)
+      def refresh_course(course, data)
         @report = Report.new
         @rust_data = data
         Course.transaction(requires_new: true) do
@@ -63,43 +63,28 @@ class CourseRefresher
           # @cache_path = data['new-cache-path']
           # @course.cache_path = @cache_path
 
-          # @course.increment_cached_version                         unless options[:no_directory_changes] # causes @course.*_path to return paths in the new cache
-
-          # FileUtils.rm_rf(@course.cache_path)                     unless options[:no_directory_changes]
-          # FileUtils.mkdir_p(@course.cache_path)                   unless options[:no_directory_changes]
-
-          # measure_and_log :update_or_clone_repository             unless options[:no_directory_changes]
-          # measure_and_log :check_directory_names                  unless options[:no_directory_changes]
           measure_and_log :update_course_options
           measure_and_log :add_records_for_new_exercises
           measure_and_log :delete_records_for_removed_exercises
-          # measure_and_log :update_exercise_options
           measure_and_log :set_has_tests_flags
-          measure_and_log :update_available_points, options[:no_directory_changes] unless options[:no_background_operations]
-          # measure_and_log :make_solutions                         unless options[:no_directory_changes]
-          # measure_and_log :make_stubs                             unless options[:no_directory_changes]
+          # measure_and_log :update_available_points, options[:no_directory_changes] unless options[:no_background_operations]
           measure_and_log :checksum_stubs
-          # measure_and_log :make_zips_of_stubs                     unless options[:no_directory_changes]
-          # measure_and_log :make_zips_of_solutions                 unless options[:no_directory_changes]
-          # measure_and_log :set_permissions                        unless options[:no_directory_changes]
           measure_and_log :invalidate_unlocks
           measure_and_log :kafka_publish_exercises
 
           @course.course_template.save!
           @course.refreshed_at = Time.now
+          @course.initial_refresh_ready = true unless @course.initial_refresh_ready
           @course.save!
           @course.exercises.each(&:save!)
 
           CourseRefresher.simulate_failure! if ::Rails.env.test? && CourseRefresher.respond_to?('simulate_failure!')
-        rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
+        rescue StandardError, ScriptError
           @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
-          # Delete the new cache we were working on
-          # FileUtils.rm_rf(@course.cache_path) unless options[:no_directory_changes]
           raise ActiveRecord::Rollback
         end
 
-        if @report.errors.empty? && !options[:no_directory_changes]
-          # FileUtils.rm_rf(@old_cache_path)
+        if @report.errors.empty? # && !options[:no_directory_changes]
           seed_maven_cache
         end
 

@@ -126,7 +126,7 @@ module RustLangsCliExecutor
         }
       elsif command_output['status'] == 'finished'
         if command_output['result'] == 'error'
-          raise "Refresh failed: \n#{data['trace'].join("\n")}"
+          raise data['trace'].join("\n")
         elsif command_output['result'] == 'executed-command'
           data
         end
