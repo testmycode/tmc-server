@@ -18,8 +18,11 @@ $(document).ready(function() {
             },
 
             received(cableData) {
+                if(cableData.refresh_initialized) {
+                    document.getElementById("refresh-btn").classList.add('disabled');
+                }
                 var refreshDiv = document.getElementById("refresh-progress-div");
-                refreshDiv.style.display = "initial";
+                refreshDiv.style.display = "block";
 
                 if(cableData.message) {
                     var refreshRow = document.createElement("DIV");

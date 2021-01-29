@@ -10,11 +10,12 @@ class RefreshCourseTask
     CourseTemplateRefresh.where(status: :not_started).each do |task|
       task.status = :in_progress
       task.save!
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{task.course_template_id}", { refresh_initialized: true })
       courses = Course.where(course_template_id: task.course_template_id)
       Rails.logger.info("Refreshing courses created from template #{task.course_template_id}")
       rust_output = RustLangsCliExecutor.refresh(courses.first, task.id)
 
-      ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{task.course_template_id}",
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{task.course_template_id}",
         {
           message: 'Updating database',
           percent_done: 0.95,
@@ -24,13 +25,13 @@ class RefreshCourseTask
       courses.each do |course|
         @refresh = CourseRefreshDatabaseUpdater.new.refresh_course(course, rust_output)
       end
-      ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{task.course_template_id}", {
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{task.course_template_id}", {
           message: 'Generating refresh report',
           percent_done: 0.99,
           time: '-',
         })
       CourseTemplateRefreshReport.create(course_template_refresh_id: task.id, refresh_errors: @refresh.errors, refresh_warnings: @refresh.warnings, refresh_notices: @refresh.notices, refresh_timings: @refresh.timings)
-      ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{task.course_template_id}", {
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{task.course_template_id}", {
         message: 'Refresh completed',
         percent_done: 1,
         time: '-',
@@ -48,7 +49,7 @@ class RefreshCourseTask
       task.percent_done = 0
       task.create_phase(e, 0)
       task.save!
-      ActionCable.server.broadcast("CourseTemplateRefreshChannel-course-id-#{task.course_template_id}", {
+      ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{task.course_template_id}", {
         message: 'Refresh crashed',
         percent_done: 0,
         time: '-',

@@ -2,7 +2,7 @@
 
 class CourseTemplateRefreshChannel < ApplicationCable::Channel
   def subscribed
-    stream_from "CourseTemplateRefreshChannel-course-id-#{params[:courseTemplateId]}"
+    stream_from "CourseTemplateRefreshChannel-#{params[:courseTemplateId]}"
   end
 
   def unsubscribed
