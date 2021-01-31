@@ -4,6 +4,7 @@
 require 'rubygems'
 require 'daemons'
 require 'fileutils'
+require 'background_task_registry'
 
 root_dir = File.expand_path('../', File.dirname(__FILE__))
 pid_dir = root_dir + '/tmp/pids'
