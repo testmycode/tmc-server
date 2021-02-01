@@ -2,6 +2,7 @@
 
 require 'net/http'
 require 'json'
+require 'rspec'
 
 class RspecRemoteFormatter
   RSpec::Core::Formatters.register self, :example_passed, :example_failed, :example_pending

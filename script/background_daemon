@@ -2,8 +2,9 @@
 # frozen_string_literal: true
 
 require 'rubygems'
-require 'daemons'
 require 'fileutils'
+require_relative '../config/environment'
+require 'background_task_registry'
 
 root_dir = File.expand_path('../', File.dirname(__FILE__))
 pid_dir = root_dir + '/tmp/pids'
@@ -15,36 +16,34 @@ def exception_to_str(e)
   e.message + "\n" + e.backtrace.join("\n        from ")
 end
 
-# for some reason, log_output doesn't seem to work. Oh well..
-Daemons.run_proc('background_daemon', dir_mode: :normal, dir: pid_dir, log_dir: log_dir, log_output: false) do
-  Dir.chdir root_dir
-  require root_dir + '/config/environment'
-  Rails.logger = Logger.new(Rails.root.join('log', 'background_daemon.log'))
-  Rails.logger.auto_flushing = true if Rails.logger.respond_to? :auto_flushing=
-  # ActiveRecord::Base.connection_config[:pool] = 25
+Dir.chdir root_dir
+require root_dir + '/config/environment'
+Rails.logger = Logger.new(Rails.root.join('log', 'background_daemon.log'))
+Rails.logger.auto_flushing = true if Rails.logger.respond_to? :auto_flushing=
+Rails.logger.info 'Starting background_daemon'
+# ActiveRecord::Base.connection_config[:pool] = 25
 
-  # Tasks may be longrunning so we want each one in a thread so one task won't
-  # block other ones.
-  processes = BackgroundTaskRegistry.all_tasks.map do |task|
-    Process.fork do
-      loop do
+# Tasks may be longrunning so we want each one in a thread so one task won't
+# block other ones.
+processes = BackgroundTaskRegistry.all_tasks.map do |task|
+  Process.fork do
+    loop do
+      begin
+        task.run
+      rescue StandardError => e
+        Rails.logger.error "#{task.class.name} exception: " + exception_to_str(e)
+
         begin
-          task.run
-        rescue StandardError => e
-          Rails.logger.error "#{task.class.name} exception: " + exception_to_str(e)
-
-          begin
-            ActiveRecord::Base.clear_active_connections!
-          rescue StandardError => e2
-            Rails.logger.error 'Failed to get rid of used db connections: ' + exception_to_str(e2)
-          end
+          ActiveRecord::Base.clear_active_connections!
+        rescue StandardError => e2
+          Rails.logger.error 'Failed to get rid of used db connections: ' + exception_to_str(e2)
         end
-        sleep task.wait_delay
       end
+      sleep task.wait_delay
     end
   end
-  # TODO: we may not detect if only one of the threads dies.
-  processes.each do |pid|
-    Process.wait(pid)
-  end
+end
+# TODO: we may not detect if only one of the threads dies.
+processes.each do |pid|
+  Process.wait(pid)
 end

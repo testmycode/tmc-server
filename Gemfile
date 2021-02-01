@@ -8,7 +8,6 @@ gem 'rails', '~> 6.1'
 
 gem 'activerecord-session_store', '~> 1.1'
 gem 'cancancan', '~> 3.2'
-gem 'daemons', '~> 1.3', require: false
 gem 'google_drive', '~> 3.0', require: false
 gem 'natcmp', '~> 1.4'
 gem 'newrelic_rpm', '~> 6.14'
