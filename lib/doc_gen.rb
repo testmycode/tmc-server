@@ -7,7 +7,7 @@ require 'system_commands'
 # Used for generating documents from acceptance tests.
 # See e.g. spec/usermanual
 class DocGen
-  include IntegrationTestActions
+  # include IntegrationTestActions
 
   attr_reader :doc_name
 
