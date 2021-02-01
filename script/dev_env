@@ -9,7 +9,7 @@ verbose on
 screen rails s
 title "rails server"
 
-screen bundle exec script/background_daemon run
+screen bundle exec script/background_daemon
 title "background"
 
 screen tail -f log/background_daemon.log

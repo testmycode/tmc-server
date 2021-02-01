@@ -450,7 +450,6 @@ DEPENDENCIES
   bundler-audit
   cancancan (~> 3.2)
   capybara (~> 3.34)
-  daemons (~> 1.3)
   database_cleaner (~> 1.8)
   doorkeeper (~> 5.4)
   factory_bot_rails (~> 6.1)
