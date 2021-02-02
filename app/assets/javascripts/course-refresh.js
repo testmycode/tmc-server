@@ -20,6 +20,7 @@ $(document).ready(function() {
             received(cableData) {
                 if(cableData.refresh_initialized) {
                     document.getElementById("refresh-btn").classList.add('disabled');
+                    document.getElementById("refresh-progress-row").innerHTML = "";
                 }
                 var refreshDiv = document.getElementById("refresh-progress-div");
                 refreshDiv.style.display = "block";

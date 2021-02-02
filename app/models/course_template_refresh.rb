@@ -15,6 +15,6 @@ class CourseTemplateRefresh < ApplicationRecord
 
   private
     def create_first_course_template_refresh_phase
-      CourseTemplateRefreshPhase.create(course_template_refresh: self, phase_name: 'Refresh initialized', time_ms: 1)
+      CourseTemplateRefreshPhase.create(course_template_refresh: self, phase_name: 'Refresh initialized', time_ms: 0)
     end
 end

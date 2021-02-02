@@ -39,9 +39,7 @@ module RustLangsCliExecutor
     " --source-url #{course.source_url}"
 
     @course_refresh = CourseTemplateRefresh.find(course_template_refresh_task_id)
-    @course_refresh.status = :in_progress
 
-    # begin
     Open3.popen2(command) do |stdin, stdout, status_thread|
       stdout.each_line do |line|
         Rails.logger.info("Rust Refresh output \n#{line}")
@@ -56,6 +54,7 @@ module RustLangsCliExecutor
         end
       end
     end
+
     @course_refresh.percent_done = 0.95
     @course_refresh.save!
     @parsed_data
@@ -99,7 +98,7 @@ module RustLangsCliExecutor
         }
       elsif command_output['status'] == 'finished'
         if command_output['result'] == 'error'
-          raise data['trace'].join("\n")
+          raise data['output-data']['trace'].join("\n")
         elsif command_output['result'] == 'executed-command'
           data
         end

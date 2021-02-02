@@ -15,7 +15,7 @@
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <ul>
       <% for error in report.course_template_refresh_report['refresh_errors'] %>
-        <li><%= simple_format error %></li>
+        <li><%= simple_format error, {}, wrapper_tag: 'span'  %></li>
       <% end %>
       </ul>
     </div>
@@ -26,7 +26,7 @@
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <ul>
       <% for warning in report.course_template_refresh_report['refresh_warnings'] %>
-        <li><%= simple_format warning %></li>
+        <li><%= simple_format warning, {}, wrapper_tag: 'span'  %></li>
       <% end %>
       </ul>
     </div>
@@ -37,7 +37,7 @@
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <ul>
       <% for notice in report.course_template_refresh_report['refresh_notices'] %>
-        <li><%= simple_format notice %></li>
+        <li><%= simple_format notice, {}, wrapper_tag: 'span'  %></li>
       <% end %>
       </ul>
     </div>
@@ -57,7 +57,7 @@
         <tbody>
           <% for phase in report.course_template_refresh_phases %>
             <tr>
-              <td class="py-1"><%= phase.phase_name %></td>
+              <td class="py-1"><%= simple_format phase.phase_name, {}, wrapper_tag: 'span' %></td>
               <td class="py-1 align-right"><%= phase.time_ms %></td>
             </tr>
           <% end %>
@@ -80,7 +80,7 @@
         <tbody>
           <% report.course_template_refresh_report['refresh_timings'].each do |k,v| %>
             <tr>
-              <td class="py-1"><%=k.to_s.split("_").join(" ").capitalize()%></td>
+              <td class="py-1"><%= simple_format k.to_s.split("_").join(" ").capitalize(), {}, wrapper_tag: 'span' %></td>
               <td class="py-1 align-right"><%= "%.3f" % v.real %></td>
             <% end %>
           </tbody>
