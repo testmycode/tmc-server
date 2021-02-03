@@ -30,6 +30,7 @@ class RefreshCourseTask
       # old_cache_path = courses.first.cache_path
       courses.first.increment_cached_version
       courses.first.course_template.save!
+      courses.each(&:save!)
       # Remove old_cache_path here or in background?
       # Set new cache_path for course_template? or increment_cached_version as tmc-langs does it too by parsing the name
 

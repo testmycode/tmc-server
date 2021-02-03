@@ -6,7 +6,7 @@ require 'fileutils'
 
 module RustLangsCliExecutor
   def self.prepare_submission(clone_path, output_path, submission_path, extra_params = {}, config = {})
-    command = "vendor/tmc-langs-rust/current prepare-submission --clone-path #{clone_path} --output-path #{output_path} --submission-path #{submission_path}"
+    command = "#{self.langs_executable_path}/current prepare-submission --clone-path #{clone_path} --output-path #{output_path} --submission-path #{submission_path}"
 
     command = command + " --top-level-dir-name #{config[:toplevel_dir_name]}" if !!config[:toplevel_dir_name]
 
@@ -21,7 +21,7 @@ module RustLangsCliExecutor
     command_output = `#{command}`
     Rails.logger.info(command_output)
 
-    result = self.process_command_output(command_output)
+    result = self.process_prepare_submission_command_output(command_output)
 
     if result['result'] == 'error'
       Rails.logger.error('Preparing submission failed: ' + result.to_s)
@@ -31,7 +31,7 @@ module RustLangsCliExecutor
   end
 
   def self.refresh(course, course_template_refresh_task_id)
-    command = 'vendor/tmc-langs-rust/current refresh-course'\
+    command = "#{self.langs_executable_path}/current refresh-course"\
     " --cache-path #{course.cache_path}"\
     " --cache-root #{Course.cache_root}"\
     " --course-name #{course.name}"\
@@ -46,7 +46,7 @@ module RustLangsCliExecutor
         data = parse_as_JSON(line)
         return unless data
 
-        @parsed_data = process_refresh_command_output(data)
+        @parsed_data = self.process_refresh_command_output(data)
         if data['output-kind'] == 'status-update'
           ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course.course_template_id}", @parsed_data)
           @course_refresh.percent_done = @parsed_data[:percent_done]
@@ -54,14 +54,23 @@ module RustLangsCliExecutor
         end
       end
     end
-
     @course_refresh.percent_done = 0.95
     @course_refresh.save!
     @parsed_data
   end
 
   private
-    def self.process_command_output(command_output)
+    def self.parse_as_JSON(output)
+      JSON.parse output
+    rescue StandardError => e
+      Rails.logger.info("Could not parse output line. #{e}")
+    end
+
+    def self.langs_executable_path
+      Pathname.new("#{::Rails.root}/vendor/tmc-langs-rust").relative_path_from(Pathname.new(Dir.pwd)).to_s
+    end
+
+    def self.process_prepare_submission_command_output(command_output)
       output_lines = command_output.split("\n")
       valid_lines = output_lines.map do |line|
         JSON.parse line
@@ -78,12 +87,6 @@ module RustLangsCliExecutor
       end
 
       last_line
-    end
-
-    def self.parse_as_JSON(output)
-      JSON.parse output
-    rescue StandardError => e
-      Rails.logger.info("Could not parse output line. #{e}")
     end
 
     def self.process_refresh_command_output(command_output)

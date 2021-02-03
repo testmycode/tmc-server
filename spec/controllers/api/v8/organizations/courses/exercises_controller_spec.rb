@@ -73,7 +73,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
         repo = clone_course_repo(course)
         repo.copy_simple_exercise('zipexercise')
         repo.add_commit_push
-        course.refresh(user.id)
+        ImitateBackgroundRefresh.new.refresh(course.course_template, user)
 
         visit "/api/v8/org/#{organization.slug}/courses/#{course_name}/exercises/zipexercise/download"
         File.open('zipexercise.zip', 'wb') { |f| f.write(page.source) }
@@ -85,7 +85,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
         repo = clone_course_repo(course)
         repo.copy_simple_exercise('zipexercise2')
         repo.add_commit_push
-        course.refresh(user.id)
+        ImitateBackgroundRefresh.new.refresh(course.course_template, user)
 
         visit "/api/v8/org/#{organization.slug}/courses/wrong_course_name/exercises/zipexercise2/download"
         expect(page.status_code).to be(404)
@@ -94,7 +94,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
         repo = clone_course_repo(course)
         repo.copy_simple_exercise('zipexercise3')
         repo.add_commit_push
-        course.refresh(user.id)
+        ImitateBackgroundRefresh.new.refresh(course.course_template, user)
 
         visit "/api/v8/org/wrong_org_slug/courses/#{course_name}/exercises/zipexercise3/download"
         expect(page.status_code).to be(404)

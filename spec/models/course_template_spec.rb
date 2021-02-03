@@ -74,6 +74,7 @@ describe CourseTemplate, type: :model do
   end
 
   it "refreshes all it's courses on refresh call" do
+    admin = FactoryBot.create(:admin)
     template = FactoryBot.create :course_template
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
@@ -81,18 +82,19 @@ describe CourseTemplate, type: :model do
     expect(template.cached_version).to eq(0)
     expect(Course.all.pluck(:cached_version)).to eq([0, 0, 0])
 
-    template.refresh(@admin.id)
+    ImitateBackgroundRefresh.new.refresh(template, admin)
     expect(template.cached_version).to eq(1)
     expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
   end
 
   it "keeps course's cached_versions synchronized" do
+    admin = FactoryBot.create(:admin)
     template = FactoryBot.create :course_template
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(0)
     expect(Course.all.pluck(:cached_version)).to eq([0, 0])
-    template.refresh(@admin.id)
+    ImitateBackgroundRefresh.new.refresh(template, admin)
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(1)
     expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
