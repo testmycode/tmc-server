@@ -17,6 +17,7 @@ class RefreshCourseTask
       Rails.logger.info("Refreshing courses created from template #{task.course_template_id}")
 
       rust_output = RustLangsCliExecutor.refresh(courses.first, task.id)
+      task.langs_refresh_output = rust_output
 
       broadcast_to_channel(channel_id, 'Updating database', 0.95, '-')
       courses.each do |course|

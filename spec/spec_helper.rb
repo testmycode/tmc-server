@@ -55,6 +55,8 @@ if ENV['M3_HOME'].blank?
   ENV['M3_HOME'] = maven_home
 end
 
+RustLangsDownloaderTask.new.run
+
 def without_db_notices
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")
   yield

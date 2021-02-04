@@ -37,6 +37,13 @@ class Setup::CourseDetailsController < Setup::SetupController
     @course.organization = @organization
 
     if @course.save
+      # Do refresh if first course
+      if !@course.course_template.cache_exists?
+        refresh_course(@course)
+      else
+        template_refresh = @course.course_template.course_template_refreshes.last
+        CourseRefreshDatabaseUpdater.new.refresh(@course, template_refresh[:langs_refresh_output])
+      end
       update_setup_course(@course.id)
       redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
     else
@@ -74,8 +81,8 @@ class Setup::CourseDetailsController < Setup::SetupController
   end
 
   private
-    def refresh_course(course, options = {})
-      course.refresh(current_user.id, options)
+    def refresh_course(course)
+      course.refresh(current_user.id)
     end
 
     def course_params_for_create_from_template
