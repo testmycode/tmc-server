@@ -30,7 +30,7 @@ describe 'The system (used by an instructor for administration)', type: :request
     repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)
     repo.add_commit_push
 
-    manually_refresh_course('mycourse', @organization.slug)
+    manually_refresh_course('mycourse', @organization.slug, course, @teacher)
 
     visit "/org/#{@organization.slug}/courses"
     click_link 'mycourse'

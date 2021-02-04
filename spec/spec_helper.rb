@@ -36,7 +36,7 @@ end
 
 Capybara.default_driver = :poltergeist
 
-Capybara.server = :webrick
+Capybara.server = :puma, { Silent: true }
 Capybara.server_port = FreePorts.take_next
 Capybara.default_max_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false

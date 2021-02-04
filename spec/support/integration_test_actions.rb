@@ -53,10 +53,12 @@ module IntegrationTestActions
     # expect(page).to have_content('teacher manual')
   end
 
-  def manually_refresh_course(coursename, organization_slug)
+  def manually_refresh_course(coursename, organization_slug, course, user)
     visit "/org/#{organization_slug}/courses"
     click_link coursename
-    click_on 'Refresh'
+    link = find(:link, 'Refresh')
+    link.trigger('click')
+    ImitateBackgroundRefresh.new.refresh(course.course_template, user)
     expect(page).to have_content('Refresh successful.')
   end
 

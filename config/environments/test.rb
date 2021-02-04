@@ -40,6 +40,10 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  config.action_cable.url = 'http://localhost:3030/cable'
+  config.action_cable.mount_path = '/cable'
+  config.action_cable.allow_same_origin_as_host = true
+
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.

@@ -32,7 +32,7 @@ class SubmissionTestSetup
     @repo = clone_course_repo(@course)
     @repo.copy_fixture_exercise(exercise_name, exercise_dest)
     @repo.add_commit_push
-    @course.refresh(@user.id)
+    ImitateBackgroundRefresh.new.refresh(@course.course_template, @user)
 
     @exercise = @course.exercises.first
     unless @exercise
