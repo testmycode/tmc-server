@@ -85,16 +85,17 @@ describe 'The system (used by a student)', type: :request, integration: true do
     expect(page).to have_content('oops')
   end
 
-  it 'should not show exercises that have been explicitly hidden' do
-    @repo.set_metadata_in('MyExercise', 'hidden' => true)
-    @repo.add_commit_push
-    @course.refresh(@teacher.id)
+  # Metadata not supported
+  # it 'should not show exercises that have been explicitly hidden' do
+  #   @repo.set_metadata_in('MyExercise', 'hidden' => true)
+  #   @repo.add_commit_push
+  #   ImitateBackgroundRefresh.new.refresh(@course.course_template, @teacher)
 
-    visit '/org/slug/courses'
-    click_link 'mycourse'
+  #   visit '/org/slug/courses'
+  #   click_link 'mycourse'
 
-    expect(page).not_to have_content('MyExercise')
-  end
+  #   expect(page).not_to have_content('MyExercise')
+  # end
 
   it 'should show exercises whose deadline has passed but without a submission form' do
     @course.exercise_group_by_name('').hard_group_deadline = [Date.yesterday.to_s].to_json
