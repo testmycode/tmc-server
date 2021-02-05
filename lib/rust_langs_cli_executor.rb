@@ -30,13 +30,13 @@ module RustLangsCliExecutor
     result
   end
 
-  def self.refresh(course, course_template_refresh_task_id)
+  def self.refresh(course_template, course_template_refresh_task_id)
     command = "#{self.langs_executable_path}/current refresh-course"\
-    " --cache-path #{course.cache_path}"\
+    " --cache-path #{course_template.cache_path}"\
     " --cache-root #{Course.cache_root}"\
-    " --course-name #{course.name}"\
-    " --git-branch #{course.git_branch}"\
-    " --source-url #{course.source_url}"
+    " --course-name #{course_template.name}"\
+    " --git-branch #{course_template.git_branch}"\
+    " --source-url #{course_template.source_url}"
 
     @course_refresh = CourseTemplateRefresh.find(course_template_refresh_task_id)
 
@@ -48,7 +48,7 @@ module RustLangsCliExecutor
 
         @parsed_data = self.process_refresh_command_output(data)
         if data['output-kind'] == 'status-update'
-          ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course.course_template_id}", @parsed_data)
+          ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", @parsed_data)
           @course_refresh.percent_done = @parsed_data[:percent_done]
           @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
         end

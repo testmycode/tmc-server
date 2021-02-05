@@ -84,6 +84,9 @@ describe CourseTemplate, type: :model do
 
     template.refresh(admin.id)
     RefreshCourseTask.new.run
+    # Requires reload because the refresh happens in "background"
+    template.reload
+
     expect(template.cached_version).to eq(1)
     expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
   end
@@ -97,6 +100,9 @@ describe CourseTemplate, type: :model do
     expect(Course.all.pluck(:cached_version)).to eq([0, 0])
     template.refresh(admin.id)
     RefreshCourseTask.new.run
+    # Requires reload because the refresh happens in "background"
+    template.reload
+
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(1)
     expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])

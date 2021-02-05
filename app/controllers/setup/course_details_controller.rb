@@ -37,12 +37,13 @@ class Setup::CourseDetailsController < Setup::SetupController
     @course.organization = @organization
 
     if @course.save
-      # Do refresh if first course
-      if !@course.course_template.cache_exists?
+      # Do refresh if custom course and course_template first course
+      # How to handle first refresh on course_templates, this ok?
+      if custom || !@course.course_template.cache_exists?
         refresh_course(@course)
       else
         template_refresh = @course.course_template.course_template_refreshes.last
-        CourseRefreshDatabaseUpdater.new.refresh(@course, template_refresh[:langs_refresh_output])
+        CourseRefreshDatabaseUpdater.new.refresh_course(@course, template_refresh[:langs_refresh_output])
       end
       update_setup_course(@course.id)
       redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)

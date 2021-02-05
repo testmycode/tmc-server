@@ -58,7 +58,7 @@ module IntegrationTestActions
     click_link coursename
     link = find(:link, 'Refresh')
     link.trigger('click')
-    
+
     course.refresh(user.id)
     RefreshCourseTask.new.run
 

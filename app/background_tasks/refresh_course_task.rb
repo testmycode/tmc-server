@@ -16,7 +16,7 @@ class RefreshCourseTask
       courses = Course.where(course_template_id: task.course_template_id)
       Rails.logger.info("Refreshing courses created from template #{task.course_template_id}")
 
-      rust_output = RustLangsCliExecutor.refresh(courses.first, task.id)
+      rust_output = RustLangsCliExecutor.refresh(task.course_template, task.id)
       task.langs_refresh_output = rust_output
 
       broadcast_to_channel(channel_id, 'Updating database', 0.95, '-')
@@ -29,8 +29,9 @@ class RefreshCourseTask
 
       broadcast_to_channel(channel_id, 'Cleaning up cache', 0.99, '-')
       # old_cache_path = courses.first.cache_path
-      courses.first.increment_cached_version
-      courses.first.course_template.save!
+      task.course_template.increment_cached_version
+      task.course_template.save!
+      task.course_template.reload
       courses.each(&:save!)
       # Remove old_cache_path here or in background?
       # Set new cache_path for course_template? or increment_cached_version as tmc-langs does it too by parsing the name
