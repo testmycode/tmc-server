@@ -18,6 +18,7 @@ describe 'The system, receiving submissions with UTF-8 special characters', type
     @repo.add_commit_push
 
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     @user = FactoryBot.create(:user, password: 'xooxer')
 

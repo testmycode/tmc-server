@@ -40,7 +40,6 @@ feature 'Admin propagates template changes to all courses cloned from template',
     visit '/course_templates'
     click_link 'Refresh'
 
-    @template.refresh(@admin.id)
     RefreshCourseTask.new.run
 
     visit '/'

@@ -18,6 +18,7 @@ describe 'The system (used by an instructor for viewing statistics)', type: :req
     repo.add_commit_push
 
     course.refresh(teacher.id)
+    RefreshCourseTask.new.run
   end
 
   it 'should show recent submissions for an exercise' do

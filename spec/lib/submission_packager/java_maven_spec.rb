@@ -161,6 +161,7 @@ describe SubmissionPackager::JavaMaven do
     @repo.write_file('MavenExercise/foo.txt', 'repohello')
     @repo.add_commit_push
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     @exercise_project.solve_all
     File.open("#{@exercise_project.path}/foo.txt", 'w') do |f|

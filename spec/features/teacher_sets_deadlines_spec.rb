@@ -69,6 +69,7 @@ feature 'Teacher sets deadlines', feature: true do
     click_button 'Save changes'
     visit_course
     click_link 'Refresh'
+    RefreshCourseTask.new.run
     click_link 'Advanced deadlines management'
     expect(page).to have_field('empty_group_hard_static', with: '1.1.2000')
   end

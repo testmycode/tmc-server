@@ -17,6 +17,7 @@ describe 'The system, receiving submissions with broken UTF-8', type: :request, 
     @repo.add_commit_push
 
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     @user = FactoryBot.create(:verified_user, password: 'xooxer')
 

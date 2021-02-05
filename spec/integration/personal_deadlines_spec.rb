@@ -29,6 +29,7 @@ describe 'Personal deadlines', type: :request, integration: true do
   specify 'doing one exercise should unlock the other' do
     skip 'Not working, requires sandbox setup for testing'
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
     visit '/org/slug/courses'
     within '#ongoing-courses' do find(:link, 'mycourse').trigger('click') end
 
@@ -51,6 +52,7 @@ describe 'Personal deadlines', type: :request, integration: true do
       end
       @repo.add_commit_push
       @course.refresh(@teacher.id)
+      RefreshCourseTask.new.run
 
       visit '/org/slug/courses'
       within '#ongoing-courses' do click_link 'mycourse' end

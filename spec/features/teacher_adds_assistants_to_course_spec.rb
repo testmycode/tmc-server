@@ -16,6 +16,7 @@ feature 'Teacher can add assistants to course', feature: true do
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
     Teachership.create!(user: @teacher, organization: @organization)
     visit '/org/slug'
     click_link @course.title

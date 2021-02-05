@@ -18,6 +18,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.add_commit_push
 
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     @user = FactoryBot.create(:user, password: 'xooxer')
     @ability = Ability.new(@user)

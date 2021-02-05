@@ -130,6 +130,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.add_commit_push
 
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     ex.write_file('test/extraFile.java', 'extra_file')
     ex.make_zip(src_only: false)
@@ -243,6 +244,7 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.copy_fixture_exercise('SimpleExerciseWithValidationErrors', 'MyValidationExercise')
     @repo.add_commit_push
     @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
     @course.exercises.find_by(name: 'MyValidationExercise').enabled!
     visit current_path
 
