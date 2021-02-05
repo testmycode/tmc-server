@@ -51,7 +51,7 @@ class CourseRefreshDatabaseUpdater
           measure_and_log :update_course_options
           measure_and_log :add_records_for_new_exercises
           measure_and_log :delete_records_for_removed_exercises
-          measure_and_log :set_has_tests_flags
+          measure_and_log :set_exercise_options
           measure_and_log :update_available_points
           measure_and_log :update_exercise_checksums
           measure_and_log :invalidate_unlocks
@@ -96,9 +96,10 @@ class CourseRefreshDatabaseUpdater
         end
       end
 
-      def set_has_tests_flags
+      def set_exercise_options
         @course.exercises.each do |e|
           e.has_tests = true # we don't yet detect whether an exercise includes tests
+          e.disabled! if e.new_record? && e.course.refreshed? # disable new exercises
         end
       end
 

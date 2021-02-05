@@ -26,6 +26,10 @@ describe 'The system (used by an instructor for administration)', type: :request
     create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path, organization_slug: @organization.slug)
     course = Course.find_by!(name: "#{@organization.slug}-mycourse")
 
+    visit "/org/#{@organization.slug}/courses"
+    click_link 'mycourse'
+    expect(page).not_to have_content('MyExercise')
+
     repo = clone_course_repo(course)
     repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)
     repo.add_commit_push
