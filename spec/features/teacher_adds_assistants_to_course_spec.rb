@@ -42,7 +42,8 @@ feature 'Teacher can add assistants to course', feature: true do
   end
 
   scenario 'Assistant accesses same resources as teacher for the course' do
-    ImitateBackgroundRefresh.new.refresh(@course.course_template, @teacher)
+    @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     log_in_as(@teacher.username, 'foobar')
     add_assistant @assistant.email, @course

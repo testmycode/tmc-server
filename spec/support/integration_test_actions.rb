@@ -58,7 +58,13 @@ module IntegrationTestActions
     click_link coursename
     link = find(:link, 'Refresh')
     link.trigger('click')
-    ImitateBackgroundRefresh.new.refresh(course.course_template, user)
+    
+    course.refresh(user.id)
+    RefreshCourseTask.new.run
+
+    visit "/org/#{organization_slug}/courses"
+    click_link coursename
+    click_link 'Show last report'
     expect(page).to have_content('Refresh successful.')
   end
 

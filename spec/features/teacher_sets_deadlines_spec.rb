@@ -21,7 +21,8 @@ feature 'Teacher sets deadlines', feature: true do
     repo.add_commit_push
 
     Teachership.create! user: @teacher, organization: organization
-    ImitateBackgroundRefresh.new.refresh(@course.course_template, @teacher)
+    @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     FactoryBot.create(:exercise, course: @course)
     FactoryBot.create(:exercise, course: @course)

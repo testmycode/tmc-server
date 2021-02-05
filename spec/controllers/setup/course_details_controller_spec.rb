@@ -61,11 +61,16 @@ describe Setup::CourseDetailsController, type: :controller do
           expect(CourseTemplate.last.dummy).to be true
           expect(CourseTemplate.last.cached_version).to eq(0)
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id } }
-          ImitateBackgroundRefresh.new.refresh(Course.last.course_template, dummy_user)
+          # imitate call refresh first (bg doesnt work in tests)
+          Course.last.refresh(dummy_user.id)
+          RefreshCourseTask.new.run
           expect(Course.all.order(:id).pluck(:cached_version)).to eq([0, 1])
 
           expect(CourseTemplate.find(@ct.id).cached_version).to eq(1)
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @ct.id } }
+          # Make sure there shouldn't be any task in :not_started mode
+          Course.last.refresh(dummy_user.id)
+          RefreshCourseTask.new.run
           expect(Course.all.order(:id).pluck(:cached_version)).to eq([0, 1, 1])
           expect(CourseTemplate.find(@ct.id).cached_version).to eq(1)
           expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
@@ -207,10 +212,12 @@ describe Setup::CourseDetailsController, type: :controller do
 
       it 'does directory changes via refresh' do
         post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @ct.source_url } }
-        ImitateBackgroundRefresh.new.refresh(Course.last.course_template, @admin)
+        Course.last.refresh(@admin.id)
+        RefreshCourseTask.new.run
         expect(Course.last.cached_version).to eq(1)
         post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', source_url: @ct.source_url } }
-        ImitateBackgroundRefresh.new.refresh(Course.last.course_template, @admin)
+        Course.last.refresh(@admin.id)
+        RefreshCourseTask.new.run
         expect(Course.all.pluck(:cached_version)).to eq([0, 1, 1])
         expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
       end

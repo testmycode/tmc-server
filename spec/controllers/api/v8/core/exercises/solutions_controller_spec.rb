@@ -26,7 +26,8 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
         repo = clone_course_repo(course)
         repo.copy_simple_exercise(exercise.name)
         repo.add_commit_push
-        ImitateBackgroundRefresh.new.refresh(course.course_template, user)
+        course.refresh(user.id)
+        RefreshCourseTask.new.run
         get :download, params: { exercise_id: exercise.id }
         expect(response.code).to eq('200')
       end
@@ -40,7 +41,8 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           repo = clone_course_repo(course)
           repo.copy_simple_exercise(exercise.name)
           repo.add_commit_push
-          ImitateBackgroundRefresh.new.refresh(course.course_template, user)
+          course.refresh(user.id)
+          RefreshCourseTask.new.run
 
           FactoryBot.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: true)
 
@@ -51,7 +53,8 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
           repo = clone_course_repo(course)
           repo.copy_simple_exercise(exercise.name)
           repo.add_commit_push
-          ImitateBackgroundRefresh.new.refresh(course.course_template, user)
+          course.refresh(user.id)
+          RefreshCourseTask.new.run
 
           FactoryBot.create(:submission, course: course, user: user, exercise: exercise, all_tests_passed: false)
 

@@ -17,7 +17,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
-    ImitateBackgroundRefresh.new.refresh(@course.course_template, @teacher)
+    @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     @user = FactoryBot.create(:verified_user, password: 'xooxer')
     @ability = Ability.new(@user)
@@ -89,7 +90,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
   # it 'should not show exercises that have been explicitly hidden' do
   #   @repo.set_metadata_in('MyExercise', 'hidden' => true)
   #   @repo.add_commit_push
-  #   ImitateBackgroundRefresh.new.refresh(@course.course_template, @teacher)
+  #   @course.refresh(@teacher.id)
+  #   RefreshCourseTask.new.run
 
   #   visit '/org/slug/courses'
   #   click_link 'mycourse'
