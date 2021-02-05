@@ -18,7 +18,7 @@ describe CourseRefresher do
 
     @local_clone = clone_course_repo(@course)
 
-    @refresher = CourseRefresher.new
+    # @refresher = CourseRefresher.new
   end
 
   it 'should discover new exercises' do
@@ -43,7 +43,9 @@ describe CourseRefresher do
     @course.git_branch = 'foo'
     @course.save!
 
-    @refresher.refresh_course @course
+    @course.refresh(@user.id)
+    RefreshCourseTask.new.run
+    # @refresher.refresh_course @course
     expect(@course.exercises.size).to eq(1)
     expect(@course.exercises[0].name).to eq('MyExercise')
   end
@@ -203,7 +205,9 @@ describe CourseRefresher do
                                    'hide_after' => '2003-01-01 00:00'
                                  }
                                })
-    @refresher.refresh_course @course
+    @course.refresh(@user.id)
+    RefreshCourseTask.new.run
+    # @refresher.refresh_course @course
 
     expect(@course.hide_after).to eq(Time.zone.parse('2002-01-01 00:00'))
   end
@@ -225,7 +229,9 @@ describe CourseRefresher do
       },
       { commit: true }
     )
-    @refresher.refresh_course @course
+    # @refresher.refresh_course @course
+    @course.refresh(@user.id)
+    RefreshCourseTask.new.run
 
     expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2002-01-01 00:00'))
   end
@@ -249,7 +255,9 @@ describe CourseRefresher do
       { 'deadline' => '2001-01-01 00:00' },
       { commit: true }
     )
-    @refresher.refresh_course @course
+    # @refresher.refresh_course @course
+    @course.refresh(@user.id)
+    RefreshCourseTask.new.run
 
     expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2001-01-01 00:00'))
   end
@@ -268,7 +276,9 @@ describe CourseRefresher do
       },
       { commit: true }
     )
-    @refresher.refresh_course @course
+    # @refresher.refresh_course @course
+    @course.refresh(@user.id)
+    RefreshCourseTask.new.run
 
     expect(@course.exercises.first.deadline_for(@user)).to be_nil
   end
@@ -591,13 +601,13 @@ describe CourseRefresher do
   it 'should not allow dashes in exercise folders' do
     add_exercise('My-Exercise')
 
-    expect { refresh_courses }.to raise_error(CourseRefresher::Failure)
+    expect { refresh_courses }.to raise_error(CourseRefreshDatabaseUpdater::Failure)
   end
 
   it 'should not allow dashes in exercise categories' do
     add_exercise('My-Category/MyExercise')
 
-    expect { refresh_courses }.to raise_error(CourseRefresher::Failure)
+    expect { refresh_courses }.to raise_error(CourseRefreshDatabaseUpdater::Failure)
   end
 
   it 'should allow dashes in exercise subfolders' do
@@ -606,20 +616,25 @@ describe CourseRefresher do
     local_repo.write_file('MyExercise/my-dir/foo.txt', 'something')
     local_repo.add_commit_push
 
-    report = @refresher.refresh_course @course
+    # report = @refresher.refresh_course @course
+    @course.refresh(@user.id)
+    RefreshCourseTask.new.run
+    report = @course.course_template.course_template_refreshes.last.course_template_refresh_report
     expect(report.errors).to be_empty
     expect(report.warnings).to be_empty
   end
 
   it 'should report YAML parsing errors normally' do
     change_course_options_file "foo: bar\noops :error", raw: true
-    expect { refresh_courses }.to raise_error(CourseRefresher::Failure)
+    expect { refresh_courses }.to raise_error(CourseRefreshDatabaseUpdater::Failure)
   end
 
   describe 'when done twice' do
     it 'should be able to use a different repo' do
       course = FactoryBot.create :course, source_url: @repo_url
-      @refresher.refresh_course course
+      # @refresher.refresh_course course
+      course.refresh(@user.id)
+      RefreshCourseTask.new.run
 
       repo_path = "#{@test_tmp_dir}/another_fake_remote_repo"
       course.source_url = "file://#{repo_path}"
@@ -628,7 +643,9 @@ describe CourseRefresher do
       @local_clone = clone_course_repo(course)
 
       add_exercise('NewEx')
-      @refresher.refresh_course course
+      # @refresher.refresh_course course
+      course.refresh(@user.id)
+      RefreshCourseTask.new.run
 
       expect(course.exercises.size).to eq(1)
       expect(course.exercises.first.name).to eq('NewEx')
@@ -656,7 +673,7 @@ describe CourseRefresher do
 
   describe 'on failure' do
     def sabotage
-      expect(CourseRefresher).to receive(:simulate_failure!).and_raise('simulated failure')
+      expect(CourseRefreshDatabaseUpdater).to receive(:simulate_failure!).and_raise('simulated failure')
     end
 
     it 'should not leave the new cache directory lying around' do
@@ -734,11 +751,14 @@ describe CourseRefresher do
     end
 
     it "doesn't remove any folders on fail" do
-      @refresher.refresh_course(@course)
+      # @refresher.refresh_course(@course)
+      @course.refresh(@user.id)
+      RefreshCourseTask.new.run
       @template.reload
 
-      expect(CourseRefresher).to receive(:simulate_failure!).and_raise('simulated failure')
-      expect { @refresher.refresh_course(@course2, no_directory_changes: true) }.to raise_error
+      expect(CourseTemplateDatabaseUpdater).to receive(:simulate_failure!).and_raise('simulated failure')
+      @course2.refresh(@user.id)
+      expect { RefreshCourseTask.new.run }.to raise_error
 
       expect(File).to exist(@template.cache_path)
       expect(File).to exist(@course.cache_path)
@@ -776,8 +796,12 @@ describe CourseRefresher do
   end
 
   def refresh_courses
-    @refresher.refresh_course(@course)
-    @refresher.refresh_course(@course2, no_directory_changes: true)
+    @course.refresh(@user.id)
+    RefreshCourseTask.new.run
+    @course2.refresh(@user.id)
+    RefreshCourseTask.new.run
+    # @refresher.refresh_course(@course)
+    # @refresher.refresh_course(@course2, no_directory_changes: true)
     @template.reload
   end
 end
