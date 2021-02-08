@@ -135,64 +135,6 @@ describe CourseRefresher do
     expect(@course2.hide_after).to eq(nil)
   end
 
-  it 'should load exercise metadata with defaults from superdirs' do
-    add_exercise('MyExercise', commit: false)
-    change_metadata_file(
-      'metadata.yml',
-      { 'deadline' => '2000-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      { commit: false }
-    )
-    change_metadata_file(
-      'MyExercise/metadata.yml',
-      { 'deadline' => '2012-01-02 12:34' },
-      { commit: true }
-    )
-
-    refresh_courses
-
-    expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
-    expect(@course.exercises.first.gdocs_sheet).to eq('xoo')
-    expect(@course2.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
-    expect(@course2.exercises.first.gdocs_sheet).to eq('xoo')
-  end
-
-  it 'should load changed exercise metadata except for fields defined in UI' do
-    add_exercise('MyExercise', commit: false)
-    change_metadata_file(
-      'metadata.yml',
-      { 'deadline' => '2000-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      { commit: false }
-    )
-    change_metadata_file('MyExercise/metadata.yml',
-                         { 'deadline' => '2012-01-02 12:34' },
-                         { commit: true })
-    refresh_courses
-
-    # set soft dl
-    expect(ActiveSupport::JSON.decode(@course.exercises.first.soft_deadline_spec)).to be_empty
-    ex = @course.exercises.first
-    ex.soft_deadline_spec = '["02.01.2012 12:33",""]'
-    ex.save!
-    expect(@course.exercises.first.soft_deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:33'))
-
-    change_metadata_file(
-      'metadata.yml',
-      { 'deadline' => '2013-01-01 00:00', 'gdocs_sheet' => 'xoo' },
-      { commit: false }
-    )
-    change_metadata_file(
-      'MyExercise/metadata.yml',
-      { 'gdocs_sheet' => 'foo' },
-      { commit: true }
-    )
-    refresh_courses
-    expect(@course.exercises.first.soft_deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:33'))
-    expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
-    expect(@course.exercises.first.gdocs_sheet).to eq('foo')
-    expect(@course2.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2012-01-02 12:34'))
-    expect(@course2.exercises.first.gdocs_sheet).to eq('foo')
-  end
-
   it 'should allow course-specific overrides in course options' do
     expect(@course.hide_after).to be_nil
 
@@ -207,80 +149,9 @@ describe CourseRefresher do
                                })
     @course.refresh(@user.id)
     RefreshCourseTask.new.run
-    # @refresher.refresh_course @course
+    @course.reload
 
     expect(@course.hide_after).to eq(Time.zone.parse('2002-01-01 00:00'))
-  end
-
-  it 'should allow course-specific overrides in metadata settings' do
-    add_exercise('MyExercise', commit: false)
-    change_metadata_file(
-      'metadata.yml',
-      {
-        'deadline' => '2001-01-01 00:00',
-        'courses' => {
-          @course.name => {
-            'deadline' => '2002-01-01 00:00'
-          },
-          'other-course' => {
-            'deadline' => '2003-01-01 00:00'
-          }
-        }
-      },
-      { commit: true }
-    )
-    # @refresher.refresh_course @course
-    @course.refresh(@user.id)
-    RefreshCourseTask.new.run
-
-    expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2002-01-01 00:00'))
-  end
-
-  it 'should apply course-specific overrides before merging subdirectory settings' do
-    add_exercise('MyExercise', commit: false)
-    change_metadata_file(
-      'metadata.yml',
-      {
-        'deadline' => '2002-01-01 00:00',
-        'courses' => {
-          @course.name => {
-            'deadline' => '2003-01-01 00:00'
-          }
-        }
-      },
-      { commit: false }
-    )
-    change_metadata_file(
-      'MyExercise/metadata.yml',
-      { 'deadline' => '2001-01-01 00:00' },
-      { commit: true }
-    )
-    # @refresher.refresh_course @course
-    @course.refresh(@user.id)
-    RefreshCourseTask.new.run
-
-    expect(@course.exercises.first.deadline_for(@user)).to eq(Time.zone.parse('2001-01-01 00:00'))
-  end
-
-  it 'should allow overriding a setting with a course-specific nil setting' do
-    add_exercise('MyExercise', commit: false)
-    change_metadata_file(
-      'MyExercise/metadata.yml',
-      {
-        'deadline' => '2002-01-01 00:00',
-        'courses' => {
-          @course.name => {
-            'deadline' => nil
-          }
-        }
-      },
-      { commit: true }
-    )
-    # @refresher.refresh_course @course
-    @course.refresh(@user.id)
-    RefreshCourseTask.new.run
-
-    expect(@course.exercises.first.deadline_for(@user)).to be_nil
   end
 
   it 'should allow overriding a setting with a nil setting in a subdirectory' do
@@ -310,48 +181,6 @@ describe CourseRefresher do
 
     expect(@course.exercises.size).to eq(0)
     expect(@course2.exercises.size).to eq(0)
-  end
-
-  it 'should mark available points requiring review' do
-    add_exercise('MyExercise')
-    change_metadata_file(
-      'metadata.yml',
-      { 'review_points' => 'addsub reviewonly' },
-      { commit: true }
-    )
-    refresh_courses
-
-    expect(@course.available_points.find_by(name: 'addsub')).to require_review
-    expect(@course.available_points.find_by(name: 'reviewonly')).not_to be_nil
-    expect(@course.available_points.find_by(name: 'reviewonly')).to require_review
-    expect(@course.available_points.find_by(name: 'mul')).not_to require_review
-    expect(@course2.available_points.find_by(name: 'addsub')).to require_review
-    expect(@course2.available_points.find_by(name: 'reviewonly')).not_to be_nil
-    expect(@course2.available_points.find_by(name: 'reviewonly')).to require_review
-    expect(@course2.available_points.find_by(name: 'mul')).not_to require_review
-  end
-
-  it "should change available points' requiring review state after second refresh" do
-    add_exercise('MyExercise')
-    change_metadata_file(
-      'metadata.yml',
-      { 'review_points' => 'addsub reviewonly' },
-      { commit: true }
-    )
-    refresh_courses
-    change_metadata_file(
-      'metadata.yml',
-      { 'review_points' => 'mul' },
-      { commit: true }
-    )
-    refresh_courses
-
-    expect(@course.available_points.find_by(name: 'addsub')).not_to require_review
-    expect(@course.available_points.find_by(name: 'reviewonly')).to be_nil
-    expect(@course.available_points.find_by(name: 'mul')).to require_review
-    expect(@course2.available_points.find_by(name: 'addsub')).not_to require_review
-    expect(@course2.available_points.find_by(name: 'reviewonly')).to be_nil
-    expect(@course2.available_points.find_by(name: 'mul')).to require_review
   end
 
   it 'should ignore exercises under directories with a .tmcignore file' do
@@ -596,18 +425,22 @@ describe CourseRefresher do
     expect(cs5).to eq(cs6)
   end
 
-  it 'should be able to scan maven exercises' # TODO
-
   it 'should not allow dashes in exercise folders' do
     add_exercise('My-Exercise')
+    refresh_courses
+    refresh_report = @template.course_template_refreshes.last
 
-    expect { refresh_courses }.to raise_error(CourseRefreshDatabaseUpdater::Failure)
+    expect(refresh_report.course_template_refresh_phases.last.phase_name).to include("contained a dash '-' which is currently not allowed")
+    expect(refresh_report.status).to eq('crashed')
   end
 
   it 'should not allow dashes in exercise categories' do
     add_exercise('My-Category/MyExercise')
+    refresh_courses
+    refresh_report = @template.course_template_refreshes.last
 
-    expect { refresh_courses }.to raise_error(CourseRefreshDatabaseUpdater::Failure)
+    expect(refresh_report.course_template_refresh_phases.last.phase_name).to include("contained a dash '-' which is currently not allowed")
+    expect(refresh_report.status).to eq('crashed')
   end
 
   it 'should allow dashes in exercise subfolders' do
@@ -620,13 +453,16 @@ describe CourseRefresher do
     @course.refresh(@user.id)
     RefreshCourseTask.new.run
     report = @course.course_template.course_template_refreshes.last.course_template_refresh_report
-    expect(report.errors).to be_empty
-    expect(report.warnings).to be_empty
+    expect(report['refresh_errors']).to be_empty
+    expect(report['refresh_warnings']).to be_empty
   end
 
   it 'should report YAML parsing errors normally' do
     change_course_options_file "foo: bar\noops :error", raw: true
-    expect { refresh_courses }.to raise_error(CourseRefreshDatabaseUpdater::Failure)
+    refresh_courses
+    refresh_report = @template.course_template_refreshes.last
+    expect(refresh_report.course_template_refresh_phases.last.phase_name).to include("while parsing a block mapping")
+    expect(refresh_report.status).to eq('crashed')
   end
 
   describe 'when done twice' do
@@ -678,7 +514,9 @@ describe CourseRefresher do
 
     it 'should not leave the new cache directory lying around' do
       sabotage
-      expect { refresh_courses }.to raise_error
+      refresh_courses
+      refresh_report = @template.course_template_refreshes.last
+      expect(refresh_report.status).to eq("crashed")
 
       expect(File).not_to exist(@template.cache_path)
       expect(File).not_to exist(@course.cache_path)
@@ -689,7 +527,9 @@ describe CourseRefresher do
       refresh_courses
       old_path = @course.cache_path
       sabotage
-      expect { refresh_courses }.to raise_error
+      refresh_courses
+      refresh_report = @template.course_template_refreshes.last
+      expect(refresh_report.status).to eq("crashed")
 
       expect(File).to exist(old_path)
     end
@@ -700,7 +540,9 @@ describe CourseRefresher do
       old_points = AvailablePoint.order(:id).to_a
 
       sabotage
-      expect { refresh_courses }.to raise_error
+      refresh_courses
+      refresh_report = @template.course_template_refreshes.last
+      expect(refresh_report.status).to eq("crashed")
 
       @template.reload
       expect(@template.cached_version).to eq(old_cached_version)
@@ -717,7 +559,7 @@ describe CourseRefresher do
     it 'should scan the exercises for available points' do
       add_exercise('MakefileC', fixture_name: 'MakefileC')
       refresh_courses
-
+ 
       points = @course.exercises.where(name: 'MakefileC').first.available_points
       expect(points.map(&:name)).to include('point1')
       points = @course2.exercises.where(name: 'MakefileC').first.available_points
@@ -756,9 +598,10 @@ describe CourseRefresher do
       RefreshCourseTask.new.run
       @template.reload
 
-      expect(CourseTemplateDatabaseUpdater).to receive(:simulate_failure!).and_raise('simulated failure')
-      @course2.refresh(@user.id)
-      expect { RefreshCourseTask.new.run }.to raise_error
+      expect(CourseRefreshDatabaseUpdater).to receive(:simulate_failure!).and_raise('simulated failure')
+      refresh_courses
+      refresh_report = @template.course_template_refreshes.last
+      expect(refresh_report.status).to eq("crashed")
 
       expect(File).to exist(@template.cache_path)
       expect(File).to exist(@course.cache_path)
@@ -796,12 +639,11 @@ describe CourseRefresher do
   end
 
   def refresh_courses
+    # Refreshes whole template nowadays if you refresh any course generated from a template
     @course.refresh(@user.id)
     RefreshCourseTask.new.run
-    @course2.refresh(@user.id)
-    RefreshCourseTask.new.run
-    # @refresher.refresh_course(@course)
-    # @refresher.refresh_course(@course2, no_directory_changes: true)
+    @course.reload
+    @course2.reload
     @template.reload
   end
 end

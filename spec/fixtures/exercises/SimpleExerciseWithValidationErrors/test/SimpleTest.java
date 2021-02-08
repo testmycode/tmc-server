@@ -3,7 +3,7 @@ import fi.helsinki.cs.tmc.edutestutils.Points;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-@Points("simpletest-all-both-test-files")
+@Points("simpletest-all both-test-files")
 public class SimpleTest {
     @Test
     @Points("addsub")
@@ -13,7 +13,7 @@ public class SimpleTest {
     }
     
     @Test
-    @Points("addsub-justsub")
+    @Points("addsub justsub")
     public void testSubtract() {
         assertEquals(3, SimpleStuff.subtract(7, 4));
         assertEquals(-333, SimpleStuff.subtract(123, 456));

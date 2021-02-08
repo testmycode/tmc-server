@@ -42,6 +42,14 @@ class CourseRefreshDatabaseUpdater
         @report.timings[method_name] = result
       end
 
+      def merge_course_specific_suboptions(opts)
+        if opts['courses'].is_a?(Hash) && opts['courses'][@course.name].is_a?(Hash)
+          opts = opts.merge(opts['courses'][@course.name])
+        end
+        opts.delete 'courses'
+        opts
+      end
+
       def refresh_course(course, data)
         @report = Report.new
         @rust_data = data['output-data']
@@ -74,7 +82,7 @@ class CourseRefreshDatabaseUpdater
       end
 
       def update_course_options
-        @course.options = @rust_data['course-options']
+        @course.options = merge_course_specific_suboptions(@rust_data['course-options'])
       end
 
       def add_records_for_new_exercises
