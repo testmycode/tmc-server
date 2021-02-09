@@ -461,7 +461,7 @@ describe CourseRefresher do
     change_course_options_file "foo: bar\noops :error", raw: true
     refresh_courses
     refresh_report = @template.course_template_refreshes.last
-    expect(refresh_report.course_template_refresh_phases.last.phase_name).to include("while parsing a block mapping")
+    expect(refresh_report.course_template_refresh_phases.last.phase_name).to include('while parsing a block mapping')
     expect(refresh_report.status).to eq('crashed')
   end
 
@@ -516,7 +516,7 @@ describe CourseRefresher do
       sabotage
       refresh_courses
       refresh_report = @template.course_template_refreshes.last
-      expect(refresh_report.status).to eq("crashed")
+      expect(refresh_report.status).to eq('crashed')
 
       expect(File).not_to exist(@template.cache_path)
       expect(File).not_to exist(@course.cache_path)
@@ -529,7 +529,7 @@ describe CourseRefresher do
       sabotage
       refresh_courses
       refresh_report = @template.course_template_refreshes.last
-      expect(refresh_report.status).to eq("crashed")
+      expect(refresh_report.status).to eq('crashed')
 
       expect(File).to exist(old_path)
     end
@@ -542,7 +542,7 @@ describe CourseRefresher do
       sabotage
       refresh_courses
       refresh_report = @template.course_template_refreshes.last
-      expect(refresh_report.status).to eq("crashed")
+      expect(refresh_report.status).to eq('crashed')
 
       @template.reload
       expect(@template.cached_version).to eq(old_cached_version)
@@ -559,7 +559,7 @@ describe CourseRefresher do
     it 'should scan the exercises for available points' do
       add_exercise('MakefileC', fixture_name: 'MakefileC')
       refresh_courses
- 
+
       points = @course.exercises.where(name: 'MakefileC').first.available_points
       expect(points.map(&:name)).to include('point1')
       points = @course2.exercises.where(name: 'MakefileC').first.available_points
@@ -601,7 +601,7 @@ describe CourseRefresher do
       expect(CourseRefreshDatabaseUpdater).to receive(:simulate_failure!).and_raise('simulated failure')
       refresh_courses
       refresh_report = @template.course_template_refreshes.last
-      expect(refresh_report.status).to eq("crashed")
+      expect(refresh_report.status).to eq('crashed')
 
       expect(File).to exist(@template.cache_path)
       expect(File).to exist(@course.cache_path)

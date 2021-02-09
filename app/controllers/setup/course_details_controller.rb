@@ -38,7 +38,6 @@ class Setup::CourseDetailsController < Setup::SetupController
 
     if @course.save
       # Do refresh if custom course and course_template first course
-      # How to handle first refresh on course_templates, this ok?
       if custom || !@course.course_template.cache_exists?
         refresh_course(@course)
       else
@@ -46,7 +45,7 @@ class Setup::CourseDetailsController < Setup::SetupController
         CourseRefreshDatabaseUpdater.new.refresh_course(@course, template_refresh[:langs_refresh_output])
       end
       update_setup_course(@course.id)
-      redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
+      redirect_to setup_organization_course_course_assistants_path(@organization.slug, @course.id)
     else
       @course_template = @course.course_template unless custom
       @course.name = input_name
@@ -71,7 +70,7 @@ class Setup::CourseDetailsController < Setup::SetupController
     authorize! :teach, @organization
     if @course.update(course_params)
       if setup_in_progress?
-        redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id),
+        redirect_to setup_organization_course_course_assistants_path(@organization.slug, @course.id),
                     notice: 'Course details updated.'
       else
         redirect_to organization_course_path(@organization, @course), notice: 'Course details updated.'

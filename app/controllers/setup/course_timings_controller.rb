@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Deprecated
 class Setup::CourseTimingsController < Setup::SetupController
   before_action :set_course
 

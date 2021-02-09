@@ -11,7 +11,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
     @assistantship = Assistantship.new
 
     if setup_in_progress?
-      print_setup_phases(4)
+      print_setup_phases(3)
     else
       add_breadcrumb("Assistants for course #{@course.title}")
     end
@@ -30,7 +30,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
         @setup_in_progress = setup_in_progress?
         @assistants = @course.assistants
         if setup_in_progress?
-          print_setup_phases(4)
+          print_setup_phases(3)
         else
           add_breadcrumb("Assistants for course #{@course.title}")
         end

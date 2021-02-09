@@ -107,6 +107,7 @@ class CourseRefreshDatabaseUpdater
       def set_exercise_options
         @course.exercises.each do |e|
           e.has_tests = true # we don't yet detect whether an exercise includes tests
+          e.options = {} # exercise metadata.yml reading support removed, set default options
           e.disabled! if e.new_record? && e.course.refreshed? # disable new exercises
         end
       end

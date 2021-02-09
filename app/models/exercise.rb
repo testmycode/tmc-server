@@ -376,6 +376,7 @@ class Exercise < ApplicationRecord
   end
 
   # Ignore some options if already set; to keep changes done in UI.
+  # metadata.yml support removed, should these be removed from database
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
 

@@ -26,7 +26,7 @@ feature 'Teacher can add assistants to course', feature: true do
     log_in_as(@teacher.username, 'foobar')
     add_assistant @assistant.email, @course
     expect(page).to have_content "Assistant #{@assistant.email} added"
-    expect(page).to have_content @assistant.username
+    expect(page).to have_content @assistant.email
   end
 
   scenario 'Teacher cannot give assistantship for non-existing user' do
