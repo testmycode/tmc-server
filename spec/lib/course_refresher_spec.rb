@@ -138,15 +138,15 @@ describe CourseRefresher do
   it 'should allow course-specific overrides in course options' do
     expect(@course.hide_after).to be_nil
 
-    change_course_options_file('hide_after' => '2001-01-01 00:00',
+    change_course_options_file({ 'hide_after' => '2001-01-01 00:00',
                                'courses' => {
-                                 @course.name => {
-                                   'hide_after' => '2002-01-01 00:00'
-                                 },
-                                 'other-course' => {
-                                   'hide_after' => '2003-01-01 00:00'
-                                 }
-                               })
+                                  @course.name => {
+                                    'hide_after' => '2002-01-01 00:00'
+                                  },
+                                  'other-course' => {
+                                    'hide_after' => '2003-01-01 00:00'
+                                  }
+                                } })
     @course.refresh(@user.id)
     RefreshCourseTask.new.run
     @course.reload

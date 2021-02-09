@@ -82,7 +82,7 @@ class CourseRefreshDatabaseUpdater
       end
 
       def update_course_options
-        @course.options = merge_course_specific_suboptions(@rust_data['course-options'])
+        @course.options = merge_course_specific_suboptions(@rust_data['course-options'].clone)
       end
 
       def add_records_for_new_exercises

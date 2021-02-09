@@ -53,7 +53,7 @@ describe Setup::CourseDetailsController, type: :controller do
 
         it 'redirects to the created course' do
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id } }
-          expect(response).to redirect_to(setup_organization_course_assistants_path(@organization, Course.last))
+          expect(response).to redirect_to(setup_organization_course_course_assistants_path(@organization, Course.last))
         end
 
         it "does directory changes when course is first created from template, but doesn't do changes when creating more courses from same template" do
@@ -125,7 +125,7 @@ describe Setup::CourseDetailsController, type: :controller do
           init_session
           put :update, params: { organization_id: @organization.slug, course_id: @course.id,
                        course: { title: 'New title', description: 'New description', material_url: 'http://new.url' } }
-          expect(response).to redirect_to(setup_organization_course_assistants_path(@organization, Course.find(@course.id)))
+          expect(response).to redirect_to(setup_organization_course_course_assistants_path(@organization, Course.find(@course.id)))
         end
       end
 

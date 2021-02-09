@@ -45,7 +45,7 @@ module IntegrationTestActions
     fill_in 'course_name', with: options[:name]
     fill_in 'course_title', with: options[:name]
     click_button 'Add Course'
-    click_button 'Accept and continue'
+    # click_button 'Accept and continue'
     click_button 'Continue'
     click_button 'Finish'
 
