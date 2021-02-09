@@ -43,7 +43,7 @@ class CourseRefreshDatabaseUpdater
       end
 
       def merge_course_specific_suboptions(opts)
-        if opts['courses'].is_a?(Hash) && opts['courses'][@course.name].is_a?(Hash)
+        if opts.key?('courses') && opts['courses'].key?(@course.name)
           opts = opts.merge(opts['courses'][@course.name])
         end
         opts.delete 'courses'

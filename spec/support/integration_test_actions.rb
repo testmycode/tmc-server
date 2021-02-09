@@ -30,7 +30,7 @@ module IntegrationTestActions
     # fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
     fill_in 'course_source_url', with: options[:source_url] if options[:source_url]
     click_button 'Add Course'
-    click_button 'Accept and continue'
+    # click_button 'Accept and continue'
     click_button 'Continue'
     click_button 'Finish'
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rust_langs_cli_executor'
+require 'fileutils'
 
 class RefreshCourseTask
   def initialize
@@ -44,6 +45,10 @@ class RefreshCourseTask
       Rails.logger.error("Course Refresh task #{task.id} failed:#{e}")
       Rails.logger.error(e.backtrace.join("\n"))
       CourseTemplateRefreshReport.create(course_template_refresh_id: task.id, refresh_errors: [e.backtrace.join("\n")], refresh_warnings: [], refresh_notices: [], refresh_timings: {})
+      unless task.langs_refresh_output.nil?
+        # Refresh crashed when updating database, thus rust can't delete new_cache_path
+        FileUtils.rm_rf(task.langs_refresh_output['output-data']['new-cache-path'])
+      end
       task.status = :crashed
       task.percent_done = 0
       task.create_phase(e, 0)

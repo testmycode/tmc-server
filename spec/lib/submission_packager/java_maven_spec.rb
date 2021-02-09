@@ -160,7 +160,7 @@ describe SubmissionPackager::JavaMaven do
   it 'includes files in the root dir from the repo' do
     @repo.write_file('MavenExercise/foo.txt', 'repohello')
     @repo.add_commit_push
-    @course.refresh(@teacher.id)
+    @course.refresh(@user.id)
     RefreshCourseTask.new.run
 
     @exercise_project.solve_all

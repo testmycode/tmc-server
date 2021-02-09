@@ -154,24 +154,6 @@ describe CourseRefresher do
     expect(@course.hide_after).to eq(Time.zone.parse('2002-01-01 00:00'))
   end
 
-  it 'should allow overriding a setting with a nil setting in a subdirectory' do
-    add_exercise('MyExercise', commit: false)
-    change_metadata_file(
-      'metadata.yml',
-      { 'deadline' => '2001-01-01 00:00' },
-      { commit: false }
-    )
-    change_metadata_file(
-      'MyExercise/metadata.yml',
-      { 'deadline' => nil },
-      { commit: true }
-    )
-    refresh_courses
-
-    expect(@course.exercises.first.deadline_for(@user)).to be_nil
-    expect(@course2.exercises.first.deadline_for(@user)).to be_nil
-  end
-
   it 'should delete removed exercises from the database' do
     add_exercise('MyExercise')
     refresh_courses
