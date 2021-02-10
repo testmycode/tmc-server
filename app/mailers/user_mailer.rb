@@ -8,7 +8,7 @@ class UserMailer < ActionMailer::Base
     @user = user
     token = user.verification_tokens.email.create!
     @url = confirm_email_url(@user.id, token.token, language: language)
-    subject = 'Confirm your mooc.fi account email address' if language == 'en' || language == 'en-lu'
+    subject = 'Confirm your mooc.fi account email address' if language == 'en' || language == 'en-lu' || language == 'en-ie'
     subject = 'Varmista mooc.fi tunnuksesi sähköpostiosoite' if language == 'fi'
     subject = 'Bekräfta e-postadressen till ditt mooc.fi-konto' if language == 'se'
     subject = 'Bestätige deine E-Mail-Adresse, um mit dem Kurs zu beginnen' if language == 'de' || language == 'de-at'
@@ -31,6 +31,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Επιβεβαιώστε την ηλεκτρονική σας διεύθυνση για να ξεκινήσετε τον κύκλο μαθημάτων «Elements of AI».' if language == 'el'
     subject = 'Потвърдете своя имейл, за да започнете курса „Elements of AI“.' if language == 'bg'
     subject = 'Conferma il tuo indirizzo e-mail per cominciare il corso Elements of AI' if language == 'it'
+    subject = 'Abyste mohl/a začít s kurzem, potvrďte prosím svou e-mailovou adresu.' if language == 'cs'
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[.\/]/, '')
