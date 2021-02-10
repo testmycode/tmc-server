@@ -1,6 +1,5 @@
 <%= javascript_tag do %>
-  const params = new URL(location.href).searchParams;
-  window.courseTemplateId = params.get('id');
+  window.courseTemplateId = (new URL(location.href)).searchParams.get('id');
 <% end %>
 <%= javascript_include_tag 'course-refresh' %>
 
