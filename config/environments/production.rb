@@ -18,7 +18,7 @@ Rails.application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
-  config.action_cable.allowed_request_origins[SiteSetting.value('baseurl_for_remote_sandboxes')]
+  config.action_cable.url = SiteSetting.value('baseurl_for_remote_sandboxes') + '/cable'
   config.action_cable.mount_path = '/cable'
   config.action_cable.allow_same_origin_as_host = true
 

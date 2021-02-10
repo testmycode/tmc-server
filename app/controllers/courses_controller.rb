@@ -35,11 +35,12 @@ class CoursesController < ApplicationController
   end
 
   def show
-    if (request.params[:generate_report]) && (can? :refresh, @course)
-      @refresh_report = CourseTemplateRefresh.find(request.params[:generate_report])
-    end
-
     authorize! :read, @course
+
+    if (request.params[:generate_report]) && (can? :teach, @course)
+      report = CourseTemplateRefresh.find(request.params[:generate_report])
+      @refresh_report = report if report.course_template_id == @course.course_template_id
+    end
 
     respond_to do |format|
       format.html do
