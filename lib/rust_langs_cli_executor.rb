@@ -38,21 +38,28 @@ module RustLangsCliExecutor
     " --git-branch #{course_template.git_branch}"\
     " --source-url #{course_template.source_url}"
 
+    Rails.logger.info(command)
     @course_refresh = CourseTemplateRefresh.find(course_template_refresh_task_id)
 
     Open3.popen2(command) do |stdin, stdout, status_thread|
-      stdout.each_line do |line|
-        Rails.logger.info("Rust Refresh output \n#{line}")
-        data = parse_as_JSON(line)
-        return unless data
+      Timeout.timeout(600, Timeout::Error, 'Refresh process took more than 10 minutes...') do
+        stdout.each_line do |line|
+          Rails.logger.info("Rust Refresh output \n#{line}")
+          data = parse_as_JSON(line)
+          return unless data
 
-        @parsed_data = self.process_refresh_command_output(data)
-        if data['output-kind'] == 'status-update'
-          ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", @parsed_data)
-          @course_refresh.percent_done = @parsed_data[:percent_done]
-          @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
+          @parsed_data = self.process_refresh_command_output(data)
+          if data['output-kind'] == 'status-update'
+            ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", @parsed_data)
+            @course_refresh.percent_done = @parsed_data[:percent_done]
+            @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
+          end
         end
       end
+    rescue Timeout::Error => e
+      Rails.logger.info("Rust Refresh took too long, killing process. #{e}")
+      status_thread.kill
+      raise e
     end
     @course_refresh.percent_done = 0.95
     @course_refresh.save!

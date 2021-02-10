@@ -44,7 +44,7 @@ $(document).ready(function() {
                     progressBar.innerHTML = newPcg + ' %';
                 }
                 if (Number(cableData.percent_done) === 1 || Number(cableData.percent_done) === 0) {
-                    window.location.href = window.location.href + `?generate_report=${cableData.course_template_refresh_id}`;
+                    window.location.href = window.location.href.replace(window.location.search, `?generate_report=${cableData.course_template_refresh_id}`);
                 }
             }
         }

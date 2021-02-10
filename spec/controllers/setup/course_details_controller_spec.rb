@@ -213,7 +213,7 @@ describe Setup::CourseDetailsController, type: :controller do
         expect(Course.last.cached_version).to eq(1)
         post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', source_url: @ct.source_url } }
         RefreshCourseTask.new.run
-        expect(Course.all.pluck(:cached_version)).to eq([0, 1, 1])
+        expect(Course.all.pluck(:cached_version)).to eq([0, 1, 1]) # Sometimes fails, don't worry
         expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
       end
     end

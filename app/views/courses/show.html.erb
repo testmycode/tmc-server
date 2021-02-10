@@ -97,11 +97,9 @@
       <div class="teacher-panel">
         <h4><%= fa_icon 'graduation-cap', text: 'Teacher functions' %></h4>
 
-        <% if can? :refresh, @course %>
-          <%= render :partial => 'courses/refresh_progress_report', :locals => { :refresh_initialized => @refresh_initialized } %>
-        <% end %>
+        <%= render :partial => 'courses/refresh_progress_report', :locals => { :refresh_initialized => @refresh_initialized } %>
 
-        <% if @refresh_report && (can? :refresh, @course) %>
+        <% if @refresh_report %>
           <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
         <% end %>
 

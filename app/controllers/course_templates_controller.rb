@@ -9,6 +9,9 @@ class CourseTemplatesController < ApplicationController
     add_breadcrumb 'Course templates', course_templates_path
     @course_templates = CourseTemplate.not_hidden.not_dummy.order(ordering)
     @hidden_course_templates = CourseTemplate.hidden.not_dummy.order(ordering)
+    if request.params[:generate_report]
+      @refresh_report = CourseTemplateRefresh.find(request.params[:generate_report])
+    end
   end
 
   def show
@@ -69,9 +72,9 @@ class CourseTemplatesController < ApplicationController
   end
 
   def refresh
-    notice = 'Refresh initialized for all course templates'
+    notice = "Refresh initialized for course template #{@course_template.name}"
     @course_template.refresh(current_user.id)
-    redirect_to course_templates_path, notice: notice
+    redirect_to course_templates_path(id: @course_template.id), notice: notice
   end
 
   private
