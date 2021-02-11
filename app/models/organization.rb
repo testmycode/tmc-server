@@ -37,8 +37,10 @@ class Organization < ApplicationRecord
 
   belongs_to :creator, class_name: 'User'
 
-  has_attached_file :logo, styles: { small_logo: '100x100>' }
-  validates_attachment_content_type :logo, content_type: /\Aimage\/.*\Z/
+  has_one_attached :logo
+  validates :logo, file_content_type: {
+    allow: /^image\/.*/
+  }
 
   scope :accepted_organizations, -> { where(verified: true).where(disabled: false) }
   scope :pending_organizations, -> { where(verified: false).where(disabled: false) }
@@ -58,7 +60,7 @@ class Organization < ApplicationRecord
   end
 
   def org_as_json
-    { name: name, information: information, slug: slug, logo_path: logo.url, pinned: pinned }
+    { name: name, information: information, slug: slug, logo_path: logo_path, pinned: pinned }
   end
 
   def teacher?(user)
@@ -81,5 +83,21 @@ class Organization < ApplicationRecord
 
   def valid_slug? # slug must not be an existing route (/org/new etc)
     errors.add(:slug, 'is a system reserved word') if %w[new list_requests].include? slug
+  end
+
+  def logo_path
+    if self.logo.attached?
+      ActiveStorage::Blob.service.path_for(self.logo.key)
+    else
+      'missing.png'
+    end
+  end
+
+  def org_logo
+    if self.logo.attached?
+      self.logo.variant(resize: '100x100')
+    else
+      'missing.png'
+    end
   end
 end

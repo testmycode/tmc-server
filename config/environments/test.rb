@@ -37,6 +37,9 @@ Rails.application.configure do
   config.active_support.deprecation = :stderr
   config.active_support.test_order = :sorted
 
+  # Which storage.yml to use
+  config.active_storage.service = :test
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 

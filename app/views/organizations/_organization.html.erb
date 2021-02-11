@@ -1,7 +1,7 @@
 <%= link_to organization, class: "organization-card-link" do %>
   <div class="card organization-card <%= organization.hidden? ? 'border-secondary' : 'border-dark' %>">
     <div class="card-body <%= organization.hidden? ? 'text-secondary' : '' %>">
-    <%= image_tag(organization.logo.url(:small_logo), class: "img-fluid") %>
+    <%= image_tag(organization.org_logo, class: "img-fluid") %>
       <div>
         <h4 class="card-title">
           <%= organization.name %>
