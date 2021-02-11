@@ -21,6 +21,7 @@ class RefreshCourseTask
       task.langs_refresh_output = rust_output
 
       broadcast_to_channel(channel_id, 'Updating database', 0.95, '-')
+      # Should we do this loop in CourseRefreshDatabaseUpdater?
       courses.each do |course|
         @refresh = CourseRefreshDatabaseUpdater.new.refresh_course(course, rust_output)
       end
@@ -29,13 +30,12 @@ class RefreshCourseTask
       CourseTemplateRefreshReport.create(course_template_refresh_id: task.id, refresh_errors: @refresh.errors, refresh_warnings: @refresh.warnings, refresh_notices: @refresh.notices, refresh_timings: @refresh.timings)
 
       broadcast_to_channel(channel_id, 'Cleaning up cache', 0.99, '-')
-      # old_cache_path = courses.first.cache_path
+      old_cache_path = task.course_template.cache_path
       task.course_template.increment_cached_version
       task.course_template.save!
       task.course_template.reload
       courses.each(&:save!)
-      # Remove old_cache_path here or in background?
-      # Set new cache_path for course_template? or increment_cached_version as tmc-langs does it too by parsing the name
+      FileUtils.rm_rf(old_cache_path)
 
       broadcast_to_channel(channel_id, 'Refresh completed', 1, '-', task.id)
       task.status = :complete
@@ -44,6 +44,7 @@ class RefreshCourseTask
     rescue => e
       Rails.logger.error("Course Refresh task #{task.id} failed:#{e}")
       Rails.logger.error(e.backtrace.join("\n"))
+      broadcast_to_channel(channel_id, 'Refresh crashed', 0, '-', task.id)
       CourseTemplateRefreshReport.create(course_template_refresh_id: task.id, refresh_errors: [e.backtrace.join("\n")], refresh_warnings: [], refresh_notices: [], refresh_timings: {})
       unless task.langs_refresh_output.nil?
         # Refresh crashed when updating database, thus rust can't delete new_cache_path
@@ -53,7 +54,6 @@ class RefreshCourseTask
       task.percent_done = 0
       task.create_phase(e, 0)
       task.save!
-      broadcast_to_channel(channel_id, 'Refresh crashed', 0, '-', task.id)
     end
   end
 
