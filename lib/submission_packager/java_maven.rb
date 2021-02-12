@@ -24,12 +24,12 @@ class SubmissionPackager
         tmc_project_file = TmcProjectFile.for_project(cloned.to_s)
         copy_extra_student_files(tmc_project_file, received, dest)
 
-        config = TmcLangs.get.get_exercise_config(exercise.clone_path)
-        config['studentFilePaths'].each do |folder|
+        config = RustLangsCliExecutor.get_exercise_packaging_configuration(exercise.clone_path)
+        config['student_file_paths'].each do |folder|
           src = received + folder
           FileUtils.cp_r(src, dest + folder) if FileTest.exist?(src)
         end
-        config['exerciseFilePaths'].each do |folder|
+        config['exercise_file_paths'].each do |folder|
           src = tests + folder
           FileUtils.cp_r(src, dest + folder) if FileTest.exist?(src)
         end
