@@ -441,12 +441,12 @@ DEPENDENCIES
   activerecord-import (~> 1.0)
   activerecord-session_store (~> 1.1)
   argon2 (~> 2.0)
-  bootstrap (~> 4.5)
+  bootstrap (~> 4.6)
   brakeman
   bundler-audit
   cancancan (~> 3.2)
-  capybara (~> 3.34)
-  database_cleaner (~> 1.8)
+  capybara (~> 3.35)
+  database_cleaner (~> 1.99)
   doorkeeper (~> 5.4)
   factory_bot_rails (~> 6.1)
   file_validators
@@ -463,7 +463,7 @@ DEPENDENCIES
   logstasher (~> 2.1)
   mimic (~> 0.4)
   natcmp (~> 1.4)
-  newrelic_rpm (~> 6.14)
+  newrelic_rpm (~> 6.15)
   pdfkit (~> 0.8)
   pg (~> 1.2)
   pghero (~> 2.7)
@@ -471,7 +471,7 @@ DEPENDENCIES
   pry
   pry-byebug
   pry-rails
-  rack-attack (~> 6.3)
+  rack-attack (~> 6.5)
   rack-cors (~> 1.1)
   rack-mini-profiler (~> 2.3)
   railroady
