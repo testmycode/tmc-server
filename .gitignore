@@ -35,3 +35,6 @@
 
 # Node_modules
 /ext/sandbox/node_modules
+
+# Ignore default active_storage
+storage/
