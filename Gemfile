@@ -6,42 +6,36 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 6.1'
 
+gem 'activerecord-import', '~> 1.0'
 gem 'activerecord-session_store', '~> 1.1'
+gem 'argon2', '~> 2.0'
+gem 'bootstrap', '~> 4.6'
 gem 'cancancan', '~> 3.2'
+gem 'doorkeeper', '~> 5.4'
 gem 'file_validators' # Used to validate organization logo
+gem 'font-awesome-rails'
 gem 'google_drive', '~> 3.0', require: false
+gem 'gravtastic', '~> 3.2' # Used to display user avatars
 gem 'image_processing' # Used by active_storage to make logo 100x100 on the fly
+gem 'logstasher', '~> 2.1'
 gem 'natcmp', '~> 1.4'
-gem 'newrelic_rpm', '~> 6.14'
+gem 'newrelic_rpm', '~> 6.15'
 gem 'pdfkit', '~> 0.8', require: false
 gem 'pg', '~> 1.2'
-gem 'activerecord-import', '~> 1.0'
-gem 'rack-attack', '~> 6.3', require: false
+gem 'pghero', '~> 2.7'
+gem 'rack-attack', '~> 6.5', require: false
 gem 'rack-cors', '~> 1.1'
+gem 'rack-mini-profiler', '~> 2.3'
 gem 'rake'
 gem 'responders', '~> 3.0'
 gem 'rest-client', '~> 2.1', require: false
+gem 'swagger-blocks', '~> 3.0'
 gem 'xml-simple', '~> 1.1', require: false
 
 gem 'hiredis', '~> 0.6' # Redis for caching
-# gem 'newrelic-redis' blocks new relic updates
 gem 'readthis', '~> 2.2' # Redis for caching
-gem 'redis', '~> 4.2'
+gem 'redis', '~> 4.2' # Redis for caching (TODO: Remove and migrate to rails cache)
 
-gem 'doorkeeper', '~> 5.4'
-gem 'gravtastic', '~> 3.2'
-
-gem 'logstasher', '~> 2.1'
-
-gem 'pghero', '~> 2.7'
-
-gem 'swagger-blocks', '~> 3.0'
-
-gem 'bootstrap', '~> 4.5'
-gem 'font-awesome-rails'
-
-gem 'rack-mini-profiler', '~> 2.3'
-gem 'argon2', '~> 2.0'
 
 group :assets do
   gem 'jquery-rails', '~> 4.4'
@@ -50,7 +44,7 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'capybara', '~> 3.34'
+  gem 'capybara', '~> 3.35'
   gem 'factory_bot_rails', '~> 6.1'
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
@@ -66,11 +60,11 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
 
-  gem 'database_cleaner', '~> 1.8'
+  gem 'database_cleaner', '~> 1.99'
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
-  gem 'rubocop', '~> 1.5.2', require: false
+  gem 'rubocop', '~> 1.5.2', require: false # HoundCI requires 1.5.2
   gem 'rubocop-rails_config', '~> 1.1'
   gem 'ruby-prof', '~> 0.12.2' # for performance tests
   gem 'simplecov', require: false
