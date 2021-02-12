@@ -6,7 +6,7 @@ require 'shellwords'
 require 'system_commands'
 
 # There is some functionality in common with JavaSimple. We mostly only test that in java_simple_spec.rb.
-describe SubmissionPackager::JavaMaven do
+describe SubmissionPackager do
   include GitTestActions
   include SystemCommands
 
@@ -23,7 +23,7 @@ describe SubmissionPackager::JavaMaven do
   end
 
   def package_it
-    SubmissionPackager.get(@exercise).package_submission(@exercise, @exercise_project.zip_path, @tar_path)
+    RustLangsCliExecutor.prepare_submission(@exercise.clone_path, @tar_path, @exercise_project.zip_path)
   end
 
   it 'should package the submission in a tar file with tests from the repo' do
@@ -176,58 +176,6 @@ describe SubmissionPackager::JavaMaven do
         `tar xf #{Shellwords.escape(@tar_path)}`
         expect(File).to exist('foo.txt')
         expect(File.read('foo.txt')).to eq('repohello')
-      end
-    end
-  end
-
-  describe 'tmc-run script added to the archive' do
-    it 'should run mvn tmc:test' do
-      pending 'TMC-langs migration will make this irrelevant'
-      @exercise_project.solve_all
-      @exercise_project.make_zip(src_only: false)
-
-      package_it
-
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          sh! ['tar', 'xf', @tar_path]
-
-          begin
-            sh! ['env', "JAVA_RAM_KB=#{64 * 1024}", './tmc-run']
-          rescue StandardError
-            if File.exist?('test_output.txt')
-              raise($!.message + "\n\n" + "The contents of test_output.txt:\n" + File.read('test_output.txt'))
-            else
-              raise
-            end
-          end
-
-          expect(File).to exist('target/classes/SimpleStuff.class')
-          expect(File).to exist('target/test-classes/SimpleTest.class')
-          expect(File).to exist('test_output.txt')
-          expect(File.read('test_output.txt')).to include('"status":"PASSED"')
-        end
-      end
-    end
-
-    it 'should report compilation errors in test_output.txt with exit code 101' do
-      pending 'TMC-langs migration will make this irrelevant'
-      @exercise_project.introduce_compilation_error
-      @exercise_project.make_zip(src_only: false)
-
-      package_it
-
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          sh! ['tar', 'xf', @tar_path]
-          `env JAVA_RAM_KB=#{64 * 1024} ./tmc-run`
-          expect($?.exitstatus).to eq(101)
-          expect(File).to exist('test_output.txt')
-
-          output = File.read('test_output.txt')
-          expect(output).to include('COMPILATION ERROR')
-          expect(output).to include('BUILD FAILURE')
-        end
       end
     end
   end

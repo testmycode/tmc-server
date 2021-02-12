@@ -146,18 +146,6 @@ class Exercise < ApplicationRecord
     "#{course.clone_path}/#{relative_path}"
   end
 
-  def exercise_dir
-    ExerciseDir.get(clone_path)
-  end
-
-  def try_get_exercise_dir
-    ExerciseDir.try_get(clone_path)
-  end
-
-  def exercise_type
-    ExerciseDir.exercise_type(clone_path)
-  end
-
   def solution_path
     "#{course.solution_path}/#{relative_path}"
   end

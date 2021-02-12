@@ -294,12 +294,6 @@ describe Course, type: :model do
       assert_destroyed(pt)
     end
 
-    it 'deletes test scanner cache entries' do
-      ent = FactoryBot.create :test_scanner_cache_entry, course: @templated_course
-      ent.course.destroy
-      assert_destroyed(ent)
-    end
-
     def assert_destroyed(obj)
       expect(obj.class.find_by(id: obj.id)).to be_nil
     end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe CourseRefresher do
+describe CourseRefreshDatabaseUpdater do
   include GitTestActions
 
   before :each do
