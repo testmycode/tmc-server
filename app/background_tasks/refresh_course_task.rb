@@ -30,12 +30,14 @@ class RefreshCourseTask
       CourseTemplateRefreshReport.create(course_template_refresh_id: task.id, refresh_errors: @refresh.errors, refresh_warnings: @refresh.warnings, refresh_notices: @refresh.notices, refresh_timings: @refresh.timings)
 
       broadcast_to_channel(channel_id, 'Cleaning up cache', 0.99, '-')
-      old_cache_path = task.course_template.cache_path
-      task.course_template.increment_cached_version
-      task.course_template.save!
-      task.course_template.reload
-      courses.each(&:save!)
-      FileUtils.rm_rf(old_cache_path)
+      if File.directory?(task.langs_refresh_output['output-data']['new-cache-path'])
+        old_cache_path = task.course_template.cache_path
+        task.course_template.increment_cached_version
+        task.course_template.save!
+        task.course_template.reload
+        courses.each(&:save!)
+        FileUtils.rm_rf(old_cache_path)
+      end
 
       broadcast_to_channel(channel_id, 'Refresh completed', 1, '-', task.id)
       task.status = :complete
@@ -44,12 +46,9 @@ class RefreshCourseTask
     rescue => e
       Rails.logger.error("Course Refresh task #{task.id} failed:#{e}")
       Rails.logger.error(e.backtrace.join("\n"))
-      broadcast_to_channel(channel_id, 'Refresh crashed', 0, '-', task.id)
       CourseTemplateRefreshReport.create(course_template_refresh_id: task.id, refresh_errors: [e.backtrace.join("\n")], refresh_warnings: [], refresh_notices: [], refresh_timings: {})
-      unless task.langs_refresh_output.nil?
-        # Refresh crashed when updating database, thus rust can't delete new_cache_path
-        FileUtils.rm_rf(task.langs_refresh_output['output-data']['new-cache-path'])
-      end
+      broadcast_to_channel(channel_id, 'Refresh crashed', 0, '-', task.id)
+
       task.status = :crashed
       task.percent_done = 0
       task.create_phase(e, 0)

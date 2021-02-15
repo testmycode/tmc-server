@@ -72,6 +72,7 @@ class CourseTemplatesController < ApplicationController
   end
 
   def refresh
+    authorize! :create, CourseTemplate
     notice = "Refresh initialized for course template #{@course_template.name}"
     @course_template.refresh(current_user.id)
     redirect_to course_templates_path(id: @course_template.id), notice: notice

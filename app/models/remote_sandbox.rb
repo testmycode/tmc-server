@@ -57,9 +57,8 @@ class RemoteSandbox
       zip_path = "#{tmpdir}/submission.zip"
       tar_path = "#{tmpdir}/submission.tar"
       File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
-      # All exrcises should have docker_image?
-      RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, tar_path, zip_path) if exercise.docker_image
-      # SubmissionPackager.package_submission(exercise, zip_path, tar_path, submission.params, include_tmc_langs: !@experimental) unless exercise.docker_image
+
+      RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, tar_path, zip_path)
 
       File.open(tar_path, 'r') do |tar_file|
         Rails.logger.info "Posting submission to #{post_url}"

@@ -21,9 +21,8 @@ class SubmissionPackager
   #   - format: may be set to :zip to get a zip file. Defaults to :tar.
   #   - toplevel_dir_name: if present, the zip or tar is made such that
   #                        there is a toplevel directory with this name
-  
+
   def get_full_zip(submission, toplevel_dir_name)
-    exercise = submission.exercise
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
       return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
