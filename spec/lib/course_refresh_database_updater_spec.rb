@@ -588,7 +588,8 @@ describe CourseRefreshDatabaseUpdater do
       expect(File).to exist(@template.cache_path)
       expect(File).to exist(@course.cache_path)
       expect(File).to exist(@course2.cache_path)
-      expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
+      # Should also have the newly generate tmc-lang-rust folder, if database updating fails
+      expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
     end
   end
 
