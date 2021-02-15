@@ -5,15 +5,6 @@ require 'fileutils'
 # If you want to change the TMC Langs Rust version, see app/background_tasks/rust_langs_downloader_task.rb
 
 module RustLangsCliExecutor
-  # Implemented only for spec/lib/submission_packager/*.spec
-  # Perhaps running above spec is useless because it should do the same as prepare_submission?
-  def self.get_exercise_packaging_configuration(exercise_path)
-    command = "#{self.langs_executable_path}/current get-exercise-packaging-configuration --exercise-path #{exercise_path}"
-    command_output = `#{command}`
-    parsed = self.parse_as_JSON(command_output)
-    parsed['data']['output-data']
-  end
-
   def self.prepare_submission(clone_path, output_path, submission_path, extra_params = {}, config = {})
     command = "#{self.langs_executable_path}/current prepare-submission --clone-path #{clone_path} --output-path #{output_path} --submission-path #{submission_path}"
     command = command + " --top-level-dir-name #{config[:toplevel_dir_name]}" if !!config[:toplevel_dir_name]
