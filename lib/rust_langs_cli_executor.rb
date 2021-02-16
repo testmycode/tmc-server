@@ -26,7 +26,8 @@ module RustLangsCliExecutor
     result
   end
 
-  def self.refresh(course_template, course_template_refresh_task_id)
+  def self.refresh(course_template_refresh_task)
+    course_template = course_template_refresh_task.course_template
     command = "#{self.langs_executable_path}/current refresh-course"\
     " --cache-path #{course_template.cache_path}"\
     " --cache-root #{Course.cache_root}"\
@@ -35,7 +36,7 @@ module RustLangsCliExecutor
     " --source-url #{course_template.source_url}"
 
     Rails.logger.info(command)
-    @course_refresh = CourseTemplateRefresh.find(course_template_refresh_task_id)
+    @course_refresh = course_template_refresh_task
 
     Open3.popen2(command) do |stdin, stdout, status_thread|
       Timeout.timeout(600, Timeout::Error, 'Refresh process took more than 10 minutes...') do

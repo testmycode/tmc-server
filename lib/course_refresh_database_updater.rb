@@ -118,7 +118,10 @@ class CourseRefreshDatabaseUpdater
           removed = []
 
           ex = @course.exercises.find { |e| e.name == exercise['name'] }
-          next unless ex
+          unless ex
+            Rails.logger.warn("Could not find exercise with name #{exercise['name']} in database for course #{@course.name}")
+            next
+          end
 
           exercise['points'].each do |point_name|
             next unless ex.available_points.none? { |point| point.name == point_name }
