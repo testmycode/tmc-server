@@ -202,7 +202,7 @@
             <li>
               Last refreshed at <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %> 
               <% if @course.course_template.course_template_refreshes.any? %>
-                by <%= @course.course_template.course_template_refreshes.last.user.email %>
+                by <%= @course.course_template.course_template_refreshes.last.user.login %>
                 <%= link_to 'Show last report', organization_course_path(@organization, @course, generate_report: @course.course_template.course_template_refreshes.last.id), class: "btn btn-link" %>
               <% end %>
             </li>
