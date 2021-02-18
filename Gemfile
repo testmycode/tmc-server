@@ -30,6 +30,7 @@ gem 'rake'
 gem 'responders', '~> 3.0'
 gem 'rest-client', '~> 2.1', require: false
 gem 'swagger-blocks', '~> 3.0'
+gem 'sassc-rails', '~> 2.1'
 gem 'xml-simple', '~> 1.1', require: false
 
 gem 'hiredis', '~> 0.6' # Redis for caching
@@ -60,13 +61,13 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
 
-  gem 'database_cleaner', '~> 1.99'
+  gem 'database_cleaner', '~> 2.0'
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
   gem 'rubocop', '~> 1.5.2', require: false # HoundCI requires 1.5.2
-  gem 'rubocop-rails_config', '~> 1.1'
-  gem 'ruby-prof', '~> 0.12.2' # for performance tests
+  gem 'rubocop-rails_config', '~> 1'
+  gem 'ruby-prof', '~> 1.4' # for performance tests
   gem 'simplecov', require: false
 end
 
