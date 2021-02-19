@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'spyware_client'
-
 # Presents the "register user" and "edit profile" views.
 class UsersController < ApplicationController
   skip_authorization_check
@@ -68,12 +66,7 @@ class UsersController < ApplicationController
 
     set_email
     password_changed = maybe_update_password(@user, params[:user])
-    user_field_changes = set_user_fields
-
-    begin
-      log_user_field_changes(user_field_changes)
-    rescue StandardError
-    end
+    set_user_fields
 
     if @user.errors.empty? && @user.save
       RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login) unless @email_before.casecmp(@user.email).zero?
@@ -205,18 +198,4 @@ class UsersController < ApplicationController
       changes
     end
 
-    def log_user_field_changes(changes)
-      unless changes.empty?
-        data = {
-          eventType: 'user_fields_changed',
-          changes: changes.clone,
-          happenedAt: (Time.now.to_f * 1000).to_i
-        }
-        Thread.new do
-          SpywareClient.send_data_to_any(data.to_json, current_user.username, request.session_options[:id])
-        rescue StandardError
-          logger.warn('Failed to send user field changes to spyware: ' + $!.message + "\n " + $!.backtrace.join("\n "))
-        end
-      end
-    end
 end

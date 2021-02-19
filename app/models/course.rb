@@ -121,7 +121,7 @@ class Course < ApplicationRecord
       details_url: view_context.api_v8_core_course_url(self),
       unlock_url: view_context.api_v8_core_course_unlock_url(self),
       reviews_url: view_context.api_v8_core_course_reviews_url(self),
-      comet_url: CometServer.get.client_url,
+      comet_url: '',
       spyware_urls: SiteSetting.value('spyware_servers')
     }.as_json
   end

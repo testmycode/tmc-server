@@ -184,6 +184,8 @@ The default user account is `admin`/`admin`.
 
 ### Production setup
 
+NB! Production setup instruction is outdated
+
 1. Recheck your comet server config in `site.yml` and then do `rvmsudo rake comet:config:update`.
 2. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake background_daemon:init:install`.
 3. Start the services: `sudo /etc/init.d/tmc-comet start`, `sudo /etc/init.d/tmc-background-daemon start`.

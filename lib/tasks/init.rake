@@ -42,27 +42,8 @@ namespace :background_daemon do
   end
 end
 
-namespace :comet do
-  namespace :init do
-    desc 'Install tmc-comet init script. Optional arg: port number (defaults to 8080).'
-    task :install, [:port] do |_t, args|
-      if args[:port]
-        system("ext/tmc-comet/initscripts/install.sh #{args[:port]}")
-      else
-        system('ext/tmc-comet/initscripts/install.sh')
-      end
-    end
-
-    task :uninstall do
-      system('ext/tmc-comet/initscripts/uninstall.sh')
-    end
-
-    task reinstall: %i[uninstall install]
-  end
-end
-
 namespace :init do
-  initables = %i[background_daemon comet]
+  initables = %i[background_daemon]
   desc 'Installs all initscripts'
   task install: initables.map { |initable| "#{initable}:init:install" }
   desc 'Uninstalls all initscripts'

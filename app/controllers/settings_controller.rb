@@ -13,12 +13,7 @@ class SettingsController < ApplicationController
     authorize! :update, @user
     set_email
     password_changed = maybe_update_password(@user, params[:user])
-    user_field_changes = set_user_fields
-
-    begin
-      log_user_field_changes(user_field_changes)
-    rescue StandardError
-    end
+    set_user_fields
 
     if @user.errors.empty? && @user.save
       flash[:notice] = if password_changed

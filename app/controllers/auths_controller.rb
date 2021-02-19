@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 # Provides an authentication service.
-#
-# Lets external services such as tmc-comet check whether a given (username, password) or
-# (username, session_id) is valid.
 class AuthsController < ApplicationController
   OK_MESSAGE = 'OK'
   FAIL_MESSAGE = 'FAIL'

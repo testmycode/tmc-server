@@ -1,7 +1,5 @@
 <%
    page_metadata = {
-     :comet_server_baseurl => comet_server_baseurl,
-     :comet_tmc_baseurl => comet_tmc_baseurl,
      :session_cookie_name => SiteSetting.value(:session_cookie_key),
      :username => current_user.guest? ? nil : current_user.username,
      :base_url => root_url,
