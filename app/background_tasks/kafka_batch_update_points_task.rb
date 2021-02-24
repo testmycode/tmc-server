@@ -228,7 +228,7 @@ class KafkaBatchUpdatePointsTask
         data: data,
         message_format_version: 1
       }
-      RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'exercises-realtime', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}") unless @kafka_bridge_url == 'test'
+      RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'exercise', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}") unless @kafka_bridge_url == 'test'
       Rails.logger.info("Batch publishing exercises finished for course #{course.name}")
       finished_successfully = true
       finished_successfully
