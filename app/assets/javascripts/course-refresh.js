@@ -38,12 +38,12 @@ $(document).ready(function() {
                     refreshDiv.appendChild(refreshRow);
 
                     var progressBar = document.getElementById('refresh-progress-bar');
-                    var newPcg = Math.floor(Number(cableData.percent_done)*100);
+                    var newPcg = Math.floor(Number(cableData.percent_done) * 100);
                     progressBar.setAttribute('aria-valuenow', newPcg);
                     progressBar.setAttribute('style', 'width:'+ newPcg + '%');
                     progressBar.innerHTML = newPcg + ' %';
                 }
-                if (Number(cableData.percent_done) === 1 || Number(cableData.percent_done) === 0) {
+                if ((Number(cableData.percent_done) === 1 || Number(cableData.percent_done) === 0) && cableData.course_template_refresh_id) {
                     window.location.href = window.location.href.split('?')[0] + `?generate_report=${cableData.course_template_refresh_id}`;
                 }
             }
