@@ -91,6 +91,7 @@ class Course < ApplicationRecord
       hide_submission_results: hide_submission_results,
       external_scoreboard_url: external_scoreboard_url,
       organization_slug: organization_slug,
+      organization_name: organization_name,
     }
   end
 
