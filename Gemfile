@@ -8,10 +8,11 @@ gem 'rails', '~> 6.1'
 
 gem 'activerecord-session_store', '~> 1.1'
 gem 'cancancan', '~> 3.2'
+gem 'file_validators' # Used to validate organization logo
 gem 'google_drive', '~> 3.0', require: false
+gem 'image_processing' # Used by active_storage to make logo 100x100 on the fly
 gem 'natcmp', '~> 1.4'
 gem 'newrelic_rpm', '~> 6.14'
-gem 'paperclip', '~> 6.1'
 gem 'pdfkit', '~> 0.8', require: false
 gem 'pg', '~> 1.2'
 gem 'activerecord-import', '~> 1.0'

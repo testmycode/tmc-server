@@ -51,10 +51,10 @@ module Api
                .select { |org| org.visibility_allowed?(request, current_user) }
 
         orgs = Organization.all if current_user.administrator?
-        orgs = orgs.map { |o| o.attributes.merge(logo_path: o.logo.url) } if current_user.administrator?
+        orgs = orgs.map { |o| o.attributes.merge(logo_path: o.logo_path) } if current_user.administrator?
 
         unless current_user.administrator?
-          orgs = orgs.map { |o| { name: o.name, information: o.information, slug: o.slug, logo_path: o.logo.url, pinned: o.pinned } }
+          orgs = orgs.map { |o| { name: o.name, information: o.information, slug: o.slug, logo_path: o.logo_path, pinned: o.pinned } }
         end
         authorize! :read, orgs
         present(orgs)
