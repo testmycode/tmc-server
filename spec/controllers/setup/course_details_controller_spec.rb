@@ -53,17 +53,21 @@ describe Setup::CourseDetailsController, type: :controller do
 
         it 'redirects to the created course' do
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id } }
-          expect(response).to redirect_to(setup_organization_course_course_timing_path(@organization, Course.last))
+          expect(response).to redirect_to(setup_organization_course_course_assistants_path(@organization, Course.last))
         end
 
         it "does directory changes when course is first created from template, but doesn't do changes when creating more courses from same template" do
           expect(CourseTemplate.last.dummy).to be true
           expect(CourseTemplate.last.cached_version).to eq(0)
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id } }
+          # imitate call refresh first (bg doesnt work in tests)
+          RefreshCourseTask.new.run
           expect(Course.all.order(:id).pluck(:cached_version)).to eq([0, 1])
 
           expect(CourseTemplate.find(@ct.id).cached_version).to eq(1)
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @ct.id } }
+          # Make sure there shouldn't be any task in :not_started mode
+          RefreshCourseTask.new.run
           expect(Course.all.order(:id).pluck(:cached_version)).to eq([0, 1, 1])
           expect(CourseTemplate.find(@ct.id).cached_version).to eq(1)
           expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
@@ -121,7 +125,7 @@ describe Setup::CourseDetailsController, type: :controller do
           init_session
           put :update, params: { organization_id: @organization.slug, course_id: @course.id,
                        course: { title: 'New title', description: 'New description', material_url: 'http://new.url' } }
-          expect(response).to redirect_to(setup_organization_course_course_timing_path(@organization, Course.find(@course.id)))
+          expect(response).to redirect_to(setup_organization_course_course_assistants_path(@organization, Course.find(@course.id)))
         end
       end
 
@@ -205,9 +209,11 @@ describe Setup::CourseDetailsController, type: :controller do
 
       it 'does directory changes via refresh' do
         post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @ct.source_url } }
+        RefreshCourseTask.new.run
         expect(Course.last.cached_version).to eq(1)
         post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', source_url: @ct.source_url } }
-        expect(Course.all.pluck(:cached_version)).to eq([0, 1, 1])
+        RefreshCourseTask.new.run
+        expect(Course.all.pluck(:cached_version)).to eq([0, 1, 1]) # Sometimes fails, don't worry
         expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
       end
     end

@@ -8,6 +8,7 @@ describe CourseTemplate, type: :model do
   describe 'validation' do
     before :each do
       @repo_path = @test_tmp_dir + '/fake_remote_repo'
+      @admin = FactoryBot.create(:admin)
       create_bare_repo(@repo_path)
     end
 
@@ -73,6 +74,7 @@ describe CourseTemplate, type: :model do
   end
 
   it "refreshes all it's courses on refresh call" do
+    admin = FactoryBot.create(:admin)
     template = FactoryBot.create :course_template
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
@@ -80,18 +82,27 @@ describe CourseTemplate, type: :model do
     expect(template.cached_version).to eq(0)
     expect(Course.all.pluck(:cached_version)).to eq([0, 0, 0])
 
-    template.refresh
+    template.refresh(admin.id)
+    RefreshCourseTask.new.run
+    # Requires reload because the refresh happens in "background"
+    template.reload
+
     expect(template.cached_version).to eq(1)
     expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
   end
 
   it "keeps course's cached_versions synchronized" do
+    admin = FactoryBot.create(:admin)
     template = FactoryBot.create :course_template
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(0)
     expect(Course.all.pluck(:cached_version)).to eq([0, 0])
-    template.refresh
+    template.refresh(admin.id)
+    RefreshCourseTask.new.run
+    # Requires reload because the refresh happens in "background"
+    template.reload
+
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(1)
     expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])

@@ -15,11 +15,12 @@ class Setup::SetupController < ApplicationController
         title: 'Details',
         path: :edit_setup_organization_course_course_details_path
       },
-      {
-        # step_number: 3,
-        title: 'Timing',
-        path: :setup_organization_course_course_timing_path
-      },
+      # Deprecated since tmc-langs-rust refresh implementation
+      # {
+      #   # step_number: 3,
+      #   title: 'Timing',
+      #   path: :setup_organization_course_course_timing_path
+      # },
       {
         # step_number: 4,
         title: 'Assistants',

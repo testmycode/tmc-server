@@ -1,6 +1,3 @@
-[submodule "ext/tmc-langs"]
-	path = ext/tmc-langs
-	url = git@github.com:testmycode/tmc-langs.git
 [submodule "ext/sandbox"]
 	path = ext/sandbox
 	url = git@github.com:rage/sandbox.git

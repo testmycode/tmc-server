@@ -1,4 +1,15 @@
+<%= javascript_tag do %>
+  window.courseTemplateId = (new URL(location.href)).searchParams.get('id');
+<% end %>
+<%= javascript_include_tag 'course-refresh' %>
+
 <h1>Course templates</h1>
+
+<%= render :partial => 'courses/refresh_progress_report', :locals => { :refresh_initialized => request.params.has_key?("id") } %>
+
+<% if @refresh_report %>
+  <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
+<% end %>
 
 <% unless @course_templates.empty? %>
   <h3>Visible</h3>
@@ -50,4 +61,4 @@
 
 <br>
 
-<%= link_to 'New Course template', new_course_template_path, class: 'btn btn-primary' %>
+<%= link_to 'New Course template', new_course_template_path, class: 'btn btn-primary mb-1' %>

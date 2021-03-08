@@ -1,28 +1,9 @@
 ## Setup
 ### Notices before installation
 
-We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` with `sudo` during the installation process.
-
-For testing environment PhantomJS (at least version 1.8.1) is required by Poltergeist gem to run headless browser tests. See [poltergeist](https://github.com/teampoltergeist/poltergeist) for documentation.
-
-Below is a quick summary of the setup procedure. It is followed by detailed instructions for Ubuntu.
-
-### Quick summary
-
-The following packages should be installed first: `ruby` (and `bundler` gem), `postgresql` (9.2+), `screen`,`git`, `zip`, `unzip`, `imagemagick`, `xfonts-75dpi`, `javac`, `java`, `ant`, `mvn`, `gcc`, `make`, `bc`, `libcurl4-openssl-dev` (or some other flavor) and `check`. Additionally, tmc-sandbox requires: `squashfs-tools`, `multistrap` `e2fsprogs`, `e2tools` and `build-essential`.
-
-1. Download submodules with `git submodule update --init --recursive`
-2. Install dependencies with `bundle install`
-3. Rename `config/site.dev.yml` to `config/site.yml`.
-4. Setup PostgreSQL based on `config/database.yml` or configure `config/database.local.yml` according to your current postgres settings.
-5. Initialize rails database with `rake db:create db:migrate`
-6. Go to `ext/sandbox` and run `npm ci`. More information from [sandbox page](https://github.com/rage/sandbox).
-7. Run the test suite with `rvmsudo rake spec`.
-8. Verify code style with `bundle exec rubocop`.
-
-After you get the test suite to pass see [post-install instructions](#post-install-instructions).
-
-### Installation instructions for Ubuntu 14.04
+We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` with `sudo` during the installation process.  
+> Note: Installation instructions works on WSL, but node needs to be installed according to [these](https://docs.microsoft.com/en-us/windows/nodejs/setup-on-wsl2) instructions.
+### Installation instructions for Ubuntu
 We expect the user to be using account which name is tmc.
 
 #### Install dependencies
@@ -31,7 +12,6 @@ Update your package list with
 ```bash
 $ sudo apt-get update
 ```
-
 TMC-server dependencies
 ```bash
 $ sudo apt-get install git build-essential zip unzip imagemagick maven make phantomjs bc postgresql postgresql-contrib chrpath libssl-dev libxft-dev libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev xfonts-75dpi libpq-dev
@@ -44,21 +24,13 @@ RVM dependencies
 ```bash
 $ sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
 ```
-TMC-sandbox dependencies
-```bash
-$ sudo apt-get install squashfs-tools multistrap e2fsprogs e2tools
+ext/sandbox dependencies see [rage/sandbox](https://github.com/rage/sandbox) for latest deps  
+Requires docker to be installed aswell, read instructions [here](https://docs.docker.com/engine/install/ubuntu/).
+```
+$ sudo apt-get install tar, zstd, moreutils, nodejs
 ```
 
 Install [wkhtmltopdf](https://github.com/pdfkit/PDFKit/wiki/Installing-WKHTMLTOPDF) for course certificate generation.
-
-#### Java installation
-
-If you want to install the official Oracle JDK, you need to add a ppa repository. You can install Oracle JDK with the following commands
-```bash
-$ sudo add-apt-repository ppa:webupd8team/java
-$ sudo apt-get update
-$ sudo apt-get install oracle-java8-installer
-```
 
 ### Install ruby via RVM
 #### Install RVM as multi-user install
@@ -66,15 +38,15 @@ $ sudo apt-get install oracle-java8-installer
 :exclamation: If you want to install RVM as a single-user installation, please see [RVM installation instructions](https://rvm.io/rvm/install).
 
 ```bash
-$ gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+$ sudo gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
 $ \curl -L https://get.rvm.io | sudo bash -s stable
 $ source /etc/profile.d/rvm.sh
 ```
 
-Add yourself to RVM group and install Ruby
+Add your own user to RVM group and install Ruby
 
 ```bash
-$ sudo adduse tmc rvm
+$ sudo adduser <logged-user> rvm
 ```
 
 Quote from [https://rvm.io/support/troubleshooting#sudo](https://rvm.io/support/troubleshooting#sudo)
@@ -83,8 +55,8 @@ Quote from [https://rvm.io/support/troubleshooting#sudo](https://rvm.io/support/
 Install ruby
 
 ```bash
-$ rvm install 2.2.0
-$ rvm use 2.2.0 --default
+$ rvm install 2.6.0
+$ rvm use 2.6.0 --default
 $ gem install bundler
 ```
 
@@ -143,10 +115,12 @@ $ bundle install
 $ git submodule update --init --recursive
 ```
 
-You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there (notice: you do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`).
+You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there.  
+> Note: You do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`.  
+:exclamation: For development environment you can run command `cp config/site.dev.yml config/site.yml`
 
-Initialize the database with `rake db:create db:migrate`
-Note: run `rake db:seed` to initialize admin account
+Initialize the database with `bin/rake db:create db:schema:load`
+Note: run `bin/rake db:seed` to initialize admin account
 
 #### Install sandbox dependencies
 
@@ -158,11 +132,11 @@ $ npm ci
 #### Run the test suite
 In the tmc-server root directory run
 ```bash
-$ rvmsudo rake spec
+$ bin/rake spec
 ```
 
 #### Verify code style (optional)
-This might require installation of rubocop; `gem install rubocop`.
+
 ```bash
 $ bundle exec rubocop
 ```
@@ -180,9 +154,12 @@ Use `script/dev_env` to start the server in [screen](http://www.gnu.org/software
 
 In screen, press `Ctrl+A` and then a number key to switch between tabs. To stop the dev environment, press `Ctrl+C`, wait a bit, then press `Q`. Repeat until all tabs are closed.
 
-The default user account is `admin`/`admin`.
+The default admin account is `admin`/`admin`.
+The default user account is `test`/`test`.
 
 ### Production setup
+
+:exclamation: Production setup instructions are outdated.
 
 1. Recheck your comet server config in `site.yml` and then do `rvmsudo rake comet:config:update`.
 2. Install init scripts: `rvmsudo rake comet:init:install`, `rvmsudo rake background_daemon:init:install`.

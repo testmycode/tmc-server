@@ -37,12 +37,15 @@ class Setup::CourseDetailsController < Setup::SetupController
     @course.organization = @organization
 
     if @course.save
-      # Fast refresh without time-consuming tasks, like making solutions
-      refresh_course(@course, no_directory_changes: @course.course_template.cache_exists?, no_background_operations: true)
-      # Full refresh happens as background task
-
+      # Do refresh if custom course and course_template first course
+      if custom || !@course.course_template.cache_exists?
+        refresh_course(@course)
+      else
+        template_refresh = @course.course_template.course_template_refreshes.last
+        CourseRefreshDatabaseUpdater.new.refresh_course(@course, template_refresh[:langs_refresh_output])
+      end
       update_setup_course(@course.id)
-      redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id)
+      redirect_to setup_organization_course_course_assistants_path(@organization.slug, @course.id)
     else
       @course_template = @course.course_template unless custom
       @course.name = input_name
@@ -67,7 +70,7 @@ class Setup::CourseDetailsController < Setup::SetupController
     authorize! :teach, @organization
     if @course.update(course_params)
       if setup_in_progress?
-        redirect_to setup_organization_course_course_timing_path(@organization.slug, @course.id),
+        redirect_to setup_organization_course_course_assistants_path(@organization.slug, @course.id),
                     notice: 'Course details updated.'
       else
         redirect_to organization_course_path(@organization, @course), notice: 'Course details updated.'
@@ -78,12 +81,8 @@ class Setup::CourseDetailsController < Setup::SetupController
   end
 
   private
-    def refresh_course(course, options = {})
-      # TODO: Could include course ID
-
-      session[:refresh_report] = course.refresh(options)
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
+    def refresh_course(course)
+      course.refresh(current_user.id)
     end
 
     def course_params_for_create_from_template

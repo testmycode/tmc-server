@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'gdocs_export'
-require 'course_refresher'
 require 'system_commands'
 require 'date_and_time_utils'
 
@@ -122,7 +121,7 @@ class Course < ApplicationRecord
       details_url: view_context.api_v8_core_course_url(self),
       unlock_url: view_context.api_v8_core_course_unlock_url(self),
       reviews_url: view_context.api_v8_core_course_reviews_url(self),
-      comet_url: CometServer.get.client_url,
+      comet_url: '',
       spyware_urls: SiteSetting.value('spyware_servers')
     }.as_json
   end
@@ -357,8 +356,8 @@ class Course < ApplicationRecord
     @groups = nil
   end
 
-  def refresh(options = {})
-    CourseRefresher.new.refresh_course(self, options)
+  def refresh(current_user_id)
+    CourseTemplateRefresh.create!(user_id: current_user_id, course_template_id: self.course_template_id)
   end
 
   def delete_cache

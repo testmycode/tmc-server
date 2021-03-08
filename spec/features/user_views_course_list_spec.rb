@@ -19,7 +19,8 @@ feature 'User views organization list', feature: true do
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(@admin.id)
+    RefreshCourseTask.new.run
 
     @exercise1 = @course.exercises.first
     @submission = FactoryBot.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true

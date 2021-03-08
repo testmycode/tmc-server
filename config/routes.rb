@@ -3,6 +3,8 @@
 TmcServer::Application.routes.draw do
   use_doorkeeper
 
+  mount ActionCable.server => '/cable'
+
   namespace :setup do
     resources :start, only: [:index]
 

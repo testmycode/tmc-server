@@ -17,7 +17,8 @@ feature 'Teacher edits unlock dates', feature: true do
     repo = clone_course_repo(@course)
     repo.copy_simple_exercise('MyExercise')
     repo.add_commit_push
-    @course.refresh
+    @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     @course.exercise_group_by_name('').group_unlock_conditions = ['1.1.2011'].to_json
     UncomputedUnlock.create_all_for_course_eager(@course)

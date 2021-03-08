@@ -7,7 +7,7 @@
 </script>
 
 <h1 class="float-left">Edit deadlines</h1>
-<a id="toggle-advanced-deadline-options" class="btn btn-sm btn-default float-right" href="javascript:void(0);">Toggle advanced options</a>
+<a id="toggle-advanced-deadline-options" class="btn btn-sm btn-link float-right" href="javascript:void(0);">Toggle advanced options</a>
 <div class="float-clear"></div>
 
 <div class="alert alert-primary" role="alert">
@@ -76,7 +76,7 @@
           %>
         </td>
         <td class="deadline-toggle-buttons">
-          <a class="toggle-groups-exercises btn btn-sm btn-default" id="toggle1_<%= group.name %>" href="javascript:void(0);">Show single exercises</a>
+          <a class="toggle-groups-exercises btn btn-sm btn-link" id="toggle1_<%= group.name %>" href="javascript:void(0);">Show single exercises</a>
         </td>
       </tr>
       </tbody>
@@ -117,7 +117,7 @@
           <td class="deadline-toggle-buttons">
             <% if ex == exercises.first %>
               <a class="reset-group-deadlines btn btn-sm btn-warning" id="reset_<%=group.name %>" href="javascript:void(0);">Clear single deadlines</a><br/>
-              <a class="toggle-groups-exercises btn btn-sm btn-default" id="toggle2_<%= group.name %>" href="javascript:void(0);">Show the whole group</a><br/>
+              <a class="toggle-groups-exercises btn btn-sm btn-link" id="toggle2_<%= group.name %>" href="javascript:void(0);">Show the whole group</a><br/>
             <% end %>
           </td>
         </tr>

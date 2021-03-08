@@ -8,7 +8,7 @@ class Setup::CourseFinisherController < Setup::SetupController
     unless setup_in_progress?
       redirect_to setup_start_index_path, notice: 'No active course setup going on.'
     end
-    print_setup_phases(5)
+    print_setup_phases(4)
   end
 
   def create

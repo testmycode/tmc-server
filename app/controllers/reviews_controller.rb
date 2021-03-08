@@ -85,7 +85,6 @@ class ReviewsController < ApplicationController
       respond_with_error('Failed to save code review.')
     else
       flash[:success] = 'Code review added.'
-      notify_user_about_new_review
       send_email_about_new_review if params[:send_email]
       @course = @submission.course
       @organization = @course.organization
@@ -216,16 +215,6 @@ class ReviewsController < ApplicationController
         authorize! :read, @review
       end
       @files = SourceFileList.for_submission(@submission) if stuff.include? :files
-    end
-
-    def notify_user_about_new_review
-      channel = '/broadcast/user/' + @review.submission.user.username + '/review-available'
-      data = {
-        exercise_name: @review.submission.exercise_name,
-        url: submission_reviews_url(@review.submission),
-        points: @review.points_list
-      }
-      CometServer.get.try_publish(channel, data)
     end
 
     def send_email_about_new_review

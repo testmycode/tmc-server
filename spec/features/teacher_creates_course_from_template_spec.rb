@@ -43,15 +43,17 @@ feature 'Teacher creates course from course template', feature: true do
     fill_in 'course_material_url', with: 'custommaterial.com'
     click_button 'Add Course'
 
-    expect(page).to have_content('Phase 3 - Course timing')
-    choose 'unlock_type_no_unlocks'
-    fill_in 'first_set_date[]', with: '1.7.2016'
-    choose 'deadline_type_weekly_deadlines'
-    click_button 'Fill and preview'
-    expect(page).to have_field('empty_group_hard_static', with: '1.7.2016')
-    click_button 'Accept and continue'
+    # Run refresh here, to simulate bg refresh
+    RefreshCourseTask.new.run
+    # expect(page).to have_content('Phase 3 - Course timing')
+    # choose 'unlock_type_no_unlocks'
+    # fill_in 'first_set_date[]', with: '1.7.2016'
+    # choose 'deadline_type_weekly_deadlines'
+    # click_button 'Fill and preview'
+    # expect(page).to have_field('empty_group_hard_static', with: '1.7.2016')
+    # click_button 'Accept and continue'
 
-    expect(page).to have_content('Phase 4 - Course assistants')
+    expect(page).to have_content('Phase 3 - Course assistants')
     fill_in 'email', with: 'assi@passi.fi'
     click_button 'Add new assistant'
     expect(page).to have_content('Assistant assi@passi.fi added')

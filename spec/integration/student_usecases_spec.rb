@@ -17,7 +17,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
     @repo.copy_simple_exercise('MyExercise')
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     @user = FactoryBot.create(:verified_user, password: 'xooxer')
     @ability = Ability.new(@user)
@@ -85,16 +86,18 @@ describe 'The system (used by a student)', type: :request, integration: true do
     expect(page).to have_content('oops')
   end
 
-  it 'should not show exercises that have been explicitly hidden' do
-    @repo.set_metadata_in('MyExercise', 'hidden' => true)
-    @repo.add_commit_push
-    @course.refresh
+  # Metadata not supported
+  # it 'should not show exercises that have been explicitly hidden' do
+  #   @repo.set_metadata_in('MyExercise', 'hidden' => true)
+  #   @repo.add_commit_push
+  #   @course.refresh(@teacher.id)
+  #   RefreshCourseTask.new.run
 
-    visit '/org/slug/courses'
-    click_link 'mycourse'
+  #   visit '/org/slug/courses'
+  #   click_link 'mycourse'
 
-    expect(page).not_to have_content('MyExercise')
-  end
+  #   expect(page).not_to have_content('MyExercise')
+  # end
 
   it 'should show exercises whose deadline has passed but without a submission form' do
     @course.exercise_group_by_name('').hard_group_deadline = [Date.yesterday.to_s].to_json
@@ -126,7 +129,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
     exx.write_file('.tmcproject.yml', "extra_student_files:\n  - test/extraFile.java\n")
     @repo.add_commit_push
 
-    @course.refresh
+    @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
 
     ex.write_file('test/extraFile.java', 'extra_file')
     ex.make_zip(src_only: false)
@@ -239,7 +243,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
     skip 'Not working, requires sandbox setup for testing'
     @repo.copy_fixture_exercise('SimpleExerciseWithValidationErrors', 'MyValidationExercise')
     @repo.add_commit_push
-    @course.refresh
+    @course.refresh(@teacher.id)
+    RefreshCourseTask.new.run
     @course.exercises.find_by(name: 'MyValidationExercise').enabled!
     visit current_path
 

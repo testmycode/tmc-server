@@ -1,3 +1,9 @@
+<% if can? :teach, @course %>
+  <%= javascript_tag do %>
+    window.courseTemplateId = "<%=j @course.course_template.id %>";
+  <% end %>
+  <%= javascript_include_tag 'course-refresh' %>
+<% end %>
 <div class="row">
   <div class="col-md-12">
     <% if can? :edit, @course %>
@@ -14,14 +20,14 @@
   </div>
   <br>
 
-  <div class="course-options-card">
-    <% unless @course.initial_refresh_ready? %>
-      <p class='course-initial-refresh-warning'><strong>
-        Course is being updated and it is not fully functional yet! Please wait.</strong>
-        <br>This operation usually takes about 15 minutes but it can take up to an hour.
-      </p>
-    <% end %>
+  <% unless @course.initial_refresh_ready? %>
+    <p class='course-initial-refresh-warning'><strong>
+      Course is being updated and it is not fully functional yet! Please wait.</strong>
+      <br>This operation usually takes about 15 minutes but it can take up to an hour.
+    </p>
+  <% end %>
 
+  <div class="course-options-card">
       <% unless @course.material_url.blank? %>
         <%= link_to @course.material_url, target: '_blank', class: 'btn btn-primary' do %>
           <%= fa_icon 'book', text: 'Course material' %>
@@ -91,7 +97,9 @@
       <div class="teacher-panel">
         <h4><%= fa_icon 'graduation-cap', text: 'Teacher functions' %></h4>
 
-        <% if @refresh_report && (can? :refresh, @course) %>
+        <%= render :partial => 'courses/refresh_progress_report', :locals => { :refresh_initialized => @refresh_initialized } %>
+
+        <% if @refresh_report %>
           <%= render :partial => 'courses/refresh_report', :locals => { :report => @refresh_report } %>
         <% end %>
 
@@ -100,22 +108,22 @@
           <% if can?(:list_user_emails, @course) || can?(:send_mail_to_participants, @course) %>
             <li>
               <% if can?(:list_user_emails, @course) %>
-                <%= link_to 'View student emails', organization_emails_path, class: 'btn btn-sm' %>
+                <%= link_to 'View student emails', organization_emails_path, class: 'btn btn-sm btn-link' %>
               <% end %>
               <% if can? :send_mail_to_participants, @course %>
-                <%= link_to 'Send message to every participant', new_organization_course_course_notifications_path(@organization, @course), class: 'btn btn-sm' %>
+                <%= link_to 'Send message to every participant', new_organization_course_course_notifications_path(@organization, @course), class: 'btn btn-link btn-sm' %>
               <% end %>
             </li>
           <% end %>
 
           <% # Feedback questions %>
           <li>
-            <%= link_to 'View feedback', organization_course_feedback_answers_path(@organization, @course), class: 'btn btn-sm' %>
-            <%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course), class: 'btn btn-sm' %>
+            <%= link_to 'View feedback', organization_course_feedback_answers_path(@organization, @course), class: 'btn btn-sm btn-link' %>
+            <%= link_to 'Manage feedback questions', organization_course_feedback_questions_path(@organization, @course), class: 'btn btn-sm btn-link' %>
           </li>
 
           <% if @course.code_review_requests_enabled? && can?(:view_code_reviews, @course) %>
-            <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course), class: 'btn btn-sm' %></li>
+            <li><%= link_to 'View code reviews', organization_course_reviews_path(@organization, @course), class: 'btn btn-sm btn-link' %></li>
             <%
               reviews_required = @course.reviews_required.count
               reviews_requested = @course.reviews_requested.count
@@ -142,21 +150,21 @@
           <% # Course timing, deadlines, unlocks %>
           <% if can? :manage_deadlines, @course %>
             <li>
-              <%= link_to 'Manage basic timing', setup_organization_course_course_timing_path(@organization, @course), class: "btn tvn-default btn-sm" %>
-              <%= link_to 'Advanced deadlines management', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-default btn-sm" %>
-              <%= link_to 'Advanced unlock conditions management', manage_unlocks_organization_course_path, class: "btn btn-default btn-sm" %>
+              <%= link_to 'Manage basic timing', setup_organization_course_course_timing_path(@organization, @course), class: "btn tvn-default btn-link btn-sm" %>
+              <%= link_to 'Advanced deadlines management', manage_deadlines_organization_course_path(@organization, @course), class: "btn btn-link btn-sm" %>
+              <%= link_to 'Advanced unlock conditions management', manage_unlocks_organization_course_path, class: "btn btn-link btn-sm" %>
             </li>
           <% end %>
 
           <li>
             <% if can? :edit, @course %>
-              <%= link_to 'Edit course details', edit_setup_organization_course_course_details_path(@organization, @course), class: "btn btn-default btn-sm" %>
+              <%= link_to 'Edit course details', edit_setup_organization_course_course_details_path(@organization, @course), class: "btn btn-link btn-sm" %>
             <% end %>
             <% if can? :manage_exercises, @course %>
-              <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-default btn-sm" %>
+              <%= link_to 'Manage exercises', manage_exercises_organization_course_path, class: "btn btn-link btn-sm" %>
             <% end %>
             <% if can? :modify_assistants, @course %>
-              <%= link_to 'Manage assistants', setup_organization_course_course_assistants_path(@organization, @course), class: "btn btn-default btn-sm" %>
+              <%= link_to 'Manage assistants', setup_organization_course_course_assistants_path(@organization, @course), class: "btn btn-link btn-sm" %>
             <% end %>
           </li>
 
@@ -169,7 +177,7 @@
             <% end %>
           <% end %>
           <% if can? :refresh, @course %>
-            <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), class: "btn btn-warning btn-sm" %>
+            <%= link_to 'Refresh', refresh_organization_course_path(@organization, @course), id: 'refresh-btn', class: "btn btn-warning btn-sm #{@refresh_initialized ? ' disabled' : nil}", data: { disable_with: "Refreshing..." }  %>
           <% end %>
           <% if @course.disabled? %>
             <%=
@@ -191,7 +199,13 @@
 
           <% # General info %>
           <% if @course.refreshed_at %>
-            <li>Last refreshed at: <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %></li>
+            <li>
+              Last refreshed at <%= @course.refreshed_at.strftime("%d.%m.%Y %H:%M:%S") %> 
+              <% if @course.course_template.course_template_refreshes.any? %>
+                by <%= @course.course_template.course_template_refreshes.last.user.login %>
+                <%= link_to 'Show last report', organization_course_path(@organization, @course, generate_report: @course.course_template.course_template_refreshes.last.id), class: "btn btn-link" %>
+              <% end %>
+            </li>
           <% end %>
 
           <% if @course.disabled? %>

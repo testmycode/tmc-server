@@ -19,7 +19,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
 
-    FactoryBot.create :course_template, name: 'template', title: 'template', source_url: @repo_path
+    @template = FactoryBot.create :course_template, name: 'template', title: 'template', source_url: @repo_path
 
     visit '/'
     # log_in_as @teacher1.login, 'teacher1'
@@ -40,6 +40,8 @@ feature 'Admin propagates template changes to all courses cloned from template',
     visit '/course_templates'
     click_link 'Refresh'
 
+    RefreshCourseTask.new.run
+
     visit '/'
     click_link @organization1.name
     click_link 'course1'
@@ -58,11 +60,15 @@ feature 'Admin propagates template changes to all courses cloned from template',
     visit '/course_templates'
     click_link 'Refresh'
 
+    RefreshCourseTask.new.run
+
     Course.first.exercises.first.enabled!
 
     add_exercise('MyAnotherExercise')
     visit '/course_templates'
     click_link 'Refresh'
+
+    RefreshCourseTask.new.run
 
     visit '/'
     click_link @organization1.name
@@ -81,6 +87,8 @@ feature 'Admin propagates template changes to all courses cloned from template',
     log_in_as @admin.login, 'xooxer'
     visit '/course_templates'
     click_link 'Refresh'
+
+    RefreshCourseTask.new.run
 
     Course.find_each do |c|
       c.exercises.first.enabled!

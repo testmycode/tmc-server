@@ -67,7 +67,7 @@ class CourseInfo
       details_url: @helpers.api_v8_core_course_url(course),
       unlock_url: @helpers.api_v8_core_course_unlock_url(course),
       reviews_url: @helpers.api_v8_core_course_reviews_url(course),
-      comet_url: CometServer.get.client_url,
+      comet_url: '',
       spyware_urls: SiteSetting.value('spyware_servers'),
       unlockables: [],
       exercises: exercises.map { |ex| exercise_data_core_api(ex) }

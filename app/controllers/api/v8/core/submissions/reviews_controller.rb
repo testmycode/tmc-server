@@ -55,7 +55,6 @@ module Api
               ::Rails.logger.error($!)
               respond_with_error('Failed to save code review.')
             else
-              notify_user_about_new_review
               send_email_about_new_review if params[:send_email]
               present(status: 'ok')
             end
@@ -101,16 +100,6 @@ module Api
                  .where('(requires_review OR requests_review) AND NOT reviewed')
                  .where(['created_at < ?', sub.created_at])
                  .update_all(newer_submission_reviewed: true)
-            end
-
-            def notify_user_about_new_review
-              channel = '/broadcast/user/' + @review.submission.user.username + '/review-available'
-              data = {
-                exercise_name: @review.submission.exercise_name,
-                url: submission_reviews_url(@review.submission),
-                points: @review.points_list
-              }
-              CometServer.get.try_publish(channel, data)
             end
 
             def send_email_about_new_review

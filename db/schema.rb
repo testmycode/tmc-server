@@ -122,6 +122,7 @@ ActiveRecord::Schema.define(version: 2021_03_02_155126) do
     t.datetime "updated_at"
     t.integer "status", default: 0, null: false
     t.decimal "percent_done", precision: 10, scale: 4, default: "0.0", null: false
+    t.jsonb "langs_refresh_output"
     t.integer "user_id", null: false
     t.integer "course_template_id", null: false
     t.index ["course_template_id"], name: "index_course_template_refreshes_on_course_template_id"

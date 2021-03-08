@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'course_refresher'
 require 'natsort'
 require 'course_list'
 require 'exercise_completion_status_generator'
+require 'json'
 
 class CoursesController < ApplicationController
   before_action :set_organization
@@ -35,12 +35,12 @@ class CoursesController < ApplicationController
   end
 
   def show
-    if session[:refresh_report]
-      @refresh_report = session[:refresh_report]
-      session.delete(:refresh_report)
-    end
-
     authorize! :read, @course
+
+    if (request.params[:generate_report]) && (can? :teach, @course)
+      report = CourseTemplateRefresh.find(request.params[:generate_report])
+      @refresh_report = report if report.course_template_id == @course.course_template_id
+    end
 
     respond_to do |format|
       format.html do
@@ -75,7 +75,7 @@ class CoursesController < ApplicationController
   def refresh
     authorize! :refresh, @course
     refresh_course(@course)
-    redirect_to organization_course_path
+    redirect_to(organization_course_path(@organization, @course), notice: 'Refresh initialized, please wait')
   end
 
   def enable
@@ -197,6 +197,10 @@ class CoursesController < ApplicationController
       @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
       @unlocks = current_user.unlocks.where(course: @course).where('valid_after IS NULL OR valid_after < ?', Time.zone.now).pluck(:exercise_name)
 
+      if can?(:teach, @course)
+        last_refresh = @course.course_template.course_template_refreshes.last
+        @refresh_initialized = last_refresh.status == 'in_progress' || last_refresh.status == 'not_started' if last_refresh
+      end
       unless current_user.guest?
         max_submissions = 100
         @submissions = @course.submissions
@@ -229,9 +233,7 @@ class CoursesController < ApplicationController
       groups
     end
 
-    def refresh_course(course, options = {})
-      session[:refresh_report] = course.refresh(options)
-    rescue CourseRefresher::Failure => e
-      session[:refresh_report] = e.report
+    def refresh_course(course)
+      course.refresh(current_user.id)
     end
 end

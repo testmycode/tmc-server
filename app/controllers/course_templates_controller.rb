@@ -9,9 +9,8 @@ class CourseTemplatesController < ApplicationController
     add_breadcrumb 'Course templates', course_templates_path
     @course_templates = CourseTemplate.not_hidden.not_dummy.order(ordering)
     @hidden_course_templates = CourseTemplate.hidden.not_dummy.order(ordering)
-    if session[:template_refresh_report]
-      @template_refresh_report = session[:template_refresh_report]
-      session.delete(:template_refresh_report)
+    if request.params[:generate_report]
+      @refresh_report = CourseTemplateRefresh.find(request.params[:generate_report])
     end
   end
 
@@ -73,13 +72,10 @@ class CourseTemplatesController < ApplicationController
   end
 
   def refresh
-    notice = 'Course template successfully refreshed'
-    begin
-      session[:template_refresh_report] = @course_template.refresh
-    rescue CourseRefresher::Failure => e
-      notice = "Refresh failed, something went wrong:<br><br>#{e}"
-    end
-    redirect_to course_templates_path, notice: notice
+    authorize! :create, CourseTemplate
+    notice = "Refresh initialized for course template #{@course_template.name}"
+    @course_template.refresh(current_user.id)
+    redirect_to course_templates_path(id: @course_template.id), notice: notice
   end
 
   private

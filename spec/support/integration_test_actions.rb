@@ -30,7 +30,7 @@ module IntegrationTestActions
     # fill_in 'course_source_backend', :with => options[:source_backend] if options[:source_backend]
     fill_in 'course_source_url', with: options[:source_url] if options[:source_url]
     click_button 'Add Course'
-    click_button 'Accept and continue'
+    # click_button 'Accept and continue'
     click_button 'Continue'
     click_button 'Finish'
 
@@ -45,7 +45,7 @@ module IntegrationTestActions
     fill_in 'course_name', with: options[:name]
     fill_in 'course_title', with: options[:name]
     click_button 'Add Course'
-    click_button 'Accept and continue'
+    # click_button 'Accept and continue'
     click_button 'Continue'
     click_button 'Finish'
 
@@ -53,11 +53,18 @@ module IntegrationTestActions
     # expect(page).to have_content('teacher manual')
   end
 
-  def manually_refresh_course(coursename, organization_slug)
+  def manually_refresh_course(coursename, organization_slug, course, user)
     visit "/org/#{organization_slug}/courses"
     click_link coursename
-    click_on 'Refresh'
-    expect(page).to have_content('Refresh successful.')
+    link = find(:link, 'Refresh')
+    link.trigger('click')
+
+    RefreshCourseTask.new.run
+
+    # visit "/org/#{organization_slug}/courses"
+    # click_link coursename
+    # click_link 'Show last report'
+    # expect(page).to have_content('Refresh successful.')
   end
 
   # Evil override fix for Capybara 1.1.2 + Selenium + Firefox 7.

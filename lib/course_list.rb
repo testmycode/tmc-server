@@ -24,7 +24,7 @@ class CourseList
       details_url: @helpers.organization_course_url(organization, course, format: :json),
       unlock_url: @helpers.organization_course_unlock_url(organization, course, format: :json),
       reviews_url: @helpers.organization_course_reviews_url(organization, course, format: :json),
-      comet_url: CometServer.get.client_url,
+      comet_url: '',
       spyware_urls: SiteSetting.value('spyware_servers')
     }
 

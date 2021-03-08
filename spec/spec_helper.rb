@@ -31,12 +31,12 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 # In console 1: Xvfb :99
 # In console 2: env DISPLAY=:99 rvmsudo rake spec
 Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, timeout: 60)
+  Capybara::Poltergeist::Driver.new(app, timeout: 60, js_errors: false)
 end
 
 Capybara.default_driver = :poltergeist
 
-Capybara.server = :webrick
+Capybara.server = :puma, { Silent: true }
 Capybara.server_port = FreePorts.take_next
 Capybara.default_max_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
@@ -54,6 +54,8 @@ if ENV['M3_HOME'].blank?
   warn "$M3_HOME is not set, trying with #{maven_home} - however, maven tests might be failing"
   ENV['M3_HOME'] = maven_home
 end
+
+RustLangsDownloaderTask.new.run
 
 def without_db_notices
   ActiveRecord::Base.connection.execute("SET client_min_messages = 'warning'")

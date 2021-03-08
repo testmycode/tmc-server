@@ -37,7 +37,6 @@ gem 'hiredis', '~> 0.6' # Redis for caching
 gem 'readthis', '~> 2.2' # Redis for caching
 gem 'redis', '~> 4.2' # Redis for caching (TODO: Remove and migrate to rails cache)
 
-
 group :assets do
   gem 'jquery-rails', '~> 4.4'
   gem 'sprockets-rails', require: 'sprockets/railtie'
@@ -47,6 +46,8 @@ end
 group :development, :test do
   gem 'capybara', '~> 3.35'
   gem 'factory_bot_rails', '~> 6.1'
+  gem 'puma', '~> 5.1'
+  # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
   gem 'rspec-activemodel-mocks', '~> 1.1'

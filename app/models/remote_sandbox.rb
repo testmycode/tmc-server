@@ -57,8 +57,8 @@ class RemoteSandbox
       zip_path = "#{tmpdir}/submission.zip"
       tar_path = "#{tmpdir}/submission.tar"
       File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
-      RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, tar_path, zip_path) if exercise.docker_image
-      SubmissionPackager.get(exercise).package_submission(exercise, zip_path, tar_path, submission.params, include_tmc_langs: !@experimental) unless exercise.docker_image
+
+      RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, tar_path, zip_path)
 
       File.open(tar_path, 'r') do |tar_file|
         Rails.logger.info "Posting submission to #{post_url}"
@@ -87,18 +87,6 @@ class RemoteSandbox
       submission.processed = true
       submission.save!
       raise
-    end
-  end
-
-  def try_to_seed_maven_cache(file_path)
-    seed_maven_cache(file_path)
-  rescue StandardError
-    Rails.logger.warn "Failed to seed maven cache: #{$!}"
-  end
-
-  def seed_maven_cache(file_path)
-    File.open(file_path, 'r') do |file|
-      RestClient.post(maven_cache_populate_url, file: file, run_tests: true)
     end
   end
 
@@ -140,9 +128,5 @@ class RemoteSandbox
 
     def status_url
       "#{@baseurl}/status.json"
-    end
-
-    def maven_cache_populate_url
-      "#{@baseurl}/maven_cache/populate.json"
     end
 end
