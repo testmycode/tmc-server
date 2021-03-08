@@ -495,7 +495,7 @@ DEPENDENCIES
   rspec-core (~> 3.10)
   rspec-rails (~> 4.0)
   rubocop (~> 1.5.2)
-  rubocop-rails_config (~> 1.1)
+  rubocop-rails_config (~> 1)
   ruby-prof (~> 1.4)
   sassc-rails (~> 2.1)
   simplecov
