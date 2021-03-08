@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'uglifier'
+
 Rails.application.configure do
   config.logstasher.enabled = true
   #
