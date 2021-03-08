@@ -4,8 +4,8 @@ $(document).ready(function() {
     var cable = ActionCable.createConsumer(hostCableUrl);
     var connection = cable.subscriptions.create(
         { 
-            channel: `CourseTemplateRefreshChannel`, 
-            courseTemplateId: `${window.courseTemplateId}`
+            channel: "CourseTemplateRefreshChannel", 
+            courseTemplateId: window.courseTemplateId
         }, 
         {
             connected() {
@@ -28,13 +28,12 @@ $(document).ready(function() {
                 if(cableData.message) {
                     var refreshRow = document.createElement("DIV");
                     refreshRow.classList.add('row');
-                    refreshRow.innerHTML = `<div class='col-md-4'>
-                                                ${cableData.message}
-                                            </div>
-                                            <div class='col-md'>
-                                                time (ms): ${cableData.time}
-                                            </div>
-                                            `;
+                    refreshRow.innerHTML = "<div class='col-md-4'>" +
+                                                cableData.message +
+                                            "</div>" +
+                                            "<div class='col-md'>" +
+                                                "time (ms): " + cableData.time +
+                                            "</div>";
                     refreshDiv.appendChild(refreshRow);
 
                     var progressBar = document.getElementById('refresh-progress-bar');
@@ -44,7 +43,7 @@ $(document).ready(function() {
                     progressBar.innerHTML = newPcg + ' %';
                 }
                 if ((Number(cableData.percent_done) === 1 || Number(cableData.percent_done) === 0) && cableData.course_template_refresh_id) {
-                    window.location.href = window.location.href.split('?')[0] + `?generate_report=${cableData.course_template_refresh_id}`;
+                    window.location.href = window.location.href.split('?')[0] + "?generate_report=" + cableData.course_template_refresh_id;
                 }
             }
         }
