@@ -128,6 +128,8 @@ class SubmissionsController < ApplicationController
       error_msg_locale: params[:error_msg_locale]
     }
 
+    low_priority = Submission.where(created_at: (Time.now - 10.minutes)..Time.now, user: current_user).count > 3
+
     unless errormsg
       @submission = Submission.new(
         user: current_user,
@@ -141,7 +143,8 @@ class SubmissionsController < ApplicationController
         message_for_reviewer: params[:request_review] ? (params[:message_for_reviewer] || '') : '',
         client_time: params[:client_time] ? Time.at(params[:client_time].to_i) : nil,
         client_nanotime: params[:client_nanotime],
-        client_ip: request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip
+        client_ip: request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip,
+        processing_priority: low_priority ? -100 : 0
       )
 
       authorize! :create, @submission

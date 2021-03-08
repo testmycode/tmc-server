@@ -303,7 +303,7 @@ class Submission < ApplicationRecord
     end
   end
 
-  def set_to_be_reprocessed!(priority = -1)
+  def set_to_be_reprocessed!(priority = -200)
     self.processed = false
     self.times_sent_to_sandbox = 0
     self.processing_priority = priority

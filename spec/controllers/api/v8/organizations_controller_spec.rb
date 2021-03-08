@@ -15,7 +15,7 @@ describe Api::V8::OrganizationsController, type: :controller do
       expect(r[0]['name']).to eq(organization.name)
       expect(r[0]['information']).to eq(organization.information)
       expect(r[0]['slug']).to eq(organization.slug)
-      expect(r[0]['logo_path']).to eq(organization.logo.url)
+      expect(r[0]['logo_path']).to eq(organization.logo_path)
       expect(r[0]['pinned']).to eq(organization.pinned)
     end
 
