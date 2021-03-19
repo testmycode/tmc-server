@@ -352,7 +352,8 @@ class Exercise < ApplicationRecord
   end
 
   def unlocked_for?(user, resolve_unlocks = true)
-    !requires_unlock? || time_unlocked_for(user, resolve_unlocks)
+    res = !requires_unlock? || time_unlocked_for(user, resolve_unlocks)
+    !!res
   end
 
   def unlockable_for?(user)

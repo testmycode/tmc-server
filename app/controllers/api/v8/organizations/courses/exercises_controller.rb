@@ -123,6 +123,7 @@ module Api
               deadline: ex.deadline_for(current_user),
               soft_deadline: ex.soft_deadline_for(current_user),
               expired: ex.expired_for?(current_user),
+              unlocked: ex.unlocked_for?(current_user),
               disabled: ex.disabled?,
               completed: ex.completed_by?(current_user),
               model_solution_token_used_on_this_exercise: model_solution_token_used_on_this_exercise,
