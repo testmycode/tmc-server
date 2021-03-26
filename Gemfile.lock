@@ -213,7 +213,9 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2021.0212)
-    mimemagic (0.3.5)
+    mimemagic (0.3.9)
+      nokogiri (~> 1)
+      rake
     mimic (0.4.4)
       json
       plist (~> 3.1.0)
@@ -232,7 +234,7 @@ GEM
     netrc (0.11.0)
     newrelic_rpm (6.15.0)
     nio4r (2.5.5)
-    nokogiri (1.11.1)
+    nokogiri (1.11.2)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     os (1.1.1)
