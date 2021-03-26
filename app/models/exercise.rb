@@ -214,7 +214,8 @@ class Exercise < ApplicationRecord
 
   # Whether the user may download the exercise ZIP file
   def downloadable_by?(user)
-    user.assistant?(course) || visible_to?(user) && unlocked_for?(user)
+    user.administrator? || user.teacher?(course.organization) || user.assistant?(course) ||
+      visible_to?(user) && unlocked_for?(user)
   end
 
   # Whether the exercise has been published (it may still be hidden)
