@@ -87,7 +87,9 @@ module Api
                 available_points: ex.available_points,
                 deadline: ex.deadline_for(current_user),
                 soft_deadline: ex.soft_deadline_for(current_user),
+                downloadable: ex.downloadable_by?(current_user),
                 expired: ex.expired_for?(current_user),
+                unlocked: ex.unlocked_for?(current_user),
               }
             end
 
@@ -122,6 +124,7 @@ module Api
               publish_time: ex.publish_time,
               deadline: ex.deadline_for(current_user),
               soft_deadline: ex.soft_deadline_for(current_user),
+              downloadable: ex.downloadable_by?(current_user),
               expired: ex.expired_for?(current_user),
               unlocked: ex.unlocked_for?(current_user),
               disabled: ex.disabled?,
