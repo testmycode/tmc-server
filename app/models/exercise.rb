@@ -89,6 +89,7 @@ class Exercise < ApplicationRecord
     property :solution_zip_url, type: :string, example: 'http://tmc.mooc.fi/api/v8/core/submissions/1337/download'
   end
 
+  attribute :docker_image, :string, default: 'eu.gcr.io/moocfi-public/tmc-sandbox-tmc-langs-rust'
   belongs_to :course
 
   has_many :available_points, dependent: :delete_all

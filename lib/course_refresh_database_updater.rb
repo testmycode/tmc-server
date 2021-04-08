@@ -114,11 +114,15 @@ class CourseRefreshDatabaseUpdater
       end
 
       def set_docker_image
+        default_image = Exercise.new.docker_image
         @rust_data['exercises'].each do |exercise|
           ex = @course.exercises.find { |e| e.name == exercise['name'] }
           next unless ex
-          # Set docker_image if sandbox_image in tmcproject-yml, otherwise uses schema.rb default (if new exercise).
-          ex.docker_image = exercise['tmcproject-yml']['sandbox_image'] if (exercise['tmcproject-yml'] || {}).include? 'sandbox_image'
+          if (exercise['tmcproject-yml'] || {}).include? 'sandbox_image'
+            ex.docker_image = exercise['tmcproject-yml']['sandbox_image']
+          else
+            ex.docker_image = default_image
+          end
         end
       end
 
