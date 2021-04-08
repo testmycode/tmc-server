@@ -60,6 +60,7 @@ class CourseRefreshDatabaseUpdater
           measure_and_log :add_records_for_new_exercises
           measure_and_log :delete_records_for_removed_exercises
           measure_and_log :set_exercise_options
+          measure_and_log :set_docker_image
           measure_and_log :update_available_points
           measure_and_log :update_exercise_checksums
           measure_and_log :invalidate_unlocks
@@ -109,6 +110,15 @@ class CourseRefreshDatabaseUpdater
           e.has_tests = true # we don't yet detect whether an exercise includes tests
           e.options = {} # exercise metadata.yml reading support removed, set default options
           e.disabled! if e.new_record? && e.course.refreshed? # disable new exercises
+        end
+      end
+
+      def set_docker_image
+        @rust_data['exercises'].each do |exercise|
+          ex = @course.exercises.find { |e| e.name == exercise['name'] }
+          next unless ex
+          # Set docker_image if sandbox_image in tmcproject-yml, otherwise uses schema.rb default (if new exercise).
+          ex.docker_image = exercise['tmcproject-yml']['sandbox_image'] if (exercise['tmcproject-yml'] || {}).include? "sandbox_image"
         end
       end
 
