@@ -118,7 +118,7 @@ class CourseRefreshDatabaseUpdater
           ex = @course.exercises.find { |e| e.name == exercise['name'] }
           next unless ex
           # Set docker_image if sandbox_image in tmcproject-yml, otherwise uses schema.rb default (if new exercise).
-          ex.docker_image = exercise['tmcproject-yml']['sandbox_image'] if (exercise['tmcproject-yml'] || {}).include? "sandbox_image"
+          ex.docker_image = exercise['tmcproject-yml']['sandbox_image'] if (exercise['tmcproject-yml'] || {}).include? 'sandbox_image'
         end
       end
 

@@ -1,4 +1,4 @@
-  
+
 # frozen_string_literal: true
 
 # Be sure to restart your server when you modify this file.
@@ -8,7 +8,7 @@ Rails.application.config.assets.version = '2.0'
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-Rails.application.config.assets.precompile += ["manifest.js"]
+Rails.application.config.assets.precompile += ['manifest.js']
 
 # Include vendor images
 # Rails.application.config.assets.precompile << proc do |path|
