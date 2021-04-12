@@ -29,7 +29,7 @@ Rails.application.configure do
 
   # Which storage.yml to use
   config.active_storage.service = :local
-  
+
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.

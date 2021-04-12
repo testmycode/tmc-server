@@ -197,5 +197,4 @@ class UsersController < ApplicationController
       end
       changes
     end
-
 end

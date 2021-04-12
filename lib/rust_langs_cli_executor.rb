@@ -47,7 +47,7 @@ module RustLangsCliExecutor
 
           @parsed_data = self.process_refresh_command_output(data)
           if data['output-kind'] == 'status-update'
-            ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", @parsed_data)
+            ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", @parsed_data) unless @parsed_data[:percent_done] == 1.0
             @course_refresh.percent_done = @parsed_data[:percent_done]
             @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
           end
