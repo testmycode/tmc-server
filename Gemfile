@@ -22,7 +22,7 @@ gem 'natcmp', '~> 1.4'
 gem 'newrelic_rpm', '~> 6.15'
 gem 'pdfkit', '~> 0.8', require: false
 gem 'pg', '~> 1.2'
-gem 'pghero', '~> 2.7'
+gem 'pghero', '~> 2.8'
 gem 'rack-attack', '~> 6.5', require: false
 gem 'rack-cors', '~> 1.1'
 gem 'rack-mini-profiler', '~> 2.3'
@@ -67,7 +67,7 @@ group :development, :test do
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
   gem 'rubocop', '~> 1.5.2', require: false # HoundCI requires 1.5.2
-  gem 'rubocop-rails_config', '~> 1'
+  gem 'rubocop-rails_config', '~> 1.2.2' # Rubocop locked
   gem 'ruby-prof', '~> 1.4' # for performance tests
   gem 'simplecov', require: false
 end
