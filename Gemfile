@@ -11,7 +11,7 @@ gem 'activerecord-session_store', '~> 2.0'
 gem 'argon2', '~> 2.0'
 gem 'bootstrap', '~> 4.6'
 gem 'cancancan', '~> 3.2'
-gem 'doorkeeper', '~> 5.4'
+gem 'doorkeeper', '~> 5.5'
 gem 'file_validators' # Used to validate organization logo
 gem 'font-awesome-rails'
 gem 'google_drive', '~> 3.0', require: false
@@ -22,7 +22,7 @@ gem 'natcmp', '~> 1.4'
 gem 'newrelic_rpm', '~> 6.15'
 gem 'pdfkit', '~> 0.8', require: false
 gem 'pg', '~> 1.2'
-gem 'pghero', '~> 2.7'
+gem 'pghero', '~> 2.8'
 gem 'rack-attack', '~> 6.5', require: false
 gem 'rack-cors', '~> 1.1'
 gem 'rack-mini-profiler', '~> 2.3'
@@ -46,13 +46,13 @@ end
 group :development, :test do
   gem 'capybara', '~> 3.35'
   gem 'factory_bot_rails', '~> 6.1'
-  gem 'puma', '~> 5.1'
+  gem 'puma', '~> 5.2'
   # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
   gem 'rspec-activemodel-mocks', '~> 1.1'
   gem 'rspec-core', '~> 3.10'
-  gem 'rspec-rails', '~> 4.0'
+  gem 'rspec-rails', '~> 5.0'
   gem 'rails-controller-testing'
   # gem 'selenium-webdriver', '~> 2.44.0'
   gem 'irb'
@@ -67,7 +67,7 @@ group :development, :test do
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
   gem 'rubocop', '~> 1.5.2', require: false # HoundCI requires 1.5.2
-  gem 'rubocop-rails_config', '~> 1'
+  gem 'rubocop-rails_config', '~> 1.2.2' # Rubocop locked
   gem 'ruby-prof', '~> 1.4' # for performance tests
   gem 'simplecov', require: false
 end
