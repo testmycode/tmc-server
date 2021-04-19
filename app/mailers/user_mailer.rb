@@ -31,6 +31,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Επιβεβαιώστε την ηλεκτρονική σας διεύθυνση για να ξεκινήσετε τον κύκλο μαθημάτων «Elements of AI».' if language == 'el'
     subject = 'Потвърдете своя имейл, за да започнете курса „Elements of AI“.' if language == 'bg'
     subject = 'Conferma il tuo indirizzo e-mail per cominciare il corso Elements of AI' if language == 'it'
+    subject = 'Staðfestu netfangið þitt til að geta byrjað á Elements of AI' if language == 'is'
     subject = "#{origin}: #{subject}" if origin
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[\.\/]/, '')
