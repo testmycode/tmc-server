@@ -11,6 +11,14 @@ require 'rust_langs_cli_executor'
 class RemoteSandbox
   attr_reader :baseurl
 
+  class InternalSandboxError < StandardError
+    attr_reader :object
+
+    def initialize(object)
+      @object = object
+    end
+  end
+
   class SandboxUnavailableError < StandardError; end
 
   def initialize(baseurl, experimental = true)
@@ -76,9 +84,20 @@ class RemoteSandbox
         submission.save!
       rescue StandardError => e
         puts e
-        raise SandboxUnavailableError
+        begin
+          # Try to parse the response to see if the error originated from within the sandbox.
+          @parsed = JSON.parse e.response
+        rescue StandardError
+          raise SandboxUnavailableError
+        end
+        raise InternalSandboxError.new(@parsed['error'])
       end
     rescue SandboxUnavailableError
+      raise
+    rescue InternalSandboxError => e
+      submission.pretest_error = e.object
+      submission.processed = true
+      submission.save!
       raise
     rescue StandardError
       Rails.logger.info "Submission #{submission.id} could not be packaged: #{Regexp.last_match(1)}"
