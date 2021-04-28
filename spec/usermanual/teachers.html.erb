@@ -60,7 +60,7 @@ require 'cgi' # for escapeHTML
 
     <h2>Overview</h2>
     <p>
-      A teacher is a user that controls his own organization. An organization can have several teachers, and they all can create and manage courses. One teacher can also belong to several organizations.
+      A teacher is a user that controls their own organization. An organization can have several teachers, and they all can create and manage courses. One teacher can also belong to several organizations.
     </p>
 
     <p>
@@ -74,10 +74,6 @@ require 'cgi' # for escapeHTML
     <h2>Creating an organization</h2>
 
     <p>
-      <b>NB: If you are using the TestMyCode service hosted by the University of Helsinki, the correct TestMyCode address for custom organisations is <a href="https://tmc.mooc.fi/" target="_blank">https://tmc.mooc.fi/</a>. Note that user accounts created for <a href="https://tmc.mooc.fi/mooc" target="_blank">https://tmc.mooc.fi/mooc</a> are <b>not</b> available here. You are free to reuse the same username and email if you wish to do so.</b>
-    </p>
-
-    <p>
       When you are rolling out TMC for your own teaching, the first step is to create your own organization. If your organization is big, such as a larger school, it's good to check from the front page if the organization already exists in the system. If it is already found, you should contact the other teachers and ask them for access to your organization. We would like to avoid making multiple organisations for a single high school, for example.
     </p>
 
@@ -86,9 +82,9 @@ require 'cgi' # for escapeHTML
     </p>
 
 <%
-  visit '/'
-  fill_in 'session_login', with: 'teacher'
-  fill_in 'session_password', with: 'teacher'
+  visit '/login'
+  fill_in 'username', with: 'teacher'
+  fill_in 'password', with: 'teacher'
   click_on 'Sign in'
 %>
 <%
@@ -110,7 +106,7 @@ require 'cgi' # for escapeHTML
     <li><b>Name</b> of the organization that will be seen in the TMC pages</li>
     <li><b>Information</b>, a longer description of your organization, seen on this organization's page</li>
     <li><b>Website</b> of your organization</li>
-    <li><b>Organization ID</b>, a short word that will be part of your organization's url. You will have an opportunity to preview organization's url</li>
+    <li><b>Organization ID</b>, a short word that will be part of your organization's url. You will have an opportunity to preview organization's url. Note that the ID must not contain hyphens ('-' character)</li>
     <li><b>Logo</b> for your organization, seen on this organization's page</li>
   </ul>
 </p>
@@ -135,22 +131,24 @@ require 'cgi' # for escapeHTML
 </p>
 
 <%
-  visit '/'
   click_on 'Sign out'
-  fill_in 'session_login', with: 'admin'
-  fill_in 'session_password', with: 'admin'
+  visit '/login'
+  fill_in 'username', with: 'admin'
+  fill_in 'password', with: 'admin'
   click_on 'Sign in'
 
+  visit '/'
   click_on 'Show'
   click_on 'Verify'
   expect(page).to have_content 'Organization Helsingin yliopisto is now verified.'
 
-  visit '/'
   click_on 'Sign out'
-  fill_in 'session_login', with: 'teacher'
-  fill_in 'session_password', with: 'teacher'
+  visit '/login'
+  fill_in 'username', with: 'teacher'
+  fill_in 'password', with: 'teacher'
   click_on 'Sign in'
 
+  visit '/'
   highlight 'a:contains("Helsingin yliopisto")'
 %>
 <%= screenshot %>
@@ -172,12 +170,12 @@ require 'cgi' # for escapeHTML
 %>
 
 <p>
-  To add a new teacher, you will have to know the teacher's exact username in TMC system. Type the username
+  To add a new teacher, you will have to know the teacher's email address linked to their TMC account. Type the email
   and click 'Add a new teacher'.
 </p>
 
 <%
-   fill_in 'username', with: 'professor'
+   fill_in 'email', with: 'professor@example.com'
    highlight '[value="Add a new teacher"]'
 %>
 <%= screenshot %>
@@ -231,7 +229,7 @@ require 'cgi' # for escapeHTML
   <ul>
     <li>
       Course <b>Name</b> is a technical name, which is shown in IDE plugins (such as NetBeans) and
-      in directory structures. The name can't contain whitespaces. This setting can <b>not</b> be changed later.
+      in directory structures. The name can't contain whitespaces or hyphens. This setting can <b>not</b> be changed later.
     </li>
     <li><b>Title</b> is a human readable (prettier) version of the name. It may contain whitespaces, and is shown on TMC pages.</li>
     <li><b>Description</b> is place for short information about the course.</li>
@@ -252,60 +250,19 @@ require 'cgi' # for escapeHTML
   click_on 'Add Course'
 %>
 
-<h3>Phase 3, timing</h3>
-
-<p>
-  Here you can set the basic timing for the course's exercise sets. Some suggestions are given. Full customization can be made later on using the advanced settings: see <a href="#Course progression">Course progression</a> for details.
-</p>
-
-<p>
-  The unlock condition states when the exercises are available. You can either have everything open from start, or have each set require that certain percentage of the previous set is completed.
-</p>
-
-<p>
-  Deadline is the moment, when the submissions has to be made. By default, exact deadline time is the end of the day set. TMC refuses to accept any attempts after that. You can choose to have no deadlines at all, weekly deadlines or just single deadline for all exercises. Insert first set deadline if needed. You can also set "soft" deadlines later on using the advanced settings.
-</p>
-
-<p>
-  For example, you can choose to have 80% of previous unlock condition, and weekly deadlines starting from 1.1.2017. By clicking 'Fill and preview', you will see the settings in the preview section.
-</p>
-
-<%
-  choose 'unlock_type_percent_from_previous'
-  fill_in 'first_set_date_', with: '1.1.2017'
-  choose 'deadline_type_weekly_deadlines'
-
-  highlight '#unlock_type_percent_from_previous'
-  highlight '#deadline_type_weekly_deadlines'
-  highlight '#first_set_date_'
-  highlight '[value="Fill and preview"]'
-  highlight '[value="Accept and continue"]'
-%>
-<%= screenshot %>
-
-<p>
-  You can also manually adjust the settings in the preview section. After you have verified that settings look good, click 'Accept and continue'.
-</p>
-
-<%
-  click_on 'Accept and continue'
-%>
-
-  <h3>Phase 4, assistants</h3>
+  <h3>Phase 3, assistants</h3>
 
 <%= screenshot %>
 
 <p>
-  If you already know your course assistants, you can add them to the course now. Just fill in their TMC usernames and click 'Add new assistant'. You can add more assistants later. When you are ready, click 'Continue'.
+  If you already know your course assistants, you can add them to the course now. Just fill in their email addresses linked to their TMC accounts and click 'Add new assistant'. You can add more assistants later. When you are ready, click 'Continue'.
 </p>
 
 <%
   click_on 'Continue'
-  highlight '[value="Fill and preview"]'
-  highlight '[value="Accept and continue"]'
 %>
 
-  <h3>Phase 5, finish</h3>
+  <h3>Phase 4, finish</h3>
 
 <%= screenshot %>
 
@@ -317,7 +274,7 @@ require 'cgi' # for escapeHTML
 </p>
 
 <%
-  click_on 'Finish'
+  click_on 'Publish now'
 %>
   <h3>The course main page</h3>
 
@@ -390,7 +347,7 @@ require 'cgi' # for escapeHTML
 <%
   visit '/org/hy/courses/1/'
   click_on 'Manage assistants'
-  fill_in 'username', with: 'oldassistant'
+  fill_in 'email', with: 'oldassistant'
   click_on 'Add new assistant'
 
 %>
@@ -407,12 +364,12 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
 <p>
-  Adding a new course assistant works same way as adding new teacher: enter the assistant's username and click 'Add new assistant'.
+  Adding a new course assistant works same way as adding new teacher: enter the assistant's email and click 'Add new assistant'.
 </p>
 
 <%
    click_on 'Manage assistants'
-   fill_in 'username', with: 'assistant'
+   fill_in 'email', with: 'assistant'
    highlight '[value="Add a new assistant"]'
 %>
 <%= screenshot %>
@@ -438,13 +395,13 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    Deadlines can be expressed as a time and date, in which case they are shared by all students, or alternatively set as time spans, so that each students has a certain time to finish the unlocked exercise after he or she first unlocks it.
+    Deadlines can be expressed as a time and date, in which case they are shared by all students, or alternatively set as time spans, so that each student has a certain time to finish the unlocked exercise after the exercise is unlocked for the student.
   </p>
 
   <h4>Unlock conditions</h4>
 
   <p>
-    The unlock condition determines when the exercise is available for the student. Two most common cases are fixed date (exercises open for all students on a certain date), or some percentage of previous exercises completed (each student can progress when he or she has completed enough of the previous assignments).
+    The unlock condition determines when the exercise is available for the student. Two most common cases are fixed date (exercises open for all students on a certain date), or some percentage of previous exercises completed (each student can progress when they have completed enough of the previous assignments).
   </p>
 
   <h3>Setting deadlines</h3>
@@ -769,7 +726,7 @@ Some common examples:
 <%= screenshot %>
 
 <p>
-  This page show a summary of all students and exercise groups. If you want to see single student's data, click his or her username.
+  This page show a summary of all students and exercise groups. If you want to see single student's data, click the link 'Profile' on their row in the points list.
 </p>
 
 <%
@@ -779,7 +736,7 @@ Some common examples:
 <%= screenshot %>
 
 <p>
-  On the student's page you can see summary of his or her progress on all courses. At the bottom of the page there's list of his submission history. If you want to check some single submission's data, you can click the corresponding 'Details' link.
+  On the student's page you can see summary of that student's progress on all courses. At the bottom of the page there's list of the student's submission history. If you want to check some single submission's data, you can click the corresponding 'Details' link.
 </p>
 
 
