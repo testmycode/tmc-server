@@ -90,13 +90,16 @@ class RemoteSandbox
         rescue StandardError
           raise SandboxUnavailableError
         end
+        if @parsed['status']
+          # If sandbox returns status key, it is busy and unavailable.
+          raise SandboxUnavailableError
+        end
         raise InternalSandboxError.new(@parsed['error'])
       end
     rescue SandboxUnavailableError
       raise
     rescue InternalSandboxError => e
       submission.pretest_error = e.object
-      submission.processed = true
       submission.save!
       raise
     rescue StandardError

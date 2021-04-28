@@ -27,7 +27,12 @@ class SubmissionProcessor
       if submission.times_sent_to_sandbox < Submission.max_attempts_at_processing
         process_submission(submission)
       else
-        submission.pretest_error = "Tried to process #{Submission.max_attempts_at_processing} times but failed. This is a system error"
+        msg = "Tried to process #{Submission.max_attempts_at_processing} times but failed. This is a system error"
+        if submission.pretest_error
+          submission.pretest_error = msg + "\n" + submission.pretest_error
+        else
+          submission.pretest_error = msg
+        end
         Rails.logger.warn "Submission #{submission.id} marked permanently failed."
         submission.processed = true
         submission.secret_token = nil
