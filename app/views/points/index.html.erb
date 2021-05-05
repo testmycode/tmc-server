@@ -25,6 +25,7 @@
       <thead>
         <tr>
           <th></th>
+          <th></th>
           <th colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>">Number of students</th>
           <% if !@summary[:sheets].empty? %>
             <th colspan="<%= @summary[:sheets].count %>">Total points/possible</th>
@@ -34,6 +35,7 @@
           <% end %>
         </tr>
         <tr class="table-totals">
+          <td>-</td>
           <td>-</td>
           <% nstudents = @summary[:users].length %>
           <td colspan="<%= (@user_fields ? @user_fields.length : 0) + 1 %>"><%= nstudents %></td>
