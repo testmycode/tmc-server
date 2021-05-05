@@ -33,25 +33,30 @@ require 'cgi' # for escapeHTML
 %>
 
   <%
+    Organization.destroy_all
+
     FactoryBot.create :user, login: 'teacher', password: 'teacher'
     FactoryBot.create :user, login: 'professor', password: 'professor'
     FactoryBot.create :user, login: 'oldassistant', password: 'oldassistant'
-    FactoryBot.create :admin, login: 'admin', password: 'admin'
-    FactoryBot.create :accepted_organization, name: 'Some organization', information: 'Some information'
+    admin = FactoryBot.create :admin, login: 'admin', password: 'admin'
 
     repo_path = "#{::Rails.root}/tmp/tests/fake_remote_repo"
+    repo_url = "file://#{repo_path}"
     create_bare_repo(repo_path)
-    clone_path = repo_path + '-wc'
-    clone_repo(repo_path, clone_path)
-    repo = GitRepo.new(clone_path)
-    repo.copy_simple_exercise('Week1/HelloWorld')
-    repo.copy_simple_exercise('Week1/SimpleExercise')
-    repo.copy_simple_exercise('Week2/HelloWorldAdvanced')
-    repo.add_commit_push
 
-    FactoryBot.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_path
-    FactoryBot.create :course_template, name: 'prog102', title: 'Programming 102', source_url: repo_path
-    FactoryBot.create :course_template, name: 'skynet', title: 'Skynet laboratory', source_url: repo_path
+    template = FactoryBot.create :course_template, name: 'prog101', title: 'Programming 101', source_url: repo_url
+    course = FactoryBot.create :course, name: 'TestCourse', title: 'TestCourse', source_backend: 'git', course_template: template, source_url: repo_url
+
+    local_clone = clone_course_repo(course)
+
+    local_clone.copy_fixture_exercise('SimpleExerciseWithSolutionsAndStubs', 'Week1/HelloWorld')
+    local_clone.copy_fixture_exercise('SimpleExerciseWithSolutionsAndStubs', 'Week1/SimpleExercise')
+    local_clone.copy_fixture_exercise('SimpleExerciseWithSolutionsAndStubs', 'Week2/HelloWorldAdvanced')
+    local_clone.add_commit_push
+
+    course.refresh(admin.id)
+    course.reload
+    template.reload
   %>
 
   <h1>Teacher Manual</h1>
@@ -68,7 +73,7 @@ require 'cgi' # for escapeHTML
     </p>
 
     <p>
-      Courses can also have course assistants. Course assistants can do the same things as teachers, but only for specified courses. A teacher is an per-organisation role, while the course assistant is a per-course role.
+      Courses can also have course assistants. Course assistants can do the same things as teachers, but only for specified courses. A teacher is a per-organisation role, while the course assistant is a per-course role.
     </p>
 
     <h2>Creating an organization</h2>
@@ -78,7 +83,7 @@ require 'cgi' # for escapeHTML
     </p>
 
     <p>
-      To create a new organization, you have to be logged in at <a href="https://tmc.mooc.fi" target="_blank">https://tmc.mooc.fi</a>. If needed, click the <em>Sign up</em> link and create your personal account. When logged in, go to url </i>/org/new</i> in the TMC system, (for example <a href="http://tmc.mooc.fi/org/new" target="_blank">http://tmc.mooc.fi/org/new</a>).
+      To create a new organization, you have to be logged in at <a href="https://tmc.mooc.fi" target="_blank">https://tmc.mooc.fi</a>. If needed, click the <em>Sign up</em> link and create your personal account. When logged in, go to the url <a href="https://tmc.mooc.fi/setup/new" target="_blank">https://tmc.mooc.fi/setup/new</a> in the TMC system to create a new organization.
     </p>
 
 <%
@@ -116,7 +121,7 @@ require 'cgi' # for escapeHTML
   <ul>
     <li><b>Contact person name</b>, who is responsible for this organization. Also some more specific information can be included</li>
     <li><b>Phone number</b> for the contact person</li>
-    <li><b>Email</b> for the contact person. If you are from an education institution, please use an email for that institution if possible.</li>
+    <li><b>Email</b> for the contact person. If you are from an educational institution, please use an email for that institution if possible.</li>
   </ul>
 </p>
 
@@ -131,7 +136,7 @@ require 'cgi' # for escapeHTML
 </p>
 
 <%
-  click_on 'Sign out'
+  visit '/logout'
   visit '/login'
   fill_in 'username', with: 'admin'
   fill_in 'password', with: 'admin'
@@ -139,10 +144,11 @@ require 'cgi' # for escapeHTML
 
   visit '/'
   click_on 'Show'
+  screenshot
   click_on 'Verify'
   expect(page).to have_content 'Organization Helsingin yliopisto is now verified.'
 
-  click_on 'Sign out'
+  visit '/logout'
   visit '/login'
   fill_in 'username', with: 'teacher'
   fill_in 'password', with: 'teacher'
@@ -156,7 +162,7 @@ require 'cgi' # for escapeHTML
 <h2>Adding new teachers</h2>
 
 <p>
-  As a teacher, you can list, add and remove teachers in your organization. From the organization front page, you can find link to list all the teachers. Remember that all teachers in the organization have same access rights as you. We recommend you add any Teaching Assistants etc. as <a href="#course_assistants">Course assistants</a>.
+  As a teacher, you can list, add and remove teachers in your organization. From your organization's front page, you can find a link to list all the teachers. Remember that all teachers in the organization have same access rights as you. We recommend you add any Teaching Assistants etc. as <a href="#course_assistants">Course assistants</a>.
 </p>
 
 <%
@@ -181,7 +187,7 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
 <p>
-  You can also remove an existing teacher by clicking the 'Remove' button next to their name.
+  You can also remove existing teachers by clicking the 'Remove' button next to their name.
 </p>
 
 <%
@@ -228,7 +234,7 @@ require 'cgi' # for escapeHTML
   On the following form the fields will be prefilled with template defaults. You may change these fields to suit your needs.
   <ul>
     <li>
-      Course <b>Name</b> is a technical name, which is shown in IDE plugins (such as NetBeans) and
+      Course <b>Name</b> is a technical name, which is shown in IDE plugins (such as TMCBeans) and
       in directory structures. The name can't contain whitespaces or hyphens. This setting can <b>not</b> be changed later.
     </li>
     <li><b>Title</b> is a human readable (prettier) version of the name. It may contain whitespaces, and is shown on TMC pages.</li>
@@ -274,7 +280,8 @@ require 'cgi' # for escapeHTML
 </p>
 
 <%
-  click_on 'Publish now'
+  click_on 'Finish'
+  click_on 'Enable course'
 %>
   <h3>The course main page</h3>
 
@@ -285,7 +292,7 @@ require 'cgi' # for escapeHTML
 </p>
 
 <p>
-  The main course page is divided into sections. First, you have the general management part, which contains links to exercise, deadline, unlock condition, assistant and general course option management screens. After that, there is the exercise list, and at the bottom, you can find yours students' submissions. Remember that as a teacher (or assistant), you will see all submissions from all students, while students see only their own submissions.
+  The main course page is divided into sections. First, you have the general management part, which contains links to exercise, deadline, unlock condition, assistant and general course option management screens. After that, there is the exercise list, and at the bottom, you can find your students' submissions. Remember that as a teacher (or an assistant), you will see all submissions from all students, while students see only their own submissions.
 </p>
 
 <h2>Editing course details</h2>
@@ -312,7 +319,7 @@ require 'cgi' # for escapeHTML
 </p>
 
 <p>
-  If external score board url is set, it is shown instead of general tmc points page, when students click 'View points' link in the course page.
+  If an external score board url is set, it is shown instead of the general tmc points page when students click the 'View points' link in the course page.
 </p>
 
   <h2>Disabling the course</h2>
@@ -321,7 +328,7 @@ require 'cgi' # for escapeHTML
     A course may be disabled so that it won't accept submissions. You might want to do this if you're not satisified with your course and wish to start a new one, if you want to configure your course without worrying about students using your course, or if you want to force students to take a vacation. Disabled courses can be re-enabled at any time.
   </p>
 
-<p>Simply click the 'Disable Course' link to disable course.</p>
+<p>Simply click the 'Disable Course' link to disable the course.</p>
 
 <%
    visit '/org/hy/courses/1'
@@ -347,13 +354,13 @@ require 'cgi' # for escapeHTML
 <%
   visit '/org/hy/courses/1/'
   click_on 'Manage assistants'
-  fill_in 'email', with: 'oldassistant'
+  fill_in 'email', with: 'oldassistant@example.com'
   click_on 'Add new assistant'
 
 %>
 
 <p>
-  Course assistants have teacher permissions for single course, instead of the whole organization. You can add course assistants by going to course page and clicking the 'Manage assistants' button.
+  Course assistants have teacher permissions for a single course, instead of the whole organization. You can add course assistants by going to the course page and clicking the 'Manage assistants' button.
 </p>
 
 
@@ -364,12 +371,12 @@ require 'cgi' # for escapeHTML
 <%= screenshot %>
 
 <p>
-  Adding a new course assistant works same way as adding new teacher: enter the assistant's email and click 'Add new assistant'.
+  Adding a new course assistant works same way as adding a new teacher: enter the assistant's email and click 'Add new assistant'.
 </p>
 
 <%
    click_on 'Manage assistants'
-   fill_in 'email', with: 'assistant'
+   fill_in 'email', with: 'assistant@example.com'
    highlight '[value="Add a new assistant"]'
 %>
 <%= screenshot %>
@@ -387,7 +394,7 @@ require 'cgi' # for escapeHTML
   <h4>Deadlines</h4>
 
   <p>
-    There are 2 kind of deadlines. A <b>soft deadline</b> is a deadline which is shown for students, but TMC will accept and process submissions even after that, only flagging them as late. A <b>hard deadline</b> is a strict deadline: when it has passed, TMC refuses to process any submissions.
+    There are two kinds of deadlines. A <b>soft deadline</b> is a deadline which is shown for students, but TMC will accept and process submissions even after that, only flagging them as late. A <b>hard deadline</b> is a strict deadline: when it has passed, TMC refuses to process any submissions.
   </p>
 
   <p>
@@ -401,7 +408,7 @@ require 'cgi' # for escapeHTML
   <h4>Unlock conditions</h4>
 
   <p>
-    The unlock condition determines when the exercise is available for the student. Two most common cases are fixed date (exercises open for all students on a certain date), or some percentage of previous exercises completed (each student can progress when they have completed enough of the previous assignments).
+    The unlock condition determines when the exercise is available for the student. Two most common cases are fixed date (exercises open for all students on a certain date), or some percentage of previous exercises completed (each student can progress when they have completed enough of the previous exercises).
   </p>
 
   <h3>Setting deadlines</h3>
@@ -437,11 +444,11 @@ require 'cgi' # for escapeHTML
   <hr>
 
   <p>
-    Another way to setup deadlines is to use unique unlock-based deadlines. It means that deadline for each student is based on the time they unlocked the exercise (see <a href="#unlock_conditions">Unlock conditions</a>). For example, to give students 2 weeks to complete an exercise after it becomes available, set the deadline to <code>unlock + 2 weeks</code>.
+    Another way to setup deadlines is to use unique unlock-based deadlines. It means that a deadline for each student is based on the time they unlocked the exercise (see <a href="#unlock_conditions">Unlock conditions</a>). For example, to give students 2 weeks to complete an exercise after it becomes available, set the deadline to <code>unlock + 2 weeks</code>.
   </p>
 
   <p>
-    All possible valuers for unlock-based deadline are:<br>
+    All possible values for unlock-based deadlines are:<br>
     <br>
     <code>unlock + &lt;N&gt; [minute[s]|hour[s]|day[s]|week[s]|month[s]|year[s]]</code>.
   </p>
@@ -502,7 +509,7 @@ require 'cgi' # for escapeHTML
 <h3>Setting unlock conditions</h3>
 
 <p>
-  If exercise or exercise group has an unlock condition attached to it and it has not passed yet, exercise will not accept submissions. If there are no unlocks set, exercise is always active.
+  If an exercise or exercise group has an unlock condition attached to it and it has not passed yet, the exercise will not accept submissions. If there are no unlocks set, the exercise is always active.
 </p>
 
 <p>
@@ -567,7 +574,7 @@ Some common examples:
 <h2>Code review</h2>
 
 <p>
-  Code reviewing is a process, in which a course teacher or a assistant goes over the code in a submitted answer and reviews it, providing comments for the students. Some exercises require a codereview to be completed. Students can also manully request a code review.
+  Code reviewing is a process in which a course teacher or an assistant goes over the code in a submitted answer and reviews it, providing comments for the students. Some exercises require a codereview to be completed. Students can also manually request a code review.
 </p>
 <p>
   If there are any unreviewed requests, the course front page has a link 'n code view requested'. You can start the review process by clicking on that link. Furthermore, the submission list on the bottom of the page shows whether each submission requires a review.
@@ -629,7 +636,7 @@ Some common examples:
 <h2>Managing feedback questions</h2>
 
 <p>
-  Every course can have feedback questions, which are show to the student after a successful submission. A question can be either free text answer or number value for selected range. For example, a numeric question could be "How difficult was this exercise? (1-5)", and a text question "What problems you had in this exercise?".
+  Every course can have feedback questions, which are shown to the student after a successful submission. A question can be either free text answer or number value for selected range. For example, a numeric question could be "How difficult was this exercise? (1-5)", and a text question "What problems you had in this exercise?".
 </p>
 
 <p>
@@ -747,7 +754,7 @@ Some common examples:
 <%= screenshot %>
 
 <p>
-  On the submission details page you can see all relevant data for that submission, including the student's answer, test results, and a suggested solution. You can also rerun submission and start code review. Rerunning submissions will never deduct points, but can give them if the code failed to pass tests due to f.ex. randomness.
+  On the submission details page you can see all relevant data for that submission, including the student's answer, test results, and a suggested solution. You can also rerun the submission and start code review. Rerunning submissions will never deduct points, but can give them if the code failed to pass tests due to f.ex. randomness.
 </p>
 
 <%
@@ -768,7 +775,7 @@ Some common examples:
 <%= screenshot %>
 
 <p>
-  The statistics page lists information about participants and completed exercises for all your organization's  courses.
+  The statistics page lists information about participants and completed exercises for all of your organization's  courses.
 </p>
 
 <%
@@ -787,7 +794,7 @@ Some common examples:
     </p>
 
     <p>
-      For the TestMyCode service provided by the University of Helsinki, this feature is in closed beta. If you would like to participate, please contanct us via email.
+      For the TestMyCode service provided by the University of Helsinki, this feature is in closed beta. If you would like to participate, please contact us via email.
     </p>
 
 </body>

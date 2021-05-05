@@ -65,9 +65,9 @@ require 'cgi' # for escapeHTML
   </p>
 
 <%
-   visit '/'
-   fill_in 'session_login', :with => 'admin'
-   fill_in 'session_password', :with => 'admin'
+   visit '/login'
+   fill_in 'username', :with => 'admin'
+   fill_in 'password', :with => 'admin'
    click_on 'Sign in'
    visit '/course_templates'
    highlight 'a:contains("New Course template")'
@@ -174,8 +174,9 @@ require 'cgi' # for escapeHTML
   FactoryBot.create :user, login: 'user', password: 'user'
 
   click_on 'Sign out'
-  fill_in 'session_login', with: 'user'
-  fill_in 'session_password', with: 'user'
+  visit '/login'
+  fill_in 'username', with: 'user'
+  fill_in 'password', with: 'user'
   click_on 'Sign in'
 
   visit '/org/new'
@@ -186,8 +187,9 @@ require 'cgi' # for escapeHTML
   expect(page).to have_content 'Organization was successfully created.'
 
   click_on 'Sign out'
-  fill_in 'session_login', with: 'admin'
-  fill_in 'session_password', with: 'admin'
+  visit '/login'
+  fill_in 'username', with: 'admin'
+  fill_in 'password', with: 'admin'
   click_on 'Sign in'
   visit '/'
   highlight 'a:contains("Show")'
@@ -224,8 +226,9 @@ require 'cgi' # for escapeHTML
 <%
   Organization.find_by(slug: 'hy').destroy!
   click_on 'Sign out'
-  fill_in 'session_login', with: 'user'
-  fill_in 'session_password', with: 'user'
+  visit '/login'
+  fill_in 'username', with: 'user'
+  fill_in 'password', with: 'user'
   click_on 'Sign in'
 
   visit '/org/new'
@@ -236,8 +239,9 @@ require 'cgi' # for escapeHTML
   expect(page).to have_content 'Organization was successfully created.'
 
   click_on 'Sign out'
-  fill_in 'session_login', with: 'admin'
-  fill_in 'session_password', with: 'admin'
+  visit '/login'
+  fill_in 'username', with: 'admin'
+  fill_in 'password', with: 'admin'
   click_on 'Sign in'
   visit '/'
 

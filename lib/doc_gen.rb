@@ -53,4 +53,9 @@ class DocGen
       @img_counter += 1
       "#{@doc_name}-#{@img_counter}.png"
     end
+
+    def screenshot_to_file(path)
+      FileUtils.mkdir_p(File.dirname(path))
+      @test_case.page.save_screenshot(path)
+    end
 end
