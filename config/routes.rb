@@ -99,6 +99,8 @@ TmcServer::Application.routes.draw do
           end
         end
 
+        resources :other_courses_from_this_template, module: :courses, only: :index
+
         resources :submissions, module: :courses, only: :index
 
         namespace :submissions, module: :courses do
