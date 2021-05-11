@@ -24,16 +24,24 @@ describe Api::V8::Courses::OtherCoursesFromThisTemplateController, type: :contro
             controller.current_user = admin
           end
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
 
         describe 'when using access token' do
           let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
       end
@@ -44,16 +52,24 @@ describe Api::V8::Courses::OtherCoursesFromThisTemplateController, type: :contro
             controller.current_user = teacher
           end
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
 
         describe 'when using access token' do
           let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
       end
@@ -64,16 +80,24 @@ describe Api::V8::Courses::OtherCoursesFromThisTemplateController, type: :contro
             controller.current_user = assistant
           end
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
 
         describe 'when using access token' do
           let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
       end
@@ -84,16 +108,24 @@ describe Api::V8::Courses::OtherCoursesFromThisTemplateController, type: :contro
             controller.current_user = user
           end
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
 
         describe 'when using access token' do
           let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
-          it 'should show all courses with same template' do
+          it 'should show all courses from same template' do
             two_courses_by_template_id
+          end
+
+          it 'should not show course from different template' do
+            course_from_different_Template
           end
         end
       end
@@ -103,7 +135,7 @@ describe Api::V8::Courses::OtherCoursesFromThisTemplateController, type: :contro
           controller.current_user = Guest.new
         end
 
-        it 'should not show any submissions' do
+        it 'should not show any courses' do
           get :index, params: { course_id: course.id }
 
           expect(response).to have_http_status(401)
@@ -124,5 +156,15 @@ describe Api::V8::Courses::OtherCoursesFromThisTemplateController, type: :contro
 
       expect(r.any? { |c|  c['id'] == course1.id }).to be(true), 'course missing from list'
       expect(r.any? { |c|  c['id'] == course2.id }).to be(true), 'course missing from list'
+    end
+
+    def course_from_different_Template
+      other_course = FactoryBot.create(:course, name: "#{organization.slug}-other-course-1", organization: organization)
+
+      get :index, params: { course_id: course.id }
+
+      r = JSON.parse response.body
+
+      expect(r.any? { |c|  c['id'] == other_course.id }).to be(false), 'course was in list'
     end
 end
