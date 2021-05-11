@@ -2,13 +2,14 @@
 
 require 'spec_helper'
 
-describe Api::V8::Courses::SubmissionsController, type: :controller do
+describe Api::V8::Courses::OtherCoursesFromThisTemplateController, type: :controller do
   let!(:user) { FactoryBot.create(:user) }
   let!(:teacher) { FactoryBot.create(:user) }
   let!(:assistant) { FactoryBot.create(:user) }
   let!(:admin) { FactoryBot.create(:admin) }
   let!(:organization) { FactoryBot.create(:accepted_organization) }
-  let!(:course) { FactoryBot.create(:course, name: "#{organization.slug}-testcourse", organization: organization, course_template_id: 1) }
+  let!(:template) { FactoryBot.create(:course_template, name: 'template') }
+  let!(:course) { FactoryBot.create(:course, name: "#{organization.slug}-testcourse", organization: organization, course_template_id: template.id) }
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }
     Teachership.create(user: teacher, organization: organization)
@@ -114,8 +115,8 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
 
   private
     def two_courses_by_template_id
-      course1 = FactoryBot.create(:course, name: "#{organization.slug}-other-course-1", organization: organization, course_template_id: 1)
-      course2 = FactoryBot.create(:course, name: "#{organization.slug}-other-course-2", organization: organization, course_template_id: 1)
+      course1 = FactoryBot.create(:course, name: "#{organization.slug}-other-course-1", organization: organization, course_template_id: template.id)
+      course2 = FactoryBot.create(:course, name: "#{organization.slug}-other-course-2", organization: organization, course_template_id: template.id)
 
       get :index, params: { course_id: course.id }
 
