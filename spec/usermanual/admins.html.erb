@@ -55,9 +55,9 @@ require 'cgi' # for escapeHTML
   <h2>Course templates</h2>
 
   <p>
-    Simplest way to create a course is to copy it from a template. This way teacher won't
-    have to create new repositories from which new course will be based off. One of the biggest
-    responsibilities for an administrator is managing these templates in TMC webapp.
+    The simplest way to create a course is to copy it from a template. This way teachers won't
+    have to create new exercise repositories for their courses. One of the biggest
+    responsibilities for an administrator is managing course templates in the TMC webapp.
   </p>
 
   <p>
@@ -72,7 +72,7 @@ require 'cgi' # for escapeHTML
    visit '/course_templates'
    highlight 'a:contains("New Course template")'
 %>
-<%= screenshot %>
+<%= screenshot(wide: true) %>
 
   <p>
     This page lists all course templates in the database with their relevant information.
@@ -105,11 +105,11 @@ require 'cgi' # for escapeHTML
       <li><b>Title</b> is a prettier version of the name that may contain whitespaces, and is shown on webapp pages.</li>
       <li><b>Description</b> is a short piece of text to show when browsing this particular course.</li>
       <li>
-        <b>Material url</b> takes user to the online resource that educates and helps the course participant with solving
+        <b>Material url</b> takes the user to the online resource that educates and helps the course participant with solving
         the course exercises.
       </li>
       <li>
-        <b>Source url</b> is a remote repository from which student will pull exercises as source files.
+        <b>Source url</b> is a remote repository from which students will pull exercises as source files.
         When this field is edited, TMC webapp will validate the url by attempting to clone the repository from the url.
         You can find information on how to create a course repository by yourself from this <a href="customcourse.html#starting_from_a_template">guide</a>.
       </li>
@@ -118,7 +118,7 @@ require 'cgi' # for escapeHTML
         Default value is master.
       </li>
       <li>
-        After the <b>Expires at</b> date no courses can be cloned from the expired template. Expiration date will not affect courses
+        After the <b>Expires at</b> date, no courses can be cloned from the expired template. Expiration date will not affect courses
         that were cloned before the expiration date.
       </li>
     </ul>
@@ -142,7 +142,7 @@ require 'cgi' # for escapeHTML
    highlight 'a:contains("Edit"):first'
    highlight 'a:contains("unhide")'
 %>
-<%= screenshot %>
+<%= screenshot(wide: true) %>
 
   <p>
     Whenever any changes to the remote repository are made (new exercises added, exercises removed, etc),
@@ -152,7 +152,7 @@ require 'cgi' # for escapeHTML
   </p>
 
   <p>
-    Course template default fields may be edited at any time by administrator via link 'Edit'. Expiration date
+    Course template default fields may be edited at any time by administrator via the link 'Edit'. Expiration date
     may be changed through the same link.
   </p>
 
@@ -168,12 +168,12 @@ require 'cgi' # for escapeHTML
     or disabled. Anyone can create a new organization, so they should be verified through careful consideration.
   </p>
 
-  <p>Administrator will see this notice on the front page when there are any unverified new organizations:</p>
+  <p>Administrators will see this notice on the front page when there are any unverified new organizations:</p>
 
 <%
   FactoryBot.create :user, login: 'user', password: 'user'
 
-  click_on 'Sign out'
+  visit '/logout'
   visit '/login'
   fill_in 'username', with: 'user'
   fill_in 'password', with: 'user'
@@ -186,7 +186,7 @@ require 'cgi' # for escapeHTML
   click_button 'Create Organization'
   expect(page).to have_content 'Organization was successfully created.'
 
-  click_on 'Sign out'
+  visit '/logout'
   visit '/login'
   fill_in 'username', with: 'admin'
   fill_in 'password', with: 'admin'
@@ -225,7 +225,7 @@ require 'cgi' # for escapeHTML
 
 <%
   Organization.find_by(slug: 'hy').destroy!
-  click_on 'Sign out'
+  visit '/logout'
   visit '/login'
   fill_in 'username', with: 'user'
   fill_in 'password', with: 'user'
@@ -238,7 +238,7 @@ require 'cgi' # for escapeHTML
   click_button 'Create Organization'
   expect(page).to have_content 'Organization was successfully created.'
 
-  click_on 'Sign out'
+  visit '/logout'
   visit '/login'
   fill_in 'username', with: 'admin'
   fill_in 'password', with: 'admin'
@@ -261,7 +261,7 @@ require 'cgi' # for escapeHTML
 %>
 <%= screenshot %>
 
-<p>Disabled organization will not be shown anywhere in the front page.</p>
+<p>Disabled organizations will not be shown anywhere in the front page.</p>
 
 <%
   visit '/'
@@ -271,7 +271,7 @@ require 'cgi' # for escapeHTML
 <h2>Monitoring background refreshes</h2>
 
 <p>
-  When a new course is made, first real-time refresh is made only partly, without generating available points for exercises. Because of that, full refresh is launched on background. As administrator, the front page shows if there are any ongoing background refreshes, and when they are made. Based on that, you can monitor possible problems, if certain course stays on the refresh list for too long time.
+  When a new course is made, first real-time refresh is made only partly, without generating available points for exercises. Because of that, full refresh is launched on background. As administrator, the front page shows if there are any ongoing background refreshes, and when they were made. Based on that, you can monitor possible problems, if certain course stays on the refresh list for too long.
 </p>
 
 <%

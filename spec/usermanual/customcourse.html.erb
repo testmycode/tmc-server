@@ -34,7 +34,7 @@ require 'cgi' # for escapeHTML
 
   <%
     teacher = FactoryBot.create(:admin, :login => 'teacher', :password => 'teacher')
-    org = FactoryBot.create(:accepted_organization, name: 'Some organization')
+    org = FactoryBot.create(:accepted_organization, name: 'Some organization', slug: 'someorg', information: 'A short description of this organization.')
     org.teachers << teacher
     org.save
   %>
@@ -56,11 +56,14 @@ require 'cgi' # for escapeHTML
   <p>Let's log in as a teacher of some organization.</p>
 
   <%
-    visit "/org/#{org.slug}"
-    screenshot
     visit "/login"
     fill_in 'email', :with => 'teacher'
     fill_in 'password', :with => 'teacher'
+  %>
+
+  <%= screenshot %>
+
+  <%
     click_on 'Sign in'
     visit "/org/#{org.slug}"
   %>
@@ -99,7 +102,7 @@ require 'cgi' # for escapeHTML
     repo_path = ENV['TMC_USERMANUAL_REPO_PATH'] || (ENV['HOME'] + '/tmc-example-repo')
     FileUtils.rm_rf(repo_path)
     FileUtils.mkdir_p(repo_path)
-    create_bare_repo(repo_path, initial_commit: true)
+    create_bare_repo(repo_path)
     repo_url = 'file://' + repo_path
 
     fill_in 'course_source_url', :with => repo_url
@@ -126,6 +129,8 @@ require 'cgi' # for escapeHTML
 
     click_button 'Continue'
     click_button 'Publish now'
+
+    RefreshCourseTask.new.run
   %>
 
   <p>
@@ -288,8 +293,15 @@ require 'cgi' # for escapeHTML
   <% visit "/org/#{org.slug}/courses/#{course.id}/" %>
   <% highlight('a:contains("Refresh")') %>
   <%= screenshot %>
-  <% click_on 'Refresh' %>
-  <% course.reload %>
+  <%
+    click_on 'Refresh'
+
+    RefreshCourseTask.new.run
+
+    course.reload
+
+    course.exercises.update_all(disabled_status: 0)
+  %>
 
   <p>
     The system now reloads all exercises from the repository and rebuilds its
@@ -297,10 +309,12 @@ require 'cgi' # for escapeHTML
     even if the exercise is deleted in the push.
   </p>
 
+  <% visit "/org/#{org.slug}/courses/#{course.id}/" %>
+
   <%= screenshot %>
 
   <p>
-    The exercise should now be available for download and accept submissions.
+    The exercises should now be available for download and they should accept submissions.
   </p>
 
   <h2>Personalized course progression</h2>
@@ -387,9 +401,9 @@ deadline:
 
   <h2>Special comments</h2>
 
-  <p>
+  <b>
     See all available special comments <a href="https://github.com/rage/tmc-langs-rust/blob/master/docs/exercise%20template%20annotations.md">here</a>.
-  </p>
+  </b>
 
   <p>
     Solution code can be demarcated with special comments so it will be removed from

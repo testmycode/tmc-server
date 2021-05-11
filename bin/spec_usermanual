@@ -1,4 +1,4 @@
 #!/bin/sh
 
-RSPEC_PATTERN="spec/usermanual/usermanual_spec.rb"
+RSPEC_PATTERN="spec/usermanual/**/*.rb"
 bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --format documentation"
