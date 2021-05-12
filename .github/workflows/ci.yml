@@ -132,4 +132,6 @@ jobs:
       - name: Run spec_usermanual tests
         run: docker-compose run web bin/spec_usermanual
       - name: Update manual to testmycode-usermanual
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./.update-usermanual.sh
