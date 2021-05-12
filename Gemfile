@@ -9,7 +9,7 @@ gem 'rails', '~> 6.1'
 gem 'activerecord-import', '~> 1.0'
 gem 'activerecord-session_store', '~> 2.0'
 gem 'argon2', '~> 2.0'
-gem 'bootstrap', '~> 4.6'
+gem 'bootstrap', '~> 5.0'
 gem 'cancancan', '~> 3.2'
 gem 'doorkeeper', '~> 5.5'
 gem 'file_validators' # Used to validate organization logo
@@ -19,7 +19,7 @@ gem 'gravtastic', '~> 3.2' # Used to display user avatars
 gem 'image_processing' # Used by active_storage to make logo 100x100 on the fly
 gem 'logstasher', '~> 2.1'
 gem 'natcmp', '~> 1.4'
-gem 'newrelic_rpm', '~> 6.15'
+gem 'newrelic_rpm', '~> 7.0'
 gem 'pdfkit', '~> 0.8', require: false
 gem 'pg', '~> 1.2'
 gem 'pghero', '~> 2.8'
@@ -45,8 +45,8 @@ end
 
 group :development, :test do
   gem 'capybara', '~> 3.35'
-  gem 'factory_bot_rails', '~> 6.1'
-  gem 'puma', '~> 5.2'
+  gem 'factory_bot_rails', '~> 6.2'
+  gem 'puma', '~> 5.3'
   # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
