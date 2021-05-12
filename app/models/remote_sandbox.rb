@@ -45,6 +45,10 @@ class RemoteSandbox
       rescue SandboxUnavailableError => e
         Rails.logger.warn e
         # ignore
+      rescue InternalSandboxError => e
+        Rails.logger.warn e
+        Rails.logger.warn "Encountered InternalSandboxError. Leaving to reprocessor daemon."
+        return true
       else
         Rails.logger.info "Submission #{submission.id} sent to remote sandbox at #{server.baseurl}"
         Rails.logger.debug "Notify url: #{notify_url}"
