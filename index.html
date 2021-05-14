@@ -1,106 +1,81 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Swagger UI</title>
-  <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16" />
-  <link href='css/typography.css' media='screen' rel='stylesheet' type='text/css'/>
-  <link href='css/reset.css' media='screen' rel='stylesheet' type='text/css'/>
-  <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
-  <link href='css/reset.css' media='print' rel='stylesheet' type='text/css'/>
-  <link href='css/print.css' media='print' rel='stylesheet' type='text/css'/>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Test My Code Usermanual</title>
 
-  <script src='lib/object-assign-pollyfill.js' type='text/javascript'></script>
-  <script src='lib/jquery-1.8.0.min.js' type='text/javascript'></script>
-  <script src='lib/jquery.slideto.min.js' type='text/javascript'></script>
-  <script src='lib/jquery.wiggle.min.js' type='text/javascript'></script>
-  <script src='lib/jquery.ba-bbq.min.js' type='text/javascript'></script>
-  <script src='lib/handlebars-4.0.5.js' type='text/javascript'></script>
-  <script src='lib/lodash.min.js' type='text/javascript'></script>
-  <script src='lib/backbone-min.js' type='text/javascript'></script>
-  <script src='swagger-ui.js' type='text/javascript'></script>
-  <script src='lib/highlight.9.1.0.pack.js' type='text/javascript'></script>
-  <script src='lib/highlight.9.1.0.pack_extended.js' type='text/javascript'></script>
-  <script src='lib/jsoneditor.min.js' type='text/javascript'></script>
-  <script src='lib/marked.js' type='text/javascript'></script>
-  <script src='lib/swagger-oauth.js' type='text/javascript'></script>
+      <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 
-  <!-- Some basic translations -->
-  <!-- <script src='lang/translator.js' type='text/javascript'></script> -->
-  <!-- <script src='lang/ru.js' type='text/javascript'></script> -->
-  <!-- <script src='lang/en.js' type='text/javascript'></script> -->
+      <meta name="description" content="Usermanual for TestMyCode">
+          <style>
+            .container {
+              display: -webkit-flex;
+              display: flex;
+              flex-flow: row wrap;
 
-  <script type="text/javascript">
-    $(function () {
-      var url = window.location.search.match(/url=([^&]+)/);
-      if (url && url.length > 1) {
-        url = decodeURIComponent(url[1]);
-      } else {
-        url = "https://tmc.mooc.fi/api/v8/documentation";
-      }
+              /* Then we define how is distributed the remaining space */
+              justify-content: space-around;
+            }
+            body {
+              font-family: "Open Sans", sans-serif;
+              background-color: #fafafa;
+            }
+            header {
+              height: 300px;
+            }
+            .item {
+              background: white;
+              width: 30%;
+              min-width: 200px;
+              text-align: center;
+              display: flex;
+              flex-direction: column;
+              margin-bottom: 5px;
+              padding: 10px;
+              box-sizing: border-box;
+            }
+            section .item {
+              -webkit-box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+              -moz-box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+              box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+            }
+            @media screen and (max-width: 550px) {
+              .item {
+                width: 100%;
+              }
 
-      hljs.configure({
-        highlightSizeThreshold: 5000
-      });
+            }
+          </style>
 
-      // Pre load translate...
-      if(window.SwaggerTranslator) {
-        window.SwaggerTranslator.translate();
-      }
-      window.swaggerUi = new SwaggerUi({
-        url: url,
-        dom_id: "swagger-ui-container",
-        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
-        onComplete: function(swaggerApi, swaggerUi){
-          if(typeof initOAuth == "function") {
-            initOAuth({
-              clientId: "your-client-id",
-              clientSecret: "your-client-secret-if-required",
-              realm: "your-realms",
-              appName: "your-app-name",
-              scopeSeparator: " ",
-              additionalQueryStringParams: {}
-            });
-          }
-
-          if(window.SwaggerTranslator) {
-            window.SwaggerTranslator.translate();
-          }
-        },
-        onFailure: function(data) {
-          log("Unable to Load SwaggerUI");
-        },
-        docExpansion: "none",
-        jsonEditor: false,
-        defaultModelRendering: 'schema',
-        showRequestHeaders: false
-      });
-
-      window.swaggerUi.load();
-
-      function log() {
-        if ('console' in window) {
-          console.log.apply(console, arguments);
-        }
-      }
-  });
-  </script>
+          <!--[if lt IE 9]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+          <![endif]-->
 </head>
 
-<body class="swagger-section">
-<div id='header'>
-  <div class="swagger-ui-wrap">
-    <a id="logo" href="http://swagger.io"><img class="logo__img" alt="swagger" height="30" width="30" src="images/logo_small.png" /><span class="logo__title">swagger</span></a>
-    <form id='api_selector'>
-      <div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/></div>
-      <div id='auth_container'></div>
-      <div class='input'><a id="explore" class="header__btn" href="#" data-sw-translate>Explore</a></div>
-    </form>
-  </div>
-</div>
-
-<div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
-<div id="swagger-ui-container" class="swagger-ui-wrap"></div>
+<body>
+  <style scoped contenteditable>
+  </style>
+  <header class="container">
+    <div class="">
+      <h1>Usermanual for the TestMyCode server and the TestMyCode Workflow</h1>
+      <p>Below we have linked usermanuals for different roles available in the TestMyCode server.</p>
+    </div>
+  </header>
+  <section class="container">
+    <article class="item">
+      <h2><a href="teachers.html">Teachers and Teaching assistants</a></h2>
+      <p>This usermanual cover how to request a new organization, how to create a course, provided by others, for your students to use,
+        how to manage deadlines, what are soft deadlines and unlock conditions, how to add teaching assistants for your course, etc.
+      </p>
+    </article>
+    <article class="item">
+      <h2><a href="customcourse.html">For creating a course template for others to use (closed beta)</a></h2>
+      <p>Usermanual for creating and providing a coustom course for others to use in the TestMyCode system.</p>
+      <p>This behaviours is currently in invite only beta. Please contact your TMC instance provider to join the beta.</p>
+    </article>
+    <article class="item"><h2><a href="admins.html">Admin</a></h2>
+      <p>Usermanual for admins</p>
+    </article>
+  </section>
 </body>
 </html>
