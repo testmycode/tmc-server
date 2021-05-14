@@ -136,3 +136,4 @@ jobs:
         with:
           branch: gh-pages
           folder: doc/usermanual
+          target-folder: usermanual
