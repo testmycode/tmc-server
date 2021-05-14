@@ -3,13 +3,13 @@
 module Api
   module V8
     module Courses
-      class OtherCoursesFromThisTemplateController < Api::V8::BaseController
+      class AllCoursesWithThisTemplateController < Api::V8::BaseController
         include Swagger::Blocks
 
-        swagger_path '/api/v8/courses/{course_id}/other_courses_from_this_template' do
+        swagger_path '/api/v8/courses/{course_id}/all_courses_with_this_template' do
           operation :get do
-            key :description, 'Returns other courses made from this template in a json format'
-            key :operationId, 'findOtherCoursesFromThisTemplate'
+            key :description, 'Returns all courses with a same template in a json format'
+            key :operationId, 'findAllCoursesWithThisTemplate'
             key :produces, [
               'application/json'
             ]
@@ -34,8 +34,6 @@ module Api
             end
           end
         end
-
-        around_action :wrap_transaction
 
         def index
           unauthorize_guest!
