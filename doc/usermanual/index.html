@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <title>Test My Code Usermanual</title>
+
+      <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+
+      <meta name="description" content="Usermanual for TestMyCode">
+          <style>
+            .container {
+              display: -webkit-flex;
+              display: flex;
+              flex-flow: row wrap;
+
+              /* Then we define how is distributed the remaining space */
+              justify-content: space-around;
+            }
+            body {
+              font-family: "Open Sans", sans-serif;
+              background-color: #fafafa;
+            }
+            header {
+              height: 300px;
+            }
+            .item {
+              background: white;
+              width: 30%;
+              min-width: 200px;
+              text-align: center;
+              display: flex;
+              flex-direction: column;
+              margin-bottom: 5px;
+              padding: 10px;
+              box-sizing: border-box;
+            }
+            section .item {
+              -webkit-box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+              -moz-box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+              box-shadow: 4px 5px 7px 3px rgba(153,153,153,1);
+            }
+            @media screen and (max-width: 550px) {
+              .item {
+                width: 100%;
+              }
+
+            }
+          </style>
+
+          <!--[if lt IE 9]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+          <![endif]-->
+</head>
+
+<body>
+  <style scoped contenteditable>
+  </style>
+  <header class="container">
+    <div class="">
+      <h1>Usermanual for the TestMyCode server and the TestMyCode Workflow</h1>
+      <p>Below we have linked usermanuals for different roles available in the TestMyCode server.</p>
+    </div>
+  </header>
+  <section class="container">
+    <article class="item">
+      <h2><a href="teachers.html">Teachers and Teaching assistants</a></h2>
+      <p>This usermanual cover how to request a new organization, how to create a course, provided by others, for your students to use,
+        how to manage deadlines, what are soft deadlines and unlock conditions, how to add teaching assistants for your course, etc.
+      </p>
+    </article>
+    <article class="item">
+      <h2><a href="customcourse.html">For creating a course template for others to use (closed beta)</a></h2>
+      <p>Usermanual for creating and providing a coustom course for others to use in the TestMyCode system.</p>
+      <p>This behaviours is currently in invite only beta. Please contact your TMC instance provider to join the beta.</p>
+    </article>
+    <article class="item"><h2><a href="admins.html">Admin</a></h2>
+      <p>Usermanual for admins</p>
+    </article>
+  </section>
+</body>
+</html>

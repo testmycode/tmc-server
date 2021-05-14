@@ -132,6 +132,7 @@ jobs:
       - name: Run spec_usermanual tests
         run: docker-compose run web bin/spec_usermanual
       - name: Update manual to testmycode-usermanual
-        env:
-          DEPLOY_TOKEN: ${{ secrets.USERMANUAL_DEPLOY_TOKEN }}
-        run: ./.update-usermanual.sh
+        uses: JamesIves/github-pages-deploy-action@4.1.3
+        with:
+          branch: gh-pages
+          folder: doc/usermanual
