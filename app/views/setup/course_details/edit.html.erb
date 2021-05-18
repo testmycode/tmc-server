@@ -13,6 +13,12 @@
        %{org} = organization id<br/>
      </small>
    }
+
+   moocfi_id_url_help = %q{
+     <small>
+       (Leave blank if your course is not listed in mooc.fi's course catalogue)
+     </small>
+   }
 %>
 
 <%= form_for(@course, url: setup_organization_course_course_details_path) do |f| %>
@@ -25,6 +31,8 @@
     <% unless @setup_in_progress %>
       <%= bs_labeled_field("External scoreboard URL", external_scoreboard_url_help + f.text_field(:external_scoreboard_url, class: 'form-control')) %>
     <% end %>
+
+    <%= bs_labeled_field('mooc.fi id', moocfi_id_url_help + f.text_field(:moocfi_id, class: 'form-control')) %>
 
     <% # TODO: check full custom course support %>
     <% #custom = @course.custom? %>

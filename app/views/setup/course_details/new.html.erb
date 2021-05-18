@@ -4,6 +4,14 @@
 
 <h2>Phase 2 - Basic information</h2>
 
+<%
+  moocfi_id_url_help = %q{
+    <small>
+      (Leave blank if your course is not listed in mooc.fi's course catalogue)
+    </small>
+  }
+%>
+
 <% ## TODO: Split to partial with edit ## %>
 <%= form_for(@course, url: setup_organization_course_path) do |f| %>
     <%= render 'shared/error_messages', target: @course %>
@@ -20,6 +28,8 @@
     <% else %>
         <%= f.hidden_field(:course_template_id, value: @course_template.id) %>
     <% end %>
+
+    <%= bs_labeled_field('mooc.fi id', moocfi_id_url_help + f.text_field(:moocfi_id, class: 'form-control')) %>
 
     <p>Fields with (*) are required</p>
 

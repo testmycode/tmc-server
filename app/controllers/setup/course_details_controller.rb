@@ -86,18 +86,18 @@ class Setup::CourseDetailsController < Setup::SetupController
     end
 
     def course_params_for_create_from_template
-      params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id)
+      params.require(:course).permit(:name, :title, :description, :material_url, :course_template_id, :moocfi_id)
     end
 
     def course_params_for_create_custom
-      params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend)
+      params.require(:course).permit(:name, :title, :description, :material_url, :source_url, :git_branch, :source_backend, :moocfi_id)
     end
 
     def course_params
       if @course.custom?
-        params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url)
+        params.require(:course).permit(:title, :description, :material_url, :source_url, :git_branch, :external_scoreboard_url, :moocfi_id)
       else
-        params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url)
+        params.require(:course).permit(:title, :description, :material_url, :external_scoreboard_url, :moocfi_id)
       end
     end
 end
