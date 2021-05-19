@@ -15,7 +15,7 @@ class AvailablePoint < ApplicationRecord
 
     property :id, type: :integer, example: 1
     property :exercise_id, type: :integer, example: 1
-    property :name, type: :string, example: 'Point name'
+    property :name, type: :string, example: "Point name"
     property :require_review, type: :boolean, example: false
   end
 
