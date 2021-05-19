@@ -43,6 +43,13 @@ group :assets do
   gem 'uglifier', '~> 4.2'
 end
 
+group :rubocop do
+  gem 'rubocop', '~> 1.5.2', require: false # HoundCI requires 1.5.2
+  gem 'rubocop-packaging', require: false
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-rails', require: false
+end
+
 group :development, :test do
   gem 'capybara', '~> 3.35'
   gem 'factory_bot_rails', '~> 6.2'
@@ -66,9 +73,6 @@ group :development, :test do
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
-  gem 'rubocop', '~> 1.5.2', require: false # HoundCI requires 1.5.2
-  # gem 'rubocop-rails_config', '~> 1.2.2' # Rubocop locked
-  gem 'rubocop-rails', require: false
   gem 'ruby-prof', '~> 1.4' # for performance tests
   gem 'simplecov', require: false
 end
