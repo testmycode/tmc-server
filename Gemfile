@@ -9,7 +9,7 @@ gem 'rails', '~> 6.1'
 gem 'activerecord-import', '~> 1.0'
 gem 'activerecord-session_store', '~> 2.0'
 gem 'argon2', '~> 2.0'
-gem 'bootstrap', '~> 5.0'
+gem 'bootstrap', '~> 4.6'
 gem 'cancancan', '~> 3.2'
 gem 'doorkeeper', '~> 5.5'
 gem 'file_validators' # Used to validate organization logo
