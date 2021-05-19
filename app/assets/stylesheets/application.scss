@@ -14,7 +14,7 @@
 $user-button-color: white;
 
 .btn-user {
-  @extend .btn-light;
+  @extend .btn-light !optional;
   &.nav-link {
     color: black !important;
     background-color: $user-button-color;
