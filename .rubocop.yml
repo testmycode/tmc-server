@@ -8,6 +8,7 @@ AllCops:
   Exclude:
     - 'ext/**/*'
     - 'db/**/*'
+    - '**/vendor/**/*'
 
 # Style
 Style/StringLiterals:
