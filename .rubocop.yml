@@ -1,6 +1,4 @@
-inherit_gem:
-  rubocop-rails_config:
-    - config/rails.yml
+require: rubocop-rails
 
 AllCops:
   SuggestExtensions: false
