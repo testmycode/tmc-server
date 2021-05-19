@@ -154,13 +154,12 @@ class SourceFileList
 
     def self.sort_source_files(files)
       files.sort_by do |f|
-        priority = begin
-          if f.path.include?('WEB-INF/') then 1
-          elsif f.path.start_with?('src/main/resources') then 2
-          elsif f.path == 'pom.xml' then 3
-          else 0
-          end
+        priority = if f.path.include?('WEB-INF/') then 1
+        elsif f.path.start_with?('src/main/resources') then 2
+        elsif f.path == 'pom.xml' then 3
+        else 0
         end
+
         [priority, f.path]
       end
     end

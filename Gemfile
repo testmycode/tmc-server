@@ -66,8 +66,8 @@ group :development, :test do
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4'
   gem 'railroady' # for doc/diagrams
-  gem 'rubocop', '~> 1.5.2', require: false # HoundCI requires 1.5.2
-  gem 'rubocop-rails_config', '~> 1.2.2' # Rubocop locked
+  gem 'rubocop', '~> 1.13', require: false # HoundCI requires 1.5.2
+  gem 'rubocop-rails_config', '~> 1.5' # Rubocop locked
   gem 'ruby-prof', '~> 1.4' # for performance tests
   gem 'simplecov', require: false
 end
