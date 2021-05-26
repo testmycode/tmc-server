@@ -151,6 +151,7 @@ class Course < ApplicationRecord
   #            message: 'should begin with http:// or https://'
   #          }
   validate :check_external_scoreboard_url
+  validates :moocfi_id, uniqueness: true
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
