@@ -75,4 +75,15 @@ class Rack::Attack
       discriminator
     end
   end
+
+  # Limit the number of password resets per ip to 10 per hour
+  throttle('password resets per ip per hour', limit: 10, period: 1.hour) do |req|
+    req.ip if req.path == '/password_reset_keys' &&
+    req.post?
+  end
+
+  # Limit the number of password resets per email to 5 per day
+  throttle('password resets per email per day', limit: 5, period: 1.day) do |req|
+    req.params['email'] if req.path == '/password_reset_keys' && req.post?
+  end
 end
