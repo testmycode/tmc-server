@@ -19,7 +19,7 @@
     <%= javascript_include_tag params[:controller] if Rails.application.assets.find_asset("#{params[:controller]}.js") %>
   </head>
   <body class="default">
-    <div class="cover">
+    <div class="<%= Rails.env.test? ? 'cover-test-env' : 'cover' %>">
       <%= render partial: 'layouts/navigation', locals: { transparent: true} %>
       <div class="cover-content container">
         <h1>TestMyCode</h1>

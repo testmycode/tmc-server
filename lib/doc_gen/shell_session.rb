@@ -29,7 +29,7 @@ class DocGen
 
         def initialize(session)
           @session = session
-          @transcript = ''
+          @transcript = +''
         end
 
         def blank_line

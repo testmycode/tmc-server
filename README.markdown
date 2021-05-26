@@ -8,7 +8,7 @@ The system has been used with great success by the [University of Helsinki CS De
 several elementary programming and data structures courses with hundreds of users.
 
 ## Usermanual ##
-Automatically built usermanual can be viewed at: http://testmycode-usermanual.github.io
+Automatically built usermanual can be viewed at: http://testmycode.github.io/tmc-server/usermanual/
 
 ## Setup ##
 

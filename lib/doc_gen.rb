@@ -27,7 +27,7 @@ class DocGen
 
   def screenshot(_options = {})
     name = next_screenshot_name
-    screenshot_to_file("#{root_path}/screenshots/#{name}")
+    screenshot_to_file("#{root_path}/screenshots/#{name}", _options)
     '<img src="screenshots/' + name + '" alt="(screenshot)" class="screenshot" />'
   end
 
@@ -52,5 +52,13 @@ class DocGen
       @img_counter ||= 0
       @img_counter += 1
       "#{@doc_name}-#{@img_counter}.png"
+    end
+
+    def screenshot_to_file(path, _options)
+      default_options = { full: true }
+      options = default_options.merge(_options)
+      FileUtils.mkdir_p(File.dirname(path))
+      options[:wide] ? @test_case.page.driver.browser.resize(1200, 800) : @test_case.page.driver.browser.resize(1024, 768)
+      @test_case.page.save_screenshot(path, full: options[:full])
     end
 end

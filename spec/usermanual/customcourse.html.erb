@@ -34,7 +34,7 @@ require 'cgi' # for escapeHTML
 
   <%
     teacher = FactoryBot.create(:admin, :login => 'teacher', :password => 'teacher')
-    org = FactoryBot.create(:accepted_organization, name: 'Some organization')
+    org = FactoryBot.create(:accepted_organization, name: 'Some organization', slug: 'someorg', information: 'A short description of this organization.')
     org.teachers << teacher
     org.save
   %>
@@ -56,14 +56,16 @@ require 'cgi' # for escapeHTML
   <p>Let's log in as a teacher of some organization.</p>
 
   <%
-    visit "/org/#{org.slug}"
-    fill_in 'session_login', :with => 'teacher'
-    fill_in 'session_password', :with => 'teacher'
+    visit "/login"
+    fill_in 'email', :with => 'teacher'
+    fill_in 'password', :with => 'teacher'
   %>
-  <% highlight '[value="Sign in"]' %>
+
   <%= screenshot %>
+
   <%
     click_on 'Sign in'
+    visit "/org/#{org.slug}"
   %>
 
   <p>
@@ -87,7 +89,7 @@ require 'cgi' # for escapeHTML
 
   <p>
     We'll name our course "<%= course_name %>", and we'll also have to give the address
-    of the git repository where we'll store the exercises. Also we have to define branch.
+    of the git repository where we'll store the exercises. Also we have to define the git branch.
     Master branch is good for us.
   </p>
 
@@ -100,7 +102,7 @@ require 'cgi' # for escapeHTML
     repo_path = ENV['TMC_USERMANUAL_REPO_PATH'] || (ENV['HOME'] + '/tmc-example-repo')
     FileUtils.rm_rf(repo_path)
     FileUtils.mkdir_p(repo_path)
-    create_bare_repo(repo_path, initial_commit: true)
+    create_bare_repo(repo_path)
     repo_url = 'file://' + repo_path
 
     fill_in 'course_source_url', :with => repo_url
@@ -120,17 +122,15 @@ require 'cgi' # for escapeHTML
   <%= screenshot %>
   <%
     click_on 'Add Course'
-    wait_until do
-      Course.count > 0
-    end
     course = Course.last
     expect(course).not_to be_nil
     course.initial_refresh_ready = true
     course.save!
 
-    click_button 'Accept and continue'
     click_button 'Continue'
     click_button 'Publish now'
+
+    RefreshCourseTask.new.run
   %>
 
   <p>
@@ -293,8 +293,15 @@ require 'cgi' # for escapeHTML
   <% visit "/org/#{org.slug}/courses/#{course.id}/" %>
   <% highlight('a:contains("Refresh")') %>
   <%= screenshot %>
-  <% click_on 'Refresh' %>
-  <% course.reload %>
+  <%
+    click_on 'Refresh'
+
+    RefreshCourseTask.new.run
+
+    course.reload
+
+    course.exercises.update_all(disabled_status: 0)
+  %>
 
   <p>
     The system now reloads all exercises from the repository and rebuilds its
@@ -302,11 +309,12 @@ require 'cgi' # for escapeHTML
     even if the exercise is deleted in the push.
   </p>
 
+  <% visit "/org/#{org.slug}/courses/#{course.id}/" %>
+
   <%= screenshot %>
 
   <p>
-    The exercise should now be available for download and accept submissions either
-    from the webapp or from the NetBeans plugin.
+    The exercises should now be available for download and they should accept submissions.
   </p>
 
   <h2>Personalized course progression</h2>
@@ -392,6 +400,10 @@ deadline:
   <h1>Reference</h1>
 
   <h2>Special comments</h2>
+
+  <b>
+    See all available special comments <a href="https://github.com/rage/tmc-langs-rust/blob/master/docs/exercise%20template%20annotations.md">here</a>.
+  </b>
 
   <p>
     Solution code can be demarcated with special comments so it will be removed from
@@ -550,20 +562,7 @@ deadline:
   <h3><code>.tmcproject.yml</code></h3>
 
   <p>
-    An exercise directory may contain a <code>.tmcproject.yml</code>. It currently supports one setting,
-    <code>extra_student_files</code>, which is a list of (relative paths to) files to be treated roughly as if
-    they were in <code>src/</code>. It can be used e.g. to mark test files as meant to be implemented by students.
-  </p>
-
-  <p>Example:</p>
-
-  <pre class="yaml">
-extra_student_files:
-  - test/StudentTest.java</pre>
-
-  <p>
-    This causes <code>test/StudentTest.java</code> to be shown as part of the solution.
-    Also, the NetBeans plugin would not overwrite the file when the exercise is updated.
+    An exercise directory may contain a <code>.tmcproject.yml</code> for further configuration of exercises. See all possible configuration options and example file contents <a href="https://github.com/rage/tmc-langs-rust/blob/master/docs/tmcproject.md">here</a>.
   </p>
 
   <h3><code>.tmcrc</code></h3>

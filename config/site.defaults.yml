@@ -137,4 +137,4 @@ cors_origins:
 course_instruction_page: http://mooc.fi/courses/general/ohjelmointi/
 
 # Teacher manual link
-teacher_manual_url: http://testmycode-usermanual.github.io/usermanual/teachers.html
+teacher_manual_url: http://testmycode.github.io/tmc-server/usermanual/
