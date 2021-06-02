@@ -92,6 +92,8 @@ TmcServer::Application.routes.draw do
           resources :points, module: :users, only: :index
         end
 
+        resources :all_courses_with_this_template, module: :courses, only: :index
+
         resources :exercises, module: :courses, param: :name, only: :index do
           resources :points, module: :exercises, only: :index
           resources :users, module: :exercises, only: [] do
