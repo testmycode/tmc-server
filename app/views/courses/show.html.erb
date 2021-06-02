@@ -230,6 +230,12 @@
              <%= link_to 'by hour', organization_course_stat_path(@organization, @course, 'submission_times') %>)
           </li>
 
+          <% if @course.moocfi_id? %>
+            <li>MOOC.fi id: <%= @course.moocfi_id %></li>
+          <% else %>
+            <li>Points will not be synchronized to MOOC.fi until MOOC.fi id is set.</li>
+          <% end %>
+
         </ul>
       </div>
     <% end # :teach, @course %>

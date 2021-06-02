@@ -13,6 +13,12 @@
        %{org} = organization id<br/>
      </small>
    }
+
+   moocfi_id_url_help = %q{
+     <small>
+       (Leave blank if your course is not listed in mooc.fi's course catalogue)
+     </small>
+   }
 %>
 
 <%= form_for(@course, url: setup_organization_course_course_details_path) do |f| %>
@@ -20,18 +26,20 @@
 
     <%= bs_labeled_field('Course title*', f.text_field(:title, class: 'form-control')) %>
     <%= bs_labeled_field('Course description', f.text_area(:description, class: 'form-control')) %>
-    <%= bs_labeled_field('Material URL', f.text_field(:material_url, class: 'form-control')) %>
+    <%= bs_labeled_field('Material URL', f.text_field(:material_url, class: 'form-control'), { label_title: 'Material URL' }) %>
 
     <% unless @setup_in_progress %>
-      <%= bs_labeled_field("External scoreboard URL", external_scoreboard_url_help + f.text_field(:external_scoreboard_url, class: 'form-control')) %>
+      <%= bs_labeled_field("External scoreboard URL", external_scoreboard_url_help + f.text_field(:external_scoreboard_url, class: 'form-control'), { label_title: 'External scoreboard URL' }) %>
     <% end %>
+
+    <%= bs_labeled_field('MOOC.fi ID', moocfi_id_url_help + f.text_field(:moocfi_id, class: 'form-control'), { label_title: 'MOOC.fi ID' }) %>
 
     <% # TODO: check full custom course support %>
     <% #custom = @course.custom? %>
     <% custom = false %>
     <% if custom %>
-        <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled', class: 'form-control')) %>
-        <%= bs_labeled_field('Source URL*', f.text_field(:source_url, class: 'form-control')) %>
+        <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled', class: 'form-control'), { label_title: 'Source Type' }) %>
+        <%= bs_labeled_field('Source URL*', f.text_field(:source_url, class: 'form-control'), { label_title: 'Source URL' }) %>
         <%= bs_labeled_field('Git branch name*', f.text_field(:git_branch, value: 'master', class: 'form-control')) %>
     <% end %>
 

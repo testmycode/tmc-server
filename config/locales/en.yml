@@ -25,3 +25,5 @@ en:
     attributes:
       organization:
         slug: "Organization ID"
+      course:
+        moocfi_id: "MOOC.fi ID"

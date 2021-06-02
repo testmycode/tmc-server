@@ -4,6 +4,14 @@
 
 <h2>Phase 2 - Basic information</h2>
 
+<%
+  moocfi_id_url_help = %q{
+    <small>
+      (Leave blank if your course is not listed in mooc.fi's course catalogue)
+    </small>
+  }
+%>
+
 <% ## TODO: Split to partial with edit ## %>
 <%= form_for(@course, url: setup_organization_course_path) do |f| %>
     <%= render 'shared/error_messages', target: @course %>
@@ -11,15 +19,17 @@
     <%= bs_labeled_field('Course name (should not contain whitespace)*', f.text_field(:name, class: 'form-control')) %>
     <%= bs_labeled_field('Course title*', f.text_field(:title, class: 'form-control')) %>
     <%= bs_labeled_field('Course description', f.text_area(:description, class: 'form-control')) %>
-    <%= bs_labeled_field('Material URL', f.text_field(:material_url, class: 'form-control')) %>
+    <%= bs_labeled_field('Material URL', f.text_field(:material_url, class: 'form-control'), { label_title: 'Material URL' }) %>
 
     <% if @custom %>
-        <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled', class: 'form-control')) %>
-        <%= bs_labeled_field('Source URL*', f.text_field(:source_url, class: 'form-control')) %>
+        <%= bs_labeled_field('Source Type', f.text_field(:source_backend, value: 'git', disabled: 'disabled', class: 'form-control'), { label_title: 'Source Type' }) %>
+        <%= bs_labeled_field('Source URL*', f.text_field(:source_url, class: 'form-control'), { label_title: 'Source URL' }) %>
         <%= bs_labeled_field('Git branch name*', f.text_field(:git_branch, value: 'master', class: 'form-control')) %>
     <% else %>
         <%= f.hidden_field(:course_template_id, value: @course_template.id) %>
     <% end %>
+
+    <%= bs_labeled_field('MOOC.fi ID', moocfi_id_url_help + f.text_field(:moocfi_id, class: 'form-control'), { label_title: 'MOOC.fi ID' }) %>
 
     <p>Fields with (*) are required</p>
 
