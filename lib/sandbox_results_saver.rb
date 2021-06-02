@@ -30,10 +30,8 @@ module SandboxResultsSaver
         submission.pretest_error =
           case results['exit_code']
           when '110'
-            error_msg = tmc_langs_response['status']
-            error_msg = error_msg + "\n" + tmc_langs_response['logs'].map do |k, v| "#{k}: #{v}" end.join("\n") if tmc_langs_response['logs']
-            error_msg = error_msg + "\n" + tmc_langs_response['data']['output-data']['trace'].map do |k, v| "#{k}: #{v}" end.join("\n") if tmc_langs_response.dig('data', 'output-data', 'trace')
-            error_msg
+            tmc_langs_response['status'] + "\n" +
+            tmc_langs_response['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
           when '137'
             'Program was forcibly terminated, most likely due to using too much time or memory.'
           when nil
