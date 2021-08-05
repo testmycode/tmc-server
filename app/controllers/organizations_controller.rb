@@ -5,7 +5,7 @@ require 'natsort'
 class OrganizationsController < ApplicationController
   before_action :set_organization, only: %i[show destroy verify disable disable_reason_input toggle_visibility all_courses]
 
-  skip_authorization_check only: %i[index new]
+  skip_authorization_check only: %i[index new all_courses]
 
   def index
     ordering = Arel.sql('hidden, LOWER(name)')
@@ -51,7 +51,7 @@ class OrganizationsController < ApplicationController
   end
 
   def all_courses
-    return respond_forbidden('Submissions for this exercise are no longer accepted.') unless current_user.administrator?
+    return respond_forbidden('This feature is only for teachers and administrators.') unless current_user.administrator? || current_user.teacher?(@organization)
     add_organization_breadcrumb
     add_breadcrumb 'All Courses'
     ordering = 'hidden, disabled_status, LOWER(courses.title)'
