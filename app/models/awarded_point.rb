@@ -231,7 +231,7 @@ class AwardedPoint < ApplicationRecord
 
   private
     def kafka_update_points
-      return unless self.course.moocfi_id
+      return if !self.course.moocfi_id || self.course.moocfi_id.blank?
       exercise = self.submission.exercise
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_progress')
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_points')

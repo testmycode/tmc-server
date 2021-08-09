@@ -52,7 +52,7 @@ class KafkaBatchUpdatePointsTask
       user = User.find(task.user_id)
       course = Course.find(task.course_id)
       Rails.logger.info("Publishing progress for user #{user.id} with moocfi id: #{course.moocfi_id}.")
-      if !course.moocfi_id
+      if !course.moocfi_id || course.moocfi_id.blank?
         Rails.logger.error('Cannot publish progress because moocfi id is not specified')
         return finished_successfully
       end
