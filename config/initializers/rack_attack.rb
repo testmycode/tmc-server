@@ -53,7 +53,7 @@ class Rack::Attack
   end
 
   # Limit the number of submissions per ip to 15 per 10 minutes
-  throttle('submissions per ip per 10 minutes', limit: 15, period: 10.minutes) do |req|
+  throttle('submissions per ip per 10 minutes', limit: 30, period: 10.minutes) do |req|
     req.ip if req.path =~ %r{^/exercises/\d+/submissions$} ||
     req.path =~ %r{^/org/\d+/exercises/\d+/submissions$} ||
     req.path =~ %r{^/api/v8/core/exercises/\d+/submissions$} &&
