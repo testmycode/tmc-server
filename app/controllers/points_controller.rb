@@ -106,7 +106,7 @@ class PointsController < ApplicationController
 
       users = users.where(administrator: false) unless include_admins
 
-      total_awarded = AwardedPoint.course_sheet_points(course, sheets, include_admins)
+      total_awarded = AwardedPoint.course_sheet_points(course, sheets, include_admins, only_for_user)
       total_available = AvailablePoint.course_sheet_points(course, sheets)
       {
         sheets: sheets.map do |sheet|
@@ -116,7 +116,7 @@ class PointsController < ApplicationController
             total_available: (total_available[sheet] || 0)
           }
         end,
-        total_awarded: AwardedPoint.course_points(course, include_admins, current_user.administrator?),
+        total_awarded: AwardedPoint.course_points(course, include_admins, current_user.administrator?, only_for_user),
         total_available: AvailablePoint.course_points_of_exercises(course, visible_exercises),
         awarded_for_user_and_sheet: per_user_and_sheet,
         total_for_user: user_totals,

@@ -66,7 +66,7 @@ class AwardedPoint < ApplicationRecord
     where(course_id: course.id, user_id: user.id)
   end
 
-  def self.course_points(course, include_admins = false, hidden = false)
+  def self.course_points(course, include_admins = false, hidden = false, only_for_user = nil)
     awarded_points = AwardedPoint.arel_table
     users = User.arel_table
     exercises = Exercise.arel_table
@@ -83,9 +83,15 @@ class AwardedPoint < ApplicationRecord
                     .and(submissions[:exercise_name].eq(exercises[:name]))
             )
     query = query.where(exercises[:hide_submission_results].eq(false).or(exercises[:id].eq(nil))) unless hidden
-    unless include_admins
+
+    if !include_admins && only_for_user
+      query.join(users).on(users[:id].eq(awarded_points[:user_id]), users[:administrator].eq(false), users[:legitimate_student].eq(true)).where(users[:id].eq(only_for_user.id))
+    elsif !include_admins
       query.join(users).on(users[:id].eq(awarded_points[:user_id]), users[:administrator].eq(false), users[:legitimate_student].eq(true))
+    elsif only_for_user
+      query.join(users).on(users[:id].eq(awarded_points[:user_id])).where(users[:id].eq(only_for_user.id))
     end
+
     res = ActiveRecord::Base.connection.execute(query.to_sql).to_a
     if !res.empty?
       res[0]['count'].to_i
@@ -103,7 +109,7 @@ class AwardedPoint < ApplicationRecord
       .group('awarded_points.id')
   end
 
-  def self.course_sheet_points(course, sheetnames, include_admins = false)
+  def self.course_sheet_points(course, sheetnames, include_admins = false, only_for_user = nil)
     awarded_points = AwardedPoint.arel_table
     available_points = AvailablePoint.arel_table
     exercises = Exercise.arel_table
@@ -116,8 +122,13 @@ class AwardedPoint < ApplicationRecord
             .where(exercises[:gdocs_sheet].in(sheetnames))
             .where(exercises[:course_id].eq(course.id))
             .group(exercises[:gdocs_sheet])
-    unless include_admins
+
+    if !include_admins && only_for_user
+      query.join(users).on(users[:id].eq(awarded_points[:user_id]), users[:administrator].eq(false), users[:legitimate_student].eq(true)).where(users[:id].eq(only_for_user.id))
+    elsif !include_admins
       query.join(users).on(users[:id].eq(awarded_points[:user_id]), users[:administrator].eq(false), users[:legitimate_student].eq(true))
+    elsif only_for_user
+      query.join(users).on(users[:id].eq(awarded_points[:user_id])).where(users[:id].eq(only_for_user.id))
     end
 
     res = {}
