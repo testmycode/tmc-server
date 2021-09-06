@@ -26,6 +26,7 @@ class SiteSetting
         raise "Invalid configuration file #{path}" unless data.is_a? Hash
         result = result.deep_merge(data)
       end
+      puts "settings", result
       result
     end
 

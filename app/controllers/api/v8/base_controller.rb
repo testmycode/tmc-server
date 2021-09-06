@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'rest-client'
 
 module Api
   module V8
@@ -35,9 +36,6 @@ module Api
 
       private
         def authenticate_user!
-          puts "current_user", @current_user
-          puts "token", bearer_token
-
           return @current_user if @current_user
 
           if doorkeeper_token
@@ -45,13 +43,10 @@ module Api
             raise 'Invalid token' unless @current_user
           else
             moocfi_user = validate_moocfi_user
-            puts "moocfi_user", moocfi_user
-            raise 'Invalid token' unless moocfi_user
+            # raise 'Invalid token' unless moocfi_user
 
-            @current_user ||= User.find_by(id: moocfi_user['upstream_id']) if moocfi_user['upstream_id'] > 0 
-            @current_user ||= create_user_from_moocfi(moocfi_user) if not moocfi_user['upstream_id'] or moocfi_user['upstream_id'] < 0
-            puts "current_user after find or create", @current_user
-            raise 'Invalid token' unless @current_user
+            @current_user ||= User.find_by(id: moocfi_user['upstream_id']) || create_user_from_moocfi(moocfi_user)
+            # raise 'Invalid token' unless @current_user
           end
           @current_user ||= user_from_session || Guest.new
         end
@@ -146,64 +141,68 @@ module Api
         end
 
         def validate_moocfi_user
-          uri = URI('http://localhost:4000/auth/validate')
-          req = Net::HTTP::Get.new(uri)
-          req["Authorization"] = request.authorization
+          base_url_for_moocfi = SiteSetting.value('base_url_for_moocfi')
 
-          mooc_response = Net::HTTP.start(uri.hostname, uri.port) {|http|
-            res = http.request(req)
-            JSON.parse(res.body)
-          }
-          user = mooc_response["user"]
-          puts user
-          user 
-          # @current_user ||= user
-          # @current_user ||= User.new({
-          #   id: user.id,
-          #   login: user.username,
-          #   email: user.email
-          # })
+          puts 'I am validating'
+          begin
+            res = RestClient::Request.execute(method: :get, url: "#{base_url_for_moocfi}/auth/validate", headers: { 'Authorization': request.authorization })
+            moocfi_response = JSON.parse(res.body)
 
-          # .find_by(id: mooc_response["user"]["upstream_id"])
+            moocfi_response['user']
+          rescue RestClient::ExceptionWithResponse => e
+            nil
+            # raise 'Invalid token' if (400..499).include? e.http_code.to_i
+            # raise 'Internal error' if e.http_code.to_i >= 500
+          end
         end
 
         def create_user_from_moocfi(moocfi_user)
-          puts "creating new user from", moocfi_user
-          user = User.new
-          user.login = SecureRandom.uuid
-          user.email = moocfi_user['email']
-          user.password = SecureRandom.base64(12)
-          user.administrator = moocfi_user['administrator'] || false
+          puts 'creating'
+          # TODO: find user by email
+          ActiveRecord::Base.transaction do
+            user = User.create!(
+              login: SecureRandom.uuid,
+              email: moocfi_user['email'],
+              password: SecureRandom.base64(12),
+              administrator: moocfi_user['administrator'] || false,
+            )
+            UserFieldValue.create!(field_name: 'first_name', user_id: user.id, value: moocfi_user['first_name'])
+            UserFieldValue.create!(field_name: 'last_name', user_id: user.id, value: moocfi_user['last_name'])
+            UserFieldValue.create!(field_name: 'organizational_id', user_id: user.id, value: moocfi_user['real_student_number'] || '')
 
-          user.save!
+            update_moocfi_user(user)
 
-          first_name = UserFieldValue.new(field_name: 'first_name', user_id: user.id, value: moocfi_user['first_name'])
-          last_name = UserFieldValue.new(field_name: 'last_name', user_id: user.id, value: moocfi_user['last_name'])
-          # first_name = user.user_field_values.new(field_name: 'first_name', value: moocfi_user['first_name'])
-          # last_name = user.user_field_values.new(field_name: 'last_name', value: moocfi_user['last_name'])
+            user
+          rescue StandardError, ScriptError => e
+            ActiveRecord::Rollback
 
-          first_name.save!
-          last_name.save!
+            raise e
+          end
+        end
 
-          puts "new user?", user.to_json
-
-          update_moocfi_user(user)
-
-          user
-        end 
-        
         def update_moocfi_user(user)
-          uri = URI('http://localhost:4000/api/user/update-from-tmc')
-          req = Net::HTTP::Post.new(uri, initheader = { 'Content-Type' => 'application/json' })
-          req["Authorization"] = request.authorization
-          req.body = { upstream_id: user['id'] }.to_json
+          puts 'updating'
+          base_url_for_moocfi = SiteSetting.value('base_url_for_moocfi')
+          moocfi_update_secret = 'faux' # SiteSetting.value('moocfi_update_secret')
 
-          mooc_response = Net::HTTP.start(uri.hostname, uri.port) {|http|
-            http.request(req)
-          }
-          puts mooc_response.code
-          raise "Error updating MOOC.fi user" if mooc_response.code.to_i >= 400
+          begin
+            res = RestClient::Request.execute(
+              method: :post, 
+              url: "#{base_url_for_moocfi}/api/user/update-from-tmc", 
+              payload: { 'upstream_id': user['id'], 'secret': moocfi_update_secret }.to_json,
+              headers: {
+                'Authorization': request.authorization,
+                'Content-Type':  'application/json'
+              }
+            )
+            moocfi_response = JSON.parse(res.body)
 
+            raise "Error updating MOOC.fi user: #{moocfi_response.message}" unless moocfi_response.success
+          rescue RestClient::ExceptionWithResponse => e
+            puts 'res', res
+            raise 'Error updating MOOC.fi user' if (400..499).include? e.http_code.to_i
+            raise 'Internal error' if e.http_code.to_i >= 500
+          end
         end
     end
   end
