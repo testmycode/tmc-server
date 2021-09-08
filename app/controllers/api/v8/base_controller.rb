@@ -45,7 +45,8 @@ module Api
             moocfi_user = validate_moocfi_user
             # raise 'Invalid token' unless moocfi_user
 
-            @current_user ||= User.find_by(id: moocfi_user['upstream_id']) || create_user_from_moocfi(moocfi_user)
+            puts 'validated ok', moocfi_user
+            @current_user ||= User.find_by(id: moocfi_user['upstream_id']) || create_or_update_user_from_moocfi(moocfi_user)
             # raise 'Invalid token' unless @current_user
           end
           @current_user ||= user_from_session || Guest.new
@@ -150,40 +151,45 @@ module Api
 
             moocfi_response['user']
           rescue RestClient::ExceptionWithResponse => e
-            nil
-            # raise 'Invalid token' if (400..499).include? e.http_code.to_i
-            # raise 'Internal error' if e.http_code.to_i >= 500
+            raise 'Invalid MOOC.fi token' if (400..499).include? e.http_code.to_i
+            raise 'Internal error' if e.http_code.to_i >= 500
           end
         end
 
-        def create_user_from_moocfi(moocfi_user)
-          puts 'creating'
-          # TODO: find user by email
-          ActiveRecord::Base.transaction do
-            user = User.create!(
-              login: SecureRandom.uuid,
-              email: moocfi_user['email'],
-              password: SecureRandom.base64(12),
-              administrator: moocfi_user['administrator'] || false,
-            )
-            UserFieldValue.create!(field_name: 'first_name', user_id: user.id, value: moocfi_user['first_name'])
-            UserFieldValue.create!(field_name: 'last_name', user_id: user.id, value: moocfi_user['last_name'])
-            UserFieldValue.create!(field_name: 'organizational_id', user_id: user.id, value: moocfi_user['real_student_number'] || '')
+        def create_or_update_user_from_moocfi(moocfi_user)
+          # in case we have a disrepancy, ie. MOOC.fi user and TMC user both exist, but MOOC.fi user doesn't have TMC id
+          user = User.find_by(email: moocfi_user['email'])
 
+          if user
             update_moocfi_user(user)
-
             user
-          rescue StandardError, ScriptError => e
-            ActiveRecord::Rollback
+          else
+            ActiveRecord::Base.transaction do
+              user = User.create!(
+                login: SecureRandom.uuid,
+                email: moocfi_user['email'],
+                password: SecureRandom.base64(12),
+                administrator: moocfi_user['administrator'] || false,
+              )
+              UserFieldValue.create!(field_name: 'first_name', user_id: user.id, value: moocfi_user['first_name'])
+              UserFieldValue.create!(field_name: 'last_name', user_id: user.id, value: moocfi_user['last_name'])
+              UserFieldValue.create!(field_name: 'organizational_id', user_id: user.id, value: moocfi_user['real_student_number'] || '')
 
-            raise e
+              update_moocfi_user(user)
+
+              UserMailer.email_confirmation(user, nil, nil).deliver_now
+
+              user
+            rescue StandardError, ScriptError
+              raise ActiveRecord::Rollback
+            end
           end
         end
 
         def update_moocfi_user(user)
           puts 'updating'
           base_url_for_moocfi = SiteSetting.value('base_url_for_moocfi')
-          moocfi_update_secret = 'faux' # SiteSetting.value('moocfi_update_secret')
+          moocfi_update_secret = SiteSetting.value('moocfi_update_secret')
 
           begin
             res = RestClient::Request.execute(
@@ -197,9 +203,8 @@ module Api
             )
             moocfi_response = JSON.parse(res.body)
 
-            raise "Error updating MOOC.fi user: #{moocfi_response.message}" unless moocfi_response.success
+            raise "Error updating MOOC.fi user: #{moocfi_response.message}" unless moocfi_response['success']
           rescue RestClient::ExceptionWithResponse => e
-            puts 'res', res
             raise 'Error updating MOOC.fi user' if (400..499).include? e.http_code.to_i
             raise 'Internal error' if e.http_code.to_i >= 500
           end
