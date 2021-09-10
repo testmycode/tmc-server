@@ -58,6 +58,7 @@ class PointsController < ApplicationController
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])
     authorize! :see_points, @course
+    return respond_unauthorized('Authentication required') if current_user.guest?
     show_timestamps = !!params[:timestamps]
 
     if can?(:teach, @course)
@@ -79,6 +80,7 @@ class PointsController < ApplicationController
     else
       @users.order!
     end
+    @users = [current_user] unless can?(:teach, @course)
     respond_to do |format|
       format.html
       format.json do
