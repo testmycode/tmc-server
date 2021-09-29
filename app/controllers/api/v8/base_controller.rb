@@ -45,7 +45,6 @@ module Api
             moocfi_user = validate_moocfi_user
             # raise 'Invalid token' unless moocfi_user
 
-            puts 'validated ok', moocfi_user
             @current_user ||= User.find_by(id: moocfi_user['upstream_id']) || create_or_update_user_from_moocfi(moocfi_user)
             # raise 'Invalid token' unless @current_user
           end
@@ -144,7 +143,6 @@ module Api
         def validate_moocfi_user
           base_url_for_moocfi = SiteSetting.value('base_url_for_moocfi')
 
-          puts 'I am validating'
           begin
             res = RestClient::Request.execute(method: :get, url: "#{base_url_for_moocfi}/auth/validate", headers: { 'Authorization': request.authorization })
             moocfi_response = JSON.parse(res.body)
@@ -157,7 +155,7 @@ module Api
         end
 
         def create_or_update_user_from_moocfi(moocfi_user)
-          # in case we have a disrepancy, ie. MOOC.fi user and TMC user both exist, but MOOC.fi user doesn't have TMC id
+          # in case we have a discrepancy, ie. MOOC.fi user and TMC user both exist, but MOOC.fi user doesn't have TMC id
           user = User.find_by(email: moocfi_user['email'])
 
           if user
@@ -187,14 +185,13 @@ module Api
         end
 
         def update_moocfi_user(user)
-          puts 'updating'
           base_url_for_moocfi = SiteSetting.value('base_url_for_moocfi')
           moocfi_update_secret = SiteSetting.value('moocfi_update_secret')
 
           begin
             res = RestClient::Request.execute(
-              method: :post, 
-              url: "#{base_url_for_moocfi}/api/user/update-from-tmc", 
+              method: :patch, 
+              url: "#{base_url_for_moocfi}/api/user", 
               payload: { 'upstream_id': user['id'], 'secret': moocfi_update_secret }.to_json,
               headers: {
                 'Authorization': request.authorization,
