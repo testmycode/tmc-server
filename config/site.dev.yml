@@ -20,3 +20,5 @@ valid_clients:
 kafka_bridge_url: "test"
 kafka_bridge_secret: "test"
 moocfi_service_id: "test"
+moocfi_update_secret: "test"
+base_url_for_moocfi: http://localhost:4000

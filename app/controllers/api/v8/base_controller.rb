@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'rest-client'
 
 module Api
   module V8
@@ -36,9 +37,16 @@ module Api
       private
         def authenticate_user!
           return @current_user if @current_user
+
           if doorkeeper_token
             @current_user ||= User.find_by(id: doorkeeper_token.resource_owner_id)
             raise 'Invalid token' unless @current_user
+          else
+            moocfi_user = validate_moocfi_user
+            # raise 'Invalid token' unless moocfi_user
+
+            @current_user ||= User.find_by(id: moocfi_user['upstream_id']) || create_or_update_user_from_moocfi(moocfi_user)
+            # raise 'Invalid token' unless @current_user
           end
           @current_user ||= user_from_session || Guest.new
         end
@@ -123,6 +131,79 @@ module Api
             else
               nil # without version check
             end
+          end
+        end
+
+        def bearer_token
+          pattern = /^Bearer /
+          authorization = request.authorization
+          authorization.gsub(pattern, '') if authorization && authorization.match(pattern)
+        end
+
+        def validate_moocfi_user
+          base_url_for_moocfi = SiteSetting.value('base_url_for_moocfi')
+
+          begin
+            res = RestClient::Request.execute(method: :get, url: "#{base_url_for_moocfi}/auth/validate", headers: { 'Authorization': request.authorization })
+            moocfi_response = JSON.parse(res.body)
+
+            moocfi_response['user']
+          rescue RestClient::ExceptionWithResponse => e
+            raise 'Invalid MOOC.fi token' if (400..499).include? e.http_code.to_i
+            raise 'Internal error' if e.http_code.to_i >= 500
+          end
+        end
+
+        def create_or_update_user_from_moocfi(moocfi_user)
+          # in case we have a discrepancy, ie. MOOC.fi user and TMC user both exist, but MOOC.fi user doesn't have TMC id
+          user = User.find_by(email: moocfi_user['email'])
+
+          if user
+            update_moocfi_user(user)
+            user
+          else
+            ActiveRecord::Base.transaction do
+              user = User.create!(
+                login: SecureRandom.uuid,
+                email: moocfi_user['email'],
+                password: SecureRandom.base64(12),
+                administrator: moocfi_user['administrator'] || false,
+              )
+              UserFieldValue.create!(field_name: 'first_name', user_id: user.id, value: moocfi_user['first_name'])
+              UserFieldValue.create!(field_name: 'last_name', user_id: user.id, value: moocfi_user['last_name'])
+              UserFieldValue.create!(field_name: 'organizational_id', user_id: user.id, value: moocfi_user['real_student_number'] || '')
+
+              update_moocfi_user(user)
+
+              UserMailer.email_confirmation(user, nil, nil).deliver_now
+
+              user
+            rescue StandardError, ScriptError
+              raise ActiveRecord::Rollback
+            end
+          end
+        end
+
+        def update_moocfi_user(user)
+          base_url_for_moocfi = SiteSetting.value('base_url_for_moocfi')
+          moocfi_update_secret = SiteSetting.value('moocfi_update_secret')
+
+          begin
+            res = RestClient::Request.execute(
+              method: :patch, 
+              url: "#{base_url_for_moocfi}/api/user", 
+              payload: { 'upstream_id': user['id'], 'secret': moocfi_update_secret }.to_json,
+              headers: {
+                'Authorization': request.authorization,
+                'Content-Type':  'application/json'
+              }
+            )
+            moocfi_response = JSON.parse(res.body)
+
+            raise "Error updating MOOC.fi user: #{moocfi_response.message}" unless moocfi_response['success']
+          rescue RestClient::ExceptionWithResponse => e
+            raise 'Error updating MOOC.fi user' if (400..499).include? e.http_code.to_i
+            raise 'Internal error' if e.http_code.to_i >= 500
           end
         end
     end

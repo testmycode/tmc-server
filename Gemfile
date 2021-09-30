@@ -61,7 +61,7 @@ group :development, :test do
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-rails'
-
+  gem 'solargraph' # vscode
   gem 'database_cleaner', '~> 2.0'
   gem 'launchy' # for capybara's save_and_open_page
   gem 'mimic', '~> 0.4'
