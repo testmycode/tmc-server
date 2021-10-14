@@ -10,24 +10,24 @@ We expect the user to be using account which name is tmc.
 
 Update your package list with
 ```bash
-$ sudo apt-get update
+sudo apt-get update
 ```
 TMC-server dependencies
 ```bash
-$ sudo apt-get install git build-essential zip unzip imagemagick maven make phantomjs bc postgresql postgresql-contrib chrpath libssl-dev libxft-dev libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev xfonts-75dpi libpq-dev
+sudo apt-get install git build-essential zip unzip imagemagick maven make phantomjs bc postgresql postgresql-contrib chrpath libssl-dev libxft-dev libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev xfonts-75dpi libpq-dev
 ```
 Ruby dependencies
 ```bash
-$ sudo apt-get install git-core curl zlib1g-dev libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev
+sudo apt-get install git-core curl zlib1g-dev libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev
 ```
 RVM dependencies
 ```bash
-$ sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
+sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
 ```
 ext/sandbox dependencies see [rage/sandbox](https://github.com/rage/sandbox) for latest deps  
 Requires docker to be installed aswell, read instructions [here](https://docs.docker.com/engine/install/ubuntu/).
 ```
-$ sudo apt-get install tar, zstd, moreutils, nodejs
+sudo apt-get install tar zstd moreutils nodejs
 ```
 
 Install [wkhtmltopdf](https://github.com/pdfkit/PDFKit/wiki/Installing-WKHTMLTOPDF) for course certificate generation.
@@ -38,15 +38,15 @@ Install [wkhtmltopdf](https://github.com/pdfkit/PDFKit/wiki/Installing-WKHTMLTOP
 :exclamation: If you want to install RVM as a single-user installation, please see [RVM installation instructions](https://rvm.io/rvm/install).
 
 ```bash
-$ sudo gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-$ \curl -L https://get.rvm.io | sudo bash -s stable
-$ source /etc/profile.d/rvm.sh
+sudo gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+\curl -L https://get.rvm.io | sudo bash -s stable
+source /etc/profile.d/rvm.sh
 ```
 
 Add your own user to RVM group and install Ruby
 
 ```bash
-$ sudo adduser <logged-user> rvm
+sudo adduser <logged-user> rvm
 ```
 
 Quote from [https://rvm.io/support/troubleshooting#sudo](https://rvm.io/support/troubleshooting#sudo)
@@ -55,9 +55,9 @@ Quote from [https://rvm.io/support/troubleshooting#sudo](https://rvm.io/support/
 Install ruby
 
 ```bash
-$ rvm install 2.6.0
-$ rvm use 2.6.0 --default
-$ gem install bundler
+rvm install 2.6.0
+rvm use 2.6.0 --default
+gem install bundler
 ```
 
 ### PostgreSQL
@@ -66,15 +66,15 @@ $ gem install bundler
 Run following command and when prompted give **tmc** as a password, if you want to use another username or stronger password change them into **config/database.local.yml**.
 
 ```bash
-$ sudo su postgres
-$ createuser tmc -s -P
+sudo su postgres
+createuser tmc -s -P
 ```
 
 If you cannot run the above command, you can also create the user manually
 
 ```bash
-$ sudo -u postgres
-$ psql -c "CREATE USER tmc WITH SUPERUSER CREATEUSER CREATEDB PASSWORD 'tmc';"
+sudo -u postgres
+psql -c "CREATE USER tmc WITH SUPERUSER CREATEUSER CREATEDB PASSWORD 'tmc';"
 ```
 :exclamation: Superuser access is useful for dev environment, but discouraged for production.
 
@@ -102,17 +102,17 @@ after to implement changes
 #### Clone the TMC repository
 
 ```bash
-$ git clone https://github.com/testmycode/tmc-server.git
-$ cd tmc-server
+git clone https://github.com/testmycode/tmc-server.git
+cd tmc-server
 ```
 
 ```bash
-$ bundle install
+bundle install
 ```
 
 :exclamation: If you are not using a github account, replace the repository submodule URLs with a HTTPS URL in .git/config e.g. `https://github.com/testmycode/tmc-langs.git`
 ```bash
-$ git submodule update --init --recursive
+git submodule update --init --recursive
 ```
 
 You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there.  
@@ -125,20 +125,20 @@ Note: run `bin/rake db:seed` to initialize admin account
 #### Install sandbox dependencies
 
 ```bash
-$ cd ext/sandbox
-$ npm ci
+cd ext/sandbox
+npm ci
 ```
 
 #### Run the test suite
 In the tmc-server root directory run
 ```bash
-$ bin/rake spec
+bin/rake spec
 ```
 
 #### Verify code style (optional)
 
 ```bash
-$ bundle exec rubocop
+bundle exec rubocop
 ```
 
 ### Post-install instructions
