@@ -80,9 +80,7 @@ class GitRepo
     end
   end
 
-  def chdir
-    Dir.chdir @path do
-      yield
-    end
+  def chdir(&block)
+    Dir.chdir @path, &block
   end
 end

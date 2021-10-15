@@ -242,9 +242,7 @@ class ApplicationController < ActionController::Base
       render render_options
     end
 
-    def wrap_transaction
-      ActiveRecord::Base.transaction(requires_new: true) do
-        yield
-      end
+    def wrap_transaction(&block)
+      ActiveRecord::Base.transaction(requires_new: true, &block)
     end
 end

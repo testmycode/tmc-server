@@ -236,10 +236,8 @@ class SubmissionsController < ApplicationController
   end
 
   private
-    def course_transaction
-      Course.transaction(requires_new: true) do
-        yield
-      end
+    def course_transaction(&block)
+      Course.transaction(requires_new: true, &block)
     end
 
     # Ugly manual access control :/
