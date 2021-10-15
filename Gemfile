@@ -8,7 +8,7 @@ gem 'rails', '~> 6.1'
 
 gem 'activerecord-import', '~> 1.2'
 gem 'activerecord-session_store', '~> 2.0'
-gem 'argon2', '~> 2.1'
+gem 'argon2', '~> 2.0' # Held back, higher requires Ruby 2.6 from tmc-server-base
 gem 'bootstrap', '~> 4.6' # Held back to 4.6
 gem 'cancancan', '~> 3.3'
 gem 'doorkeeper', '~> 5.5'

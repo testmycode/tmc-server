@@ -455,7 +455,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import (~> 1.2)
   activerecord-session_store (~> 2.0)
-  argon2 (~> 2.1)
+  argon2 (~> 2.0)
   bootstrap (~> 4.6)
   brakeman
   bundler-audit
