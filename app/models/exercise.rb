@@ -50,6 +50,9 @@ class Exercise < ApplicationRecord
   swagger_schema :CoreExerciseQueryDetails do
     property :id, type: :integer, example: 1
     property :checksum, type: :string, example: 'f25e139769b2688e213938456959eeaf'
+    property :course_name, type: :string, example: 'Introduction to Programming 2021'
+    property :exercise_name, type: :string, example: 'Part01-01_smile'
+    property :hide_submission_results, type: :boolean, example: false
   end
 
   swagger_schema :CoreExerciseDetails do
