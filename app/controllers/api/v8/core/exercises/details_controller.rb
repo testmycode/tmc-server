@@ -57,7 +57,7 @@ module Api
                 checksum: exercise.checksum,
                 course_name: exercise.course.name,
                 exercise_name: exercise.name,
-                hide_submission_results: exercise.course.hide_submission_results,
+                hide_submission_results: (exercise.course.hide_submission_results || exercise.hide_submission_results),
               }
             end
             present exercises: data
