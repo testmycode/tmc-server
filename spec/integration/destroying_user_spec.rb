@@ -40,7 +40,7 @@ describe 'Deleting own user', type: :request, integration: true do
     visit "/users/#{user.id}/destroy/#{token.token}"
 
     # expect(page).to have_content("Deleting the account #{user.login}")
-    expect(page).to have_content('Deleting your account will have the following consequences:')
+    expect(page).to have_content('Deleting your account will have the following consequences for all the courses where you have used this user account')
 
     expect(page).to have_button('Destroy my account permanently', disabled: true)
 
