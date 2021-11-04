@@ -6,11 +6,11 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 6.1'
 
-gem 'activerecord-import', '~> 1.0'
+gem 'activerecord-import', '~> 1.2'
 gem 'activerecord-session_store', '~> 2.0'
-gem 'argon2', '~> 2.0'
-gem 'bootstrap', '~> 4.6'
-gem 'cancancan', '~> 3.2'
+gem 'argon2', '~> 2.0' # Held back, higher requires Ruby 2.6 from tmc-server-base
+gem 'bootstrap', '~> 4.6' # Held back to 4.6
+gem 'cancancan', '~> 3.3'
 gem 'doorkeeper', '~> 5.5'
 gem 'file_validators' # Used to validate organization logo
 gem 'font-awesome-rails'
@@ -19,7 +19,7 @@ gem 'gravtastic', '~> 3.2' # Used to display user avatars
 gem 'image_processing' # Used by active_storage to make logo 100x100 on the fly
 gem 'logstasher', '~> 2.1'
 gem 'natcmp', '~> 1.4'
-gem 'newrelic_rpm', '~> 7.0'
+gem 'newrelic_rpm', '~> 8.0'
 gem 'pdfkit', '~> 0.8', require: false
 gem 'pg', '~> 1.2'
 gem 'pghero', '~> 2.8'
@@ -35,7 +35,7 @@ gem 'xml-simple', '~> 1.1', require: false
 
 gem 'hiredis', '~> 0.6' # Redis for caching
 gem 'readthis', '~> 2.2' # Redis for caching
-gem 'redis', '~> 4.2' # Redis for caching (TODO: Remove and migrate to rails cache)
+gem 'redis', '~> 4.5' # Redis for caching (TODO: Remove and migrate to rails cache)
 
 group :assets do
   gem 'jquery-rails', '~> 4.4'
@@ -46,7 +46,7 @@ end
 group :development, :test do
   gem 'capybara', '~> 3.35'
   gem 'factory_bot_rails', '~> 6.2'
-  gem 'puma', '~> 5.3'
+  gem 'puma', '~> 5.5'
   # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'

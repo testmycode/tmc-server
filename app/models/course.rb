@@ -238,7 +238,7 @@ class Course < ApplicationRecord
         hidden_if_registered_after > Time.now ||
         (!user.guest? && hidden_if_registered_after > user.created_at)
       )
-      )
+    )
   end
 
   def hide_after=(x)

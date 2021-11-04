@@ -24,11 +24,6 @@ class TmcProjectFile
     empty
   end
 
-  def force_new_sandbox
-    return false unless @data
-    @data['force_new_sandbox']
-  end
-
   private
     def self.empty
       TmcProjectFile.new({})
