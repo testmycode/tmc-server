@@ -109,7 +109,7 @@ class Ability
       end
 
       can :download, Submission do |sub|
-        !sub.course.hide_submission_results? && !sub.exercise.hide_submission_results? && can?(:read, sub)
+        !sub.course.hide_submission_results? && !sub.exercise.hide_submission_results? && (can?(:read, sub) || sub.paste_visible_for?(user))
       end
 
       can :read_results, Submission do |sub|

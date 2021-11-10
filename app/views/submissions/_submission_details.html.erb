@@ -45,7 +45,7 @@
           <li>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</li>
         <% end %>
 
-        <% if can? :read, @submission %>
+        <% if can? :read, @submission or @is_paste %>
           <li><%= link_to "Download as zip", submission_full_zip_index_path(@submission) %></li>
         <% end %>
 
