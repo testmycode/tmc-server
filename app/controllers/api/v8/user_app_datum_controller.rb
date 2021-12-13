@@ -19,7 +19,7 @@ module Api
         # headers['Transfer-Encoding'] = 'chunked'
         headers.delete('Content-Length')
 
-        self.response_body = build_json_enumerator(-> { UserAppDatum.all })
+        self.response_body = build_json_enumerator(-> { UserAppDatum.find_each })
         # render json: UserAppDatum.all
       end
 
