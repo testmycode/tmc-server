@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Api
   module V8
     class UserAppDatumController < Api::V8::BaseController
@@ -15,7 +16,7 @@ module Api
         headers['X-Accel-Buffering'] = 'no'
         headers['Cache-Control'] = 'no-cache'
         headers['Content-Type'] = 'application/json'
-        # headers['Transfer-Encoding'] = 'chunked' 
+        # headers['Transfer-Encoding'] = 'chunked'
         headers.delete('Content-Length')
 
         self.response_body = build_json_enumerator(-> { UserAppDatum.all })
