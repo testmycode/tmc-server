@@ -19,7 +19,7 @@ module Api
         # headers['Transfer-Encoding'] = 'chunked'
         headers.delete('Content-Length')
 
-        self.response_body = build_json_enumerator(-> { UserAppDatum.find_each })
+        self.response_body = build_json_enumerator(UserAppDatum)
         # render json: UserAppDatum.all
       end
 
@@ -28,7 +28,7 @@ module Api
           first = true
           Enumerator.new do |yielder|
             yielder << '['
-            query.call.each do |datum|
+            query.find_each do |datum|
               yielder << ',' unless first
               yielder << datum.to_json
               first = false
