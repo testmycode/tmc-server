@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# 11 771 957 Awarded points in database, this could take a while...
+
+AwardedPoint.all.each do |point|
+  user = point.user
+  organization = point.course.organization
+  OrganizationMembership.create!(user: user, organization: organization) unless organization.member?(user)
+end
+

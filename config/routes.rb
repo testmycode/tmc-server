@@ -84,6 +84,7 @@ TmcServer::Application.routes.draw do
 
           get 'eligible_students', to: 'courses/studyright_eligibility#eligible_students'
         end
+        resources :memberships, module: :organizations, only: [:create, :index]
       end
 
       resources :courses, only: :show do

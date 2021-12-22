@@ -31,6 +31,8 @@ class User < ApplicationRecord
   has_many :assistantships, dependent: :destroy
   has_many :assisted_courses, through: :assistantships, source: :course
   has_many :verification_tokens
+  has_many :organization_memberships, dependent: :destroy
+  has_many :memberships, through: :organization_memberships, source: :organization
 
   validates :login, presence: true,
                     uniqueness: { case_sensitive: false },
@@ -176,6 +178,10 @@ class User < ApplicationRecord
     assisted_courses.exists?(course.id)
   end
 
+  def member?(organization)
+    memberships.include?(organization)
+  end
+
   # TODO: this might need optimizing for minimizing sql queries made
   def readable_by?(user)
     user.administrator? ||
@@ -187,7 +193,7 @@ class User < ApplicationRecord
   def visible_to_teacher?(teacher)
     courses = Course.joins(organization: :teacherships).where(teacherships: { user_id: teacher.id })
     courses.each do |c|
-      return true if student_in_course?(c)
+      return true if student_in_course?(c) || member?(c.organization)
     end
     false
   end

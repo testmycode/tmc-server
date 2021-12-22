@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_02_155126) do
+ActiveRecord::Schema.define(version: 2021_12_16_171653) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -313,6 +313,16 @@ ActiveRecord::Schema.define(version: 2021_03_02_155126) do
     t.datetime "updated_at"
     t.boolean "confidential", default: true, null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
+  end
+
+  create_table "organization_memberships", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "organization_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_organization_memberships_on_organization_id"
+    t.index ["user_id", "organization_id"], name: "index_organization_memberships_on_user_id_and_organization_id", unique: true
+    t.index ["user_id"], name: "index_organization_memberships_on_user_id"
   end
 
   create_table "organizations", id: :serial, force: :cascade do |t|

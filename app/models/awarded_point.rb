@@ -51,6 +51,7 @@ class AwardedPoint < ApplicationRecord
   belongs_to :user
   belongs_to :submission
 
+  after_save :create_organization_membership
   after_save :kafka_update_points
   after_destroy :kafka_update_points
 
@@ -246,5 +247,11 @@ class AwardedPoint < ApplicationRecord
       exercise = self.submission.exercise
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_progress')
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_points')
+    end
+
+    def create_organization_membership
+      organization = self.course.organization
+      user = self.user
+      OrganizationMembership.create!(user: user, organization: organization) unless organization.member?(user)
     end
 end
