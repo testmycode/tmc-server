@@ -44,7 +44,7 @@ class Organization < ApplicationRecord
     allow: /^image\/.*/
   }
 
-  #TODO: After memberships have been populated from AwardedPoints, @my_organizations, that uses these scopes, can be replaced with membership organizations
+  # TODO: After memberships have been populated from AwardedPoints, @my_organizations, that uses these scopes, can be replaced with membership organizations
   scope :accepted_organizations, -> { where(verified: true).where(disabled: false) }
   scope :pending_organizations, -> { where(verified: false).where(disabled: false) }
   scope :assisted_organizations, ->(user) { joins(:courses, courses: :assistantships).where(assistantships: { user_id: user.id }) }

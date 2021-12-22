@@ -8,4 +8,3 @@ AwardedPoint.all.each do |point|
   organization = point.course.organization
   OrganizationMembership.create!(user: user, organization: organization) unless organization.member?(user)
 end
-

@@ -8,7 +8,7 @@ module Api
 
         swagger_path '/api/v8/org/{organization_slug}/memberships' do
           operation :post do
-            key :description, "Creates a membership to the organization for the current user."
+            key :description, 'Creates a membership to the organization for the current user.'
             key :operationId, 'createUserOrganizationMembership'
             key :produces, ['application/json']
             key :tags, ['organization', 'membership']
@@ -28,7 +28,7 @@ module Api
 
         swagger_path '/api/v8/org/{organization_slug}/memberships' do
           operation :get do
-            key :description, "Returns a list of organization members."
+            key :description, 'Returns a list of organization members.'
             key :operationId, 'findUserOrganizationMembership'
             key :produces, ['application/json']
             key :tags, ['organization', 'membership']
@@ -78,17 +78,14 @@ module Api
           authorize! :teach, organization
 
           data = organization.members.map do |u|
-            user_fields = u.user_field_values.map { |o| [o.field_name, o.value] }.to_h
-            d = {
+            {
               id: u.id,
               email: u.email,
             }
           end
           present(members: data)
         end
-
       end
     end
   end
 end
-  

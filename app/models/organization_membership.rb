@@ -9,4 +9,3 @@ class OrganizationMembership < ApplicationRecord
             uniqueness: { scope: :organization, message: 'is already in this organization' }
   validates :organization, presence: true
 end
-  
