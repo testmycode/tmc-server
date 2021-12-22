@@ -1,10 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# 11 771 957 Awarded points in database, this could take a while...
+user_course_combos = AwardedPoint.distinct.pluck(:user_id, :course_id)
 
-AwardedPoint.all.each do |point|
-  user = point.user
-  organization = point.course.organization
-  OrganizationMembership.create!(user: user, organization: organization) unless organization.member?(user)
-end
+course_ids = user_course_combos.map { |combo| combo[1] }.uniq
+
+course_id_to_organization_id = Course.find(course_ids).map { |c| [c.id, c.organization_id] }.to_h
+
+user_org_combos = user_course_combos.map { |combo| [combo[0], course_id_to_organization_id[combo[1]]] }.uniq.to_h
+
+user_org_combos.each { |user_id, org_id| OrganizationMembership.create!(user: User.find(user_id), organization: Organization.find(org_id)) }
