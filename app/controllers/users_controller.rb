@@ -86,8 +86,8 @@ class UsersController < ApplicationController
     language = params[:language]
     VerificationToken.unscoped.email.find_by!(user_id: params[:user_id], token: params[:id])
     redirect_path = root_url
-    redirect_path = "https://course.elementsofai.com/#{language ? "#{language}/" : ''}email-verification" if params[:origin] && params[:origin].start_with?('elements_of_ai')
-    redirect_path = "https://buildingai.elementsofai.com/#{language ? "#{language}/" : ''}email-verified" if params[:origin] && params[:origin].start_with?('building_ai')
+    redirect_path = "https://course.elementsofai.com/#{language && language != "en" ? "#{language}/" : ''}email-verification" if params[:origin] && params[:origin].start_with?('elements_of_ai')
+    redirect_path = "https://buildingai.elementsofai.com/#{language && language != "en" ? "#{language}/" : ''}email-verified" if params[:origin] && params[:origin].start_with?('building_ai')
     User.find(params[:user_id]).update!(email_verified: true)
     redirect_to redirect_path, notice: 'Your email address has been verified!'
   end
