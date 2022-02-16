@@ -448,29 +448,9 @@ td.hljs-ln-numbers {
 	/* your custom style here */
 }
 
-/* 2022-01-01
-   BUG: Mozilla inserts newlines in text copied from code listing [https://bugzilla.mozilla.org/show_bug.cgi?id=1625534]
-   FIX: unset *user-select on mozilla browsers
-   (Uses CSS-hack described: [https://bugzilla.mozilla.org/show_bug.cgi?id=1446470]) */
-@-moz-document url-prefix() {
-  td.hljs-ln-numbers {
-    -webkit-user-select:unset;
-    -moz-user-select:unset;
-    -ms-user-select:unset;
-    user-select:unset;
-  }
-}
-
 /* for block of code */
 td.hljs-ln-code {
 	padding-left: 10px !important;
-}
-
-/* 2022-01-01
-   BUG: Mozilla inserts newlines when copying text before div blocks.
-   FIX: set display: inline-block on div.hljs-ln-line */
-div.hljs-ln-line {
-  display: inline-block
 }
 
 .course-card-link:hover {
