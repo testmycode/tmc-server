@@ -1,4 +1,4 @@
-FROM testmycode/tmc-server-base:latest
+FROM eu.gcr.io/moocfi-public/tmc-server-base:latest
 LABEL name tmc-server
 
 ADD Gemfile /app/Gemfile
