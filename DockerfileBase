@@ -14,8 +14,8 @@ RUN wget --no-check-certificate -O /tmp/phantomjs.tar.bz2  https://bitbucket.org
     ln -s /srv/var/phantomjs/bin/phantomjs /usr/bin/phantomjs && \
     \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" > /etc/apt/sources.list.d/postgresql.list && \
-    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" > /etc/apt/sources.list.d/webupd8team-java.list && \
-    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" >> /etc/apt/sources.list.d/webupd8team-java.list && \
+    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu bionic main" > /etc/apt/sources.list.d/webupd8team-java.list && \
+    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu bionic main" >> /etc/apt/sources.list.d/webupd8team-java.list && \
     echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
