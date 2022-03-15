@@ -119,7 +119,7 @@ You can view the site settings from the file `config/site.defaults.yml`. If you 
 > Note: You do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`.  
 :exclamation: For development environment you can run command `cp config/site.dev.yml config/site.yml`
 
-Initialize the database with `bin/rake db:create db:schema:load`
+Initialize the database with `bin/rake db:create db:migrate`
 Note: run `bin/rake db:seed` to initialize admin account
 
 #### Install sandbox dependencies
