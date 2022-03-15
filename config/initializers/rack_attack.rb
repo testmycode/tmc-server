@@ -11,9 +11,9 @@ class Rack::Attack
 
   # This safelist is needed because courses.mooc.fi backend auths user
   # rather then the user and his IP.
-  safelist('mark any auth request safe') do |request|
+  safelist('mark courses.mooc.fi backend requests as safe') do |request|
     if ENV['RACK_ATTACK_SAFE_API_KEY']
-      ENV['RACK_ATTACK_SAFE_API_KEY'] == request.params['RATELIMIT_PROTECTION_SAFE_API_KEY']
+      ENV['RACK_ATTACK_SAFE_API_KEY'] == request.headers['RATELIMIT_PROTECTION_SAFE_API_KEY']
     else
       false
     end
