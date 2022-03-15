@@ -13,7 +13,7 @@ class Rack::Attack
   # rather then the user and his IP.
   safelist('mark courses.mooc.fi backend requests as safe') do |request|
     if ENV['RACK_ATTACK_SAFE_API_KEY']
-      ENV['RACK_ATTACK_SAFE_API_KEY'] == request.headers['RATELIMIT_PROTECTION_SAFE_API_KEY']
+      ENV['RACK_ATTACK_SAFE_API_KEY'] == request.get_header('RATELIMIT_PROTECTION_SAFE_API_KEY')
     else
       false
     end
