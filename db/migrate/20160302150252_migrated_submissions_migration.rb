@@ -1,4 +1,4 @@
-class MigratedSubmissions < ActiveRecord::Migration[4.2]
+class MigratedSubmissionsMigration < ActiveRecord::Migration[4.2]
   def change
     create_table :migrated_submissions, :id => false do |t|
       t.integer :from_course_id

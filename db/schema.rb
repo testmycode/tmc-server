@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_16_171653) do
+ActiveRecord::Schema.define(version: 2022_01_03_090515) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -396,7 +396,7 @@ ActiveRecord::Schema.define(version: 2021_12_16_171653) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
-  create_table "submission_data", primary_key: "submission_id", id: :serial, force: :cascade do |t|
+  create_table "submission_data", primary_key: "submission_id", id: :integer, default: nil, force: :cascade do |t|
     t.binary "return_file"
     t.binary "stdout_compressed"
     t.binary "stderr_compressed"
@@ -422,8 +422,6 @@ ActiveRecord::Schema.define(version: 2021_12_16_171653) do
     t.integer "times_sent_to_sandbox", default: 0, null: false
     t.datetime "processing_attempts_started_at"
     t.integer "processing_priority", default: 0, null: false
-    t.binary "stdout_compressed"
-    t.binary "stderr_compressed"
     t.text "params_json"
     t.boolean "requires_review", default: false, null: false
     t.boolean "requests_review", default: false, null: false
@@ -523,6 +521,7 @@ ActiveRecord::Schema.define(version: 2021_12_16_171653) do
     t.boolean "legitimate_student", default: true, null: false
     t.boolean "email_verified", default: false, null: false
     t.string "argon_hash"
+    t.index "lower(email)", name: "index_user_email_lowercase", unique: true
     t.index ["login"], name: "index_users_on_login", unique: true
   end
 

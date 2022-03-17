@@ -19,6 +19,7 @@ class ConvertToActiveStorage < ActiveRecord::Migration[6.1]
 
     transaction do
       models.each do |model|
+        next unless model == Organization
         attachments = model.column_names.map do |c|
           if c =~ /(.+)_file_name$/
             $1
