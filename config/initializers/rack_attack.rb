@@ -2,6 +2,19 @@
 
 require 'rack/attack'
 
+LOGGER = Logger.new('log/rack-attack.log')
+ActiveSupport::Notifications.subscribe('rack.attack') do |_name, _start, _finish, _request_id, req|
+  req = req[:request]
+  msg = [req.env['rack.attack.match_type'], req.ip, req.request_method, req.fullpath, ('"' + req.user_agent.to_s + '"')].join(' ')
+  if %i[throttle blocklist].include?(req.env['rack.attack.match_type'])
+    LOGGER.error(msg)
+  else
+    # Safelist should log here, i.e. courses.mooc.fi
+    LOGGER.info(msg)
+  end
+end
+
+# RACK Request: https://github.com/rack/rack/blob/main/lib/rack/request.rb
 class Rack::Attack
   def self.user_identifier_discriminator(access_token)
     db_token = Doorkeeper::AccessToken.find_by(token: access_token)
@@ -13,7 +26,7 @@ class Rack::Attack
   # rather then the user and his IP.
   # RACK Request adds the "HTTP_" infront of the header key.
   safelist('mark courses.mooc.fi backend requests as safe') do |request|
-    if ENV['RACK_ATTACK_SAFE_API_KEY']
+    if ENV['RACK_ATTACK_SAFE_API_KEY'] && request.has_header?('HTTP_RATELIMIT_PROTECTION_SAFE_API_KEY')
       ENV['RACK_ATTACK_SAFE_API_KEY'] == request.get_header('HTTP_RATELIMIT_PROTECTION_SAFE_API_KEY')
     else
       false
