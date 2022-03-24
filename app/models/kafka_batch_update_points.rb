@@ -7,7 +7,7 @@ class KafkaBatchUpdatePoints < ApplicationRecord
     transaction do
       create!(course_id: course_id, user_id: user_id, realtime: false, task_type: "user_progress")
       Exercise.where(course_id: 600).each do |exercise|
-        create!(course_id: course_id, user_id: user_id, exercise_id: exercise.id realtime: false, task_type: "user_points")
+        create!(course_id: course_id, user_id: user_id, exercise_id: exercise.id, realtime: false, task_type: "user_points")
       end
     end
   end
