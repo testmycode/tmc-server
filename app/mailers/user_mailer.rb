@@ -32,7 +32,7 @@ class UserMailer < ActionMailer::Base
     subject = 'Потвърдете своя имейл, за да започнете курса „Elements of AI“.' if language == 'bg'
     subject = 'Conferma il tuo indirizzo e-mail per cominciare il corso Elements of AI' if language == 'it'
     subject = 'Abyste mohl/a začít s kurzem, potvrďte prosím svou e-mailovou adresu.' if language == 'cs'
-    subject = "#{origin}: #{subject}" if origin
+    subject = "#{origin}: #{subject}" if origin && !origin.start_with?('courses_moocfi')
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[.\/]/, '')
       origin_name += "_#{language}" if language
