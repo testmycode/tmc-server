@@ -151,7 +151,13 @@ class Course < ApplicationRecord
   #            message: 'should begin with http:// or https://'
   #          }
   validate :check_external_scoreboard_url
-  validates :moocfi_id, uniqueness: true, if: -> (x) { x.moocfi_id.present? }
+  validates :moocfi_id,
+            uniqueness: true,
+            format: {
+              with: /\A[0-9a-f]{32}\z|\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/,
+              message: "should be a hash ID. You can find it from mooc.fi from your course's details. Please leave this empty if your course is not in mooc.fi (note that mooc.fi and tmc.mooc.fi are separate services)"
+            },
+            if: -> (x) { x.moocfi_id.present? }
 
   has_many :exercises, dependent: :delete_all
   has_many :submissions, dependent: :delete_all
