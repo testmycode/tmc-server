@@ -242,7 +242,7 @@ GEM
     parallel (1.21.0)
     parser (3.0.2.0)
       ast (~> 2.4.1)
-    pdfkit (0.8.5)
+    pdfkit (0.8.7)
     pg (1.2.3)
     pghero (2.8.1)
       activerecord (>= 5)
