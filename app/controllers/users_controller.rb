@@ -95,7 +95,7 @@ class UsersController < ApplicationController
 
   def send_verification_email
     user = User.find(params[:user_id])
-    raise 'Access denied' if user != current_user && !current_user.admin?
+    raise 'Access denied' if user != current_user && !current_user.administrator?
     raise 'Already verified' if user.email_verified?
     UserMailer.email_confirmation(user).deliver_now
     redirect_to root_path, notice: "Verification email sent to #{user.email}."
