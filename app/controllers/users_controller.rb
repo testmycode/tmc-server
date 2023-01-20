@@ -122,8 +122,11 @@ class UsersController < ApplicationController
     sign_out if current_user == user
     email = user.email
     username = user.login
+    id = user.id
     user.destroy
-    RecentlyChangedUserDetail.deleted.create!(old_value: false, new_value: true, email: email, username: username)
+    RecentlyChangedUserDetail.where(username: username).delete_all
+    RecentlyChangedUserDetail.deleted.create!(old_value: id, new_value: true, email: email, username: username)
+    Doorkeeper::AccessToken.where(resource_owner_id: id).delete_all
     redirect_to root_url, notice: 'Your account has been permanently destroyed.'
   end
 
