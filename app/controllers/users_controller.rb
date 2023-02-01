@@ -125,7 +125,7 @@ class UsersController < ApplicationController
     id = user.id
     user.destroy
     RecentlyChangedUserDetail.where(username: username).delete_all
-    RecentlyChangedUserDetail.deleted.create!(old_value: id, new_value: true, email: email, username: username)
+    RecentlyChangedUserDetail.deleted.create!(new_value: true, email: email, username: username, user_id: id)
     Doorkeeper::AccessToken.where(resource_owner_id: id).delete_all
     redirect_to root_url, notice: 'Your account has been permanently destroyed.'
   end
