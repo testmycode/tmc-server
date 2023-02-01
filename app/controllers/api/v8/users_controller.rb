@@ -132,7 +132,7 @@ module Api
           update_email
           maybe_update_password
           raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
-          RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
+          RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login) unless @email_before.casecmp(@user.email).zero?
           return render json: {
             message: 'User details updated.'
           }

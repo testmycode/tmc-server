@@ -61,26 +61,24 @@ class UsersController < ApplicationController
   end
 
   def update
-    User.transaction do
-      @user = current_user
-      @email_before = @user.email
+    @user = current_user
+    @email_before = @user.email
 
-      set_email
-      password_changed = maybe_update_password(@user, params[:user])
-      set_user_fields
+    set_email
+    password_changed = maybe_update_password(@user, params[:user])
+    set_user_fields
 
-      if @user.errors.empty? && @user.save
-        RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
-        flash[:notice] = if password_changed
-          'Changes saved and password changed'
-        else
-          'Changes saved'
-        end
-        redirect_to user_path
+    if @user.errors.empty? && @user.save
+      RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login) unless @email_before.casecmp(@user.email).zero?
+      flash[:notice] = if password_changed
+        'Changes saved and password changed'
       else
-        flash.now[:error] = 'Failed to save profile'
-        render action: :show, status: :forbidden
+        'Changes saved'
       end
+      redirect_to user_path
+    else
+      flash.now[:error] = 'Failed to save profile'
+      render action: :show, status: :forbidden
     end
   end
 
