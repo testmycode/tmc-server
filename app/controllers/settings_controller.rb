@@ -11,20 +11,25 @@ class SettingsController < ApplicationController
 
   def update
     authorize! :update, @user
-    set_email
-    password_changed = maybe_update_password(@user, params[:user])
-    set_user_fields
 
-    if @user.errors.empty? && @user.save
-      flash[:notice] = if password_changed
-        'Changes saved and password changed'
+    User.transaction do
+      @email_before = @user.email
+      set_email
+      password_changed = maybe_update_password(@user, params[:user])
+      set_user_fields
+
+      if @user.errors.empty? && @user.save
+        RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
+        flash[:notice] = if password_changed
+          'Changes saved and password changed'
+        else
+          'Changes saved'
+        end
+        redirect_to participant_settings_path(@user)
       else
-        'Changes saved'
+        flash.now[:error] = 'Failed to save profile'
+        render action: :show, status: :forbidden
       end
-      redirect_to participant_settings_path(@user)
-    else
-      flash.now[:error] = 'Failed to save profile'
-      render action: :show, status: :forbidden
     end
   end
 
