@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_02_01_141929) do
+ActiveRecord::Schema.define(version: 2023_02_01_144009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -444,6 +444,7 @@ ActiveRecord::Schema.define(version: 2023_02_01_141929) do
     t.index ["exercise_name"], name: "index_submissions_on_exercise_name"
     t.index ["paste_key"], name: "index_submissions_on_paste_key"
     t.index ["processed"], name: "index_submissions_on_processed"
+    t.index ["requires_review", "requests_review"], name: "index_submissions_on_requires_review_and_requests_review"
     t.index ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name"
   end
 
