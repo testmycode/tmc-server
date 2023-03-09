@@ -112,6 +112,15 @@ class Course < ApplicationRecord
     end
   end
 
+  swagger_schema :CourseBasicInfo do
+    key :required, %i[id name organization_id title]
+
+    property :id, type: :integer, example: 13
+    property :name, type: :string, example: 'organizationid-coursename'
+    property :organization_id, type: :integer, example: 1
+    property :title, type: :string, example: 'testcourse'
+  end
+
   def links_as_json(view_context)
     {
       id: id,

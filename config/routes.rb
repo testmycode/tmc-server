@@ -56,6 +56,8 @@ TmcServer::Application.routes.draw do
 
       resources :users, only: %i[show create update] do
         resources :request_deletion, only: [:create], module: :users
+        resources :assistantships, module: :users, only: :index
+        resources :teacherships, module: :users, only: :index
       end
 
       resources :user_app_datum, only: [:index]
