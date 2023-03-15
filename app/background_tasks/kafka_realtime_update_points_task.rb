@@ -2,7 +2,7 @@
 
 require 'kafka_updater'
 
-class KafkaBatchUpdatePointsTask
+class KafkaRealtimeUpdatePointsTask
   def initialize
     @kafka_bridge_url = SiteSetting.value('kafka_bridge_url')
     @kafka_bridge_secret = SiteSetting.value('kafka_bridge_secret')
@@ -13,7 +13,7 @@ class KafkaBatchUpdatePointsTask
   def run
     return unless @kafka_bridge_url && @kafka_bridge_secret && @service_id
     return if @kafka_bridge_url.empty? || @kafka_bridge_secret.empty? || @service_id.empty?
-    KafkaBatchUpdatePoints.where(realtime: false).each do |task|
+    KafkaBatchUpdatePoints.where(realtime: true).each do |task|
       finished_successfully = false
       begin
         type = @updater.task_type(task)
