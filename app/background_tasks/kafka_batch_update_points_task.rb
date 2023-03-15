@@ -41,5 +41,4 @@ class KafkaBatchUpdatePointsTask
   def wait_delay
     5
   end
-    
 end

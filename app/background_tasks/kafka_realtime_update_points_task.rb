@@ -41,5 +41,4 @@ class KafkaRealtimeUpdatePointsTask
   def wait_delay
     5
   end
-    
 end
