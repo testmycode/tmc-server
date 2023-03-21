@@ -155,7 +155,6 @@ class AwardedPoint < ApplicationRecord
   def self.per_user_in_course_with_sheet(course, sheetname, opts = {})
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
-    submissions = Submission.arel_table
 
     sql = per_user_in_course_with_sheet_query(course, sheetname, opts[:hidden])
           .project([users[:login].as('username'), awarded_points[:name].as('name')])
@@ -219,7 +218,6 @@ class AwardedPoint < ApplicationRecord
     awarded_points = AwardedPoint.arel_table
     available_points = AvailablePoint.arel_table
     exercises = Exercise.arel_table
-    submissions = Submission.arel_table
 
     q = awarded_points
         .join(users).on(awarded_points[:user_id].eq(users[:id]))
