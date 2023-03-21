@@ -59,7 +59,6 @@ class PointsController < ApplicationController
     @course = Course.find(params[:course_id])
     authorize! :see_points, @course
     return respond_unauthorized('Authentication required') if current_user.guest?
-    show_timestamps = !!params[:timestamps]
 
     if can?(:teach, @course)
       @user_fields = UserField.all.select(&:show_in_participant_list?)
@@ -70,7 +69,7 @@ class PointsController < ApplicationController
     add_breadcrumb @sheetname
 
     @exercises = Exercise.course_gdocs_sheet_exercises(@course, @sheetname, current_user.administrator?).includes(:available_points).order!(:name)
-    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, show_timestamps: show_timestamps, hidden: current_user.administrator?)
+    @users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, @sheetname, hidden: current_user.administrator?)
 
     @users = @course.users.includes(:user_field_values)
     if params[:sort_by] == 'points'

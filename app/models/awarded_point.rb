@@ -158,17 +158,13 @@ class AwardedPoint < ApplicationRecord
     submissions = Submission.arel_table
 
     sql = per_user_in_course_with_sheet_query(course, sheetname, opts[:hidden])
-          .project([users[:login].as('username'), awarded_points[:name].as('name'), submissions[:created_at].as('time')])
+          .project([users[:login].as('username'), awarded_points[:name].as('name')])
           .to_sql
 
     result = {}
     ActiveRecord::Base.connection.execute(sql).each do |record|
       result[record['username']] ||= []
-      result[record['username']] << if opts[:show_timestamps]
-        { point: record['name'], time: record['time'] }
-      else
-        record['name']
-      end
+      result[record['username']] << record['name']
     end
     result.default = []
     result
@@ -229,13 +225,12 @@ class AwardedPoint < ApplicationRecord
         .join(users).on(awarded_points[:user_id].eq(users[:id]))
         .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
         .join(exercises, Arel::Nodes::OuterJoin).on(available_points[:exercise_id].eq(exercises[:id]))
-        .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
         .where(awarded_points[:course_id].eq(course.id))
         .where(awarded_points[:user_id].eq(users[:id]))
         .where(exercises[:course_id].eq(course.id))
         .where(exercises[:gdocs_sheet].in(sheetnames))
-        .where(submissions[:course_id].eq(course.id))
-        .where(submissions[:user_id].eq(users[:id]))
+        .where(awarded_points[:course_id].eq(course.id))
+        .where(awarded_points[:user_id].eq(users[:id]))
 
     q = q.where(exercises[:hide_submission_results].eq(false).or(exercises[:id].eq(nil))) unless hidden
     q

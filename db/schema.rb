@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_02_01_144009) do
+ActiveRecord::Schema.define(version: 2023_03_21_143927) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -440,11 +440,11 @@ ActiveRecord::Schema.define(version: 2023_02_01_144009) do
     t.string "sandbox"
     t.index ["course_id", "created_at"], name: "index_submissions_on_course_id_and_created_at"
     t.index ["course_id", "exercise_name"], name: "index_submissions_on_course_id_and_exercise_name"
+    t.index ["course_id", "requires_review", "requests_review"], name: "index_submissions_on_course_id_and_reviews"
     t.index ["course_id", "user_id"], name: "index_submissions_on_course_id_and_user_id"
     t.index ["exercise_name"], name: "index_submissions_on_exercise_name"
     t.index ["paste_key"], name: "index_submissions_on_paste_key"
     t.index ["processed"], name: "index_submissions_on_processed"
-    t.index ["requires_review", "requests_review"], name: "index_submissions_on_requires_review_and_requests_review"
     t.index ["user_id", "exercise_name"], name: "index_submissions_on_user_id_and_exercise_name"
   end
 
