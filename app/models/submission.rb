@@ -401,7 +401,9 @@ class Submission < ApplicationRecord
     def kafka_update_progress
       return if (!self.course.moocfi_id || self.course.moocfi_id.blank?) || !self.processed
       realtime = self.created_at > 1.hour.ago
+      first_submission = self.exercise.submissions_by(user).length == 1
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_progress', realtime: realtime)
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_points', realtime: realtime)
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_points', realtime: realtime) unless first_submission
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, task_type: 'user_course_points', realtime: realtime) if first_submission
     end
 end

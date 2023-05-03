@@ -200,4 +200,49 @@ class KafkaUpdater
     finished_successfully = true
     finished_successfully
   end
+
+  def update_user_course_points(task)
+    finished_successfully = false
+    course = Course.find(task.course_id)
+    user = User.find(task.user_id)
+    Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
+    if !course.moocfi_id
+      Rails.logger.error('Cannot publish points because moocfi id is not specified')
+      return finished_successfully
+    end
+    exercises = []
+    course.exercises.each do |exercise|
+      awarded_points = exercise.points_for(user)
+      completed = exercise.completed_by?(user)
+      user_submissions = exercise.submissions_by(user)
+      attempted = user_submissions.length > 0
+      original_submission_date = user_submissions.pluck(:created_at).sort.first
+      original_submission_date_str = original_submission_date.strftime("%FT%T%:z") unless original_submission_date.nil?
+      exercises << {
+        timestamp: Time.zone.now.iso8601,
+        exercise_id: exercise.id.to_s,
+        n_points: awarded_points.length,
+        completed: completed,
+        attempted: attempted,
+        user_id: user.id,
+        course_id: course.moocfi_id,
+        service_id: @service_id,
+        required_actions: [],
+        original_submission_date: original_submission_date_str,
+        message_format_version: 1
+      }
+    end
+    message = {
+      timestamp: Time.zone.now.iso8601,
+      user_id: user.id,
+      course_id: course.moocfi_id,
+      exercises: exercises,
+      message_format_version: 1
+    }
+    topic = 'user-course-points-batch'
+    RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: topic, payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}") unless @kafka_bridge_url == 'test'
+    Rails.logger.info("Publishing points finished for user #{user.id}")
+    finished_successfully = true
+    finished_successfully
+  end
 end

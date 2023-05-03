@@ -28,6 +28,8 @@ class KafkaRealtimeUpdatePointsTask
           finished_successfully = @updater.update_course_points(task)
         when 'exercises'
           finished_successfully = @updater.update_exercises(task)
+        when 'user_course_points'
+          finished_successfully = @updater.update_user_course_points(task)
         else
           Rails.logger.error("Cannot process task #{task.id} because task.task_type is not defined")
         end
