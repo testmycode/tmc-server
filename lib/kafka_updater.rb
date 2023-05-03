@@ -217,7 +217,7 @@ class KafkaUpdater
       user_submissions = exercise.submissions_by(user)
       attempted = user_submissions.length > 0
       original_submission_date = user_submissions.pluck(:created_at).sort.first
-      original_submission_date_str = original_submission_date.strftime("%FT%T%:z") unless original_submission_date.nil?
+      original_submission_date_str = original_submission_date.strftime('%FT%T%:z') unless original_submission_date.nil?
       exercises << {
         timestamp: Time.zone.now.iso8601,
         exercise_id: exercise.id.to_s,
