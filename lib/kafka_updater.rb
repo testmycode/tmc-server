@@ -142,11 +142,15 @@ class KafkaUpdater
     points_per_user.each do |username, _points_by_group|
       current_user = User.find_by(login: username)
       Rails.logger.info("Publishing points for user #{current_user.id}")
+      exercises_data = []
       exercises.map do |exercise|
         awarded_points = exercise.points_for(current_user)
         completed = exercise.completed_by?(current_user)
-        attempted = !exercise.submissions_by(current_user).empty?
-        message = {
+        user_submissions = exercise.submissions_by(current_user)
+        attempted = user_submissions.length > 0
+        original_submission_date = user_submissions.pluck(:created_at).sort.first
+        original_submission_date_str = original_submission_date.strftime('%FT%T%:z') unless original_submission_date.nil?
+        exercises_data << {
           timestamp: Time.zone.now.iso8601,
           exercise_id: exercise.id.to_s,
           n_points: awarded_points.length,
@@ -156,10 +160,18 @@ class KafkaUpdater
           course_id: course.moocfi_id,
           service_id: @service_id,
           required_actions: [],
+          original_submission_date: original_submission_date_str,
           message_format_version: 1
         }
-        RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-points-batch', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}") unless @kafka_bridge_url == 'test'
       end
+      message = {
+        timestamp: Time.zone.now.iso8601,
+        user_id: current_user.id,
+        course_id: course.moocfi_id,
+        exercises: exercises_data,
+        message_format_version: 1
+      }
+      RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: 'user-course-points-batch', payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}") unless @kafka_bridge_url == 'test'
       Rails.logger.info("Publishing points finished for user #{current_user.id}")
     end
     Rails.logger.info("Batch publishing points finished for course #{course.name}")
@@ -239,7 +251,7 @@ class KafkaUpdater
       exercises: exercises,
       message_format_version: 1
     }
-    topic = 'user-course-points-batch'
+    topic = task.realtime ? 'user-course-points-realtime' : 'user-course-points-batch'
     RestClient.post("#{@kafka_bridge_url}/api/v0/event", { topic: topic, payload: message }.to_json, content_type: :json, authorization: "Basic #{@kafka_bridge_secret}") unless @kafka_bridge_url == 'test'
     Rails.logger.info("Publishing points finished for user #{user.id}")
     finished_successfully = true
