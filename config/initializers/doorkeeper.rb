@@ -6,9 +6,13 @@ Doorkeeper.configure do
 
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    # Put your resource owner authentication logic here.
-    # Example implementation:
-    User.find_by(id: session[:user_id]) || redirect_to(login_url(return_to: request.url)) # TODO: make login nicer
+    user = User.find_by(id: session[:user_id])
+    if user
+      user
+    else
+      redirect_to(login_url(return_to: request.url))
+      nil
+    end
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
@@ -61,6 +65,7 @@ Doorkeeper.configure do
   default_scopes  :public
   optional_scopes %I[
     internal_beta_all
+    openid
   ]
 
   # Change the way client credentials are retrieved from the request object.
