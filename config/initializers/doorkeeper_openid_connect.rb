@@ -41,7 +41,7 @@ Doorkeeper::OpenidConnect.configure do
     # Example implementation:
     # resource_owner.id
 
-    user_response = RestClient.get "https://courses.mooc.fi/api/v0/tmc-server/users-by-upstream-id/#{resource_owner.id}", {:Authorization => Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project}
+    user_response = RestClient.get "https://courses.mooc.fi/api/v0/tmc-server/users-by-upstream-id/#{resource_owner.id}", { Authorization: Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project }
 
     user = JSON.parse(user_response)
 
