@@ -45,7 +45,7 @@ Doorkeeper::OpenidConnect.configure do
 
     user = JSON.parse(user_response)
 
-    user.id
+    user["id"]
 
     # or if you need pairwise subject identifier, implement like below:
     # Digest::SHA256.hexdigest("#{resource_owner.id}#{URI.parse(application.redirect_uri).host}#{'your_secret_salt'}")
