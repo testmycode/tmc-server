@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_21_143927) do
+ActiveRecord::Schema.define(version: 2023_09_10_232815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -315,6 +315,12 @@ ActiveRecord::Schema.define(version: 2023_03_21_143927) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
+  create_table "oauth_openid_requests", force: :cascade do |t|
+    t.bigint "access_grant_id", null: false
+    t.string "nonce", null: false
+    t.index ["access_grant_id"], name: "index_oauth_openid_requests_on_access_grant_id"
+  end
+
   create_table "organization_memberships", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "organization_id"
@@ -556,6 +562,7 @@ ActiveRecord::Schema.define(version: 2023_03_21_143927) do
   add_foreign_key "kafka_batch_update_points", "courses"
   add_foreign_key "model_solution_token_useds", "courses"
   add_foreign_key "model_solution_token_useds", "users"
+  add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", on_delete: :cascade
   add_foreign_key "reviews", "submissions", on_delete: :cascade
   add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "submission_data", "submissions", on_delete: :cascade

@@ -12,6 +12,7 @@ gem 'argon2', '~> 2.0' # Held back, higher requires Ruby 2.6 from tmc-server-bas
 gem 'bootstrap', '~> 4.6' # Held back to 4.6
 gem 'cancancan', '~> 3.3'
 gem 'doorkeeper', '~> 5.5'
+gem 'doorkeeper-openid_connect'
 gem 'file_validators' # Used to validate organization logo
 gem 'font-awesome-rails'
 gem 'google_drive', '~> 3.0', require: false

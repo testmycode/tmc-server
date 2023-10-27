@@ -70,12 +70,14 @@ GEM
       zeitwerk (~> 2.3)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
+    aes_key_wrap (1.1.0)
     argon2 (2.0.3)
       ffi (~> 1.14)
       ffi-compiler (~> 1.0)
     ast (2.4.2)
     autoprefixer-rails (10.3.3.0)
       execjs (~> 2)
+    bindata (2.4.15)
     bootstrap (4.6.0)
       autoprefixer-rails (>= 9.1.0)
       popper_js (>= 1.14.3, < 2)
@@ -114,6 +116,9 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.5.4)
       railties (>= 5)
+    doorkeeper-openid_connect (1.8.3)
+      doorkeeper (>= 5.5, < 5.7)
+      json-jwt (>= 1.15.0)
     erubi (1.10.0)
     eventmachine (1.2.7)
     execjs (2.8.1)
@@ -196,6 +201,11 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.6.0)
+    json-jwt (1.15.3)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      bindata
+      httpclient
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.3.0)
@@ -463,6 +473,7 @@ DEPENDENCIES
   capybara (~> 3.35)
   database_cleaner (~> 2.0)
   doorkeeper (~> 5.5)
+  doorkeeper-openid_connect
   factory_bot_rails (~> 6.2)
   file_validators
   font-awesome-rails

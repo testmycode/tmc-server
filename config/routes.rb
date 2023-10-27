@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 TmcServer::Application.routes.draw do
+  use_doorkeeper_openid_connect
   use_doorkeeper
 
   mount ActionCable.server => '/cable'
