@@ -47,7 +47,7 @@ end
 group :development, :test do
   gem 'capybara', '~> 3.35'
   gem 'factory_bot_rails', '~> 6.2'
-  gem 'puma', '~> 5.5'
+  gem 'puma', '~> 5.6'
   # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
   gem 'poltergeist', '~> 1.18'
   gem 'rspec', '~> 3.10'
