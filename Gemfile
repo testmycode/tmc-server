@@ -23,7 +23,7 @@ gem 'natcmp', '~> 1.4'
 gem 'newrelic_rpm', '~> 8.0'
 gem 'pdfkit', '~> 0.8', require: false
 gem 'pg', '~> 1.2'
-gem 'pghero', '~> 2.8'
+gem 'pghero', '~> 3.1'
 gem 'rack-attack', '~> 6.5', require: false
 gem 'rack-cors', '~> 1.1'
 gem 'rack-mini-profiler', '~> 2.3'
