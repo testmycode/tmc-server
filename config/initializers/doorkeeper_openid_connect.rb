@@ -71,7 +71,7 @@ Doorkeeper::OpenidConnect.configure do
   #   end
   # end
   claims do
-    claim :email, response: [:id_token, :user_info] do |resource_owner|
+    claim :email, scope: :openid, response: [:id_token, :user_info] do |resource_owner|
       User.find(resource_owner.id).email
     end
   end
