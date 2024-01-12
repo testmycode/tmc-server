@@ -77,7 +77,7 @@ class RemoteSandbox
             file: tar_file, notify: notify_url, token: submission.secret_token, submission_id: submission.id
           }
           payload[:docker_image] = exercise.docker_image if exercise.docker_image
-          payload[:memory_limit] = exercise.memory_limit if exercise.memory_limit
+          payload[:memory_limit_gb] = exercise.memory_limit_gb if exercise.memory_limit_gb
           payload[:cpu_limit] = exercise.cpu_limit if exercise.cpu_limit
 
           RestClient::Request.execute(method: :post, url: post_url, timeout: 5, payload: payload)
