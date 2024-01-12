@@ -126,6 +126,30 @@ class CourseRefreshDatabaseUpdater
         end
       end
 
+      def set_memory_limit
+        @rust_data['exercises'].each do |exercise|
+          ex = @course.exercises.find { |e| e.name == exercise['name'] }
+          next unless ex
+          if (exercise['tmcproject-yml'] || {}).include? 'memory_gb'
+            ex.memory_limit = exercise['tmcproject-yml']['memory_gb']
+          else
+            ex.memory_limit = 1
+          end
+        end
+      end
+
+      def set_cpu_limit
+        @rust_data['exercises'].each do |exercise|
+          ex = @course.exercises.find { |e| e.name == exercise['name'] }
+          next unless ex
+          if (exercise['tmcproject-yml'] || {}).include? 'cpus'
+            ex.cpu_limit = exercise['tmcproject-yml']['cpus']
+          else
+            ex.cpu_limit = 1
+          end
+        end
+      end
+
       def update_available_points
         @rust_data['exercises'].each do |exercise|
           added = []
