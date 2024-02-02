@@ -37,7 +37,7 @@ module Api
           can_see_everything = current_user.administrator? || current_user.teacher?(course.organization) || current_user.assistant?(course)
           authorize! :read, course
 
-          exercises = Exercise.includes(:available_points).where(course_id: course.id)
+          exercises = course.exercises
           unlocked_exercises = course.unlocks
                                      .where(user_id: current_user.id)
                                      .where(['valid_after IS NULL OR valid_after < ?', Time.now])
@@ -54,19 +54,25 @@ module Api
 
           exercises = exercises.pluck(:id)
 
-          all_exercises = course.exercises.where(disabled_status: 0)
+          all_exercises = course.exercises.includes(:available_points).where(disabled_status: 0)
           unless can_see_everything
             all_exercises = course.exercises
+                                  .includes(:available_points)
                                   .where(hidden: false)
                                   .select(&:_fast_visible?)
           end
 
+          all_awarded_points = AwardedPoints.course_user_points(course, current_user).includes(:submissions)
+
           presentable = all_exercises.map do |ex|
             points_visible = ex.points_visible_to?(current_user)
+            available_points = ex.available_points
+            available_points_names = available_points.map(&:name)
+            awarded_points = all_awarded_points.select { |awp| available_points_names.include?(awp.name) }.map(&:name)
             {
               id: ex.id,
-              available_points: points_visible ? ex.available_points : [],
-              awarded_points: points_visible ? ex.points_for(current_user) : [],
+              available_points: points_visible ? available_points : [],
+              awarded_points: points_visible ? awarded_points : [],
               name: ex.name,
               publish_time: ex.publish_time,
               solution_visible_after: ex.solution_visible_after,
