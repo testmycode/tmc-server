@@ -62,7 +62,7 @@ module Api
                                   .select(&:_fast_visible?)
           end
 
-          all_awarded_points = AwardedPoints.course_user_points(course, current_user).includes(:submissions)
+          all_awarded_points = AwardedPoint.course_user_points(course, current_user).includes(:submission)
 
           presentable = all_exercises.map do |ex|
             points_visible = ex.points_visible_to?(current_user)
