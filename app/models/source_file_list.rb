@@ -118,7 +118,7 @@ class SourceFileList
     def self.source_file?(file)
       return false unless file.file?
       dir = file.parent.to_s
-      name = file.basename.to_s
+      name = file.basename.to_s.downcase
       name.end_with?('.java', '.jsp') ||
         (name.end_with?('.xml') && name != 'build.xml' && name != 'pom.xml' && name != 'nbactions.xml' && !name.end_with?('checkstyle.xml')) ||
         name.end_with?('.properties') ||
@@ -134,7 +134,7 @@ class SourceFileList
         name.end_with?('.hpp') ||
         name.end_with?('.h') ||
         name.end_with?('.rb') ||
-        (dir.include?('/R') && name.end_with?('.R')) ||
+        (dir.include?('/R') && name.end_with?('.r')) ||
         (dir.include?('/src') && name.end_with?('.py')) ||
         dir.include?('/WEB-INF') ||
         name.end_with?('.cs')
