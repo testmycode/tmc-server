@@ -102,6 +102,13 @@ module Api
         set_user_fields
         set_extra_data
 
+        if BannedEmail.banned?(@user.email)
+          return render json: {
+            success: true,
+            message: 'User created.'
+          }
+        end
+
         if @user.errors.empty? && @user.save
           # TODO: Whitelist origins
           UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now

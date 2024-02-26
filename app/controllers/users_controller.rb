@@ -37,6 +37,12 @@ class UsersController < ApplicationController
     set_password
     set_user_fields
 
+    if BannedEmail.banned?(@user.email)
+      flash[:notice] = 'User account created. You can now log in.'
+      redirect_to root_path
+      return
+    end
+
     if @user.errors.empty? && @user.save
       UserMailer.email_confirmation(@user).deliver_now
       if @bare_layout
