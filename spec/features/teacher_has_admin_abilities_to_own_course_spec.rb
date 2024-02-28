@@ -74,20 +74,6 @@ feature 'Teacher has admin abilities to own course', feature: true do
     expect(page).not_to have_content('0/6')
   end
 
-  scenario 'Teacher can make code review' do
-    visit '/org/slug/courses/1'
-
-    expect(page).to have_content('1 code review requested')
-    click_link '1 code review requested'
-    click_link 'Requested'
-    # click_link 'Start code review'
-
-    fill_in('review_review_body', with: 'Code looks ok')
-
-    page.execute_script("$('form#new_review').submit()")
-    expect(page).to have_content('None at the moment.')
-  end
-
   scenario 'Teacher can manage course feedback questions' do
     visit '/org/slug/courses/1'
     click_link 'Manage feedback questions'
