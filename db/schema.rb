@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_02_26_094608) do
+ActiveRecord::Schema.define(version: 2024_02_28_101929) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -178,7 +178,7 @@ ActiveRecord::Schema.define(version: 2024_02_26_094608) do
     t.boolean "hide_submissions", default: false, null: false
     t.boolean "model_solution_visible_before_completion", default: false, null: false
     t.float "soft_deadline_point_multiplier", default: 0.75, null: false
-    t.boolean "code_review_requests_enabled", default: true, null: false
+    t.boolean "code_review_requests_enabled", default: false, null: false
     t.integer "grant_model_solution_token_every_nth_completed_exercise"
     t.integer "initial_coin_stash"
     t.boolean "large_exercises_consume_more_coins", default: false
