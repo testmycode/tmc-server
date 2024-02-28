@@ -573,6 +573,68 @@ Some common examples:
 </ul>
 </p>
 
+<h2>Code review</h2>
+
+<p>
+  Code reviewing is a process in which a course teacher or an assistant goes over the code in a submitted answer and reviews it, providing comments for the students. Some exercises require a codereview to be completed. Students can also manually request a code review.
+</p>
+<p>
+  If there are any unreviewed requests, the course front page has a link 'n code view requested'. You can start the review process by clicking on that link. Furthermore, the submission list on the bottom of the page shows whether each submission requires a review.
+</p>
+
+
+<%
+   student = FactoryBot.create :verified_user, login: 'student', email: 'student@example.com'
+   course = Course.find(2)
+   exercise1 = course.exercises.find_by(name: 'Week1-HelloWorld')
+   submission = FactoryBot.create :submission, course: course, user: student, exercise: exercise1, requests_review: true
+   submission_data = FactoryBot.create :submission_data, submission: submission
+   available_point = FactoryBot.create :available_point, exercise: exercise1
+   available_point.award_to(student, submission)
+
+   visit '/org/hy/courses/2'
+   highlight 'a:contains("Requested")'
+   highlight 'a:contains("1 code review requested")'
+%>
+<%= screenshot %>
+
+<p>
+  The Review page shows all submissions which still require reviews. Click the 'Requested' link for the submission you want to review.
+</p>
+
+<%
+   click_on '1 code review requested'
+   highlight 'a:contains("Requested")'
+
+%>
+<%= screenshot %>
+
+<p>
+  On the review screen, you can see student's code at the bottom of the page. Test result visibility can be toggled by clicking 'Test results'. When you have looked the code, click 'Start code review' to write your feedback.
+</p>
+
+<%
+   click_on 'Requested'
+   highlight 'button:contains("Start code review")'
+
+%>
+<%= screenshot %>
+
+<p>
+  Write you review text in the text area. If you want to notify the student by email, you can check 'Notify
+  by e-mail' checkbox. When you are ready, click 'Save review'.
+</p>
+
+
+<%
+   click_on 'Start code review'
+   fill_in 'review_review_body', with: 'Code looks ok but you could...'
+   highlight 'label:contains("Notify by e-mail")'
+   highlight 'button:contains("Save review")'
+   sleep 1      # to prevent javascript animation to be captured
+%>
+<%= screenshot %>
+
 <h2>Managing feedback questions</h2>
 
 <p>
