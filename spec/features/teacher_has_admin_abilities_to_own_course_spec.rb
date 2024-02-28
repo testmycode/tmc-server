@@ -22,6 +22,7 @@ feature 'Teacher has admin abilities to own course', feature: true do
 
     @course.refresh(@teacher.id)
     RefreshCourseTask.new.run
+    @course.update(code_review_requests_enabled: true)
 
     @exercise1 = @course.exercises.first
     @submission = FactoryBot.create :submission, course: @course, user: @student, exercise: @exercise1, requests_review: true
