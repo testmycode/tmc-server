@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_02_28_101929) do
+ActiveRecord::Schema.define(version: 2024_03_04_085436) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 2024_02_28_101929) do
     t.boolean "awarded_after_soft_deadline", default: false, null: false
     t.index ["course_id", "user_id", "name"], name: "index_awarded_points_on_course_id_and_user_id_and_name", unique: true
     t.index ["course_id", "user_id", "submission_id"], name: "index_awarded_points_on_course_id_and_user_id_and_submission_id"
+    t.index ["submission_id"], name: "index_awarded_points_on_submission_id"
     t.index ["user_id", "submission_id", "name"], name: "index_awarded_points_on_user_id_and_submission_id_and_name", unique: true
   end
 
