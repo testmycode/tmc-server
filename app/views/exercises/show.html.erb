@@ -180,8 +180,8 @@
   <div class="col-md-12">
   <h2>Submissions</h2>
     <% if !@submissions.empty? %>
-      <% if @submissions.size < @submission_count %>
-        <p>Showing <%= @submissions.size%> of <%= @submission_count %> submissions. <%= link_to "View all submissions", exercise_path(@exercise, view_all: 1) %></p>
+      <% if @submissions.size == 50 %>
+        <p>Showing only 50 submissions. <%= link_to "View all submissions", exercise_path(@exercise, view_all: 1) %></p>
       <% end %>
       <%= show_submission_list(@submissions, :show_exercise_column => false, :show_awarded_points => true) %>
     <% else %>
