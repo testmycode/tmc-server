@@ -9,6 +9,7 @@ module Api
         def index
           return respond_forbidden unless current_user.administrator?
           RecentlyChangedUserDetail.deleted.where('created_at < ?', DateTime.now - 1.week).update(email: nil)
+          RecentlyChangedUserDetail.email_changed.where('created_at < ?', DateTime.now - 1.month).delete_all
           render json: { changes: RecentlyChangedUserDetail.all }
         end
       end
