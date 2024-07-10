@@ -30,7 +30,7 @@ module TmcServer
     config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log]
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.eager_load_paths << Rails.root.join('lib')
+    # config.eager_load_paths << Rails.root.join('lib')
 
     config.relative_url_root = SiteSetting.value('base_path')
 

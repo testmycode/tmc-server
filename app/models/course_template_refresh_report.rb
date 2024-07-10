@@ -2,10 +2,10 @@
 
 class CourseTemplateRefreshReport < ApplicationRecord
   belongs_to :course_template_refresh
-  serialize :refresh_errors, Array
-  serialize :refresh_warnings, Array
-  serialize :refresh_notices, Array
-  serialize :refresh_timings, Hash
+  serialize :refresh_errors, class: Array, coder: JSON
+  serialize :refresh_warnings, class: Array, coder: JSON
+  serialize :refresh_notices, class: Array, coder: JSON
+  serialize :refresh_timings, class: Hash, coder: JSON
 
   attr_reader :refresh_errors
   attr_reader :refresh_warnings

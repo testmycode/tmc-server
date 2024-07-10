@@ -9,7 +9,7 @@ gem 'rails', '~> 7.1', '>= 7.1.3.4'
 gem 'activerecord-import', '~> 1.7'
 gem 'activerecord-session_store', '~> 2.1'
 gem 'argon2', '~> 2.3'
-gem 'bootstrap', '~> 5.3', '>= 5.3.3'
+gem 'bootstrap', '~> 4.6' # Held back to 4.6
 gem 'cancancan', '~> 3.6', '>= 3.6.1'
 gem 'doorkeeper', '~> 5.7', '>= 5.7.1'
 gem 'doorkeeper-openid_connect', '~> 1.8', '>= 1.8.9'
@@ -33,6 +33,7 @@ gem 'rest-client', '~> 2.1', require: false
 gem 'swagger-blocks', '~> 3.0'
 gem 'sassc-rails', '~> 2.1', '>= 2.1.2'
 gem 'xml-simple', '~> 1.1', '>= 1.1.9', require: false
+gem 'cgi', '~> 0.3.6'
 
 gem 'hiredis', '~> 0.6.3' # Redis for caching
 gem 'readthis', '~> 2.2' # Redis for caching

@@ -2,7 +2,6 @@
 
 require 'json'
 require 'benchmark'
-require 'remote_sandbox'
 
 class SandboxStatusFetcherTask
   def initialize

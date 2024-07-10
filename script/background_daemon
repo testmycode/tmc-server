@@ -34,7 +34,7 @@ processes = BackgroundTaskRegistry.all_tasks.map do |task|
         Rails.logger.error "#{task.class.name} exception: " + exception_to_str(e)
 
         begin
-          ActiveRecord::Base.clear_active_connections!
+          ActiveRecord::Base.connection_handler.clear_active_connections!
         rescue StandardError => e2
           Rails.logger.error 'Failed to get rid of used db connections: ' + exception_to_str(e2)
         end

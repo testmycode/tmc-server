@@ -2,6 +2,7 @@
 
 require 'rust_langs_cli_executor'
 require 'fileutils'
+require 'course_refresh_database_updater'
 
 class RefreshCourseTask
   def initialize

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'version'
-require 'twitter-bootstrap-breadcrumbs'
+require 'twitter_bootstrap_breadcrumbs'
 
 # Base class for all controllers.
 #
