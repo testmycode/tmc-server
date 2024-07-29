@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'point_comparison'
+
 # Stores when a point (course_id, name) has been awared to a particular user.
 #
 # There is a reference to the submission that first awarded the point, but this

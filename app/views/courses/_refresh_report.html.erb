@@ -81,7 +81,7 @@
           <% report.course_template_refresh_report['refresh_timings'].each do |k,v| %>
             <tr>
               <td class="py-1"><%= simple_format k.to_s.split("_").join(" ").capitalize(), {}, wrapper_tag: 'span' %></td>
-              <td class="py-1 align-right"><%= "%.3f" % v.real %></td>
+              <td class="py-1 align-right"><%= "%.3f" % v["real"] %></td>
             <% end %>
           </tbody>
         </table>

@@ -63,6 +63,7 @@ class RefreshCourseTask
 
   private
     def broadcast_to_channel(id, msg, percent, time, refresh_id = nil)
+      Rails.logger.info("Broadcasting message: #{msg} to channel CourseTemplateRefreshChannel-#{id}, Percent done: #{percent}, Time: #{time}, Course Template Refresh ID: #{refresh_id}")
       ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{id}", {
         message: msg,
         percent_done: percent,

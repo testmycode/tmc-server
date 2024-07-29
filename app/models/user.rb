@@ -146,7 +146,7 @@ class User < ApplicationRecord
     user = find_by(login: login)
     user ||= find_by('lower(email) = ?', login.downcase)
     return nil if user.nil?
-    return user if user.has_password?(submitted_password)
+    user if user.has_password?(submitted_password)
   end
 
   def password_reset_key

@@ -224,7 +224,7 @@ class Submission < ApplicationRecord
         successful: tcr.successful?,
         message: tcr.message,
         exception: tcr.exception ? ActiveSupport::JSON.decode(tcr.exception) : nil,
-        detailed_message: tcr.detailed_message ? tcr.detailed_message : nil
+        detailed_message: tcr.detailed_message || nil
       }
     end
   end
