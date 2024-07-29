@@ -538,10 +538,6 @@ class Course < ApplicationRecord
     super(url)
   end
 
-  def contains_unlock_deadlines?
-    exercise_groups.any?(&:contains_unlock_deadlines?)
-  end
-
   def has_external_scoreboard_url?
     external_scoreboard_url.present?
   end
