@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'fileutils'
+require 'file_tree_hasher'
 
 describe FileTreeHasher do
   def write_file(path, content)

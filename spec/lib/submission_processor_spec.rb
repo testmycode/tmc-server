@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'submission_processor'
 
 describe SubmissionProcessor do
   def expect_processing

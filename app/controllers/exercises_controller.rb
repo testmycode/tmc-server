@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'submission_list'
+
 class ExercisesController < ApplicationController
   def show
     @exercise = Exercise.find(params[:id])

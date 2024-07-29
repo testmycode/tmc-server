@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'course_list'
+
 class Api::Beta::ParticipantController < Api::Beta::BaseController
   before_action :doorkeeper_authorize!, scopes: [:public]
 

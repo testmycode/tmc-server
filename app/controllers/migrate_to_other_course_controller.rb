@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'student_submission_migrator'
+
 class MigrateToOtherCourseController < ApplicationController
   def show
     @old_course = Course.find(params[:course_id])

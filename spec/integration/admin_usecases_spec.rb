@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'submission_processor'
 
 describe 'The system (used by an instructor for administration)', type: :request, integration: true do
   include IntegrationTestActions

@@ -9,6 +9,7 @@ require 'etc'
 require 'fileutils'
 require 'capybara/poltergeist'
 require 'simplecov'
+require 'tailoring'
 # require 'rspec_remote_formatter'
 SimpleCov.start 'rails' do
   add_filter '/bin/'

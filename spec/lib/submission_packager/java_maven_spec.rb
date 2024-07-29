@@ -4,6 +4,8 @@ require 'spec_helper'
 require 'tmpdir'
 require 'shellwords'
 require 'system_commands'
+require 'submission_packager'
+require 'rust_langs_cli_executor'
 
 # There is some functionality in common with JavaSimple. We mostly only test that in java_simple_spec.rb.
 describe SubmissionPackager do

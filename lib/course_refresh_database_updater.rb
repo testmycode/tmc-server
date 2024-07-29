@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'benchmark'
+require 'system_commands'
 
 class CourseRefreshDatabaseUpdater
   def refresh_course(course, refreshed_course_data)

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'course_refresh_database_updater'
+
 class Setup::CourseDetailsController < Setup::SetupController
   before_action :set_course, except: %i[new create]
 

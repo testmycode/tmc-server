@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'test_run_grader'
 
 describe TestRunGrader do
   include GitTestActions

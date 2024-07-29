@@ -3,6 +3,8 @@
 # Saves results from a remote sandbox to the database.
 #
 # See also: TestRunGrader
+require 'test_run_grader'
+
 module SandboxResultsSaver
   class InvalidTokenError < RuntimeError; end
 

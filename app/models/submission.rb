@@ -2,6 +2,7 @@
 
 require 'zlib'
 require 'securerandom'
+require 'submission_packager'
 
 class Submission < ApplicationRecord
   include Swagger::Blocks

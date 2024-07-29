@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'submission_processor'
+
 module Api
   module V8
     module Core

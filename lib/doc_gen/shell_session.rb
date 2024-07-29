@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'cgi' # for escapeHTML
+require 'doc_gen'
 
 class DocGen
   # A shell session where the interaction can be printed to the generated document.

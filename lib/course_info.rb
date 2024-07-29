@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'natsort'
+require 'course_list'
 
 # Builds /courses/:id.json
 class CourseInfo

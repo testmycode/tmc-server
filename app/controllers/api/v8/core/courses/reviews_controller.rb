@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'natsort'
+
 module Api
   module V8
     module Core

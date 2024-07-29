@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'doc_gen'
 
 describe 'User manual', type: :request, usermanual: true, integration: true do
   def make_page(name)
