@@ -166,6 +166,7 @@ FactoryBot.define do
     sequence(:information) { |n| "information#{n}" }
     sequence(:slug) { |n| "organization#{n}" }
     verified { false }
+    creator factory: :user
   end
 
   factory :accepted_organization, class: Organization do
@@ -173,5 +174,6 @@ FactoryBot.define do
     sequence(:information) { |n| "a_information#{n}" }
     sequence(:slug) { |n| "a_organization#{n}" }
     verified { true }
+    creator factory: :user
   end
 end
