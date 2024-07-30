@@ -17,6 +17,8 @@ describe Unlock, type: :model do
       @available_point = FactoryBot.create(:available_point, exercise_id: @ex1.id)
       @available_point2 = FactoryBot.create(:available_point, exercise_id: @ex2.id)
 
+      @submission = FactoryBot.create(:submission, course: @course, user: @user, exercise: @ex1)
+
       @course.reload
     end
 
@@ -28,7 +30,7 @@ describe Unlock, type: :model do
       expect(unlocks.first.valid_after).to eq(Date.parse('2011-11-11').in_time_zone)
       expect(unlocks.first.exercise_name).to eq('ex1')
 
-      AwardedPoint.create!(user_id: @user.id, course_id: @course.id, name: @available_point.name)
+      AwardedPoint.create!(user_id: @user.id, course_id: @course.id, name: @available_point.name, submission_id: @submission.id)
       Unlock.refresh_unlocks(@course, @user)
 
       unlocks = Unlock.order('exercise_name ASC').to_a

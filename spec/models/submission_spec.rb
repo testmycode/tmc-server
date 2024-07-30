@@ -21,7 +21,7 @@ describe Submission, type: :model do
 
       submission = Submission.new(@params)
       expect(submission).not_to be_valid
-      expect(submission.errors[:user].size).to eq(1)
+      expect(submission.errors[:user].size).to eq(2)
     end
 
     it 'should require an exercise name' do
@@ -45,7 +45,7 @@ describe Submission, type: :model do
 
       submission = Submission.new(@params)
       expect(submission).not_to be_valid
-      expect(submission.errors[:course].size).to eq(1)
+      expect(submission.errors[:course].size).to eq(2)
     end
   end
 
