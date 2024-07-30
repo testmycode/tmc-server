@@ -51,7 +51,7 @@ class AwardedPoint < ApplicationRecord
 
   belongs_to :course
   belongs_to :user
-  belongs_to :submission
+  belongs_to :submission, optional: true
 
   after_save :create_organization_membership
   after_save :kafka_update_points
