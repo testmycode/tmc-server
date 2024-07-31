@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class OrganizationMembership < ApplicationRecord
-  belongs_to :user
-  belongs_to :organization
+  belongs_to :user, optional: true
+  belongs_to :organization, optional: true
 
   validates :user,
             presence: { message: 'does not exist' },

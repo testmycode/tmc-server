@@ -70,7 +70,7 @@ class Submission < ApplicationRecord
                  # Used when doing submissions.include(:exercises)
                  Exercise.joins(:submission)
                end
-             end), foreign_key: :exercise_name, primary_key: :name
+             end), foreign_key: :exercise_name, primary_key: :name, optional: true
 
   has_one :submission_data, dependent: :delete
   after_save { submission_data&.save! }

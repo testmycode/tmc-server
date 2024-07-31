@@ -18,13 +18,13 @@ describe Assistantship, type: :model do
   it "can't create assistantship if course is non-existant" do
     user = FactoryBot.create :user
     course = FactoryBot.create :course
-    expect { Assistantship.create! user_id: user.id, course_id: course.id + 1 }.to raise_error("Validation failed: Course can't be blank")
+    expect { Assistantship.create! user_id: user.id, course_id: course.id + 1 }.to raise_error("Validation failed: Course must exist, Course can't be blank")
   end
 
   it "can't create assistantship if user is non-existant" do
     user = FactoryBot.create :user
     course = FactoryBot.create :course
-    expect { Assistantship.create! user_id: user.id + 1, course_id: course.id }.to raise_error('Validation failed: User does not exist')
+    expect { Assistantship.create! user_id: user.id + 1, course_id: course.id }.to raise_error('Validation failed: User must exist, User does not exist')
   end
 
   it "can't create assistantship if user already assistant" do
