@@ -29,7 +29,7 @@ describe FeedbackRepliesController, '#create', type: :controller do
 
   describe 'for an admin user' do
     let(:admin) { FactoryBot.create(:admin, email: 'admin@mydomain.com') }
-    let(:url) { 'http://url.where.we.arrived.com' }
+    let(:url) { 'http://test.host/referer' }
     before do
       controller.current_user = admin
       request.env['HTTP_REFERER'] = url
