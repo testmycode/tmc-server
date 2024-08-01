@@ -7,7 +7,8 @@ require 'rspec/rails'
 require 'database_cleaner'
 require 'etc'
 require 'fileutils'
-require 'capybara/poltergeist'
+require 'capybara/rspec'
+require "capybara/cuprite"
 require 'simplecov'
 require 'tailoring'
 # require 'rspec_remote_formatter'
@@ -26,24 +27,43 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 # Dir[Rails.root.join('lib/**/*.rb')].each { |f| require f }
 
 # Use :selenium this if you want to see what's going on and don't feel like screenshotting
-# Otherwise :poltergeist with PhantomJS is somewhat faster and doesn't pop up in your face.
+# Otherwise :cuprite with PhantomJS is somewhat faster and doesn't pop up in your face.
 #
 # Recommendation for Selenium: run tests under Xvfb:
 # In console 1: Xvfb :99
 # In console 2: env DISPLAY=:99 rvmsudo rake spec
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, timeout: 60, js_errors: false)
+Capybara.register_driver(:cuprite) do |app|
+  Capybara::Cuprite::Driver.new(app, browser_options: { 'no-sandbox': nil })
 end
 
-Capybara.default_driver = :poltergeist
+Capybara.default_driver = :cuprite
+Capybara.javascript_driver = :cuprite
 
 Capybara.server = :puma, { Silent: true }
 Capybara.server_port = FreePorts.take_next
 Capybara.default_max_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
+Capybara.default_max_wait_time = 5
+Capybara.disable_animation = true
 
 if Capybara.default_driver == :selenium
   Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
+end
+
+RSpec.configure do |config|
+  config.before(:each, type: :system) do
+    driven_by(:cuprite, screen_size: [1440, 810], options: {
+      js_errors: false,
+      headless: %w[0 false].exclude?(ENV["HEADLESS"]),
+      slowmo: ENV["SLOWMO"]&.to_f,
+      process_timeout: 15,
+      timeout: 10,
+      browser_options: { 'no-sandbox': nil },
+      pending_connection_errors: false
+    })
+  end
+
+  config.filter_gems_from_backtrace("capybara", "cuprite", "ferrum")
 end
 
 def get_m3_home
