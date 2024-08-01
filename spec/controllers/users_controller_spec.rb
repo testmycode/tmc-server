@@ -12,7 +12,7 @@ describe UsersController, type: :controller do
       it 'should redirect to login page' do
         get :show
         expect(response.status).to eq(302)
-        expect(response.headers["Location"]).to include('/login?return_to=%2Fuser')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fuser')
       end
 
       it 'should deny access if signup is disabled in site settings' do

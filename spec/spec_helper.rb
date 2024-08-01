@@ -8,7 +8,7 @@ require 'database_cleaner'
 require 'etc'
 require 'fileutils'
 require 'capybara/rspec'
-require "capybara/cuprite"
+require 'capybara/cuprite'
 require 'simplecov'
 require 'tailoring'
 # require 'rspec_remote_formatter'
@@ -54,8 +54,8 @@ RSpec.configure do |config|
   config.before(:each, type: :system) do
     driven_by(:cuprite, screen_size: [1440, 810], options: {
       js_errors: false,
-      headless: %w[0 false].exclude?(ENV["HEADLESS"]),
-      slowmo: ENV["SLOWMO"]&.to_f,
+      headless: %w[0 false].exclude?(ENV['HEADLESS']),
+      slowmo: ENV['SLOWMO']&.to_f,
       process_timeout: 15,
       timeout: 10,
       browser_options: { 'no-sandbox': nil },
@@ -63,7 +63,7 @@ RSpec.configure do |config|
     })
   end
 
-  config.filter_gems_from_backtrace("capybara", "cuprite", "ferrum")
+  config.filter_gems_from_backtrace('capybara', 'cuprite', 'ferrum')
 end
 
 def get_m3_home

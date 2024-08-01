@@ -8,7 +8,7 @@ class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
     if kind =~ FeedbackQuestion.send(:intrange_regex)
       range = (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
       if !/^(-?\d+)$/.match?(ans)
-        record.errors.add(:answer, "is not an integer")
+        record.errors.add(:answer, 'is not an integer')
       elsif !range.include?(ans.to_i)
         record.errors.add(:answer, "is not between #{range.first}..#{range.last}")
       end
