@@ -51,7 +51,7 @@ group :development, :test do
   gem 'puma', '~> 6.4', '>= 6.4.2'
   gem 'thin', '~> 1.8', '>= 1.8.2' # A transitive dependency, this forces the latest version
   # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
-  gem 'cuprite', '~> 0.15.1'
+  gem 'poltergeist', '~> 1.18', '>= 1.18.1'
   gem 'rspec', '~> 3.13'
   gem 'rspec-activemodel-mocks', '~> 1.2'
   gem 'rspec-core', '~> 3.13'
