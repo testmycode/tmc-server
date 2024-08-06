@@ -1,4 +1,4 @@
-FROM ruby:2.6
+FROM ruby:3.3
 LABEL name tmc-server-base
 
 ENV PHANTOMJS_VERSION 2.1.1

@@ -253,7 +253,7 @@ describe User, type: :model do
       @course1 = FactoryBot.create :course, organization: @organization1
       @course2 = FactoryBot.create :course, organization: @organization2
       @course3 = FactoryBot.create :course, organization: @organization1
-      @ex1 = FactoryBot.create :exercise, course: @course
+      @ex1 = FactoryBot.create :exercise, course: @course1
       @ex2 = FactoryBot.create :exercise, course: @course2
       @ex3 = FactoryBot.create :exercise, course: @course3
       @sub1 = FactoryBot.create :submission, user: @user1,

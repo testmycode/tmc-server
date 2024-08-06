@@ -2,6 +2,7 @@
 
 require 'tmpdir'
 require 'fileutils'
+require 'rust_langs_cli_executor'
 
 # Takes a submission zip and makes a tar file suitable for the sandbox
 class SubmissionPackager

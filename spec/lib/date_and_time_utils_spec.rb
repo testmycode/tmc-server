@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'date_and_time_utils'
 
 describe DateAndTimeUtils do
   describe '#to_time' do

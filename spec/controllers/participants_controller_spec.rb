@@ -23,7 +23,7 @@ describe ParticipantsController, type: :controller do
       it 'redirects me to login page' do
         get :me
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('login?return_to=%2Fparticipants%2Fme')
+        expect(response.headers['Location']).to include('login?return_to=%2Fparticipants%2Fme')
       end
     end
   end

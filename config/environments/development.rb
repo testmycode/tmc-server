@@ -58,4 +58,6 @@ Rails.application.configure do
   else
     config.cache_store = :memory_store, { size: 64.megabytes }
   end
+
+  config.hosts << URI.parse(SiteSetting.value('baseurl_for_remote_sandboxes')).host
 end

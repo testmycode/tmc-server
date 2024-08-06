@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'course_refresh_database_updater'
 
 describe CourseRefreshDatabaseUpdater do
   include GitTestActions

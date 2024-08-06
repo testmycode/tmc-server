@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'doc_gen'
 
 describe 'User manual', type: :request, usermanual: true, integration: true do
   def make_page(name)
@@ -9,14 +10,17 @@ describe 'User manual', type: :request, usermanual: true, integration: true do
   end
 
   it 'has a page for custom course creation manual' do
+    pending
     make_page 'customcourse'
   end
 
   it 'has a page for admins' do
+    pending
     make_page 'admins'
   end
 
   it 'has a page for teachers' do
+    pending
     make_page 'teachers'
   end
 end

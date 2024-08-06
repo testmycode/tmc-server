@@ -165,7 +165,7 @@ describe CourseTemplatesController, type: :controller do
 
     describe 'GET new' do
       it 'should respond with a 403' do
-        get :new, {}
+        get :new
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -237,7 +237,7 @@ describe CourseTemplatesController, type: :controller do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
         get :index, params: {}
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('/login?return_to=%2Fcourse_templates')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
     end
 
@@ -249,15 +249,15 @@ describe CourseTemplatesController, type: :controller do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
         get :edit, params: { id: @course_template.to_param }
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('/login?return_to=%2Fcourse_templates')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
     end
 
     describe 'GET new' do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
-        get :new, {}
+        get :new
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('/login?return_to=%2Fcourse_templates')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
     end
 
@@ -269,7 +269,7 @@ describe CourseTemplatesController, type: :controller do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
         get :edit, params: { id: @course_template.to_param }
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('/login?return_to=%2Fcourse_templates')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
     end
 
@@ -283,7 +283,7 @@ describe CourseTemplatesController, type: :controller do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
         post :create, params: { course_template: valid_attributes }
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('/login?return_to=%2Fcourse_templates')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
     end
 
@@ -300,7 +300,7 @@ describe CourseTemplatesController, type: :controller do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
         put :update, params: { id: @course_template.to_param, course_template: invalid_attributes }
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('/login?return_to=%2Fcourse_templates')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
     end
 
@@ -318,7 +318,7 @@ describe CourseTemplatesController, type: :controller do
       it 'should respond with a 302 and redirect to login with correct return_to param' do
         delete :destroy, params: { id: @course_template.to_param }
         expect(response.code.to_i).to eq(302)
-        expect(response.body).to include('/login?return_to=%2Fcourse_templates')
+        expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
     end
   end

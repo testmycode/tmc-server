@@ -89,7 +89,6 @@ module ExtraField
 
       kind = kind.to_s
 
-      require "#{kind}_field"
       cls_name = "#{kind.camelize}Field"
 
       cls = Object.const_get(cls_name)

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'point_comparison'
+
 # Stores when a point (course_id, name) has been awared to a particular user.
 #
 # There is a reference to the submission that first awarded the point, but this
@@ -49,7 +51,7 @@ class AwardedPoint < ApplicationRecord
 
   belongs_to :course
   belongs_to :user
-  belongs_to :submission
+  belongs_to :submission, optional: true
 
   after_save :create_organization_membership
   after_save :kafka_update_points

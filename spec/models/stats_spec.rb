@@ -4,17 +4,20 @@ require 'spec_helper'
 
 describe Stats, type: :model do
   it 'should give interesting statistics about the system' do
-    course1 = FactoryBot.create(:course, name: 'course1')
-    course2 = FactoryBot.create(:course, name: 'course2')
+    user1 = FactoryBot.create(:user)
+    user2 = FactoryBot.create(:user)
+    FactoryBot.create(:user)
+
+    organization = FactoryBot.create(:organization, creator: user1)
+
+    course1 = FactoryBot.create(:course, name: 'course1', organization: organization)
+    course2 = FactoryBot.create(:course, name: 'course2', organization: organization)
     cat1ex1 = FactoryBot.create(:exercise, course: course1, name: 'cat1-ex1')
     cat1ex2 = FactoryBot.create(:exercise, course: course1, name: 'cat1-ex2')
     cat2ex1 = FactoryBot.create(:exercise, course: course1, name: 'cat2-ex1')
     cat3ex1 = FactoryBot.create(:exercise, course: course2, name: 'cat3-ex1')
     FactoryBot.create(:exercise, course: course1, name: 'cat1-hiddenex', hidden: true)
 
-    user1 = FactoryBot.create(:user)
-    user2 = FactoryBot.create(:user)
-    FactoryBot.create(:user)
     create_successful_submission(course: course1, exercise: cat1ex1, user: user1)
     create_successful_submission(course: course1, exercise: cat1ex1, user: user2)
     create_successful_submission(course: course1, exercise: cat1ex2, user: user1)
@@ -42,10 +45,10 @@ describe Stats, type: :model do
     expect(egs['cat2'][:possible_completed_exercise_count]).to eq(1)
   end
 
-  def create_successful_submission(opts)
-    sub = FactoryBot.create(:submission, opts.merge(all_tests_passed: true))
+  def create_successful_submission(**kwargs)
+    sub = FactoryBot.create(:submission, all_tests_passed: true, **kwargs)
     FactoryBot.create(:test_case_run, submission: sub, successful: true)
-    expect(sub.status(opts[:user])).to eq(:ok)
+    expect(sub.status(kwargs[:user])).to eq(:ok)
     sub
   end
 end

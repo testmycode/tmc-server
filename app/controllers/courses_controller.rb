@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 require 'natsort'
-require 'course_list'
 require 'exercise_completion_status_generator'
 require 'json'
+require 'course_list'
+require 'course_info'
 
 class CoursesController < ApplicationController
   before_action :set_organization

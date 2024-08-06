@@ -3,6 +3,7 @@
 # Course stub to be copied by teachers for their own organisations
 
 require 'net/http'
+require 'system_commands'
 
 class CourseTemplate < ApplicationRecord
   include SystemCommands

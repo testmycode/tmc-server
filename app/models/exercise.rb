@@ -2,6 +2,8 @@
 
 require 'shellwords'
 
+require 'date_and_time_utils'
+
 class Exercise < ApplicationRecord
   self.include_root_in_json = false
   include Swagger::Blocks

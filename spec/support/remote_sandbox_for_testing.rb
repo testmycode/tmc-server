@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'system_commands'
+require 'sandbox_results_saver'
 
 class RemoteSandboxForTesting
   @server_pids = nil

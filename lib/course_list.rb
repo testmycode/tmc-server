@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'natsort'
+
 # Builds /courses.json
 class CourseList
   def initialize(user, helpers)

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'student_submission_migrator'
+
 class MigrateToOtherCourseController < ApplicationController
   def show
     @old_course = Course.find(params[:course_id])
@@ -11,7 +13,7 @@ class MigrateToOtherCourseController < ApplicationController
     @already_migrated = already_migrated
     @extra_alert_text = get_extra_text
     return respond_with_error('Please login to continue') if current_user.guest?
-    return respond_with_error('This migration is not allowed') unless StudentSubmissionMigrator.new(@old_course, @to_course, current_user).migration_is_allowed
+    respond_with_error('This migration is not allowed') unless StudentSubmissionMigrator.new(@old_course, @to_course, current_user).migration_is_allowed
   end
 
   def migrate

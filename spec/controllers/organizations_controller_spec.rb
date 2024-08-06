@@ -53,7 +53,7 @@ describe OrganizationsController, type: :controller do
       end
 
       it 'lists only pending organization requests' do
-        get :list_requests, {}
+        get :list_requests
         expect(assigns(:unverified_organizations).sort).to eq([@org1, @org3].sort)
       end
     end
@@ -124,7 +124,7 @@ describe OrganizationsController, type: :controller do
 
     describe 'GET list_requests' do
       it 'denies access' do
-        get :list_requests, {}
+        get :list_requests
         expect(response.code.to_i).to eq(403)
       end
     end

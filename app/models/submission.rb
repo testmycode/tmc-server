@@ -2,6 +2,7 @@
 
 require 'zlib'
 require 'securerandom'
+require 'submission_packager'
 
 class Submission < ApplicationRecord
   include Swagger::Blocks
@@ -69,7 +70,7 @@ class Submission < ApplicationRecord
                  # Used when doing submissions.include(:exercises)
                  Exercise.joins(:submission)
                end
-             end), foreign_key: :exercise_name, primary_key: :name
+             end), foreign_key: :exercise_name, primary_key: :name, optional: true
 
   has_one :submission_data, dependent: :delete
   after_save { submission_data&.save! }
@@ -224,7 +225,7 @@ class Submission < ApplicationRecord
         successful: tcr.successful?,
         message: tcr.message,
         exception: tcr.exception ? ActiveSupport::JSON.decode(tcr.exception) : nil,
-        detailed_message: tcr.detailed_message ? tcr.detailed_message : nil
+        detailed_message: tcr.detailed_message || nil
       }
     end
   end

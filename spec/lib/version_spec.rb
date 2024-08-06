@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'version'
 
 describe Version do
   it 'splits the version string into components' do

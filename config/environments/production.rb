@@ -114,4 +114,6 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   config.wkhtmltopdf = 'xvfb-run wkhtmltopdf'
+
+  config.hosts << URI.parse(SiteSetting.value('baseurl_for_remote_sandboxes')).host
 end

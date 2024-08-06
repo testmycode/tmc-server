@@ -1,7 +1,7 @@
 ## Setup
 ### Notices before installation
 
-We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` with `sudo` during the installation process.  
+We assume you use [RVM](https://rvm.io/). If you don't, then replace `rvmsudo` with `sudo` during the installation process.
 > Note: Installation instructions works on WSL, but node needs to be installed according to [these](https://docs.microsoft.com/en-us/windows/nodejs/setup-on-wsl2) instructions.
 ### Installation instructions for Ubuntu
 We expect the user to be using account which name is tmc.
@@ -24,7 +24,7 @@ RVM dependencies
 ```bash
 sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
 ```
-ext/sandbox dependencies see [rage/sandbox](https://github.com/rage/sandbox) for latest deps  
+ext/sandbox dependencies see [rage/sandbox](https://github.com/rage/sandbox) for latest deps
 Requires docker to be installed aswell, read instructions [here](https://docs.docker.com/engine/install/ubuntu/).
 ```
 sudo apt-get install tar zstd moreutils nodejs
@@ -115,8 +115,8 @@ bundle install
 git submodule update --init --recursive
 ```
 
-You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there.  
-> Note: You do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`.  
+You can view the site settings from the file `config/site.defaults.yml`. If you want to change the settings for the site, create a new file `config/site.yml` and define the changes there.
+> Note: You do not need to copy the entire file. Settings not in `site.yml` will be looked up from `site.defaults.yml`.
 :exclamation: For development environment you can run command `cp config/site.dev.yml config/site.yml`
 
 Initialize the database with `bin/rails db:create db:migrate`

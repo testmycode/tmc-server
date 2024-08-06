@@ -37,7 +37,7 @@ class Organization < ApplicationRecord
   has_many :organization_memberships, dependent: :destroy
   has_many :members, through: :organization_memberships, source: :user
 
-  belongs_to :creator, class_name: 'User'
+  belongs_to :creator, class_name: 'User', optional: true
 
   has_one_attached :logo
   validates :logo, file_content_type: {

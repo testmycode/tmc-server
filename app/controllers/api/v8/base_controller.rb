@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'version'
 
 module Api
   module V8

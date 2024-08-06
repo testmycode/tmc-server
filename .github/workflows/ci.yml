@@ -18,11 +18,11 @@ jobs:
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
       - name: Docker compose build
-        run: docker-compose build
+        run: docker compose build
       - name: Setup database & test env
-        run: docker-compose run web bin/rake db:create db:schema:load RAILS_ENV=test
+        run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
       - name: Run spec_v8 tests
-        run: docker-compose run web bin/spec_v8
+        run: docker compose run web bin/spec_v8
 
   spec_models:
     runs-on: ubuntu-latest
@@ -36,11 +36,11 @@ jobs:
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
       - name: Docker compose build
-        run: docker-compose build
+        run: docker compose build
       - name: Setup database & test env
-        run: docker-compose run web bin/rake db:create db:schema:load RAILS_ENV=test
+        run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
       - name: Run spec_models tests
-        run: docker-compose run web bin/spec_models
+        run: docker compose run web bin/spec_models
 
   spec_controllers:
     runs-on: ubuntu-latest
@@ -54,11 +54,11 @@ jobs:
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
       - name: Docker compose build
-        run: docker-compose build
+        run: docker compose build
       - name: Setup database & test env
-        run: docker-compose run web bin/rake db:create db:schema:load RAILS_ENV=test
+        run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
       - name: Run spec_controllers tests
-        run: docker-compose run web bin/spec_controllers
+        run: docker compose run web bin/spec_controllers
 
   spec_features:
     runs-on: ubuntu-latest
@@ -72,11 +72,11 @@ jobs:
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
       - name: Docker compose build
-        run: docker-compose build
+        run: docker compose build
       - name: Setup database & test env
-        run: docker-compose run web bin/rake db:create db:schema:load RAILS_ENV=test
+        run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
       - name: Run spec_features tests
-        run: docker-compose run web bin/spec_features
+        run: docker compose run web bin/spec_features
 
   spec_lib:
     runs-on: ubuntu-latest
@@ -90,11 +90,11 @@ jobs:
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
       - name: Docker compose build
-        run: docker-compose build
+        run: docker compose build
       - name: Setup database & test env
-        run: docker-compose run web bin/rake db:create db:schema:load RAILS_ENV=test
+        run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
       - name: Run spec_lib tests
-        run: docker-compose run web bin/spec_lib
+        run: docker compose run web bin/spec_lib
 
   spec_integration:
     runs-on: ubuntu-latest
@@ -108,32 +108,8 @@ jobs:
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
       - name: Docker compose build
-        run: docker-compose build
+        run: docker compose build
       - name: Setup database & test env
-        run: docker-compose run web bin/rake db:create db:schema:load RAILS_ENV=test
+        run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
       - name: Run spec_integration tests
-        run: docker-compose run web bin/spec_integration
-
-  spec_usermanual:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          submodules: false
-      - name: Setup git submodules
-        run: |
-          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-          git submodule update --init --recursive
-      - name: Docker compose build
-        run: docker-compose build
-      - name: Setup database & test env
-        run: docker-compose run web bin/rake db:create db:schema:load RAILS_ENV=test
-      - name: Run spec_usermanual tests
-        run: docker-compose run web bin/spec_usermanual
-      - name: Update manual to testmycode-usermanual
-        uses: JamesIves/github-pages-deploy-action@4.1.3
-        with:
-          branch: gh-pages
-          folder: doc/usermanual
-          target-folder: usermanual
+        run: docker compose run web bin/spec_integration

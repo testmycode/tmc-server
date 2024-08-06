@@ -80,7 +80,7 @@ module ApplicationHelper
       str << "  #{field}#{label}"
       str << '</label>'
     else
-      label_title = options[:label_title] ? options[:label_title] : nil
+      label_title = options[:label_title] || nil
       label = label_tag label, label_title, class: 'control-label'
       str += raw('<div class="form-group">' + raw(label) + raw(field) + '</div>')
     end
