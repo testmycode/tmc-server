@@ -119,4 +119,6 @@ Rails.application.configure do
   config.wkhtmltopdf = 'xvfb-run wkhtmltopdf'
 
   config.hosts << URI.parse(SiteSetting.value('baseurl_for_remote_sandboxes')).host
+
+  config.active_record.cache_versioning = false
 end
