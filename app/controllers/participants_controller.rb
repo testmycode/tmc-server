@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'portable_csv'
+require 'csv'
 require 'natcmp'
 
 class ParticipantsController < ApplicationController
@@ -162,7 +162,7 @@ class ParticipantsController < ApplicationController
     end
 
     def index_csv
-      PortableCSV.generate(force_quotes: true) do |csv|
+      CSV.generate(force_quotes: true) do |csv|
         title_row = (@ordinary_fields + @extra_fields.map(&:name)).select { |f| @visible_columns.include?(f) }.map(&:humanize)
 
         if @group_completion

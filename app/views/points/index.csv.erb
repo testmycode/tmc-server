@@ -1,5 +1,6 @@
-<% require 'portable_csv' %>
-<%= PortableCSV.generate(:force_quotes => true) do |csv|
+<% require 'csv' %>
+
+<%= CSV.generate(:force_quotes => true) do |csv|
   arr = []
   arr << :id if can?(:teach, @course)
   arr += @user_fields.map(&:label) if @user_fields
