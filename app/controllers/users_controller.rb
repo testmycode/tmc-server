@@ -98,7 +98,7 @@ class UsersController < ApplicationController
     redirect_path = "https://buildingai.elementsofai.com/#{language && language != "en" ? "#{language}/" : ''}email-verified" if params[:origin] && params[:origin].start_with?('building_ai')
     redirect_path = 'https://courses.mooc.fi/email-verified' if params[:origin] && params[:origin].start_with?('courses_moocfi')
     User.find(params[:user_id]).update!(email_verified: true)
-    redirect_to redirect_path, notice: 'Your email address has been verified!'
+    redirect_to redirect_path, notice: 'Your email address has been verified!', allow_other_host: true
   end
 
   def send_verification_email
