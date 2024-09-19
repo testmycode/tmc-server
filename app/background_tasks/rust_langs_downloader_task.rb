@@ -3,7 +3,7 @@
 require 'rust_langs_cli_executor'
 
 class RustLangsDownloaderTask
-  @@rust_langs_version = '0.17.2.17'
+  @@rust_langs_version = '0.17.2.18'
 
   def initialize
   end
