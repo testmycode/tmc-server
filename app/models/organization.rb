@@ -94,7 +94,7 @@ class Organization < ApplicationRecord
 
   def logo_path
     if self.logo.attached?
-      Rails.application.routes.url_helpers.rails_representation_url(self.logo.variant(resize: '100x100').processed, only_path: true)
+      Rails.application.routes.url_helpers.rails_representation_url(self.logo.variant(resize_to_fill: [100, nil]).processed, only_path: true)
     else
       'missing.png'
     end
@@ -105,7 +105,7 @@ class Organization < ApplicationRecord
 
   def org_logo
     if self.logo.attached?
-      self.logo.variant(resize: '100x100')
+      self.logo.variant(resize_to_fill: [100, nil])
     else
       'missing.png'
     end
