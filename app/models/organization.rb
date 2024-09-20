@@ -109,5 +109,8 @@ class Organization < ApplicationRecord
     else
       'missing.png'
     end
+  rescue ActiveStorage::InvariableError => e
+    Rails.logger.error("Could not resize image for organization #{id}: #{e.message}")
+    'missing.png'
   end
 end
