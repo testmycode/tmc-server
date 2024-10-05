@@ -42,6 +42,14 @@ class ApplicationController < ActionController::Base
     respond_with_error('File not found', 404, exception)
   end
 
+  rescue_from Rack::Timeout::RequestTimeoutException do |exception|
+    respond_with_error('Request timed out', 503, exception) # status code 408 would be the correct status code, but when receiving 408 Firefox retries 10 times and then states the connection was reset instead of showing our error
+  end
+
+  rescue_from Rack::Timeout::RequestTimeoutError do |exception|
+    respond_with_error('Request timed out', 503, exception) # status code 408 would be the correct status code, but when receiving 408 Firefox retries 10 times and then states the connection was reset instead of showing our error
+  end
+
   before_action :set_default_url_options
   before_action :check_api_version
   before_action :set_bare_layout

@@ -16,7 +16,6 @@
     user-select: unset;
   }
 }
-
 /* 2022-01-01
   BUG: Mozilla inserts newlines when copying text before div blocks.
   FIX: set display: inline-block on div.hljs-ln-line

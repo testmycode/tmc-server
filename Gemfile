@@ -26,6 +26,7 @@ gem 'pg', '~> 1.5', '>= 1.5.6'
 gem 'pghero', '~> 3.5'
 gem 'rack-attack', '~> 6.7', require: false
 gem 'rack-cors', '~> 2.0', '>= 2.0.2'
+gem 'rack-timeout', '~> 0.7.0'
 gem 'rack-mini-profiler', '~> 3.3', '>= 3.3.1'
 gem 'rake', '~> 13.2', '>= 13.2.1'
 gem 'responders', '~> 3.1', '>= 3.1.1'
