@@ -4,4 +4,4 @@
 ENV['RACK_TIMEOUT_SERVICE_TIMEOUT'] = '120'
 
 # rack-timeout is too verbose by default, only log errors
-# Rack::Timeout::Logger.level = Logger::ERROR
+Rack::Timeout::Logger.level = Logger::ERROR
