@@ -152,18 +152,12 @@ class PassengerStatusParser
           next
         end
 
-        # Extract CPU and Memory using regex to handle variable whitespace
-        if line =~ /^CPU\s*:\s*([\d.]+)%\s+Memory\s*:\s*([\d.]+\s*[KMGTP]?)/i
+        # Extract CPU, Memory, and Last used using regex to handle variable whitespace
+        if line =~ /^CPU\s*:\s*([\d.]+)%\s+Memory\s*:\s*([\d.]+\s*[KMGTP]?)\s+Last\s+used\s*:\s*([\dm\s]+s)/i
           current_worker_data[:cpu] = Regexp.last_match(1).to_f
           current_worker_data[:memory_str] = Regexp.last_match(2).strip
-          debug_log("Parsed CPU and Memory: CPU=#{current_worker_data[:cpu]}%, Memory='#{current_worker_data[:memory_str]}'")
-          next
-        end
-
-        # Extract Last used using regex to handle variable whitespace
-        if line =~ /^Last\s+used\s*:\s*([\dm\s]+s)\s*(?:ago|ag)?/i
-          current_worker_data[:last_used_str] = Regexp.last_match(1).strip
-          debug_log("Parsed Last Used: '#{current_worker_data[:last_used_str]}'")
+          current_worker_data[:last_used_str] = Regexp.last_match(3).strip
+          debug_log("Parsed CPU, Memory, Last Used: CPU=#{current_worker_data[:cpu]}%, Memory='#{current_worker_data[:memory_str]}', Last Used='#{current_worker_data[:last_used_str]}'")
           next
         end
       end
@@ -245,13 +239,13 @@ class PassengerWorkerManager
       end
 
       # Define column widths
-      pid_width = 8
-      sessions_width = 10
-      processed_width = 12
-      uptime_width = 12
-      cpu_width = 8
-      memory_width = 14
-      last_used_width = 14
+      pid_width = 10
+      sessions_width = 12
+      processed_width = 14
+      uptime_width = 14
+      cpu_width = 10
+      memory_width = 16
+      last_used_width = 16
 
       # Print table header
       header = [
