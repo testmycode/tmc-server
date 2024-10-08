@@ -35,7 +35,7 @@ class WorkerProcess
 
   # Parses memory string like "184M", "1.2G", "512K" into integer megabytes
   def parse_memory(mem_str)
-    match = mem_str.strip.match(/^([\d.]+)([KMGTP])?$/i)
+    match = mem_str.strip.match(/^([\d.]+)\s*([KMGTP])?$/i)
     return 0 unless match
 
     value = match[1].to_f
@@ -90,21 +90,22 @@ class PassengerStatusParser
       output.each_line do |line|
         line = line.strip
 
-        # Capture total processes
-        if line.start_with?('Processes :')
-          @total_processes = line.split(':').last.strip.to_i
+        # Capture total processes using regex to handle variable whitespace
+        if line =~ /^Processes\s*:\s*(\d+)/
+          @total_processes = Regexp.last_match(1).to_i
+          next
         end
 
         # Detect start of Application groups
-        if line.start_with?('----------- Application groups -----------')
+        if line =~ /^-+ Application groups -+$/
           in_app_group = true
           next
         end
 
         next unless in_app_group
 
-        # Start of a worker entry
-        if line.start_with?('* PID:')
+        # Start of a worker entry using regex to handle variable whitespace
+        if line =~ /^\*\s*PID\s*:\s*(\d+)\s+Sessions\s*:\s*(\d+)\s+Processed\s*:\s*(\d+)\s+Uptime\s*:\s*([\dm\s]+s)/
           # Save previous worker if exists
           if current_worker_data.any?
             @workers << build_worker(current_worker_data)
@@ -112,25 +113,24 @@ class PassengerStatusParser
           end
 
           # Extract PID, Sessions, Processed, Uptime
-          pid_match = line.match(/\* PID:\s*(\d+)\s+Sessions:\s*(\d+)\s+Processed:\s*(\d+)\s+Uptime:\s*([\dm\s]+s)/)
-          if pid_match
-            current_worker_data[:pid] = pid_match[1].to_i
-            current_worker_data[:sessions] = pid_match[2].to_i
-            current_worker_data[:processed] = pid_match[3].to_i
-            current_worker_data[:uptime_str] = pid_match[4].strip
-          end
-        elsif line.start_with?('CPU:')
-          # Extract CPU and Memory
-          cpu_match = line.match(/CPU:\s*([\d.]+)%/)
-          memory_match = line.match(/Memory\s*:\s*([\d.]+[KMGTP]?)/)
-          current_worker_data[:cpu] = cpu_match[1].to_f if cpu_match
-          current_worker_data[:memory_str] = memory_match[1] if memory_match
-        elsif line.start_with?('Last used:')
-          # Extract Last used
-          last_used_match = line.match(/Last used:\s*([\dm\s]+s)\s*(?:ago|ag)?/)
-          if last_used_match
-            current_worker_data[:last_used_str] = last_used_match[1].strip
-          end
+          current_worker_data[:pid] = Regexp.last_match(1).to_i
+          current_worker_data[:sessions] = Regexp.last_match(2).to_i
+          current_worker_data[:processed] = Regexp.last_match(3).to_i
+          current_worker_data[:uptime_str] = Regexp.last_match(4).strip
+          next
+        end
+
+        # Extract CPU and Memory using regex to handle variable whitespace
+        if line =~ /^CPU\s*:\s*([\d.]+)%\s+Memory\s*:\s*([\d.]+\s*[KMGTP]?)/i
+          current_worker_data[:cpu] = Regexp.last_match(1).to_f
+          current_worker_data[:memory_str] = Regexp.last_match(2).strip
+          next
+        end
+
+        # Extract Last used using regex to handle variable whitespace
+        if line =~ /^Last\s+used\s*:\s*([\dm\s]+s)\s*(?:ago|ag)?/i
+          current_worker_data[:last_used_str] = Regexp.last_match(1).strip
+          next
         end
       end
 
