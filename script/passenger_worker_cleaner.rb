@@ -6,7 +6,7 @@ require 'open3'
 # Configuration Constants
 PASSENGER_STATUS_CMD = 'passenger-status'
 MIN_WORKERS_ALLOWED = 4
-LAST_USED_THRESHOLD_SECONDS = 10 * 60  # 10 minutes
+LAST_USED_THRESHOLD_SECONDS = 5 * 60  # 5 minutes
 
 # Helper method for debug logging
 def debug_log(message)
