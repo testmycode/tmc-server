@@ -205,18 +205,20 @@ class PassengerWorkerManager
     if total_processes > MIN_WORKERS_ALLOWED
       puts "Number of processes (#{total_processes}) exceeds the minimum allowed (#{MIN_WORKERS_ALLOWED})."
 
-      worker_to_kill = find_worker_to_kill(workers)
+      workers_to_kill = find_workers_to_kill(workers)
 
-      if worker_to_kill
-        pid = worker_to_kill.pid
-        last_used_seconds = worker_to_kill.last_used_seconds
-        last_used_minutes = (last_used_seconds / 60).to_i
-        last_used_seconds_remainder = last_used_seconds % 60
+      if workers_to_kill.any?
+        workers_to_kill.each do |worker|
+          pid = worker.pid
+          last_used_seconds = worker.last_used_seconds
+          last_used_minutes = (last_used_seconds / 60).to_i
+          last_used_seconds_remainder = last_used_seconds % 60
 
-        puts "Killing worker PID #{pid} with last used time of #{last_used_minutes}m #{last_used_seconds_remainder}s and memory: #{worker_to_kill.memory_mb} MB."
-        debug_log("Attempting to kill WorkerProcess: PID=#{pid}, Last Used=#{last_used_seconds}s, Memory=#{worker_to_kill.memory_mb}MB")
+          puts "Killing worker PID #{pid} with last used time of #{last_used_minutes}m #{last_used_seconds_remainder}s and memory: #{worker.memory_mb} MB."
+          debug_log("Attempting to kill WorkerProcess: PID=#{pid}, Last Used=#{last_used_seconds}s, Memory=#{worker.memory_mb}MB")
 
-        kill_worker(pid)
+          kill_worker(pid)
+        end
       else
         puts "No workers have been idle for more than #{LAST_USED_THRESHOLD_SECONDS / 60} minutes."
         debug_log('No eligible workers found to kill.')
@@ -246,6 +248,7 @@ class PassengerWorkerManager
       cpu_width = 10
       memory_width = 16
       last_used_width = 16
+      eligible_width = 6
 
       # Print table header
       header = [
@@ -255,7 +258,8 @@ class PassengerWorkerManager
         'Uptime'.ljust(uptime_width),
         'CPU (%)'.ljust(cpu_width),
         'Memory (MB)'.ljust(memory_width),
-        'Last Used'.ljust(last_used_width)
+        'Last Used'.ljust(last_used_width),
+        'Eligible'.ljust(eligible_width)
       ].join(' | ')
 
       separator = '-' * header.length
@@ -263,8 +267,8 @@ class PassengerWorkerManager
       puts header
       puts separator
 
-      # Print each worker's details
       workers.each do |worker|
+        eligible = worker.last_used_seconds > LAST_USED_THRESHOLD_SECONDS ? '*' : ''
         row = [
           worker.pid.to_s.ljust(pid_width),
           worker.sessions.to_s.ljust(sessions_width),
@@ -272,7 +276,8 @@ class PassengerWorkerManager
           worker.formatted_uptime.ljust(uptime_width),
           worker.cpu.to_s.ljust(cpu_width),
           worker.memory_mb.to_s.ljust(memory_width),
-          worker.formatted_last_used.ljust(last_used_width)
+          worker.formatted_last_used.ljust(last_used_width),
+          eligible.ljust(eligible_width)
         ].join(' | ')
 
         puts row
@@ -281,17 +286,25 @@ class PassengerWorkerManager
       puts "===== End of Summary =====\n\n"
     end
 
-    def find_worker_to_kill(workers)
+    def find_workers_to_kill(workers)
       eligible_workers = workers.select { |w| w.last_used_seconds > LAST_USED_THRESHOLD_SECONDS }
 
       debug_log("Eligible workers to kill (idle > #{LAST_USED_THRESHOLD_SECONDS / 60} minutes): #{eligible_workers.map(&:pid).join(', ')}")
 
-      return nil if eligible_workers.empty?
+      # Sort eligible workers by last_used_seconds descending (most idle first)
+      sorted_workers = eligible_workers.sort_by { |w| -w.last_used_seconds }
 
-      # Find the worker with the maximum last used time
-      worker = eligible_workers.max_by { |w| w.last_used_seconds }
-      debug_log("Selected worker to kill: PID=#{worker.pid}, Last Used=#{worker.last_used_seconds}s, Memory=#{worker.memory_mb}MB")
-      worker
+      workers_to_kill = []
+      current_total = @parser.total_processes
+
+      sorted_workers.each do |worker|
+        break if current_total - workers_to_kill.size <= MIN_WORKERS_ALLOWED
+        workers_to_kill << worker
+      end
+
+      debug_log("Workers to kill: #{workers_to_kill.map(&:pid).join(', ')}")
+
+      workers_to_kill
     end
 
     def kill_worker(pid)
