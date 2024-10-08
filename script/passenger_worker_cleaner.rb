@@ -24,6 +24,7 @@ class WorkerProcess
 
   # Parses a time string like "16m 52s" into total seconds
   def parse_time(time_str)
+    return 0 unless time_str
     total_seconds = 0
     # Match patterns like "16m", "52s", etc.
     time_str.scan(/(\d+)m|(\d+)s/) do |min, sec|
