@@ -122,7 +122,7 @@ class Exercise < ApplicationRecord
   }
 
   enum disabled_status: %i[enabled disabled]
-  enum paste_visibility: %i[open secured no-tests-public everyone]
+  enum paste_visibility: %i[open secured no-tests-public everyone completed-only]
 
   def relative_path
     name.tr('-', '/')
