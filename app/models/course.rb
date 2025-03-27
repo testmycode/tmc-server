@@ -189,7 +189,7 @@ class Course < ApplicationRecord
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
   enum disabled_status: %i[enabled disabled]
-  enum paste_visibility: %i[open secured no-tests-public everyone]
+  enum paste_visibility: %i[open secured no-tests-public everyone completed-only]
 
   def destroy
     # Optimization: delete dependent objects quickly.
