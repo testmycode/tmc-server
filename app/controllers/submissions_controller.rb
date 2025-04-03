@@ -317,15 +317,17 @@ class SubmissionsController < ApplicationController
       end
 
       paste_visible = @submission.paste_visible_for?(current_user)
-      return if paste_visible
+
       paste_visibility = @exercise.paste_visibility
       paste_visibility ||= @course.paste_visibility
       paste_visibility ||= 'open'
       case paste_visibility
       when 'protected', 'secured'
-        respond_forbidden unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || paste_visible
+        respond_forbidden unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s
       when 'no-tests-public'
         respond_forbidden unless can?(:teach, @course) || @submission.created_at > 2.hours.ago || @submission.user_id.to_s == current_user.id.to_s
+      when 'completed-only'
+        respond_forbidden("You cannot see this paste because you haven't completed this exercise.") unless can?(:teach, @course) || @submission.user_id.to_s == current_user.id.to_s || @submission.exercise.completed_by?(current_user) || current_user.submissions.where(exercise_name: @exercise.name, pretest_error: nil, all_tests_passed: true).any?
       when 'everyone'
         nil
       else
