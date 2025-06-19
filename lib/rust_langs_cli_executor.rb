@@ -6,12 +6,12 @@ require 'fileutils'
 
 module RustLangsCliExecutor
   def self.prepare_submission(clone_path, output_path, submission_path, extra_params = {}, config = {})
-    command = "#{self.langs_executable_path}/current prepare-submission --clone-path #{clone_path} --output-path #{output_path} --submission-path #{submission_path}"
-    command = command + " --top-level-dir-name #{config[:toplevel_dir_name]}" if !!config[:toplevel_dir_name]
-    command = command + " --stub-zip-path #{config[:tests_from_stub]}" if !!config[:tests_from_stub]
-    command = command + " --output-format #{config[:format]}" if !!config[:format]
+    command = "#{self.langs_executable_path}/current prepare-submission --clone-path '#{clone_path}' --output-path '#{output_path}' --submission-path '#{submission_path}'"
+    command = command + " --top-level-dir-name '#{config[:toplevel_dir_name]}'" if !!config[:toplevel_dir_name]
+    command = command + " --stub-zip-path '#{config[:tests_from_stub]}'" if !!config[:tests_from_stub]
+    command = command + " --output-format '#{config[:format]}'" if !!config[:format]
     extra_params.each do |k, v|
-      command = command + " --tmc-param #{k}=#{v}" unless v.nil?
+      command = command + " --tmc-param '#{k}=#{v}'" unless v.nil?
     end
 
     command_output = `#{command}`
