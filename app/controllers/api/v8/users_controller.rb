@@ -171,6 +171,7 @@ module Api
           elsif @user.email.casecmp(new_email) != 0
             @user.email = new_email
             @user.email_verified = false
+            UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now
           end
         end
 
