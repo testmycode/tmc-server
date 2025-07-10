@@ -175,15 +175,20 @@ module Api
 
         @user = User.find_by!(id: params[:id])
         authorize! :update, @user
-        @user.password_managed_by_moocfi = params[:set_password_managed_by_moocfi]
-        if @user.save
-          render json: {
-            status: "Password managed by Mooc.fi set to #{params[:set_password_managed_by_moocfi]}."
-          }
+
+        value = params[:set_password_managed_by_moocfi]
+        unless value.in?([true, false])
+          @user.errors.add(:password_managed_by_moocfi, 'must be a boolean')
+        else
+          @user.password_managed_by_moocfi = value
+        end
+
+        if @user.errors.any? || !@user.save
+          render json: { errors: @user.errors }, status: :bad_request
         else
           render json: {
-            errors: @user.errors
-          }, status: :bad_request
+            status: "Password managed by Mooc.fi set to #{value}."
+          }
         end
       end
 
