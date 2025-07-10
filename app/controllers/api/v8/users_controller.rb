@@ -172,24 +172,21 @@ module Api
 
       def set_password_managed_by_moocfi
         unauthorize_guest! if current_user.guest?
-
         @user = User.find_by!(id: params[:id])
         authorize! :update, @user
 
         value = params[:set_password_managed_by_moocfi]
-        if !boolean_param?(value)
+        unless boolean_param?(value)
           @user.errors.add(:password_managed_by_moocfi, 'must be a boolean')
-        else
-          @user.password_managed_by_moocfi = value
+          return render json: { errors: @user.errors }, status: :bad_request
         end
 
-        if @user.errors.any? || !@user.save
-          render json: { errors: @user.errors }, status: :bad_request
-        else
-          render json: {
-            status: "Password managed by Mooc.fi set to #{value}."
-          }
-        end
+        @user.password_managed_by_moocfi = value
+        return render json: { errors: @user.errors }, status: :bad_request unless @user.save
+
+        render json: {
+          status: "Password managed by Mooc.fi set to #{value}."
+        }
       end
 
       private
