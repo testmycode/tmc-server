@@ -31,6 +31,7 @@ FactoryBot.define do
     sequence(:email) { |n| "user#{n}@example.com" }
     sequence(:email_verified) { |n| 'false' }
     administrator { false }
+    password_managed_by_moocfi { false }
   end
 
   factory :verified_user, class: User do
@@ -39,6 +40,7 @@ FactoryBot.define do
     sequence(:email) { |n| "ver_user#{n}@example.com" }
     sequence(:email_verified) { |n| 'true' }
     administrator { false }
+    password_managed_by_moocfi { false }
   end
 
   factory :admin, class: User do
@@ -47,6 +49,7 @@ FactoryBot.define do
     sequence(:email) { |n| "admin#{n}@example.com" }
     sequence(:email_verified) { |n| 'true' }
     administrator { true }
+    password_managed_by_moocfi { false }
   end
 
   factory :course, class: Course do

@@ -538,7 +538,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_10_194038) do
     t.boolean "legitimate_student", default: true, null: false
     t.boolean "email_verified", default: false, null: false
     t.string "argon_hash"
-    t.boolean "password_managed_by_moocfi", default: false
+    t.boolean "password_managed_by_moocfi", default: false, null: false
     t.index "lower(email)", name: "index_user_email_lowercase", unique: true
     t.index ["login"], name: "index_users_on_login", unique: true
   end
