@@ -56,6 +56,27 @@ module Api
         end
       end
 
+      swagger_path '/api/v8/users/{user_id}/set_password_managed_by_moocfi' do
+        operation :post do
+          key :description, 'Sets the boolean password_managed_by_moocfi for the user with the given id to payload value.'
+          key :operationId, 'setPasswordManagedByMoocfi'
+          key :produces, ['application/json']
+          key :tags, ['user']
+          parameter '$ref': '#/parameters/user_id'
+          response 403, '$ref': '#/responses/error'
+          response 404, '$ref': '#/responses/error'
+          response 200 do
+            key :description, "status 'ok' and sets the boolean password_managed_by_moocfi"
+            schema do
+              key :title, :status
+              key :required, [:status]
+              property :status, type: :string, example: 'Password managed by Mooc.fi set to true.'
+            end
+          end
+        end
+      end
+
+
       def show
         unauthorize_guest! if current_user.guest?
         user = current_user
@@ -147,6 +168,23 @@ module Api
         render json: {
           errors: @user.errors
         }, status: :bad_request
+      end
+
+      def set_password_managed_by_moocfi
+        unauthorize_guest! if current_user.guest?
+
+        @user = User.find_by!(id: params[:id])
+        authorize! :update, @user
+        @user.password_managed_by_moocfi = params[:set_password_managed_by_moocfi]
+        if @user.save
+          render json: {
+            status: "Password managed by Mooc.fi set to #{params[:set_password_managed_by_moocfi]}."
+          }
+        else
+          render json: {
+            errors: @user.errors
+          }, status: :bad_request
+        end
       end
 
       private
