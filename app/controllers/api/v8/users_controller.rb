@@ -177,7 +177,7 @@ module Api
         authorize! :update, @user
 
         value = params[:set_password_managed_by_moocfi]
-        unless value.in?([true, false])
+        if !boolean_param?(value)
           @user.errors.add(:password_managed_by_moocfi, 'must be a boolean')
         else
           @user.password_managed_by_moocfi = value
@@ -193,6 +193,10 @@ module Api
       end
 
       private
+        def boolean_param?(value)
+          value.is_a?(TrueClass) || value.is_a?(FalseClass)
+        end
+
         def set_email
           user_params = params[:user]
 
