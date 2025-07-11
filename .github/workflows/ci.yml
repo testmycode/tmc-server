@@ -35,10 +35,6 @@ jobs:
         run: |
           sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
           git submodule update --init --recursive
-      - name: Prune Docker system (remove old containers, images, and volumes)
-        run: |
-          docker compose down -v || true
-          docker system prune -af || true
       - name: Docker compose build
         run: docker compose build
       - name: Setup database & test env
