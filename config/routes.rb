@@ -59,7 +59,7 @@ TmcServer::Application.routes.draw do
         resources :request_deletion, only: [:create], module: :users
         resources :assistantships, module: :users, only: :index
         resources :teacherships, module: :users, only: :index
-        post :set_password_managed_by_moocfi, on: :member
+        post :set_password_managed_by_courses_mooc_fi, on: :member
       end
 
       resources :user_app_datum, only: [:index]

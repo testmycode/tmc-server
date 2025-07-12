@@ -56,26 +56,27 @@ module Api
         end
       end
 
-      swagger_path '/api/v8/users/{user_id}/set_password_managed_by_moocfi' do
+      swagger_path '/api/v8/users/{user_id}/set_password_managed_by_courses_mooc_fi' do
         operation :post do
-          key :description, 'Sets the boolean password_managed_by_moocfi for the user with the given id to payload value.'
-          key :operationId, 'setPasswordManagedByMoocfi'
+          key :description, 'Sets the boolean password_managed_by_courses_mooc_fi for the user with the given id to true.'
+          key :operationId, 'setPasswordManagedByCoursesMoocFi'
           key :produces, ['application/json']
           key :tags, ['user']
           parameter '$ref': '#/parameters/user_id'
           response 403, '$ref': '#/responses/error'
           response 404, '$ref': '#/responses/error'
           response 200 do
-            key :description, "status 'ok' and sets the boolean password_managed_by_moocfi"
+            key :description, "status 'ok' and sets the boolean password_managed_by_courses_mooc_fi to true"
             schema do
               key :title, :status
               key :required, [:status]
-              property :status, type: :string, example: 'Password managed by Mooc.fi set to true.'
+              property :status, type: :string, example: 'Password managed by courses.mooc.fi set to true.'
             end
           end
         end
       end
 
+      skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi]
 
       def show
         unauthorize_guest! if current_user.guest?
@@ -170,30 +171,27 @@ module Api
         }, status: :bad_request
       end
 
-      def set_password_managed_by_moocfi
-        unauthorize_guest! if current_user.guest?
-        @user = User.find_by!(id: params[:id])
-        authorize! :update, @user
+      def set_password_managed_by_courses_mooc_fi
+        only_admins!
 
-        value = params[:set_password_managed_by_moocfi]
-        unless boolean_param?(value)
-          @user.errors.add(:password_managed_by_moocfi, 'must be a boolean')
-          return render json: { errors: @user.errors }, status: :bad_request
+        User.transaction do
+          @user = User.find_by!(id: params[:id])
+          @user.password_managed_by_courses_mooc_fi = true
+          @user.password_hash = nil
+          @user.salt = nil
+          @user.argon_hash = nil
+          @user.save!
+          raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
+          return render json: {
+            status: "Password managed by courses.mooc.fi set to true and password deleted."
+          }
         end
-
-        @user.password_managed_by_moocfi = value
-        return render json: { errors: @user.errors }, status: :bad_request unless @user.save
-
         render json: {
-          status: "Password managed by Mooc.fi set to #{value}."
-        }
+          errors: @user.errors
+        }, status: :bad_request
       end
 
       private
-        def boolean_param?(value)
-          value.is_a?(TrueClass) || value.is_a?(FalseClass)
-        end
-
         def set_email
           user_params = params[:user]
 
