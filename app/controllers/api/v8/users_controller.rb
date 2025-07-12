@@ -183,7 +183,7 @@ module Api
           @user.save!
           raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
           return render json: {
-            status: "Password managed by courses.mooc.fi set to true and password deleted."
+            status: 'Password managed by courses.mooc.fi set to true and password deleted.'
           }
         end
         render json: {
