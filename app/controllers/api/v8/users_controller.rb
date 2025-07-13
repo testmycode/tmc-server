@@ -70,7 +70,7 @@ module Api
             schema do
               key :title, :status
               key :required, [:status]
-              property :status, type: :string, example: 'Password managed by courses.mooc.fi set to true.'
+              property :status, type: :string, example: 'Password managed by courses.mooc.fi set to true and password deleted.'
             end
           end
         end
@@ -180,7 +180,6 @@ module Api
           @user.password_hash = nil
           @user.salt = nil
           @user.argon_hash = nil
-          @user.save!
           raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
           return render json: {
             status: 'Password managed by courses.mooc.fi set to true and password deleted.'
