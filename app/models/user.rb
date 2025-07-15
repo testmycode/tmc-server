@@ -146,7 +146,25 @@ class User < ApplicationRecord
     user = find_by(login: login)
     user ||= find_by('lower(email) = ?', login.downcase)
     return nil if user.nil?
+    user if user.password_managed_by_courses_mooc_fi && authenticate_via_courses_mooc_fi(user.email, submitted_password)
     user if user.has_password?(submitted_password)
+  end
+
+  def authenticate_via_courses_mooc_fi(email, submitted_password)
+    uri = URI.parse('https://courses.mooc.fi/api/v0/tmc-server/auth')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = (uri.scheme == 'https')
+    request = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/json' })
+    request.body = { email: email, password: submitted_password }.to_json
+
+    response = http.request(request)
+    return false unless response.is_a?(Net::HTTPSuccess)
+
+    data = JSON.parse(response.body)
+    data['authenticated'] == true
+  rescue StandardError => e
+    Rails.logger.error("MOOC.fi authentication failed: #{e}")
+    false
   end
 
   def password_reset_key

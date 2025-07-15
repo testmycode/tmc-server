@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with: 
+        with:
           submodules: false
       - name: Setup git submodules
         run: |
@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with: 
+        with:
           submodules: false
       - name: Setup git submodules
         run: |
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with: 
+        with:
           submodules: false
       - name: Setup git submodules
         run: |
@@ -65,7 +65,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with: 
+        with:
           submodules: false
       - name: Setup git submodules
         run: |
@@ -83,7 +83,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with: 
+        with:
           submodules: false
       - name: Setup git submodules
         run: |
@@ -101,7 +101,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with: 
+        with:
           submodules: false
       - name: Setup git submodules
         run: |
