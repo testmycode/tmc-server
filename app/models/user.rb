@@ -161,7 +161,7 @@ class User < ApplicationRecord
     )
 
     data = JSON.parse(response.body)
-    unless data["authenticated"] == true
+    unless data['authenticated'] == true
       raise "Authentication via courses.mooc.fi failed for #{email}"
     end
 
@@ -174,6 +174,34 @@ class User < ApplicationRecord
   rescue => e
     Rails.logger.error("Unexpected error during authentication via courses.mooc.fi: #{e.message}")
     raise "Unexpected error while authenticating via courses.mooc.fi: #{e.message}"
+  end
+
+  def update_password_via_courses_mooc_fi(email, old_password, new_password)
+    update_url = SiteSetting.value('courses_mooc_fi_update_password_url')
+
+    response = RestClient.put(
+      update_url,
+      {
+        email: email,
+        old_password: old_password,
+        new_password: new_password
+      }.to_json,
+      { content_type: :json, accept: :json }
+    )
+
+    data = JSON.parse(response.body)
+
+    unless data['updated'] == true
+      raise "Updating password via courses.mooc.fi failed for #{email}"
+    end
+
+    true
+  rescue RestClient::ExceptionWithResponse => e
+    Rails.logger.error("Updating password via courses.mooc.fi failed for #{email}: #{e.response}")
+    false
+  rescue => e
+    Rails.logger.error("Unexpected error updating password via courses.mooc.fi for #{email}: #{e.message}")
+    false
   end
 
   def password_reset_key
