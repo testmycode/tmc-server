@@ -175,12 +175,12 @@ module Api
         only_admins!
 
         User.transaction do
-          @user = User.find_by!(id: params[:id])
-          @user.password_managed_by_courses_mooc_fi = true
-          @user.password_hash = nil
-          @user.salt = nil
-          @user.argon_hash = nil
-          raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
+          user = User.find_by!(id: params[:id])
+          user.password_managed_by_courses_mooc_fi = true
+          user.password_hash = nil
+          user.salt = nil
+          user.argon_hash = nil
+          raise ActiveRecord::Rollback if !user.errors.empty? || !user.save
           return render json: {
             status: 'Password managed by courses.mooc.fi set to true and password deleted.'
           }

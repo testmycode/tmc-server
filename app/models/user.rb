@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rest-client'
+
 class User < ApplicationRecord
   include Comparable
   include Gravtastic
@@ -151,20 +153,27 @@ class User < ApplicationRecord
   end
 
   def authenticate_via_courses_mooc_fi(email, submitted_password)
-    uri = URI.parse('https://courses.mooc.fi/api/v0/tmc-server/auth')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = (uri.scheme == 'https')
-    request = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/json' })
-    request.body = { email: email, password: submitted_password }.to_json
-
-    response = http.request(request)
-    return false unless response.is_a?(Net::HTTPSuccess)
+    auth_url = SiteSetting.value('courses_mooc_fi_auth_url')
+    response = RestClient.post(
+      auth_url,
+      { email: email, password: submitted_password }.to_json,
+      { content_type: :json, accept: :json }
+    )
 
     data = JSON.parse(response.body)
-    data['authenticated'] == true
-  rescue StandardError => e
-    Rails.logger.error("MOOC.fi authentication failed: #{e}")
-    false
+    unless data["authenticated"] == true
+      raise "Authentication via courses.mooc.fi failed for #{email}"
+    end
+
+    true
+  rescue RestClient::Unauthorized, RestClient::Forbidden
+    raise "Authentication rejected by courses.mooc.fi for #{email}"
+  rescue RestClient::ExceptionWithResponse => e
+    Rails.logger.error("Authentication via courses.mooc.fi error: #{e.response}")
+    raise "Authentication via courses.mooc.fi failed: #{e.message}"
+  rescue => e
+    Rails.logger.error("Unexpected error during authentication via courses.mooc.fi: #{e.message}")
+    raise "Unexpected error while authenticating via courses.mooc.fi: #{e.message}"
   end
 
   def password_reset_key
