@@ -180,6 +180,7 @@ module Api
           user.password_hash = nil
           user.salt = nil
           user.argon_hash = nil
+          user.courses_mooc_fi_user_id = params[:courses_mooc_fi_user_id]
           raise ActiveRecord::Rollback if !user.errors.empty? || !user.save
           return render json: {
             status: 'Password managed by courses.mooc.fi set to true and password deleted.'
