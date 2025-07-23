@@ -230,8 +230,8 @@ module Api
         end
 
         def maybe_update_password
-          if @user.password_managed_by_courses_mooc_fi
-            return @user.update_password_via_courses_mooc_fi(@user.email, user_params[:old_password], user_params[:password])
+          if @user.password_managed_by_courses_mooc_fi && @user.courses_mooc_fi_user_id.present?
+            return @user.update_password_via_courses_mooc_fi(@user.courses_mooc_fi_user_id, user_params[:old_password], user_params[:password])
           end
 
           if params[:old_password].present? && params[:password].present?
