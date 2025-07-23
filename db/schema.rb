@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_11_214850) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_23_122117) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -539,7 +539,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_11_214850) do
     t.boolean "email_verified", default: false, null: false
     t.string "argon_hash"
     t.boolean "password_managed_by_courses_mooc_fi", default: false, null: false
+    t.string "courses_mooc_fi_user_id"
     t.index "lower(email)", name: "index_user_email_lowercase", unique: true
+    t.index ["courses_mooc_fi_user_id"], name: "index_users_on_courses_mooc_fi_user_id", unique: true
     t.index ["login"], name: "index_users_on_login", unique: true
   end
 
