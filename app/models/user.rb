@@ -156,8 +156,14 @@ class User < ApplicationRecord
     auth_url = SiteSetting.value('courses_mooc_fi_auth_url')
     response = RestClient.post(
       auth_url,
-      { user_id: courses_mooc_fi_user_id, password: submitted_password }.to_json,
-      { content_type: :json, accept: :json }
+      {
+        user_id: courses_mooc_fi_user_id,
+        password: submitted_password }.to_json,
+      {
+        content_type: :json,
+        accept: :json,
+        Authorization: Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project,
+      }
     )
 
     data = JSON.parse(response.body)
@@ -184,9 +190,13 @@ class User < ApplicationRecord
       {
         user_id: courses_mooc_fi_user_id,
         old_password: old_password,
-        new_password: new_password
+        new_password: new_password,
       }.to_json,
-      { content_type: :json, accept: :json }
+      {
+        content_type: :json,
+        accept: :json,
+        Authorization: Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project,
+      }
     )
 
     data = JSON.parse(response.body)
