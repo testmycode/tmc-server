@@ -11,4 +11,12 @@ class KafkaBatchUpdatePoints < ApplicationRecord
       end
     end
   end
+
+  def self.send_points_again_for_user_and_all_courses(user_id)
+    transaction do
+      Submission.where(user_id: user_id).distinct.pluck(:course_id).each do |course_id|
+        send_points_again_for_user_and_course(course_id, user_id)
+      end
+    end
+  end
 end
