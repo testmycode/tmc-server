@@ -60,6 +60,7 @@ TmcServer::Application.routes.draw do
         resources :assistantships, module: :users, only: :index
         resources :teacherships, module: :users, only: :index
         post :set_password_managed_by_courses_mooc_fi, on: :member
+        get :get_user_with_email, on: :collection
       end
 
       resources :user_app_datum, only: [:index]

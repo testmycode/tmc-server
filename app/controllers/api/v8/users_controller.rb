@@ -76,6 +76,32 @@ module Api
         end
       end
 
+      swagger_path '/api/v8/users/get_user_with_email?email={email}' do
+        operation :get do
+          key :description, "Returns the user's id as upstream_id, user's courses.mooc.fi-id as id, email, first name and last name by user email"
+          key :operationId, 'getUserInformationByEmail'
+          key :produces, ['application/json']
+          key :tags, ['user']
+          parameter '$ref': '#/parameters/user_email'
+          response 403, '$ref': '#/responses/error'
+          response 404, '$ref': '#/responses/error'
+          response 200 do
+            key :description, "User's courses.mooc.fi-id as id, email, first name, last name and id as upstream_id as json"
+            key :content, 'application/json'
+            schema do
+              key :title, :user
+              key :required, [:user]
+              key :type, :object
+              property :id, type: :string, description: "User's courses.mooc.fi user id", example: 'ABCD1234-5678-EFGH-IJ90-ABC123DEF456'
+              property :email, type: :string, description: 'User email', example: 'user@example.com'
+              property :first_name, type: :string, description: 'User first name', example: 'John'
+              property :last_name, type: :string, description: 'User last name', example: 'Doe'
+              property :upstream_id, type: :integer, description: "User's user id in TMC database", example: 123
+            end
+          end
+        end
+      end
+
       skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi]
 
       def show
@@ -125,19 +151,13 @@ module Api
         set_extra_data
 
         if BannedEmail.banned?(@user.email)
-          return render json: {
-            success: true,
-            message: 'User created.'
-          }
+          return render json: build_success_response(params[:include_id])
         end
 
         if @user.errors.empty? && @user.save
           # TODO: Whitelist origins
           UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now
-          render json: {
-            success: true,
-            message: 'User created.'
-          }
+          render json: build_success_response(params[:include_id])
         else
           errors = @user.errors
           errors[:username] = errors.delete(:login) if errors.key?(:login)
@@ -189,6 +209,24 @@ module Api
         render json: {
           errors: @user.errors
         }, status: :bad_request
+      end
+
+      def get_user_with_email
+        unauthorize_guest! if current_user.guest?
+
+        user = User.find_by!(email: params[:email])
+        logger.info user
+        authorize! :read, user
+
+        name = UserFieldValue.where(user_id: user.id, field_name: ['first_name', 'last_name']).pluck(:field_name, :value).to_h
+
+        render json: {
+          id: user.courses_mooc_fi_user_id,
+          email: user.email,
+          first_name: name['first_name'],
+          last_name: name['last_name'],
+          upstream_id: user.id,
+        }
       end
 
       private
@@ -274,6 +312,17 @@ module Api
             datum.value = value
             datum.save! if eager_save
           end
+        end
+
+        def build_success_response(include_id = false)
+          response = {
+            success: true,
+            message: 'User created.',
+          }
+          if include_id
+            response[:id] = @user.id
+          end
+          response
         end
     end
   end

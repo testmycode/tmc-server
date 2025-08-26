@@ -158,7 +158,8 @@ class User < ApplicationRecord
       auth_url,
       {
         user_id: courses_mooc_fi_user_id,
-        password: submitted_password }.to_json,
+        password: submitted_password,
+      }.to_json,
       {
         content_type: :json,
         accept: :json,

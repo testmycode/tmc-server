@@ -62,6 +62,13 @@ module Api
           key :required, true
           key :type, :integer
         end
+        parameter :path_user_email do
+          key :name, :user_email
+          key :in, :path
+          key :description, "User's email"
+          key :required, true
+          key :type, :string
+        end
         parameter :path_exercise_id do
           key :name, :exercise_id
           key :in, :path
