@@ -215,7 +215,6 @@ module Api
         unauthorize_guest! if current_user.guest?
 
         user = User.find_by!(email: params[:email])
-        logger.info user
         authorize! :read, user
 
         name = UserFieldValue.where(user_id: user.id, field_name: ['first_name', 'last_name']).pluck(:field_name, :value).to_h
