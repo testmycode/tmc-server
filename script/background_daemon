@@ -12,10 +12,8 @@ require 'logger'
 root_dir = File.expand_path('../', File.dirname(__FILE__))
 pid_dir = root_dir + '/tmp/pids'
 log_dir = root_dir + '/log'
-background_daemon_log_dir = root_dir + '/logs/background_daemon'
 FileUtils.mkdir_p(pid_dir)
 FileUtils.mkdir_p(log_dir)
-FileUtils.mkdir_p(background_daemon_log_dir)
 
 def exception_to_str(e)
   e.message + "\n" + e.backtrace.join("\n        from ")
@@ -45,7 +43,7 @@ Rails.logger.info 'Starting background_daemon'
 processes = BackgroundTaskRegistry.all_tasks.map do |task|
   Process.fork do
     # Create individual logger for this task
-    task_log_file = File.join(background_daemon_log_dir, "#{task.class.name.underscore}.log")
+    task_log_file = Rails.root.join('log', 'background_daemon', "#{task.class.name.underscore}.log")
     task_logger = Logger.new(task_log_file)
     task_logger.formatter = proc do |severity, datetime, progname, msg|
       "#{datetime}: #{severity} - #{msg}\n"
