@@ -54,6 +54,13 @@ module Api
               return respond_forbidden('Submissions for this exercise are no longer accepted.')
             end
 
+            # Check if user has too many processing submissions for this exercise
+            processing_count = current_user.processing_submissions_count_for_exercise(@exercise.name, @course.id)
+            if processing_count >= 3
+              authorization_skip!
+              return respond_forbidden("Too many submissions currently processing for this exercise. You have #{processing_count} submissions being processed. Please wait for them to complete before submitting again. All your submissions will eventually get processed and you will get your points.")
+            end
+
             file_contents = File.read(params[:submission][:file].tempfile.path)
 
             errormsg = nil

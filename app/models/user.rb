@@ -280,6 +280,11 @@ class User < ApplicationRecord
     User.where('lower(email) LIKE ?', "%#{query.strip.downcase}%")
   end
 
+  # Count how many submissions this user has processing for a specific exercise
+  def processing_submissions_count_for_exercise(exercise_name, course_id)
+    Submission.processing_count_for_user_and_exercise(id, exercise_name, course_id)
+  end
+
   private
     def course_ids_arel
       courses = Course.arel_table
