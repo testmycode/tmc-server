@@ -50,10 +50,10 @@ processes = BackgroundTaskRegistry.all_tasks.map do |task|
       "#{datetime}: #{severity} - #{msg}\n"
     end
     task_logger.auto_flushing = true if task_logger.respond_to? :auto_flushing=
-    
+
     # Set up Rails logger for this process to use the task-specific logger
     Rails.logger = task_logger
-    
+
     Rails.logger.info "Starting #{task.class.name} background task"
     last_reminder_time = nil
     loop do

@@ -74,7 +74,7 @@ class RemoteSandbox
         end
       rescue Timeout::Error
         Rails.logger.error("RustLangsCliExecutor.prepare_submission timed out after #{SUBMISSION_PACKAGING_TIMEOUT_SECONDS} seconds for submission #{submission.id}")
-        submission.pretest_error = "Packaging submission took too long. Please make sure your submission is not too large or has too large files, or too many files."
+        submission.pretest_error = 'Packaging submission took too long. Please make sure your submission is not too large or has too large files, or too many files.'
         submission.processed = true
         submission.save!
         return
