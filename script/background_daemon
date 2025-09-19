@@ -12,8 +12,10 @@ require 'logger'
 root_dir = File.expand_path('../', File.dirname(__FILE__))
 pid_dir = root_dir + '/tmp/pids'
 log_dir = root_dir + '/log'
+background_daemon_log_dir = root_dir + '/logs/background_daemon'
 FileUtils.mkdir_p(pid_dir)
 FileUtils.mkdir_p(log_dir)
+FileUtils.mkdir_p(background_daemon_log_dir)
 
 def exception_to_str(e)
   e.message + "\n" + e.backtrace.join("\n        from ")
@@ -42,10 +44,22 @@ Rails.logger.info 'Starting background_daemon'
 # block other ones.
 processes = BackgroundTaskRegistry.all_tasks.map do |task|
   Process.fork do
+    # Create individual logger for this task
+    task_log_file = File.join(background_daemon_log_dir, "#{task.class.name.underscore}.log")
+    task_logger = Logger.new(task_log_file)
+    task_logger.formatter = proc do |severity, datetime, progname, msg|
+      "#{datetime}: #{severity} - #{msg}\n"
+    end
+    task_logger.auto_flushing = true if task_logger.respond_to? :auto_flushing=
+    
+    # Set up Rails logger for this process to use the task-specific logger
+    Rails.logger = task_logger
+    
+    Rails.logger.info "Starting #{task.class.name} background task"
     last_reminder_time = nil
     loop do
       begin
-        if last_reminder_time.nil? || Time.zone.now - last_reminder_time > 10.minutes
+        if last_reminder_time.nil? || Time.zone.now - last_reminder_time > 1.minutes
           Rails.logger.info "Occasional reminder that #{task.class.name} is running."
           last_reminder_time = Time.zone.now
         end
