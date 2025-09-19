@@ -4,6 +4,8 @@ require 'tmpdir'
 require 'fileutils'
 require 'rust_langs_cli_executor'
 
+SUBMISSION_PACKAGING_TIMEOUT_SECONDS = 10
+
 # Takes a submission zip and makes a tar file suitable for the sandbox
 class SubmissionPackager
   # Packages a submitted ZIP of the given exercise into a TAR or a ZIP with tests
@@ -28,10 +30,17 @@ class SubmissionPackager
       zip_path = "#{tmpdir}/submission.zip"
       return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
       File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
-      RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, return_zip_path, zip_path, submission.params,
-                                              tests_from_stub: submission.exercise.stub_zip_file_path,
-                                              format: :zip,
-                                              toplevel_dir_name: toplevel_dir_name)
+      begin
+        Timeout.timeout(SUBMISSION_PACKAGING_TIMEOUT_SECONDS) do
+          RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, return_zip_path, zip_path, submission.params,
+                                                  tests_from_stub: submission.exercise.stub_zip_file_path,
+                                                  format: :zip,
+                                                  toplevel_dir_name: toplevel_dir_name)
+        end
+      rescue Timeout::Error
+        Rails.logger.error("RustLangsCliExecutor.prepare_submission timed out after #{SUBMISSION_PACKAGING_TIMEOUT_SECONDS} seconds for submission #{submission.id} in SubmissionPackager")
+        raise "Submission preparation timed out after #{SUBMISSION_PACKAGING_TIMEOUT_SECONDS} seconds. Please try again."
+      end
       File.read(return_zip_path)
     end
   end
