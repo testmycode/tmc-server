@@ -102,7 +102,8 @@ class KafkaUpdater
     user = User.find(task.user_id)
     Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id
-      Rails.logger.error('Cannot publish points because moocfi id is not specified')
+      Rails.logger.error('Cannot publish points because moocfi id is not specified. Removing extra task (this task never should have been created.)')
+      task.destroy!
       return finished_successfully
     end
     exercise = Exercise.find(task.exercise_id)
