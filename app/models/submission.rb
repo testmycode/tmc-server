@@ -116,6 +116,16 @@ class Submission < ApplicationRecord
     unprocessed.count
   end
 
+  # Count how many submissions a user has processing for a specific exercise
+  def self.processing_count_for_user_and_exercise(user_id, exercise_name, course_id)
+    where(
+      user_id: user_id,
+      exercise_name: exercise_name,
+      course_id: course_id,
+      processed: false
+    ).count
+  end
+
   # How many times at most should a submission be (successfully) sent to a sandbox
   def self.max_attempts_at_processing
     3
