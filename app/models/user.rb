@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rest-client'
+
 class User < ApplicationRecord
   include Comparable
   include Gravtastic
@@ -146,7 +148,71 @@ class User < ApplicationRecord
     user = find_by(login: login)
     user ||= find_by('lower(email) = ?', login.downcase)
     return nil if user.nil?
+    user if user.password_managed_by_courses_mooc_fi && user.courses_mooc_fi_user_id.present? && authenticate_via_courses_mooc_fi(user.courses_mooc_fi_user_id, submitted_password)
     user if user.has_password?(submitted_password)
+  end
+
+  def authenticate_via_courses_mooc_fi(courses_mooc_fi_user_id, submitted_password)
+    auth_url = SiteSetting.value('courses_mooc_fi_auth_url')
+    response = RestClient.post(
+      auth_url,
+      {
+        user_id: courses_mooc_fi_user_id,
+        password: submitted_password,
+      }.to_json,
+      {
+        content_type: :json,
+        accept: :json,
+        Authorization: Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project,
+      }
+    )
+
+    data = JSON.parse(response.body)
+    unless data['authenticated'] == true
+      raise "Authentication via courses.mooc.fi failed for #{email}"
+    end
+
+    true
+  rescue RestClient::Unauthorized, RestClient::Forbidden
+    raise "Authentication rejected by courses.mooc.fi for #{email}"
+  rescue RestClient::ExceptionWithResponse => e
+    Rails.logger.error("Authentication via courses.mooc.fi error: #{e.response}")
+    raise "Authentication via courses.mooc.fi failed: #{e.message}"
+  rescue => e
+    Rails.logger.error("Unexpected error during authentication via courses.mooc.fi: #{e.message}")
+    raise "Unexpected error while authenticating via courses.mooc.fi: #{e.message}"
+  end
+
+  def update_password_via_courses_mooc_fi(courses_mooc_fi_user_id, old_password, new_password)
+    update_url = SiteSetting.value('courses_mooc_fi_update_password_url')
+
+    response = RestClient.put(
+      update_url,
+      {
+        user_id: courses_mooc_fi_user_id,
+        old_password: old_password,
+        new_password: new_password,
+      }.to_json,
+      {
+        content_type: :json,
+        accept: :json,
+        Authorization: Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project,
+      }
+    )
+
+    data = JSON.parse(response.body)
+
+    unless data['updated'] == true
+      raise "Updating password via courses.mooc.fi failed for user with courses.mooc.fi-user-id #{courses_mooc_fi_user_id}"
+    end
+
+    true
+  rescue RestClient::ExceptionWithResponse => e
+    Rails.logger.error("Updating password via courses.mooc.fi failed for user with courses.mooc.fi-user-id #{courses_mooc_fi_user_id}: #{e.response}")
+    false
+  rescue => e
+    Rails.logger.error("Unexpected error updating password via courses.mooc.fi for user with courses.mooc.fi-user-id #{courses_mooc_fi_user_id}: #{e.message}")
+    false
   end
 
   def password_reset_key
