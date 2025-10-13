@@ -4,6 +4,10 @@ require 'cgi'
 
 class UserMailer < ActionMailer::Base
   def email_confirmation(user, origin = nil, language = nil)
+    # For the Elements course, emails often bounce because the course does not mention mooc.fi handles the technical implementation of the course.
+    # To protect our delivery rates we temporaily disable sending this email.
+    return if origin && origin.downcase.include?('elements')
+
     @origin = origin
     @user = user
     token = user.verification_tokens.email.create!
