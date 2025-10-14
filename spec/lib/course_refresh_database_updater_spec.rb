@@ -444,7 +444,7 @@ describe CourseRefreshDatabaseUpdater do
     change_course_options_file "foo: bar\noops :error", raw: true
     refresh_courses
     refresh_report = @template.course_template_refreshes.last
-    expect(refresh_report.course_template_refresh_phases.last.phase_name).to include('while parsing a block mapping')
+    expect(refresh_report.course_template_refresh_phases.last.phase_name).to include('Failed to deserialize YAML')
     expect(refresh_report.status).to eq('crashed')
   end
 

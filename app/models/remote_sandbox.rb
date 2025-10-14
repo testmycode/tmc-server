@@ -70,7 +70,7 @@ class RemoteSandbox
 
       begin
         Timeout.timeout(SUBMISSION_PACKAGING_TIMEOUT_SECONDS) do
-          RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, tar_path, zip_path)
+          RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, tar_path, zip_path, {}, no_archive_prefix: true)
         end
       rescue Timeout::Error
         Rails.logger.error("RustLangsCliExecutor.prepare_submission timed out after #{SUBMISSION_PACKAGING_TIMEOUT_SECONDS} seconds for submission #{submission.id}")

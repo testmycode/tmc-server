@@ -25,7 +25,7 @@ describe SubmissionPackager do
   end
 
   def package_it
-    RustLangsCliExecutor.prepare_submission(@exercise.clone_path, @tar_path, @exercise_project.zip_path)
+    RustLangsCliExecutor.prepare_submission(@exercise.clone_path, @tar_path, @exercise_project.zip_path, {}, no_archive_prefix: true)
   end
 
   it 'should package the submission in a tar file with tests from the repo' do
