@@ -34,7 +34,8 @@ class KafkaBatchUpdatePointsTask
           Rails.logger.error("Cannot process task #{task.id} because task.task_type is not defined")
         end
       rescue => e
-        Rails.logger.error("Task failed: #{e}")
+        Rails.logger.error("Task failed: #{e.class.name}: #{e.message}")
+        Rails.logger.error("Task failed backtrace: #{e.backtrace.join("\n")}") if e.backtrace
       end
       task.destroy! if finished_successfully
     end
