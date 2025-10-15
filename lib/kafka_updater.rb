@@ -9,6 +9,11 @@ class KafkaUpdater
     @service_id = service_id
   end
 
+  def task_type(task)
+    return task.task_type if task.task_type.present?
+    'unknown'
+  end
+
   private
     def make_kafka_request(topic, payload)
       return if @kafka_bridge_url == 'test'
@@ -25,8 +30,10 @@ class KafkaUpdater
         Rails.logger.debug("Kafka request successful for topic #{topic}")
         response
       rescue RestClient::ExceptionWithResponse => e
-        Rails.logger.error("Kafka bridge API error for topic #{topic}: #{e.response.code} - #{e.response.body}")
-        raise "Kafka bridge API error: #{e.response.code} - #{e.response.body}"
+        response_body = e.response && e.response.body
+        response_body = response_body && response_body.length > 1000 ? "#{response_body[0..1000]}..." : response_body
+        Rails.logger.error("Kafka bridge API error for topic #{topic}: #{e.response.code} - #{response_body}")
+        raise "Kafka bridge API error: #{e.response.code} - #{response_body}"
       rescue RestClient::Exception => e
         Rails.logger.error("Kafka bridge connection error for topic #{topic}: #{e.message}")
         raise "Kafka bridge connection error: #{e.message}"
@@ -34,11 +41,6 @@ class KafkaUpdater
         Rails.logger.error("Unexpected error in Kafka request for topic #{topic}: #{e.message}")
         raise "Unexpected Kafka error: #{e.message}"
       end
-    end
-
-    def task_type(task)
-      return task.task_type if task.task_type.present?
-      'unknown'
     end
 
     def update_user_progress(task)
