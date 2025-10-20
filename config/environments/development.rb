@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.configure do
-  config.logstasher.enabled = true
+  config.logstasher.enabled = false
 
   # Settings specified here will take precedence over those in config/application.rb.
 
