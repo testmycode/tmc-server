@@ -39,18 +39,29 @@ class PasswordResetKeysController < ApplicationController
       return render action: :show, status: :forbidden
     end
 
-    @user.password = params[:password]
-    if @user.save
-      @key.destroy
-      flash[:success] = 'Your password has been reset.'
-      redirect_to root_path
-    else
-      flash.now[:alert] = if @user.errors[:password]
-        'Password ' + @user.errors[:password].join(', ')
+    if @user.password_managed_by_courses_mooc_fi
+      success = @user.update_password_via_courses_mooc_fi(nil, params[:password])
+      if success
+        @key.destroy
+        flash[:success] = 'Your password has been reset.'
+        redirect_to root_path
       else
-        'Failed to set password'
+        'Failed to reset password.'
       end
-      render action: :show, status: :forbidden
+    else
+      @user.password = params[:password]
+      if @user.save
+        @key.destroy
+        flash[:success] = 'Your password has been reset.'
+        redirect_to root_path
+      else
+        flash.now[:alert] = if @user.errors[:password]
+          'Password ' + @user.errors[:password].join(', ')
+        else
+          'Failed to set password'
+        end
+        render action: :show, status: :forbidden
+      end
     end
   end
 
