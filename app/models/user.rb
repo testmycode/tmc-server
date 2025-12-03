@@ -167,9 +167,9 @@ class User < ApplicationRecord
     end
 
     response = conn.post(auth_url) do |req|
-      req.headers["Content-Type"] = "application/json"
-      req.headers["Accept"] = "application/json"
-      req.headers["Authorization"] = Base64.decode64(
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['Accept'] = 'application/json'
+      req.headers['Authorization'] = Base64.decode64(
         Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
       )
 
@@ -208,9 +208,9 @@ class User < ApplicationRecord
 
     begin
       response = conn.post(update_url) do |req|
-        req.headers["Content-Type"] = "application/json"
-        req.headers["Accept"] = "application/json"
-        req.headers["Authorization"] = Base64.decode64(
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['Accept'] = 'application/json'
+        req.headers['Authorization'] = Base64.decode64(
           Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
         )
 
