@@ -197,19 +197,21 @@ module Api
         user = User.find(params[:id])
         authorize! :destroy, user
 
-        if user.destroy
-          RecentlyChangedUserDetail.where(username: user.login).delete_all
-          RecentlyChangedUserDetail.deleted.create!(
-            new_value: true,
-            email: user.email,
-            username: user.login,
-            user_id: user.id
-          )
-          Doorkeeper::AccessToken.where(resource_owner_id: user.id).delete_all
+        User.transaction do
+          if user.destroy
+            RecentlyChangedUserDetail.where(username: user.login).delete_all
+            RecentlyChangedUserDetail.deleted.create!(
+              new_value: true,
+              email: user.email,
+              username: user.login,
+              user_id: user.id
+            )
+            Doorkeeper::AccessToken.where(resource_owner_id: user.id).delete_all
 
-          render json: { success: true, message: 'User deleted.' }
-        else
-          render json: { success: false, errors: user.errors }, status: :bad_request
+            render json: { success: true, message: 'User deleted.' }
+          else
+            render json: { success: false, errors: user.errors }, status: :bad_request
+          end
         end
       end
 
