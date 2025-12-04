@@ -9,19 +9,6 @@ module PointsHelper
     end
   end
 
-  def gdocs_notifications(notifications)
-    ret = "<span class='flash notice'><ul>"
-    ret += notifications.map do |msg|
-      if msg =~ /^error/ || msg =~ /^exception/
-        "<span class='error'><li>#{msg}</li></span>"
-      else
-        "<li>#{msg}</li>"
-      end
-    end.join
-    ret += '</ul></span>'
-    ret
-  end
-
   def points_list(points)
     points.to_a.natsort.map { |pt| h(pt) }.join('&nbsp; ').html_safe
   end

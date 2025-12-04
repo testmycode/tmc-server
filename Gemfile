@@ -13,9 +13,9 @@ gem 'bootstrap', '~> 4.6' # Held back to 4.6
 gem 'cancancan', '~> 3.6', '>= 3.6.1'
 gem 'doorkeeper', '~> 5.7', '>= 5.7.1'
 gem 'doorkeeper-openid_connect', '~> 1.8', '>= 1.8.9'
+gem 'faraday', '~> 2.14'
 gem 'file_validators', '~> 3.0' # Used to validate organization logo
 gem 'font-awesome-rails', '~> 4.7', '>= 4.7.0.8'
-gem 'google_drive', '~> 3.0', '>= 3.0.7', require: false
 gem 'gravtastic', '~> 3.2', '>= 3.2.6' # Used to display user avatars
 gem 'image_processing', '~> 1.12', '>= 1.12.2' # Used by active_storage to make logo 100x100 on the fly
 gem 'logstasher', '~> 2.1', '>= 2.1.5'

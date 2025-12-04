@@ -203,12 +203,6 @@ TmcServer::Application.routes.draw do
         post 'toggle_submission_result_visibility'
       end
 
-      resources :points, only: %i[index show] do
-        member do
-          get 'refresh_gdocs'
-        end
-      end
-
       resources :exercises, only: [:index] do
         collection do
           post 'set_disabled_statuses'

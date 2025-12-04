@@ -10,10 +10,6 @@
       <% else %>
         <%= link_to('Sort by default order', organization_course_point_path(@organization, @course, @sheetname, show_attempted: params[:show_attempted]), class: "btn btn-primary") %>
       <% end %>
-
-      <% if can? :refresh_gdocs_spreadsheet, @course %>
-        <% link_to 'Refresh Google Docs worksheet', refresh_gdocs_organization_course_point_path(@organization, @course, @sheetname), class: "btn btn-primary" %>
-      <% end %>
     </div>
   </div>
 

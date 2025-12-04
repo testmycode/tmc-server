@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'gdocs_export'
 require 'system_commands'
 require 'date_and_time_utils'
 
@@ -290,10 +289,6 @@ class Course < ApplicationRecord
   def gdocs_sheets(exercises = nil)
     exercises ||= self.exercises.select { |ex| !ex.hidden? && ex.published? }
     exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
-  end
-
-  def refresh_gdocs_worksheet(sheetname)
-    GDocsExport.refresh_course_worksheet_points self, sheetname
   end
 
   def self.cache_root
