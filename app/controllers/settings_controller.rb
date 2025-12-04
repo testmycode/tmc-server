@@ -86,6 +86,10 @@ class SettingsController < ApplicationController
     end
 
     def maybe_update_password(user, user_params)
+      if user.password_managed_by_courses_mooc_fi && user.courses_mooc_fi_user_id.present?
+        return user.update_password_via_courses_mooc_fi(user.courses_mooc_fi_user_id, user_params[:old_password], user_params[:password])
+      end
+
       if user_params[:old_password].present? || user_params[:password].present?
         if !user.has_password?(user_params[:old_password])
           user.errors.add(:old_password, 'incorrect')

@@ -55,10 +55,12 @@ TmcServer::Application.routes.draw do
         resources :recently_changed_user_details, only: :index
       end
 
-      resources :users, only: %i[show create update] do
+      resources :users, only: %i[show create update destroy] do
         resources :request_deletion, only: [:create], module: :users
         resources :assistantships, module: :users, only: :index
         resources :teacherships, module: :users, only: :index
+        post :set_password_managed_by_courses_mooc_fi, on: :member
+        get :get_user_with_email, on: :collection
       end
 
       resources :user_app_datum, only: [:index]
@@ -201,11 +203,7 @@ TmcServer::Application.routes.draw do
         post 'toggle_submission_result_visibility'
       end
 
-      resources :points, only: %i[index show] do
-        member do
-          get 'refresh_gdocs'
-        end
-      end
+      resources :points, only: %i[index show]
 
       resources :exercises, only: [:index] do
         collection do

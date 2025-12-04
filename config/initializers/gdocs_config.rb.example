@@ -1,4 +1,0 @@
-#TODO: move to config/site.yml
-#TmcServer::Application.config.gdocs_username = 'username@gmail.com'
-#TmcServer::Application.config.gdocs_password = 'password'
-
