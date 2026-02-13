@@ -20,9 +20,6 @@ class Ability
       can :disable, Organization
 
       can :rerun, Submission
-      can :refresh_gdocs_spreadsheet, Course do |c|
-        c.spreadsheet_key.present?
-      end
       can :access, :pghero
       can :read_vm_log, Submission
       can :read, :instance_state
