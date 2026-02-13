@@ -6,6 +6,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 7.1', '>= 7.1.3.4'
 
+gem 'mini_racer', '~> 0.19.2'
 gem 'activerecord-import', '~> 1.7'
 gem 'activerecord-session_store', '~> 2.1'
 gem 'argon2', '~> 2.3'
