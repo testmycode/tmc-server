@@ -138,3 +138,8 @@ course_instruction_page: http://mooc.fi/courses/general/ohjelmointi/
 
 # Teacher manual link
 teacher_manual_url: http://testmycode.github.io/tmc-server/usermanual/
+
+# URLs for password management via courses.mooc.fi
+courses_mooc_fi_auth_url:
+courses_mooc_fi_update_password_url:
+courses_mooc_fi_create_user_url:

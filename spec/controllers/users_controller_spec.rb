@@ -52,6 +52,8 @@ describe UsersController, type: :controller do
         password: 'xoox',
         password_repeat: 'xoox'
       }
+      # Mock the courses.mooc.fi integration to avoid HTTP calls in tests
+      allow_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).and_return(true)
     end
 
     it 'should create a new user account' do
