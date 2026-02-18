@@ -45,6 +45,12 @@ class UsersController < ApplicationController
 
     if @user.errors.empty? && @user.save
       UserMailer.email_confirmation(@user).deliver_now
+
+      # Post the new user to courses.mooc.fi for password management
+      if params[:user][:password].present?
+        @user.post_new_user_to_courses_mooc_fi(params[:user][:password])
+      end
+
       if @bare_layout
         render plain: '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', layout: true
       else
