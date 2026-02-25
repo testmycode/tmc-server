@@ -237,6 +237,55 @@ class User < ApplicationRecord
     end
   end
 
+  def post_new_user_to_courses_mooc_fi(password)
+    Rails.logger.info("Posting new user #{self.email} to courses.mooc.fi")
+    create_url = SiteSetting.value('courses_mooc_fi_create_user_url')
+
+    conn = Faraday.new do |f|
+      f.request :json
+      f.response :json
+    end
+
+    begin
+      response = conn.post(create_url) do |req|
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['Accept'] = 'application/json'
+        req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+
+        req.body = {
+          upstream_id: id,
+          password: password,
+        }
+      end
+
+      data = response.body
+
+      unless data.is_a?(Hash) && data['user'].present?
+        Rails.logger.error("Creating user in courses.mooc.fi returned unexpected response for user #{self.email}: #{data}")
+        raise "Creating user in courses.mooc.fi failed for user #{self.email}"
+      end
+
+      unless data['password_set']
+        Rails.logger.warn("Password was not set for user #{self.email} in courses.mooc.fi")
+      end
+
+      Rails.logger.info("User #{self.email} successfully created in courses.mooc.fi")
+      true
+
+    rescue Faraday::ClientError => e
+      Rails.logger.error(
+        "Creating user in courses.mooc.fi failed for user #{self.email}: #{e.response}"
+      )
+      false
+
+    rescue => e
+      Rails.logger.error(
+        "Unexpected error creating user in courses.mooc.fi for user #{self.email}: #{e.message}"
+      )
+      false
+    end
+  end
+
   def password_reset_key
     action_tokens.find { |t| t.action == 'reset_password' }
   end

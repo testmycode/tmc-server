@@ -47,13 +47,6 @@ class PointsController < ApplicationController
     end
   end
 
-  def refresh_gdocs
-    authorize! :refresh, @course
-    @sheetname = params[:id]
-    @course = Course.find(params[:course_id])
-    @notifications = @course.refresh_gdocs_worksheet @sheetname
-  end
-
   def show
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])

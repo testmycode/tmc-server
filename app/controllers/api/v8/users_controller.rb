@@ -157,6 +157,12 @@ module Api
         if @user.errors.empty? && @user.save
           # TODO: Whitelist origins
           UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now
+
+          # Post the new user to courses.mooc.fi for password management
+          if params[:user][:password].present?
+            @user.post_new_user_to_courses_mooc_fi(params[:user][:password])
+          end
+
           render json: build_success_response(params[:include_id])
         else
           errors = @user.errors
