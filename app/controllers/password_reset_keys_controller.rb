@@ -46,7 +46,8 @@ class PasswordResetKeysController < ApplicationController
         flash[:success] = 'Your password has been reset.'
         redirect_to root_path
       else
-        'Failed to reset password.'
+        flash.now[:alert] = 'Failed to reset password.'
+        render action: :show, status: :forbidden
       end
     else
       @user.password = params[:password]

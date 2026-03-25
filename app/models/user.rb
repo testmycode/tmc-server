@@ -175,20 +175,30 @@ class User < ApplicationRecord
       }
     end
 
-    response.body == true
+    if response.body == true
+      return true
+    end
+
+    Rails.logger.warn(
+      "Authentication via courses.mooc.fi rejected for user #{self.email}: status=#{response.status}, request-id=#{response.headers['request-id']}, body=#{response.body.inspect}"
+    )
+    false
 
   rescue Faraday::ClientError => e
     status = e.response&.dig(:status)
-
-    if status == 401 || status == 403
-      return false
-    end
-
-    Rails.logger.error("Authentication via courses.mooc.fi error: #{e.response}")
+    request_id = e.response&.dig(:headers, 'request-id')
+    body = e.response&.dig(:body)
+    Rails.logger.error("Authentication via courses.mooc.fi error for user #{self.email}: status=#{status}, request-id=#{request_id}, body=#{body.inspect}")
     raise
 
   rescue => e
-    Rails.logger.error("Unexpected error during authentication via courses.mooc.fi: #{e.message}")
+    if defined?(response) && response
+      status = response.status
+      request_id = response.headers['request-id']
+      Rails.logger.error("Unexpected error during authentication via courses.mooc.fi for user #{self.email}: status=#{status}, request-id=#{request_id}, error=#{e.message}")
+    else
+      Rails.logger.error("Unexpected error during authentication via courses.mooc.fi for user #{self.email} (no response): #{e.message}")
+    end
     raise
   end
 
@@ -218,21 +228,32 @@ class User < ApplicationRecord
       data = response.body
 
       unless data == true
-        raise "Updating password via courses.mooc.fi failed for user with courses.mooc.fi-user-id #{self.courses_mooc_fi_user_id}"
+        raise "Updating password via courses.mooc.fi failed for user #{self.email}"
       end
 
       true
 
     rescue Faraday::ClientError => e
+      status = e.response&.dig(:status)
+      request_id = e.response&.dig(:headers, 'request-id')
+      body = e.response&.dig(:body)
       Rails.logger.error(
-        "Updating password via courses.mooc.fi failed for user with courses.mooc.fi-user-id #{self.courses_mooc_fi_user_id}: #{e.response}"
+        "Updating password via courses.mooc.fi failed for user #{self.email}: status=#{status}, request-id=#{request_id}, body=#{body.inspect}"
       )
       false
 
     rescue => e
-      Rails.logger.error(
-        "Unexpected error updating password via courses.mooc.fi for user with courses.mooc.fi-user-id #{self.courses_mooc_fi_user_id}: #{e.message}"
-      )
+      if defined?(response) && response
+        status = response.status
+        request_id = response.headers['request-id']
+        Rails.logger.error(
+          "Unexpected error updating password via courses.mooc.fi for user #{self.email}: status=#{status}, request-id=#{request_id}, error=#{e.message}"
+        )
+      else
+        Rails.logger.error(
+          "Unexpected error updating password via courses.mooc.fi for user #{self.email} (no response): #{e.message}"
+        )
+      end
       false
     end
   end
@@ -261,8 +282,10 @@ class User < ApplicationRecord
       data = response.body
 
       unless data.is_a?(Hash) && data['user'].present?
-        Rails.logger.error("Creating user in courses.mooc.fi returned unexpected response for user #{self.email}: #{data}")
-        raise "Creating user in courses.mooc.fi failed for user #{self.email}"
+        status = response.status
+        request_id = response.headers['request-id']
+        Rails.logger.error("Creating user in courses.mooc.fi returned unexpected response for user #{self.email}: status=#{status}, request-id=#{request_id}, body=#{data.inspect}")
+        return false
       end
 
       unless data['password_set']
@@ -273,15 +296,26 @@ class User < ApplicationRecord
       true
 
     rescue Faraday::ClientError => e
+      status = e.response&.dig(:status)
+      request_id = e.response&.dig(:headers, 'request-id')
+      body = e.response&.dig(:body)
       Rails.logger.error(
-        "Creating user in courses.mooc.fi failed for user #{self.email}: #{e.response}"
+        "Creating user in courses.mooc.fi failed for user #{self.email}: status=#{status}, request-id=#{request_id}, body=#{body.inspect}"
       )
       false
 
     rescue => e
-      Rails.logger.error(
-        "Unexpected error creating user in courses.mooc.fi for user #{self.email}: #{e.message}"
-      )
+      if defined?(response) && response
+        status = response.status
+        request_id = response.headers['request-id']
+        Rails.logger.error(
+          "Unexpected error creating user in courses.mooc.fi for user #{self.email}: status=#{status}, request-id=#{request_id}, error=#{e.message}"
+        )
+      else
+        Rails.logger.error(
+          "Unexpected error creating user in courses.mooc.fi for user #{self.email} (no response): #{e.message}"
+        )
+      end
       false
     end
   end
