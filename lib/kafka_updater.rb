@@ -16,7 +16,11 @@ class KafkaUpdater
 
   def update_user_progress(task)
     finished_successfully = false
-    user = User.find(task.user_id)
+    user = User.find_by(id: task.user_id)
+    unless user
+      Rails.logger.warn("KafkaUpdater#update_user_progress: missing user id=#{task.user_id} task_id=#{task.id}")
+      return true
+    end
     course = Course.find(task.course_id)
     Rails.logger.info("Publishing progress for user #{user.id} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id || course.moocfi_id.blank?
@@ -69,6 +73,10 @@ class KafkaUpdater
     available_points = AvailablePoint.course_sheet_points(course, parts)
     points_per_user.each do |username, points_by_group|
       current_user = User.find_by(login: username)
+      unless current_user
+        Rails.logger.warn("KafkaUpdater#update_course_progress: no user for login=#{username.inspect} course_id=#{course.id}")
+        next
+      end
       Rails.logger.info("Publishing progress for user #{current_user.id}")
       progress = points_by_group.map do |group_name, awarded_points|
         max_points = available_points[group_name] || 0
@@ -98,8 +106,12 @@ class KafkaUpdater
 
   def update_user_points(task)
     finished_successfully = false
+    user = User.find_by(id: task.user_id)
+    unless user
+      Rails.logger.warn("KafkaUpdater#update_user_points: missing user id=#{task.user_id} task_id=#{task.id}")
+      return true
+    end
     course = Course.find(task.course_id)
-    user = User.find(task.user_id)
     Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id
       Rails.logger.error('Cannot publish points because moocfi id is not specified. Removing extra task (this task never should have been created.)')
@@ -142,6 +154,10 @@ class KafkaUpdater
     exercises = Exercise.where(course_id: course.id).where(disabled_status: 0)
     points_per_user.each do |username, _points_by_group|
       current_user = User.find_by(login: username)
+      unless current_user
+        Rails.logger.warn("KafkaUpdater#update_course_points: no user for login=#{username.inspect} course_id=#{course.id}")
+        next
+      end
       Rails.logger.info("Publishing points for user #{current_user.id}")
       exercises_data = []
       exercises.map do |exercise|
@@ -216,8 +232,12 @@ class KafkaUpdater
 
   def update_user_course_points(task)
     finished_successfully = false
+    user = User.find_by(id: task.user_id)
+    unless user
+      Rails.logger.warn("KafkaUpdater#update_user_course_points: missing user id=#{task.user_id} task_id=#{task.id}")
+      return true
+    end
     course = Course.find(task.course_id)
-    user = User.find(task.user_id)
     Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id
       Rails.logger.error('Cannot publish points because moocfi id is not specified')
