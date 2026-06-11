@@ -227,6 +227,33 @@ describe User, type: :model do
     expect(user).not_to have_password('ihatecookies')
   end
 
+  it 'should authenticate regardless of the Unicode normalization form of the password' do
+    nfc = "p\u{00E4}ssword"  # "pässword" with a composed ä (U+00E4)
+    nfd = "pa\u{0308}ssword" # "pässword" with a decomposed ä (a + combining U+0308)
+    expect(nfc.bytes).not_to eq(nfd.bytes) # sanity check: the raw inputs really differ
+
+    # Stored from the NFD form (as one platform/form might submit it)...
+    User.create!(login: 'umlaut', password: nfd, email: 'umlaut@example.com')
+    user = User.find_by!(login: 'umlaut')
+
+    # ...must still verify against the NFC form (as another platform/form would submit it).
+    expect(user).to have_password(nfc)
+    expect(user).to have_password(nfd)
+    expect(user).not_to have_password('different')
+  end
+
+  it 'authenticates an argon hash that predates normalization (raw bytes)' do
+    nfd = "pa\u{0308}ssword" # decomposed "pässword"
+    user = User.create!(login: 'legacynorm', password: 'placeholder', email: 'legacynorm@example.com')
+    # Simulate a hash stored before normalization existed: argon over the raw NFD bytes.
+    user.update_column(:argon_hash, Argon2::Password.new(t_cost: 4, m_cost: 15).create(nfd))
+    user.update_column(:salt, nil)
+
+    user = User.find_by!(login: 'legacynorm')
+    expect(user).to have_password(nfd) # raw-bytes fallback keeps the existing user logging in
+    expect(user).not_to have_password('different')
+  end
+
   it 'should not reset the password when saved without changing the password' do
     user = User.create!(login: 'instructor', password: 'ihatecookies', email: 'instructor@example.com')
     user.login = 'funny_person'

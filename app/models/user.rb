@@ -45,6 +45,17 @@ class User < ApplicationRecord
                       message: 'does not look like an email'
                     }
 
+  # Guard the courses.mooc.fi delegation id: it must be a valid UUID and unique. A malformed id
+  # set here would otherwise be persisted while the local password hash is nulled, locking the
+  # user out (they could neither log in locally nor be delegated to courses.mooc.fi).
+  validates :courses_mooc_fi_user_id,
+            uniqueness: true,
+            format: {
+              with: /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/,
+              message: 'must be a valid UUID'
+            },
+            allow_blank: true
+
   validate :reject_common_login_mistakes, on: :create
 
   scope :legitimate_students, -> { where(legitimate_student: true) }
@@ -129,7 +140,15 @@ class User < ApplicationRecord
 
   def has_password?(submitted_password)
     if !salt
-      return Argon2::Password.verify_password(submitted_password, argon_hash)
+      normalized = normalize_password(submitted_password)
+      # When normalization changes nothing (e.g. an ASCII password) there is only one form to
+      # check, so verify once. Only when it changes the input do we also try the raw bytes, to
+      # stay compatible with argon hashes created before normalization existed.
+      if normalized == submitted_password
+        return Argon2::Password.verify_password(submitted_password, argon_hash)
+      end
+      return Argon2::Password.verify_password(normalized, argon_hash) ||
+             Argon2::Password.verify_password(submitted_password, argon_hash)
     end
     result = Argon2::Password.verify_password(old_encrypt(submitted_password), argon_hash)
     if result && salt
@@ -147,12 +166,28 @@ class User < ApplicationRecord
     user ||= find_by('lower(email) = ?', login.downcase)
     return nil if user.nil?
 
-    if user.password_managed_by_courses_mooc_fi && user.courses_mooc_fi_user_id.present?
+    if user.managed_externally?
       return user if user.authenticate_via_courses_mooc_fi(submitted_password)
+      return nil
+    elsif user.externally_managed_without_target?
+      # Half-migrated/misconfigured: flagged as managed by courses.mooc.fi but with no id to
+      # delegate to. Fail closed instead of silently authenticating against the stale local hash.
+      Rails.logger.error("User #{user.id} is password_managed_by_courses_mooc_fi but has no courses_mooc_fi_user_id; refusing local fallback authentication")
       return nil
     end
 
     user if user.has_password?(submitted_password)
+  end
+
+  # The password is stored in courses.mooc.fi and we have the id needed to delegate auth/changes.
+  def managed_externally?
+    password_managed_by_courses_mooc_fi && courses_mooc_fi_user_id.present?
+  end
+
+  # Flagged as managed by courses.mooc.fi but missing the delegation id: a misconfigured state in
+  # which local credentials must never be used as a fallback.
+  def externally_managed_without_target?
+    password_managed_by_courses_mooc_fi && courses_mooc_fi_user_id.blank?
   end
 
 
@@ -171,11 +206,12 @@ class User < ApplicationRecord
 
       req.body = {
         user_id: courses_mooc_fi_user_id,
-        password: submitted_password
+        password: normalize_password(submitted_password)
       }
     end
 
     if response.body == true
+      clear_stale_local_password
       return true
     end
 
@@ -220,8 +256,8 @@ class User < ApplicationRecord
 
         req.body = {
           user_id: self.courses_mooc_fi_user_id,
-          old_password: old_password,
-          new_password: new_password
+          old_password: normalize_password(old_password),
+          new_password: normalize_password(new_password)
         }
       end
 
@@ -231,6 +267,7 @@ class User < ApplicationRecord
         raise "Updating password via courses.mooc.fi failed for user #{self.email}"
       end
 
+      clear_stale_local_password
       true
 
     rescue Faraday::ClientError => e
@@ -275,7 +312,7 @@ class User < ApplicationRecord
 
         req.body = {
           upstream_id: id,
-          password: password,
+          password: normalize_password(password),
         }
       end
 
@@ -519,6 +556,24 @@ class User < ApplicationRecord
     end
 
     def generate_argon(input)
-      Argon2::Password.new(t_cost: 4, m_cost: 15).create(input)
+      Argon2::Password.new(t_cost: 4, m_cost: 15).create(normalize_password(input))
+    end
+
+    # Normalize a password to Unicode NFC before hashing or verifying so that the same password
+    # entered on different platforms/forms hashes to identical bytes. Argon2 hashes raw bytes, so
+    # a composed "ä" (U+00E4) and a decomposed "ä" (U+0061 U+0308) would otherwise produce
+    # different hashes. nil is passed through unchanged (e.g. a missing old_password on reset).
+    def normalize_password(password)
+      return password unless password.is_a?(String)
+      password.unicode_normalize(:nfc)
+    end
+
+    # courses.mooc.fi owns this user's password, so any local hash is dead weight that must never
+    # be used as a fallback. Drop it if present. This self-heals users whose managed flag was set
+    # by a direct SQL backfill that left the old hash behind (see also the one-time cleanup task).
+    # update_columns writes directly, skipping validations and callbacks.
+    def clear_stale_local_password
+      return unless argon_hash.present? || salt.present? || password_hash.present?
+      update_columns(argon_hash: nil, salt: nil, password_hash: nil, updated_at: Time.now)
     end
 end
