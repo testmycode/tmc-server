@@ -565,7 +565,13 @@ class User < ApplicationRecord
     # different hashes. nil is passed through unchanged (e.g. a missing old_password on reset).
     def normalize_password(password)
       return password unless password.is_a?(String)
-      password.unicode_normalize(:nfc)
+      # HTTP Basic Auth credentials arrive Base64-decoded as ASCII-8BIT (binary), and
+      # unicode_normalize raises Encoding::CompatibilityError on any ASCII-8BIT string regardless
+      # of its contents. Reinterpret the bytes as UTF-8 first; if they are not valid UTF-8 there is
+      # nothing meaningful to normalize, so leave the password untouched.
+      utf8 = password.encoding == Encoding::UTF_8 ? password : password.dup.force_encoding(Encoding::UTF_8)
+      return password unless utf8.valid_encoding?
+      utf8.unicode_normalize(:nfc)
     end
 
     # courses.mooc.fi owns this user's password, so any local hash is dead weight that must never
