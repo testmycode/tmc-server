@@ -39,7 +39,7 @@ class PasswordResetKeysController < ApplicationController
       return render action: :show, status: :forbidden
     end
 
-    if @user.password_managed_by_courses_mooc_fi
+    if @user.managed_externally?
       success = @user.update_password_via_courses_mooc_fi(nil, params[:password])
       if success
         @key.destroy
@@ -49,6 +49,12 @@ class PasswordResetKeysController < ApplicationController
         flash.now[:alert] = 'Failed to reset password.'
         render action: :show, status: :forbidden
       end
+    elsif @user.externally_managed_without_target?
+      # Flagged as managed by courses.mooc.fi but with no id to delegate to. Do not fall back to a
+      # local reset (authentication would ignore it); surface the misconfiguration instead.
+      Rails.logger.error("Password reset for user #{@user.id}: managed by courses.mooc.fi but missing courses_mooc_fi_user_id")
+      flash.now[:alert] = 'This account cannot be reset right now. Please contact support.'
+      render action: :show, status: :forbidden
     else
       @user.password = params[:password]
       if @user.save

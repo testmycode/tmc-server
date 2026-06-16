@@ -299,8 +299,14 @@ module Api
 
         def maybe_update_password
           if params[:old_password].present? && params[:password].present?
-            if @user.password_managed_by_courses_mooc_fi && @user.courses_mooc_fi_user_id.present?
-              return @user.update_password_via_courses_mooc_fi(params[:old_password], params[:password])
+            if @user.managed_externally?
+              unless @user.update_password_via_courses_mooc_fi(params[:old_password], params[:password])
+                @user.errors.add(:password, 'could not be changed. Please check your current password and try again.')
+              end
+              return
+            elsif @user.externally_managed_without_target?
+              @user.errors.add(:base, 'This account is being migrated; password changes are temporarily unavailable.')
+              return
             end
             if !@user.has_password?(params[:old_password])
               @user.errors.add(:old_password, 'incorrect')
