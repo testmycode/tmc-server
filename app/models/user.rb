@@ -176,7 +176,11 @@ class User < ApplicationRecord
       return nil
     end
 
-    user if user.has_password?(submitted_password)
+    if user.has_password?(submitted_password)
+      # Locally-managed user logged in: migrate them to courses.mooc.fi
+      user.post_new_user_to_courses_mooc_fi(submitted_password)
+      user
+    end
   end
 
   # The password is stored in courses.mooc.fi and we have the id needed to delegate auth/changes.
@@ -194,7 +198,7 @@ class User < ApplicationRecord
   def authenticate_via_courses_mooc_fi(submitted_password)
     auth_url = SiteSetting.value('courses_mooc_fi_auth_url')
 
-    conn = Faraday.new do |f|
+    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
       f.request :json
       f.response :json
     end
@@ -243,7 +247,7 @@ class User < ApplicationRecord
   def update_password_via_courses_mooc_fi(old_password, new_password)
     update_url = SiteSetting.value('courses_mooc_fi_update_password_url')
 
-    conn = Faraday.new do |f|
+    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
       f.request :json
       f.response :json
     end
@@ -299,7 +303,9 @@ class User < ApplicationRecord
     Rails.logger.info("Posting new user #{self.email} to courses.mooc.fi")
     create_url = SiteSetting.value('courses_mooc_fi_create_user_url')
 
-    conn = Faraday.new do |f|
+    # Best-effort call made inline during logins/password changes: tight timeouts so a hung
+    # courses.mooc.fi can't stall authentication (migration retries on the next attempt).
+    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
       f.request :json
       f.response :json
     end

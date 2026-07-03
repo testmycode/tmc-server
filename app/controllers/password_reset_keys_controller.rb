@@ -58,6 +58,8 @@ class PasswordResetKeysController < ApplicationController
     else
       @user.password = params[:password]
       if @user.save
+        # Not yet managed by courses.mooc.fi: migrate the user there with the new password
+        @user.post_new_user_to_courses_mooc_fi(params[:password])
         @key.destroy
         flash[:success] = 'Your password has been reset.'
         redirect_to root_path

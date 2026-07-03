@@ -191,6 +191,32 @@ describe UsersController, type: :controller do
         expect(@user.reload).to have_password('newpassword')
       end
 
+      it 'should migrate the user to courses.mooc.fi when the password is changed' do
+        expect_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).with('newpassword').and_return(true)
+        put :update, params: { user: params.merge(old_password: 'oldpassword',
+                                        password: 'newpassword',
+                                        password_repeat: 'newpassword') }
+        expect(response).to redirect_to(user_path)
+      end
+
+      it 'should not migrate the user to courses.mooc.fi when the password change fails' do
+        expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+        put :update, params: { user: params.merge(old_password: 'wrongpassword',
+                                        password: 'newpassword',
+                                        password_repeat: 'newpassword') }
+        expect(response.status).to eq(403)
+      end
+
+      it 'should delegate to courses.mooc.fi without migrating for an already managed user' do
+        @user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
+        expect_any_instance_of(User).to receive(:update_password_via_courses_mooc_fi).with('oldpassword', 'newpassword').and_return(true)
+        expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+        put :update, params: { user: params.merge(old_password: 'oldpassword',
+                                        password: 'newpassword',
+                                        password_repeat: 'newpassword') }
+        expect(response).to redirect_to(user_path)
+      end
+
       it 'should not change the password if the old password was wrong' do
         put :update, params: { user: params.merge(old_password: 'wrongpassword',
                                         password: 'newpassword',

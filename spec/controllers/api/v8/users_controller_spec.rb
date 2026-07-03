@@ -121,4 +121,46 @@ describe Api::V8::UsersController, type: :controller do
       end
     end
   end
+
+  describe 'PUT update password' do
+    let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+    before :each do
+      user.password = 'oldpassword'
+      user.save!
+    end
+
+    def do_update(old_password)
+      put :update, params: { id: 'current', user: { email: user.email },
+                             old_password: old_password, password: 'newpassword', password_repeat: 'newpassword' }
+    end
+
+    it 'migrates the user to courses.mooc.fi when the password is changed' do
+      expect_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).with('newpassword').and_return(true)
+
+      do_update('oldpassword')
+
+      expect(response).to have_http_status(200)
+      expect(user.reload).to have_password('newpassword')
+    end
+
+    it 'does not migrate the user when the password change fails' do
+      expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+
+      do_update('wrongpassword')
+
+      expect(response).to have_http_status(400)
+      expect(user.reload).to have_password('oldpassword')
+    end
+
+    it 'delegates to courses.mooc.fi without migrating for an already managed user' do
+      user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
+      expect_any_instance_of(User).to receive(:update_password_via_courses_mooc_fi).with('oldpassword', 'newpassword').and_return(true)
+      expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+
+      do_update('oldpassword')
+
+      expect(response).to have_http_status(200)
+    end
+  end
 end

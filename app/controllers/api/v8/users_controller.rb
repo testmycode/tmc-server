@@ -187,6 +187,10 @@ module Api
           update_email
           maybe_update_password
           raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
+          # Password changed locally: migrate the user to courses.mooc.fi
+          if params[:old_password].present? && params[:password].present? && !@user.managed_externally?
+            @user.post_new_user_to_courses_mooc_fi(params[:password])
+          end
           RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
           return render json: {
             message: 'User details updated.'
