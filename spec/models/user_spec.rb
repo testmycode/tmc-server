@@ -270,6 +270,34 @@ describe User, type: :model do
     expect(User.authenticate('root', 'ilikecookies')).to be_nil
   end
 
+  describe 'migrating to courses.mooc.fi on login' do
+    it 'posts a locally-managed user on successful authentication' do
+      user = User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
+      expect_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).with('secret123').and_return(true)
+      expect(User.authenticate('localuser', 'secret123')).to eq(user)
+    end
+
+    it 'still authenticates when the migration post fails' do
+      user = User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
+      expect_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).with('secret123').and_return(false)
+      expect(User.authenticate('localuser', 'secret123')).to eq(user)
+    end
+
+    it 'does not post when authentication fails' do
+      User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
+      expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+      expect(User.authenticate('localuser', 'wrongpassword')).to be_nil
+    end
+
+    it 'does not post for an already managed user' do
+      user = User.create!(login: 'manageduser', password: 'secret123', email: 'managed@example.com')
+      user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
+      expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+      allow_any_instance_of(User).to receive(:authenticate_via_courses_mooc_fi).with('secret123').and_return(true)
+      expect(User.authenticate('manageduser', 'secret123')).to eq(user)
+    end
+  end
+
   describe 'visibility' do
     before :each do
       @organization1 = FactoryBot.create :accepted_organization, slug: 'slug1'

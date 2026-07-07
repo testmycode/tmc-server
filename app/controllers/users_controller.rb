@@ -82,6 +82,8 @@ class UsersController < ApplicationController
       set_user_fields
 
       if @user.errors.empty? && @user.save
+        # Password changed locally: migrate the user to courses.mooc.fi
+        @user.post_new_user_to_courses_mooc_fi(params[:user][:password]) if password_changed && !@user.managed_externally?
         RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
         flash[:notice] = if password_changed
           'Changes saved and password changed'
