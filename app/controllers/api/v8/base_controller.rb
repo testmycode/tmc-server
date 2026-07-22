@@ -34,17 +34,112 @@ module Api
         end
       end
 
+      # The exact UUID format the User model enforces on courses_mooc_fi_user_id (see
+      # app/models/user.rb). Duplicated here so the introspected subject is shape-checked before
+      # any lookup or the update_column backfill, which bypasses that load-bearing model validation.
+      COURSES_MOOC_FI_USER_ID_FORMAT = /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/
+
       private
         def authenticate_user!
           return @current_user if @current_user
           if doorkeeper_token
             @current_user ||= User.find_by(id: doorkeeper_token.resource_owner_id)
             raise 'Invalid token' unless @current_user
+          elsif Rails.configuration.x.accept_courses_mooc_fi_tokens && (bearer = bearer_token).present?
+            @current_user ||= user_from_courses_mooc_fi_token(bearer)
           end
           @current_user ||= user_from_session || Guest.new
         end
 
         attr_reader :current_user
+
+        # Additive, feature-flagged auth path (Rails.configuration.x.accept_courses_mooc_fi_tokens,
+        # default off). Only reached when there is no native Doorkeeper token. Treats the bearer as
+        # a courses.mooc.fi (secret-project-331) OAuth token, validates it via RFC 7662
+        # introspection, and maps it to a local user. Fails closed to nil (caller resolves Guest)
+        # on any problem; never raises.
+        def user_from_courses_mooc_fi_token(token)
+          result = CoursesMoocFiTokenIntrospector.introspect(token)
+          return nil unless result
+
+          unless result.scope?('exercise-services')
+            Rails.logger.warn('courses.mooc.fi token rejected: missing exercise-services scope')
+            return nil
+          end
+
+          # The subject is about to be used as courses_mooc_fi_user_id, both for the find_by below
+          # and (on a cache miss) for the update_column backfill, which bypasses the model's
+          # load-bearing UUID-format validation. Shape-check it once here so a malformed subject can
+          # neither be looked up nor persisted. Fail closed on mismatch.
+          unless COURSES_MOOC_FI_USER_ID_FORMAT.match?(result.sub)
+            Rails.logger.warn('courses.mooc.fi token rejected: subject is not a valid UUID')
+            return nil
+          end
+
+          user = User.find_by(courses_mooc_fi_user_id: result.sub)
+          user ||= backfill_from_upstream_id(result)
+          return nil unless user
+
+          # Decision 5 (widened 2026-07-23): introspected tokens must never resolve to an elevated
+          # user. Originally admins-only; now also blocks anyone holding any teachership or
+          # assistantship, because those grant real CanCan abilities (manage exercises/deadlines,
+          # read others' submissions). Elevated users keep using native tmc tokens; fail closed to
+          # Guest here.
+          reason = elevated_user_reason(user)
+          if reason
+            Rails.logger.warn("courses.mooc.fi token resolved to #{reason} user #{user.id}; refusing introspected auth (elevated users must use native tmc tokens)")
+            return nil
+          end
+
+          user
+        rescue => e
+          Rails.logger.warn("courses.mooc.fi token authentication error: #{e.class}: #{e.message}")
+          nil
+        end
+
+        # nil when the user holds no elevated role; otherwise a short reason naming the highest
+        # concern (administrator > teacher > assistant), used only for the warn log. Uses efficient
+        # existence checks rather than loading and iterating every organization/course.
+        def elevated_user_reason(user)
+          return 'administrator' if user.administrator?
+          return 'teacher' if Teachership.exists?(user_id: user.id)
+          return 'assistant' if Assistantship.exists?(user_id: user.id)
+          nil
+        end
+
+        # No user is mapped to this token's subject yet, but the introspection response carries the
+        # TMC integer id (upstream_id). Look the user up by it and backfill the UUID so later
+        # requests resolve directly. Guarded against the unique-index race and against clobbering a
+        # user already bound to a different subject.
+        def backfill_from_upstream_id(result)
+          upstream_id = result.upstream_id
+          return nil if upstream_id.blank?
+
+          user = User.find_by(id: upstream_id)
+          return nil unless user
+
+          if user.courses_mooc_fi_user_id.blank?
+            begin
+              user.update_column(:courses_mooc_fi_user_id, result.sub)
+            rescue ActiveRecord::RecordNotUnique
+              # Another request backfilled the same subject first. Trust the authoritative mapping.
+              user = User.find_by(courses_mooc_fi_user_id: result.sub)
+            end
+          elsif user.courses_mooc_fi_user_id != result.sub
+            # upstream_id points at a user already bound to a different subject. Do not override.
+            Rails.logger.warn("courses.mooc.fi upstream_id #{upstream_id} maps to user #{user.id} already bound to a different courses_mooc_fi_user_id; refusing")
+            return nil
+          end
+
+          user
+        end
+
+        def bearer_token
+          auth = request.authorization
+          return nil unless auth
+          match = auth.match(/\ABearer[ ]+(.+)\z/i)
+          match && match[1]
+        end
 
         def errors_json(messages)
           { errors: [*messages] }
