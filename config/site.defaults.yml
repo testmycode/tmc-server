@@ -143,3 +143,8 @@ teacher_manual_url: http://testmycode.github.io/tmc-server/usermanual/
 courses_mooc_fi_auth_url:
 courses_mooc_fi_update_password_url:
 courses_mooc_fi_create_user_url:
+
+# RFC 7662 introspection endpoint for validating courses.mooc.fi OAuth tokens. Only used when the
+# ACCEPT_COURSES_MOOC_FI_TOKENS flag is on. Set per deployment, e.g.
+# https://courses.mooc.fi/api/v0/main-frontend/oauth/introspect
+courses_mooc_fi_introspection_url:
