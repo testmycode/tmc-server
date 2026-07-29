@@ -62,9 +62,9 @@ module Api
           key :required, true
           key :type, :integer
         end
-        parameter :path_user_email do
-          key :name, :user_email
-          key :in, :path
+        parameter :query_user_email do
+          key :name, :email
+          key :in, :query
           key :description, "User's email"
           key :required, true
           key :type, :string

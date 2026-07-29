@@ -16,14 +16,12 @@ module Api
               parameter do
                 key :in, 'query'
                 key :name, 'ids'
-                schema do
-                  key :type, :array
-                  items do
-                    key :type, :integer
-                  end
-                end
-                key :type, :array
                 key :description, 'Exercise Ids'
+                key :type, :array
+                key :collectionFormat, 'csv'
+                items do
+                  key :type, :integer
+                end
               end
               response 200 do
                 key :description, 'Exercises in json'

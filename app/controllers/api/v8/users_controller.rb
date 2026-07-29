@@ -62,7 +62,7 @@ module Api
           key :operationId, 'setPasswordManagedByCoursesMoocFi'
           key :produces, ['application/json']
           key :tags, ['user']
-          parameter '$ref': '#/parameters/user_id'
+          parameter '$ref': '#/parameters/path_user_id'
           response 403, '$ref': '#/responses/error'
           response 404, '$ref': '#/responses/error'
           response 200 do
@@ -76,18 +76,17 @@ module Api
         end
       end
 
-      swagger_path '/api/v8/users/get_user_with_email?email={email}' do
+      swagger_path '/api/v8/users/get_user_with_email' do
         operation :get do
           key :description, "Returns the user's id as upstream_id, user's courses.mooc.fi-id as id, email, first name and last name by user email"
           key :operationId, 'getUserInformationByEmail'
           key :produces, ['application/json']
           key :tags, ['user']
-          parameter '$ref': '#/parameters/user_email'
+          parameter '$ref': '#/parameters/query_user_email'
           response 403, '$ref': '#/responses/error'
           response 404, '$ref': '#/responses/error'
           response 200 do
             key :description, "User's courses.mooc.fi-id as id, email, first name, last name and id as upstream_id as json"
-            key :content, 'application/json'
             schema do
               key :title, :user
               key :required, [:user]
