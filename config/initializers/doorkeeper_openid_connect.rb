@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require 'app_secrets'
+
 Doorkeeper::OpenidConnect.configure do
   issuer 'https://tmc.mooc.fi'
 
-  signing_key Rails.application.secrets.openid_connect_signing_key
+  signing_key AppSecrets.openid_connect_signing_key
 
   subject_types_supported [:public]
 
@@ -41,7 +43,7 @@ Doorkeeper::OpenidConnect.configure do
     # Example implementation:
     # resource_owner.id
 
-    user_response = RestClient.get "https://courses.mooc.fi/api/v0/tmc-server/users-by-upstream-id/#{resource_owner.id}", { Authorization: Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project }
+    user_response = RestClient.get "https://courses.mooc.fi/api/v0/tmc-server/users-by-upstream-id/#{resource_owner.id}", { Authorization: AppSecrets.tmc_server_secret_for_communicating_to_secret_project }
 
     user = JSON.parse(user_response)
 
