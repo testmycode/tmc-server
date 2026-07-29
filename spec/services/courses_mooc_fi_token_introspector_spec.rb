@@ -76,16 +76,16 @@ RSpec.describe CoursesMoocFiTokenIntrospector do
     end
 
     it 'sends the token, both client credentials, and the Accept header in the request' do
-      allow(Rails.application.secrets).to receive(:courses_mooc_fi_introspection_client_id).and_return('client-abc')
-      allow(Rails.application.secrets).to receive(:courses_mooc_fi_introspection_secret).and_return('secret-xyz')
+      allow(AppSecrets).to receive(:courses_mooc_fi_introspection_client_id).and_return('client-abc')
+      allow(AppSecrets).to receive(:courses_mooc_fi_introspection_secret).and_return('secret-xyz')
       stub_faraday_response(status: 200, body: active_body)
 
       described_class.introspect(token)
 
       expect(sent_body).to include(
         token: token,
-        client_id: Rails.application.secrets.courses_mooc_fi_introspection_client_id,
-        client_secret: Rails.application.secrets.courses_mooc_fi_introspection_secret
+        client_id: AppSecrets.courses_mooc_fi_introspection_client_id,
+        client_secret: AppSecrets.courses_mooc_fi_introspection_secret
       )
       expect(sent_body[:client_id]).to eq('client-abc')
       expect(sent_body[:client_secret]).to eq('secret-xyz')
@@ -93,8 +93,8 @@ RSpec.describe CoursesMoocFiTokenIntrospector do
     end
 
     it 'returns nil and warns when the introspection is not configured (missing secrets)' do
-      allow(Rails.application.secrets).to receive(:courses_mooc_fi_introspection_client_id).and_return('')
-      allow(Rails.application.secrets).to receive(:courses_mooc_fi_introspection_secret).and_return('')
+      allow(AppSecrets).to receive(:courses_mooc_fi_introspection_client_id).and_return('')
+      allow(AppSecrets).to receive(:courses_mooc_fi_introspection_secret).and_return('')
       expect(Rails.logger).to receive(:warn).with(/not configured/)
       expect(Faraday).not_to receive(:new)
       expect(described_class.introspect(token)).to be_nil

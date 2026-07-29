@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'app_secrets'
 require 'digest'
 
 # Validates courses.mooc.fi (secret-project-331) OAuth2 access tokens against the
@@ -62,8 +63,8 @@ class CoursesMoocFiTokenIntrospector
   private
     def request_introspection(token)
       url = SiteSetting.value('courses_mooc_fi_introspection_url')
-      client_id = Rails.application.secrets.courses_mooc_fi_introspection_client_id
-      client_secret = Rails.application.secrets.courses_mooc_fi_introspection_secret
+      client_id = AppSecrets.courses_mooc_fi_introspection_client_id
+      client_secret = AppSecrets.courses_mooc_fi_introspection_secret
 
       # A flag-on-but-unconfigured deploy (blank URL or missing client credentials) would otherwise
       # silently fail closed to Guest with no clue why. Emit one distinct warn so the misconfig is

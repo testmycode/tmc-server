@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'app_secrets'
+
 class User < ApplicationRecord
   include Comparable
   include Gravtastic
@@ -206,7 +208,7 @@ class User < ApplicationRecord
     response = conn.post(auth_url) do |req|
       req.headers['Content-Type'] = 'application/json'
       req.headers['Accept'] = 'application/json'
-      req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+      req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
 
       req.body = {
         user_id: courses_mooc_fi_user_id,
@@ -256,7 +258,7 @@ class User < ApplicationRecord
       response = conn.post(update_url) do |req|
         req.headers['Content-Type'] = 'application/json'
         req.headers['Accept'] = 'application/json'
-        req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+        req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
 
         req.body = {
           user_id: self.courses_mooc_fi_user_id,
@@ -314,7 +316,7 @@ class User < ApplicationRecord
       response = conn.post(create_url) do |req|
         req.headers['Content-Type'] = 'application/json'
         req.headers['Accept'] = 'application/json'
-        req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+        req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
 
         req.body = {
           upstream_id: id,
