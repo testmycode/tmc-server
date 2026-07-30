@@ -19,7 +19,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
 
     before :each do
       allow(controller).to receive(:doorkeeper_token) { token }
-      get :index, format: text
+      get :index, format: :text
     end
 
     context 'when not logged in' do
