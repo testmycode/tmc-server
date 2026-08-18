@@ -83,6 +83,7 @@ class ParticipantsController < ApplicationController
       @app_data = JSON.pretty_generate(JSON.parse(@user.user_app_data.to_json))
       @courses_mooc_fi_status = @user.courses_mooc_fi_migration_status
       @courses_mooc_fi_status_label = courses_mooc_fi_status_label(@user, @courses_mooc_fi_status)
+      @courses_mooc_fi_force_migrate_available = !@user.managed_externally? || courses_mooc_fi_account_missing?(@courses_mooc_fi_status)
     else
       add_breadcrumb 'My stats', participant_path(@user)
     end
@@ -139,7 +140,7 @@ class ParticipantsController < ApplicationController
     return respond_forbidden('This feature is only available to admins') unless current_user.administrator?
     return respond_forbidden('This feature is disabled for admin accounts') if @user.administrator?
 
-    if @user.managed_externally?
+    if @user.managed_externally? && !courses_mooc_fi_account_missing?(@user.courses_mooc_fi_migration_status)
       return redirect_to participant_path(@user), alert: 'User is already managed by courses.mooc.fi.'
     end
 
@@ -154,9 +155,18 @@ class ParticipantsController < ApplicationController
   end
 
   private
+    # nil means the live status is unknown (unreachable/unconfigured) -- trust the local flag
+    # instead of treating the account as missing.
+    def courses_mooc_fi_account_missing?(status)
+      status.present? && (!status[:shadow_user_exists] || status[:deleted_at].present?)
+    end
+
     def courses_mooc_fi_status_label(user, status)
-      return 'Fully migrated' if user.managed_externally?
       return 'Broken: flagged as migrated locally but missing the target id' if user.externally_managed_without_target?
+      if user.managed_externally?
+        return "Broken: flagged as migrated locally, but courses.mooc.fi doesn't have a live account for this user" if courses_mooc_fi_account_missing?(status)
+        return 'Fully migrated'
+      end
       return 'Inconsistent: courses.mooc.fi already has a password, but it isn\'t linked locally' if status&.dig(:password_set)
 
       'Not migrated'

@@ -35,8 +35,10 @@
           <li>Could not reach courses.mooc.fi to confirm live status. (shown to you because you're an admin)</li>
         <% end %>
       <% end %>
-      <% if current_user.administrator? && !@user.administrator? && !@user.managed_externally? %>
-        <% confirm_text = if @courses_mooc_fi_status&.dig(:password_set)
+      <% if current_user.administrator? && !@user.administrator? && @courses_mooc_fi_force_migrate_available %>
+        <% confirm_text = if @user.managed_externally?
+          "#{@user.email} is flagged as migrated locally, but courses.mooc.fi doesn't have a live account for them. Force migrating will (re)create the account on courses.mooc.fi and relink them to it. Continue?"
+        elsif @courses_mooc_fi_status&.dig(:password_set)
           "#{@user.email} already has a working password on courses.mooc.fi. Force migrating will still wipe their local tmc-server password and relink them to that existing account. Continue?"
         else
           "Force migrate #{@user.email} to courses.mooc.fi now?"
