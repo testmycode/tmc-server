@@ -196,7 +196,7 @@ class User < ApplicationRecord
 
 
   def authenticate_via_courses_mooc_fi(submitted_password)
-    auth_url = SiteSetting.value('courses_mooc_fi_auth_url')
+    auth_url = courses_mooc_fi_url('/api/v0/tmc-server/users/authenticate')
 
     conn = courses_mooc_fi_connection
 
@@ -242,7 +242,7 @@ class User < ApplicationRecord
 
 
   def update_password_via_courses_mooc_fi(old_password, new_password)
-    update_url = SiteSetting.value('courses_mooc_fi_update_password_url')
+    update_url = courses_mooc_fi_url('/api/v0/tmc-server/users/change-password')
 
     conn = courses_mooc_fi_connection
 
@@ -295,7 +295,7 @@ class User < ApplicationRecord
 
   def post_new_user_to_courses_mooc_fi(password)
     Rails.logger.info("Posting new user #{self.email} to courses.mooc.fi")
-    create_url = SiteSetting.value('courses_mooc_fi_create_user_url')
+    create_url = courses_mooc_fi_url('/api/v0/tmc-server/users/create')
 
     # Best-effort call made inline during logins/password changes: tight timeouts so a hung
     # courses.mooc.fi can't stall authentication (migration retries on the next attempt).
@@ -360,11 +360,9 @@ class User < ApplicationRecord
   # updated after a confirmed remote success, so a failure (e.g. re-creating a soft-deleted linked
   # id collides on the primary key) never leaves the account half-migrated.
   def force_migrate_to_courses_mooc_fi
-    ensure_url = SiteSetting.value('courses_mooc_fi_users_by_upstream_id_url')
-
     conn = courses_mooc_fi_connection
 
-    response = conn.get("#{ensure_url}/#{id}") do |req|
+    response = conn.get(courses_mooc_fi_url("/api/v0/tmc-server/users-by-upstream-id/#{id}")) do |req|
       req.headers['Accept'] = 'application/json'
       req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
     end
@@ -399,12 +397,11 @@ class User < ApplicationRecord
   # Live, display-only read of courses.mooc.fi's view of this user -- never gates any action.
   # nil means genuinely unknown (unconfigured, network error, unexpected response), not "not migrated".
   def courses_mooc_fi_migration_status
-    status_url = SiteSetting.value('courses_mooc_fi_user_status_url')
-    return nil if status_url.blank?
+    return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
 
     conn = courses_mooc_fi_connection
 
-    response = conn.get("#{status_url}/#{id}/status") do |req|
+    response = conn.get(courses_mooc_fi_url("/api/v0/tmc-server/users-by-upstream-id/#{id}/status")) do |req|
       req.headers['Accept'] = 'application/json'
       req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
     end
@@ -435,11 +432,9 @@ class User < ApplicationRecord
 
   def courses_mooc_fi_profile_url
     return nil if courses_mooc_fi_user_id.blank?
+    return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
 
-    base_url = SiteSetting.value('courses_mooc_fi_manage_user_url')
-    return nil if base_url.blank?
-
-    "#{base_url}/#{courses_mooc_fi_user_id}"
+    courses_mooc_fi_url("/manage/users/#{courses_mooc_fi_user_id}")
   end
 
   def password_reset_key
@@ -584,6 +579,10 @@ class User < ApplicationRecord
         f.request :json
         f.response :json
       end
+    end
+
+    def courses_mooc_fi_url(path)
+      "#{SiteSetting.value('courses_mooc_fi_base_url')}#{path}"
     end
 
     def course_ids_arel

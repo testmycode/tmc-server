@@ -273,20 +273,20 @@ describe User, type: :model do
   describe 'courses_mooc_fi_profile_url' do
     it 'is nil when the user has no courses.mooc.fi id' do
       user = User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
-      SiteSetting.all_settings['courses_mooc_fi_manage_user_url'] = 'https://courses.mooc.fi/manage/users'
+      SiteSetting.all_settings['courses_mooc_fi_base_url'] = 'https://courses.mooc.fi'
       expect(user.courses_mooc_fi_profile_url).to be_nil
     end
 
-    it 'is nil when courses_mooc_fi_manage_user_url is not configured' do
+    it 'is nil when courses_mooc_fi_base_url is not configured' do
       user = User.create!(login: 'manageduser', password: 'secret123', email: 'managed@example.com', courses_mooc_fi_user_id: SecureRandom.uuid)
-      SiteSetting.all_settings['courses_mooc_fi_manage_user_url'] = nil
+      SiteSetting.all_settings['courses_mooc_fi_base_url'] = nil
       expect(user.courses_mooc_fi_profile_url).to be_nil
     end
 
     it 'builds the profile url from the configured base url and the courses.mooc.fi id' do
       id = SecureRandom.uuid
       user = User.create!(login: 'manageduser', password: 'secret123', email: 'managed@example.com', courses_mooc_fi_user_id: id)
-      SiteSetting.all_settings['courses_mooc_fi_manage_user_url'] = 'https://courses.mooc.fi/manage/users'
+      SiteSetting.all_settings['courses_mooc_fi_base_url'] = 'https://courses.mooc.fi'
       expect(user.courses_mooc_fi_profile_url).to eq("https://courses.mooc.fi/manage/users/#{id}")
     end
   end
