@@ -20,6 +20,16 @@
       <% if current_user.administrator? && !@user.administrator? %>
         <li><%= link_to 'Generate password reset link', password_reset_link_participant_path, class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
       <% end %>
+      <% if current_user.administrator? %>
+        <li>Courses.mooc.fi managed: <%= @user.password_managed_by_courses_mooc_fi ? 'yes' : 'no' %> (shown to you because you're an admin)</li>
+        <li>Courses.mooc.fi user id: <%= @user.courses_mooc_fi_user_id.presence || 'not set' %> (shown to you because you're an admin)</li>
+      <% end %>
+      <% if current_user.administrator? && !@user.administrator? && !@user.managed_externally? %>
+        <li><%= button_to 'Force migrate to courses.mooc.fi', force_migrate_to_courses_mooc_fi_participant_path, method: :post, class: 'btn btn-primary', data: { confirm: "Force migrate #{@user.email} to courses.mooc.fi now?" } %> (shown to you because you're an admin)</li>
+      <% end %>
+      <% if current_user.administrator? && @user.courses_mooc_fi_profile_url %>
+        <li><%= link_to 'View on courses.mooc.fi', @user.courses_mooc_fi_profile_url, target: '_blank', rel: 'noopener', class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
+      <% end %>
       </ul>
   </section>
 </div>

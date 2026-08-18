@@ -131,6 +131,24 @@ class ParticipantsController < ApplicationController
     @password_reset_link = @user.generate_password_reset_link
   end
 
+  def force_migrate_to_courses_mooc_fi
+    @user = User.find(params[:id])
+    authorize! :view_participant_information, @user
+    return respond_forbidden('This feature is only available to admins') unless current_user.administrator?
+    return respond_forbidden('This feature is disabled for admin accounts') if @user.administrator?
+
+    if @user.managed_externally?
+      return redirect_to participant_path(@user), alert: 'User is already managed by courses.mooc.fi.'
+    end
+
+    result = @user.force_migrate_to_courses_mooc_fi
+    if result[:success]
+      redirect_to participant_path(@user), notice: 'User force-migrated to courses.mooc.fi.'
+    else
+      redirect_to participant_path(@user), alert: "Force migration to courses.mooc.fi failed: #{result[:error]}"
+    end
+  end
+
   private
     def index_json_data
       result = []

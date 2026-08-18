@@ -363,6 +363,56 @@ class User < ApplicationRecord
     end
   end
 
+  # Admin-triggered override of the normal login/password-change-triggered migration: creates
+  # the user on courses.mooc.fi with a throwaway random password nobody needs to know, since the
+  # user gets a real one later via password reset once courses.mooc.fi confirms the account
+  # (see set_password_managed_by_courses_mooc_fi). Returns the raw status/body on failure rather
+  # than a guessed message, since we don't control courses.mooc.fi's error schema.
+  def force_migrate_to_courses_mooc_fi
+    create_url = SiteSetting.value('courses_mooc_fi_create_user_url')
+    password = SecureRandom.hex(24)
+
+    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
+      f.request :json
+      f.response :json
+    end
+
+    response = conn.post(create_url) do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['Accept'] = 'application/json'
+      req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+      req.body = { upstream_id: id, password: normalize_password(password) }
+    end
+
+    data = response.body
+    if response.status == 200 && data.is_a?(Hash) && data['user'].present?
+      Rails.logger.info("User #{self.email} force-migrated to courses.mooc.fi by an admin")
+      { success: true }
+    else
+      Rails.logger.error("Force migration to courses.mooc.fi failed for user #{self.email}: status=#{response.status}, body=#{data.inspect}")
+      { success: false, error: "status=#{response.status}, body=#{data.inspect}" }
+    end
+
+  rescue Faraday::ClientError => e
+    status = e.response&.dig(:status)
+    body = e.response&.dig(:body)
+    Rails.logger.error("Force migration to courses.mooc.fi errored for user #{self.email}: status=#{status}, body=#{body.inspect}")
+    { success: false, error: "status=#{status}, body=#{body.inspect}" }
+
+  rescue => e
+    Rails.logger.error("Force migration to courses.mooc.fi unexpectedly failed for user #{self.email}: #{e.message}")
+    { success: false, error: e.message }
+  end
+
+  def courses_mooc_fi_profile_url
+    return nil if courses_mooc_fi_user_id.blank?
+
+    base_url = SiteSetting.value('courses_mooc_fi_manage_user_url')
+    return nil if base_url.blank?
+
+    "#{base_url}/#{courses_mooc_fi_user_id}"
+  end
+
   def password_reset_key
     action_tokens.find { |t| t.action == 'reset_password' }
   end

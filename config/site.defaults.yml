@@ -143,3 +143,4 @@ teacher_manual_url: http://testmycode.github.io/tmc-server/usermanual/
 courses_mooc_fi_auth_url:
 courses_mooc_fi_update_password_url:
 courses_mooc_fi_create_user_url:
+courses_mooc_fi_manage_user_url:
