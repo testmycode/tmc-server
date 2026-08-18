@@ -61,10 +61,11 @@ describe ParticipantsController, type: :controller do
       end
 
       it 'migrates the user when they are not yet managed externally and the migration succeeds' do
-        expect_any_instance_of(User).to receive(:force_migrate_to_courses_mooc_fi).and_return({ success: true })
+        expect_any_instance_of(User).to receive(:force_migrate_to_courses_mooc_fi).and_return({ success: true, courses_mooc_fi_user_id: 'abc-123' })
         post :force_migrate_to_courses_mooc_fi, params: { id: @user.id }
         expect(response).to redirect_to(participant_path(@user))
         expect(flash[:notice]).to match(/force-migrated/)
+        expect(flash[:notice]).to match(/abc-123/)
       end
 
       it 'shows the exact error when the migration fails' do
@@ -72,6 +73,56 @@ describe ParticipantsController, type: :controller do
         post :force_migrate_to_courses_mooc_fi, params: { id: @user.id }
         expect(response).to redirect_to(participant_path(@user))
         expect(flash[:alert]).to match(/status=422/)
+      end
+    end
+  end
+
+  describe 'GET /show' do
+    describe 'when logged in as an admin' do
+      before :each do
+        controller.current_user = FactoryBot.create(:admin)
+      end
+
+      it 'shows the migration status when courses.mooc.fi confirms the user is not migrated' do
+        expect_any_instance_of(User).to receive(:courses_mooc_fi_migration_status).and_return(
+          { shadow_user_exists: false, courses_mooc_fi_user_id: nil, password_set: false, deleted_at: nil }
+        )
+        get :show, params: { id: @user.id }
+        expect(response).to be_successful
+        expect(assigns(:courses_mooc_fi_status_label)).to eq('Not migrated')
+      end
+
+      it 'flags an inconsistency when courses.mooc.fi already has a password but the user is not linked locally' do
+        expect_any_instance_of(User).to receive(:courses_mooc_fi_migration_status).and_return(
+          { shadow_user_exists: true, courses_mooc_fi_user_id: SecureRandom.uuid, password_set: true, deleted_at: nil }
+        )
+        get :show, params: { id: @user.id }
+        expect(response).to be_successful
+        expect(assigns(:courses_mooc_fi_status_label)).to match(/Inconsistent/)
+      end
+
+      it 'shows fully migrated when the user is already managed externally, regardless of the live status' do
+        @user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
+        expect_any_instance_of(User).to receive(:courses_mooc_fi_migration_status).and_return(nil)
+        get :show, params: { id: @user.id }
+        expect(response).to be_successful
+        expect(assigns(:courses_mooc_fi_status_label)).to eq('Fully migrated')
+      end
+
+      it 'flags the broken state when managed locally but missing the target id' do
+        @user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: nil)
+        expect_any_instance_of(User).to receive(:courses_mooc_fi_migration_status).and_return(nil)
+        get :show, params: { id: @user.id }
+        expect(response).to be_successful
+        expect(assigns(:courses_mooc_fi_status_label)).to match(/Broken/)
+      end
+
+      it 'degrades gracefully when courses.mooc.fi cannot be reached' do
+        expect_any_instance_of(User).to receive(:courses_mooc_fi_migration_status).and_return(nil)
+        get :show, params: { id: @user.id }
+        expect(response).to be_successful
+        expect(assigns(:courses_mooc_fi_status)).to be_nil
+        expect(assigns(:courses_mooc_fi_status_label)).to eq('Not migrated')
       end
     end
   end

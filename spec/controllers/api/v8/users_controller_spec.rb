@@ -163,4 +163,33 @@ describe Api::V8::UsersController, type: :controller do
       expect(response).to have_http_status(200)
     end
   end
+
+  describe 'POST set_password_managed_by_courses_mooc_fi' do
+    before :each do
+      controller.current_user = admin
+    end
+
+    it 'rejects a blank courses_mooc_fi_user_id with a clean 400 instead of erroring' do
+      post :set_password_managed_by_courses_mooc_fi, params: { id: user.id }
+
+      expect(response).to have_http_status(400)
+      expect(user.reload.password_managed_by_courses_mooc_fi).to eq(false)
+    end
+
+    it 'marks the user as managed and clears the local password on success' do
+      user.password = 'oldpassword'
+      user.save!
+      moocfi_id = SecureRandom.uuid
+
+      post :set_password_managed_by_courses_mooc_fi, params: { id: user.id, courses_mooc_fi_user_id: moocfi_id }
+
+      expect(response).to have_http_status(200)
+      user.reload
+      expect(user.password_managed_by_courses_mooc_fi).to eq(true)
+      expect(user.courses_mooc_fi_user_id).to eq(moocfi_id)
+      expect(user.argon_hash).to be_nil
+      expect(user.salt).to be_nil
+      expect(user.password_hash).to be_nil
+    end
+  end
 end

@@ -81,6 +81,8 @@ class ParticipantsController < ApplicationController
       add_breadcrumb 'Participants', :participants_path
       add_breadcrumb @user.username, participant_path(@user)
       @app_data = JSON.pretty_generate(JSON.parse(@user.user_app_data.to_json))
+      @courses_mooc_fi_status = @user.courses_mooc_fi_migration_status
+      @courses_mooc_fi_status_label = courses_mooc_fi_status_label(@user, @courses_mooc_fi_status)
     else
       add_breadcrumb 'My stats', participant_path(@user)
     end
@@ -143,13 +145,22 @@ class ParticipantsController < ApplicationController
 
     result = @user.force_migrate_to_courses_mooc_fi
     if result[:success]
-      redirect_to participant_path(@user), notice: 'User force-migrated to courses.mooc.fi.'
+      redirect_to participant_path(@user), notice:
+        "User force-migrated to courses.mooc.fi (id: #{result[:courses_mooc_fi_user_id]}). " \
+        "They have no password yet — use 'Generate password reset link' below to give them one."
     else
       redirect_to participant_path(@user), alert: "Force migration to courses.mooc.fi failed: #{result[:error]}"
     end
   end
 
   private
+    def courses_mooc_fi_status_label(user, status)
+      return 'Fully migrated' if user.managed_externally?
+      return 'Broken: flagged as migrated locally but missing the target id' if user.externally_managed_without_target?
+      return 'Inconsistent: courses.mooc.fi already has a password, but it isn\'t linked locally' if status&.dig(:password_set)
+
+      'Not migrated'
+    end
     def index_json_data
       result = []
       @participants.each do |user|

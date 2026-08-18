@@ -198,10 +198,7 @@ class User < ApplicationRecord
   def authenticate_via_courses_mooc_fi(submitted_password)
     auth_url = SiteSetting.value('courses_mooc_fi_auth_url')
 
-    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
-      f.request :json
-      f.response :json
-    end
+    conn = courses_mooc_fi_connection
 
     response = conn.post(auth_url) do |req|
       req.headers['Content-Type'] = 'application/json'
@@ -247,10 +244,7 @@ class User < ApplicationRecord
   def update_password_via_courses_mooc_fi(old_password, new_password)
     update_url = SiteSetting.value('courses_mooc_fi_update_password_url')
 
-    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
-      f.request :json
-      f.response :json
-    end
+    conn = courses_mooc_fi_connection
 
     begin
       response = conn.post(update_url) do |req|
@@ -305,10 +299,7 @@ class User < ApplicationRecord
 
     # Best-effort call made inline during logins/password changes: tight timeouts so a hung
     # courses.mooc.fi can't stall authentication (migration retries on the next attempt).
-    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
-      f.request :json
-      f.response :json
-    end
+    conn = courses_mooc_fi_connection
 
     begin
       response = conn.post(create_url) do |req|
@@ -363,31 +354,32 @@ class User < ApplicationRecord
     end
   end
 
-  # Admin-triggered override of the normal login/password-change-triggered migration: creates
-  # the user on courses.mooc.fi with a throwaway random password nobody needs to know, since the
-  # user gets a real one later via password reset once courses.mooc.fi confirms the account
-  # (see set_password_managed_by_courses_mooc_fi). Returns the raw status/body on failure rather
-  # than a guessed message, since we don't control courses.mooc.fi's error schema.
+  # Ensures the courses.mooc.fi shadow account exists (reusing the get-or-create lookup, a no-op
+  # if it's already there), then hands off password ownership locally -- never sends a password,
+  # so the user is passwordless until generate_password_reset_link runs. Local state is only
+  # updated after a confirmed remote success, so a failure (e.g. re-creating a soft-deleted linked
+  # id collides on the primary key) never leaves the account half-migrated.
   def force_migrate_to_courses_mooc_fi
-    create_url = SiteSetting.value('courses_mooc_fi_create_user_url')
-    password = SecureRandom.hex(24)
+    ensure_url = SiteSetting.value('courses_mooc_fi_users_by_upstream_id_url')
 
-    conn = Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
-      f.request :json
-      f.response :json
-    end
+    conn = courses_mooc_fi_connection
 
-    response = conn.post(create_url) do |req|
-      req.headers['Content-Type'] = 'application/json'
+    response = conn.get("#{ensure_url}/#{id}") do |req|
       req.headers['Accept'] = 'application/json'
       req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
-      req.body = { upstream_id: id, password: normalize_password(password) }
     end
 
     data = response.body
-    if response.status == 200 && data.is_a?(Hash) && data['user'].present?
-      Rails.logger.info("User #{self.email} force-migrated to courses.mooc.fi by an admin")
-      { success: true }
+    if response.status == 200 && data.is_a?(Hash) && data['id'].present?
+      update!(
+        password_managed_by_courses_mooc_fi: true,
+        courses_mooc_fi_user_id: data['id'],
+        argon_hash: nil,
+        salt: nil,
+        password_hash: nil
+      )
+      Rails.logger.info("User #{self.email} force-migrated to courses.mooc.fi by an admin (id=#{data['id']})")
+      { success: true, courses_mooc_fi_user_id: data['id'] }
     else
       Rails.logger.error("Force migration to courses.mooc.fi failed for user #{self.email}: status=#{response.status}, body=#{data.inspect}")
       { success: false, error: "status=#{response.status}, body=#{data.inspect}" }
@@ -402,6 +394,43 @@ class User < ApplicationRecord
   rescue => e
     Rails.logger.error("Force migration to courses.mooc.fi unexpectedly failed for user #{self.email}: #{e.message}")
     { success: false, error: e.message }
+  end
+
+  # Live, display-only read of courses.mooc.fi's view of this user -- never gates any action.
+  # nil means genuinely unknown (unconfigured, network error, unexpected response), not "not migrated".
+  def courses_mooc_fi_migration_status
+    status_url = SiteSetting.value('courses_mooc_fi_user_status_url')
+    return nil if status_url.blank?
+
+    conn = courses_mooc_fi_connection
+
+    response = conn.get("#{status_url}/#{id}/status") do |req|
+      req.headers['Accept'] = 'application/json'
+      req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+    end
+
+    data = response.body
+    unless response.status == 200 && data.is_a?(Hash)
+      Rails.logger.error("Fetching courses.mooc.fi migration status failed for user #{self.email}: status=#{response.status}, body=#{data.inspect}")
+      return nil
+    end
+
+    {
+      shadow_user_exists: data['shadow_user_exists'],
+      courses_mooc_fi_user_id: data['courses_mooc_fi_user_id'],
+      password_set: data['password_set'],
+      deleted_at: data['deleted_at']
+    }
+
+  rescue Faraday::ClientError => e
+    status = e.response&.dig(:status)
+    body = e.response&.dig(:body)
+    Rails.logger.error("Fetching courses.mooc.fi migration status errored for user #{self.email}: status=#{status}, body=#{body.inspect}")
+    nil
+
+  rescue => e
+    Rails.logger.error("Fetching courses.mooc.fi migration status unexpectedly failed for user #{self.email}: #{e.message}")
+    nil
   end
 
   def courses_mooc_fi_profile_url
@@ -550,6 +579,13 @@ class User < ApplicationRecord
   end
 
   private
+    def courses_mooc_fi_connection
+      Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
+        f.request :json
+        f.response :json
+      end
+    end
+
     def course_ids_arel
       courses = Course.arel_table
       submissions = Submission.arel_table
