@@ -20,6 +20,34 @@
       <% if current_user.administrator? && !@user.administrator? %>
         <li><%= link_to 'Generate password reset link', password_reset_link_participant_path, class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
       <% end %>
+      <% if current_user.administrator? %>
+        <li>Courses.mooc.fi managed: <%= @user.password_managed_by_courses_mooc_fi ? 'yes' : 'no' %> (shown to you because you're an admin)</li>
+        <li>Courses.mooc.fi user id: <%= @user.courses_mooc_fi_user_id.presence || 'not set' %> (shown to you because you're an admin)</li>
+        <li>Courses.mooc.fi status: <%= @courses_mooc_fi_status_label %> (shown to you because you're an admin)</li>
+        <% if @courses_mooc_fi_status %>
+          <li>
+            Courses.mooc.fi says: account exists=<%= @courses_mooc_fi_status[:shadow_user_exists] %>,
+            id=<%= @courses_mooc_fi_status[:courses_mooc_fi_user_id] || 'none' %>,
+            password set=<%= @courses_mooc_fi_status[:password_set] %><% if @courses_mooc_fi_status[:deleted_at] %>, deleted at <%= @courses_mooc_fi_status[:deleted_at] %><% end %>
+            (shown to you because you're an admin)
+          </li>
+        <% else %>
+          <li>Could not reach courses.mooc.fi to confirm live status. (shown to you because you're an admin)</li>
+        <% end %>
+      <% end %>
+      <% if current_user.administrator? && !@user.administrator? && @courses_mooc_fi_force_migrate_available %>
+        <% confirm_text = if @user.managed_externally?
+          "#{@user.email} is flagged as migrated locally, but courses.mooc.fi doesn't have a live account for them. Force migrating will (re)create the account on courses.mooc.fi and relink them to it. Continue?"
+        elsif @courses_mooc_fi_status&.dig(:password_set)
+          "#{@user.email} already has a working password on courses.mooc.fi. Force migrating will still wipe their local tmc-server password and relink them to that existing account. Continue?"
+        else
+          "Force migrate #{@user.email} to courses.mooc.fi now?"
+        end %>
+        <li><%= button_to 'Force migrate to courses.mooc.fi', force_migrate_to_courses_mooc_fi_participant_path, method: :post, class: 'btn btn-primary', data: { confirm: confirm_text } %> (shown to you because you're an admin)</li>
+      <% end %>
+      <% if current_user.administrator? && @user.courses_mooc_fi_profile_url %>
+        <li><%= link_to 'View on courses.mooc.fi', @user.courses_mooc_fi_profile_url, target: '_blank', rel: 'noopener', class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
+      <% end %>
       </ul>
   </section>
 </div>
