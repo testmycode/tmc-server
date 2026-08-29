@@ -13,7 +13,28 @@ module Api
           return render json: data
         end
 
-        render json: UserAppDatum.all
+        headers['X-Accel-Buffering'] = 'no'
+        headers['Cache-Control'] = 'no-cache'
+        headers['Content-Type'] = 'application/json'
+        # headers['Transfer-Encoding'] = 'chunked'
+        headers.delete('Content-Length')
+
+        self.response_body = build_json_enumerator(UserAppDatum)
+        # render json: UserAppDatum.all
+      end
+
+      private
+        def build_json_enumerator(query)
+          first = true
+          Enumerator.new do |yielder|
+            yielder << '['
+            query.find_each do |datum|
+              yielder << ',' unless first
+              yielder << datum.to_json
+              first = false
+            end
+            yielder << ']'
+          end
       end
     end
   end
