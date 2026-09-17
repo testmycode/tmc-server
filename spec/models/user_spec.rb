@@ -314,8 +314,57 @@ describe User, type: :model do
       user = User.create!(login: 'manageduser', password: 'secret123', email: 'managed@example.com')
       user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
       expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
-      allow_any_instance_of(User).to receive(:authenticate_via_courses_mooc_fi).with('secret123').and_return(true)
+      allow_any_instance_of(User).to receive(:courses_mooc_fi_authentication_status).with('secret123').and_return(:accepted)
       expect(User.authenticate('manageduser', 'secret123')).to eq(user)
+    end
+  end
+
+  describe '.authenticate_with_status' do
+    let!(:managed_user) do
+      user = User.create!(login: 'manageduser', password: 'secret123', email: 'managed@example.com')
+      user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
+      user
+    end
+
+    def stub_courses_mooc_fi_authentication(status:, body:)
+      response = double(success?: (200..299).cover?(status), status: status, body: body, headers: {})
+      connection = double
+      allow(connection).to receive(:post).and_return(response)
+      allow(Faraday).to receive(:new).and_return(connection)
+    end
+
+    it 'rejects a wrong local password' do
+      User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
+      expect(User.authenticate_with_status('localuser', 'wrongpassword').last).to eq(:rejected)
+    end
+
+    it 'rejects a password that courses.mooc.fi refuses' do
+      stub_courses_mooc_fi_authentication(status: 200, body: false)
+      expect(User.authenticate_with_status('manageduser', 'secret123').last).to eq(:rejected)
+    end
+
+    it 'accepts a password that courses.mooc.fi confirms' do
+      stub_courses_mooc_fi_authentication(status: 200, body: true)
+      user, status = User.authenticate_with_status('manageduser', 'secret123')
+      expect(status).to eq(:accepted)
+      expect(user).to eq(managed_user)
+    end
+
+    it 'reports an error from courses.mooc.fi as unavailable, not as a wrong password' do
+      stub_courses_mooc_fi_authentication(status: 500, body: 'oops')
+      expect(User.authenticate_with_status('manageduser', 'secret123').last).to eq(:unavailable)
+      expect(User.authenticate('manageduser', 'secret123')).to be_nil
+    end
+
+    it 'reports an unreachable courses.mooc.fi as unavailable' do
+      allow(Faraday).to receive(:new).and_raise(Faraday::ConnectionFailed.new('boom'))
+      expect(User.authenticate_with_status('manageduser', 'secret123').last).to eq(:unavailable)
+    end
+
+    it 'reports a missing courses_mooc_fi_user_id as misconfigured, not as a passing outage' do
+      managed_user.update_column(:courses_mooc_fi_user_id, nil)
+      expect(User.authenticate_with_status('manageduser', 'secret123').last).to eq(:misconfigured)
+      expect(User.authenticate('manageduser', 'secret123')).to be_nil
     end
   end
 

@@ -23,6 +23,7 @@ class User < ApplicationRecord
   has_many :unlocks, dependent: :delete_all
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :reviews, foreign_key: :reviewer_id, inverse_of: :reviewer, dependent: :nullify
+  has_many :course_template_refreshes, dependent: :nullify
   has_many :course_notifications
   has_many :comments
   has_many :certificates
@@ -159,28 +160,37 @@ class User < ApplicationRecord
     result
   end
 
+  # The user when the password is accepted, nil otherwise. Use .authenticate_with_status when the
+  # outcome is shown to the user, so that a delegation failure is not reported as a wrong password.
   def self.authenticate(login, submitted_password)
-    return nil unless login
+    user, status = authenticate_with_status(login, submitted_password)
+    status == :accepted ? user : nil
+  end
+
+  # [user, status] where status is :accepted, :rejected when the password was judged wrong,
+  # :unavailable when courses.mooc.fi could not be reached, or :misconfigured when the account
+  # cannot be delegated at all and only an admin can repair it. A found user is returned whatever
+  # the status, so sign in only on :accepted.
+  def self.authenticate_with_status(login, submitted_password)
+    return [nil, :rejected] unless login
     login = login.strip
     user = find_by(login: login)
     user ||= find_by('lower(email) = ?', login.downcase)
-    return nil if user.nil?
+    return [nil, :rejected] if user.nil?
 
-    if user.managed_externally?
-      return user if user.authenticate_via_courses_mooc_fi(submitted_password)
-      return nil
-    elsif user.externally_managed_without_target?
-      # Half-migrated/misconfigured: flagged as managed by courses.mooc.fi but with no id to
-      # delegate to. Fail closed instead of silently authenticating against the stale local hash.
+    return [user, user.courses_mooc_fi_authentication_status(submitted_password)] if user.managed_externally?
+
+    if user.externally_managed_without_target?
+      # Fail closed instead of silently authenticating against the stale local hash.
       Rails.logger.error("User #{user.id} is password_managed_by_courses_mooc_fi but has no courses_mooc_fi_user_id; refusing local fallback authentication")
-      return nil
+      return [user, :misconfigured]
     end
 
-    if user.has_password?(submitted_password)
-      # Locally-managed user logged in: migrate them to courses.mooc.fi
-      user.post_new_user_to_courses_mooc_fi(submitted_password)
-      user
-    end
+    return [user, :rejected] unless user.has_password?(submitted_password)
+
+    # Locally-managed user logged in: migrate them to courses.mooc.fi
+    user.post_new_user_to_courses_mooc_fi(submitted_password)
+    [user, :accepted]
   end
 
   # The password is stored in courses.mooc.fi and we have the id needed to delegate auth/changes.
@@ -195,7 +205,9 @@ class User < ApplicationRecord
   end
 
 
-  def authenticate_via_courses_mooc_fi(submitted_password)
+  # :accepted, :rejected when courses.mooc.fi judged the password wrong, or :unavailable when it
+  # could not be consulted. Raises nothing, so that an outage is never mistaken for a rejection.
+  def courses_mooc_fi_authentication_status(submitted_password)
     auth_url = courses_mooc_fi_url('/api/v0/tmc-server/users/authenticate')
 
     conn = courses_mooc_fi_connection
@@ -211,22 +223,29 @@ class User < ApplicationRecord
       }
     end
 
+    unless response.success?
+      Rails.logger.error(
+        "Authentication via courses.mooc.fi failed for user #{self.email}: status=#{response.status}, request-id=#{response.headers['request-id']}, body=#{response.body.inspect}"
+      )
+      return :unavailable
+    end
+
     if response.body == true
       clear_stale_local_password
-      return true
+      return :accepted
     end
 
     Rails.logger.warn(
       "Authentication via courses.mooc.fi rejected for user #{self.email}: status=#{response.status}, request-id=#{response.headers['request-id']}, body=#{response.body.inspect}"
     )
-    false
+    :rejected
 
   rescue Faraday::ClientError => e
     status = e.response&.dig(:status)
     request_id = e.response&.dig(:headers, 'request-id')
     body = e.response&.dig(:body)
     Rails.logger.error("Authentication via courses.mooc.fi error for user #{self.email}: status=#{status}, request-id=#{request_id}, body=#{body.inspect}")
-    raise
+    :unavailable
 
   rescue => e
     if defined?(response) && response
@@ -236,7 +255,7 @@ class User < ApplicationRecord
     else
       Rails.logger.error("Unexpected error during authentication via courses.mooc.fi for user #{self.email} (no response): #{e.message}")
     end
-    raise
+    :unavailable
   end
 
 

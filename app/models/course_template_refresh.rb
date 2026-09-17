@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CourseTemplateRefresh < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :course_template
   has_many :course_template_refresh_phases, dependent: :delete_all
   has_one :course_template_refresh_report, dependent: :destroy
