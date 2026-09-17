@@ -18,24 +18,19 @@ class SessionsController < ApplicationController
     rescue StandardError
     end
 
-    user = begin
-      User.authenticate(params[:session][:login], params[:session][:password])
-    rescue Faraday::Error => e
-      # courses.mooc.fi delegated authentication is unreachable; fail gracefully instead of 500.
-      Rails.logger.error("Login temporarily unavailable due to courses.mooc.fi error: #{e.class}: #{e.message}")
-      return try_to_redirect_incorrect_login(alert: 'Login is temporarily unavailable. Please try again shortly.')
-    end
+    user, status = User.authenticate_with_status(params[:session][:login], params[:session][:password])
 
-    redirect_params = {}
-    if user.nil?
-      msg = 'Invalid credentials. Try again.'
-      redirect_params = { alert: msg }
-      return try_to_redirect_incorrect_login(redirect_params)
-    else
+    case status
+    when :accepted
       sign_in user
+      try_to_redirect_back
+    when :unavailable
+      try_to_redirect_incorrect_login(alert: 'Login is temporarily unavailable. Please try again shortly.')
+    when :misconfigured
+      try_to_redirect_incorrect_login(alert: 'Your account needs manual attention before you can log in. Please contact support.')
+    else
+      try_to_redirect_incorrect_login(alert: 'Invalid credentials. Try again.')
     end
-
-    try_to_redirect_back(redirect_params)
   end
 
   def destroy
