@@ -248,6 +248,7 @@ module Api
         end
 
         user = User.find_by!(id: params[:id])
+        authorize! :update, user
         User.transaction do
           user.password_managed_by_courses_mooc_fi = true
           user.password_hash = nil

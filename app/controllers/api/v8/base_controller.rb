@@ -47,11 +47,16 @@ module Api
             raise 'Invalid token' unless @current_user
           elsif Rails.configuration.x.accept_courses_mooc_fi_tokens
             @current_user = CoursesMoocFiAuthentication.user_for(request)
+            @auth_source = :courses_mooc_fi_token if @current_user
           end
           @current_user ||= user_from_session || Guest.new
         end
 
         attr_reader :current_user
+
+        def current_ability
+          @current_ability ||= ::Ability.new(current_user, auth_source: @auth_source)
+        end
 
         def errors_json(messages)
           { errors: [*messages] }
