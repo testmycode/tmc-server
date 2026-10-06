@@ -48,13 +48,18 @@ class User < ApplicationRecord
                       message: 'does not look like an email'
                     }
 
+  COURSES_MOOC_FI_USER_ID_FORMAT = /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/
+
+  # Lookups by courses.mooc.fi id (token authentication) match exactly, so store the canonical form.
+  normalizes :courses_mooc_fi_user_id, with: ->(id) { id.strip.downcase }
+
   # Guard the courses.mooc.fi delegation id: it must be a valid UUID and unique. A malformed id
   # set here would otherwise be persisted while the local password hash is nulled, locking the
   # user out (they could neither log in locally nor be delegated to courses.mooc.fi).
   validates :courses_mooc_fi_user_id,
             uniqueness: true,
             format: {
-              with: /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/,
+              with: COURSES_MOOC_FI_USER_ID_FORMAT,
               message: 'must be a valid UUID'
             },
             allow_blank: true
