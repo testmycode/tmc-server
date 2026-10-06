@@ -13,9 +13,8 @@ describe Api::V8::ApidocsController, type: :controller do
     expect(errors).to be_empty, -> { "Generated apidocs are not valid Swagger 2.0:\n#{errors.join("\n")}" }
   end
 
-  # The Swagger 2.0 JSON schema only requires a path key to start with a slash, so it
-  # cannot catch a query string smuggled into the key. Query parameters belong in
-  # `parameters`, with `in: query`.
+  # The Swagger 2.0 schema only requires path keys to start with a slash, so it cannot catch a
+  # query string in the key; use `parameters` with `in: query`.
   it 'declares no path containing a query string' do
     get :index
 
