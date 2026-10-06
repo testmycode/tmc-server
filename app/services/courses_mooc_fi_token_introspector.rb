@@ -74,9 +74,7 @@ class CoursesMoocFiTokenIntrospector
         return nil
       end
 
-      # Mirror the Faraday idiom used elsewhere for courses.mooc.fi calls (see
-      # User#authenticate_via_courses_mooc_fi), with tight timeouts so a hung
-      # provider can never stall an authenticated request. RFC 7662
+      # Tight timeouts so a hung provider can never stall an authenticated request. RFC 7662
       # client_secret_post: client credentials go in the form body.
       conn = Faraday.new(request: { open_timeout: 2, timeout: 5 }) do |f|
         f.request :url_encoded

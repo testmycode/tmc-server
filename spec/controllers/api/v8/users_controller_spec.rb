@@ -163,4 +163,114 @@ describe Api::V8::UsersController, type: :controller do
       expect(response).to have_http_status(200)
     end
   end
+
+  describe 'DELETE destroy' do
+    before :each do
+      controller.current_user = admin
+    end
+
+    it 'deletes the user' do
+      delete :destroy, params: { id: user.id }
+
+      expect(response).to have_http_status(200)
+      body = JSON.parse(response.body)
+      expect(body['success']).to eq(true)
+      expect(body['already_deleted']).to eq(false)
+      expect(User.find_by(id: user.id)).to be_nil
+    end
+
+    it 'reports an already deleted user as a success instead of a 404' do
+      deleted_id = user.id
+      user.destroy!
+
+      delete :destroy, params: { id: deleted_id }
+
+      expect(response).to have_http_status(200)
+      body = JSON.parse(response.body)
+      expect(body['success']).to eq(true)
+      expect(body['already_deleted']).to eq(true)
+    end
+
+    it 'deletes a user who has refreshed a course template' do
+      course_template = FactoryBot.create(:course_template)
+      refresh = CourseTemplateRefresh.create!(user_id: user.id, course_template_id: course_template.id)
+
+      delete :destroy, params: { id: user.id }
+
+      expect(response).to have_http_status(200)
+      expect(User.find_by(id: user.id)).to be_nil
+      expect(refresh.reload.user_id).to be_nil
+    end
+
+    it 'answers a guest with a not_authorized code' do
+      controller.current_user = Guest.new
+
+      delete :destroy, params: { id: user.id }
+
+      expect(response).to have_http_status(401)
+      body = JSON.parse(response.body)
+      expect(body['success']).to eq(false)
+      expect(body['code']).to eq('not_authorized')
+      expect(User.find_by(id: user.id)).not_to be_nil
+    end
+
+    it "answers another user's deletion attempt with a not_authorized code" do
+      controller.current_user = other_user
+
+      delete :destroy, params: { id: user.id }
+
+      expect(response).to have_http_status(403)
+      expect(JSON.parse(response.body)['code']).to eq('not_authorized')
+      expect(User.find_by(id: user.id)).not_to be_nil
+    end
+
+    it 'answers a refused destroy with a destroy_failed code' do
+      allow_any_instance_of(User).to receive(:destroy).and_return(false)
+
+      delete :destroy, params: { id: user.id }
+
+      expect(response).to have_http_status(400)
+      expect(JSON.parse(response.body)['code']).to eq('destroy_failed')
+    end
+
+    it 'answers an unexpected failure with an internal_error code' do
+      allow_any_instance_of(User).to receive(:destroy).and_raise(ActiveRecord::InvalidForeignKey.new('boom'))
+
+      delete :destroy, params: { id: user.id }
+
+      expect(response).to have_http_status(500)
+      body = JSON.parse(response.body)
+      expect(body['success']).to eq(false)
+      expect(body['code']).to eq('internal_error')
+    end
+  end
+
+  describe 'POST set_password_managed_by_courses_mooc_fi' do
+    before :each do
+      controller.current_user = admin
+    end
+
+    it 'rejects a blank courses_mooc_fi_user_id with a clean 400 instead of erroring' do
+      post :set_password_managed_by_courses_mooc_fi, params: { id: user.id }
+
+      expect(response).to have_http_status(400)
+      expect(user.reload.password_managed_by_courses_mooc_fi).to eq(false)
+    end
+
+    it 'marks the user as managed and clears the local password on success' do
+      user.password = 'oldpassword'
+      user.save!
+      moocfi_id = SecureRandom.uuid
+
+      post :set_password_managed_by_courses_mooc_fi, params: { id: user.id, courses_mooc_fi_user_id: moocfi_id }
+
+      expect(response).to have_http_status(200)
+      user.reload
+      expect(user.password_managed_by_courses_mooc_fi).to eq(true)
+      expect(user.courses_mooc_fi_user_id).to eq(moocfi_id)
+      expect(user.argon_hash).to be_nil
+      expect(user.salt).to be_nil
+      expect(user.password_hash).to be_nil
+    end
+  end
 end

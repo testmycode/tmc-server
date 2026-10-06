@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_23_122117) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_17_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -129,7 +129,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_23_122117) do
     t.integer "status", default: 0, null: false
     t.decimal "percent_done", precision: 10, scale: 4, default: "0.0", null: false
     t.jsonb "langs_refresh_output"
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "course_template_id", null: false
     t.index ["course_template_id"], name: "index_course_template_refreshes_on_course_template_id"
     t.index ["user_id"], name: "index_course_template_refreshes_on_user_id"
@@ -564,7 +564,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_23_122117) do
   add_foreign_key "course_template_refresh_phases", "course_template_refreshes"
   add_foreign_key "course_template_refresh_reports", "course_template_refreshes"
   add_foreign_key "course_template_refreshes", "course_templates"
-  add_foreign_key "course_template_refreshes", "users"
+  add_foreign_key "course_template_refreshes", "users", on_delete: :nullify
   add_foreign_key "courses", "organizations"
   add_foreign_key "exercises", "courses", on_delete: :cascade
   add_foreign_key "feedback_answers", "feedback_questions", on_delete: :cascade

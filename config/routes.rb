@@ -276,6 +276,7 @@ TmcServer::Application.routes.draw do
     end
     member do
       get 'password_reset_link', to: 'participants#password_reset_link'
+      post 'force_migrate_to_courses_mooc_fi', to: 'participants#force_migrate_to_courses_mooc_fi'
     end
   end
 

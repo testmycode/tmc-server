@@ -129,9 +129,9 @@ class UsersController < ApplicationController
       return
     end
     user = authenticate_current_user_destroy
-    user_authentication = User.authenticate(user.login, params[:user][:password])
-    if user_authentication.nil?
-      redirect_to verify_destroying_user_url, alert: 'The password was incorrect.'
+    _authenticated_user, status = User.authenticate_with_status(user.login, params[:user][:password])
+    unless status == :accepted
+      redirect_to verify_destroying_user_url, alert: failed_authentication_alert(status)
       return
     end
     VerificationToken.delete_user.find_by!(user: user, token: params[:id])
@@ -157,6 +157,17 @@ class UsersController < ApplicationController
       user = User.find(params[:user_id])
       authorize! :destroy, user
       user
+    end
+
+    def failed_authentication_alert(status)
+      case status
+      when :unavailable
+        'We could not reach the system that holds your password. Please try again in a few minutes, or contact support if this keeps happening.'
+      when :misconfigured
+        'Your account needs manual attention before it can be deleted. Please contact support.'
+      else
+        'The password was incorrect.'
+      end
     end
 
     def set_email

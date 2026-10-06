@@ -58,11 +58,19 @@ module Api
 
       swagger_path '/api/v8/users/{user_id}/set_password_managed_by_courses_mooc_fi' do
         operation :post do
-          key :description, 'Sets the boolean password_managed_by_courses_mooc_fi for the user with the given id to true.'
+          key :description, 'Sets the boolean password_managed_by_courses_mooc_fi for the user with the given id to true and records the courses.mooc.fi user id.'
           key :operationId, 'setPasswordManagedByCoursesMoocFi'
           key :produces, ['application/json']
           key :tags, ['user']
           parameter '$ref': '#/parameters/path_user_id'
+          parameter do
+            key :name, :courses_mooc_fi_user_id
+            key :in, :formData
+            key :description, "The user's id on courses.mooc.fi"
+            key :required, true
+            key :type, :string
+          end
+          response 400, '$ref': '#/responses/error'
           response 403, '$ref': '#/responses/error'
           response 404, '$ref': '#/responses/error'
           response 200 do
@@ -101,7 +109,7 @@ module Api
         end
       end
 
-      skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi]
+      skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi destroy]
 
       def show
         unauthorize_guest! if current_user.guest?
@@ -200,11 +208,14 @@ module Api
         }, status: :bad_request
       end
 
+      # courses.mooc.fi retries account deletion and keys off success/already_deleted/code, so a
+      # user that is already gone must answer 200, never 404.
       def destroy
-        unauthorize_guest! if current_user.guest?
+        return render_destroy_failure('not_authorized', 'Authentication required', :unauthorized) if current_user.guest?
 
-        user = User.find(params[:id])
-        authorize! :destroy, user
+        user = User.find_by(id: params[:id])
+        return render json: { success: true, already_deleted: true } if user.nil?
+        return render_destroy_failure('not_authorized', 'Forbidden', :forbidden) unless can?(:destroy, user)
 
         User.transaction do
           if user.destroy
@@ -217,18 +228,27 @@ module Api
             )
             Doorkeeper::AccessToken.where(resource_owner_id: user.id).delete_all
 
-            render json: { success: true, message: 'User deleted.' }
+            render json: { success: true, already_deleted: false, message: 'User deleted.' }
           else
-            render json: { success: false, errors: user.errors }, status: :bad_request
+            render_destroy_failure('destroy_failed', user.errors.full_messages, :bad_request)
           end
         end
+      rescue StandardError => e
+        Rails.logger.error("Deleting user #{params[:id]} failed: #{e.class}: #{e.message}")
+        render_destroy_failure('internal_error', 'User deletion failed.', :internal_server_error)
       end
 
       def set_password_managed_by_courses_mooc_fi
         only_admins!
 
+        if params[:courses_mooc_fi_user_id].blank?
+          return render json: {
+            errors: { courses_mooc_fi_user_id: ['must be present'] }
+          }, status: :bad_request
+        end
+
+        user = User.find_by!(id: params[:id])
         User.transaction do
-          user = User.find_by!(id: params[:id])
           user.password_managed_by_courses_mooc_fi = true
           user.password_hash = nil
           user.salt = nil
@@ -240,7 +260,7 @@ module Api
           }
         end
         render json: {
-          errors: @user.errors
+          errors: user.errors
         }, status: :bad_request
       end
 
@@ -262,6 +282,10 @@ module Api
       end
 
       private
+        def render_destroy_failure(code, messages, status)
+          render json: { success: false, code: code, errors: [*messages] }, status: status
+        end
+
         def set_email
           user_params = params[:user]
 

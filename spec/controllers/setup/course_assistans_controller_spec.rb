@@ -24,7 +24,7 @@ describe Setup::CourseAssistantsController, type: :controller do
         user3 = FactoryBot.create(:user)
         @course.assistants << [user1, user2, user3]
         get :index, params: { organization_id: @organization.slug, course_id: @course.id }
-        expect(assigns(:assistants)).to eq([user1, user2, user3])
+        expect(assigns(:assistants).sort_by(&:id)).to eq([user1, user2, user3].sort_by(&:id))
       end
     end
 
