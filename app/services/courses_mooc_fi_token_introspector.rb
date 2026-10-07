@@ -64,7 +64,7 @@ class CoursesMoocFiTokenIntrospector
         raise Unavailable, 'courses_mooc_fi_base_url, COURSES_MOOC_FI_INTROSPECTION_CLIENT_ID or COURSES_MOOC_FI_INTROSPECTION_SECRET is not set'
       end
 
-      connection = Faraday.new(request: { open_timeout: 2, timeout: 5 }) do |f|
+      connection = Faraday.new(headers: CoursesMoocFiRateLimitBypass.headers, request: { open_timeout: 2, timeout: 5 }) do |f|
         f.request :url_encoded
         f.response :json
       end

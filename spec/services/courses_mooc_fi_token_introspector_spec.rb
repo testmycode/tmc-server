@@ -44,6 +44,18 @@ RSpec.describe CoursesMoocFiTokenIntrospector do
       expect(sent.request_headers['Accept']).to eq('application/json')
     end
 
+    { 'bypass-key' => 'bypass-key', '' => nil, nil => nil }.each do |configured, sent|
+      it "sends rate-limit bypass key #{sent.inspect} when RACK_ATTACK_SAFE_API_KEY is #{configured.inspect}" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('RACK_ATTACK_SAFE_API_KEY').and_return(configured)
+        stub_provider(status: 200, body: active_body)
+
+        introspect
+
+        expect(provider_requests.last.request_headers['RATELIMIT-PROTECTION-SAFE-API-KEY']).to eq(sent)
+      end
+    end
+
     it 'derives the endpoint and issuer from courses_mooc_fi_base_url' do
       allow(SiteSetting).to receive(:value).with('courses_mooc_fi_base_url').and_return('http://project-331.local/')
       provider.post('http://project-331.local/api/v0/main-frontend/oauth/introspect') do

@@ -342,6 +342,18 @@ describe User, type: :model do
       allow(Faraday).to receive(:new).and_return(connection)
     end
 
+    { 'bypass-key' => { 'RATELIMIT-PROTECTION-SAFE-API-KEY' => 'bypass-key' }, '' => {}, nil => {} }.each do |configured, headers|
+      it "sends rate-limit bypass headers #{headers} when RACK_ATTACK_SAFE_API_KEY is #{configured.inspect}" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('RACK_ATTACK_SAFE_API_KEY').and_return(configured)
+        stub_courses_mooc_fi_authentication(status: 200, body: true)
+
+        User.authenticate_with_status('manageduser', 'secret123')
+
+        expect(Faraday).to have_received(:new).with(hash_including(headers: headers))
+      end
+    end
+
     it 'rejects a wrong local password' do
       User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
       expect(User.authenticate_with_status('localuser', 'wrongpassword').last).to eq(:rejected)
