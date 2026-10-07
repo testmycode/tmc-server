@@ -273,4 +273,65 @@ describe Api::V8::UsersController, type: :controller do
       expect(user.password_hash).to be_nil
     end
   end
+
+  describe 'with a courses.mooc.fi access token' do
+    let(:token) { nil }
+
+    around do |example|
+      original = Rails.configuration.x.accept_courses_mooc_fi_tokens
+      Rails.configuration.x.accept_courses_mooc_fi_tokens = true
+      example.run
+      Rails.configuration.x.accept_courses_mooc_fi_tokens = original
+    end
+
+    def authenticate_with_token_as(token_user)
+      token_user.update!(courses_mooc_fi_user_id: SecureRandom.uuid)
+      request.headers['Authorization'] = 'Bearer sp331-access-token'
+      allow(CoursesMoocFiTokenIntrospector).to receive(:introspect).and_return(
+        CoursesMoocFiTokenIntrospector::Result.new(sub: token_user.courses_mooc_fi_user_id)
+      )
+    end
+
+    it 'still shows the current user' do
+      authenticate_with_token_as(user)
+      get :show, params: { id: 'current' }
+      expect(response).to have_http_status(200)
+      expect(JSON.parse(response.body)['id']).to eq(user.id)
+    end
+
+    it "refuses to change the user's own email" do
+      authenticate_with_token_as(user)
+      put :update, params: { id: 'current', user: { email: 'taken-over@example.com' } }
+      expect(response).to have_http_status(403)
+      expect(user.reload.email).not_to eq('taken-over@example.com')
+    end
+
+    it "refuses an administrator changing another user's email" do
+      authenticate_with_token_as(admin)
+      put :update, params: { id: user.id, user: { email: 'taken-over@example.com' } }
+      expect(response).to have_http_status(403)
+      expect(user.reload.email).not_to eq('taken-over@example.com')
+    end
+
+    it 'refuses to delete the user' do
+      authenticate_with_token_as(user)
+      delete :destroy, params: { id: user.id }
+      expect(response).to have_http_status(403)
+      expect(User.find_by(id: user.id)).not_to be_nil
+    end
+
+    it 'refuses an administrator deleting a user' do
+      authenticate_with_token_as(admin)
+      delete :destroy, params: { id: user.id }
+      expect(response).to have_http_status(403)
+      expect(User.find_by(id: user.id)).not_to be_nil
+    end
+
+    it 'refuses an administrator handing password management to courses.mooc.fi' do
+      authenticate_with_token_as(admin)
+      post :set_password_managed_by_courses_mooc_fi, params: { id: user.id, courses_mooc_fi_user_id: SecureRandom.uuid }
+      expect(response).to have_http_status(403)
+      expect(user.reload.password_managed_by_courses_mooc_fi).to eq(false)
+    end
+  end
 end

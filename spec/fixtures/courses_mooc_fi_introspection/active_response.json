@@ -1,0 +1,14 @@
+{
+  "active": true,
+  "scope": "exercise-services",
+  "client_id": "tmc-server-introspection-dev",
+  "username": "11111111-2222-3333-4444-555555555555",
+  "exp": 1767225600,
+  "iat": 1767222000,
+  "sub": "11111111-2222-3333-4444-555555555555",
+  "iss": "https://courses.mooc.fi/api/v0/main-frontend/oauth",
+  "jti": "123e4567-e89b-12d3-a456-426614174000",
+  "token_type": "Bearer",
+  "upstream_id": 42,
+  "client_bearer_allowed": true
+}

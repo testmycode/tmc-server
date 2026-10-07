@@ -34,6 +34,8 @@ module TmcServer
 
     config.relative_url_root = SiteSetting.value('base_path')
 
+    config.x.accept_courses_mooc_fi_tokens = ENV['ACCEPT_COURSES_MOOC_FI_TOKENS'] == 'true'
+
     config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
       allow do
         origins '*'

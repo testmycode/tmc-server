@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'app_secrets'
+
 class User < ApplicationRecord
   include Comparable
   include Gravtastic
@@ -46,13 +48,18 @@ class User < ApplicationRecord
                       message: 'does not look like an email'
                     }
 
+  COURSES_MOOC_FI_USER_ID_FORMAT = /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/
+
+  # Lookups by courses.mooc.fi id (token authentication) match exactly, so store the canonical form.
+  normalizes :courses_mooc_fi_user_id, with: ->(id) { id.strip.downcase }
+
   # Guard the courses.mooc.fi delegation id: it must be a valid UUID and unique. A malformed id
   # set here would otherwise be persisted while the local password hash is nulled, locking the
   # user out (they could neither log in locally nor be delegated to courses.mooc.fi).
   validates :courses_mooc_fi_user_id,
             uniqueness: true,
             format: {
-              with: /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/,
+              with: COURSES_MOOC_FI_USER_ID_FORMAT,
               message: 'must be a valid UUID'
             },
             allow_blank: true
@@ -215,7 +222,7 @@ class User < ApplicationRecord
     response = conn.post(auth_url) do |req|
       req.headers['Content-Type'] = 'application/json'
       req.headers['Accept'] = 'application/json'
-      req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+      req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
 
       req.body = {
         user_id: courses_mooc_fi_user_id,
@@ -269,7 +276,7 @@ class User < ApplicationRecord
       response = conn.post(update_url) do |req|
         req.headers['Content-Type'] = 'application/json'
         req.headers['Accept'] = 'application/json'
-        req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+        req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
 
         req.body = {
           user_id: self.courses_mooc_fi_user_id,
@@ -324,7 +331,7 @@ class User < ApplicationRecord
       response = conn.post(create_url) do |req|
         req.headers['Content-Type'] = 'application/json'
         req.headers['Accept'] = 'application/json'
-        req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+        req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
 
         req.body = {
           upstream_id: id,
@@ -383,7 +390,7 @@ class User < ApplicationRecord
 
     response = conn.get(courses_mooc_fi_url("/api/v0/tmc-server/users-by-upstream-id/#{id}")) do |req|
       req.headers['Accept'] = 'application/json'
-      req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+      req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
     end
 
     data = response.body
@@ -422,7 +429,7 @@ class User < ApplicationRecord
 
     response = conn.get(courses_mooc_fi_url("/api/v0/tmc-server/users-by-upstream-id/#{id}/status")) do |req|
       req.headers['Accept'] = 'application/json'
-      req.headers['Authorization'] = Rails.application.secrets.tmc_server_secret_for_communicating_to_secret_project
+      req.headers['Authorization'] = AppSecrets.tmc_server_secret_for_communicating_to_secret_project
     end
 
     data = response.body

@@ -22,6 +22,11 @@ module Api
         end
       end
 
+      rescue_from CoursesMoocFiTokenIntrospector::Unavailable do |e|
+        Rails.logger.error("courses.mooc.fi token introspection unavailable: #{e.message}")
+        respond_with_error('courses.mooc.fi could not verify your login right now. Try again later.', 503)
+      end
+
       rescue_from ActiveRecord::RecordNotFound do |e|
         render json: errors_json(e.message), status: :not_found
       end
@@ -40,11 +45,18 @@ module Api
           if doorkeeper_token
             @current_user ||= User.find_by(id: doorkeeper_token.resource_owner_id)
             raise 'Invalid token' unless @current_user
+          elsif Rails.configuration.x.accept_courses_mooc_fi_tokens
+            @current_user = CoursesMoocFiAuthentication.user_for(request)
+            @auth_source = :courses_mooc_fi_token if @current_user
           end
           @current_user ||= user_from_session || Guest.new
         end
 
         attr_reader :current_user
+
+        def current_ability
+          @current_ability ||= ::Ability.new(current_user, auth_source: @auth_source)
+        end
 
         def errors_json(messages)
           { errors: [*messages] }

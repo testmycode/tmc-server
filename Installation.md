@@ -98,6 +98,51 @@ service postgresql restart
 ```
 after to implement changes
 
+#### Alternative: run PostgreSQL in a container
+
+The committed `config/database.yml` expects a local PostgreSQL with a `tmc` superuser
+reachable over the Unix socket, which is how the project and CI run — do not change those
+defaults. If you only need to run the test suite and would rather not create that role or
+edit `pg_hba.conf` on your machine (for example on a shared host where you are not root),
+run a throwaway PostgreSQL in Docker instead and point just the test environment at it.
+
+`config/database.yml` ends by ERB-including `config/database.local.yml` if it exists, so
+that file can override any environment. It is gitignored — keep it that way, it is a
+machine-local override and must never be committed.
+
+Start the container (the version should match production; 14 at the time of writing):
+
+```bash
+docker run -d --name tmc-test-pg -p 127.0.0.1:5433:5432 \
+  -e POSTGRES_USER=tmc -e POSTGRES_PASSWORD=tmc -e POSTGRES_DB=tmc-test postgres:14
+```
+
+Create `config/database.local.yml`:
+
+```yaml
+test:
+  adapter: postgresql
+  username: tmc
+  password: tmc
+  database: tmc-test
+  host: 127.0.0.1
+  port: 5433
+  pool: 25
+```
+
+Load the schema and run specs:
+
+```bash
+RAILS_ENV=test bundle exec rake db:schema:load
+RAILS_ENV=test bundle exec rspec spec/services
+```
+
+A non-default port (5433 above) keeps the container from colliding with a system
+PostgreSQL on 5432. Note this covers the test environment only — the sandbox-backed
+integration specs and the dev server still want the full local setup described above.
+Remove the container with `docker rm -f tmc-test-pg` and delete
+`config/database.local.yml` when you are done.
+
 ### TMC-server installation
 #### Clone the TMC repository
 

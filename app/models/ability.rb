@@ -6,7 +6,9 @@
 class Ability
   include CanCan::Ability
 
-  def initialize(user)
+  # +auth_source+ is :courses_mooc_fi_token when the user authenticated with a courses.mooc.fi
+  # access token; account changes are then denied to everyone, administrators included.
+  def initialize(user, auth_source: nil)
     if user.administrator?
       can :manage, :all
       can :create, Course
@@ -285,5 +287,11 @@ class Ability
         can?(:teach, o)
       end
     end
+
+    return unless auth_source == :courses_mooc_fi_token
+
+    # The token is scoped to exercise services; it must not take over or delete the account.
+    cannot :update, User
+    cannot :destroy, User
   end
 end

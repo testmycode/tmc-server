@@ -270,6 +270,15 @@ describe User, type: :model do
     expect(User.authenticate('root', 'ilikecookies')).to be_nil
   end
 
+  describe 'courses_mooc_fi_user_id' do
+    it 'is stored in lower case and found by any case' do
+      user = User.create!(login: 'manageduser', password: 'secret123', email: 'managed@example.com',
+                          courses_mooc_fi_user_id: 'ABCDEF01-2345-6789-ABCD-EF0123456789')
+      expect(user.reload.courses_mooc_fi_user_id).to eq('abcdef01-2345-6789-abcd-ef0123456789')
+      expect(User.find_by(courses_mooc_fi_user_id: 'ABCDEF01-2345-6789-abcd-EF0123456789')).to eq(user)
+    end
+  end
+
   describe 'courses_mooc_fi_profile_url' do
     it 'is nil when the user has no courses.mooc.fi id' do
       user = User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')

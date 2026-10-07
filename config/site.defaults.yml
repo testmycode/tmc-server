@@ -139,5 +139,6 @@ course_instruction_page: http://mooc.fi/courses/general/ohjelmointi/
 # Teacher manual link
 teacher_manual_url: http://testmycode.github.io/tmc-server/usermanual/
 
-# Base URL for password management and admin lookups via courses.mooc.fi, e.g. https://courses.mooc.fi
+# Base URL for password management, admin lookups and access-token introspection via courses.mooc.fi,
+# e.g. https://courses.mooc.fi
 courses_mooc_fi_base_url:
