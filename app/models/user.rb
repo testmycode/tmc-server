@@ -601,7 +601,7 @@ class User < ApplicationRecord
 
   private
     def courses_mooc_fi_connection
-      Faraday.new(request: { open_timeout: 2, timeout: 10 }) do |f|
+      Faraday.new(headers: CoursesMoocFiRateLimitBypass.headers, request: { open_timeout: 2, timeout: 10 }) do |f|
         f.request :json
         f.response :json
       end
