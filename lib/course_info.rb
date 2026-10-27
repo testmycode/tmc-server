@@ -15,10 +15,7 @@ class CourseInfo
   def course_data(organization, course, opts = {})
     exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
 
-    @unlocked_exercises = course.unlocks
-                                .where(user_id: @user.id)
-                                .where(['valid_after IS NULL OR valid_after < ?', Time.now])
-                                .pluck(:exercise_name)
+    @unlocked_exercises = course.unlocked_exercise_names_for(@user, exercises)
 
     submissions_by_exercise = {}
     Submission.where(course_id: course.id, user_id: @user.id).each do |sub|
@@ -35,23 +32,16 @@ class CourseInfo
 
   def course_data_core_api(course)
     # UncomputedUnlock.resolve(course, @user)
-    @unlocked_exercises = course.unlocks
-                                .where(user_id: @user.id)
-                                .where(['valid_after IS NULL OR valid_after < ?', Time.now])
-                                .pluck(:exercise_name)
-
     exercises = course.exercises.includes(:course, :available_points)
-
-    unless @user.administrator? || @user.teacher?(course.organization) || @user.assistant?(course)
-      exercises = exercises.where(hidden: false, disabled_status: 0)
-      exercises = if @unlocked_exercises.empty?
-        exercises.where(unlock_spec: nil)
-      else
-        exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{@unlocked_exercises.map { |_| '?' }.join(', ')})", *@unlocked_exercises])
-      end.select(&:_fast_visible?)
+    can_see_everything = @user.administrator? || @user.teacher?(course.organization) || @user.assistant?(course)
+    exercises = exercises.where(hidden: false, disabled_status: 0) unless can_see_everything
+    exercises = exercises.to_a
+    @unlocked_exercises = course.unlocked_exercise_names_for(@user, exercises)
+    unless can_see_everything
+      exercises = exercises.select { |ex| @unlocked_exercises.include?(ex.name) && ex._fast_visible? }
     end
 
-    exercises = exercises.to_a.natsort_by(&:name)
+    exercises = exercises.natsort_by(&:name)
 
     # Cache submissions so that we can calculate quickly whether the exercise
     # was completed or attampted and so on...
@@ -80,7 +70,7 @@ class CourseInfo
       return nil unless exercise.visible_to?(@user)
 
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
+      locked = !@unlocked_exercises.include?(exercise.name)
       show_points = !exercise.hide_submission_results? && !exercise.course.hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 
@@ -118,7 +108,7 @@ class CourseInfo
 
     def exercise_data_core_api(exercise)
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
+      locked = !@unlocked_exercises.include?(exercise.name)
       show_points = !exercise.hide_submission_results? && !exercise.course.hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 

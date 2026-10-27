@@ -4,8 +4,8 @@ require 'set'
 
 # Keeps track of whether a (course, user)'s unlocks have yet to be computed, enabling lazy computation.
 # A course refresh populates this table and the UnlockComputerTask background task
-# consumes it by calling Unlock.refresh_unlocks on the entries. All code that accesses
-# unlocks must ensure that UncomputedUnlock.resolve is called for the (course, user) first.
+# consumes it by calling Unlock.refresh_unlocks on the entries. Code that needs
+# up-to-date unlocks should call UncomputedUnlock.resolve for the (course, user) first.
 class UncomputedUnlock < ApplicationRecord
   belongs_to :course
   belongs_to :user

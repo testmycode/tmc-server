@@ -31,6 +31,24 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     @conditions.empty? && @valid_after.nil?
   end
 
+  # Whether the raw spec is only a date, so the clock alone decides the unlock.
+  # Reads the JSON without parsing the spec, since parsing a progress condition queries the course's exercises.
+  def self.date_only?(string)
+    conditions = raw_conditions(string)
+    conditions.any? && conditions.all? { |c| DateAndTimeUtils.looks_like_date_or_time(c) }
+  end
+
+  # The raw spec's conditions other than dates. Works on specs that no longer parse.
+  def self.non_date_conditions(string)
+    raw_conditions(string).reject { |c| DateAndTimeUtils.looks_like_date_or_time(c) }
+  end
+
+  def self.raw_conditions(string)
+    return [] if string.nil?
+    ActiveSupport::JSON.decode(string).map { |c| c.to_s.strip }.reject(&:empty?)
+  end
+  private_class_method :raw_conditions
+
   attr_reader :raw_spec
   attr_reader :valid_after
   attr_reader :universal_descriptions

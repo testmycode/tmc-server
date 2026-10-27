@@ -81,11 +81,22 @@ class ExerciseGroup
     exercises(false).map(&:unlock_conditions).first
   end
 
+  # The group's exercises keyed by raw unlock spec (nil for none); more than one key means
+  # `group_unlock_conditions` shows only the first exercise's conditions.
+  def exercises_by_unlock_spec
+    exercises(false).group_by(&:unlock_spec)
+  end
+
   def group_unlock_conditions=(unlock_conditions)
-    exercises(false).each do |e|
+    group_exercises = exercises(false)
+    # Rows granted under other conditions keep their date: fast refresh never revokes them, so moving it would open them early.
+    conditions = UnlockSpec.non_date_conditions(unlock_conditions).sort
+    rows_to_move = group_exercises.select { |e| UnlockSpec.non_date_conditions(e.unlock_spec).sort == conditions }.map(&:name)
+    group_exercises.each do |e|
       e.unlock_spec = unlock_conditions
       e.save!
     end
+    update_unlock_dates(group_exercises.first, rows_to_move) unless group_exercises.empty?
   end
 
   def available_point_names
@@ -107,6 +118,13 @@ class ExerciseGroup
   end
 
   private
+    # Unlock rows copy the date at creation; keep existing rows in step when the date is edited.
+    def update_unlock_dates(exercise, exercise_names)
+      spec = exercise.unlock_spec_obj
+      return if spec.empty?
+      Unlock.where(course_id: course.id, exercise_name: exercise_names).update_all(valid_after: spec.valid_after)
+    end
+
     def group_deadline(method)
       exercises(false).map { |n| n.send(method) }.first
     end

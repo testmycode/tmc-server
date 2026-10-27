@@ -31,6 +31,36 @@ describe CourseRefreshDatabaseUpdater do
     expect(@course2.exercises[0].name).to eq('MyExercise')
   end
 
+  describe 'unlock conditions of a new exercise in an existing group' do
+    before :each do
+      add_exercise('Week1/A')
+      add_exercise('Week1/B')
+      refresh_courses
+    end
+
+    def new_exercise_in_week1
+      add_exercise('Week1/C')
+      refresh_courses
+      @course.exercises.find_by(name: 'Week1-C')
+    end
+
+    it 'inherits the conditions the group shares' do
+      @course.exercise_group_by_name('Week1').group_unlock_conditions = ['1.1.2011'].to_json
+
+      expect(new_exercise_in_week1.unlock_spec).to eq(['1.1.2011'].to_json)
+    end
+
+    it 'stays without conditions when the group has none' do
+      expect(new_exercise_in_week1.unlock_spec).to be_nil
+    end
+
+    it 'is not given conditions when the group disagrees' do
+      @course.exercises.find_by(name: 'Week1-A').update!(unlock_spec: ['1.1.2011'].to_json)
+
+      expect(new_exercise_in_week1.unlock_spec).to be_nil
+    end
+  end
+
   # test that git branch is changed for all courses of the same template
   it 'clones the given git branch' do
     @local_clone.chdir do

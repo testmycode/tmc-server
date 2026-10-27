@@ -155,10 +155,14 @@ class CoursesController < ApplicationController
   def save_unlocks
     authorize! :manage_unlocks, @course
 
-    groups = group_params
-    groups.each do |name, conditions|
-      array = conditions.values.reject(&:blank?)
-      @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
+    begin
+      group_params.each do |name, conditions|
+        array = conditions.values.reject(&:blank?)
+        group = @course.exercise_group_by_name(name)
+        Rails.logger.info "Unlock conditions of #{@course.name}/#{name} set by user #{current_user.id}: #{group.exercises(false).first&.unlock_spec || '[]'} -> #{array.to_json}"
+        group.group_unlock_conditions = array.to_json
+      end
+    ensure
       UncomputedUnlock.create_all_for_course(@course)
     end
 
@@ -196,7 +200,7 @@ class CoursesController < ApplicationController
       @exercises = @exercises.select { |ex| ex.visible_to?(current_user) }
                              .natsort_by(&:name)
       @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
-      @unlocks = current_user.unlocks.where(course: @course).where('valid_after IS NULL OR valid_after < ?', Time.zone.now).pluck(:exercise_name)
+      @unlocks = @course.unlocked_exercise_names_for(current_user, @exercises)
 
       if can?(:teach, @course)
         last_refresh = @course.course_template.course_template_refreshes.last

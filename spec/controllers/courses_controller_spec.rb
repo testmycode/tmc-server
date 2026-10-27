@@ -336,6 +336,29 @@ describe CoursesController, type: :controller do
       get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
       expect(response.code.to_i).to eq(403)
     end
+
+    describe 'when teacher' do
+      render_views
+
+      before :each do
+        @course = FactoryBot.create :course, organization: @organization
+        Teachership.create(user: @user, organization: @organization)
+        controller.current_user = @user
+        @course.exercises.create(name: 'g-e1')
+        @course.exercises.create(name: 'g-e2')
+      end
+
+      it 'does not warn when the exercises of a group share unlock conditions' do
+        get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
+        expect(response.body).not_to include('have different unlock conditions')
+      end
+
+      it 'warns when the exercises of a group have different unlock conditions' do
+        @course.exercises.find_by(name: 'g-e1').update!(unlock_spec: ['1.1.2011'].to_json)
+        get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
+        expect(response.body).to include('have different unlock conditions')
+      end
+    end
   end
 
   describe 'POST save_unlocks' do
@@ -404,6 +427,14 @@ describe CoursesController, type: :controller do
           expect(spec).to include('exercise e1')
           expect(spec).to include('5% of e2')
         end
+      end
+
+      it 'replaces stored conditions that no longer parse' do
+        @course.exercises.create(name: 'g-e1').update_column(:unlock_spec, ['exercise removed'].to_json)
+
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, group: { g: { '0' => '1.2.2000' } } }
+
+        expect(@course.exercises.find_by(name: 'g-e1').unlock_spec).to eq(['1.2.2000'].to_json)
       end
     end
 

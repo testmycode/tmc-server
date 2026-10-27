@@ -37,22 +37,13 @@ module Api
           can_see_everything = current_user.administrator? || current_user.teacher?(course.organization) || current_user.assistant?(course)
           authorize! :read, course
 
-          exercises = course.exercises
-          unlocked_exercises = course.unlocks
-                                     .where(user_id: current_user.id)
-                                     .where(['valid_after IS NULL OR valid_after < ?', Time.now])
-                                     .pluck(:exercise_name)
-
-          unless can_see_everything
-            exercises = exercises.where(hidden: false, disabled_status: 0)
-            exercises = if unlocked_exercises.empty?
-              exercises.where(unlock_spec: nil)
-            else
-              exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{unlocked_exercises.map { |_| '?' }.join(', ')})", *unlocked_exercises])
-            end
+          if can_see_everything
+            unlocked_ids = course.exercises.pluck(:id).to_set
+          else
+            exercises = course.exercises.where(hidden: false, disabled_status: 0).to_a
+            unlocked_names = course.unlocked_exercise_names_for(current_user, exercises)
+            unlocked_ids = exercises.select { |ex| unlocked_names.include?(ex.name) }.to_set(&:id)
           end
-
-          exercises = exercises.pluck(:id)
 
           all_exercises = course.exercises.includes(:available_points).where(disabled_status: 0)
           unless can_see_everything
@@ -79,7 +70,7 @@ module Api
               deadline: ex.deadline_for(current_user),
               soft_deadline: ex.soft_deadline_for(current_user),
               disabled: ex.disabled?,
-              unlocked: exercises.include?(ex.id)
+              unlocked: unlocked_ids.include?(ex.id)
             }
           end
 

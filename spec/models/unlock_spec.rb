@@ -40,6 +40,13 @@ describe Unlock, type: :model do
       expect(unlocks.second.exercise_name).to eq('ex2')
     end
 
+    it 'ignores an unlock that a concurrent refresh created first' do
+      Unlock.create!(user: @user, course: @course, exercise_name: 'ex1', valid_after: Time.zone.now)
+
+      expect { Unlock.send(:fast_refresh_unlocks_impl, @course, @user, {}) }.not_to raise_error
+      expect(Unlock.where(user_id: @user.id, exercise_name: 'ex1').count).to eq(1)
+    end
+
     it "doesn't recreate old unlocks" do
       Unlock.refresh_unlocks(@course, @user)
       u = Unlock.where(exercise_name: 'ex1').first

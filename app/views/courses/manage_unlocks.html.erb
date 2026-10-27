@@ -75,6 +75,15 @@
                  class='btn btn-sm btn-link remove-condition-button'>remove</a><br/>
             <% end %>
           </div>
+          <% exercises_by_spec = group.exercises_by_unlock_spec %>
+          <% if exercises_by_spec.length > 1 %>
+            <p class="text-danger">
+              The exercises in this group have different unlock conditions; saving sets them all to the ones shown.
+              <% exercises_by_spec.each do |spec, exercises| %>
+                <br/><%= spec || 'none' %>: <%= exercises.map(&:name).join(', ') %>
+              <% end %>
+            </p>
+          <% end %>
           <a id="add-condition-<%= group.name %>"
              href="javascript:void(0);"
              onclick="add_unlock_condition('#unlock-conditions-<%= group.name %>', '<%= param_array %>')"
