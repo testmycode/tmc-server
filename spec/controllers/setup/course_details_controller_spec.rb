@@ -78,7 +78,7 @@ describe Setup::CourseDetailsController, type: :controller do
 
       describe 'with invalid parameters' do
         it 'should not create a course' do
-          post :create, params: { organization_id: @organization.slug, course: { name: 's p a c e s', title: 'New Course', source_url: @repo_path } }
+          post :create, params: { organization_id: @organization.slug, course: { name: 's p a c e s', title: 'New Course', course_template_id: @ct.id } }
           expect(response).to render_template(:new)
           expect(assigns(:course).name).to eq('s p a c e s')
         end
@@ -191,6 +191,26 @@ describe Setup::CourseDetailsController, type: :controller do
       end
     end
 
+    describe 'when creating custom course' do
+      it 'denies access when the organization does not allow teachers to create custom courses' do
+        get :custom, params: { organization_id: @organization.slug }
+        expect(response.code.to_i).to eq(403)
+        expect do
+          post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path } }
+        end.not_to change { Course.count }
+        expect(response.code.to_i).to eq(403)
+      end
+
+      it 'creates the course when the organization allows teachers to create custom courses' do
+        @organization.update!(teachers_can_create_custom_courses: true)
+        get :custom, params: { organization_id: @organization.slug }
+        expect(response).to render_template(:new)
+        expect do
+          post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path } }
+        end.to change { Course.count }.by(1)
+      end
+    end
+
     ## TODO: Tests for the rest of the actions, when they are properly implemented
   end
 
@@ -200,6 +220,13 @@ describe Setup::CourseDetailsController, type: :controller do
     end
 
     describe 'when creating custom course' do
+      it 'shows the custom course form even if the organization does not allow teachers to create custom courses' do
+        expect(@organization.teachers_can_create_custom_courses).to be false
+        get :custom, params: { organization_id: @organization.slug }
+        expect(response).to render_template(:new)
+        expect(assigns(:custom)).to be true
+      end
+
       it 'should create the course' do
         init_session
         expect do
@@ -230,6 +257,12 @@ describe Setup::CourseDetailsController, type: :controller do
       post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path, course_template_id: @ct.id } }
       expect(response.code.to_i).to eq(403)
       ## TODO: Rest of the actions
+    end
+
+    it 'should not allow creating custom courses even if teachers are allowed to' do
+      @organization.update!(teachers_can_create_custom_courses: true)
+      get :custom, params: { organization_id: @organization.slug }
+      expect(response.code.to_i).to eq(403)
     end
   end
 

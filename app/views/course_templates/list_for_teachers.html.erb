@@ -26,7 +26,7 @@
 
 <br/>
 
-<% if can? :create, :custom_course %>
+<% if can? :create_custom_course, @organization %>
 
   <h3>Create custom course</h3>
   <%= link_to 'Create New Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-sm btn-warning" %>

@@ -12,7 +12,6 @@ class Ability
     if user.administrator?
       can :manage, :all
       can :create, Course
-      can :create, :custom_course
       cannot :refresh, Course
       can :refresh, Course, &:custom?
       can :view, :participants_list
@@ -71,6 +70,10 @@ class Ability
 
       can :edit, Course do |c|
         can? :teach, c.organization
+      end
+
+      can :create_custom_course, Organization do |o|
+        o.teachers_can_create_custom_courses? && can?(:teach, o)
       end
 
       can :refresh, Course do |c|

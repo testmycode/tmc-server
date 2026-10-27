@@ -32,7 +32,7 @@
   <%= link_to 'Create New Course', setup_organization_course_chooser_index_path(@organization), class: "btn btn-primary" %>
 <% end %>
 
-<% if can? :create, :custom_course %>
+<% if can? :create_custom_course, @organization %>
     <br><br>
     <%= link_to 'Create Custom Course', new_custom_setup_organization_course_path(@organization), class: "btn btn-sm btn-danger" %>
 <% end %>

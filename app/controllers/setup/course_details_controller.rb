@@ -17,7 +17,7 @@ class Setup::CourseDetailsController < Setup::SetupController
   end
 
   def custom
-    authorize! :create, :custom_course
+    authorize! :create_custom_course, @organization
     print_setup_phases(2)
 
     @course = Course.new
@@ -30,6 +30,7 @@ class Setup::CourseDetailsController < Setup::SetupController
     authorize! :teach, @organization
 
     custom = params[:course][:course_template_id].blank?
+    authorize! :create_custom_course, @organization if custom
 
     create_params = custom ? course_params_for_create_custom : course_params_for_create_from_template
     input_name = create_params[:name]
