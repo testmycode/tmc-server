@@ -38,21 +38,10 @@ module Api
           authorize! :read, course
 
           exercises = course.exercises
-          unlocked_exercises = course.unlocks
-                                     .where(user_id: current_user.id)
-                                     .where(['valid_after IS NULL OR valid_after < ?', Time.now])
-                                     .pluck(:exercise_name)
-
-          unless can_see_everything
-            exercises = exercises.where(hidden: false, disabled_status: 0)
-            exercises = if unlocked_exercises.empty?
-              exercises.where(unlock_spec: nil)
-            else
-              exercises.where(["unlock_spec IS NULL OR exercises.name IN (#{unlocked_exercises.map { |_| '?' }.join(', ')})", *unlocked_exercises])
-            end
-          end
-
-          exercises = exercises.pluck(:id)
+          exercises = exercises.where(hidden: false, disabled_status: 0) unless can_see_everything
+          exercises = exercises.to_a
+          unlocked_names = course.unlocked_exercise_names_for(current_user, exercises)
+          unlocked_ids = exercises.select { |ex| can_see_everything || !ex.requires_unlock? || unlocked_names.include?(ex.name) }.map(&:id)
 
           all_exercises = course.exercises.includes(:available_points).where(disabled_status: 0)
           unless can_see_everything
@@ -79,7 +68,7 @@ module Api
               deadline: ex.deadline_for(current_user),
               soft_deadline: ex.soft_deadline_for(current_user),
               disabled: ex.disabled?,
-              unlocked: exercises.include?(ex.id)
+              unlocked: unlocked_ids.include?(ex.id)
             }
           end
 

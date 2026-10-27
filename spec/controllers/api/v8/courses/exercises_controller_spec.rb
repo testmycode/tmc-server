@@ -50,6 +50,25 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
     end
   end
 
+  describe 'As a student without unlock rows' do
+    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+    def unlocked_flags
+      get :index, params: { course_id: course.id }
+      JSON.parse(response.body).to_h { |ex| [ex['name'], ex['unlocked']] }
+    end
+
+    it 'marks a date-unlocked exercise as unlocked once the date has passed' do
+      exercise.update!(unlock_spec: ['1.1.2011'].to_json)
+      expect(unlocked_flags['testexercise']).to be true
+    end
+
+    it 'marks a date-unlocked exercise as locked before the date' do
+      exercise.update!(unlock_spec: [(Time.zone.now + 1.day).strftime('%d.%m.%Y %H:%M')].to_json)
+      expect(unlocked_flags['testexercise']).to be false
+    end
+  end
+
   describe 'As a guest' do
     let(:token) { nil }
     describe 'when searching for exercises' do

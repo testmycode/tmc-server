@@ -78,6 +78,22 @@ describe Api::V8::Core::CoursesController, type: :controller do
         expect(exs[1]['completed']).to be_falsey
       end
 
+      describe 'with a date-only unlock and no unlock rows' do
+        it 'lists the exercise as unlocked after the date' do
+          course.exercises[0].update!(unlock_spec: ['1.1.2011'].to_json)
+
+          ex = show_course['course']['exercises'].find { |e| e['name'] == 'Exercise1' }
+          expect(ex['locked']).to be false
+        end
+
+        it 'does not list the exercise before the date' do
+          course.exercises[0].update!(unlock_spec: [(Time.zone.now + 1.day).strftime('%d.%m.%Y %H:%M')].to_json)
+
+          names = show_course['course']['exercises'].map { |e| e['name'] }
+          expect(names).not_to include('Exercise1')
+        end
+      end
+
       describe 'and as guest user' do
         it 'should respond with a 401' do
           controller.current_user = Guest.new

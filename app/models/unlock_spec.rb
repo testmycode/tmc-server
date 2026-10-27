@@ -31,6 +31,11 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     @conditions.empty? && @valid_after.nil?
   end
 
+  # True when the clock alone decides the unlock: a date and no other condition.
+  def date_only?
+    @conditions.empty? && !@valid_after.nil?
+  end
+
   attr_reader :raw_spec
   attr_reader :valid_after
   attr_reader :universal_descriptions

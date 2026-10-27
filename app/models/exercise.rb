@@ -353,7 +353,19 @@ class Exercise < ApplicationRecord
     deadline_spec_obj.depends_on_unlock_time?
   end
 
+  # Date-only unlocks are decided by the clock, not by unlock rows: a user without rows must not stay locked.
+  # Explicit-unlock exercises are excluded because their unlock row starts the deadline timer.
+  def unlocked_by_date?
+    unlock_spec_obj.date_only? && !requires_explicit_unlock?
+  end
+
+  # Returns the time the exercise became unlocked for the user, or nil if it is locked.
   def time_unlocked_for(user, resolve_unlocks = true)
+    if unlocked_by_date?
+      unlock_date = unlock_spec_obj.valid_after
+      return unlock_date <= Time.now ? unlock_date : nil
+    end
+
     UncomputedUnlock.resolve(course, user) if resolve_unlocks
     unlocks.where(user_id: user).find_by('valid_after IS NULL OR valid_after < ?', Time.now)&.created_at
   end

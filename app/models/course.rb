@@ -356,6 +356,14 @@ class Course < ApplicationRecord
     exercises.to_a.select { |ex| ex.name == name || (group && ex.belongs_to_exercise_group?(group)) }
   end
 
+  # Names of the exercises unlocked for the user. `exercises_to_check` avoids reloading exercises the caller has.
+  def unlocked_exercise_names_for(user, exercises_to_check = exercises.to_a)
+    now = Time.now
+    from_rows = unlocks.where(user_id: user.id).where('valid_after IS NULL OR valid_after < ?', now).pluck(:exercise_name)
+    by_date = exercises_to_check.select(&:unlocked_by_date?)
+    (from_rows - by_date.map(&:name)) | by_date.select { |ex| ex.unlock_spec_obj.valid_after <= now }.map(&:name)
+  end
+
   def unlockable_exercises_for(user)
     UncomputedUnlock.resolve(self, user)
     unlocked = unlocks.where(user_id: user.id).pluck(:exercise_name)

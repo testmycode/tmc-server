@@ -196,7 +196,7 @@ class CoursesController < ApplicationController
       @exercises = @exercises.select { |ex| ex.visible_to?(current_user) }
                              .natsort_by(&:name)
       @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
-      @unlocks = current_user.unlocks.where(course: @course).where('valid_after IS NULL OR valid_after < ?', Time.zone.now).pluck(:exercise_name)
+      @unlocks = @course.unlocked_exercise_names_for(current_user, @exercises)
 
       if can?(:teach, @course)
         last_refresh = @course.course_template.course_template_refreshes.last
