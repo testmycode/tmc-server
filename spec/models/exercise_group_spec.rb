@@ -61,6 +61,13 @@ describe ExerciseGroup, type: :model do
       expect(Unlock.where(exercise_name: %w[week1-01 week1-02]).pluck(:valid_after)).to all(eq(Time.zone.parse('2012-05-05')))
     end
 
+    it 'keeps the date of explicit unlocks, whose deadline timer has already started' do
+      [ex1, ex2].each { |ex| ex.update!(deadline_spec: ['unlock + 7 days'].to_json) }
+      group.group_unlock_conditions = ['5.5.2012'].to_json
+
+      expect(Unlock.where(exercise_name: %w[week1-01 week1-02]).pluck(:valid_after)).to all(eq(Time.zone.parse('2011-01-01')))
+    end
+
     it 'leaves unlock rows alone when the conditions are cleared' do
       group.group_unlock_conditions = [].to_json
 
