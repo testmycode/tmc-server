@@ -38,7 +38,7 @@ class CourseInfo
     exercises = exercises.to_a
     @unlocked_exercises = course.unlocked_exercise_names_for(@user, exercises)
     unless can_see_everything
-      exercises = exercises.select { |ex| (!ex.requires_unlock? || @unlocked_exercises.include?(ex.name)) && ex._fast_visible? }
+      exercises = exercises.select { |ex| @unlocked_exercises.include?(ex.name) && ex._fast_visible? }
     end
 
     exercises = exercises.natsort_by(&:name)
@@ -70,7 +70,7 @@ class CourseInfo
       return nil unless exercise.visible_to?(@user)
 
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
+      locked = !@unlocked_exercises.include?(exercise.name)
       show_points = !exercise.hide_submission_results? && !exercise.course.hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 
@@ -108,7 +108,7 @@ class CourseInfo
 
     def exercise_data_core_api(exercise)
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = exercise.requires_unlock? && !@unlocked_exercises.include?(exercise.name)
+      locked = !@unlocked_exercises.include?(exercise.name)
       show_points = !exercise.hide_submission_results? && !exercise.course.hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 

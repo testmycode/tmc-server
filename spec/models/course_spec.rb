@@ -307,20 +307,21 @@ describe Course, type: :model do
       @dated_past = FactoryBot.create(:exercise, course: @course, name: 'dated_past', unlock_spec: ['1.1.2011'].to_json)
       @dated_future = FactoryBot.create(:exercise, course: @course, name: 'dated_future', unlock_spec: ['1.1.2999'].to_json)
       @by_points = FactoryBot.create(:exercise, course: @course, name: 'by_points', unlock_spec: ['1.1.2011', 'exercise open'].to_json)
+      @course.reload
     end
 
-    it 'includes date-only exercises past their date without unlock rows' do
-      expect(@course.unlocked_exercise_names_for(@user)).to contain_exactly('dated_past')
+    it 'includes exercises without conditions and date-only exercises past their date without unlock rows' do
+      expect(@course.unlocked_exercise_names_for(@user, @course.exercises.to_a)).to contain_exactly('open', 'dated_past')
     end
 
     it 'includes progress-based exercises only when the user has an unlock row' do
       Unlock.create!(user: @user, course: @course, exercise_name: 'by_points', valid_after: Time.zone.now - 1.hour)
-      expect(@course.unlocked_exercise_names_for(@user)).to contain_exactly('dated_past', 'by_points')
+      expect(@course.unlocked_exercise_names_for(@user, @course.exercises.to_a)).to contain_exactly('open', 'dated_past', 'by_points')
     end
 
     it 'ignores unlock rows of date-only exercises whose date is still ahead' do
       Unlock.create!(user: @user, course: @course, exercise_name: 'dated_future', valid_after: Time.zone.now - 1.day)
-      expect(@course.unlocked_exercise_names_for(@user)).not_to include('dated_future')
+      expect(@course.unlocked_exercise_names_for(@user, @course.exercises.to_a)).not_to include('dated_future')
     end
   end
 

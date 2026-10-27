@@ -4,9 +4,11 @@
 # Stores whether and when an exercise has been unlocked for an user.
 #
 # An exercise is considered unlocked for a user if an unlock for
-# (user, course, exercise, valid_after < Time.now) exists.
+# (user, course, exercise, valid_after < Time.now) exists, except that exercises
+# whose only condition is a date are unlocked by the clock (Exercise#unlocked_by_date?)
+# and need no unlock.
 # The set of unlocks for a (course, user) is recomputed in the following cases:
-# - the course is refreshed (since the specs might change)
+# - the course is refreshed or unlock conditions are saved, for users with awarded points
 # - the user has a submission graded
 #
 # However, if the course has deadlines based on the unlock times of exercises,
@@ -84,6 +86,6 @@ class Unlock < ApplicationRecord
           )
         end
       end
-      Unlock.import new_unlocks
+      Unlock.import new_unlocks, on_duplicate_key_ignore: true
     end
 end

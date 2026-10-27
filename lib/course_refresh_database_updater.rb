@@ -107,11 +107,25 @@ class CourseRefreshDatabaseUpdater
       end
 
       def set_exercise_options
+        specs_by_group = @course.exercises.reject(&:new_record?).group_by(&:exercise_group_name).transform_values { |es| es.map(&:unlock_spec).uniq }
         @course.exercises.each do |e|
           e.has_tests = true # we don't yet detect whether an exercise includes tests
           e.options = {} # exercise metadata.yml reading support removed, set default options
+          inherit_group_unlock_spec(e, specs_by_group[e.exercise_group_name] || []) if e.new_record?
           e.disabled! if e.new_record? && e.course.refreshed? # disable new exercises
         end
+      end
+
+      # Without this a new exercise in a locked group is open to everyone until a teacher saves the group's conditions again.
+      def inherit_group_unlock_spec(exercise, specs)
+        if specs.length > 1
+          @report.warnings << "Exercise #{exercise.name} was added to a group whose exercises have different unlock conditions; set them on the manage unlocks page"
+        elsif specs.first
+          exercise.unlock_spec = specs.first
+          @report.notices << "Exercise #{exercise.name} inherited the unlock conditions of its group"
+        end
+      rescue UnlockSpec::InvalidSyntaxError, RuntimeError => e
+        @report.warnings << "Exercise #{exercise.name} could not inherit the unlock conditions of its group: #{e.message}"
       end
 
       def set_docker_image

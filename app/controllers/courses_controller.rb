@@ -155,10 +155,14 @@ class CoursesController < ApplicationController
   def save_unlocks
     authorize! :manage_unlocks, @course
 
-    groups = group_params
-    groups.each do |name, conditions|
-      array = conditions.values.reject(&:blank?)
-      @course.exercise_group_by_name(name).group_unlock_conditions = array.to_json
+    begin
+      group_params.each do |name, conditions|
+        array = conditions.values.reject(&:blank?)
+        group = @course.exercise_group_by_name(name)
+        Rails.logger.info "Unlock conditions of #{@course.name}/#{name} set by user #{current_user.id}: #{group.exercises(false).first&.unlock_spec || '[]'} -> #{array.to_json}"
+        group.group_unlock_conditions = array.to_json
+      end
+    ensure
       UncomputedUnlock.create_all_for_course(@course)
     end
 

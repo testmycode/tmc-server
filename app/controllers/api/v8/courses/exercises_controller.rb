@@ -37,11 +37,13 @@ module Api
           can_see_everything = current_user.administrator? || current_user.teacher?(course.organization) || current_user.assistant?(course)
           authorize! :read, course
 
-          exercises = course.exercises
-          exercises = exercises.where(hidden: false, disabled_status: 0) unless can_see_everything
-          exercises = exercises.to_a
-          unlocked_names = course.unlocked_exercise_names_for(current_user, exercises)
-          unlocked_ids = exercises.select { |ex| can_see_everything || !ex.requires_unlock? || unlocked_names.include?(ex.name) }.map(&:id)
+          if can_see_everything
+            unlocked_ids = course.exercises.pluck(:id).to_set
+          else
+            exercises = course.exercises.where(hidden: false, disabled_status: 0).to_a
+            unlocked_names = course.unlocked_exercise_names_for(current_user, exercises)
+            unlocked_ids = exercises.select { |ex| unlocked_names.include?(ex.name) }.to_set(&:id)
+          end
 
           all_exercises = course.exercises.includes(:available_points).where(disabled_status: 0)
           unless can_see_everything
