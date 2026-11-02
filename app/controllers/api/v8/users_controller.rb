@@ -189,6 +189,7 @@ module Api
           @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
           @email_before = @user.email
           authorize! :update, @user
+          authorize! :update_credentials, @user if credentials_change_requested?
           set_user_fields
           set_extra_data(true)
           update_email
@@ -348,6 +349,12 @@ module Api
               @user.password = params[:password]
             end
           end
+        end
+
+        def credentials_change_requested?
+          new_email = params.dig(:user, :email)
+          email_changed = new_email.present? && @user.email.casecmp(new_email.to_s.strip) != 0
+          email_changed || (params[:old_password].present? && params[:password].present?)
         end
 
         def set_user_fields

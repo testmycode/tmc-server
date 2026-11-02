@@ -28,7 +28,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
 
     context 'when logged in' do
       let(:user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: user.id, accessible?: true }
+      let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
       it { expect(subject.id).to be user.id }
     end
   end
@@ -38,7 +38,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
       allow(controller).to receive(:doorkeeper_token) { token }
     end
     context 'with a valid token having invalid user ID' do
-      let(:token) { double resource_owner_id: -1, accessible?: true }
+      let(:token) { double resource_owner_id: -1, accessible?: true, includes_scope?: false }
       it 'request is not successful' do
         get :index
         expect(response).to have_http_status(401)

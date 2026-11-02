@@ -14,7 +14,7 @@ module Api
 
         swagger_path '/api/v8/application/user_access_tokens' do
           operation :post do
-            key :description, "Issues an access token for the given user, owned by the configured target application. Requires a client_credentials token of an allow-listed application with the #{REQUIRED_SCOPE} scope. Administrators, teachers and assistants are refused. The token expires after #{TOKEN_LIFETIME.to_i} seconds."
+            key :description, "Issues an access token for the given user, owned by the configured target application. Requires a client_credentials token of an allow-listed application with the #{REQUIRED_SCOPE} scope. Administrators, teachers and assistants are refused. The token cannot change the user's email or password or delete the account. It expires after #{TOKEN_LIFETIME.to_i} seconds."
             key :operationId, 'issueUserAccessToken'
             key :produces, ['application/json']
             key :tags, ['user']
@@ -73,7 +73,7 @@ module Api
           token = Doorkeeper::AccessToken.create_for(
             application: target_application,
             resource_owner: user,
-            scopes: 'public',
+            scopes: "public #{HANDOFF_TOKEN_SCOPE}",
             expires_in: TOKEN_LIFETIME.to_i
           )
           Rails.logger.info("Issued user access token: issuer application uid=#{doorkeeper_token.application.uid} user_id=#{user.id}")

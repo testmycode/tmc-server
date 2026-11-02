@@ -16,7 +16,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
 
   describe 'GET courses' do
     describe 'as admin' do
-      let(:token) { double resource_owner_id: admin.id, accessible?: true }
+      let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
       it 'shows a list of collections of course urls' do
         get :index, params: { organization_slug: organization.slug }
         json = JSON.parse response.body
@@ -31,7 +31,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       end
     end
     describe 'as user' do
-      let(:token) { double resource_owner_id: user.id, accessible?: true }
+      let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
       it 'shows a list of collections of course urls' do
         get :index, params: { organization_slug: organization.slug }
         json = JSON.parse response.body

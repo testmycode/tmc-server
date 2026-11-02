@@ -18,7 +18,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
 
   describe 'index' do
     context 'as a regular user' do
-      let!(:token) { double resource_owner_id: regular_user.id, accessible?: true }
+      let!(:token) { double resource_owner_id: regular_user.id, accessible?: true, includes_scope?: false }
 
       it 'should not allow access' do
         get :index, params: { course_id: course.id }
@@ -27,7 +27,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
     end
 
     context 'as an admin' do
-      let!(:token) { double resource_owner_id: admin_user.id, accessible?: true }
+      let!(:token) { double resource_owner_id: admin_user.id, accessible?: true, includes_scope?: false }
 
       it 'gives submission ids for the last hour' do
         get :index, params: { course_id: course.id }

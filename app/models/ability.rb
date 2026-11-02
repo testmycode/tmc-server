@@ -6,9 +6,13 @@
 class Ability
   include CanCan::Ability
 
-  # +auth_source+ is :courses_mooc_fi_token when the user authenticated with a courses.mooc.fi
-  # access token; account changes are then denied to everyone, administrators included.
+  # +auth_source+ restricts account changes for tokens that are not the user's own login:
+  # :courses_mooc_fi_token denies them all, administrators included; :handoff_token (issued by
+  # Api::V8::Application::UserAccessTokensController) allows profile edits but no email or password
+  # change (+:update_credentials+) and no account deletion.
   def initialize(user, auth_source: nil)
+    alias_action :update_credentials, to: :update
+
     if user.administrator?
       can :manage, :all
       can :create, Course
@@ -291,10 +295,14 @@ class Ability
       end
     end
 
-    return unless auth_source == :courses_mooc_fi_token
-
-    # The token is scoped to exercise services; it must not take over or delete the account.
-    cannot :update, User
-    cannot :destroy, User
+    case auth_source
+    when :courses_mooc_fi_token
+      # The token is scoped to exercise services; it must not take over or delete the account.
+      cannot :update, User
+      cannot :destroy, User
+    when :handoff_token
+      cannot :update_credentials, User
+      cannot :destroy, User
+    end
   end
 end

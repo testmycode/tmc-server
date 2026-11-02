@@ -14,7 +14,7 @@ describe Api::V8::Core::Courses::UnlocksController, type: :controller do
 
   describe 'POST unlock exercises' do
     describe 'as an authenticated user' do
-      let!(:token) { double resource_owner_id: user.id, accessible?: true }
+      let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
 
       it 'should allow unlocking exercises' do
         post :create, params: { organization_slug: organization.id, course_id: course.id }

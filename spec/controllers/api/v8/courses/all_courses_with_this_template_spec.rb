@@ -34,7 +34,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: admin.id, accessible?: true }
+          let!(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id
@@ -62,7 +62,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: teacher.id, accessible?: true }
+          let!(:token) { double resource_owner_id: teacher.id, accessible?: true, includes_scope?: false }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id
@@ -90,7 +90,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: assistant.id, accessible?: true }
+          let!(:token) { double resource_owner_id: assistant.id, accessible?: true, includes_scope?: false }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id
@@ -118,7 +118,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: user.id, accessible?: true }
+          let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id

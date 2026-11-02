@@ -17,7 +17,7 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
   describe 'GET course by name' do
     describe 'when logged as admin' do
       let(:current_user) { admin }
-      let(:token) { double resource_owner_id: current_user.id, accessible?: true }
+      let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
 
       describe 'when organization id and course name given' do
         it 'shows course information' do
@@ -60,7 +60,7 @@ describe Api::V8::Organizations::CoursesController, type: :controller do
 
     describe 'when logged as user' do
       let(:current_user) { user }
-      let(:token) { double resource_owner_id: current_user.id, accessible?: true }
+      let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
 
       describe 'when organization id and course name given' do
         it 'shows course information' do

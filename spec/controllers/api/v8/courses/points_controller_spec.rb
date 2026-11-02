@@ -20,7 +20,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
   describe 'GET points for a course by id' do
     describe 'as admin' do
       let(:current_user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: current_user.id, accessible?: true }
+      let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
 
       describe 'when course ID given' do
         it "shows only user's point information" do
@@ -47,7 +47,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, accessible?: true }
+      let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
 
       describe 'when course ID given' do
         it "shows only user's point information" do

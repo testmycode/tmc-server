@@ -28,7 +28,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     post :create, params: { user_id: user_id }, format: :json
   end
 
-  it 'issues a public one-day token for the user owned by the target application' do
+  it 'issues a one-day handoff token for the user owned by the target application' do
     post_with(issuer_token, user.id)
 
     expect(response).to have_http_status(200)
@@ -37,7 +37,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     issued = Doorkeeper::AccessToken.find_by(token: body['access_token'])
     expect(issued.resource_owner_id).to eq(user.id)
     expect(issued.application).to eq(target_app)
-    expect(issued.scopes.to_a).to eq(['public'])
+    expect(issued.scopes.to_a).to eq(%w[public handoff])
     expect(body['created_at']).to eq(issued.created_at.to_i)
     expect(body['expires_in']).to eq(86_400)
     expect(issued.expires_in).to eq(86_400)
