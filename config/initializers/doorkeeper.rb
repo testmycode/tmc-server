@@ -66,6 +66,7 @@ Doorkeeper.configure do
   optional_scopes %I[
     internal_beta_all
     openid
+    issue_user_access_tokens
   ]
 
   # Change the way client credentials are retrieved from the request object.

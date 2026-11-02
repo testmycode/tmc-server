@@ -153,6 +153,10 @@ TmcServer::Application.routes.draw do
       resources :application, param: :name, only: [] do
         resources :credentials, module: :application, only: :index
       end
+
+      namespace :application do
+        resources :user_access_tokens, only: :create
+      end
     end
   end
 

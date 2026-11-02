@@ -188,6 +188,7 @@ module Api
         Api::V8::Core::SubmissionsController,
         Api::V8::Core::Submissions::FeedbackController,
         Api::V8::Core::Submissions::ReviewsController,
+        Api::V8::Application::UserAccessTokensController,
         AvailablePoint,
         AwardedPoint,
         Course,
