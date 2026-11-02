@@ -20,7 +20,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
   end
 
   describe 'As an admin' do
-    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+    let(:token) { double resource_owner_id: admin.id, accessible?: true }
     describe 'when course name is given' do
       it 'should return successful response' do
         get :index, params: { course_name: course_name, organization_slug: organization.slug }
@@ -38,7 +38,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
   end
 
   describe 'As a student' do
-    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let(:token) { double resource_owner_id: user.id, accessible?: true }
     describe 'when course name is given' do
       it 'should return successful response' do
         get :index, params: { course_name: course_name, organization_slug: organization.slug }
@@ -56,7 +56,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
   end
 
   describe 'As any user' do
-    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+    let(:token) { double resource_owner_id: admin.id, accessible?: true }
     describe 'when course name could not be found' do
       it 'should return error' do
         get :index, params: { course_name: 'null', organization_slug: organization.slug }
@@ -67,7 +67,7 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
 
   describe 'Downloading an exercise zip' do
     describe 'as an unauthenticated user' do
-      let(:token) { double resource_owner_id: Guest.new.id, acceptable?: true }
+      let(:token) { double resource_owner_id: Guest.new.id, accessible?: true }
 
       it 'should succeed if the course name and slug are correct', driver: :rack_test do
         repo = clone_course_repo(course)

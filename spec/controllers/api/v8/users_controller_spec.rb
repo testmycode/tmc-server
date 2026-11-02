@@ -12,7 +12,7 @@ describe Api::V8::UsersController, type: :controller do
   end
 
   describe "GET current user's info with an access token" do
-    let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let!(:token) { double resource_owner_id: user.id, accessible?: true }
     it 'user sees own info' do
       get :show, params: { id: 'current' }
 
@@ -30,7 +30,7 @@ describe Api::V8::UsersController, type: :controller do
     end
 
     context 'as an administrator' do
-      let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let!(:token) { double resource_owner_id: admin.id, accessible?: true }
 
       it 'user sees own info' do
         get :show, params: { id: 'current' }
@@ -40,7 +40,7 @@ describe Api::V8::UsersController, type: :controller do
   end
   describe "GET user's info with user id" do
     describe 'using user token' do
-      let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let!(:token) { double resource_owner_id: user.id, accessible?: true }
       it 'user sees own info' do
         get :show, params: { id: user.id }
 
@@ -57,7 +57,7 @@ describe Api::V8::UsersController, type: :controller do
       end
     end
     describe 'using admin token' do
-      let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let!(:token) { double resource_owner_id: admin.id, accessible?: true }
       it "admin can see everyone's infos" do
         get :show, params: { id: user.id }
 
@@ -123,7 +123,7 @@ describe Api::V8::UsersController, type: :controller do
   end
 
   describe 'PUT update password' do
-    let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let!(:token) { double resource_owner_id: user.id, accessible?: true }
 
     before :each do
       user.password = 'oldpassword'

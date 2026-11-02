@@ -57,10 +57,10 @@ module Api
         skip_authorization_check
 
         def create
-          return respond_unauthorized unless doorkeeper_token
+          return respond_unauthorized unless doorkeeper_token&.accessible?
           return respond_forbidden unless authorized_issuer?
 
-          user_id = Integer(params[:user_id].to_s, exception: false)
+          user_id = Integer(params[:user_id].to_s, 10, exception: false)
           return respond_with_error('user_id must be an integer', 400) unless user_id
 
           user = User.find_by(id: user_id)
@@ -97,8 +97,7 @@ module Api
             # resource_owner_id is set on user tokens, which never qualify even from an allowed application.
             # The target is a frontend client, so its credentials must not be usable to issue tokens.
             doorkeeper_token.resource_owner_id.nil? &&
-              application.present? &&
-              issuer_uids.include?(application.uid) &&
+              issuer_uids.include?(application&.uid) &&
               application.uid != Rails.configuration.x.user_access_token_target_application_uid &&
               doorkeeper_token.acceptable?([REQUIRED_SCOPE])
           end

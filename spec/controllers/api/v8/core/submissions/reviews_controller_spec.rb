@@ -18,7 +18,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
 
   describe 'POST create' do
     describe 'As an admin' do
-      let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let(:token) { double resource_owner_id: admin.id, accessible?: true }
 
       it 'can make new review' do
         expect do
@@ -29,7 +29,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
     end
 
     describe 'As a teacher' do
-      let(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+      let(:token) { double resource_owner_id: teacher.id, accessible?: true }
 
       it 'can make new review' do
         expect do
@@ -40,7 +40,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
     end
 
     describe 'As a student' do
-      let(:token) { double resource_owner_id: student.id, acceptable?: true }
+      let(:token) { double resource_owner_id: student.id, accessible?: true }
 
       it "can't make new review" do
         expect do

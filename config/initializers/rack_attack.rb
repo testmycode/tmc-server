@@ -100,9 +100,8 @@ class Rack::Attack
     end
   end
 
-  # Limit the number of issued user access tokens per ip to 120 per minute
   throttle('user access tokens per ip per minute', limit: 120, period: 1.minute) do |req|
-    req.ip if req.path == '/api/v8/application/user_access_tokens' && req.post?
+    req.ip if req.path.start_with?('/api/v8/application/user_access_tokens') && req.post?
   end
 
   # Limit the number of password resets per ip to 10 per hour

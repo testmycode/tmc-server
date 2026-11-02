@@ -52,7 +52,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
 
     it 'prefers a native Doorkeeper token' do
       user = FactoryBot.create(:user)
-      allow(controller).to receive(:doorkeeper_token).and_return(double(resource_owner_id: user.id, acceptable?: true))
+      allow(controller).to receive(:doorkeeper_token).and_return(double(resource_owner_id: user.id, accessible?: true))
       expect(CoursesMoocFiTokenIntrospector).not_to receive(:introspect)
       get :index
       expect(current_user).to eq(user)

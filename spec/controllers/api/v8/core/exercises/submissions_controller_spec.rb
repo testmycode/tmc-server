@@ -29,7 +29,7 @@ describe Api::V8::Core::Exercises::SubmissionsController, type: :controller do
 
   describe 'Creating a submission' do
     describe 'as an authenticated user' do
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { double resource_owner_id: user.id, accessible?: true }
 
       it 'should accept submissions when the deadline is open' do
         exercise.deadline_spec = ['1.1.2100'].to_json

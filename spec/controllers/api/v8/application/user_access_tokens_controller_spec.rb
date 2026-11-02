@@ -74,7 +74,23 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     issuer_token.revoke
     post_with(issuer_token, user.id)
 
-    expect(response).to have_http_status(403)
+    expect(response).to have_http_status(401)
+  end
+
+  it 'rejects an expired token' do
+    token = Doorkeeper::AccessToken.create!(application: issuer_app, scopes: 'issue_user_access_tokens', expires_in: 60, created_at: 2.minutes.ago)
+    post_with(token, user.id)
+
+    expect(response).to have_http_status(401)
+  end
+
+  it 'reads a zero-padded user_id as decimal' do
+    other_user = FactoryBot.create(:user)
+    post_with(issuer_token, "0#{other_user.id}")
+
+    expect(response).to have_http_status(200)
+    issued = Doorkeeper::AccessToken.find_by(token: JSON.parse(response.body)['access_token'])
+    expect(issued.resource_owner_id).to eq(other_user.id)
   end
 
   it 'returns 404 for an unknown user' do

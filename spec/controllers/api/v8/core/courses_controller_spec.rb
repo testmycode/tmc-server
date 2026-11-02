@@ -11,7 +11,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
 
   describe 'GET course details show' do
     describe 'in JSON format with valid token' do
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { double resource_owner_id: user.id, accessible?: true }
       let(:course) { FactoryBot.create(:course, name: 'Course1') }
       before :each do
         course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: course)
