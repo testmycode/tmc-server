@@ -27,7 +27,7 @@ module TmcServer
     # config.i18n.default_locale = :de
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log]
+    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log client_secret access_token refresh_token] + [/\A(token|code)\z/]
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.eager_load_paths << Rails.root.join('lib')
