@@ -301,8 +301,7 @@ class Ability
       cannot :update, User
       cannot :destroy, User
     when :handoff_token
-      cannot :update_credentials, User
-      cannot :destroy, User
+      cannot %i[update_credentials destroy], User
     end
   end
 end

@@ -352,8 +352,9 @@ module Api
         end
 
         def credentials_change_requested?
-          new_email = params.dig(:user, :email)
-          email_changed = new_email.present? && @user.email.casecmp(new_email.to_s.strip) != 0
+          user_params = params[:user]
+          new_email = user_params[:email] if user_params.is_a?(ActionController::Parameters)
+          email_changed = new_email.present? && @user.email.to_s.casecmp(new_email.to_s.strip) != 0
           email_changed || (params[:old_password].present? && params[:password].present?)
         end
 

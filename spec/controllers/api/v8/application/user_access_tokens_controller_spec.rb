@@ -43,6 +43,15 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     expect(issued.expires_in).to eq(86_400)
   end
 
+  it 'rejects an application whose credentials are public' do
+    public_app = Doorkeeper::Application.create!(name: SiteSetting.value('valid_clients').first['name'], redirect_uri: 'urn:ietf:wg:oauth:2.0:oob')
+    Rails.configuration.x.user_access_token_issuer_application_uids = [public_app.uid]
+    token = Doorkeeper::AccessToken.create!(application: public_app, scopes: 'issue_user_access_tokens')
+    post_with(token, user.id)
+
+    expect(response).to have_http_status(403)
+  end
+
   it 'requires a token' do
     post_with(nil, user.id)
 

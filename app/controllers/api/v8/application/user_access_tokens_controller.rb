@@ -60,10 +60,9 @@ module Api
           return respond_unauthorized unless doorkeeper_token&.accessible?
           return respond_forbidden unless authorized_issuer?
 
-          user_id = Integer(params[:user_id].to_s, 10, exception: false)
-          return respond_with_error('user_id must be an integer', 400) unless user_id
+          return respond_with_error('user_id must be an integer', 400) unless params[:user_id].to_s.match?(/\A\d+\z/)
 
-          user = User.find_by(id: user_id)
+          user = User.find_by(id: params[:user_id].to_i)
           return respond_not_found('User not found') unless user
           return respond_forbidden('Tokens are not issued for administrators, teachers or assistants') if privileged?(user)
 
@@ -91,15 +90,21 @@ module Api
             user.administrator? || user.teacherships.exists? || user.assistantships.exists?
           end
 
+          # Their credentials are served publicly by the credentials endpoint.
+          def public_client_names
+            Array(SiteSetting.value('valid_clients')).filter_map { |client| client['name'] }
+          end
+
           def authorized_issuer?
             issuer_uids = Rails.configuration.x.user_access_token_issuer_application_uids
-            application = doorkeeper_token.application
             # resource_owner_id is set on user tokens, which never qualify even from an allowed application.
+            return false unless doorkeeper_token.resource_owner_id.nil? && doorkeeper_token.acceptable?([REQUIRED_SCOPE])
+
+            application = doorkeeper_token.application
             # The target is a frontend client, so its credentials must not be usable to issue tokens.
-            doorkeeper_token.resource_owner_id.nil? &&
-              issuer_uids.include?(application&.uid) &&
+            issuer_uids.include?(application&.uid) &&
               application.uid != Rails.configuration.x.user_access_token_target_application_uid &&
-              doorkeeper_token.acceptable?([REQUIRED_SCOPE])
+              public_client_names.exclude?(application.name)
           end
       end
     end
