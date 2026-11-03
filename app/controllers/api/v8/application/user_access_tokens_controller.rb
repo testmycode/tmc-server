@@ -64,7 +64,7 @@ module Api
 
           user = User.find_by(id: params[:user_id].to_i)
           return respond_not_found('User not found') unless user
-          return respond_forbidden('Tokens are not issued for administrators, teachers or assistants') if privileged?(user)
+          return respond_forbidden('Tokens are not issued for administrators, teachers or assistants') if user.privileged?
 
           target_application = Doorkeeper::Application.find_by(uid: Rails.configuration.x.user_access_token_target_application_uid)
           return respond_with_error('Target application is not configured', 500) unless target_application
@@ -86,10 +86,6 @@ module Api
         end
 
         private
-          def privileged?(user)
-            user.administrator? || user.teacherships.exists? || user.assistantships.exists?
-          end
-
           # Their credentials are served publicly by the credentials endpoint.
           def public_client_names
             Array(SiteSetting.value('valid_clients')).filter_map { |client| client['name'] }
@@ -103,6 +99,7 @@ module Api
             application = doorkeeper_token.application
             # The target is a frontend client, so its credentials must not be usable to issue tokens.
             issuer_uids.include?(application&.uid) &&
+              application.confidential? &&
               application.uid != Rails.configuration.x.user_access_token_target_application_uid &&
               public_client_names.exclude?(application.name)
           end

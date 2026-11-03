@@ -480,6 +480,11 @@ class User < ApplicationRecord
     login.downcase <=> other.login.downcase
   end
 
+  # Administrators, teachers and assistants, whose accounts handoff tokens must never act as.
+  def privileged?
+    administrator? || teacherships.exists? || assistantships.exists?
+  end
+
   def teacher?(organization)
     organizations.include? organization
   end

@@ -64,5 +64,43 @@ RSpec.describe Api::V8::BaseController, type: :controller do
         expect(response).to have_http_status(401)
       end
     end
+    context 'with a handoff token' do
+      let(:user) { FactoryBot.create(:user) }
+      let(:application) { Doorkeeper::Application.create!(name: 'client', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
+      let(:token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public handoff') }
+
+      it 'authenticates an unprivileged user' do
+        get :index
+        expect(response).to have_http_status(200)
+      end
+
+      it 'is refused once the user has become an administrator' do
+        user.update!(administrator: true)
+        get :index
+        expect(response).to have_http_status(401)
+      end
+
+      it 'is refused once the user has become a teacher' do
+        Teachership.create!(user: user, organization: FactoryBot.create(:organization))
+        get :index
+        expect(response).to have_http_status(401)
+      end
+
+      it 'is refused once the user has become an assistant' do
+        Assistantship.create!(user: user, course: FactoryBot.create(:course))
+        get :index
+        expect(response).to have_http_status(401)
+      end
+    end
+    context 'with a privileged user\'s ordinary login token' do
+      let(:user) { FactoryBot.create(:admin) }
+      let(:application) { Doorkeeper::Application.create!(name: 'client', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
+      let(:token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public') }
+
+      it 'authenticates' do
+        get :index
+        expect(response).to have_http_status(200)
+      end
+    end
   end
 end

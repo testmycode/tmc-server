@@ -52,6 +52,13 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     expect(response).to have_http_status(403)
   end
 
+  it 'rejects a non-confidential application' do
+    issuer_app.update!(confidential: false)
+    post_with(issuer_token, user.id)
+
+    expect(response).to have_http_status(403)
+  end
+
   it 'requires a token' do
     post_with(nil, user.id)
 
