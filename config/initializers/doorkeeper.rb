@@ -39,7 +39,7 @@ Doorkeeper.configure do
 
   # Issuer tokens are re-fetched by their clients; every other token stays non-expiring.
   custom_access_token_expires_in do |context|
-    1.hour.to_i if context.grant_type == Doorkeeper::OAuth::CLIENT_CREDENTIALS && context.scopes&.exists?('issue_user_access_tokens')
+    1.hour.to_i if context.grant_type == Doorkeeper::OAuth::CLIENT_CREDENTIALS && context.scopes&.exists?(AccessTokenAuthentication::ISSUER_SCOPE)
   end
 
   # Assign a custom TTL for implicit grants.

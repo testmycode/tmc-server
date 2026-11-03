@@ -6,9 +6,6 @@ require 'version'
 module Api
   module V8
     class BaseController < ApplicationController
-      # Marks tokens issued by Application::UserAccessTokensController.
-      HANDOFF_TOKEN_SCOPE = 'handoff'
-
       clear_respond_to
       respond_to :json
 
@@ -46,12 +43,9 @@ module Api
         def authenticate_user!
           return @current_user if @current_user
           if doorkeeper_token
-            user = User.find_by(id: doorkeeper_token.resource_owner_id) if doorkeeper_token.accessible?
-            handoff = doorkeeper_token.includes_scope?(HANDOFF_TOKEN_SCOPE)
-            # The user may have gained privileges after the handoff token was issued.
-            return respond_unauthorized('Invalid token') if user.nil? || (handoff && user.privileged?)
-            @current_user = user
-            @auth_source = :handoff_token if handoff
+            @current_user = AccessTokenAuthentication.user_for(doorkeeper_token)
+            return respond_unauthorized('Invalid token') unless @current_user
+            @auth_source = :handoff_token if AccessTokenAuthentication.handoff?(doorkeeper_token)
           elsif Rails.configuration.x.accept_courses_mooc_fi_tokens
             @current_user = CoursesMoocFiAuthentication.user_for(request)
             @auth_source = :courses_mooc_fi_token if @current_user

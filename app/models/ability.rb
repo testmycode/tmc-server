@@ -7,9 +7,8 @@ class Ability
   include CanCan::Ability
 
   # +auth_source+ restricts account changes for tokens that are not the user's own login:
-  # :courses_mooc_fi_token denies them all, administrators included; :handoff_token (issued by
-  # Api::V8::Application::UserAccessTokensController) allows profile edits but no email or password
-  # change (+:update_credentials+) and no account deletion.
+  # :courses_mooc_fi_token denies all, administrators included; :handoff_token allows profile
+  # edits but no +:update_credentials+ (email, password) and no account deletion.
   def initialize(user, auth_source: nil)
     alias_action :update_credentials, to: :update
 

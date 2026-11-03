@@ -284,14 +284,14 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  get '/users/:user_id/verify/:id', to: 'users#confirm_email', as: 'confirm_email'
+  get '/users/:user_id/verify/:token', to: 'users#confirm_email', as: 'confirm_email'
   post '/users/:user_id/send_verification_email', to: 'users#send_verification_email', as: 'send_verification_email'
 
   resources :users, only: [:index]
 
   post '/users/:user_id/send_destroy_email', to: 'users#send_destroy_email', as: 'send_destroy_email'
-  get '/users/:user_id/destroy/:id', to: 'users#verify_destroying_user', as: 'verify_destroying_user'
-  delete '/users/:user_id/destroy/:id', to: 'users#destroy_user', as: 'destroy_user'
+  get '/users/:user_id/destroy/:token', to: 'users#verify_destroying_user', as: 'verify_destroying_user'
+  delete '/users/:user_id/destroy/:token', to: 'users#destroy_user', as: 'destroy_user'
 
   resources :certificates, only: %i[show create]
 

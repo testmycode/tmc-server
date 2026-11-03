@@ -189,7 +189,6 @@ module Api
           @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
           @email_before = @user.email
           authorize! :update, @user
-          authorize! :update_credentials, @user if credentials_change_requested?
           set_user_fields
           set_extra_data(true)
           update_email
@@ -307,6 +306,7 @@ module Api
           if new_email.blank?
             @user.errors.add(:email, 'needed')
           elsif @user.email.casecmp(new_email) != 0
+            authorize! :update_credentials, @user
             @user.email = new_email
             @user.email_verified = false
             UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now
@@ -328,6 +328,7 @@ module Api
 
         def maybe_update_password
           if params[:old_password].present? && params[:password].present?
+            authorize! :update_credentials, @user
             if @user.managed_externally?
               unless @user.update_password_via_courses_mooc_fi(params[:old_password], params[:password])
                 @user.errors.add(:password, 'could not be changed. Please check your current password and try again.')
@@ -349,13 +350,6 @@ module Api
               @user.password = params[:password]
             end
           end
-        end
-
-        def credentials_change_requested?
-          user_params = params[:user]
-          new_email = user_params[:email] if user_params.is_a?(ActionController::Parameters)
-          email_changed = new_email.present? && @user.email.to_s.casecmp(new_email.to_s.strip) != 0
-          email_changed || (params[:old_password].present? && params[:password].present?)
         end
 
         def set_user_fields

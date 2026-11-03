@@ -34,7 +34,7 @@ module SessionsHelper
     end
 
     def user_from_basic_auth
-      if request&.authorization
+      if request && ActionController::HttpAuthentication::Basic.has_basic_credentials?(request)
         username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
         User.authenticate(username, password) if username && password
       end

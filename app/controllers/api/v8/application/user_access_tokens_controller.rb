@@ -3,18 +3,16 @@
 module Api
   module V8
     module Application
-      # Issues a login access token for a user to a trusted backend, e.g. for a sign-in handoff
-      # verified elsewhere. Only allow-listed client_credentials applications holding the
-      # issue_user_access_tokens scope may call it.
+      # Issues a login token for a user to a trusted backend after a sign-in handoff verified
+      # elsewhere. Callable only by allow-listed client_credentials apps with the issuer scope.
       class UserAccessTokensController < Api::V8::BaseController
         include Swagger::Blocks
 
-        REQUIRED_SCOPE = 'issue_user_access_tokens'
         TOKEN_LIFETIME = 1.day
 
         swagger_path '/api/v8/application/user_access_tokens' do
           operation :post do
-            key :description, "Issues an access token for the given user, owned by the configured target application. Requires a client_credentials token of an allow-listed application with the #{REQUIRED_SCOPE} scope. Administrators, teachers and assistants are refused. The token cannot change the user's email or password or delete the account. It expires after #{TOKEN_LIFETIME.to_i} seconds."
+            key :description, "Issues an access token for the given user, owned by the configured target application. Requires a client_credentials token of an allow-listed application with the #{AccessTokenAuthentication::ISSUER_SCOPE} scope. Administrators, teachers and assistants are refused. The token cannot change the user's email or password or delete the account. It expires after #{TOKEN_LIFETIME.to_i} seconds."
             key :operationId, 'issueUserAccessToken'
             key :produces, ['application/json']
             key :tags, ['user']
@@ -72,7 +70,7 @@ module Api
           token = Doorkeeper::AccessToken.create_for(
             application: target_application,
             resource_owner: user,
-            scopes: "public #{HANDOFF_TOKEN_SCOPE}",
+            scopes: "public #{AccessTokenAuthentication::HANDOFF_SCOPE}",
             expires_in: TOKEN_LIFETIME.to_i
           )
           Rails.logger.info("Issued user access token: issuer application uid=#{doorkeeper_token.application.uid} user_id=#{user.id}")
@@ -94,7 +92,7 @@ module Api
           def authorized_issuer?
             issuer_uids = Rails.configuration.x.user_access_token_issuer_application_uids
             # resource_owner_id is set on user tokens, which never qualify even from an allowed application.
-            return false unless doorkeeper_token.resource_owner_id.nil? && doorkeeper_token.acceptable?([REQUIRED_SCOPE])
+            return false unless AccessTokenAuthentication.issuer_token?(doorkeeper_token)
 
             application = doorkeeper_token.application
             # The target is a frontend client, so its credentials must not be usable to issue tokens.

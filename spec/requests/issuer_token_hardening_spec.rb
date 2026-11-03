@@ -38,7 +38,7 @@ describe 'Issuer token hardening', type: :request do
     let(:filter) { ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters) }
 
     it 'hides credentials and tokens' do
-      params = { client_secret: 's', access_token: 'a', refresh_token: 'r', token: 't', code: 'c' }
+      params = { client_secret: 's', access_token: 'a', refresh_token: 'r', token: 't', code: 'c', bearer_token: 'b', id_token: 'i', id_token_hint: 'h', code_verifier: 'v' }
 
       expect(filter.filter(params).values.uniq).to eq(['[FILTERED]'])
     end
