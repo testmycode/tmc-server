@@ -27,7 +27,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
 
   describe 'Downloading a submission as zip' do
     describe 'as an admin' do
-      let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
 
       it "should allow to download everyone's submissions" do
         # pending("test that submission zip's content is correct")
@@ -40,7 +40,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       before :each do
         Teachership.create(user: teacher, organization: organization)
       end
-      let(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+      let(:token) { double resource_owner_id: teacher.id, accessible?: true, includes_scope?: false }
 
       it "should allow to download own organization's submissions" do
         # pending("test that submission zip's content is correct")
@@ -63,7 +63,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       before :each do
         Assistantship.create(user: assistant, course: course)
       end
-      let(:token) { double resource_owner_id: assistant.id, acceptable?: true }
+      let(:token) { double resource_owner_id: assistant.id, accessible?: true, includes_scope?: false }
 
       it "should allow to download own course's submissions" do
         # pending("test that submission zip's content is correct")
@@ -82,7 +82,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       end
     end
     describe 'as a student' do
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
 
       it 'should allow to download own submissions' do
         # pending("test that submission zip's content is correct")

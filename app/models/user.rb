@@ -167,6 +167,14 @@ class User < ApplicationRecord
     result
   end
 
+  # The user a typed username names, matched against login exactly and email case-insensitively.
+  def self.find_by_login_or_email(username)
+    username = username&.strip
+    return nil if username.blank?
+
+    find_by(login: username) || find_by('lower(email) = ?', username.downcase)
+  end
+
   # The user when the password is accepted, nil otherwise. Use .authenticate_with_status when the
   # outcome is shown to the user, so that a delegation failure is not reported as a wrong password.
   def self.authenticate(login, submitted_password)
@@ -179,10 +187,7 @@ class User < ApplicationRecord
   # cannot be delegated at all and only an admin can repair it. A found user is returned whatever
   # the status, so sign in only on :accepted.
   def self.authenticate_with_status(login, submitted_password)
-    return [nil, :rejected] unless login
-    login = login.strip
-    user = find_by(login: login)
-    user ||= find_by('lower(email) = ?', login.downcase)
+    user = find_by_login_or_email(login)
     return [nil, :rejected] if user.nil?
 
     return [user, user.courses_mooc_fi_authentication_status(submitted_password)] if user.managed_externally?
@@ -478,6 +483,11 @@ class User < ApplicationRecord
 
   def <=>(other)
     login.downcase <=> other.login.downcase
+  end
+
+  # Administrators, teachers and assistants, whose accounts handoff tokens must never act as.
+  def privileged?
+    administrator? || teacherships.exists? || assistantships.exists?
   end
 
   def teacher?(organization)

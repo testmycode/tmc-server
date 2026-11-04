@@ -43,4 +43,16 @@ describe AuthsController, type: :controller do
     expect(response).to be_successful
     expect(response.body).to eq('OK')
   end
+
+  it 'accepts an access token only while it is not revoked' do
+    application = Doorkeeper::Application.create!(name: 'client', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob')
+    token = Doorkeeper::AccessToken.create!(application: application, resource_owner_id: @user.id, scopes: 'public')
+
+    post :show, params: { username: 'foo', session_id: token.token, format: :text }
+    expect(response.body).to eq('OK')
+
+    token.revoke
+    post :show, params: { username: 'foo', session_id: token.token, format: :text }
+    expect(response.body).to eq('FAIL')
+  end
 end

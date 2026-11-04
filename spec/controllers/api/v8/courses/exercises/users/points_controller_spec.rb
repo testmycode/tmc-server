@@ -30,7 +30,7 @@ describe Api::V8::Courses::Exercises::Users::PointsController, type: :controller
   end
 
   describe 'As any user' do
-    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+    let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
     describe 'when searching for users awarded points by user id' do
       describe 'and using course id' do
         it 'should return only correct users awarded points' do

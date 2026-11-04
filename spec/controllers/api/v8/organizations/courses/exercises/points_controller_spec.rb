@@ -22,7 +22,7 @@ describe Api::V8::Organizations::Courses::Exercises::PointsController, type: :co
   end
 
   describe 'As an admin' do
-    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+    let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
     describe 'when searching for all users awarded points' do
       describe 'using course name' do
         it 'should return all users awarded points of the exercise' do
@@ -48,7 +48,7 @@ describe Api::V8::Organizations::Courses::Exercises::PointsController, type: :co
   end
 
   describe 'As any user' do
-    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+    let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
     describe 'when searching awarded points' do
       describe 'and no points are found' do
         it 'should return an empty array' do

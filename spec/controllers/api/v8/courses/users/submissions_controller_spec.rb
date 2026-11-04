@@ -38,7 +38,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
 
           it "should show given user's submissions" do
             users_own_subs(course_id: course.id, user_id: user.id)
@@ -62,7 +62,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: teacher.id, accessible?: true, includes_scope?: false }
 
           it "should show given user's submissions in my organizations" do
             users_own_subs(course_id: course.id, user_id: user.id)
@@ -90,7 +90,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: assistant.id, accessible?: true, includes_scope?: false }
 
           it "should show given user's submissions in my courses" do
             users_own_subs(course_id: course.id, user_id: user.id)
@@ -118,7 +118,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
 
           it 'should show my own submissions' do
             users_own_subs(course_id: course.id, user_id: user.id)
@@ -163,7 +163,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
 
           it 'should show my own submissions' do
             users_own_subs(course_id: course.id, user_id: 'current')

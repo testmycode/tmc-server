@@ -29,9 +29,7 @@ class Api::Beta::BaseController < ApplicationController
 
   private
     def authenticate_user!
-      if doorkeeper_token
-        @current_user = User.find(doorkeeper_token.resource_owner_id)
-      end
+      @current_user = AccessTokenAuthentication.user_for(doorkeeper_token)
 
       return if @current_user
 

@@ -12,7 +12,7 @@ describe Api::V8::UsersController, type: :controller do
   end
 
   describe "GET current user's info with an access token" do
-    let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
     it 'user sees own info' do
       get :show, params: { id: 'current' }
 
@@ -30,7 +30,7 @@ describe Api::V8::UsersController, type: :controller do
     end
 
     context 'as an administrator' do
-      let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let!(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
 
       it 'user sees own info' do
         get :show, params: { id: 'current' }
@@ -40,7 +40,7 @@ describe Api::V8::UsersController, type: :controller do
   end
   describe "GET user's info with user id" do
     describe 'using user token' do
-      let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
       it 'user sees own info' do
         get :show, params: { id: user.id }
 
@@ -57,7 +57,7 @@ describe Api::V8::UsersController, type: :controller do
       end
     end
     describe 'using admin token' do
-      let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let!(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
       it "admin can see everyone's infos" do
         get :show, params: { id: user.id }
 
@@ -123,7 +123,7 @@ describe Api::V8::UsersController, type: :controller do
   end
 
   describe 'PUT update password' do
-    let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
 
     before :each do
       user.password = 'oldpassword'
@@ -332,6 +332,65 @@ describe Api::V8::UsersController, type: :controller do
       post :set_password_managed_by_courses_mooc_fi, params: { id: user.id, courses_mooc_fi_user_id: SecureRandom.uuid }
       expect(response).to have_http_status(403)
       expect(user.reload.password_managed_by_courses_mooc_fi).to eq(false)
+    end
+  end
+
+  describe 'with a handoff token' do
+    let(:application) { Doorkeeper::Application.create!(name: 'mooc.fi frontend', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
+    let(:token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public handoff') }
+
+    before :each do
+      allow(ExtraField).to receive(:by_kind).with(:user).and_return([UserField.new(name: 'first_name'), UserField.new(name: 'last_name')])
+      user.password = 'oldpassword'
+      user.save!
+    end
+
+    it 'updates the name when the rest of the profile is sent back unchanged' do
+      put :update, params: { id: user.id, user: { email: user.email.upcase }, user_field: { first_name: 'Ada', last_name: 'Lovelace' } }
+      expect(response).to have_http_status(200)
+      expect(UserFieldValue.where(user: user).pluck(:field_name, :value).to_h).to eq('first_name' => 'Ada', 'last_name' => 'Lovelace')
+    end
+
+    it 'refuses to change the email' do
+      put :update, params: { id: 'current', user: { email: 'taken-over@example.com' }, user_field: { first_name: 'Ada' } }
+      expect(response).to have_http_status(403)
+      expect(user.reload.email).not_to eq('taken-over@example.com')
+      expect(UserFieldValue.where(user: user, field_name: 'first_name')).to be_empty
+    end
+
+    it 'refuses to change the password' do
+      put :update, params: { id: 'current', user: { email: user.email }, old_password: 'oldpassword', password: 'newpassword', password_repeat: 'newpassword' }
+      expect(response).to have_http_status(403)
+      expect(user.reload).to have_password('oldpassword')
+    end
+
+    it 'refuses to delete the user' do
+      delete :destroy, params: { id: user.id }
+      expect(response).to have_http_status(403)
+      expect(User.find_by(id: user.id)).not_to be_nil
+    end
+
+    context 'when the token is an ordinary login token' do
+      let(:token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public') }
+
+      it 'changes the email' do
+        put :update, params: { id: 'current', user: { email: 'new@example.com' } }
+        expect(response).to have_http_status(200)
+        expect(user.reload.email).to eq('new@example.com')
+      end
+
+      it 'changes the password' do
+        allow_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).and_return(true)
+        put :update, params: { id: 'current', user: { email: user.email }, old_password: 'oldpassword', password: 'newpassword', password_repeat: 'newpassword' }
+        expect(response).to have_http_status(200)
+        expect(user.reload).to have_password('newpassword')
+      end
+
+      it 'deletes the user' do
+        delete :destroy, params: { id: user.id }
+        expect(response).to have_http_status(200)
+        expect(User.find_by(id: user.id)).to be_nil
+      end
     end
   end
 end

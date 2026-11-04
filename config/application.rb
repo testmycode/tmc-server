@@ -27,7 +27,7 @@ module TmcServer
     # config.i18n.default_locale = :de
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log]
+    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log client_secret access_token refresh_token bearer_token id_token id_token_hint code_verifier] + [/\A(token|code)\z/]
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.eager_load_paths << Rails.root.join('lib')
@@ -35,6 +35,8 @@ module TmcServer
     config.relative_url_root = SiteSetting.value('base_path')
 
     config.x.accept_courses_mooc_fi_tokens = ENV['ACCEPT_COURSES_MOOC_FI_TOKENS'] == 'true'
+    config.x.user_access_token_issuer_application_uids = ENV.fetch('USER_ACCESS_TOKEN_ISSUER_APPLICATION_UIDS', '').split(',').map(&:strip).reject(&:empty?)
+    config.x.user_access_token_target_application_uid = ENV['USER_ACCESS_TOKEN_TARGET_APPLICATION_UID'].presence
 
     config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
       allow do

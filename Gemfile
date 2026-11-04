@@ -25,7 +25,7 @@ gem 'newrelic_rpm', '~> 9.11'
 gem 'pdfkit', '~> 0.8.7.3', require: false
 gem 'pg', '~> 1.5', '>= 1.5.6'
 gem 'pghero', '~> 3.5'
-gem 'rack-attack', '~> 6.7', require: false
+gem 'rack-attack', '~> 6.7'
 gem 'rack-cors', '~> 2.0', '>= 2.0.2'
 gem 'rack-timeout', '~> 0.7.0'
 gem 'rack-mini-profiler', '~> 3.3', '>= 3.3.1'
