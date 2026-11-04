@@ -41,6 +41,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     expect(body['created_at']).to eq(issued.created_at.to_i)
     expect(body['expires_in']).to eq(86_400)
     expect(issued.expires_in).to eq(86_400)
+    expect(response.headers['Cache-Control']).to eq('no-store')
   end
 
   it 'rejects an application whose credentials are public' do

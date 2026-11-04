@@ -75,6 +75,9 @@ module Api
           )
           Rails.logger.info("Issued user access token: issuer application uid=#{doorkeeper_token.application.uid} user_id=#{user.id}")
 
+          response.headers['Cache-Control'] = 'no-store'
+          response.headers['Pragma'] = 'no-cache'
+
           render json: {
             access_token: token.plaintext_token,
             token_type: 'bearer',
