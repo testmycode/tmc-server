@@ -153,9 +153,9 @@ class Course < ApplicationRecord
   validates :description, length: { maximum: 512 }
   validate :check_name_length
 
+  before_validation :save_template
   # If made from template, make sure cached_version is not out of sync.
   before_save :set_cached_version
-  before_validation :save_template
   validates :source_url, presence: true
   # validates :custom_points_url,
   #          format: {
@@ -191,8 +191,8 @@ class Course < ApplicationRecord
 
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
-  enum :disabled_status, %i[enabled disabled]
-  enum :paste_visibility, %i[open secured no-tests-public everyone completed-only]
+  enum :disabled_status, { enabled: 0, disabled: 1 }
+  enum :paste_visibility, { open: 0, secured: 1, 'no-tests-public': 2, everyone: 3, 'completed-only': 4 }
 
   sig { void }
   def destroy

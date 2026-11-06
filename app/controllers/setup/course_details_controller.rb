@@ -31,6 +31,18 @@ class Setup::CourseDetailsController < Setup::SetupController
   end
 
   sig { void }
+  def edit
+    authorize! :teach, @organization
+    @setup_in_progress = T.let(setup_in_progress?, T.nilable(T::Boolean))
+    if setup_in_progress?
+      print_setup_phases(2)
+    else
+      add_course_breadcrumb
+      add_breadcrumb('Edit details')
+    end
+  end
+
+  sig { void }
   def create
     authorize! :teach, @organization
 
@@ -62,18 +74,6 @@ class Setup::CourseDetailsController < Setup::SetupController
       print_setup_phases(2)
       @custom = custom
       render action: 'new', notice: 'Course could not be created'
-    end
-  end
-
-  sig { void }
-  def edit
-    authorize! :teach, @organization
-    @setup_in_progress = T.let(setup_in_progress?, T.nilable(T::Boolean))
-    if setup_in_progress?
-      print_setup_phases(2)
-    else
-      add_course_breadcrumb
-      add_breadcrumb('Edit details')
     end
   end
 

@@ -8,6 +8,11 @@ class PasswordResetKeysController < ApplicationController
   add_breadcrumb 'Forgot password', ->(*_a) { }, only: %i[new show]
 
   sig { void }
+  def show
+    find_key_and_user
+  end
+
+  sig { void }
   def new; end
 
   sig { void }
@@ -25,11 +30,6 @@ class PasswordResetKeysController < ApplicationController
 
     key = ActionToken.generate_password_reset_key_for(user)
     PasswordResetKeyMailer.reset_link_email(user, key).deliver_now
-  end
-
-  sig { void }
-  def show
-    find_key_and_user
   end
 
   sig { void }

@@ -18,6 +18,15 @@ class Setup::OrganizationsController < Setup::SetupController
   end
 
   sig { void }
+  def edit
+    authorize! :edit, @organization
+
+    add_organization_breadcrumb
+    add_breadcrumb 'Edit details'
+    @cant_edit_slug = T.let(!current_user.administrator?, T.nilable(T::Boolean))
+  end
+
+  sig { void }
   def create
     authorize! :request, :organization
     @organization = Organization.init(organization_params, current_user)
@@ -29,15 +38,6 @@ class Setup::OrganizationsController < Setup::SetupController
     else
       render :new
     end
-  end
-
-  sig { void }
-  def edit
-    authorize! :edit, @organization
-
-    add_organization_breadcrumb
-    add_breadcrumb 'Edit details'
-    @cant_edit_slug = T.let(!current_user.administrator?, T.nilable(T::Boolean))
   end
 
   sig { void }

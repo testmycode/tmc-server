@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 # source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 7.2.4'
+gem 'rails', '~> 8.0.5'
 
 gem 'mini_racer', '~> 0.19.2'
 gem 'activerecord-import', '~> 1.7'

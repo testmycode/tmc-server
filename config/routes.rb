@@ -18,7 +18,7 @@ TmcServer::Application.routes.draw do
       end
       resources :courses, only: [] do
         resource :course_details, only: %i[edit update]
-        resource :course_timing, only: %i[index show edit update]
+        resource :course_timing, only: %i[show edit update]
         resources :course_assistants, only: %i[index create destroy]
         resources :course_finisher, only: %i[index create]
       end
@@ -223,7 +223,7 @@ TmcServer::Application.routes.draw do
       get 'feedback_answers/chart/:type' => 'feedback_answers_charts#show', :as => 'feedback_answers_chart'
       resources :reviews, only: [:index]
       resource :unlock, only: %i[show create]
-      resource :course_notifications, only: %i[create index show new]
+      resource :course_notifications, only: %i[create show new]
       resources :migrate_to_other_course, only: [:show] do
         member do
           post :migrate

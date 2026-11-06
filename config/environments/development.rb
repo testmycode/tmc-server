@@ -41,11 +41,6 @@ Rails.application.configure do
   config.action_cable.mount_path = '/cable'
   config.action_cable.allow_same_origin_as_host = true
 
-  # Adds additional error checking when serving assets at runtime.
-  # Checks for improperly declared sprockets dependencies.
-  # Raises helpful error messages.
-  config.assets.raise_runtime_errors = true
-
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
   if ENV['REDIS_URL']

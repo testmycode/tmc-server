@@ -18,6 +18,9 @@ module TmcServer
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
     config.load_defaults 7.1
+    # Rails 8.0 defaults read before config/initializers run, too early for new_framework_defaults_8_0.rb.
+    config.active_support.to_time_preserves_timezone = :zone
+    config.action_dispatch.strict_freshness = true
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.

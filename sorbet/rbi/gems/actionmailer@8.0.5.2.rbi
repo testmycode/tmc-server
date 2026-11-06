@@ -543,9 +543,6 @@ class ActionMailer::Base < ::AbstractController::Base
   def __callbacks; end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:477
-  def __callbacks?; end
-
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:477
   def _deliver_callbacks; end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:490
@@ -1033,9 +1030,6 @@ class ActionMailer::Base < ::AbstractController::Base
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:477
     def __callbacks=(value); end
 
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:477
-    def __callbacks?; end
-
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:483
     def _default_form_builder; end
 
@@ -1390,6 +1384,108 @@ class ActionMailer::Base < ::AbstractController::Base
 
     private
 
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:477
+    def __class_attr___callbacks; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:477
+    def __class_attr___callbacks=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:483
+    def __class_attr__default_form_builder; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:483
+    def __class_attr__default_form_builder=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:490
+    def __class_attr__helper_methods; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:490
+    def __class_attr__helper_methods=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:496
+    def __class_attr__layout; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:496
+    def __class_attr__layout=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:496
+    def __class_attr__layout_conditions; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:496
+    def __class_attr__layout_conditions=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
+    def __class_attr__view_cache_dependencies; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
+    def __class_attr__view_cache_dependencies=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:502
+    def __class_attr_default_params; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:502
+    def __class_attr_default_params=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:479
+    def __class_attr_deliver_later_queue_name; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:479
+    def __class_attr_deliver_later_queue_name=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:479
+    def __class_attr_delivery_job; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:479
+    def __class_attr_delivery_job=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_delivery_method; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_delivery_method=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_delivery_methods; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_delivery_methods=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_file_settings; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_file_settings=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
+    def __class_attr_fragment_cache_keys; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
+    def __class_attr_fragment_cache_keys=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:480
+    def __class_attr_rescue_handlers; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:480
+    def __class_attr_rescue_handlers=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_sendmail_settings; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_sendmail_settings=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_smtp_settings; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_smtp_settings=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_test_settings; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
+    def __class_attr_test_settings=(new_value); end
+
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:623
     def method_missing(method_name, *, **, &); end
 
@@ -1463,12 +1559,10 @@ module ActionMailer::Callbacks
   module GeneratedClassMethods
     def __callbacks; end
     def __callbacks=(value); end
-    def __callbacks?; end
   end
 
   module GeneratedInstanceMethods
     def __callbacks; end
-    def __callbacks?; end
   end
 end
 
@@ -1707,8 +1801,13 @@ class ActionMailer::LogSubscriber < ::ActiveSupport::LogSubscriber
   def process(event); end
 
   class << self
+    private
+
     # pkg:gem/actionmailer#lib/action_mailer/log_subscriber.rb:25
-    def log_levels; end
+    def __class_attr_log_levels; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/log_subscriber.rb:25
+    def __class_attr_log_levels=(new_value); end
   end
 end
 
@@ -1737,11 +1836,19 @@ class ActionMailer::MailDeliveryJob < ::ActiveJob::Base
   def mailer_class; end
 
   class << self
+    private
+
     # pkg:gem/actionmailer#lib/action_mailer/mail_delivery_job.rb:14
-    def queue_name; end
+    def __class_attr_queue_name; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/mail_delivery_job.rb:14
+    def __class_attr_queue_name=(new_value); end
 
     # pkg:gem/actionmailer#lib/action_mailer/mail_delivery_job.rb:19
-    def rescue_handlers; end
+    def __class_attr_rescue_handlers; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/mail_delivery_job.rb:19
+    def __class_attr_rescue_handlers=(new_value); end
   end
 end
 
@@ -2255,9 +2362,6 @@ class ActionMailer::TestCase < ::ActiveSupport::TestCase
   def _mailer_class?; end
 
   class << self
-    # pkg:gem/actionmailer#lib/action_mailer/test_case.rb:42
-    def __callbacks; end
-
     # pkg:gem/actionmailer#lib/action_mailer/test_case.rb:41
     def _mailer_class; end
 
@@ -2266,6 +2370,20 @@ class ActionMailer::TestCase < ::ActiveSupport::TestCase
 
     # pkg:gem/actionmailer#lib/action_mailer/test_case.rb:41
     def _mailer_class?; end
+
+    private
+
+    # pkg:gem/actionmailer#lib/action_mailer/test_case.rb:42
+    def __class_attr___callbacks; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/test_case.rb:42
+    def __class_attr___callbacks=(new_value); end
+
+    # pkg:gem/actionmailer#lib/action_mailer/test_case.rb:41
+    def __class_attr__mailer_class; end
+
+    # pkg:gem/actionmailer#lib/action_mailer/test_case.rb:41
+    def __class_attr__mailer_class=(new_value); end
   end
 end
 
@@ -2596,7 +2714,7 @@ ActionMailer::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActionMailer::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
 
 # pkg:gem/actionmailer#lib/action_mailer/gem_version.rb:13
-ActionMailer::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
+ActionMailer::VERSION::PRE = T.let(T.unsafe(nil), String)
 
 # pkg:gem/actionmailer#lib/action_mailer/gem_version.rb:15
 ActionMailer::VERSION::STRING = T.let(T.unsafe(nil), String)

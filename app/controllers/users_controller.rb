@@ -16,6 +16,17 @@ class UsersController < ApplicationController
   end
 
   sig { void }
+  def show
+    add_breadcrumb 'My account', user_path
+
+    if current_user.guest?
+      raise CanCan::AccessDenied
+    else
+      @user = current_user
+    end
+  end
+
+  sig { void }
   def new
     authorize! :create, User
     alternative_location = SiteSetting.all_settings['signup_location']
@@ -64,17 +75,6 @@ class UsersController < ApplicationController
       end
     else
       render action: :new, status: :forbidden
-    end
-  end
-
-  sig { void }
-  def show
-    add_breadcrumb 'My account', user_path
-
-    if current_user.guest?
-      raise CanCan::AccessDenied
-    else
-      @user = current_user
     end
   end
 

@@ -9,6 +9,7 @@ AllCops:
   SuggestExtensions: false
   NewCops: disable
   TargetRubyVersion: 3.3
+  TargetRailsVersion: 8.0
   Exclude:
     - 'ext/**/*'
     - 'db/**/*'
@@ -96,4 +97,26 @@ Sorbet/SignatureBuildOrder:
   Enabled: true
 
 Sorbet/ConstantsFromStrings:
+  Enabled: true
+
+# Cops that catch code a Rails upgrade breaks or deprecates.
+Rails/EnumSyntax:
+  Enabled: true
+
+Rails/EnumHash:
+  Enabled: true
+
+Rails/DeprecatedActiveModelErrorsMethods:
+  Enabled: true
+
+Rails/HttpPositionalArguments:
+  Enabled: true
+
+Rails/TransactionExitStatement:
+  Enabled: true
+
+Rails/ActionOrder:
+  Enabled: true
+
+Rails/ActiveRecordCallbacksOrder:
   Enabled: true

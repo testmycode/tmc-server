@@ -59,21 +59,6 @@ module Api
         end
 
         sig { void }
-        def create
-          unauthorize_guest!
-
-          organization = Organization.find_by!(slug: params[:organization_slug])
-          authorize! :read, organization
-
-          if organization.member?(current_user)
-            present(status: "#{current_user.email} is already a member of #{organization.name}")
-          else
-            OrganizationMembership.create! user: current_user, organization: organization
-            present(status: "Membership created to #{organization.name} for #{current_user.email}")
-          end
-        end
-
-        sig { void }
         def index
           unauthorize_guest!
 
@@ -87,6 +72,21 @@ module Api
             }
           end
           present(members: data)
+        end
+
+        sig { void }
+        def create
+          unauthorize_guest!
+
+          organization = Organization.find_by!(slug: params[:organization_slug])
+          authorize! :read, organization
+
+          if organization.member?(current_user)
+            present(status: "#{current_user.email} is already a member of #{organization.name}")
+          else
+            OrganizationMembership.create! user: current_user, organization: organization
+            present(status: "Membership created to #{organization.name} for #{current_user.email}")
+          end
         end
       end
     end

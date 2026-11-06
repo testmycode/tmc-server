@@ -95,8 +95,9 @@ class Submission < ApplicationRecord
   before_create :set_processing_attempts_started_at
   before_create :set_paste_key_if_paste_available
 
-  after_save :kafka_update_progress
+  before_create :randomize_secret_token
   after_destroy :kafka_update_progress
+  after_save :kafka_update_progress
 
   sig { returns(T.nilable(Integer)) }
   def processing_time
@@ -143,8 +144,6 @@ class Submission < ApplicationRecord
   def self.max_attempts_at_processing
     3
   end
-
-  before_create :randomize_secret_token
 
   sig { returns(T::Boolean) }
   def tests_ran?

@@ -50,6 +50,12 @@ module ActiveStorage
   # pkg:gem/activestorage#lib/active_storage.rb:360
   def draw_routes=(val); end
 
+  # pkg:gem/activestorage#lib/active_storage.rb:379
+  def ffmpeg_allowed_formats; end
+
+  # pkg:gem/activestorage#lib/active_storage.rb:379
+  def ffmpeg_allowed_formats=(val); end
+
   # pkg:gem/activestorage#lib/active_storage.rb:49
   def logger; end
 
@@ -198,6 +204,15 @@ module ActiveStorage
     # pkg:gem/activestorage#lib/active_storage.rb:360
     def draw_routes=(val); end
 
+    # pkg:gem/activestorage#lib/active_storage.rb:379
+    def ffmpeg_allowed_formats; end
+
+    # pkg:gem/activestorage#lib/active_storage.rb:379
+    def ffmpeg_allowed_formats=(val); end
+
+    # pkg:gem/activestorage#lib/active_storage.rb:381
+    def ffmpeg_format_whitelist_arguments; end
+
     # Returns the currently loaded version of Active Storage as a +Gem::Version+.
     #
     # pkg:gem/activestorage#lib/active_storage/gem_version.rb:5
@@ -235,6 +250,12 @@ module ActiveStorage
 
     # pkg:gem/activestorage#lib/active_storage/engine.rb:26
     def railtie_routes_url_helpers(include_path_helpers = T.unsafe(nil)); end
+
+    # Raises when the installed mini_magick cannot apply the shipped ImageMagick security policy.
+    # Called before Active Storage hands untrusted content to ImageMagick.
+    #
+    # pkg:gem/activestorage#lib/active_storage/image_magick.rb:53
+    def require_securable_mini_magick!; end
 
     # pkg:gem/activestorage#lib/active_storage.rb:361
     def resolve_model_to_route; end
@@ -343,8 +364,12 @@ class ActiveStorage::AnalyzeJob < ::ActiveStorage::BaseJob
   def perform(blob); end
 
   class << self
-    def queue_name; end
-    def rescue_handlers; end
+    private
+
+    def __class_attr_queue_name; end
+    def __class_attr_queue_name=(new_value); end
+    def __class_attr_rescue_handlers; end
+    def __class_attr_rescue_handlers=(new_value); end
   end
 end
 
@@ -424,7 +449,7 @@ class ActiveStorage::Analyzer::AudioAnalyzer < ::ActiveStorage::Analyzer
   # pkg:gem/activestorage#lib/active_storage/analyzer/audio_analyzer.rb:24
   def duration; end
 
-  # pkg:gem/activestorage#lib/active_storage/analyzer/audio_analyzer.rb:73
+  # pkg:gem/activestorage#lib/active_storage/analyzer/audio_analyzer.rb:76
   def ffprobe_path; end
 
   # pkg:gem/activestorage#lib/active_storage/analyzer/audio_analyzer.rb:52
@@ -473,18 +498,18 @@ end
 # This analyzer relies on the third-party {MiniMagick}[https://github.com/minimagick/minimagick] gem. MiniMagick requires
 # the {ImageMagick}[http://www.imagemagick.org] system library.
 #
-# pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:6
+# pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:8
 class ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick < ::ActiveStorage::Analyzer::ImageAnalyzer
   private
 
-  # pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:12
+  # pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:14
   def read_image; end
 
-  # pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:37
+  # pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:41
   def rotated_image?(image); end
 
   class << self
-    # pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:7
+    # pkg:gem/activestorage#lib/active_storage/analyzer/image_analyzer/image_magick.rb:9
     def accept?(blob); end
   end
 end
@@ -586,7 +611,7 @@ class ActiveStorage::Analyzer::VideoAnalyzer < ::ActiveStorage::Analyzer
   # pkg:gem/activestorage#lib/active_storage/analyzer/video_analyzer.rb:96
   def encoded_width; end
 
-  # pkg:gem/activestorage#lib/active_storage/analyzer/video_analyzer.rb:153
+  # pkg:gem/activestorage#lib/active_storage/analyzer/video_analyzer.rb:156
   def ffprobe_path; end
 
   # pkg:gem/activestorage#lib/active_storage/analyzer/video_analyzer.rb:42
@@ -966,37 +991,37 @@ module ActiveStorage::Attached::Model
 
   mixes_in_class_methods ::ActiveStorage::Attached::Model::ClassMethods
 
-  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:277
+  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:281
   def attachment_changes; end
 
-  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:281
+  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:285
   def changed_for_autosave?; end
 
-  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:291
+  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:295
   def reload(*); end
 
   private
 
-  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:285
+  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:289
   def initialize_dup(*); end
 
   class << self
-    # pkg:gem/activestorage#lib/active_storage/attached/model.rb:259
+    # pkg:gem/activestorage#lib/active_storage/attached/model.rb:263
     def validate_service_configuration(service_name, model_class, association_name); end
 
     private
 
-    # pkg:gem/activestorage#lib/active_storage/attached/model.rb:270
+    # pkg:gem/activestorage#lib/active_storage/attached/model.rb:274
     def validate_global_service_configuration(model_class); end
   end
 end
 
 # pkg:gem/activestorage#lib/active_storage/attached/model.rb:54
 module ActiveStorage::Attached::Model::ClassMethods
-  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:206
+  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:210
   def has_many_attached(name, dependent: T.unsafe(nil), service: T.unsafe(nil), strict_loading: T.unsafe(nil)); end
 
-  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:106
+  # pkg:gem/activestorage#lib/active_storage/attached/model.rb:108
   def has_one_attached(name, dependent: T.unsafe(nil), service: T.unsafe(nil), strict_loading: T.unsafe(nil)); end
 end
 
@@ -1101,11 +1126,18 @@ class ActiveStorage::Attachment < ::ActiveStorage::Record
   def transformations_by_name(transformations); end
 
   class << self
-    def __callbacks; end
-    def _reflections; end
-    def _validators; end
-    def defined_enums; end
     def with_all_variant_records(*args, **); end
+
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr__reflections; end
+    def __class_attr__reflections=(new_value); end
+    def __class_attr__validators; end
+    def __class_attr__validators=(new_value); end
+    def __class_attr_defined_enums; end
+    def __class_attr_defined_enums=(new_value); end
   end
 end
 
@@ -1137,9 +1169,14 @@ class ActiveStorage::BaseController < ::ActionController::Base
   def _layout(lookup_context, formats, keys); end
 
   class << self
-    def __callbacks; end
-    def etag_with_template_digest; end
-    def middleware_stack; end
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr_etag_with_template_digest; end
+    def __class_attr_etag_with_template_digest=(new_value); end
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
@@ -1197,23 +1234,20 @@ class ActiveStorage::Blob < ::ActiveStorage::Record
 
   def compute_checksum_in_chunks(io); end
   def extract_content_type(io); end
+  def media_type; end
   def service_metadata; end
+  def tempfile_extension; end
   def touch_attachments; end
   def update_service_metadata; end
   def web_image?; end
 
   class << self
-    def __callbacks; end
-    def _reflections; end
-    def _validators; end
-    def attachment_reflections; end
     def build_after_unfurling(io:, filename:, key: T.unsafe(nil), content_type: T.unsafe(nil), metadata: T.unsafe(nil), service_name: T.unsafe(nil), identify: T.unsafe(nil), record: T.unsafe(nil)); end
     def combine_signed_id_purposes(purpose); end
     def compose(blobs, filename:, key: T.unsafe(nil), content_type: T.unsafe(nil), metadata: T.unsafe(nil)); end
     def create_after_unfurling!(io:, filename:, key: T.unsafe(nil), content_type: T.unsafe(nil), metadata: T.unsafe(nil), service_name: T.unsafe(nil), identify: T.unsafe(nil), record: T.unsafe(nil)); end
     def create_and_upload!(io:, filename:, key: T.unsafe(nil), content_type: T.unsafe(nil), metadata: T.unsafe(nil), service_name: T.unsafe(nil), identify: T.unsafe(nil), record: T.unsafe(nil)); end
     def create_before_direct_upload!(filename:, byte_size:, checksum:, key: T.unsafe(nil), content_type: T.unsafe(nil), metadata: T.unsafe(nil), service_name: T.unsafe(nil), record: T.unsafe(nil)); end
-    def defined_enums; end
     def find_signed(id, record: T.unsafe(nil), purpose: T.unsafe(nil)); end
     def find_signed!(id, record: T.unsafe(nil), purpose: T.unsafe(nil)); end
     def generate_unique_secure_token(length: T.unsafe(nil)); end
@@ -1230,6 +1264,20 @@ class ActiveStorage::Blob < ::ActiveStorage::Record
 
     private
 
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr__reflections; end
+    def __class_attr__reflections=(new_value); end
+    def __class_attr__validators; end
+    def __class_attr__validators=(new_value); end
+    def __class_attr_attachment_reflections; end
+    def __class_attr_attachment_reflections=(new_value); end
+    def __class_attr_defined_enums; end
+    def __class_attr_defined_enums=(new_value); end
+    def __class_attr_service; end
+    def __class_attr_service=(new_value); end
+    def __class_attr_services; end
+    def __class_attr_services=(new_value); end
     def filter_metadata(metadata); end
   end
 end
@@ -1336,8 +1384,18 @@ class ActiveStorage::Blobs::ProxyController < ::ActiveStorage::BaseController
   def _layout(lookup_context, formats, keys); end
 
   class << self
-    def __callbacks; end
-    def middleware_stack; end
+    def live_streaming_excluded_keys; end
+    def live_streaming_excluded_keys=(value); end
+    def live_streaming_excluded_keys?; end
+
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr_live_streaming_excluded_keys; end
+    def __class_attr_live_streaming_excluded_keys=(new_value); end
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
@@ -1351,16 +1409,24 @@ class ActiveStorage::Blobs::RedirectController < ::ActiveStorage::BaseController
   def _layout(lookup_context, formats, keys); end
 
   class << self
-    def __callbacks; end
-    def middleware_stack; end
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
 class ActiveStorage::Current < ::ActiveSupport::CurrentAttributes
   class << self
-    def defaults; end
     def url_options; end
     def url_options=(value); end
+
+    private
+
+    def __class_attr_defaults; end
+    def __class_attr_defaults=(new_value); end
   end
 end
 
@@ -1374,7 +1440,10 @@ class ActiveStorage::DirectUploadsController < ::ActiveStorage::BaseController
   def direct_upload_json(blob); end
 
   class << self
-    def middleware_stack; end
+    private
+
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
@@ -1397,8 +1466,12 @@ class ActiveStorage::DiskController < ::ActiveStorage::BaseController
   def named_disk_service(name); end
 
   class << self
-    def __callbacks; end
-    def middleware_stack; end
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
@@ -1547,8 +1620,45 @@ class ActiveStorage::FixtureSet
 
     # pkg:gem/activestorage#lib/active_storage/fixture_set.rb:45
     def file_fixture_path?; end
+
+    private
+
+    # pkg:gem/activestorage#lib/active_storage/fixture_set.rb:45
+    def __class_attr_file_fixture_path; end
+
+    # pkg:gem/activestorage#lib/active_storage/fixture_set.rb:45
+    def __class_attr_file_fixture_path=(new_value); end
   end
 end
+
+# Adds Active Storage's ImageMagick security policy to every ImageMagick process MiniMagick spawns.
+#
+# ImageMagick reads every `policy.xml` on its configuration search path and applies all of them,
+# so the shipped policy adds to the operator's policy rather than replacing it. `MAGICK_CONFIGURE_PATH`
+# prepends to that search path; a value the operator has already set, in the environment or in
+# `MiniMagick.cli_env`, is kept after the shipped directory.
+#
+# pkg:gem/activestorage#lib/active_storage/image_magick.rb:25
+module ActiveStorage::ImageMagick
+  class << self
+    # Called when Active Storage loads, and again after the application initializes, so that a
+    # `MAGICK_CONFIGURE_PATH` or `MiniMagick.cli_env` set by an initializer or dotenv keeps the policy.
+    #
+    # pkg:gem/activestorage#lib/active_storage/image_magick.rb:30
+    def apply_policy; end
+
+    # pkg:gem/activestorage#lib/active_storage/image_magick.rb:37
+    def configure_path(operator_path); end
+
+    private
+
+    # pkg:gem/activestorage#lib/active_storage/image_magick.rb:41
+    def operator_paths(path); end
+  end
+end
+
+# pkg:gem/activestorage#lib/active_storage/image_magick.rb:26
+ActiveStorage::ImageMagick::POLICY_DIRECTORY = T.let(T.unsafe(nil), String)
 
 # Raised when uploaded or downloaded data does not match a precomputed checksum.
 # Indicates that a network error or a software bug caused data corruption.
@@ -1615,17 +1725,32 @@ class ActiveStorage::LogSubscriber < ::ActiveSupport::LogSubscriber
   def log_prefix_for_service(event); end
 
   class << self
+    private
+
     # pkg:gem/activestorage#lib/active_storage/log_subscriber.rb:12
-    def log_levels; end
+    def __class_attr_log_levels; end
+
+    # pkg:gem/activestorage#lib/active_storage/log_subscriber.rb:12
+    def __class_attr_log_levels=(new_value); end
   end
 end
+
+# pkg:gem/activestorage#lib/active_storage/image_magick.rb:14
+ActiveStorage::MINIMAGICK_AVAILABLE = T.let(T.unsafe(nil), FalseClass)
+
+# pkg:gem/activestorage#lib/active_storage/image_magick.rb:48
+ActiveStorage::MINIMAGICK_UNSECURABLE = T.let(T.unsafe(nil), FalseClass)
 
 class ActiveStorage::MirrorJob < ::ActiveStorage::BaseJob
   def perform(key, checksum:); end
 
   class << self
-    def queue_name; end
-    def rescue_handlers; end
+    private
+
+    def __class_attr_queue_name; end
+    def __class_attr_queue_name=(new_value); end
+    def __class_attr_rescue_handlers; end
+    def __class_attr_rescue_handlers=(new_value); end
   end
 end
 
@@ -1674,8 +1799,12 @@ class ActiveStorage::PreviewImageJob < ::ActiveStorage::BaseJob
   def perform(blob, variations); end
 
   class << self
-    def queue_name; end
-    def rescue_handlers; end
+    private
+
+    def __class_attr_queue_name; end
+    def __class_attr_queue_name=(new_value); end
+    def __class_attr_rescue_handlers; end
+    def __class_attr_rescue_handlers=(new_value); end
   end
 end
 
@@ -1828,8 +1957,12 @@ class ActiveStorage::PurgeJob < ::ActiveStorage::BaseJob
   def perform(blob); end
 
   class << self
-    def queue_name; end
-    def rescue_handlers; end
+    private
+
+    def __class_attr_queue_name; end
+    def __class_attr_queue_name=(new_value); end
+    def __class_attr_rescue_handlers; end
+    def __class_attr_rescue_handlers=(new_value); end
   end
 end
 
@@ -1838,8 +1971,12 @@ class ActiveStorage::Record < ::ActiveRecord::Base
   include ::ActiveStorage::Record::GeneratedAssociationMethods
 
   class << self
-    def _validators; end
-    def defined_enums; end
+    private
+
+    def __class_attr__validators; end
+    def __class_attr__validators=(new_value); end
+    def __class_attr_defined_enums; end
+    def __class_attr_defined_enums=(new_value); end
   end
 end
 
@@ -1936,8 +2073,12 @@ class ActiveStorage::Representations::BaseController < ::ActiveStorage::BaseCont
   def set_representation; end
 
   class << self
-    def __callbacks; end
-    def middleware_stack; end
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
@@ -1954,8 +2095,18 @@ class ActiveStorage::Representations::ProxyController < ::ActiveStorage::Represe
   def _layout(lookup_context, formats, keys); end
 
   class << self
-    def __callbacks; end
-    def middleware_stack; end
+    def live_streaming_excluded_keys; end
+    def live_streaming_excluded_keys=(value); end
+    def live_streaming_excluded_keys?; end
+
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr_live_streaming_excluded_keys; end
+    def __class_attr_live_streaming_excluded_keys=(new_value); end
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
@@ -1967,7 +2118,10 @@ class ActiveStorage::Representations::RedirectController < ::ActiveStorage::Repr
   def _layout(lookup_context, formats, keys); end
 
   class << self
-    def middleware_stack; end
+    private
+
+    def __class_attr_middleware_stack; end
+    def __class_attr_middleware_stack=(new_value); end
   end
 end
 
@@ -2186,10 +2340,12 @@ end
 
 module ActiveStorage::Streaming
   extend ::ActiveSupport::Concern
+  include GeneratedInstanceMethods
   include ::ActionController::Rendering
   include ::ActionController::DataStreaming
   include ::ActionController::Live
 
+  mixes_in_class_methods GeneratedClassMethods
   mixes_in_class_methods ::ActionController::Rendering::ClassMethods
   mixes_in_class_methods ::ActionController::Live::ClassMethods
 
@@ -2198,6 +2354,14 @@ module ActiveStorage::Streaming
   def ranges_valid?(ranges); end
   def send_blob_byte_range_data(blob, range_header, disposition: T.unsafe(nil)); end
   def send_blob_stream(blob, disposition: T.unsafe(nil)); end
+
+  module GeneratedClassMethods
+    def live_streaming_excluded_keys; end
+    def live_streaming_excluded_keys=(value); end
+    def live_streaming_excluded_keys?; end
+  end
+
+  module GeneratedInstanceMethods; end
 end
 
 ActiveStorage::Streaming::DEFAULT_BLOB_STREAMING_DISPOSITION = T.let(T.unsafe(nil), String)
@@ -2206,12 +2370,16 @@ class ActiveStorage::TransformJob < ::ActiveStorage::BaseJob
   def perform(blob, transformations); end
 
   class << self
-    def queue_name; end
-    def rescue_handlers; end
+    private
+
+    def __class_attr_queue_name; end
+    def __class_attr_queue_name=(new_value); end
+    def __class_attr_rescue_handlers; end
+    def __class_attr_rescue_handlers=(new_value); end
   end
 end
 
-# pkg:gem/activestorage#lib/active_storage.rb:379
+# pkg:gem/activestorage#lib/active_storage.rb:385
 module ActiveStorage::Transformers
   extend ::ActiveSupport::Autoload
 end
@@ -2303,7 +2471,7 @@ ActiveStorage::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActiveStorage::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
 
 # pkg:gem/activestorage#lib/active_storage/gem_version.rb:13
-ActiveStorage::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
+ActiveStorage::VERSION::PRE = T.let(T.unsafe(nil), String)
 
 # pkg:gem/activestorage#lib/active_storage/gem_version.rb:15
 ActiveStorage::VERSION::STRING = T.let(T.unsafe(nil), String)
@@ -2346,12 +2514,20 @@ class ActiveStorage::VariantRecord < ::ActiveStorage::Record
   def autosave_associated_records_for_image_blob(*args); end
 
   class << self
-    def __callbacks; end
-    def _reflections; end
-    def _validators; end
-    def attachment_reflections; end
-    def defined_enums; end
     def with_attached_image(*args, **); end
+
+    private
+
+    def __class_attr___callbacks; end
+    def __class_attr___callbacks=(new_value); end
+    def __class_attr__reflections; end
+    def __class_attr__reflections=(new_value); end
+    def __class_attr__validators; end
+    def __class_attr__validators=(new_value); end
+    def __class_attr_attachment_reflections; end
+    def __class_attr_attachment_reflections=(new_value); end
+    def __class_attr_defined_enums; end
+    def __class_attr_defined_enums=(new_value); end
   end
 end
 

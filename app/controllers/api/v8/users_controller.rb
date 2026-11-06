@@ -190,7 +190,7 @@ module Api
         unauthorize_guest! if current_user.guest?
 
         user = current_user
-        User.transaction do
+        updated = User.transaction do
           user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
           email_before = user.email
           authorize! :update, user
@@ -204,13 +204,17 @@ module Api
             user.post_new_user_to_courses_mooc_fi(params[:password])
           end
           RecentlyChangedUserDetail.email_changed.create!(old_value: email_before, new_value: user.email, username: user.login, user_id: user.id) unless T.must(email_before.casecmp(user.email)).zero?
-          return render json: {
+          true
+        end
+        if updated
+          render json: {
             message: 'User details updated.'
           }
+        else
+          render json: {
+            errors: user.errors
+          }, status: :bad_request
         end
-        render json: {
-          errors: user.errors
-        }, status: :bad_request
       end
 
       # courses.mooc.fi retries account deletion and keys off success/already_deleted/code, so a
@@ -256,20 +260,24 @@ module Api
 
         user = User.find_by!(id: params[:id])
         authorize! :update, user
-        User.transaction do
+        updated = User.transaction do
           user.password_managed_by_courses_mooc_fi = true
           user.password_hash = nil
           user.salt = nil
           user.argon_hash = nil
           user.courses_mooc_fi_user_id = params[:courses_mooc_fi_user_id]
           raise ActiveRecord::Rollback if !user.errors.empty? || !user.save
-          return render json: {
+          true
+        end
+        if updated
+          render json: {
             status: 'Password managed by courses.mooc.fi set to true and password deleted.'
           }
+        else
+          render json: {
+            errors: user.errors
+          }, status: :bad_request
         end
-        render json: {
-          errors: user.errors
-        }, status: :bad_request
       end
 
       sig { void }

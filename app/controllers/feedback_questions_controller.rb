@@ -17,6 +17,17 @@ class FeedbackQuestionsController < ApplicationController
   end
 
   sig { void }
+  def show
+    @question = FeedbackQuestion.find(params[:id])
+    @course = T.must(@question.course)
+    @organization = @course.organization
+    authorize! :manage_feedback_questions, @course
+    add_course_breadcrumb
+    add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
+    add_breadcrumb "Question #{@question.title}"
+  end
+
+  sig { void }
   def new
     @question = T.let(FeedbackQuestion.new(course: @course), T.nilable(FeedbackQuestion))
     authorize! :manage_feedback_questions, @course
@@ -40,17 +51,6 @@ class FeedbackQuestionsController < ApplicationController
       flash.now[:error] = 'Failed to create question.'
       render :new
     end
-  end
-
-  sig { void }
-  def show
-    @question = FeedbackQuestion.find(params[:id])
-    @course = T.must(@question.course)
-    @organization = @course.organization
-    authorize! :manage_feedback_questions, @course
-    add_course_breadcrumb
-    add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
-    add_breadcrumb "Question #{@question.title}"
   end
 
   sig { void }

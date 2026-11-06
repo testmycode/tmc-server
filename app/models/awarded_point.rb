@@ -59,9 +59,9 @@ class AwardedPoint < ApplicationRecord
   belongs_to :user
   belongs_to :submission, optional: true
 
+  after_destroy :kafka_update_points
   after_save :create_organization_membership
   after_save :kafka_update_points
-  after_destroy :kafka_update_points
 
   sig { params(exercise: Exercise, user: User).returns(ActiveRecord::Relation) }
   def self.exercise_user_points(exercise, user)

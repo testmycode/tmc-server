@@ -31,16 +31,10 @@ module ActiveJob
     # pkg:gem/activejob#lib/active_job/enqueuing.rb:14
     def perform_all_later(*jobs); end
 
-    # pkg:gem/activejob#lib/active_job.rb:52
-    def use_big_decimal_serializer; end
-
-    # pkg:gem/activejob#lib/active_job.rb:58
-    def use_big_decimal_serializer=(value); end
-
-    # pkg:gem/activejob#lib/active_job.rb:69
+    # pkg:gem/activejob#lib/active_job.rb:57
     def verbose_enqueue_logs; end
 
-    # pkg:gem/activejob#lib/active_job.rb:69
+    # pkg:gem/activejob#lib/active_job.rb:57
     def verbose_enqueue_logs=(_arg0); end
 
     # Returns the currently loaded version of Active Job as a +Gem::Version+.
@@ -209,9 +203,6 @@ class ActiveJob::Base
   def __callbacks; end
 
   # pkg:gem/activejob#lib/active_job/base.rb:70
-  def __callbacks?; end
-
-  # pkg:gem/activejob#lib/active_job/base.rb:70
   def _enqueue_callbacks; end
 
   # pkg:gem/activejob#lib/active_job/base.rb:70
@@ -265,9 +256,6 @@ class ActiveJob::Base
 
     # pkg:gem/activejob#lib/active_job/base.rb:70
     def __callbacks=(value); end
-
-    # pkg:gem/activejob#lib/active_job/base.rb:70
-    def __callbacks?; end
 
     # pkg:gem/activejob#lib/active_job/base.rb:70
     def _enqueue_callbacks; end
@@ -379,6 +367,86 @@ class ActiveJob::Base
 
     # pkg:gem/activejob#lib/active_job/base.rb:71
     def retry_jitter=(value); end
+
+    private
+
+    # pkg:gem/activejob#lib/active_job/base.rb:70
+    def __class_attr___callbacks; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:70
+    def __class_attr___callbacks=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:65
+    def __class_attr__queue_adapter; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:65
+    def __class_attr__queue_adapter=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:65
+    def __class_attr__queue_adapter_name; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:65
+    def __class_attr__queue_adapter_name=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/test_helper.rb:19
+    def __class_attr__test_adapter; end
+
+    # pkg:gem/activejob#lib/active_job/test_helper.rb:19
+    def __class_attr__test_adapter=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:71
+    def __class_attr_after_discard_procs; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:71
+    def __class_attr_after_discard_procs=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:68
+    def __class_attr_enqueue_after_transaction_commit; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:68
+    def __class_attr_enqueue_after_transaction_commit=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:73
+    def __class_attr_log_arguments; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:73
+    def __class_attr_log_arguments=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:67
+    def __class_attr_priority; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:67
+    def __class_attr_priority=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:66
+    def __class_attr_queue_name; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:66
+    def __class_attr_queue_name=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:66
+    def __class_attr_queue_name_delimiter; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:66
+    def __class_attr_queue_name_delimiter=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:66
+    def __class_attr_queue_name_prefix; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:66
+    def __class_attr_queue_name_prefix=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:69
+    def __class_attr_rescue_handlers; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:69
+    def __class_attr_rescue_handlers=(new_value); end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:71
+    def __class_attr_retry_jitter; end
+
+    # pkg:gem/activejob#lib/active_job/base.rb:71
+    def __class_attr_retry_jitter=(new_value); end
   end
 end
 
@@ -410,25 +478,25 @@ module ActiveJob::Callbacks
     # pkg:gem/activejob#lib/active_job/callbacks.rb:23
     def __callbacks; end
 
-    # pkg:gem/activejob#lib/active_job/callbacks.rb:23
-    def __callbacks?; end
-
     # pkg:gem/activejob#lib/active_job/callbacks.rb:24
     def _execute_callbacks; end
 
     # pkg:gem/activejob#lib/active_job/callbacks.rb:24
     def _run_execute_callbacks(&block); end
+
+    private
+
+    # pkg:gem/activejob#lib/active_job/callbacks.rb:23
+    def __class_attr___callbacks; end
   end
 
   module GeneratedClassMethods
     def __callbacks; end
     def __callbacks=(value); end
-    def __callbacks?; end
   end
 
   module GeneratedInstanceMethods
     def __callbacks; end
-    def __callbacks?; end
   end
 end
 
@@ -771,6 +839,9 @@ module ActiveJob::Core
   # pkg:gem/activejob#lib/active_job/core.rb:183
   def deserialize_arguments_if_needed; end
 
+  # pkg:gem/activejob#lib/active_job/core.rb:202
+  def deserialize_time(time); end
+
   # pkg:gem/activejob#lib/active_job/core.rb:190
   def serialize_arguments(arguments); end
 
@@ -859,12 +930,12 @@ module ActiveJob::Enqueuing
   #    my_job_instance.enqueue wait_until: Date.tomorrow.midnight
   #    my_job_instance.enqueue priority: 10
   #
-  # pkg:gem/activejob#lib/active_job/enqueuing.rb:113
+  # pkg:gem/activejob#lib/active_job/enqueuing.rb:112
   def enqueue(options = T.unsafe(nil)); end
 
   private
 
-  # pkg:gem/activejob#lib/active_job/enqueuing.rb:129
+  # pkg:gem/activejob#lib/active_job/enqueuing.rb:128
   def raw_enqueue; end
 
   module GeneratedClassMethods
@@ -877,7 +948,7 @@ end
 
 # Includes the +perform_later+ method for job initialization.
 #
-# pkg:gem/activejob#lib/active_job/enqueuing.rb:58
+# pkg:gem/activejob#lib/active_job/enqueuing.rb:57
 module ActiveJob::Enqueuing::ClassMethods
   # Push a job onto the queue. By default the arguments must be either String,
   # Integer, Float, NilClass, TrueClass, FalseClass, BigDecimal, Symbol, Date,
@@ -903,12 +974,12 @@ module ActiveJob::Enqueuing::ClassMethods
   #    self.enqueue_after_transaction_commit = false
   #  end
   #
-  # pkg:gem/activejob#lib/active_job/enqueuing.rb:82
+  # pkg:gem/activejob#lib/active_job/enqueuing.rb:81
   def perform_later(*, **, &); end
 
   private
 
-  # pkg:gem/activejob#lib/active_job/enqueuing.rb:92
+  # pkg:gem/activejob#lib/active_job/enqueuing.rb:91
   def job_or_instantiate(*args, **, &_); end
 end
 
@@ -1201,14 +1272,14 @@ class ActiveJob::LogSubscriber < ::ActiveSupport::LogSubscriber
   # pkg:gem/activejob#lib/active_job/log_subscriber.rb:145
   def args_info(job); end
 
-  # pkg:gem/activejob#lib/active_job/log_subscriber.rb:203
+  # pkg:gem/activejob#lib/active_job/log_subscriber.rb:199
+  def enqueue_source_location; end
+
+  # pkg:gem/activejob#lib/active_job/log_subscriber.rb:207
   def enqueued_jobs_message(adapter, enqueued_jobs); end
 
   # pkg:gem/activejob#lib/active_job/log_subscriber.rb:183
   def error(progname = T.unsafe(nil), &block); end
-
-  # pkg:gem/activejob#lib/active_job/log_subscriber.rb:199
-  def extract_enqueue_source_location(locations); end
 
   # pkg:gem/activejob#lib/active_job/log_subscriber.rb:154
   def format(arg); end
@@ -1238,8 +1309,19 @@ class ActiveJob::LogSubscriber < ::ActiveSupport::LogSubscriber
     # pkg:gem/activejob#lib/active_job/log_subscriber.rb:7
     def backtrace_cleaner?; end
 
+    private
+
+    # pkg:gem/activejob#lib/active_job/log_subscriber.rb:7
+    def __class_attr_backtrace_cleaner; end
+
+    # pkg:gem/activejob#lib/active_job/log_subscriber.rb:7
+    def __class_attr_backtrace_cleaner=(new_value); end
+
     # pkg:gem/activejob#lib/active_job/log_subscriber.rb:27
-    def log_levels; end
+    def __class_attr_log_levels; end
+
+    # pkg:gem/activejob#lib/active_job/log_subscriber.rb:27
+    def __class_attr_log_levels=(new_value); end
   end
 end
 
@@ -1319,14 +1401,14 @@ module ActiveJob::QueueAdapter::ClassMethods
 
   private
 
-  # pkg:gem/activejob#lib/active_job/queue_adapter.rb:65
+  # pkg:gem/activejob#lib/active_job/queue_adapter.rb:66
   def assign_adapter(adapter_name, queue_adapter); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapter.rb:72
+  # pkg:gem/activejob#lib/active_job/queue_adapter.rb:73
   def queue_adapter?(object); end
 end
 
-# pkg:gem/activejob#lib/active_job/queue_adapter.rb:70
+# pkg:gem/activejob#lib/active_job/queue_adapter.rb:71
 ActiveJob::QueueAdapter::ClassMethods::QUEUE_ADAPTER_METHODS = T.let(T.unsafe(nil), Array)
 
 # = Active Job adapters
@@ -1340,7 +1422,6 @@ ActiveJob::QueueAdapter::ClassMethods::QUEUE_ADAPTER_METHODS = T.let(T.unsafe(ni
 # * {Resque}[https://github.com/resque/resque]
 # * {Sidekiq}[https://sidekiq.org]
 # * {Sneakers}[https://github.com/jondot/sneakers]
-# * {Sucker Punch}[https://github.com/brandonhilkert/sucker_punch]
 # * Please Note: We are not accepting pull requests for new adapters. See the {README}[link:files/activejob/README_md.html] for more details.
 #
 # For testing and development Active Job has three built-in adapters:
@@ -1360,7 +1441,6 @@ ActiveJob::QueueAdapter::ClassMethods::QUEUE_ADAPTER_METHODS = T.let(T.unsafe(ni
 #   | Resque            | Yes   | Yes    | Yes (Gem)  | Queue      | Global  | Yes     |
 #   | Sidekiq           | Yes   | Yes    | Yes        | Queue      | No      | Job     |
 #   | Sneakers          | Yes   | Yes    | No         | Queue      | Queue   | No      |
-#   | Sucker Punch      | Yes   | Yes    | Yes        | No         | No      | No      |
 #   | Active Job Async  | Yes   | Yes    | Yes        | No         | No      | No      |
 #   | Active Job Inline | No    | Yes    | N/A        | N/A        | N/A     | N/A     |
 #   | Active Job Test   | No    | Yes    | N/A        | N/A        | N/A     | N/A     |
@@ -1439,7 +1519,7 @@ ActiveJob::QueueAdapter::ClassMethods::QUEUE_ADAPTER_METHODS = T.let(T.unsafe(ni
 # N/A: The adapter does not run in a separate process, and therefore doesn't
 # support retries.
 #
-# pkg:gem/activejob#lib/active_job/queue_adapters.rb:114
+# pkg:gem/activejob#lib/active_job/queue_adapters.rb:112
 module ActiveJob::QueueAdapters
   extend ::ActiveSupport::Autoload
 
@@ -1449,12 +1529,12 @@ module ActiveJob::QueueAdapters
     #   ActiveJob::QueueAdapters.lookup(:sidekiq)
     #   # => ActiveJob::QueueAdapters::SidekiqAdapter
     #
-    # pkg:gem/activejob#lib/active_job/queue_adapters.rb:138
+    # pkg:gem/activejob#lib/active_job/queue_adapters.rb:135
     def lookup(name); end
   end
 end
 
-# pkg:gem/activejob#lib/active_job/queue_adapters.rb:130
+# pkg:gem/activejob#lib/active_job/queue_adapters.rb:127
 ActiveJob::QueueAdapters::ADAPTER = T.let(T.unsafe(nil), String)
 
 # = Active Job Abstract Adapter
@@ -1464,18 +1544,10 @@ ActiveJob::QueueAdapters::ADAPTER = T.let(T.unsafe(nil), String)
 #
 # pkg:gem/activejob#lib/active_job/queue_adapters/abstract_adapter.rb:9
 class ActiveJob::QueueAdapters::AbstractAdapter
-  # pkg:gem/activejob#lib/active_job/queue_adapters/abstract_adapter.rb:18
+  # pkg:gem/activejob#lib/active_job/queue_adapters/abstract_adapter.rb:10
   def enqueue(job); end
 
-  # Defines whether enqueuing should happen implicitly to after commit when called
-  # from inside a transaction. Most adapters should return true, but some adapters
-  # that use the same database as Active Record and are transaction aware can return
-  # false to continue enqueuing jobs as part of the transaction.
-  #
   # pkg:gem/activejob#lib/active_job/queue_adapters/abstract_adapter.rb:14
-  def enqueue_after_transaction_commit?; end
-
-  # pkg:gem/activejob#lib/active_job/queue_adapters/abstract_adapter.rb:22
   def enqueue_at(job, timestamp); end
 end
 
@@ -1581,13 +1653,10 @@ ActiveJob::QueueAdapters::AsyncAdapter::Scheduler::DEFAULT_EXECUTOR_OPTIONS = T.
 #
 # pkg:gem/activejob#lib/active_job/queue_adapters/inline_adapter.rb:13
 class ActiveJob::QueueAdapters::InlineAdapter < ::ActiveJob::QueueAdapters::AbstractAdapter
-  # pkg:gem/activejob#lib/active_job/queue_adapters/inline_adapter.rb:18
+  # pkg:gem/activejob#lib/active_job/queue_adapters/inline_adapter.rb:14
   def enqueue(job); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/inline_adapter.rb:14
-  def enqueue_after_transaction_commit?; end
-
-  # pkg:gem/activejob#lib/active_job/queue_adapters/inline_adapter.rb:22
+  # pkg:gem/activejob#lib/active_job/queue_adapters/inline_adapter.rb:18
   def enqueue_at(*); end
 end
 
@@ -1603,33 +1672,21 @@ end
 #
 # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:14
 class ActiveJob::QueueAdapters::TestAdapter < ::ActiveJob::QueueAdapters::AbstractAdapter
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:18
-  def initialize(enqueue_after_transaction_commit: T.unsafe(nil)); end
-
   # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:15
   def at; end
 
   # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:15
   def at=(_arg0); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:36
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:28
   def enqueue(job); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:15
-  def enqueue_after_transaction_commit; end
-
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:15
-  def enqueue_after_transaction_commit=(_arg0); end
-
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:22
-  def enqueue_after_transaction_commit?; end
-
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:41
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:33
   def enqueue_at(job, timestamp); end
 
   # Provides a store of all the enqueued jobs with the TestAdapter so you can check them.
   #
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:27
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:19
   def enqueued_jobs; end
 
   # Provides a store of all the enqueued jobs with the TestAdapter so you can check them.
@@ -1657,7 +1714,7 @@ class ActiveJob::QueueAdapters::TestAdapter < ::ActiveJob::QueueAdapters::Abstra
 
   # Provides a store of all the performed jobs with the TestAdapter so you can check them.
   #
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:32
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:24
   def performed_jobs; end
 
   # Provides a store of all the performed jobs with the TestAdapter so you can check them.
@@ -1679,25 +1736,25 @@ class ActiveJob::QueueAdapters::TestAdapter < ::ActiveJob::QueueAdapters::Abstra
 
   private
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:87
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:79
   def filter_as_proc(filter); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:65
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:57
   def filtered?(job); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:79
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:71
   def filtered_job_class?(job); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:73
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:65
   def filtered_queue?(job); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:69
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:61
   def filtered_time?(job); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:47
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:39
   def job_to_hash(job, extras = T.unsafe(nil)); end
 
-  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:56
+  # pkg:gem/activejob#lib/active_job/queue_adapters/test_adapter.rb:48
   def perform_or_enqueue(perform, job, job_data); end
 end
 
@@ -1883,45 +1940,45 @@ class ActiveJob::SerializationError < ::ArgumentError; end
 # The +ActiveJob::Serializers+ module is used to store a list of known serializers
 # and to add new ones. It also has helpers to serialize/deserialize objects.
 #
-# pkg:gem/activejob#lib/active_job/serializers.rb:10
+# pkg:gem/activejob#lib/active_job/serializers.rb:8
 module ActiveJob::Serializers
   extend ::ActiveSupport::Autoload
 
-  # pkg:gem/activejob#lib/active_job/serializers.rb:25
+  # pkg:gem/activejob#lib/active_job/serializers.rb:23
   def _additional_serializers; end
 
-  # pkg:gem/activejob#lib/active_job/serializers.rb:25
+  # pkg:gem/activejob#lib/active_job/serializers.rb:23
   def _additional_serializers=(val); end
 
   class << self
-    # pkg:gem/activejob#lib/active_job/serializers.rb:25
+    # pkg:gem/activejob#lib/active_job/serializers.rb:23
     def _additional_serializers; end
 
-    # pkg:gem/activejob#lib/active_job/serializers.rb:25
+    # pkg:gem/activejob#lib/active_job/serializers.rb:23
     def _additional_serializers=(val); end
 
     # Adds new serializers to a list of known serializers.
     #
-    # pkg:gem/activejob#lib/active_job/serializers.rb:57
+    # pkg:gem/activejob#lib/active_job/serializers.rb:55
     def add_serializers(*new_serializers); end
 
     # Returns deserialized object.
     # Will look up through all known serializers.
     # If no serializer found will raise <tt>ArgumentError</tt>.
     #
-    # pkg:gem/activejob#lib/active_job/serializers.rb:41
+    # pkg:gem/activejob#lib/active_job/serializers.rb:39
     def deserialize(argument); end
 
     # Returns serialized representative of the passed object.
     # Will look up through all known serializers.
     # Raises ActiveJob::SerializationError if it can't find a proper serializer.
     #
-    # pkg:gem/activejob#lib/active_job/serializers.rb:32
+    # pkg:gem/activejob#lib/active_job/serializers.rb:30
     def serialize(argument); end
 
     # Returns list of known serializers.
     #
-    # pkg:gem/activejob#lib/active_job/serializers.rb:52
+    # pkg:gem/activejob#lib/active_job/serializers.rb:50
     def serializers; end
   end
 end
@@ -2707,7 +2764,7 @@ ActiveJob::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActiveJob::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
 
 # pkg:gem/activejob#lib/active_job/gem_version.rb:13
-ActiveJob::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
+ActiveJob::VERSION::PRE = T.let(T.unsafe(nil), String)
 
 # pkg:gem/activejob#lib/active_job/gem_version.rb:15
 ActiveJob::VERSION::STRING = T.let(T.unsafe(nil), String)
