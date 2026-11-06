@@ -62,6 +62,10 @@ class ActiveSupport::HashWithIndifferentAccess < Hash
         ).returns(T.type_parameter(:ConflictRes))
       )).returns(ActiveSupport::HashWithIndifferentAccess) }
   def deep_merge!(other_hash, &block); end
+
+  # @version >= 7.2
+  sig { params(other: T.untyped).returns(T::Boolean) }
+  def deep_merge?(other); end
 end
 
 module ActiveSupport::Testing::SetupAndTeardown::ClassMethods
@@ -153,6 +157,10 @@ class Hash
         ).returns(T.type_parameter(:ConflictRes))
       )).returns(T::Hash[T.any(K, T.type_parameter(:K2)), T.any(V, T.type_parameter(:V2), T.type_parameter(:ConflictRes))]) }
   def deep_merge!(other_hash, &block); end
+
+  # @version >= 7.2
+  sig { params(other: T.untyped).returns(T::Boolean) }
+  def deep_merge?(other); end
 end
 
 class Array
@@ -541,6 +549,10 @@ class ActiveSupport::ErrorReporter
   # @version >= 7.1.0.beta1
   sig { params(error: Exception, handled: T::Boolean, severity: T.nilable(Symbol), context: T::Hash[Symbol, T.untyped], source: T.nilable(String)).void }
   def report(error, handled: true, severity: T.unsafe(nil), context: T.unsafe(nil), source: T.unsafe(nil)); end
+
+  # @version >= 7.2.0.beta1
+  sig { params(error: T.any(Exception, String), severity: T.nilable(Symbol), context: T::Hash[Symbol, T.untyped], source: T.nilable(String)).void }
+  def unexpected(error, severity: T.unsafe(nil), context: T.unsafe(nil), source: T.unsafe(nil)); end
 end
 
 module ActiveSupport::Testing::Assertions

@@ -134,11 +134,25 @@ class ActiveStorage::Attachment
     end
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[::ActiveStorage::Attachment])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[::ActiveStorage::Attachment])])
+      ).returns(T::Array[::ActiveStorage::Attachment])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::ActiveStorage::Attachment]) }
     def destroy_all; end
@@ -490,6 +504,9 @@ class ActiveStorage::Attachment
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateAssociationRelation) }
@@ -624,6 +641,9 @@ class ActiveStorage::Attachment
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with_all_variant_records(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -1041,6 +1061,9 @@ class ActiveStorage::Attachment
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateRelation) }
@@ -1177,6 +1200,9 @@ class ActiveStorage::Attachment
     def with_all_variant_records(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -1273,20 +1299,6 @@ class ActiveStorage::Attachment
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[::ActiveStorage::Attachment])])
-      ).returns(T::Array[::ActiveStorage::Attachment])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[T.any(::ActiveStorage::Attachment, Integer, String, T::Enumerable[::ActiveStorage::Attachment])])
-      ).returns(T::Array[::ActiveStorage::Attachment])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::ActiveStorage::Attachment]) }
     def load_target; end

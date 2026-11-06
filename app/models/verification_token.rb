@@ -8,7 +8,7 @@ class VerificationToken < ApplicationRecord
 
   belongs_to :user
 
-  enum type: %i[email delete_user]
+  enum :type, %i[email delete_user]
 
   validates :type, presence: true
   validates :user, presence: true

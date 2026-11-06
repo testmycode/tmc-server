@@ -133,11 +133,25 @@ class ActiveRecord::SessionStore::Session
     end
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[::ActiveRecord::SessionStore::Session])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[::ActiveRecord::SessionStore::Session])])
+      ).returns(T::Array[::ActiveRecord::SessionStore::Session])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::ActiveRecord::SessionStore::Session]) }
     def destroy_all; end
@@ -442,6 +456,9 @@ class ActiveRecord::SessionStore::Session
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateAssociationRelation) }
@@ -573,6 +590,9 @@ class ActiveRecord::SessionStore::Session
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -933,6 +953,9 @@ class ActiveRecord::SessionStore::Session
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateRelation) }
@@ -1066,6 +1089,9 @@ class ActiveRecord::SessionStore::Session
     def with(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -1162,20 +1188,6 @@ class ActiveRecord::SessionStore::Session
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[::ActiveRecord::SessionStore::Session])])
-      ).returns(T::Array[::ActiveRecord::SessionStore::Session])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[T.any(::ActiveRecord::SessionStore::Session, Integer, String, T::Enumerable[::ActiveRecord::SessionStore::Session])])
-      ).returns(T::Array[::ActiveRecord::SessionStore::Session])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::ActiveRecord::SessionStore::Session]) }
     def load_target; end

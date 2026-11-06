@@ -271,7 +271,7 @@ module Benchmark
     def measure(label = T.unsafe(nil)); end
 
     # pkg:gem/benchmark#lib/benchmark.rb:341
-    def ms(&block); end
+    def ms; end
 
     # pkg:gem/benchmark#lib/benchmark.rb:341
     def realtime; end

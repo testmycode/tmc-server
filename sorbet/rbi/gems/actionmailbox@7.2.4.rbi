@@ -6,7 +6,7 @@
 
 
 # :markup: markdown
-# :include: actionmailbox/README.md
+# :include: ../README.md
 #
 # pkg:gem/actionmailbox#lib/action_mailbox/gem_version.rb:3
 module ActionMailbox
@@ -223,7 +223,7 @@ class ActionMailbox::Base
   def inbound_email; end
 
   # pkg:gem/actionmailbox#lib/action_mailbox/base.rb:73
-  def logger(&block); end
+  def logger(&); end
 
   # pkg:gem/actionmailbox#lib/action_mailbox/base.rb:71
   def mail(*, **, &); end
@@ -296,7 +296,7 @@ end
 class ActionMailbox::BaseController < ::ActionController::Base
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def authenticate_by_password; end
   def ensure_configured; end
   def ingress_name; end
@@ -367,6 +367,26 @@ class ActionMailbox::InboundEmail < ::ActionMailbox::Record
   def mail; end
   def processed?; end
   def source; end
+
+  class << self
+    def __callbacks; end
+    def _reflections; end
+    def _validators; end
+    def attachment_reflections; end
+    def bounced(*args, **); end
+    def defined_enums; end
+    def delivered(*args, **); end
+    def failed(*args, **); end
+    def not_bounced(*args, **); end
+    def not_delivered(*args, **); end
+    def not_failed(*args, **); end
+    def not_pending(*args, **); end
+    def not_processing(*args, **); end
+    def pending(*args, **); end
+    def processing(*args, **); end
+    def statuses; end
+    def with_attached_raw_email(*args, **); end
+  end
 end
 
 module ActionMailbox::InboundEmail::GeneratedAssociationMethods
@@ -449,7 +469,7 @@ class ActionMailbox::Ingresses::Mailgun::InboundEmailsController < ::ActionMailb
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def authenticate; end
   def authenticated?; end
   def key; end
@@ -485,7 +505,7 @@ class ActionMailbox::Ingresses::Mandrill::InboundEmailsController < ::ActionMail
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def authenticate; end
   def authenticated?; end
   def events; end
@@ -519,7 +539,7 @@ class ActionMailbox::Ingresses::Postmark::InboundEmailsController < ::ActionMail
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
 
   class << self
     def __callbacks; end
@@ -534,7 +554,7 @@ class ActionMailbox::Ingresses::Relay::InboundEmailsController < ::ActionMailbox
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def require_valid_rfc822_message; end
 
   class << self
@@ -550,7 +570,7 @@ class ActionMailbox::Ingresses::Sendgrid::InboundEmailsController < ::ActionMail
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def envelope; end
   def mail; end
 
@@ -563,6 +583,11 @@ end
 class ActionMailbox::Record < ::ActiveRecord::Base
   include ::ActionMailbox::Record::GeneratedAttributeMethods
   include ::ActionMailbox::Record::GeneratedAssociationMethods
+
+  class << self
+    def _validators; end
+    def defined_enums; end
+  end
 end
 
 module ActionMailbox::Record::GeneratedAssociationMethods; end
@@ -756,7 +781,7 @@ ActionMailbox::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActionMailbox::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
 
 # pkg:gem/actionmailbox#lib/action_mailbox/gem_version.rb:13
-ActionMailbox::VERSION::PRE = T.let(T.unsafe(nil), String)
+ActionMailbox::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
 
 # pkg:gem/actionmailbox#lib/action_mailbox/gem_version.rb:15
 ActionMailbox::VERSION::STRING = T.let(T.unsafe(nil), String)
@@ -826,7 +851,7 @@ class Rails::Conductor::ActionMailbox::InboundEmails::SourcesController < ::Rail
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
 
   class << self
     def middleware_stack; end
@@ -841,7 +866,7 @@ class Rails::Conductor::ActionMailbox::InboundEmailsController < ::Rails::Conduc
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def create_inbound_email(mail); end
   def mail_params; end
   def new_mail; end
@@ -856,7 +881,7 @@ class Rails::Conductor::ActionMailbox::IncineratesController < ::Rails::Conducto
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
 
   class << self
     def middleware_stack; end
@@ -868,7 +893,7 @@ class Rails::Conductor::ActionMailbox::ReroutesController < ::Rails::Conductor::
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def reroute(inbound_email); end
 
   class << self
@@ -879,7 +904,7 @@ end
 class Rails::Conductor::BaseController < ::ActionController::Base
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def ensure_development_env; end
 
   class << self

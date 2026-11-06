@@ -39801,6 +39801,9 @@ class RuboCop::Cop::Style::MutableConstant < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::ConfigurableEnforcedStyle
   extend ::RuboCop::Cop::AutoCorrector
 
+  # pkg:gem/rubocop#lib/rubocop/cop/style/mutable_constant.rb:141
+  def on_assignment(value); end
+
   # pkg:gem/rubocop#lib/rubocop/cop/style/mutable_constant.rb:127
   def on_casgn(node); end
 
@@ -39832,9 +39835,6 @@ class RuboCop::Cop::Style::MutableConstant < ::RuboCop::Cop::Base
 
   # pkg:gem/rubocop#lib/rubocop/cop/style/mutable_constant.rb:184
   def mutable_literal?(value); end
-
-  # pkg:gem/rubocop#lib/rubocop/cop/style/mutable_constant.rb:141
-  def on_assignment(value); end
 
   # pkg:gem/rubocop#lib/rubocop/cop/style/mutable_constant.rb:204
   def requires_parentheses?(node); end

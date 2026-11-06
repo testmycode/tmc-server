@@ -117,11 +117,25 @@ class ActionToken
     end
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::ActionToken, Integer, String, T::Enumerable[T.any(::ActionToken, Integer, String, T::Enumerable[::ActionToken])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::ActionToken, Integer, String, T::Enumerable[T.any(::ActionToken, Integer, String, T::Enumerable[::ActionToken])])
+      ).returns(T::Array[::ActionToken])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::ActionToken]) }
     def destroy_all; end
@@ -454,6 +468,9 @@ class ActionToken
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def confirm_email(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
@@ -599,6 +616,9 @@ class ActionToken
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -1073,6 +1093,9 @@ class ActionToken
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def confirm_email(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
@@ -1220,6 +1243,9 @@ class ActionToken
     def with(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -1316,20 +1342,6 @@ class ActionToken
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActionToken, Integer, String, T::Enumerable[T.any(::ActionToken, Integer, String, T::Enumerable[::ActionToken])])
-      ).returns(T::Array[::ActionToken])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActionToken, Integer, String, T::Enumerable[T.any(::ActionToken, Integer, String, T::Enumerable[::ActionToken])])
-      ).returns(T::Array[::ActionToken])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::ActionToken]) }
     def load_target; end

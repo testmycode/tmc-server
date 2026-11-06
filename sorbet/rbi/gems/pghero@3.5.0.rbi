@@ -407,6 +407,14 @@ end
 class PgHero::Connection < ::ActiveRecord::Base
   include ::PgHero::Connection::GeneratedAttributeMethods
   include ::PgHero::Connection::GeneratedAssociationMethods
+
+  class << self
+    # pkg:gem/pghero#lib/pghero/connection.rb:2
+    def _validators; end
+
+    # pkg:gem/pghero#lib/pghero/connection.rb:2
+    def defined_enums; end
+  end
 end
 
 # pkg:gem/pghero#lib/pghero/connection.rb:2
@@ -565,7 +573,7 @@ class PgHero::HomeController < ::ActionController::Base
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
 
   class << self
     def __callbacks; end
@@ -1157,6 +1165,14 @@ class PgHero::NotEnabled < ::PgHero::Error; end
 class PgHero::QueryStats < ::PgHero::Stats
   include ::PgHero::QueryStats::GeneratedAttributeMethods
   include ::PgHero::QueryStats::GeneratedAssociationMethods
+
+  class << self
+    # pkg:gem/pghero#lib/pghero/query_stats.rb:2
+    def _validators; end
+
+    # pkg:gem/pghero#lib/pghero/query_stats.rb:2
+    def defined_enums; end
+  end
 end
 
 # pkg:gem/pghero#lib/pghero/query_stats.rb:2
@@ -1169,6 +1185,14 @@ module PgHero::QueryStats::GeneratedAttributeMethods; end
 class PgHero::SpaceStats < ::PgHero::Stats
   include ::PgHero::SpaceStats::GeneratedAttributeMethods
   include ::PgHero::SpaceStats::GeneratedAssociationMethods
+
+  class << self
+    # pkg:gem/pghero#lib/pghero/space_stats.rb:2
+    def _validators; end
+
+    # pkg:gem/pghero#lib/pghero/space_stats.rb:2
+    def defined_enums; end
+  end
 end
 
 # pkg:gem/pghero#lib/pghero/space_stats.rb:2
@@ -1181,6 +1205,14 @@ module PgHero::SpaceStats::GeneratedAttributeMethods; end
 class PgHero::Stats < ::ActiveRecord::Base
   include ::PgHero::Stats::GeneratedAttributeMethods
   include ::PgHero::Stats::GeneratedAssociationMethods
+
+  class << self
+    # pkg:gem/pghero#lib/pghero/stats.rb:2
+    def _validators; end
+
+    # pkg:gem/pghero#lib/pghero/stats.rb:2
+    def defined_enums; end
+  end
 end
 
 # pkg:gem/pghero#lib/pghero/stats.rb:2

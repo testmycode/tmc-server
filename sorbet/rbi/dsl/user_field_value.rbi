@@ -113,11 +113,25 @@ class UserFieldValue
     end
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::UserFieldValue, Integer, String, T::Enumerable[T.any(::UserFieldValue, Integer, String, T::Enumerable[::UserFieldValue])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::UserFieldValue, Integer, String, T::Enumerable[T.any(::UserFieldValue, Integer, String, T::Enumerable[::UserFieldValue])])
+      ).returns(T::Array[::UserFieldValue])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::UserFieldValue]) }
     def destroy_all; end
@@ -435,6 +449,9 @@ class UserFieldValue
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateAssociationRelation) }
@@ -566,6 +583,9 @@ class UserFieldValue
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -983,6 +1003,9 @@ class UserFieldValue
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateRelation) }
@@ -1116,6 +1139,9 @@ class UserFieldValue
     def with(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -1212,20 +1238,6 @@ class UserFieldValue
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::UserFieldValue, Integer, String, T::Enumerable[T.any(::UserFieldValue, Integer, String, T::Enumerable[::UserFieldValue])])
-      ).returns(T::Array[::UserFieldValue])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::UserFieldValue, Integer, String, T::Enumerable[T.any(::UserFieldValue, Integer, String, T::Enumerable[::UserFieldValue])])
-      ).returns(T::Array[::UserFieldValue])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::UserFieldValue]) }
     def load_target; end

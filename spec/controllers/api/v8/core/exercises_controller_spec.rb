@@ -60,7 +60,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
       it 'should show appropriate error' do
         get :show, params: { id: 741 }
         expect(response).to have_http_status :not_found
-        expect(response.body).to include "Couldn't find Exercise with 'id'=741"
+        expect(response.parsed_body['errors']).to eq(["Couldn't find Exercise with 'id'=\"741\""])
       end
     end
   end

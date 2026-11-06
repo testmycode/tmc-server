@@ -16,7 +16,7 @@ class ActionToken < ApplicationRecord
 
   before_create :randomize_token
 
-  enum action: %i[confirm_email reset_password enroll_course]
+  enum :action, %i[confirm_email reset_password enroll_course]
 
   sig { params(user: User).returns(ActionToken) }
   def self.generate_password_reset_key_for(user)

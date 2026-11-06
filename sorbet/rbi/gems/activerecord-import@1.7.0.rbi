@@ -28,9 +28,9 @@ end
 
 # pkg:gem/activerecord-import#lib/activerecord-import/import.rb:262
 class ActiveRecord::Base
-  include ::ActiveModel::Access
   include ::ActiveModel::ForbiddenAttributesProtection
   include ::ActiveModel::AttributeAssignment
+  include ::ActiveModel::Access
   include ::ActiveModel::Serialization
   extend ::ActiveRecord::Import::Connection
 
@@ -295,10 +295,10 @@ class ActiveRecord::Base
     # pkg:gem/activerecord-import#lib/activerecord-import/import.rb:546
     def bulk_import!(*args); end
 
-    # pkg:gem/activerecord-import#lib/activerecord-import/import.rb:530
+    # pkg:gem/activerecord-import#lib/activerecord-import/import.rb:541
     def import(*args); end
 
-    # pkg:gem/activerecord-import#lib/activerecord-import/import.rb:546
+    # pkg:gem/activerecord-import#lib/activerecord-import/import.rb:553
     def import!(*args); end
 
     # pkg:gem/activerecord-import#lib/activerecord-import/import.rb:555

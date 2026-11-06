@@ -83,11 +83,25 @@ class Review
     sig { params(attributes: T.untyped, block: T.nilable(T.proc.params(object: ::Review).void)).returns(::Review) }
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::Review, Integer, String, T::Enumerable[T.any(::Review, Integer, String, T::Enumerable[::Review])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::Review, Integer, String, T::Enumerable[T.any(::Review, Integer, String, T::Enumerable[::Review])])
+      ).returns(T::Array[::Review])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::Review]) }
     def destroy_all; end
@@ -407,6 +421,9 @@ class Review
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateAssociationRelation) }
@@ -534,6 +551,9 @@ class Review
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -1065,6 +1085,9 @@ class Review
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateRelation) }
@@ -1194,6 +1217,9 @@ class Review
     def with(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -1290,20 +1316,6 @@ class Review
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::Review, Integer, String, T::Enumerable[T.any(::Review, Integer, String, T::Enumerable[::Review])])
-      ).returns(T::Array[::Review])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::Review, Integer, String, T::Enumerable[T.any(::Review, Integer, String, T::Enumerable[::Review])])
-      ).returns(T::Array[::Review])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::Review]) }
     def load_target; end

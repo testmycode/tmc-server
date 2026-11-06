@@ -90,11 +90,25 @@ class Course
     sig { params(attributes: T.untyped, block: T.nilable(T.proc.params(object: ::Course).void)).returns(::Course) }
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::Course, Integer, String, T::Enumerable[T.any(::Course, Integer, String, T::Enumerable[::Course])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::Course, Integer, String, T::Enumerable[T.any(::Course, Integer, String, T::Enumerable[::Course])])
+      ).returns(T::Array[::Course])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::Course]) }
     def destroy_all; end
@@ -640,6 +654,9 @@ class Course
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def assisted_courses(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
@@ -824,6 +841,9 @@ class Course
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with_certificates_for(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -2788,6 +2808,9 @@ class Course
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def assisted_courses(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
@@ -2974,6 +2997,9 @@ class Course
     def with_certificates_for(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -3070,20 +3096,6 @@ class Course
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::Course, Integer, String, T::Enumerable[T.any(::Course, Integer, String, T::Enumerable[::Course])])
-      ).returns(T::Array[::Course])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::Course, Integer, String, T::Enumerable[T.any(::Course, Integer, String, T::Enumerable[::Course])])
-      ).returns(T::Array[::Course])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::Course]) }
     def load_target; end

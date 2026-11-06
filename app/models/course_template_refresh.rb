@@ -9,7 +9,7 @@ class CourseTemplateRefresh < ApplicationRecord
   has_one :course_template_refresh_report, dependent: :destroy
   after_create :create_first_course_template_refresh_phase
 
-  enum status: %i[not_started in_progress complete crashed]
+  enum :status, %i[not_started in_progress complete crashed]
 
   sig { params(phase_name: T.untyped, time_ms: T.untyped).returns(CourseTemplateRefreshPhase) }
   def create_phase(phase_name, time_ms)

@@ -69,16 +69,16 @@ module FactoryBot
     def lint(*args); end
 
     # pkg:gem/factory_bot#lib/factory_bot.rb:83
-    def register_strategy(strategy_name, strategy_class, &block); end
+    def register_strategy(strategy_name, strategy_class, &); end
 
     # pkg:gem/factory_bot#lib/factory_bot/reload.rb:2
     def reload; end
 
     # pkg:gem/factory_bot#lib/factory_bot.rb:83
-    def rewind_sequences(&block); end
+    def rewind_sequences(&); end
 
     # pkg:gem/factory_bot#lib/factory_bot.rb:83
-    def strategy_by_name(name, &block); end
+    def strategy_by_name(name, &); end
 
     # pkg:gem/factory_bot#lib/factory_bot.rb:54
     def use_parent_strategy; end

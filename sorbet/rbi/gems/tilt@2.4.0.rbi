@@ -604,15 +604,15 @@ end
 class Tilt::SassTemplate < ::Tilt::StaticTemplate
   private
 
-  # pkg:gem/tilt#lib/tilt/sass.rb:53
+  # pkg:gem/tilt#lib/tilt/sass.rb:25
   def _prepare_output; end
 
-  # pkg:gem/tilt#lib/tilt/sass.rb:57
+  # pkg:gem/tilt#lib/tilt/sass.rb:29
   def sass_options; end
 end
 
-# pkg:gem/tilt#lib/tilt/sass.rb:41
-Tilt::SassTemplate::Engine = SassC::Engine
+# pkg:gem/tilt#lib/tilt/sass.rb:16
+Tilt::SassTemplate::ALLOWED_KEYS = T.let(T.unsafe(nil), Array)
 
 # pkg:gem/tilt#lib/tilt/sass.rb:67
 class Tilt::ScssTemplate < ::Tilt::SassTemplate

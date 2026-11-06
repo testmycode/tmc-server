@@ -113,11 +113,25 @@ class Assistantship
     end
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::Assistantship, Integer, String, T::Enumerable[T.any(::Assistantship, Integer, String, T::Enumerable[::Assistantship])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::Assistantship, Integer, String, T::Enumerable[T.any(::Assistantship, Integer, String, T::Enumerable[::Assistantship])])
+      ).returns(T::Array[::Assistantship])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::Assistantship]) }
     def destroy_all; end
@@ -462,6 +476,9 @@ class Assistantship
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateAssociationRelation) }
@@ -589,6 +606,9 @@ class Assistantship
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -949,6 +969,9 @@ class Assistantship
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateRelation) }
@@ -1078,6 +1101,9 @@ class Assistantship
     def with(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -1174,20 +1200,6 @@ class Assistantship
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::Assistantship, Integer, String, T::Enumerable[T.any(::Assistantship, Integer, String, T::Enumerable[::Assistantship])])
-      ).returns(T::Array[::Assistantship])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::Assistantship, Integer, String, T::Enumerable[T.any(::Assistantship, Integer, String, T::Enumerable[::Assistantship])])
-      ).returns(T::Array[::Assistantship])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::Assistantship]) }
     def load_target; end

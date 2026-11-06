@@ -129,11 +129,25 @@ class OrganizationMembership
     end
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::OrganizationMembership, Integer, String, T::Enumerable[T.any(::OrganizationMembership, Integer, String, T::Enumerable[::OrganizationMembership])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::OrganizationMembership, Integer, String, T::Enumerable[T.any(::OrganizationMembership, Integer, String, T::Enumerable[::OrganizationMembership])])
+      ).returns(T::Array[::OrganizationMembership])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::OrganizationMembership]) }
     def destroy_all; end
@@ -494,6 +508,9 @@ class OrganizationMembership
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateAssociationRelation) }
@@ -625,6 +642,9 @@ class OrganizationMembership
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def with(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
@@ -985,6 +1005,9 @@ class OrganizationMembership
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateRelation) }
@@ -1118,6 +1141,9 @@ class OrganizationMembership
     def with(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
   end
 
@@ -1214,20 +1240,6 @@ class OrganizationMembership
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::OrganizationMembership, Integer, String, T::Enumerable[T.any(::OrganizationMembership, Integer, String, T::Enumerable[::OrganizationMembership])])
-      ).returns(T::Array[::OrganizationMembership])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::OrganizationMembership, Integer, String, T::Enumerable[T.any(::OrganizationMembership, Integer, String, T::Enumerable[::OrganizationMembership])])
-      ).returns(T::Array[::OrganizationMembership])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::OrganizationMembership]) }
     def load_target; end

@@ -203,10 +203,10 @@ class LogStasher::ActionView::LogSubscriber < ::ActionView::LogSubscriber
   # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:18
   def logger; end
 
-  # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:12
+  # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:16
   def render_collection(event); end
 
-  # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:12
+  # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:15
   def render_partial(event); end
 
   # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:12
@@ -295,7 +295,7 @@ class LogStasher::ActiveRecord::LogSubscriber < ::ActiveRecord::LogSubscriber
   # pkg:gem/logstasher#lib/logstasher/active_record/log_subscriber.rb:18
   def logger; end
 
-  # pkg:gem/logstasher#lib/logstasher/active_record/log_subscriber.rb:12
+  # pkg:gem/logstasher#lib/logstasher/active_record/log_subscriber.rb:16
   def sql(event); end
 
   private

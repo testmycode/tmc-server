@@ -87,6 +87,23 @@ class Doorkeeper::AccessGrant < ::ActiveRecord::Base
 
   # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_grant.rb:7
   def generate_token; end
+
+  class << self
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_grant.rb:7
+    def __callbacks; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_grant.rb:7
+    def _reflections; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_grant.rb:6
+    def _validators; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_grant.rb:6
+    def defined_enums; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_grant.rb:7
+    def strict_loading_by_default; end
+  end
 end
 
 # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_grant.rb:6
@@ -225,6 +242,23 @@ class Doorkeeper::AccessToken < ::ActiveRecord::Base
 
   # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_token.rb:7
   def use_refresh_token=(_arg0); end
+
+  class << self
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_token.rb:7
+    def __callbacks; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_token.rb:7
+    def _reflections; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_token.rb:6
+    def _validators; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_token.rb:6
+    def defined_enums; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_token.rb:7
+    def strict_loading_by_default; end
+  end
 end
 
 # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/access_token.rb:6
@@ -710,6 +744,23 @@ class Doorkeeper::Application < ::ActiveRecord::Base
 
   # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/application.rb:8
   def secret_generator; end
+
+  class << self
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/application.rb:8
+    def __callbacks; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/application.rb:8
+    def _reflections; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/application.rb:7
+    def _validators; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/application.rb:7
+    def defined_enums; end
+
+    # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/application.rb:8
+    def strict_loading_by_default; end
+  end
 end
 
 # pkg:gem/doorkeeper#lib/doorkeeper/orm/active_record/application.rb:7
@@ -772,7 +823,7 @@ class Doorkeeper::ApplicationController < ::ActionController::Base
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
 
   class << self
     def __callbacks; end
@@ -883,7 +934,7 @@ class Doorkeeper::ApplicationsController < ::Doorkeeper::ApplicationController
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def application_params; end
   def i18n_scope(action); end
   def set_application; end
@@ -903,7 +954,7 @@ class Doorkeeper::AuthorizationsController < ::Doorkeeper::ApplicationController
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
   def after_successful_authorization(context); end
   def authorization; end
   def authorize_response; end
@@ -932,7 +983,7 @@ class Doorkeeper::AuthorizedApplicationsController < ::Doorkeeper::ApplicationCo
 
   private
 
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
 
   class << self
     def __callbacks; end

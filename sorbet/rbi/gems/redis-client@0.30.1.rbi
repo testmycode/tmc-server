@@ -9,7 +9,7 @@ module Process
   extend ::Sass::ForkTracker::CoreExt
   extend ::RedisClient::PIDCache::CoreExt
   extend ::ConnectionPool::ForkTracker
-  extend ::ActiveSupport::ForkTracker::ModernCoreExt
+  extend ::ActiveSupport::ForkTracker::CoreExt
 end
 
 # pkg:gem/redis-client#lib/redis_client/version.rb:3

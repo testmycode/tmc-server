@@ -125,11 +125,25 @@ class ActiveStorage::Blob
     end
     def create_or_find_by!(attributes, &block); end
 
+    sig do
+      params(
+        records: T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[::ActiveStorage::Blob])])
+      ).returns(Integer)
+    end
+    def delete(*records); end
+
     sig { returns(Integer) }
     def delete_all; end
 
     sig { params(args: T.untyped).returns(Integer) }
     def delete_by(*args); end
+
+    sig do
+      params(
+        records: T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[::ActiveStorage::Blob])])
+      ).returns(T::Array[::ActiveStorage::Blob])
+    end
+    def destroy(*records); end
 
     sig { returns(T::Array[::ActiveStorage::Blob]) }
     def destroy_all; end
@@ -502,6 +516,9 @@ class ActiveStorage::Blob
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateAssociationRelation) }
@@ -641,6 +658,9 @@ class ActiveStorage::Blob
     def with_attached_preview_image(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
+    def with_recursive(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateAssociationRelation) }
     def without(*args, &blk); end
   end
 
@@ -690,10 +710,10 @@ class ActiveStorage::Blob
     sig { void }
     def byte_size_will_change!; end
 
-    sig { returns(::String) }
+    sig { returns(T.nilable(::String)) }
     def checksum; end
 
-    sig { params(value: ::String).returns(::String) }
+    sig { params(value: T.nilable(::String)).returns(T.nilable(::String)) }
     def checksum=(value); end
 
     sig { returns(T::Boolean) }
@@ -708,10 +728,10 @@ class ActiveStorage::Blob
     sig { returns(T::Boolean) }
     def checksum_came_from_user?; end
 
-    sig { returns(T.nilable([::String, ::String])) }
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
     def checksum_change; end
 
-    sig { returns(T.nilable([::String, ::String])) }
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
     def checksum_change_to_be_saved; end
 
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
@@ -720,7 +740,7 @@ class ActiveStorage::Blob
     sig { returns(T.nilable(::String)) }
     def checksum_in_database; end
 
-    sig { returns(T.nilable([::String, ::String])) }
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
     def checksum_previous_change; end
 
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
@@ -1086,7 +1106,7 @@ class ActiveStorage::Blob
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
     def saved_change_to_byte_size?(from: T.unsafe(nil), to: T.unsafe(nil)); end
 
-    sig { returns(T.nilable([::String, ::String])) }
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
     def saved_change_to_checksum; end
 
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
@@ -1227,6 +1247,9 @@ class ActiveStorage::Blob
     def annotate(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def arel_columns(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def create_with(*args, &blk); end
 
     sig { params(value: T::Boolean).returns(PrivateRelation) }
@@ -1364,6 +1387,9 @@ class ActiveStorage::Blob
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def with_attached_preview_image(*args, &blk); end
+
+    sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
+    def with_recursive(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(PrivateRelation) }
     def without(*args, &blk); end
@@ -1541,20 +1567,6 @@ class ActiveStorage::Blob
       ).returns(PrivateCollectionProxy)
     end
     def concat(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[::ActiveStorage::Blob])])
-      ).returns(T::Array[::ActiveStorage::Blob])
-    end
-    def delete(*records); end
-
-    sig do
-      params(
-        records: T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[T.any(::ActiveStorage::Blob, Integer, String, T::Enumerable[::ActiveStorage::Blob])])
-      ).returns(T::Array[::ActiveStorage::Blob])
-    end
-    def destroy(*records); end
 
     sig { returns(T::Array[::ActiveStorage::Blob]) }
     def load_target; end

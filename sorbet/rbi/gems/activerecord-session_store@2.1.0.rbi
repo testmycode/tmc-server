@@ -275,6 +275,12 @@ class ActiveRecord::SessionStore::Session < ::ActiveRecord::Base
   def serialize_data!; end
 
   class << self
+    # pkg:gem/activerecord-session_store#lib/active_record/session_store/session.rb:17
+    def __callbacks; end
+
+    # pkg:gem/activerecord-session_store#lib/active_record/session_store/session.rb:7
+    def _validators; end
+
     # pkg:gem/activerecord-session_store#lib/active_record/session_store/session.rb:14
     def data_column_name; end
 
@@ -283,6 +289,9 @@ class ActiveRecord::SessionStore::Session < ::ActiveRecord::Base
 
     # pkg:gem/activerecord-session_store#lib/active_record/session_store/session.rb:21
     def data_column_size_limit; end
+
+    # pkg:gem/activerecord-session_store#lib/active_record/session_store/session.rb:7
+    def defined_enums; end
 
     # Hook to set up sessid compatibility.
     #
@@ -341,13 +350,13 @@ class ActiveRecord::SessionStore::SqlBypass
   def initialize(attributes); end
 
   # pkg:gem/activerecord-session_store#lib/active_record/session_store/sql_bypass.rb:69
-  def connection(&block); end
+  def connection(&); end
 
   # pkg:gem/activerecord-session_store#lib/active_record/session_store/sql_bypass.rb:69
   def connection=(arg); end
 
   # pkg:gem/activerecord-session_store#lib/active_record/session_store/sql_bypass.rb:69
-  def connection_pool(&block); end
+  def connection_pool(&); end
 
   # pkg:gem/activerecord-session_store#lib/active_record/session_store/sql_bypass.rb:69
   def connection_pool=(arg); end

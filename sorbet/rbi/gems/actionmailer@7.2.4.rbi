@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem actionmailer`.
 
 
-# :include: actionmailer/README.rdoc
+# :include: ../README.rdoc
 #
 # pkg:gem/actionmailer#lib/action_mailer/gem_version.rb:3
 module ActionMailer
@@ -509,7 +509,6 @@ class ActionMailer::Base < ::AbstractController::Base
   include ::AbstractController::Rendering
   include ::AbstractController::Logger
   include ::ActiveSupport::Benchmarkable
-  include ::ActiveSupport::Deprecation::DeprecatedConstantAccessor
   include ::AbstractController::Helpers
   include ::AbstractController::Translation
   include ::AbstractController::AssetPaths
@@ -537,7 +536,7 @@ class ActionMailer::Base < ::AbstractController::Base
   extend ::ActionView::Rendering::ClassMethods
   extend ::ActionView::Layouts::ClassMethods
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:644
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:638
   def initialize; end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:477
@@ -559,7 +558,10 @@ class ActionMailer::Base < ::AbstractController::Base
   def _helper_methods?; end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:496
-  def _layout_conditions(&block); end
+  def _layout_conditions; end
+
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:496
+  def _layout_conditions?; end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:493
   def _process_action_callbacks; end
@@ -620,7 +622,7 @@ class ActionMailer::Base < ::AbstractController::Base
   #  # or by index
   #  mail.attachments[0]                # => Mail::Part (first attachment)
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:761
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:755
   def attachments; end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:492
@@ -684,7 +686,7 @@ class ActionMailer::Base < ::AbstractController::Base
   #
   # If the name is a blank string, it returns just the address.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:685
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:679
   def email_address_with_name(address, name); end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
@@ -746,7 +748,7 @@ class ActionMailer::Base < ::AbstractController::Base
   # +nil+ in order to reset the value otherwise another field will be added
   # for the same header.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:723
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:717
   def headers(args = T.unsafe(nil)); end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:492
@@ -850,18 +852,18 @@ class ActionMailer::Base < ::AbstractController::Base
   #     format.html
   #   end
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:870
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:864
   def mail(headers = T.unsafe(nil), &block); end
 
   # Returns the name of the mailer object.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:678
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:672
   def mailer_name; end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:642
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:636
   def message; end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:642
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:636
   def message=(_arg0); end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:481
@@ -888,7 +890,7 @@ class ActionMailer::Base < ::AbstractController::Base
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:482
   def preview_paths; end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:650
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:644
   def process(method_name, *args, **); end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
@@ -957,33 +959,33 @@ class ActionMailer::Base < ::AbstractController::Base
   private
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:496
-  def _layout(lookup_context, formats); end
+  def _layout(lookup_context, formats, keys); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1071
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1065
   def _protected_ivars; end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:947
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:941
   def apply_defaults(headers); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:967
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:961
   def assign_headers_to_message(message, headers); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:973
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:967
   def collect_responses(headers, &block); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:983
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:977
   def collect_responses_from_block(headers); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:997
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:991
   def collect_responses_from_templates(headers); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:990
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:984
   def collect_responses_from_text(headers); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:957
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:951
   def compute_default(value); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1040
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1034
   def create_parts_from_responses(m, responses); end
 
   # Translates the +subject+ using \Rails I18n class under <tt>[mailer_scope, action_name]</tt> scope.
@@ -991,21 +993,21 @@ class ActionMailer::Base < ::AbstractController::Base
   # humanized version of the <tt>action_name</tt>.
   # If the subject has interpolations, you can pass them through the +interpolations+ parameter.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:937
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:931
   def default_i18n_subject(interpolations = T.unsafe(nil)); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1010
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1004
   def each_template(paths, name, &block); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1053
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1047
   def insert_part(container, response, charset); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1067
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1061
   def instrument_name; end
 
   # This and #instrument_name is for caching instrument
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1060
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1054
   def instrument_payload(key); end
 
   # Used by #mail to set the content type of the message.
@@ -1018,10 +1020,10 @@ class ActionMailer::Base < ::AbstractController::Base
   # attachments, or the message is multipart, then the default content type is
   # used.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:915
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:909
   def set_content_type(m, user_content_type, class_default); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1019
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:1013
   def wrap_inline_attachments(message); end
 
   class << self
@@ -1109,13 +1111,11 @@ class ActionMailer::Base < ::AbstractController::Base
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:575
     def controller_path; end
 
-    # Sets the defaults through app configuration:
+    # Allows to set defaults through app configuration:
     #
-    #     config.action_mailer.default(from: "no-reply@example.org")
+    #    config.action_mailer.default_options = { from: "no-reply@example.org" }
     #
-    # Aliased by ::default_options=
-    #
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:582
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:580
     def default(value = T.unsafe(nil)); end
 
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:492
@@ -1124,11 +1124,7 @@ class ActionMailer::Base < ::AbstractController::Base
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:492
     def default_asset_host_protocol=(value); end
 
-    # Allows to set defaults through app configuration:
-    #
-    #    config.action_mailer.default_options = { from: "no-reply@example.org" }
-    #
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:589
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:584
     def default_options=(value = T.unsafe(nil)); end
 
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:502
@@ -1162,7 +1158,7 @@ class ActionMailer::Base < ::AbstractController::Base
     # calling +deliver_mail+ directly and passing a +Mail::Message+ will do
     # nothing except tell the logger you sent the email.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:597
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:592
     def deliver_mail(mail); end
 
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:479
@@ -1196,7 +1192,7 @@ class ActionMailer::Base < ::AbstractController::Base
     #
     # If the name is a blank string, it returns just the address.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:607
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:602
     def email_address_with_name(address, name); end
 
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
@@ -1356,7 +1352,7 @@ class ActionMailer::Base < ::AbstractController::Base
 
     # Emails do not support relative path links.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:943
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:937
     def supports_path?; end
 
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:478
@@ -1394,16 +1390,16 @@ class ActionMailer::Base < ::AbstractController::Base
 
     private
 
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:628
-    def method_missing(method_name, *args, **); end
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:623
+    def method_missing(method_name, *, **, &); end
 
     # pkg:gem/actionmailer#lib/action_mailer/base.rb:558
     def observer_class_for(value); end
 
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:637
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:631
     def respond_to_missing?(method, include_all = T.unsafe(nil)); end
 
-    # pkg:gem/actionmailer#lib/action_mailer/base.rb:615
+    # pkg:gem/actionmailer#lib/action_mailer/base.rb:610
     def set_payload_for_mail(payload, mail); end
   end
 end
@@ -1415,38 +1411,38 @@ module ActionMailer::Base::HelperMethods
   include ::ActionText::TagHelper
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
-  def combined_fragment_cache_key(*args, **, &block); end
+  def combined_fragment_cache_key(*, **, &); end
 
   # pkg:gem/actionmailer#lib/action_mailer/base.rb:494
-  def view_cache_dependencies(*args, **, &block); end
+  def view_cache_dependencies(*, **, &); end
 end
 
-# pkg:gem/actionmailer#lib/action_mailer/base.rb:769
+# pkg:gem/actionmailer#lib/action_mailer/base.rb:763
 class ActionMailer::Base::LateAttachmentsProxy < ::SimpleDelegator
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:771
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:765
   def []=(_name, _content); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:770
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:764
   def inline; end
 
   private
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:774
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:768
   def _raise_error; end
 end
 
-# pkg:gem/actionmailer#lib/action_mailer/base.rb:664
+# pkg:gem/actionmailer#lib/action_mailer/base.rb:658
 class ActionMailer::Base::NullMail
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:665
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:659
   def body; end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:666
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:660
   def header; end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:672
-  def method_missing(*args); end
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:666
+  def method_missing(*, **, &); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/base.rb:668
+  # pkg:gem/actionmailer#lib/action_mailer/base.rb:662
   def respond_to?(string, include_all = T.unsafe(nil)); end
 end
 
@@ -1529,7 +1525,7 @@ module ActionMailer::DeliveryMethods
   mixes_in_class_methods GeneratedClassMethods
   mixes_in_class_methods ::ActionMailer::DeliveryMethods::ClassMethods
 
-  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:80
+  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:79
   def wrap_delivery_behavior!(*args); end
 
   module GeneratedClassMethods
@@ -1577,7 +1573,7 @@ end
 
 # Helpers for creating and wrapping delivery behavior, used by DeliveryMethods.
 #
-# pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:42
+# pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:41
 module ActionMailer::DeliveryMethods::ClassMethods
   # Adds a new delivery method through the given class using the given
   # symbol as alias and the default options supplied.
@@ -1586,16 +1582,16 @@ module ActionMailer::DeliveryMethods::ClassMethods
   #     location:  '/usr/sbin/sendmail',
   #     arguments: %w[ -i ]
   #
-  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:52
+  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:51
   def add_delivery_method(symbol, klass, default_options = T.unsafe(nil)); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:44
-  def deliveries(&block); end
+  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:43
+  def deliveries(&); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:44
+  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:43
   def deliveries=(arg); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:58
+  # pkg:gem/actionmailer#lib/action_mailer/delivery_methods.rb:57
   def wrap_delivery_behavior(mail, method = T.unsafe(nil), options = T.unsafe(nil)); end
 end
 
@@ -1647,7 +1643,7 @@ end
 # = Action Mailer \InlinePreviewInterceptor
 #
 # Implements a mailer preview interceptor that converts image tag src attributes
-# that use inline cid: style URLs to data: style URLs so that they are visible
+# that use inline +cid:+ style URLs to +data:+ style URLs so that they are visible
 # when previewing an HTML email in a web browser.
 #
 # This interceptor is enabled by default. To disable it, delete it from the
@@ -1759,7 +1755,7 @@ end
 module ActionMailer::MailHelper
   # Access the message attachments list.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:45
+  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:53
   def attachments; end
 
   # Take the text and format it, indented two spaces for each line, and
@@ -1787,17 +1783,17 @@ module ActionMailer::MailHelper
   #   format_paragraph(my_text, 25, 4)
   #   # => "    Here is a sample text with\n    more than 40 characters"
   #
-  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:57
+  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:65
   def format_paragraph(text, len = T.unsafe(nil), indent = T.unsafe(nil)); end
 
   # Access the mailer instance.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:35
+  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:43
   def mailer; end
 
   # Access the message instance.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:40
+  # pkg:gem/actionmailer#lib/action_mailer/mail_helper.rb:48
   def message; end
 end
 
@@ -2042,86 +2038,86 @@ class ActionMailer::Parameterized::Mailer
   private
 
   # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:117
-  def method_missing(method_name, *args, **); end
+  def method_missing(method_name, *, **, &); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:126
+  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:125
   def respond_to_missing?(method, include_all = T.unsafe(nil)); end
 end
 
-# pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:131
+# pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:130
 class ActionMailer::Parameterized::MessageDelivery < ::ActionMailer::MessageDelivery
-  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:132
-  def initialize(mailer_class, action, params, *args, **); end
+  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:131
+  def initialize(mailer_class, action, params, *, **, &); end
 
   private
 
-  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:146
+  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:144
   def enqueue_delivery(delivery_method, options = T.unsafe(nil)); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:139
+  # pkg:gem/actionmailer#lib/action_mailer/parameterized.rb:137
   def processed_mailer; end
 end
 
-# pkg:gem/actionmailer#lib/action_mailer/preview.rb:93
+# pkg:gem/actionmailer#lib/action_mailer/preview.rb:69
 class ActionMailer::Preview
   extend ::ActiveSupport::DescendantsTracker
 
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:98
+  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:74
   def initialize(params = T.unsafe(nil)); end
 
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:96
+  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:72
   def params; end
 
   class << self
     # Returns all mailer preview classes.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:104
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:80
     def all; end
 
     # Returns the mail object for the given email name. The registered preview
     # interceptors will be informed so that they can transform the message
     # as they would if the mail was actually being delivered.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:112
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:88
     def call(email, params = T.unsafe(nil)); end
 
     # Returns +true+ if the email exists.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:125
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:101
     def email_exists?(email); end
 
     # Returns all of the available email previews.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:120
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:96
     def emails; end
 
     # Returns +true+ if the preview exists.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:130
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:106
     def exists?(preview); end
 
     # Find a mailer preview by its underscored class name.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:135
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:111
     def find(preview); end
 
     # Returns the underscored name of the mailer preview without the suffix.
     #
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:140
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:116
     def preview_name; end
 
     private
 
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:159
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:135
     def inform_preview_interceptors(message); end
 
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:145
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:121
     def load_previews; end
 
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:151
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:127
     def preview_paths; end
 
-    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:155
+    # pkg:gem/actionmailer#lib/action_mailer/preview.rb:131
     def show_previews; end
   end
 end
@@ -2131,46 +2127,37 @@ module ActionMailer::Previews
   extend ::ActiveSupport::Concern
 
   mixes_in_class_methods ::ActionMailer::Previews::ClassMethods
-
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:28
-  def preview_path; end
 end
 
-# pkg:gem/actionmailer#lib/action_mailer/preview.rb:36
+# pkg:gem/actionmailer#lib/action_mailer/preview.rb:28
 module ActionMailer::Previews::ClassMethods
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:45
-  def preview_path; end
-
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:37
-  def preview_path=(value); end
-
   # Register an Interceptor which will be called before mail is previewed.
   # Either a class or a string can be passed in as the Interceptor. If a
   # string is passed in it will be constantized.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:66
+  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:42
   def register_preview_interceptor(interceptor); end
 
   # Register one or more Interceptors which will be called before mail is previewed.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:54
+  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:30
   def register_preview_interceptors(*interceptors); end
 
   # Unregister a previously registered Interceptor.
   # Either a class or a string can be passed in as the Interceptor. If a
   # string is passed in it will be constantized.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:77
+  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:53
   def unregister_preview_interceptor(interceptor); end
 
   # Unregister one or more previously registered Interceptors.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:59
+  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:35
   def unregister_preview_interceptors(*interceptors); end
 
   private
 
-  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:82
+  # pkg:gem/actionmailer#lib/action_mailer/preview.rb:58
   def interceptor_class_for(interceptor); end
 end
 
@@ -2532,7 +2519,7 @@ module ActionMailer::TestHelper
   #     end
   #   end
   #
-  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:211
+  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:191
   def assert_no_enqueued_emails(&block); end
 
   # Returns any emails that are sent in the block.
@@ -2550,7 +2537,7 @@ module ActionMailer::TestHelper
   #     assert_equal "Hi there", emails.first.subject
   #   end
   #
-  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:269
+  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:249
   def capture_emails(&block); end
 
   # Delivers all enqueued emails. If a block is given, delivers all of the emails
@@ -2590,12 +2577,12 @@ module ActionMailer::TestHelper
   # If the +:at+ option is specified, then only delivers emails enqueued to deliver
   # immediately or before the given time.
   #
-  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:251
+  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:231
   def deliver_enqueued_emails(queue: T.unsafe(nil), at: T.unsafe(nil), &block); end
 
   private
 
-  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:278
+  # pkg:gem/actionmailer#lib/action_mailer/test_helper.rb:258
   def delivery_job_filter(job); end
 end
 
@@ -2609,7 +2596,7 @@ ActionMailer::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActionMailer::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
 
 # pkg:gem/actionmailer#lib/action_mailer/gem_version.rb:13
-ActionMailer::VERSION::PRE = T.let(T.unsafe(nil), String)
+ActionMailer::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
 
 # pkg:gem/actionmailer#lib/action_mailer/gem_version.rb:15
 ActionMailer::VERSION::STRING = T.let(T.unsafe(nil), String)

@@ -100,5 +100,12 @@ describe Organization, type: :model do
       attach_logo(organization, 300, 120)
       expect(organization.logo_path).to start_with('/rails/active_storage/representations/')
     end
+
+    it 'keeps a WebP logo as WebP when scaling it' do
+      organization = Organization.create!(valid_params)
+      webp = Vips::Image.black(300, 120).webpsave_buffer
+      organization.logo.attach(io: StringIO.new(webp), filename: 'logo.webp', content_type: 'image/webp')
+      expect(organization.org_logo.processed.image.blob.content_type).to eq('image/webp')
+    end
   end
 end

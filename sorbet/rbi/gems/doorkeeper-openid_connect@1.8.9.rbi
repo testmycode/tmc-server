@@ -495,7 +495,7 @@ class Doorkeeper::OpenidConnect::IdToken
   def claims; end
 
   # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/id_token.rb:6
-  def model_name(&block); end
+  def model_name(&); end
 
   # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/id_token.rb:8
   def nonce; end
@@ -765,6 +765,20 @@ class Doorkeeper::OpenidConnect::Request < ::ActiveRecord::Base
 
   # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/orm/active_record/request.rb:11
   def autosave_associated_records_for_access_grant(*args); end
+
+  class << self
+    # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/orm/active_record/request.rb:8
+    def __callbacks; end
+
+    # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/orm/active_record/request.rb:11
+    def _reflections; end
+
+    # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/orm/active_record/request.rb:5
+    def _validators; end
+
+    # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/orm/active_record/request.rb:5
+    def defined_enums; end
+  end
 end
 
 # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/orm/active_record/request.rb:5
@@ -841,7 +855,7 @@ class Doorkeeper::OpenidConnect::UserInfo
   def claims; end
 
   # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/user_info.rb:6
-  def model_name(&block); end
+  def model_name(&); end
 
   # pkg:gem/doorkeeper-openid_connect#lib/doorkeeper/openid_connect/user_info.rb:6
   def validation_context; end

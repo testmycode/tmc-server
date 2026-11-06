@@ -11,10 +11,10 @@ module ActionController; end
 class ActionController::API < ::ActionController::Metal
   include ::ActionDispatch::Routing::PolymorphicRoutes
   include ::ActionController::Head
+  include ::AbstractController::Caching::ConfigMethods
 end
 
 class ActionController::Base < ::ActionController::Metal
-  include ::ActiveSupport::Deprecation::DeprecatedConstantAccessor
   include ::ActionDispatch::Routing::PolymorphicRoutes
   include ::ActionController::Head
   include ::AbstractController::Caching::ConfigMethods

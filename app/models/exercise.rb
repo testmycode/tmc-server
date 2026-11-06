@@ -123,8 +123,8 @@ class Exercise < ApplicationRecord
     res
   }
 
-  enum disabled_status: %i[enabled disabled]
-  enum paste_visibility: %i[open secured no-tests-public everyone completed-only]
+  enum :disabled_status, %i[enabled disabled]
+  enum :paste_visibility, %i[open secured no-tests-public everyone completed-only]
 
   sig { returns(String) }
   def relative_path
