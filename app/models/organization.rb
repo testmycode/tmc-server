@@ -1,8 +1,10 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Organisations (schools etc.) have teachers and their own customized courses.
 
 class Organization < ApplicationRecord
+  extend T::Sig
   include Swagger::Blocks
 
   swagger_schema :Organization do
@@ -52,6 +54,7 @@ class Organization < ApplicationRecord
   scope :participated_organizations, ->(user) { joins(:courses, courses: :awarded_points).where(awarded_points: { user_id: user.id }) }
   scope :visible_organizations, -> { accepted_organizations.where(hidden: false) }
 
+  sig { params(params: T.any(ActionController::Parameters, T::Hash[Symbol, T.untyped]), initial_user: User).returns(Organization) }
   def self.init(params, initial_user)
     organization = Organization.new(params.merge(verified: false, creator: initial_user))
     teachership = Teachership.new(user: initial_user, organization: organization)
@@ -62,39 +65,48 @@ class Organization < ApplicationRecord
     organization
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def org_as_json
     { name: name, information: information, slug: slug, logo_path: logo_path, pinned: pinned }
   end
 
+  sig { params(user: T.nilable(User)).returns(T::Boolean) }
   def teacher?(user)
     teachers.include? user
   end
 
+  sig { params(user: T.nilable(User)).returns(T::Boolean) }
   def member?(user)
     members.include?(user)
   end
 
+  sig { returns(T.nilable(String)) }
   def to_param
     slug
   end
 
+  sig { params(slug: String).returns(ActiveRecord::Relation) }
   def find_by_slug(slug)
     Organization.where(slug: slug)
   end
 
+  sig { params(request: ActionDispatch::Request, user: User).returns(T::Boolean) }
   def visibility_allowed?(request, user)
     return true if user.administrator?
+    whitelisted_ips = self.whitelisted_ips
     return true unless whitelisted_ips
     whitelisted_ips.include?(request.remote_ip)
   end
 
+  sig { void }
   def valid_slug? # slug must not be an existing route (/org/new etc)
     errors.add(:slug, 'is a system reserved word') if %w[new list_requests].include? slug
   end
 
+  sig { returns(String) }
   def logo_path
     if self.logo.attached?
-      Rails.application.routes.url_helpers.rails_representation_url(self.logo.variant(resize_to_fill: [100, nil]).processed, only_path: true)
+      Rails.application.routes.url_helpers.rails_representation_url(T.unsafe(self.logo).variant(resize_to_fill: [100, nil]).processed, only_path: true)
     else
       'missing.png'
     end
@@ -103,9 +115,10 @@ class Organization < ApplicationRecord
     'missing.png'
   end
 
+  sig { returns(T.any(ActiveStorage::VariantWithRecord, ActiveStorage::Variant, String)) }
   def org_logo
     if self.logo.attached?
-      self.logo.variant(resize_to_fill: [100, nil])
+      T.unsafe(self.logo).variant(resize_to_fill: [100, nil])
     else
       'missing.png'
     end

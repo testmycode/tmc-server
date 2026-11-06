@@ -1,33 +1,39 @@
+# typed: strict
 # frozen_string_literal: true
 
 class SettingsController < ApplicationController
+  extend T::Sig
   skip_authorization_check
 
   before_action :set_user
 
+  sig { void }
   def show
     authorize! :read, @user
   end
 
+  sig { void }
   def update
     authorize! :update, @user
+    user = T.must(@user)
 
     User.transaction do
-      @email_before = @user.email
+      email_before = user.email
+      @email_before = T.let(email_before, T.nilable(String))
       set_email
-      password_changed = maybe_update_password(@user, params[:user])
+      password_changed = maybe_update_password(user, params[:user])
       set_user_fields
 
-      if @user.errors.empty? && @user.save
+      if user.errors.empty? && user.save
         # Password changed locally: migrate the user to courses.mooc.fi
-        @user.post_new_user_to_courses_mooc_fi(params[:user][:password]) if password_changed && !@user.managed_externally?
-        RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
+        user.post_new_user_to_courses_mooc_fi(params[:user][:password]) if password_changed && !user.managed_externally?
+        RecentlyChangedUserDetail.email_changed.create!(old_value: email_before, new_value: user.email, username: user.login, user_id: user.id) unless T.must(email_before.casecmp(user.email)).zero?
         flash[:notice] = if password_changed
           'Changes saved and password changed'
         else
           'Changes saved'
         end
-        redirect_to participant_settings_path(@user)
+        redirect_to participant_settings_path(user)
       else
         flash.now[:error] = 'Failed to save profile'
         render action: :show, status: :forbidden
@@ -35,6 +41,7 @@ class SettingsController < ApplicationController
     end
   end
 
+  sig { void }
   def dangerously_destroy_user
     @user = authenticate_current_user_destroy
     if @user.submissions.length != 0
@@ -54,39 +61,46 @@ class SettingsController < ApplicationController
     redirect_to root_url, notice: "The account #{username} (#{email}) has been permanently destroyed."
   end
 
+  sig { void }
   def verify_dangerously_destroying_user
     @user = authenticate_current_user_destroy
   end
 
+  sig { void }
   def user_has_submissions
     @user = authenticate_current_user_destroy
   end
 
   private
+    sig { returns(User) }
     def authenticate_current_user_destroy
       user = User.find(params[:participant_id])
       authorize! :destroy, user
       user
     end
 
+    sig { void }
     def set_user
-      @user = User.find(params[:participant_id])
+      @user = T.let(User.find(params[:participant_id]), T.nilable(User))
     end
 
+    sig { void }
     def set_email
+      user = T.must(@user)
       user_params = params[:user]
 
-      return if !@user.new_record? && user_params[:email_repeat].blank?
+      return if !user.new_record? && user_params[:email_repeat].blank?
 
       if user_params[:email].blank?
-        @user.errors.add(:email, 'needed')
+        user.errors.add(:email, 'needed')
       elsif user_params[:email] != user_params[:email_repeat]
-        @user.errors.add(:email_repeat, 'did not match')
+        user.errors.add(:email_repeat, 'did not match')
       else
-        @user.email = user_params[:email].strip
+        user.email = user_params[:email].strip
       end
     end
 
+    sig { params(user: User, user_params: T.untyped).returns(T::Boolean) }
     def maybe_update_password(user, user_params)
       if user_params[:old_password].present? || user_params[:password].present?
         if user.managed_externally?
@@ -116,11 +130,12 @@ class SettingsController < ApplicationController
       end
     end
 
+    sig { returns(T.nilable(T::Hash[T.untyped, T.untyped])) }
     def set_user_fields
       return if params[:user_field].nil?
       changes = {}
       UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
-        value_record = @user.field_value_record(field)
+        value_record = T.must(@user).field_value_record(field)
         old_value = value_record.ruby_value
         value_record.set_from_form(params[:user_field][field.name])
         new_value = value_record.ruby_value

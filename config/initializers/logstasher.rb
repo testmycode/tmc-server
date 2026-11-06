@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 if LogStasher.enabled?
@@ -5,8 +6,8 @@ if LogStasher.enabled?
     # This block is run in application_controller context,
     # so you have access to all controller methods
     begin
-      fields[:user] = if current_user&.login
-        current_user.login
+      fields[:user] = if T.unsafe(self).current_user&.login
+        T.unsafe(self).current_user.login
       else
         'guest'
       end

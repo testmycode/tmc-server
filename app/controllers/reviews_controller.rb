@@ -1,19 +1,24 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'natsort'
 
 # Presents the code review UI.
 class ReviewsController < ApplicationController
+  extend T::Sig
   before_action :set_organization, except: %i[new create]
 
+  sig { void }
   def index
     if params[:course_id]
       fetch :course
-      @organization = @course.organization
-      @my_reviews = @course.submissions
-                           .where(user_id: current_user.id)
-                           .where('requests_review OR requires_review OR reviewed')
-                           .order('created_at DESC')
+      course = T.must(@course)
+      @organization = course.organization
+      my_reviews = course.submissions
+                         .where(user_id: current_user.id)
+                         .where('requests_review OR requires_review OR reviewed')
+                         .order('created_at DESC')
+      @my_reviews = T.let(my_reviews, T.nilable(ActiveRecord::Relation))
 
       respond_to do |format|
         format.html do
@@ -27,58 +32,66 @@ class ReviewsController < ApplicationController
       end
     else
       fetch :submission, :files
-      raise "Submission's exercise has been moved or deleted" unless @submission.exercise
+      submission = T.must(@submission)
+      raise "Submission's exercise has been moved or deleted" unless submission.exercise
 
-      @course = @submission.course
-      @organization = @course.organization
+      course = T.must(submission.course)
+      @course = course
+      @organization = course.organization
 
       respond_to do |format|
         format.html do
           add_course_breadcrumb
           add_exercise_breadcrumb
           add_submission_breadcrumb
-          breadcrumb_label = @submission.reviews.count == 1 ? 'Code review' : 'Code reviews'
-          add_breadcrumb breadcrumb_label, submission_reviews_path(@submission)
+          breadcrumb_label = submission.reviews.count == 1 ? 'Code review' : 'Code reviews'
+          add_breadcrumb breadcrumb_label, submission_reviews_path(submission)
           render 'reviews/submission_index'
         end
       end
     end
   end
 
+  sig { void }
   def new
     fetch :submission, :files
+    submission = T.must(@submission)
 
-    @show_page_presence = true
+    @show_page_presence = T.let(true, T.nilable(T::Boolean))
 
-    @course = @submission.course
-    @organization = @course.organization
+    course = T.must(submission.course)
+    @course = course
+    @organization = course.organization
     add_course_breadcrumb
-    add_breadcrumb 'Code reviews', organization_course_reviews_path(@organization, @course)
+    add_breadcrumb 'Code reviews', organization_course_reviews_path(@organization, course)
     add_breadcrumb 'Code review editor'
 
-    @new_review = Review.new(
-      submission_id: @submission.id,
+    @new_review = T.let(Review.new(
+      submission_id: submission.id,
       reviewer_id: current_user.id
-    )
-    authorize! :create_review, @course
+    ), T.nilable(Review))
+    authorize! :create_review, course
     render 'reviews/submission_index'
   end
 
+  sig { void }
   def create
     fetch :submission
-    @review = Review.new(
-      submission_id: @submission.id,
+    submission = T.must(@submission)
+    review = Review.new(
+      submission_id: submission.id,
       reviewer_id: current_user.id,
       review_body: params[:review][:review_body]
     )
-    authorize! :create_review, @submission.course
+    @review = review
+    authorize! :create_review, submission.course
 
     begin
       ActiveRecord::Base.connection.transaction do
         award_points
         mark_as_reviewed
-        @review.submission.save!
-        @review.save!
+        T.must(review.submission).save!
+        review.save!
       end
     rescue StandardError
       ::Rails.logger.error($!)
@@ -86,12 +99,14 @@ class ReviewsController < ApplicationController
     else
       flash[:success] = 'Code review added.'
       send_email_about_new_review if params[:send_email]
-      @course = @submission.course
-      @organization = @course.organization
-      redirect_to organization_course_reviews_path(@organization, @course)
+      course = T.must(submission.course)
+      @course = course
+      @organization = course.organization
+      redirect_to organization_course_reviews_path(@organization, course)
     end
   end
 
+  sig { void }
   def update
     fetch :review
     authorize! :update, @review
@@ -104,21 +119,24 @@ class ReviewsController < ApplicationController
     end
   end
 
+  sig { void }
   def destroy
     fetch :review
     authorize! :delete, @review
-    if @review.destroy
+    review = T.must(@review)
+    if review.destroy
       flash[:success] = 'Code review deleted.'
-      redirect_to new_submission_review_path(@review.submission_id)
+      redirect_to new_submission_review_path(review.submission_id)
     else
       respond_with_error('Failed to delete code review.')
     end
   end
 
   private
+    sig { returns(T::Hash[Symbol, T.untyped]) }
     def course_reviews_json
-      submissions = @my_reviews.includes(reviews: %i[reviewer submission])
-      exercises = @course.exercises.index_by { |e| e.name }
+      submissions = T.must(@my_reviews).includes(reviews: %i[reviewer submission])
+      exercises = T.must(@course).exercises.index_by { |e| e.name }
       reviews = submissions.map do |s|
         s.reviews.map do |r|
           {
@@ -133,13 +151,14 @@ class ReviewsController < ApplicationController
       }
     end
 
+    sig { params(exercises: T::Hash[T.nilable(String), Exercise], review: Review).returns(T::Hash[Symbol, T.untyped]) }
     def review_json(exercises, review)
-      available_points = exercises[review.submission.exercise_name].available_points.where(requires_review: true).map(&:name)
+      available_points = T.must(exercises[T.must(review.submission).exercise_name]).available_points.where(requires_review: true).map(&:name)
       points_not_awarded = available_points - review.points_list
       {
         id: review.id,
         marked_as_read: review.marked_as_read,
-        reviewer_name: review.reviewer.display_name,
+        reviewer_name: T.must(review.reviewer).display_name,
         review_body: review.review_body,
         points: review.points_list.natsort,
         points_not_awarded: points_not_awarded.natsort,
@@ -150,18 +169,20 @@ class ReviewsController < ApplicationController
       }
     end
 
+    sig { params(read: T::Boolean).void }
     def mark_as_read(read)
       which = read ? 'read' : 'unread'
 
       fetch :review
       authorize! (read ? :mark_as_read : :mark_as_unread), @review
+      review = T.must(@review)
 
-      @review.marked_as_read = read
-      if @review.save
+      review.marked_as_read = read
+      if review.save
         respond_to do |format|
           format.html do
             flash[:success] = "Code review marked as #{which}."
-            redirect_to submission_reviews_path(@review.submission)
+            redirect_to submission_reviews_path(review.submission)
           end
           format.json do
             render json: { status: 'OK' }
@@ -172,27 +193,30 @@ class ReviewsController < ApplicationController
       end
     end
 
+    sig { void }
     def update_review
       fetch :review
       authorize! :update, @review
-      @review.review_body = params[:review][:review_body]
+      review = T.must(@review)
+      review.review_body = params[:review][:review_body]
 
       begin
         mark_as_reviewed
         award_points
-        @review.submission.save!
-        @review.save!
+        T.must(review.submission).save!
+        review.save!
       rescue StandardError
         ::Rails.logger.error($!)
         respond_with_error('Failed to save code review.')
       else
         flash[:success] = 'Code review edited. (No notification sent).'
-        redirect_to new_submission_review_path(@review.submission_id)
+        redirect_to new_submission_review_path(review.submission_id)
       end
     end
 
+    sig { void }
     def mark_as_reviewed
-      sub = @review.submission
+      sub = T.must(T.must(@review).submission)
       sub.reviewed = true
       sub.review_dismissed = false
       sub.of_same_kind
@@ -201,6 +225,7 @@ class ReviewsController < ApplicationController
          .update_all(newer_submission_reviewed: true)
     end
 
+    sig { params(stuff: Symbol).void }
     def fetch(*stuff)
       if stuff.include? :course
         @course = Course.find(params[:course_id])
@@ -211,21 +236,24 @@ class ReviewsController < ApplicationController
         authorize! :read, @submission
       end
       if stuff.include? :review
-        @review = Review.find(params[:id])
+        @review = T.let(Review.find(params[:id]), T.nilable(Review))
         authorize! :read, @review
       end
-      @files = SourceFileList.for_submission(@submission) if stuff.include? :files
+      @files = T.let(SourceFileList.for_submission(T.must(@submission)), T.nilable(SourceFileList)) if stuff.include? :files
     end
 
+    sig { void }
     def send_email_about_new_review
-      ReviewMailer.review_email(@review).deliver
+      ReviewMailer.review_email(T.must(@review)).deliver_now
     end
 
+    sig { void }
     def award_points
-      submission = @review.submission
+      review = T.must(@review)
+      submission = T.must(review.submission)
       exercise = submission.exercise
-      course = exercise.course
       raise 'Exercise of submission has been moved or deleted' unless exercise
+      course = T.must(exercise.course)
 
       available_points = exercise.available_points.where(requires_review: true).map(&:name)
       previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
@@ -248,11 +276,12 @@ class ReviewsController < ApplicationController
         end
       end
 
-      @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
+      review.points = (review.points_list + new_points + previous_points).uniq.natsort.join(' ')
       submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
     end
 
   private
+    sig { void }
     def set_organization
       @organization = Organization.find_by(slug: params[:organization_id])
     end

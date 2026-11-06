@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -53,6 +54,19 @@ describe EmailsController, type: :controller do
         expect(assigns(:students)).to include(@user1)
         expect(assigns(:students)).to include(@user2)
         expect(assigns(:students)).to_not include(@user3)
+      end
+
+      describe 'HTML page' do
+        render_views
+
+        it 'lists the students with their names' do
+          @user1.user_field_values.create!(field_name: 'first_name', value: 'Firstie')
+          controller.current_user = @teacher
+          get :index, params: { organization_id: @organization.slug, id: @course.id }
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include(@user1.email)
+          expect(response.body).to include('Firstie')
+        end
       end
 
       it 'denies access for non-teachers' do

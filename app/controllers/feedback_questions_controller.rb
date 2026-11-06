@@ -1,26 +1,31 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Handles the feedback question editing UI.
 class FeedbackQuestionsController < ApplicationController
+  extend T::Sig
   before_action :set_course
   before_action :set_organization
 
+  sig { void }
   def index
     add_course_breadcrumb
     add_breadcrumb 'Feedback questions'
 
-    @questions = @course.feedback_questions.order(:position)
+    @questions = T.let(T.must(@course).feedback_questions.order(:position), T.nilable(ActiveRecord::Relation))
     authorize! :manage_feedback_questions, @course
   end
 
+  sig { void }
   def new
-    @question = FeedbackQuestion.new(course: @course)
+    @question = T.let(FeedbackQuestion.new(course: @course), T.nilable(FeedbackQuestion))
     authorize! :manage_feedback_questions, @course
     add_course_breadcrumb
     add_breadcrumb 'Feedback questions', organization_course_feedback_questions_path(@organization, @course)
     add_breadcrumb 'Add new question'
   end
 
+  sig { void }
   def create
     @question = FeedbackQuestion.new(feedback_question_params[:feedback_question])
     @question.course = @course
@@ -37,9 +42,10 @@ class FeedbackQuestionsController < ApplicationController
     end
   end
 
+  sig { void }
   def show
     @question = FeedbackQuestion.find(params[:id])
-    @course = @question.course
+    @course = T.must(@question.course)
     @organization = @course.organization
     authorize! :manage_feedback_questions, @course
     add_course_breadcrumb
@@ -47,9 +53,10 @@ class FeedbackQuestionsController < ApplicationController
     add_breadcrumb "Question #{@question.title}"
   end
 
+  sig { void }
   def update
     @question = FeedbackQuestion.find(params[:id])
-    @course = @question.course
+    @course = T.must(@question.course)
     @organization = @course.organization
     authorize! :manage_feedback_questions, @course
 
@@ -65,9 +72,10 @@ class FeedbackQuestionsController < ApplicationController
     end
   end
 
+  sig { void }
   def destroy
     @question = FeedbackQuestion.find(params[:id])
-    @course = @question.course
+    @course = T.must(@question.course)
     @organization = @course.organization
     authorize! :manage_feedback_questions, @course
 
@@ -82,20 +90,24 @@ class FeedbackQuestionsController < ApplicationController
   end
 
   private
+    sig { returns(ActionController::Parameters) }
     def feedback_question_params
       params.permit({ feedback_question: %i[question title kind] }, :intrange_min, :intrange_max, :commit, :course_id)
     end
 
+    sig { void }
     def set_course
       @course = Course.find(params[:course_id]) if params[:course_id]
       authorize! :read, @course
     end
 
+    sig { params(question: FeedbackQuestion).void }
     def fix_question_kind(question)
       return unless question.kind == 'intrange'
       question.kind += "[#{params[:intrange_min]}..#{params[:intrange_max]}]"
     end
 
+    sig { void }
     def set_organization
       @organization = Organization.find_by(slug: params[:organization_id])
     end

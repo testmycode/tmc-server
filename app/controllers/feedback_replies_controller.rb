@@ -1,7 +1,9 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Handles replying to a feedback answer by e-mail.
 class FeedbackRepliesController < ApplicationController
+  sig { void }
   def create
     answer = FeedbackAnswer.find(params['answer_id'])
     authorize! :reply_feedback_answer, answer

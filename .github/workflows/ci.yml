@@ -6,6 +6,40 @@ on:
     branches: [ master, bs4 ]
   workflow_dispatch:
 jobs:
+  sorbet:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres@localhost:5432/tmc-sorbet
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Type check
+        run: bundle exec srb tc
+      - name: Verify gem RBIs
+        run: bin/tapioca gem --verify
+      - name: Load database schema
+        run: bin/rake db:create db:schema:load
+      - name: Verify DSL RBIs
+        run: bin/tapioca dsl --verify
+
   spec_v8:
     runs-on: ubuntu-latest
     steps:

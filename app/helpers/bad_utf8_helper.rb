@@ -1,7 +1,11 @@
+# typed: strict
 
 # frozen_string_literal: true
 
 module BadUtf8Helper
+  extend T::Sig
+
+  sig { params(str: String).returns(String) }
   def force_utf8_violently(str)
     if str.encoding == Encoding.find('UTF-8') && str.valid_encoding?
       str

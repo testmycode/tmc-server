@@ -1,8 +1,12 @@
+# typed: strict
 # frozen_string_literal: true
 
 class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
+  extend T::Sig
+
+  sig { params(record: FeedbackAnswer).void }
   def validate(record)
-    kind = record.feedback_question.kind
+    kind = T.must(record.feedback_question).kind
     ans = record.answer.strip
 
     if kind =~ FeedbackQuestion.send(:intrange_regex)

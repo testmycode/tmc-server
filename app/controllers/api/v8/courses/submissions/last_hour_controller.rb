@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -29,6 +30,7 @@ module Api
 
           skip_authorization_check
 
+          sig { void }
           def index
             return respond_forbidden unless current_user.administrator?
             course = Course.find(params[:course_id])

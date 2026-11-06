@@ -1,17 +1,21 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Attempts to send submissions for processing to a free tmc-sandbox.
 # Also called by the reprocessor background task to attempt reprocessing if
 # the sandbox was previously unavailable.
 class SubmissionProcessor
+  extend T::Sig
+
   # Tries to send the submission to a sandbox and updates its status.
   # If not sandboxes are available, then the submission is left to the reprocessor daemon.
+  sig { params(submission: Submission).void }
   def process_submission(submission)
-    submission.processing_tried_at = Time.now
+    submission.processing_tried_at = Time.zone.now
     submission.save!
 
     if RemoteSandbox.try_to_send_submission_to_free_server(submission, submission.result_url)
-      submission.processing_began_at = Time.now
+      submission.processing_began_at = Time.zone.now
       submission.times_sent_to_sandbox += 1
       submission.save!
       Rails.logger.info "Submission #{submission.id} sent to sandbox."
@@ -20,6 +24,7 @@ class SubmissionProcessor
 
   # Called periodically by script/background_daemon.
   # It tries to send submissions to a sandbox
+  sig { void }
   def process_some_submissions
     Submission.to_be_reprocessed.limit(2).each do |submission|
       Rails.logger.info "Attempting to process submission #{submission.id}"

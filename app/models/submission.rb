@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'zlib'
@@ -5,6 +6,7 @@ require 'securerandom'
 require 'submission_packager'
 
 class Submission < ApplicationRecord
+  extend T::Sig
   include Swagger::Blocks
 
   swagger_schema :Submission do
@@ -77,8 +79,11 @@ class Submission < ApplicationRecord
 
   has_many :test_case_runs, -> { order(:id) }, dependent: :delete_all
   has_many :reviews, -> { order(:created_at) }, dependent: :delete_all do
+    extend T::Sig
+
+    sig { returns(T.nilable(Review)) }
     def latest
-      order('created_at DESC').limit(1).first
+      T.unsafe(self).order('created_at DESC').limit(1).first
     end
   end
   has_many :awarded_points, dependent: :nullify
@@ -93,30 +98,37 @@ class Submission < ApplicationRecord
   after_save :kafka_update_progress
   after_destroy :kafka_update_progress
 
+  sig { returns(T.nilable(Integer)) }
   def processing_time
-    if processing_completed_at.nil? || processing_completed_at.nil?
+    completed_at = processing_completed_at
+    started_at = processing_attempts_started_at
+    if completed_at.nil? || started_at.nil?
       nil
     else
-      (processing_completed_at - processing_attempts_started_at).round
+      (completed_at - started_at).round
     end
   end
 
+  sig { returns(ActiveRecord::Relation) }
   def self.to_be_reprocessed
     unprocessed
       .where('processing_tried_at IS NULL OR processing_tried_at < ?', Time.now - processing_retry_interval)
       .where('processing_began_at IS NULL OR processing_began_at < ?', Time.now - processing_resend_interval)
   end
 
+  sig { returns(ActiveRecord::Relation) }
   def self.unprocessed
     where(processed: false)
       .order('processing_priority DESC, processing_tried_at ASC, id ASC')
   end
 
+  sig { returns(Integer) }
   def self.unprocessed_count
     unprocessed.count
   end
 
   # Count how many submissions a user has processing for a specific exercise
+  sig { params(user_id: T.nilable(Integer), exercise_name: String, course_id: Integer).returns(Integer) }
   def self.processing_count_for_user_and_exercise(user_id, exercise_name, course_id)
     where(
       user_id: user_id,
@@ -127,24 +139,29 @@ class Submission < ApplicationRecord
   end
 
   # How many times at most should a submission be (successfully) sent to a sandbox
+  sig { returns(Integer) }
   def self.max_attempts_at_processing
     3
   end
 
   before_create :randomize_secret_token
 
+  sig { returns(T::Boolean) }
   def tests_ran?
     processed? && pretest_error.nil?
   end
 
+  sig { returns(String) }
   def result_url
     "#{SiteSetting.value(:baseurl_for_remote_sandboxes).sub(/\/+$/, '')}/submissions/#{id}/result"
   end
 
+  sig { returns(T.nilable(T::Hash[String, T.untyped])) }
   def params
     ActiveSupport::JSON.decode(params_json) if params_json
   end
 
+  sig { params(value: T.untyped).void }
   def params=(value)
     if value.is_a?(Hash)
       value.each { |k, v| raise "Invalid submission param: #{k} = #{v}" unless valid_param?(k, v) }
@@ -156,6 +173,7 @@ class Submission < ApplicationRecord
     end
   end
 
+  sig { params(k: T.untyped, v: T.untyped).returns(T.nilable(Integer)) }
   def valid_param?(k, v)
     # See also: SubmissionPackager.write_extra_params
     k = k.to_s
@@ -163,6 +181,7 @@ class Submission < ApplicationRecord
     k =~ /^[a-zA-Z\-_]+$/ && v =~ /^[a-zA-Z\-_]+$/
   end
 
+  sig { params(user: User).returns(Symbol) }
   def status(user)
     if !processed?
       :processing
@@ -177,20 +196,23 @@ class Submission < ApplicationRecord
     end
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def can_see_results?(user)
-    results_hidden = ((!exercise.nil? && exercise.hide_submission_results?) || course.hide_submission_results?)
+    results_hidden = ((!exercise.nil? && T.must(exercise).hide_submission_results?) || T.must(course).hide_submission_results?)
     !results_hidden ||
-      course.organization.teacher?(user) ||
-      course.assistant?(user) ||
+      T.must(T.must(course).organization).teacher?(user) ||
+      T.must(course).assistant?(user) ||
       user.administrator?
   end
 
+  sig { returns(T::Array[String]) }
   def points_list
     points.to_s.split(' ')
   end
 
   # Returns a query for all submissions (including this one) by the same user
   # for the same course and exercise
+  sig { returns(ActiveRecord::Relation) }
   def of_same_kind
     Submission.where(
       course_id: course_id,
@@ -201,16 +223,19 @@ class Submission < ApplicationRecord
 
   # Returns the newest submission by the same user for the same exercise,
   # as long as it's newer than this submission
+  sig { returns(T.nilable(Submission)) }
   def newest_of_same_kind
     of_same_kind.where(['created_at > ?', created_at]).order('created_at DESC').first
   end
 
+  sig { returns(T::Boolean) }
   def review_dismissable?
     (requires_review? || requests_review?) &&
       !review_dismissed? &&
       !newer_submission_reviewed?
   end
 
+  sig { returns(Integer) }
   def unprocessed_submissions_before_this
     if !processed?
       i = 0
@@ -224,10 +249,12 @@ class Submission < ApplicationRecord
     end
   end
 
+  sig { returns(String) }
   def downloadable_file_name
     "#{exercise_name}-#{id}.zip"
   end
 
+  sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def test_case_records
     test_case_runs.map do |tcr|
       {
@@ -242,61 +269,75 @@ class Submission < ApplicationRecord
 
   delegate :return_file, to: :submission_data
 
+  sig { params(value: T.nilable(String)).void }
   def return_file=(value)
     build_submission_data unless submission_data
-    submission_data.return_file = value
+    T.must(submission_data).return_file = value
   end
 
+  sig { returns(T.nilable(String)) }
   def stdout
     build_submission_data unless submission_data
-    submission_data.stdout
+    T.must(submission_data).stdout
   end
 
+  sig { params(value: T.nilable(String)).void }
   def stdout=(value)
     build_submission_data unless submission_data
-    submission_data.stdout = value
+    T.must(submission_data).stdout = value
   end
 
+  sig { returns(T.nilable(String)) }
   def stderr
     build_submission_data unless submission_data
-    submission_data.stderr
+    T.must(submission_data).stderr
   end
 
+  sig { params(value: T.nilable(String)).void }
   def stderr=(value)
     build_submission_data unless submission_data
-    submission_data.stderr = value
+    T.must(submission_data).stderr = value
   end
 
+  sig { returns(T.nilable(String)) }
   def vm_log
     build_submission_data unless submission_data
-    submission_data.vm_log
+    T.must(submission_data).vm_log
   end
 
+  sig { params(value: T.nilable(String)).void }
   def vm_log=(value)
     build_submission_data unless submission_data
-    submission_data.vm_log = value
+    T.must(submission_data).vm_log = value
   end
 
+  sig { returns(T.nilable(String)) }
   def valgrind
     build_submission_data unless submission_data
-    submission_data.valgrind
+    T.must(submission_data).valgrind
   end
 
+  sig { params(value: T.nilable(String)).void }
   def valgrind=(value)
     build_submission_data unless submission_data
-    submission_data.valgrind = value
+    T.must(submission_data).valgrind = value
   end
 
+  # Parsed from the sandbox's JSON.
+  sig { returns(T.untyped) }
   def validations
     build_submission_data unless submission_data
-    JSON.parse submission_data.validations if submission_data.validations.present?
+    data = T.must(submission_data).validations
+    JSON.parse data if data.present?
   end
 
+  sig { params(value: T.nilable(String)).void }
   def validations=(value)
     build_submission_data unless submission_data
-    submission_data.validations = value
+    T.must(submission_data).validations = value
   end
 
+  sig { void }
   def raise_pretest_error_if_any
     unless pretest_error.nil?
       error = "Submission failed: #{pretest_error}."
@@ -314,11 +355,12 @@ class Submission < ApplicationRecord
     end
   end
 
+  sig { params(priority: Integer).returns(T::Boolean) }
   def set_to_be_reprocessed!(priority = -200)
     self.processed = false
     self.times_sent_to_sandbox = 0
     self.processing_priority = priority
-    self.processing_attempts_started_at = Time.now
+    self.processing_attempts_started_at = Time.zone.now
     self.processing_tried_at = nil
     self.processing_began_at = nil
     self.processing_completed_at = nil
@@ -330,21 +372,25 @@ class Submission < ApplicationRecord
   # When a remote sandbox returns a result to the webapp,
   # it authenticates the result by passing back the secret token.
   # Changing it in the meantime will obsolete any runs currently being processed.
+  sig { void }
   def randomize_secret_token
     self.secret_token = rand(10**100).to_s
   end
 
   # How often we try to resend if no sandbox has received it yet
+  sig { returns(ActiveSupport::Duration) }
   def self.processing_retry_interval
     7.seconds
   end
 
   # How often we try to resend after a sandbox has received but not responded with a result
+  sig { returns(ActiveSupport::Duration) }
   def self.processing_resend_interval
     5.minutes
   end
 
   # A dirty workaround. See http://stackoverflow.com/questions/10666808/rails-eager-loading-a-belongs-to-with-conditions-refering-to-self
+  sig { params(submissions: T::Enumerable[Submission]).void }
   def self.eager_load_exercises(submissions)
     keys = submissions.map { |s| "(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})" }
     keys.uniq!
@@ -358,21 +404,25 @@ class Submission < ApplicationRecord
     end
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def paste_visible_for?(user)
     return false unless paste_available
-    return true if exercise && exercise.completed_by?(user)
-    return true if user.submissions.where(exercise_name: exercise.name, pretest_error: nil, all_tests_passed: true).any?
+    return true if exercise&.completed_by?(user)
+    return true if user.submissions.where(exercise_name: T.must(exercise).name, pretest_error: nil, all_tests_passed: true).any?
     !all_tests_passed
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def readable_by?(user)
-    user.administrator? || user.teacher?(course.organization) || user.assistant?(course) || user_id == user.id
+    user.administrator? || user.teacher?(T.must(course).organization) || user.assistant?(T.must(course)) || user_id == user.id
   end
 
+  sig { void }
   def set_paste_key_if_paste_available
     self.paste_key = SecureRandom.urlsafe_base64 if paste_available?
   end
 
+  sig { params(submissions: T::Array[T.untyped]).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def self.filter_fields!(submissions)
     submissions.map! do |sub|
       {
@@ -405,16 +455,18 @@ class Submission < ApplicationRecord
   end
 
   private
+    sig { void }
     def set_processing_attempts_started_at
-      self.processing_attempts_started_at = Time.now
+      self.processing_attempts_started_at = Time.zone.now
     end
 
+    sig { void }
     def kafka_update_progress
-      return if (!self.course.moocfi_id || self.course.moocfi_id.blank?) || !self.processed
-      realtime = self.created_at > 1.hour.ago
-      first_submission = self.exercise.submissions_by(user).length == 1
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_progress', realtime: realtime)
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: self.exercise.id, task_type: 'user_points', realtime: realtime) unless first_submission
+      return if (!T.must(self.course).moocfi_id || T.must(self.course).moocfi_id.blank?) || !self.processed
+      realtime = T.must(self.created_at) > 1.hour.ago
+      first_submission = T.must(self.exercise).submissions_by(T.must(user)).length == 1
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(self.exercise).id, task_type: 'user_progress', realtime: realtime)
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(self.exercise).id, task_type: 'user_points', realtime: realtime) unless first_submission
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, task_type: 'user_course_points', realtime: realtime) if first_submission
     end
 end

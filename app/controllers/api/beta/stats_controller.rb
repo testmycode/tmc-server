@@ -1,8 +1,10 @@
+# typed: strict
 # frozen_string_literal: true
 
 class Api::Beta::StatsController < Api::Beta::BaseController
   before_action :doorkeeper_authorize!, scopes: [:public]
 
+  sig { void }
   def submission_processing_times
     processing_began_at = Submission.arel_table[:processing_began_at]
     results = Submission
@@ -14,15 +16,16 @@ class Api::Beta::StatsController < Api::Beta::BaseController
 
     res = results.map do |result|
       {
-        avg_duration: result.avg_duration,
-        stddev: result.stddev,
-        minute: result.minute,
-        count: result.count
+        avg_duration: result[:avg_duration],
+        stddev: result[:stddev],
+        minute: result[:minute],
+        count: result[:count]
       }
     end
     present(res)
   end
 
+  sig { void }
   def submission_queue_times
     created_at = Submission.arel_table[:created_at]
     results = Submission
@@ -30,10 +33,10 @@ class Api::Beta::StatsController < Api::Beta::BaseController
 
     res = results.map do |result|
       {
-        avg_duration: result.avg_duration,
-        stddev: result.stddev,
-        minute: result.minute,
-        count: result.count
+        avg_duration: result[:avg_duration],
+        stddev: result[:stddev],
+        minute: result[:minute],
+        count: result[:count]
       }
     end
     present(res)

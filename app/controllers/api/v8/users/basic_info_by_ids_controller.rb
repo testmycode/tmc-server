@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -6,6 +7,7 @@ module Api
       class BasicInfoByIdsController < Api::V8::BaseController
         skip_authorization_check
 
+        sig { void }
         def create
           return respond_forbidden unless current_user.administrator?
           users = if params[:extra_fields]

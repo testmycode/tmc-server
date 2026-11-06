@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -58,6 +59,7 @@ module Api
 
         skip_authorization_check
 
+        sig { void }
         def create
           return respond_forbidden unless current_user.administrator?
           users = params[:emails].map do |email|

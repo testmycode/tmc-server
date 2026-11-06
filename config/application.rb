@@ -1,9 +1,12 @@
+# typed: strict
 # frozen_string_literal: true
 
 require File.expand_path('boot', __dir__)
+require 'sorbet-runtime'
 require File.expand_path('../app/models/site_setting.rb', __dir__)
 
 require 'rails/all'
+require File.expand_path('sorbet_runtime', __dir__)
 
 # Require the gems listed in gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -37,6 +40,7 @@ module TmcServer
     config.x.accept_courses_mooc_fi_tokens = ENV['ACCEPT_COURSES_MOOC_FI_TOKENS'] == 'true'
 
     config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
+      T.bind(self, Rack::Cors)
       allow do
         origins '*'
         resource '/oauth*', headers: :any, methods: :any

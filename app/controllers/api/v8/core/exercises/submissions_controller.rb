@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'submission_processor'
@@ -36,26 +37,27 @@ module Api
 
           around_action :wrap_transaction
 
+          sig { void }
           def create
             unauthorize_guest!
 
-            @exercise = Exercise.find(params[:exercise_id])
-            authorize! :read, @exercise
-            @course = @exercise.course
-            authorize! :read, @course
+            exercise = Exercise.find(params[:exercise_id])
+            authorize! :read, exercise
+            course = T.must(exercise.course)
+            authorize! :read, course
 
             if !params[:submission] || !params[:submission][:file]
               authorization_skip!
               return respond_not_found('No ZIP file selected or failed to receive it')
             end
 
-            unless @exercise.submittable_by?(current_user)
+            unless exercise.submittable_by?(current_user)
               authorization_skip!
               return respond_forbidden('Submissions for this exercise are no longer accepted.')
             end
 
             # Check if user has too many processing submissions for this exercise
-            processing_count = current_user.processing_submissions_count_for_exercise(@exercise.name, @course.id)
+            processing_count = current_user.processing_submissions_count_for_exercise(T.must(exercise.name), course.id)
             if processing_count >= 3
               authorization_skip!
               return respond_forbidden("Too many submissions currently processing for this exercise. You have #{processing_count} submissions being processed. Please wait for them to complete before submitting again. All your submissions will eventually get processed and you will get your points.")
@@ -76,10 +78,10 @@ module Api
             low_priority = Submission.where(created_at: (Time.now - 10.minutes)..Time.now, user: current_user).count > 3
 
             unless errormsg
-              @submission = Submission.new(
+              submission = Submission.new(
                 user: current_user,
-                course: @course,
-                exercise: @exercise,
+                course: course,
+                exercise: exercise,
                 return_file: file_contents,
                 params_json: submission_params.to_json,
                 requests_review: !params[:request_review].nil?,
@@ -102,22 +104,22 @@ module Api
                 processing_priority: low_priority ? -100 : 0
               )
 
-              authorize! :create, @submission
+              authorize! :create, submission
 
-              unless @submission.save
+              unless submission.save
                 errormsg = 'Failed to save submission.'
-                errormsg += " Errors: #{@submission.errors.messages}"
+                errormsg += " Errors: #{submission.errors.messages}"
               end
             end
 
             unless errormsg
-              # SubmissionProcessor.new.process_submission(@submission)
+              # SubmissionProcessor.new.process_submission(submission)
             end
 
             if !errormsg
-              render json: { submission_url: api_v8_core_submission_url(@submission),
-                             paste_url: @submission.paste_key ? paste_url(@submission.paste_key) : '',
-                             show_submission_url: submission_url(@submission) }
+              render json: { submission_url: api_v8_core_submission_url(submission),
+                             paste_url: submission.paste_key ? paste_url(submission.paste_key) : '',
+                             show_submission_url: submission_url(submission) }
             else
               render json: { error: errormsg }
             end

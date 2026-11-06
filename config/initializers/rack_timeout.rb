@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 # set the timeout to 2 minutes

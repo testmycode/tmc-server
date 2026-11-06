@@ -1,39 +1,47 @@
+# typed: strict
 # frozen_string_literal: true
 
 module BreadCrumbs
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
+  extend T::Sig
+  extend T::Helpers
+  requires_ancestor { ActionController::Base }
 
   module ClassMethods
+    extend T::Sig
+    extend T::Helpers
+    requires_ancestor { T.class_of(ActionController::Base) }
+
+    # options: before_action options such as only:.
+    sig { params(name: T.nilable(T.any(String, Symbol)), url: T.any(String, Symbol, Proc), options: T::Hash[Symbol, T.untyped]).void }
     def add_breadcrumb(name, url, options = {})
       class_name = self.name
       before_action options do |controller|
-        name = controller.send :translate_breadcrumb, name, class_name if name.is_a?(Symbol)
-        controller.send :add_breadcrumb, name, url
+        crumb_name = name.is_a?(Symbol) ? controller.send(:translate_breadcrumb, name, class_name) : name
+        controller.send :add_breadcrumb, crumb_name, url
       end
     end
   end
 
+  mixes_in_class_methods(ClassMethods)
+
     protected
+      # A Symbol name is an I18n key under breadcrumbs.<controller path>; a url that mentions a
+      # route helper or ivar is evaluated in the controller.
+      sig { params(name: T.nilable(T.any(String, Symbol)), url: T.any(String, Symbol, Proc), options: T::Hash[Symbol, T.untyped]).void }
       def add_breadcrumb(name, url = '', options = {})
-        @breadcrumbs ||= []
-        name = translate_breadcrumb(name, self.class.name) if name.is_a?(Symbol)
+        breadcrumbs = @breadcrumbs ||= T.let([], T.nilable(T::Array[T::Hash[Symbol, T.untyped]]))
+        name = translate_breadcrumb(name, T.must(self.class.name)) if name.is_a?(Symbol)
         url = eval(url.to_s) if url.class != Proc && url =~ /_path|_url|@/ # rubocop:disable Performance/RegexpMatch
-        @breadcrumbs << { name: name, url: url, options: options }
+        breadcrumbs << { name: name, url: url, options: options }
       end
 
+      sig { params(name: Symbol, class_name: String).returns(String) }
       def translate_breadcrumb(name, class_name)
         scope = [:breadcrumbs]
         namespace = class_name.underscore.split('/')
-        namespace.last.sub!('_controller', '')
+        T.must(namespace.last).sub!('_controller', '')
         scope += namespace
 
         I18n.t name, scope: scope
-      end
-
-      def render_breadcrumbs(divider = '/')
-        s = render partial: 'twitter-bootstrap/breadcrumbs', locals: { divider: divider }
-        s.first
       end
 end

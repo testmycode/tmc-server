@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -52,6 +53,7 @@ module Api
             end
           end
 
+          sig { void }
           def index
             unauthorize_guest!
             course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
@@ -74,6 +76,7 @@ module Api
             present(presentable)
           end
 
+          sig { void }
           def show
             authorization_skip!
             organization = Organization.find_by!(slug: params[:organization_slug])
@@ -140,6 +143,7 @@ module Api
             )
           end
 
+          sig { void }
           def download
             course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
             exercise = Exercise.find_by!(name: params[:name], course_id: course.id)

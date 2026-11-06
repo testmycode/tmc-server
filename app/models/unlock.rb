@@ -1,3 +1,4 @@
+# typed: strict
 
 # frozen_string_literal: true
 
@@ -16,11 +17,13 @@
 # starting the timer prematurely.
 #
 class Unlock < ApplicationRecord
+  extend T::Sig
   belongs_to :user
   belongs_to :course
   belongs_to :exercise, ->(unlock) { where(course: unlock.course) }, foreign_key: :exercise_name, primary_key: :name
   # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
+  sig { params(course: Course, user: User).void }
   def self.refresh_unlocks(course, user)
     time = Time.zone.now
     Unlock.transaction do
@@ -31,6 +34,7 @@ class Unlock < ApplicationRecord
     end
   end
 
+  sig { params(exercises: T::Enumerable[Exercise], user: User).void }
   def self.unlock_exercises(exercises, user)
     Unlock.transaction do
       for ex in exercises
@@ -46,6 +50,7 @@ class Unlock < ApplicationRecord
   end
 
   private
+    sig { params(course: Course, user: User, user_unlocks_by_exercise_name: T::Hash[T.nilable(String), Unlock]).void }
     def self.refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
       course.exercises.enabled.each do |exercise|
         existing = user_unlocks_by_exercise_name[exercise.name]
@@ -59,19 +64,21 @@ class Unlock < ApplicationRecord
             valid_after: exercise.unlock_spec_obj.valid_after
           )
         elsif exists && !may_exist
-          user_unlocks_by_exercise_name[exercise.name].destroy
+          existing.destroy
         elsif exists && may_exist && exercise.unlock_spec_obj.valid_after != existing.valid_after
-          existing.valid_after = exercise.unlock_spec_obj.valid_after
+          # Active Record casts any Time to TimeWithZone; Tapioca types the writer as TimeWithZone only.
+          existing.valid_after = T.unsafe(exercise.unlock_spec_obj.valid_after)
           existing.save!
         end
       end
     end
 
+    sig { params(course: Course, user: User, user_unlocks_by_exercise_name: T::Hash[T.nilable(String), Unlock]).void }
     def self.fast_refresh_unlocks_impl(course, user, user_unlocks_by_exercise_name)
       # We can share the calculation between the exercises that have the same condition
-      new_unlocks = []
+      new_unlocks = T.let([], T::Array[Unlock])
       course.exercises.enabled.group_by { |o| o.unlock_spec }.each do |_spec, exercises|
-        exercise = exercises.first
+        exercise = T.must(exercises.first)
         existing = exercises.all? { |ex| user_unlocks_by_exercise_name[ex.name] }
         exists = !!existing
         may_exist = exercise.requires_unlock? && exercise.unlock_spec_obj.permits_unlock_for?(user)

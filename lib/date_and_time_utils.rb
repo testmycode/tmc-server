@@ -1,7 +1,15 @@
+# typed: strict
 
 # frozen_string_literal: true
 
 module DateAndTimeUtils
+  extend T::Sig
+
+  # input: a date/time string, Date or Time; blank gives nil, anything else raises.
+  sig do
+    params(input: T.untyped, options: T::Hash[Symbol, T.untyped])
+      .returns(T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime)))
+  end
   def self.to_time(input, options = {})
     options = {
       prefer_end_of_day: false
@@ -24,6 +32,7 @@ module DateAndTimeUtils
     d
   end
 
+  sig { params(input: String).returns(T.any(Date, ActiveSupport::TimeWithZone)) }
   def self.parse_date_or_time(input)
     s = input.strip
 
@@ -45,6 +54,7 @@ module DateAndTimeUtils
     result
   end
 
+  sig { params(time: T.untyped, options: T::Hash[Symbol, T.untyped]).returns(T.nilable(String)) }
   def self.to_utc_str(time, options = {})
     t = to_time(time, options)
     if !t.nil?
@@ -54,6 +64,8 @@ module DateAndTimeUtils
     end
   end
 
+  # str: any value from a user-written spec; non-strings give false.
+  sig { params(str: T.untyped).returns(T::Boolean) }
   def self.looks_like_date_or_time(str)
     !!parse_date_or_time(str)
   rescue StandardError

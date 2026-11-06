@@ -1,15 +1,19 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Used to migrate students between similar courses. This requires for the GIT repos to be checkout to same version to ensure safe transition
 class StudentSubmissionMigrator
+  extend T::Sig
   class CannotRefreshError < RuntimeError; end
   class RefreshFailedError < CannotRefreshError; end
+  sig { params(old_course: Course, new_course: Course, user: User).void }
   def initialize(old_course, new_course, user)
     @old_course = old_course
     @new_course = new_course
     @user = user
   end
 
+  sig { void }
   def migrate!
     validate_migration!
     ActiveRecord::Base.transaction do
@@ -22,6 +26,7 @@ class StudentSubmissionMigrator
     end
   end
 
+  sig { returns(T::Boolean) }
   def migration_is_allowed
     allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
     return false if allowed_migrations.nil?
@@ -33,11 +38,13 @@ class StudentSubmissionMigrator
   end
 
   private
+    sig { void }
     def validate_migration!
       raise CannotRefreshError, 'Cannot migrate with courses which have diffenent git revisions' unless @old_course.git_revision == @new_course.git_revision
       raise CannotRefreshError, 'Migration between these courses is not allowed' unless migration_is_allowed
     end
 
+    sig { params(submission: Submission).void }
     def migrate_submission_and_data(submission)
       new_submission = submission.dup
       new_submission.course = @new_course
@@ -50,15 +57,19 @@ class StudentSubmissionMigrator
       new_submission.reload
       new_submission.update_columns(created_at: submission.created_at, processing_attempts_started_at: submission.processing_attempts_started_at)
       MigratedSubmissions.create!(from_course_id: @old_course.id, to_course_id: @new_course.id, original_submission_id: submission.id, new_submission_id: new_submission.id)
-      Unlock.refresh_unlocks(new_submission.course, submission.user)
+      # Submission's belongs_to :course and :user are required.
+      Unlock.refresh_unlocks(T.must(new_submission.course), T.must(submission.user))
     end
 
+    sig { params(submission: Submission, new_submission: Submission).void }
     def migrate_submission_data(submission, new_submission)
-      new_submission_data = submission.submission_data.dup
+      # Every submission is created with its return file, which lives in submission_data.
+      new_submission_data = T.must(submission.submission_data).dup
       new_submission_data.submission = new_submission
       new_submission_data.save!
     end
 
+    sig { params(submission: Submission, new_submission: Submission).void }
     def migrate_test_case_runs(submission, new_submission)
       submission.test_case_runs.each do |test_case_run|
         new_test_case_run = test_case_run.dup
@@ -68,6 +79,7 @@ class StudentSubmissionMigrator
       end
     end
 
+    sig { params(submission: Submission, new_submission: Submission).void }
     def migrate_awarded_points(submission, new_submission)
       submission.awarded_points.each do |awarded_point|
         new_point = awarded_point.dup
@@ -78,6 +90,7 @@ class StudentSubmissionMigrator
       end
     end
 
+    sig { void }
     def update_app_data
       allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
       return if allowed_migrations.nil?

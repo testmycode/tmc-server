@@ -1,13 +1,16 @@
+# typed: strict
 # frozen_string_literal: true
 
 # CanCan ability definitions.
 #
 # See: https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
 class Ability
+  extend T::Sig
   include CanCan::Ability
 
   # +auth_source+ is :courses_mooc_fi_token when the user authenticated with a courses.mooc.fi
   # access token; account changes are then denied to everyone, administrators included.
+  sig { params(user: User, auth_source: T.nilable(Symbol)).void }
   def initialize(user, auth_source: nil)
     if user.administrator?
       can :manage, :all

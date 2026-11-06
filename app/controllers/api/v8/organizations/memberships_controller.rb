@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -57,6 +58,7 @@ module Api
           end
         end
 
+        sig { void }
         def create
           unauthorize_guest!
 
@@ -71,6 +73,7 @@ module Api
           end
         end
 
+        sig { void }
         def index
           unauthorize_guest!
 

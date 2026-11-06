@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -30,6 +31,7 @@ module Api
 
           skip_authorization_check
 
+          sig { void }
           def eligible_students
             unauthorize_guest!
 
@@ -41,11 +43,11 @@ module Api
 
             applied_students = UserAppDatum.where(field_name: 'applies_for_study_right', value: 't', namespace: 'ohjelmoinnin-mooc-2019').pluck(:user_id)
 
-            groups = course.exercise_groups[0..6] + course.exercise_groups[7..13]
+            groups = T.must(course.exercise_groups[0..6]) + T.must(course.exercise_groups[7..13])
 
             cbu = course.exercise_group_completion_by_user
 
-            user_ids = groups.flat_map { |group| ap = cbu[group.name][:available_points]; cbu[group.name][:points_by_user].map { |k, v| { k => (v.to_f / ap) } } }.group_by { |o| o.keys.first }.map { |k, v| { k => v.map { |o2| o2[k] } } }.inject(:merge).select { |_k, v| v.length == groups.length }.select { |_k, v| v.all? { |o2| o2 >= 0.8995 } }.map { |k, _v| k }
+            user_ids = groups.flat_map { |group| ap = T.must(cbu[group.name])[:available_points]; T.must(cbu[group.name])[:points_by_user].map { |k, v| { k => (v.to_f / ap) } } }.group_by { |o| o.keys.first }.map { |k, v| { k => v.map { |o2| o2[k] } } }.inject(:merge).select { |_k, v| v.length == groups.length }.select { |_k, v| v.all? { |o2| o2 >= 0.8995 } }.map { |k, _v| k }
 
             eligble_ids = (user_ids & applied_students)
             users = User.where(id: eligble_ids)

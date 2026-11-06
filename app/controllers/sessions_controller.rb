@@ -1,9 +1,11 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Handles login and logout.
 class SessionsController < ApplicationController
   skip_authorization_check
 
+  sig { void }
   def new
     session[:return_to] ||= params[:return_to]
     if signed_in?
@@ -12,6 +14,7 @@ class SessionsController < ApplicationController
     end
   end
 
+  sig { void }
   def create
     begin
       clear_expired_sessions
@@ -22,7 +25,7 @@ class SessionsController < ApplicationController
 
     case status
     when :accepted
-      sign_in user
+      sign_in T.must(user)
       try_to_redirect_back
     when :unavailable
       try_to_redirect_incorrect_login(alert: 'Login is temporarily unavailable. Please try again shortly.')
@@ -33,12 +36,14 @@ class SessionsController < ApplicationController
     end
   end
 
+  sig { void }
   def destroy
     sign_out
     try_to_redirect_back(notice: 'Goodbye')
   end
 
   private
+    sig { params(redirect_params: T::Hash[Symbol, T.untyped]).void }
     def try_to_redirect_back(redirect_params = {})
       if session[:return_to].present?
         return_to = session.delete(:return_to)
@@ -52,6 +57,7 @@ class SessionsController < ApplicationController
       end
     end
 
+    sig { params(redirect_params: T::Hash[Symbol, T.untyped]).void }
     def try_to_redirect_incorrect_login(redirect_params = {})
       if request.referer.present?
         redirect_to request.referer, redirect_params
@@ -62,6 +68,7 @@ class SessionsController < ApplicationController
       end
     end
 
+    sig { void }
     def clear_expired_sessions
       Session.delete_expired
     end

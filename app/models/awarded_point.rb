@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'point_comparison'
@@ -8,6 +9,7 @@ require 'point_comparison'
 # reference can be nil if the submission has been deleted.
 
 class AwardedPoint < ApplicationRecord
+  extend T::Sig
   include PointComparison
   include Swagger::Blocks
 
@@ -22,6 +24,7 @@ class AwardedPoint < ApplicationRecord
     property :created_at, type: :string, example: '2016-10-17T11:10:17.295+03:00'
   end
 
+  sig { returns(T::Hash[String, T.untyped]) }
   def point_as_json
     as_json only: %i[
       id
@@ -42,10 +45,11 @@ class AwardedPoint < ApplicationRecord
     property :exercise_id, type: :integer, example: 1
   end
 
-  def self.as_json_with_exercise_ids(related_exercises)
-    related_exercises = related_exercises.map { |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
-    all.map do |p|
-      { awarded_point: p.point_as_json, exercise_id: related_exercises["#{p.course_id}-#{p.submission.exercise_name}"] }
+  sig { params(points: T::Enumerable[AwardedPoint], related_exercises: T::Enumerable[Exercise]).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+  def self.as_json_with_exercise_ids(points, related_exercises)
+    exercise_ids = related_exercises.map { |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
+    points.map do |p|
+      { awarded_point: p.point_as_json, exercise_id: exercise_ids["#{p.course_id}-#{T.must(p.submission).exercise_name}"] }
     end
   end
 
@@ -57,6 +61,7 @@ class AwardedPoint < ApplicationRecord
   after_save :kafka_update_points
   after_destroy :kafka_update_points
 
+  sig { params(exercise: Exercise, user: User).returns(ActiveRecord::Relation) }
   def self.exercise_user_points(exercise, user)
     return none if exercise.hide_submission_results
     where(course_id: exercise.course_id, user_id: user.id)
@@ -65,10 +70,12 @@ class AwardedPoint < ApplicationRecord
              exercise.course_id, exercise.name)
   end
 
+  sig { params(course: Course, user: User).returns(ActiveRecord::Relation) }
   def self.course_user_points(course, user)
     where(course_id: course.id, user_id: user.id)
   end
 
+  sig { params(course: Course, include_admins: T::Boolean, hidden: T::Boolean, only_for_user: T.nilable(User)).returns(Integer) }
   def self.course_points(course, include_admins = false, hidden = false, only_for_user = nil)
     awarded_points = AwardedPoint.arel_table
     users = User.arel_table
@@ -104,6 +111,7 @@ class AwardedPoint < ApplicationRecord
     end
   end
 
+  sig { params(course: Course, user: User, sheetname: String).returns(ActiveRecord::Relation) }
   def self.course_user_sheet_points(course, user, sheetname)
     course_user_points(course, user)
       .joins('INNER JOIN available_points ON available_points.name = awarded_points.name')
@@ -112,6 +120,7 @@ class AwardedPoint < ApplicationRecord
       .group('awarded_points.id')
   end
 
+  sig { params(course: Course, sheetnames: T.any(String, T::Array[String]), include_admins: T::Boolean, only_for_user: T.nilable(User)).returns(T::Hash[String, Integer]) }
   def self.course_sheet_points(course, sheetnames, include_admins = false, only_for_user = nil)
     awarded_points = AwardedPoint.arel_table
     available_points = AvailablePoint.arel_table
@@ -134,7 +143,7 @@ class AwardedPoint < ApplicationRecord
       query.join(users).on(users[:id].eq(awarded_points[:user_id])).where(users[:id].eq(only_for_user.id))
     end
 
-    res = {}
+    res = T.let({}, T::Hash[String, Integer])
     ActiveRecord::Base.connection.execute(query.to_sql).map do |record|
       res[record['gdocs_sheet']] = record['count'].to_i
     end
@@ -142,6 +151,7 @@ class AwardedPoint < ApplicationRecord
   end
 
   # Loads users that have any points for the course/sheet
+  sig { params(course: Course, sheetname: String).returns(ActiveRecord::Relation) }
   def self.users_in_course_with_sheet(course, sheetname)
     users = User.arel_table
 
@@ -154,6 +164,7 @@ class AwardedPoint < ApplicationRecord
   end
 
   # Gets a hash of user to array of point names awarded for exercises of the given sheet
+  sig { params(course: Course, sheetname: String, opts: T::Hash[Symbol, T::Boolean]).returns(T::Hash[String, T::Array[String]]) }
   def self.per_user_in_course_with_sheet(course, sheetname, opts = {})
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
@@ -162,10 +173,9 @@ class AwardedPoint < ApplicationRecord
           .project([users[:login].as('username'), awarded_points[:name].as('name')])
           .to_sql
 
-    result = {}
+    result = T.let({}, T::Hash[String, T::Array[String]])
     ActiveRecord::Base.connection.execute(sql).each do |record|
-      result[record['username']] ||= []
-      result[record['username']] << record['name']
+      (result[record['username']] ||= []) << record['name']
     end
     result.default = []
     result
@@ -173,6 +183,7 @@ class AwardedPoint < ApplicationRecord
 
   # Gets a hash of user to count of points awarded for exercises of the given sheet
   # TODO find users, shttename -> sheetnames
+  sig { params(course: Course, sheetnames: T.any(String, T::Array[String]), only_for_user: T.nilable(User), hidden: T::Boolean).returns(T::Hash[String, T::Hash[String, Integer]]) }
   def self.count_per_user_in_course_with_sheet(course, sheetnames, only_for_user = nil, hidden = false)
     users = User.arel_table
     exercises = Exercise.arel_table
@@ -183,15 +194,14 @@ class AwardedPoint < ApplicationRecord
 
     query.where(users[:id].eq(only_for_user.id)) if only_for_user
 
-    result = {}
+    result = T.let({}, T::Hash[String, T::Hash[String, Integer]])
     ActiveRecord::Base.connection.execute(query.to_sql).each do |record|
-      result[record['username']] ||= {}
-      result[record['username']][record['gdocs_sheet']] ||= 0
-      result[record['username']][record['gdocs_sheet']] = record['count'].to_i
+      (result[record['username']] ||= {})[record['gdocs_sheet']] = record['count'].to_i
     end
     result
   end
 
+  sig { params(user: User).returns(T::Array[Integer]) }
   def self.all_awarded(user)
     awarded_points = AwardedPoint.arel_table
     exercises = Exercise.arel_table
@@ -211,10 +221,12 @@ class AwardedPoint < ApplicationRecord
     ActiveRecord::Base.connection.execute(awarded_query.to_sql).to_a.map { |h| h['id'] }
   end
 
+  sig { params(query: ActiveRecord::Relation).returns(ActiveRecord::Relation) }
   private_class_method def self.without_admins(query)
     query.joins('INNER JOIN users ON users.id = awarded_points.user_id').where(users: { administrator: false })
   end
 
+  sig { params(course: Course, sheetnames: T.any(String, T::Array[String]), hidden: T.nilable(T.any(T::Boolean, T::Hash[Symbol, T::Boolean]))).returns(Arel::SelectManager) }
   private_class_method def self.per_user_in_course_with_sheet_query(course, sheetnames, hidden = false)
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
@@ -237,15 +249,17 @@ class AwardedPoint < ApplicationRecord
   end
 
   private
+    sig { void }
     def kafka_update_points
-      return if !self.course.moocfi_id || self.course.moocfi_id.blank?
-      exercise = self.submission.exercise
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_progress')
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_points')
+      return if !T.must(self.course).moocfi_id || T.must(self.course).moocfi_id.blank?
+      exercise = T.must(self.submission).exercise
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(exercise).id, task_type: 'user_progress')
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(exercise).id, task_type: 'user_points')
     end
 
+    sig { void }
     def create_organization_membership
-      organization = self.course.organization
+      organization = T.must(T.must(self.course).organization)
       user = self.user
       OrganizationMembership.create!(user: user, organization: organization) unless organization.member?(user)
     end

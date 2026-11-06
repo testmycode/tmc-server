@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -107,7 +108,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
       describe 'when correct course id and review id are given' do
         describe 'when review is edited' do
           it 'review text should be updated' do
-            put :update, params: { course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' } }
+            put :update, params: { course_id: course.id, id: review.id, review: { review_body: 'Code looks ok' } }
             review.reload
             expect(response).to have_http_status(200)
             expect(review.review_body).to include('Code looks ok')
@@ -116,7 +117,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
         describe 'when review is marked as read' do
           it "review's marked_as_read status should change accordingly" do
-            put :update, params: { course_id: course.id, id: submission.id, mark_as_read: 1 }
+            put :update, params: { course_id: course.id, id: review.id, mark_as_read: 1 }
             review.reload
             expect(response).to have_http_status :ok
             expect(review.marked_as_read).to be_truthy
@@ -125,7 +126,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
         describe 'when review is marked as unread' do
           it "review's marked_as_read status should change accordingly" do
-            put :update, params: { course_id: course.id, id: submission.id, mark_as_unread: 1 }
+            put :update, params: { course_id: course.id, id: review.id, mark_as_unread: 1 }
             review.reload
             expect(response).to have_http_status :ok
             expect(review.marked_as_read).to be_falsey
@@ -146,9 +147,9 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
         let(:user) { FactoryBot.create(:user) }
         let(:token) { double resource_owner_id: user.id, acceptable?: true }
         it 'should deny access' do
-          FactoryBot.create(:review, submission: submission)
+          other_review = FactoryBot.create(:review, submission: submission)
           exercise.reload
-          put :update, params: { course_id: course.id, id: submission.id, review: { review_body: 'Code looks ok' } }
+          put :update, params: { course_id: course.id, id: other_review.id, review: { review_body: 'Code looks ok' } }
           expect(response).to have_http_status(403)
           expect(response.body).to include('You are not authorized to access this page')
         end

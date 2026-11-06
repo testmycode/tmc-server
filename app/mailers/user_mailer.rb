@@ -1,17 +1,20 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'cgi'
 
 class UserMailer < ActionMailer::Base
+  extend T::Sig
+  sig { params(user: User, origin: T.nilable(String), language: T.nilable(String)).void }
   def email_confirmation(user, origin = nil, language = nil)
     # For the Elements course, emails often bounce because the course does not mention mooc.fi handles the technical implementation of the course.
     # To protect our delivery rates we temporaily disable sending this email.
     return if origin && origin.downcase.include?('elements')
 
-    @origin = origin
-    @user = user
+    @origin = T.let(origin, T.nilable(String))
+    @user = T.let(user, T.nilable(User))
     token = user.verification_tokens.email.create!
-    @url = confirm_email_url(@user.id, token.token, language: language)
+    @url = T.let(confirm_email_url(user.id, token.token, language: language), T.nilable(String))
     subject = 'Confirm your mooc.fi account email address' if language == 'en' || language == 'en-lu' || language == 'en-ie'
     subject = 'Vahvista mooc.fi-tilisi sähköpostiosoite' if language == 'fi'
     subject = 'Bekräfta e-postadressen för ditt mooc.fi-konto' if language == 'se'
@@ -40,7 +43,7 @@ class UserMailer < ActionMailer::Base
     if origin
       origin_name = origin.downcase.tr(' ', '_').gsub(/[.\/]/, '')
       origin_name += "_#{language}" if language
-      @url = confirm_email_url(@user.id, token.token, language: language, origin: CGI.escape(origin_name))
+      @url = confirm_email_url(user.id, token.token, language: language, origin: CGI.escape(origin_name))
       template_path = Rails.root.join('config', 'email_templates', 'user_mailer', 'email_confirmation')
       html_template_path = template_path.join("#{origin_name}.html.erb")
       text_template_path = template_path.join("#{origin_name}.text.erb")
@@ -57,18 +60,20 @@ class UserMailer < ActionMailer::Base
     mail(from: SiteSetting.value('emails')['from'], to: user.email, subject: subject)
   end
 
+  sig { params(user: User).void }
   def destroy_confirmation(user)
-    @user = user
+    @user = T.let(user, T.nilable(User))
     token = user.verification_tokens.delete_user.create!
-    @url = verify_destroying_user_url(@user.id, token.token)
+    @url = T.let(verify_destroying_user_url(user.id, token.token), T.nilable(String))
     mail(from: SiteSetting.value('emails')['from'], to: user.email, subject: 'Confirm deleting your mooc.fi account')
   end
 
   private
+    sig { returns(String) }
     def base_url
-      @base_url ||= begin
+      @base_url ||= T.let(begin
         settings = SiteSetting.value('emails')
         settings['baseurl'].sub(/\/+$/, '')
-      end
+      end, T.nilable(String))
     end
 end

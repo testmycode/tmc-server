@@ -1,6 +1,8 @@
+# typed: strict
 # frozen_string_literal: true
 
 class FeedbackAnswersChartsController < ApplicationController
+  sig { void }
   def show
     @course = Course.find(params[:course_id])
     @organization = @course.organization
@@ -25,9 +27,11 @@ class FeedbackAnswersChartsController < ApplicationController
   end
 
   private
+    sig { void }
     def show_scatterplot
-      @questions = @course.feedback_questions.select(&:intrange?).sort_by(&:position)
-      if @questions.size == 2
+      questions = T.must(@course).feedback_questions.select(&:intrange?).sort_by(&:position)
+      @questions = T.let(questions, T.nilable(T::Array[FeedbackQuestion]))
+      if questions.size == 2
         render action: 'show_scatterplot', layout: 'bare'
       else
         respond_with_error('Scatterplot only available if there are exactly two numeric questions')

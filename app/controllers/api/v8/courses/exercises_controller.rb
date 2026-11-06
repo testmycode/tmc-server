@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -31,9 +32,10 @@ module Api
           end
         end
 
+        sig { void }
         def index
           unauthorize_guest!
-          course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+          course = Course.find_by!(id: params[:course_id])
           can_see_everything = current_user.administrator? || current_user.teacher?(course.organization) || current_user.assistant?(course)
           authorize! :read, course
 

@@ -1,19 +1,26 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'rest-client'
 
 class KafkaUpdater
+  extend T::Sig
+
+  # Arguments are site settings, nil when unset; the tasks only call the updaters when all are present.
+  sig { params(kafka_bridge_url: T.nilable(String), kafka_bridge_secret: T.nilable(String), service_id: T.nilable(String)).void }
   def initialize(kafka_bridge_url, kafka_bridge_secret, service_id)
     @kafka_bridge_url = kafka_bridge_url
     @kafka_bridge_secret = kafka_bridge_secret
     @service_id = service_id
   end
 
+  sig { params(task: KafkaBatchUpdatePoints).returns(String) }
   def task_type(task)
     return task.task_type if task.task_type.present?
     'unknown'
   end
 
+  sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_user_progress(task)
     finished_successfully = false
     user = User.find_by(id: task.user_id)
@@ -21,7 +28,7 @@ class KafkaUpdater
       Rails.logger.warn("KafkaUpdater#update_user_progress: missing user id=#{task.user_id} task_id=#{task.id}")
       return true
     end
-    course = Course.find(task.course_id)
+    course = Course.find_by!(id: task.course_id)
     Rails.logger.info("Publishing progress for user #{user.id} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id || course.moocfi_id.blank?
       Rails.logger.error('Cannot publish progress because moocfi id is not specified')
@@ -30,11 +37,12 @@ class KafkaUpdater
     parts = course.gdocs_sheets
     points_per_user = AwardedPoint.count_per_user_in_course_with_sheet(course, parts, user)
     available_points = AvailablePoint.course_sheet_points(course, parts)
-    unless points_per_user[user.username]
+    user_points = points_per_user[user.username]
+    unless user_points
       Rails.logger.info('No points found. Skipping')
       return true
     end
-    progress = points_per_user[user.username].map do |group_name, awarded_points|
+    progress = user_points.map do |group_name, awarded_points|
       max_points = available_points[group_name] || 0
       stupid_name = "osa#{group_name.tr('^0-9', '').rjust(2, "0")}"
       {
@@ -59,9 +67,10 @@ class KafkaUpdater
     finished_successfully
   end
 
+  sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_course_progress(task)
     finished_successfully = false
-    course = Course.find(task.course_id)
+    course = Course.find_by!(id: task.course_id)
     Rails.logger.info("Batch publishing progress for course #{course.name} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id
       Rails.logger.error('Cannot publish progress because moocfi id is not specified')
@@ -104,6 +113,7 @@ class KafkaUpdater
     finished_successfully
     end
 
+  sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_user_points(task)
     finished_successfully = false
     user = User.find_by(id: task.user_id)
@@ -111,14 +121,14 @@ class KafkaUpdater
       Rails.logger.warn("KafkaUpdater#update_user_points: missing user id=#{task.user_id} task_id=#{task.id}")
       return true
     end
-    course = Course.find(task.course_id)
+    course = Course.find_by!(id: task.course_id)
     Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id
       Rails.logger.error('Cannot publish points because moocfi id is not specified. Removing extra task (this task never should have been created.)')
       task.destroy!
       return finished_successfully
     end
-    exercise = Exercise.find(task.exercise_id)
+    exercise = Exercise.find_by!(id: task.exercise_id)
     awarded_points = exercise.points_for(user)
     completed = exercise.completed_by?(user)
     message = {
@@ -140,9 +150,10 @@ class KafkaUpdater
     finished_successfully
     end
 
+  sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_course_points(task)
     finished_successfully = false
-    course = Course.find(task.course_id)
+    course = Course.find_by!(id: task.course_id)
     Rails.logger.info("Batch publishing points for course #{course.name} with moocfi id: #{course.moocfi_id}")
     if !course.moocfi_id
       Rails.logger.error('Cannot publish points because moocfi id is not specified')
@@ -196,9 +207,10 @@ class KafkaUpdater
     finished_successfully
     end
 
+  sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_exercises(task)
     finished_successfully = false
-    course = Course.find(task.course_id)
+    course = Course.find_by!(id: task.course_id)
     Rails.logger.info("Batch publishing exercises for course #{course.name} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id
       Rails.logger.error('Cannot publish exercises because moocfi id is not specified')
@@ -207,7 +219,8 @@ class KafkaUpdater
     exercises = Exercise.where(course_id: course.id).where(disabled_status: 0)
     data = exercises.map do |exercise|
       max_points = AvailablePoint.where(exercise_id: exercise.id).count
-      stupid_name = "osa#{exercise.gdocs_sheet.tr('^0-9', '').rjust(2, "0")}"
+      # Exercises with hidden points have no gdocs_sheet, so this raises and fails the whole task.
+      stupid_name = "osa#{T.must(exercise.gdocs_sheet).tr('^0-9', '').rjust(2, "0")}"
       exerciseData = {
         name: exercise.name,
         id: exercise.id.to_s,
@@ -230,6 +243,7 @@ class KafkaUpdater
     finished_successfully
     end
 
+  sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_user_course_points(task)
     finished_successfully = false
     user = User.find_by(id: task.user_id)
@@ -237,7 +251,7 @@ class KafkaUpdater
       Rails.logger.warn("KafkaUpdater#update_user_course_points: missing user id=#{task.user_id} task_id=#{task.id}")
       return true
     end
-    course = Course.find(task.course_id)
+    course = Course.find_by!(id: task.course_id)
     Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
     if !course.moocfi_id
       Rails.logger.error('Cannot publish points because moocfi id is not specified')
@@ -280,6 +294,7 @@ class KafkaUpdater
     end
 
   private
+    sig { params(topic: String, payload: T::Hash[Symbol, T.untyped]).returns(T.nilable(RestClient::Response)) }
     def make_kafka_request(topic, payload)
       return if @kafka_bridge_url == 'test'
 

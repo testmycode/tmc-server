@@ -1,8 +1,9 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'rack/attack'
 
-LOGGER = Logger.new('log/rack-attack.log')
+LOGGER = T.let(Logger.new('log/rack-attack.log'), Logger)
 ActiveSupport::Notifications.subscribe('rack.attack') do |_name, _start, _finish, _request_id, req|
   req = req[:request]
   msg = [req.env['rack.attack.match_type'], req.ip, req.request_method, req.fullpath, ('"' + req.user_agent.to_s + '"')].join(' ')
@@ -16,6 +17,10 @@ end
 
 # RACK Request: https://github.com/rack/rack/blob/main/lib/rack/request.rb
 class Rack::Attack
+  extend T::Sig
+
+  # The token is a raw request param, so it can be any shape.
+  sig { params(access_token: T.untyped).returns(T.untyped) }
   def self.user_identifier_discriminator(access_token)
     db_token = Doorkeeper::AccessToken.find_by(token: access_token)
     return access_token unless db_token

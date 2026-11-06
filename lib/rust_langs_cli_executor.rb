@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'fileutils'
@@ -5,6 +6,18 @@ require 'fileutils'
 # If you want to change the TMC Langs Rust version, see app/background_tasks/rust_langs_downloader_task.rb
 
 module RustLangsCliExecutor
+  extend T::Sig
+
+  # Returns the last JSON line tmc-langs printed.
+  sig do
+    params(
+      clone_path: String,
+      output_path: String,
+      submission_path: String,
+      extra_params: T::Hash[T.untyped, T.untyped],
+      config: T::Hash[Symbol, T.untyped]
+    ).returns(T.untyped)
+  end
   def self.prepare_submission(clone_path, output_path, submission_path, extra_params = {}, config = {})
     command = "#{self.langs_executable_path}/current prepare-submission --clone-path '#{clone_path}' --output-path '#{output_path}' --submission-path '#{submission_path}'"
     command = command + ' --no-archive-prefix' if config[:no_archive_prefix]
@@ -26,8 +39,10 @@ module RustLangsCliExecutor
     result
   end
 
+  # Returns the data of tmc-langs' last output line, or nil if it printed a non-JSON line.
+  sig { params(course_template_refresh_task: CourseTemplateRefresh).returns(T.untyped) }
   def self.refresh(course_template_refresh_task)
-    course_template = course_template_refresh_task.course_template
+    course_template = T.must(course_template_refresh_task.course_template)
     command = "#{self.langs_executable_path}/current refresh-course"\
     " --cache-path #{course_template.cache_path}"\
     " --cache-root #{Course.cache_root}"\
@@ -36,7 +51,7 @@ module RustLangsCliExecutor
     " --source-url #{course_template.source_url}"
 
     Rails.logger.info(command)
-    @course_refresh = course_template_refresh_task
+    parsed_data = T.let(nil, T.untyped)
 
     Open3.popen2(command) do |stdin, stdout, status_thread|
       Timeout.timeout(600, Timeout::Error, 'Refresh process took more than 10 minutes...') do
@@ -45,11 +60,11 @@ module RustLangsCliExecutor
           data = parse_as_JSON(line)
           return unless data
 
-          @parsed_data = self.process_refresh_command_output(data)
+          parsed_data = self.process_refresh_command_output(data)
           if data['output-kind'] == 'status-update'
-            ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", @parsed_data) unless @parsed_data[:percent_done] == 1.0
-            @course_refresh.percent_done = @parsed_data[:percent_done]
-            @course_refresh.create_phase(@parsed_data[:message], @parsed_data[:time])
+            ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", parsed_data) unless parsed_data[:percent_done] == 1.0
+            course_template_refresh_task.percent_done = parsed_data[:percent_done]
+            course_template_refresh_task.create_phase(parsed_data[:message], parsed_data[:time])
           end
         end
       end
@@ -58,22 +73,25 @@ module RustLangsCliExecutor
       status_thread.kill
       raise e
     end
-    @course_refresh.percent_done = 0.95
-    @course_refresh.save!
-    @parsed_data
+    course_template_refresh_task.percent_done = BigDecimal('0.95')
+    course_template_refresh_task.save!
+    parsed_data
   end
 
   private
+    sig { params(output: String).returns(T.untyped) }
     def self.parse_as_JSON(output)
       JSON.parse output
     rescue StandardError => e
       Rails.logger.info("Could not parse output line. #{e}")
     end
 
+    sig { returns(String) }
     def self.langs_executable_path
       Pathname.new("#{::Rails.root}/vendor/tmc-langs-rust").relative_path_from(Pathname.new(Dir.pwd)).to_s
     end
 
+    sig { params(command_output: String).returns(T.untyped) }
     def self.process_prepare_submission_command_output(command_output)
       output_lines = command_output.split("\n")
       valid_lines = output_lines.map do |line|
@@ -93,6 +111,7 @@ module RustLangsCliExecutor
       last_line
     end
 
+    sig { params(command_output: T.untyped).returns(T.untyped) }
     def self.process_refresh_command_output(command_output)
       data = command_output['data']
       if command_output['status'] == 'crashed'

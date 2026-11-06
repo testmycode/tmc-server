@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'shellwords'
@@ -8,16 +9,21 @@ require 'pathname'
 # Manages a sysv init script that calls a Ruby program that accepts the standard start|stop|restart|status parameters.
 # Compatible with RVM.
 class RubyInitScript
+  extend T::Sig
+
+  sig { params(options: T::Hash[Symbol, T.untyped]).void }
   def initialize(options = {})
-    @options = default_options.merge(options)
+    @rvm_info = T.let(nil, T.untyped)
+    @options = T.let(default_options.merge(options), T::Hash[Symbol, T.untyped])
     preprocess_options
     check_options
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def default_options
     {
       name: nil,
-      erb_path: __dir__ + '/ruby_init_script/initscript.erb',
+      erb_path: File.expand_path('ruby_init_script/initscript.erb', __dir__),
       rails_env: 'production',
       working_dir: ::Rails.root,
       executable_path: nil,
@@ -26,6 +32,7 @@ class RubyInitScript
     }
   end
 
+  sig { returns(String) }
   def script_source
     # TODO: This breaks if rvm is not installed
     rvm_current = `rvm current`
@@ -37,14 +44,10 @@ class RubyInitScript
     else
       puts "Not using RVM. Don't forget to invoke this with rvmsudo if you use RVM."
       ruby_path = `which ruby`.chomp
-      env = {}
+      env = T.let({}, T::Hash[String, String])
     end
 
     env['RAILS_ENV'] = @options[:rails_env] if @options[:rails_env]
-
-    def get_binding(_name, _working_dir, _executable_path, _ruby_path, _user, _env)
-      binding
-    end
 
     erb = ERB.new(File.read(@options[:erb_path]))
 
@@ -60,6 +63,7 @@ class RubyInitScript
     erb.result(b)
   end
 
+  sig { void }
   def install
     script = script_source
 
@@ -71,6 +75,7 @@ class RubyInitScript
     system("update-rc.d #{init_script_full_name} defaults 90 10")
   end
 
+  sig { void }
   def uninstall
     system("update-rc.d -f #{init_script_full_name} remove")
     if File.exist?(init_script_path)
@@ -80,25 +85,45 @@ class RubyInitScript
     end
   end
 
+  sig { returns(String) }
   def init_script_full_name
     @options[:name]
   end
 
+  sig { returns(String) }
   def init_script_path
     "/etc/init.d/#{init_script_full_name}"
   end
 
+  sig { returns(String) }
   def short_description
     @options[:short_description] || init_script_full_name
   end
 
   private
+    # Binding for the init script template, which reads these locals.
+    sig do
+      params(
+        _name: String,
+        _working_dir: String,
+        _executable_path: String,
+        _ruby_path: String,
+        _user: String,
+        _env: T::Hash[String, String]
+      ).returns(Binding)
+    end
+    def get_binding(_name, _working_dir, _executable_path, _ruby_path, _user, _env)
+      binding
+    end
+
+    sig { void }
     def preprocess_options
       @options.each_key do |k|
         @options[k] = @options[k].to_s if @options[k].is_a? Pathname
       end
     end
 
+    sig { void }
     def check_options
       raise ':name required' unless @options[:name]
       raise ':erb_path required' unless @options[:erb_path]
@@ -106,6 +131,8 @@ class RubyInitScript
       raise ':executable_path required' unless @options[:executable_path]
     end
 
+    # Parsed `rvm info` YAML, keyed by ruby name.
+    sig { returns(T.untyped) }
     def rvm_info
       @rvm_info ||= begin
         output = `rvm info 2>/dev/null` # We silence the "RVM is not a function" warning on stderr.

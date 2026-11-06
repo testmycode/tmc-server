@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -38,6 +39,7 @@ module Api
             end
           end
 
+          sig { void }
           def create
             submission = Submission.find(params[:submission_id])
             authorize! :read, submission

@@ -36,6 +36,7 @@ gem 'swagger-blocks', '~> 3.0'
 gem 'sassc-rails', '~> 2.1', '>= 2.1.2'
 gem 'xml-simple', '~> 1.1', '>= 1.1.9', require: false
 gem 'cgi', '~> 0.3.6'
+gem 'sorbet-runtime', '~> 0.6.13640'
 
 gem 'hiredis', '~> 0.6.3' # Redis for caching
 gem 'readthis', '~> 2.2' # Redis for caching
@@ -75,6 +76,9 @@ group :development, :test do
   gem 'rubocop-rails_config', '~> 1.16' # Rubocop locked
   gem 'ruby-prof', '~> 1.7' # for performance tests
   gem 'simplecov', '~> 0.22.0', require: false
+  gem 'sorbet', '~> 0.6.13640', require: false
+  gem 'spoom', '~> 1.8', require: false
+  gem 'tapioca', '~> 0.20.0', require: false
 end
 
 group :development do

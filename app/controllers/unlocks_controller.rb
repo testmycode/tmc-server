@@ -1,12 +1,15 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Receives explicit unlock requests and shows a web UI for making them.
 class UnlocksController < ApplicationController
+  extend T::Sig
+  sig { void }
   def show
     @course = Course.find(params[:course_id])
     authorize! :read, @course
     @organization = Organization.find_by(slug: params[:organization_id])
-    @exercises = @course.unlockable_exercises_for(current_user)
+    @exercises = T.let(@course.unlockable_exercises_for(current_user), T.nilable(T::Array[Exercise]))
 
     respond_to do |format|
       format.html do
@@ -16,6 +19,7 @@ class UnlocksController < ApplicationController
     end
   end
 
+  sig { void }
   def create
     @course = Course.find(params[:course_id])
     authorize! :read, @course

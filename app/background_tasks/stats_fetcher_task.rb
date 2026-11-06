@@ -1,9 +1,13 @@
+# typed: strict
 # frozen_string_literal: true
 
 class StatsFetcherTask
+  extend T::Sig
+  sig { void }
   def initialize
   end
 
+  sig { void }
   def run
     data = {
       high_priority_submissions_count: Submission.to_be_reprocessed.where(processing_priority: 0).count,
@@ -19,6 +23,7 @@ class StatsFetcherTask
     Rails.cache.write('submission-stats-cache', data.to_json, expires_in: 1.minute)
   end
 
+  sig { returns(Integer) }
   def wait_delay
     5
   end

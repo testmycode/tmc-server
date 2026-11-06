@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Course stub to be copied by teachers for their own organisations
@@ -6,6 +7,7 @@ require 'net/http'
 require 'system_commands'
 
 class CourseTemplate < ApplicationRecord
+  extend T::Sig
   include SystemCommands
 
   validates :name,
@@ -38,6 +40,7 @@ class CourseTemplate < ApplicationRecord
 
   after_save :update_courses_sourcedata
 
+  sig { params(course: Course, options: T::Hash[Symbol, T.nilable(String)]).returns(CourseTemplate) }
   def self.new_dummy(course, options = {})
     CourseTemplate.new(dummy: true,
                        name: course.name,
@@ -49,6 +52,7 @@ class CourseTemplate < ApplicationRecord
                        source_backend: options[:source_backend] || 'git')
   end
 
+  sig { void }
   def valid_git_repo?
     result = sh!('git', 'ls-remote', '--exit-code', source_url, git_branch, timeout: 10)
     result[:status].success?
@@ -56,26 +60,33 @@ class CourseTemplate < ApplicationRecord
     errors.add(:base, 'Cannot clone repository. Error: ' + e.to_s)
   end
 
+  sig { void }
   def valid_source_backend?
     errors.add(:source_backend, '"not git') unless source_backend == 'git'
   end
 
+  sig { void }
   def set_default_source_backend
-    self.source_backend ||= CourseTemplate.default_source_backend
+    self.source_backend = CourseTemplate.default_source_backend if T.let(source_backend, T.nilable(String)).nil?
   end
 
+  sig { returns(String) }
   def self.default_source_backend
     'git'
   end
 
+  sig { returns(T::Boolean) }
   def clonable?
+    expires_at = self.expires_at
     !hidden? && (expires_at.nil? || expires_at > Time.now) && !dummy?
   end
 
+  sig { returns(String) }
   def cache_path
     File.join(Course.cache_root, "#{name}-#{cached_version}")
   end
 
+  sig { void }
   def increment_cached_version
     self.cached_version += 1
     courses.each do |course|
@@ -83,15 +94,18 @@ class CourseTemplate < ApplicationRecord
     end
   end
 
+  sig { params(current_user_id: Integer).returns(CourseTemplateRefresh) }
   def refresh(current_user_id)
     CourseTemplateRefresh.create!(user_id: current_user_id, course_template_id: self.id)
   end
 
+  sig { returns(T::Boolean) }
   def cache_exists?
     File.exist?(cache_path)
   end
 
   private
+    sig { void }
     def update_courses_sourcedata
       courses.each do |c|
         c.cached_version = cached_version

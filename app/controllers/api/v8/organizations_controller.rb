@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -45,6 +46,7 @@ module Api
         end
       end
 
+      sig { void }
       def index
         orgs = Organization
                .visible_organizations
@@ -60,6 +62,7 @@ module Api
         present(orgs)
       end
 
+      sig { void }
       def show
         org = Organization.find_by!(slug: params[:slug])
         authorize! :read, org

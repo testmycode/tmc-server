@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -6,16 +7,17 @@ module Api
       class PasswordResetController < Api::V8::BaseController
         skip_authorization_check
 
+        sig { void }
         def create
-          @email = params['email'].to_s.strip
-          if @email.empty?
+          email = params['email'].to_s.strip
+          if email.empty?
             return render json: {
               success: false,
               errors: 'No email address provided'
             }
           end
 
-          user = User.find_by('lower(email) = ?', @email.downcase)
+          user = User.find_by('lower(email) = ?', email.downcase)
           unless user
             return render json: {
               success: false,
@@ -25,7 +27,7 @@ module Api
 
           key = ActionToken.generate_password_reset_key_for(user)
           # TODO: Whitelist origins
-          PasswordResetKeyMailer.reset_link_email(user, key, params['origin']).deliver
+          PasswordResetKeyMailer.reset_link_email(user, key, params['origin']).deliver_now
           render json: {
             success: true
           }

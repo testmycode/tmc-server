@@ -1,13 +1,15 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Deprecated
 class Setup::CourseTimingsController < Setup::SetupController
   before_action :set_course
 
+  sig { void }
   def show
     authorize! :teach, @organization
 
-    @setup_in_progress = setup_in_progress?
+    @setup_in_progress = T.let(setup_in_progress?, T.nilable(T::Boolean))
     if setup_in_progress?
       print_setup_phases(3)
     else
@@ -15,9 +17,10 @@ class Setup::CourseTimingsController < Setup::SetupController
       add_breadcrumb('Timing')
     end
 
-    @group_array = groups_as_array
+    @group_array = T.let(groups_as_array, T.nilable(T::Array[String]))
   end
 
+  sig { void }
   def update
     authorize! :teach, @organization
 
@@ -76,8 +79,10 @@ class Setup::CourseTimingsController < Setup::SetupController
   end
 
   private
+    sig { void }
     def save_unlocks
       authorize! :manage_unlocks, @course
+      course = T.must(@course)
 
       groups = group_params
       groups.each do |name, unlock_data|
@@ -86,66 +91,76 @@ class Setup::CourseTimingsController < Setup::SetupController
         elsif unlock_data[:_unlock_option] == 'percentage_from'
           unlock_condition = "#{unlock_data[:_percentage_required]}% from #{unlock_data[:_unlock_groupname]}"
         end
-        @course.exercise_group_by_name(name).group_unlock_conditions = Array(unlock_condition).to_json
-        UncomputedUnlock.create_all_for_course(@course)
+        T.must(course.exercise_group_by_name(name)).group_unlock_conditions = Array(unlock_condition).to_json
+        UncomputedUnlock.create_all_for_course(course)
       end
     end
 
+    sig { void }
     def clear_all_unlocks
       authorize! :manage_unlocks, @course
-      @course.exercise_groups.each do |eg|
+      T.must(@course).exercise_groups.each do |eg|
         eg.group_unlock_conditions = [''].to_json
       end
     end
 
+    sig { params(percentage: T.any(String, Integer)).void }
     def unlocks_previous_set_completed(percentage = 80)
       authorize! :manage_unlocks, @course
-      prevname = nil
-      @course.exercise_groups.each do |eg|
+      prevname = T.let(nil, T.nilable(String))
+      T.must(@course).exercise_groups.each do |eg|
         eg.group_unlock_conditions = Array("#{percentage}% from #{prevname}").to_json unless prevname.nil?
         prevname = eg.name
       end
     end
 
+    sig { void }
     def save_deadlines
       authorize! :manage_deadlines, @course
+      course = T.must(@course)
       groups = group_params
       groups.each do |name, deadlines|
         hard_deadlines = [deadlines[:hard][:static], ''].to_json
-        @course.exercise_group_by_name(name).hard_group_deadline = hard_deadlines
+        T.must(course.exercise_group_by_name(name)).hard_group_deadline = hard_deadlines
       end
     end
 
+    sig { void }
     def clear_all_deadlines
       authorize! :manage_deadlines, @course
-      @course.exercise_groups.each do |eg|
+      T.must(@course).exercise_groups.each do |eg|
         eg.hard_group_deadline = ['', ''].to_json
       end
     end
 
+    # first_date: the first_set_date param, a one-element array of a date string.
+    sig { params(first_date: T.untyped, days: Integer).void }
     def fill_deadlines_with_interval(first_date, days = 7)
       authorize! :manage_deadlines, @course
       date = first_date
-      @course.exercise_groups.each do |eg|
+      T.must(@course).exercise_groups.each do |eg|
         eg.hard_group_deadline = date.to_json
         date = Array((DateTime.parse(date[0]) + days.days).strftime('%Y-%m-%d'))
       end
     end
 
+    sig { params(date: T.untyped).void }
     def fill_all_deadlines_with(date)
       authorize! :manage_deadlines, @course
-      @course.exercise_groups.each do |eg|
+      T.must(@course).exercise_groups.each do |eg|
         eg.hard_group_deadline = date.to_json
       end
     end
 
   private
+    sig { returns(T::Array[String]) }
     def groups_as_array
-      @course.exercise_groups.each_with_object(['']) do |group, array|
+      T.must(@course).exercise_groups.each_with_object(['']) do |group, array|
         array << group.name
       end
     end
 
+    sig { returns(T.any(ActionController::Parameters, T::Hash[T.untyped, T.untyped])) }
     def group_params
       sliced = params.slice(:group, :empty_group)
       groups = sliced[:group] || {}

@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -27,6 +28,7 @@ module Api
             end
           end
 
+          sig { void }
           def index
             unauthorize_guest!
             organization = Organization.find_by!(slug: params[:organization_slug])

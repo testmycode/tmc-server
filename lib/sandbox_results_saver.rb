@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Saves results from a remote sandbox to the database.
@@ -6,8 +7,12 @@
 require 'test_run_grader'
 
 module SandboxResultsSaver
+  extend T::Sig
+
   class InvalidTokenError < RuntimeError; end
 
+  # results: the sandbox's reply fields, keyed by name.
+  sig { params(submission: Submission, results: T::Hash[String, T.untyped]).void }
   def self.save_results(submission, results)
     ActiveRecord::Base.transaction do
       raise InvalidTokenError, 'Invalid or expired token' if results['token'] != submission.secret_token
@@ -42,7 +47,7 @@ module SandboxResultsSaver
             'Running the submission failed. Exit code: ' + results['exit_code'] + ' (did you use an exit() command?)'
           end
         # Move to tmc-langs-rust
-        if submission.stdout.include?('Temporary failure in name resolution: Unknown host maven.mooc.fi')
+        if submission.stdout&.include?('Temporary failure in name resolution: Unknown host maven.mooc.fi')
           submission.pretest_error = "Unable to run tests because this course's teacher has not configured this exercise template correctly.\nPlease contact your teacher so that they can fix the template and rerun your submission.\nIf your solution is correct, you'll get the points from this exercise once the teacher reruns your submission."
         end
       when 'finished'
@@ -54,12 +59,13 @@ module SandboxResultsSaver
 
       submission.secret_token = nil
       submission.processed = true
-      submission.processing_completed_at = Time.now
+      submission.processing_completed_at = Time.zone.now
       submission.save!
     end
   end
 
   private
+    sig { params(submission: Submission, test_output: T.untyped).void }
     def self.handle_tmc_langs_output(submission, test_output)
       if test_output.key? 'logs'
         if test_output['logs'].key? 'stdout'
@@ -87,6 +93,8 @@ module SandboxResultsSaver
       end
     end
 
+    # Returns the decoded tmc-langs run result, or an error message string if it can't be decoded.
+    sig { params(test_output: T.untyped).returns(T.untyped) }
     def self.decode_test_output(test_output)
       if test_output.blank?
         return 'Missing test output. Did you terminate your program with an exit() command? Also make sure your program did not run out of memory. For example excessive printing (thousands of lines) may cause this.'

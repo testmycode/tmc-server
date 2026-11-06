@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -5,6 +6,7 @@ module Api
     module Application
       class CredentialsController < Api::V8::BaseController
         skip_authorization_check
+        sig { void }
         def index
           valid_clients = SiteSetting.value('valid_clients')
                                      .map { |o| o['name'] }

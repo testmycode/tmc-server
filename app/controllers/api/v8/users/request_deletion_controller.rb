@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -6,6 +7,7 @@ module Api
       class RequestDeletionController < Api::V8::BaseController
         skip_authorization_check
 
+        sig { void }
         def create
           user = current_user
           user = User.find_by!(id: params[:user_id]) unless params[:user_id] == 'current'

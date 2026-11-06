@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -58,6 +59,7 @@ module Api
             end
           end
 
+          sig { void }
           def index
             unauthorize_guest!
             exercise = Exercise.find_by!(id: params[:exercise_id])
