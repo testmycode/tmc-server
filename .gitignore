@@ -38,3 +38,6 @@
 
 # Ignore default active_storage
 storage/
+
+# Nix / direnv
+/.direnv
