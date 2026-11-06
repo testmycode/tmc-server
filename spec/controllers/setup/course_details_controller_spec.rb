@@ -198,7 +198,7 @@ describe Setup::CourseDetailsController, type: :controller do
         expect(response.code.to_i).to eq(403)
         expect do
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', source_url: @repo_path } }
-        end.not_to change { Course.count }
+        end.not_to(change { Course.count })
         expect(response.code.to_i).to eq(403)
       end
 

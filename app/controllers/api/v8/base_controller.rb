@@ -90,8 +90,8 @@ module Api
           respond_with_error(msg, 401)
         end
 
-        sig { params(msg: String, code: Integer, exception: T.nilable(Exception), extra_json_keys: T::Hash[Symbol, T.untyped]).void }
-        def respond_with_error(msg, code = 500, exception = nil, extra_json_keys = {})
+        sig { params(msg: String, code: Integer, _exception: T.nilable(Exception), extra_json_keys: T::Hash[Symbol, T.untyped]).void }
+        def respond_with_error(msg, code = 500, _exception = nil, extra_json_keys = {})
           respond_to do |format|
             format.html do
               render json: errors_json(msg), status: code

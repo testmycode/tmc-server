@@ -9,10 +9,9 @@ require 'active_record'
 if ActiveRecord.gem_version < Gem::Version.new('7.2.1')
   module ActiveRecord::Scoping::Named::ClassMethods
     private
-
-    def singleton_method_added(name)
-      super
-      generate_relation_method(name) if Kernel.respond_to?(name) && !ActiveRecord::Relation.method_defined?(name)
-    end
+      def singleton_method_added(name)
+        super
+        generate_relation_method(name) if Kernel.respond_to?(name) && !ActiveRecord::Relation.method_defined?(name)
+      end
   end
 end

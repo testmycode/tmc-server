@@ -155,7 +155,6 @@ class Setup::CourseTimingsController < Setup::SetupController
       end
     end
 
-  private
     sig { returns(T::Array[String]) }
     def groups_as_array
       T.must(@course).exercise_groups.each_with_object(['']) do |group, array|

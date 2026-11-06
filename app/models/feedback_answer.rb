@@ -40,40 +40,39 @@ class FeedbackAnswer < ApplicationRecord
     by_submission.values.shuffle! # shuffled to minimize user identifiability
   end
 
-  private
-    sig { params(exercise: Exercise).returns(Arel::SelectManager) }
-    def self.numeric_answers_query(exercise)
-      questions = FeedbackQuestion.arel_table
-      answers = FeedbackAnswer.arel_table
+  sig { params(exercise: Exercise).returns(Arel::SelectManager) }
+  private_class_method def self.numeric_answers_query(exercise)
+    questions = FeedbackQuestion.arel_table
+    answers = FeedbackAnswer.arel_table
 
-      numeric_answers_base_query(exercise)
-        .project(
-          questions[:id].as('qid'),
-          answers[:submission_id].as('sid'),
-          Arel.sql('CAST(answer AS int)').as('answer')
-        )
-    end
+    numeric_answers_base_query(exercise)
+      .project(
+        questions[:id].as('qid'),
+        answers[:submission_id].as('sid'),
+        Arel.sql('CAST(answer AS int)').as('answer')
+      )
+  end
 
-    sig { params(exercise: Exercise).returns(Arel::SelectManager) }
-    def self.numeric_answer_averages_query(exercise)
-      questions = FeedbackQuestion.arel_table
+  sig { params(exercise: Exercise).returns(Arel::SelectManager) }
+  private_class_method def self.numeric_answer_averages_query(exercise)
+    questions = FeedbackQuestion.arel_table
 
-      numeric_answers_base_query(exercise)
-        .group(questions[:id])
-        .project(
-          questions[:id].as('qid'),
-          Arel.sql('AVG(CAST(answer AS int))').as('avg')
-        )
-    end
+    numeric_answers_base_query(exercise)
+      .group(questions[:id])
+      .project(
+        questions[:id].as('qid'),
+        Arel.sql('AVG(CAST(answer AS int))').as('avg')
+      )
+  end
 
-    sig { params(exercise: Exercise).returns(Arel::SelectManager) }
-    def self.numeric_answers_base_query(exercise)
-      answers = FeedbackAnswer.arel_table
-      questions = FeedbackQuestion.arel_table
+  sig { params(exercise: Exercise).returns(Arel::SelectManager) }
+  private_class_method def self.numeric_answers_base_query(exercise)
+    answers = FeedbackAnswer.arel_table
+    questions = FeedbackQuestion.arel_table
 
-      answers.join(questions).on(answers[:feedback_question_id].eq(questions[:id]))
-             .where(questions[:kind].matches('intrange%'))
-             .where(answers[:course_id].eq(exercise.course_id))
-             .where(answers[:exercise_name].eq(exercise.name))
-    end
+    answers.join(questions).on(answers[:feedback_question_id].eq(questions[:id]))
+           .where(questions[:kind].matches('intrange%'))
+           .where(answers[:course_id].eq(exercise.course_id))
+           .where(answers[:exercise_name].eq(exercise.name))
+  end
 end

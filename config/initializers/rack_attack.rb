@@ -39,7 +39,7 @@ class Rack::Attack
   end
 
   # Return 503 Service Unavailable for throttles
-  self.throttled_responder = lambda do |env|
+  self.throttled_responder = lambda do |_env|
     [ 503, # status
       {}, # headers
       ["Service Unavailable\n"] # body

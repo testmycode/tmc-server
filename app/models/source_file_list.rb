@@ -95,90 +95,90 @@ class SourceFileList
     new(files)
   end
 
-  private
-    sig { params(root_dir: T.any(String, Pathname)).returns(T::Array[FileRecord]) }
-    def self.find_source_files_under(root_dir)
-      files = T.let([], T::Array[FileRecord])
-      total_size = 0
-      Pathname(root_dir).realpath.find do |file|
-        Find.prune if file.directory? && should_skip_dir?(file)
+  sig { params(root_dir: T.any(String, Pathname)).returns(T::Array[FileRecord]) }
+  private_class_method def self.find_source_files_under(root_dir)
+    files = T.let([], T::Array[FileRecord])
+    total_size = 0
+    Pathname(root_dir).realpath.find do |file|
+      Find.prune if file.directory? && should_skip_dir?(file)
 
-        next unless source_file?(file) && file.size <= MAX_INDIVIDUAL_FILE_SIZE
-        total_size += file.size
-        raise 'Files are too large' if total_size > MAX_SIZE
+      next unless source_file?(file) && file.size <= MAX_INDIVIDUAL_FILE_SIZE
+      total_size += file.size
+      raise 'Files are too large' if total_size > MAX_SIZE
 
-        files << FileRecord.new(file.to_s, file.read)
+      files << FileRecord.new(file.to_s, file.read)
+    end
+
+    files.sort_by(&:path)
+  end
+
+  sig { params(root_dir: T.any(String, Pathname)).returns(T::Array[FileRecord]) }
+  private_class_method def self.find_all_files_under(root_dir)
+    files = T.let([], T::Array[FileRecord])
+    total_size = 0
+    Pathname(root_dir).realpath.find do |file|
+      next unless file.size <= MAX_INDIVIDUAL_FILE_SIZE
+      total_size += file.size
+      raise 'Files are too large' if total_size > MAX_SIZE
+      name = file.to_s
+      next if file.directory? || name.end_with?('.zip') || name.end_with?('.tar') || name.include?('nbproject')
+      files << FileRecord.new(file.to_s, file.read)
+    end
+
+    files.sort_by(&:path)
+  end
+
+  sig { params(file: Pathname).returns(T::Boolean) }
+  private_class_method def self.source_file?(file)
+    return false unless file.file?
+    dir = file.parent.to_s
+    name = file.basename.to_s.downcase
+    name.end_with?('.java', '.jsp') ||
+      (name.end_with?('.xml') && name != 'build.xml' && name != 'pom.xml' && name != 'nbactions.xml' && !name.end_with?('checkstyle.xml')) ||
+      name.end_with?('.properties') ||
+      name.end_with?('.txt') ||
+      name.end_with?('.html') ||
+      name.end_with?('.css') ||
+      name.end_with?('.less') ||
+      name.end_with?('.sass') ||
+      name.end_with?('.js') ||
+      name.end_with?('.c') ||
+      name.end_with?('.cpp') ||
+      name.end_with?('.qml') ||
+      name.end_with?('.hpp') ||
+      name.end_with?('.h') ||
+      name.end_with?('.rb') ||
+      (dir.include?('/R') && name.end_with?('.r')) ||
+      (dir.include?('/src') && name.end_with?('.py')) ||
+      dir.include?('/WEB-INF') ||
+      name.end_with?('.cs')
+  end
+
+  sig { params(file: Pathname).returns(T::Boolean) }
+  private_class_method def self.should_skip_dir?(file)
+    name = file.basename.to_s
+    name.start_with?('.') || name == 'test' || name == 'lib' || name == 'nbproject' || name == 'bower_components' || name == 'test_runner'
+  end
+
+  sig { params(root_dir: T.any(String, Pathname), files: T::Array[FileRecord]).void }
+  private_class_method def self.make_path_names_relative(root_dir, files)
+    root_dir = root_dir.to_s
+    for file in files
+      file.path = T.must(file.path[(root_dir.size + 1)...file.path.length]) if file.path.start_with?(root_dir)
+    end
+  end
+
+  sig { params(files: T::Array[FileRecord]).returns(T::Array[FileRecord]) }
+  private_class_method def self.sort_source_files(files)
+    files.sort_by do |f|
+      priority = if f.path.include?('WEB-INF/') then 1
+      elsif f.path.start_with?('src/main/resources') then 2
+      elsif f.path == 'pom.xml' then 3
+      else
+        0
       end
 
-      files.sort_by(&:path)
+      [priority, f.path]
     end
-
-    sig { params(root_dir: T.any(String, Pathname)).returns(T::Array[FileRecord]) }
-    def self.find_all_files_under(root_dir)
-      files = T.let([], T::Array[FileRecord])
-      total_size = 0
-      Pathname(root_dir).realpath.find do |file|
-        next unless file.size <= MAX_INDIVIDUAL_FILE_SIZE
-        total_size += file.size
-        raise 'Files are too large' if total_size > MAX_SIZE
-        name = file.to_s
-        next if file.directory? || name.end_with?('.zip') || name.end_with?('.tar') || name.include?('nbproject')
-        files << FileRecord.new(file.to_s, file.read)
-      end
-
-      files.sort_by(&:path)
-    end
-
-    sig { params(file: Pathname).returns(T::Boolean) }
-    def self.source_file?(file)
-      return false unless file.file?
-      dir = file.parent.to_s
-      name = file.basename.to_s.downcase
-      name.end_with?('.java', '.jsp') ||
-        (name.end_with?('.xml') && name != 'build.xml' && name != 'pom.xml' && name != 'nbactions.xml' && !name.end_with?('checkstyle.xml')) ||
-        name.end_with?('.properties') ||
-        name.end_with?('.txt') ||
-        name.end_with?('.html') ||
-        name.end_with?('.css') ||
-        name.end_with?('.less') ||
-        name.end_with?('.sass') ||
-        name.end_with?('.js') ||
-        name.end_with?('.c') ||
-        name.end_with?('.cpp') ||
-        name.end_with?('.qml') ||
-        name.end_with?('.hpp') ||
-        name.end_with?('.h') ||
-        name.end_with?('.rb') ||
-        (dir.include?('/R') && name.end_with?('.r')) ||
-        (dir.include?('/src') && name.end_with?('.py')) ||
-        dir.include?('/WEB-INF') ||
-        name.end_with?('.cs')
-    end
-
-    sig { params(file: Pathname).returns(T::Boolean) }
-    def self.should_skip_dir?(file)
-      name = file.basename.to_s
-      name.start_with?('.') || name == 'test' || name == 'lib' || name == 'nbproject' || name == 'bower_components' || name == 'test_runner'
-    end
-
-    sig { params(root_dir: T.any(String, Pathname), files: T::Array[FileRecord]).void }
-    def self.make_path_names_relative(root_dir, files)
-      root_dir = root_dir.to_s
-      for file in files
-        file.path = T.must(file.path[(root_dir.size + 1)...file.path.length]) if file.path.start_with?(root_dir)
-      end
-    end
-
-    sig { params(files: T::Array[FileRecord]).returns(T::Array[FileRecord]) }
-    def self.sort_source_files(files)
-      files.sort_by do |f|
-        priority = if f.path.include?('WEB-INF/') then 1
-        elsif f.path.start_with?('src/main/resources') then 2
-        elsif f.path == 'pom.xml' then 3
-        else 0
-        end
-
-        [priority, f.path]
-      end
-    end
+  end
 end

@@ -24,6 +24,7 @@ class RemoteSandbox
 
     sig { params(object: T.untyped).void }
     def initialize(object)
+      super()
       @object = object
     end
   end
@@ -89,7 +90,7 @@ class RemoteSandbox
         submission.pretest_error = 'Packaging submission took too long. Please make sure your submission is not too large or has too large files, or too many files.'
         submission.processed = true
         submission.save!
-        return
+        next
       end
 
       File.open(tar_path, 'r') do |tar_file|

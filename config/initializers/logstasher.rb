@@ -21,6 +21,7 @@ if LogStasher.enabled?
         fields[:client_version] = params[:client_version] if params[:client_version]
       end
     rescue NameError
+      # Not every logged request has params.
     end
 
     fields[:site] = /^\/api/.match?(request.path) ? 'api' : 'user'

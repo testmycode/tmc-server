@@ -54,7 +54,7 @@ module IntegrationTestActions
     # expect(page).to have_content('teacher manual')
   end
 
-  def manually_refresh_course(coursename, organization_slug, course, user)
+  def manually_refresh_course(coursename, organization_slug, _course, _user)
     visit "/org/#{organization_slug}/courses"
     click_link coursename
     link = find(:link, 'Refresh')

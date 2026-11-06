@@ -22,5 +22,5 @@ module BackgroundTaskRegistry
 end
 
 Dir.glob(Rails.root.to_s + '/app/background_tasks/*.rb').each do |f|
-  BackgroundTaskRegistry.register File.basename(f, '.rb').classify.constantize
+  BackgroundTaskRegistry.register File.basename(f, '.rb').classify.constantize # rubocop:disable Sorbet/ConstantsFromStrings -- discovers every task file
 end

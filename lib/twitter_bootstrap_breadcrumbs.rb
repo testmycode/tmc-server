@@ -25,13 +25,13 @@ module BreadCrumbs
   mixes_in_class_methods(ClassMethods)
 
     protected
-      # A Symbol name is an I18n key under breadcrumbs.<controller path>; a url that mentions a
-      # route helper or ivar is evaluated in the controller.
+      # A Symbol name is an I18n key under breadcrumbs.<controller path>; a Symbol url names a
+      # route helper to call.
       sig { params(name: T.nilable(T.any(String, Symbol)), url: T.any(String, Symbol, Proc), options: T::Hash[Symbol, T.untyped]).void }
       def add_breadcrumb(name, url = '', options = {})
         breadcrumbs = @breadcrumbs ||= T.let([], T.nilable(T::Array[T::Hash[Symbol, T.untyped]]))
         name = translate_breadcrumb(name, T.must(self.class.name)) if name.is_a?(Symbol)
-        url = eval(url.to_s) if url.class != Proc && url =~ /_path|_url|@/ # rubocop:disable Performance/RegexpMatch
+        url = send(url) if url.is_a?(Symbol)
         breadcrumbs << { name: name, url: url, options: options }
       end
 

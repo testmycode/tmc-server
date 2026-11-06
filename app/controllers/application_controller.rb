@@ -240,6 +240,7 @@ class ApplicationController < ActionController::Base
       client_version = begin
         Version.new(params['client_version']) if params['client_version'].present?
       rescue StandardError
+        nil
       end
       !client_version.nil? && client_version >= Version.new(min_version)
     end

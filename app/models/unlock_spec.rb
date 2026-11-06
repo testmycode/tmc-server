@@ -91,6 +91,16 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     !!@depends_on_other_exercises
   end
 
+  sig { params(spec: String, exercise: Exercise).returns(T::Boolean) }
+  def self.parsable?(spec, exercise)
+    UnlockSpec.new(exercise.course, ActiveSupport::JSON.decode(spec)) # Parses spec and fails if invalid
+    true
+  rescue InvalidSyntaxError
+    raise
+  rescue StandardError
+    raise InvalidSyntaxError, $!
+  end
+
   private
     sig { params(str: String).void }
     def parse_condition(str)
@@ -206,15 +216,5 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       else
         word.pluralize
       end
-    end
-
-    sig { params(spec: String, exercise: Exercise).returns(T::Boolean) }
-    def self.parsable?(spec, exercise)
-      UnlockSpec.new(exercise.course, ActiveSupport::JSON.decode(spec)) # Parses spec and fails if invalid
-      true
-    rescue InvalidSyntaxError
-      raise
-    rescue StandardError
-      raise InvalidSyntaxError, $!
     end
 end

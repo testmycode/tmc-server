@@ -38,10 +38,10 @@ module TestRunGrader
     user = T.must(submission.user)
 
     submission.test_case_runs.destroy_all
-    TestRunGrader.create_test_case_runs(submission, exercise, results)
+    create_test_case_runs(submission, exercise, results)
 
     review_points = exercise.available_points.where(requires_review: true).map(&:name)
-    TestRunGrader.award_points(submission, exercise, user, results, review_points)
+    award_points(submission, exercise, user, results, review_points)
     UncomputedUnlock.create!(course: submission.course, user: user)
     # Unlock.refresh_unlocks(submission.course, submission.user)
 
@@ -60,7 +60,7 @@ module TestRunGrader
 
   private
     sig { params(submission: Submission, exercise: Exercise, results: T::Hash[String, T.untyped]).void }
-    def self.create_test_case_runs(submission, exercise, results)
+    def create_test_case_runs(submission, exercise, results)
       all_passed = T.let(true, T::Boolean)
       results['testResults'].each do |test_result|
         passed = test_result['successful']
@@ -103,7 +103,7 @@ module TestRunGrader
         review_points: T::Array[String]
       ).void
     end
-    def self.award_points(submission, exercise, user, results, review_points)
+    def award_points(submission, exercise, user, results, review_points)
       # belongs_to :course is required.
       course = T.must(exercise.course)
       available_points = exercise.available_points.to_a.map(&:name)
@@ -132,7 +132,7 @@ module TestRunGrader
     end
 
     sig { params(results: T::Hash[String, T.untyped]).returns(T::Array[String]) }
-    def self.points_from_test_results(results)
+    def points_from_test_results(results)
       point_status = T.let({}, T::Hash[String, T.nilable(T::Boolean)]) # point -> true / false / nil i.e. ok so far / failed / unseen
       results['testResults'].each do |result|
         result['points'].each do |name|
@@ -147,7 +147,7 @@ module TestRunGrader
     end
 
     sig { params(obj: T.untyped).returns(T.nilable(String)) }
-    def self.to_json_or_null(obj)
+    def to_json_or_null(obj)
       ActiveSupport::JSON.encode(obj) unless obj.nil?
     end
 

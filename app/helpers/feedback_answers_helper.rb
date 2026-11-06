@@ -13,17 +13,6 @@ module FeedbackAnswersHelper
     end
   end
 
-  sig { params(question: FeedbackQuestion).void }
-  def feedback_statistics_for_question(question)
-    stats = {}
-    stats[:count] = question.feedback_answers.count
-
-    if question.intrange?
-    end
-
-    # TODO
-  end
-
   sig { params(action: String, answer: FeedbackAnswer).returns(String) }
   def name_for(action, answer)
     "#{action} #{pluralize(answer.reply_to_feedback_answers.count, 'reply').sub(/\d+\s/, '')}"

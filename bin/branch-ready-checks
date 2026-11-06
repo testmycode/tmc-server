@@ -1,0 +1,23 @@
+#!/bin/bash
+# Slow gates to run before opening a PR; stops at the first failure.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+run() {
+  echo "> $*"
+  "$@"
+}
+
+run bundle exec rubocop
+run bundle exec srb tc
+run bin/tapioca gem --verify
+
+# tapioca dsl loads the app, so it needs a reachable DB (DATABASE_URL, else config/database.yml development).
+if ! bundle exec rails runner 'ActiveRecord::Base.connection.execute("SELECT 1")' >/dev/null 2>&1; then
+  echo "Database not reachable. Start Postgres and set DATABASE_URL, or fix the development DB in config/database.yml." >&2
+  echo "Create it with: bin/rake db:create db:schema:load" >&2
+  exit 1
+fi
+run bin/tapioca dsl --verify
+
+echo "All branch-ready checks passed."

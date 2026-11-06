@@ -35,7 +35,7 @@ class TmcProjectFile
 
   private
     sig { returns(TmcProjectFile) }
-    def self.empty
+    private_class_method def self.empty
       TmcProjectFile.new({})
     end
 

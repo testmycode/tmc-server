@@ -90,14 +90,16 @@ class StatsController < ApplicationController
 
       start_time =
         if params[:start_time]
-        then time_param(:start_time)
-        else T.must(course.time_of_first_submission).to_date.in_time_zone
+          time_param(:start_time)
+        else
+          T.must(course.time_of_first_submission).to_date.in_time_zone
         end
       return respond_with_error('Invalid start_time', 400) if start_time.nil?
       end_time =
         if params[:end_time]
-        then time_param(:end_time)
-        else T.must(course.time_of_last_submission).to_date.in_time_zone
+          time_param(:end_time)
+        else
+          T.must(course.time_of_last_submission).to_date.in_time_zone
         end
       return respond_with_error('Invalid end_time', 400) if end_time.nil?
       time_unit = param_as_one_of(:time_unit, [nil, 'minute', 'hour', 'day']) || 'day'
@@ -192,7 +194,6 @@ class StatsController < ApplicationController
       end
     end
 
-  private
     sig { void }
     def set_organization
       @organization = Organization.find_by!(slug: params[:organization_id]) unless params[:organization_id].nil?

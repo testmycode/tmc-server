@@ -41,15 +41,15 @@ class FeedbackQuestion < ApplicationRecord
     }
   end
 
+  sig { returns(Regexp) }
+  def self.intrange_regex
+    /^intrange\[(-?\d+)\.\.(-?\d+)\]$/
+  end
+
   private
     sig { returns(Regexp) }
     def intrange_regex
       self.class.intrange_regex
-    end
-
-    sig { returns(Regexp) }
-    def self.intrange_regex
-      /^intrange\[(-?\d+)\.\.(-?\d+)\]$/
     end
 
     sig { void }

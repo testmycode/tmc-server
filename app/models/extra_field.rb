@@ -42,7 +42,7 @@ module ExtraField
   def initialize(options = {})
     @options = T.let(default_options.merge(options), T::Hash[Symbol, T.untyped])
     raise 'Name missing' unless @options[:name]
-    @value_class = T.let(Object.const_get(T.must(self.class.name) + 'Value'), T.class_of(UserFieldValue))
+    @value_class = T.let(UserFieldValue, T.class_of(UserFieldValue))
   end
 
   sig { returns(T::Hash[Symbol, T.untyped]) }
@@ -126,7 +126,7 @@ module ExtraField
       raise "Don't nest groups" if @group
       @group = group_name
       begin
-        yield
+        block.call
       ensure
         @group = nil
       end
@@ -150,25 +150,23 @@ module ExtraField
   end
   private_constant :ConfigDsl
 
-  private
-    sig { returns(T::Array[String]) }
-    def self.config_files
-      Dir.glob("#{::Rails.root}/config/extra_fields/*_fields.rb")
-    end
+  sig { returns(T::Array[String]) }
+  private_class_method def self.config_files
+    Dir.glob("#{::Rails.root}/config/extra_fields/*_fields.rb")
+  end
 
-    sig { params(kind: T.any(String, Symbol), config_file_path: String).returns(T::Array[UserField]) }
-    def self.load_fields(kind, config_file_path)
-      return [] unless File.exist?(config_file_path)
+  sig { params(kind: T.any(String, Symbol), config_file_path: String).returns(T::Array[UserField]) }
+  private_class_method def self.load_fields(kind, config_file_path)
+    return [] unless File.exist?(config_file_path)
 
-      kind = kind.to_s
+    cls =
+      case kind.to_s
+      when 'user' then UserField
+      else raise "Field class not found for kind #{kind}"
+      end
 
-      cls_name = "#{kind.camelize}Field"
-
-      cls = Object.const_get(cls_name)
-      raise "Field class not found: #{cls}" if cls.nil?
-
-      dsl = ConfigDsl.new(cls)
-      dsl.instance_eval(File.read(config_file_path))
-      dsl.fields
-    end
+    dsl = ConfigDsl.new(cls)
+    dsl.instance_eval(File.read(config_file_path))
+    dsl.fields
+  end
 end

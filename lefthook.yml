@@ -1,0 +1,8 @@
+# Skip once with LEFTHOOK=0. Slow gates live in bin/branch-ready-checks.
+pre-commit:
+  jobs:
+    - name: rubocop-autocorrect
+      glob: "*.rb"
+      # Autocorrect only: leftover offenses must not block the commit.
+      run: bundle exec rubocop --autocorrect --force-exclusion {staged_files} || true
+      stage_fixed: true

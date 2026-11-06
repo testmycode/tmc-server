@@ -55,9 +55,8 @@ module FileStore
     "#{root}/#{relpath}"
   end
 
-  private
-    sig { returns(String) }
-    def self.tmpdir
-      "#{root}/tmp"
-    end
+  sig { returns(String) }
+  private_class_method def self.tmpdir
+    "#{root}/tmp"
+  end
 end

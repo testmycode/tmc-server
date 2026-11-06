@@ -78,15 +78,18 @@ class Setup::SetupController < ApplicationController
     end
   end
 
-  # url: a route helper name, evaluated here with the current organization and course when
-  # options[:pass_parameters] is set.
-  sig { params(name: String, type: String, url: T.nilable(T.any(String, Symbol)), options: T::Hash[Symbol, T.untyped]).void }
-  def add_phase(name, type, url = '', options = {})
+  # route_helper: called with the current organization and course when options[:pass_parameters] is set.
+  sig { params(name: String, type: String, route_helper: T.nilable(Symbol), options: T::Hash[Symbol, T.untyped]).void }
+  def add_phase(name, type, route_helper = nil, options = {})
     phases = @course_setup_phases ||= T.let([], T.nilable(T::Array[T::Hash[Symbol, T.untyped]]))
-    if options[:pass_parameters]
-      url = url.to_s + "('#{T.must(@organization).slug}', #{T.must(@course).id})"
-    end
-    url = eval(url.to_s) if url =~ /_path|_url|@/
+    url =
+      if route_helper.nil?
+        nil
+      elsif options[:pass_parameters]
+        send(route_helper, T.must(@organization).slug, T.must(@course).id)
+      else
+        send(route_helper)
+      end
     phases << { name: name, url: url, type: type }
   end
 

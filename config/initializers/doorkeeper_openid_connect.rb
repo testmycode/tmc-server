@@ -40,7 +40,7 @@ Doorkeeper::OpenidConnect.configure do
     # redirect_to account_select_url
   end
 
-  subject do |resource_owner, application|
+  subject do |resource_owner, _application|
     # Example implementation:
     # resource_owner.id
 

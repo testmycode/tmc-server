@@ -5,10 +5,8 @@ require 'etc'
 
 namespace :background_daemon do
   namespace :init do
-    DEFAULT_NAME = 'tmc-background-daemon'
-
     def init_script(name = nil)
-      name ||= DEFAULT_NAME
+      name ||= 'tmc-background-daemon'
       RubyInitScript.new(
         name: name,
         short_description: 'TMC background daemon',

@@ -68,52 +68,51 @@ module SandboxResultsSaver
     end
   end
 
-  private
-    sig { params(submission: Submission, test_output: T.untyped).void }
-    def self.handle_tmc_langs_output(submission, test_output)
-      if test_output.key? 'logs'
-        if test_output['logs'].key? 'stdout'
-          submission.stdout = test_output['logs']['stdout']
-        end
-        if test_output['logs'].key? 'stderr'
-          submission.stderr = test_output['logs']['stderr']
-        end
+  sig { params(submission: Submission, test_output: T.untyped).void }
+  private_class_method def self.handle_tmc_langs_output(submission, test_output)
+    if test_output.key? 'logs'
+      if test_output['logs'].key? 'stdout'
+        submission.stdout = test_output['logs']['stdout']
       end
+      if test_output['logs'].key? 'stderr'
+        submission.stderr = test_output['logs']['stderr']
+      end
+    end
 
-      case test_output['status']
-      when 'COMPILE_FAILED'
-        submission.pretest_error = "Compilation error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
-        submission.all_tests_passed = false
-      when 'GENERIC_ERROR'
-        submission.pretest_error = "Generic error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
-        submission.all_tests_passed = false
-      when 'TESTS_FAILED', 'PASSED'
-        submission.pretest_error = nil
-      when 'TESTRUN_INTERRUPTED'
-        submission.pretest_error = "Missing test output. Did you terminate your program with an exit() command?\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
-        submission.all_tests_passed = false
+    case test_output['status']
+    when 'COMPILE_FAILED'
+      submission.pretest_error = "Compilation error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
+      submission.all_tests_passed = false
+    when 'GENERIC_ERROR'
+      submission.pretest_error = "Generic error:\n" + test_output['logs'].map do |k, v| "#{k}: #{v}" end.join("\n")
+      submission.all_tests_passed = false
+    when 'TESTS_FAILED', 'PASSED'
+      submission.pretest_error = nil
+    when 'TESTRUN_INTERRUPTED'
+      submission.pretest_error = "Missing test output. Did you terminate your program with an exit() command?\nAlso make sure your program did not run out of memory.\nFor example excessive printing (thousands of lines) may cause this."
+      submission.all_tests_passed = false
+    else
+      raise "Unknown result type from tmc-langs: #{test_output}"
+    end
+  end
+
+  # Returns the decoded tmc-langs run result, or an error message string if it can't be decoded.
+  sig { params(test_output: T.untyped).returns(T.untyped) }
+  private_class_method def self.decode_test_output(test_output)
+    if test_output.blank?
+      return 'Missing test output. Did you terminate your program with an exit() command? Also make sure your program did not run out of memory. For example excessive printing (thousands of lines) may cause this.'
+    end
+
+    begin
+      result = if test_output.is_a?(Enumerable)
+        test_output
       else
-        raise "Unknown result type from tmc-langs: #{test_output}"
+        ActiveSupport::JSON.decode(test_output)
       end
+      raise unless result.is_a?(Hash)
+      result
+    rescue StandardError
+      'Unknown error while running tests.'
     end
-
-    # Returns the decoded tmc-langs run result, or an error message string if it can't be decoded.
-    sig { params(test_output: T.untyped).returns(T.untyped) }
-    def self.decode_test_output(test_output)
-      if test_output.blank?
-        return 'Missing test output. Did you terminate your program with an exit() command? Also make sure your program did not run out of memory. For example excessive printing (thousands of lines) may cause this.'
-      end
-
-      begin
-        result = if test_output.is_a?(Enumerable)
-          test_output
-        else
-          ActiveSupport::JSON.decode(test_output)
-        end
-        raise unless result.is_a?(Hash)
-        result
-      rescue StandardError
-        'Unknown error while running tests.'
-      end
-    end
+  end
 end

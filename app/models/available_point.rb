@@ -103,6 +103,7 @@ class AvailablePoint < ApplicationRecord
       created_at: point_awarded_at
     )
   rescue ActiveRecord::RecordNotUnique
+    # Already awarded.
   end
 
   private

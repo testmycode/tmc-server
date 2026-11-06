@@ -32,10 +32,10 @@ class DocGen
     File.open(output_path, 'wb') { |f| f.write(text) }
   end
 
-  sig { params(_options: T.untyped).returns(String) }
-  def screenshot(_options = {})
+  sig { params(options: T.untyped).returns(String) }
+  def screenshot(options = {})
     name = next_screenshot_name
-    screenshot_to_file("#{root_path}/screenshots/#{name}", _options)
+    screenshot_to_file("#{root_path}/screenshots/#{name}", options)
     '<img src="screenshots/' + name + '" alt="(screenshot)" class="screenshot" />'
   end
 
@@ -66,10 +66,10 @@ class DocGen
       "#{@doc_name}-#{@img_counter}.png"
     end
 
-    sig { params(path: T.any(String, Pathname), _options: T.untyped).returns(T.untyped) }
-    def screenshot_to_file(path, _options)
+    sig { params(path: T.any(String, Pathname), overrides: T.untyped).returns(T.untyped) }
+    def screenshot_to_file(path, overrides)
       default_options = T.let({ full: true }, T::Hash[Symbol, T.untyped])
-      options = default_options.merge(_options)
+      options = default_options.merge(overrides)
       FileUtils.mkdir_p(File.dirname(path))
       options[:wide] ? @test_case.page.driver.browser.resize(1200, 800) : @test_case.page.driver.browser.resize(1024, 768)
       @test_case.page.save_screenshot(path, full: options[:full])

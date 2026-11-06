@@ -23,12 +23,12 @@ Dir.chdir root_dir
 require root_dir + '/config/environment'
 
 stdout_logger = Logger.new(STDOUT)
-stdout_logger.formatter = proc do |severity, datetime, progname, msg|
+stdout_logger.formatter = proc do |severity, datetime, _progname, msg|
   "#{datetime}: #{severity} - #{msg}\n"
 end
 
 file_logger = Logger.new(Rails.root.join('log', 'background_daemon.log'))
-file_logger.formatter = proc do |severity, datetime, progname, msg|
+file_logger.formatter = proc do |severity, datetime, _progname, msg|
   "#{datetime}: #{severity} - #{msg}\n"
 end
 
@@ -46,7 +46,7 @@ processes = BackgroundTaskRegistry.all_tasks.map do |task|
     # Create individual logger for this task
     task_log_file = Rails.root.join('log', 'background_daemon', "#{task.class.name.underscore}.log")
     task_logger = Logger.new(task_log_file)
-    task_logger.formatter = proc do |severity, datetime, progname, msg|
+    task_logger.formatter = proc do |severity, datetime, _progname, msg|
       "#{datetime}: #{severity} - #{msg}\n"
     end
     task_logger.auto_flushing = true if task_logger.respond_to? :auto_flushing=

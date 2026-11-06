@@ -19,6 +19,7 @@ class SessionsController < ApplicationController
     begin
       clear_expired_sessions
     rescue StandardError
+      # Cleanup is best effort; it must not block logging in.
     end
 
     user, status = User.authenticate_with_status(params[:session][:login], params[:session][:password])

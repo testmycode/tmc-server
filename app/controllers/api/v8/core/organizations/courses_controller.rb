@@ -36,7 +36,7 @@ module Api
             courses = organization.courses.ongoing.order(ordering)
             courses = courses.select { |c| c.visible_to?(current_user) }
             authorize! :read, courses
-            present courses.map { |c| c.links_as_json(view_context) }
+            present(courses.map { |c| c.links_as_json(view_context) })
           end
         end
       end

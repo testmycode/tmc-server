@@ -27,17 +27,16 @@ class ExerciseCompletionStatusGenerator
     completion_status
   end
 
-  private
-    sig { params(required_points: T::Array[String], awarded_points: T::Array[String], attempted: T::Boolean).returns(T.nilable(Integer)) }
-    def self.completion_status_of_exercise(required_points, awarded_points, attempted)
-      return nil if required_points.empty?
-      return nil if required_points == (required_points - awarded_points) && !attempted
-      percentage_of_completed_exercises(required_points - awarded_points, required_points)
-    end
+  sig { params(required_points: T::Array[String], awarded_points: T::Array[String], attempted: T::Boolean).returns(T.nilable(Integer)) }
+  private_class_method def self.completion_status_of_exercise(required_points, awarded_points, attempted)
+    return nil if required_points.empty?
+    return nil if required_points == (required_points - awarded_points) && !attempted
+    percentage_of_completed_exercises(required_points - awarded_points, required_points)
+  end
 
-    sig { params(not_awarded: T::Array[String], required: T::Array[String]).returns(Integer) }
-    def self.percentage_of_completed_exercises(not_awarded, required)
-      return 100 if not_awarded.empty?
-      (100 * (required.size - not_awarded.size)) / required.size
-    end
+  sig { params(not_awarded: T::Array[String], required: T::Array[String]).returns(Integer) }
+  private_class_method def self.percentage_of_completed_exercises(not_awarded, required)
+    return 100 if not_awarded.empty?
+    (100 * (required.size - not_awarded.size)) / required.size
+  end
 end

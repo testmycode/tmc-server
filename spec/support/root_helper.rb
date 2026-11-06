@@ -55,7 +55,7 @@ class RootHelper
 
   private
     def main_loop
-      begin
+      loop do
         command = @pipe_in.readline.strip
         begin
           response = execute_command(command)
@@ -64,7 +64,8 @@ class RootHelper
           debug(response)
         end
         @pipe_out.write("#{response}\n") if response.present?
-      end while command != 'STOP'
+        break if command == 'STOP'
+      end
     end
 
     def execute_command(command)
@@ -95,7 +96,6 @@ class RootHelper
       @server_pids = []
     end
 
-  private
     def start_server(port)
       debug("Starting server #{port}")
 

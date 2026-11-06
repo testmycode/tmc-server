@@ -357,11 +357,12 @@ class Course < ApplicationRecord
       result = exercises.all.map(&:exercise_group_name).uniq
                         .map { |gname| ExerciseGroup.new(self, gname) }
 
-      begin
+      loop do
         all_parents = result.map(&:parent_name).compact
         new_parents = all_parents.reject { |pn| result.any? { |eg| eg.name == pn } }.uniq
+        break if new_parents.empty?
         result += new_parents.map { |pn| ExerciseGroup.new(self, pn) }
-      end until new_parents.empty?
+      end
 
       result.sort
     end, T.nilable(T::Array[ExerciseGroup]))
@@ -579,9 +580,13 @@ class Course < ApplicationRecord
 
   sig { params(material: T.nilable(String)).void }
   def material_url=(material)
-    return super('') if material.blank?
-    return super("http://#{material}") unless /^https?:\/\//.match?(material)
-    super(material)
+    if material.blank?
+      super('')
+    elsif !/^https?:\/\//.match?(material)
+      super("http://#{material}")
+    else
+      super(material)
+    end
   end
 
   sig { returns(T::Boolean) }
@@ -591,8 +596,11 @@ class Course < ApplicationRecord
 
   sig { params(url: T.nilable(String)).void }
   def external_scoreboard_url=(url)
-    return super("http://#{url}") unless url =~ /^(https?:\/\/|$)/
-    super(url)
+    if url =~ /^(https?:\/\/|$)/
+      super(url)
+    else
+      super("http://#{url}")
+    end
   end
 
   sig { returns(T::Boolean) }

@@ -83,8 +83,8 @@ module Api
               missing_review_points: exercise ? exercise.missing_review_points_for(T.must(submission.user)) : []
             }
 
-            submission_json = submission_json.merge(
-              T.must(case submission.status(current_user)
+            status_fields =
+              case submission.status(current_user)
               when :processing then {
                 submissions_before_this: submission.unprocessed_submissions_before_this,
                 total_unprocessed: Submission.unprocessed_count
@@ -107,8 +107,8 @@ module Api
               when :error then {
                 error: submission.pretest_error
               }
-              end)
-            )
+              end
+            submission_json = submission_json.merge(T.must(status_fields))
             submission_json[:status] = :ok if submission_json[:status] == :hidden && !netbeans_plugin_at_least?('1.2.5')
             if !!params[:include_files]
               submission_json[:files] = SourceFileList.for_submission(submission).map { |f| { path: f.path, contents: f.contents } }

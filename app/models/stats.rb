@@ -71,25 +71,24 @@ module Stats
     participants_with_submissions_count(exercises) * exercises.size
   end
 
-  private
-    sig { returns(ActiveRecord::Relation) }
-    def self.all_regular_users
-      User.where(administrator: false)
-    end
+  sig { returns(ActiveRecord::Relation) }
+  private_class_method def self.all_regular_users
+    User.where(administrator: false)
+  end
 
-    sig { returns(ActiveRecord::Relation) }
-    def self.all_nonhidden_exercises
-      Exercise.where(hidden: false)
-    end
+  sig { returns(ActiveRecord::Relation) }
+  private_class_method def self.all_nonhidden_exercises
+    Exercise.where(hidden: false)
+  end
 
-    sig { params(exercise_or_course: T.nilable(T.any(Course, T.any(ActiveRecord::Relation, T::Array[Exercise])))).returns(T.any(ActiveRecord::Relation, T::Array[Exercise])) }
-    def self.get_exercises(exercise_or_course = nil)
-      if exercise_or_course.nil?
-        all_nonhidden_exercises
-      elsif exercise_or_course.is_a?(Course)
-        exercise_or_course.exercises.where(hidden: false)
-      else
-        exercise_or_course
-      end
+  sig { params(exercise_or_course: T.nilable(T.any(Course, T.any(ActiveRecord::Relation, T::Array[Exercise])))).returns(T.any(ActiveRecord::Relation, T::Array[Exercise])) }
+  private_class_method def self.get_exercises(exercise_or_course = nil)
+    if exercise_or_course.nil?
+      all_nonhidden_exercises
+    elsif exercise_or_course.is_a?(Course)
+      exercise_or_course.exercises.where(hidden: false)
+    else
+      exercise_or_course
     end
+  end
 end

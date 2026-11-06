@@ -272,7 +272,6 @@ class ParticipantsController < ApplicationController
       end
     end
 
-  private
     sig { void }
     def set_organization
       @organization = Organization.find_by!(slug: params[:organization_id]) unless params[:organization_id].nil?

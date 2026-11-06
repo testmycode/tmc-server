@@ -79,8 +79,8 @@ class SubmissionsController < ApplicationController
           missing_review_points: exercise ? exercise.missing_review_points_for(T.must(submission.user)) : []
         }
 
-        output = output.merge(
-          T.must(case submission.status(current_user)
+        status_fields =
+          case submission.status(current_user)
           when :processing then {
             submissions_before_this: submission.unprocessed_submissions_before_this,
             total_unprocessed: Submission.unprocessed_count
@@ -103,8 +103,8 @@ class SubmissionsController < ApplicationController
           when :error then {
             error: submission.pretest_error
           }
-          end)
-        )
+          end
+        output = output.merge(T.must(status_fields))
         output[:status] = :ok if output[:status] == :hidden
         if !!params[:include_files]
           output[:files] = SourceFileList.for_submission(submission).map { |f| { path: f.path, contents: f.contents } }
@@ -363,17 +363,14 @@ class SubmissionsController < ApplicationController
         return if can?(:teach, course) || submission.user_id.to_s == current_user.id.to_s
         if T.must(submission.created_at) > 2.hours.ago
           respond_forbidden("You cannot see this paste because all tests passed and you haven't completed this exercise.") unless paste_visible
-          return
         else
           unless paste_visible
             submission_exercise = submission.exercise
             if submission_exercise && !submission_exercise.completed_by?(current_user)
               respond_forbidden("You cannot see this paste because you haven't completed this exercise.")
-              return
             else
               respond_forbidden('You cannot see this paste because it was created over 2 hours ago.')
             end
-            return
           end
         end
       end

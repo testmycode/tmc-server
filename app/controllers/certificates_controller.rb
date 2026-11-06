@@ -17,7 +17,7 @@ class CertificatesController < ApplicationController
     certificate = Certificate.new(user: @user)
     @certificate = T.let(certificate, T.nilable(Certificate))
 
-    last_certificate =  certificates.last
+    last_certificate = certificates.last
     certificate.name = last_certificate.name if last_certificate
   end
 

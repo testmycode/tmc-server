@@ -1,8 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'set'
-
 # Keeps track of whether a (course, user)'s unlocks have yet to be computed, enabling lazy computation.
 # A course refresh populates this table and the UnlockComputerTask background task
 # consumes it by calling Unlock.refresh_unlocks on the entries. Code that needs

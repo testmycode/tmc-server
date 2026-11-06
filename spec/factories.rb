@@ -30,7 +30,7 @@ FactoryBot.define do
     sequence(:login) { |n| "user#{n}" }
     sequence(:password) { |n| "userpass#{n}" }
     sequence(:email) { |n| "user#{n}@example.com" }
-    sequence(:email_verified) { |n| 'false' }
+    sequence(:email_verified) { 'false' }
     administrator { false }
     password_managed_by_courses_mooc_fi { false }
   end
@@ -39,7 +39,7 @@ FactoryBot.define do
     sequence(:login) { |n| "ver_user#{n}" }
     sequence(:password) { |n| "ver_userpass#{n}" }
     sequence(:email) { |n| "ver_user#{n}@example.com" }
-    sequence(:email_verified) { |n| 'true' }
+    sequence(:email_verified) { 'true' }
     administrator { false }
     password_managed_by_courses_mooc_fi { false }
   end
@@ -48,7 +48,7 @@ FactoryBot.define do
     sequence(:login) { |n| "admin#{n}" }
     sequence(:password) { |n| "adminpass#{n}" }
     sequence(:email) { |n| "admin#{n}@example.com" }
-    sequence(:email_verified) { |n| 'true' }
+    sequence(:email_verified) { 'true' }
     administrator { true }
     password_managed_by_courses_mooc_fi { false }
   end

@@ -1,16 +1,32 @@
+require:
+  - rubocop-sorbet
+
 inherit_gem:
   rubocop-rails_config:
     - config/rails.yml
 
 AllCops:
   SuggestExtensions: false
-  TargetRubyVersion: 2.5
+  NewCops: disable
+  TargetRubyVersion: 3.3
   Exclude:
     - 'ext/**/*'
     - 'db/**/*'
     - '**/vendor/**/*'
 
+# rails_config sets DisabledByDefault; enabling a department opts in its default
+# cops without turning off the rails_config ones.
+Lint:
+  Enabled: true
+
+Security:
+  Enabled: true
+
 # Style
+# Ruby 3.1+ shorthand (`{ x: }`) would rewrite ~600 hashes; not worth the churn.
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
+
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: single_quotes
@@ -49,3 +65,35 @@ Metrics/PerceivedComplexity:
 
 Performance/RegexpMatch:
   Enabled: false
+
+# Dormant until TargetRubyVersion 3.3; deferred to the Performance autocorrect stage.
+Style/MapToHash:
+  Enabled: false
+
+Performance/SelectMap:
+  Enabled: false
+
+Performance/MapCompact:
+  Enabled: false
+
+Sorbet/ValidSigil:
+  Enabled: true
+
+Sorbet/EnforceSigilOrder:
+  Enabled: true
+
+Sorbet/StrictSigil:
+  Enabled: true
+  Include:
+    - 'app/**/*.rb'
+    - 'lib/**/*.rb'
+    - 'config/**/*.rb'
+  Exclude:
+    # DSL files read with instance_eval; Sorbet ignores them.
+    - 'config/extra_fields/*'
+
+Sorbet/SignatureBuildOrder:
+  Enabled: true
+
+Sorbet/ConstantsFromStrings:
+  Enabled: true

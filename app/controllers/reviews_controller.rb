@@ -282,7 +282,6 @@ class ReviewsController < ApplicationController
       submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
     end
 
-  private
     sig { void }
     def set_organization
       @organization = Organization.find_by!(slug: params[:organization_id]) unless params[:organization_id].nil?

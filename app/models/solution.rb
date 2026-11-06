@@ -56,6 +56,7 @@ class Solution
   def files
     @files ||= T.let(SourceFileList.for_solution(self), T.nilable(SourceFileList))
   end
+
   private
     sig { returns(Course) }
     def course

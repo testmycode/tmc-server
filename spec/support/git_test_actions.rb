@@ -50,10 +50,10 @@ module GitTestActions
       return base_name unless File.exist?(base_name)
 
       n = 1
-      begin
+      loop do
         n += 1
         name = base_name + n.to_s
-      end while File.exist?(name)
-      name
+        break name unless File.exist?(name)
+      end
     end
 end

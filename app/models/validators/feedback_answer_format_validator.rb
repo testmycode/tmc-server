@@ -9,7 +9,7 @@ class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
     kind = T.must(record.feedback_question).kind
     ans = record.answer.strip
 
-    if kind =~ FeedbackQuestion.send(:intrange_regex)
+    if kind =~ FeedbackQuestion.intrange_regex
       range = (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
       if !/^(-?\d+)$/.match?(ans)
         record.errors.add(:answer, 'is not an integer')

@@ -74,6 +74,7 @@ group :development, :test do
   gem 'railroady', '~> 1.6' # for doc/diagrams
   gem 'rubocop', '~> 1.65', require: false
   gem 'rubocop-rails_config', '~> 1.16' # Rubocop locked
+  gem 'rubocop-sorbet', '~> 0.10.1', require: false # 0.10.2+ needs rubocop 1.75
   gem 'ruby-prof', '~> 1.7' # for performance tests
   gem 'simplecov', '~> 0.22.0', require: false
   gem 'sorbet', '~> 0.6.13640', require: false

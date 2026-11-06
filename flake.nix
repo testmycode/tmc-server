@@ -35,6 +35,7 @@
             pkgs.gnumake
             pkgs.vips
             pkgs.git
+            pkgs.lefthook
           ];
 
           shellHook = ''
@@ -42,6 +43,11 @@
             export BUNDLE_PATH="$PWD/vendor/bundle"
             export GEM_HOME="$PWD/vendor/bundle/ruby/${ruby.version.libDir}"
             export PATH="$GEM_HOME/bin:$PWD/bin:$PATH"
+
+            # Never in CI or Docker builds.
+            if [ -z "''${CI:-}" ] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+              lefthook install >/dev/null
+            fi
           '';
         };
       }

@@ -53,16 +53,16 @@ module RustLangsCliExecutor
     Rails.logger.info(command)
     parsed_data = T.let(nil, T.untyped)
 
-    Open3.popen2(command) do |stdin, stdout, status_thread|
+    Open3.popen2(command) do |_stdin, stdout, status_thread|
       Timeout.timeout(600, Timeout::Error, 'Refresh process took more than 10 minutes...') do
         stdout.each_line do |line|
           Rails.logger.info("Rust Refresh output \n#{line}")
           data = parse_as_JSON(line)
-          return unless data
+          return nil unless data
 
           parsed_data = self.process_refresh_command_output(data)
           if data['output-kind'] == 'status-update'
-            ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", parsed_data) unless parsed_data[:percent_done] == 1.0
+            ActionCable.server.broadcast("CourseTemplateRefreshChannel-#{course_template.id}", parsed_data) unless parsed_data[:percent_done] == 1.0 # rubocop:disable Lint/FloatComparison -- tmc-langs reports exactly 1.0 when done
             course_template_refresh_task.percent_done = parsed_data[:percent_done]
             course_template_refresh_task.create_phase(parsed_data[:message], parsed_data[:time])
           end
@@ -78,57 +78,56 @@ module RustLangsCliExecutor
     parsed_data
   end
 
-  private
-    sig { params(output: String).returns(T.untyped) }
-    def self.parse_as_JSON(output)
-      JSON.parse output
-    rescue StandardError => e
-      Rails.logger.info("Could not parse output line. #{e}")
+  sig { params(output: String).returns(T.untyped) }
+  private_class_method def self.parse_as_JSON(output)
+    JSON.parse output
+  rescue StandardError => e
+    Rails.logger.info("Could not parse output line. #{e}")
+  end
+
+  sig { returns(String) }
+  private_class_method def self.langs_executable_path
+    Pathname.new("#{::Rails.root}/vendor/tmc-langs-rust").relative_path_from(Pathname.new(Dir.pwd)).to_s
+  end
+
+  sig { params(command_output: String).returns(T.untyped) }
+  private_class_method def self.process_prepare_submission_command_output(command_output)
+    output_lines = command_output.split("\n")
+    valid_lines = output_lines.map do |line|
+      JSON.parse line
+    rescue
+      nil
+    end.select { |line| !!line }
+
+    last_line = valid_lines.last
+    raise 'TMC-langs-rust printed no JSON output' if last_line.nil?
+
+    if last_line['status'] == 'crashed'
+      Rails.logger.info('TMC-langs-rust crashed')
+      Rails.logger.info(last_line)
+      raise "TMC-langs-rust crashed: #{last_line.to_json}"
     end
 
-    sig { returns(String) }
-    def self.langs_executable_path
-      Pathname.new("#{::Rails.root}/vendor/tmc-langs-rust").relative_path_from(Pathname.new(Dir.pwd)).to_s
-    end
+    last_line
+  end
 
-    sig { params(command_output: String).returns(T.untyped) }
-    def self.process_prepare_submission_command_output(command_output)
-      output_lines = command_output.split("\n")
-      valid_lines = output_lines.map do |line|
-        JSON.parse line
-      rescue
-        nil
-      end.select { |line| !!line }
-
-      last_line = valid_lines.last
-      raise 'TMC-langs-rust printed no JSON output' if last_line.nil?
-
-      if last_line['status'] == 'crashed'
-        Rails.logger.info('TMC-langs-rust crashed')
-        Rails.logger.info(last_line)
-        raise "TMC-langs-rust crashed: #{last_line.to_json}"
-      end
-
-      last_line
-    end
-
-    sig { params(command_output: T.untyped).returns(T.untyped) }
-    def self.process_refresh_command_output(command_output)
-      data = command_output['data']
-      if command_output['status'] == 'crashed'
-        raise "TMC-langs-rust crashed: \n#{data}"
-      elsif command_output['output-kind'] == 'status-update'
-        {
-          message: command_output['message'],
-          percent_done: command_output['percent-done'],
-          time: command_output['time'],
-        }
-      elsif command_output['status'] == 'finished'
-        if command_output['result'] == 'error'
-          raise data['output-data']['trace'].join("\n")
-        elsif command_output['result'] == 'executed-command'
-          data
-        end
+  sig { params(command_output: T.untyped).returns(T.untyped) }
+  private_class_method def self.process_refresh_command_output(command_output)
+    data = command_output['data']
+    if command_output['status'] == 'crashed'
+      raise "TMC-langs-rust crashed: \n#{data}"
+    elsif command_output['output-kind'] == 'status-update'
+      {
+        message: command_output['message'],
+        percent_done: command_output['percent-done'],
+        time: command_output['time'],
+      }
+    elsif command_output['status'] == 'finished'
+      if command_output['result'] == 'error'
+        raise data['output-data']['trace'].join("\n")
+      elsif command_output['result'] == 'executed-command'
+        data
       end
     end
+  end
 end

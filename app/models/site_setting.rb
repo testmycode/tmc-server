@@ -24,23 +24,22 @@ class SiteSetting
     @settings = settings_from_files(settings_files.select { |f| f.end_with?('site.defaults.yml') })
   end
 
-  private
-    sig { params(files: T::Array[String]).returns(T::Hash[String, T.untyped]) }
-    def self.settings_from_files(files)
-      result = T.let({}, T::Hash[String, T.untyped])
-      files.each do |path|
-        next unless File.exist?(path)
-        template = ERB.new File.new(path).read
-        data = YAML.safe_load template.result(binding)
-        raise "Invalid configuration file #{path}" unless data.is_a? Hash
-        result = result.deep_merge(data)
-      end
-      result
+  sig { params(files: T::Array[String]).returns(T::Hash[String, T.untyped]) }
+  private_class_method def self.settings_from_files(files)
+    result = T.let({}, T::Hash[String, T.untyped])
+    files.each do |path|
+      next unless File.exist?(path)
+      template = ERB.new File.new(path).read
+      data = YAML.safe_load template.result(binding)
+      raise "Invalid configuration file #{path}" unless data.is_a? Hash
+      result = result.deep_merge(data)
     end
+    result
+  end
 
-    sig { returns(T::Array[String]) }
-    def self.settings_files
-      config_dir = "#{Rails.root}/config"
-      ["#{config_dir}/site.defaults.yml", "#{config_dir}/site.yml"]
-    end
+  sig { returns(T::Array[String]) }
+  private_class_method def self.settings_files
+    config_dir = "#{Rails.root}/config"
+    ["#{config_dir}/site.defaults.yml", "#{config_dir}/site.yml"]
+  end
 end
