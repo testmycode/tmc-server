@@ -137,6 +137,17 @@ describe SubmissionsController, type: :controller do
     end
   end
 
+  describe 'GET index' do
+    render_views
+
+    it 'loads the rows from a URL whose query is separated by plain ampersands' do
+      controller.current_user = FactoryBot.create(:admin)
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id }
+      url = JSON.parse(response.body[/url: (".*"),$/, 1])
+      expect(URI(url).query.split('&')).to include('row_format=datatables')
+    end
+  end
+
   describe 'when the exercise has been removed from the course' do
     render_views
 

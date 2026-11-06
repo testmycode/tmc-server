@@ -33,7 +33,7 @@ describe 'The system (used by an instructor for administration)', type: :request
     expect(page).not_to have_content('MyExercise')
 
     repo = clone_course_repo(course)
-    repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)
+    repo.copy_simple_exercise('MyExercise', deadline: (Date.current - 1.day).to_s)
     repo.add_commit_push
 
     manually_refresh_course('mycourse', @organization.slug, course, @teacher)

@@ -12,16 +12,16 @@ class ActiveJob::LogSubscriber < ::ActiveSupport::LogSubscriber; end
 module LogStasher
   extend ::LogStasher
 
-  # pkg:gem/logstasher#lib/logstasher.rb:69
+  # pkg:gem/logstasher#lib/logstasher.rb:83
   def add_custom_fields(&block); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:78
+  # pkg:gem/logstasher#lib/logstasher.rb:99
   def add_custom_fields_to_request_context(&block); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:58
+  # pkg:gem/logstasher#lib/logstasher.rb:72
   def add_default_fields_to_payload(payload, request); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:87
+  # pkg:gem/logstasher#lib/logstasher.rb:115
   def add_default_fields_to_request_context(request); end
 
   # pkg:gem/logstasher#lib/logstasher.rb:22
@@ -36,19 +36,19 @@ module LogStasher
   # pkg:gem/logstasher#lib/logstasher.rb:22
   def backtrace_filter=(_arg0); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:184
+  # pkg:gem/logstasher#lib/logstasher.rb:212
   def build_logstash_event(data, tags); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:134
+  # pkg:gem/logstasher#lib/logstasher.rb:162
   def called_as_console?; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:130
+  # pkg:gem/logstasher#lib/logstasher.rb:158
   def called_as_rake?; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:91
+  # pkg:gem/logstasher#lib/logstasher.rb:119
   def clear_request_context; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:149
+  # pkg:gem/logstasher#lib/logstasher.rb:177
   def configured_to_suppress_app_logs?(config); end
 
   # pkg:gem/logstasher#lib/logstasher.rb:22
@@ -57,7 +57,7 @@ module LogStasher
   # pkg:gem/logstasher#lib/logstasher.rb:22
   def controller_monkey_patch=(_arg0); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:212
+  # pkg:gem/logstasher#lib/logstasher.rb:240
   def debug(message = T.unsafe(nil), additional_fields = T.unsafe(nil)); end
 
   # pkg:gem/logstasher#lib/logstasher/railtie.rb:9
@@ -69,13 +69,13 @@ module LogStasher
   # pkg:gem/logstasher#lib/logstasher.rb:22
   def enabled=(_arg0); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:219
+  # pkg:gem/logstasher#lib/logstasher.rb:247
   def enabled?; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:212
+  # pkg:gem/logstasher#lib/logstasher.rb:240
   def error(message = T.unsafe(nil), additional_fields = T.unsafe(nil)); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:212
+  # pkg:gem/logstasher#lib/logstasher.rb:240
   def fatal(message = T.unsafe(nil), additional_fields = T.unsafe(nil)); end
 
   # pkg:gem/logstasher#lib/logstasher.rb:22
@@ -84,10 +84,10 @@ module LogStasher
   # pkg:gem/logstasher#lib/logstasher.rb:22
   def field_renaming=(_arg0); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:138
+  # pkg:gem/logstasher#lib/logstasher.rb:166
   def has_active_job?; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:212
+  # pkg:gem/logstasher#lib/logstasher.rb:240
   def info(message = T.unsafe(nil), additional_fields = T.unsafe(nil)); end
 
   # Log an arbitrary message.
@@ -102,7 +102,7 @@ module LogStasher
   #   LogStasher.info("message", timing:1234)
   #   LogStasher.info(custom1:"yes", custom2:"no")
   #
-  # pkg:gem/logstasher#lib/logstasher.rb:165
+  # pkg:gem/logstasher#lib/logstasher.rb:193
   def log(severity, message, additional_fields = T.unsafe(nil)); end
 
   # pkg:gem/logstasher#lib/logstasher.rb:22
@@ -129,19 +129,19 @@ module LogStasher
   # pkg:gem/logstasher#lib/logstasher.rb:30
   def remove_existing_log_subscriptions; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:199
+  # pkg:gem/logstasher#lib/logstasher.rb:227
   def request_context; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:126
+  # pkg:gem/logstasher#lib/logstasher.rb:154
   def set_data_for_console; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:122
+  # pkg:gem/logstasher#lib/logstasher.rb:150
   def set_data_for_rake; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:104
+  # pkg:gem/logstasher#lib/logstasher.rb:132
   def setup(config); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:95
+  # pkg:gem/logstasher#lib/logstasher.rb:123
   def setup_before(config); end
 
   # pkg:gem/logstasher#lib/logstasher.rb:22
@@ -150,27 +150,27 @@ module LogStasher
   # pkg:gem/logstasher#lib/logstasher.rb:22
   def source=(_arg0); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:191
+  # pkg:gem/logstasher#lib/logstasher.rb:219
   def store; end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:142
+  # pkg:gem/logstasher#lib/logstasher.rb:170
   def suppress_app_logs(config); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:212
+  # pkg:gem/logstasher#lib/logstasher.rb:240
   def unknown(message = T.unsafe(nil), additional_fields = T.unsafe(nil)); end
 
   # pkg:gem/logstasher#lib/logstasher.rb:49
   def unsubscribe(component, subscriber); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:212
+  # pkg:gem/logstasher#lib/logstasher.rb:240
   def warn(message = T.unsafe(nil), additional_fields = T.unsafe(nil)); end
 
-  # pkg:gem/logstasher#lib/logstasher.rb:203
+  # pkg:gem/logstasher#lib/logstasher.rb:231
   def watch(event, opts = T.unsafe(nil), &block); end
 
   private
 
-  # pkg:gem/logstasher#lib/logstasher.rb:225
+  # pkg:gem/logstasher#lib/logstasher.rb:253
   def new_logger(path); end
 end
 
@@ -184,7 +184,7 @@ module LogStasher::ActionController::Instrumentation
 
   private
 
-  # pkg:gem/logstasher#lib/logstasher/rails_ext/action_controller/base.rb:44
+  # pkg:gem/logstasher#lib/logstasher/rails_ext/action_controller/base.rb:49
   def add_custom_fields_to_store; end
 
   # this method is called from within super of process_action.
@@ -226,7 +226,7 @@ class LogStasher::ActionView::LogSubscriber < ::ActionView::LogSubscriber
   # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:43
   def request_context; end
 
-  # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:58
+  # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:59
   def runtimes(event); end
 
   # pkg:gem/logstasher#lib/logstasher/action_view/log_subscriber.rb:47
@@ -313,45 +313,45 @@ class LogStasher::ActiveRecord::LogSubscriber < ::ActiveRecord::LogSubscriber
   def runtimes(event); end
 end
 
-# pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:8
+# pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:9
 module LogStasher::ActiveSupport; end
 
-# pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:9
+# pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:10
 class LogStasher::ActiveSupport::LogSubscriber < ::ActiveSupport::LogSubscriber
   include ::LogStasher::CustomFields::LogSubscriber
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:32
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:33
   def logger; end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:12
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:13
   def process_action(event); end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:28
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:29
   def redirect_to(event); end
 
   private
 
   # Monkey patching to enable exception logging
   #
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:84
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:85
   def extract_exception(payload); end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:52
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:53
   def extract_format(payload); end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:48
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:49
   def extract_path(payload); end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:38
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:39
   def extract_request(payload); end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:56
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:57
   def extract_status(payload); end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:74
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:75
   def location(_event); end
 
-  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:64
+  # pkg:gem/logstasher#lib/logstasher/active_support/log_subscriber.rb:65
   def runtimes(event); end
 end
 
@@ -390,16 +390,16 @@ LogStasher::ActiveSupport::MailerLogSubscriber::MAILER_FIELDS = T.let(T.unsafe(n
 # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:4
 module LogStasher::CustomFields
   class << self
-    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:15
+    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:18
     def add(*fields); end
 
-    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:11
+    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:14
     def clear; end
 
-    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:19
+    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:22
     def custom_fields; end
 
-    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:23
+    # pkg:gem/logstasher#lib/logstasher/custom_fields.rb:26
     def custom_fields=(val); end
   end
 end

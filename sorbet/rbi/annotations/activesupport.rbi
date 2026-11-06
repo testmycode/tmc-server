@@ -567,4 +567,8 @@ module ActiveSupport::Testing::ErrorReporterAssertions
   # @version >= 7.1.0.rc1
   sig { params(error_class: T.class_of(Exception), block: T.proc.void).returns(ActiveSupport::Testing::ErrorReporterAssertions::ErrorCollector::Report) }
   def assert_error_reported(error_class = T.unsafe(nil), &block); end
+
+  # @version >= 8.1.0.beta1
+  sig { params(error_class: T.class_of(Exception), block: T.proc.void).returns(T::Array[ActiveSupport::Testing::ErrorReporterAssertions::ErrorCollector::Report]) }
+  def capture_error_reports(error_class = T.unsafe(nil), &block); end
 end

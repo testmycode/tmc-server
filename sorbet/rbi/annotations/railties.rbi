@@ -24,6 +24,10 @@ module Rails
     sig { returns(ActiveSupport::ErrorReporter) }
     def error; end
 
+    # @version >= 8.1.0.beta1
+    sig { returns(ActiveSupport::EventReporter) }
+    def event; end
+
     # @version >= 7.1.0.rc1
     sig { returns(ActiveSupport::BroadcastLogger) }
     def logger; end

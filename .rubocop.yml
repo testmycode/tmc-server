@@ -9,7 +9,7 @@ AllCops:
   SuggestExtensions: false
   NewCops: disable
   TargetRubyVersion: 3.3
-  TargetRailsVersion: 8.0
+  TargetRailsVersion: 8.1
   Exclude:
     - 'ext/**/*'
     - 'db/**/*'

@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 # source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 8.0.5'
+gem 'rails', '~> 8.1.4'
 
 gem 'mini_racer', '~> 0.19.2'
 gem 'activerecord-import', '~> 1.7'
@@ -19,7 +19,7 @@ gem 'file_validators', '~> 3.0' # Used to validate organization logo
 gem 'font-awesome-rails', '~> 4.7', '>= 4.7.0.8'
 gem 'gravtastic', '~> 3.2', '>= 3.2.6' # Used to display user avatars
 gem 'image_processing', '~> 2.2' # Active Storage variants of organization logos
-gem 'logstasher', '~> 2.1', '>= 2.1.5'
+gem 'logstasher', '~> 3.0'
 gem 'natcmp', '~> 1.4', '>= 1.4.3'
 gem 'newrelic_rpm', '~> 9.11'
 gem 'pdfkit', '~> 0.8.7.3', require: false

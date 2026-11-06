@@ -154,7 +154,7 @@ end
 #
 #     private
 #       def ensure_sender_is_a_user
-#         unless User.exist?(email_address: mail.from)
+#         unless User.exists?(email_address: mail.from)
 #           bounce_with UserRequiredMailer.missing(inbound_email)
 #         end
 #       end
@@ -195,7 +195,10 @@ class ActionMailbox::Base
   def _process_callbacks; end
 
   # pkg:gem/actionmailbox#lib/action_mailbox/base.rb:68
-  def _run_process_callbacks(&block); end
+  def _run_process_callbacks; end
+
+  # pkg:gem/actionmailbox#lib/action_mailbox/base.rb:68
+  def _run_process_callbacks!(&block); end
 
   # Immediately sends the given +message+ and changes the inbound email's status to +:bounced+.
   #
@@ -315,6 +318,8 @@ class ActionMailbox::BaseController < ::ActionController::Base
 
     def __class_attr___callbacks; end
     def __class_attr___callbacks=(new_value); end
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -371,6 +376,11 @@ class ActionMailbox::InboundEmail < ::ActionMailbox::Record
   include ::ActionMailbox::InboundEmail::Incineratable
   extend ::ActionMailbox::InboundEmail::MessageId::ClassMethods
 
+  def _run_commit_callbacks(&block); end
+  def _run_create_callbacks(&block); end
+  def _run_destroy_callbacks(&block); end
+  def _run_save_callbacks(&block); end
+  def _run_update_callbacks(&block); end
   def autosave_associated_records_for_raw_email_attachment(*args); end
   def autosave_associated_records_for_raw_email_blob(*args); end
   def instrumentation_payload; end
@@ -503,6 +513,8 @@ class ActionMailbox::Ingresses::Mailgun::InboundEmailsController < ::ActionMailb
 
     def __class_attr___callbacks; end
     def __class_attr___callbacks=(new_value); end
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -544,6 +556,8 @@ class ActionMailbox::Ingresses::Mandrill::InboundEmailsController < ::ActionMail
 
     def __class_attr___callbacks; end
     def __class_attr___callbacks=(new_value); end
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -578,6 +592,8 @@ class ActionMailbox::Ingresses::Postmark::InboundEmailsController < ::ActionMail
 
     def __class_attr___callbacks; end
     def __class_attr___callbacks=(new_value); end
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -598,6 +614,8 @@ class ActionMailbox::Ingresses::Relay::InboundEmailsController < ::ActionMailbox
 
     def __class_attr___callbacks; end
     def __class_attr___callbacks=(new_value); end
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -619,6 +637,8 @@ class ActionMailbox::Ingresses::Sendgrid::InboundEmailsController < ::ActionMail
 
     def __class_attr___callbacks; end
     def __class_attr___callbacks=(new_value); end
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -861,10 +881,10 @@ end
 
 # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:4
 class Mail::Message
-  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:21
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:25
   def bcc_addresses; end
 
-  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:17
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:21
   def cc_addresses; end
 
   # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:5
@@ -873,21 +893,24 @@ class Mail::Message
   # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/recipients.rb:5
   def recipients; end
 
-  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:9
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:13
   def recipients_addresses; end
 
-  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:13
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:9
+  def reply_to_address; end
+
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:17
   def to_addresses; end
 
-  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:29
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:33
   def x_forwarded_to_addresses; end
 
-  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:25
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:29
   def x_original_to_addresses; end
 
   private
 
-  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:34
+  # pkg:gem/actionmailbox#lib/action_mailbox/mail_ext/addresses.rb:38
   def address_list(obj); end
 end
 
@@ -907,6 +930,8 @@ class Rails::Conductor::ActionMailbox::InboundEmails::SourcesController < ::Rail
   class << self
     private
 
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -928,6 +953,8 @@ class Rails::Conductor::ActionMailbox::InboundEmailsController < ::Rails::Conduc
   class << self
     private
 
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -943,6 +970,8 @@ class Rails::Conductor::ActionMailbox::IncineratesController < ::Rails::Conducto
   class << self
     private
 
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -959,6 +988,8 @@ class Rails::Conductor::ActionMailbox::ReroutesController < ::Rails::Conductor::
   class << self
     private
 
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end
@@ -979,6 +1010,8 @@ class Rails::Conductor::BaseController < ::ActionController::Base
     def __class_attr__layout=(new_value); end
     def __class_attr__layout_conditions; end
     def __class_attr__layout_conditions=(new_value); end
+    def __class_attr_config; end
+    def __class_attr_config=(new_value); end
     def __class_attr_middleware_stack; end
     def __class_attr_middleware_stack=(new_value); end
   end

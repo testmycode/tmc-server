@@ -6,8 +6,6 @@ require 'submission_packager'
 require 'timeout'
 require 'rust_langs_cli_executor'
 
-SUBMISSION_PACKAGING_TIMEOUT_SECONDS = 10
-
 # Represents a connection to a remote machine running the tmc-sandbox web service.
 #
 # These are transient objects read from the configuration file.

@@ -104,8 +104,8 @@ describe Exercise, type: :model do
 
   it 'should treat date deadlines as being at 23:59:59 local time' do
     ex = FactoryBot.create(:exercise, course: course)
-    set_deadline(ex, Date.today)
-    expect(ex.deadline_for(user)).to eq(Date.today.end_of_day)
+    set_deadline(ex, Date.current)
+    expect(ex.deadline_for(user)).to eq(Date.current.end_of_day)
   end
 
   it 'should accept deadlines in either SQLish or Finnish date format' do
@@ -177,7 +177,7 @@ describe Exercise, type: :model do
     expect(ex.deadline_for(user)).to be_nil
     expect(ex).to be_submittable_by(admin)
 
-    set_deadline(ex, Date.today - 1.day)
+    set_deadline(ex, Date.current - 1.day)
     expect(ex).to be_submittable_by(admin)
 
     ex.hidden = true
@@ -196,16 +196,16 @@ describe Exercise, type: :model do
     expect(ex.publish_time).to be_nil
     expect(ex).to be_submittable_by(user)
 
-    ex.publish_time = Date.today + 1.day
+    ex.publish_time = Date.current + 1.day
     expect(ex).not_to be_submittable_by(user)
 
-    ex.publish_time = Date.today - 1.day
+    ex.publish_time = Date.current - 1.day
     expect(ex).to be_submittable_by(user)
 
-    set_deadline(ex, Date.today + 1.day)
+    set_deadline(ex, Date.current + 1.day)
     expect(ex).to be_submittable_by(user)
 
-    set_deadline(ex, Date.today - 1.day)
+    set_deadline(ex, Date.current - 1.day)
     expect(ex).not_to be_submittable_by(user)
 
     set_deadline(ex, nil)

@@ -13,7 +13,7 @@ describe Api::Beta::ParticipantController, type: :request do
   end
 
   def get_paste(id, user)
-    get "/paste/#{id}.json", { api_version: ApiVersion::API_VERSION }, { 'Accept' => 'application/json', 'HTTP_AUTHORIZATION' => basic_auth(user) }
+    get "/paste/#{id}.json", params: { api_version: ApiVersion::API_VERSION }, headers: { 'Accept' => 'application/json', 'HTTP_AUTHORIZATION' => basic_auth(user) }
   end
 
   describe 'TMC-api with JSON' do
