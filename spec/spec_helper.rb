@@ -8,7 +8,7 @@ require 'rspec/rails'
 require 'database_cleaner'
 require 'etc'
 require 'fileutils'
-require 'capybara/poltergeist'
+require 'capybara/cuprite'
 require 'simplecov'
 require 'tailoring'
 # require 'rspec_remote_formatter'
@@ -26,26 +26,18 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 # Require everything in lib too.
 # Dir[Rails.root.join('lib/**/*.rb')].each { |f| require f }
 
-# Use :selenium this if you want to see what's going on and don't feel like screenshotting
-# Otherwise :poltergeist with PhantomJS is somewhat faster and doesn't pop up in your face.
-#
-# Recommendation for Selenium: run tests under Xvfb:
-# In console 1: Xvfb :99
-# In console 2: env DISPLAY=:99 rvmsudo rake spec
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, timeout: 60, js_errors: false)
+# dockerize turns off Chromium's sandbox, which refuses to start as root in Docker.
+Capybara.register_driver :cuprite do |app|
+  Capybara::Cuprite::Driver.new(app, headless: true, dockerize: true, timeout: 60, js_errors: false)
 end
 
-Capybara.default_driver = :poltergeist
+Capybara.default_driver = :cuprite
+Capybara.javascript_driver = :cuprite
 
 Capybara.server = :puma, { Silent: true }
 Capybara.server_port = FreePorts.take_next
 Capybara.default_max_wait_time = 60 # Comet messages may take longer to appear than the default 2 sec
 Capybara.ignore_hidden_elements = false
-
-if Capybara.default_driver == :selenium
-  Capybara.current_session.driver.browser.manage.window.resize_to 1250, 900
-end
 
 def get_m3_home
   `mvn --version | grep "Maven home" | sed 's/Maven home: //'`.chomp

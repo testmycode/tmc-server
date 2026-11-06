@@ -52,9 +52,8 @@ group :development, :test do
   gem 'capybara', '~> 3.40'
   gem 'factory_bot_rails', '~> 6.4', '>= 6.4.3'
   gem 'puma', '~> 6.4', '>= 6.4.2'
-  gem 'thin', '~> 1.8', '>= 1.8.2' # A transitive dependency, this forces the latest version
   # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
-  gem 'poltergeist', '~> 1.18', '>= 1.18.1'
+  gem 'cuprite', '~> 0.17.0'
   gem 'rspec', '~> 3.13'
   gem 'rspec-activemodel-mocks', '~> 1.2'
   gem 'rspec-core', '~> 3.13'
@@ -70,7 +69,6 @@ group :development, :test do
 
   gem 'database_cleaner', '~> 2.0', '>= 2.0.2'
   gem 'launchy', '~> 3.0', '>= 3.0.1' # for capybara's save_and_open_page
-  gem 'mimic', '~> 0.4.4'
   gem 'railroady', '~> 1.6' # for doc/diagrams
   gem 'rubocop', '~> 1.65', require: false
   gem 'rubocop-rails_config', '~> 1.16' # Rubocop locked

@@ -71,7 +71,7 @@ class DocGen
       default_options = T.let({ full: true }, T::Hash[Symbol, T.untyped])
       options = default_options.merge(overrides)
       FileUtils.mkdir_p(File.dirname(path))
-      options[:wide] ? @test_case.page.driver.browser.resize(1200, 800) : @test_case.page.driver.browser.resize(1024, 768)
+      options[:wide] ? @test_case.page.current_window.resize_to(1200, 800) : @test_case.page.current_window.resize_to(1024, 768)
       @test_case.page.save_screenshot(path, full: options[:full])
     end
 end

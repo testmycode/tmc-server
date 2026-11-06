@@ -110,13 +110,9 @@ module IntegrationTestActions
   end
 
   def screenshot_to_file(path)
-    page.driver.resize_window 1200, 1200
+    page.current_window.resize_to(1200, 1200)
     FileUtils.mkdir_p(File.dirname(path))
-    if page.driver.respond_to? :render
-      page.driver.render(path) # Webkit
-    else
-      page.driver.browser.save_screenshot(path) # Selenium
-    end
+    page.save_screenshot(path) # rubocop:disable Lint/Debugger
     trim_image_edges(path)
   end
 

@@ -2,13 +2,16 @@
 
 # frozen_string_literal: true
 
+require 'puma'
+require 'puma/server'
+
 # Receives incoming results from a remote sandbox during testing.
 # Used by RemoteSandboxForTesting
 class SubmissionResultReceiver
   def initialize
     @queue = Queue.new
     @port = 3000
-    start_mimic_server!
+    start_server!
   end
 
   def pop
@@ -16,7 +19,8 @@ class SubmissionResultReceiver
   end
 
   def cleanup!
-    Mimic.cleanup!
+    @server&.stop(true)
+    @server = nil
     @queue = nil
   end
 
@@ -33,17 +37,23 @@ class SubmissionResultReceiver
   end
 
   def receiver_url
-    "http://#{host_ip}:3000/results"
+    "http://#{host_ip}:#{@port}/results"
   end
 
   private
-    def start_mimic_server!
-      queue = @queue # put in closure, blocks below have different `self`
-      Mimic.mimic(port: 3000, fork: true) do
-        post('/results') do
-          queue << params
-          [200, {}, ['OK']]
-        end
+    def start_server!
+      queue = @queue
+      app = lambda do |env|
+        request = Rack::Request.new(env)
+        next [404, {}, ['Not found']] unless request.post? && request.path_info == '/results'
+
+        queue << request.params
+        [200, {}, ['OK']]
       end
+
+      @server = Puma::Server.new(app, nil, min_threads: 0, max_threads: 1, log_writer: Puma::LogWriter.null)
+      # All interfaces, because in CI the sandbox reaches us at the container's IP.
+      @server.add_tcp_listener('0.0.0.0', @port)
+      @server.run
     end
 end
