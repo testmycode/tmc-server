@@ -25,9 +25,9 @@ describe Api::V8::OrganizationsController, type: :controller do
 
       r = JSON.parse response.body
 
-      expect(r).not_to have_content('"name"=>"' + unaccepted_organization.name + '"')
-      expect(r).not_to have_content('"information"=>"' + unaccepted_organization.information + '"')
-      expect(r).not_to have_content('"slug"=>"' + unaccepted_organization.slug + '"')
+      slugs = r.map { |o| o['slug'] }
+      expect(slugs).to include(organization.slug)
+      expect(slugs).not_to include(unaccepted_organization.slug)
     end
   end
 end

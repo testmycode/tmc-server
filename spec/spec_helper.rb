@@ -13,9 +13,9 @@ require 'simplecov'
 require 'tailoring'
 # require 'rspec_remote_formatter'
 SimpleCov.start 'rails' do
-  add_filter '/bin/'
-  add_filter '/db/'
-  add_filter '/spec/'
+  skip '/bin/'
+  skip '/db/'
+  skip '/spec/'
 end
 
 Rack::Attack.enabled = false

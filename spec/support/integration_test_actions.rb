@@ -68,15 +68,9 @@ module IntegrationTestActions
     # expect(page).to have_content('Refresh successful.')
   end
 
-  # Evil override fix for Capybara 1.1.2 + Selenium + Firefox 7.
-  # From http://how.itnig.net/facts/attach-file-in-capybara---selenium-webdriver
+  # Chromium resolves relative paths against its own working directory, not the spec's.
   def attach_file(field_locator, file_name)
-    case Capybara.current_driver
-    when :selenium
-      find_field(field_locator).native.send_keys(File.expand_path(file_name))
-    else
-      super
-    end
+    super(field_locator, File.expand_path(file_name))
   end
 
   def wait_for_submission_to_be_processed

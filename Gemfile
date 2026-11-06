@@ -39,6 +39,11 @@ gem 'xml-simple', '~> 1.1', '>= 1.1.9', require: false
 gem 'cgi', '~> 0.3.6'
 gem 'sorbet-runtime', '~> 0.6.13640'
 
+# Bundled rather than default gems from Ruby 3.4/4.0 on, so Bundler must list them
+gem 'benchmark', '~> 0.5.0'
+gem 'csv', '~> 3.3', '>= 3.3.7'
+gem 'ostruct', '~> 0.6.3'
+
 gem 'redis', '~> 6.0' # Rails.cache and Rack::MiniProfiler in production
 
 group :assets do
@@ -72,8 +77,7 @@ group :development, :test do
   gem 'rubocop', '~> 1.65', require: false
   gem 'rubocop-rails_config', '~> 1.16' # Rubocop locked
   gem 'rubocop-sorbet', '~> 0.10.1', require: false # 0.10.2+ needs rubocop 1.75
-  gem 'ruby-prof', '~> 1.7' # for performance tests
-  gem 'simplecov', '~> 0.22.0', require: false
+  gem 'simplecov', '~> 1.3', require: false
   gem 'sorbet', '~> 0.6.13640', require: false
   gem 'spoom', '~> 1.8', require: false
   gem 'tapioca', '~> 0.20.0', require: false

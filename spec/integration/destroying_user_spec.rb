@@ -73,9 +73,7 @@ describe 'Deleting own user', type: :request, integration: true do
 
     fill_in 'user[password]', with: user.password
 
-    click_button 'Destroy my account permanently'
-
-    page.accept_alert
+    accept_confirm { click_button 'Destroy my account permanently' }
 
     expect { User.find_by!(login: username) }.to raise_error ActiveRecord::RecordNotFound
     expect(page).to have_content('Your account has been permanently destroyed.')
@@ -102,9 +100,7 @@ describe 'Deleting own user', type: :request, integration: true do
 
     fill_in 'user[password]', with: 'thisiswrongpassword'
 
-    click_button 'Destroy my account permanently'
-
-    page.accept_alert
+    accept_confirm { click_button 'Destroy my account permanently' }
 
     expect(User.find_by(login: user.login) == user)
     expect(page).to have_content('The password was incorrect')

@@ -9,7 +9,6 @@ class RemoteSandboxForTesting
   @server_pids = nil
   @result_queue = nil
   @server_ports = nil
-  @host = 'http://localhost'
 
   def self.server_ports
     # Currently just one server. Running multiple server webapps on the same machine is problematic.
@@ -27,12 +26,6 @@ class RemoteSandboxForTesting
     SandboxResultsSaver.save_results(submission, results)
   end
 
-  # Allows tests to be run w/o root by using an external sandbox.
-  def self.use_server_at(host, port)
-    @host = host
-    @server_ports = [port].flatten
-  end
-
   def self.init_servers_as_root!(actual_user, actual_group)
     raise 'Root helper already started' if @root_helper
     raise 'init_servers_as_root! should be called as root' if Process::Sys.geteuid != 0
@@ -43,12 +36,6 @@ class RemoteSandboxForTesting
 
     @root_helper = RootHelper.new
     @root_helper.send_command('START SERVER ' + server_ports.join(','))
-  end
-
-  def self.init_stubs!
-    RemoteSandbox.stub(:all) do
-      server_ports.map { |port| RemoteSandbox.new("#{@host}:#{port}/") }
-    end
   end
 
   def self.cleanup_after_all_tests!
@@ -103,10 +90,6 @@ end
 
 # Disabled for now
 # RSpec.configure do |config|
-#   config.before :each do
-#     RemoteSandboxForTesting.init_stubs!
-#   end
-
 #   config.after :suite do
 #     RemoteSandboxForTesting.cleanup_after_all_tests!
 #   end
