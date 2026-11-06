@@ -101,11 +101,12 @@ module RustLangsCliExecutor
       end.select { |line| !!line }
 
       last_line = valid_lines.last
+      raise 'TMC-langs-rust printed no JSON output' if last_line.nil?
 
       if last_line['status'] == 'crashed'
         Rails.logger.info('TMC-langs-rust crashed')
         Rails.logger.info(last_line)
-        raise 'TMC-langs-rust crashed: ' + last_line
+        raise "TMC-langs-rust crashed: #{last_line.to_json}"
       end
 
       last_line

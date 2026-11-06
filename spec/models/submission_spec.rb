@@ -155,4 +155,24 @@ describe Submission, type: :model do
     s.destroy
     expect(SubmissionData.find_by(submission_id: id)).to be_nil
   end
+
+  describe 'when the exercise has been removed by a refresh' do
+    let(:course) { FactoryBot.create(:course, moocfi_id: SecureRandom.hex(16)) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:submission) do
+      sub = FactoryBot.create(:submission, course: course, user: user, paste_available: true, all_tests_passed: true)
+      sub.exercise.destroy
+      KafkaBatchUpdatePoints.delete_all
+      Submission.find(sub.id)
+    end
+
+    it 'saves without queueing progress updates' do
+      submission.update!(processed: true, points: 'changed')
+      expect(KafkaBatchUpdatePoints.count).to eq(0)
+    end
+
+    it 'decides paste visibility from the submitter\'s passing submissions' do
+      expect(submission.paste_visible_for?(user)).to be(true)
+    end
+  end
 end

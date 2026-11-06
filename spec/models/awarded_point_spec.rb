@@ -105,6 +105,13 @@ describe AwardedPoint, type: :model do
       expect(counts[@user2.login][@sheet2]).to eq(1)
     end
 
+    specify 'users_in_course_with_sheet excludes points of exercises with hidden results' do
+      expect(AwardedPoint.users_in_course_with_sheet(@course, @sheet2)).to eq([@user2])
+
+      @ex2.update!(hide_submission_results: true)
+      expect(AwardedPoint.users_in_course_with_sheet(@course, @sheet2)).to eq([])
+    end
+
     describe 'with change in exercise name' do
       before :each do
         @ex2.update_attribute(:name, 'a_different_name')
@@ -125,6 +132,28 @@ describe AwardedPoint, type: :model do
         points = AwardedPoint.count_per_user_in_course_with_sheet(@course, @sheet2)
         expect(points[@user2.login][@sheet2]).to eq(1)
       end
+    end
+  end
+
+  describe 'when its submission has been deleted' do
+    let(:course) { FactoryBot.create(:course, moocfi_id: SecureRandom.hex(16)) }
+    let(:point) do
+      submission = FactoryBot.create(:submission, course: course)
+      point = FactoryBot.create(:awarded_point, course: course, user: submission.user, submission: submission)
+      submission.destroy
+      KafkaBatchUpdatePoints.delete_all
+      AwardedPoint.find(point.id)
+    end
+
+    it 'is listed without an exercise id' do
+      json = AwardedPoint.as_json_with_exercise_ids([point], course.exercises)
+      expect(json).to eq([{ awarded_point: point.point_as_json, exercise_id: nil }])
+    end
+
+    it 'saves and destroys without queueing progress updates' do
+      point.update!(name: 'renamed')
+      point.destroy!
+      expect(KafkaBatchUpdatePoints.count).to eq(0)
     end
   end
 end

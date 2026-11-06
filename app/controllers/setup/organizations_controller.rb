@@ -58,7 +58,7 @@ class Setup::OrganizationsController < Setup::SetupController
   private
     sig { void }
     def set_organization
-      @organization = Organization.find_by(slug: params[:id]) unless params[:id].nil?
+      @organization = Organization.find_by!(slug: params[:id]) unless params[:id].nil?
     end
 
     sig { returns(ActionController::Parameters) }

@@ -177,7 +177,7 @@ module Api
           render json: build_success_response(user, params[:include_id])
         else
           errors = user.errors
-          T.unsafe(errors)[:username] = errors.delete(:login) if errors.key?(:login)
+          errors.delete(:login)&.each { |message| errors.add(:username, message) }
           render json: {
             success: false,
             errors: user.errors

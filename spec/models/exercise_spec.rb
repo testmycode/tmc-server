@@ -322,4 +322,12 @@ describe Exercise, type: :model do
     FactoryBot.create(:awarded_point, course: course, submission: submission, user: user, name: pt2.name)
     expect(exercise.missing_review_points_for(user)).to eq([pt3.name])
   end
+
+  describe '#reload' do
+    it 'returns the record and accepts reload options' do
+      record = FactoryBot.create(:exercise)
+      expect(record.reload).to be(record)
+      expect(record.class.transaction { record.reload(lock: true) }).to be(record)
+    end
+  end
 end

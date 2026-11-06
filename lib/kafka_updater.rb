@@ -6,7 +6,7 @@ require 'rest-client'
 class KafkaUpdater
   extend T::Sig
 
-  # Arguments are site settings, nil when unset; the tasks only call the updaters when all are present.
+  # Site settings, nil when unset; callers only run the updaters when all are present.
   sig { params(kafka_bridge_url: T.nilable(String), kafka_bridge_secret: T.nilable(String), service_id: T.nilable(String)).void }
   def initialize(kafka_bridge_url, kafka_bridge_secret, service_id)
     @kafka_bridge_url = kafka_bridge_url
@@ -217,10 +217,12 @@ class KafkaUpdater
       return finished_successfully
     end
     exercises = Exercise.where(course_id: course.id).where(disabled_status: 0)
-    data = exercises.map do |exercise|
+    data = exercises.filter_map do |exercise|
+      # Hidden-points exercises have no sheet; course progress skips them too.
+      gdocs_sheet = exercise.gdocs_sheet
+      next unless gdocs_sheet
       max_points = AvailablePoint.where(exercise_id: exercise.id).count
-      # Exercises with hidden points have no gdocs_sheet, so this raises and fails the whole task.
-      stupid_name = "osa#{T.must(exercise.gdocs_sheet).tr('^0-9', '').rjust(2, "0")}"
+      stupid_name = "osa#{gdocs_sheet.tr('^0-9', '').rjust(2, "0")}"
       exerciseData = {
         name: exercise.name,
         id: exercise.id.to_s,

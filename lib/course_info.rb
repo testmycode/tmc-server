@@ -158,6 +158,6 @@ class CourseInfo
 
     sig { params(exercise: Exercise).returns(T.nilable(Submission)) }
     def get_latest_submission(exercise)
-      exercise.submissions_by(@user).min_by { |submission| T.must(submission.created_at) }
+      exercise.submissions_by(@user).max_by { |submission| T.must(submission.created_at) }
     end
 end

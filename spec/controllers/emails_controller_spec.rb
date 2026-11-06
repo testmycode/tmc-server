@@ -23,6 +23,16 @@ describe EmailsController, type: :controller do
         end
       end
 
+      it 'applies user field filters' do
+        allow(UserField).to receive_messages(all: [UserField.new(name: 'organizational_id', field_type: 'text')])
+        UserFieldValue.create!(user: @user, field_name: 'organizational_id', value: '12345')
+        controller.current_user = @admin
+
+        get :index, params: { filter_organizational_id: '12345' }, format: :text
+
+        expect(assigns(:emails)).to eq([@user.email])
+      end
+
       it 'denies access for non-admins' do
         controller.current_user = @teacher
         get :index, format: :text

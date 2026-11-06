@@ -26,7 +26,7 @@ class Solution
       true
     elsif !ignore_email_verification && !user.email_verified?
       false
-    elsif !T.must(course.organization).verified
+    elsif !course.organization&.verified
       false
     elsif user.teacher?(course.organization) || user.assistant?(course)
       true

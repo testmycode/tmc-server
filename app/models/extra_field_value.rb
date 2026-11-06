@@ -28,7 +28,7 @@ module ExtraFieldValue
   # May want to refactor some day.
   sig { returns(T.any(String, T::Boolean)) }
   def ruby_value
-    case T.must(field).field_type
+    case field&.field_type
     when :boolean
       value.blank? || value == '0' ? false : true
     else
@@ -38,14 +38,14 @@ module ExtraFieldValue
 
   sig { params(new_value: T.untyped).void }
   def set_from_form(new_value)
-    if T.must(field).should_save?
-      self.value =
-        case field_kind
-        when :boolean
-          new_value.to_bool
-        else
-          new_value.to_s
-        end
-    end
+    field = self.field
+    return unless field&.should_save?
+    self.value =
+      case field.field_type
+      when :boolean
+        ActiveModel::Type::Boolean.new.cast(new_value) ? '1' : ''
+      else
+        new_value.to_s
+      end
   end
 end

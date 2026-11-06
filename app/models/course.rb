@@ -402,10 +402,11 @@ class Course < ApplicationRecord
     exercises.to_a.select { |ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
   end
 
-  sig { returns(NilClass) }
-  def reload
+  sig { params(options: T.nilable(T::Hash[Symbol, T.untyped])).returns(T.self_type) }
+  def reload(options = nil)
     super
     @groups = nil
+    self
   end
 
   sig { params(current_user_id: Integer).returns(CourseTemplateRefresh) }
@@ -626,15 +627,17 @@ class Course < ApplicationRecord
 
     sig { void }
     def check_name_length
+      name = self.name
+      slug = organization&.slug
       # If name starts with organization slug (org-course1), then check that
       # the actual name (course1) is within range (for backward compatibility).
-      test_range = if !name.nil? && T.must(name).start_with?("#{T.must(organization).slug}-")
-        name_range_with_slug
+      test_range = if name && slug && name.start_with?("#{slug}-")
+        name_range_with_slug(slug)
       else
         name_range
       end
 
-      unless !name.nil? && test_range.include?(T.must(name).length)
+      unless name && test_range.include?(name.length)
         errors.add(:name, "must be between #{name_range} characters")
       end
     end
@@ -644,9 +647,9 @@ class Course < ApplicationRecord
       1..40
     end
 
-    sig { returns(T::Range[Integer]) }
-    def name_range_with_slug
-      add_length = T.must(T.must(organization).slug).length + 1
+    sig { params(slug: String).returns(T::Range[Integer]) }
+    def name_range_with_slug(slug)
+      add_length = slug.length + 1
       (name_range.first + add_length)..(name_range.last + add_length)
     end
 

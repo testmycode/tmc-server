@@ -18,9 +18,9 @@ module CourseTimingsHelper
 
   sig { params(group: ExerciseGroup).returns(T::Boolean) }
   def complex_unlock_conditions?(group)
-    # Nil for a parent group without exercises of its own, which crashes the timings page.
-    conditions = T.must(group.group_unlock_conditions)
-    return false if conditions.empty?
+    # Nil for a parent group without exercises of its own.
+    conditions = group.group_unlock_conditions
+    return false if conditions.blank?
     return true if conditions.length > 1
     return false if conditions.first.empty?
     return true unless conditions.first =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/

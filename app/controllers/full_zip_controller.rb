@@ -8,8 +8,9 @@ class FullZipController < ApplicationController
   def index
     submission = Submission.find(params[:submission_id])
     authorize! :download, submission
-    exercise = T.must(submission.exercise)
-    base_name = "#{T.must(submission.user).login}-#{exercise.name}-#{submission.id}"
+    return respond_not_found("This submission's exercise has been removed") if submission.exercise.nil?
+
+    base_name = "#{T.must(submission.user).login}-#{submission.exercise_name}-#{submission.id}"
     data = SubmissionPackager.new.get_full_zip(submission)
     send_data(data, filename: "#{base_name}_full.zip")
   end

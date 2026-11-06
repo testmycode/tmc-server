@@ -109,6 +109,6 @@ class FeedbackQuestionsController < ApplicationController
 
     sig { void }
     def set_organization
-      @organization = Organization.find_by(slug: params[:organization_id])
+      @organization = Organization.find_by!(slug: params[:organization_id]) unless params[:organization_id].nil?
     end
 end

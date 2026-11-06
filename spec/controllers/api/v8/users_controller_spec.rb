@@ -123,6 +123,20 @@ describe Api::V8::UsersController, type: :controller do
     end
   end
 
+  describe 'POST create' do
+    let(:token) { nil }
+
+    it 'reports login errors under username' do
+      allow(SecureRandom).to receive(:uuid).and_return(other_user.login)
+
+      post :create, params: { user: { email: 'new@example.com', password: 'secret123', password_confirmation: 'secret123' } }
+
+      json = JSON.parse(response.body)
+      expect(json['success']).to eq(false)
+      expect(json['errors']).to eq('username' => ['has already been taken'])
+    end
+  end
+
   describe 'PUT update password' do
     let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 

@@ -90,14 +90,16 @@ class StatsController < ApplicationController
 
       start_time =
         if params[:start_time]
-        then Time.zone.parse(params[:start_time])
+        then time_param(:start_time)
         else T.must(course.time_of_first_submission).to_date.in_time_zone
         end
+      return respond_with_error('Invalid start_time', 400) if start_time.nil?
       end_time =
         if params[:end_time]
-        then Time.zone.parse(params[:end_time])
+        then time_param(:end_time)
         else T.must(course.time_of_last_submission).to_date.in_time_zone
         end
+      return respond_with_error('Invalid end_time', 400) if end_time.nil?
       time_unit = param_as_one_of(:time_unit, [nil, 'minute', 'hour', 'day']) || 'day'
       @start_time = T.let(start_time, T.nilable(ActiveSupport::TimeWithZone))
       @end_time = T.let(end_time, T.nilable(ActiveSupport::TimeWithZone))
@@ -163,6 +165,13 @@ class StatsController < ApplicationController
       end
     end
 
+    sig { params(name: Symbol).returns(T.nilable(ActiveSupport::TimeWithZone)) }
+    def time_param(name)
+      Time.zone.parse(params[name].to_s)
+    rescue ArgumentError
+      nil
+    end
+
     sig { params(field: String).returns(String) }
     def expr_for_time_in_time_zone(field)
       connection = ActiveRecord::Base.connection
@@ -186,6 +195,6 @@ class StatsController < ApplicationController
   private
     sig { void }
     def set_organization
-      @organization = Organization.find_by(slug: params[:organization_id])
+      @organization = Organization.find_by!(slug: params[:organization_id]) unless params[:organization_id].nil?
     end
 end

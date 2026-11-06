@@ -43,4 +43,31 @@ describe Review, type: :model do
     @sub.destroy
     expect(Review.find_by(id: review.id)).to be_nil
   end
+
+  describe '.course_reviews_json' do
+    let(:view_context) do
+      controller = ApplicationController.new
+      controller.request = ActionDispatch::TestRequest.create
+      controller.view_context
+    end
+
+    it "lists no points to award when the review's exercise has been removed" do
+      review = mk_review
+      @ex.destroy
+
+      json = Review.course_reviews_json(@course, Submission.where(id: @sub.id), view_context)
+
+      expect(json.map { |r| r[:id] }).to eq([review.id])
+      expect(json.first[:points_not_awarded]).to eq([])
+    end
+
+    it 'lists reviews whose reviewer has been deleted' do
+      mk_review
+      @admin.destroy
+
+      json = Review.course_reviews_json(@course, Submission.where(id: @sub.id), view_context)
+
+      expect(json.first[:reviewer_name]).to eq('(deleted)')
+    end
+  end
 end

@@ -39,10 +39,10 @@ class SubmissionsController < ApplicationController
     @course ||= submission.course
     @exercise ||= submission.exercise
     course = T.must(@course)
-    exercise = T.must(@exercise)
+    exercise = @exercise
     @organization = course.organization
 
-    @model_solution_token_used = T.let(ModelSolutionTokenUsed.where(course: course, exercise_name: exercise.name, user: submission.user), T.nilable(ActiveRecord::Relation))
+    @model_solution_token_used = T.let(ModelSolutionTokenUsed.where(course: course, exercise_name: submission.exercise_name, user: submission.user), T.nilable(ActiveRecord::Relation))
 
     add_course_breadcrumb
     add_exercise_breadcrumb
@@ -55,7 +55,7 @@ class SubmissionsController < ApplicationController
       end
       format.zip do
         respond_forbidden if !current_user.administrator? && course.hide_submissions?
-        send_data(submission.return_file, filename: "#{T.must(submission.user).login}-#{exercise.name}-#{submission.id}.zip")
+        send_data(submission.return_file, filename: "#{T.must(submission.user).login}-#{submission.exercise_name}-#{submission.id}.zip")
       end
       format.json do
         output = {
@@ -64,19 +64,19 @@ class SubmissionsController < ApplicationController
           user_id: submission.user_id,
           login: T.must(submission.user).login,
           course: course.name,
-          exercise_name: T.must(submission.exercise).name,
+          exercise_name: submission.exercise_name,
           status: submission.status(current_user),
           points: submission.points_list,
           validations: submission.validations,
           valgrind: submission.valgrind,
-          solution_url: exercise.solution.visible_to?(current_user) ? view_context.exercise_solution_url(exercise) : nil,
+          solution_url: exercise && exercise.solution.visible_to?(current_user) ? view_context.exercise_solution_url(exercise) : nil,
           submitted_at: submission.created_at,
           processing_time: submission.processing_time,
           reviewed: submission.reviewed?,
           requests_review:  submission.requests_review?,
           paste_url: submission.paste_available ? paste_url(submission.paste_key) : nil,
           message_for_paste: submission.paste_available ? submission.message_for_paste : nil,
-          missing_review_points: exercise.missing_review_points_for(T.must(submission.user))
+          missing_review_points: exercise ? exercise.missing_review_points_for(T.must(submission.user)) : []
         }
 
         output = output.merge(
@@ -219,6 +219,9 @@ class SubmissionsController < ApplicationController
     @course ||= submission.course
     authorize! :teach, @course
     @exercise ||= submission.exercise
+    exercise = @exercise
+    return respond_not_found("This submission's exercise has been removed") if exercise.nil?
+
     @organization = T.must(@course).organization
     add_course_breadcrumb
     add_exercise_breadcrumb
@@ -226,7 +229,7 @@ class SubmissionsController < ApplicationController
     add_breadcrumb 'Difference with model solution'
 
     submission_files = SourceFileList.for_submission(submission)
-    solution_files = SourceFileList.for_solution(T.must(@exercise).solution)
+    solution_files = SourceFileList.for_solution(exercise.solution)
     files_in_list = Set.new
     files = T.let([], T::Array[T::Hash[Symbol, String]])
     @files = files
@@ -274,7 +277,7 @@ class SubmissionsController < ApplicationController
       elsif params[:paste_key]
         @submission = Submission.find_by!(paste_key: params[:paste_key])
         @exercise = @submission.exercise
-        @course = T.must(@exercise).course
+        @course = @submission.course
         @is_paste = T.let(true, T.nilable(T::Boolean))
         check_access!
       elsif params[:course_id]
@@ -339,12 +342,12 @@ class SubmissionsController < ApplicationController
       end
 
       submission = T.must(@submission)
-      exercise = T.must(@exercise)
+      exercise = @exercise
       course = T.must(@course)
 
       paste_visible = submission.paste_visible_for?(current_user)
 
-      paste_visibility = exercise.paste_visibility
+      paste_visibility = exercise&.paste_visibility
       paste_visibility ||= course.paste_visibility
       paste_visibility ||= 'open'
       case paste_visibility
@@ -353,7 +356,7 @@ class SubmissionsController < ApplicationController
       when 'no-tests-public'
         respond_forbidden unless can?(:teach, course) || T.must(submission.created_at) > 2.hours.ago || submission.user_id.to_s == current_user.id.to_s
       when 'completed-only'
-        respond_forbidden("You cannot see this paste because you haven't completed this exercise.") unless can?(:teach, course) || submission.user_id.to_s == current_user.id.to_s || exercise.completed_by?(current_user) || current_user.submissions.where(exercise_name: exercise.name, pretest_error: nil, all_tests_passed: true).any?
+        respond_forbidden("You cannot see this paste because you haven't completed this exercise.") unless can?(:teach, course) || submission.user_id.to_s == current_user.id.to_s || exercise&.completed_by?(current_user) || current_user.submissions.where(exercise_name: submission.exercise_name, pretest_error: nil, all_tests_passed: true).any?
       when 'everyone'
         nil
       else

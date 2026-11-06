@@ -112,6 +112,52 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
     end
   end
 
+  describe 'a submission whose exercise has been removed from the course' do
+    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+    before :each do
+      exercise.update_column(:name, 'removed-by-refresh')
+    end
+
+    it 'can be downloaded' do
+      get :download, params: { id: submission.id }
+      expect(response.code).to eq('200')
+    end
+
+    it 'is shown without exercise details' do
+      get :show, params: { id: submission.id }
+      expect(response.code).to eq('200')
+      json = JSON.parse(response.body)
+      expect(json['exercise_name']).to eq(submission.exercise_name)
+      expect(json['solution_url']).to be_nil
+      expect(json['missing_review_points']).to eq([])
+    end
+  end
+
+  describe 'a submission whose results are hidden' do
+    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+    before :each do
+      course.update!(hide_submission_results: true)
+    end
+
+    it 'is shown as ok to a NetBeans plugin that sends no version' do
+      get :show, params: { id: submission.id, client: 'netbeans_plugin' }
+      expect(response.code).to eq('200')
+      expect(JSON.parse(response.body)['status']).to eq('ok')
+    end
+
+    it 'is shown as ok to a NetBeans plugin older than 1.2.5' do
+      get :show, params: { id: submission.id, client: 'netbeans_plugin', client_version: '1.2.4' }
+      expect(JSON.parse(response.body)['status']).to eq('ok')
+    end
+
+    it 'is shown as hidden to a NetBeans plugin from 1.2.5 on' do
+      get :show, params: { id: submission.id, client: 'netbeans_plugin', client_version: '1.2.5' }
+      expect(JSON.parse(response.body)['status']).to eq('hidden')
+    end
+  end
+
   after :all do
     FileUtils.rm_rf(repo_path)
   end

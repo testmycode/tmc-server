@@ -50,4 +50,41 @@ describe ReviewsController, type: :controller do
       end
     end
   end
+
+  describe 'GET index for a course as JSON' do
+    before :each do
+      @course = FactoryBot.create :course, organization: @organization
+      @exercise = FactoryBot.create :exercise, course: @course
+      @submission = FactoryBot.create :submission, course: @course, user: @student, exercise: @exercise, reviewed: true
+      @review = FactoryBot.create :review, submission: @submission, reviewer: @teacher
+      controller.current_user = @student
+    end
+
+    it 'labels reviews whose reviewer has been deleted' do
+      @review.update_column(:reviewer_id, nil)
+
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id, format: :json, api_version: ApiVersion::API_VERSION }
+
+      expect(response).to be_successful
+      expect(JSON.parse(response.body)['reviews'].map { |r| r['reviewer_name'] }).to eq(['(deleted)'])
+    end
+
+    it 'lists reviews of exercises that have been removed' do
+      @exercise.update_column(:name, 'removed-by-refresh')
+
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id, format: :json, api_version: ApiVersion::API_VERSION }
+
+      expect(response).to be_successful
+      expect(JSON.parse(response.body)['reviews'].map { |r| r['points_not_awarded'] }).to eq([[]])
+    end
+
+    it 'responds 404 to the review page of a submission whose exercise has been removed' do
+      FactoryBot.create(:submission_data, submission: @submission)
+      @exercise.update_column(:name, 'removed-by-refresh')
+
+      get :index, params: { submission_id: @submission.id }
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

@@ -33,7 +33,7 @@ class SubmissionPackager
       File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
       begin
         Timeout.timeout(SUBMISSION_PACKAGING_TIMEOUT_SECONDS) do
-          RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, return_zip_path, zip_path, submission.params,
+          RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, return_zip_path, zip_path, submission.params || {},
                                                   tests_from_stub: submission.exercise.stub_zip_file_path,
                                                   format: :zip,
                                                   no_archive_prefix: true)

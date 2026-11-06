@@ -34,7 +34,7 @@ module Api
           submission = Submission.find(params[:id])
           authorize! :download, submission
 
-          send_data(submission.return_file, filename: "#{T.must(submission.user).login}-#{T.must(submission.exercise).name}-#{submission.id}.zip")
+          send_data(submission.return_file, filename: "#{T.must(submission.user).login}-#{submission.exercise_name}-#{submission.id}.zip")
         end
 
         sig { void }
@@ -60,27 +60,27 @@ module Api
           # This gets invalidated for the submitter when the results arrive so that they see the results right away.
           output = Rails.cache.fetch("api_v8_core_submission_show_#{submission.id}_user_#{current_user.id}", expires_in: 30.seconds) do
             course = T.must(submission.course)
-            exercise = T.must(submission.exercise)
+            exercise = submission.exercise
             submission_json = {
               api_version: ApiVersion::API_VERSION,
               all_tests_passed: submission.all_tests_passed?,
               user_id: submission.user_id,
               login: T.must(submission.user).login,
               course: course.name,
-              exercise_name: exercise.name,
+              exercise_name: submission.exercise_name,
               status: submission.status(current_user),
               points: submission.points_list,
               validations: submission.validations,
               valgrind: submission.valgrind,
               submission_url: submission_url(submission),
-              solution_url: exercise.solution.visible_to?(current_user, true) ? view_context.exercise_solution_url(exercise) : nil,
+              solution_url: exercise && exercise.solution.visible_to?(current_user, true) ? view_context.exercise_solution_url(exercise) : nil,
               submitted_at: submission.created_at,
               processing_time: submission.processing_time,
               reviewed: submission.reviewed?,
               requests_review:  submission.requests_review?,
               paste_url: submission.paste_available ? paste_url(submission.paste_key) : nil,
               message_for_paste: submission.paste_available ? submission.message_for_paste : nil,
-              missing_review_points: exercise.missing_review_points_for(T.must(submission.user))
+              missing_review_points: exercise ? exercise.missing_review_points_for(T.must(submission.user)) : []
             }
 
             submission_json = submission_json.merge(
@@ -109,7 +109,7 @@ module Api
               }
               end)
             )
-            submission_json[:status] = :ok if submission_json[:status] == :hidden && !can_handle_hidden_fields(params)
+            submission_json[:status] = :ok if submission_json[:status] == :hidden && !netbeans_plugin_at_least?('1.2.5')
             if !!params[:include_files]
               submission_json[:files] = SourceFileList.for_submission(submission).map { |f| { path: f.path, contents: f.contents } }
             end
@@ -118,20 +118,6 @@ module Api
 
           render json: output
         end
-
-        private
-          sig { params(params: T.untyped).returns(T::Boolean) }
-          def can_handle_hidden_fields(params)
-            return false unless params[:client] == 'netbeans_plugin'
-            splitted = params[:client_version].split('.')
-            min_version = [1, 2, 5]
-            min_version.each_with_index do |version_number, i|
-              return false unless splitted[i]
-              return false if splitted[i].to_i < version_number
-              return true if splitted[i].to_i > version_number
-            end
-            true
-          end
       end
     end
   end

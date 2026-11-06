@@ -31,7 +31,6 @@ class StudentSubmissionMigrator
     allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
     return false if allowed_migrations.nil?
     allowed_migrations.each do |allowed_pair|
-      puts allowed_pair
       return true if allowed_pair['from'] == @old_course.id && allowed_pair['to'] == @new_course.id
     end
     false

@@ -143,13 +143,6 @@ class Exercise < ApplicationRecord
     parts.join('-')
   end
 
-  sig { returns(Integer) }
-  def part
-    T.unsafe(self).exercise.group_name.tr('^0-9', '').to_i
-  rescue
-    0
-  end
-
   sig { params(group: ExerciseGroup).returns(T::Boolean) }
   def belongs_to_exercise_group?(group)
     group.course.id == course_id && (exercise_group_name + '-').start_with?(group.name + '-')
@@ -195,10 +188,11 @@ class Exercise < ApplicationRecord
     submissions_by_user_id[user.id] ||= submissions.where(user_id: user.id).to_a
   end
 
-  sig { returns(T::Hash[T.nilable(Integer), T::Array[Submission]]) }
-  def reload
+  sig { params(options: T.nilable(T::Hash[Symbol, T.untyped])).returns(T.self_type) }
+  def reload(options = nil)
     super
     @submissions_by = {}
+    self
   end
 
   # Whether a user may make submissions

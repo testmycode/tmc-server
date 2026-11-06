@@ -28,7 +28,7 @@ class User < ApplicationRecord
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :reviews, foreign_key: :reviewer_id, inverse_of: :reviewer, dependent: :nullify
   has_many :course_template_refreshes, dependent: :nullify
-  has_many :course_notifications
+  has_many :course_notifications, foreign_key: :sender_id, inverse_of: :sender
   has_many :comments
   has_many :certificates
   has_many :teacherships, dependent: :destroy
@@ -604,14 +604,13 @@ class User < ApplicationRecord
 
     result = T.let({}, T::Hash[Integer, T::Array[T::Hash[Symbol, T.untyped]]])
     ActiveRecord::Base.connection.execute(sql).each do |record|
-      # {"course_id"=>"8", "name"=>"viikkob-B.1.Opiskelijanumero", "count"=>"1", "all_tests_passed"=>"t", "got_all_points"=>"t", "available_points"=>"{B.1}", "awarded_points"=>"{B.1}"}
       course_id = record['course_id'].to_i
       (result[course_id] ||= []) << {
         exercise_name: record['name'],
         exercise_id: record['id'].to_i,
         submissions_count: record['count'].to_i,
-        all_tests_passed: record['all_tests_passed'] == 't',
-        got_all_points: record['got_all_points'] == 't',
+        all_tests_passed: record['all_tests_passed'] == true,
+        got_all_points: record['got_all_points'] == true,
         available_points: record['available_points'].nil? ? nil : record['available_points'].split(' '),
         awarded_points: record['awarded_points'].nil? ? nil : record['awarded_points'].split(' ')
       }

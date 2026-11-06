@@ -33,7 +33,7 @@ class ReviewsController < ApplicationController
     else
       fetch :submission, :files
       submission = T.must(@submission)
-      raise "Submission's exercise has been moved or deleted" unless submission.exercise
+      return respond_not_found("This submission's exercise has been removed") unless submission.exercise
 
       course = T.must(submission.course)
       @course = course
@@ -56,6 +56,7 @@ class ReviewsController < ApplicationController
   def new
     fetch :submission, :files
     submission = T.must(@submission)
+    return respond_not_found("This submission's exercise has been removed") unless submission.exercise
 
     @show_page_presence = T.let(true, T.nilable(T::Boolean))
 
@@ -153,12 +154,13 @@ class ReviewsController < ApplicationController
 
     sig { params(exercises: T::Hash[T.nilable(String), Exercise], review: Review).returns(T::Hash[Symbol, T.untyped]) }
     def review_json(exercises, review)
-      available_points = T.must(exercises[T.must(review.submission).exercise_name]).available_points.where(requires_review: true).map(&:name)
+      exercise = exercises[T.must(review.submission).exercise_name]
+      available_points = exercise ? exercise.available_points.where(requires_review: true).map(&:name) : []
       points_not_awarded = available_points - review.points_list
       {
         id: review.id,
         marked_as_read: review.marked_as_read,
-        reviewer_name: T.must(review.reviewer).display_name,
+        reviewer_name: review.reviewer&.display_name || '(deleted)',
         review_body: review.review_body,
         points: review.points_list.natsort,
         points_not_awarded: points_not_awarded.natsort,
@@ -283,6 +285,6 @@ class ReviewsController < ApplicationController
   private
     sig { void }
     def set_organization
-      @organization = Organization.find_by(slug: params[:organization_id])
+      @organization = Organization.find_by!(slug: params[:organization_id]) unless params[:organization_id].nil?
     end
 end

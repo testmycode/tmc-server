@@ -9,12 +9,13 @@ class ExerciseStatusController < ApplicationController
     course_id = params[:course_id]
     user_id = params[:id]
 
-    course = T.must(Course.where(id: course_id).first || Course.where(name: course_id).first)
-    found_user = User.where(id: user_id).first || User.where(login: user_id).first
-
+    course = Course.where(id: course_id).first || Course.where(name: course_id).first
+    return respond_not_found('Course not found') if course.nil?
     return respond_forbidden unless course.visible_to?(Guest.new) || current_user.administrator?
 
-    user = T.must(found_user)
+    user = User.where(id: user_id).first || User.where(login: user_id).first
+    return respond_not_found('User not found') if user.nil?
+
     user_subs = user.submissions.where(course_id: course.id).to_a.group_by(&:exercise_name)
 
     results = {}

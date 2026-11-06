@@ -416,7 +416,7 @@ class CourseNotification
     def build_course(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(::User) }
-    def build_user(*args, &blk); end
+    def build_sender(*args, &blk); end
 
     sig { returns(T.nilable(::Course)) }
     def course; end
@@ -437,34 +437,34 @@ class CourseNotification
     def create_course!(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(::User) }
-    def create_user(*args, &blk); end
+    def create_sender(*args, &blk); end
 
     sig { params(args: T.untyped, blk: T.untyped).returns(::User) }
-    def create_user!(*args, &blk); end
+    def create_sender!(*args, &blk); end
 
     sig { returns(T.nilable(::Course)) }
     def reload_course; end
 
     sig { returns(T.nilable(::User)) }
-    def reload_user; end
+    def reload_sender; end
 
     sig { void }
     def reset_course; end
 
     sig { void }
-    def reset_user; end
+    def reset_sender; end
 
     sig { returns(T.nilable(::User)) }
-    def user; end
+    def sender; end
 
     sig { params(value: T.nilable(::User)).void }
-    def user=(value); end
+    def sender=(value); end
 
     sig { returns(T::Boolean) }
-    def user_changed?; end
+    def sender_changed?; end
 
     sig { returns(T::Boolean) }
-    def user_previously_changed?; end
+    def sender_previously_changed?; end
   end
 
   module GeneratedAssociationRelationMethods

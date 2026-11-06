@@ -11,6 +11,7 @@ class FeedbackQuestion < ApplicationRecord
   validates :course, presence: true
   validates :kind, presence: true
   validates :question, presence: true
+  validate :validate_kind
 
   sig { returns(String) }
   def title_or_question
@@ -53,6 +54,6 @@ class FeedbackQuestion < ApplicationRecord
 
     sig { void }
     def validate_kind
-      errors[:kind] << 'invalid' unless kind == 'text' || kind =~ intrange_regex
+      errors.add(:kind, 'invalid') unless kind == 'text' || kind =~ intrange_regex
     end
 end

@@ -30,7 +30,8 @@ class ActionToken < ApplicationRecord
 
   sig { returns(T::Boolean) }
   def expired?
-    T.must(expires_at) < Time.now
+    expires_at = self.expires_at
+    !expires_at.nil? && expires_at < Time.now
   end
 
   private

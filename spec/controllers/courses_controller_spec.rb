@@ -327,6 +327,22 @@ describe CoursesController, type: :controller do
         expect(e.unlock_deadline).to be_nil
       end
     end
+
+    it 'skips groups that no longer exist' do
+      @course.exercises.create(name: 'group1-e1')
+
+      post :save_deadlines, params: {
+           organization_id: @organization.slug,
+           id: @course.id,
+           group: {
+             removed: { soft: { static: '1.1.2000', unlock: '' }, hard: { static: '', unlock: '' } },
+             group1: { soft: { static: '2.2.2000', unlock: '' }, hard: { static: '', unlock: '' } }
+           }
+          }
+
+      expect(response).to redirect_to(manage_deadlines_organization_course_path(@organization, @course))
+      expect(@course.exercises.find_by(name: 'group1-e1').soft_static_deadline).to eq('2.2.2000')
+    end
   end
 
   describe 'GET manage_unlocks' do
@@ -352,6 +368,14 @@ describe CoursesController, type: :controller do
       it 'does not warn when the exercises of a group share unlock conditions' do
         get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
         expect(response.body).not_to include('have different unlock conditions')
+      end
+
+      it 'renders parent groups that have no exercises of their own' do
+        @course.exercises.create!(name: 'part1-sub1-e1')
+        get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
+        expect(response).to be_successful
+        get :manage_deadlines, params: { organization_id: @organization.slug, id: @course.id }
+        expect(response).to be_successful
       end
 
       it 'warns when the exercises of a group have different unlock conditions' do
@@ -435,6 +459,15 @@ describe CoursesController, type: :controller do
 
         post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, group: { g: { '0' => '1.2.2000' } } }
 
+        expect(@course.exercises.find_by(name: 'g-e1').unlock_spec).to eq(['1.2.2000'].to_json)
+      end
+
+      it 'skips groups that no longer exist' do
+        @course.exercises.create(name: 'g-e1')
+
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, group: { removed: { '0' => '1.1.2000' }, g: { '0' => '1.2.2000' } } }
+
+        expect(response).to redirect_to(manage_unlocks_organization_course_path(@organization, @course))
         expect(@course.exercises.find_by(name: 'g-e1').unlock_spec).to eq(['1.2.2000'].to_json)
       end
     end

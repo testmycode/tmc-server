@@ -68,5 +68,17 @@ describe ExerciseStatusController, type: :controller do
         expect(json[@exercise3.name]).to eq('not_attempted')
       end
     end
+
+    it 'responds 404 for an unknown course' do
+      get :show, params: { organization_id: @organization.slug, course_id: 'no-such-course', id: 'nobody', format: :json, api_version: ApiVersion::API_VERSION }
+      expect(response).to have_http_status(:not_found)
+      expect(JSON.parse(response.body)['error']).to eq('Course not found')
+    end
+
+    it 'responds 404 for an unknown user' do
+      get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: 'nobody', format: :json, api_version: ApiVersion::API_VERSION }
+      expect(response).to have_http_status(:not_found)
+      expect(JSON.parse(response.body)['error']).to eq('User not found')
+    end
   end
 end

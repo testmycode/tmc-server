@@ -3,8 +3,9 @@
 
 class ModelSolutionTokenUsedsController < ApplicationController
   extend T::Sig
-  before_action :set_model_solution_token_used, only: [:show, :edit, :update, :destroy]
-  before_action :only_admins
+  skip_authorization_check
+  before_action :only_admins!
+  before_action :set_model_solution_token_used, only: [:show]
 
   # GET /model_solution_token_useds
   sig { void }

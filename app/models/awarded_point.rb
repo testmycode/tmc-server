@@ -49,7 +49,9 @@ class AwardedPoint < ApplicationRecord
   def self.as_json_with_exercise_ids(points, related_exercises)
     exercise_ids = related_exercises.map { |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
     points.map do |p|
-      { awarded_point: p.point_as_json, exercise_id: exercise_ids["#{p.course_id}-#{T.must(p.submission).exercise_name}"] }
+      submission = p.submission
+      exercise_id = submission ? exercise_ids["#{p.course_id}-#{submission.exercise_name}"] : nil
+      { awarded_point: p.point_as_json, exercise_id: exercise_id }
     end
   end
 
@@ -155,7 +157,7 @@ class AwardedPoint < ApplicationRecord
   def self.users_in_course_with_sheet(course, sheetname)
     users = User.arel_table
 
-    sql = per_user_in_course_with_sheet_query(course, sheetname, hidden: false)
+    sql = per_user_in_course_with_sheet_query(course, sheetname, false)
           .project(users[:id].as('uid'))
           .to_sql
 
@@ -226,7 +228,7 @@ class AwardedPoint < ApplicationRecord
     query.joins('INNER JOIN users ON users.id = awarded_points.user_id').where(users: { administrator: false })
   end
 
-  sig { params(course: Course, sheetnames: T.any(String, T::Array[String]), hidden: T.nilable(T.any(T::Boolean, T::Hash[Symbol, T::Boolean]))).returns(Arel::SelectManager) }
+  sig { params(course: Course, sheetnames: T.any(String, T::Array[String]), hidden: T.nilable(T::Boolean)).returns(Arel::SelectManager) }
   private_class_method def self.per_user_in_course_with_sheet_query(course, sheetnames, hidden = false)
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
@@ -252,9 +254,10 @@ class AwardedPoint < ApplicationRecord
     sig { void }
     def kafka_update_points
       return if !T.must(self.course).moocfi_id || T.must(self.course).moocfi_id.blank?
-      exercise = T.must(self.submission).exercise
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(exercise).id, task_type: 'user_progress')
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(exercise).id, task_type: 'user_points')
+      exercise = self.submission&.exercise
+      return unless exercise
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_progress')
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_points')
     end
 
     sig { void }

@@ -51,8 +51,12 @@ module SandboxResultsSaver
           submission.pretest_error = "Unable to run tests because this course's teacher has not configured this exercise template correctly.\nPlease contact your teacher so that they can fix the template and rerun your submission.\nIf your solution is correct, you'll get the points from this exercise once the teacher reruns your submission."
         end
       when 'finished'
-        TestRunGrader.grade_results(submission, tmc_langs_response)
-        handle_tmc_langs_output(submission, tmc_langs_response)
+        if tmc_langs_response.is_a?(Hash)
+          TestRunGrader.grade_results(submission, tmc_langs_response)
+          handle_tmc_langs_output(submission, tmc_langs_response)
+        else
+          submission.pretest_error = tmc_langs_response
+        end
       else
         raise 'Unknown status: ' + results['status']
       end
@@ -106,7 +110,7 @@ module SandboxResultsSaver
         else
           ActiveSupport::JSON.decode(test_output)
         end
-        raise unless result.is_a?(Enumerable)
+        raise unless result.is_a?(Hash)
         result
       rescue StandardError
         'Unknown error while running tests.'

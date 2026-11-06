@@ -69,7 +69,7 @@ class CourseTemplatesController < ApplicationController
 
   sig { void }
   def list_for_teachers
-    @organization = Organization.find_by(slug: params[:organization_id])
+    @organization = Organization.find_by!(slug: params[:organization_id])
     authorize! :teach, @organization
     add_organization_breadcrumb
     add_breadcrumb 'Course templates'

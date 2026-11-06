@@ -43,11 +43,12 @@ module Api
 
             applied_students = UserAppDatum.where(field_name: 'applies_for_study_right', value: 't', namespace: 'ohjelmoinnin-mooc-2019').pluck(:user_id)
 
-            groups = T.must(course.exercise_groups[0..6]) + T.must(course.exercise_groups[7..13])
-
-            cbu = course.exercise_group_completion_by_user
-
-            user_ids = groups.flat_map { |group| ap = T.must(cbu[group.name])[:available_points]; T.must(cbu[group.name])[:points_by_user].map { |k, v| { k => (v.to_f / ap) } } }.group_by { |o| o.keys.first }.map { |k, v| { k => v.map { |o2| o2[k] } } }.inject(:merge).select { |_k, v| v.length == groups.length }.select { |_k, v| v.all? { |o2| o2 >= 0.8995 } }.map { |k, _v| k }
+            completion_by_group = course.exercise_group_completion_by_user
+            # Groups without available points are absent from the completion data and can't be failed.
+            completions = course.exercise_groups.first(14).filter_map { |group| completion_by_group[group.name] }
+            user_ids = completions.map do |completion|
+              completion[:points_by_user].select { |_user_id, points| points.to_f / completion[:available_points] >= 0.8995 }.keys
+            end.reduce(:&) || []
 
             eligble_ids = (user_ids & applied_students)
             users = User.where(id: eligble_ids)

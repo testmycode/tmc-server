@@ -135,10 +135,11 @@ class CoursesController < ApplicationController
 
     groups = group_params
     groups.each do |name, deadlines|
-      soft_deadlines = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
-      hard_deadlines = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
-      T.must(course.exercise_group_by_name(name)).soft_group_deadline = soft_deadlines
-      T.must(course.exercise_group_by_name(name)).hard_group_deadline = hard_deadlines
+      # The form may name groups that a refresh removed after it was rendered.
+      group = course.exercise_group_by_name(name)
+      next if group.nil?
+      group.soft_group_deadline = [deadlines[:soft][:static], deadlines[:soft][:unlock]].to_json
+      group.hard_group_deadline = [deadlines[:hard][:static], deadlines[:hard][:unlock]].to_json
     end
 
     exercises = params[:exercise] || {}
@@ -181,8 +182,9 @@ class CoursesController < ApplicationController
 
     begin
       group_params.each do |name, conditions|
+        group = course.exercise_group_by_name(name)
+        next if group.nil?
         array = conditions.values.reject(&:blank?)
-        group = T.must(course.exercise_group_by_name(name))
         Rails.logger.info "Unlock conditions of #{course.name}/#{name} set by user #{current_user.id}: #{group.exercises(false).first&.unlock_spec || '[]'} -> #{array.to_json}"
         group.group_unlock_conditions = array.to_json
       end

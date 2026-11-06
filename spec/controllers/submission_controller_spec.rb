@@ -136,6 +136,48 @@ describe SubmissionsController, type: :controller do
       end
     end
   end
+
+  describe 'when the exercise has been removed from the course' do
+    render_views
+
+    before :each do
+      @submission.update!(paste_available: true, paste_key: 'paste-of-removed', all_tests_passed: true)
+      FactoryBot.create(:submission_data, submission: @submission)
+      @exercise.update_column(:name, 'removed-by-refresh')
+    end
+
+    it 'shows the submission page' do
+      get :show, params: { id: @submission.id }
+      expect(response).to be_successful
+    end
+
+    it 'shows the paste page' do
+      get :show, params: { paste_key: @submission.paste_key }
+      expect(response).to be_successful
+    end
+
+    it 'returns JSON without exercise details' do
+      get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
+      json = JSON.parse response.body
+      check_common_keys(json)
+      expect(json['exercise_name']).to eq(@submission.exercise_name)
+      expect(json['solution_url']).to be_nil
+      expect(json['missing_review_points']).to eq([])
+    end
+
+    it 'sends the submission zip' do
+      get :show, params: { id: @submission.id, format: :zip }
+      expect(response).to be_successful
+    end
+
+    it 'responds 404 to the difference with the model solution' do
+      teacher = FactoryBot.create(:user)
+      Teachership.create!(user: teacher, organization: @organization)
+      controller.current_user = teacher
+      get :difference_with_solution, params: { submission_id: @submission.id }
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end
 
 def check_common_keys(json)

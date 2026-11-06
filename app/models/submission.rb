@@ -408,7 +408,7 @@ class Submission < ApplicationRecord
   def paste_visible_for?(user)
     return false unless paste_available
     return true if exercise&.completed_by?(user)
-    return true if user.submissions.where(exercise_name: T.must(exercise).name, pretest_error: nil, all_tests_passed: true).any?
+    return true if user.submissions.where(exercise_name: exercise_name, pretest_error: nil, all_tests_passed: true).any?
     !all_tests_passed
   end
 
@@ -463,10 +463,12 @@ class Submission < ApplicationRecord
     sig { void }
     def kafka_update_progress
       return if (!T.must(self.course).moocfi_id || T.must(self.course).moocfi_id.blank?) || !self.processed
+      exercise = self.exercise
+      return unless exercise
       realtime = T.must(self.created_at) > 1.hour.ago
-      first_submission = T.must(self.exercise).submissions_by(T.must(user)).length == 1
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(self.exercise).id, task_type: 'user_progress', realtime: realtime)
-      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: T.must(self.exercise).id, task_type: 'user_points', realtime: realtime) unless first_submission
+      first_submission = exercise.submissions_by(T.must(user)).length == 1
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_progress', realtime: realtime)
+      KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, exercise_id: exercise.id, task_type: 'user_points', realtime: realtime) unless first_submission
       KafkaBatchUpdatePoints.create!(course_id: self.course_id, user_id: self.user_id, task_type: 'user_course_points', realtime: realtime) if first_submission
     end
 end

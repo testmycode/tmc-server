@@ -229,13 +229,19 @@ class ApplicationController < ActionController::Base
     # To support older versions of tmc-netbeans-plugin
     sig { returns(T::Boolean) }
     def client_supports_http_basic_auth?
-      return true if params[:client].blank?
-      client = params[:client]
+      params[:client] != 'netbeans_plugin' || netbeans_plugin_at_least?('0.8.0')
+    end
+
+    # Whether the request comes from tmc-netbeans-plugin +min_version+ or newer.
+    # A NetBeans plugin that sends no parseable version counts as older.
+    sig { params(min_version: String).returns(T::Boolean) }
+    def netbeans_plugin_at_least?(min_version)
+      return false unless params[:client] == 'netbeans_plugin'
       client_version = begin
         Version.new(params['client_version']) if params['client_version'].present?
       rescue StandardError
       end
-      !(client == 'netbeans_plugin' && T.must(client_version) < Version.new('0.8.0'))
+      !client_version.nil? && client_version >= Version.new(min_version)
     end
 
     sig { returns(String) }
@@ -256,9 +262,10 @@ class ApplicationController < ActionController::Base
 
       permitted = permitted.map { |f| prefix + f } if permitted.is_a?(Array)
 
-      result = Hash[params.select do |k, v|
+      selected = params.select do |k, v|
         k.start_with?(prefix) && v.present? && (permitted == :all || (permitted.is_a?(Array) && permitted.include?(k)))
-      end.permit(permitted)]
+      end
+      result = Hash[selected.permit(*selected.keys)]
       if options[:remove_prefix]
         result = result.transform_keys { |k| k.sub(/^#{prefix}/, '') }
       end
@@ -316,7 +323,7 @@ class ApplicationController < ActionController::Base
       if exercise
         add_breadcrumb "Exercise #{exercise.name}", exercise_path(exercise)
       elsif @submission&.exercise_name
-        add_breadcrumb "(deleted exercise #{@submission.exercise_name}"
+        add_breadcrumb "(deleted exercise #{@submission.exercise_name})"
       else
         raise 'Neither @exercise nor @submission.exercise_name set'
       end

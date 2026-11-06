@@ -39,7 +39,8 @@ class Review < ApplicationRecord
     exercises = course.exercises.index_by { |e| e.name }
     reviewed_submissions.map do |s|
       s.reviews.map do |r|
-        available_points = T.must(exercises[r.submission.exercise_name]).available_points.where(requires_review: true).map(&:name)
+        exercise = exercises[r.submission.exercise_name]
+        available_points = exercise ? exercise.available_points.where(requires_review: true).map(&:name) : []
         points_not_awarded = available_points - r.points_list
         {
           submission_id: s.id,
@@ -47,7 +48,7 @@ class Review < ApplicationRecord
 
           id: r.id,
           marked_as_read: r.marked_as_read,
-          reviewer_name: r.reviewer.display_name,
+          reviewer_name: r.reviewer&.display_name || '(deleted)',
           review_body: r.review_body,
           points: r.points_list.natsort,
           points_not_awarded: points_not_awarded.natsort,

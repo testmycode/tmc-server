@@ -175,6 +175,10 @@ describe Course, type: :model do
       should_be_invalid_params(valid_params.merge(name: nil))
     end
 
+    it 'requires an organization' do
+      should_be_invalid_params(valid_params.merge(organization: nil))
+    end
+
     it 'requires name to be reasonably short' do
       should_be_invalid_params(valid_params.merge(name: 'a' * 41))
     end
@@ -386,5 +390,13 @@ describe Course, type: :model do
     template = FactoryBot.create :course_template, name: 'templatesName'
     course = FactoryBot.create :course, name: 'coursesName', course_template: template, source_url: template.source_url
     expect(course.cache_path).to eq(template.cache_path)
+  end
+
+  describe '#reload' do
+    it 'returns the record and accepts reload options' do
+      record = FactoryBot.create(:course)
+      expect(record.reload).to be(record)
+      expect(record.class.transaction { record.reload(lock: true) }).to be(record)
+    end
   end
 end

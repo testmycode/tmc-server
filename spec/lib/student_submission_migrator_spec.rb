@@ -61,6 +61,11 @@ describe StudentSubmissionMigrator do
     expect(MigratedSubmissions.find_by(to_course_id: @other_course.id, original_submission_id: @sub2)).not_to be_nil
   end
 
+  it 'checks the allowed migrations without printing them' do
+    migrator = StudentSubmissionMigrator.new(@course, @other_course, @user)
+    expect { expect(migrator.migration_is_allowed).to be(true) }.not_to output.to_stdout
+  end
+
   it 'throws exception if it cannot be migrated safely' do
     bad_course = FactoryBot.create(:course)
     allow(bad_course).to receive(:git_revision) { 'other' }

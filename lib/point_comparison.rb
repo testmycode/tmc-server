@@ -6,7 +6,6 @@ require 'natcmp'
 # Provides an ordering for AvailablePoint and AwardedPoint based on natcmp'ing their names.
 module PointComparison
   extend T::Sig
-  extend Comparable
 
   sig { params(other: T.any(AvailablePoint, AwardedPoint)).returns(Integer) }
   def <=>(other)

@@ -473,4 +473,19 @@ describe User, type: :model do
       end
     end
   end
+
+  describe '#courses_with_submissions' do
+    it 'reports passed tests and full points as true' do
+      user = FactoryBot.create(:user)
+      exercise = FactoryBot.create(:exercise)
+      course = exercise.course
+      available_point = FactoryBot.create(:available_point, exercise: exercise)
+      submission = FactoryBot.create(:submission, course: course, exercise: exercise, user: user, all_tests_passed: true)
+      FactoryBot.create(:awarded_point, course: course, submission: submission, user: user, name: available_point.name)
+
+      expect(user.courses_with_submissions[course.id]).to match([
+        a_hash_including(exercise_id: exercise.id, all_tests_passed: true, got_all_points: true)
+      ])
+    end
+  end
 end

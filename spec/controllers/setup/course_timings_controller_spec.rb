@@ -29,6 +29,17 @@ describe Setup::CourseTimingsController, type: :controller do
         expect(assigns(:course_setup_phases)).not_to be_nil
       end
 
+      describe 'with a parent group that has no exercises of its own' do
+        render_views
+
+        it 'renders' do
+          @course.exercises.create!(name: 'part1-sub1-e1')
+          get :show, params: { organization_id: @organization.slug, course_id: @course.id }
+          expect(response).to be_successful
+          expect(response.body).to include('group[part1]')
+        end
+      end
+
       it 'should not show wizard bar when not in wizard mode' do
         get :show, params: { organization_id: @organization.slug, course_id: @course.id }
         expect(assigns(:course_setup_phases)).to be_nil
@@ -140,6 +151,20 @@ describe Setup::CourseTimingsController, type: :controller do
         expect(assigns(:course).exercise_group_by_name('group1').group_unlock_conditions).to eq([''])
         expect(assigns(:course).exercise_group_by_name('group2').group_unlock_conditions).to eq(['92% from group1'])
         expect(assigns(:course).exercise_group_by_name('group3').group_unlock_conditions).to eq(['94% from group2'])
+      end
+
+      it 'skips groups that no longer exist' do
+        put :update, params: {
+            organization_id: @organization.slug,
+            course_id: @course.id,
+            commit: 'Accept and continue',
+            group: {
+              removed: { '_unlock_option' => 'no_unlock', 'hard' => { 'static' => '2016-05-16' } },
+              group1: { '_unlock_option' => 'no_unlock', 'hard' => { 'static' => '2016-06-16' } }
+            },
+          }
+        expect(response).to redirect_to(organization_course_path(@organization, @course))
+        expect(assigns(:course).exercise_group_by_name('group1').hard_group_deadline.static_deadline_spec).to eq('2016-06-16')
       end
 
       it 'should redirect to next step if in wizard mode' do

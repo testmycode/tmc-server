@@ -86,12 +86,14 @@ class Setup::CourseTimingsController < Setup::SetupController
 
       groups = group_params
       groups.each do |name, unlock_data|
+        group = course.exercise_group_by_name(name)
+        next if group.nil?
         if unlock_data[:_unlock_option] == 'no_unlock'
           unlock_condition = ''
         elsif unlock_data[:_unlock_option] == 'percentage_from'
           unlock_condition = "#{unlock_data[:_percentage_required]}% from #{unlock_data[:_unlock_groupname]}"
         end
-        T.must(course.exercise_group_by_name(name)).group_unlock_conditions = Array(unlock_condition).to_json
+        group.group_unlock_conditions = Array(unlock_condition).to_json
         UncomputedUnlock.create_all_for_course(course)
       end
     end
@@ -120,8 +122,9 @@ class Setup::CourseTimingsController < Setup::SetupController
       course = T.must(@course)
       groups = group_params
       groups.each do |name, deadlines|
-        hard_deadlines = [deadlines[:hard][:static], ''].to_json
-        T.must(course.exercise_group_by_name(name)).hard_group_deadline = hard_deadlines
+        group = course.exercise_group_by_name(name)
+        next if group.nil?
+        group.hard_group_deadline = [deadlines[:hard][:static], ''].to_json
       end
     end
 

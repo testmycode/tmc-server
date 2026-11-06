@@ -13,7 +13,7 @@ class ReviewMailer < ActionMailer::Base
     @review = T.let(review, T.nilable(Review))
     @url = T.let(settings['baseurl'].sub(/\/+$/, '') + "/submissions/#{submission.id}/reviews", T.nilable(String))
     from = settings['from']
-    reply_to = T.must(review.reviewer).email
+    reply_to = review.reviewer&.email
     mail(from: from, reply_to: reply_to, to: T.must(submission.user).email, subject: subject)
   end
 end

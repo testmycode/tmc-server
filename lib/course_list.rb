@@ -49,7 +49,7 @@ class CourseList
         sheets: sheets.map do |sheet|
           {
             name: sheet,
-            total_available: AvailablePoint.course_sheet_points(course, sheet)
+            total_available: AvailablePoint.course_sheet_points(course, sheet)[sheet] || 0
           }
         end,
         total_available: AvailablePoint.course_points_of_exercises(course, exercises)
