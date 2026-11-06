@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'vips'
 
 describe Organization, type: :model do
   let(:valid_params) do
@@ -68,6 +69,36 @@ describe Organization, type: :model do
       @user = FactoryBot.create(:user)
       @org = Organization.init(valid_params, @user)
       expect(@org.teachers.include?(@user))
+    end
+  end
+
+  describe 'logo' do
+    def attach_logo(organization, width, height)
+      png = Vips::Image.black(width, height).pngsave_buffer
+      organization.logo.attach(io: StringIO.new(png), filename: 'logo.png', content_type: 'image/png')
+    end
+
+    def dimensions(variant)
+      image = Vips::Image.new_from_buffer(variant.processed.download, '')
+      [image.width, image.height]
+    end
+
+    it 'scales a wide logo down to 100 px wide, keeping its aspect ratio' do
+      organization = Organization.create!(valid_params)
+      attach_logo(organization, 300, 120)
+      expect(dimensions(organization.org_logo)).to eq([100, 40])
+    end
+
+    it 'does not enlarge a logo narrower than 100 px' do
+      organization = Organization.create!(valid_params)
+      attach_logo(organization, 60, 90)
+      expect(dimensions(organization.org_logo)).to eq([60, 90])
+    end
+
+    it 'links logo_path to the scaled variant' do
+      organization = Organization.create!(valid_params)
+      attach_logo(organization, 300, 120)
+      expect(organization.logo_path).to start_with('/rails/active_storage/representations/')
     end
   end
 end

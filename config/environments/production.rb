@@ -117,5 +117,5 @@ Rails.application.configure do
   config.hosts << URI.parse(SiteSetting.value('baseurl_for_remote_sandboxes')).host
 
   config.active_record.cache_versioning = false
-  config.active_storage.variant_processor = :mini_magick
+  config.active_storage.variant_processor = :vips
 end

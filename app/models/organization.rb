@@ -106,7 +106,7 @@ class Organization < ApplicationRecord
   sig { returns(String) }
   def logo_path
     if self.logo.attached?
-      Rails.application.routes.url_helpers.rails_representation_url(T.unsafe(self.logo).variant(resize_to_fill: [100, nil]).processed, only_path: true)
+      Rails.application.routes.url_helpers.rails_representation_url(T.unsafe(self.logo).variant(resize_to_limit: [100, nil]).processed, only_path: true)
     else
       'missing.png'
     end
@@ -118,7 +118,7 @@ class Organization < ApplicationRecord
   sig { returns(T.any(ActiveStorage::VariantWithRecord, ActiveStorage::Variant, String)) }
   def org_logo
     if self.logo.attached?
-      T.unsafe(self.logo).variant(resize_to_fill: [100, nil])
+      T.unsafe(self.logo).variant(resize_to_limit: [100, nil])
     else
       'missing.png'
     end

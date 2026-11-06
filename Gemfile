@@ -18,7 +18,7 @@ gem 'faraday', '~> 2.14'
 gem 'file_validators', '~> 3.0' # Used to validate organization logo
 gem 'font-awesome-rails', '~> 4.7', '>= 4.7.0.8'
 gem 'gravtastic', '~> 3.2', '>= 3.2.6' # Used to display user avatars
-gem 'image_processing', '~> 1.12', '>= 1.12.2' # Used by active_storage to make logo 100x100 on the fly
+gem 'image_processing', '~> 2.2' # Active Storage variants of organization logos
 gem 'logstasher', '~> 2.1', '>= 2.1.5'
 gem 'natcmp', '~> 1.4', '>= 1.4.3'
 gem 'newrelic_rpm', '~> 9.11'
@@ -32,6 +32,7 @@ gem 'rack-mini-profiler', '~> 3.3', '>= 3.3.1'
 gem 'rake', '~> 13.2', '>= 13.2.1'
 gem 'responders', '~> 3.1', '>= 3.1.1'
 gem 'rest-client', '~> 2.1', require: false
+gem 'ruby-vips', '~> 2.3', require: false # Active Storage loads it on first use, so booting needs no libvips
 gem 'swagger-blocks', '~> 3.0'
 gem 'dartsass-sprockets', '~> 3.2'
 gem 'xml-simple', '~> 1.1', '>= 1.1.9', require: false

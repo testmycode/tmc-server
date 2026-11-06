@@ -43,6 +43,8 @@
             export BUNDLE_PATH="$PWD/vendor/bundle"
             export GEM_HOME="$PWD/vendor/bundle/ruby/${ruby.version.libDir}"
             export PATH="$GEM_HOME/bin:$PWD/bin:$PATH"
+            # ruby-vips dlopens libvips through ffi, which doesn't search the Nix store.
+            export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.vips pkgs.glib ]}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
             # Never in CI or Docker builds.
             if [ -z "''${CI:-}" ] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
