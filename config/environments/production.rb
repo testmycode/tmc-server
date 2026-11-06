@@ -70,12 +70,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   if ENV['REDIS_URL']
-    config.cache_store = :readthis_store, {
-      expires_in: 1.week.to_i, # default
-      namespace: 'cache',
-      redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
-    }
-    Readthis.fault_tolerant = true
+    config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_URL'), namespace: 'cache', expires_in: 1.week }
   else
     config.cache_store = :memory_store, { size: 64.megabytes }
   end

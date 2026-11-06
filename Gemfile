@@ -38,9 +38,7 @@ gem 'xml-simple', '~> 1.1', '>= 1.1.9', require: false
 gem 'cgi', '~> 0.3.6'
 gem 'sorbet-runtime', '~> 0.6.13640'
 
-gem 'hiredis', '~> 0.6.3' # Redis for caching
-gem 'readthis', '~> 2.2' # Redis for caching
-gem 'redis', '~> 4.5' # Redis for caching (TODO: Remove and migrate to rails cache)
+gem 'redis', '~> 6.0' # Rails.cache and Rack::MiniProfiler in production
 
 group :assets do
   gem 'jquery-rails', '~> 4.6'
