@@ -33,7 +33,7 @@ gem 'rake', '~> 13.2', '>= 13.2.1'
 gem 'responders', '~> 3.1', '>= 3.1.1'
 gem 'rest-client', '~> 2.1', require: false
 gem 'swagger-blocks', '~> 3.0'
-gem 'sassc-rails', '~> 2.1', '>= 2.1.2'
+gem 'dartsass-sprockets', '~> 3.2'
 gem 'xml-simple', '~> 1.1', '>= 1.1.9', require: false
 gem 'cgi', '~> 0.3.6'
 gem 'sorbet-runtime', '~> 0.6.13640'

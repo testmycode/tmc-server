@@ -54,10 +54,10 @@ end
 # pkg:gem/bootstrap#lib/bootstrap/version.rb:5
 Bootstrap::BOOTSTRAP_SHA = T.let(T.unsafe(nil), String)
 
-# pkg:gem/bootstrap#lib/bootstrap/engine.rb:7
+# pkg:gem/bootstrap#lib/bootstrap/engine.rb:23
 module Bootstrap::Rails; end
 
-# pkg:gem/bootstrap#lib/bootstrap/engine.rb:8
+# pkg:gem/bootstrap#lib/bootstrap/engine.rb:24
 class Bootstrap::Rails::Engine < ::Rails::Engine; end
 
 # pkg:gem/bootstrap#lib/bootstrap/version.rb:4

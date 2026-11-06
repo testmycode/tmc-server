@@ -37,6 +37,10 @@ module TmcServer
 
     config.relative_url_root = SiteSetting.value('base_path')
 
+    # Bootstrap 4.6 has no @use version, so it and our @imports of it keep using what Dart Sass deprecates.
+    config.sass.quiet_deps = true
+    config.sass.silence_deprecations = %w[import global-builtin color-functions if-function abs-percent]
+
     config.x.accept_courses_mooc_fi_tokens = ENV['ACCEPT_COURSES_MOOC_FI_TOKENS'] == 'true'
 
     config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
