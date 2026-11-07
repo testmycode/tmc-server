@@ -7,16 +7,16 @@ require 'rust_langs_cli_executor'
 describe RustLangsCliExecutor do
   describe '.prepare_submission' do
     def prepare_with_output(output)
-      allow(Open3).to receive(:capture2).and_return([output, instance_double(Process::Status)])
+      allow(RustLangsCliExecutor).to receive(:capture_stdout).and_return(output)
       RustLangsCliExecutor.prepare_submission('clone', 'output', 'submission')
     end
 
     it 'passes client-supplied params to tmc-langs as single arguments, not through a shell' do
       locale = "fi'; touch /tmp/pwned; echo '"
-      expect(Open3).to receive(:capture2)
-        .with(end_with('/current'), 'prepare-submission', '--clone-path', 'clone', '--output-path', 'output',
-              '--submission-path', 'submission', '--tmc-param', "error_msg_locale=#{locale}")
-        .and_return(["{\"status\":\"finished\"}\n", instance_double(Process::Status)])
+      expect(RustLangsCliExecutor).to receive(:capture_stdout)
+        .with([end_with('/current'), 'prepare-submission', '--clone-path', 'clone', '--output-path', 'output',
+               '--submission-path', 'submission', '--tmc-param', "error_msg_locale=#{locale}"])
+        .and_return("{\"status\":\"finished\"}\n")
       RustLangsCliExecutor.prepare_submission('clone', 'output', 'submission', { error_msg_locale: locale })
     end
 
@@ -31,6 +31,21 @@ describe RustLangsCliExecutor do
     it 'raises with the crash report when tmc-langs crashed' do
       expect { prepare_with_output("{\"status\":\"crashed\",\"message\":\"boom\"}\n") }
         .to raise_error(RuntimeError, 'TMC-langs-rust crashed: {"status":"crashed","message":"boom"}')
+    end
+
+    it "kills tmc-langs and returns promptly when the caller's timeout expires" do
+      Dir.mktmpdir do |dir|
+        pid_file = File.join(dir, 'pid')
+        File.write(File.join(dir, 'current'), "#!/bin/sh\necho $$ > #{pid_file}\nexec sleep 30\n")
+        File.chmod(0o755, File.join(dir, 'current'))
+        allow(RustLangsCliExecutor).to receive(:langs_executable_path).and_return(dir)
+
+        started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        expect { Timeout.timeout(1) { RustLangsCliExecutor.prepare_submission('clone', 'output', 'submission') } }
+          .to raise_error(Timeout::Error)
+        expect(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).to be < 10
+        expect { Process.kill(0, File.read(pid_file).to_i) }.to raise_error(Errno::ESRCH)
+      end
     end
   end
 

@@ -30,7 +30,7 @@ module RustLangsCliExecutor
       command.push('--tmc-param', "#{k}=#{v}") unless v.nil?
     end
 
-    command_output, _status = Open3.capture2(*command)
+    command_output = self.capture_stdout(command)
     Rails.logger.info(command_output)
 
     result = self.process_prepare_submission_command_output(command_output)
@@ -56,7 +56,7 @@ module RustLangsCliExecutor
     Rails.logger.info(command.shelljoin)
     parsed_data = T.let(nil, T.untyped)
 
-    Open3.popen2(*command) do |_stdin, stdout, status_thread|
+    T.unsafe(Open3).popen2(*command) do |_stdin, stdout, status_thread|
       Timeout.timeout(600, Timeout::Error, 'Refresh process took more than 10 minutes...') do
         stdout.each_line do |line|
           Rails.logger.info("Rust Refresh output \n#{line}")
@@ -73,12 +73,34 @@ module RustLangsCliExecutor
       end
     rescue Timeout::Error => e
       Rails.logger.info("Rust Refresh took too long, killing process. #{e}")
-      status_thread.kill
+      self.kill_process(status_thread.pid)
       raise e
     end
     course_template_refresh_task.percent_done = BigDecimal('0.95')
     course_template_refresh_task.save!
     parsed_data
+  end
+
+  # Kills the child if the caller's Timeout interrupts the read; Open3 would otherwise wait for it to exit.
+  sig { params(command: T::Array[String]).returns(String) }
+  private_class_method def self.capture_stdout(command)
+    T.unsafe(Open3).popen2(*command) do |_stdin, stdout, wait_thread|
+      finished = false
+      begin
+        output = stdout.read.to_s
+        finished = true
+        output
+      ensure
+        self.kill_process(wait_thread.pid) unless finished
+      end
+    end
+  end
+
+  sig { params(pid: Integer).void }
+  private_class_method def self.kill_process(pid)
+    Process.kill('KILL', pid)
+  rescue Errno::ESRCH
+    nil
   end
 
   sig { params(output: String).returns(T.untyped) }
