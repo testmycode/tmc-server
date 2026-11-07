@@ -7,7 +7,7 @@ describe SystemCommands do
   it 'should return error when when command exit status is non-zero' do
     expect do
       sh!('false')
-    end.to raise_error
+    end.to raise_error(RuntimeError, /failed with status/)
   end
 
   it 'should return error on timeout properly' do

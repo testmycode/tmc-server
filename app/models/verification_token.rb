@@ -13,7 +13,7 @@ class VerificationToken < ApplicationRecord
   validates :type, presence: true
   validates :user, presence: true
 
-  default_scope { where(created_at: ((Time.current - 1.week)..Time.current)) }
+  default_scope { where(created_at: (1.week.ago..Time.current)) }
 
   before_create :generate_token
 

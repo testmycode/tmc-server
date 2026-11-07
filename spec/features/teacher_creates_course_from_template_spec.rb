@@ -6,7 +6,7 @@ require 'spec_helper'
 feature 'Teacher creates course from course template', feature: true do
   include IntegrationTestActions
 
-  create_course_button_text = 'Create New Course'
+  let(:create_course_button_text) { 'Create New Course' }
 
   before :each do
     @organization = FactoryBot.create :accepted_organization, slug: 'slug'
@@ -86,6 +86,7 @@ feature 'Teacher creates course from course template', feature: true do
     log_in_as(@user.login, 'foobar')
 
     visit '/org/slug'
+    expect(page).to have_current_path('/org/slug')
     expect(page).not_to have_content(create_course_button_text)
   end
 end

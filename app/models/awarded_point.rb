@@ -161,7 +161,7 @@ class AwardedPoint < ApplicationRecord
           .project(users[:id].as('uid'))
           .to_sql
 
-    uids = ActiveRecord::Base.connection.execute(sql).map { |record| record['uid'] }
+    uids = ActiveRecord::Base.connection.execute(sql).pluck('uid')
     User.where(id: uids)
   end
 
@@ -220,7 +220,7 @@ class AwardedPoint < ApplicationRecord
                       courses[:id].eq(exercises[:course_id])
                             .and(submissions[:exercise_name].eq(exercises[:name]))
                     )
-    ActiveRecord::Base.connection.execute(awarded_query.to_sql).to_a.map { |h| h['id'] }
+    ActiveRecord::Base.connection.execute(awarded_query.to_sql).to_a.pluck('id')
   end
 
   sig { params(query: ActiveRecord::Relation).returns(ActiveRecord::Relation) }

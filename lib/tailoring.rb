@@ -20,7 +20,7 @@ class Tailoring
   sig { returns(Tailoring) }
   def self.get
     @tailoring ||= T.let(begin
-      path = "#{::Rails.root}/config/site_tailoring.rb"
+      path = Rails.root.join('config/site_tailoring.rb').to_s
       if File.exist?(path)
         require path
         SiteTailoring.new

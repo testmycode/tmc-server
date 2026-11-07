@@ -87,7 +87,7 @@ module RustLangsCliExecutor
 
   sig { returns(String) }
   private_class_method def self.langs_executable_path
-    Pathname.new("#{::Rails.root}/vendor/tmc-langs-rust").relative_path_from(Pathname.new(Dir.pwd)).to_s
+    Rails.root.join('vendor/tmc-langs-rust').relative_path_from(Pathname.new(Dir.pwd)).to_s
   end
 
   sig { params(command_output: String).returns(T.untyped) }

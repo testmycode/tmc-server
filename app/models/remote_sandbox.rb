@@ -59,7 +59,7 @@ class RemoteSandbox
         # ignore
       else
         Rails.logger.info "Submission #{submission.id} sent to remote sandbox at #{server.baseurl}"
-        Rails.logger.debug "Notify url: #{notify_url}"
+        Rails.logger.debug { "Notify url: #{notify_url}" }
         return true
       end
     end
@@ -108,7 +108,7 @@ class RemoteSandbox
         submission.sandbox = post_url
         submission.save!
       rescue StandardError => e
-        puts e
+        Rails.logger.error(e)
         begin
           # Try to parse the response to see if the error originated from within the sandbox.
           raise SandboxUnavailableError unless e.is_a?(RestClient::Exception)

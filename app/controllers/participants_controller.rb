@@ -130,9 +130,9 @@ class ParticipantsController < ApplicationController
     end
 
     submissions = if current_user.administrator? || current_user.id == user.id
-      user.submissions.order('created_at DESC').includes(:user).includes(:course)
+      user.submissions.order(created_at: :desc).includes(:user).includes(:course)
     else # teacher and assistant sees only submissions for own teacherd courses
-      user.submissions.order('created_at DESC').includes(:user, :course).where(course: current_user.teaching_in_courses)
+      user.submissions.order(created_at: :desc).includes(:user, :course).where(course: current_user.teaching_in_courses)
     end
     @submission_count = T.let(submissions.count, T.nilable(Integer))
     submissions = submissions.limit(100) unless !!params[:view_all]

@@ -5,7 +5,7 @@ root_dir = File.expand_path('../', File.dirname(__FILE__))
 require root_dir + '/config/environment'
 require 'fileutils'
 
-if ![1, 2].include?(ARGV.length) || ['-h', '--help'].include?(ARGV[0])
+if [1, 2].exclude?(ARGV.length) || ['-h', '--help'].include?(ARGV[0])
   puts 'Usage: script/export_submissions dest_dir [course_name]'
   puts
   exit(false)

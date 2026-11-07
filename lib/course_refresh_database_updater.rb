@@ -119,7 +119,7 @@ class CourseRefreshDatabaseUpdater
 
     sig { void }
     def add_records_for_new_exercises
-      rust_ex = @rust_data['exercises'].map { |ex| ex['name'] }
+      rust_ex = @rust_data['exercises'].pluck('name')
       course_ex = course.exercises.map { |ex| ex.name }
       added_exercises = rust_ex - course_ex
       added_exercises.each do |exercise|
@@ -231,7 +231,7 @@ class CourseRefreshDatabaseUpdater
 
     sig { void }
     def kafka_publish_exercises
-      KafkaBatchUpdatePoints.create!(course_id: course.id, task_type: 'exercises') if course.moocfi_id && !course.moocfi_id.blank?
+      KafkaBatchUpdatePoints.create!(course_id: course.id, task_type: 'exercises') if course.moocfi_id && course.moocfi_id.present?
     end
   end
   private_constant :Impl

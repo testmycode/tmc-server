@@ -48,6 +48,7 @@ feature 'Admin creates course templates', feature: true do
     expect(page).to have_content("Source url can't be blank")
 
     visit '/course_templates'
+    expect(page).to have_current_path('/course_templates')
     expect(page).not_to have_content('name with w h i t e s p a c e s')
   end
 

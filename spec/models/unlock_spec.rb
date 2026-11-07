@@ -25,7 +25,7 @@ describe Unlock, type: :model do
 
     it 'creates unlocks as specified' do
       Unlock.refresh_unlocks(@course, @user)
-      unlocks = Unlock.order('exercise_name ASC').to_a
+      unlocks = Unlock.order(:exercise_name).to_a
       expect(unlocks.size).to eq(1)
 
       expect(unlocks.first.valid_after).to eq(Date.parse('2011-11-11').in_time_zone)
@@ -34,7 +34,7 @@ describe Unlock, type: :model do
       AwardedPoint.create!(user_id: @user.id, course_id: @course.id, name: @available_point.name, submission_id: @submission.id)
       Unlock.refresh_unlocks(@course, @user)
 
-      unlocks = Unlock.order('exercise_name ASC').to_a
+      unlocks = Unlock.order(:exercise_name).to_a
       expect(unlocks.size).to eq(2)
 
       expect(unlocks.second.valid_after).to eq(Date.parse('2011-11-22').in_time_zone)

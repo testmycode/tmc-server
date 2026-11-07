@@ -9,7 +9,7 @@ describe Api::V8::ApidocsController, type: :controller do
     get :index
     json = response.body
 
-    schema = File.join(Rails.root, 'spec', 'resources', 'swagger-schema.json')
+    schema = Rails.root.join('spec/resources/swagger-schema.json').to_s
     errors = JSON::Validator.fully_validate(schema, json)
     expect(errors).to be_empty, -> { "Generated apidocs are not valid Swagger 2.0:\n#{errors.join("\n")}" }
   end
@@ -19,7 +19,7 @@ describe Api::V8::ApidocsController, type: :controller do
   it 'declares no path containing a query string' do
     get :index
 
-    paths = JSON.parse(response.body)['paths'].keys
+    paths = response.parsed_body['paths'].keys
     expect(paths.grep(/\?/)).to be_empty
   end
 end

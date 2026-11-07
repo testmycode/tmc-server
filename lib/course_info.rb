@@ -23,7 +23,7 @@ class CourseInfo
     @unlocked_exercises = course.unlocked_exercise_names_for(@user, exercises)
 
     submissions_by_exercise = T.let({}, T::Hash[T.nilable(String), T::Array[Submission]])
-    Submission.where(course_id: course.id, user_id: @user.id).each do |sub|
+    Submission.where(course_id: course.id, user_id: @user.id).find_each do |sub|
       (submissions_by_exercise[sub.exercise_name] ||= []) << sub
     end
     exercises.each do |ex|
@@ -79,7 +79,7 @@ class CourseInfo
       return nil unless exercise.visible_to?(@user)
 
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = !@unlocked_exercises.include?(exercise.name)
+      locked = @unlocked_exercises.exclude?(exercise.name)
       show_points = !exercise.hide_submission_results? && !T.must(exercise.course).hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 
@@ -118,7 +118,7 @@ class CourseInfo
     sig { params(exercise: Exercise).returns(T::Hash[Symbol, T.untyped]) }
     def exercise_data_core_api(exercise)
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = !@unlocked_exercises.include?(exercise.name)
+      locked = @unlocked_exercises.exclude?(exercise.name)
       show_points = !exercise.hide_submission_results? && !T.must(exercise.course).hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 

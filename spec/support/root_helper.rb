@@ -117,7 +117,7 @@ class RootHelper
     end
 
     def servers_parent_dir
-      "#{::Rails.root}/tmp/test-sandbox-server"
+      Rails.root.join('tmp/test-sandbox-server').to_s
     end
 
     def debug(_msg)

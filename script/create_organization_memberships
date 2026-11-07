@@ -3,7 +3,7 @@
 
 user_course_combos = AwardedPoint.distinct.pluck(:user_id, :course_id)
 
-course_ids = user_course_combos.map { |combo| combo[1] }.uniq
+course_ids = user_course_combos.pluck(1).uniq
 
 course_id_to_organization_id = Course.find(course_ids).to_h { |c| [c.id, c.organization_id] }
 

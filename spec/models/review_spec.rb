@@ -57,7 +57,7 @@ describe Review, type: :model do
 
       json = Review.course_reviews_json(@course, Submission.where(id: @sub.id), view_context)
 
-      expect(json.map { |r| r[:id] }).to eq([review.id])
+      expect(json.pluck(:id)).to eq([review.id])
       expect(json.first[:points_not_awarded]).to eq([])
     end
 

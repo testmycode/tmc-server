@@ -16,7 +16,7 @@ class ReviewedSubmissionsController < ApplicationController
                          .where(reviewed: true)
                          .includes(reviews: :reviewer)
                          .includes(:user)
-                         .order('created_at DESC')
+                         .order(created_at: :desc)
     @submissions = T.let(submissions, T.nilable(ActiveRecord::Relation))
   end
 end

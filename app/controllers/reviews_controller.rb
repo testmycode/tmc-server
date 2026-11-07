@@ -17,7 +17,7 @@ class ReviewsController < ApplicationController
       my_reviews = course.submissions
                          .where(user_id: current_user.id)
                          .where('requests_review OR requires_review OR reviewed')
-                         .order('created_at DESC')
+                         .order(created_at: :desc)
       @my_reviews = T.let(my_reviews, T.nilable(ActiveRecord::Relation))
 
       respond_to do |format|
@@ -223,7 +223,7 @@ class ReviewsController < ApplicationController
       sub.review_dismissed = false
       sub.of_same_kind
          .where('(requires_review OR requests_review) AND NOT reviewed')
-         .where(['created_at < ?', sub.created_at])
+         .where(created_at: ...sub.created_at)
          .update_all(newer_submission_reviewed: true)
     end
 

@@ -78,6 +78,7 @@ feature 'Teacher can add assistants to course', feature: true do
     log_out
     log_in_as(@assistant.username, 'newfoobar')
     visit "/org/slug/courses/#{course2.id}"
+    expect(page).to have_current_path("/org/slug/courses/#{course2.id}")
     expect(page).not_to have_content('Manage deadlines')
     expect(page).not_to have_content('Manage unlock conditions')
   end

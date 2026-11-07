@@ -13,7 +13,7 @@ class Validators::FeedbackAnswerFormatValidator < ActiveModel::Validator
       range = (Regexp.last_match(1).to_i)..(Regexp.last_match(2).to_i)
       if !/^(-?\d+)$/.match?(ans)
         record.errors.add(:answer, 'is not an integer')
-      elsif !range.include?(ans.to_i)
+      elsif range.exclude?(ans.to_i)
         record.errors.add(:answer, "is not between #{range.first}..#{range.last}")
       end
     elsif kind == 'text'

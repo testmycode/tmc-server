@@ -32,7 +32,7 @@ describe SubmissionsController, type: :controller do
         @submission.processed = false
         @submission.save!
         get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-        json = JSON.parse response.body
+        json = response.parsed_body
         check_common_keys(json)
         expect(json).to have_key 'submissions_before_this'
         expect(json).to have_key 'total_unprocessed'
@@ -45,7 +45,7 @@ describe SubmissionsController, type: :controller do
         @submission.all_tests_passed = true
         @submission.save!
         get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-        json = JSON.parse response.body
+        json = response.parsed_body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
         expect(json).to have_key 'feedback_questions'
@@ -57,7 +57,7 @@ describe SubmissionsController, type: :controller do
     describe 'when test failed' do
       it "should return 'fail' status and right field" do
         get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-        json = JSON.parse response.body
+        json = response.parsed_body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
         expect(json['status']).to eq('fail')
@@ -69,7 +69,7 @@ describe SubmissionsController, type: :controller do
         @submission.pretest_error = 'some funny error'
         @submission.save!
         get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-        json = JSON.parse response.body
+        json = response.parsed_body
         check_common_keys(json)
         expect(json).to have_key 'error'
         expect(json['status']).to eq('error')
@@ -89,28 +89,28 @@ describe SubmissionsController, type: :controller do
         @submission.points = 'some points'
         @submission.save!
         get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-        json = JSON.parse response.body
+        json = response.parsed_body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
         expect(json['status']).to eq('ok')
-        expect(json['all_tests_passed']).to be nil
+        expect(json['all_tests_passed']).to be_nil
         expect(json['test_cases'][0]['name']).to include('TestResultsAreHidden')
         expect(json['points']).to eq([])
-        expect(json['validations']).to be nil
-        expect(json['valgrind']).to be nil
+        expect(json['validations']).to be_nil
+        expect(json['valgrind']).to be_nil
       end
 
       it "when all_tests_passed is false and no points should return 'ok' status and 'TestResultsAreHidden' and empty points array" do
         # pending('Waiting for clients to be updated')
         get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-        json = JSON.parse response.body
+        json = response.parsed_body
         expect(json).to have_key 'test_cases'
         expect(json['status']).to eq('ok')
-        expect(json['all_tests_passed']).to be nil
+        expect(json['all_tests_passed']).to be_nil
         expect(json['test_cases'][0]['name']).to include('TestResultsAreHidden')
         expect(json['points']).to eq([])
-        expect(json['validations']).to be nil
-        expect(json['valgrind']).to be nil
+        expect(json['validations']).to be_nil
+        expect(json['valgrind']).to be_nil
       end
     end
 
@@ -125,14 +125,14 @@ describe SubmissionsController, type: :controller do
         @submission.points = 'some points'
         @submission.save!
         get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-        json = JSON.parse response.body
+        json = response.parsed_body
         check_common_keys(json)
         expect(json).to have_key 'test_cases'
-        expect(json['all_tests_passed']).to be nil
+        expect(json['all_tests_passed']).to be_nil
         expect(json['test_cases'][0]['name']).to eq 'TestResultsAreHidden test'
         expect(json['points']).to eq []
-        expect(json['validations']).to be nil
-        expect(json['valgrind']).to be nil
+        expect(json['validations']).to be_nil
+        expect(json['valgrind']).to be_nil
       end
     end
   end
@@ -169,7 +169,7 @@ describe SubmissionsController, type: :controller do
 
     it 'returns JSON without exercise details' do
       get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
-      json = JSON.parse response.body
+      json = response.parsed_body
       check_common_keys(json)
       expect(json['exercise_name']).to eq(@submission.exercise_name)
       expect(json['solution_url']).to be_nil

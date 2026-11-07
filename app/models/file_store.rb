@@ -13,7 +13,7 @@ module FileStore
   extend T::Sig
   sig { returns(String) }
   def self.root
-    "#{::Rails.root}/db/files"
+    Rails.root.join('db/files').to_s
   end
 
   sig { params(relpath: T.any(String, Pathname)).returns(String) }

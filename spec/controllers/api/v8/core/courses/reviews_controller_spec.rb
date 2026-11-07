@@ -25,7 +25,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
         it "shows only user's submission's review information" do
           get :index, params: { course_id: course.id }
           expect(response).to have_http_status(200)
-          json = JSON.parse response.body
+          json = response.parsed_body
           expect(json[0]['submission_id']).to eq(review.submission.id)
           expect(json[0]['exercise_name']).to eq(exercise.name)
           expect(json[0]['id']).to eq(review.id)
@@ -53,7 +53,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
         it "shows only user's submission's review information" do
           get :index, params: { course_id: course.id }
           expect(response).to have_http_status(200)
-          json = JSON.parse response.body
+          json = response.parsed_body
           expect(json[0]['submission_id']).to eq(review.submission.id)
           expect(json[0]['exercise_name']).to eq(exercise.name)
           expect(json[0]['id']).to eq(review.id)

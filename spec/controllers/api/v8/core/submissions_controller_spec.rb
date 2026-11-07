@@ -5,9 +5,13 @@ require 'spec_helper'
 
 describe Api::V8::Core::SubmissionsController, type: :controller do
   let!(:organization) { FactoryBot.create(:accepted_organization) }
-  repo_path = Dir.tmpdir + '/api/v8/core/submissions/remote_repo'
-  FileUtils.rm_rf(repo_path)
-  create_bare_repo(repo_path)
+  let(:repo_path) { Dir.tmpdir + '/api/v8/core/submissions/remote_repo' }
+
+  before do
+    FileUtils.rm_rf(repo_path)
+    create_bare_repo(repo_path)
+  end
+
   let!(:course) { FactoryBot.create(:course, organization: organization, source_backend: 'git', source_url: repo_path) }
   let!(:admin) { FactoryBot.create(:admin) }
   let!(:teacher) { FactoryBot.create(:user) }
@@ -26,6 +30,9 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
     allow(controller).to receive(:doorkeeper_token) { token }
   end
 
+  after do
+    FileUtils.rm_rf(repo_path)
+  end
   describe 'Downloading a submission as zip' do
     describe 'as an admin' do
       let(:token) { double resource_owner_id: admin.id, acceptable?: true }
@@ -127,7 +134,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
     it 'is shown without exercise details' do
       get :show, params: { id: submission.id }
       expect(response.code).to eq('200')
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json['exercise_name']).to eq(submission.exercise_name)
       expect(json['solution_url']).to be_nil
       expect(json['missing_review_points']).to eq([])
@@ -144,21 +151,17 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
     it 'is shown as ok to a NetBeans plugin that sends no version' do
       get :show, params: { id: submission.id, client: 'netbeans_plugin' }
       expect(response.code).to eq('200')
-      expect(JSON.parse(response.body)['status']).to eq('ok')
+      expect(response.parsed_body['status']).to eq('ok')
     end
 
     it 'is shown as ok to a NetBeans plugin older than 1.2.5' do
       get :show, params: { id: submission.id, client: 'netbeans_plugin', client_version: '1.2.4' }
-      expect(JSON.parse(response.body)['status']).to eq('ok')
+      expect(response.parsed_body['status']).to eq('ok')
     end
 
     it 'is shown as hidden to a NetBeans plugin from 1.2.5 on' do
       get :show, params: { id: submission.id, client: 'netbeans_plugin', client_version: '1.2.5' }
-      expect(JSON.parse(response.body)['status']).to eq('hidden')
+      expect(response.parsed_body['status']).to eq('hidden')
     end
-  end
-
-  after :all do
-    FileUtils.rm_rf(repo_path)
   end
 end

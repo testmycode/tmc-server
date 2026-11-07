@@ -10,7 +10,7 @@ describe Setup::SetupController, type: :controller do
   end
 
   def phase_urls
-    controller.instance_variable_get(:@course_setup_phases).map { |phase| phase[:url] }
+    controller.instance_variable_get(:@course_setup_phases).pluck(:url)
   end
 
   it 'calls the route helper with the organization and course when asked to pass them' do

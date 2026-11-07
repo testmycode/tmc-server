@@ -15,7 +15,7 @@ describe Organization, type: :model do
   end
   describe 'validation' do
     it 'accepts valid parameters' do
-      expect { Organization.create!(valid_params).to_not raise_error }
+      expect { Organization.create!(valid_params) }.not_to raise_error
     end
 
     it 'requires a name' do
@@ -68,7 +68,7 @@ describe Organization, type: :model do
     it 'grants the requesting user teachership to the organization' do
       @user = FactoryBot.create(:user)
       @org = Organization.init(valid_params, @user)
-      expect(@org.teachers.include?(@user))
+      expect(@org.teachers).to include(@user)
     end
   end
 

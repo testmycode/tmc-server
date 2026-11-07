@@ -46,7 +46,7 @@ class FeedbackAnswersController < ApplicationController
                                .joins(:submission)
                                .joins(submission: :user) # .joins(:exercise) # fails due to :conditions of belongs_to receiving incorrect self :(
                                .where(feedback_questions: { kind: 'text' })
-                               .order('created_at DESC')
+                               .order(created_at: :desc)
                                .all, T.nilable(ActiveRecord::Relation))
       end
       format.json do

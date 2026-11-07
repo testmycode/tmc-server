@@ -11,7 +11,7 @@ namespace :background_daemon do
         name: name,
         short_description: 'TMC background daemon',
         executable_path: 'script/background_daemon',
-        user: Etc.getpwuid(File.stat(::Rails.root).uid).name
+        user: Etc.getpwuid(::Rails.root.stat.uid).name
       )
     end
 

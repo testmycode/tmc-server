@@ -320,9 +320,9 @@ class SubmissionsController < ApplicationController
       end
 
       if params[:max_id]
-        submissions = submissions.where('id <= ?', params[:max_id])
+        submissions = submissions.where(id: ..params[:max_id])
       end
-      submissions = submissions.includes(:user).order('id DESC')
+      submissions = submissions.includes(:user).order(id: :desc)
       remaining = submissions.count
       submissions_limited = submissions.limit(1000)
       Submission.eager_load_exercises(submissions_limited)

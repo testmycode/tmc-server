@@ -7,11 +7,11 @@ require 'student_submission_migrator'
 describe StudentSubmissionMigrator do
   before :each do
     @course = FactoryBot.create(:course)
-    allow(@course).to receive(:git_revision) { 'same' }
+    allow(@course).to receive(:git_revision).and_return('same')
     @other_course = @course.dup
     @other_course.name = @other_course.name + '1'
     @other_course.save!
-    allow(@other_course).to receive(:git_revision) { 'same' }
+    allow(@other_course).to receive(:git_revision).and_return('same')
 
     @user = FactoryBot.create(:user)
 
@@ -68,7 +68,7 @@ describe StudentSubmissionMigrator do
 
   it 'throws exception if it cannot be migrated safely' do
     bad_course = FactoryBot.create(:course)
-    allow(bad_course).to receive(:git_revision) { 'other' }
+    allow(bad_course).to receive(:git_revision).and_return('other')
     migrator = StudentSubmissionMigrator.new(@course, bad_course, @user)
     expect { migrator.migrate! }.to raise_exception(StudentSubmissionMigrator::CannotRefreshError)
   end

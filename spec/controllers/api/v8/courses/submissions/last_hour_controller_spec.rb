@@ -11,7 +11,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
 
   let!(:submission_1) { FactoryBot.create(:submission, course: course) }
   let!(:submission_2) { FactoryBot.create(:submission, course: course) }
-  let!(:submission_3) { FactoryBot.create(:submission, course: course, created_at: Time.current - 2.hours) }
+  let!(:submission_3) { FactoryBot.create(:submission, course: course, created_at: 2.hours.ago) }
 
   before(:each) do
     allow(controller).to receive(:doorkeeper_token) { token }
@@ -33,7 +33,7 @@ describe Api::V8::Courses::Submissions::LastHourController, type: :controller do
       it 'gives submission ids for the last hour' do
         get :index, params: { course_id: course.id }
         expect(response).to have_http_status(:ok)
-        res = JSON.parse(response.body)
+        res = response.parsed_body
         expect(res.length).to eq(2)
         expect(res).to include(submission_1.id)
         expect(res).not_to include(submission_3.id)

@@ -10,7 +10,7 @@ describe BreadCrumbs, type: :controller do
   end
 
   def breadcrumb_urls
-    controller.instance_variable_get(:@breadcrumbs).map { |crumb| crumb[:url] }
+    controller.instance_variable_get(:@breadcrumbs).pluck(:url)
   end
 
   it 'keeps a path whose organization slug contains _path or _url as is' do

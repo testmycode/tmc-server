@@ -113,9 +113,9 @@ class StatsController < ApplicationController
           records = course.submissions
                           .select(['COUNT(*) c', "date_trunc('#{time_unit}', #{expr_for_time_in_time_zone('created_at')}) t"])
                           .group('t')
-                          .where('created_at >= ?', start_time)
+                          .where(created_at: start_time..)
                           .where(user: User.legitimate_students)
-                          .where('created_at < ?', end_time)
+                          .where(created_at: ...end_time)
 
           date_format = '%Y-%m-%d %H:%M:%S' # query returns in this format, without timezone
           # date_format = '%FT%T.%LZ' # query returns in this format, without timezone
@@ -149,7 +149,7 @@ class StatsController < ApplicationController
           records = course.submissions.where(user: User.legitimate_students).select([
                                                                                        'COUNT(*) c',
                                                                                        "EXTRACT(HOUR FROM #{expr_for_time_in_time_zone('created_at')}) h"
-                                                                                     ]).group('h').order('h ASC')
+                                                                                     ]).group('h').order(:h)
 
           lookup = {}
           for r in records

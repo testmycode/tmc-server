@@ -51,8 +51,8 @@ class RemoteSandboxForTesting
   end
 
   private_class_method def self.copy_server_instance(port, actual_user, actual_group)
-    instance_dir = "#{::Rails.root}/tmp/test-sandbox-server/#{port}"
-    maven_cache_dir = "#{::Rails.root}/tmp/test-maven-cache" # This we won't delete each time
+    instance_dir = Rails.root.join("tmp/test-sandbox-server/#{port}").to_s
+    maven_cache_dir = Rails.root.join('tmp/test-maven-cache').to_s # This we won't delete each time
 
     FileUtils.mkdir_p(maven_cache_dir)
     SystemCommands.sh!('chown', '-R', actual_user, maven_cache_dir)
@@ -61,7 +61,7 @@ class RemoteSandboxForTesting
     FileUtils.rm_rf instance_dir
     FileUtils.mkdir_p instance_dir
 
-    source = "#{::Rails.root}/ext/tmc-sandbox"
+    source = Rails.root.join('ext/tmc-sandbox').to_s
     FileUtils.ln_s "#{source}/misc", "#{instance_dir}/misc"
     FileUtils.ln_s "#{source}/uml", "#{instance_dir}/uml"
     FileUtils.cp_r "#{source}/web", instance_dir

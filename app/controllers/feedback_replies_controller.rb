@@ -19,7 +19,7 @@ class FeedbackRepliesController < ApplicationController
     if request.referer.present?
       redirect_to request.referer, params: { notice: 'Reply to a review was mailed' }
     else
-      redirect_back fallback_location: root_path
+      redirect_back_or_to(root_path)
     end
   end
 end

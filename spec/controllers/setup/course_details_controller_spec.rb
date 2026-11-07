@@ -63,13 +63,13 @@ describe Setup::CourseDetailsController, type: :controller do
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse', title: 'New Course', course_template_id: @ct.id } }
           # imitate call refresh first (bg doesnt work in tests)
           RefreshCourseTask.new.run
-          expect(Course.all.order(:id).pluck(:cached_version)).to eq([0, 1])
+          expect(Course.order(:id).pluck(:cached_version)).to eq([0, 1])
 
           expect(CourseTemplate.find(@ct.id).cached_version).to eq(1)
           post :create, params: { organization_id: @organization.slug, course: { name: 'NewCourse2', title: 'New Course 2', course_template_id: @ct.id } }
           # Make sure there shouldn't be any task in :not_started mode
           RefreshCourseTask.new.run
-          expect(Course.all.order(:id).pluck(:cached_version)).to eq([0, 1, 1])
+          expect(Course.order(:id).pluck(:cached_version)).to eq([0, 1, 1])
           expect(CourseTemplate.find(@ct.id).cached_version).to eq(1)
           expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(1)
         end

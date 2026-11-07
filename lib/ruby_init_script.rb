@@ -136,11 +136,11 @@ class RubyInitScript
       @rvm_info ||= begin
         output = `rvm info 2>/dev/null` # We silence the "RVM is not a function" warning on stderr.
         # This can happen if one uses `sudo -i -u tmc` and then does `rvmsudo rvm info`.
-        potential_warning = <<EOS.strip_heredoc
+        potential_warning = <<~EOS
         You need to change your terminal emulator preferences to allow login shell.
         Sometimes it is required to use `/bin/bash --login` as the command.
         Please visit https://rvm.io/integration/gnome-terminal/ for a example.
-EOS
+        EOS
         output = output.sub(potential_warning, '')
         YAML.safe_load(output)
       end

@@ -80,7 +80,7 @@ describe CourseTemplatesController, type: :controller do
         it "doesn't create any course templates" do
           expect do
             post :create, params: { course_template: invalid_attributes }
-          end.to change(CourseTemplate, :count).by(0)
+          end.not_to change(CourseTemplate, :count)
         end
 
         it "re-renders the 'new' template" do
@@ -171,13 +171,13 @@ describe CourseTemplatesController, type: :controller do
       end
     end
 
-    describe 'GET edit' do
+    describe 'GET show' do
       before :each do
         @course_template = FactoryBot.create :course_template
       end
 
       it 'should respond with a 403' do
-        get :edit, params: { id: @course_template.to_param }
+        get :show, params: { id: @course_template.to_param }
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -186,7 +186,7 @@ describe CourseTemplatesController, type: :controller do
       it "doesn't create any course templates" do
         expect do
           post :create, params: { course_template: valid_attributes }
-        end.to change(CourseTemplate, :count).by(0)
+        end.not_to change(CourseTemplate, :count)
       end
 
       it 'should respond with a 403' do
@@ -219,7 +219,7 @@ describe CourseTemplatesController, type: :controller do
       it "doesn't destroy the course template" do
         expect do
           delete :destroy, params: { id: @course_template.to_param }
-        end.to change(CourseTemplate, :count).by(0)
+        end.not_to change(CourseTemplate, :count)
       end
 
       it 'should respond with a 403' do
@@ -262,13 +262,13 @@ describe CourseTemplatesController, type: :controller do
       end
     end
 
-    describe 'GET edit' do
+    describe 'GET show' do
       before :each do
         @course_template = FactoryBot.create :course_template
       end
 
       it 'should respond with a 302 and redirect to login with correct return_to param' do
-        get :edit, params: { id: @course_template.to_param }
+        get :show, params: { id: @course_template.to_param }
         expect(response.code.to_i).to eq(302)
         expect(response.headers['Location']).to include('/login?return_to=%2Fcourse_templates')
       end
@@ -278,7 +278,7 @@ describe CourseTemplatesController, type: :controller do
       it "doesn't create any course templates" do
         expect do
           post :create, params: { course_template: valid_attributes }
-        end.to change(CourseTemplate, :count).by(0)
+        end.not_to change(CourseTemplate, :count)
       end
 
       it 'should respond with a 302 and redirect to login with correct return_to param' do
@@ -313,7 +313,7 @@ describe CourseTemplatesController, type: :controller do
       it "doesn't destroy the course template" do
         expect do
           delete :destroy, params: { id: @course_template.to_param }
-        end.to change(CourseTemplate, :count).by(0)
+        end.not_to change(CourseTemplate, :count)
       end
 
       it 'should respond with a 302 and redirect to login with correct return_to param' do

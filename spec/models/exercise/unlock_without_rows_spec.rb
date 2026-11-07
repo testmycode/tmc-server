@@ -22,7 +22,7 @@ describe Exercise, type: :model do
     end
 
     it 'is unlocked, visible, downloadable and submittable after the date' do
-      unlock_spec_of((Time.zone.now - 1.day).strftime('%d.%m.%Y %H:%M'))
+      unlock_spec_of(1.day.ago.strftime('%d.%m.%Y %H:%M'))
 
       expect(exercise).to be_unlocked_for(user)
       expect(exercise.visible_to?(user)).to be true
@@ -31,7 +31,7 @@ describe Exercise, type: :model do
     end
 
     it 'is locked before the date' do
-      unlock_spec_of((Time.zone.now + 1.day).strftime('%d.%m.%Y %H:%M'))
+      unlock_spec_of(1.day.from_now.strftime('%d.%m.%Y %H:%M'))
 
       expect(exercise).not_to be_unlocked_for(user)
       expect(exercise.submittable_by?(user)).to be false
@@ -63,8 +63,8 @@ describe Exercise, type: :model do
     end
 
     it 'ignores a stale row for a date that moved into the future' do
-      unlock_spec_of((Time.zone.now + 1.day).strftime('%d.%m.%Y %H:%M'))
-      Unlock.create!(user: user, course: course, exercise_name: exercise.name, valid_after: Time.zone.now - 1.day)
+      unlock_spec_of(1.day.from_now.strftime('%d.%m.%Y %H:%M'))
+      Unlock.create!(user: user, course: course, exercise_name: exercise.name, valid_after: 1.day.ago)
 
       expect(exercise).not_to be_unlocked_for(user)
     end

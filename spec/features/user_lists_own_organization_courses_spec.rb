@@ -50,7 +50,7 @@ feature 'User lists own organization courses', feature: true do
         expect(page).to have_content('Course 1')
         expect(page).to have_content('Course 2')
         expect(page).to have_content('Course 4')
-        expect(page).to_not have_content('Course 3')
+        expect(page).not_to have_content('Course 3')
       end
     end
   end

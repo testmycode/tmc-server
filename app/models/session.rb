@@ -5,7 +5,7 @@ class Session < ActiveRecord::SessionStore::Session
   extend T::Sig
   sig { returns(Integer) }
   def self.delete_expired
-    where('updated_at < ?', 1.month.ago).delete_all
+    where(updated_at: ...1.month.ago).delete_all
   end
 
   sig { params(user: User).returns(T::Boolean) }

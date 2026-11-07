@@ -152,7 +152,7 @@ module ExtraField
 
   sig { returns(T::Array[String]) }
   private_class_method def self.config_files
-    Dir.glob("#{::Rails.root}/config/extra_fields/*_fields.rb")
+    Dir.glob(Rails.root.join('config/extra_fields/*_fields.rb').to_s)
   end
 
   sig { params(kind: T.any(String, Symbol), config_file_path: String).returns(T::Array[UserField]) }

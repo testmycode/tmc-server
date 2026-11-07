@@ -35,7 +35,7 @@ feature 'Teacher disables courses', feature: true do
     click_link 'Test Course 1'
     click_link 'Enable Course'
 
-    expect(page).to_not have_content('The course is currently disabled.')
+    expect(page).not_to have_content('The course is currently disabled.')
   end
 
   scenario "Non-teacher doesn't succeed" do
@@ -45,7 +45,7 @@ feature 'Teacher disables courses', feature: true do
 
     click_link 'Test Course 1'
 
-    expect(page).to_not have_link('Disable Course')
+    expect(page).not_to have_link('Disable Course')
   end
 
   scenario "Non-teacher can't access a disabled course" do
@@ -54,6 +54,7 @@ feature 'Teacher disables courses', feature: true do
 
     visit '/org/slug/courses'
 
-    expect(page).to_not have_link('Test Course 1')
+    expect(page).to have_current_path('/org/slug/courses')
+    expect(page).not_to have_link('Test Course 1')
   end
 end

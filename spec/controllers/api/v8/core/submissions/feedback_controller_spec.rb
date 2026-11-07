@@ -35,7 +35,7 @@ describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
         # pending 'Failing for some reason'
         expect do
           post :create, params: { submission_id: submission.id, answers: [{ answer: '2', question_id: question.id }] }
-        end.to change(FeedbackAnswer, :count).by(0)
+        end.not_to change(FeedbackAnswer, :count)
         expect(response.code.to_i).to eq(401)
       end
     end

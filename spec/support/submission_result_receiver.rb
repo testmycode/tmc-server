@@ -14,9 +14,7 @@ class SubmissionResultReceiver
     start_server!
   end
 
-  def pop
-    @queue.pop
-  end
+  delegate :pop, to: :@queue
 
   def cleanup!
     @server&.stop(true)

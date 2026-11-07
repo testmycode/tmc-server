@@ -31,6 +31,6 @@ describe Api::V8::Organizations::Courses::StudyrightEligibilityController, type:
     get :eligible_students, params: { organization_slug: 'mooc', course_name: '2019-ohjelmointi' }
 
     expect(response).to have_http_status(200)
-    expect(JSON.parse(response.body)['eligible_students'].map { |s| s['id'] }).to eq([eligible.id])
+    expect(response.parsed_body['eligible_students'].pluck('id')).to eq([eligible.id])
   end
 end

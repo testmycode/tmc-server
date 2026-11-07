@@ -5,7 +5,7 @@ require 'natsort'
 
 class OrganizationsController < ApplicationController
   extend T::Sig
-  before_action :set_organization, only: %i[show destroy verify disable disable_reason_input toggle_visibility all_courses]
+  before_action :set_organization, only: %i[show verify disable disable_reason_input toggle_visibility all_courses]
 
   skip_authorization_check only: %i[index new all_courses]
 

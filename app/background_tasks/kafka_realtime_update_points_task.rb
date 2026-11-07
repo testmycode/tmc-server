@@ -17,7 +17,7 @@ class KafkaRealtimeUpdatePointsTask
   def run
     return unless @kafka_bridge_url && @kafka_bridge_secret && @service_id
     return if @kafka_bridge_url.empty? || @kafka_bridge_secret.empty? || @service_id.empty?
-    KafkaBatchUpdatePoints.where(realtime: true).each do |task|
+    KafkaBatchUpdatePoints.where(realtime: true).find_each do |task|
       finished_successfully = false
       begin
         type = @updater.task_type(task)

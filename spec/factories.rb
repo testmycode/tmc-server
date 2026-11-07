@@ -8,7 +8,7 @@ require File.expand_path 'spec/support/git_test_actions'
 include GitTestActions
 
 def make_repo_for_course_template
-  repo_path = "#{::Rails.root}/tmp/tests/factory_repo"
+  repo_path = Rails.root.join('tmp/tests/factory_repo').to_s
   return repo_path if Dir.exist? repo_path
 
   create_bare_repo repo_path
@@ -35,7 +35,7 @@ FactoryBot.define do
     password_managed_by_courses_mooc_fi { false }
   end
 
-  factory :verified_user, class: User do
+  factory :verified_user, class: 'User' do
     sequence(:login) { |n| "ver_user#{n}" }
     sequence(:password) { |n| "ver_userpass#{n}" }
     sequence(:email) { |n| "ver_user#{n}@example.com" }
@@ -44,7 +44,7 @@ FactoryBot.define do
     password_managed_by_courses_mooc_fi { false }
   end
 
-  factory :admin, class: User do
+  factory :admin, class: 'User' do
     sequence(:login) { |n| "admin#{n}" }
     sequence(:password) { |n| "adminpass#{n}" }
     sequence(:email) { |n| "admin#{n}@example.com" }
@@ -53,7 +53,7 @@ FactoryBot.define do
     password_managed_by_courses_mooc_fi { false }
   end
 
-  factory :course, class: Course do
+  factory :course, class: 'Course' do
     sequence(:name) { |n| "course#{n}" }
     sequence(:title) { |n| "Course #{n}" }
     source_url { make_repo_for_course_template }
@@ -172,7 +172,7 @@ FactoryBot.define do
     verified { false }
   end
 
-  factory :accepted_organization, class: Organization do
+  factory :accepted_organization, class: 'Organization' do
     sequence(:name) { |n| "a_organization#{n}" }
     sequence(:information) { |n| "a_information#{n}" }
     sequence(:slug) { |n| "a_organization#{n}" }

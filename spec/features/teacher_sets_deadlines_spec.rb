@@ -58,7 +58,7 @@ feature 'Teacher sets deadlines', feature: true do
     fill_in 'empty_group_soft_static', with: 'a.b.cccc'
     click_button 'Save changes'
 
-    expect(page).to_not have_content('Successfully saved deadlines.')
+    expect(page).not_to have_content('Successfully saved deadlines.')
     expect(page).to have_content('Invalid syntax')
   end
 

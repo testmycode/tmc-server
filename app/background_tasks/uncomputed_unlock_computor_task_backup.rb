@@ -15,7 +15,7 @@ class UncomputedUnlockComputorTaskBackup
     return unless count > 3
     threads = [7, count - 3].min
     limit = [threads * 5, count - 3].min
-    a = UncomputedUnlock.order('id DESC').limit(limit)
+    a = UncomputedUnlock.order(id: :desc).limit(limit)
 
     Rails.logger.info "Creating #{threads} threads to compute unlocks."
 

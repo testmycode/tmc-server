@@ -58,7 +58,7 @@ describe Exercise, type: :model do
       Unlock.unlock_exercises([@ex2], @user)
       @ex2.reload
       expect(@ex2).to be_unlocked_for(@user)
-      expect(@ex2.deadline_for(@user)).to be_within(5.minutes).of(Time.zone.now + 5.days)
+      expect(@ex2.deadline_for(@user)).to be_within(5.minutes).of(5.days.from_now)
     end
 
     def invalidate_unlocks

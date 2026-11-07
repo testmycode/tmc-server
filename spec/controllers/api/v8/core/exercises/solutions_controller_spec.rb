@@ -7,7 +7,7 @@ require 'fileutils'
 describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
   let(:organization) { FactoryBot.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
-  repo_path = Dir.tmpdir + '/api/v8/core/exercises/solutions/remote_repo'
+  let(:repo_path) { Dir.tmpdir + '/api/v8/core/exercises/solutions/remote_repo' }
   let(:course) { FactoryBot.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
   let(:exercise) { FactoryBot.create(:exercise, name: 'testexercise', course: course) }
   let(:user) { FactoryBot.create(:verified_user) }
@@ -19,6 +19,9 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
     allow(controller).to receive(:doorkeeper_token) { token }
   end
 
+  after do
+    FileUtils.rm_rf(repo_path)
+  end
   describe 'Downloading an exercise solution zip' do
     describe 'as an admin' do
       let(:token) { double resource_owner_id: admin.id, acceptable?: true }
@@ -70,9 +73,5 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
         end
       end
     end
-  end
-
-  after :all do
-    FileUtils.rm_rf(repo_path)
   end
 end

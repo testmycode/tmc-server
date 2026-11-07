@@ -20,8 +20,8 @@ describe 'Deleting own user', type: :request, integration: true do
 
     token = user.verification_tokens.delete_user[0]
 
-    expect(token.nil? == false)
-    expect(User.find_by(login: user.login) == user)
+    expect(token).not_to be_nil
+    expect(User.find_by(login: user.login)).to eq(user)
   end
 
   it 'verify destroy page should have a verification button and password field' do
@@ -48,7 +48,7 @@ describe 'Deleting own user', type: :request, integration: true do
     check "I've read the above and i'm sure i understand the consequences"
 
     expect(page).to have_button('Destroy my account permanently', disabled: false)
-    expect(User.find_by(login: user.login) == user)
+    expect(User.find_by(login: user.login)).to eq(user)
     expect(page).to have_content('Your password')
   end
 
@@ -102,7 +102,7 @@ describe 'Deleting own user', type: :request, integration: true do
 
     accept_confirm { click_button 'Destroy my account permanently' }
 
-    expect(User.find_by(login: user.login) == user)
+    expect(User.find_by(login: user.login)).to eq(user)
     expect(page).to have_content('The password was incorrect')
   end
 

@@ -30,7 +30,7 @@ class Unlock < ApplicationRecord
       unlocks = course.unlocks.where(user_id: user.id)
       by_exercise_name = unlocks.index_by { |u| u.exercise_name }
       fast_refresh_unlocks_impl(course, user, by_exercise_name)
-      UncomputedUnlock.where(course_id: course.id, user_id: user.id).where('created_at < ?', time).delete_all
+      UncomputedUnlock.where(course_id: course.id, user_id: user.id).where(created_at: ...time).delete_all
     end
   end
 

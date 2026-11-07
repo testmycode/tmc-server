@@ -45,7 +45,7 @@ describe ReviewsController, type: :controller do
         controller.current_user = @student
         expect do
           post :create, params: { submission_id: @submission.id, review: { review_body: 'Code looks ok' } }
-        end.to change(Review, :count).by(0)
+        end.not_to change(Review, :count)
         expect(response.code.to_i).to eq(403)
       end
     end
@@ -66,7 +66,7 @@ describe ReviewsController, type: :controller do
       get :index, params: { organization_id: @organization.slug, course_id: @course.id, format: :json, api_version: ApiVersion::API_VERSION }
 
       expect(response).to be_successful
-      expect(JSON.parse(response.body)['reviews'].map { |r| r['reviewer_name'] }).to eq(['(deleted)'])
+      expect(response.parsed_body['reviews'].pluck('reviewer_name')).to eq(['(deleted)'])
     end
 
     it 'lists reviews of exercises that have been removed' do
@@ -75,7 +75,7 @@ describe ReviewsController, type: :controller do
       get :index, params: { organization_id: @organization.slug, course_id: @course.id, format: :json, api_version: ApiVersion::API_VERSION }
 
       expect(response).to be_successful
-      expect(JSON.parse(response.body)['reviews'].map { |r| r['points_not_awarded'] }).to eq([[]])
+      expect(response.parsed_body['reviews'].pluck('points_not_awarded')).to eq([[]])
     end
 
     it 'responds 404 to the review page of a submission whose exercise has been removed' do

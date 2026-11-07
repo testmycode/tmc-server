@@ -184,7 +184,7 @@ class CoursesController < ApplicationController
       group_params.each do |name, conditions|
         group = course.exercise_group_by_name(name)
         next if group.nil?
-        array = conditions.values.reject(&:blank?)
+        array = conditions.values.compact_blank
         Rails.logger.info "Unlock conditions of #{course.name}/#{name} set by user #{current_user.id}: #{group.exercises(false).first&.unlock_spec || '[]'} -> #{array.to_json}"
         group.group_unlock_conditions = array.to_json
       end
@@ -245,7 +245,7 @@ class CoursesController < ApplicationController
         max_submissions = 100
         submissions = course.submissions
         submissions = submissions.where(user_id: current_user.id) unless can? :teach, course
-        submissions = submissions.order('created_at DESC').includes(:user)
+        submissions = submissions.order(created_at: :desc).includes(:user)
         total_submissions = if can?(:teach, course)
           course.submissions_count
         else

@@ -35,7 +35,7 @@ feature 'Teacher disables exercises', feature: true do
     [@ex1, @ex2, @ex3].each do |ex|
       expect(page).to have_content("#{ex.name} (disabled)")
     end
-    expect(page).to_not have_content("#{@ex4.name} (disabled)")
+    expect(page).not_to have_content("#{@ex4.name} (disabled)")
   end
 
   scenario 'Teacher enables exercises' do
@@ -57,7 +57,7 @@ feature 'Teacher disables exercises', feature: true do
 
     [@ex1, @ex2, @ex3, @ex4].each do |ex|
       expect(page).to have_content(ex.name.to_s)
-      expect(page).to_not have_content("#{ex.name} (disabled)")
+      expect(page).not_to have_content("#{ex.name} (disabled)")
     end
   end
 
@@ -83,8 +83,8 @@ feature 'Teacher disables exercises', feature: true do
 
     expect(page).to have_content(@ex1.name.to_s)
     expect(page).to have_content(@ex2.name.to_s)
-    expect(page).to_not have_content(@ex3.name.to_s)
-    expect(page).to_not have_content(@ex4.name.to_s)
+    expect(page).not_to have_content(@ex3.name.to_s)
+    expect(page).not_to have_content(@ex4.name.to_s)
   end
 
   scenario 'Student cannot access disabled exercise page' do

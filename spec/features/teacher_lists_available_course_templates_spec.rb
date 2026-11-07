@@ -33,6 +33,7 @@ feature 'Teacher lists available course templates', feature: true do
     log_in_as(@user.login, 'foobar')
 
     visit '/org/slug'
+    expect(page).to have_current_path('/org/slug')
     expect(page).not_to have_content('Create New Course from template')
   end
 end

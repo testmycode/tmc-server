@@ -30,7 +30,7 @@ class UncomputedUnlock < ApplicationRecord
   sig { params(course: Course).void }
   def self.create_all_for_course_eager(course)
     transaction do
-      rows_to_insert = User.all.pluck(:id).map { |uid| { course_id: course.id, user_id: uid } }
+      rows_to_insert = User.pluck(:id).map { |uid| { course_id: course.id, user_id: uid } }
       UncomputedUnlock.create!(rows_to_insert)
     end
   end

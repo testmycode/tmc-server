@@ -400,7 +400,7 @@ class Course < ApplicationRecord
   def unlockable_exercises_for(user)
     UncomputedUnlock.resolve(self, user)
     unlocked = unlocks.where(user_id: user.id).pluck(:exercise_name)
-    exercises.to_a.select { |ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
+    exercises.to_a.select { |ex| unlocked.exclude?(ex.name) && ex.unlockable_for?(user) }
   end
 
   sig { params(options: T.nilable(T::Hash[Symbol, T.untyped])).returns(T.self_type) }
@@ -432,13 +432,13 @@ class Course < ApplicationRecord
 
   sig { returns(T.nilable(ActiveSupport::TimeWithZone)) }
   def time_of_first_submission
-    sub = submissions.order('created_at ASC').limit(1).first
+    sub = submissions.order(:created_at).limit(1).first
     sub&.created_at
   end
 
   sig { returns(T.nilable(ActiveSupport::TimeWithZone)) }
   def time_of_last_submission
-    sub = submissions.order('created_at DESC').limit(1).first
+    sub = submissions.order(created_at: :desc).limit(1).first
     sub&.created_at
   end
 

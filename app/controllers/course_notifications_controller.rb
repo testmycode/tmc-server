@@ -22,7 +22,7 @@ class CourseNotificationsController < ApplicationController
     authorize! :send_mail_to_participants, course
 
     participants = User.course_students(course)
-    emails = participants.map(&:email).reject(&:blank?)
+    emails = participants.map(&:email).compact_blank
 
     notification_attributes = T.let(course_notification_params[:course_notification].merge(sender_id: current_user.id), ActionController::Parameters)
     notifier = course.course_notifications.create(notification_attributes)

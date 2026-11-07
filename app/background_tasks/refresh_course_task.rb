@@ -13,7 +13,7 @@ class RefreshCourseTask
 
   sig { void }
   def run
-    CourseTemplateRefresh.where(status: :not_started).each do |task|
+    CourseTemplateRefresh.where(status: :not_started).find_each do |task|
       channel_id = task.course_template_id
       task.status = :in_progress
       task.save!

@@ -34,7 +34,7 @@ describe CoursesController, type: :controller do
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = 'Basic ' + Base64.encode64("#{@user.login}:#{@user.password}")
         get :index, params: options
-        JSON.parse(response.body)
+        response.parsed_body
       end
 
       it 'renders all non-hidden courses in order by name' do
@@ -46,7 +46,7 @@ describe CoursesController, type: :controller do
 
         result = get_index_json
 
-        expect(result['courses'].map { |c| c['name'] }).to eq(%w[Course1 Course2 Course3])
+        expect(result['courses'].pluck('name')).to eq(%w[Course1 Course2 Course3])
       end
     end
   end
@@ -123,7 +123,7 @@ describe CoursesController, type: :controller do
         @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
         get :show, params: options
         if parse_json
-          JSON.parse(response.body)
+          response.parsed_body
         else
           response.body
         end
@@ -147,7 +147,7 @@ describe CoursesController, type: :controller do
 
         result = get_show_json
 
-        names = result['course']['exercises'].map { |ex| ex['name'] }
+        names = result['course']['exercises'].pluck('name')
         expect(names).not_to include('Exercise1')
         expect(names).to include('Exercise2')
         expect(names).to include('Exercise3')

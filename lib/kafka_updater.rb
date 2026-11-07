@@ -309,7 +309,7 @@ class KafkaUpdater
           timeout: 30,
           open_timeout: 10
         )
-        Rails.logger.debug("Kafka request successful for topic #{topic}")
+        Rails.logger.debug { "Kafka request successful for topic #{topic}" }
         response
       rescue RestClient::ExceptionWithResponse => e
         response_body = e.response && e.response.body

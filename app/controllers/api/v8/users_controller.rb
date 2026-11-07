@@ -140,7 +140,7 @@ module Api
         if params[:extra_fields]
           extra_fields = T.let({}, T::Hash[T.nilable(String), T.nilable(String)])
           namespace = params[:extra_fields]
-          UserAppDatum.where(namespace: namespace, user: user).each do |datum|
+          UserAppDatum.where(namespace: namespace, user: user).find_each do |datum|
             extra_fields[datum.field_name] = datum.value
           end
           data[:extra_fields] = extra_fields

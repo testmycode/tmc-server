@@ -78,7 +78,7 @@ class FixtureExercise
   end
 
   def self.fixture_exercises_root
-    "#{::Rails.root}/spec/fixtures/exercises"
+    Rails.root.join('spec/fixtures/exercises').to_s
   end
 
   private

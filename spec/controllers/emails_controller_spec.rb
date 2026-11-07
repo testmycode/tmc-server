@@ -18,7 +18,7 @@ describe EmailsController, type: :controller do
       it 'lists all users in the system if current user is admin' do
         controller.current_user = @admin
         get :index, format: :text
-        User.all.each do |user|
+        User.find_each do |user|
           expect(assigns(:emails)).to include(user.email)
         end
       end
@@ -63,7 +63,7 @@ describe EmailsController, type: :controller do
         get :index, params: { organization_id: @organization.slug, id: @course.id }
         expect(assigns(:students)).to include(@user1)
         expect(assigns(:students)).to include(@user2)
-        expect(assigns(:students)).to_not include(@user3)
+        expect(assigns(:students)).not_to include(@user3)
       end
 
       describe 'HTML page' do

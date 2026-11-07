@@ -236,8 +236,8 @@ describe 'The system (used by a student)', type: :request, integration: true do
 
     visit submission_path(Submission.last, anchor: 'files')
 
-    expect(page).not_to have_content('src/SimpleStuff.java')
     expect(page).to have_content('Access denied')
+    expect(page).not_to have_content('src/SimpleStuff.java')
   end
 
   it 'should show checkstyle validation results' do

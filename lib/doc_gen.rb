@@ -52,7 +52,7 @@ class DocGen
   private
     sig { returns(String) }
     def root_path
-      "#{Rails.root}/doc/usermanual"
+      Rails.root.join('doc/usermanual').to_s
     end
 
     sig { returns(String) }

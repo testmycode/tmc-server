@@ -58,7 +58,6 @@ class MigrateToOtherCourseController < ApplicationController
       allowed_migrations = SiteSetting.value(:allow_migrations_between_courses)
       return nil if allowed_migrations.nil?
       allowed_migrations.each do |allowed_pair|
-        puts allowed_pair
         return allowed_pair['message'] if allowed_pair['from'] == T.must(@old_course).id && allowed_pair['to'] == T.must(@to_course).id
       end
       nil

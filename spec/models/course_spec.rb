@@ -235,7 +235,7 @@ describe Course, type: :model do
       expect do
         c = Course.create!(params)
         c.destroy!
-      end.to_not raise_error
+      end.not_to raise_error
     end
   end
 
@@ -264,7 +264,7 @@ describe Course, type: :model do
 
     it "doesn't delete course template" do
       @templated_course.destroy
-      expect(CourseTemplate.all.count).to eq(1)
+      expect(CourseTemplate.count).to eq(1)
     end
 
     it 'deletes dependent exercises' do
@@ -320,12 +320,12 @@ describe Course, type: :model do
     end
 
     it 'includes progress-based exercises only when the user has an unlock row' do
-      Unlock.create!(user: @user, course: @course, exercise_name: 'by_points', valid_after: Time.zone.now - 1.hour)
+      Unlock.create!(user: @user, course: @course, exercise_name: 'by_points', valid_after: 1.hour.ago)
       expect(@course.unlocked_exercise_names_for(@user, @course.exercises.to_a)).to contain_exactly('open', 'dated_past', 'by_points')
     end
 
     it 'ignores unlock rows of date-only exercises whose date is still ahead' do
-      Unlock.create!(user: @user, course: @course, exercise_name: 'dated_future', valid_after: Time.zone.now - 1.day)
+      Unlock.create!(user: @user, course: @course, exercise_name: 'dated_future', valid_after: 1.day.ago)
       expect(@course.unlocked_exercise_names_for(@user, @course.exercises.to_a)).not_to include('dated_future')
     end
   end

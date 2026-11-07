@@ -11,17 +11,17 @@ describe 'User manual', type: :request, usermanual: true, integration: true do
   end
 
   it 'has a page for custom course creation manual' do
-    pending
+    pending 'DocGen#method_missing passes Capybara keyword arguments positionally'
     make_page 'customcourse'
   end
 
   it 'has a page for admins' do
-    pending
+    pending 'DocGen#method_missing passes Capybara keyword arguments positionally'
     make_page 'admins'
   end
 
   it 'has a page for teachers' do
-    pending
+    pending 'DocGen#method_missing passes Capybara keyword arguments positionally'
     make_page 'teachers'
   end
 end

@@ -208,7 +208,7 @@ describe User, type: :model do
     user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
     expect(user.password_hash).to be_nil
-    expect(user.argon_hash).to_not be_nil
+    expect(user.argon_hash).not_to be_nil
     expect(user).to have_password('ilikecookies')
     expect(user).not_to have_password('ihatecookies')
   end
@@ -223,7 +223,7 @@ describe User, type: :model do
     user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
     expect(user.password_hash).to be_nil
-    expect(user.argon_hash).to_not be_nil
+    expect(user.argon_hash).not_to be_nil
     expect(user).to have_password('ilikecookies')
     expect(user).not_to have_password('ihatecookies')
   end

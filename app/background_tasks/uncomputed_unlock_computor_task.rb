@@ -11,7 +11,7 @@ class UncomputedUnlockComputorTask
 
   sig { void }
   def run
-    UncomputedUnlock.order('id ASC').limit(1).each do |uncomputed_unlock|
+    UncomputedUnlock.order(:id).limit(1).each do |uncomputed_unlock|
       course = T.must(uncomputed_unlock.course)
       user = T.must(uncomputed_unlock.user)
       Rails.logger.info "Calculating unlocks for user #{user.id} and course #{course.name}. Queue length: #{UncomputedUnlock.count}."

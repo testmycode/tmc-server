@@ -14,7 +14,7 @@ RSpec.describe 'courses.mooc.fi introspection response contract' do
   optional_members = { 'exp' => :expires_at, 'upstream_id' => :upstream_id }.freeze
 
   def fixture(name)
-    JSON.parse(File.read(Rails.root.join('spec/fixtures/courses_mooc_fi_introspection', name)))
+    JSON.parse(Rails.root.join('spec/fixtures/courses_mooc_fi_introspection', name).read)
   end
 
   let(:active_response) { fixture('active_response.json') }

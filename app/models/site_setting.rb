@@ -39,7 +39,7 @@ class SiteSetting
 
   sig { returns(T::Array[String]) }
   private_class_method def self.settings_files
-    config_dir = "#{Rails.root}/config"
+    config_dir = Rails.root.join('config').to_s
     ["#{config_dir}/site.defaults.yml", "#{config_dir}/site.yml"]
   end
 end

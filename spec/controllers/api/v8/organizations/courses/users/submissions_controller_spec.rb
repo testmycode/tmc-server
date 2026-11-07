@@ -195,7 +195,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
     def users_own_subs(parameters)
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), 'incorrect submission or user id'
     end
@@ -209,7 +209,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end
@@ -222,7 +222,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end
@@ -233,7 +233,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end
@@ -244,7 +244,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end

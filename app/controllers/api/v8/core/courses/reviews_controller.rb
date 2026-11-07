@@ -63,7 +63,7 @@ module Api
             users_reviewed_submissions = course.submissions
                                                .where(user_id: current_user.id)
                                                .where('requests_review OR requires_review OR reviewed')
-                                               .order('created_at DESC')
+                                               .order(created_at: :desc)
 
             present Review.course_reviews_json(course, users_reviewed_submissions, view_context)
           end
@@ -123,7 +123,7 @@ module Api
             sub.review_dismissed = false
             sub.of_same_kind
                .where('(requires_review OR requests_review) AND NOT reviewed')
-               .where(['created_at < ?', sub.created_at])
+               .where(created_at: ...sub.created_at)
                .update_all(newer_submission_reviewed: true)
           end
 

@@ -21,6 +21,6 @@ describe CourseInfo do
 
     data = CourseInfo.new(user, view_context).course_data(course.organization, course)
 
-    expect(data[:exercises].map { |e| e[:latest_submission_id] }).to eq([latest.id])
+    expect(data[:exercises].pluck(:latest_submission_id)).to eq([latest.id])
   end
 end

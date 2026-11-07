@@ -11,7 +11,7 @@ describe Api::V8::OrganizationsController, type: :controller do
     it 'should show correct fields from the visible organizations' do
       get :index
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r[0]['name']).to eq(organization.name)
       expect(r[0]['information']).to eq(organization.information)
@@ -23,9 +23,9 @@ describe Api::V8::OrganizationsController, type: :controller do
     it 'should not show hidden organizations' do
       get :index
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
-      slugs = r.map { |o| o['slug'] }
+      slugs = r.pluck('slug')
       expect(slugs).to include(organization.slug)
       expect(slugs).not_to include(unaccepted_organization.slug)
     end

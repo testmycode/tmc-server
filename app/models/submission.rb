@@ -83,7 +83,7 @@ class Submission < ApplicationRecord
 
     sig { returns(T.nilable(Review)) }
     def latest
-      T.unsafe(self).order('created_at DESC').limit(1).first
+      T.unsafe(self).order(created_at: :desc).limit(1).first
     end
   end
   has_many :awarded_points, dependent: :nullify
@@ -120,7 +120,7 @@ class Submission < ApplicationRecord
   sig { returns(ActiveRecord::Relation) }
   def self.unprocessed
     where(processed: false)
-      .order('processing_priority DESC, processing_tried_at ASC, id ASC')
+      .order(processing_priority: :desc, processing_tried_at: :asc, id: :asc)
   end
 
   sig { returns(Integer) }
@@ -224,7 +224,7 @@ class Submission < ApplicationRecord
   # as long as it's newer than this submission
   sig { returns(T.nilable(Submission)) }
   def newest_of_same_kind
-    of_same_kind.where(['created_at > ?', created_at]).order('created_at DESC').first
+    of_same_kind.where(['created_at > ?', created_at]).order(created_at: :desc).first
   end
 
   sig { returns(T::Boolean) }

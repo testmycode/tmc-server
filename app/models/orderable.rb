@@ -29,13 +29,13 @@ module Orderable
 
   sig { void }
   def move_forward!
-    other = record_class.where("position > #{quote(position)}").order('position ASC').first
+    other = record_class.where("position > #{quote(position)}").order(:position).first
     move_after!(other) if other
   end
 
   sig { void }
   def move_backward!
-    other = record_class.where("position < #{quote(position)}").order('position DESC').first
+    other = record_class.where("position < #{quote(position)}").order(position: :desc).first
     move_before!(other) if other
   end
 
