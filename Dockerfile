@@ -1,4 +1,4 @@
-FROM eu.gcr.io/moocfi-public/tmc-server-base:latest
+FROM eu.gcr.io/moocfi-public/tmc-server-base:ruby4-trixie
 LABEL name=tmc-server
 
 RUN apt-get update \
