@@ -18,6 +18,15 @@ describe 'Client IP resolution' do
     expect(remote_ip('HTTP_X_FORWARDED_FOR' => '203.0.113.7', 'HTTP_FORWARDED' => 'for=203.0.113.7')).to eq('203.0.113.7')
   end
 
+  it 'takes the client from Forwarded when it is the only proxy header' do
+    expect(remote_ip('HTTP_FORWARDED' => 'for=203.0.113.7')).to eq('203.0.113.7')
+  end
+
+  it 'rejects Forwarded and X-Forwarded-For that name different clients' do
+    expect { remote_ip('HTTP_X_FORWARDED_FOR' => '203.0.113.7', 'HTTP_FORWARDED' => 'for=198.51.100.9') }
+      .to raise_error(ActionDispatch::RemoteIp::IpSpoofAttackError)
+  end
+
   it 'rejects a Client-Ip that X-Forwarded-For does not contain' do
     expect { remote_ip('HTTP_X_FORWARDED_FOR' => '203.0.113.7', 'HTTP_CLIENT_IP' => '198.51.100.9') }
       .to raise_error(ActionDispatch::RemoteIp::IpSpoofAttackError)

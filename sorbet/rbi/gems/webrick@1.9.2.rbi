@@ -368,10 +368,10 @@ class WEBrick::GenericServer
   # pkg:gem/webrick#lib/webrick/server.rb:66
   def config; end
 
-  # Updates +listen+ to enable SSL when the SSL configuration is active.
-  #
   # Adds listeners from +address+ and +port+ to the server.  See
   # WEBrick::Utils::create_listeners for details.
+  #
+  # Updates +listen+ to enable SSL when the SSL configuration is active.
   #
   # pkg:gem/webrick#lib/webrick/server.rb:129
   def listen(address, port); end
@@ -389,13 +389,13 @@ class WEBrick::GenericServer
   # You must subclass GenericServer and implement \#run which accepts a TCP
   # client socket
   #
-  # pkg:gem/webrick#lib/webrick/server.rb:244
+  # pkg:gem/webrick#lib/webrick/server.rb:243
   def run(sock); end
 
   # Shuts down the server and all listening sockets.  New listeners must be
   # provided to restart the server.
   #
-  # pkg:gem/webrick#lib/webrick/server.rb:234
+  # pkg:gem/webrick#lib/webrick/server.rb:233
   def shutdown; end
 
   # Starts the server and runs the +block+ for each connection.  This method
@@ -428,7 +428,7 @@ class WEBrick::GenericServer
 
   # Stops the server from accepting new connections.
   #
-  # pkg:gem/webrick#lib/webrick/server.rb:222
+  # pkg:gem/webrick#lib/webrick/server.rb:221
   def stop; end
 
   # Tokens control the number of outstanding clients.  The
@@ -442,24 +442,24 @@ class WEBrick::GenericServer
   # Accepts a TCP client socket from the TCP server socket +svr+ and returns
   # the client socket.
   #
-  # pkg:gem/webrick#lib/webrick/server.rb:256
+  # pkg:gem/webrick#lib/webrick/server.rb:255
   def accept_client(svr); end
 
-  # pkg:gem/webrick#lib/webrick/server.rb:347
+  # pkg:gem/webrick#lib/webrick/server.rb:346
   def alarm_shutdown_pipe; end
 
   # Calls the callback +callback_name+ from the configuration with +args+
   #
-  # pkg:gem/webrick#lib/webrick/server.rb:334
+  # pkg:gem/webrick#lib/webrick/server.rb:333
   def call_callback(callback_name, *args); end
 
-  # pkg:gem/webrick#lib/webrick/server.rb:359
+  # pkg:gem/webrick#lib/webrick/server.rb:358
   def cleanup_listener; end
 
-  # pkg:gem/webrick#lib/webrick/server.rb:342
+  # pkg:gem/webrick#lib/webrick/server.rb:341
   def cleanup_shutdown_pipe(shutdown_pipe); end
 
-  # pkg:gem/webrick#lib/webrick/server.rb:338
+  # pkg:gem/webrick#lib/webrick/server.rb:337
   def setup_shutdown_pipe; end
 
   # Starts a server thread for the client socket +sock+ that runs the given
@@ -470,7 +470,7 @@ class WEBrick::GenericServer
   #
   # If any errors occur in the block they are logged and handled.
   #
-  # pkg:gem/webrick#lib/webrick/server.rb:288
+  # pkg:gem/webrick#lib/webrick/server.rb:287
   def start_thread(sock, &block); end
 end
 
@@ -966,6 +966,9 @@ end
 # pkg:gem/webrick#lib/webrick/httpauth/authenticator.rb:114
 WEBrick::HTTPAuth::ProxyAuthenticator::AuthException = WEBrick::HTTPStatus::ProxyAuthenticationRequired
 
+# pkg:gem/webrick#lib/webrick/httpauth/authenticator.rb:113
+WEBrick::HTTPAuth::ProxyAuthenticator::ResponseInfoField = T.let(T.unsafe(nil), String)
+
 # Basic authentication for proxy servers.  See BasicAuth for details.
 #
 # pkg:gem/webrick#lib/webrick/httpauth/basicauth.rb:112
@@ -1258,7 +1261,7 @@ class WEBrick::HTTPRequest
   # This method provides the metavariables defined by the revision 3
   # of "The WWW Common Gateway Interface Version 1.1"
   # To browse the current document of CGI Version 1.1, see below:
-  # http://tools.ietf.org/html/rfc3875
+  # https://www.rfc-editor.org/rfc/rfc3875
   #
   # pkg:gem/webrick#lib/webrick/httprequest.rb:407
   def meta_vars; end
@@ -1386,34 +1389,34 @@ class WEBrick::HTTPRequest
 
   private
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:566
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:594
   def _read_data(io, method, *arg); end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:506
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:527
   def parse_host_request_line(host); end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:586
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:614
   def parse_query; end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:484
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:503
   def parse_uri(str, scheme = T.unsafe(nil)); end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:511
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:531
   def read_body(socket, block); end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:535
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:559
   def read_chunk_size(socket); end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:546
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:570
   def read_chunked(socket, block); end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:582
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:610
   def read_data(io, size); end
 
   # pkg:gem/webrick#lib/webrick/httprequest.rb:471
   def read_header(socket); end
 
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:578
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:606
   def read_line(io, size = T.unsafe(nil)); end
 
   # pkg:gem/webrick#lib/webrick/httprequest.rb:451
@@ -1425,9 +1428,12 @@ class WEBrick::HTTPRequest
   # the initial(first) value. (apr_table_mergen() adds new value after the
   # existing value with ", " prefix)
   #
-  # pkg:gem/webrick#lib/webrick/httprequest.rb:614
+  # pkg:gem/webrick#lib/webrick/httprequest.rb:642
   def setup_forwarded_info; end
 end
+
+# pkg:gem/webrick#lib/webrick/httprequest.rb:526
+WEBrick::HTTPRequest::HOST_PATTERN = T.let(T.unsafe(nil), Regexp)
 
 # same as Mongrel, Thin and Puma
 #
@@ -2301,54 +2307,54 @@ end
 module WEBrick::HTTPUtils
   private
 
-  # pkg:gem/webrick#lib/webrick/httputils.rb:454
+  # pkg:gem/webrick#lib/webrick/httputils.rb:474
   def _escape(str, regex); end
 
   # :stopdoc:
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:452
+  # pkg:gem/webrick#lib/webrick/httputils.rb:472
   def _make_regex(str); end
 
-  # pkg:gem/webrick#lib/webrick/httputils.rb:453
+  # pkg:gem/webrick#lib/webrick/httputils.rb:473
   def _make_regex!(str); end
 
-  # pkg:gem/webrick#lib/webrick/httputils.rb:460
+  # pkg:gem/webrick#lib/webrick/httputils.rb:480
   def _unescape(str, regex); end
 
   # Removes quotes and escapes from +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:234
+  # pkg:gem/webrick#lib/webrick/httputils.rb:254
   def dequote(str); end
 
   # Escapes HTTP reserved and unwise characters in +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:478
+  # pkg:gem/webrick#lib/webrick/httputils.rb:498
   def escape(str); end
 
   # Escapes 8 bit characters in +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:519
+  # pkg:gem/webrick#lib/webrick/httputils.rb:539
   def escape8bit(str); end
 
   # Escapes form reserved characters in +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:492
+  # pkg:gem/webrick#lib/webrick/httputils.rb:512
   def escape_form(str); end
 
   # Escapes path +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:508
+  # pkg:gem/webrick#lib/webrick/httputils.rb:528
   def escape_path(str); end
 
   # Loads Apache-compatible mime.types in +file+.
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:123
+  # pkg:gem/webrick#lib/webrick/httputils.rb:122
   def load_mime_types(file); end
 
   # Returns the mime type of +filename+ from the list in +mime_tab+.  If no
   # mime type was found application/octet-stream is returned.
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:145
+  # pkg:gem/webrick#lib/webrick/httputils.rb:144
   def mime_type(filename, mime_tab); end
 
   # Normalizes a request path.  Raises an exception if the path cannot be
@@ -2359,134 +2365,137 @@ module WEBrick::HTTPUtils
 
   # Parses form data in +io+ with the given +boundary+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:406
+  # pkg:gem/webrick#lib/webrick/httputils.rb:426
   def parse_form_data(io, boundary); end
 
-  # Parses an HTTP header +raw+ into a hash of header fields with an Array
-  # of values.
-  #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:156
+  # pkg:gem/webrick#lib/webrick/httputils.rb:171
   def parse_header(raw); end
 
   # Parses the query component of a URI in +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:382
+  # pkg:gem/webrick#lib/webrick/httputils.rb:402
   def parse_query(str); end
 
   # Parses q values in +value+ as used in Accept headers.
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:213
+  # pkg:gem/webrick#lib/webrick/httputils.rb:233
   def parse_qvalues(value); end
 
   # Parses a Range header value +ranges_specifier+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:195
+  # pkg:gem/webrick#lib/webrick/httputils.rb:215
   def parse_range_header(ranges_specifier); end
 
   # Quotes and escapes quotes in +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:244
+  # pkg:gem/webrick#lib/webrick/httputils.rb:264
   def quote(str); end
 
   # Splits a header value +str+ according to HTTP specification.
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:186
+  # pkg:gem/webrick#lib/webrick/httputils.rb:206
   def split_header_value(str); end
 
   # Unescapes HTTP reserved and unwise characters in +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:485
+  # pkg:gem/webrick#lib/webrick/httputils.rb:505
   def unescape(str); end
 
   # Unescapes form reserved characters in +str+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:501
+  # pkg:gem/webrick#lib/webrick/httputils.rb:521
   def unescape_form(str); end
 
   class << self
-    # pkg:gem/webrick#lib/webrick/httputils.rb:454
+    # pkg:gem/webrick#lib/webrick/httputils.rb:474
     def _escape(str, regex); end
 
     # :stopdoc:
     #
-    # pkg:gem/webrick#lib/webrick/httputils.rb:452
+    # pkg:gem/webrick#lib/webrick/httputils.rb:472
     def _make_regex(str); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:453
+    # pkg:gem/webrick#lib/webrick/httputils.rb:473
     def _make_regex!(str); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:460
+    # pkg:gem/webrick#lib/webrick/httputils.rb:480
     def _unescape(str, regex); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:239
+    # pkg:gem/webrick#lib/webrick/httputils.rb:259
     def dequote(str); end
 
     # Escapes HTTP reserved and unwise characters in +str+
     #
-    # pkg:gem/webrick#lib/webrick/httputils.rb:478
+    # pkg:gem/webrick#lib/webrick/httputils.rb:498
     def escape(str); end
 
     # Escapes 8 bit characters in +str+
     #
-    # pkg:gem/webrick#lib/webrick/httputils.rb:519
+    # pkg:gem/webrick#lib/webrick/httputils.rb:539
     def escape8bit(str); end
 
     # Escapes form reserved characters in +str+
     #
-    # pkg:gem/webrick#lib/webrick/httputils.rb:492
+    # pkg:gem/webrick#lib/webrick/httputils.rb:512
     def escape_form(str); end
 
     # Escapes path +str+
     #
-    # pkg:gem/webrick#lib/webrick/httputils.rb:508
+    # pkg:gem/webrick#lib/webrick/httputils.rb:528
     def escape_path(str); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:139
+    # pkg:gem/webrick#lib/webrick/httputils.rb:138
     def load_mime_types(file); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:150
+    # pkg:gem/webrick#lib/webrick/httputils.rb:149
     def mime_type(filename, mime_tab); end
 
     # pkg:gem/webrick#lib/webrick/httputils.rb:42
     def normalize_path(path); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:432
+    # pkg:gem/webrick#lib/webrick/httputils.rb:452
     def parse_form_data(io, boundary); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:181
+    # pkg:gem/webrick#lib/webrick/httputils.rb:201
     def parse_header(raw); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:401
+    # pkg:gem/webrick#lib/webrick/httputils.rb:421
     def parse_query(str); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:229
+    # pkg:gem/webrick#lib/webrick/httputils.rb:249
     def parse_qvalues(value); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:208
+    # pkg:gem/webrick#lib/webrick/httputils.rb:228
     def parse_range_header(ranges_specifier); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:247
+    # pkg:gem/webrick#lib/webrick/httputils.rb:267
     def quote(str); end
 
-    # pkg:gem/webrick#lib/webrick/httputils.rb:190
+    # pkg:gem/webrick#lib/webrick/httputils.rb:210
     def split_header_value(str); end
 
     # Unescapes HTTP reserved and unwise characters in +str+
     #
-    # pkg:gem/webrick#lib/webrick/httputils.rb:485
+    # pkg:gem/webrick#lib/webrick/httputils.rb:505
     def unescape(str); end
 
     # Unescapes form reserved characters in +str+
     #
-    # pkg:gem/webrick#lib/webrick/httputils.rb:501
+    # pkg:gem/webrick#lib/webrick/httputils.rb:521
     def unescape_form(str); end
   end
+end
+
+# pkg:gem/webrick#lib/webrick/httputils.rb:161
+class WEBrick::HTTPUtils::CookieHeader < ::Array
+  # pkg:gem/webrick#lib/webrick/httputils.rb:162
+  def join(separator = T.unsafe(nil)); end
 end
 
 # Stores multipart form data.  FormData objects are created when
 # WEBrick::HTTPUtils.parse_form_data is called.
 #
-# pkg:gem/webrick#lib/webrick/httputils.rb:253
+# pkg:gem/webrick#lib/webrick/httputils.rb:273
 class WEBrick::HTTPUtils::FormData < ::String
   # Creates a new FormData object.
   #
@@ -2495,7 +2504,7 @@ class WEBrick::HTTPUtils::FormData < ::String
   #
   # This is called by WEBrick::HTTPUtils.parse_form_data for you
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:278
+  # pkg:gem/webrick#lib/webrick/httputils.rb:298
   def initialize(*args); end
 
   # Adds +str+ to this FormData which may be the body, a header or a
@@ -2503,68 +2512,80 @@ class WEBrick::HTTPUtils::FormData < ::String
   #
   # This is called by WEBrick::HTTPUtils.parse_form_data for you
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:311
+  # pkg:gem/webrick#lib/webrick/httputils.rb:331
   def <<(str); end
 
   # Retrieves the header at the first entry in +key+
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:297
+  # pkg:gem/webrick#lib/webrick/httputils.rb:317
   def [](*key); end
 
   # Adds +data+ at the end of the chain of entries
   #
   # This is called by WEBrick::HTTPUtils.parse_form_data for you.
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:331
+  # pkg:gem/webrick#lib/webrick/httputils.rb:351
   def append_data(data); end
 
   # Yields each entry in this FormData
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:346
+  # pkg:gem/webrick#lib/webrick/httputils.rb:366
   def each_data; end
 
   # The filename of the form data part
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:265
+  # pkg:gem/webrick#lib/webrick/httputils.rb:285
   def filename; end
 
   # The filename of the form data part
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:265
+  # pkg:gem/webrick#lib/webrick/httputils.rb:285
   def filename=(_arg0); end
 
   # Returns all the FormData as an Array
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:358
+  # pkg:gem/webrick#lib/webrick/httputils.rb:378
   def list; end
 
   # The name of the form data part
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:260
+  # pkg:gem/webrick#lib/webrick/httputils.rb:280
   def name; end
 
   # The name of the form data part
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:260
+  # pkg:gem/webrick#lib/webrick/httputils.rb:280
   def name=(_arg0); end
 
-  # pkg:gem/webrick#lib/webrick/httputils.rb:267
+  # pkg:gem/webrick#lib/webrick/httputils.rb:287
   def next_data=(_arg0); end
 
   # A FormData will behave like an Array
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:369
+  # pkg:gem/webrick#lib/webrick/httputils.rb:389
   def to_ary; end
 
   # This FormData's body
   #
-  # pkg:gem/webrick#lib/webrick/httputils.rb:374
+  # pkg:gem/webrick#lib/webrick/httputils.rb:394
   def to_s; end
 
   protected
 
-  # pkg:gem/webrick#lib/webrick/httputils.rb:267
+  # pkg:gem/webrick#lib/webrick/httputils.rb:287
   def next_data; end
+end
+
+# pkg:gem/webrick#lib/webrick/httputils.rb:167
+WEBrick::HTTPUtils::HEADER_CLASSES = T.let(T.unsafe(nil), Hash)
+
+# Parses an HTTP header +raw+ into a hash of header fields with an Array
+# of values.
+#
+# pkg:gem/webrick#lib/webrick/httputils.rb:155
+class WEBrick::HTTPUtils::SplitHeader < ::Array
+  # pkg:gem/webrick#lib/webrick/httputils.rb:156
+  def join(separator = T.unsafe(nil)); end
 end
 
 # Represents an HTTP protocol version
@@ -2757,6 +2778,7 @@ end
 #
 # pkg:gem/webrick#lib/webrick/utils.rb:118
 class WEBrick::Utils::TimeoutHandler
+  include ::Singleton::SingletonInstanceMethods
   include ::Singleton
   extend ::Singleton::SingletonClassMethods
 

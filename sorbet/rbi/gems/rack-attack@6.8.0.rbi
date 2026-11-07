@@ -23,111 +23,111 @@ module Rack; end
 
 # pkg:gem/rack-attack#lib/rack/attack/cache.rb:4
 class Rack::Attack
-  # pkg:gem/rack-attack#lib/rack/attack.rb:97
+  # pkg:gem/rack-attack#lib/rack/attack.rb:99
   def initialize(app); end
 
-  # pkg:gem/rack-attack#lib/rack/attack.rb:102
+  # pkg:gem/rack-attack#lib/rack/attack.rb:104
   def call(env); end
 
-  # pkg:gem/rack-attack#lib/rack/attack.rb:95
+  # pkg:gem/rack-attack#lib/rack/attack.rb:97
   def configuration; end
 
   class << self
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def blocklist(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def blocklist(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def blocklist_ip(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def blocklist_ip(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def blocklisted_responder(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def blocklisted_responder(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def blocklisted_responder=(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def blocklisted_responder=(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def blocklisted_response(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def blocklisted_response(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def blocklisted_response=(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def blocklisted_response=(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def blocklists(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def blocklists(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:47
+    # pkg:gem/rack-attack#lib/rack/attack.rb:49
     def cache; end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:51
+    # pkg:gem/rack-attack#lib/rack/attack.rb:53
     def clear!; end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def clear_configuration(*args, **, &block); end
-
-    # pkg:gem/rack-attack#lib/rack/attack.rb:35
-    def configuration; end
-
-    # pkg:gem/rack-attack#lib/rack/attack.rb:34
-    def enabled; end
-
-    # pkg:gem/rack-attack#lib/rack/attack.rb:34
-    def enabled=(_arg0); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def clear_configuration(*, **, &); end
 
     # pkg:gem/rack-attack#lib/rack/attack.rb:37
+    def configuration; end
+
+    # pkg:gem/rack-attack#lib/rack/attack.rb:36
+    def enabled; end
+
+    # pkg:gem/rack-attack#lib/rack/attack.rb:36
+    def enabled=(_arg0); end
+
+    # pkg:gem/rack-attack#lib/rack/attack.rb:39
     def instrument(request); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:34
+    # pkg:gem/rack-attack#lib/rack/attack.rb:36
     def notifier; end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:34
+    # pkg:gem/rack-attack#lib/rack/attack.rb:36
     def notifier=(_arg0); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:56
+    # pkg:gem/rack-attack#lib/rack/attack.rb:58
     def reset!; end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def safelist(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def safelist(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def safelist_ip(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def safelist_ip(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def safelists(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def safelists(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttle(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttle(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:34
+    # pkg:gem/rack-attack#lib/rack/attack.rb:36
     def throttle_discriminator_normalizer; end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:34
+    # pkg:gem/rack-attack#lib/rack/attack.rb:36
     def throttle_discriminator_normalizer=(_arg0); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttled_responder(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttled_responder(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttled_responder=(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttled_responder=(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttled_response(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttled_response(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttled_response=(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttled_response=(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttled_response_retry_after_header(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttled_response_retry_after_header(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttled_response_retry_after_header=(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttled_response_retry_after_header=(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def throttles(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def throttles(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def track(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def track(*, **, &); end
 
-    # pkg:gem/rack-attack#lib/rack/attack.rb:61
-    def tracks(*args, **, &block); end
+    # pkg:gem/rack-attack#lib/rack/attack.rb:63
+    def tracks(*, **, &); end
   end
 end
 
@@ -150,13 +150,13 @@ end
 # pkg:gem/rack-attack#lib/rack/attack/base_proxy.rb:7
 class Rack::Attack::BaseProxy < ::SimpleDelegator
   class << self
-    # pkg:gem/rack-attack#lib/rack/attack/base_proxy.rb:21
+    # pkg:gem/rack-attack#lib/rack/attack/base_proxy.rb:22
     def handle?(_store); end
 
     # pkg:gem/rack-attack#lib/rack/attack/base_proxy.rb:13
     def inherited(klass); end
 
-    # pkg:gem/rack-attack#lib/rack/attack/base_proxy.rb:17
+    # pkg:gem/rack-attack#lib/rack/attack/base_proxy.rb:18
     def lookup(store); end
 
     # pkg:gem/rack-attack#lib/rack/attack/base_proxy.rb:9
@@ -263,7 +263,7 @@ class Rack::Attack::Configuration
   # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:63
   def blocklist_ip(ip_address); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:84
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:88
   def blocklisted?(request); end
 
   # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:23
@@ -283,25 +283,25 @@ class Rack::Attack::Configuration
   # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:22
   def blocklists; end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:101
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:105
   def clear_configuration; end
 
   # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:43
   def safelist(name = T.unsafe(nil), &block); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:67
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:69
   def safelist_ip(ip_address); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:79
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:83
   def safelisted?(request); end
 
   # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:22
   def safelists; end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:71
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:75
   def throttle(name, options, &block); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:89
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:93
   def throttled?(request); end
 
   # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:23
@@ -325,15 +325,18 @@ class Rack::Attack::Configuration
   # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:22
   def throttles; end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:75
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:79
   def track(name, options = T.unsafe(nil), &block); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:95
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:99
   def tracked?(request); end
+
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:22
+  def tracks; end
 
   private
 
-  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:107
+  # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:111
   def set_defaults; end
 end
 
@@ -343,7 +346,7 @@ Rack::Attack::Configuration::DEFAULT_BLOCKLISTED_RESPONDER = T.let(T.unsafe(nil)
 # pkg:gem/rack-attack#lib/rack/attack/configuration.rb:10
 Rack::Attack::Configuration::DEFAULT_THROTTLED_RESPONDER = T.let(T.unsafe(nil), Proc)
 
-# pkg:gem/rack-attack#lib/rack/attack.rb:20
+# pkg:gem/rack-attack#lib/rack/attack.rb:19
 class Rack::Attack::Error < ::StandardError; end
 
 # pkg:gem/rack-attack#lib/rack/attack/fail2ban.rb:5
@@ -394,13 +397,13 @@ module Rack::Attack::FallbackPathNormalizer
   end
 end
 
-# pkg:gem/rack-attack#lib/rack/attack.rb:23
+# pkg:gem/rack-attack#lib/rack/attack.rb:25
 class Rack::Attack::IncompatibleStoreError < ::Rack::Attack::Error; end
 
 # pkg:gem/rack-attack#lib/rack/attack.rb:21
 class Rack::Attack::MisconfiguredStoreError < ::Rack::Attack::Error; end
 
-# pkg:gem/rack-attack#lib/rack/attack.rb:22
+# pkg:gem/rack-attack#lib/rack/attack.rb:23
 class Rack::Attack::MissingStoreError < ::Rack::Attack::Error; end
 
 # pkg:gem/rack-attack#lib/rack/attack/path_normalizer.rb:21
@@ -420,23 +423,6 @@ end
 
 # pkg:gem/rack-attack#lib/rack/attack/store_proxy/dalli_proxy.rb:7
 module Rack::Attack::StoreProxy; end
-
-# pkg:gem/rack-attack#lib/rack/attack/store_proxy/active_support_redis_store_proxy.rb:8
-class Rack::Attack::StoreProxy::ActiveSupportRedisStoreProxy < ::Rack::Attack::BaseProxy
-  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/active_support_redis_store_proxy.rb:15
-  def increment(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
-
-  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/active_support_redis_store_proxy.rb:29
-  def read(name, options = T.unsafe(nil)); end
-
-  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/active_support_redis_store_proxy.rb:33
-  def write(name, value, options = T.unsafe(nil)); end
-
-  class << self
-    # pkg:gem/rack-attack#lib/rack/attack/store_proxy/active_support_redis_store_proxy.rb:9
-    def handle?(store); end
-  end
-end
 
 # pkg:gem/rack-attack#lib/rack/attack/store_proxy/dalli_proxy.rb:8
 class Rack::Attack::StoreProxy::DalliProxy < ::Rack::Attack::BaseProxy
@@ -485,13 +471,13 @@ end
 
 # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_cache_store_proxy.rb:8
 class Rack::Attack::StoreProxy::RedisCacheStoreProxy < ::Rack::Attack::BaseProxy
-  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_cache_store_proxy.rb:13
-  def increment(name, amount = T.unsafe(nil), **options); end
+  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_cache_store_proxy.rb:37
+  def delete_matched(matcher, options = T.unsafe(nil)); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_cache_store_proxy.rb:27
+  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_cache_store_proxy.rb:29
   def read(name, options = T.unsafe(nil)); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_cache_store_proxy.rb:31
+  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_cache_store_proxy.rb:33
   def write(name, value, options = T.unsafe(nil)); end
 
   class << self
@@ -522,7 +508,7 @@ class Rack::Attack::StoreProxy::RedisProxy < ::Rack::Attack::BaseProxy
 
   private
 
-  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_proxy.rb:61
+  # pkg:gem/rack-attack#lib/rack/attack/store_proxy/redis_proxy.rb:62
   def rescuing; end
 
   class << self
@@ -573,19 +559,19 @@ class Rack::Attack::Throttle
 
   private
 
-  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:72
+  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:73
   def annotate_request_with_matched_data(request, data); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:68
+  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:69
   def annotate_request_with_throttle_data(request, data); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:52
+  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:53
   def discriminator_for(request); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:64
+  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:65
   def limit_for(request); end
 
-  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:60
+  # pkg:gem/rack-attack#lib/rack/attack/throttle.rb:61
   def period_for(request); end
 end
 

@@ -34,6 +34,9 @@ class Doorkeeper::ApplicationController
     include ::TwitterBreadcrumbsHelper
     include ::FontAwesome::Rails::IconHelper
     include ::Doorkeeper::DashboardHelper
+
+    sig { returns(T.untyped) }
+    def current_resource_owner; end
   end
 
   class HelperProxy < ::ActionView::Base

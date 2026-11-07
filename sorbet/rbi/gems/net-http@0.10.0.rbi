@@ -10,7 +10,7 @@
 # For information about \HTTP, see:
 #
 # - {Hypertext Transfer Protocol}[https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol].
-# - {Technical overview}[https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Technical_overview].
+# - {Technology}[https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Technology].
 #
 # == About the Examples
 #
@@ -45,7 +45,7 @@
 #
 # - If performance is important, consider using sessions, which lower request overhead.
 #   This {session}[rdoc-ref:Net::HTTP@Sessions] has multiple requests for
-#   {HTTP methods}[https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods]
+#   {HTTP methods}[https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Method]
 #   and {WebDAV methods}[https://en.wikipedia.org/wiki/WebDAV#Implementation]:
 #
 #     Net::HTTP.start(hostname) do |http|
@@ -55,6 +55,7 @@
 #       body = 'Some text'
 #       http.post(path, body)  # Can also have a block.
 #       http.put(path, body)
+#       http.query(path, body) # Can also have a block.
 #       http.delete(path)
 #       http.options(path)
 #       http.trace(path)
@@ -171,7 +172,7 @@
 # In the block, you can use these instance methods,
 # each of which that sends a single request:
 #
-# - {HTTP methods}[https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods]:
+# - {HTTP methods}[https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Method]:
 #
 #   - #get, #request_get: GET.
 #   - #head, #request_head: HEAD.
@@ -180,6 +181,7 @@
 #   - #options: OPTIONS.
 #   - #trace: TRACE.
 #   - #patch: PATCH.
+#   - #query, #request_query: QUERY.
 #
 # - {WebDAV methods}[https://en.wikipedia.org/wiki/WebDAV#Implementation]:
 #
@@ -420,7 +422,7 @@
 # if the response has header <tt>'Content-Range'</tt>.
 #
 # Otherwise decompression (or not) depends on the value of header
-# {Content-Encoding}[https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#content-encoding-response-header]:
+# {Content-Encoding}[https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Content-Encoding_2]:
 #
 # - <tt>'deflate'</tt>, <tt>'gzip'</tt>, or <tt>'x-gzip'</tt>:
 #   decompresses the body and deletes the header.
@@ -433,7 +435,7 @@
 #
 # First, what's elsewhere. Class Net::HTTP:
 #
-# - Inherits from {class Object}[https://docs.ruby-lang.org/en/master/Object.html#class-Object-label-What-27s+Here].
+# - Inherits from {class Object}[https://docs.ruby-lang.org/en/master/Object.html#class-object-whats-here].
 #
 # This is a categorized summary of methods and attributes.
 #
@@ -526,6 +528,8 @@
 #   Sends a PROPPATCH request and returns a response object.
 # - {#put}[rdoc-ref:Net::HTTP#put]:
 #   Sends a PUT request and returns a response object.
+# - {#query}[rdoc-ref:Net::HTTP#query]:
+#   Sends a QUERY request and returns a response object.
 # - {#request}[rdoc-ref:Net::HTTP#request]:
 #   Sends a request and returns a response object.
 # - {#request_get}[rdoc-ref:Net::HTTP#request_get]:
@@ -694,95 +698,95 @@
 # - {#set_debug_output}[rdoc-ref:Net::HTTP#set_debug_output]:
 #   Sets the output stream for debugging.
 #
-# pkg:gem/net-http#lib/net/http.rb:724
+# pkg:gem/net-http#lib/net/http.rb:728
 class Net::HTTP < ::Net::Protocol
   # Creates a new \Net::HTTP object for the specified server address,
   # without opening the TCP connection or initializing the \HTTP session.
   # The +address+ should be a DNS hostname or IP address.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1148
+  # pkg:gem/net-http#lib/net/http.rb:1152
   def initialize(address, port = T.unsafe(nil)); end
 
-  # pkg:gem/net-http#lib/net/http.rb:1492
+  # pkg:gem/net-http#lib/net/http.rb:1496
   def active?; end
 
   # Returns the string host name or host IP given as argument +address+ in ::new.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1265
+  # pkg:gem/net-http#lib/net/http.rb:1269
   def address; end
 
   # Sets or returns the path to a CA certification file in PEM format.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1539
+  # pkg:gem/net-http#lib/net/http.rb:1543
   def ca_file; end
 
   # Sets or returns the path to a CA certification file in PEM format.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1539
+  # pkg:gem/net-http#lib/net/http.rb:1543
   def ca_file=(_arg0); end
 
   # Sets or returns the path of to CA directory
   # containing certification files in PEM format.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1543
+  # pkg:gem/net-http#lib/net/http.rb:1547
   def ca_path; end
 
   # Sets or returns the path of to CA directory
   # containing certification files in PEM format.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1543
+  # pkg:gem/net-http#lib/net/http.rb:1547
   def ca_path=(_arg0); end
 
   # Sets or returns the OpenSSL::X509::Certificate object
   # to be used for client certification.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1547
+  # pkg:gem/net-http#lib/net/http.rb:1551
   def cert; end
 
   # Sets or returns the OpenSSL::X509::Certificate object
   # to be used for client certification.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1547
+  # pkg:gem/net-http#lib/net/http.rb:1551
   def cert=(_arg0); end
 
   # Sets or returns the X509::Store to be used for verifying peer certificate.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1550
+  # pkg:gem/net-http#lib/net/http.rb:1554
   def cert_store; end
 
   # Sets or returns the X509::Store to be used for verifying peer certificate.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1550
+  # pkg:gem/net-http#lib/net/http.rb:1554
   def cert_store=(_arg0); end
 
   # Sets or returns the available SSL ciphers.
-  # See {OpenSSL::SSL::SSLContext#ciphers=}[OpenSSL::SSL::SSL::Context#ciphers=].
+  # See {OpenSSL::SSL::SSLContext#ciphers=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-ciphers-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1554
+  # pkg:gem/net-http#lib/net/http.rb:1558
   def ciphers; end
 
   # Sets or returns the available SSL ciphers.
-  # See {OpenSSL::SSL::SSLContext#ciphers=}[OpenSSL::SSL::SSL::Context#ciphers=].
+  # See {OpenSSL::SSL::SSLContext#ciphers=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-ciphers-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1554
+  # pkg:gem/net-http#lib/net/http.rb:1558
   def ciphers=(_arg0); end
 
   # Sets or returns whether to close the connection when the response is empty;
   # initially +false+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1496
+  # pkg:gem/net-http#lib/net/http.rb:1500
   def close_on_empty_response; end
 
   # Sets or returns whether to close the connection when the response is empty;
   # initially +false+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1496
+  # pkg:gem/net-http#lib/net/http.rb:1500
   def close_on_empty_response=(_arg0); end
 
   # Returns the continue timeout value;
   # see continue_timeout=.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1449
+  # pkg:gem/net-http#lib/net/http.rb:1453
   def continue_timeout; end
 
   # Sets the continue timeout value,
@@ -790,7 +794,7 @@ class Net::HTTP < ::Net::Protocol
   # If the \HTTP object does not receive a response in this many seconds
   # it sends the request body.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1455
+  # pkg:gem/net-http#lib/net/http.rb:1459
   def continue_timeout=(sec); end
 
   # Sends a COPY request to the server;
@@ -802,7 +806,7 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.copy('/todos/1')
   #
-  # pkg:gem/net-http#lib/net/http.rb:2227
+  # pkg:gem/net-http#lib/net/http.rb:2250
   def copy(path, initheader = T.unsafe(nil)); end
 
   # Sends a DELETE request to the server;
@@ -814,19 +818,19 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.delete('/todos/1')
   #
-  # pkg:gem/net-http#lib/net/http.rb:2201
+  # pkg:gem/net-http#lib/net/http.rb:2224
   def delete(path, initheader = T.unsafe(nil)); end
 
   # Sets or returns the extra X509 certificates to be added to the certificate chain.
-  # See {OpenSSL::SSL::SSLContext#add_certificate}[OpenSSL::SSL::SSL::Context#add_certificate].
+  # See {OpenSSL::SSL::SSLContext#add_certificate}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-add_certificate].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1558
+  # pkg:gem/net-http#lib/net/http.rb:1562
   def extra_chain_cert; end
 
   # Sets or returns the extra X509 certificates to be added to the certificate chain.
-  # See {OpenSSL::SSL::SSLContext#add_certificate}[OpenSSL::SSL::SSL::Context#add_certificate].
+  # See {OpenSSL::SSL::SSLContext#add_certificate}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-add_certificate].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1558
+  # pkg:gem/net-http#lib/net/http.rb:1562
   def extra_chain_cert=(_arg0); end
 
   # Finishes the \HTTP session:
@@ -839,7 +843,7 @@ class Net::HTTP < ::Net::Protocol
   #
   # Raises IOError if not in a session.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1648
+  # pkg:gem/net-http#lib/net/http.rb:1652
   def finish; end
 
   # :call-seq:
@@ -871,10 +875,10 @@ class Net::HTTP < ::Net::Protocol
   # - Net::HTTP::Get: request class for \HTTP method GET.
   # - Net::HTTP.get: sends GET request, returns response body.
   #
-  # pkg:gem/net-http#lib/net/http.rb:2013
+  # pkg:gem/net-http#lib/net/http.rb:2017
   def get(path, initheader = T.unsafe(nil), dest = T.unsafe(nil), &block); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2338
+  # pkg:gem/net-http#lib/net/http.rb:2391
   def get2(path, initheader = T.unsafe(nil), &block); end
 
   # Sends a HEAD request to the server;
@@ -891,24 +895,24 @@ class Net::HTTP < ::Net::Protocol
   #    ["content-type", ["application/json; charset=utf-8"]],
   #    ["connection", ["close"]]]
   #
-  # pkg:gem/net-http#lib/net/http.rb:2037
+  # pkg:gem/net-http#lib/net/http.rb:2041
   def head(path, initheader = T.unsafe(nil)); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2339
+  # pkg:gem/net-http#lib/net/http.rb:2392
   def head2(path, initheader = T.unsafe(nil), &block); end
 
   # Sets or returns whether to ignore end-of-file when reading a response body
   # with <tt>Content-Length</tt> headers;
   # initially +true+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1472
+  # pkg:gem/net-http#lib/net/http.rb:1476
   def ignore_eof; end
 
   # Sets or returns whether to ignore end-of-file when reading a response body
   # with <tt>Content-Length</tt> headers;
   # initially +true+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1472
+  # pkg:gem/net-http#lib/net/http.rb:1476
   def ignore_eof=(_arg0); end
 
   # Returns a string representation of +self+:
@@ -916,7 +920,7 @@ class Net::HTTP < ::Net::Protocol
   #   Net::HTTP.new(hostname).inspect
   #   # => "#<Net::HTTP jsonplaceholder.typicode.com:80 open=false>"
   #
-  # pkg:gem/net-http#lib/net/http.rb:1206
+  # pkg:gem/net-http#lib/net/http.rb:1210
   def inspect; end
 
   # Returns the IP address for the connection.
@@ -938,7 +942,7 @@ class Net::HTTP < ::Net::Protocol
   #   http.ipaddr # => "172.67.155.76"
   #   http.finish
   #
-  # pkg:gem/net-http#lib/net/http.rb:1349
+  # pkg:gem/net-http#lib/net/http.rb:1353
   def ipaddr; end
 
   # Sets the IP address for the connection:
@@ -950,7 +954,7 @@ class Net::HTTP < ::Net::Protocol
   #
   # The IP address may not be set if the session has been started.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1361
+  # pkg:gem/net-http#lib/net/http.rb:1365
   def ipaddr=(addr); end
 
   # Sets or returns the numeric (\Integer or \Float) number of seconds
@@ -961,7 +965,7 @@ class Net::HTTP < ::Net::Protocol
   # otherwise the connection will have been closed
   # and a new connection is opened.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1467
+  # pkg:gem/net-http#lib/net/http.rb:1471
   def keep_alive_timeout; end
 
   # Sets or returns the numeric (\Integer or \Float) number of seconds
@@ -972,41 +976,41 @@ class Net::HTTP < ::Net::Protocol
   # otherwise the connection will have been closed
   # and a new connection is opened.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1467
+  # pkg:gem/net-http#lib/net/http.rb:1471
   def keep_alive_timeout=(_arg0); end
 
   # Sets or returns the OpenSSL::PKey::RSA or OpenSSL::PKey::DSA object.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1561
+  # pkg:gem/net-http#lib/net/http.rb:1565
   def key; end
 
   # Sets or returns the OpenSSL::PKey::RSA or OpenSSL::PKey::DSA object.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1561
+  # pkg:gem/net-http#lib/net/http.rb:1565
   def key=(_arg0); end
 
   # Sets or returns the string local host used to establish the connection;
   # initially +nil+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1272
+  # pkg:gem/net-http#lib/net/http.rb:1276
   def local_host; end
 
   # Sets or returns the string local host used to establish the connection;
   # initially +nil+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1272
+  # pkg:gem/net-http#lib/net/http.rb:1276
   def local_host=(_arg0); end
 
   # Sets or returns the integer local port used to establish the connection;
   # initially +nil+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1276
+  # pkg:gem/net-http#lib/net/http.rb:1280
   def local_port; end
 
   # Sets or returns the integer local port used to establish the connection;
   # initially +nil+.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1276
+  # pkg:gem/net-http#lib/net/http.rb:1280
   def local_port=(_arg0); end
 
   # Sends a LOCK request to the server;
@@ -1019,13 +1023,13 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.lock('/todos/1', data)
   #
-  # pkg:gem/net-http#lib/net/http.rb:2147
+  # pkg:gem/net-http#lib/net/http.rb:2170
   def lock(path, body, initheader = T.unsafe(nil)); end
 
   # Returns the maximum number of times to retry an idempotent request;
   # see #max_retries=.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1405
+  # pkg:gem/net-http#lib/net/http.rb:1409
   def max_retries; end
 
   # Sets the maximum number of times to retry an idempotent request in case of
@@ -1040,31 +1044,31 @@ class Net::HTTP < ::Net::Protocol
   #   http.max_retries = 2   # => 2
   #   http.max_retries       # => 2
   #
-  # pkg:gem/net-http#lib/net/http.rb:1395
+  # pkg:gem/net-http#lib/net/http.rb:1399
   def max_retries=(retries); end
 
   # Sets or returns the maximum SSL version.
-  # See {OpenSSL::SSL::SSLContext#max_version=}[OpenSSL::SSL::SSL::Context#max_version=].
+  # See {OpenSSL::SSL::SSLContext#max_version=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-max_version-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1576
+  # pkg:gem/net-http#lib/net/http.rb:1580
   def max_version; end
 
   # Sets or returns the maximum SSL version.
-  # See {OpenSSL::SSL::SSLContext#max_version=}[OpenSSL::SSL::SSL::Context#max_version=].
+  # See {OpenSSL::SSL::SSLContext#max_version=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-max_version-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1576
+  # pkg:gem/net-http#lib/net/http.rb:1580
   def max_version=(_arg0); end
 
   # Sets or returns the minimum SSL version.
-  # See {OpenSSL::SSL::SSLContext#min_version=}[OpenSSL::SSL::SSL::Context#min_version=].
+  # See {OpenSSL::SSL::SSLContext#min_version=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-min_version-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1572
+  # pkg:gem/net-http#lib/net/http.rb:1576
   def min_version; end
 
   # Sets or returns the minimum SSL version.
-  # See {OpenSSL::SSL::SSLContext#min_version=}[OpenSSL::SSL::SSL::Context#min_version=].
+  # See {OpenSSL::SSL::SSLContext#min_version=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-min_version-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1572
+  # pkg:gem/net-http#lib/net/http.rb:1576
   def min_version=(_arg0); end
 
   # Sends a MKCOL request to the server;
@@ -1077,7 +1081,7 @@ class Net::HTTP < ::Net::Protocol
   #   http.mkcol('/todos/1', data)
   #   http = Net::HTTP.new(hostname)
   #
-  # pkg:gem/net-http#lib/net/http.rb:2241
+  # pkg:gem/net-http#lib/net/http.rb:2264
   def mkcol(path, body = T.unsafe(nil), initheader = T.unsafe(nil)); end
 
   # Sends a MOVE request to the server;
@@ -1089,7 +1093,7 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.move('/todos/1')
   #
-  # pkg:gem/net-http#lib/net/http.rb:2214
+  # pkg:gem/net-http#lib/net/http.rb:2237
   def move(path, initheader = T.unsafe(nil)); end
 
   # Sets or returns the numeric (\Integer or \Float) number of seconds
@@ -1098,7 +1102,7 @@ class Net::HTTP < ::Net::Protocol
   # If the connection is not made in the given interval,
   # an exception is raised.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1371
+  # pkg:gem/net-http#lib/net/http.rb:1375
   def open_timeout; end
 
   # Sets or returns the numeric (\Integer or \Float) number of seconds
@@ -1107,7 +1111,7 @@ class Net::HTTP < ::Net::Protocol
   # If the connection is not made in the given interval,
   # an exception is raised.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1371
+  # pkg:gem/net-http#lib/net/http.rb:1375
   def open_timeout=(_arg0); end
 
   # Sends an Options request to the server;
@@ -1119,7 +1123,7 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.options('/')
   #
-  # pkg:gem/net-http#lib/net/http.rb:2174
+  # pkg:gem/net-http#lib/net/http.rb:2197
   def options(path, initheader = T.unsafe(nil)); end
 
   # :call-seq:
@@ -1147,19 +1151,19 @@ class Net::HTTP < ::Net::Protocol
   #
   #   http.patch('/todos/1', data) # => #<Net::HTTPCreated 201 Created readbody=true>
   #
-  # pkg:gem/net-http#lib/net/http.rb:2100
+  # pkg:gem/net-http#lib/net/http.rb:2104
   def patch(path, data, initheader = T.unsafe(nil), dest = T.unsafe(nil), &block); end
 
   # Returns the X509 certificate chain (an array of strings)
   # for the session's socket peer,
   # or +nil+ if none.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1597
+  # pkg:gem/net-http#lib/net/http.rb:1601
   def peer_cert; end
 
   # Returns the integer port number given as argument +port+ in ::new.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1268
+  # pkg:gem/net-http#lib/net/http.rb:1272
   def port; end
 
   # :call-seq:
@@ -1192,10 +1196,10 @@ class Net::HTTP < ::Net::Protocol
   # - Net::HTTP::Post: request class for \HTTP method POST.
   # - Net::HTTP.post: sends POST request, returns response body.
   #
-  # pkg:gem/net-http#lib/net/http.rb:2071
+  # pkg:gem/net-http#lib/net/http.rb:2075
   def post(path, data, initheader = T.unsafe(nil), dest = T.unsafe(nil), &block); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2340
+  # pkg:gem/net-http#lib/net/http.rb:2393
   def post2(path, data, initheader = T.unsafe(nil), &block); end
 
   # Sends a PROPFIND request to the server;
@@ -1208,7 +1212,7 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.propfind('/todos/1', data)
   #
-  # pkg:gem/net-http#lib/net/http.rb:2188
+  # pkg:gem/net-http#lib/net/http.rb:2211
   def propfind(path, body = T.unsafe(nil), initheader = T.unsafe(nil)); end
 
   # Sends a PROPPATCH request to the server;
@@ -1221,13 +1225,13 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.proppatch('/todos/1', data)
   #
-  # pkg:gem/net-http#lib/net/http.rb:2133
+  # pkg:gem/net-http#lib/net/http.rb:2156
   def proppatch(path, body, initheader = T.unsafe(nil)); end
 
   # Returns +true+ if a proxy server is defined, +false+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1881
+  # pkg:gem/net-http#lib/net/http.rb:1885
   def proxy?; end
 
   # Sets the proxy address;
@@ -1235,7 +1239,7 @@ class Net::HTTP < ::Net::Protocol
   # Returns the address of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1903
+  # pkg:gem/net-http#lib/net/http.rb:1907
   def proxy_address; end
 
   # Sets the proxy address;
@@ -1243,21 +1247,21 @@ class Net::HTTP < ::Net::Protocol
   # Returns the address of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1312
+  # pkg:gem/net-http#lib/net/http.rb:1316
   def proxy_address=(_arg0); end
 
   # Sets whether to determine the proxy from environment variable
   # '<tt>ENV['http_proxy']</tt>';
-  # see {Proxy Using ENV['http_proxy']}[rdoc-ref:Net::HTTP@Proxy+Using+-27ENV-5B-27http_proxy-27-5D-27].
+  # see {Proxy Using ENV}[rdoc-ref:Net::HTTP@Proxy+Using+ENVHTTPProxy].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1308
+  # pkg:gem/net-http#lib/net/http.rb:1312
   def proxy_from_env=(_arg0); end
 
   # Returns +true+ if the proxy server is defined in the environment,
   # +false+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1888
+  # pkg:gem/net-http#lib/net/http.rb:1892
   def proxy_from_env?; end
 
   # Sets the proxy password;
@@ -1265,7 +1269,7 @@ class Net::HTTP < ::Net::Protocol
   # Returns the password of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1934
+  # pkg:gem/net-http#lib/net/http.rb:1938
   def proxy_pass; end
 
   # Sets the proxy password;
@@ -1273,7 +1277,7 @@ class Net::HTTP < ::Net::Protocol
   # Returns the password of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1324
+  # pkg:gem/net-http#lib/net/http.rb:1328
   def proxy_pass=(_arg0); end
 
   # Sets the proxy port;
@@ -1281,7 +1285,7 @@ class Net::HTTP < ::Net::Protocol
   # Returns the port number of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1913
+  # pkg:gem/net-http#lib/net/http.rb:1917
   def proxy_port; end
 
   # Sets the proxy port;
@@ -1289,18 +1293,18 @@ class Net::HTTP < ::Net::Protocol
   # Returns the port number of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1316
+  # pkg:gem/net-http#lib/net/http.rb:1320
   def proxy_port=(_arg0); end
 
   # The proxy URI determined from the environment for this connection.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1893
+  # pkg:gem/net-http#lib/net/http.rb:1897
   def proxy_uri; end
 
-  # Sets wheter the proxy uses SSL;
+  # Sets whether the proxy uses SSL;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1328
+  # pkg:gem/net-http#lib/net/http.rb:1332
   def proxy_use_ssl=(_arg0); end
 
   # Sets the proxy user;
@@ -1308,7 +1312,7 @@ class Net::HTTP < ::Net::Protocol
   # Returns the user name of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1923
+  # pkg:gem/net-http#lib/net/http.rb:1927
   def proxy_user; end
 
   # Sets the proxy user;
@@ -1316,13 +1320,13 @@ class Net::HTTP < ::Net::Protocol
   # Returns the user name of the proxy server, if defined, +nil+ otherwise;
   # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1320
+  # pkg:gem/net-http#lib/net/http.rb:1324
   def proxy_user=(_arg0); end
 
-  # pkg:gem/net-http#lib/net/http.rb:1943
+  # pkg:gem/net-http#lib/net/http.rb:1947
   def proxyaddr; end
 
-  # pkg:gem/net-http#lib/net/http.rb:1944
+  # pkg:gem/net-http#lib/net/http.rb:1948
   def proxyport; end
 
   # Sends a PUT request to the server;
@@ -1340,17 +1344,35 @@ class Net::HTTP < ::Net::Protocol
   # - Net::HTTP::Put: request class for \HTTP method PUT.
   # - Net::HTTP.put: sends PUT request, returns response body.
   #
-  # pkg:gem/net-http#lib/net/http.rb:2119
+  # pkg:gem/net-http#lib/net/http.rb:2142
   def put(path, data, initheader = T.unsafe(nil)); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2341
+  # pkg:gem/net-http#lib/net/http.rb:2394
   def put2(path, data, initheader = T.unsafe(nil), &block); end
+
+  # Sends a QUERY request to the server;
+  # returns an instance of a subclass of Net::HTTPResponse.
+  #
+  # The request is based on the Net::HTTP::Query object
+  # created from string +path+, string +data+, and initial headers hash +initheader+.
+  #
+  #   data = '{"userId": 1, "id": 1, "title": "delectus aut autem", "completed": false}'
+  #   http = Net::HTTP.new(hostname)
+  #   http.query('/todos/1', data) # => #<Net::HTTPOK 200 OK readbody=true>
+  #
+  # Related:
+  #
+  # - Net::HTTP::Query: request class for \HTTP method QUERY.
+  # - Net::HTTP.query: sends QUERY request, returns response body.
+  #
+  # pkg:gem/net-http#lib/net/http.rb:2123
+  def query(path, data, initheader = T.unsafe(nil), dest = T.unsafe(nil), &block); end
 
   # Returns the numeric (\Integer or \Float) number of seconds
   # to wait for one block to be read (via one read(2) call);
   # see #read_timeout=.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1376
+  # pkg:gem/net-http#lib/net/http.rb:1380
   def read_timeout; end
 
   # Sets the read timeout, in seconds, for +self+ to integer +sec+;
@@ -1364,7 +1386,7 @@ class Net::HTTP < ::Net::Protocol
   #   http.read_timeout = 0
   #   http.get('/todos/1') # Raises Net::ReadTimeout.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1418
+  # pkg:gem/net-http#lib/net/http.rb:1422
   def read_timeout=(sec); end
 
   # Sends the given request +req+ to the server;
@@ -1397,7 +1419,7 @@ class Net::HTTP < ::Net::Protocol
   #
   #   #<Net::HTTPOK 200 OK readbody=false>
   #
-  # pkg:gem/net-http#lib/net/http.rb:2399
+  # pkg:gem/net-http#lib/net/http.rb:2452
   def request(*args, &block); end
 
   # Sends a GET request to the server;
@@ -1422,7 +1444,7 @@ class Net::HTTP < ::Net::Protocol
   #
   #   #<Net::HTTPOK 200 OK readbody=false>
   #
-  # pkg:gem/net-http#lib/net/http.rb:2280
+  # pkg:gem/net-http#lib/net/http.rb:2303
   def request_get(path, initheader = T.unsafe(nil), &block); end
 
   # Sends a HEAD request to the server;
@@ -1434,7 +1456,7 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.head('/todos/1') # => #<Net::HTTPOK 200 OK readbody=true>
   #
-  # pkg:gem/net-http#lib/net/http.rb:2293
+  # pkg:gem/net-http#lib/net/http.rb:2316
   def request_head(path, initheader = T.unsafe(nil), &block); end
 
   # Sends a POST request to the server;
@@ -1460,7 +1482,7 @@ class Net::HTTP < ::Net::Protocol
   #
   #   "{\n  \"xyzzy\": \"\",\n  \"id\": 201\n}"
   #
-  # pkg:gem/net-http#lib/net/http.rb:2320
+  # pkg:gem/net-http#lib/net/http.rb:2343
   def request_post(path, data, initheader = T.unsafe(nil), &block); end
 
   # Sends a PUT request to the server;
@@ -1473,13 +1495,42 @@ class Net::HTTP < ::Net::Protocol
   #   http.put('/todos/1', 'xyzzy')
   #   # => #<Net::HTTPOK 200 OK readbody=true>
   #
-  # pkg:gem/net-http#lib/net/http.rb:2334
+  # pkg:gem/net-http#lib/net/http.rb:2357
   def request_put(path, data, initheader = T.unsafe(nil), &block); end
+
+  # Sends a QUERY request to the server;
+  # returns an instance of a subclass of Net::HTTPResponse.
+  #
+  # The request is based on the Net::HTTP::Query object
+  # created from string +path+, string +body+, and initial headers hash +initheader+.
+  #
+  #   http = Net::HTTP.new(hostname)
+  #   http.query('/todos/1', 'xyzzy')
+  #   # => #<Net::HTTPOK 200 OK readbody=true>
+  #
+  # With no block given, returns the response object:
+  #
+  #   http = Net::HTTP.new(hostname)
+  #   http.request_query('/todos') # => #<Net::HTTPOK 200 OK readbody=true>
+  #
+  # With a block given, calls the block with the response object
+  # and returns the response object:
+  #
+  #   http.request_query('/todos') do |res|
+  #     p res
+  #   end # => #<Net::HTTPOK 200 OK readbody=true>
+  #
+  # Output:
+  #
+  #   #<Net::HTTPOK 200 OK readbody=false>
+  #
+  # pkg:gem/net-http#lib/net/http.rb:2387
+  def request_query(path, data, initheader = T.unsafe(nil), &block); end
 
   # Returns the encoding to use for the response body;
   # see #response_body_encoding=.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1280
+  # pkg:gem/net-http#lib/net/http.rb:1284
   def response_body_encoding; end
 
   # Sets the encoding to be used for the response body;
@@ -1500,7 +1551,7 @@ class Net::HTTP < ::Net::Protocol
   #   http.response_body_encoding = 'US-ASCII'         # => "US-ASCII"
   #   http.response_body_encoding = 'ASCII'            # => "ASCII"
   #
-  # pkg:gem/net-http#lib/net/http.rb:1300
+  # pkg:gem/net-http#lib/net/http.rb:1304
   def response_body_encoding=(value); end
 
   # Sends an \HTTP request to the server;
@@ -1523,7 +1574,7 @@ class Net::HTTP < ::Net::Protocol
   #   http.send_request('POST', '/todos', 'xyzzy')
   #   # => #<Net::HTTPCreated 201 Created readbody=true>
   #
-  # pkg:gem/net-http#lib/net/http.rb:2363
+  # pkg:gem/net-http#lib/net/http.rb:2416
   def send_request(name, path, data = T.unsafe(nil), header = T.unsafe(nil)); end
 
   # *WARNING* This method opens a serious security hole.
@@ -1575,29 +1626,29 @@ class Net::HTTP < ::Net::Protocol
   #   read 2 bytes
   #   Conn keep-alive
   #
-  # pkg:gem/net-http#lib/net/http.rb:1259
+  # pkg:gem/net-http#lib/net/http.rb:1263
   def set_debug_output(output); end
 
   # Sets or returns the SSL timeout seconds.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1564
+  # pkg:gem/net-http#lib/net/http.rb:1568
   def ssl_timeout; end
 
   # Sets or returns the SSL timeout seconds.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1564
+  # pkg:gem/net-http#lib/net/http.rb:1568
   def ssl_timeout=(_arg0); end
 
   # Sets or returns the SSL version.
-  # See {OpenSSL::SSL::SSLContext#ssl_version=}[OpenSSL::SSL::SSL::Context#ssl_version=].
+  # See {OpenSSL::SSL::SSLContext#ssl_version=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-ssl_version-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1568
+  # pkg:gem/net-http#lib/net/http.rb:1572
   def ssl_version; end
 
   # Sets or returns the SSL version.
-  # See {OpenSSL::SSL::SSLContext#ssl_version=}[OpenSSL::SSL::SSL::Context#ssl_version=].
+  # See {OpenSSL::SSL::SSLContext#ssl_version=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#method-i-ssl_version-3D].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1568
+  # pkg:gem/net-http#lib/net/http.rb:1572
   def ssl_version=(_arg0); end
 
   # Starts an \HTTP session.
@@ -1621,7 +1672,7 @@ class Net::HTTP < ::Net::Protocol
   #   # => #<Net::HTTP jsonplaceholder.typicode.com:80 open=false>
   #   http.started? # => false
   #
-  # pkg:gem/net-http#lib/net/http.rb:1625
+  # pkg:gem/net-http#lib/net/http.rb:1629
   def start; end
 
   # Returns +true+ if the \HTTP session has been started:
@@ -1638,7 +1689,7 @@ class Net::HTTP < ::Net::Protocol
   #   end # => true
   #   http.started? # => false
   #
-  # pkg:gem/net-http#lib/net/http.rb:1488
+  # pkg:gem/net-http#lib/net/http.rb:1492
   def started?; end
 
   # Sends a TRACE request to the server;
@@ -1650,7 +1701,7 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.trace('/todos/1')
   #
-  # pkg:gem/net-http#lib/net/http.rb:2254
+  # pkg:gem/net-http#lib/net/http.rb:2277
   def trace(path, initheader = T.unsafe(nil)); end
 
   # Sends an UNLOCK request to the server;
@@ -1663,7 +1714,7 @@ class Net::HTTP < ::Net::Protocol
   #   http = Net::HTTP.new(hostname)
   #   http.unlock('/todos/1', data)
   #
-  # pkg:gem/net-http#lib/net/http.rb:2161
+  # pkg:gem/net-http#lib/net/http.rb:2184
   def unlock(path, body, initheader = T.unsafe(nil)); end
 
   # Sets whether a new session is to use
@@ -1673,68 +1724,68 @@ class Net::HTTP < ::Net::Protocol
   #
   # Raises OpenSSL::SSL::SSLError if the port is not an HTTPS port.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1510
+  # pkg:gem/net-http#lib/net/http.rb:1514
   def use_ssl=(flag); end
 
   # Returns +true+ if +self+ uses SSL, +false+ otherwise.
   # See Net::HTTP#use_ssl=.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1500
+  # pkg:gem/net-http#lib/net/http.rb:1504
   def use_ssl?; end
 
   # Sets or returns the callback for the server certification verification.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1579
+  # pkg:gem/net-http#lib/net/http.rb:1583
   def verify_callback; end
 
   # Sets or returns the callback for the server certification verification.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1579
+  # pkg:gem/net-http#lib/net/http.rb:1583
   def verify_callback=(_arg0); end
 
   # Sets or returns the maximum depth for the certificate chain verification.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1582
+  # pkg:gem/net-http#lib/net/http.rb:1586
   def verify_depth; end
 
   # Sets or returns the maximum depth for the certificate chain verification.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1582
+  # pkg:gem/net-http#lib/net/http.rb:1586
   def verify_depth=(_arg0); end
 
   # Sets or returns whether to verify that the server certificate is valid
   # for the hostname.
-  # See {OpenSSL::SSL::SSLContext#verify_hostname=}[OpenSSL::SSL::SSL::Context#verify_hostname=].
+  # See {OpenSSL::SSL::SSLContext#verify_hostname=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#attribute-i-verify_hostname].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1592
+  # pkg:gem/net-http#lib/net/http.rb:1596
   def verify_hostname; end
 
   # Sets or returns whether to verify that the server certificate is valid
   # for the hostname.
-  # See {OpenSSL::SSL::SSLContext#verify_hostname=}[OpenSSL::SSL::SSL::Context#verify_hostname=].
+  # See {OpenSSL::SSL::SSLContext#verify_hostname=}[https://docs.ruby-lang.org/en/master/OpenSSL/SSL/SSLContext.html#attribute-i-verify_hostname].
   #
-  # pkg:gem/net-http#lib/net/http.rb:1592
+  # pkg:gem/net-http#lib/net/http.rb:1596
   def verify_hostname=(_arg0); end
 
   # Sets or returns the flags for server the certification verification
   # at the beginning of the SSL/TLS session.
   # OpenSSL::SSL::VERIFY_NONE or OpenSSL::SSL::VERIFY_PEER are acceptable.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1587
+  # pkg:gem/net-http#lib/net/http.rb:1591
   def verify_mode; end
 
   # Sets or returns the flags for server the certification verification
   # at the beginning of the SSL/TLS session.
   # OpenSSL::SSL::VERIFY_NONE or OpenSSL::SSL::VERIFY_PEER are acceptable.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1587
+  # pkg:gem/net-http#lib/net/http.rb:1591
   def verify_mode=(_arg0); end
 
   # Returns the numeric (\Integer or \Float) number of seconds
   # to wait for one block to be written (via one write(2) call);
   # see #write_timeout=.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1381
+  # pkg:gem/net-http#lib/net/http.rb:1385
   def write_timeout; end
 
   # Sets the write timeout, in seconds, for +self+ to integer +sec+;
@@ -1756,74 +1807,77 @@ class Net::HTTP < ::Net::Protocol
   #   http.write_timeout = 0
   #   http.post(_uri.path, data, headers) # Raises Net::WriteTimeout.
   #
-  # pkg:gem/net-http#lib/net/http.rb:1442
+  # pkg:gem/net-http#lib/net/http.rb:1446
   def write_timeout=(sec); end
 
   private
 
-  # pkg:gem/net-http#lib/net/http.rb:2587
+  # pkg:gem/net-http#lib/net/http.rb:2646
   def D(msg); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2573
+  # pkg:gem/net-http#lib/net/http.rb:2632
   def addr_port; end
 
-  # pkg:gem/net-http#lib/net/http.rb:2490
+  # pkg:gem/net-http#lib/net/http.rb:2549
   def begin_transport(req); end
 
   # without proxy, obsolete
   #
-  # pkg:gem/net-http#lib/net/http.rb:1957
+  # pkg:gem/net-http#lib/net/http.rb:1961
   def conn_address; end
 
-  # pkg:gem/net-http#lib/net/http.rb:1961
+  # pkg:gem/net-http#lib/net/http.rb:1965
   def conn_port; end
 
-  # pkg:gem/net-http#lib/net/http.rb:1660
+  # pkg:gem/net-http#lib/net/http.rb:1664
   def connect; end
 
   # Adds a message to debugging output
   #
-  # pkg:gem/net-http#lib/net/http.rb:2581
+  # pkg:gem/net-http#lib/net/http.rb:2640
   def debug(msg); end
 
-  # pkg:gem/net-http#lib/net/http.rb:1802
+  # pkg:gem/net-http#lib/net/http.rb:1806
   def do_finish; end
 
   # :stopdoc:
   #
-  # pkg:gem/net-http#lib/net/http.rb:1654
+  # pkg:gem/net-http#lib/net/http.rb:1658
   def do_start; end
 
-  # pkg:gem/net-http#lib/net/http.rb:1965
+  # pkg:gem/net-http#lib/net/http.rb:1969
   def edit_path(path); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2513
+  # pkg:gem/net-http#lib/net/http.rb:2572
   def end_transport(req, res); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2530
+  # pkg:gem/net-http#lib/net/http.rb:2589
   def keep_alive?(req, res); end
 
-  # pkg:gem/net-http#lib/net/http.rb:1798
+  # pkg:gem/net-http#lib/net/http.rb:1802
   def on_connect; end
 
   # Executes a request which uses a representation
   # and returns its body.
   #
-  # pkg:gem/net-http#lib/net/http.rb:2422
+  # pkg:gem/net-http#lib/net/http.rb:2475
   def send_entity(path, data, initheader, dest, type, &block); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2554
+  # pkg:gem/net-http#lib/net/http.rb:2613
   def sspi_auth(req); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2539
+  # pkg:gem/net-http#lib/net/http.rb:2598
   def sspi_auth?(res); end
 
-  # pkg:gem/net-http#lib/net/http.rb:2435
+  # pkg:gem/net-http#lib/net/http.rb:1791
+  def timeouted_connect(conn_addr, conn_port); end
+
+  # pkg:gem/net-http#lib/net/http.rb:2488
   def transport_request(req); end
 
   # :stopdoc:
   #
-  # pkg:gem/net-http#lib/net/http.rb:1949
+  # pkg:gem/net-http#lib/net/http.rb:1953
   def unescape(value); end
 
   class << self
@@ -1833,7 +1887,7 @@ class Net::HTTP < ::Net::Protocol
     # This class is obsolete.  You may pass these same parameters directly to
     # \Net::HTTP.new.  See Net::HTTP.new for details of the arguments.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1829
+    # pkg:gem/net-http#lib/net/http.rb:1833
     def Proxy(p_addr = T.unsafe(nil), p_port = T.unsafe(nil), p_user = T.unsafe(nil), p_pass = T.unsafe(nil), p_use_ssl = T.unsafe(nil)); end
 
     # Allows to set the default configuration that will be used
@@ -1850,7 +1904,7 @@ class Net::HTTP < ::Net::Protocol
     #   http.read_timeout   # => 1
     #   http.write_timeout  # => 1
     #
-    # pkg:gem/net-http#lib/net/http.rb:1142
+    # pkg:gem/net-http#lib/net/http.rb:1146
     def default_configuration; end
 
     # Allows to set the default configuration that will be used
@@ -1867,14 +1921,14 @@ class Net::HTTP < ::Net::Protocol
     #   http.read_timeout   # => 1
     #   http.write_timeout  # => 1
     #
-    # pkg:gem/net-http#lib/net/http.rb:1142
+    # pkg:gem/net-http#lib/net/http.rb:1146
     def default_configuration=(_arg0); end
 
     # Returns integer +80+, the default port to use for \HTTP requests:
     #
     #   Net::HTTP.default_port # => 80
     #
-    # pkg:gem/net-http#lib/net/http.rb:935
+    # pkg:gem/net-http#lib/net/http.rb:939
     def default_port; end
 
     # :call-seq:
@@ -1909,7 +1963,7 @@ class Net::HTTP < ::Net::Protocol
     # - Net::HTTP::Get: request class for \HTTP method +GET+.
     # - Net::HTTP#get: convenience method for \HTTP method +GET+.
     #
-    # pkg:gem/net-http#lib/net/http.rb:804
+    # pkg:gem/net-http#lib/net/http.rb:808
     def get(uri_or_host, path_or_headers = T.unsafe(nil), port = T.unsafe(nil)); end
 
     # :call-seq:
@@ -1919,7 +1973,7 @@ class Net::HTTP < ::Net::Protocol
     # Like Net::HTTP.get, but writes the returned body to $stdout;
     # returns +nil+.
     #
-    # pkg:gem/net-http#lib/net/http.rb:763
+    # pkg:gem/net-http#lib/net/http.rb:767
     def get_print(uri_or_host, path_or_headers = T.unsafe(nil), port = T.unsafe(nil)); end
 
     # :call-seq:
@@ -1929,27 +1983,27 @@ class Net::HTTP < ::Net::Protocol
     # Like Net::HTTP.get, but returns a Net::HTTPResponse object
     # instead of the body string.
     #
-    # pkg:gem/net-http#lib/net/http.rb:814
+    # pkg:gem/net-http#lib/net/http.rb:818
     def get_response(uri_or_host, path_or_headers = T.unsafe(nil), port = T.unsafe(nil), &block); end
 
     # Returns integer +80+, the default port to use for \HTTP requests:
     #
     #   Net::HTTP.http_default_port # => 80
     #
-    # pkg:gem/net-http#lib/net/http.rb:943
+    # pkg:gem/net-http#lib/net/http.rb:947
     def http_default_port; end
 
     # Returns integer +443+, the default port to use for HTTPS requests:
     #
     #   Net::HTTP.https_default_port # => 443
     #
-    # pkg:gem/net-http#lib/net/http.rb:951
+    # pkg:gem/net-http#lib/net/http.rb:955
     def https_default_port; end
 
-    # pkg:gem/net-http#lib/net/http.rb:753
+    # pkg:gem/net-http#lib/net/http.rb:757
     def is_version_1_1?; end
 
-    # pkg:gem/net-http#lib/net/http.rb:754
+    # pkg:gem/net-http#lib/net/http.rb:758
     def is_version_1_2?; end
 
     # Returns a new \Net::HTTP object +http+
@@ -1981,10 +2035,10 @@ class Net::HTTP < ::Net::Protocol
     # For proxy-defining arguments +p_addr+ through +p_no_proxy+,
     # see {Proxy Server}[rdoc-ref:Net::HTTP@Proxy+Server].
     #
-    # pkg:gem/net-http#lib/net/http.rb:1100
+    # pkg:gem/net-http#lib/net/http.rb:1104
     def new(address, port = T.unsafe(nil), p_addr = T.unsafe(nil), p_port = T.unsafe(nil), p_user = T.unsafe(nil), p_pass = T.unsafe(nil), p_no_proxy = T.unsafe(nil), p_use_ssl = T.unsafe(nil)); end
 
-    # pkg:gem/net-http#lib/net/http.rb:1068
+    # pkg:gem/net-http#lib/net/http.rb:1072
     def newobj(*_arg0); end
 
     # Posts data to a host; returns a Net::HTTPResponse object.
@@ -2013,7 +2067,7 @@ class Net::HTTP < ::Net::Protocol
     # - Net::HTTP::Post: request class for \HTTP method +POST+.
     # - Net::HTTP#post: convenience method for \HTTP method +POST+.
     #
-    # pkg:gem/net-http#lib/net/http.rb:857
+    # pkg:gem/net-http#lib/net/http.rb:861
     def post(url, data, header = T.unsafe(nil)); end
 
     # Posts data to a host; returns a Net::HTTPResponse object.
@@ -2036,41 +2090,41 @@ class Net::HTTP < ::Net::Protocol
     #     "id": 101
     #   }
     #
-    # pkg:gem/net-http#lib/net/http.rb:884
+    # pkg:gem/net-http#lib/net/http.rb:888
     def post_form(url, params); end
 
     # Returns the address of the proxy host, or +nil+ if none;
     # see Net::HTTP@Proxy+Server.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1861
+    # pkg:gem/net-http#lib/net/http.rb:1865
     def proxy_address; end
 
     # Returns true if self is a class which was created by HTTP::Proxy.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1855
+    # pkg:gem/net-http#lib/net/http.rb:1859
     def proxy_class?; end
 
     # Returns the password for accessing the proxy, or +nil+ if none;
     # see Net::HTTP@Proxy+Server.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1873
+    # pkg:gem/net-http#lib/net/http.rb:1877
     def proxy_pass; end
 
     # Returns the port number of the proxy host, or +nil+ if none;
     # see Net::HTTP@Proxy+Server.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1865
+    # pkg:gem/net-http#lib/net/http.rb:1869
     def proxy_port; end
 
     # Use SSL when talking to the proxy. If Net::HTTP does not use a proxy, nil.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1876
+    # pkg:gem/net-http#lib/net/http.rb:1880
     def proxy_use_ssl; end
 
     # Returns the user name for accessing the proxy, or +nil+ if none;
     # see Net::HTTP@Proxy+Server.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1869
+    # pkg:gem/net-http#lib/net/http.rb:1873
     def proxy_user; end
 
     # Sends a PUT request to the server; returns a Net::HTTPResponse object.
@@ -2099,10 +2153,10 @@ class Net::HTTP < ::Net::Protocol
     # - Net::HTTP::Put: request class for \HTTP method +PUT+.
     # - Net::HTTP#put: convenience method for \HTTP method +PUT+.
     #
-    # pkg:gem/net-http#lib/net/http.rb:920
+    # pkg:gem/net-http#lib/net/http.rb:924
     def put(url, data, header = T.unsafe(nil)); end
 
-    # pkg:gem/net-http#lib/net/http.rb:955
+    # pkg:gem/net-http#lib/net/http.rb:959
     def socket_type; end
 
     # :call-seq:
@@ -2191,22 +2245,22 @@ class Net::HTTP < ::Net::Protocol
     # Note: If +port+ is +nil+ and <tt>opts[:use_ssl]</tt> is a truthy value,
     # the value passed to +new+ is Net::HTTP.https_default_port, not +port+.
     #
-    # pkg:gem/net-http#lib/net/http.rb:1045
+    # pkg:gem/net-http#lib/net/http.rb:1049
     def start(address, *arg, &block); end
 
     # Returns +false+; retained for compatibility.
     #
-    # pkg:gem/net-http#lib/net/http.rb:748
+    # pkg:gem/net-http#lib/net/http.rb:752
     def version_1_1?; end
 
     # Returns +true+; retained for compatibility.
     #
-    # pkg:gem/net-http#lib/net/http.rb:738
+    # pkg:gem/net-http#lib/net/http.rb:742
     def version_1_2; end
 
     # Returns +true+; retained for compatibility.
     #
-    # pkg:gem/net-http#lib/net/http.rb:743
+    # pkg:gem/net-http#lib/net/http.rb:747
     def version_1_2?; end
   end
 end
@@ -2225,9 +2279,54 @@ module Net::HTTP::ProxyDelta
   def edit_path(path); end
 end
 
+# \Class for representing
+# {HTTP method QUERY}[https://www.rfc-editor.org/rfc/rfc10008.html]:
+#
+#   require 'net/http'
+#   uri = URI('http://example.com')
+#   hostname = uri.hostname # => "example.com"
+#   uri.path = '/posts'
+#   req = Net::HTTP::Query.new(uri) # => #<Net::HTTP::Query QUERY>
+#   req.body = '{"title": "foo","body": "bar","userId": 1}'
+#   req.content_type = 'application/json'
+#   res = Net::HTTP.start(hostname) do |http|
+#     http.request(req)
+#   end
+#
+# See {Request Headers}[rdoc-ref:Net::HTTPRequest@Request+Headers].
+#
+# Properties:
+#
+# - Request body: yes.
+# - Response body: yes.
+# - {Safe}[https://en.wikipedia.org/wiki/HTTP#Safe_method]: yes.
+# - {Idempotent}[https://en.wikipedia.org/wiki/HTTP#Idempotent_method]: yes.
+# - {Cacheable}[https://en.wikipedia.org/wiki/HTTP#Cacheable_method]: yes.
+#
+# Related:
+#
+# - Net::HTTP#query: sends +QUERY+ request, returns response object.
+#
+# pkg:gem/net-http#lib/net/http/requests.rb:302
+class Net::HTTP::Query < ::Net::HTTPRequest; end
+
 # :stopdoc:
 #
-# pkg:gem/net-http#lib/net/http.rb:727
+# pkg:gem/net-http#lib/net/http/requests.rb:304
+Net::HTTP::Query::METHOD = T.let(T.unsafe(nil), String)
+
+# pkg:gem/net-http#lib/net/http/requests.rb:305
+Net::HTTP::Query::REQUEST_HAS_BODY = T.let(T.unsafe(nil), TrueClass)
+
+# pkg:gem/net-http#lib/net/http/requests.rb:306
+Net::HTTP::Query::RESPONSE_HAS_BODY = T.let(T.unsafe(nil), TrueClass)
+
+# pkg:gem/net-http#lib/net/http.rb:1782
+Net::HTTP::TCP_SOCKET_NEW_HAS_OPEN_TIMEOUT = T.let(T.unsafe(nil), TrueClass)
+
+# :stopdoc:
+#
+# pkg:gem/net-http#lib/net/http.rb:731
 Net::HTTP::VERSION = T.let(T.unsafe(nil), String)
 
 # Response class for <tt>Already Reported (WebDAV)</tt> responses (status code 208).
@@ -2474,10 +2573,10 @@ class Net::HTTPGenericRequest
   # pkg:gem/net-http#lib/net/http/generic_request.rb:334
   def encode_multipart_form_data(out, params, opt); end
 
-  # pkg:gem/net-http#lib/net/http/generic_request.rb:390
+  # pkg:gem/net-http#lib/net/http/generic_request.rb:399
   def flush_buffer(out, buf, chunked_p); end
 
-  # pkg:gem/net-http#lib/net/http/generic_request.rb:385
+  # pkg:gem/net-http#lib/net/http/generic_request.rb:391
   def quote_string(str, charset); end
 
   # pkg:gem/net-http#lib/net/http/generic_request.rb:284
@@ -2492,10 +2591,10 @@ class Net::HTTPGenericRequest
   # Waits up to the continue timeout for a response from the server provided
   # we're speaking HTTP 1.1 and are expecting a 100-continue response.
   #
-  # pkg:gem/net-http#lib/net/http/generic_request.rb:402
+  # pkg:gem/net-http#lib/net/http/generic_request.rb:411
   def wait_for_continue(sock, ver); end
 
-  # pkg:gem/net-http#lib/net/http/generic_request.rb:415
+  # pkg:gem/net-http#lib/net/http/generic_request.rb:424
   def write_header(sock, ver, path); end
 end
 
@@ -2704,7 +2803,7 @@ module Net::HTTPHeader
   # Note that some field values may be retrieved via convenience methods;
   # see {Getters}[rdoc-ref:Net::HTTPHeader@Getters].
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:226
+  # pkg:gem/net-http#lib/net/http/header.rb:224
   def [](key); end
 
   # Sets the value for the case-insensitive +key+ to +val+,
@@ -2719,7 +2818,7 @@ module Net::HTTPHeader
   # Note that some field values may be set via convenience methods;
   # see {Setters}[rdoc-ref:Net::HTTPHeader@Setters].
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:242
+  # pkg:gem/net-http#lib/net/http/header.rb:240
   def []=(key, val); end
 
   # Adds value +val+ to the value array for field +key+ if the field exists;
@@ -2735,7 +2834,7 @@ module Net::HTTPHeader
   #   req['Foo']            # => "bar, baz, baz, bam"
   #   req.get_fields('Foo') # => ["bar", "baz", "baz", "bam"]
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:263
+  # pkg:gem/net-http#lib/net/http/header.rb:261
   def add_field(key, val); end
 
   # Sets header <tt>'Authorization'</tt> using the given
@@ -2745,14 +2844,14 @@ module Net::HTTPHeader
   #   req['Authorization']
   #   # => "Basic bXlfYWNjb3VudDpteV9wYXNzd29yZA=="
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:949
+  # pkg:gem/net-http#lib/net/http/header.rb:990
   def basic_auth(account, password); end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:495
+  # pkg:gem/net-http#lib/net/http/header.rb:509
   def canonical_each; end
 
   # Returns +true+ if field <tt>'Transfer-Encoding'</tt>
-  # exists and has value <tt>'chunked'</tt>,
+  # exists and has <tt>'chunked'</tt> as its final transfer coding,
   # +false+ otherwise;
   # see {Transfer-Encoding response header}[https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#transfer-encoding-response-header]:
   #
@@ -2760,17 +2859,21 @@ module Net::HTTPHeader
   #   res['Transfer-Encoding'] # => "chunked"
   #   res.chunked?             # => true
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:658
+  # <tt>'gzip, chunked'</tt> is chunked but <tt>'chunked, gzip'</tt> is not,
+  # because only the final transfer coding frames the message.
+  # See {RFC 9112 Section 6.3}[https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3].
+  #
+  # pkg:gem/net-http#lib/net/http/header.rb:699
   def chunked?; end
 
   # Returns whether the HTTP session is to be closed.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:970
+  # pkg:gem/net-http#lib/net/http/header.rb:1011
   def connection_close?; end
 
   # Returns whether the HTTP session is to be kept alive.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:978
+  # pkg:gem/net-http#lib/net/http/header.rb:1019
   def connection_keep_alive?; end
 
   # Returns the value of field <tt>'Content-Length'</tt> as an integer,
@@ -2782,7 +2885,13 @@ module Net::HTTPHeader
   #   res = Net::HTTP.get_response(hostname, '/todos/1')
   #   res.content_length # => nil
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:620
+  # The value must consist of digits only.
+  # Multiple <tt>'Content-Length'</tt> values are accepted
+  # only when they are all identical;
+  # otherwise Net::HTTPHeaderSyntaxError is raised.
+  # See {RFC 9110 Section 8.6}[https://www.rfc-editor.org/rfc/rfc9110.html#section-8.6].
+  #
+  # pkg:gem/net-http#lib/net/http/header.rb:639
   def content_length; end
 
   # Sets the value of field <tt>'Content-Length'</tt> to the given numeric;
@@ -2799,7 +2908,7 @@ module Net::HTTPHeader
   #     http.request(req)
   #   end # => #<Net::HTTPCreated 201 Created readbody=true>
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:641
+  # pkg:gem/net-http#lib/net/http/header.rb:679
   def content_length=(len); end
 
   # Returns a Range object representing the value of field
@@ -2812,7 +2921,7 @@ module Net::HTTPHeader
   #   res['Content-Range'] # => "bytes 0-499/1000"
   #   res.content_range    # => 0..499
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:674
+  # pkg:gem/net-http#lib/net/http/header.rb:715
   def content_range; end
 
   # Returns the {media type}[https://en.wikipedia.org/wiki/Media_type]
@@ -2824,10 +2933,10 @@ module Net::HTTPHeader
   #   res['content-type'] # => "application/json; charset=utf-8"
   #   res.content_type    # => "application/json"
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:705
+  # pkg:gem/net-http#lib/net/http/header.rb:746
   def content_type; end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:780
+  # pkg:gem/net-http#lib/net/http/header.rb:821
   def content_type=(type, params = T.unsafe(nil)); end
 
   # Removes the header for the given case-insensitive +key+
@@ -2838,17 +2947,17 @@ module Net::HTTPHeader
   #   req.delete('Accept') # => ["*/*"]
   #   req.delete('Nosuch') # => nil
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:457
+  # pkg:gem/net-http#lib/net/http/header.rb:471
   def delete(key); end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:375
+  # pkg:gem/net-http#lib/net/http/header.rb:389
   def each; end
 
   # Like #each_header, but the keys are returned in capitalized form.
   #
   # Net::HTTPHeader#canonical_each is an alias for Net::HTTPHeader#each_capitalized.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:488
+  # pkg:gem/net-http#lib/net/http/header.rb:502
   def each_capitalized; end
 
   # Calls the block with each capitalized field name:
@@ -2871,7 +2980,7 @@ module Net::HTTPHeader
   #
   # Returns an enumerator if no block is given.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:421
+  # pkg:gem/net-http#lib/net/http/header.rb:435
   def each_capitalized_name; end
 
   # Calls the block with each key/value pair:
@@ -2893,10 +3002,10 @@ module Net::HTTPHeader
   #
   # Net::HTTPHeader#each is an alias for Net::HTTPHeader#each_header.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:368
+  # pkg:gem/net-http#lib/net/http/header.rb:382
   def each_header; end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:400
+  # pkg:gem/net-http#lib/net/http/header.rb:414
   def each_key(&block); end
 
   # Calls the block with each field key:
@@ -2918,7 +3027,7 @@ module Net::HTTPHeader
   #
   # Net::HTTPHeader#each_name is an alias for Net::HTTPHeader#each_key.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:395
+  # pkg:gem/net-http#lib/net/http/header.rb:409
   def each_name(&block); end
 
   # Calls the block with each string field value:
@@ -2936,7 +3045,7 @@ module Net::HTTPHeader
   #
   # Returns an enumerator if no block is given.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:442
+  # pkg:gem/net-http#lib/net/http/header.rb:456
   def each_value; end
 
   # call-seq:
@@ -2968,10 +3077,10 @@ module Net::HTTPHeader
   #   res.fetch('Nosuch', 'Foo')     # => "Foo"
   #   res.fetch('Nosuch')            # Raises KeyError.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:345
+  # pkg:gem/net-http#lib/net/http/header.rb:359
   def fetch(key, *args, &block); end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:823
+  # pkg:gem/net-http#lib/net/http/header.rb:864
   def form_data=(params, sep = T.unsafe(nil)); end
 
   # Returns the array field value for the given +key+,
@@ -2982,7 +3091,7 @@ module Net::HTTPHeader
   #   res.get_fields('Connection') # => ["keep-alive"]
   #   res.get_fields('Nosuch')     # => nil
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:310
+  # pkg:gem/net-http#lib/net/http/header.rb:324
   def get_fields(key); end
 
   # pkg:gem/net-http#lib/net/http/header.rb:187
@@ -2994,10 +3103,10 @@ module Net::HTTPHeader
   #   req.key?('Accept') # => true
   #   req.key?('Nosuch') # => false
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:467
+  # pkg:gem/net-http#lib/net/http/header.rb:481
   def key?(key); end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:214
+  # pkg:gem/net-http#lib/net/http/header.rb:212
   def length; end
 
   # Returns the leading ('type') part of the
@@ -3010,7 +3119,7 @@ module Net::HTTPHeader
   #   res['content-type'] # => "application/json; charset=utf-8"
   #   res.main_type       # => "application"
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:727
+  # pkg:gem/net-http#lib/net/http/header.rb:768
   def main_type; end
 
   # Sets header <tt>'Proxy-Authorization'</tt> using the given
@@ -3020,7 +3129,7 @@ module Net::HTTPHeader
   #   req['Proxy-Authorization']
   #   # => "Basic bXlfYWNjb3VudDpteV9wYXNzd29yZA=="
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:960
+  # pkg:gem/net-http#lib/net/http/header.rb:1001
   def proxy_basic_auth(account, password); end
 
   # Returns an array of Range objects that represent
@@ -3034,10 +3143,10 @@ module Net::HTTPHeader
   #   req.delete('Range')
   #   req.range # # => nil
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:513
+  # pkg:gem/net-http#lib/net/http/header.rb:527
   def range; end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:609
+  # pkg:gem/net-http#lib/net/http/header.rb:623
   def range=(r, e = T.unsafe(nil)); end
 
   # Returns the integer representing length of the value of field
@@ -3049,7 +3158,7 @@ module Net::HTTPHeader
   #   res['Content-Range'] = 'bytes 0-499/1000'
   #   res.range_length     # => 500
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:691
+  # pkg:gem/net-http#lib/net/http/header.rb:732
   def range_length; end
 
   # Sets the value of field <tt>'Content-Type'</tt>;
@@ -3061,7 +3170,7 @@ module Net::HTTPHeader
   #
   # Net::HTTPHeader#content_type= is an alias for Net::HTTPHeader#set_content_type.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:776
+  # pkg:gem/net-http#lib/net/http/header.rb:817
   def set_content_type(type, params = T.unsafe(nil)); end
 
   # Stores form data to be used in a +POST+ or +PUT+ request.
@@ -3167,7 +3276,7 @@ module Net::HTTPHeader
   # - +:charset+: Value is the character set for the form submission.
   #   Field names and values of non-file fields should be encoded with this charset.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:928
+  # pkg:gem/net-http#lib/net/http/header.rb:969
   def set_form(params, enctype = T.unsafe(nil), formopt = T.unsafe(nil)); end
 
   # Sets the request body to a URL-encoded string derived from argument +params+,
@@ -3205,7 +3314,7 @@ module Net::HTTPHeader
   #
   # Net::HTTPHeader#form_data= is an alias for Net::HTTPHeader#set_form_data.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:816
+  # pkg:gem/net-http#lib/net/http/header.rb:857
   def set_form_data(params, sep = T.unsafe(nil)); end
 
   # call-seq:
@@ -3234,10 +3343,10 @@ module Net::HTTPHeader
   #
   # Net::HTTPHeader#range= is an alias for Net::HTTPHeader#set_range.
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:580
+  # pkg:gem/net-http#lib/net/http/header.rb:594
   def set_range(r, e = T.unsafe(nil)); end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:210
+  # pkg:gem/net-http#lib/net/http/header.rb:208
   def size; end
 
   # Returns the trailing ('subtype') part of the
@@ -3250,7 +3359,7 @@ module Net::HTTPHeader
   #   res['content-type'] # => "application/json; charset=utf-8"
   #   res.sub_type        # => "json"
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:742
+  # pkg:gem/net-http#lib/net/http/header.rb:783
   def sub_type; end
 
   # Returns a hash of the key/value pairs:
@@ -3263,7 +3372,7 @@ module Net::HTTPHeader
   #    "user-agent"=>["Ruby"],
   #    "host"=>["jsonplaceholder.typicode.com"]}
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:481
+  # pkg:gem/net-http#lib/net/http/header.rb:495
   def to_hash; end
 
   # Returns the trailing ('parameters') part of the value of field <tt>'Content-Type'</tt>,
@@ -3274,24 +3383,27 @@ module Net::HTTPHeader
   #   res['content-type'] # => "application/json; charset=utf-8"
   #   res.type_params     # => {"charset"=>"utf-8"}
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:757
+  # pkg:gem/net-http#lib/net/http/header.rb:798
   def type_params; end
 
   private
 
-  # pkg:gem/net-http#lib/net/http/header.rb:288
-  def append_field_value(ary, val); end
+  # pkg:gem/net-http#lib/net/http/header.rb:299
+  def append_field_value(ary, val, key); end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:964
+  # pkg:gem/net-http#lib/net/http/header.rb:1005
   def basic_encode(account, password); end
 
-  # pkg:gem/net-http#lib/net/http/header.rb:497
+  # pkg:gem/net-http#lib/net/http/header.rb:511
   def capitalize(name); end
+
+  # pkg:gem/net-http#lib/net/http/header.rb:280
+  def set_field(key, val); end
 
   # :stopdoc:
   #
-  # pkg:gem/net-http#lib/net/http/header.rb:273
-  def set_field(key, val); end
+  # pkg:gem/net-http#lib/net/http/header.rb:271
+  def validate_field_name(key); end
 end
 
 # The maximum length of HTTP header values.
@@ -3496,6 +3608,7 @@ Net::HTTPRedirection::EXCEPTION_TYPE = Net::HTTPRetriableError
 # - Net::HTTP::Options
 # - Net::HTTP::Trace
 # - Net::HTTP::Patch
+# - Net::HTTP::Query
 #
 # Subclasses for WebDAV requests:
 #
@@ -3507,7 +3620,7 @@ Net::HTTPRedirection::EXCEPTION_TYPE = Net::HTTPRetriableError
 # - Net::HTTP::Lock
 # - Net::HTTP::Unlock
 #
-# pkg:gem/net-http#lib/net/http/request.rb:75
+# pkg:gem/net-http#lib/net/http/request.rb:76
 class Net::HTTPRequest < ::Net::HTTPGenericRequest
   # Creates an HTTP request object for +path+.
   #
@@ -3515,7 +3628,7 @@ class Net::HTTPRequest < ::Net::HTTPGenericRequest
   # Accept-Encoding to enable compression of the response body unless
   # Accept-Encoding or Range are supplied in +initheader+.
   #
-  # pkg:gem/net-http#lib/net/http/request.rb:82
+  # pkg:gem/net-http#lib/net/http/request.rb:83
   def initialize(path, initheader = T.unsafe(nil)); end
 end
 
@@ -3658,7 +3771,7 @@ Net::HTTPRequestURITooLarge = Net::HTTPURITooLong
 class Net::HTTPResponse
   include ::Net::HTTPHeader
 
-  # pkg:gem/net-http#lib/net/http/response.rb:195
+  # pkg:gem/net-http#lib/net/http/response.rb:215
   def initialize(httpv, code, msg); end
 
   # Returns the string response body;
@@ -3676,18 +3789,18 @@ class Net::HTTPResponse
   #   "{\n  \"userId\": 1,\n  \"id\": 1,\n  \"title\": \"delectus aut autem\",\n  \"completed\": false\n}"
   #   nil
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:401
+  # pkg:gem/net-http#lib/net/http/response.rb:421
   def body; end
 
   # Sets the body of the response to the given value.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:406
+  # pkg:gem/net-http#lib/net/http/response.rb:426
   def body=(value); end
 
   # Returns the value set by body_encoding=, or +false+ if none;
   # see #body_encoding=.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:230
+  # pkg:gem/net-http#lib/net/http/response.rb:250
   def body_encoding; end
 
   # Sets the encoding that should be used when reading the body:
@@ -3712,71 +3825,71 @@ class Net::HTTPResponse
   #     p res.body.encoding # => #<Encoding:UTF-8>
   #   end
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:254
+  # pkg:gem/net-http#lib/net/http/response.rb:274
   def body_encoding=(value); end
 
   # The HTTP result code string. For example, '302'.  You can also
   # determine the response type by examining which response subclass
   # the response object is an instance of.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:214
+  # pkg:gem/net-http#lib/net/http/response.rb:234
   def code; end
 
   # response <-> exception relationship
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:271
+  # pkg:gem/net-http#lib/net/http/response.rb:291
   def code_type; end
 
   # Set to true automatically when the request did not contain an
   # Accept-Encoding header from the user.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:226
+  # pkg:gem/net-http#lib/net/http/response.rb:246
   def decode_content; end
 
   # Set to true automatically when the request did not contain an
   # Accept-Encoding header from the user.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:226
+  # pkg:gem/net-http#lib/net/http/response.rb:246
   def decode_content=(_arg0); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:410
+  # pkg:gem/net-http#lib/net/http/response.rb:430
   def entity; end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:275
+  # pkg:gem/net-http#lib/net/http/response.rb:295
   def error!; end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:281
+  # pkg:gem/net-http#lib/net/http/response.rb:301
   def error_type; end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:303
+  # pkg:gem/net-http#lib/net/http/response.rb:323
   def header; end
 
   # The HTTP version supported by the server.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:209
+  # pkg:gem/net-http#lib/net/http/response.rb:229
   def http_version; end
 
   # Whether to ignore EOF when reading bodies with a specified Content-Length
   # header.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:261
+  # pkg:gem/net-http#lib/net/http/response.rb:281
   def ignore_eof; end
 
   # Whether to ignore EOF when reading bodies with a specified Content-Length
   # header.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:261
+  # pkg:gem/net-http#lib/net/http/response.rb:281
   def ignore_eof=(_arg0); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:263
+  # pkg:gem/net-http#lib/net/http/response.rb:283
   def inspect; end
 
   # The HTTP result message sent by the server. For example, 'Not Found'.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:217
+  # pkg:gem/net-http#lib/net/http/response.rb:237
   def message; end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:218
+  # pkg:gem/net-http#lib/net/http/response.rb:238
   def msg; end
 
   # Gets the entity body returned by the remote HTTP server.
@@ -3807,48 +3920,48 @@ class Net::HTTPResponse
   #     end
   #   }
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:356
+  # pkg:gem/net-http#lib/net/http/response.rb:376
   def read_body(dest = T.unsafe(nil), &block); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:308
+  # pkg:gem/net-http#lib/net/http/response.rb:328
   def read_header; end
 
   # body
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:317
+  # pkg:gem/net-http#lib/net/http/response.rb:337
   def reading_body(sock, reqmethodallowbody); end
 
   # header (for backward compatibility only; DO NOT USE)
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:298
+  # pkg:gem/net-http#lib/net/http/response.rb:318
   def response; end
 
   # The URI used to fetch this response.  The response URI is only available
   # if a URI was used to create the request.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:222
+  # pkg:gem/net-http#lib/net/http/response.rb:242
   def uri; end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:290
+  # pkg:gem/net-http#lib/net/http/response.rb:310
   def uri=(uri); end
 
   # Raises an HTTP error if the response is not 2xx (success).
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:286
+  # pkg:gem/net-http#lib/net/http/response.rb:306
   def value; end
 
   private
 
-  # pkg:gem/net-http#lib/net/http/response.rb:451
+  # pkg:gem/net-http#lib/net/http/response.rb:471
   def check_bom(str); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:415
+  # pkg:gem/net-http#lib/net/http/response.rb:435
   def detect_encoding(str, encoding = T.unsafe(nil)); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:541
+  # pkg:gem/net-http#lib/net/http/response.rb:561
   def extracting_encodings_from_meta_elements(value); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:506
+  # pkg:gem/net-http#lib/net/http/response.rb:526
   def get_attribute(ss); end
 
   # Checks for a supported Content-Encoding header and yields an Inflate
@@ -3859,13 +3972,13 @@ class Net::HTTPResponse
   # If a Content-Range header is present, a plain socket is yielded as the
   # bytes in the range may not be a complete deflate block.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:558
+  # pkg:gem/net-http#lib/net/http/response.rb:578
   def inflater; end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:647
+  # pkg:gem/net-http#lib/net/http/response.rb:672
   def procdest(dest, block); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:593
+  # pkg:gem/net-http#lib/net/http/response.rb:613
   def read_body_0(dest); end
 
   # read_chunked reads from +@socket+ for chunk-size, chunk-extension, CRLF,
@@ -3874,41 +3987,44 @@ class Net::HTTPResponse
   #
   # See RFC 2616 section 3.6.1 for definitions
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:623
+  # pkg:gem/net-http#lib/net/http/response.rb:648
   def read_chunked(dest, chunk_data_io); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:465
+  # pkg:gem/net-http#lib/net/http/response.rb:485
   def scanning_meta(str); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:435
+  # pkg:gem/net-http#lib/net/http/response.rb:455
   def sniff_encoding(str, encoding = T.unsafe(nil)); end
 
-  # pkg:gem/net-http#lib/net/http/response.rb:643
+  # pkg:gem/net-http#lib/net/http/response.rb:668
   def stream_check; end
 
   class << self
     # true if the response has a body.
     #
-    # pkg:gem/net-http#lib/net/http/response.rb:138
+    # pkg:gem/net-http#lib/net/http/response.rb:145
     def body_permitted?; end
 
-    # pkg:gem/net-http#lib/net/http/response.rb:142
+    # pkg:gem/net-http#lib/net/http/response.rb:149
     def exception_type; end
 
-    # pkg:gem/net-http#lib/net/http/response.rb:146
+    # pkg:gem/net-http#lib/net/http/response.rb:162
+    def read_line(sock, limit, ignore_eof = T.unsafe(nil)); end
+
+    # pkg:gem/net-http#lib/net/http/response.rb:153
     def read_new(sock); end
 
     private
 
-    # pkg:gem/net-http#lib/net/http/response.rb:171
+    # pkg:gem/net-http#lib/net/http/response.rb:184
     def each_response_header(sock); end
 
     # :stopdoc:
     #
-    # pkg:gem/net-http#lib/net/http/response.rb:158
+    # pkg:gem/net-http#lib/net/http/response.rb:171
     def read_status_line(sock); end
 
-    # pkg:gem/net-http#lib/net/http/response.rb:165
+    # pkg:gem/net-http#lib/net/http/response.rb:178
     def response_class(code); end
   end
 end
@@ -3916,22 +4032,22 @@ end
 # Inflater is a wrapper around Net::BufferedIO that transparently inflates
 # zlib and gzip streams.
 #
-# pkg:gem/net-http#lib/net/http/response.rb:661
+# pkg:gem/net-http#lib/net/http/response.rb:686
 class Net::HTTPResponse::Inflater
   # Creates a new Inflater wrapping +socket+
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:666
+  # pkg:gem/net-http#lib/net/http/response.rb:691
   def initialize(socket); end
 
   # The number of bytes inflated, used to update the Content-Length of
   # the response.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:684
+  # pkg:gem/net-http#lib/net/http/response.rb:709
   def bytes_inflated; end
 
   # Finishes the inflate stream.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:675
+  # pkg:gem/net-http#lib/net/http/response.rb:700
   def finish; end
 
   # Returns a Net::ReadAdapter that inflates each read chunk into +dest+.
@@ -3939,7 +4055,7 @@ class Net::HTTPResponse::Inflater
   # This allows a large response body to be inflated without storing the
   # entire body in memory.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:694
+  # pkg:gem/net-http#lib/net/http/response.rb:719
   def inflate_adapter(dest); end
 
   # Reads +clen+ bytes from the socket, inflates them, then writes them to
@@ -3952,14 +4068,25 @@ class Net::HTTPResponse::Inflater
   #
   # See https://bugs.ruby-lang.org/issues/6492 for further discussion.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:721
+  # pkg:gem/net-http#lib/net/http/response.rb:746
   def read(clen, dest, ignore_eof = T.unsafe(nil)); end
 
   # Reads the rest of the socket, inflates it, then writes it to +dest+.
   #
-  # pkg:gem/net-http#lib/net/http/response.rb:730
+  # pkg:gem/net-http#lib/net/http/response.rb:755
   def read_all(dest); end
 end
+
+# The maximum number of informational (1xx) responses accepted before the
+# final response.
+#
+# pkg:gem/net-http#lib/net/http/response.rb:141
+Net::HTTPResponse::MAX_INFORMATIONAL_RESPONSES = T.let(T.unsafe(nil), Integer)
+
+# The maximum total size in bytes of the response header.
+#
+# pkg:gem/net-http#lib/net/http/response.rb:137
+Net::HTTPResponse::MAX_RESPONSE_HEADER_LENGTH = T.let(T.unsafe(nil), Integer)
 
 # pkg:gem/net-http#lib/net/http/exceptions.rb:20
 class Net::HTTPRetriableError < ::Net::ProtoRetriableError
@@ -3973,7 +4100,7 @@ Net::HTTPServerError::EXCEPTION_TYPE = Net::HTTPFatalError
 # https://bugs.ruby-lang.org/issues/20900
 # https://github.com/bblimke/webmock/pull/1081
 #
-# pkg:gem/net-http#lib/net/http.rb:2593
+# pkg:gem/net-http#lib/net/http.rb:2652
 Net::HTTPSession = Net::HTTP
 
 # pkg:gem/net-http#lib/net/http/responses.rb:42

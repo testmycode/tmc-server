@@ -12,9 +12,9 @@ gem 'activerecord-session_store', '~> 2.1'
 gem 'argon2', '~> 2.3'
 gem 'bootstrap', '~> 4.6' # Held back to 4.6
 gem 'cancancan', '~> 3.6', '>= 3.6.1'
-gem 'doorkeeper', '~> 5.7', '>= 5.7.1'
-gem 'doorkeeper-openid_connect', '~> 1.8', '>= 1.8.9'
-gem 'faraday', '~> 2.14'
+gem 'doorkeeper', '~> 5.9', '>= 5.9.9'
+gem 'doorkeeper-openid_connect', '~> 2.1'
+gem 'faraday', '~> 2.15'
 gem 'file_validators', '~> 3.0' # Used to validate organization logo
 gem 'font-awesome-rails', '~> 4.7', '>= 4.7.0.8'
 gem 'gravtastic', '~> 3.2', '>= 3.2.6' # Used to display user avatars
@@ -25,10 +25,10 @@ gem 'newrelic_rpm', '~> 9.11'
 gem 'pdfkit', '~> 0.8.7.3', require: false
 gem 'pg', '~> 1.5', '>= 1.5.6'
 gem 'pghero', '~> 3.5'
-gem 'rack-attack', '~> 6.7', require: false
-gem 'rack-cors', '~> 2.0', '>= 2.0.2'
+gem 'rack-attack', '~> 6.8', require: false
+gem 'rack-cors', '~> 3.0'
 gem 'rack-timeout', '~> 0.7.0'
-gem 'rack-mini-profiler', '~> 3.3', '>= 3.3.1'
+gem 'rack-mini-profiler', '~> 5.0'
 gem 'rake', '~> 13.2', '>= 13.2.1'
 gem 'responders', '~> 3.1', '>= 3.1.1'
 gem 'rest-client', '~> 2.1', require: false
@@ -55,7 +55,7 @@ end
 group :development, :test do
   gem 'capybara', '~> 3.40'
   gem 'factory_bot_rails', '~> 6.4', '>= 6.4.3'
-  gem 'puma', '~> 6.4', '>= 6.4.2'
+  gem 'puma', '~> 8.0'
   # gem 'passenger', '~> 5.0', require: "phusion_passenger/rack_handler"
   gem 'cuprite', '~> 0.17.0'
   gem 'rspec', '~> 3.13'

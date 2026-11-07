@@ -10,4 +10,5 @@ module Doorkeeper::AccessTokenMixin
   mixes_in_class_methods ::Doorkeeper::Models::SecretStorable::ClassMethods
   mixes_in_class_methods ::Doorkeeper::Models::ResourceOwnerable::ClassMethods
   mixes_in_class_methods ::Doorkeeper::Models::ExpirationTimeSqlMath::ClassMethods
+  mixes_in_class_methods ::Doorkeeper::Models::Concerns::WriteToPrimary::ClassMethods
 end

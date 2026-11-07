@@ -17,7 +17,7 @@
 #
 # Domain name parser based on the Public Suffix List.
 #
-# Copyright (c) 2009-2024 Simone Carletti <weppos@weppos.net>
+# Copyright (c) 2009-2026 Simone Carletti <weppos@weppos.net>
 #
 # pkg:gem/public_suffix#lib/public_suffix/domain.rb:9
 module PublicSuffix

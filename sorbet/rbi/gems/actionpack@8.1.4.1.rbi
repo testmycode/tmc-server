@@ -9757,37 +9757,37 @@ end
 # pkg:gem/actionpack#lib/action_dispatch/constants.rb:8
 module ActionDispatch::Constants; end
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:12
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:23
 ActionDispatch::Constants::CONTENT_ENCODING = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:13
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:24
 ActionDispatch::Constants::CONTENT_SECURITY_POLICY = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:14
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:25
 ActionDispatch::Constants::CONTENT_SECURITY_POLICY_REPORT_ONLY = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:16
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:27
 ActionDispatch::Constants::FEATURE_POLICY = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:15
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:26
 ActionDispatch::Constants::LOCATION = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:19
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:30
 ActionDispatch::Constants::SERVER_TIMING = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:20
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:31
 ActionDispatch::Constants::STRICT_TRANSPORT_SECURITY = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:35
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:37
 ActionDispatch::Constants::UNPROCESSABLE_CONTENT = T.let(T.unsafe(nil), Symbol)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:11
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:22
 ActionDispatch::Constants::VARY = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:18
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:29
 ActionDispatch::Constants::X_CASCADE = T.let(T.unsafe(nil), String)
 
-# pkg:gem/actionpack#lib/action_dispatch/constants.rb:17
+# pkg:gem/actionpack#lib/action_dispatch/constants.rb:28
 ActionDispatch::Constants::X_REQUEST_ID = T.let(T.unsafe(nil), String)
 
 # # Action Dispatch Content Security Policy
@@ -16119,7 +16119,7 @@ class ActionDispatch::Response
   def _cache_control; end
 
   # pkg:gem/actionpack#lib/action_dispatch/http/response.rb:108
-  def _cache_control=(v); end
+  def _cache_control=(value); end
 
   # pkg:gem/actionpack#lib/action_dispatch/http/response.rb:447
   def abort; end
@@ -16390,7 +16390,7 @@ class ActionDispatch::Response
     # pkg:gem/actionpack#lib/action_dispatch/http/response.rb:191
     def merge_default_headers(original, default); end
 
-    # pkg:gem/actionpack#lib/action_dispatch/http/response.rb:56
+    # pkg:gem/actionpack#lib/action_dispatch/http/response.rb:51
     def rack_status_code(status); end
   end
 end
@@ -16498,10 +16498,10 @@ end
 # To be deprecated:
 #
 # pkg:gem/actionpack#lib/action_dispatch/http/response.rb:64
-ActionDispatch::Response::Header = Rack::Utils::HeaderHash
+ActionDispatch::Response::Header = Rack::Headers
 
-# pkg:gem/actionpack#lib/action_dispatch/http/response.rb:46
-ActionDispatch::Response::Headers = Rack::Utils::HeaderHash
+# pkg:gem/actionpack#lib/action_dispatch/http/response.rb:42
+ActionDispatch::Response::Headers = Rack::Headers
 
 # pkg:gem/actionpack#lib/action_dispatch/http/response.rb:100
 ActionDispatch::Response::NO_CONTENT_CODES = T.let(T.unsafe(nil), Array)
@@ -19812,6 +19812,7 @@ end
 
 # pkg:gem/actionpack#lib/action_dispatch/middleware/server_timing.rb:9
 class ActionDispatch::ServerTiming::Subscriber
+  include ::Singleton::SingletonInstanceMethods
   include ::Singleton
   extend ::Singleton::SingletonClassMethods
 
@@ -20779,6 +20780,7 @@ Mime::ALL = T.let(T.unsafe(nil), Mime::AllType)
 
 # pkg:gem/actionpack#lib/action_dispatch/http/mime_type.rb:349
 class Mime::AllType < ::Mime::Type
+  include ::Singleton::SingletonInstanceMethods
   include ::Singleton
   extend ::Singleton::SingletonClassMethods
 
@@ -20833,6 +20835,7 @@ end
 
 # pkg:gem/actionpack#lib/action_dispatch/http/mime_type.rb:365
 class Mime::NullType
+  include ::Singleton::SingletonInstanceMethods
   include ::Singleton
   extend ::Singleton::SingletonClassMethods
 
@@ -21054,3 +21057,6 @@ Mime::Type::MIME_REGEXP = T.let(T.unsafe(nil), Regexp)
 
 # pkg:gem/actionpack#lib/action_dispatch.rb:35
 module Rack; end
+
+# pkg:gem/actionpack#lib/action_dispatch/http/response.rb:42
+class Rack::Headers < ::Hash; end
