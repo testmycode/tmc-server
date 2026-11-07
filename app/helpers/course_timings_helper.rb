@@ -13,7 +13,7 @@ module CourseTimingsHelper
 
   sig { params(condition: String).returns(T.nilable(String)) }
   def parse_group_from_unlock_condition(condition)
-    condition.split.last if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
+    condition.split.last if /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/.match?(condition)
   end
 
   sig { params(group: ExerciseGroup).returns(T::Boolean) }
@@ -23,7 +23,7 @@ module CourseTimingsHelper
     return false if conditions.blank?
     return true if conditions.length > 1
     return false if conditions.first.empty?
-    return true unless conditions.first =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
+    return true unless /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/.match?(conditions.first)
     false
   end
 end

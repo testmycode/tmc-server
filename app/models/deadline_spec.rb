@@ -54,12 +54,12 @@ class DeadlineSpec # (the name of this class is unfortunate as it confuses IDEs 
 
   sig { returns(T.nilable(String)) }
   def static_deadline_spec
-    @specs.select { |n| !n.nil? && DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map(&:raw_spec).first
+    @specs.find { |n| !n.nil? && DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }&.raw_spec
   end
 
   sig { returns(T.nilable(String)) }
   def unlock_deadline_spec
-    @specs.select { |n| !n.nil? && !DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }.map(&:raw_spec).first
+    @specs.find { |n| !n.nil? && !DateAndTimeUtils.looks_like_date_or_time(n.raw_spec) }&.raw_spec
   end
 
   private

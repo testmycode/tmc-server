@@ -37,7 +37,7 @@ class ParticipantsController < ApplicationController
     @raw_column_params = T.let(params_starting_with('column_', valid_fields, remove_prefix: false), T.nilable(T::Hash[String, T.untyped]))
     visible_columns =
       if column_params.empty?
-        ordinary_fields + extra_fields.select(&:show_in_participant_list?).map(&:name)
+        ordinary_fields + extra_fields.filter_map { |field| field.name if field.show_in_participant_list? }
       else
         column_params.keys
       end
@@ -86,10 +86,8 @@ class ParticipantsController < ApplicationController
                   .to_a
                   .sort!
                   .group_by(&:course_id).transform_values do |course_points|
-        {
-          awarded: course_points.reject(&:awarded_after_soft_deadline?).map(&:name),
-          late: course_points.select(&:awarded_after_soft_deadline?).map(&:name)
-        }
+        late, on_time = course_points.partition(&:awarded_after_soft_deadline?)
+        { awarded: on_time.map(&:name), late: late.map(&:name) }
       end
     @awarded_points = T.let(awarded_points, T.nilable(T::Hash[T.nilable(Integer), { awarded: T::Array[String], late: T::Array[String] }]))
 
@@ -124,7 +122,7 @@ class ParticipantsController < ApplicationController
       missing_points[course_id] = missing
 
       percent_completed[course_id] = if awarded[:awarded].size + awarded[:late].size + missing.size > 0
-        100 * ((awarded[:awarded].size.to_f + awarded[:late].size.to_f * course.soft_deadline_point_multiplier) / (awarded[:awarded].size + awarded[:late].size + missing.size))
+        100 * ((awarded[:awarded].size.to_f + (awarded[:late].size.to_f * course.soft_deadline_point_multiplier)) / (awarded[:awarded].size + awarded[:late].size + missing.size))
       else
         0
       end
@@ -236,7 +234,7 @@ class ParticipantsController < ApplicationController
       visible_columns = T.must(@visible_columns)
       group_completion = @group_completion
       CSV.generate(force_quotes: true) do |csv|
-        title_row = (ordinary_fields + extra_fields.map(&:name)).select { |f| visible_columns.include?(f) }.map(&:humanize)
+        title_row = (ordinary_fields + extra_fields.map(&:name)).filter_map { |f| f.humanize if visible_columns.include?(f) }
 
         completion_cols = T.let([], T::Array[String])
         if group_completion

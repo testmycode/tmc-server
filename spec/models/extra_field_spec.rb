@@ -22,8 +22,8 @@ describe ExtraField, type: :model do
 
   before :each do
     @user = FactoryBot.create(:user)
-    UserField.instance_variable_set('@all', nil)
-    ExtraField.instance_variable_set('@fields', nil)
+    UserField.instance_variable_set(:@all, nil)
+    ExtraField.instance_variable_set(:@fields, nil)
   end
 
   it 'can load all extra fields from configuration files' do

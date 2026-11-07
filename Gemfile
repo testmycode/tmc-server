@@ -75,8 +75,14 @@ group :development, :test do
   gem 'launchy', '~> 3.1' # for capybara's save_and_open_page
   gem 'railroady', '~> 1.6' # for doc/diagrams
   gem 'rubocop', '~> 1.92', require: false
+  gem 'rubocop-capybara', '~> 3.1', require: false
+  gem 'rubocop-factory_bot', '~> 2.28', require: false
+  gem 'rubocop-performance', '~> 1.27', require: false
+  gem 'rubocop-rails', '~> 2.38', require: false
   gem 'rubocop-rails_config', '~> 1.17'
+  gem 'rubocop-rspec', '~> 3.10', require: false
   gem 'rubocop-sorbet', '~> 0.17', require: false
+  gem 'rubocop-thread_safety', '~> 0.8', require: false
   gem 'simplecov', '~> 1.3', require: false
   gem 'sorbet', '~> 0.6.13640', require: false
   gem 'spoom', '~> 1.8', require: false

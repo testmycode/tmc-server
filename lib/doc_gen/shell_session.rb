@@ -26,7 +26,7 @@ class DocGen
     sig { params(blk: T.proc.params(example: ExampleBlock).void).returns(String) }
     def example(&blk)
       example = ExampleBlock.new(self)
-      blk.call(example)
+      yield(example)
       '<div class="shell">' + example.transcript + '</div>'
     end
 

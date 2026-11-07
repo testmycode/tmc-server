@@ -61,7 +61,7 @@ module Api
             points_visible = ex.points_visible_to?(current_user)
             available_points = ex.available_points
             available_points_names = available_points.map(&:name)
-            awarded_points = all_awarded_points.select { |awp| available_points_names.include?(awp.name) }.map(&:name)
+            awarded_points = all_awarded_points.filter_map { |awp| awp.name if available_points_names.include?(awp.name) }
             {
               id: ex.id,
               available_points: points_visible ? available_points : [],

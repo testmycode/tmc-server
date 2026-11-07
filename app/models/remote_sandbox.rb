@@ -150,7 +150,7 @@ class RemoteSandbox
 
   sig { returns(Integer) }
   def self.total_capacity
-    all.map(&:capacity).reduce(0, &:+)
+    all.sum(&:capacity)
   end
 
   sig { returns(Integer) }

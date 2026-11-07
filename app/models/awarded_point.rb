@@ -47,7 +47,7 @@ class AwardedPoint < ApplicationRecord
 
   sig { params(points: T::Enumerable[AwardedPoint], related_exercises: T::Enumerable[Exercise]).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def self.as_json_with_exercise_ids(points, related_exercises)
-    exercise_ids = related_exercises.map { |e| ["#{e.course_id}-#{e.name}", e.id] }.to_h
+    exercise_ids = related_exercises.to_h { |e| ["#{e.course_id}-#{e.name}", e.id] }
     points.map do |p|
       submission = p.submission
       exercise_id = submission ? exercise_ids["#{p.course_id}-#{submission.exercise_name}"] : nil

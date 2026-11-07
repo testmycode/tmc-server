@@ -16,7 +16,7 @@ class OrganizationsController < ApplicationController
                     .accepted_organizations
                     .with_attached_logo
                     .order(ordering)
-                    .reject { |org| org.hidden? && !can?(:view_hidden_organizations, nil) || !org.visibility_allowed?(request, current_user) }
+                    .reject { |org| (org.hidden? && !can?(:view_hidden_organizations, nil)) || !org.visibility_allowed?(request, current_user) }
     @organizations = T.let(organizations, T.nilable(T::Array[Organization]))
     my_organizations = Organization.taught_organizations(current_user).with_attached_logo.select { |org| org.visibility_allowed?(request, current_user) }
     my_organizations |= Organization.assisted_organizations(current_user).with_attached_logo.select { |org| org.visibility_allowed?(request, current_user) }
@@ -142,8 +142,8 @@ class OrganizationsController < ApplicationController
       all_awarded = AwardedPoint.all_awarded(user)
       all_available = AvailablePoint.courses_points(courses).map(&:course_id)
       courses.each do |course|
-        awarded = all_awarded.select { |id| id == course.id }.length.to_f
-        available = all_available.select { |id| id == course.id }.length.to_f
+        awarded = all_awarded.count { |id| id == course.id }.to_f
+        available = all_available.count { |id| id == course.id }.to_f
         percent_completed[course.id] = 100 * (awarded / available) unless course.hide_submission_results
       end
       percent_completed

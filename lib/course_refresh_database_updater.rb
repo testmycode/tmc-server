@@ -97,7 +97,7 @@ class CourseRefreshDatabaseUpdater
         refreshed.save!
         refreshed.exercises.each(&:save!)
       rescue StandardError, ScriptError => e
-        @report.errors << e.message + "\n" + T.must(e.backtrace).join("\n")
+        @report.errors << (e.message + "\n" + T.must(e.backtrace).join("\n"))
         raise ActiveRecord::Rollback
       end
 
@@ -196,7 +196,7 @@ class CourseRefreshDatabaseUpdater
         end
 
         ex.available_points.to_a.clone.each do |point|
-          if exercise['points'].none? { |name| name == point.name }
+          if exercise['points'].none?(point.name)
             removed << point.name
             point.destroy
             ex.available_points.destroy(point)

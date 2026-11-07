@@ -128,7 +128,7 @@ class User < ApplicationRecord
 
   sig { params(field_name: String).returns(UserFieldValue) }
   def field_value_record_by_name(field_name)
-    value = user_field_values.to_a.select { |v| v.field_name == field_name }.first
+    value = user_field_values.to_a.find { |v| v.field_name == field_name }
     unless value
       value = UserFieldValue.new(field_name: field_name, user_id: id, value: '')
       user_field_values << value

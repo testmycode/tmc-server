@@ -72,9 +72,7 @@ class Setup::CourseTimingsController < Setup::SetupController
     else
       raise 'Wrong button'
     end
-  rescue UnlockSpec::InvalidSyntaxError => e
-    redirect_to setup_organization_course_course_timing_path, alert: e.to_s
-  rescue DeadlineSpec::InvalidSyntaxError => e
+  rescue UnlockSpec::InvalidSyntaxError, DeadlineSpec::InvalidSyntaxError => e
     redirect_to setup_organization_course_course_timing_path, alert: e.to_s
   end
 

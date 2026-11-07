@@ -33,7 +33,7 @@ class FixtureExercise
   def initialize(fixture_name, path, _options = {})
     @fixture_name = fixture_name
     @path = File.expand_path(path)
-    FileUtils.rm_rf @path if File.exist? @path
+    FileUtils.rm_rf @path
 
     if @path.include?(self.class.fixture_exercises_root)
       raise "Don't create #{self.class} to refer to the fixture. Give it a nonexistent path where it'll create a copy."
@@ -65,7 +65,7 @@ class FixtureExercise
 
     zip_options = []
     if options[:src_only]
-      zip_options << '--include ' + Shellwords.escape("#{name}/src/*")
+      zip_options << ('--include ' + Shellwords.escape("#{name}/src/*"))
     end
 
     Dir.chdir(File.dirname(@path)) do |_dir|
@@ -115,7 +115,7 @@ class FixtureExercise
 
     def copy_gitignore
       gitignore = File.join path, '.gitignore'
-      FileUtils.rm_rf gitignore if File.exist? gitignore
+      FileUtils.rm_rf gitignore
       FileUtils.ln("#{common_files_path}/.gitignore", gitignore)
     end
 

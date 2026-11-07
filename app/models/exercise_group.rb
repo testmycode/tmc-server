@@ -114,9 +114,9 @@ class ExerciseGroup
     # Rows granted under other conditions keep their date: fast refresh never revokes them, so moving it would open them early.
     # Explicit unlocks keep theirs too: the row already started the deadline timer, so a later date would lock it while the timer runs.
     conditions = UnlockSpec.non_date_conditions(unlock_conditions).sort
-    rows_to_move = group_exercises.select do |e|
-      !e.requires_explicit_unlock? && UnlockSpec.non_date_conditions(e.unlock_spec).sort == conditions
-    end.map(&:name)
+    rows_to_move = group_exercises.filter_map do |e|
+      e.name if !e.requires_explicit_unlock? && UnlockSpec.non_date_conditions(e.unlock_spec).sort == conditions
+    end
     group_exercises.each do |e|
       e.unlock_spec = unlock_conditions
       e.save!

@@ -302,7 +302,7 @@ class Course < ApplicationRecord
   sig { params(exercises: T.nilable(T::Enumerable[Exercise])).returns(T::Array[String]) }
   def gdocs_sheets(exercises = nil)
     exercises ||= self.exercises.select { |ex| !ex.hidden? && ex.published? }
-    exercises.map(&:gdocs_sheet).compact.uniq
+    exercises.filter_map(&:gdocs_sheet).uniq
   end
 
   sig { returns(String) }
@@ -358,7 +358,7 @@ class Course < ApplicationRecord
                         .map { |gname| ExerciseGroup.new(self, gname) }
 
       loop do
-        all_parents = result.map(&:parent_name).compact
+        all_parents = result.filter_map(&:parent_name)
         new_parents = all_parents.reject { |pn| result.any? { |eg| eg.name == pn } }.uniq
         break if new_parents.empty?
         result += new_parents.map { |pn| ExerciseGroup.new(self, pn) }
@@ -493,8 +493,7 @@ class Course < ApplicationRecord
 
     groups = exercises
              .where(disabled_status: 0)
-             .select(&:_fast_visible?)
-             .map(&:name)
+             .filter_map { |e| e.name if e._fast_visible? }
              .map { |name| name =~ /^(.+)-[^-]+$/ ? T.must(Regexp.last_match(1)) : '' }
              .uniq
 
@@ -548,7 +547,7 @@ class Course < ApplicationRecord
       res = conn.execute(sql).values.to_h
       awarded = res[false].nil? ? 0 : res[false].to_i
       late = res[true].nil? ? 0 : res[true].to_i
-      calculated_ratio = (awarded + late * self.soft_deadline_point_multiplier).to_f / available_points.length
+      calculated_ratio = (awarded + (late * self.soft_deadline_point_multiplier)).to_f / available_points.length
       result[group] = {
         awarded: awarded,
         late: late,
@@ -596,7 +595,7 @@ class Course < ApplicationRecord
 
   sig { params(url: T.nilable(String)).void }
   def external_scoreboard_url=(url)
-    if url =~ /^(https?:\/\/|$)/
+    if /^(https?:\/\/|$)/.match?(url)
       super(url)
     else
       super("http://#{url}")

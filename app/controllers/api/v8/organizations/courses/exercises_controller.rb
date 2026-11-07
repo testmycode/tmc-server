@@ -109,7 +109,7 @@ module Api
             end
             if grant_model_solution_token_every_nth_completed_exercise && grant_model_solution_token_every_nth_completed_exercise > 0
               completed_exercises_count = course.submissions.where(all_tests_passed: true, user: current_user).distinct.select(:exercise_name).count
-              total_model_solution_tokens = completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise + (course.initial_coin_stash || 0)
+              total_model_solution_tokens = (completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise) + (course.initial_coin_stash || 0)
 
               tokens_used = if course.large_exercises_consume_more_coins?
                 ModelSolutionTokenUsed.where(user: current_user, course: course).sum(:cost)

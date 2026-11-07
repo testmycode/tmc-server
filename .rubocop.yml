@@ -1,4 +1,6 @@
 plugins:
+  - rubocop-performance
+  - rubocop-rails
   - rubocop-sorbet
 
 inherit_gem:
@@ -7,7 +9,7 @@ inherit_gem:
 
 AllCops:
   SuggestExtensions: false
-  NewCops: disable
+  NewCops: enable
   TargetRubyVersion: 4.0
   TargetRailsVersion: 8.1
   Exclude:
@@ -22,6 +24,18 @@ Lint:
 
 Security:
   Enabled: true
+
+Performance:
+  Enabled: true
+
+# Decision tables of literal or constant results (Solution#visible_to?) read better unmerged.
+Lint/DuplicateBranch:
+  IgnoreLiteralBranches: true
+  IgnoreConstantBranches: true
+
+# Would rewrite the Swagger DSL's `key :'$ref'` to `key :$ref`.
+Lint/SymbolConversion:
+  Enabled: false
 
 # Style
 # Ruby 3.1+ shorthand (`{ x: }`) would rewrite ~600 hashes; not worth the churn.
@@ -64,18 +78,8 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Performance/RegexpMatch:
-  Enabled: false
-
-# Deferred to the Performance autocorrect stage.
 Style/MapToHash:
-  Enabled: false
-
-Performance/SelectMap:
-  Enabled: false
-
-Performance/MapCompact:
-  Enabled: false
+  Enabled: true
 
 Sorbet/ValidSigil:
   Enabled: true

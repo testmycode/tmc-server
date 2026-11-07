@@ -71,7 +71,7 @@ class RootHelper
     def execute_command(command)
       if command =~ /^START SERVERS? (\d+(?:\s*,\s*\d+)*)$/
         raise 'Servers already started' unless @server_pids.empty?
-        ports = Regexp.last_match(1).split(',').map(&:strip).map(&:to_i)
+        ports = Regexp.last_match(1).split(',').map { |port| port.strip.to_i }
         start_servers(ports)
         'OK'
       elsif command == 'STOP'

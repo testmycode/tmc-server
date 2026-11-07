@@ -101,7 +101,7 @@ class PointsController < ApplicationController
       user_totals = {}
       for username, per_sheet in per_user_and_sheet
         user_totals[username] ||= 0
-        user_totals[username] += per_sheet.values.reduce(0, &:+)
+        user_totals[username] += per_sheet.values.sum
       end
 
       include_admins = current_user.administrator?

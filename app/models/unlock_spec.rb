@@ -136,12 +136,12 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
         @depends_on_other_exercises = true
         @conditions << lambda do |u|
           available, awarded, late = available_and_awarded_and_awarded_late(course, group, u)
-          (awarded.count.to_f + late.count.to_f * course.soft_deadline_point_multiplier) / available.count.to_f >= percentage - 0.0001
+          (awarded.count.to_f + (late.count.to_f * course.soft_deadline_point_multiplier)) / available.count.to_f >= percentage - 0.0001
         end
         @universal_descriptions << "#{percentage_str}% from #{group}"
         @describers << lambda do |u|
           available, awarded, late = available_and_awarded_and_awarded_late(course, group, u)
-          remaining = ((percentage - 0.0001) * available.count.to_f).ceil - (awarded.count.to_f + late.count.to_f * course.soft_deadline_point_multiplier).round(2)
+          remaining = ((percentage - 0.0001) * available.count.to_f).ceil - (awarded.count.to_f + (late.count.to_f * course.soft_deadline_point_multiplier)).round(2)
           if remaining > 0
             "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
           end

@@ -5,7 +5,9 @@ require 'spec_helper'
 require 'twitter_bootstrap_breadcrumbs'
 
 describe BreadCrumbs, type: :controller do
-  controller(ApplicationController) { }
+  controller(ApplicationController) do
+    # ApplicationController already includes BreadCrumbs.
+  end
 
   def breadcrumb_urls
     controller.instance_variable_get(:@breadcrumbs).map { |crumb| crumb[:url] }

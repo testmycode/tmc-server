@@ -34,7 +34,7 @@ class CourseNotificationsController < ApplicationController
 
     failed_emails = []
     emails.each do |email|
-      raise 'Invalid e-mail' unless email =~ /\S+@\S+/
+      raise 'Invalid e-mail' unless /\S+@\S+/.match?(email)
       CourseNotificationMailer.notification_email(
         reply_to: current_user.email,
         to: email,

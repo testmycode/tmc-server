@@ -207,7 +207,7 @@ class Exercise < ApplicationRecord
   sig { params(user: User).returns(T::Boolean) }
   def visible_to?(user)
     user.administrator? || user.teacher?(T.must(course).organization) || user.assistant?(T.must(course)) ||
-      _fast_visible? && (unlocked_for?(user) || unlock_spec_obj.permits_unlock_for?(user))
+      (_fast_visible? && (unlocked_for?(user) || unlock_spec_obj.permits_unlock_for?(user)))
   end
 
   sig { returns(T::Boolean) }
@@ -234,7 +234,7 @@ class Exercise < ApplicationRecord
   sig { params(user: User).returns(T::Boolean) }
   def downloadable_by?(user)
     user.administrator? || user.teacher?(T.must(course).organization) || user.assistant?(T.must(course)) ||
-      visible_to?(user) && unlocked_for?(user)
+      (visible_to?(user) && unlocked_for?(user))
   end
 
   # Whether the exercise has been published (it may still be hidden)
@@ -305,7 +305,7 @@ class Exercise < ApplicationRecord
   sig { returns(T::Array[String]) }
   def available_review_points
     # use 'select' instead of 'where' to use cached value of available_points
-    available_points.to_a.select(&:requires_review).map(&:name)
+    available_points.to_a.filter_map { |point| point.name if point.requires_review }
   end
 
   sig { params(user: User).returns(T::Array[String]) }
