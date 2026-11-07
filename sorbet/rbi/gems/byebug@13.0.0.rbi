@@ -159,6 +159,7 @@ module Byebug
     # pkg:gem/byebug#lib/byebug/remote.rb:20
     def actual_port; end
 
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def add_catchpoint(_arg0); end
 
     # Starts byebug, and stops at the first line of user's code.
@@ -166,10 +167,19 @@ module Byebug
     # pkg:gem/byebug#lib/byebug/attacher.rb:10
     def attach; end
 
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def breakpoints; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def catchpoints; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def contexts; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def current_context; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def debug_load(*_arg0); end
 
     # Saves information about the unhandled exception and gives a byebug
@@ -186,18 +196,25 @@ module Byebug
     # pkg:gem/byebug#lib/byebug/core.rb:61
     def load_settings; end
 
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def lock; end
 
     # pkg:gem/byebug#lib/byebug/remote.rb:59
     def parse_host_and_port(host_port_spec); end
 
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def post_mortem=(_arg0); end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def post_mortem?; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def raised_exception; end
 
     # pkg:gem/byebug#lib/byebug/attacher.rb:21
     def spawn(host = T.unsafe(nil), port = T.unsafe(nil)); end
 
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def start; end
 
     # Connects to the remote byebug
@@ -215,14 +232,31 @@ module Byebug
     # pkg:gem/byebug#lib/byebug/remote.rb:39
     def start_server(host = T.unsafe(nil), port = T.unsafe(nil)); end
 
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def started?; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def stop; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def stoppable?; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def thread_context(_arg0); end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def tracing=(_arg0); end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def tracing?; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def unlock; end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def verbose=(_arg0); end
+
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def verbose?; end
 
     # If in remote mode, wait for the remote connection
@@ -338,24 +372,24 @@ class Byebug::BreakCommand < ::Byebug::Command
   include ::Byebug::Helpers::FileHelper
   include ::Byebug::Helpers::ParseHelper
 
-  # pkg:gem/byebug#lib/byebug/commands/break.rb:40
+  # pkg:gem/byebug#lib/byebug/commands/break.rb:42
   def execute; end
 
   private
 
-  # pkg:gem/byebug#lib/byebug/commands/break.rb:83
+  # pkg:gem/byebug#lib/byebug/commands/break.rb:85
   def add_line_breakpoint(file, line); end
 
-  # pkg:gem/byebug#lib/byebug/commands/break.rb:54
+  # pkg:gem/byebug#lib/byebug/commands/break.rb:56
   def line_breakpoint(location); end
 
-  # pkg:gem/byebug#lib/byebug/commands/break.rb:65
+  # pkg:gem/byebug#lib/byebug/commands/break.rb:67
   def method_breakpoint(location); end
 
-  # pkg:gem/byebug#lib/byebug/commands/break.rb:74
+  # pkg:gem/byebug#lib/byebug/commands/break.rb:76
   def target_object(str); end
 
-  # pkg:gem/byebug#lib/byebug/commands/break.rb:104
+  # pkg:gem/byebug#lib/byebug/commands/break.rb:106
   def valid_breakpoints_for(path, line); end
 
   class << self
@@ -365,14 +399,14 @@ class Byebug::BreakCommand < ::Byebug::Command
     # pkg:gem/byebug#lib/byebug/commands/break.rb:20
     def regexp; end
 
-    # pkg:gem/byebug#lib/byebug/commands/break.rb:36
+    # pkg:gem/byebug#lib/byebug/commands/break.rb:38
     def short_description; end
   end
 end
 
 # Implements breakpoints
 #
-# pkg:gem/byebug#lib/byebug/breakpoint.rb:7
+# pkg:gem/byebug#lib/byebug/core.rb:4
 class Byebug::Breakpoint
   # pkg:gem/byebug#lib/byebug/core.rb:4
   def initialize(_arg0, _arg1, _arg2); end
@@ -409,7 +443,7 @@ class Byebug::Breakpoint
 
   # Prints all information associated to the breakpoint
   #
-  # pkg:gem/byebug#lib/byebug/breakpoint.rb:105
+  # pkg:gem/byebug#lib/byebug/breakpoint.rb:88
   def inspect; end
 
   # pkg:gem/byebug#lib/byebug/core.rb:4
@@ -440,13 +474,13 @@ class Byebug::Breakpoint
 
     # True if there's no breakpoints
     #
-    # pkg:gem/byebug#lib/byebug/breakpoint.rb:98
+    # pkg:gem/byebug#lib/byebug/breakpoint.rb:81
     def none?; end
 
     # Returns true if a breakpoint could be set in line number +lineno+ in file
     # name +filename.
     #
-    # pkg:gem/byebug#lib/byebug/breakpoint.rb:91
+    # pkg:gem/byebug#lib/byebug/breakpoint.rb:74
     def potential_line?(filename, lineno); end
 
     # Returns an array of line numbers in file named +filename+ where
@@ -468,11 +502,8 @@ class Byebug::Breakpoint
 
     private
 
-    # pkg:gem/byebug#lib/byebug/breakpoint.rb:63
+    # pkg:gem/byebug#lib/byebug/breakpoint.rb:59
     def potential_lines_with_trace_points(iseq, lines); end
-
-    # pkg:gem/byebug#lib/byebug/breakpoint.rb:74
-    def potential_lines_without_trace_points(iseq, lines); end
   end
 end
 
@@ -564,40 +595,40 @@ class Byebug::Command
   def arguments; end
 
   # pkg:gem/byebug#lib/byebug/command.rb:61
-  def confirm(*args, **, &block); end
+  def confirm(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:43
   def context; end
 
   # pkg:gem/byebug#lib/byebug/command.rb:61
-  def errmsg(*args, **, &block); end
+  def errmsg(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:47
   def frame; end
 
   # pkg:gem/byebug#lib/byebug/command.rb:55
-  def help(*args, **, &block); end
+  def help(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:55
-  def match(*args, **, &block); end
+  def match(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:57
-  def pr(*args, **, &block); end
+  def pr(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:58
-  def prc(*args, **, &block); end
+  def prc(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:61
-  def print(*args, **, &block); end
+  def print(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:36
   def processor; end
 
   # pkg:gem/byebug#lib/byebug/command.rb:59
-  def prv(*args, **, &block); end
+  def prv(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/command.rb:61
-  def puts(*args, **, &block); end
+  def puts(*, **, &); end
 
   class << self
     # Special methods to allow command filtering in processors
@@ -728,28 +759,28 @@ class Byebug::CommandProcessor
   def command_list; end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:45
-  def commands(*args, **, &block); end
+  def commands(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:43
-  def confirm(*args, **, &block); end
+  def confirm(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:21
   def context; end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:43
-  def errmsg(*args, **, &block); end
+  def errmsg(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:37
-  def frame(*args, **, &block); end
+  def frame(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:21
   def interface; end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:39
-  def pr(*args, **, &block); end
+  def pr(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:40
-  def prc(*args, **, &block); end
+  def prc(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:20
   def prev_line; end
@@ -771,10 +802,10 @@ class Byebug::CommandProcessor
   def process_commands; end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:41
-  def prv(*args, **, &block); end
+  def prv(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/processors/command_processor.rb:43
-  def puts(*args, **, &block); end
+  def puts(*, **, &); end
 
   protected
 
@@ -839,11 +870,11 @@ class Byebug::ConditionCommand < ::Byebug::Command
   end
 end
 
-# Mantains context information for the debugger and it's the main
+# Maintains context information for the debugger and it's the main
 # communication point between the library and the C-extension through the
 # at_breakpoint, at_catchpoint, at_tracing, at_line and at_return callbacks
 #
-# pkg:gem/byebug#lib/byebug/context.rb:14
+# pkg:gem/byebug#lib/byebug/core.rb:4
 class Byebug::Context
   include ::Byebug::Helpers::FileHelper
   extend ::Byebug::Helpers::PathHelper
@@ -886,7 +917,7 @@ class Byebug::Context
   def dead?; end
 
   # pkg:gem/byebug#lib/byebug/context.rb:58
-  def file(*args, **, &block); end
+  def file(*, **, &); end
 
   # Reader for the current frame
   #
@@ -928,7 +959,7 @@ class Byebug::Context
   def interrupt; end
 
   # pkg:gem/byebug#lib/byebug/context.rb:58
-  def line(*args, **, &block); end
+  def line(*, **, &); end
 
   # Current file & line information
   #
@@ -1084,8 +1115,10 @@ class Byebug::DebugCommand < ::Byebug::Command
   end
 end
 
+# pkg:gem/byebug#lib/byebug/core.rb:4
 class Byebug::DebugThread < ::Thread
   class << self
+    # pkg:gem/byebug#lib/byebug/core.rb:4
     def inherited; end
   end
 end
@@ -1594,7 +1627,7 @@ module Byebug::Helpers::EvalHelper
   def separate_thread_eval(expression); end
 
   # Evaluates a string containing Ruby code in a specific binding,
-  # returning nil in an error happens.
+  # returning nil if an error happens.
   #
   # pkg:gem/byebug#lib/byebug/helpers/eval.rb:38
   def silent_eval(str, binding = T.unsafe(nil)); end
@@ -1614,7 +1647,7 @@ module Byebug::Helpers::EvalHelper
   # will get blocked by byebug's main thread.
   #
   # pkg:gem/byebug#lib/byebug/helpers/eval.rb:91
-  def allowing_other_threads; end
+  def allowing_other_threads(&block); end
 
   # pkg:gem/byebug#lib/byebug/helpers/eval.rb:72
   def error_msg(exception); end
@@ -1622,7 +1655,7 @@ module Byebug::Helpers::EvalHelper
   # Runs the given block in a new thread, waits for it to finish and
   # returns the new thread's result.
   #
-  # pkg:gem/byebug#lib/byebug/helpers/eval.rb:105
+  # pkg:gem/byebug#lib/byebug/helpers/eval.rb:103
   def in_new_thread; end
 
   # pkg:gem/byebug#lib/byebug/helpers/eval.rb:66
@@ -1631,10 +1664,10 @@ module Byebug::Helpers::EvalHelper
   # pkg:gem/byebug#lib/byebug/helpers/eval.rb:60
   def safe_eval(str, binding); end
 
-  # pkg:gem/byebug#lib/byebug/helpers/eval.rb:113
+  # pkg:gem/byebug#lib/byebug/helpers/eval.rb:111
   def safe_inspect(var); end
 
-  # pkg:gem/byebug#lib/byebug/helpers/eval.rb:119
+  # pkg:gem/byebug#lib/byebug/helpers/eval.rb:117
   def safe_to_s(var); end
 
   # pkg:gem/byebug#lib/byebug/helpers/eval.rb:80
@@ -1719,7 +1752,7 @@ end
 
 # Utilities to assist command parsing
 #
-# pkg:gem/byebug#lib/byebug/helpers/parse.rb:8
+# pkg:gem/byebug#lib/byebug/helpers/parse.rb:10
 module Byebug::Helpers::ParseHelper
   # Parses +str+ of command +cmd+ as an integer between +min+ and +max+.
   #
@@ -1728,24 +1761,24 @@ module Byebug::Helpers::ParseHelper
   # @todo Remove the `cmd` parameter. It has nothing to do with the method's
   # purpose.
   #
-  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:17
+  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:19
   def get_int(str, cmd, min = T.unsafe(nil), max = T.unsafe(nil)); end
 
   # @return +str+ as an integer or 1 if +str+ is empty.
   #
-  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:51
+  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:58
   def parse_steps(str, cmd); end
 
   # @return true if code is syntactically correct for Ruby, false otherwise
   #
-  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:35
+  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:37
   def syntax_valid?(code); end
 
   private
 
   # Temporarily disable output to $stderr
   #
-  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:65
+  # pkg:gem/byebug#lib/byebug/helpers/parse.rb:72
   def without_stderr; end
 end
 
@@ -1777,7 +1810,7 @@ module Byebug::Helpers::PathHelper
   def glob_for(dir); end
 end
 
-# Reflection utilitie
+# Reflection utility
 #
 # pkg:gem/byebug#lib/byebug/helpers/reflection.rb:8
 module Byebug::Helpers::ReflectionHelper
@@ -1866,19 +1899,19 @@ end
 module Byebug::Helpers::VarHelper
   include ::Byebug::Helpers::EvalHelper
 
-  # pkg:gem/byebug#lib/byebug/helpers/var.rb:42
+  # pkg:gem/byebug#lib/byebug/helpers/var.rb:58
   def var_args; end
 
-  # pkg:gem/byebug#lib/byebug/helpers/var.rb:21
+  # pkg:gem/byebug#lib/byebug/helpers/var.rb:37
   def var_global; end
 
-  # pkg:gem/byebug#lib/byebug/helpers/var.rb:29
+  # pkg:gem/byebug#lib/byebug/helpers/var.rb:45
   def var_instance(str); end
 
   # pkg:gem/byebug#lib/byebug/helpers/var.rb:13
   def var_list(ary, binding = T.unsafe(nil)); end
 
-  # pkg:gem/byebug#lib/byebug/helpers/var.rb:35
+  # pkg:gem/byebug#lib/byebug/helpers/var.rb:51
   def var_local; end
 end
 
@@ -1898,76 +1931,73 @@ Byebug::HistfileSetting::DEFAULT = T.let(T.unsafe(nil), String)
 
 # Handles byebug's history of commands.
 #
-# pkg:gem/byebug#lib/byebug/history.rb:19
+# pkg:gem/byebug#lib/byebug/history.rb:9
 class Byebug::History
-  # pkg:gem/byebug#lib/byebug/history.rb:22
+  # pkg:gem/byebug#lib/byebug/history.rb:12
   def initialize; end
 
   # Array holding the list of commands in history
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:29
+  # pkg:gem/byebug#lib/byebug/history.rb:19
   def buffer; end
 
   # Discards history.
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:58
+  # pkg:gem/byebug#lib/byebug/history.rb:48
   def clear; end
 
   # Max number of commands to be displayed when no size has been specified.
   #
   # Never more than Setting[:histsize].
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:105
+  # pkg:gem/byebug#lib/byebug/history.rb:95
   def default_max_size; end
 
   # Whether a specific command should not be stored in history.
   #
   # For now, empty lines and consecutive duplicates.
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:123
+  # pkg:gem/byebug#lib/byebug/history.rb:113
   def ignore?(buf); end
 
   # Array of ids of the last +number+ commands.
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:96
+  # pkg:gem/byebug#lib/byebug/history.rb:86
   def last_ids(number); end
 
-  # Removes a command from Readline's history.
-  #
-  # pkg:gem/byebug#lib/byebug/history.rb:75
-  def pop; end
-
-  # Adds a new command to Readline's history.
+  # Removes a command from Reline's history.
   #
   # pkg:gem/byebug#lib/byebug/history.rb:65
+  def pop; end
+
+  # Adds a new command to Reline's history.
+  #
+  # pkg:gem/byebug#lib/byebug/history.rb:55
   def push(cmd); end
 
   # Restores history from disk.
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:36
+  # pkg:gem/byebug#lib/byebug/history.rb:26
   def restore; end
 
   # Saves history to disk.
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:45
+  # pkg:gem/byebug#lib/byebug/history.rb:35
   def save; end
 
-  # pkg:gem/byebug#lib/byebug/history.rb:20
+  # pkg:gem/byebug#lib/byebug/history.rb:10
   def size; end
-
-  # pkg:gem/byebug#lib/byebug/history.rb:20
-  def size=(_arg0); end
 
   # Max number of commands to be displayed when a size has been specified.
   #
   # The only bound here is not showing more items than available.
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:114
+  # pkg:gem/byebug#lib/byebug/history.rb:104
   def specific_max_size(number); end
 
   # Prints the requested numbers of history entries.
   #
-  # pkg:gem/byebug#lib/byebug/history.rb:83
+  # pkg:gem/byebug#lib/byebug/history.rb:73
   def to_s(n_cmds); end
 end
 
@@ -2287,24 +2317,24 @@ end
 
 # Enter IRB from byebug's prompt
 #
-# pkg:gem/byebug#lib/byebug/commands/irb.rb:11
+# pkg:gem/byebug#lib/byebug/commands/irb.rb:10
 class Byebug::IrbCommand < ::Byebug::Command
-  # pkg:gem/byebug#lib/byebug/commands/irb.rb:30
+  # pkg:gem/byebug#lib/byebug/commands/irb.rb:29
   def execute; end
 
   private
 
-  # pkg:gem/byebug#lib/byebug/commands/irb.rb:40
+  # pkg:gem/byebug#lib/byebug/commands/irb.rb:41
   def with_clean_argv; end
 
   class << self
-    # pkg:gem/byebug#lib/byebug/commands/irb.rb:18
+    # pkg:gem/byebug#lib/byebug/commands/irb.rb:17
     def description; end
 
-    # pkg:gem/byebug#lib/byebug/commands/irb.rb:14
+    # pkg:gem/byebug#lib/byebug/commands/irb.rb:13
     def regexp; end
 
-    # pkg:gem/byebug#lib/byebug/commands/irb.rb:26
+    # pkg:gem/byebug#lib/byebug/commands/irb.rb:25
     def short_description; end
   end
 end
@@ -2350,16 +2380,16 @@ class Byebug::ListCommand < ::Byebug::Command
   include ::Byebug::Helpers::ParseHelper
 
   # pkg:gem/byebug#lib/byebug/commands/list.rb:150
-  def amend_final(*args, **, &block); end
+  def amend_final(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/commands/list.rb:40
   def execute; end
 
   # pkg:gem/byebug#lib/byebug/commands/list.rb:150
-  def max_line(*args, **, &block); end
+  def max_line(*, **, &); end
 
   # pkg:gem/byebug#lib/byebug/commands/list.rb:150
-  def size(*args, **, &block); end
+  def size(*, **, &); end
 
   private
 
@@ -2455,7 +2485,7 @@ class Byebug::LocalInterface < ::Byebug::Interface
   # pkg:gem/byebug#lib/byebug/interfaces/local_interface.rb:10
   def initialize; end
 
-  # Reads a single line of input using Readline. If Ctrl-D is pressed, it
+  # Reads a single line of input using Reline. If Ctrl-D is pressed, it
   # returns "continue", meaning that program's execution will go on.
   #
   # @param prompt Prompt to be displayed.
@@ -2472,14 +2502,14 @@ class Byebug::LocalInterface < ::Byebug::Interface
   # pkg:gem/byebug#lib/byebug/interfaces/local_interface.rb:34
   def with_repl_like_sigint; end
 
-  # Disable any Readline completion procs.
+  # Disable any Reline completion procs.
   #
   # Other gems, for example, IRB could've installed completion procs that are
   # dependent on them being loaded. Disable those while byebug is the REPL
-  # making use of Readline.
+  # making use of Reline.
   #
   # pkg:gem/byebug#lib/byebug/interfaces/local_interface.rb:51
-  def without_readline_completion; end
+  def without_reline_completion; end
 end
 
 # pkg:gem/byebug#lib/byebug/interfaces/local_interface.rb:8
@@ -2799,7 +2829,7 @@ class Byebug::SaveCommand < ::Byebug::Command
   end
 end
 
-# Setting to customize the file where byebug's history is saved.
+# Setting to customize the file where byebug's settings are saved.
 #
 # pkg:gem/byebug#lib/byebug/settings/savefile.rb:9
 class Byebug::SavefileSetting < ::Byebug::Setting
@@ -3091,7 +3121,7 @@ end
 
 # Implements the step functionality.
 #
-# Allows the user the continue execution until the next instruction, possibily
+# Allows the user the continue execution until the next instruction, possibly
 # in a different frame. Use step to step into method calls or blocks.
 #
 # pkg:gem/byebug#lib/byebug/commands/step.rb:13
@@ -3127,7 +3157,7 @@ module Byebug::Subcommands
   def execute; end
 
   # pkg:gem/byebug#lib/byebug/subcommands.rb:18
-  def subcommand_list(*args, **, &block); end
+  def subcommand_list(*, **, &); end
 
   class << self
     # pkg:gem/byebug#lib/byebug/subcommands.rb:13
@@ -3292,9 +3322,10 @@ class Byebug::ThreadCommand::SwitchCommand < ::Byebug::Command
   end
 end
 
+# pkg:gem/byebug#lib/byebug/core.rb:4
 class Byebug::ThreadsTable; end
 
-# Show (and possibily stop) at every line that changes a global variable.
+# Show (and possibly stop) at every line that changes a global variable.
 #
 # pkg:gem/byebug#lib/byebug/commands/tracevar.rb:9
 class Byebug::TracevarCommand < ::Byebug::Command
@@ -3560,12 +3591,12 @@ end
 class Byebug::WhereCommand < ::Byebug::Command
   include ::Byebug::Helpers::FrameHelper
 
-  # pkg:gem/byebug#lib/byebug/commands/where.rb:39
+  # pkg:gem/byebug#lib/byebug/commands/where.rb:43
   def execute; end
 
   private
 
-  # pkg:gem/byebug#lib/byebug/commands/where.rb:45
+  # pkg:gem/byebug#lib/byebug/commands/where.rb:49
   def print_backtrace; end
 
   class << self
@@ -3575,7 +3606,7 @@ class Byebug::WhereCommand < ::Byebug::Command
     # pkg:gem/byebug#lib/byebug/commands/where.rb:16
     def regexp; end
 
-    # pkg:gem/byebug#lib/byebug/commands/where.rb:35
+    # pkg:gem/byebug#lib/byebug/commands/where.rb:39
     def short_description; end
   end
 end

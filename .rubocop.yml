@@ -8,7 +8,7 @@ inherit_gem:
 AllCops:
   SuggestExtensions: false
   NewCops: disable
-  TargetRubyVersion: 3.3
+  TargetRubyVersion: 3.4 # The highest RuboCop 1.65 accepts; raise to 4.0 with the RuboCop bump
   TargetRailsVersion: 8.1
   Exclude:
     - 'ext/**/*'

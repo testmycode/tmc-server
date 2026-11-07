@@ -8,29 +8,6 @@
 # pkg:gem/pry-byebug#lib/byebug/processors/pry_processor.rb:5
 module Byebug
   extend ::Byebug::Helpers::ReflectionHelper
-
-  class << self
-    def add_catchpoint(_arg0); end
-    def breakpoints; end
-    def catchpoints; end
-    def contexts; end
-    def current_context; end
-    def debug_load(*_arg0); end
-    def lock; end
-    def post_mortem=(_arg0); end
-    def post_mortem?; end
-    def raised_exception; end
-    def start; end
-    def started?; end
-    def stop; end
-    def stoppable?; end
-    def thread_context(_arg0); end
-    def tracing=(_arg0); end
-    def tracing?; end
-    def unlock; end
-    def verbose=(_arg0); end
-    def verbose?; end
-  end
 end
 
 # Extends raw byebug's processor.
@@ -55,10 +32,10 @@ class Byebug::PryProcessor < ::Byebug::CommandProcessor
   def at_return(_return_value); end
 
   # pkg:gem/pry-byebug#lib/byebug/processors/pry_processor.rb:14
-  def bold(*args, **, &block); end
+  def bold(*, **, &); end
 
   # pkg:gem/pry-byebug#lib/byebug/processors/pry_processor.rb:13
-  def output(*args, **, &block); end
+  def output(*, **, &); end
 
   # Set up a number of navigational commands to be performed by Byebug.
   #

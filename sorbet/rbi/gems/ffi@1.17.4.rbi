@@ -367,7 +367,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# pkg:gem/ffi#lib/ffi/compat.rb:32
+# pkg:gem/ffi#lib/ffi.rb:3
 module FFI
   private
 
@@ -375,6 +375,9 @@ module FFI
   def custom_typedefs; end
 
   class << self
+    # pkg:gem/ffi#lib/ffi.rb:3
+    def _async_cb_dispatcher_atfork_child; end
+
     # (see FFI.typedef)
     #
     # pkg:gem/ffi#lib/ffi/types.rb:62
@@ -422,6 +425,11 @@ module FFI
     # pkg:gem/ffi#lib/ffi/library.rb:46
     def map_library_name(lib); end
 
+    # This is for FFI internal use only.
+    #
+    # pkg:gem/ffi#lib/ffi/compat.rb:46
+    def shareable_proc(**kwargs, &block); end
+
     # @param type +type+ is an instance of class accepted by {FFI.find_type}
     # @return [Integer]
     # Get +type+ size, in bytes.
@@ -446,11 +454,13 @@ module FFI
 
     # Truffleruby and JRuby don't support Ractor so far.
     # So they don't need separation between builtin and custom types.
+    #
+    # pkg:gem/ffi#lib/ffi.rb:3
     def custom_typedefs; end
   end
 end
 
-# pkg:gem/ffi#lib/ffi/abstract_memory.rb:33
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::AbstractMemory
   # pkg:gem/ffi#lib/ffi.rb:3
   def [](_arg0); end
@@ -1042,6 +1052,7 @@ end
 # pkg:gem/ffi#lib/ffi/abstract_memory.rb:34
 FFI::AbstractMemory::LONG_MAX = T.let(T.unsafe(nil), Integer)
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::ArrayType < ::FFI::Type
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(_arg0, _arg1); end
@@ -1099,19 +1110,25 @@ class FFI::AutoPointer < ::FFI::Pointer
   # @return [Boolean] +autorelease+
   # Set +autorelease+ property. See {Pointer Autorelease section at Pointer}.
   #
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:101
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:107
   def autorelease=(autorelease); end
 
   # @return [Boolean] +autorelease+
   # Get +autorelease+ property. See {Pointer Autorelease section at Pointer}.
   #
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:108
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:114
   def autorelease?; end
+
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:96
+  def clone; end
+
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:92
+  def dup; end
 
   # @return [nil]
   # Free the pointer.
   #
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:94
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:100
   def free; end
 
   class << self
@@ -1123,7 +1140,7 @@ class FFI::AutoPointer < ::FFI::Pointer
     #   @param ctx not used. Please set +nil+.
     # @return [AutoPointer]
     #
-    # pkg:gem/ffi#lib/ffi/autopointer.rb:175
+    # pkg:gem/ffi#lib/ffi/autopointer.rb:181
     def from_native(val, ctx); end
 
     # Return native type of AutoPointer.
@@ -1132,7 +1149,7 @@ class FFI::AutoPointer < ::FFI::Pointer
     # @return [Type::POINTER]
     # @raise {RuntimeError} if class does not implement a +#release+ method
     #
-    # pkg:gem/ffi#lib/ffi/autopointer.rb:161
+    # pkg:gem/ffi#lib/ffi/autopointer.rb:167
     def native_type; end
   end
 end
@@ -1142,32 +1159,32 @@ end
 #  All subclasses of Releaser should define a +#release(ptr)+ method.
 # A releaser is an object in charge of release an {AutoPointer}.
 #
-# pkg:gem/ffi#lib/ffi/autopointer.rb:116
+# pkg:gem/ffi#lib/ffi/autopointer.rb:122
 class FFI::AutoPointer::Releaser
   # @param [Pointer] ptr
   # @param [#call] proc
   # @return [nil]
   # A new instance of Releaser.
   #
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:123
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:129
   def initialize(ptr, proc); end
 
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:117
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:123
   def autorelease; end
 
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:117
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:123
   def autorelease=(_arg0); end
 
   # @param args
   # Release pointer if +autorelease+ is set.
   #
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:142
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:148
   def call(*args); end
 
   # @return [nil]
   # Free pointer.
   #
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:131
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:137
   def free; end
 
   # Release +ptr+ by using Proc or Method defined at +ptr+
@@ -1176,7 +1193,7 @@ class FFI::AutoPointer::Releaser
   # @param [Pointer] ptr
   # @return [nil]
   #
-  # pkg:gem/ffi#lib/ffi/autopointer.rb:151
+  # pkg:gem/ffi#lib/ffi/autopointer.rb:157
   def release(ptr); end
 end
 
@@ -1249,6 +1266,7 @@ class FFI::Bitmask < ::FFI::Enum
   def to_native(query, ctx); end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Buffer < ::FFI::AbstractMemory
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(*_arg0); end
@@ -1274,11 +1292,22 @@ class FFI::Buffer < ::FFI::AbstractMemory
   def initialize_copy(_arg0); end
 
   class << self
+    # pkg:gem/ffi#lib/ffi.rb:3
     def alloc_in(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def alloc_inout(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def alloc_out(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def new_in(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def new_inout(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def new_out(*_arg0); end
   end
 end
@@ -1318,7 +1347,7 @@ module FFI::DataConverter
   def to_native(value, ctx); end
 end
 
-# pkg:gem/ffi#lib/ffi/dynamic_library.rb:32
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::DynamicLibrary
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(_arg0, _arg1); end
@@ -1339,7 +1368,10 @@ class FFI::DynamicLibrary
   def name; end
 
   class << self
+    # pkg:gem/ffi#lib/ffi.rb:3
     def last_error; end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def open(_arg0, _arg1); end
 
     private
@@ -1371,6 +1403,7 @@ FFI::DynamicLibrary::SEARCH_PATH = T.let(T.unsafe(nil), Array)
 # pkg:gem/ffi#lib/ffi/dynamic_library.rb:67
 FFI::DynamicLibrary::SEARCH_PATH_MESSAGE = T.let(T.unsafe(nil), String)
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::DynamicLibrary::Symbol < ::FFI::Pointer
   # pkg:gem/ffi#lib/ffi.rb:3
   def inspect; end
@@ -1489,13 +1522,15 @@ class FFI::Enums
   def find(query); end
 end
 
-# pkg:gem/ffi#lib/ffi/function.rb:32
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Function < ::FFI::Pointer
   include ::FFI::Function::RegisterAttach
 
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(*_arg0); end
 
+  # Use a workaround for https://github.com/libffi/libffi/issues/905
+  #
   # pkg:gem/ffi#lib/ffi.rb:3
   def attach(mod, name); end
 
@@ -1544,14 +1579,15 @@ end
 # Stash the Function in a module variable so it can be inspected by attached_functions.
 # On CRuby it also ensures that it does not get garbage collected.
 #
-# pkg:gem/ffi#lib/ffi/function.rb:56
+# pkg:gem/ffi#lib/ffi/function.rb:79
 module FFI::Function::RegisterAttach
-  # pkg:gem/ffi#lib/ffi/function.rb:57
+  # pkg:gem/ffi#lib/ffi/function.rb:80
   def attach(mod, name); end
 end
 
 FFI::FunctionInfo = FFI::FunctionType
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::FunctionType < ::FFI::Type
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(*_arg0); end
@@ -1591,6 +1627,7 @@ module FFI::IO
   end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 module FFI::LastError
   private
 
@@ -1601,9 +1638,37 @@ module FFI::LastError
   def error=(_arg0); end
 
   class << self
+    # pkg:gem/ffi#lib/ffi.rb:3
     def error; end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def error=(_arg0); end
   end
+end
+
+# pkg:gem/ffi#lib/ffi/ffi.rb:63
+module FFI::LegacyForkTracking; end
+
+# pkg:gem/ffi#lib/ffi/ffi.rb:84
+module FFI::LegacyForkTracking::IOExt
+  # pkg:gem/ffi#lib/ffi/ffi.rb:85
+  def popen(*args); end
+end
+
+# pkg:gem/ffi#lib/ffi/ffi.rb:64
+module FFI::LegacyForkTracking::KernelExt
+  # pkg:gem/ffi#lib/ffi/ffi.rb:65
+  def fork; end
+end
+
+# pkg:gem/ffi#lib/ffi/ffi.rb:79
+module FFI::LegacyForkTracking::KernelExtPrivate
+  include ::FFI::LegacyForkTracking::KernelExt
+
+  private
+
+  # pkg:gem/ffi#lib/ffi/ffi.rb:81
+  def fork; end
 end
 
 # This module is the base to use native functions.
@@ -1863,7 +1928,7 @@ module FFI::Library
   # Freeze all definitions of the module
   #
   # This freezes the module's definitions, so that it can be used in a Ractor.
-  # No further methods or variables can be attached and no further enums or typedefs can be created in this module afterwards.
+  # No further functions or variables can be attached and no further enums or typedefs can be created in this module afterwards.
   #
   # pkg:gem/ffi#lib/ffi/library.rb:568
   def freeze; end
@@ -2033,17 +2098,28 @@ class FFI::ManagedStruct < ::FFI::Struct
   def initialize(pointer = T.unsafe(nil)); end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::MemoryPointer < ::FFI::Pointer
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(*_arg0); end
 
   class << self
+    # pkg:gem/ffi#lib/ffi.rb:3
     def from_string(_arg0); end
   end
 end
 
+# pkg:gem/ffi#lib/ffi/ffi.rb:53
+module FFI::ModernForkTracking
+  # pkg:gem/ffi#lib/ffi/ffi.rb:54
+  def _fork; end
+end
+
 FFI::NativeLibrary = FFI::DynamicLibrary
+
+# pkg:gem/ffi#lib/ffi.rb:3
 module FFI::NativeType; end
+
 FFI::NativeType::BOOL = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::NativeType::BUFFER_IN = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::NativeType::BUFFER_INOUT = T.let(T.unsafe(nil), FFI::Type::Builtin)
@@ -2074,12 +2150,13 @@ class FFI::NotFoundError < ::LoadError
   def initialize(function, *libraries); end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::NullPointerError < ::RuntimeError; end
 
 # This module defines different constants and class methods to play with
 # various platforms.
 #
-# pkg:gem/ffi#lib/ffi/platform.rb:39
+# pkg:gem/ffi#lib/ffi.rb:3
 module FFI::Platform
   class << self
     # Test if current OS is a *BSD (include MAC)
@@ -2209,7 +2286,7 @@ FFI::Platform::OSVERSION = T.let(T.unsafe(nil), Integer)
 # pkg:gem/ffi#lib/ffi/platform.rb:35
 class FFI::PlatformError < ::LoadError; end
 
-# pkg:gem/ffi#lib/ffi/pointer.rb:42
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Pointer < ::FFI::AbstractMemory
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(*_arg0); end
@@ -2392,7 +2469,7 @@ class FFI::StrPtrConverter
   end
 end
 
-# pkg:gem/ffi#lib/ffi/struct.rb:41
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Struct
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(*_arg0); end
@@ -2479,8 +2556,13 @@ class FFI::Struct
     # pkg:gem/ffi#lib/ffi/struct.rb:104
     def alignment; end
 
+    # pkg:gem/ffi#lib/ffi.rb:3
     def alloc_in(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def alloc_inout(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def alloc_out(*_arg0); end
 
     # pkg:gem/ffi#lib/ffi/struct.rb:165
@@ -2536,8 +2618,13 @@ class FFI::Struct
     # pkg:gem/ffi#lib/ffi/struct.rb:109
     def members; end
 
+    # pkg:gem/ffi#lib/ffi.rb:3
     def new_in(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def new_inout(*_arg0); end
+
+    # pkg:gem/ffi#lib/ffi.rb:3
     def new_out(*_arg0); end
 
     # (see FFI::StructLayout#offset_of)
@@ -2618,6 +2705,7 @@ class FFI::Struct
   end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Struct::InlineArray
   include ::Enumerable
 
@@ -2680,7 +2768,7 @@ class FFI::StructByReference
   # Always get {FFI::Type}::POINTER.
   #
   # pkg:gem/ffi#lib/ffi/struct_by_reference.rb:47
-  def native_type; end
+  def native_type(_type = T.unsafe(nil)); end
 
   # pkg:gem/ffi#lib/ffi/struct_by_reference.rb:36
   def struct_class; end
@@ -2693,6 +2781,7 @@ class FFI::StructByReference
   def to_native(value, ctx); end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructByValue < ::FFI::Type
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(_arg0); end
@@ -2704,7 +2793,7 @@ class FFI::StructByValue < ::FFI::Type
   def struct_class; end
 end
 
-# pkg:gem/ffi#lib/ffi/struct_layout.rb:36
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout < ::FFI::Type
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(_arg0, _arg1, _arg2); end
@@ -2737,6 +2826,7 @@ class FFI::StructLayout < ::FFI::Type
   def to_a; end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout::Array < ::FFI::StructLayout::Field
   # pkg:gem/ffi#lib/ffi.rb:3
   def get(_arg0); end
@@ -2745,6 +2835,7 @@ class FFI::StructLayout::Array < ::FFI::StructLayout::Field
   def put(_arg0, _arg1); end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout::CharArray < ::FFI::Struct::InlineArray
   # pkg:gem/ffi#lib/ffi.rb:3
   def to_s; end
@@ -2773,6 +2864,7 @@ class FFI::StructLayout::Enum < ::FFI::StructLayout::Field
   def put(ptr, value); end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout::Field
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(*_arg0); end
@@ -2799,6 +2891,7 @@ class FFI::StructLayout::Field
   def type; end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout::Function < ::FFI::StructLayout::Field
   # pkg:gem/ffi#lib/ffi.rb:3
   def get(_arg0); end
@@ -2828,8 +2921,13 @@ class FFI::StructLayout::Mapped < ::FFI::StructLayout::Field
   def put(ptr, value); end
 end
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout::Number < ::FFI::StructLayout::Field; end
+
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout::Pointer < ::FFI::StructLayout::Field; end
+
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::StructLayout::String < ::FFI::StructLayout::Field; end
 
 # Build a {StructLayout struct layout}.
@@ -2971,6 +3069,7 @@ FFI::TYPE_ULONG = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::TYPE_VARARGS = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::TYPE_VOID = T.let(T.unsafe(nil), FFI::Type::Builtin)
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Type
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(_arg0); end
@@ -2991,6 +3090,7 @@ FFI::Type::BUFFER_IN = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::Type::BUFFER_INOUT = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::Type::BUFFER_OUT = T.let(T.unsafe(nil), FFI::Type::Builtin)
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Type::Builtin < ::FFI::Type
   # pkg:gem/ffi#lib/ffi.rb:3
   def inspect; end
@@ -3011,6 +3111,7 @@ FFI::Type::LONG = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::Type::LONGDOUBLE = T.let(T.unsafe(nil), FFI::Type::Builtin)
 FFI::Type::LONG_LONG = T.let(T.unsafe(nil), FFI::Type::Builtin)
 
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::Type::Mapped < ::FFI::Type
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(_arg0); end
@@ -3067,7 +3168,7 @@ end
 # pkg:gem/ffi#lib/ffi/version.rb:2
 FFI::VERSION = T.let(T.unsafe(nil), String)
 
-# pkg:gem/ffi#lib/ffi/variadic.rb:34
+# pkg:gem/ffi#lib/ffi.rb:3
 class FFI::VariadicInvoker
   # pkg:gem/ffi#lib/ffi.rb:3
   def initialize(_arg0, _arg1, _arg2, _arg3); end
@@ -3094,4 +3195,12 @@ class FFI::VariadicInvoker
 
   # pkg:gem/ffi#lib/ffi.rb:3
   def return_type; end
+end
+
+module Process
+  extend ::FFI::ModernForkTracking
+  extend ::Sass::ForkTracker::CoreExt
+  extend ::RedisClient::PIDCache::CoreExt
+  extend ::ConnectionPool::ForkTracker
+  extend ::ActiveSupport::ForkTracker::CoreExt
 end

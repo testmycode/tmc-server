@@ -68,7 +68,7 @@ group :development, :test do
   gem 'brakeman', '~> 6.1', '>= 6.1.2', require: false
   gem 'bundler-audit', '~> 0.9.1'
   gem 'pry', '~> 0.14.2'
-  gem 'pry-byebug', '~> 3.10', '>= 3.10.1'
+  gem 'pry-byebug', '~> 3.12'
   gem 'pry-rails', '~> 0.3.11'
 
   gem 'database_cleaner', '~> 2.0', '>= 2.0.2'

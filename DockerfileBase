@@ -1,11 +1,10 @@
-FROM ruby:3.3
-LABEL name tmc-server-base
+FROM ruby:4.0-trixie
+LABEL name=tmc-server-base
 
-ENV MAVEN_VERSION 3.3.9
-ENV MAVEN_HOME /usr/share/maven
-ENV M3_HOME /usr/share/maven
+ENV MAVEN_HOME=/usr/share/maven
+ENV M3_HOME=/usr/share/maven
 
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs vim lsof wget bzip2 zip openjdk-17-jdk postgresql-client check python3 maven && \
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs vim lsof wget bzip2 zip openjdk-21-jdk postgresql-client check python3 maven && \
   rm -rf /var/lib/apt/lists/* && \
   mkdir /app &&\
   git config --global user.name "TmcTest" && \

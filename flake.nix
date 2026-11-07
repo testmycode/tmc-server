@@ -17,7 +17,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         # Keep in step with the image in DockerfileBase; nixpkgs only carries the newest Rubies.
-        ruby = nixpkgs-ruby.packages.${system}."ruby-3.3";
+        ruby = nixpkgs-ruby.packages.${system}."ruby-4.0";
       in
       {
         devShells.default = pkgs.mkShell {

@@ -10,7 +10,7 @@ module Bundler::Audit; end
 
 # Represents an advisory loaded from the {Database}.
 #
-# pkg:gem/bundler-audit#lib/bundler/audit/advisory.rb:38
+# pkg:gem/bundler-audit#lib/bundler/audit/advisory.rb:26
 class Bundler::Audit::Advisory < ::Struct
   # Compares two advisories.
   #
@@ -150,7 +150,7 @@ class Bundler::Audit::Database
   # @return [Enumerator]
   #   If no block is given, an Enumerator will be returned.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:262
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:265
   def advisories(&block); end
 
   # Enumerates over advisories for the given gem.
@@ -167,7 +167,7 @@ class Bundler::Audit::Database
   # @return [Enumerator]
   #   If no block is given, an Enumerator will be returned.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:285
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:288
   def advisories_for(name); end
 
   # Verifies whether the gem is effected by any advisories.
@@ -185,7 +185,7 @@ class Bundler::Audit::Database
   # @return [Enumerator]
   #   If no block is given, an Enumerator will be returned.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:309
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:312
   def check_gem(gem); end
 
   # The last commit ID of the repository.
@@ -195,7 +195,7 @@ class Bundler::Audit::Database
   #
   # @since 0.9.0
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:225
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:228
   def commit_id; end
 
   # Determines if the database is a git repository.
@@ -204,7 +204,7 @@ class Bundler::Audit::Database
   #
   # @since 0.8.0
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:181
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:180
   def git?; end
 
   # Inspects the database.
@@ -212,7 +212,7 @@ class Bundler::Audit::Database
   # @return [String]
   #   The inspected database.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:345
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:348
   def inspect; end
 
   # Determines the time when the database was last updated.
@@ -221,7 +221,7 @@ class Bundler::Audit::Database
   #
   # @since 0.8.0
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:240
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:243
   def last_updated_at; end
 
   # The path to the advisory database.
@@ -236,7 +236,7 @@ class Bundler::Audit::Database
   # @return [Integer]
   #   The number of advisories.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:325
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:328
   def size; end
 
   # Converts the database to a String.
@@ -244,7 +244,7 @@ class Bundler::Audit::Database
   # @return [String]
   #   The path to the database.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:335
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:338
   def to_s; end
 
   # Updates the ruby-advisory-db.
@@ -256,13 +256,17 @@ class Bundler::Audit::Database
   #   Specify whether `git` should be `--quiet`.
   #
   # @return [true, nil]
-  #   `true` indicates that the update was successful.
-  #   `nil` indicates the database is not a git repository, thus not
-  #   capable of being updated.
+  #   * `true` - the ruby-advisory-db git repository was successfully
+  #     updated.
+  #   * `nil` - the ruby-advisory-db is not a git repository or the `git`
+  #     command is not installed.
+  #
+  # @raise [UpdateFailed]
+  #   Could not update the ruby-advisory-db git repository.
   #
   # @since 0.8.0
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:201
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:204
   def update!(options = T.unsafe(nil)); end
 
   protected
@@ -275,7 +279,7 @@ class Bundler::Audit::Database
   # @yieldparam [String] path
   #   A path to an advisory `.yml` file.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:360
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:363
   def each_advisory_path(&block); end
 
   # Enumerates over the advisories for the given gem.
@@ -289,7 +293,7 @@ class Bundler::Audit::Database
   # @yieldparam [String] path
   #   A path to an advisory `.yml` file.
   #
-  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:376
+  # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:379
   def each_advisory_path_for(name, &block); end
 
   class << self
@@ -304,7 +308,7 @@ class Bundler::Audit::Database
     # @option options [Boolean] :quiet
     #   Specify whether `git` should be `--quiet`.
     #
-    # @return [Dataase]
+    # @return [Database]
     #   The newly downloaded database.
     #
     # @raise [DownloadFailed]
@@ -346,9 +350,8 @@ class Bundler::Audit::Database
     # @option options [Boolean] :quiet
     #   Specify whether `git` should be `--quiet`.
     #
-    # @return [Boolean, nil]
+    # @return [Boolean]
     #   Specifies whether the update was successful.
-    #   A `nil` indicates no update was performed.
     #
     # @raise [ArgumentError]
     #   Invalid options were given.
@@ -360,7 +363,7 @@ class Bundler::Audit::Database
     #
     # @deprecated Use {#update!} instead.
     #
-    # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:158
+    # pkg:gem/bundler-audit#lib/bundler/audit/database.rb:157
     def update!(options = T.unsafe(nil)); end
   end
 end
