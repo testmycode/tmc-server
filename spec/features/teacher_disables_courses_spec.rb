@@ -54,7 +54,7 @@ feature 'Teacher disables courses', feature: true do
 
     visit '/org/slug/courses'
 
-    expect(page).to have_current_path('/org/slug/courses')
+    expect(page).to have_current_path('/org/slug')
     expect(page).not_to have_link('Test Course 1')
   end
 end

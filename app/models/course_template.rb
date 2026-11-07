@@ -54,7 +54,7 @@ class CourseTemplate < ApplicationRecord
 
   sig { void }
   def valid_git_repo?
-    result = sh!('git', 'ls-remote', '--exit-code', source_url, git_branch, timeout: 10)
+    result = sh!('git', 'ls-remote', '--exit-code', '--', source_url, git_branch, timeout: 10)
     result[:status].success?
   rescue StandardError => e
     errors.add(:base, 'Cannot clone repository. Error: ' + e.to_s)

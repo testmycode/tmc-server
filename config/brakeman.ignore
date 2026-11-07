@@ -1,0 +1,635 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "5dbd2de58c6ff2fb90e9b725058df7915ee3085e51b0c1b024b5fd3869e33512",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/background_tasks/rust_langs_downloader_task.rb",
+      "line": 27,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`wget https://download.mooc.fi/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version} -O #{\"vendor/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}\"}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RustLangsDownloaderTask",
+        "method": "run"
+      },
+      "user_input": "@@rust_langs_version",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "The version is a constant in this file."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "73ea6fc75cbc4ef690218d09aed5b24541f0e36d45bf8ef19a3e6575d72ff54b",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/background_tasks/rust_langs_downloader_task.rb",
+      "line": 28,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`chmod +x #{\"vendor/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}\"}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RustLangsDownloaderTask",
+        "method": "run"
+      },
+      "user_input": "@@rust_langs_version",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "The version is a constant in this file."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "59cdc01b2c3cedcc5ffe248e63f31eccf08f22365063c1310677546b607bd989",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/background_tasks/rust_langs_downloader_task.rb",
+      "line": 30,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{\"vendor/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}\"} --help`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RustLangsDownloaderTask",
+        "method": "run"
+      },
+      "user_input": "@@rust_langs_version",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "The version is a constant in this file."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "56a968053d7e27cb52db3f1ec166ee71e3487c00a163dfb3583a890deb18985a",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/api/v8/core/exercises/solutions_controller.rb",
+      "line": 37,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Exercise.find_by!(:id => params[:exercise_id]).solution_zip_file_path)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::V8::Core::Exercises::SolutionsController",
+        "method": "download"
+      },
+      "user_input": "Exercise.find_by!(:id => params[:exercise_id]).solution_zip_file_path",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "The zip path is built by the server from the course cache and exercise name, not from request input."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "525d3ab0cb512cbfe357e9e4437744a4d9119375abf8792f752f11c2f4c0828f",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/api/v8/core/exercises_controller.rb",
+      "line": 58,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Exercise.find(params[:id]).stub_zip_file_path)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::V8::Core::ExercisesController",
+        "method": "download"
+      },
+      "user_input": "Exercise.find(params[:id]).stub_zip_file_path",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "The zip path is built by the server from the course cache and exercise name, not from request input."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "c8b0abcc337bab9972f4923d273ba2f43d790f542481d61a5263b8289662f269",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/api/v8/organizations/courses/exercises_controller.rb",
+      "line": 152,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Exercise.find_by!(:name => params[:name], :course_id => Course.find_by!(:name => (\"#{params[:organization_slug]}-#{params[:course_name]}\")).id).stub_zip_file_path)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::V8::Organizations::Courses::ExercisesController",
+        "method": "download"
+      },
+      "user_input": "Exercise.find_by!(:name => params[:name], :course_id => Course.find_by!(:name => (\"#{params[:organization_slug]}-#{params[:course_name]}\")).id).stub_zip_file_path",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "The zip path is built by the server from the course cache and exercise name, not from request input."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "c62709b26d3c48a8b18455a68329c56315e1b9635db69d523fe17c25fae77c9a",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/exercises_controller.rb",
+      "line": 39,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Exercise.find(params[:id]).stub_zip_file_path)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ExercisesController",
+        "method": "show"
+      },
+      "user_input": "Exercise.find(params[:id]).stub_zip_file_path",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "The zip path is built by the server from the course cache and exercise name, not from request input."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "4762dd11dca5dd581fe897843ddb6e5fcd3bfb979fe7b8130d7145c72c2a51fe",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/solutions_controller.rb",
+      "line": 38,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Exercise.find(params[:exercise_id]).solution_zip_file_path)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SolutionsController",
+        "method": "show"
+      },
+      "user_input": "Exercise.find(params[:exercise_id]).solution_zip_file_path",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "The zip path is built by the server from the course cache and exercise name, not from request input."
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "9f2cb7b2b33cfedf50ff2f49ab82c0ebb98234b07e48c67955abae75c1683e48",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/users_controller.rb",
+      "line": 33,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(SiteSetting.all_settings[\"signup_location\"], :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "UsersController",
+        "method": "new"
+      },
+      "user_input": "SiteSetting.all_settings[\"signup_location\"]",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "The signup location is admin-only site configuration."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5d5d1ff45df2d45631484405078689792f8ede556f597d3da06ef800f3fd2e0a",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/course.rb",
+      "line": 514,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.select_rows(\"        SELECT user_id, COUNT(*)\\n        FROM awarded_points\\n        WHERE course_id = #{ActiveRecord::Base.connection.quote(id)} AND\\n              name IN (#{ExerciseGroup.new(self, group).available_point_names.map do\n ActiveRecord::Base.connection.quote(ap)\n end.join(\",\")})\\n        GROUP BY user_id\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Course",
+        "method": "exercise_group_completion_by_user"
+      },
+      "user_input": "ExerciseGroup.new(self, group).available_point_names",
+      "confidence": "High",
+      "cwe_id": [
+        89
+      ],
+      "note": "Every interpolated value goes through connection.quote."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e2d4122fbe5ebc1c45615282bf186f3ee265a9c9e78a3509a1179285e28d09ac",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/course.rb",
+      "line": 547,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"        SELECT awarded_after_soft_deadline, COUNT(*)\\n        FROM awarded_points\\n        WHERE course_id = #{ActiveRecord::Base.connection.quote(id)} AND\\n              name IN (#{ExerciseGroup.new(self, group).available_point_names.map do\n ActiveRecord::Base.connection.quote(ap)\n end.join(\",\")}) AND\\n              user_id = #{ActiveRecord::Base.connection.quote(user.id)}\\n        GROUP BY awarded_after_soft_deadline\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Course",
+        "method": "exercise_group_completion_counts_for_user"
+      },
+      "user_input": "ExerciseGroup.new(self, group).available_point_names",
+      "confidence": "High",
+      "cwe_id": [
+        89
+      ],
+      "note": "Every interpolated value goes through connection.quote."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "3d57910e2261cf37ba4aef1177e967b91ae7753691c26a383eb88bdcab9c92fc",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/orderable.rb",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "record_class.where(\"position > #{quote(position)}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Orderable",
+        "method": "move_forward!"
+      },
+      "user_input": "quote(position)",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": "position is quoted."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e6e98612b48c405841846cde49e7045e4a8559621c804917fef5b6dd1dd85531",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/orderable.rb",
+      "line": 38,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "record_class.where(\"position < #{quote(position)}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Orderable",
+        "method": "move_backward!"
+      },
+      "user_input": "quote(position)",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": "position is quoted."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "518ad5effff203dd2354e624042a941a5ec60a48f62c95208604898bebfa081c",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/orderable.rb",
+      "line": 64,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.select_value(\"SELECT 1 FROM #{record_class.quoted_table_name} WHERE position = #{(ActiveRecord::Base.connection.select_value(\"SELECT position FROM #{record_class.quoted_table_name} WHERE id = #{other.id}\").to_i + delta)}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Orderable",
+        "method": "move!"
+      },
+      "user_input": "(ActiveRecord::Base.connection.select_value(\"SELECT position FROM #{record_class.quoted_table_name} WHERE id = #{other.id}\").to_i + delta)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Only integers from the database and code, and a comparison operator from the caller, are interpolated."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9aa35232696bf892fb3c4901120ced56f714ef61d94e30b7a925bea67b6467dc",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/orderable.rb",
+      "line": 65,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"UPDATE #{record_class.quoted_table_name} SET position = position + (#{delta}) WHERE position #{op} #{(ActiveRecord::Base.connection.select_value(\"SELECT position FROM #{record_class.quoted_table_name} WHERE id = #{other.id}\").to_i + delta)}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Orderable",
+        "method": "move!"
+      },
+      "user_input": "delta",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Only integers from the database and code, and a comparison operator from the caller, are interpolated."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "784c01b222535a1e3bb68c8cd4f32deca5a2e3df76d485ebf81f6e73a252ddb9",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/orderable.rb",
+      "line": 68,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"UPDATE #{record_class.quoted_table_name} SET position = #{(ActiveRecord::Base.connection.select_value(\"SELECT position FROM #{record_class.quoted_table_name} WHERE id = #{other.id}\").to_i + delta)} WHERE id = #{id}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Orderable",
+        "method": "move!"
+      },
+      "user_input": "(ActiveRecord::Base.connection.select_value(\"SELECT position FROM #{record_class.quoted_table_name} WHERE id = #{other.id}\").to_i + delta)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Only integers from the database and code, and a comparison operator from the caller, are interpolated."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "2cded541198d25f773e05f2714ccde0a449716fce9a3a23e56ff00c571c54e41",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/stats.rb",
+      "line": 56,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "all_regular_users.where(\"EXISTS (SELECT 1 FROM submissions WHERE user_id = users.id #{\"AND (course_id, exercise_name) IN (#{get_exercises(exercise_or_course).map do\n \"(#{e.course_id}, #{Exercise.connection.quote(e.name)})\"\n end.join(\",\")})\"})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Stats",
+        "method": "Stats.participants_with_submissions_count"
+      },
+      "user_input": "Exercise.connection.quote(e.name)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "course_id is an integer from the database and the name is quoted."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9424e03b012468ddc72f08972ffeba3d76277667714719b43fd520ec47bb8686",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/submission.rb",
+      "line": 398,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Exercise.where(((\"(course_id, name) IN (\" + submissions.map do\n \"(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})\"\n end.join(\",\")) + \")\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Submission",
+        "method": "Submission.eager_load_exercises"
+      },
+      "user_input": "submissions.map do\n \"(#{connection.quote(s.course_id)}, #{connection.quote(s.exercise_name)})\"\n end.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Both values go through connection.quote."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "db72cd434e0e7d9b51fb2524142b90d72743f31acd5d4fa87ed3c260e8b45ae9",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/courses/help.html.erb",
+      "line": 33,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Course.find(params[:course_id]).material_url, Course.find(params[:course_id]).material_url, :target => \"_blank\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "CoursesController",
+          "method": "help",
+          "line": 168,
+          "file": "app/controllers/courses_controller.rb",
+          "rendered": {
+            "name": "courses/help",
+            "file": "app/views/courses/help.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "courses/help"
+      },
+      "user_input": "Course.find(params[:course_id]).material_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Course#material_url= prefixes anything without http(s):// with http://, so javascript: URLs can't get through."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "a8a1daeedec03d37d3282dde9662c963f55492b22ce9cb825eaff6f4a45d90a0",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/files/_files.html.erb",
+      "line": 3,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "T.let(Exercise.find(params[:exercise_id]).solution, T.nilable(Solution)).files.find do\n (f.html_prelude != nil)\n end.html_prelude",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SolutionsController",
+          "method": "show",
+          "line": 36,
+          "file": "app/controllers/solutions_controller.rb",
+          "rendered": {
+            "name": "solutions/show",
+            "file": "app/views/solutions/show.html.erb"
+          }
+        },
+        {
+          "type": "template",
+          "name": "solutions/show",
+          "line": 3,
+          "file": "app/views/solutions/show.html.erb",
+          "rendered": {
+            "name": "files/_files",
+            "file": "app/views/files/_files.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "files/_files"
+      },
+      "user_input": "Exercise.find(params[:exercise_id]).solution",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Teachers write the .html preludes in their exercise repos; rendering them as HTML is the feature."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "0dad3bd5f895c05fc32478cc3884b91d852c72a641dd9b729b5acca17cde3fd2",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/doc_gen/shell_session.rb",
+      "line": 52,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{command} 2>&1`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DocGen::ShellSession::ExampleBlock",
+        "method": "run"
+      },
+      "user_input": "command",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "User manual generator run by developers; commands come from the manual templates."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "0a1c6f4686a85ba17b79b90737dce3a9673ce557ce774762b02850b5cb0b46af",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/ruby_init_script.rb",
+      "line": 74,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "system(\"update-rc.d #{init_script_full_name} defaults 90 10\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RubyInitScript",
+        "method": "install"
+      },
+      "user_input": "init_script_full_name",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Operator-run init script installer; the script name comes from the rake task argument."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "1242c40924d48da4d88f8ba6f79b726c7cffd9cf68607368b7d83c830b849633",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/ruby_init_script.rb",
+      "line": 79,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "system(\"update-rc.d -f #{init_script_full_name} remove\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RubyInitScript",
+        "method": "uninstall"
+      },
+      "user_input": "init_script_full_name",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Operator-run init script installer; the script name comes from the rake task argument."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "5ca6d40038619fcfccd99ce710064c40e6c905f3d1faf5fa70ede67eba2b696c",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rust_langs_cli_executor.rb",
+      "line": 33,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture2(\"#{self.langs_executable_path}/current\", \"prepare-submission\", \"--clone-path\", clone_path, \"--output-path\", output_path, \"--submission-path\", submission_path, \"--no-archive-prefix\", \"--stub-archive-path\", \"--output-format\", \"--tmc-param\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RustLangsCliExecutor",
+        "method": "self.prepare_submission"
+      },
+      "user_input": "self.langs_executable_path",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Arguments are passed as an array to Open3, so no shell parses them."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "0c5c7d2990b8627b767deffda61fa918ed95d0fd4618db280a28d83055fe5dcf",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rust_langs_cli_executor.rb",
+      "line": 59,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.popen2(\"#{self.langs_executable_path}/current\", \"refresh-course\", \"--cache-path\", T.must(course_template_refresh_task.course_template).cache_path, \"--cache-root\", Course.cache_root, \"--course-name\", T.must(course_template_refresh_task.course_template).name.to_s, \"--git-branch\", T.must(course_template_refresh_task.course_template).git_branch, \"--source-url\", T.must(course_template_refresh_task.course_template).source_url.to_s)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RustLangsCliExecutor",
+        "method": "self.refresh"
+      },
+      "user_input": "self.langs_executable_path",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Arguments are passed as an array to Open3, so no shell parses them."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "5c11e998b648ec57e834ab53070f8e02f21a3ac659138505358b36238d504d04",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/system_commands.rb",
+      "line": 47,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{((mk_command(args.flatten) or args[0].join(\" \")) or \"timeout #{{ :assert_silent => false, :escape => true, :timeout => nil }.merge(args.pop)[:timeout]} #{(mk_command(args.flatten) or args[0].join(\" \"))}\")} 2>&1`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SystemCommands",
+        "method": "sh!"
+      },
+      "user_input": "mk_command(args.flatten)",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "sh! Shellwords-escapes every word unless escape: false, which no caller passes."
+    }
+  ],
+  "brakeman_version": "8.1.0"
+}

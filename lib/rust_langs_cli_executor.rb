@@ -2,6 +2,8 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'open3'
+require 'shellwords'
 
 # If you want to change the TMC Langs Rust version, see app/background_tasks/rust_langs_downloader_task.rb
 
@@ -19,15 +21,16 @@ module RustLangsCliExecutor
     ).returns(T.untyped)
   end
   def self.prepare_submission(clone_path, output_path, submission_path, extra_params = {}, config = {})
-    command = "#{self.langs_executable_path}/current prepare-submission --clone-path '#{clone_path}' --output-path '#{output_path}' --submission-path '#{submission_path}'"
-    command = command + ' --no-archive-prefix' if config[:no_archive_prefix]
-    command = command + " --stub-archive-path '#{config[:tests_from_stub]}'" if !!config[:tests_from_stub]
-    command = command + " --output-format '#{config[:format]}'" if !!config[:format]
+    command = ["#{self.langs_executable_path}/current", 'prepare-submission',
+               '--clone-path', clone_path, '--output-path', output_path, '--submission-path', submission_path]
+    command << '--no-archive-prefix' if config[:no_archive_prefix]
+    command.push('--stub-archive-path', config[:tests_from_stub].to_s) if config[:tests_from_stub]
+    command.push('--output-format', config[:format].to_s) if config[:format]
     extra_params.each do |k, v|
-      command = command + " --tmc-param '#{k}=#{v}'" unless v.nil?
+      command.push('--tmc-param', "#{k}=#{v}") unless v.nil?
     end
 
-    command_output = `#{command}`
+    command_output, _status = Open3.capture2(*command)
     Rails.logger.info(command_output)
 
     result = self.process_prepare_submission_command_output(command_output)
@@ -43,17 +46,17 @@ module RustLangsCliExecutor
   sig { params(course_template_refresh_task: CourseTemplateRefresh).returns(T.untyped) }
   def self.refresh(course_template_refresh_task)
     course_template = T.must(course_template_refresh_task.course_template)
-    command = "#{self.langs_executable_path}/current refresh-course"\
-    " --cache-path #{course_template.cache_path}"\
-    " --cache-root #{Course.cache_root}"\
-    " --course-name #{course_template.name}"\
-    " --git-branch #{course_template.git_branch}"\
-    " --source-url #{course_template.source_url}"
+    command = ["#{self.langs_executable_path}/current", 'refresh-course',
+               '--cache-path', course_template.cache_path,
+               '--cache-root', Course.cache_root,
+               '--course-name', course_template.name.to_s,
+               '--git-branch', course_template.git_branch,
+               '--source-url', course_template.source_url.to_s]
 
-    Rails.logger.info(command)
+    Rails.logger.info(command.shelljoin)
     parsed_data = T.let(nil, T.untyped)
 
-    Open3.popen2(command) do |_stdin, stdout, status_thread|
+    Open3.popen2(*command) do |_stdin, stdout, status_thread|
       Timeout.timeout(600, Timeout::Error, 'Refresh process took more than 10 minutes...') do
         stdout.each_line do |line|
           Rails.logger.info("Rust Refresh output \n#{line}")

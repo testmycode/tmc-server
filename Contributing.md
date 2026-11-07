@@ -10,7 +10,7 @@ The Nix dev shell (`nix develop`) installs [lefthook](https://lefthook.dev) hook
 On commit, `rubocop --autocorrect` runs on the staged Ruby files and the fixes are re-staged.
 It never blocks a commit. Skip it with `LEFTHOOK=0 git commit ...`.
 
-Before opening a PR, run `bin/branch-ready-checks` (rubocop, `srb tc`, and the tapioca verifications; needs a database).
+Before opening a PR, run `bin/branch-ready-checks` (rubocop, brakeman, `srb tc`, and the tapioca verifications; needs a database).
 
 ## Tips running tests
 
@@ -20,6 +20,9 @@ file.
 
 ##### To run all code style validations
 `bundle exec rubocop`
+
+##### To run the security scan
+`bundle exec brakeman`. Record a reviewed false positive, with a note saying why it is safe, through `bundle exec brakeman -I`.
 
 ##### To run all tests
 `rvmsudo rake spec`

@@ -29,6 +29,13 @@ describe CourseTemplate, type: :model do
       end.not_to raise_error
     end
 
+    it "doesn't let a source url pass options to git" do
+      marker = "#{@test_tmp_dir}/upload_pack_ran"
+      template = CourseTemplate.new(valid_params.merge(source_url: "--upload-pack=touch #{marker}"))
+      expect(template).not_to be_valid
+      expect(File).not_to exist(marker)
+    end
+
     it 'requires a name' do
       should_be_invalid_params(valid_params.merge(name: nil))
       should_be_invalid_params(valid_params.merge(name: ''))

@@ -9,6 +9,7 @@ run() {
 }
 
 run bundle exec rubocop
+run bundle exec brakeman --no-pager --quiet --ensure-ignore-notes
 run bundle exec srb tc
 run bin/tapioca gem --verify
 
