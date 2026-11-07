@@ -1,8 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'pathname'
-
 # Represents a `.tmcproject.yml` file.
 class TmcProjectFile
   extend T::Sig

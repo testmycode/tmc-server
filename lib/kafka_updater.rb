@@ -111,7 +111,7 @@ class KafkaUpdater
     Rails.logger.info("Batch publishing progress finished for course #{course.name}")
     finished_successfully = true
     finished_successfully
-    end
+  end
 
   sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_user_points(task)
@@ -148,7 +148,7 @@ class KafkaUpdater
     Rails.logger.info("Publishing points finished for user #{user.id}")
     finished_successfully = true
     finished_successfully
-    end
+  end
 
   sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_course_points(task)
@@ -205,7 +205,7 @@ class KafkaUpdater
     Rails.logger.info("Batch publishing points finished for course #{course.name}")
     finished_successfully = true
     finished_successfully
-    end
+  end
 
   sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_exercises(task)
@@ -243,7 +243,7 @@ class KafkaUpdater
     Rails.logger.info("Batch publishing exercises finished for course #{course.name}")
     finished_successfully = true
     finished_successfully
-    end
+  end
 
   sig { params(task: KafkaBatchUpdatePoints).returns(T::Boolean) }
   def update_user_course_points(task)
@@ -293,7 +293,7 @@ class KafkaUpdater
     Rails.logger.info("Publishing points finished for user #{user.id}")
     finished_successfully = true
     finished_successfully
-    end
+  end
 
   private
     sig { params(topic: String, payload: T::Hash[Symbol, T.untyped]).returns(T.nilable(RestClient::Response)) }

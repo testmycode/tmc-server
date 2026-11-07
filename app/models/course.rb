@@ -252,16 +252,16 @@ class Course < ApplicationRecord
     user.administrator? ||
       user.teacher?(organization) ||
       user.assistant?(self) || (
-      initial_refresh_ready? &&
-      !disabled? &&
-      !hidden &&
-      (hide_after.nil? || hide_after > Time.now) &&
-      (
-        hidden_if_registered_after.nil? ||
-        hidden_if_registered_after > Time.now ||
-        (!user.guest? && hidden_if_registered_after > user.created_at)
+        initial_refresh_ready? &&
+        !disabled? &&
+        !hidden &&
+        (hide_after.nil? || hide_after > Time.now) &&
+        (
+          hidden_if_registered_after.nil? ||
+          hidden_if_registered_after > Time.now ||
+          (!user.guest? && hidden_if_registered_after > user.created_at)
+        )
       )
-    )
   end
 
   sig { params(x: T.untyped).void }

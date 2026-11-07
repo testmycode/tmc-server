@@ -5898,7 +5898,7 @@ class ActiveRecord::Associations::Preloader::ThroughAssociation < ::ActiveRecord
   def through_scope; end
 end
 
-# pkg:gem/activerecord#lib/active_record/associations/singular_association.rb:6
+# pkg:gem/activerecord#lib/active_record/associations/singular_association.rb:5
 class ActiveRecord::Associations::SingularAssociation < ::ActiveRecord::Associations::Association
   # pkg:gem/activerecord#lib/active_record/associations/singular_association.rb:29
   def build(attributes = T.unsafe(nil), &block); end
@@ -8220,7 +8220,6 @@ class ActiveRecord::Base
   extend ::ActiveStorage::Reflection::ActiveRecordExtensions::ClassMethods
   extend ::ActionText::Attribute::ClassMethods
   extend ::ActiveRecord::SignedId::DeprecateSignedIdVerifierSecret
-  extend ::ActiveRecord::Import::Connection
 
   # pkg:gem/activerecord#lib/active_record/base.rb:283
   def __callbacks; end
@@ -12392,7 +12391,7 @@ class ActiveRecord::ConnectionAdapters::ConnectionHandler
   def each_connection_pool(role = T.unsafe(nil), &block); end
 
   # pkg:gem/activerecord#lib/active_record/connection_adapters/abstract/connection_handler.rb:115
-  def establish_connection(config, owner_name: T.unsafe(nil), role: T.unsafe(nil), shard: T.unsafe(nil), clobber: T.unsafe(nil)); end
+  def establish_connection(*args, **kwargs, &block); end
 
   # Disconnects all currently idle connections.
   #

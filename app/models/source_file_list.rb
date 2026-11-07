@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require 'find'
-require 'pathname'
 require 'safe_unzipper'
 require 'system_commands'
 require 'tmc_dir_utils'

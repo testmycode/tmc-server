@@ -1,4 +1,4 @@
-require:
+plugins:
   - rubocop-sorbet
 
 inherit_gem:
@@ -8,7 +8,7 @@ inherit_gem:
 AllCops:
   SuggestExtensions: false
   NewCops: disable
-  TargetRubyVersion: 3.4 # The highest RuboCop 1.65 accepts; raise to 4.0 with the RuboCop bump
+  TargetRubyVersion: 4.0
   TargetRailsVersion: 8.1
   Exclude:
     - 'ext/**/*'
@@ -67,7 +67,7 @@ Metrics/PerceivedComplexity:
 Performance/RegexpMatch:
   Enabled: false
 
-# Dormant until TargetRubyVersion 3.3; deferred to the Performance autocorrect stage.
+# Deferred to the Performance autocorrect stage.
 Style/MapToHash:
   Enabled: false
 

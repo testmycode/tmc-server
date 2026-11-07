@@ -11,7 +11,6 @@ class ActiveRecord::Base
   include ::ActiveModel::Access
   include ::ActiveModel::Serialization
   extend ::ActiveRecord::SignedId::DeprecateSignedIdVerifierSecret
-  extend ::ActiveRecord::Import::Connection
 end
 
 # :markup: markdown

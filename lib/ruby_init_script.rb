@@ -4,7 +4,6 @@
 require 'shellwords'
 require 'system_commands'
 require 'erb'
-require 'pathname'
 
 # Manages a sysv init script that calls a Ruby program that accepts the standard start|stop|restart|status parameters.
 # Compatible with RVM.
