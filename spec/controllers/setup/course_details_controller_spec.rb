@@ -274,4 +274,14 @@ describe Setup::CourseDetailsController, type: :controller do
       started: Time.now
     }
   end
+
+  describe 'with a course of another organization in the URL' do
+    it 'does not let a teacher rewrite its details' do
+      other_course = FactoryBot.create(:course, organization: FactoryBot.create(:accepted_organization), title: 'otherTitle')
+      controller.current_user = @teacher
+      put :update, params: { organization_id: @organization.slug, course_id: other_course.id, course: { title: 'hijacked' } }
+      expect(response.code.to_i).to eq(404)
+      expect(other_course.reload.title).to eq('otherTitle')
+    end
+  end
 end

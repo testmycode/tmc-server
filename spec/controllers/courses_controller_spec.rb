@@ -53,7 +53,7 @@ describe CoursesController, type: :controller do
 
   describe 'GET show' do
     before :each do
-      @course = FactoryBot.create(:course)
+      @course = FactoryBot.create(:course, organization: @organization)
     end
 
     describe 'for administrators' do
@@ -107,7 +107,7 @@ describe CoursesController, type: :controller do
 
     describe 'in JSON format' do
       before :each do
-        @course = FactoryBot.create(:course, name: 'Course1')
+        @course = FactoryBot.create(:course, name: 'Course1', organization: @organization)
         @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: @course)
         @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise2', course: @course)
         @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise3', course: @course)
@@ -220,7 +220,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST disable' do
     before :each do
-      @course = FactoryBot.create(:course)
+      @course = FactoryBot.create(:course, organization: @organization)
     end
 
     describe 'As a teacher' do
@@ -242,7 +242,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST enable' do
     before :each do
-      @course = FactoryBot.create(:course)
+      @course = FactoryBot.create(:course, organization: @organization)
     end
 
     describe 'As a teacher' do
@@ -347,7 +347,7 @@ describe CoursesController, type: :controller do
 
   describe 'GET manage_unlocks' do
     it 'when non-teacher should respond with a 403' do
-      @course = FactoryBot.create :course
+      @course = FactoryBot.create :course, organization: @organization
       @course.organization = @organization
       controller.current_user = @user
       get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
@@ -512,6 +512,25 @@ describe CoursesController, type: :controller do
         @course.reload
         expect(response.code.to_i).to eq(403)
       end
+    end
+  end
+
+  describe 'with a course of another organization in the URL' do
+    before :each do
+      @other_course = FactoryBot.create(:course, organization: FactoryBot.create(:accepted_organization))
+      controller.current_user = @teacher
+    end
+
+    it 'does not let a teacher disable it' do
+      post :disable, params: { organization_id: @organization.slug, id: @other_course.id }
+      expect(response.code.to_i).to eq(404)
+      expect(@other_course.reload.disabled?).to be(false)
+    end
+
+    it 'does not let a teacher hide it' do
+      post :toggle_hidden, params: { organization_id: @organization.slug, id: @other_course.id }
+      expect(response.code.to_i).to eq(404)
+      expect(@other_course.reload.hidden).to be(false)
     end
   end
 end

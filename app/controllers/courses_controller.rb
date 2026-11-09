@@ -161,7 +161,7 @@ class CoursesController < ApplicationController
 
   sig { void }
   def help
-    @course = Course.find(params[:course_id])
+    @course = T.must(@organization).courses.find(params[:course_id])
     authorize! :read, @course
     add_course_breadcrumb
     add_breadcrumb 'Help page'
@@ -265,7 +265,7 @@ class CoursesController < ApplicationController
 
     sig { void }
     def set_course
-      @course = Course.find(params[:id])
+      @course = T.must(@organization).courses.find(params[:id])
     end
 
     sig { returns(T.any(ActionController::Parameters, T::Hash[T.untyped, T.untyped])) }

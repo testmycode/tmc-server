@@ -149,6 +149,6 @@ class Setup::SetupController < ApplicationController
 
     sig { void }
     def set_course
-      @course = Course.find(params[:course_id]) unless params[:course_id].nil?
+      @course = T.must(@organization).courses.find(params[:course_id]) unless params[:course_id].nil?
     end
 end

@@ -33,7 +33,7 @@ class TeachersController < ApplicationController
   sig { void }
   def destroy
     authorize! :remove_teacher, @organization
-    @teachership = Teachership.find(params[:id])
+    @teachership = T.must(@organization).teacherships.find(params[:id])
     destroyed_username = T.must(@teachership.user).login
     @teachership.destroy!
     redirect_to organization_teachers_path, notice: "Teacher #{destroyed_username} removed from organization"

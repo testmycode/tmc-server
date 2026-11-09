@@ -227,6 +227,32 @@ describe SubmissionsController, type: :controller do
       expect(response.body).to include('The submitted files cannot be shown')
     end
   end
+
+  describe 'GET difference_with_solution' do
+    before :each do
+      allow(SourceFileList).to receive_messages(for_submission: SourceFileList.new([]), for_solution: SourceFileList.new([]))
+    end
+
+    it 'shows the difference to a teacher of a verified organization' do
+      teacher = FactoryBot.create(:verified_user)
+      Teachership.create!(user: teacher, organization: @organization)
+      controller.current_user = teacher
+      get :difference_with_solution, params: { submission_id: @submission.id }
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'denies a teacher of an unverified organization' do
+      organization = FactoryBot.create(:organization)
+      course = FactoryBot.create(:course, organization: organization)
+      exercise = FactoryBot.create(:exercise, course: course)
+      submission = FactoryBot.create(:submission, course: course, user: @user, exercise: exercise)
+      teacher = FactoryBot.create(:verified_user)
+      Teachership.create!(user: teacher, organization: organization)
+      controller.current_user = teacher
+      get :difference_with_solution, params: { submission_id: submission.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end
 
 def check_common_keys(json)

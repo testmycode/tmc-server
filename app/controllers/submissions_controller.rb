@@ -226,6 +226,7 @@ class SubmissionsController < ApplicationController
     @exercise ||= submission.exercise
     exercise = @exercise
     return respond_not_found("This submission's exercise has been removed") if exercise.nil?
+    authorize! :read, exercise.solution
 
     @organization = T.must(@course).organization
     add_course_breadcrumb

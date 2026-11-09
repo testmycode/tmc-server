@@ -55,6 +55,7 @@ class PointsController < ApplicationController
     sheetname = T.let(params[:id], String)
     @sheetname = T.let(sheetname, T.nilable(String))
     @course = Course.find(params[:course_id])
+    authorize! :read, @course
     authorize! :see_points, @course
     return respond_unauthorized('Authentication required') if current_user.guest?
 
@@ -69,6 +70,7 @@ class PointsController < ApplicationController
     exercises = Exercise.course_gdocs_sheet_exercises(@course, sheetname, current_user.administrator?).includes(:available_points).order!(:name)
     @exercises = T.let(exercises, T.nilable(ActiveRecord::Relation))
     users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, sheetname, hidden: current_user.administrator?)
+    users_to_points = users_to_points.slice(current_user.login) unless can?(:teach, @course)
     @users_to_points = T.let(users_to_points, T.nilable(T::Hash[String, T::Array[String]]))
 
     users = @course.users.includes(:user_field_values)
