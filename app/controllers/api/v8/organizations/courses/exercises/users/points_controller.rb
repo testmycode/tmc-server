@@ -76,7 +76,7 @@ module Api
                                       course_id: course.id,
                                       user_id: params[:user_id])
 
-                authorize! :read, points
+                points = visible_awarded_points(course, points)
                 present(AwardedPoint.as_json_with_exercise_ids(points, course.exercises))
               end
             end

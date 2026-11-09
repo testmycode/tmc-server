@@ -421,9 +421,13 @@ class Submission < ApplicationRecord
     self.paste_key = SecureRandom.urlsafe_base64 if paste_available?
   end
 
-  sig { params(submissions: T::Array[T.untyped]).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
-  def self.filter_fields!(submissions)
+  # Maps `submissions` in place to their API list fields, as seen by `viewer`.
+  sig { params(submissions: T::Array[T.untyped], viewer: User).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+  def self.filter_fields!(submissions, viewer)
+    ActiveRecord::Associations::Preloader.new(records: submissions, associations: { course: :organization }).call
+    eager_load_exercises(submissions)
     submissions.map! do |sub|
+      results_visible = sub.can_see_results?(viewer)
       {
         id: sub.id,
         user_id: sub.user_id,
@@ -432,8 +436,8 @@ class Submission < ApplicationRecord
         exercise_name: sub.exercise_name,
         course_id: sub.course_id,
         processed: sub.processed,
-        all_tests_passed: sub.all_tests_passed,
-        points: sub.points,
+        all_tests_passed: results_visible ? sub.all_tests_passed : nil,
+        points: results_visible ? sub.points : nil,
         processing_tried_at: sub.processing_tried_at,
         processing_began_at: sub.processing_began_at,
         processing_completed_at: sub.processing_completed_at,

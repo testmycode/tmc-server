@@ -33,7 +33,7 @@ module Api
           def index
             course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
             points = course.awarded_points.includes(:submission)
-            authorize_collection :read, points
+            points = visible_awarded_points(course, points)
             present AwardedPoint.as_json_with_exercise_ids(points, course.exercises)
           end
         end

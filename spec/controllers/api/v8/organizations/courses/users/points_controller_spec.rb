@@ -199,4 +199,16 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
       end
     end
   end
+
+  describe "GET current user's points in exam mode" do
+    let(:current_user) { FactoryBot.create(:user) }
+    let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+
+    it 'is forbidden' do
+      course.update!(hide_submission_results: true)
+      get :index, params: { organization_slug: organization.slug, course_name: course_name, user_id: 'current' }
+      expect(response).to have_http_status(403)
+      expect(response.body).not_to include current_user_course_point.name
+    end
+  end
 end

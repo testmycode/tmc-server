@@ -17,14 +17,15 @@ class SubmissionList
 
   sig { params(submission: Submission).returns(T::Hash[Symbol, T.untyped]) }
   def submission_data(submission)
+    results_visible = submission.can_see_results?(@user)
     {
       exercise_name: submission.exercise_name,
       id: submission.id,
       user_id: submission.user_id,
       course_id: submission.course_id,
       created_at: submission.created_at,
-      all_tests_passed: submission.all_tests_passed,
-      points: submission.points,
+      all_tests_passed: results_visible ? submission.all_tests_passed : nil,
+      points: results_visible ? submission.points : nil,
       submitted_zip_url: @helpers.download_api_v8_core_submission_url(submission),
       paste_url: paste_url(submission),
       processing_time: submission.processing_time,

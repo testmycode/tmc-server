@@ -18,10 +18,13 @@ class ExerciseStatusController < ApplicationController
 
     user_subs = user.submissions.where(course_id: course.id).to_a.group_by(&:exercise_name)
 
+    can_teach = can?(:teach, course)
     results = {}
     course.exercises.each do |ex|
+      next unless can_teach || ex._fast_visible?
       ex.set_submissions_by!(user, user_subs.fetch(T.must(ex.name), [])) # used by completed_by? and attempted_by?
-      results[ex.name] = if ex.completed_by?(user)
+      results_hidden = !can_teach && (course.hide_submission_results? || ex.hide_submission_results?)
+      results[ex.name] = if !results_hidden && ex.completed_by?(user)
         'completed'
       elsif ex.attempted_by?(user)
         'attempted'
