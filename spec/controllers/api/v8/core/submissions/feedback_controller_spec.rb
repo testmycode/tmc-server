@@ -26,6 +26,14 @@ describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
         }.to change(FeedbackAnswer, :count).by(1)
         expect(response.code.to_i).to eq(302)
       end
+
+      it "can't answer another course's question" do
+        other_question = FactoryBot.create(:feedback_question)
+        expect do
+          post :create, params: { submission_id: submission.id, answers: [{ answer: '2', question_id: other_question.id }] }
+        end.not_to change(FeedbackAnswer, :count)
+        expect(response.code.to_i).to eq(422)
+      end
     end
 
     describe 'As an unauthenticated user' do

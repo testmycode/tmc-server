@@ -34,14 +34,14 @@ class Solution
       false
     elsif course.hide_submission_results? || @exercise.hide_submission_results?
       false
-    elsif course.model_solution_visible_before_completion? && course.enabled?
-      true
     elsif @exercise.completed_by?(user)
       true
     elsif !course.visible_to?(user)
       false
     elsif !@exercise.visible_to?(user)
       false
+    elsif course.model_solution_visible_before_completion? && course.enabled?
+      true
     else
       show_when_completed = SiteSetting.value('show_model_solutions_when_exercise_completed')
       show_when_expired = SiteSetting.value('show_model_solutions_when_exercise_expired')

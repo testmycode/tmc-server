@@ -56,6 +56,10 @@ module Api
             end
 
             answer_records.each { |record| authorize! :create, record }
+            course_question_ids = T.must(submission.course).feedback_question_ids
+            if answer_records.any? { |record| course_question_ids.exclude?(record.feedback_question_id) }
+              return respond_with_error('Feedback question not found in this course', 422)
+            end
             begin
               ActiveRecord::Base.connection.transaction(requires_new: true) do
                 answer_records.each(&:save!)

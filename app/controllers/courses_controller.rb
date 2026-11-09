@@ -69,13 +69,13 @@ class CoursesController < ApplicationController
   # Method for teacher to give a single course for students to select.
   sig { void }
   def show_json
-    course = [Course.find(params[:id])]
+    course = T.must(@organization).courses.find(params[:id])
     authorize! :read, course
     return respond_unauthorized('Authentication required') if current_user.guest?
 
     data = {
       api_version: ApiVersion::API_VERSION,
-      courses: CourseList.new(current_user, view_context).course_list_data(T.must(@organization), course)
+      courses: CourseList.new(current_user, view_context).course_list_data(T.must(@organization), [course])
     }
     render json: data.to_json
   end

@@ -204,6 +204,25 @@ describe CoursesController, type: :controller do
     end
   end
 
+  describe 'GET show_json' do
+    def get_show_json(course)
+      @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
+      get :show_json, params: { organization_id: @organization.slug, id: course.id, format: 'json', api_version: ApiVersion::API_VERSION }
+    end
+
+    it 'shows a readable course' do
+      course = FactoryBot.create(:course, organization: @organization)
+      get_show_json(course)
+      expect(response.parsed_body['courses'].pluck('id')).to eq([course.id])
+    end
+
+    it 'denies a hidden course' do
+      course = FactoryBot.create(:course, organization: @organization, hidden: true)
+      get_show_json(course)
+      expect(response.code.to_i).to eq(403)
+    end
+  end
+
   describe 'POST refresh' do
     before :each do
       controller.current_user = FactoryBot.create :user
