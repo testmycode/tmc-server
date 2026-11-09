@@ -8,17 +8,23 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
   extend T::Sig
   class InvalidSyntaxError < StandardError; end
 
+  # Aliases so the per-instance T.lets below don't rebuild these types on every UnlockSpec.new.
+  Conditions = T.type_alias { T::Array[T.proc.params(user: User).returns(T::Boolean)] }
+  Describers = T.type_alias { T::Array[T.proc.params(user: User).returns(T.nilable(String))] }
+  OptionalTime = T.type_alias { T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime)) }
+  private_constant :Conditions, :Describers, :OptionalTime
+
   # course may be nil while an exercise is being built; only progress conditions need it.
   # conditions is a decoded JSON array.
   sig { params(course: T.nilable(Course), conditions: T::Array[T.untyped]).void }
   def initialize(course, conditions)
     @course = course
     @raw_spec = conditions
-    @conditions = T.let([], T::Array[T.proc.params(user: User).returns(T::Boolean)])
+    @conditions = T.let([], Conditions)
     @universal_descriptions = T.let([], T::Array[String])
-    @describers = T.let([], T::Array[T.proc.params(user: User).returns(T.nilable(String))])
+    @describers = T.let([], Describers)
     @datetime_count = T.let(0, Integer)
-    @valid_after = T.let(nil, T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime)))
+    @valid_after = T.let(nil, OptionalTime)
     @depends_on_other_exercises = T.let(false, T::Boolean)
     conditions.each_with_index do |condition, i|
       parse_condition(condition.to_s.strip) if condition.to_s.present?

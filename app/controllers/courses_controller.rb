@@ -230,7 +230,6 @@ class CoursesController < ApplicationController
     def assign_show_view_vars
       course = T.must(@course)
       exercises = course.exercises.includes(:course)
-      exercises.preload(:unlocks).where(unlocks: { user: current_user })
       exercises = exercises.select { |ex| ex.visible_to?(current_user) }
                            .natsort_by(&:name)
       @exercises = exercises

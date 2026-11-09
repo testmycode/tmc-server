@@ -44,7 +44,7 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
   if ENV['REDIS_URL']
-    config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_URL'), namespace: 'cache', expires_in: 1.week }
+    config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_URL'), namespace: 'cache-v2', expires_in: 1.week }
   else
     config.cache_store = :memory_store, { size: 64.megabytes }
   end

@@ -544,9 +544,12 @@ class Exercise < ApplicationRecord
   end
 
   private
-    sig { returns(T::Hash[T.nilable(Integer), T::Array[Submission]]) }
+    SubmissionsByUserId = T.type_alias { T::Hash[T.nilable(Integer), T::Array[Submission]] }
+    private_constant :SubmissionsByUserId
+
+    sig { returns(SubmissionsByUserId) }
     def submissions_by_user_id
-      @submissions_by ||= T.let({}, T.nilable(T::Hash[T.nilable(Integer), T::Array[Submission]]))
+      @submissions_by ||= T.let({}, T.nilable(SubmissionsByUserId))
     end
 
     sig { params(spec: T.nilable(String)).returns(DeadlineSpec) }

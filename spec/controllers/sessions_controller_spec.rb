@@ -41,6 +41,19 @@ describe SessionsController, type: :controller do
           expect(response).to redirect_to('/important_path')
         end
       end
+
+      it 'should keep a return_to URL on this host' do
+        get :new, params: { return_to: 'http://test.host/oauth/authorize?client_id=1' }
+        expect(response).to redirect_to('http://test.host/oauth/authorize?client_id=1')
+      end
+
+      it 'should ignore a return_to that is not an absolute local path' do
+        ['courses', '//evil.example.com', 'https://evil.example.com'].each do |return_to|
+          session.delete(:return_to)
+          get :new, params: { return_to: return_to }
+          expect(response).to redirect_to('/')
+        end
+      end
     end
   end
 

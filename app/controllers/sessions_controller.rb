@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
 
   sig { void }
   def new
-    session[:return_to] ||= params[:return_to]
+    session[:return_to] ||= url_from(params[:return_to])
     if signed_in?
       path = session[:return_to] ||= root_path
       redirect_to path

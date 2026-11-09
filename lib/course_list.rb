@@ -45,13 +45,9 @@ class CourseList
     exercises = course.exercises.select { |e| e.points_visible_to?(@user) }
     if opts[:include_points]
       sheets = course.gdocs_sheets(exercises).natsort
+      points_per_sheet = AvailablePoint.course_sheet_points(course, sheets)
       data[:points] = {
-        sheets: sheets.map do |sheet|
-          {
-            name: sheet,
-            total_available: AvailablePoint.course_sheet_points(course, sheet)[sheet] || 0
-          }
-        end,
+        sheets: sheets.map { |sheet| { name: sheet, total_available: points_per_sheet[sheet] || 0 } },
         total_available: AvailablePoint.course_points_of_exercises(course, exercises)
       }
     end

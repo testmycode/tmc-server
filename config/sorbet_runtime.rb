@@ -1,8 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
-# Reports sorbet-runtime violations in production instead of raising (except T.must), where a wrong sig must not take the site down.
-# Other environments keep sorbet's raising defaults. Required from config/application.rb so it also covers boot.
+# Production only: reports sorbet-runtime violations instead of raising (except T.must), so a wrong sig can't take the site down.
+# Required from config/application.rb to cover boot.
 module SorbetRuntimeReporting
   extend T::Sig
 
@@ -14,12 +14,14 @@ module SorbetRuntimeReporting
   @reported_locations = T.let(Set.new, T::Set[String])
   @reported_locations_mutex = T.let(Mutex.new, Thread::Mutex)
 
-  # Logs the violation and notifies NewRelic, once per process for each location, so a
-  # wrong sig on a per-row method can't flood the logs.
+  # Logs and notifies NewRelic once per process per location, so a wrong sig on a per-row method can't flood the logs.
   sig { params(error: Exception, location: T.nilable(String)).void }
   def self.report(error, location)
-    return unless first_report_at?(location || error.message)
+    log(error) if first_report_at?(location || error.message)
+  end
 
+  sig { params(error: Exception).void }
+  def self.log(error)
     backtrace = error.backtrace || []
     # Both are nil until the application has initialized.
     root = T.let(Rails.root, T.nilable(Pathname))
@@ -40,17 +42,21 @@ module SorbetRuntimeReporting
     frame && "#{frame.path}:#{frame.lineno}"
   end
 
-  # Makes violations log instead of raise, except T.must, which raises so the error names the line
-  # that got nil instead of a NoMethodError further on.
+  # Makes violations log instead of raise. T.must still raises, so the error names the line that got nil
+  # instead of a later NoMethodError.
   sig { void }
   def self.install_production_handlers!
     T::Configuration.exclude_value_in_type_errors
 
     T::Configuration.call_validation_error_handler = lambda do |signature, opts|
+      caller_location = opts[:location]
+      location = "#{signature.method_name}@#{caller_location&.path}:#{caller_location&.lineno}"
+      # Checked first: building the error (backtrace) is the expensive part.
+      next unless first_report_at?(location)
+
       error = TypeError.new(opts[:pretty_message])
       error.set_backtrace(caller)
-      caller_location = opts[:location]
-      report(error, "#{signature.method_name}@#{caller_location&.path}:#{caller_location&.lineno}")
+      log(error)
     end
 
     T::Configuration.inline_type_error_handler = lambda do |error, opts|
@@ -75,7 +81,7 @@ module SorbetRuntimeReporting
       !@reported_locations.add?(location).nil?
     end
   end
-  private_class_method :first_report_at?
+  private_class_method :first_report_at?, :log
 end
 
 SorbetRuntimeReporting.install_production_handlers! if Rails.env.production?
