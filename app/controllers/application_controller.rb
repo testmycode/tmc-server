@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+require 'safe_unzipper'
 require 'version'
 require 'twitter_bootstrap_breadcrumbs'
 
@@ -43,6 +44,11 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::MissingFile do |exception|
     T.bind(self, ApplicationController)
     respond_with_error('File not found', 404, exception)
+  end
+
+  rescue_from SafeUnzipper::ArchiveTooLargeError do |exception|
+    T.bind(self, ApplicationController)
+    respond_with_error("The submitted files cannot be shown: #{exception.message}", 422)
   end
 
   rescue_from Rack::Timeout::RequestTimeoutException do |exception|

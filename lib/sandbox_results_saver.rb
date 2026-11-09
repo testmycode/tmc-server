@@ -15,7 +15,7 @@ module SandboxResultsSaver
   sig { params(submission: Submission, results: T::Hash[String, T.untyped]).void }
   def self.save_results(submission, results)
     ActiveRecord::Base.transaction do
-      raise InvalidTokenError, 'Invalid or expired token' if results['token'] != submission.secret_token
+      raise InvalidTokenError, 'Invalid or expired token' unless valid_token?(submission, results['token'])
 
       submission.all_tests_passed = false
       submission.stdout = results['stdout']
@@ -66,6 +66,14 @@ module SandboxResultsSaver
       submission.processing_completed_at = Time.zone.now
       submission.save!
     end
+  end
+
+  # The token is cleared once a submission is processed, so a blank one must never match.
+  sig { params(submission: Submission, token: T.untyped).returns(T::Boolean) }
+  private_class_method def self.valid_token?(submission, token)
+    expected = submission.secret_token
+    return false if submission.processed? || expected.blank? || !token.is_a?(String) || token.blank?
+    ActiveSupport::SecurityUtils.secure_compare(token, expected)
   end
 
   sig { params(submission: Submission, test_output: T.untyped).void }

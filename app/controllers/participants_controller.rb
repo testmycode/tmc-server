@@ -151,6 +151,7 @@ class ParticipantsController < ApplicationController
   def password_reset_link
     @user = User.find(params[:id])
     authorize! :view_participant_information, @user
+    return respond_forbidden('This feature is only available to admins') unless current_user.administrator?
     return respond_forbidden('This feature is disabled for admin accounts') if @user.administrator?
 
     @password_reset_link = T.let(@user.generate_password_reset_link, T.nilable(String))

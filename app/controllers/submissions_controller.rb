@@ -50,14 +50,18 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        respond_forbidden if !current_user.administrator? && course.hide_submissions?
+        return respond_forbidden if !current_user.administrator? && course.hide_submissions?
         @files = T.let(SourceFileList.for_submission(submission), T.nilable(T.any(SourceFileList, T::Array[T::Hash[Symbol, String]])))
       end
       format.zip do
-        respond_forbidden if !current_user.administrator? && course.hide_submissions?
+        return respond_forbidden if !current_user.administrator? && course.hide_submissions?
         send_data(submission.return_file, filename: "#{T.must(submission.user).login}-#{submission.exercise_name}-#{submission.id}.zip")
       end
       format.json do
+        # Only the files are hidden: clients poll this endpoint for the results of their own submissions.
+        include_files = !!params[:include_files]
+        return respond_forbidden if include_files && !current_user.administrator? && course.hide_submissions?
+
         output = {
           api_version: ApiVersion::API_VERSION,
           all_tests_passed: submission.all_tests_passed?,
@@ -106,7 +110,7 @@ class SubmissionsController < ApplicationController
           end
         output = output.merge(T.must(status_fields))
         output[:status] = :ok if output[:status] == :hidden
-        if !!params[:include_files]
+        if include_files
           output[:files] = SourceFileList.for_submission(submission).map { |f| { path: f.path, contents: f.contents } }
         end
 
@@ -207,6 +211,7 @@ class SubmissionsController < ApplicationController
   sig { void }
   def update_by_exercise
     exercise = T.must(@exercise)
+    authorize! :rerun, Submission.new(course: exercise.course, exercise: exercise)
     for submission in exercise.submissions
       schedule_for_rerun(submission, -2)
     end

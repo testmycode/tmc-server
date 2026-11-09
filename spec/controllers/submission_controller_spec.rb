@@ -189,6 +189,44 @@ describe SubmissionsController, type: :controller do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe 'when the course hides submissions' do
+    before :each do
+      FactoryBot.create(:submission_data, submission: @submission)
+      @course.update!(hide_submissions: true)
+    end
+
+    it 'forbids the zip' do
+      get :show, params: { id: @submission.id, format: :zip }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'forbids the files in JSON' do
+      get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION, include_files: 1 }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'still returns the results in JSON' do
+      get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
+      expect(response).to have_http_status(:ok)
+      check_common_keys(response.parsed_body)
+    end
+  end
+
+  describe 'when the submission archive is too large to extract' do
+    render_views
+
+    before :each do
+      FactoryBot.create(:submission_data, submission: @submission)
+      stub_const('SafeUnzipper::MAX_ENTRIES', 0)
+    end
+
+    it 'explains why the files are not shown' do
+      get :show, params: { id: @submission.id }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('The submitted files cannot be shown')
+    end
+  end
 end
 
 def check_common_keys(json)

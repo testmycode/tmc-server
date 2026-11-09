@@ -112,6 +112,32 @@ describe ParticipantsController, type: :controller do
     end
   end
 
+  describe 'GET /password_reset_link' do
+    let(:course) { FactoryBot.create(:course) }
+
+    before do
+      FactoryBot.create(:awarded_point, course: course, user: @user)
+    end
+
+    it 'is forbidden for a teacher of a course the user is in' do
+      teacher = FactoryBot.create(:user)
+      Teachership.create!(user: teacher, organization: course.organization)
+      controller.current_user = teacher
+
+      expect(ActionToken).not_to receive(:generate_password_reset_key_for)
+      get :password_reset_link, params: { id: @user.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'shows the link to an admin' do
+      controller.current_user = FactoryBot.create(:admin)
+
+      get :password_reset_link, params: { id: @user.id }
+      expect(response).to have_http_status(:ok)
+      expect(assigns(:password_reset_link)).to include('/reset_password/')
+    end
+  end
+
   describe 'GET /show' do
     describe 'when logged in as an admin' do
       before :each do

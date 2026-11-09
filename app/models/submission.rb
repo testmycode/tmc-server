@@ -373,7 +373,7 @@ class Submission < ApplicationRecord
   # Changing it in the meantime will obsolete any runs currently being processed.
   sig { void }
   def randomize_secret_token
-    self.secret_token = rand(10**100).to_s
+    self.secret_token = SecureRandom.hex(32)
   end
 
   # How often we try to resend if no sandbox has received it yet
