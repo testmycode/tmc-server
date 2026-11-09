@@ -16,7 +16,7 @@ class AuthsController < ApplicationController
       user = User.find_by(login: params[:username])
       user ||= User.find_by('lower(email) = ?', params[:username].downcase)
       # Allows using oauth2 tokens of the new api for authenticating
-      res = if user && Doorkeeper::AccessToken.find_by(resource_owner_id: user.id, token: params[:session_id])
+      res = if user && Doorkeeper::AccessToken.find_by(resource_owner_id: user.id, token: params[:session_id])&.accessible?
         OK_MESSAGE
       elsif user && find_session_by_id(params[:session_id])&.belongs_to?(user)
         OK_MESSAGE
@@ -26,13 +26,13 @@ class AuthsController < ApplicationController
       return render plain: res
     end
 
-    user = User.find_by(login: params[:username])
-    user ||= User.find_by('lower(email) = ?', params[:username].downcase)
-    msg = if user && params[:password].present? && user.has_password?(params[:password])
-      OK_MESSAGE
+    status = if params[:username].present? && params[:password].present?
+      User.authenticate_with_status(params[:username].to_s, params[:password].to_s).last
     else
-      FAIL_MESSAGE
+      :rejected
     end
+    PasswordFailureThrottle.record_failure(request) if status == :rejected
+    msg = status == :accepted ? OK_MESSAGE : FAIL_MESSAGE
 
     respond_to do |format|
       format.any(:html, :text) do # Work around bug in HTTP library used by tmc-comet and accept HTML mime type

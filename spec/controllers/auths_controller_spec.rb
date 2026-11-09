@@ -6,6 +6,7 @@ require 'spec_helper'
 describe AuthsController, type: :controller do
   before :each do
     @user = FactoryBot.create(:user, login: 'foo', password: 'bar')
+    allow_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).and_return(true)
   end
 
   it 'tells whether the given user/password is valid or not' do
@@ -43,5 +44,24 @@ describe AuthsController, type: :controller do
     post :show, params: { username: 'foo', session_id: s.session_id, format: :text }
     expect(response).to be_successful
     expect(response.body).to eq('OK')
+  end
+
+  it 'fails without a username' do
+    get :show, params: { password: 'bar', format: :text }
+    expect(response).to be_successful
+    expect(response.body).to eq('FAIL')
+  end
+
+  it 'checks the password of an externally managed user with courses.mooc.fi' do
+    @user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
+    expect_any_instance_of(User).to receive(:courses_mooc_fi_authentication_status).with('bar').and_return(:rejected)
+    get :show, params: { username: 'foo', password: 'bar', format: :text }
+    expect(response.body).to eq('FAIL')
+  end
+
+  it 'refuses the local password of a user flagged as externally managed without an id' do
+    @user.update_column(:password_managed_by_courses_mooc_fi, true)
+    get :show, params: { username: 'foo', password: 'bar', format: :text }
+    expect(response.body).to eq('FAIL')
   end
 end

@@ -3,10 +3,9 @@
 
 class PasswordResetKeyMailer < ActionMailer::Base
   extend T::Sig
-  sig { params(user: User, key: ActionToken, origin: T.nilable(String)).void }
-  def reset_link_email(user, key, origin = nil)
+  sig { params(user: User, key: ActionToken).void }
+  def reset_link_email(user, key)
     @user = T.let(user, T.nilable(User))
-    @origin = T.let(origin, T.nilable(String))
     settings = SiteSetting.value('emails')
 
     subject = 'Reset your mooc.fi account password'

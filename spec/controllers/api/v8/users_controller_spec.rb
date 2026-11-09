@@ -138,7 +138,7 @@ describe Api::V8::UsersController, type: :controller do
   end
 
   describe 'PUT update password' do
-    let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
     before :each do
       user.password = 'oldpassword'

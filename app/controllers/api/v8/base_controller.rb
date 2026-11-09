@@ -49,14 +49,21 @@ module Api
         sig { void }
         def authenticate_user!
           return if @current_user
-          if doorkeeper_token
-            @current_user = T.let(User.find_by(id: doorkeeper_token.resource_owner_id), T.nilable(User))
+          if (token = doorkeeper_token)
+            @current_user = T.let(User.find_by(id: token.resource_owner_id), T.nilable(User))
             raise 'Invalid token' unless @current_user
           elsif Rails.configuration.x.accept_courses_mooc_fi_tokens
             @current_user = CoursesMoocFiAuthentication.user_for(request)
             @auth_source = T.let(:courses_mooc_fi_token, T.nilable(Symbol)) if @current_user
           end
-          @current_user ||= user_from_session || Guest.new
+          @current_user ||= user_from_session_with_verified_csrf || Guest.new
+        end
+
+        # The session cookie authenticates API calls made from TMC's own pages, so those need the
+        # CSRF token that the skipped verify_authenticity_token would otherwise demand.
+        sig { returns(T.nilable(User)) }
+        def user_from_session_with_verified_csrf
+          user_from_session if verified_request?
         end
 
         # Before authenticate_user! has run (ApplicationController's own before_actions), this is a Guest.

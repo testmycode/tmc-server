@@ -67,17 +67,21 @@ class Rack::Attack
     req.post?)
   end
 
+  blocklist('password checks after too many wrong passwords') do |req|
+    PasswordFailureThrottle.blocked?(req)
+  end
+
   # Limit the number of account creations to 15 accounts per minute
   throttle('account creations per minute', limit: 15, period: 1.minute) do |req|
     req.ip if req.path == '/user' ||
-    (req.path == 'api/v8/users' &&
+    (req.path.match?(%r{\A/api/v8/users(\.\w+)?\z}) &&
     req.post?)
   end
 
   # Limit the number of account creations to 1000 per day
   throttle('account creations per day', limit: 1000, period: 1.day) do |req|
     req.ip if req.path == '/user' ||
-    (req.path == 'api/v8/users' &&
+    (req.path.match?(%r{\A/api/v8/users(\.\w+)?\z}) &&
     req.post?)
   end
 
@@ -105,14 +109,16 @@ class Rack::Attack
     end
   end
 
+  PASSWORD_RESET_PATH = T.let(%r{\A/(password_reset_keys|api/v8/users/password_reset)(\.\w+)?\z}, Regexp)
+
   # Limit the number of password resets per ip to 10 per hour
   throttle('password resets per ip per hour', limit: 10, period: 1.hour) do |req|
-    req.ip if req.path == '/password_reset_keys' &&
+    req.ip if req.path.match?(PASSWORD_RESET_PATH) &&
     req.post?
   end
 
   # Limit the number of password resets per email to 5 per day
   throttle('password resets per email per day', limit: 5, period: 1.day) do |req|
-    req.params['email'] if req.path == '/password_reset_keys' && req.post?
+    req.params['email'].to_s.strip.downcase.presence if req.path.match?(PASSWORD_RESET_PATH) && req.post?
   end
 end

@@ -92,6 +92,13 @@ class ApplicationController < ActionController::Base
       @current_ability ||= T.let(::Ability.new(current_user), T.nilable(::Ability))
     end
 
+    # The request's Doorkeeper access token, or nil when it is missing, revoked or expired.
+    sig { returns(T.nilable(Doorkeeper::AccessToken)) }
+    def doorkeeper_token
+      token = super
+      token if token&.accessible?
+    end
+
     sig { void }
     def set_default_url_options
       Rails.application.routes.default_url_options[:host] = request.host_with_port
