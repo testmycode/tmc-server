@@ -77,15 +77,25 @@ module Api
           @current_ability ||= T.let(::Ability.new(current_user, auth_source: @auth_source), T.nilable(::Ability))
         end
 
-        # Narrows `points` (awarded points of `course`) to what the caller may see.
-        # Raises CanCan::AccessDenied unless the caller may read the course and see its points.
+        # Narrows `points` (awarded points of `course`) to what the caller may see. Teachers see all;
+        # anyone else only their own, none in exam mode or as a guest, and never those of exercises
+        # that are hidden or hiding their results.
+        # Raises CanCan::AccessDenied unless the caller may read the course.
         sig { params(course: Course, points: ActiveRecord::Relation).returns(ActiveRecord::Relation) }
         def visible_awarded_points(course, points)
           authorize! :read, course
-          authorize! :see_points, course
           return points if can?(:teach, course)
+          return points.none if current_user.guest? || !can?(:see_points, course)
           hidden_exercises = course.exercises.where(hidden: true).or(course.exercises.where(hide_submission_results: true))
-          points.where.not(name: AvailablePoint.where(exercise_id: hidden_exercises.select(:id)).select(:name))
+          points.where(user_id: current_user.id)
+                .where.not(name: AvailablePoint.where(exercise_id: hidden_exercises.select(:id)).select(:name))
+        end
+
+        # The API list fields of those `submissions` the current user may read.
+        sig { params(submissions: ActiveRecord::Relation).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+        def readable_submission_fields(submissions)
+          readable = submissions.preload(course: :organization).select { |sub| sub.readable_by?(current_user) }
+          Submission.filter_fields!(readable, current_user)
         end
 
         sig { params(messages: T.any(String, T::Array[String])).returns(T::Hash[Symbol, T::Array[String]]) }

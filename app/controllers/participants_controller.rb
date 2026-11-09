@@ -70,7 +70,7 @@ class ParticipantsController < ApplicationController
         render json: index_json_data
       end
       format.csv do
-        render_csv(text: index_csv, filename: 'participants.csv')
+        render_csv(body: index_csv, filename: 'participants.csv')
       end
     end
   end
@@ -234,7 +234,7 @@ class ParticipantsController < ApplicationController
       extra_fields = T.must(@extra_fields)
       visible_columns = T.must(@visible_columns)
       group_completion = @group_completion
-      CSV.generate(force_quotes: true) do |csv|
+      CsvCell.generate(force_quotes: true) do |csv|
         title_row = (ordinary_fields + extra_fields.map(&:name)).filter_map { |f| f.humanize if visible_columns.include?(f) }
 
         completion_cols = T.let([], T::Array[String])

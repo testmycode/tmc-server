@@ -131,10 +131,10 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
 
       describe 'when course name given' do
-        it "shows only user's point information" do
+        it "lists none of another user's points" do
           get :index, params: { organization_slug: organization.slug, course_name: course_name, user_id: course_point.user_id }
           expect(response).to have_http_status(200)
-          expect(response.body).to include course_point.name
+          expect(response.parsed_body).to eq([])
           expect(response.body).not_to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
           expect(response.body).not_to include point.name
@@ -158,10 +158,10 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
 
       describe 'when course name given' do
-        it "shows only user's point information" do
+        it "lists none of another user's points" do
           get :index, params: { organization_slug: organization.slug, course_name: course_name, user_id: course_point.user_id }
           expect(response).to have_http_status(200)
-          expect(response.body).to include course_point.name
+          expect(response.parsed_body).to eq([])
           expect(response.body).not_to include point.name
         end
       end
@@ -181,10 +181,10 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
       let(:token) { nil }
 
       describe 'when course name given' do
-        it "shows only user's point information" do
+        it 'lists no points' do
           get :index, params: { organization_slug: organization.slug, course_name: course_name, user_id: course_point.user_id }
           expect(response).to have_http_status(200)
-          expect(response.body).to include course_point.name
+          expect(response.parsed_body).to eq([])
           expect(response.body).not_to include point.name
         end
       end
@@ -204,11 +204,11 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
     let(:current_user) { FactoryBot.create(:user) }
     let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
 
-    it 'is forbidden' do
+    it 'lists no points' do
       course.update!(hide_submission_results: true)
       get :index, params: { organization_slug: organization.slug, course_name: course_name, user_id: 'current' }
-      expect(response).to have_http_status(403)
-      expect(response.body).not_to include current_user_course_point.name
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body).to eq([])
     end
   end
 end

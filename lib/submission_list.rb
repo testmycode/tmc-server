@@ -8,6 +8,7 @@ class SubmissionList
   def initialize(user, helpers)
     @user = user
     @helpers = helpers
+    @results_visible_to_user = T.let(Submission.results_visibility_for(user), T.proc.params(submission: Submission).returns(T::Boolean))
   end
 
   sig { params(submissions: T::Enumerable[Submission]).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
@@ -17,7 +18,7 @@ class SubmissionList
 
   sig { params(submission: Submission).returns(T::Hash[Symbol, T.untyped]) }
   def submission_data(submission)
-    results_visible = submission.can_see_results?(@user)
+    results_visible = @results_visible_to_user.call(submission)
     {
       exercise_name: submission.exercise_name,
       id: submission.id,

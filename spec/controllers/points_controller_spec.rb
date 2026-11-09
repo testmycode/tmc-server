@@ -40,6 +40,13 @@ describe PointsController, type: :controller do
         expect(response.code.to_i).to eq(403)
       end
     end
+
+    it 'denies a course the user cannot read' do
+      @course.update!(hidden: true)
+      controller.current_user = FactoryBot.create(:user)
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id }
+      expect(response.code.to_i).to eq(403)
+    end
   end
 
   describe 'GET show' do
@@ -71,6 +78,13 @@ describe PointsController, type: :controller do
         get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @sheetname }
         expect(response.code.to_i).to eq(403)
       end
+    end
+
+    it 'shows the sheet to a student with no points in it' do
+      controller.current_user = FactoryBot.create(:user)
+      get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @sheetname }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to have_content('✔')
     end
 
     describe 'in JSON format' do

@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+# Renders the HTML preludes that teachers write at the top of exercise files.
 module HtmlPreludeHelper
   extend T::Sig
 
@@ -8,6 +9,7 @@ module HtmlPreludeHelper
     (Rails::HTML5::SafeListSanitizer.allowed_tags + %w[table thead tbody tfoot tr th td caption]).freeze,
     T::Set[String]
   )
+  # Rails' safe list plus inline styles and table spans; the sanitizer still filters style properties.
   ALLOWED_ATTRIBUTES = T.let(
     (Rails::HTML5::SafeListSanitizer.allowed_attributes + %w[style colspan rowspan]).freeze,
     T::Set[String]

@@ -11,6 +11,7 @@ class PointsController < ApplicationController
   sig { void }
   def index
     @course = Course.find(params[:course_id])
+    authorize! :read, @course
     authorize! :see_points, @course
     return respond_unauthorized('Authentication required') if current_user.guest?
     add_course_breadcrumb
@@ -59,7 +60,8 @@ class PointsController < ApplicationController
     authorize! :see_points, @course
     return respond_unauthorized('Authentication required') if current_user.guest?
 
-    if can?(:teach, @course)
+    can_teach = can?(:teach, @course)
+    if can_teach
       @user_fields = UserField.all.select(&:show_in_participant_list?)
     end
 
@@ -69,19 +71,20 @@ class PointsController < ApplicationController
 
     exercises = Exercise.course_gdocs_sheet_exercises(@course, sheetname, current_user.administrator?).includes(:available_points).order!(:name)
     @exercises = T.let(exercises, T.nilable(ActiveRecord::Relation))
-    users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, sheetname, hidden: current_user.administrator?)
-    users_to_points = users_to_points.slice(current_user.login) unless can?(:teach, @course)
+    users_to_points = AwardedPoint.per_user_in_course_with_sheet(@course, sheetname, hidden: current_user.administrator?,
+                                                                                     only_for_user: can_teach ? nil : current_user)
     @users_to_points = T.let(users_to_points, T.nilable(T::Hash[String, T::Array[String]]))
 
     users = @course.users.includes(:user_field_values)
-    if params[:sort_by] == 'points'
+    if !can_teach
+      users = [current_user]
+    elsif params[:sort_by] == 'points'
       users = users.sort_by do |u|
         [-users_to_points.fetch(u.login, []).size, u.login.downcase]
       end
     else
       users.order!
     end
-    users = [current_user] unless can?(:teach, @course)
     @users = T.let(users, T.nilable(T.any(ActiveRecord::Relation, T::Array[User])))
     respond_to do |format|
       format.html

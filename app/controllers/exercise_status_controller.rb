@@ -8,17 +8,22 @@ class ExerciseStatusController < ApplicationController
   def show
     course_id = params[:course_id]
     user_id = params[:id]
+    return respond_unauthorized if current_user.guest?
 
     course = Course.where(id: course_id).first || Course.where(name: course_id).first
     return respond_not_found('Course not found') if course.nil?
     return respond_forbidden unless course.visible_to?(Guest.new) || current_user.administrator?
 
-    user = User.where(id: user_id).first || User.where(login: user_id).first
+    can_teach = can?(:teach, course)
+    # A numeric login would otherwise resolve to the user with that id.
+    user = current_user if user_id == current_user.login
+    user ||= User.where(id: user_id).first || User.where(login: user_id).first
+    # Checked before the 404 so that students cannot probe which logins exist.
+    return respond_forbidden unless can_teach || user == current_user
     return respond_not_found('User not found') if user.nil?
 
     user_subs = user.submissions.where(course_id: course.id).to_a.group_by(&:exercise_name)
 
-    can_teach = can?(:teach, course)
     results = {}
     course.exercises.each do |ex|
       next unless can_teach || ex._fast_visible?

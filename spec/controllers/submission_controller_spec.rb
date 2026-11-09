@@ -137,6 +137,17 @@ describe SubmissionsController, type: :controller do
     end
   end
 
+  describe 'POST create' do
+    it 'records the client IP from remote_ip, not a client-sent X-Forwarded-For' do
+      exercise = FactoryBot.create(:returnable_exercise, course: @course)
+      zip = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/submission_uploads/empty.zip'), 'application/octet-stream')
+      request.env['REMOTE_ADDR'] = '203.0.113.7'
+      request.env['HTTP_X_FORWARDED_FOR'] = '198.51.100.9'
+      expect { post :create, params: { exercise_id: exercise.id, submission: { file: zip } } }.to change(Submission, :count).by(1)
+      expect(Submission.last.client_ip).to eq('203.0.113.7')
+    end
+  end
+
   describe 'GET index' do
     render_views
 

@@ -50,9 +50,9 @@ class EmailsController < ApplicationController
         format.html
         format.text { render plain: students.map { |s| s.email.to_s }.join("\n") }
         format.csv do
-          csv = CSV.generate do |rows|
+          csv = CsvCell.generate do |rows|
             rows << %w[Username Email]
-            students.each { |s| rows << [s.username, s.email].map { |cell| CsvCell.escape(cell) } }
+            students.each { |s| rows << [s.username, s.email] }
           end
           render plain: csv
         end

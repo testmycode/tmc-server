@@ -52,6 +52,9 @@ Rails.application.configure do
   # Which storage.yml to use
   config.active_storage.service = :local
 
+  # nginx terminates TLS and may not pass the scheme on; the secure session cookie relies on this.
+  config.assume_ssl = true
+
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 

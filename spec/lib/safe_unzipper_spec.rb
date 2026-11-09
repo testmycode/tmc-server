@@ -67,6 +67,15 @@ describe SafeUnzipper do
     expect(Dir.empty?('out')).to be(true)
   end
 
+  it 'refuses an archive whose extraction times out' do
+    SystemCommands.sh!('zip', '-r', 'foo.zip', 'foo')
+    Dir.mkdir('out')
+    allow(SystemCommands).to receive(:sh!).and_call_original
+    allow(SystemCommands).to receive(:sh!).with('unzip', any_args).and_raise(SystemCommands::TimeoutError)
+
+    expect { SafeUnzipper.new.unzip('foo.zip', 'out') }.to raise_error(SafeUnzipper::ArchiveTooLargeError, /too long/)
+  end
+
   it 'removes symlinks inside the unzipped directory' do
     File.symlink('../good_file', 'foo/bar/good_link')
     zip_and_unzip

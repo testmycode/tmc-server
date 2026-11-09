@@ -29,6 +29,16 @@ describe ParticipantsController, type: :controller do
     end
   end
 
+  describe 'GET /index as CSV' do
+    it 'neutralizes cells a spreadsheet would run as formulas' do
+      FactoryBot.create(:user, login: '=HYPERLINK("http://x")')
+      controller.current_user = FactoryBot.create(:admin)
+      get :index, format: :csv
+      expect(response.body).to include %("'=HYPERLINK(""http://x"")")
+      expect(response.body).not_to include %("=HYPERLINK)
+    end
+  end
+
   describe 'POST /force_migrate_to_courses_mooc_fi' do
     describe 'when logged in as a non-admin' do
       before :each do

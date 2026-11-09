@@ -51,13 +51,13 @@ describe Api::V8::Courses::PointsController, type: :controller do
       let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
 
       describe 'when course ID given' do
-        it "shows only user's point information" do
+        it "shows only the caller's own points" do
           get :index, params: { course_id: course.id }
           expect(response).to have_http_status(200)
           expect(response.body).not_to include point.name
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
-          expect(response.body).to include course_point.name
+          expect(response.body).not_to include course_point.name
         end
       end
       describe 'when invalid course ID given' do
@@ -78,11 +78,10 @@ describe Api::V8::Courses::PointsController, type: :controller do
       let(:token) { nil }
 
       describe 'when course ID given' do
-        it "shows only user's point information" do
+        it 'lists no points' do
           get :index, params: { course_id: course.id }
           expect(response).to have_http_status(200)
-          expect(response.body).not_to include point.name
-          expect(response.body).to include course_point.name
+          expect(response.parsed_body).to eq([])
         end
       end
       describe 'when invalid course ID given' do
@@ -99,6 +98,44 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
   describe 'GET points for a course in exam mode' do
     before(:each) { course.update!(hide_submission_results: true) }
+
+    describe 'as user' do
+      let(:current_user) { FactoryBot.create(:user) }
+      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+
+      it 'lists no points' do
+        get :index, params: { course_id: course.id }
+        expect(response).to have_http_status(200)
+        expect(response.parsed_body).to eq([])
+      end
+    end
+
+    describe 'as guest' do
+      let(:current_user) { Guest.new }
+      let(:token) { nil }
+
+      it 'lists no points' do
+        get :index, params: { course_id: course.id }
+        expect(response).to have_http_status(200)
+        expect(response.parsed_body).to eq([])
+      end
+    end
+
+    describe 'as admin' do
+      let(:current_user) { FactoryBot.create(:admin) }
+      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+
+      it 'lists the points' do
+        get :index, params: { course_id: course.id }
+        expect(response.body).to include course_point.name
+      end
+    end
+  end
+
+  describe 'GET points for a hidden course the caller is not on' do
+    let!(:current_user_course_point) { nil }
+
+    before(:each) { course.update!(hidden: true) }
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
@@ -123,11 +160,28 @@ describe Api::V8::Courses::PointsController, type: :controller do
     end
   end
 
+  describe 'GET points for a course with an exercise in exam mode' do
+    let!(:exam_point) do
+      exercise = FactoryBot.create(:exercise, course: course, hide_submission_results: true)
+      FactoryBot.create(:available_point, exercise: exercise)
+      FactoryBot.create(:awarded_point, course: course, user: current_user, name: exercise.available_points.first.name)
+    end
+    let(:current_user) { FactoryBot.create(:user) }
+    let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+
+    it "leaves out the exercise's points" do
+      get :index, params: { course_id: course.id }
+      expect(response).to have_http_status(200)
+      expect(response.body).to include current_user_course_point.name
+      expect(response.body).not_to include exam_point.name
+    end
+  end
+
   describe 'GET points for a course with a hidden exercise' do
     let!(:hidden_point) do
       exercise = FactoryBot.create(:exercise, course: course, hidden: true)
       FactoryBot.create(:available_point, exercise: exercise)
-      FactoryBot.create(:awarded_point, course: course, name: exercise.available_points.first.name)
+      FactoryBot.create(:awarded_point, course: course, user: current_user, name: exercise.available_points.first.name)
     end
 
     describe 'as user' do
@@ -137,7 +191,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
       it "leaves out the hidden exercise's points" do
         get :index, params: { course_id: course.id }
         expect(response).to have_http_status(200)
-        expect(response.body).to include course_point.name
+        expect(response.body).to include current_user_course_point.name
         expect(response.body).not_to include hidden_point.name
       end
     end

@@ -421,13 +421,25 @@ class Submission < ApplicationRecord
     self.paste_key = SecureRandom.urlsafe_base64 if paste_available?
   end
 
-  # Maps `submissions` in place to their API list fields, as seen by `viewer`.
+  # can_see_results? for many submissions seen by one viewer, evaluated once per course and exercise.
+  sig { params(viewer: User).returns(T.proc.params(submission: Submission).returns(T::Boolean)) }
+  def self.results_visibility_for(viewer)
+    visible_by_exercise = T.let({}, T::Hash[[T.nilable(Integer), T.nilable(String)], T::Boolean])
+    lambda do |submission|
+      visible_by_exercise.fetch([submission.course_id, submission.exercise_name]) do |key|
+        visible_by_exercise[key] = submission.can_see_results?(viewer)
+      end
+    end
+  end
+
+  # Maps `submissions` in place to their API list fields, as seen by `viewer`. Preload their courses'
+  # organizations first; Api::V8::BaseController#readable_submission_fields does.
   sig { params(submissions: T::Array[T.untyped], viewer: User).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def self.filter_fields!(submissions, viewer)
-    ActiveRecord::Associations::Preloader.new(records: submissions, associations: { course: :organization }).call
     eager_load_exercises(submissions)
+    results_visible_to_viewer = results_visibility_for(viewer)
     submissions.map! do |sub|
-      results_visible = sub.can_see_results?(viewer)
+      results_visible = results_visible_to_viewer.call(sub)
       {
         id: sub.id,
         user_id: sub.user_id,

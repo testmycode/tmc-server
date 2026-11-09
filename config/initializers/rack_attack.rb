@@ -71,17 +71,19 @@ class Rack::Attack
     PasswordFailureThrottle.blocked?(req)
   end
 
+  API_ACCOUNT_CREATION_PATH = T.let(%r{\A/api/v8/users(\.\w+)?\z}, Regexp)
+
   # Limit the number of account creations to 15 accounts per minute
   throttle('account creations per minute', limit: 15, period: 1.minute) do |req|
     req.ip if req.path == '/user' ||
-    (req.path.match?(%r{\A/api/v8/users(\.\w+)?\z}) &&
+    (req.path.match?(API_ACCOUNT_CREATION_PATH) &&
     req.post?)
   end
 
   # Limit the number of account creations to 1000 per day
   throttle('account creations per day', limit: 1000, period: 1.day) do |req|
     req.ip if req.path == '/user' ||
-    (req.path.match?(%r{\A/api/v8/users(\.\w+)?\z}) &&
+    (req.path.match?(API_ACCOUNT_CREATION_PATH) &&
     req.post?)
   end
 
@@ -117,8 +119,36 @@ class Rack::Attack
     req.post?
   end
 
+  # Reset requests carry only an email, so anything larger is not a real client.
+  PASSWORD_RESET_JSON_MAX_BYTES = 8192
+
+  # The email a password reset is requested for, picked the way Rails params do: the query string
+  # wins over the body, and every content type Rails parses as JSON is read as JSON. Oversized
+  # JSON bodies share one key so that padding cannot dodge the per-email limit.
+  sig { params(req: Rack::Attack::Request).returns(T.nilable(String)) }
+  def self.password_reset_email(req)
+    email = req.GET['email']
+    email ||= Mime::Type.lookup(req.media_type.to_s).symbol == :json ? json_body_email(req) : req.POST['email']
+    email.to_s.strip.downcase.presence
+  end
+
+  sig { params(req: Rack::Attack::Request).returns(T.untyped) }
+  private_class_method def self.json_body_email(req)
+    body = req.body
+    json = body.read(PASSWORD_RESET_JSON_MAX_BYTES + 1).to_s
+    body.rewind
+    return 'oversized JSON body' if json.bytesize > PASSWORD_RESET_JSON_MAX_BYTES
+
+    parsed = begin
+      JSON.parse(json)
+    rescue JSON::ParserError
+      nil
+    end
+    parsed['email'] if parsed.is_a?(Hash)
+  end
+
   # Limit the number of password resets per email to 5 per day
   throttle('password resets per email per day', limit: 5, period: 1.day) do |req|
-    req.params['email'].to_s.strip.downcase.presence if req.path.match?(PASSWORD_RESET_PATH) && req.post?
+    password_reset_email(req) if req.path.match?(PASSWORD_RESET_PATH) && req.post?
   end
 end

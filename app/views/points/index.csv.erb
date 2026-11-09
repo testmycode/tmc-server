@@ -1,12 +1,12 @@
 <% require 'csv' %>
-<%= CSV.generate(:force_quotes => true) do |csv|
+<%= CsvCell.generate(force_quotes: true) do |csv|
   arr = []
   arr << :id if can?(:teach, @course)
   arr += @user_fields.map(&:label) if @user_fields
   arr << :email if can?(:teach, @course)
   arr << :username if can?(:teach, @course) && params[:include_username]
   arr += @summary[:sheets].map {|sheet| sheet[:name] } + ["Total"]
-  csv << arr.map { |cell| CsvCell.escape(cell) }
+  csv << arr
 
   @summary[:users].each do |user|
     points = @summary[:sheets].map do |sheet|
@@ -24,6 +24,6 @@
     arr << user.email if can?(:teach, @course)
     arr << user.login if can?(:teach, @course) && params[:include_username]
     arr += points + [total]
-    csv << arr.map { |cell| CsvCell.escape(cell) }
+    csv << arr
   end
 end.html_safe %>

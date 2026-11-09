@@ -19,6 +19,64 @@ describe 'Signup and password reset throttles', type: :request do
     expect(response).to have_http_status(:service_unavailable)
   end
 
+  it 'limits API password resets per email sent as JSON' do
+    FactoryBot.create(:user, email: 'student@example.com')
+    5.times do |i|
+      post '/api/v8/users/password_reset', params: { email: 'student@example.com' }.to_json,
+                                           headers: { 'CONTENT_TYPE' => 'application/json' }, env: { 'REMOTE_ADDR' => "198.51.100.#{i}" }
+      expect(response).to have_http_status(:ok)
+    end
+
+    post '/api/v8/users/password_reset', params: { email: 'Student@example.com' }.to_json,
+                                         headers: { 'CONTENT_TYPE' => 'application/json' }, env: { 'REMOTE_ADDR' => ip }
+    expect(response).to have_http_status(:service_unavailable)
+  end
+
+  it 'counts the email from the query string, which Rails prefers over the body' do
+    FactoryBot.create(:user, email: 'student@example.com')
+    5.times do |i|
+      post '/password_reset_keys?email=student@example.com', params: { email: "decoy#{i}@example.com" },
+                                                             env: { 'REMOTE_ADDR' => "198.51.100.#{i}" }
+    end
+    expect(response).not_to have_http_status(:service_unavailable)
+
+    post '/password_reset_keys?email=student@example.com', params: { email: 'decoy@example.com' }, env: { 'REMOTE_ADDR' => ip }
+    expect(response).to have_http_status(:service_unavailable)
+  end
+
+  it 'limits password resets per email sent with a JSON synonym content type' do
+    FactoryBot.create(:user, email: 'student@example.com')
+    5.times do |i|
+      post '/api/v8/users/password_reset', params: { email: 'student@example.com' }.to_json,
+                                           headers: { 'CONTENT_TYPE' => 'text/x-json' }, env: { 'REMOTE_ADDR' => "198.51.100.#{i}" }
+      expect(response).to have_http_status(:ok)
+    end
+
+    post '/api/v8/users/password_reset', params: { email: 'student@example.com' }.to_json,
+                                         headers: { 'CONTENT_TYPE' => 'text/x-json' }, env: { 'REMOTE_ADDR' => ip }
+    expect(response).to have_http_status(:service_unavailable)
+  end
+
+  it 'limits padded JSON password resets together' do
+    5.times do |i|
+      post '/api/v8/users/password_reset', params: { email: "nobody#{i}@example.com", padding: 'x' * 10_000 }.to_json,
+                                           headers: { 'CONTENT_TYPE' => 'application/json' }, env: { 'REMOTE_ADDR' => "198.51.100.#{i}" }
+    end
+    expect(response).not_to have_http_status(:service_unavailable)
+
+    post '/api/v8/users/password_reset', params: { email: 'someone@example.com', padding: 'x' * 10_000 }.to_json,
+                                         headers: { 'CONTENT_TYPE' => 'application/json' }, env: { 'REMOTE_ADDR' => ip }
+    expect(response).to have_http_status(:service_unavailable)
+  end
+
+  it 'leaves a JSON body readable for the app' do
+    FactoryBot.create(:user, email: 'student@example.com')
+    expect do
+      post '/api/v8/users/password_reset', params: { email: 'student@example.com' }.to_json,
+                                           headers: { 'CONTENT_TYPE' => 'application/json' }, env: { 'REMOTE_ADDR' => ip }
+    end.to change { ActionMailer::Base.deliveries.size }.by(1)
+  end
+
   it 'limits password resets per IP across the web form and the API' do
     5.times { |i| post '/password_reset_keys', params: { email: "nobody#{i}@example.com" }, env: { 'REMOTE_ADDR' => ip } }
     5.times { |i| post '/api/v8/users/password_reset', params: { email: "noone#{i}@example.com" }, env: { 'REMOTE_ADDR' => ip } }

@@ -56,8 +56,7 @@ module Api
             end
 
             answer_records.each { |record| authorize! :create, record }
-            course_question_ids = T.must(submission.course).feedback_question_ids
-            if answer_records.any? { |record| course_question_ids.exclude?(record.feedback_question_id) }
+            if FeedbackAnswer.any_outside_course?(answer_records, T.must(submission.course))
               return respond_with_error('Feedback question not found in this course', 422)
             end
             begin

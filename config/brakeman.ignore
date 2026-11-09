@@ -1,75 +1,6 @@
 {
   "ignored_warnings": [
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "5dbd2de58c6ff2fb90e9b725058df7915ee3085e51b0c1b024b5fd3869e33512",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/background_tasks/rust_langs_downloader_task.rb",
-      "line": 27,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`wget https://download.mooc.fi/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version} -O #{\"vendor/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}\"}`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "RustLangsDownloaderTask",
-        "method": "run"
-      },
-      "user_input": "@@rust_langs_version",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": "The version is a constant in this file."
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "73ea6fc75cbc4ef690218d09aed5b24541f0e36d45bf8ef19a3e6575d72ff54b",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/background_tasks/rust_langs_downloader_task.rb",
-      "line": 28,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`chmod +x #{\"vendor/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}\"}`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "RustLangsDownloaderTask",
-        "method": "run"
-      },
-      "user_input": "@@rust_langs_version",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": "The version is a constant in this file."
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "59cdc01b2c3cedcc5ffe248e63f31eccf08f22365063c1310677546b607bd989",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/background_tasks/rust_langs_downloader_task.rb",
-      "line": 30,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`#{\"vendor/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{@@rust_langs_version}\"} --help`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "RustLangsDownloaderTask",
-        "method": "run"
-      },
-      "user_input": "@@rust_langs_version",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": "The version is a constant in this file."
-    },
-    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "56a968053d7e27cb52db3f1ec166ee71e3487c00a163dfb3583a890deb18985a",
@@ -413,40 +344,6 @@
         89
       ],
       "note": "Both values go through connection.quote."
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "db72cd434e0e7d9b51fb2524142b90d72743f31acd5d4fa87ed3c260e8b45ae9",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/courses/help.html.erb",
-      "line": 33,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(Course.find(params[:course_id]).material_url, Course.find(params[:course_id]).material_url, :target => \"_blank\")",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "CoursesController",
-          "method": "help",
-          "line": 168,
-          "file": "app/controllers/courses_controller.rb",
-          "rendered": {
-            "name": "courses/help",
-            "file": "app/views/courses/help.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "courses/help"
-      },
-      "user_input": "Course.find(params[:course_id]).material_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Course#material_url= prefixes anything without http(s):// with http://, so javascript: URLs can't get through."
     },
     {
       "warning_type": "Command Injection",
