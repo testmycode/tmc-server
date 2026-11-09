@@ -6,7 +6,7 @@
   arr << :email if can?(:teach, @course)
   arr << :username if can?(:teach, @course) && params[:include_username]
   arr += @summary[:sheets].map {|sheet| sheet[:name] } + ["Total"]
-  csv << arr
+  csv << arr.map { |cell| CsvCell.escape(cell) }
 
   @summary[:users].each do |user|
     points = @summary[:sheets].map do |sheet|
@@ -24,6 +24,6 @@
     arr << user.email if can?(:teach, @course)
     arr << user.login if can?(:teach, @course) && params[:include_username]
     arr += points + [total]
-    csv << arr
+    csv << arr.map { |cell| CsvCell.escape(cell) }
   end
 end.html_safe %>

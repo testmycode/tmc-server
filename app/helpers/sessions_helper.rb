@@ -5,6 +5,9 @@ module SessionsHelper
   extend T::Sig
   sig { params(user: User).returns(User) }
   def sign_in(user)
+    return_to = session[:return_to]
+    reset_session
+    session[:return_to] = return_to if return_to
     session[:user_id] = user.id
     @current_user = T.let(user, T.nilable(User))
     user

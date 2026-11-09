@@ -100,7 +100,7 @@ module Api
                                Time.at(params[:client_time].to_i)
                              end,
                 client_nanotime: params[:client_nanotime],
-                client_ip: request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip,
+                client_ip: request.remote_ip,
                 processing_priority: low_priority ? -100 : 0
               )
 

@@ -6,7 +6,7 @@ require 'rack/attack'
 LOGGER = T.let(Logger.new('log/rack-attack.log'), Logger)
 ActiveSupport::Notifications.subscribe('rack.attack') do |_name, _start, _finish, _request_id, req|
   req = req[:request]
-  msg = [req.env['rack.attack.match_type'], req.ip, req.request_method, req.fullpath, ('"' + req.user_agent.to_s + '"')].join(' ')
+  msg = [req.env['rack.attack.match_type'], req.ip, req.request_method, req.path, ('"' + req.user_agent.to_s + '"')].join(' ')
   if %i[throttle blocklist].include?(req.env['rack.attack.match_type'])
     LOGGER.error(msg)
   else
