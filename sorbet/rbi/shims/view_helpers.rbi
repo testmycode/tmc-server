@@ -124,6 +124,17 @@ module FlashBlockHelper
   include ApplicationHelper
 end
 
+module HtmlPreludeHelper
+  include Kernel
+  include ERB::Util
+  include ActionView::Helpers
+  include ActionController::Base::HelperMethods
+  include GeneratedUrlHelpersModule
+  include GeneratedPathHelpersModule
+  include SessionsHelper
+  include ApplicationHelper
+end
+
 module PasteHelper
   include Kernel
   include ERB::Util

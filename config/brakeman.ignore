@@ -449,50 +449,6 @@
       "note": "Course#material_url= prefixes anything without http(s):// with http://, so javascript: URLs can't get through."
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "a8a1daeedec03d37d3282dde9662c963f55492b22ce9cb825eaff6f4a45d90a0",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/files/_files.html.erb",
-      "line": 3,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "T.let(Exercise.find(params[:exercise_id]).solution, T.nilable(Solution)).files.find do\n (f.html_prelude != nil)\n end.html_prelude",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "SolutionsController",
-          "method": "show",
-          "line": 36,
-          "file": "app/controllers/solutions_controller.rb",
-          "rendered": {
-            "name": "solutions/show",
-            "file": "app/views/solutions/show.html.erb"
-          }
-        },
-        {
-          "type": "template",
-          "name": "solutions/show",
-          "line": 3,
-          "file": "app/views/solutions/show.html.erb",
-          "rendered": {
-            "name": "files/_files",
-            "file": "app/views/files/_files.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "files/_files"
-      },
-      "user_input": "Exercise.find(params[:exercise_id]).solution",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Teachers write the .html preludes in their exercise repos; rendering them as HTML is the feature."
-    },
-    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "0dad3bd5f895c05fc32478cc3884b91d852c72a641dd9b729b5acca17cde3fd2",
@@ -560,52 +516,6 @@
         77
       ],
       "note": "Operator-run init script installer; the script name comes from the rake task argument."
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "5ca6d40038619fcfccd99ce710064c40e6c905f3d1faf5fa70ede67eba2b696c",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/rust_langs_cli_executor.rb",
-      "line": 33,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "Open3.capture2(\"#{self.langs_executable_path}/current\", \"prepare-submission\", \"--clone-path\", clone_path, \"--output-path\", output_path, \"--submission-path\", submission_path, \"--no-archive-prefix\", \"--stub-archive-path\", \"--output-format\", \"--tmc-param\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "RustLangsCliExecutor",
-        "method": "self.prepare_submission"
-      },
-      "user_input": "self.langs_executable_path",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": "Arguments are passed as an array to Open3, so no shell parses them."
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "0c5c7d2990b8627b767deffda61fa918ed95d0fd4618db280a28d83055fe5dcf",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/rust_langs_cli_executor.rb",
-      "line": 59,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "Open3.popen2(\"#{self.langs_executable_path}/current\", \"refresh-course\", \"--cache-path\", T.must(course_template_refresh_task.course_template).cache_path, \"--cache-root\", Course.cache_root, \"--course-name\", T.must(course_template_refresh_task.course_template).name.to_s, \"--git-branch\", T.must(course_template_refresh_task.course_template).git_branch, \"--source-url\", T.must(course_template_refresh_task.course_template).source_url.to_s)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "RustLangsCliExecutor",
-        "method": "self.refresh"
-      },
-      "user_input": "self.langs_executable_path",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": "Arguments are passed as an array to Open3, so no shell parses them."
     },
     {
       "warning_type": "Command Injection",
