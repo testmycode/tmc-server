@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Ruby 3.0
+    - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.0
+        ruby-version: '4.0'
     - name: Cache gems
       uses: actions/cache@v4
       with:
@@ -29,3 +29,5 @@ jobs:
         bundle install --jobs 4 --retry 3
     - name: Run RuboCop
       run: bundle exec rubocop
+    - name: Run Brakeman
+      run: bundle exec brakeman --no-pager --quiet --ensure-ignore-notes

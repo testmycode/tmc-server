@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -521,11 +522,8 @@ describe CourseRefreshDatabaseUpdater do
   end
 
   describe 'on failure' do
-    def sabotage
-      expect(CourseRefreshDatabaseUpdater).to receive(:simulate_failure!).and_raise('simulated failure')
-    end
-
     it 'should not leave the new cache directory lying around' do
+      add_exercise('MyExercise')
       sabotage
       refresh_courses
       refresh_report = @template.course_template_refreshes.last
@@ -537,6 +535,7 @@ describe CourseRefreshDatabaseUpdater do
     end
 
     it 'should not delete the old cache directory' do
+      add_exercise('MyExercise')
       refresh_courses
       old_path = @course.cache_path
       sabotage
@@ -548,9 +547,14 @@ describe CourseRefreshDatabaseUpdater do
     end
 
     it 'should roll back any database changes' do
+      add_exercise('MyExercise')
+      refresh_courses
+      Exercise.update_all(has_tests: false)
+      change_course_options_file 'hidden' => true
       old_cached_version = @course.cached_version
-      old_exercises = Exercise.order(:id).to_a
-      old_points = AvailablePoint.order(:id).to_a
+      old_courses = Course.order(:id).map(&:attributes)
+      old_exercises = Exercise.order(:id).map(&:attributes)
+      old_points = AvailablePoint.order(:id).map(&:attributes)
 
       sabotage
       refresh_courses
@@ -563,8 +567,9 @@ describe CourseRefreshDatabaseUpdater do
       expect(@course.cached_version).to eq(old_cached_version)
       @course2.reload
       expect(@course2.cached_version).to eq(old_cached_version)
-      expect(Exercise.order(:id).to_a).to eq(old_exercises)
-      expect(AvailablePoint.order(:id).to_a).to eq(old_points)
+      expect(Course.order(:id).map(&:attributes)).to eq(old_courses)
+      expect(Exercise.order(:id).map(&:attributes)).to eq(old_exercises)
+      expect(AvailablePoint.order(:id).map(&:attributes)).to eq(old_points)
     end
   end
 
@@ -606,12 +611,13 @@ describe CourseRefreshDatabaseUpdater do
     end
 
     it "doesn't remove any folders on fail" do
+      add_exercise('MyExercise')
       # @refresher.refresh_course(@course)
       @course.refresh(@user.id)
       RefreshCourseTask.new.run
       @template.reload
 
-      expect(CourseRefreshDatabaseUpdater).to receive(:simulate_failure!).and_raise('simulated failure')
+      sabotage
       refresh_courses
       refresh_report = @template.course_template_refreshes.last
       expect(refresh_report.status).to eq('crashed')
@@ -621,6 +627,14 @@ describe CourseRefreshDatabaseUpdater do
       expect(File).to exist(@course2.cache_path)
       # Should also have the newly generate tmc-lang-rust folder, if database updating fails
       expect(Dir["#{@test_tmp_dir}/cache/git_repos/*"].count).to be(2)
+    end
+  end
+
+  # Fails once the course and an exercise are saved, so the refresh must roll back both.
+  def sabotage
+    allow_any_instance_of(Exercise).to receive(:save!).and_wrap_original do |original, *args|
+      original.call(*args)
+      raise 'simulated failure'
     end
   end
 

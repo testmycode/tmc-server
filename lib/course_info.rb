@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'natsort'
@@ -5,22 +6,25 @@ require 'course_list'
 
 # Builds /courses/:id.json
 class CourseInfo
+  extend T::Sig
+  sig { params(user: User, helpers: T.all(ActionView::Base, ExercisesHelper)).void }
   def initialize(user, helpers)
     @user = user
     @helpers = helpers
+    @unlocked_exercises = T.let(Set.new, T::Set[T.nilable(String)])
 
-    @course_list = CourseList.new(user, helpers)
+    @course_list = T.let(CourseList.new(user, helpers), CourseList)
   end
 
+  sig { params(organization: Organization, course: Course, opts: T::Hash[Symbol, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
   def course_data(organization, course, opts = {})
     exercises = course.exercises.includes(:course, :available_points).to_a.natsort_by(&:name)
 
     @unlocked_exercises = course.unlocked_exercise_names_for(@user, exercises)
 
-    submissions_by_exercise = {}
-    Submission.where(course_id: course.id, user_id: @user.id).each do |sub|
-      submissions_by_exercise[sub.exercise_name] ||= []
-      submissions_by_exercise[sub.exercise_name] << sub
+    submissions_by_exercise = T.let({}, T::Hash[T.nilable(String), T::Array[Submission]])
+    Submission.where(course_id: course.id, user_id: @user.id).find_each do |sub|
+      (submissions_by_exercise[sub.exercise_name] ||= []) << sub
     end
     exercises.each do |ex|
       ex.set_submissions_by!(@user, submissions_by_exercise[ex.name] || [])
@@ -30,6 +34,7 @@ class CourseInfo
                                                                exercises: exercises.map { |ex| exercise_data(ex) }.reject(&:nil?))
   end
 
+  sig { params(course: Course).returns(T::Hash[Symbol, T.untyped]) }
   def course_data_core_api(course)
     # UncomputedUnlock.resolve(course, @user)
     exercises = course.exercises.includes(:course, :available_points)
@@ -45,7 +50,10 @@ class CourseInfo
 
     # Cache submissions so that we can calculate quickly whether the exercise
     # was completed or attampted and so on...
-    submissions_by_exercise = Submission.where(course: course, user: @user).group_by { |submission| submission.exercise_name }
+    submissions_by_exercise = T.let(
+      Submission.where(course: course, user: @user).group_by { |submission| submission.exercise_name },
+      T::Hash[T.nilable(String), T::Array[Submission]]
+    )
     exercises.each do |ex|
       ex.set_submissions_by!(@user, submissions_by_exercise[ex.name] || [])
     end
@@ -66,15 +74,16 @@ class CourseInfo
   end
 
   private
+    sig { params(exercise: Exercise).returns(T.nilable(T::Hash[Symbol, T.untyped])) }
     def exercise_data(exercise)
       return nil unless exercise.visible_to?(@user)
 
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = !@unlocked_exercises.include?(exercise.name)
-      show_points = !exercise.hide_submission_results? && !exercise.course.hide_submission_results?
+      locked = @unlocked_exercises.exclude?(exercise.name)
+      show_points = !exercise.hide_submission_results? && !T.must(exercise.course).hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 
-      data = {
+      data = T.let({
         id: exercise.id,
         name: exercise.name,
         locked: locked,
@@ -94,7 +103,7 @@ class CourseInfo
         valgrind_strategy: exercise.valgrind_strategy,
         code_review_requests_enabled: exercise.code_review_requests_enabled?,
         run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled?
-      }
+      }, T::Hash[Symbol, T.untyped])
 
       data[:solution_zip_url] = @helpers.exercise_solution_zip_url(exercise) if @user.administrator?
       data[:exercise_submissions_url] = @helpers.exercise_url(exercise, format: 'json', api_version: ApiVersion::API_VERSION)
@@ -106,13 +115,14 @@ class CourseInfo
       data
     end
 
+    sig { params(exercise: Exercise).returns(T::Hash[Symbol, T.untyped]) }
     def exercise_data_core_api(exercise)
       # optimization: use @unlocked_exercises to avoid querying unlocks repeatedly
-      locked = !@unlocked_exercises.include?(exercise.name)
-      show_points = !exercise.hide_submission_results? && !exercise.course.hide_submission_results?
+      locked = @unlocked_exercises.exclude?(exercise.name)
+      show_points = !exercise.hide_submission_results? && !T.must(exercise.course).hide_submission_results?
       attempted = exercise.attempted_by?(@user)
 
-      data = {
+      data = T.let({
         id: exercise.id,
         name: exercise.name,
         locked: locked,
@@ -134,26 +144,20 @@ class CourseInfo
         valgrind_strategy: exercise.valgrind_strategy,
         code_review_requests_enabled: exercise.code_review_requests_enabled?,
         run_tests_locally_action_enabled: exercise.run_tests_locally_action_enabled?
-      }
+      }, T::Hash[Symbol, T.untyped])
 
       data[:solution_zip_url] = @helpers.download_api_v8_core_exercise_solution_url(exercise) if @user.administrator?
 
       data
     end
 
-    def exercises
-      @exercises ||= course.exercises.select { |e| e.points_visible_to?(@user) }
-    end
-
-    def sheets
-      @sheets ||= course.gdocs_sheets(exercises).natsort
-    end
-
+    sig { params(e: Exercise).returns(String) }
     def exercise_return_url(e)
       @helpers.exercise_submissions_url(e, format: 'json').to_s
     end
 
+    sig { params(exercise: Exercise).returns(T.nilable(Submission)) }
     def get_latest_submission(exercise)
-      exercise.submissions_by(@user).min_by(&:created_at)
+      exercise.submissions_by(@user).max_by { |submission| T.must(submission.created_at) }
     end
 end

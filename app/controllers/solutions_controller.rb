@@ -1,17 +1,19 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Returns the suggestion solution as a ZIP.
 class SolutionsController < ApplicationController
+  sig { void }
   def show
     @exercise = Exercise.find(params[:exercise_id])
-    @course = @exercise.course
+    @course = T.must(@exercise.course)
     @organization = @course.organization
 
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_breadcrumb 'Suggested solution'
 
-    @solution = @exercise.solution
+    @solution = T.let(@exercise.solution, T.nilable(Solution))
     begin
       authorize! :read, @solution
     rescue CanCan::AccessDenied

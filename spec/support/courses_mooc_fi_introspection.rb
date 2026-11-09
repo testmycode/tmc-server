@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # Points CoursesMoocFiTokenIntrospector at a Faraday test adapter standing in for courses.mooc.fi,

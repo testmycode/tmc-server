@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'course_info'
@@ -32,6 +33,7 @@ module Api
           end
         end
 
+        sig { void }
         def show
           unauthorize_guest!
           course = Course.find_by!(id: params[:id])

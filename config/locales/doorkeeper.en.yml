@@ -44,6 +44,7 @@ en:
         application_id: 'Application Id'
         secret: 'Secret'
         scopes: 'Scopes'
+        confidential: 'Confidential'
         callback_urls: 'Callback urls'
         actions: 'Actions'
 

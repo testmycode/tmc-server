@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -25,7 +26,14 @@ describe CourseTemplate, type: :model do
     it 'accepts valid parameters' do
       expect do
         CourseTemplate.create!(valid_params)
-      end.to_not raise_error
+      end.not_to raise_error
+    end
+
+    it "doesn't let a source url pass options to git" do
+      marker = "#{@test_tmp_dir}/upload_pack_ran"
+      template = CourseTemplate.new(valid_params.merge(source_url: "--upload-pack=touch #{marker}"))
+      expect(template).not_to be_valid
+      expect(File).not_to exist(marker)
     end
 
     it 'requires a name' do
@@ -80,7 +88,7 @@ describe CourseTemplate, type: :model do
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(0)
-    expect(Course.all.pluck(:cached_version)).to eq([0, 0, 0])
+    expect(Course.pluck(:cached_version)).to eq([0, 0, 0])
 
     template.refresh(admin.id)
     RefreshCourseTask.new.run
@@ -88,7 +96,7 @@ describe CourseTemplate, type: :model do
     template.reload
 
     expect(template.cached_version).to eq(1)
-    expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
+    expect(Course.pluck(:cached_version)).to eq([1, 1, 1])
   end
 
   it "keeps course's cached_versions synchronized" do
@@ -97,7 +105,7 @@ describe CourseTemplate, type: :model do
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(0)
-    expect(Course.all.pluck(:cached_version)).to eq([0, 0])
+    expect(Course.pluck(:cached_version)).to eq([0, 0])
     template.refresh(admin.id)
     RefreshCourseTask.new.run
     # Requires reload because the refresh happens in "background"
@@ -105,7 +113,7 @@ describe CourseTemplate, type: :model do
 
     template.courses << FactoryBot.create(:course, course_template: template, source_url: template.source_url)
     expect(template.cached_version).to eq(1)
-    expect(Course.all.pluck(:cached_version)).to eq([1, 1, 1])
+    expect(Course.pluck(:cached_version)).to eq([1, 1, 1])
   end
 
   it "keeps course's source url and git branch synchronized" do
@@ -113,7 +121,7 @@ describe CourseTemplate, type: :model do
     course1 = FactoryBot.create :course, course_template: template, source_url: template.source_url
     course2 = FactoryBot.create :course, course_template: template, source_url: template.source_url
 
-    new_repo_path = "#{::Rails.root}/tmp/tests/factory_repo_changed"
+    new_repo_path = Rails.root.join('tmp/tests/factory_repo_changed').to_s
     create_bare_repo new_repo_path
     template.source_url = new_repo_path
     template.save!

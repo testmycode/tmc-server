@@ -1,8 +1,11 @@
+# typed: strict
 # frozen_string_literal: true
 
 module BootstrapFlashHelper
+  extend T::Sig
   ALERT_TYPES = %i[error info success danger].freeze
 
+  sig { returns(ActiveSupport::SafeBuffer) }
   def bootstrap_flash
     flash_messages = []
     flash.each do |type, message|

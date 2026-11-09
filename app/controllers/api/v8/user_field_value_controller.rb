@@ -1,9 +1,11 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
   module V8
     class UserFieldValueController < Api::V8::BaseController
       skip_authorization_check
+      sig { void }
       def index
         only_admins!
 

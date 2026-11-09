@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -95,7 +96,7 @@ describe ExercisesController, type: :controller do
       it 'does not fail if no parameters are given' do
         expect do
           post :set_disabled_statuses, params: { course: { exercises: [''] }, organization_id: @organization.slug, course_id: @course.id }
-        end.to_not raise_error
+        end.not_to raise_error
       end
     end
   end

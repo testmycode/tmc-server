@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -19,7 +20,7 @@ describe Api::V8::UsersController, type: :controller do
       expect(response).to have_http_status(200)
       expect(response.body).to include(user.username)
       expect(response.body).to include(user.email)
-      expect(JSON.parse(response.body)['administrator']).to eq(false)
+      expect(response.parsed_body['administrator']).to eq(false)
     end
     it "user doesn't see other users' infos" do
       get :show, params: { id: 'current' }
@@ -34,7 +35,7 @@ describe Api::V8::UsersController, type: :controller do
 
       it 'user sees own info' do
         get :show, params: { id: 'current' }
-        expect(JSON.parse(response.body)['administrator']).to eq(true)
+        expect(response.parsed_body['administrator']).to eq(true)
       end
     end
   end
@@ -122,6 +123,20 @@ describe Api::V8::UsersController, type: :controller do
     end
   end
 
+  describe 'POST create' do
+    let(:token) { nil }
+
+    it 'reports login errors under username' do
+      allow(SecureRandom).to receive(:uuid).and_return(other_user.login)
+
+      post :create, params: { user: { email: 'new@example.com', password: 'secret123', password_confirmation: 'secret123' } }
+
+      json = response.parsed_body
+      expect(json['success']).to eq(false)
+      expect(json['errors']).to eq('username' => ['has already been taken'])
+    end
+  end
+
   describe 'PUT update password' do
     let!(:token) { double resource_owner_id: user.id, acceptable?: true }
 
@@ -173,7 +188,7 @@ describe Api::V8::UsersController, type: :controller do
       delete :destroy, params: { id: user.id }
 
       expect(response).to have_http_status(200)
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body['success']).to eq(true)
       expect(body['already_deleted']).to eq(false)
       expect(User.find_by(id: user.id)).to be_nil
@@ -186,7 +201,7 @@ describe Api::V8::UsersController, type: :controller do
       delete :destroy, params: { id: deleted_id }
 
       expect(response).to have_http_status(200)
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body['success']).to eq(true)
       expect(body['already_deleted']).to eq(true)
     end
@@ -208,7 +223,7 @@ describe Api::V8::UsersController, type: :controller do
       delete :destroy, params: { id: user.id }
 
       expect(response).to have_http_status(401)
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body['success']).to eq(false)
       expect(body['code']).to eq('not_authorized')
       expect(User.find_by(id: user.id)).not_to be_nil
@@ -220,7 +235,7 @@ describe Api::V8::UsersController, type: :controller do
       delete :destroy, params: { id: user.id }
 
       expect(response).to have_http_status(403)
-      expect(JSON.parse(response.body)['code']).to eq('not_authorized')
+      expect(response.parsed_body['code']).to eq('not_authorized')
       expect(User.find_by(id: user.id)).not_to be_nil
     end
 
@@ -230,7 +245,7 @@ describe Api::V8::UsersController, type: :controller do
       delete :destroy, params: { id: user.id }
 
       expect(response).to have_http_status(400)
-      expect(JSON.parse(response.body)['code']).to eq('destroy_failed')
+      expect(response.parsed_body['code']).to eq('destroy_failed')
     end
 
     it 'answers an unexpected failure with an internal_error code' do
@@ -239,7 +254,7 @@ describe Api::V8::UsersController, type: :controller do
       delete :destroy, params: { id: user.id }
 
       expect(response).to have_http_status(500)
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body['success']).to eq(false)
       expect(body['code']).to eq('internal_error')
     end
@@ -296,7 +311,7 @@ describe Api::V8::UsersController, type: :controller do
       authenticate_with_token_as(user)
       get :show, params: { id: 'current' }
       expect(response).to have_http_status(200)
-      expect(JSON.parse(response.body)['id']).to eq(user.id)
+      expect(response.parsed_body['id']).to eq(user.id)
     end
 
     it "refuses to change the user's own email" do

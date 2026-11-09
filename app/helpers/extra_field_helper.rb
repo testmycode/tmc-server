@@ -1,8 +1,13 @@
+# typed: strict
 # frozen_string_literal: true
 
 module ExtraFieldHelper
+  extend T::Sig
+
+  sig { params(field_value: UserFieldValue, method_options: T::Hash[Symbol, T.untyped]).returns(String) }
   def extra_field(field_value, method_options)
-    field = field_value.field
+    # The value record is looked up by a configured field, so its field exists.
+    field = T.must(field_value.field)
 
     return '' if field.options[:hidden]
     return raw(field.label) if field.field_type == :html
@@ -14,7 +19,6 @@ module ExtraFieldHelper
     common_attrs[:disabled] = 'disabled' if field.options[:disabled]
 
     existing_value = field_value.value
-    existing_value = field.default if existing_value.nil?
 
     field_tag =
       case field.field_type
@@ -37,6 +41,8 @@ module ExtraFieldHelper
     bs_labeled_field(raw(field.label), field_tag, order: label_order, type: field.field_type)
   end
 
+  # `value` is the raw filter param.
+  sig { params(prefix: String, field: UserField, value: T.untyped).returns(String) }
   def extra_field_filter(prefix, field, value)
     return '' if field.field_type == :html
 
@@ -63,6 +69,7 @@ module ExtraFieldHelper
     bs_labeled_field(raw(field.name.humanize), field_tag, order: label_order)
   end
 
+  sig { params(prefix: String, field: UserField, value: T::Boolean).returns(String) }
   def extra_field_checkbox(prefix, field, value)
     return '' if field.field_type == :html
     field_name = prefix + field.name
@@ -70,8 +77,9 @@ module ExtraFieldHelper
     labeled_field(raw(field.name.humanize), field_tag, order: :label_last, super_class: 'checkbox')
   end
 
+  sig { params(value_record: UserFieldValue).returns(String) }
   def extra_field_value(value_record)
-    field = value_record.field
+    field = T.must(value_record.field)
     case field.field_type
     when :boolean
       value_record.value.blank? ? 'No' : 'Yes'

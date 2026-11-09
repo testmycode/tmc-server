@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -44,9 +45,46 @@ describe ReviewsController, type: :controller do
         controller.current_user = @student
         expect do
           post :create, params: { submission_id: @submission.id, review: { review_body: 'Code looks ok' } }
-        end.to change(Review, :count).by(0)
+        end.not_to change(Review, :count)
         expect(response.code.to_i).to eq(403)
       end
+    end
+  end
+
+  describe 'GET index for a course as JSON' do
+    before :each do
+      @course = FactoryBot.create :course, organization: @organization
+      @exercise = FactoryBot.create :exercise, course: @course
+      @submission = FactoryBot.create :submission, course: @course, user: @student, exercise: @exercise, reviewed: true
+      @review = FactoryBot.create :review, submission: @submission, reviewer: @teacher
+      controller.current_user = @student
+    end
+
+    it 'labels reviews whose reviewer has been deleted' do
+      @review.update_column(:reviewer_id, nil)
+
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id, format: :json, api_version: ApiVersion::API_VERSION }
+
+      expect(response).to be_successful
+      expect(response.parsed_body['reviews'].pluck('reviewer_name')).to eq(['(deleted)'])
+    end
+
+    it 'lists reviews of exercises that have been removed' do
+      @exercise.update_column(:name, 'removed-by-refresh')
+
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id, format: :json, api_version: ApiVersion::API_VERSION }
+
+      expect(response).to be_successful
+      expect(response.parsed_body['reviews'].pluck('points_not_awarded')).to eq([[]])
+    end
+
+    it 'responds 404 to the review page of a submission whose exercise has been removed' do
+      FactoryBot.create(:submission_data, submission: @submission)
+      @exercise.update_column(:name, 'removed-by-refresh')
+
+      get :index, params: { submission_id: @submission.id }
+
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

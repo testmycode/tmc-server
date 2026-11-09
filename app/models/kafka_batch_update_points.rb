@@ -1,6 +1,8 @@
+# typed: strict
 # frozen_string_literal: true
 
 class KafkaBatchUpdatePoints < ApplicationRecord
+  extend T::Sig
   belongs_to :course
 
   # Re-enqueue user progress and points updates for a given (course, user) pair.
@@ -11,6 +13,8 @@ class KafkaBatchUpdatePoints < ApplicationRecord
   # Returns:
   #   { status: :ok, course_id:, user_id:, progress_enqueued:, user_points_enqueued: }
   #   or { status: :skip_<reason>, course_id:, user_id: }
+  # interval is checked in the body so console callers get a readable error.
+  sig { params(course_id: Integer, user_id: Integer, interval: T.untyped).returns(T::Hash[Symbol, T.untyped]) }
   def self.send_points_again_for_user_and_course(course_id, user_id, interval: nil)
     if interval && !interval.is_a?(ActiveSupport::Duration)
       raise ArgumentError, 'Invalid interval: expected an ActiveSupport::Duration (e.g. 1.week, 3.days)'
@@ -43,6 +47,7 @@ class KafkaBatchUpdatePoints < ApplicationRecord
   #
   # Accepts optional `interval` (ActiveSupport::Duration) to restrict submissions.
   # Returns aggregate counts by status and total enqueued items.
+  sig { params(user_id: Integer, interval: T.untyped).returns(T::Hash[Symbol, Integer]) }
   def self.send_points_again_for_user_and_all_courses(user_id, interval: nil)
     if interval && !interval.is_a?(ActiveSupport::Duration)
       raise ArgumentError, 'Invalid interval: expected an ActiveSupport::Duration (e.g. 1.week, 3.days)'
@@ -75,6 +80,7 @@ class KafkaBatchUpdatePoints < ApplicationRecord
   # then prints overall totals at the end.
   # Wraps the whole operation in one transaction; if it aborts, prints a clear message.
   # Returns overall totals hash.
+  sig { params(duration: T.untyped, batch_size: Integer).returns(T::Hash[Symbol, Integer]) }
   def self.resend_points_for_recent_submissions(duration, batch_size: 1000)
     unless duration.is_a?(ActiveSupport::Duration)
       raise ArgumentError, 'Invalid argument: expected an ActiveSupport::Duration (e.g. 1.week, 3.days)'

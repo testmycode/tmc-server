@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -29,6 +30,7 @@ module Api
 
           around_action :wrap_transaction
 
+          sig { void }
           def create
             unauthorize_guest!
             course = Course.find(params[:course_id])

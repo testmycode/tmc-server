@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -59,7 +60,7 @@ describe DateAndTimeUtils do
       expect(t.sec).to eq(0o0)
     end
 
-    it 'should accept (local time) SQL-like yyyy-mm-dd hh:ii datetime strings' do
+    it 'should accept (local time) SQL-like yyyy-mm-dd hh:ii:ss datetime strings' do
       t = DateAndTimeUtils.parse_date_or_time('2011-07-13 13:45:21')
       expect(t).to be_a(Time)
       expect(t.day).to eq(13)
@@ -109,8 +110,8 @@ describe DateAndTimeUtils do
     end
 
     it 'should raise an exception if it cannot parse the string' do
-      expect { DateAndTimeUtils.parse_date_or_time('xooxers') }.to raise_error
-      expect { DateAndTimeUtils.parse_date_or_time('2011-07-13 12:34:56:78') }.to raise_error
+      expect { DateAndTimeUtils.parse_date_or_time('xooxers') }.to raise_error(RuntimeError, /Cannot parse date\/time/)
+      expect { DateAndTimeUtils.parse_date_or_time('2011-07-13 12:34:56:78') }.to raise_error(RuntimeError, /Cannot parse date\/time/)
     end
 
     it 'should raise user-friendly exceptions' do

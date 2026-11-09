@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -100,7 +101,7 @@ feature 'Teacher can edit course parameters', feature: true do
       link = find(:link, 'oldTitle')
       link.trigger('click')
 
-      expect(page).to_not have_link('Points list')
+      expect(page).not_to have_link('Points list')
     end
 
     scenario 'Student cannot see the custom URL if they have no submissions in the course' do
@@ -110,7 +111,7 @@ feature 'Teacher can edit course parameters', feature: true do
       link = find(:link, 'oldTitle')
       link.trigger('click')
 
-      expect(page).to_not have_link('Points list')
+      expect(page).not_to have_link('Points list')
     end
 
     scenario 'Student can see the custom URL correctly if they have submissions in the course' do

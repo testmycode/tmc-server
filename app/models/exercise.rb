@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'shellwords'
@@ -5,6 +6,7 @@ require 'shellwords'
 require 'date_and_time_utils'
 
 class Exercise < ApplicationRecord
+  extend T::Sig
   self.include_root_in_json = false
   include Swagger::Blocks
 
@@ -121,273 +123,321 @@ class Exercise < ApplicationRecord
     res
   }
 
-  enum disabled_status: %i[enabled disabled]
-  enum paste_visibility: %i[open secured no-tests-public everyone completed-only]
+  enum :disabled_status, { enabled: 0, disabled: 1 }
+  enum :paste_visibility, { open: 0, secured: 1, 'no-tests-public': 2, everyone: 3, 'completed-only': 4 }
 
+  sig { returns(String) }
   def relative_path
-    name.tr('-', '/')
+    T.must(name).tr('-', '/')
   end
 
+  sig { returns(T.nilable(ExerciseGroup)) }
   def exercise_group
-    course.exercise_group_by_name(exercise_group_name)
+    T.must(course).exercise_group_by_name(exercise_group_name)
   end
 
+  sig { returns(String) }
   def exercise_group_name
-    parts = name.split('-')
+    parts = T.must(name).split('-')
     parts.pop
     parts.join('-')
   end
 
-  def part
-    exercise.group_name.tr('^0-9', '').to_i
-  rescue
-    0
-  end
-
+  sig { params(group: ExerciseGroup).returns(T::Boolean) }
   def belongs_to_exercise_group?(group)
     group.course.id == course_id && (exercise_group_name + '-').start_with?(group.name + '-')
   end
 
+  sig { returns(String) }
   def clone_path
-    "#{course.clone_path}/#{relative_path}"
+    "#{T.must(course).clone_path}/#{relative_path}"
   end
 
+  sig { returns(String) }
   def solution_path
-    "#{course.solution_path}/#{relative_path}"
+    "#{T.must(course).solution_path}/#{relative_path}"
   end
 
+  sig { returns(String) }
   def stub_path
-    "#{course.stub_path}/#{relative_path}"
+    "#{T.must(course).stub_path}/#{relative_path}"
   end
 
+  sig { returns(String) }
   def stub_zip_file_path
-    "#{course.stub_zip_path}/#{name}.zip"
+    "#{T.must(course).stub_zip_path}/#{name}.zip"
   end
 
+  sig { returns(String) }
   def solution_zip_file_path
-    "#{course.solution_zip_path}/#{name}.zip"
+    "#{T.must(course).solution_zip_path}/#{name}.zip"
   end
 
+  sig { returns(Solution) }
   def solution
     Solution.new(self)
   end
 
+  sig { params(user: User, value: T::Array[Submission]).void }
   def set_submissions_by!(user, value)
-    @submissions_by ||= {}
-    @submissions_by[user.id] = value
+    submissions_by_user_id[user.id] = value
   end
 
+  sig { params(user: User).returns(T::Array[Submission]) }
   def submissions_by(user)
-    @submissions_by ||= {}
-    @submissions_by[user.id] ||= submissions.where(user_id: user.id).to_a
+    submissions_by_user_id[user.id] ||= submissions.where(user_id: user.id).to_a
   end
 
-  def reload
+  sig { params(options: T.nilable(T::Hash[Symbol, T.untyped])).returns(T.self_type) }
+  def reload(options = nil)
     super
     @submissions_by = {}
+    self
   end
 
   # Whether a user may make submissions
+  sig { params(user: User).returns(T::Boolean) }
   def submittable_by?(user)
     returnable? &&
-      (user.administrator? || user.teacher?(course.organization) || user.assistant?(course) ||
+      (user.administrator? || user.teacher?(T.must(course).organization) || user.assistant?(T.must(course)) ||
         (!expired_for?(user) && !hidden? && published? && !disabled? && !user.guest? && unlocked_for?(user)))
   end
 
   # Whether a user may see all metadata about the exercise
+  sig { params(user: User).returns(T::Boolean) }
   def visible_to?(user)
-    user.administrator? || user.teacher?(course.organization) || user.assistant?(course) ||
-      _fast_visible? && (unlocked_for?(user) || unlock_spec_obj.permits_unlock_for?(user))
+    user.administrator? || user.teacher?(T.must(course).organization) || user.assistant?(T.must(course)) ||
+      (_fast_visible? && (unlocked_for?(user) || unlock_spec_obj.permits_unlock_for?(user)))
   end
 
+  sig { returns(T::Boolean) }
   def _fast_visible?
     !hidden? && !disabled? && published?
   end
 
   # Whether the user may see the scoreboard for the exercise
+  sig { params(user: User).returns(T::Boolean) }
   def points_visible_to?(user)
     user.administrator? ||
-      user.teacher?(course.organization) ||
+      user.teacher?(T.must(course).organization) ||
       (
         !hidden? &&
         published? &&
         !disabled? &&
-        (course.locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user)) &&
+        (T.must(course).locked_exercise_points_visible? || unlock_spec_obj.permits_unlock_for?(user)) &&
         !hide_submission_results &&
-        !course.hide_submission_results
+        !T.must(course).hide_submission_results
       )
   end
 
   # Whether the user may download the exercise ZIP file
+  sig { params(user: User).returns(T::Boolean) }
   def downloadable_by?(user)
-    user.administrator? || user.teacher?(course.organization) || user.assistant?(course) ||
-      visible_to?(user) && unlocked_for?(user)
+    user.administrator? || user.teacher?(T.must(course).organization) || user.assistant?(T.must(course)) ||
+      (visible_to?(user) && unlocked_for?(user))
   end
 
   # Whether the exercise has been published (it may still be hidden)
+  sig { returns(T::Boolean) }
   def published?
+    publish_time = self.publish_time
     !publish_time || publish_time <= Time.now
   end
 
   delegate :deadline_for, to: :deadline_spec_obj
 
+  sig { params(user: User).returns(T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime))) }
   def soft_deadline_for(user)
     soft_deadline_spec_obj.deadline_for(user)
   end
 
   # Whether the deadline has passed
+  sig { params(user: User).returns(T::Boolean) }
   def expired_for?(user)
     Exercise.deadline_expired?(deadline_for(user))
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def soft_deadline_expired_for?(user)
     Exercise.deadline_expired?(soft_deadline_for(user))
   end
 
   # Whether a user has made a submission for this exercise
+  sig { params(user: User).returns(T::Boolean) }
   def attempted_by?(user)
     submissions_by(user).any?(&:processed)
   end
 
   # Whether a user has made a submission with all test cases passing
+  sig { params(user: User).returns(T::Boolean) }
   def completed_by?(user)
     submissions_by(user).any? do |s|
       s.pretest_error.nil? && s.all_tests_passed?
     end
   end
 
+  sig { returns(T::Boolean) }
   def requires_review?
     !available_review_points.empty?
   end
 
   # Whether a code review for this exercise exists for a submission made by 'user'.
+  sig { params(user: User).returns(T::Boolean) }
   def reviewed_for?(user)
     submissions_by(user).any?(&:reviewed)
   end
 
   # Returns all reviewed submissions for this exercise for 'user'
+  sig { params(user: User).returns(T::Array[Submission]) }
   def reviewed_submissions_for(user)
     submissions_by(user).select(&:reviewed)
   end
 
   # Whether all of the required code review points have been given.
   # Returns true if the exercise doesn't require code review.
+  sig { params(user: User).returns(T::Boolean) }
   def all_review_points_given_for?(user)
     arp = available_review_points
     return true if arp.empty? # optimization
-    user.has_points?(course, arp)
+    user.has_points?(T.must(course), arp)
   end
 
+  sig { returns(T::Array[String]) }
   def available_review_points
     # use 'select' instead of 'where' to use cached value of available_points
-    available_points.to_a.select(&:requires_review).map(&:name)
+    available_points.to_a.filter_map { |point| point.name if point.requires_review }
   end
 
+  sig { params(user: User).returns(T::Array[String]) }
   def points_for(user)
     AwardedPoint.exercise_user_points(self, user).map(&:name)
   end
 
+  sig { params(user: User).returns(T::Array[String]) }
   def missing_review_points_for(user)
     available_review_points - points_for(user)
   end
 
+  sig { params(spec: T.nilable(String)).void }
   def unlock_spec=(spec)
     check_is_json_array_of_strings(spec)
-    @unlock_spec_obj = UnlockSpec.from_str(course, spec)
-    super(@unlock_spec_obj.empty? ? nil : spec)
+    unlock_spec_obj = UnlockSpec.from_str(course, spec)
+    @unlock_spec_obj = T.let(unlock_spec_obj, T.nilable(UnlockSpec))
+    super(unlock_spec_obj.empty? ? nil : spec)
   end
 
+  sig { returns(UnlockSpec) }
   def unlock_spec_obj
-    @unlock_spec_obj ||= UnlockSpec.from_str(course, unlock_spec)
+    @unlock_spec_obj ||= T.let(UnlockSpec.from_str(course, unlock_spec), T.nilable(UnlockSpec))
   end
 
+  sig { returns(T::Array[T.untyped]) }
   def unlock_conditions
     unlock_spec_obj.raw_spec
   end
 
+  sig { params(spec: T.nilable(String)).void }
   def deadline_spec=(spec)
     check_is_json_array_of_strings(spec)
     super(spec)
-    @deadline_spec_obj = DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
+    @deadline_spec_obj = T.let(DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec)), T.nilable(DeadlineSpec))
   end
 
+  sig { params(spec: T.nilable(String)).void }
   def soft_deadline_spec=(spec)
     check_is_json_array_of_strings(spec)
     super(spec)
-    @soft_deadline_spec_obj = DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
+    @soft_deadline_spec_obj = T.let(DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec)), T.nilable(DeadlineSpec))
   end
 
+  sig { returns(DeadlineSpec) }
   def deadline_spec_obj
-    @deadline_spec_obj ||= new_deadline_spec_obj(deadline_spec)
+    @deadline_spec_obj ||= T.let(new_deadline_spec_obj(deadline_spec), T.nilable(DeadlineSpec))
   end
 
+  sig { returns(DeadlineSpec) }
   def soft_deadline_spec_obj
-    @soft_deadline_spec_obj ||= new_deadline_spec_obj(soft_deadline_spec)
+    @soft_deadline_spec_obj ||= T.let(new_deadline_spec_obj(soft_deadline_spec), T.nilable(DeadlineSpec))
   end
 
+  sig { returns(T.nilable(String)) }
   def static_deadline
     deadline_spec_obj.static_deadline_spec
   end
 
+  sig { returns(T.nilable(String)) }
   def unlock_deadline
     deadline_spec_obj.unlock_deadline_spec
   end
 
+  sig { returns(T.nilable(String)) }
   def soft_static_deadline
     soft_deadline_spec_obj.static_deadline_spec
   end
 
+  sig { returns(T.nilable(String)) }
   def soft_unlock_deadline
     soft_deadline_spec_obj.unlock_deadline_spec
   end
 
+  sig { returns(T::Boolean) }
   def has_unlock_deadline?
     unlock_deadline.present? || soft_unlock_deadline.present?
   end
 
+  sig { returns(T::Boolean) }
   def requires_unlock?
     !unlock_spec.nil?
   end
 
+  sig { returns(T::Boolean) }
   def requires_explicit_unlock?
     deadline_spec_obj.depends_on_unlock_time?
   end
 
   # Date-only unlocks are decided by the clock, not by unlock rows: a user without rows must not stay locked.
   # Explicit-unlock exercises are excluded because their unlock row starts the deadline timer.
+  sig { returns(T::Boolean) }
   def unlocked_by_date?
     UnlockSpec.date_only?(unlock_spec) && !requires_explicit_unlock?
   end
 
   # Returns when the exercise unlocked for the user, or nil if it is locked or needs no unlock.
+  sig { params(user: User, resolve_unlocks: T::Boolean).returns(T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime))) }
   def time_unlocked_for(user, resolve_unlocks = true)
     return unlock_time_by_date if unlocked_by_date?
 
-    UncomputedUnlock.resolve(course, user) if resolve_unlocks
+    UncomputedUnlock.resolve(T.must(course), user) if resolve_unlocks
     unlocks.where(user_id: user).find_by('valid_after IS NULL OR valid_after < ?', Time.now)&.created_at
   end
 
   # The unlock date of a date-only exercise once it has passed; nil before it.
+  sig { returns(T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime))) }
   def unlock_time_by_date
-    unlock_date = unlock_spec_obj.valid_after
+    unlock_date = T.must(unlock_spec_obj.valid_after)
     unlock_date <= Time.now ? unlock_date : nil
   end
 
+  sig { params(user: User, resolve_unlocks: T::Boolean).returns(T::Boolean) }
   def unlocked_for?(user, resolve_unlocks = true)
     res = !requires_unlock? || time_unlocked_for(user, resolve_unlocks)
     !!res
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def unlockable_for?(user)
     requires_explicit_unlock? && !unlocked_for?(user) && unlock_spec_obj.permits_unlock_for?(user)
   end
 
+  sig { params(new_value: T.untyped).void }
   def solution_visible_after=(new_value)
-    super(DateAndTimeUtils.to_time(new_value, prefer_end_of_day: true))
+    # Active Record casts any Time to TimeWithZone; Tapioca types the writer as TimeWithZone only.
+    super(T.unsafe(DateAndTimeUtils.to_time(new_value, prefer_end_of_day: true)))
   end
 
   # Ignore some options if already set; to keep changes done in UI.
   # metadata.yml support removed, should these be removed from database
+  sig { params(new_options: T::Hash[String, T.untyped]).void }
   def options=(new_options)
     new_options = self.class.default_options.merge(new_options)
 
@@ -407,30 +457,36 @@ class Exercise < ApplicationRecord
 
   # Whether this exercise accepts submissions at all.
   # TMC may be used to distribute exercise templates without tests.
+  sig { returns(T::Boolean) }
   def returnable?
-    if !returnable_forced.nil?
-      returnable_forced # may be true or false
+    forced = returnable_forced
+    if !forced.nil?
+      forced
     else
-      has_tests? && course.initial_refresh_ready?
+      has_tests? && T.must(course).initial_refresh_ready?
     end
   end
 
   # The memory limit in megabytes or nil if not set.
   # Limited by the global limit in site.yml (if any).
   # Not configurable per-exercise yet but possibly in the future.
+  sig { returns(T.nilable(Integer)) }
   def memory_limit
     global_limit = SiteSetting.value('memory_limit')
     global_limit&.to_i
   end
 
+  sig { returns(T::Array[String]) }
   def runtime_params_array
     ActiveSupport::JSON.decode(runtime_params)
   end
 
+  sig { returns(T::Boolean) }
   def code_review_requests_enabled?
-    course.code_review_requests_enabled? && self[:code_review_requests_enabled]
+    T.must(course).code_review_requests_enabled? && self[:code_review_requests_enabled]
   end
 
+  sig { returns(T::Hash[String, T.untyped]) }
   def self.default_options
     {
       'deadline' => nil,
@@ -448,10 +504,12 @@ class Exercise < ApplicationRecord
     }
   end
 
+  sig { returns(ActiveRecord::Relation) }
   def submissions_having_feedback
     submissions.where('EXISTS (SELECT 1 FROM feedback_answers WHERE feedback_answers.submission_id = submissions.id)')
   end
 
+  sig { params(users: T.any(ActiveRecord::Relation, T::Array[User]), exercises: T.any(ActiveRecord::Relation, T::Array[Exercise])).returns(Integer) }
   def self.count_completed(users, exercises)
     return 0 if exercises.empty?
 
@@ -474,16 +532,27 @@ class Exercise < ApplicationRecord
     end
   end
 
+  sig { void }
   def toggle_submission_result_visiblity
     self.hide_submission_results = !hide_submission_results
     save!
   end
 
+  sig { params(deadline: T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime)), time: T.any(Time, ActiveSupport::TimeWithZone)).returns(T::Boolean) }
   def self.deadline_expired?(deadline, time = Time.now)
-    !deadline.nil? && deadline < time
+    !deadline.nil? && deadline.to_time < time.to_time
   end
 
   private
+    SubmissionsByUserId = T.type_alias { T::Hash[T.nilable(Integer), T::Array[Submission]] }
+    private_constant :SubmissionsByUserId
+
+    sig { returns(SubmissionsByUserId) }
+    def submissions_by_user_id
+      @submissions_by ||= T.let({}, T.nilable(SubmissionsByUserId))
+    end
+
+    sig { params(spec: T.nilable(String)).returns(DeadlineSpec) }
     def new_deadline_spec_obj(spec)
       if spec
         DeadlineSpec.new(self, ActiveSupport::JSON.decode(spec))
@@ -492,17 +561,20 @@ class Exercise < ApplicationRecord
       end
     end
 
+    sig { params(enabled: T.untyped, sheetname: T.untyped).returns(T.nilable(String)) }
     def new_gdocs_sheet(enabled, sheetname)
       return nil unless enabled
       return sheetname.to_s if sheetname.present?
       name_to_gdocs_sheet
     end
 
+    sig { returns(String) }
     def name_to_gdocs_sheet
-      sheetname = name.split('-')[0..-2].join('-')
+      sheetname = T.must(T.must(name).split('-')[0..-2]).join('-')
       sheetname.empty? ? 'root' : sheetname
     end
 
+    sig { params(value: T.untyped).returns(String) }
     def to_json_array(value)
       if !value.nil?
         value = [value] unless value.is_a?(Array)
@@ -512,6 +584,7 @@ class Exercise < ApplicationRecord
       end
     end
 
+    sig { params(str: T.nilable(String)).void }
     def check_is_json_array_of_strings(str)
       return if str.nil?
       array = ActiveSupport::JSON.decode(str)
@@ -519,6 +592,7 @@ class Exercise < ApplicationRecord
       raise 'JSON array of strings expected' if array.any? { |a| !a.is_a?(String) }
     end
 
+    sig { params(raw_params: T.untyped).returns(String) }
     def parse_runtime_params(raw_params)
       if raw_params.nil?
         '[]'

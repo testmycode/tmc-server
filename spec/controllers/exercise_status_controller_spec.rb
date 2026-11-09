@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -48,7 +49,7 @@ describe ExerciseStatusController, type: :controller do
       it 'should show completition status for submitted exercises' do
         do_get
         expect(response).to be_successful
-        json = JSON.parse response.body
+        json = response.parsed_body
         expect(json).to have_key @exercise.name
         expect(json).to have_key @exercise2.name
         expect(json[@exercise.name]).to eq('completed')
@@ -57,15 +58,27 @@ describe ExerciseStatusController, type: :controller do
       end
 
       it 'should work when using course and user name instrad of id:s' do
-        do_get
+        get :show, params: { organization_id: @organization.slug, course_id: @course.name, id: @user.login, format: :json, api_version: ApiVersion::API_VERSION }
         expect(response).to be_successful
-        json = JSON.parse response.body
+        json = response.parsed_body
         expect(json).to have_key @exercise.name
         expect(json).to have_key @exercise2.name
         expect(json[@exercise.name]).to eq('completed')
         expect(json[@exercise2.name]).to eq('attempted')
         expect(json[@exercise3.name]).to eq('not_attempted')
       end
+    end
+
+    it 'responds 404 for an unknown course' do
+      get :show, params: { organization_id: @organization.slug, course_id: 'no-such-course', id: 'nobody', format: :json, api_version: ApiVersion::API_VERSION }
+      expect(response).to have_http_status(:not_found)
+      expect(response.parsed_body['error']).to eq('Course not found')
+    end
+
+    it 'responds 404 for an unknown user' do
+      get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: 'nobody', format: :json, api_version: ApiVersion::API_VERSION }
+      expect(response).to have_http_status(:not_found)
+      expect(response.parsed_body['error']).to eq('User not found')
     end
   end
 end

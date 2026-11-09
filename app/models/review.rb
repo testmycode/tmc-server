@@ -1,8 +1,10 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'natsort'
 
 class Review < ApplicationRecord
+  extend T::Sig
   include Swagger::Blocks
 
   swagger_schema :Review do
@@ -31,12 +33,14 @@ class Review < ApplicationRecord
     property :updated_at, type: :string, example: '2016-10-10T13:22:19.554+03:00'
   end
 
+  sig { params(course: Course, reviewed_submissions: ActiveRecord::Relation, view_context: ActionView::Base).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def self.course_reviews_json(course, reviewed_submissions, view_context)
     reviewed_submissions = reviewed_submissions.includes(reviews: %i[reviewer submission])
     exercises = course.exercises.index_by { |e| e.name }
     reviewed_submissions.map do |s|
       s.reviews.map do |r|
-        available_points = exercises[r.submission.exercise_name].available_points.where(requires_review: true).map(&:name)
+        exercise = exercises[r.submission.exercise_name]
+        available_points = exercise ? exercise.available_points.where(requires_review: true).map(&:name) : []
         points_not_awarded = available_points - r.points_list
         {
           submission_id: s.id,
@@ -44,7 +48,7 @@ class Review < ApplicationRecord
 
           id: r.id,
           marked_as_read: r.marked_as_read,
-          reviewer_name: r.reviewer.display_name,
+          reviewer_name: r.reviewer&.display_name || '(deleted)',
           review_body: r.review_body,
           points: r.points_list.natsort,
           points_not_awarded: points_not_awarded.natsort,
@@ -60,18 +64,21 @@ class Review < ApplicationRecord
   belongs_to :submission
   belongs_to :reviewer, class_name: 'User', inverse_of: :reviews
 
+  sig { returns(T::Array[String]) }
   def points_list
     points.to_s.split
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def readable_by?(user)
     user.administrator? ||
-      user.id == submission.user.id ||
-      user.teacher?(submission.course.organization)
+      user.id == T.must(T.must(submission).user).id ||
+      user.teacher?(T.must(T.must(submission).course).organization)
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def manageable_by?(user)
     user.administrator? ||
-      user.teacher?(submission.course.organization)
+      user.teacher?(T.must(T.must(submission).course).organization)
   end
 end

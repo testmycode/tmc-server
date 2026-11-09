@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -207,7 +208,7 @@ describe User, type: :model do
     user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
     expect(user.password_hash).to be_nil
-    expect(user.argon_hash).to_not be_nil
+    expect(user.argon_hash).not_to be_nil
     expect(user).to have_password('ilikecookies')
     expect(user).not_to have_password('ihatecookies')
   end
@@ -222,7 +223,7 @@ describe User, type: :model do
     user = User.find_by!(login: 'instructor')
     expect(user.password).to be_nil
     expect(user.password_hash).to be_nil
-    expect(user.argon_hash).to_not be_nil
+    expect(user.argon_hash).not_to be_nil
     expect(user).to have_password('ilikecookies')
     expect(user).not_to have_password('ihatecookies')
   end
@@ -470,6 +471,21 @@ describe User, type: :model do
         Assistantship.create! user: @assistant, course: @course2
         expect(@assistant.teaching_in_courses).to match_array([@course1.id, @course2.id])
       end
+    end
+  end
+
+  describe '#courses_with_submissions' do
+    it 'reports passed tests and full points as true' do
+      user = FactoryBot.create(:user)
+      exercise = FactoryBot.create(:exercise)
+      course = exercise.course
+      available_point = FactoryBot.create(:available_point, exercise: exercise)
+      submission = FactoryBot.create(:submission, course: course, exercise: exercise, user: user, all_tests_passed: true)
+      FactoryBot.create(:awarded_point, course: course, submission: submission, user: user, name: available_point.name)
+
+      expect(user.courses_with_submissions[course.id]).to match([
+        a_hash_including(exercise_id: exercise.id, all_tests_passed: true, got_all_points: true)
+      ])
     end
   end
 end

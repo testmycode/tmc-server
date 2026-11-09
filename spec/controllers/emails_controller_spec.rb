@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -17,9 +18,19 @@ describe EmailsController, type: :controller do
       it 'lists all users in the system if current user is admin' do
         controller.current_user = @admin
         get :index, format: :text
-        User.all.each do |user|
+        User.find_each do |user|
           expect(assigns(:emails)).to include(user.email)
         end
+      end
+
+      it 'applies user field filters' do
+        allow(UserField).to receive_messages(all: [UserField.new(name: 'organizational_id', field_type: 'text')])
+        UserFieldValue.create!(user: @user, field_name: 'organizational_id', value: '12345')
+        controller.current_user = @admin
+
+        get :index, params: { filter_organizational_id: '12345' }, format: :text
+
+        expect(assigns(:emails)).to eq([@user.email])
       end
 
       it 'denies access for non-admins' do
@@ -52,7 +63,20 @@ describe EmailsController, type: :controller do
         get :index, params: { organization_id: @organization.slug, id: @course.id }
         expect(assigns(:students)).to include(@user1)
         expect(assigns(:students)).to include(@user2)
-        expect(assigns(:students)).to_not include(@user3)
+        expect(assigns(:students)).not_to include(@user3)
+      end
+
+      describe 'HTML page' do
+        render_views
+
+        it 'lists the students with their names' do
+          @user1.user_field_values.create!(field_name: 'first_name', value: 'Firstie')
+          controller.current_user = @teacher
+          get :index, params: { organization_id: @organization.slug, id: @course.id }
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include(@user1.email)
+          expect(response.body).to include('Firstie')
+        end
       end
 
       it 'denies access for non-teachers' do

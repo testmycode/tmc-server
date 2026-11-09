@@ -4,6 +4,14 @@ Check http://testmycode.github.io for contribution guidelines!
 
 
 
+## Git hooks
+
+The Nix dev shell (`nix develop`) installs [lefthook](https://lefthook.dev) hooks.
+On commit, `rubocop --autocorrect` runs on the staged Ruby files and the fixes are re-staged.
+It never blocks a commit. Skip it with `LEFTHOOK=0 git commit ...`.
+
+Before opening a PR, run `bin/branch-ready-checks` (rubocop, brakeman, `srb tc`, and the tapioca verifications; needs a database).
+
 ## Tips running tests
 
 It may take some time to run whole test suite, thus while developing one
@@ -12,6 +20,9 @@ file.
 
 ##### To run all code style validations
 `bundle exec rubocop`
+
+##### To run the security scan
+`bundle exec brakeman`. Record a reviewed false positive, with a note saying why it is safe, through `bundle exec brakeman -I`.
 
 ##### To run all tests
 `rvmsudo rake spec`

@@ -1,13 +1,15 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
   module V8
     module Exercises
       class ModelSolutionsController < Api::V8::BaseController
+        sig { void }
         def index
           unauthorize_guest!
           exercise = Exercise.find(params[:exercise_id])
-          course = exercise.course
+          course = T.must(exercise.course)
           authorize! :read, exercise
           solution = exercise.solution
           begin

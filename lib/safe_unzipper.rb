@@ -1,8 +1,11 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'system_commands'
 
 class SafeUnzipper
+  extend T::Sig
+  sig { params(zip_path: T.any(String, Pathname), dest_dir: T.any(String, Pathname)).void }
   def unzip(zip_path, dest_dir)
     dest_dir = File.absolute_path(dest_dir)
     # Ideally we'd protect against `unzip` exploits too by running in a sandbox
@@ -11,6 +14,7 @@ class SafeUnzipper
   end
 
   private
+    sig { params(root_dir_abs: String, file: String).void }
     def clean_up(root_dir_abs, file)
       if File.symlink?(file)
         dest = File.absolute_path(File.readlink(file), File.dirname(file))

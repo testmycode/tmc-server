@@ -1,8 +1,10 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'app_secrets'
 
 class User < ApplicationRecord
+  extend T::Sig
   include Comparable
   include Gravtastic
   include Swagger::Blocks
@@ -26,7 +28,7 @@ class User < ApplicationRecord
   has_many :uncomputed_unlocks, dependent: :delete_all
   has_many :reviews, foreign_key: :reviewer_id, inverse_of: :reviewer, dependent: :nullify
   has_many :course_template_refreshes, dependent: :nullify
-  has_many :course_notifications
+  has_many :course_notifications, foreign_key: :sender_id, inverse_of: :sender
   has_many :comments
   has_many :certificates
   has_many :teacherships, dependent: :destroy
@@ -69,9 +71,11 @@ class User < ApplicationRecord
   scope :legitimate_students, -> { where(legitimate_student: true) }
   scope :non_legitimate_students, -> { where(legitimate_student: false) }
 
+  sig { returns(T.nilable(String)) }
   attr_accessor :password
   before_save :encrypt_password
 
+  sig { params(course: Course).returns(ActiveRecord::Relation) }
   def self.course_students(course)
     joins(:awarded_points)
       .where(awarded_points: { course_id: course.id })
@@ -79,46 +83,60 @@ class User < ApplicationRecord
   end
 
   # TODO: Later after enrollment has implemented, this should use it instead
+  sig { params(organization: Organization).returns(ActiveRecord::Relation) }
   def self.organization_students(organization)
     joins(awarded_points: :course)
       .where(courses: { organization_id: organization.id })
       .group('users.id')
   end
 
+  sig { params(course: Course, sheetname: String).returns(ActiveRecord::Relation) }
   def self.course_sheet_students(course, sheetname)
     AwardedPoint.users_in_course_with_sheet(course, sheetname)
   end
 
+  sig { returns(String) }
   def username
     login # 'login' is a legacy name that ought to be refactored out some day
   end
 
+  sig { params(name: String).void }
   def username=(name)
     self.login = name
   end
 
   # May eventually be separate from username
+  sig { returns(String) }
   def display_name
     username
   end
 
-  def field_value(field)
-    field_value_record(field).value
+  sig { params(field_name: String).returns(String) }
+  def field_value_by_name(field_name)
+    field_value_record_by_name(field_name).value
   end
 
+  sig { params(field: UserField).returns(T.any(String, T::Boolean)) }
   def field_ruby_value(field)
     field_value_record(field).ruby_value
   end
 
+  sig { params(field: UserField).returns(UserFieldValue) }
   def field_value_record(field)
-    value = user_field_values.to_a.select { |v| v.field_name == field.name }.first
+    field_value_record_by_name(field.name)
+  end
+
+  sig { params(field_name: String).returns(UserFieldValue) }
+  def field_value_record_by_name(field_name)
+    value = user_field_values.to_a.find { |v| v.field_name == field_name }
     unless value
-      value = UserFieldValue.new(field_name: field.name, user_id: id, value: '')
+      value = UserFieldValue.new(field_name: field_name, user_id: id, value: '')
       user_field_values << value
     end
     value
   end
 
+  sig { params(filter_params: T.any(ActionController::Parameters, T::Hash[String, T.untyped])).returns(ActiveRecord::Relation) }
   def self.filter_by(filter_params)
     users = includes(:user_field_values)
 
@@ -142,10 +160,12 @@ class User < ApplicationRecord
     users
   end
 
+  sig { returns(T::Boolean) }
   def guest?
     false
   end
 
+  sig { params(submitted_password: T.nilable(String)).returns(T::Boolean) }
   def has_password?(submitted_password)
     if !salt
       normalized = normalize_password(submitted_password)
@@ -169,6 +189,7 @@ class User < ApplicationRecord
 
   # The user when the password is accepted, nil otherwise. Use .authenticate_with_status when the
   # outcome is shown to the user, so that a delegation failure is not reported as a wrong password.
+  sig { params(login: T.nilable(String), submitted_password: T.nilable(String)).returns(T.nilable(User)) }
   def self.authenticate(login, submitted_password)
     user, status = authenticate_with_status(login, submitted_password)
     status == :accepted ? user : nil
@@ -178,6 +199,7 @@ class User < ApplicationRecord
   # :unavailable when courses.mooc.fi could not be reached, or :misconfigured when the account
   # cannot be delegated at all and only an admin can repair it. A found user is returned whatever
   # the status, so sign in only on :accepted.
+  sig { params(login: T.nilable(String), submitted_password: T.nilable(String)).returns([T.nilable(User), Symbol]) }
   def self.authenticate_with_status(login, submitted_password)
     return [nil, :rejected] unless login
     login = login.strip
@@ -201,12 +223,14 @@ class User < ApplicationRecord
   end
 
   # The password is stored in courses.mooc.fi and we have the id needed to delegate auth/changes.
+  sig { returns(T::Boolean) }
   def managed_externally?
     password_managed_by_courses_mooc_fi && courses_mooc_fi_user_id.present?
   end
 
   # Flagged as managed by courses.mooc.fi but missing the delegation id: a misconfigured state in
   # which local credentials must never be used as a fallback.
+  sig { returns(T::Boolean) }
   def externally_managed_without_target?
     password_managed_by_courses_mooc_fi && courses_mooc_fi_user_id.blank?
   end
@@ -214,6 +238,7 @@ class User < ApplicationRecord
 
   # :accepted, :rejected when courses.mooc.fi judged the password wrong, or :unavailable when it
   # could not be consulted. Raises nothing, so that an outage is never mistaken for a rejection.
+  sig { params(submitted_password: T.nilable(String)).returns(Symbol) }
   def courses_mooc_fi_authentication_status(submitted_password)
     auth_url = courses_mooc_fi_url('/api/v0/tmc-server/users/authenticate')
 
@@ -267,6 +292,7 @@ class User < ApplicationRecord
 
 
 
+  sig { params(old_password: T.nilable(String), new_password: T.nilable(String)).returns(T::Boolean) }
   def update_password_via_courses_mooc_fi(old_password, new_password)
     update_url = courses_mooc_fi_url('/api/v0/tmc-server/users/change-password')
 
@@ -319,6 +345,7 @@ class User < ApplicationRecord
     end
   end
 
+  sig { params(password: T.nilable(String)).returns(T::Boolean) }
   def post_new_user_to_courses_mooc_fi(password)
     Rails.logger.info("Posting new user #{self.email} to courses.mooc.fi")
     create_url = courses_mooc_fi_url('/api/v0/tmc-server/users/create')
@@ -385,6 +412,7 @@ class User < ApplicationRecord
   # so the user is passwordless until generate_password_reset_link runs. Local state is only
   # updated after a confirmed remote success, so a failure (e.g. re-creating a soft-deleted linked
   # id collides on the primary key) never leaves the account half-migrated.
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def force_migrate_to_courses_mooc_fi
     conn = courses_mooc_fi_connection
 
@@ -422,6 +450,7 @@ class User < ApplicationRecord
 
   # Live, display-only read of courses.mooc.fi's view of this user -- never gates any action.
   # nil means genuinely unknown (unconfigured, network error, unexpected response), not "not migrated".
+  sig { returns(T.nilable(T::Hash[Symbol, T.untyped])) }
   def courses_mooc_fi_migration_status
     return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
 
@@ -456,6 +485,7 @@ class User < ApplicationRecord
     nil
   end
 
+  sig { returns(T.nilable(String)) }
   def courses_mooc_fi_profile_url
     return nil if courses_mooc_fi_user_id.blank?
     return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
@@ -463,40 +493,49 @@ class User < ApplicationRecord
     courses_mooc_fi_url("/manage/users/#{courses_mooc_fi_user_id}")
   end
 
+  sig { returns(T.nilable(ActionToken)) }
   def password_reset_key
     action_tokens.find { |t| t.action == 'reset_password' }
   end
 
+  sig { params(course: Course, point_name: String).returns(T::Boolean) }
   def has_point?(course, point_name)
     awarded_points.where(course_id: course.id, name: point_name).any?
   end
 
+  sig { params(course: Course, point_names: T::Array[String]).returns(T::Boolean) }
   def has_points?(course, point_names)
     existing = awarded_points.where(course_id: course.id, name: point_names).map(&:name)
     point_names.all? { |pt| existing.include?(pt) }
   end
 
+  sig { params(other: T.untyped).returns(T.nilable(Integer)) }
   def <=>(other)
     login.downcase <=> other.login.downcase
   end
 
+  sig { params(organization: T.nilable(Organization)).returns(T::Boolean) }
   def teacher?(organization)
     organizations.include? organization
   end
 
+  sig { params(organization: Organization).returns(T.nilable(Teachership)) }
   def teachership(organization)
     Teachership.find_by(user_id: self, organization_id: organization)
   end
 
+  sig { params(course: Course).returns(T::Boolean) }
   def assistant?(course)
     assisted_courses.exists?(course.id)
   end
 
+  sig { params(organization: T.nilable(Organization)).returns(T::Boolean) }
   def member?(organization)
     memberships.include?(organization)
   end
 
   # TODO: this might need optimizing for minimizing sql queries made
+  sig { params(user: User).returns(T::Boolean) }
   def readable_by?(user)
     user.administrator? ||
       id == user.id ||
@@ -504,6 +543,7 @@ class User < ApplicationRecord
       visible_to_assistant?(user)
   end
 
+  sig { params(teacher: User).returns(T::Boolean) }
   def visible_to_teacher?(teacher)
     courses = Course.joins(organization: :teacherships).where(teacherships: { user_id: teacher.id })
     courses.each do |c|
@@ -512,6 +552,7 @@ class User < ApplicationRecord
     false
   end
 
+  sig { params(assistant: User).returns(T::Boolean) }
   def visible_to_assistant?(assistant)
     assistant.assisted_courses.each do |c|
       return true if student_in_course?(c)
@@ -519,10 +560,12 @@ class User < ApplicationRecord
     false
   end
 
+  sig { params(c: Course).returns(T::Boolean) }
   def student_in_course?(c)
     in?(User.course_students(c))
   end
 
+  sig { params(organization: Organization).returns(T::Boolean) }
   def student_in_organization?(organization)
     organization.courses.each do |c|
       return true if student_in_course?(c)
@@ -530,6 +573,7 @@ class User < ApplicationRecord
     false
   end
 
+  sig { returns(T.nilable(T::Array[Integer])) }
   def teaching_in_courses
     if !assistantships.empty?
       Course.where(id: assistantships.pluck(:course_id)).ids
@@ -538,14 +582,17 @@ class User < ApplicationRecord
     end
   end
 
+  sig { returns(T::Array[Integer]) }
   def teaching_in_organizations
     Teachership.where(user: self).pluck(:organization_id)
   end
 
+  sig { params(course: Course).returns(T.nilable(Assistantship)) }
   def assistantship(course)
     Assistantship.find_by(user_id: self, course_id: course)
   end
 
+  sig { returns(T::Hash[Integer, T::Array[T::Hash[Symbol, T.untyped]]]) }
   def courses_with_submissions
     exercises = Exercise.arel_table
     submissions = Submission.arel_table
@@ -555,17 +602,15 @@ class User < ApplicationRecord
       .project(exercises[:course_id], exercises[:name], exercises[:id], submissions[:id].count, Arel::Nodes::SqlLiteral.new('bool_or(submissions.all_tests_passed)').as('all_tests_passed'), Arel::Nodes::SqlLiteral.new('ARRAY_AGG(DISTINCT available_points.name order by available_points.name) = ARRAY_AGG(DISTINCT awarded_points.name order by awarded_points.name)').as('got_all_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT available_points.name, ' ' order by available_points.name)").as('available_points'), Arel::Nodes::SqlLiteral.new("STRING_AGG(DISTINCT awarded_points.name, ' ' order by awarded_points.name)").as('awarded_points'))
     sql = query.to_sql
 
-    result = {}
+    result = T.let({}, T::Hash[Integer, T::Array[T::Hash[Symbol, T.untyped]]])
     ActiveRecord::Base.connection.execute(sql).each do |record|
-      # {"course_id"=>"8", "name"=>"viikkob-B.1.Opiskelijanumero", "count"=>"1", "all_tests_passed"=>"t", "got_all_points"=>"t", "available_points"=>"{B.1}", "awarded_points"=>"{B.1}"}
       course_id = record['course_id'].to_i
-      result[course_id] ||= []
-      result[course_id] << {
+      (result[course_id] ||= []) << {
         exercise_name: record['name'],
         exercise_id: record['id'].to_i,
         submissions_count: record['count'].to_i,
-        all_tests_passed: record['all_tests_passed'] == 't',
-        got_all_points: record['got_all_points'] == 't',
+        all_tests_passed: record['all_tests_passed'] == true,
+        got_all_points: record['got_all_points'] == true,
         available_points: record['available_points'].nil? ? nil : record['available_points'].split(' '),
         awarded_points: record['awarded_points'].nil? ? nil : record['awarded_points'].split(' ')
       }
@@ -574,14 +619,16 @@ class User < ApplicationRecord
     result
   end
 
+  sig { returns(T::Array[Integer]) }
   def course_ids
-    results = []
+    results = T.let([], T::Array[Integer])
     ActiveRecord::Base.connection.execute(course_ids_arel.to_sql).each do |record|
       results << record['course_id']
     end
     results
   end
 
+  sig { returns(String) }
   def generate_password_reset_link
     key = ActionToken.generate_password_reset_key_for(self)
     settings = SiteSetting.value('emails')
@@ -589,17 +636,21 @@ class User < ApplicationRecord
     url
   end
 
+  sig { params(query: T.nilable(String)).returns(ActiveRecord::Relation) }
   def self.search(query)
     return User.none unless query
     User.where('lower(email) LIKE ?', "%#{query.strip.downcase}%")
   end
 
   # Count how many submissions this user has processing for a specific exercise
+  sig { params(exercise_name: String, course_id: Integer).returns(Integer) }
   def processing_submissions_count_for_exercise(exercise_name, course_id)
     Submission.processing_count_for_user_and_exercise(id, exercise_name, course_id)
   end
 
   private
+    # Unchecked because specs stub Faraday.new with plain doubles.
+    sig { returns(Faraday::Connection).checked(:never) }
     def courses_mooc_fi_connection
       Faraday.new(headers: CoursesMoocFiRateLimitBypass.headers, request: { open_timeout: 2, timeout: 10 }) do |f|
         f.request :json
@@ -607,10 +658,12 @@ class User < ApplicationRecord
       end
     end
 
+    sig { params(path: String).returns(String) }
     def courses_mooc_fi_url(path)
       "#{SiteSetting.value('courses_mooc_fi_base_url')}#{path}"
     end
 
+    sig { returns(Arel::SelectManager) }
     def course_ids_arel
       courses = Course.arel_table
       submissions = Submission.arel_table
@@ -621,17 +674,20 @@ class User < ApplicationRecord
                  .order(submissions[:course_id])
     end
 
+    sig { params(query: Arel::SelectManager).returns(Arel::SelectManager) }
     def without_disabled(query)
       exercises = Exercise.arel_table
       query.where(exercises[:disabled_status].eq(0))
       query.where(exercises[:hidden].eq(false))
     end
 
+    sig { params(query: Arel::SelectManager).returns(Arel::SelectManager) }
     def without_hidden_points(query)
       exercises = Exercise.arel_table
       query.where(exercises[:hide_submission_results].eq(false))
     end
 
+    sig { returns(Arel::SelectManager) }
     def submissions_exercises_and_points_for_user
       users = User.arel_table
       awarded_points = AwardedPoint.arel_table
@@ -649,6 +705,7 @@ class User < ApplicationRecord
         .order(exercises[:name], exercises[:course_id])
     end
 
+    sig { void }
     def encrypt_password
       if password.present?
         self.argon_hash = generate_argon(password)
@@ -656,14 +713,17 @@ class User < ApplicationRecord
       end
     end
 
+    sig { params(string: T.nilable(String)).returns(String) }
     def old_encrypt(string)
       secure_hash("#{salt}--#{string}")
     end
 
+    sig { params(string: String).returns(String) }
     def secure_hash(string)
       Digest::SHA2.hexdigest(string)
     end
 
+    sig { void }
     def reject_common_login_mistakes
       return if login.blank?
       errors.add(:login, 'may not be your email address. Keep in mind that your username is public to everyone.') if login.include?('@')
@@ -672,6 +732,7 @@ class User < ApplicationRecord
       errors.add(:email, 'is incorrect. You probably meant firstname.lastname@helsinki.fi. Keep in mind that your email address does not contain your University of Helsinki username.') if email.end_with?('@helsinki.fi') && !/.*\..*@helsinki.fi/.match?(email)
     end
 
+    sig { params(input: T.nilable(String)).returns(String) }
     def generate_argon(input)
       Argon2::Password.new(t_cost: 4, m_cost: 15).create(normalize_password(input))
     end
@@ -680,6 +741,7 @@ class User < ApplicationRecord
     # entered on different platforms/forms hashes to identical bytes. Argon2 hashes raw bytes, so
     # a composed "ä" (U+00E4) and a decomposed "ä" (U+0061 U+0308) would otherwise produce
     # different hashes. nil is passed through unchanged (e.g. a missing old_password on reset).
+    sig { params(password: T.nilable(String)).returns(T.nilable(String)) }
     def normalize_password(password)
       return password unless password.is_a?(String)
       # HTTP Basic Auth credentials arrive Base64-decoded as ASCII-8BIT (binary), and
@@ -695,6 +757,7 @@ class User < ApplicationRecord
     # be used as a fallback. Drop it if present. This self-heals users whose managed flag was set
     # by a direct SQL backfill that left the old hash behind (see also the one-time cleanup task).
     # update_columns writes directly, skipping validations and callbacks.
+    sig { void }
     def clear_stale_local_password
       return unless argon_hash.present? || salt.present? || password_hash.present?
       update_columns(argon_hash: nil, salt: nil, password_hash: nil, updated_at: Time.now)

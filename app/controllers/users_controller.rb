@@ -1,17 +1,32 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Presents the "register user" and "edit profile" views.
 class UsersController < ApplicationController
+  extend T::Sig
   skip_authorization_check
 
   after_action :remove_x_frame_options_header_when_bare_layout, only: %i[new create show]
 
+  sig { void }
   def index
     raise CanCan::AccessDenied if current_user.guest?
     respond_forbidden unless current_user.administrator?
-    @users = User.search(params[:search])
+    @users = T.let(User.search(params[:search]), T.nilable(ActiveRecord::Relation))
   end
 
+  sig { void }
+  def show
+    add_breadcrumb 'My account', user_path
+
+    if current_user.guest?
+      raise CanCan::AccessDenied
+    else
+      @user = current_user
+    end
+  end
+
+  sig { void }
   def new
     authorize! :create, User
     alternative_location = SiteSetting.all_settings['signup_location']
@@ -22,10 +37,11 @@ class UsersController < ApplicationController
       # Logged in from this page. No need to be here, so redirect away
       redirect_to root_path
     else
-      @user = User.new
+      @user = T.let(User.new, T.nilable(User))
     end
   end
 
+  sig { void }
   def create
     authorize! :create, User
 
@@ -62,20 +78,12 @@ class UsersController < ApplicationController
     end
   end
 
-  def show
-    add_breadcrumb 'My account', user_path
-
-    if current_user.guest?
-      raise CanCan::AccessDenied
-    else
-      @user = current_user
-    end
-  end
-
+  sig { void }
   def update
     User.transaction do
       @user = current_user
-      @email_before = @user.email
+      email_before = @user.email
+      @email_before = T.let(email_before, T.nilable(String))
 
       set_email
       password_changed = maybe_update_password(@user, params[:user])
@@ -84,7 +92,7 @@ class UsersController < ApplicationController
       if @user.errors.empty? && @user.save
         # Password changed locally: migrate the user to courses.mooc.fi
         @user.post_new_user_to_courses_mooc_fi(params[:user][:password]) if password_changed && !@user.managed_externally?
-        RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
+        RecentlyChangedUserDetail.email_changed.create!(old_value: email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless T.must(email_before.casecmp(@user.email)).zero?
         flash[:notice] = if password_changed
           'Changes saved and password changed'
         else
@@ -98,6 +106,7 @@ class UsersController < ApplicationController
     end
   end
 
+  sig { void }
   def confirm_email
     language = params[:language]
     VerificationToken.unscoped.email.find_by!(user_id: params[:user_id], token: params[:id])
@@ -109,6 +118,7 @@ class UsersController < ApplicationController
     redirect_to redirect_path, notice: 'Your email address has been verified!', allow_other_host: true
   end
 
+  sig { void }
   def send_verification_email
     user = User.find(params[:user_id])
     raise 'Access denied' if user != current_user && !current_user.administrator?
@@ -117,11 +127,13 @@ class UsersController < ApplicationController
     redirect_to root_path, notice: "Verification email sent to #{user.email}."
   end
 
+  sig { void }
   def verify_destroying_user
     @user = authenticate_current_user_destroy
     VerificationToken.delete_user.find_by!(user: @user, token: params[:id])
   end
 
+  sig { void }
   def destroy_user
     im_sure = params[:im_sure]
     if im_sure != '1'
@@ -146,6 +158,7 @@ class UsersController < ApplicationController
     redirect_to root_url, notice: 'Your account has been permanently destroyed.'
   end
 
+  sig { void }
   def send_destroy_email
     user = authenticate_current_user_destroy
     UserMailer.destroy_confirmation(user).deliver_now
@@ -153,12 +166,14 @@ class UsersController < ApplicationController
   end
 
   private
+    sig { returns(User) }
     def authenticate_current_user_destroy
       user = User.find(params[:user_id])
       authorize! :destroy, user
       user
     end
 
+    sig { params(status: T.anything).returns(String) }
     def failed_authentication_alert(status)
       case status
       when :unavailable
@@ -170,33 +185,38 @@ class UsersController < ApplicationController
       end
     end
 
+    sig { void }
     def set_email
+      user = T.must(@user)
       user_params = params[:user]
 
-      return if !@user.new_record? && user_params[:email_repeat].blank?
+      return if !user.new_record? && user_params[:email_repeat].blank?
 
       if user_params[:email].blank?
-        @user.errors.add(:email, 'needed')
+        user.errors.add(:email, 'needed')
       elsif user_params[:email] != user_params[:email_repeat]
-        @user.errors.add(:email_repeat, 'did not match')
+        user.errors.add(:email_repeat, 'did not match')
       else
-        @user.email = user_params[:email].strip
+        user.email = user_params[:email].strip
       end
     end
 
+    sig { void }
     def set_password
+      user = T.must(@user)
       user_params = params[:user]
       if user_params[:password].blank?
-        @user.errors.add(:password, 'needed')
+        user.errors.add(:password, 'needed')
       elsif user_params[:password].length > 1000
-        @user.errors.add(:password, 'cannot be over 1000 characters')
+        user.errors.add(:password, 'cannot be over 1000 characters')
       elsif user_params[:password] != user_params[:password_repeat]
-        @user.errors.add(:password_repeat, 'did not match')
+        user.errors.add(:password_repeat, 'did not match')
       else
-        @user.password = user_params[:password]
+        user.password = user_params[:password]
       end
     end
 
+    sig { params(user: User, user_params: T.untyped).returns(T::Boolean) }
     def maybe_update_password(user, user_params)
       if user_params[:old_password].present? || user_params[:password].present?
         if user.managed_externally?
@@ -226,11 +246,12 @@ class UsersController < ApplicationController
       end
     end
 
+    sig { returns(T.nilable(T::Hash[T.untyped, T.untyped])) }
     def set_user_fields
       return if params[:user_field].nil?
       changes = {}
       UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
-        value_record = @user.field_value_record(field)
+        value_record = T.must(@user).field_value_record(field)
         old_value = value_record.ruby_value
         value_record.set_from_form(params[:user_field][field.name])
         new_value = value_record.ruby_value

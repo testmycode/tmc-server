@@ -1,13 +1,17 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'rust_langs_cli_executor'
 
 class RustLangsDownloaderTask
-  @@rust_langs_version = '0.39.8'
+  extend T::Sig
+  @@rust_langs_version = T.let('0.39.8', String)
 
+  sig { void }
   def initialize
   end
 
+  sig { void }
   def run
     Rails.logger.info('Creating directory vendor/tmc-langs-rust') unless File.directory?('vendor/tmc-langs-rust')
     Dir.mkdir('vendor/tmc-langs-rust') unless File.directory?('vendor/tmc-langs-rust')
@@ -46,6 +50,7 @@ class RustLangsDownloaderTask
     end
   end
 
+  sig { returns(Integer) }
   def wait_delay
     1
   end

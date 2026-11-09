@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -43,8 +44,8 @@ describe OrganizationMembership, type: :model do
     OrganizationMembership.create! user: user, organization: organization2
     OrganizationMembership.create! user: user, organization: organization3
     user.destroy!
-    expect(Organization.all.count).to eq(3)
-    expect(OrganizationMembership.all.count).to eq(0)
+    expect(Organization.count).to eq(3)
+    expect(OrganizationMembership.count).to eq(0)
     expect(organization1.members).to eq([])
     expect(organization2.members).to eq([])
     expect(organization3.members).to eq([])
@@ -59,8 +60,8 @@ describe OrganizationMembership, type: :model do
     OrganizationMembership.create! user: user2, organization: organization
     OrganizationMembership.create! user: user3, organization: organization
     organization.destroy!
-    expect(User.all.count).to eq(3)
-    expect(OrganizationMembership.all.count).to eq(0)
+    expect(User.count).to eq(3)
+    expect(OrganizationMembership.count).to eq(0)
     expect(user1.memberships).to eq([])
     expect(user2.memberships).to eq([])
     expect(user3.memberships).to eq([])

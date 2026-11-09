@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -48,7 +49,7 @@ describe FeedbackAnswersController, type: :controller do
       post :create, params: params
 
       expect(response).not_to be_successful
-      expect(FeedbackAnswer.all.count).to eq(0)
+      expect(FeedbackAnswer.count).to eq(0)
     end
 
     it 'should not allow answering on behalf of another user' do

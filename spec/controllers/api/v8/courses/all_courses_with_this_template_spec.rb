@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -152,7 +153,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
 
       get :index, params: { course_id: course.id }
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |c|  c['id'] == course1.id }).to be(true), 'course missing from list'
       expect(r.any? { |c|  c['id'] == course2.id }).to be(true), 'course missing from list'
@@ -163,7 +164,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
 
       get :index, params: { course_id: course.id }
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |c|  c['id'] == other_course.id }).to be(false), 'course was in list'
     end

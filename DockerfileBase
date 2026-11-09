@@ -1,24 +1,13 @@
-FROM ruby:3.3
-LABEL name tmc-server-base
+FROM ruby:4.0-trixie
+LABEL name=tmc-server-base
 
-ENV PHANTOMJS_VERSION 2.1.1
-ENV MAVEN_VERSION 3.3.9
-ENV MAVEN_HOME /usr/share/maven
-ENV M3_HOME /usr/share/maven
+ENV MAVEN_HOME=/usr/share/maven
+ENV M3_HOME=/usr/share/maven
 
-RUN wget --no-check-certificate -O /tmp/phantomjs.tar.bz2  https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-$PHANTOMJS_VERSION-linux-x86_64.tar.bz2 && \
-  tar -xjf /tmp/phantomjs.tar.bz2 -C /tmp && \
-  rm -f /tmp/phantomjs.tar.bz2 && \
-  mkdir -p /srv/var && \
-  mv /tmp/phantomjs* /srv/var/phantomjs && \
-  ln -s /srv/var/phantomjs/bin/phantomjs /usr/bin/phantomjs && \
-  apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs vim lsof wget libfreetype6 libfontconfig bzip2 libfreetype6 libfontconfig bzip2 zip openjdk-17-jdk postgresql-client check python3 maven && \
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs vim lsof wget bzip2 zip openjdk-21-jdk postgresql-client check python3 maven && \
   rm -rf /var/lib/apt/lists/* && \
   mkdir /app &&\
   git config --global user.name "TmcTest" && \
   git config --global user.email "tmc@example.com"
-
-# Phantomjs workaround
-ENV OPENSSL_CONF /dev/null
 
 WORKDIR /app

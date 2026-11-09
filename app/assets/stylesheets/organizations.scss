@@ -27,8 +27,8 @@ $image-size: 6rem;
 
 .small-organization-card .card-body img {
   margin-right: 1rem;
-  width: $image-size/2;
-  height: $image-size/2;
+  width: $image-size * 0.5;
+  height: $image-size * 0.5;
 }
 
 .cover-content {

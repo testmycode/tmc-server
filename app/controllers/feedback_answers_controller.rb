@@ -1,17 +1,21 @@
+# typed: strict
 # frozen_string_literal: true
 
 class FeedbackAnswersController < ApplicationController
+  extend T::Sig
+  sig { void }
   def index
     if params[:course_id]
       @course = Course.find(params[:course_id])
-      @parent = @course
-      @numeric_stats = @course.exercises.where(hidden: false).sort.map do |ex|
+      @parent = T.let(@course, T.nilable(T.any(Course, Exercise)))
+      numeric_stats = @course.exercises.where(hidden: false).sort.map do |ex|
         [ex, FeedbackAnswer.numeric_answer_averages(ex), ex.submissions_having_feedback.count]
       end
-      @title = @course.title
+      @numeric_stats = T.let(numeric_stats, T.nilable(T::Array[[Exercise, T::Hash[Integer, Float], Integer]]))
+      @title = T.let(@course.title, T.nilable(String))
     elsif params[:exercise_id]
       @exercise = Exercise.find(params[:exercise_id])
-      @course = @exercise.course
+      @course = T.must(@exercise.course)
       @parent = @exercise
       @numeric_stats = [[@exercise, FeedbackAnswer.numeric_answer_averages(@exercise), @exercise.submissions_having_feedback.count]]
       @title = @exercise.name
@@ -28,7 +32,8 @@ class FeedbackAnswersController < ApplicationController
       add_breadcrumb 'Feedback', organization_course_feedback_answers_path
     end
 
-    @numeric_questions = @course.feedback_questions.where("kind LIKE 'intrange%'").order(:position)
+    numeric_questions = @course.feedback_questions.where("kind LIKE 'intrange%'").order(:position)
+    @numeric_questions = T.let(numeric_questions, T.nilable(ActiveRecord::Relation))
 
     respond_to do |format|
       format.html do
@@ -36,20 +41,20 @@ class FeedbackAnswersController < ApplicationController
         authorize! :read_feedback_questions, @parent
         authorize! :read_feedback_answers, @parent
 
-        @text_answers = @parent.feedback_answers
+        @text_answers = T.let(T.must(@parent).feedback_answers
                                .joins(:feedback_question)
                                .joins(:submission)
                                .joins(submission: :user) # .joins(:exercise) # fails due to :conditions of belongs_to receiving incorrect self :(
                                .where(feedback_questions: { kind: 'text' })
-                               .order('created_at DESC')
-                               .all
+                               .order(created_at: :desc)
+                               .all, T.nilable(ActiveRecord::Relation))
       end
       format.json do
         authorize! :read, @parent
         # We only deliver public statistics so no authorization required
 
         render json: {
-          numeric_questions: @numeric_questions.map do |q|
+          numeric_questions: numeric_questions.map do |q|
             {
               id: q.id,
               title: q.title,
@@ -57,7 +62,7 @@ class FeedbackAnswersController < ApplicationController
               position: q.position
             }
           end,
-          numeric_stats: @numeric_stats.map do |ex, averages, answer_count|
+          numeric_stats: T.must(@numeric_stats).map do |ex, averages, answer_count|
             {
               exercise: {
                 id: ex.id,
@@ -73,14 +78,17 @@ class FeedbackAnswersController < ApplicationController
     end
   end
 
+  sig { void }
   def show
-    @answer = FeedbackAnswer.find(params[:id])
-    authorize! :read, @answer
-    @course = @answer.course
-    @exercise = @answer.exercise
+    answer = FeedbackAnswer.find(params[:id])
+    @answer = T.let(answer, T.nilable(FeedbackAnswer))
+    authorize! :read, answer
+    @course = answer.course
+    @exercise = answer.exercise
   end
 
   # Create multiple answers at once
+  sig { void }
   def create
     submission = Submission.find(params[:submission_id])
     authorize! :read, submission

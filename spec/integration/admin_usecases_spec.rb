@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -21,6 +22,7 @@ describe 'The system (used by an instructor for administration)', type: :request
 
   it 'should allow using a git repo as a source for a new course' do
     create_new_course(name: 'mycourse', source_backend: 'git', source_url: @repo_path, organization_slug: @organization.slug)
+    expect(Course.find_by!(name: "#{@organization.slug}-mycourse").source_url).to eq(@repo_path)
   end
 
   it "should show all exercises pushed to the course's git repo" do
@@ -32,7 +34,7 @@ describe 'The system (used by an instructor for administration)', type: :request
     expect(page).not_to have_content('MyExercise')
 
     repo = clone_course_repo(course)
-    repo.copy_simple_exercise('MyExercise', deadline: (Date.today - 1.day).to_s)
+    repo.copy_simple_exercise('MyExercise', deadline: (Date.current - 1.day).to_s)
     repo.add_commit_push
 
     manually_refresh_course('mycourse', @organization.slug, course, @teacher)
@@ -55,6 +57,7 @@ describe 'The system (used by an instructor for administration)', type: :request
     setup.submission.save!
 
     visit submission_path(setup.submission)
+    expect(page).to have_current_path(submission_path(setup.submission))
     expect(page).not_to have_content('All tests successful')
 
     click_button 'Rerun submission'

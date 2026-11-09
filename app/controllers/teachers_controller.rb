@@ -1,17 +1,21 @@
+# typed: strict
 # frozen_string_literal: true
 
 class TeachersController < ApplicationController
+  extend T::Sig
   before_action :set_organization
 
+  sig { void }
   def index
     authorize! :teach, @organization
     ordering = Arel.sql('LOWER(login)')
-    @teachers = @organization.teachers.order(ordering)
-    @teachership = Teachership.new
+    @teachers = T.let(T.must(@organization).teachers.order(ordering), T.nilable(ActiveRecord::Relation))
+    @teachership = T.let(Teachership.new, T.nilable(Teachership))
     add_organization_breadcrumb
     add_breadcrumb 'Manage teachers'
   end
 
+  sig { void }
   def create
     authorize! :teach, @organization
 
@@ -19,26 +23,29 @@ class TeachersController < ApplicationController
     @teachership = Teachership.new(user: user, organization: @organization)
 
     if @teachership.save
-      redirect_to organization_teachers_path, notice: "Teacher #{user.email} added to organization"
+      redirect_to organization_teachers_path, notice: "Teacher #{T.must(user).email} added to organization"
     else
-      @teachers = @organization.teachers
+      @teachers = T.must(@organization).teachers
       render :index
     end
   end
 
+  sig { void }
   def destroy
     authorize! :remove_teacher, @organization
     @teachership = Teachership.find(params[:id])
-    destroyed_username = @teachership.user.login
+    destroyed_username = T.must(@teachership.user).login
     @teachership.destroy!
     redirect_to organization_teachers_path, notice: "Teacher #{destroyed_username} removed from organization"
   end
 
   private
+    sig { void }
     def set_organization
-      @organization = Organization.find_by(slug: params[:organization_id])
+      @organization = Organization.find_by!(slug: params[:organization_id])
     end
 
+    sig { returns(ActionController::Parameters) }
     def teacher_params
       params.permit(:email)
     end

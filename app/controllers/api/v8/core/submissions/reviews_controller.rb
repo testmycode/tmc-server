@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'natsort'
@@ -7,6 +8,7 @@ module Api
     module Core
       module Submissions
         class ReviewsController < Api::V8::BaseController
+          extend T::Sig
           include Swagger::Blocks
 
           swagger_path '/api/v8/core/submissions/{submission_id}/reviews' do
@@ -33,12 +35,13 @@ module Api
 
           around_action :wrap_transaction
 
+          sig { void }
           def create
             unauthorize_guest!
             submission = Submission.find(params[:submission_id])
             authorize! :read, submission
 
-            @review = Review.new(
+            review = Review.new(
               submission_id: submission.id,
               reviewer_id: current_user.id,
               review_body: params[:review][:review_body]
@@ -48,31 +51,32 @@ module Api
 
             begin
               ActiveRecord::Base.connection.transaction do
-                award_points
-                mark_as_reviewed
-                @review.submission.save!
-                @review.save!
+                award_points(review)
+                mark_as_reviewed(review)
+                T.must(review.submission).save!
+                review.save!
               end
             rescue StandardError
               ::Rails.logger.error($!)
               respond_with_error('Failed to save code review.')
             else
-              send_email_about_new_review if params[:send_email]
+              send_email_about_new_review(review) if params[:send_email]
               present(status: 'ok')
             end
           end
 
           private
-            def award_points
-              submission = @review.submission
+            sig { params(review: Review).void }
+            def award_points(review)
+              submission = T.must(review.submission)
               exercise = submission.exercise
-              course = exercise.course
               raise 'Exercise of submission has been moved or deleted' unless exercise
+              course = T.must(exercise.course)
 
               available_points = exercise.available_points.where(requires_review: true).map(&:name)
               previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
 
-              new_points = []
+              new_points = T.let([], T::Array[String])
               if params[:review][:points].respond_to?(:keys)
                 params[:review][:points].keys.each do |point_name|
                   unless exercise.available_points.where(name: point_name).any?
@@ -90,22 +94,24 @@ module Api
                 end
               end
 
-              @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
+              review.points = (review.points_list + new_points + previous_points).uniq.natsort.join(' ')
               submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
             end
 
-            def mark_as_reviewed
-              sub = @review.submission
+            sig { params(review: Review).void }
+            def mark_as_reviewed(review)
+              sub = T.must(review.submission)
               sub.reviewed = true
               sub.review_dismissed = false
               sub.of_same_kind
                  .where('(requires_review OR requests_review) AND NOT reviewed')
-                 .where(['created_at < ?', sub.created_at])
+                 .where(created_at: ...sub.created_at)
                  .update_all(newer_submission_reviewed: true)
             end
 
-            def send_email_about_new_review
-              ReviewMailer.review_email(@review).deliver
+            sig { params(review: Review).void }
+            def send_email_about_new_review(review)
+              ReviewMailer.review_email(review).deliver_now
             end
         end
       end

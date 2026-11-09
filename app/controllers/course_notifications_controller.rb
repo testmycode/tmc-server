@@ -1,26 +1,31 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Handles emailing notification to every participant
 class CourseNotificationsController < ApplicationController
+  extend T::Sig
   before_action :set_organization
 
+  sig { void }
   def new
     course = Course.find(course_notification_params[:course_id])
     authorize! :send_mail_to_participants, course
-    @notifier ||= CourseNotification.new
+    @notifier ||= T.let(CourseNotification.new, T.nilable(CourseNotification))
     @course = Course.find_by(id: params[:course_id])
     add_course_breadcrumb
     add_breadcrumb 'Course notification'
   end
 
+  sig { void }
   def create
     course = Course.find(course_notification_params[:course_id])
     authorize! :send_mail_to_participants, course
 
     participants = User.course_students(course)
-    emails = participants.map(&:email).reject(&:blank?)
+    emails = participants.map(&:email).compact_blank
 
-    notifier = course.course_notifications.create(course_notification_params[:course_notification].merge(sender_id: current_user.id))
+    notification_attributes = T.let(course_notification_params[:course_notification].merge(sender_id: current_user.id), ActionController::Parameters)
+    notifier = course.course_notifications.create(notification_attributes)
 
     if notifier.message.blank?
       flash[:error] = 'Cannot send a blank message.'
@@ -29,7 +34,7 @@ class CourseNotificationsController < ApplicationController
 
     failed_emails = []
     emails.each do |email|
-      raise 'Invalid e-mail' unless email =~ /\S+@\S+/
+      raise 'Invalid e-mail' unless /\S+@\S+/.match?(email)
       CourseNotificationMailer.notification_email(
         reply_to: current_user.email,
         to: email,
@@ -46,11 +51,13 @@ class CourseNotificationsController < ApplicationController
   end
 
   private
+    sig { returns(ActionController::Parameters) }
     def course_notification_params
       params.permit(:commit, :course_id, course_notification: %i[topic message])
     end
 
+    sig { void }
     def set_organization
-      @organization = Organization.find_by(slug: params[:organization_id])
+      @organization = Organization.find_by!(slug: params[:organization_id])
     end
 end

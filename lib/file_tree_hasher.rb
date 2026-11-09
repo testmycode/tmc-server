@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'find'
@@ -9,6 +10,8 @@ require 'digest/sha2'
 #
 # The has depends on the files' paths as well as contents.
 class FileTreeHasher
+  extend T::Sig
+  sig { params(root_path: T.any(String, Pathname)).returns(String) }
   def self.hash_file_tree(root_path)
     paths = []
     root_path = File.expand_path(root_path)

@@ -1,8 +1,9 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'rack/attack'
 
-LOGGER = Logger.new('log/rack-attack.log')
+LOGGER = T.let(Logger.new('log/rack-attack.log'), Logger)
 ActiveSupport::Notifications.subscribe('rack.attack') do |_name, _start, _finish, _request_id, req|
   req = req[:request]
   msg = [req.env['rack.attack.match_type'], req.ip, req.request_method, req.fullpath, ('"' + req.user_agent.to_s + '"')].join(' ')
@@ -16,6 +17,10 @@ end
 
 # RACK Request: https://github.com/rack/rack/blob/main/lib/rack/request.rb
 class Rack::Attack
+  extend T::Sig
+
+  # The token is a raw request param, so it can be any shape.
+  sig { params(access_token: T.untyped).returns(T.untyped) }
   def self.user_identifier_discriminator(access_token)
     db_token = Doorkeeper::AccessToken.find_by(token: access_token)
     return access_token unless db_token
@@ -34,7 +39,7 @@ class Rack::Attack
   end
 
   # Return 503 Service Unavailable for throttles
-  self.throttled_responder = lambda do |env|
+  self.throttled_responder = lambda do |_env|
     [ 503, # status
       {}, # headers
       ["Service Unavailable\n"] # body
@@ -44,51 +49,51 @@ class Rack::Attack
   # Limit the number of logins to 20 attempts per minute
   throttle('login attempts per minute', limit: 20, period: 1.minute) do |req|
     req.ip if req.path == '/sessions' ||
-    req.path == '/oauth/token' &&
-    req.post?
+    (req.path == '/oauth/token' &&
+    req.post?)
   end
 
   # Limit the number of logins to 100 attempts per hour
   throttle('login attempts per hour', limit: 100, period: 1.hour) do |req|
     req.ip if req.path == '/sessions' ||
-    req.path == '/oauth/token' &&
-    req.post?
+    (req.path == '/oauth/token' &&
+    req.post?)
   end
 
   # Limit the number of logins to 500 attempts per day
   throttle('login attempts per day', limit: 500, period: 1.day) do |req|
     req.ip if req.path == '/sessions' ||
-    req.path == '/oauth/token' &&
-    req.post?
+    (req.path == '/oauth/token' &&
+    req.post?)
   end
 
   # Limit the number of account creations to 15 accounts per minute
   throttle('account creations per minute', limit: 15, period: 1.minute) do |req|
     req.ip if req.path == '/user' ||
-    req.path == 'api/v8/users' &&
-    req.post?
+    (req.path == 'api/v8/users' &&
+    req.post?)
   end
 
   # Limit the number of account creations to 1000 per day
   throttle('account creations per day', limit: 1000, period: 1.day) do |req|
     req.ip if req.path == '/user' ||
-    req.path == 'api/v8/users' &&
-    req.post?
+    (req.path == 'api/v8/users' &&
+    req.post?)
   end
 
   # Limit the number of submissions per ip to 15 per 10 minutes
   throttle('submissions per ip per 10 minutes', limit: 30, period: 10.minutes) do |req|
     req.ip if req.path =~ %r{^/exercises/\d+/submissions$} ||
     req.path =~ %r{^/org/\d+/exercises/\d+/submissions$} ||
-    req.path =~ %r{^/api/v8/core/exercises/\d+/submissions$} &&
-    req.post?
+    (req.path =~ %r{^/api/v8/core/exercises/\d+/submissions$} &&
+    req.post?)
   end
 
   # Limit the number of submissions per ip to 200 per day to api v7 endpoints
   throttle('submissions per ip per day to api v7', limit: 200, period: 1.day) do |req|
     req.ip if req.path =~ %r{^/exercises/\d+/submissions$} ||
-    req.path =~ %r{^/org/\d+/exercises/\d+/submissions$} &&
-    req.post?
+    (req.path =~ %r{^/org/\d+/exercises/\d+/submissions$} &&
+    req.post?)
   end
 
   # Limit the number of submissions per user to 250 per day to the api v8 endpoint

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -21,8 +22,8 @@ describe ExtraField, type: :model do
 
   before :each do
     @user = FactoryBot.create(:user)
-    UserField.instance_variable_set('@all', nil)
-    ExtraField.instance_variable_set('@fields', nil)
+    UserField.instance_variable_set(:@all, nil)
+    ExtraField.instance_variable_set(:@fields, nil)
   end
 
   it 'can load all extra fields from configuration files' do
@@ -107,6 +108,26 @@ describe ExtraField, type: :model do
         boolrec.set_from_form(nil)
         boolrec.save!
         expect(@user.reload.field_value_record(boolfield).value).to be_blank
+      end
+
+      it "take '0' to mean false" do
+        use_default_config
+        boolfield = ExtraField.by_kind(:user)[1]
+        boolrec = @user.field_value_record(boolfield)
+        boolrec.set_from_form('0')
+        expect(boolrec.value).to be_blank
+        expect(boolrec.ruby_value).to be(false)
+      end
+    end
+
+    context 'whose field is no longer configured' do
+      it 'keep their stored value' do
+        use_default_config
+        rec = UserFieldValue.create!(user: @user, field_name: 'removed', value: 'old')
+
+        expect(rec.ruby_value).to eq('old')
+        rec.set_from_form('new')
+        expect(rec.value).to eq('old')
       end
     end
   end

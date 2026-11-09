@@ -5,15 +5,13 @@ require 'etc'
 
 namespace :background_daemon do
   namespace :init do
-    DEFAULT_NAME = 'tmc-background-daemon'
-
     def init_script(name = nil)
-      name ||= DEFAULT_NAME
+      name ||= 'tmc-background-daemon'
       RubyInitScript.new(
         name: name,
         short_description: 'TMC background daemon',
         executable_path: 'script/background_daemon',
-        user: Etc.getpwuid(File.stat(::Rails.root).uid).name
+        user: Etc.getpwuid(::Rails.root.stat.uid).name
       )
     end
 

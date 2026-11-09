@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'find'
@@ -51,7 +52,7 @@ class FixtureExercise::MakefileCExercise < FixtureExercise
     end
 
     def replace_method_body_in_file(path, method, body)
-      lines = IO.readlines(path)
+      lines = File.readlines(path)
       lines = lines.map do |line|
         if line.include? "METHOD BODY #{method}"
           body + " // METHOD BODY #{method}\n"

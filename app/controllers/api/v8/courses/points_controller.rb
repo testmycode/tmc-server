@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -26,11 +27,12 @@ module Api
           end
         end
 
+        sig { void }
         def index
           course = Course.find_by!(id: params[:course_id])
           points = course.awarded_points.includes(:submission)
           authorize_collection :read, points
-          present points.as_json_with_exercise_ids(course.exercises)
+          present AwardedPoint.as_json_with_exercise_ids(points, course.exercises)
         end
       end
     end

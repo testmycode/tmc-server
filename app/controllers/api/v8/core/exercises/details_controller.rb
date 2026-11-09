@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -43,9 +44,10 @@ module Api
 
           skip_authorization_check
 
+          sig { void }
           def show
             exercise_ids = params[:ids]
-            return respond_not_found('Query param ids is empty. Example: ?ids=1,2,3') if !exercise_ids.present? || exercise_ids.empty?
+            return respond_not_found('Query param ids is empty. Example: ?ids=1,2,3') if exercise_ids.blank? || exercise_ids.empty?
 
             exercises = Exercise.where(id: exercise_ids.split(',')).includes(:course)
             authorize! :read, exercises
@@ -53,9 +55,9 @@ module Api
               {
                 id: exercise.id,
                 checksum: exercise.checksum,
-                course_name: exercise.course.name,
+                course_name: T.must(exercise.course).name,
                 exercise_name: exercise.name,
-                hide_submission_results: (exercise.course.hide_submission_results || exercise.hide_submission_results),
+                hide_submission_results: (T.must(exercise.course).hide_submission_results || exercise.hide_submission_results),
               }
             end
             present exercises: data

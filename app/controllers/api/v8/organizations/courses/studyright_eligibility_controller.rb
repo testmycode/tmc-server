@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -30,6 +31,7 @@ module Api
 
           skip_authorization_check
 
+          sig { void }
           def eligible_students
             unauthorize_guest!
 
@@ -41,11 +43,12 @@ module Api
 
             applied_students = UserAppDatum.where(field_name: 'applies_for_study_right', value: 't', namespace: 'ohjelmoinnin-mooc-2019').pluck(:user_id)
 
-            groups = course.exercise_groups[0..6] + course.exercise_groups[7..13]
-
-            cbu = course.exercise_group_completion_by_user
-
-            user_ids = groups.flat_map { |group| ap = cbu[group.name][:available_points]; cbu[group.name][:points_by_user].map { |k, v| { k => (v.to_f / ap) } } }.group_by { |o| o.keys.first }.map { |k, v| { k => v.map { |o2| o2[k] } } }.inject(:merge).select { |_k, v| v.length == groups.length }.select { |_k, v| v.all? { |o2| o2 >= 0.8995 } }.map { |k, _v| k }
+            completion_by_group = course.exercise_group_completion_by_user
+            # Groups without available points are absent from the completion data and can't be failed.
+            completions = course.exercise_groups.first(14).filter_map { |group| completion_by_group[group.name] }
+            user_ids = completions.map do |completion|
+              completion[:points_by_user].select { |_user_id, points| points.to_f / completion[:available_points] >= 0.8995 }.keys
+            end.reduce(:&) || []
 
             eligble_ids = (user_ids & applied_students)
             users = User.where(id: eligble_ids)
@@ -66,10 +69,10 @@ module Api
               }
               if user_id_to_extra_fields
                 extra_fields = user_id_to_extra_fields[u.id] || []
-                d[:extra_fields] = extra_fields.map { |o| [o.field_name, o.value] }.to_h
+                d[:extra_fields] = extra_fields.to_h { |o| [o.field_name, o.value] }
               end
               if params[:user_fields]
-                user_fields = u.user_field_values.map { |o| [o.field_name, o.value] }.to_h
+                user_fields = u.user_field_values.to_h { |o| [o.field_name, o.value] }
                 d[:user_fields] = user_fields
                 d[:student_number] = user_fields['organizational_id']
                 d[:first_name] = user_fields['first_name']

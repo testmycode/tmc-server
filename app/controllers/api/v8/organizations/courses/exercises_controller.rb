@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -52,6 +53,7 @@ module Api
             end
           end
 
+          sig { void }
           def index
             unauthorize_guest!
             course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
@@ -74,6 +76,7 @@ module Api
             present(presentable)
           end
 
+          sig { void }
           def show
             authorization_skip!
             organization = Organization.find_by!(slug: params[:organization_slug])
@@ -106,7 +109,7 @@ module Api
             end
             if grant_model_solution_token_every_nth_completed_exercise && grant_model_solution_token_every_nth_completed_exercise > 0
               completed_exercises_count = course.submissions.where(all_tests_passed: true, user: current_user).distinct.select(:exercise_name).count
-              total_model_solution_tokens = completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise + (course.initial_coin_stash || 0)
+              total_model_solution_tokens = (completed_exercises_count / grant_model_solution_token_every_nth_completed_exercise) + (course.initial_coin_stash || 0)
 
               tokens_used = if course.large_exercises_consume_more_coins?
                 ModelSolutionTokenUsed.where(user: current_user, course: course).sum(:cost)
@@ -140,6 +143,7 @@ module Api
             )
           end
 
+          sig { void }
           def download
             course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
             exercise = Exercise.find_by!(name: params[:name], course_id: course.id)

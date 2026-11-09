@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -9,8 +10,8 @@ describe Version do
   end
 
   it 'can be compared with other versions' do
-    expect(v('0')).to eq(v('0'))
-    expect(v('1')).to eq(v('1'))
+    expect(v('0')).to eq(v('0.0'))
+    expect(v('1')).to eq(v('1.0'))
     expect(v('0')).to be < v('1')
     expect(v('1')).to be > v('0')
 
@@ -22,7 +23,7 @@ describe Version do
     expect(v('0.2.9')).to be < v('0.2.10')
     expect(v('0.2.10')).to be > v('0.2.9')
 
-    expect(v('0.2.09')).to eq(v('0.2.09'))
+    expect(v('0.2.09')).to eq(v('0.2.9'))
 
     expect(v('1.2.09')).to be > v('0.2.09')
     expect(v('0.2.09')).to be < v('1.2.09')

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -38,7 +39,7 @@ describe Api::V8::Core::Exercises::SubmissionsController, type: :controller do
         expect { create_submission(zip_file) }.to change(Submission, :count).by(1)
 
         expect(response).to have_http_status :ok
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json).not_to have_key('error')
 
         submission = Submission.last
@@ -55,7 +56,7 @@ describe Api::V8::Core::Exercises::SubmissionsController, type: :controller do
         expect { create_submission(zip_file) }.not_to change(Submission, :count)
 
         expect(response).to have_http_status :forbidden
-        expect(JSON.parse(response.body)['error']).to eq('Submissions for this exercise are no longer accepted.')
+        expect(response.parsed_body['error']).to eq('Submissions for this exercise are no longer accepted.')
       end
 
       # Refused in the body only; the status stays 200.
@@ -63,14 +64,14 @@ describe Api::V8::Core::Exercises::SubmissionsController, type: :controller do
         expect { create_submission(text_file) }.not_to change(Submission, :count)
 
         expect(response).to have_http_status :ok
-        expect(JSON.parse(response.body)['error']).to eq("The uploaded file doesn't look like a ZIP file.")
+        expect(response.parsed_body['error']).to eq("The uploaded file doesn't look like a ZIP file.")
       end
 
       it 'should decline submissions when a file is not selected' do
         expect { create_submission(nil) }.not_to change(Submission, :count)
 
         expect(response).to have_http_status :not_found
-        expect(JSON.parse(response.body)['error']).to eq('No ZIP file selected or failed to receive it')
+        expect(response.parsed_body['error']).to eq('No ZIP file selected or failed to receive it')
       end
     end
 
@@ -81,7 +82,7 @@ describe Api::V8::Core::Exercises::SubmissionsController, type: :controller do
         expect { create_submission(zip_file) }.not_to change(Submission, :count)
 
         expect(response).to have_http_status :unauthorized
-        expect(JSON.parse(response.body)['error']).to eq('Authentication required')
+        expect(response.parsed_body['error']).to eq('Authentication required')
       end
     end
   end

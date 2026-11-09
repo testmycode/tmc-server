@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -34,13 +35,13 @@ describe TeachersController, type: :controller do
         it "with a invalid username doesn't create a new teachership" do
           expect do
             post :create, params: { organization_id: @organization.slug, username: 'invalid' }
-          end.to change(Teachership, :count).by(0)
+          end.not_to change(Teachership, :count)
         end
 
         it 'with a username that already is a teacher in the organization' do
           expect do
             post :create, params: { organization_id: @organization.slug, username: @teacher.username }
-          end.to change(Teachership, :count).by(0)
+          end.not_to change(Teachership, :count)
         end
       end
 

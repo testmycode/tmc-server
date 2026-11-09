@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -6,11 +7,11 @@ require 'student_submission_migrator'
 describe StudentSubmissionMigrator do
   before :each do
     @course = FactoryBot.create(:course)
-    allow(@course).to receive(:git_revision) { 'same' }
+    allow(@course).to receive(:git_revision).and_return('same')
     @other_course = @course.dup
     @other_course.name = @other_course.name + '1'
     @other_course.save!
-    allow(@other_course).to receive(:git_revision) { 'same' }
+    allow(@other_course).to receive(:git_revision).and_return('same')
 
     @user = FactoryBot.create(:user)
 
@@ -60,9 +61,14 @@ describe StudentSubmissionMigrator do
     expect(MigratedSubmissions.find_by(to_course_id: @other_course.id, original_submission_id: @sub2)).not_to be_nil
   end
 
+  it 'checks the allowed migrations without printing them' do
+    migrator = StudentSubmissionMigrator.new(@course, @other_course, @user)
+    expect { expect(migrator.migration_is_allowed).to be(true) }.not_to output.to_stdout
+  end
+
   it 'throws exception if it cannot be migrated safely' do
     bad_course = FactoryBot.create(:course)
-    allow(bad_course).to receive(:git_revision) { 'other' }
+    allow(bad_course).to receive(:git_revision).and_return('other')
     migrator = StudentSubmissionMigrator.new(@course, bad_course, @user)
     expect { migrator.migrate! }.to raise_exception(StudentSubmissionMigrator::CannotRefreshError)
   end
