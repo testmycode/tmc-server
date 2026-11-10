@@ -118,6 +118,8 @@ valid_clients:
     min_version: 0.0.1
   - name: tmc_cli
     min_version: 0.0.1
+  - name: tmc_cli_rust
+    min_version: 0.0.0
   - name: netbeans_plugin
     min_version: 0.2.22
   - name: tmc.py
