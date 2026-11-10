@@ -39,8 +39,9 @@ class User < ApplicationRecord
   has_many :organization_memberships, dependent: :destroy
   has_many :memberships, through: :organization_memberships, source: :organization
 
+  # Case-sensitive so it uses index_users_on_login; a case-insensitive check scans every user on each signup.
   validates :login, presence: true,
-                    uniqueness: { case_sensitive: false },
+                    uniqueness: true,
                     length: { within: 2..50 }
 
   validates :email, presence: true,

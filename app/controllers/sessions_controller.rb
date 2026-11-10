@@ -16,12 +16,6 @@ class SessionsController < ApplicationController
 
   sig { void }
   def create
-    begin
-      clear_expired_sessions
-    rescue StandardError
-      # Cleanup is best effort; it must not block logging in.
-    end
-
     user, status = User.authenticate_with_status(params[:session][:login], params[:session][:password])
 
     case status
@@ -67,10 +61,5 @@ class SessionsController < ApplicationController
       else
         redirect_to login_path, redirect_params
       end
-    end
-
-    sig { void }
-    def clear_expired_sessions
-      Session.delete_expired
     end
 end
