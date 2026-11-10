@@ -448,7 +448,7 @@ class Submission < ApplicationRecord
         exercise_name: sub.exercise_name,
         course_id: sub.course_id,
         processed: sub.processed,
-        all_tests_passed: results_visible ? sub.all_tests_passed : nil,
+        all_tests_passed: results_visible && sub.all_tests_passed,
         points: results_visible ? sub.points : nil,
         processing_tried_at: sub.processing_tried_at,
         processing_began_at: sub.processing_began_at,
@@ -463,7 +463,7 @@ class Submission < ApplicationRecord
         newer_submission_reviewed: sub.newer_submission_reviewed,
         review_dismissed: sub.review_dismissed,
         paste_available: sub.paste_available,
-        message_for_paste: sub.message_for_paste,
+        message_for_paste: sub.message_for_paste.to_s,
         paste_key: sub.paste_key
       }
     end

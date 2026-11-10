@@ -20,6 +20,14 @@ describe Api::V8::OrganizationsController, type: :controller do
       expect(r[0]['pinned']).to eq(organization.pinned)
     end
 
+    it 'lists missing information as an empty string, which tmc-langs requires' do
+      organization.update!(information: nil)
+      get :index
+      expect(response.parsed_body[0]['information']).to eq('')
+      get :show, params: { slug: organization.slug }
+      expect(response.parsed_body['information']).to eq('')
+    end
+
     it 'should not show hidden organizations' do
       get :index
 

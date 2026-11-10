@@ -25,7 +25,7 @@ class SubmissionList
       user_id: submission.user_id,
       course_id: submission.course_id,
       created_at: submission.created_at,
-      all_tests_passed: results_visible ? submission.all_tests_passed : nil,
+      all_tests_passed: results_visible && submission.all_tests_passed,
       points: results_visible ? submission.points : nil,
       submitted_zip_url: @helpers.download_api_v8_core_submission_url(submission),
       paste_url: paste_url(submission),

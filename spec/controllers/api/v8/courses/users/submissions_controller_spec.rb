@@ -35,7 +35,7 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
       controller.current_user = user
       get :index, params: { course_id: course.id, user_id: user.id }
       listed = response.parsed_body.find { |s| s['id'] == submission.id }
-      expect(listed['all_tests_passed']).to be_nil
+      expect(listed['all_tests_passed']).to be(false)
       expect(listed['points']).to be_nil
     end
 
