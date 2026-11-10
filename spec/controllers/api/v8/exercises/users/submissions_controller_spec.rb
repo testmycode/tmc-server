@@ -25,9 +25,10 @@ describe Api::V8::Exercises::Users::SubmissionsController, type: :controller do
   end
 
   it "does not list another user's submissions to a student" do
-    submission(FactoryBot.create(:user))
+    other = FactoryBot.create(:user)
+    submission(other)
     sign_in(user)
-    get :index, params: { exercise_id: exercise.id, user_id: Submission.last.user_id }
+    get :index, params: { exercise_id: exercise.id, user_id: other.id }
     expect(response.parsed_body).to eq([])
   end
 

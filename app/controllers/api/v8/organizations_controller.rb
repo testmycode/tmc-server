@@ -48,15 +48,10 @@ module Api
 
       sig { void }
       def index
-        orgs = Organization
-               .visible_organizations
-               .select { |org| org.visibility_allowed?(request, current_user) }
-
-        orgs = Organization.all if current_user.administrator?
         orgs = if current_user.administrator?
-          orgs.map { |o| o.attributes.merge(o.org_as_json.stringify_keys) }
+          Organization.all.map { |o| o.attributes.merge(o.org_as_json.stringify_keys) }
         else
-          orgs.map(&:org_as_json)
+          Organization.visible_organizations.filter_map { |org| org.org_as_json if org.visibility_allowed?(request, current_user) }
         end
         authorize! :read, orgs
         present(orgs)

@@ -76,16 +76,7 @@ module Api
           authorize! :read, user
 
           taught_organizations = T.let(user.teacherships.pluck(:organization_id), T::Array[Integer])
-          readable = Organization.find(taught_organizations).map do |o|
-            {
-              'organization_id': o.id,
-              'name': o.name,
-              'information': o.information,
-              'slug': o.slug,
-              'logo_path': o.logo_path,
-              'pinned': o.pinned,
-            }
-          end
+          readable = Organization.find(taught_organizations).map { |o| o.org_as_json.merge(organization_id: o.id) }
 
           authorize! :read, readable
           present(readable)

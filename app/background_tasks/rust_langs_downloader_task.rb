@@ -24,6 +24,12 @@ class RustLangsDownloaderTask
   FIRST_RETRY_DELAY_SECONDS = 60
   MAX_RETRY_DELAY_SECONDS = 3600
 
+  # The published x86_64 Linux build of a tmc-langs-cli version.
+  sig { params(version: String).returns(String) }
+  def self.download_url(version)
+    "https://download.mooc.fi/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{version}"
+  end
+
   sig { void }
   def initialize
     @retry_delay_seconds = T.let(nil, T.nilable(Integer))
@@ -84,7 +90,7 @@ class RustLangsDownloaderTask
     # Downloads the pinned version to `path`, raising DownloadFailed if wget fails.
     sig { params(path: String).void }
     def download!(path)
-      return if system('wget', "https://download.mooc.fi/tmc-langs-rust/tmc-langs-cli-x86_64-unknown-linux-gnu-#{RUST_LANGS_VERSION}", '-O', path)
+      return if system('wget', RustLangsDownloaderTask.download_url(RUST_LANGS_VERSION), '-O', path)
 
       raise DownloadFailed, "wget failed to download tmc-langs #{RUST_LANGS_VERSION}: #{Process.last_status.inspect}"
     end

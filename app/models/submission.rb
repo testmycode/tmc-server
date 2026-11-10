@@ -422,6 +422,13 @@ class Submission < ApplicationRecord
   end
 
   # can_see_results? for many submissions seen by one viewer, evaluated once per course and exercise.
+  # all_tests_passed and points as submission listings show them. Hidden results stay a boolean
+  # false, not null, because tmc-langs requires one.
+  sig { params(visible: T::Boolean).returns(T::Hash[Symbol, T.untyped]) }
+  def listed_results(visible)
+    { all_tests_passed: visible && all_tests_passed, points: visible ? points : nil }
+  end
+
   sig { params(viewer: User).returns(T.proc.params(submission: Submission).returns(T::Boolean)) }
   def self.results_visibility_for(viewer)
     visible_by_exercise = T.let({}, T::Hash[[T.nilable(Integer), T.nilable(String)], T::Boolean])
@@ -448,8 +455,7 @@ class Submission < ApplicationRecord
         exercise_name: sub.exercise_name,
         course_id: sub.course_id,
         processed: sub.processed,
-        all_tests_passed: results_visible && sub.all_tests_passed,
-        points: results_visible ? sub.points : nil,
+        **sub.listed_results(results_visible),
         processing_tried_at: sub.processing_tried_at,
         processing_began_at: sub.processing_began_at,
         processing_completed_at: sub.processing_completed_at,
