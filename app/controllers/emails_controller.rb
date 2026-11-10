@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require 'csv'
+
 # Displays the raw list of participant e-mails, useful for mass-mailing scripts.
 class EmailsController < ApplicationController
   extend T::Sig
@@ -47,7 +49,13 @@ class EmailsController < ApplicationController
       respond_to do |format|
         format.html
         format.text { render plain: students.map { |s| s.email.to_s }.join("\n") }
-        format.csv { render plain: "Username,Email\n" + students.map { |s| "#{s.username},#{s.email}" }.join("\n") }
+        format.csv do
+          csv = CsvCell.generate do |rows|
+            rows << %w[Username Email]
+            students.each { |s| rows << [s.username, s.email] }
+          end
+          render plain: csv
+        end
       end
     end
 end

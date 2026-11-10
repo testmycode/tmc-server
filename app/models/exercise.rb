@@ -203,11 +203,18 @@ class Exercise < ApplicationRecord
         (!expired_for?(user) && !hidden? && published? && !disabled? && !user.guest? && unlocked_for?(user)))
   end
 
-  # Whether a user may see all metadata about the exercise
+  # Whether a user may see all metadata about the exercise. Course#exercises_visible_to batches this.
   sig { params(user: User).returns(T::Boolean) }
   def visible_to?(user)
     user.administrator? || user.teacher?(T.must(course).organization) || user.assistant?(T.must(course)) ||
-      (_fast_visible? && (unlocked_for?(user) || unlock_spec_obj.permits_unlock_for?(user)))
+      visible_to_non_staff?(user) { unlocked_for?(user) }
+  end
+
+  # The part of visible_to? for users who are not course staff; the block tells whether the
+  # exercise is unlocked for the user, so batch callers can answer it from preloaded unlocks.
+  sig { params(user: User, unlocked: T.proc.returns(T::Boolean)).returns(T::Boolean) }
+  def visible_to_non_staff?(user, &unlocked)
+    _fast_visible? && (yield || unlock_spec_obj.permits_unlock_for?(user))
   end
 
   sig { returns(T::Boolean) }

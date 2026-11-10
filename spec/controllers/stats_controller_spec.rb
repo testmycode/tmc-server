@@ -32,4 +32,12 @@ describe StatsController, type: :controller do
       expect(response.parsed_body).to be_an(Array)
     end
   end
+  describe 'GET course stats of a hidden course' do
+    it 'is denied to a student' do
+      course = FactoryBot.create(:course, hidden: true)
+      controller.current_user = FactoryBot.create(:user)
+      get :index, params: { organization_id: course.organization.slug, course_id: course.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end

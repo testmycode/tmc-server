@@ -67,7 +67,7 @@ class Organization < ApplicationRecord
 
   sig { returns(T::Hash[Symbol, T.untyped]) }
   def org_as_json
-    { name: name, information: information, slug: slug, logo_path: logo_path, pinned: pinned }
+    { name: name, information: information.to_s, slug: slug, logo_path: logo_path, pinned: pinned }
   end
 
   sig { params(user: T.nilable(User)).returns(T::Boolean) }

@@ -49,14 +49,21 @@ module Api
         sig { void }
         def authenticate_user!
           return if @current_user
-          if doorkeeper_token
-            @current_user = T.let(User.find_by(id: doorkeeper_token.resource_owner_id), T.nilable(User))
+          if (token = doorkeeper_token)
+            @current_user = T.let(User.find_by(id: token.resource_owner_id), T.nilable(User))
             raise 'Invalid token' unless @current_user
           elsif Rails.configuration.x.accept_courses_mooc_fi_tokens
             @current_user = CoursesMoocFiAuthentication.user_for(request)
             @auth_source = T.let(:courses_mooc_fi_token, T.nilable(Symbol)) if @current_user
           end
-          @current_user ||= user_from_session || Guest.new
+          @current_user ||= user_from_session_with_verified_csrf || Guest.new
+        end
+
+        # The session cookie authenticates API calls made from TMC's own pages, so those need the
+        # CSRF token that the skipped verify_authenticity_token would otherwise demand.
+        sig { returns(T.nilable(User)) }
+        def user_from_session_with_verified_csrf
+          user_from_session if verified_request?
         end
 
         # Before authenticate_user! has run (ApplicationController's own before_actions), this is a Guest.
@@ -68,6 +75,27 @@ module Api
         sig { returns(::Ability) }
         def current_ability
           @current_ability ||= T.let(::Ability.new(current_user, auth_source: @auth_source), T.nilable(::Ability))
+        end
+
+        # Narrows `points` (awarded points of `course`) to what the caller may see. Teachers see all;
+        # anyone else only their own, none in exam mode or as a guest, and never those of exercises
+        # that are hidden or hiding their results.
+        # Raises CanCan::AccessDenied unless the caller may read the course.
+        sig { params(course: Course, points: ActiveRecord::Relation).returns(ActiveRecord::Relation) }
+        def visible_awarded_points(course, points)
+          authorize! :read, course
+          return points if can?(:teach, course)
+          return points.none if current_user.guest? || !can?(:see_points, course)
+          hidden_exercises = course.exercises.where(hidden: true).or(course.exercises.where(hide_submission_results: true))
+          points.where(user_id: current_user.id)
+                .where.not(name: AvailablePoint.where(exercise_id: hidden_exercises.select(:id)).select(:name))
+        end
+
+        # The API list fields of those `submissions` the current user may read.
+        sig { params(submissions: ActiveRecord::Relation).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+        def readable_submission_fields(submissions)
+          readable = submissions.preload(course: :organization).select { |sub| sub.readable_by?(current_user) }
+          Submission.filter_fields!(readable, current_user)
         end
 
         sig { params(messages: T.any(String, T::Array[String])).returns(T::Hash[Symbol, T::Array[String]]) }

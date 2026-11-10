@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+require 'safe_unzipper'
 require 'version'
 require 'twitter_bootstrap_breadcrumbs'
 
@@ -45,6 +46,11 @@ class ApplicationController < ActionController::Base
     respond_with_error('File not found', 404, exception)
   end
 
+  rescue_from SafeUnzipper::ArchiveTooLargeError do |exception|
+    T.bind(self, ApplicationController)
+    respond_with_error("The submitted files cannot be shown: #{exception.message}", 422)
+  end
+
   rescue_from Rack::Timeout::RequestTimeoutException do |exception|
     T.bind(self, ApplicationController)
     respond_with_error('Request timed out', 504, exception) # status code 408 would be the correct status code, but when receiving 408 Firefox retries 10 times and then states the connection was reset instead of showing our error
@@ -84,6 +90,13 @@ class ApplicationController < ActionController::Base
     sig { returns(::Ability) }
     def current_ability
       @current_ability ||= T.let(::Ability.new(current_user), T.nilable(::Ability))
+    end
+
+    # The request's Doorkeeper access token, or nil when it is missing, revoked or expired.
+    sig { returns(T.nilable(Doorkeeper::AccessToken)) }
+    def doorkeeper_token
+      token = super
+      token if token&.accessible?
     end
 
     sig { void }

@@ -83,4 +83,17 @@ describe TeachersController, type: :controller do
       end
     end
   end
+
+  describe 'with a teachership of another organization' do
+    it 'does not let a teacher remove it' do
+      organization = FactoryBot.create(:accepted_organization)
+      Teachership.create!(user: @teacher, organization: organization)
+      other_teachership = Teachership.create!(user: @user, organization: FactoryBot.create(:accepted_organization))
+      controller.current_user = @teacher
+      expect do
+        delete :destroy, params: { organization_id: organization.slug, id: other_teachership.id }
+      end.not_to change(Teachership, :count)
+      expect(response.code.to_i).to eq(404)
+    end
+  end
 end

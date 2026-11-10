@@ -27,6 +27,7 @@ class Api::V8::ApidocsController
     include ::ExtraFieldHelper
     include ::FeedbackAnswersHelper
     include ::FlashBlockHelper
+    include ::HtmlPreludeHelper
     include ::PasteHelper
     include ::PointsHelper
     include ::SessionsHelper

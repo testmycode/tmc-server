@@ -137,6 +137,17 @@ describe SubmissionsController, type: :controller do
     end
   end
 
+  describe 'POST create' do
+    it 'records the client IP from remote_ip, not a client-sent X-Forwarded-For' do
+      exercise = FactoryBot.create(:returnable_exercise, course: @course)
+      zip = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/submission_uploads/empty.zip'), 'application/octet-stream')
+      request.env['REMOTE_ADDR'] = '203.0.113.7'
+      request.env['HTTP_X_FORWARDED_FOR'] = '198.51.100.9'
+      expect { post :create, params: { exercise_id: exercise.id, submission: { file: zip } } }.to change(Submission, :count).by(1)
+      expect(Submission.last.client_ip).to eq('203.0.113.7')
+    end
+  end
+
   describe 'GET index' do
     render_views
 
@@ -187,6 +198,70 @@ describe SubmissionsController, type: :controller do
       controller.current_user = teacher
       get :difference_with_solution, params: { submission_id: @submission.id }
       expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'when the course hides submissions' do
+    before :each do
+      FactoryBot.create(:submission_data, submission: @submission)
+      @course.update!(hide_submissions: true)
+    end
+
+    it 'forbids the zip' do
+      get :show, params: { id: @submission.id, format: :zip }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'forbids the files in JSON' do
+      get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION, include_files: 1 }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'still returns the results in JSON' do
+      get :show, params: { id: @submission.id, format: :json, api_version: ApiVersion::API_VERSION }
+      expect(response).to have_http_status(:ok)
+      check_common_keys(response.parsed_body)
+    end
+  end
+
+  describe 'when the submission archive is too large to extract' do
+    render_views
+
+    before :each do
+      FactoryBot.create(:submission_data, submission: @submission)
+      stub_const('SafeUnzipper::MAX_ENTRIES', 0)
+    end
+
+    it 'explains why the files are not shown' do
+      get :show, params: { id: @submission.id }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('The submitted files cannot be shown')
+    end
+  end
+
+  describe 'GET difference_with_solution' do
+    before :each do
+      allow(SourceFileList).to receive_messages(for_submission: SourceFileList.new([]), for_solution: SourceFileList.new([]))
+    end
+
+    it 'shows the difference to a teacher of a verified organization' do
+      teacher = FactoryBot.create(:verified_user)
+      Teachership.create!(user: teacher, organization: @organization)
+      controller.current_user = teacher
+      get :difference_with_solution, params: { submission_id: @submission.id }
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'denies a teacher of an unverified organization' do
+      organization = FactoryBot.create(:organization)
+      course = FactoryBot.create(:course, organization: organization)
+      exercise = FactoryBot.create(:exercise, course: course)
+      submission = FactoryBot.create(:submission, course: course, user: @user, exercise: exercise)
+      teacher = FactoryBot.create(:verified_user)
+      Teachership.create!(user: teacher, organization: organization)
+      controller.current_user = teacher
+      get :difference_with_solution, params: { submission_id: submission.id }
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

@@ -373,7 +373,7 @@ class Submission < ApplicationRecord
   # Changing it in the meantime will obsolete any runs currently being processed.
   sig { void }
   def randomize_secret_token
-    self.secret_token = rand(10**100).to_s
+    self.secret_token = SecureRandom.hex(32)
   end
 
   # How often we try to resend if no sandbox has received it yet
@@ -421,9 +421,32 @@ class Submission < ApplicationRecord
     self.paste_key = SecureRandom.urlsafe_base64 if paste_available?
   end
 
-  sig { params(submissions: T::Array[T.untyped]).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
-  def self.filter_fields!(submissions)
+  # can_see_results? for many submissions seen by one viewer, evaluated once per course and exercise.
+  # all_tests_passed and points as submission listings show them. Hidden results stay a boolean
+  # false, not null, because tmc-langs requires one.
+  sig { params(visible: T::Boolean).returns(T::Hash[Symbol, T.untyped]) }
+  def listed_results(visible)
+    { all_tests_passed: visible && all_tests_passed, points: visible ? points : nil }
+  end
+
+  sig { params(viewer: User).returns(T.proc.params(submission: Submission).returns(T::Boolean)) }
+  def self.results_visibility_for(viewer)
+    visible_by_exercise = T.let({}, T::Hash[[T.nilable(Integer), T.nilable(String)], T::Boolean])
+    lambda do |submission|
+      visible_by_exercise.fetch([submission.course_id, submission.exercise_name]) do |key|
+        visible_by_exercise[key] = submission.can_see_results?(viewer)
+      end
+    end
+  end
+
+  # Maps `submissions` in place to their API list fields, as seen by `viewer`. Preload their courses'
+  # organizations first; Api::V8::BaseController#readable_submission_fields does.
+  sig { params(submissions: T::Array[T.untyped], viewer: User).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+  def self.filter_fields!(submissions, viewer)
+    eager_load_exercises(submissions)
+    results_visible_to_viewer = results_visibility_for(viewer)
     submissions.map! do |sub|
+      results_visible = results_visible_to_viewer.call(sub)
       {
         id: sub.id,
         user_id: sub.user_id,
@@ -432,8 +455,7 @@ class Submission < ApplicationRecord
         exercise_name: sub.exercise_name,
         course_id: sub.course_id,
         processed: sub.processed,
-        all_tests_passed: sub.all_tests_passed,
-        points: sub.points,
+        **sub.listed_results(results_visible),
         processing_tried_at: sub.processing_tried_at,
         processing_began_at: sub.processing_began_at,
         processing_completed_at: sub.processing_completed_at,
@@ -447,7 +469,7 @@ class Submission < ApplicationRecord
         newer_submission_reviewed: sub.newer_submission_reviewed,
         review_dismissed: sub.review_dismissed,
         paste_available: sub.paste_available,
-        message_for_paste: sub.message_for_paste,
+        message_for_paste: sub.message_for_paste.to_s,
         paste_key: sub.paste_key
       }
     end

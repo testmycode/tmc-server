@@ -10,13 +10,7 @@ class PasswordResetKeyMailer
   include GeneratedMountedHelpers
 
   class << self
-    sig do
-      params(
-        user: ::User,
-        key: ::ActionToken,
-        origin: T.nilable(::String)
-      ).returns(::ActionMailer::MessageDelivery)
-    end
-    def reset_link_email(user, key, origin = T.unsafe(nil)); end
+    sig { params(user: ::User, key: ::ActionToken).returns(::ActionMailer::MessageDelivery) }
+    def reset_link_email(user, key); end
   end
 end

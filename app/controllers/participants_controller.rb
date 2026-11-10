@@ -70,7 +70,7 @@ class ParticipantsController < ApplicationController
         render json: index_json_data
       end
       format.csv do
-        render_csv(text: index_csv, filename: 'participants.csv')
+        render_csv(body: index_csv, filename: 'participants.csv')
       end
     end
   end
@@ -151,6 +151,7 @@ class ParticipantsController < ApplicationController
   def password_reset_link
     @user = User.find(params[:id])
     authorize! :view_participant_information, @user
+    return respond_forbidden('This feature is only available to admins') unless current_user.administrator?
     return respond_forbidden('This feature is disabled for admin accounts') if @user.administrator?
 
     @password_reset_link = T.let(@user.generate_password_reset_link, T.nilable(String))
@@ -233,7 +234,7 @@ class ParticipantsController < ApplicationController
       extra_fields = T.must(@extra_fields)
       visible_columns = T.must(@visible_columns)
       group_completion = @group_completion
-      CSV.generate(force_quotes: true) do |csv|
+      CsvCell.generate(force_quotes: true) do |csv|
         title_row = (ordinary_fields + extra_fields.map(&:name)).filter_map { |f| f.humanize if visible_columns.include?(f) }
 
         completion_cols = T.let([], T::Array[String])

@@ -396,6 +396,19 @@ class Course < ApplicationRecord
     end.to_set(&:name)
   end
 
+  # The batched form of Exercise#visible_to? for exercises of this course, with a constant
+  # number of queries for exercises without unlock conditions.
+  sig { params(user: User, exercises_to_check: T::Array[Exercise]).returns(T::Array[Exercise]) }
+  def exercises_visible_to(user, exercises_to_check)
+    return exercises_to_check if user.administrator? || user.teacher?(organization) || user.assistant?(self)
+
+    UncomputedUnlock.resolve(self, user)
+    unlocked = unlocked_exercise_names_for(user, exercises_to_check)
+    exercises_to_check.select do |ex|
+      ex.visible_to_non_staff?(user) { unlocked.include?(ex.name) }
+    end
+  end
+
   sig { params(user: User).returns(T::Array[Exercise]) }
   def unlockable_exercises_for(user)
     UncomputedUnlock.resolve(self, user)

@@ -29,6 +29,16 @@ describe ParticipantsController, type: :controller do
     end
   end
 
+  describe 'GET /index as CSV' do
+    it 'neutralizes cells a spreadsheet would run as formulas' do
+      FactoryBot.create(:user, login: '=HYPERLINK("http://x")')
+      controller.current_user = FactoryBot.create(:admin)
+      get :index, format: :csv
+      expect(response.body).to include %("'=HYPERLINK(""http://x"")")
+      expect(response.body).not_to include %("=HYPERLINK)
+    end
+  end
+
   describe 'POST /force_migrate_to_courses_mooc_fi' do
     describe 'when logged in as a non-admin' do
       before :each do
@@ -109,6 +119,32 @@ describe ParticipantsController, type: :controller do
         expect(response).to redirect_to(participant_path(@user))
         expect(flash[:alert]).to match(/status=422/)
       end
+    end
+  end
+
+  describe 'GET /password_reset_link' do
+    let(:course) { FactoryBot.create(:course) }
+
+    before do
+      FactoryBot.create(:awarded_point, course: course, user: @user)
+    end
+
+    it 'is forbidden for a teacher of a course the user is in' do
+      teacher = FactoryBot.create(:user)
+      Teachership.create!(user: teacher, organization: course.organization)
+      controller.current_user = teacher
+
+      expect(ActionToken).not_to receive(:generate_password_reset_key_for)
+      get :password_reset_link, params: { id: @user.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'shows the link to an admin' do
+      controller.current_user = FactoryBot.create(:admin)
+
+      get :password_reset_link, params: { id: @user.id }
+      expect(response).to have_http_status(:ok)
+      expect(assigns(:password_reset_link)).to include('/reset_password/')
     end
   end
 

@@ -35,8 +35,8 @@ class Api::Beta::BaseController < ApplicationController
   private
     sig { void }
     def authenticate_user!
-      if doorkeeper_token
-        @current_user = T.let(User.find(doorkeeper_token.resource_owner_id), T.nilable(User))
+      if (token = doorkeeper_token)
+        @current_user = T.let(User.find_by(id: token.resource_owner_id), T.nilable(User))
       end
 
       return if @current_user

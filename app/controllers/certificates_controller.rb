@@ -37,7 +37,7 @@ class CertificatesController < ApplicationController
     authorize! :create, @certificate
 
     if @certificate.save
-      redirect_to participant_certificates_path(@user), notice: "Certificate successfully created. <a href=\"#{certificate_path(@certificate)}\">View certificate</a>"
+      redirect_to participant_certificates_path(@user), notice: helpers.safe_join(['Certificate successfully created. ', helpers.link_to('View certificate', certificate_path(@certificate))])
     else
       render action: :new
     end

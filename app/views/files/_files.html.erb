@@ -1,6 +1,6 @@
 <% just_one_html_prelude = (files.count {|f| f.html_prelude != nil } == 1) %>
 <% if just_one_html_prelude %>
-  <%= raw(files.find {|f| f.html_prelude != nil }.html_prelude) %>
+  <%= sanitize_html_prelude(files.find {|f| f.html_prelude != nil }.html_prelude) %>
 <% end %>
 
 <% running_idx = 0 %>
@@ -15,7 +15,7 @@
         <div id="<%= running_idx %>" class="panel-collapse collapse show">
           <div>
             <% if !just_one_html_prelude && file.html_prelude %>
-              <%= raw(file.html_prelude) %>
+              <%= sanitize_html_prelude(file.html_prelude) %>
             <% end %>
             <%
               brush = case File.extname(file.path)

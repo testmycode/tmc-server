@@ -51,7 +51,7 @@ class Setup::CourseAssistantsController < Setup::SetupController
   sig { void }
   def destroy
     authorize! :modify_assistants, @course
-    @assistantship = Assistantship.find(params[:id])
+    @assistantship = T.must(@course).assistantships.find(params[:id])
     destroyed_email = T.must(@assistantship.user).email
     @assistantship.destroy!
     redirect_to setup_organization_course_course_assistants_path, notice: "Assistant #{destroyed_email} removed from course."

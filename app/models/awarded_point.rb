@@ -166,14 +166,18 @@ class AwardedPoint < ApplicationRecord
   end
 
   # Gets a hash of user to array of point names awarded for exercises of the given sheet
-  sig { params(course: Course, sheetname: String, opts: T::Hash[Symbol, T::Boolean]).returns(T::Hash[String, T::Array[String]]) }
-  def self.per_user_in_course_with_sheet(course, sheetname, opts = {})
+  sig do
+    params(course: Course, sheetname: String, hidden: T::Boolean, only_for_user: T.nilable(User))
+      .returns(T::Hash[String, T::Array[String]])
+  end
+  def self.per_user_in_course_with_sheet(course, sheetname, hidden: false, only_for_user: nil)
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
 
-    sql = per_user_in_course_with_sheet_query(course, sheetname, opts[:hidden])
-          .project([users[:login].as('username'), awarded_points[:name].as('name')])
-          .to_sql
+    query = per_user_in_course_with_sheet_query(course, sheetname, hidden)
+            .project([users[:login].as('username'), awarded_points[:name].as('name')])
+    query.where(users[:id].eq(only_for_user.id)) if only_for_user
+    sql = query.to_sql
 
     result = T.let({}, T::Hash[String, T::Array[String]])
     ActiveRecord::Base.connection.execute(sql).each do |record|

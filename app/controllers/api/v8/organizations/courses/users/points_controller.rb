@@ -57,7 +57,7 @@ module Api
               course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
               params[:user_id] = current_user.id if params[:user_id] == 'current'
               points = course.awarded_points.includes(:submission).where(user_id: params[:user_id])
-              authorize_collection :read, points
+              points = visible_awarded_points(course, points)
               present AwardedPoint.as_json_with_exercise_ids(points, course.exercises)
             end
           end

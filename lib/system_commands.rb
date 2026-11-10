@@ -12,6 +12,9 @@ module SystemCommands
   extend T::Helpers
   requires_ancestor { Kernel }
 
+  # Raised by sh! when its timeout kills the command.
+  class TimeoutError < RuntimeError; end
+
   module_function
 
   # Prefer sh! instead
@@ -47,7 +50,7 @@ module SystemCommands
     output = `#{cmd} 2>&1`
     status = $?
 
-    raise "Command '#{cmd}' timed out, status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
+    raise TimeoutError, "Command '#{cmd}' timed out, status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
     raise "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
     raise "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 

@@ -25,6 +25,29 @@ describe Api::V8::Courses::Users::SubmissionsController, type: :controller do
     Assistantship.create(user: assistant, course: course)
   end
 
+  describe "GET a user's submissions in exam mode" do
+    before :each do
+      submission.update!(all_tests_passed: true, points: 'point1')
+      course.update!(hide_submission_results: true)
+    end
+
+    it 'hides the results from the student' do
+      controller.current_user = user
+      get :index, params: { course_id: course.id, user_id: user.id }
+      listed = response.parsed_body.find { |s| s['id'] == submission.id }
+      expect(listed['all_tests_passed']).to be(false)
+      expect(listed['points']).to be_nil
+    end
+
+    it 'shows the results to a teacher' do
+      controller.current_user = teacher
+      get :index, params: { course_id: course.id, user_id: user.id }
+      listed = response.parsed_body.find { |s| s['id'] == submission.id }
+      expect(listed['all_tests_passed']).to be(true)
+      expect(listed['points']).to eq('point1')
+    end
+  end
+
   describe "GET single user's submissions" do
     describe 'by course id as json' do
       describe 'as an admin' do

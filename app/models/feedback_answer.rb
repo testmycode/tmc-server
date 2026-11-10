@@ -12,6 +12,13 @@ class FeedbackAnswer < ApplicationRecord
 
   validates_with Validators::FeedbackAnswerFormatValidator
 
+  # Whether any of `answers` names a feedback question that is not one of `course`'s.
+  sig { params(answers: T::Array[FeedbackAnswer], course: Course).returns(T::Boolean) }
+  def self.any_outside_course?(answers, course)
+    course_question_ids = course.feedback_question_ids
+    answers.any? { |answer| course_question_ids.exclude?(answer.feedback_question_id) }
+  end
+
   sig { returns(T::Boolean) }
   def replied?
     reply_to_feedback_answers.count > 0

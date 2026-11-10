@@ -69,13 +69,13 @@ class CoursesController < ApplicationController
   # Method for teacher to give a single course for students to select.
   sig { void }
   def show_json
-    course = [Course.find(params[:id])]
+    course = T.must(@organization).courses.find(params[:id])
     authorize! :read, course
     return respond_unauthorized('Authentication required') if current_user.guest?
 
     data = {
       api_version: ApiVersion::API_VERSION,
-      courses: CourseList.new(current_user, view_context).course_list_data(T.must(@organization), course)
+      courses: CourseList.new(current_user, view_context).course_list_data(T.must(@organization), [course])
     }
     render json: data.to_json
   end
@@ -161,7 +161,7 @@ class CoursesController < ApplicationController
 
   sig { void }
   def help
-    @course = Course.find(params[:course_id])
+    @course = T.must(@organization).courses.find(params[:course_id])
     authorize! :read, @course
     add_course_breadcrumb
     add_breadcrumb 'Help page'
@@ -265,7 +265,7 @@ class CoursesController < ApplicationController
 
     sig { void }
     def set_course
-      @course = Course.find(params[:id])
+      @course = T.must(@organization).courses.find(params[:id])
     end
 
     sig { returns(T.any(ActionController::Parameters, T::Hash[T.untyped, T.untyped])) }

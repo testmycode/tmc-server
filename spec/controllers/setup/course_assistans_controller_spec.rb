@@ -112,4 +112,16 @@ describe Setup::CourseAssistantsController, type: :controller do
       expect(response.code.to_i).to eq(302)
     end
   end
+
+  describe 'with an assistantship of another course' do
+    it 'does not let a teacher remove it' do
+      other_course = FactoryBot.create(:course, organization: FactoryBot.create(:accepted_organization))
+      assistantship = Assistantship.create!(user: @user, course: other_course)
+      controller.current_user = @teacher
+      expect do
+        delete :destroy, params: { organization_id: @organization.slug, course_id: @course.id, id: assistantship.id }
+      end.not_to change(Assistantship, :count)
+      expect(response.code.to_i).to eq(404)
+    end
+  end
 end

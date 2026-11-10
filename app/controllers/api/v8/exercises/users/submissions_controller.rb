@@ -65,7 +65,7 @@ module Api
             exercise = Exercise.find_by!(id: params[:exercise_id])
             params[:user_id] = current_user.id if params[:user_id] == 'current'
             submissions = Submission.where(course_id: exercise.course_id, exercise_name: exercise.name, user_id: params[:user_id])
-            readable = Submission.filter_fields!(submissions.select { |sub| sub.readable_by?(current_user) })
+            readable = readable_submission_fields(submissions)
 
             authorize! :read, readable
             present(readable)

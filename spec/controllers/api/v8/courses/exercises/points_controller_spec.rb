@@ -35,6 +35,27 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
     end
   end
 
+  describe 'As a student' do
+    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+    it "returns only the student's own points" do
+      get :index, params: { course_id: course.id, exercise_name: exercise.name }
+      expect(response.parsed_body.map { |p| p['awarded_point']['id'] }).to eq([awarded_point2.id])
+    end
+  end
+
+  describe 'As a teacher' do
+    let(:teacher) { FactoryBot.create(:user) }
+    let(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+
+    before { Teachership.create!(user: teacher, organization: organization) }
+
+    it "returns every user's points" do
+      get :index, params: { course_id: course.id, exercise_name: exercise.name }
+      expect(response.parsed_body.map { |p| p['awarded_point']['id'] }).to contain_exactly(awarded_point1.id, awarded_point2.id)
+    end
+  end
+
   describe 'As a guest' do
     let(:token) { nil }
     describe 'when searching for awarded points' do

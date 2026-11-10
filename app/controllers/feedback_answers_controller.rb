@@ -104,6 +104,9 @@ class FeedbackAnswersController < ApplicationController
                          answer: answer_hash[:answer])
     end
     answer_records.each { |record| authorize! :create, record }
+    if FeedbackAnswer.any_outside_course?(answer_records, T.must(submission.course))
+      return respond_with_error('Feedback question not found in this course', 422)
+    end
 
     begin
       ActiveRecord::Base.connection.transaction(requires_new: true) do

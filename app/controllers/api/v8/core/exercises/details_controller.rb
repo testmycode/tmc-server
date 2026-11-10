@@ -49,8 +49,10 @@ module Api
             exercise_ids = params[:ids]
             return respond_not_found('Query param ids is empty. Example: ?ids=1,2,3') if exercise_ids.blank? || exercise_ids.empty?
 
-            exercises = Exercise.where(id: exercise_ids.split(',')).includes(:course)
-            authorize! :read, exercises
+            exercises = Exercise.where(id: exercise_ids.split(',')).includes(course: :organization).to_a
+            exercises = exercises.group_by(&:course).flat_map do |course, course_exercises|
+              course && can?(:read, course) ? course.exercises_visible_to(current_user, course_exercises) : []
+            end
             data = exercises.map do |exercise|
               {
                 id: exercise.id,

@@ -26,8 +26,7 @@ module Api
           end
 
           key = ActionToken.generate_password_reset_key_for(user)
-          # TODO: Whitelist origins
-          PasswordResetKeyMailer.reset_link_email(user, key, params['origin']).deliver_now
+          PasswordResetKeyMailer.reset_link_email(user, key).deliver_now
           render json: {
             success: true
           }

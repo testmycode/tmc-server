@@ -27,6 +27,7 @@ class Rails::Conductor::BaseController
     include ::ExtraFieldHelper
     include ::FeedbackAnswersHelper
     include ::FlashBlockHelper
+    include ::HtmlPreludeHelper
     include ::PasteHelper
     include ::PointsHelper
     include ::SessionsHelper

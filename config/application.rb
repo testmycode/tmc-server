@@ -32,7 +32,10 @@ module TmcServer
     # config.i18n.default_locale = :de
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log]
+    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log
+                                   token access_token refresh_token client_secret secret _key crypt otp salt]
+    # Exact, so that other keys containing "code" stay readable.
+    config.filter_parameters << /\Acode\z/
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.eager_load_paths << Rails.root.join('lib')
@@ -45,7 +48,7 @@ module TmcServer
 
     config.x.accept_courses_mooc_fi_tokens = ENV['ACCEPT_COURSES_MOOC_FI_TOKENS'] == 'true'
 
-    config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
+    config.middleware.insert_before 0, Rack::Cors, debug: false, logger: (-> { Rails.logger }) do
       T.bind(self, Rack::Cors)
       allow do
         origins '*'

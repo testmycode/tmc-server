@@ -27,6 +27,7 @@ class Doorkeeper::ApplicationController
     include ::ExtraFieldHelper
     include ::FeedbackAnswersHelper
     include ::FlashBlockHelper
+    include ::HtmlPreludeHelper
     include ::PasteHelper
     include ::PointsHelper
     include ::SessionsHelper

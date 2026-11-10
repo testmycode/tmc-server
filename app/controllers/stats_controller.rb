@@ -42,7 +42,9 @@ class StatsController < ApplicationController
   private
     sig { void }
     def get_vars
-      @course = Course.find(params[:course_id]) if params[:course_id]
+      return unless params[:course_id]
+      @course = Course.find(params[:course_id])
+      authorize! :read, @course
     end
 
     sig { void }

@@ -40,6 +40,13 @@ describe PointsController, type: :controller do
         expect(response.code.to_i).to eq(403)
       end
     end
+
+    it 'denies a course the user cannot read' do
+      @course.update!(hidden: true)
+      controller.current_user = FactoryBot.create(:user)
+      get :index, params: { organization_id: @organization.slug, course_id: @course.id }
+      expect(response.code.to_i).to eq(403)
+    end
   end
 
   describe 'GET show' do
@@ -70,6 +77,34 @@ describe PointsController, type: :controller do
         @course.save!
         get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @sheetname }
         expect(response.code.to_i).to eq(403)
+      end
+    end
+
+    it 'shows the sheet to a student with no points in it' do
+      controller.current_user = FactoryBot.create(:user)
+      get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @sheetname }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to have_content('✔')
+    end
+
+    describe 'in JSON format' do
+      before :each do
+        @other_user = FactoryBot.create(:user)
+        other_submission = FactoryBot.create(:submission, course: @course, user: @other_user, exercise: @exercise)
+        FactoryBot.create(:awarded_point, course: @course, name: @available_point.name, submission: other_submission, user: @other_user)
+      end
+
+      it 'gives a student only their own points' do
+        get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @sheetname, format: :json, api_version: ApiVersion::API_VERSION }
+        expect(response.parsed_body['users_to_points'].keys).to eq([@user.login])
+      end
+
+      it "gives a teacher everyone's points" do
+        teacher = FactoryBot.create(:user)
+        Teachership.create!(user: teacher, organization: @organization)
+        controller.current_user = teacher
+        get :show, params: { organization_id: @organization.slug, course_id: @course.id, id: @sheetname, format: :json, api_version: ApiVersion::API_VERSION }
+        expect(response.parsed_body['users_to_points'].keys).to contain_exactly(@user.login, @other_user.login)
       end
     end
   end

@@ -5,6 +5,9 @@ module SessionsHelper
   extend T::Sig
   sig { params(user: User).returns(User) }
   def sign_in(user)
+    return_to = session[:return_to]
+    reset_session
+    session[:return_to] = return_to if return_to
     session[:user_id] = user.id
     @current_user = T.let(user, T.nilable(User))
     user
@@ -44,9 +47,11 @@ module SessionsHelper
 
     sig { returns(T.nilable(User)) }
     def user_from_basic_auth
-      if request&.authorization
-        username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
-        User.authenticate(username, password) if username && password
-      end
+      return unless request && ActionController::HttpAuthentication::Basic.has_basic_credentials?(request)
+      username, password = ActionController::HttpAuthentication::Basic.user_name_and_password(request)
+      return unless username && password
+      user, status = User.authenticate_with_status(username, password)
+      PasswordFailureThrottle.record_failure(request) if status == :rejected
+      user if status == :accepted
     end
 end

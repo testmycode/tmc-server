@@ -66,6 +66,15 @@ describe EmailsController, type: :controller do
         expect(assigns(:students)).not_to include(@user3)
       end
 
+      it 'exports a CSV that spreadsheets do not evaluate as formulas' do
+        @user1.update_column(:login, '=HYPERLINK("http://example.com","x")')
+        controller.current_user = @teacher
+        get :index, params: { organization_id: @organization.slug, id: @course.id }, format: :csv
+        rows = CSV.parse(response.body)
+        expect(rows.first).to eq(%w[Username Email])
+        expect(rows).to include(["'=HYPERLINK(\"http://example.com\",\"x\")", @user1.email])
+      end
+
       describe 'HTML page' do
         render_views
 
