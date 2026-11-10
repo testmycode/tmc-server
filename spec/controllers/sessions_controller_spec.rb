@@ -77,6 +77,17 @@ describe SessionsController, type: :controller do
       end
     end
 
+    describe 'with stale sessions in the store' do
+      it 'does not delete them while logging in' do
+        stale = Session.create!(session_id: 'stale', data: {})
+        stale.update_column(:updated_at, 2.months.ago)
+
+        post_create
+
+        expect(Session.exists?(stale.id)).to be(true)
+      end
+    end
+
     describe 'when authentication fails' do
       before :each do
         allow(User).to receive(:authenticate_with_status).and_return([nil, :rejected])

@@ -112,6 +112,16 @@ describe User, type: :model do
       expect(user.errors[:login].size).to eq(1)
     end
 
+    it 'checks login uniqueness without scanning LOWER(login)' do
+      user = User.new(@params)
+      queries = []
+      callback = ->(*, payload) { queries << payload[:sql] }
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') { user.valid? }
+
+      expect(queries.grep(/"users"\."login"/)).not_to be_empty
+      expect(queries.grep(/LOWER\("users"\."login"\)/i)).to be_empty
+    end
+
     it 'should fail without email' do
       @params.delete(:email)
 
