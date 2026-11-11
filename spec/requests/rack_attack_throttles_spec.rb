@@ -78,6 +78,13 @@ describe 'Rack::Attack throttles', type: :request do
       expect(call(path, ip: '198.51.100.99', input: body, 'CONTENT_TYPE' => 'application/json', **bearer)).to eq(503)
     end
 
+    it 'counts user_ids that are not integers in one bucket' do
+      10.times { |i| call(path, ip: "198.51.100.#{i}", **bearer, params: { user_id: "42 #{i}" }) }
+
+      expect(call(path, ip: '198.51.100.99', **bearer, params: { user_id: '42x' })).to eq(503)
+      expect(call(path, ip: '198.51.100.99', **bearer, params: { user_id: '42' })).to eq(200)
+    end
+
     it 'does not let requests without a usable issuer token use up the budget' do
       user_token = Doorkeeper::AccessToken.create!(application: issuer_app, resource_owner_id: 1, scopes: 'issue_user_access_tokens')
       10.times { |i| call(path, ip: "198.51.100.#{i}", params: { user_id: '42' }) }

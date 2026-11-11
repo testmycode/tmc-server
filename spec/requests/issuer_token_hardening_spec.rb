@@ -82,6 +82,33 @@ describe 'Issuer token hardening', type: :request do
       expect(status_after(1, '/oauth/token')).to eq(503)
     end
 
+    context 'with an allow-listed issuer' do
+      let!(:target_app) { Doorkeeper::Application.create!(name: 'mooc.fi frontend', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
+      let(:issuer_token) { Doorkeeper::AccessToken.create!(application: issuer_app, scopes: 'issue_user_access_tokens') }
+      let(:user) { FactoryBot.create(:user) }
+
+      around :each do |example|
+        config = Rails.configuration.x
+        original = [config.user_access_token_issuer_application_uids, config.user_access_token_target_application_uid]
+        config.user_access_token_issuer_application_uids = [issuer_app.uid]
+        config.user_access_token_target_application_uid = target_app.uid
+        example.run
+      ensure
+        config.user_access_token_issuer_application_uids, config.user_access_token_target_application_uid = original
+      end
+
+      it 'counts padded JSON bodies towards the per-user limit' do
+        body = { user_id: user.id, padding: 'x' * 10_000 }.to_json
+        headers = { 'Authorization' => "Bearer #{issuer_token.token}", 'Content-Type' => 'application/json' }
+        statuses = Array.new(11) do |i|
+          post '/api/v8/application/user_access_tokens', params: body, headers: headers, env: { 'REMOTE_ADDR' => "198.51.100.#{i}" }
+          response.status
+        end
+
+        expect(statuses).to eq(([200] * 10) + [503])
+      end
+    end
+
     it 'buckets by the forwarded client address behind a private-range proxy' do
       proxied = { 'REMOTE_ADDR' => '10.0.0.1' }
       expect(status_after(21, '/oauth/token', proxied.merge('HTTP_X_FORWARDED_FOR' => '203.0.113.9'))).to eq(503)

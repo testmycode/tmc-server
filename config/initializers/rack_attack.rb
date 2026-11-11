@@ -60,16 +60,19 @@ class Rack::Attack
 
   # The issuer application and target user of a token issue request. Nil unless the request
   # carries a usable issuer token, so that anonymous requests cannot use up a user's handoffs.
+  # Requests whose user_id is not a plain integer, oversized JSON bodies included, share one bucket
+  # per application: Rails may still read a user from them.
   sig { params(req: Rack::Attack::Request).returns(T.nilable(String)) }
   def self.token_issue_bucket(req)
     return unless token_issue?(req)
 
-    user_id = rails_param(req, 'user_id')
     token_string = access_token_string(req)
-    return unless user_id&.match?(/\A\d+\z/) && token_string
+    token = token_string && Doorkeeper::AccessToken.by_token(token_string)
+    return unless token && AccessTokenAuthentication.issuer_token?(token)
 
-    token = Doorkeeper::AccessToken.by_token(token_string)
-    "#{token.application_id}:#{user_id.to_i}" if token && AccessTokenAuthentication.issuer_token?(token)
+    user_id = rails_param(req, 'user_id')
+    target = user_id&.match?(/\A\d+\z/) ? user_id.to_i : 'unrecognized user_id'
+    "#{token.application_id}:#{target}"
   end
 
   # This safelist is needed because courses.mooc.fi backend auths user
