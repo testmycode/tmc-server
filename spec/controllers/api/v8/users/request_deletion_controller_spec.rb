@@ -25,4 +25,15 @@ describe Api::V8::Users::RequestDeletionController, type: :controller do
 
     expect(response).to have_http_status(403)
   end
+
+  it 'refuses a deletion request made with a handoff token' do
+    application = Doorkeeper::Application.create!(name: 'mooc.fi frontend', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob')
+    token = Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public handoff')
+    request.headers['Authorization'] = "Bearer #{token.token}"
+    expect(UserMailer).not_to receive(:destroy_confirmation)
+
+    post :create, params: { user_id: 'current' }
+
+    expect(response).to have_http_status(403)
+  end
 end
