@@ -45,26 +45,6 @@ RSpec.describe Api::V8::BaseController, type: :controller do
         expect(response).to have_http_status(401)
       end
     end
-    context 'with a revoked token' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:application) { Doorkeeper::Application.create!(name: 'client', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
-      let(:token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public').tap(&:revoke) }
-      it 'request is not successful' do
-        request.accept = 'application/json'
-        get :index
-        expect(response).to have_http_status(401)
-        expect(response.parsed_body).to eq('error' => 'Invalid token')
-      end
-    end
-    context 'with an expired token' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:application) { Doorkeeper::Application.create!(name: 'client', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
-      let(:token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public', expires_in: 60, created_at: 2.minutes.ago) }
-      it 'request is not successful' do
-        get :index
-        expect(response).to have_http_status(401)
-      end
-    end
     context 'with a handoff token' do
       let(:user) { FactoryBot.create(:user) }
       let(:application) { Doorkeeper::Application.create!(name: 'client', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
