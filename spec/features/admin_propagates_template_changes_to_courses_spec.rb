@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -108,6 +109,7 @@ feature 'Admin propagates template changes to all courses cloned from template',
     click_link 'MyExercise'
     attach_file('Zipped project', 'MyExercise.zip')
     click_button 'Submit'
+    expect(page).to have_content('Submission received.')
 
     visit '/'
     click_link @organization1.name

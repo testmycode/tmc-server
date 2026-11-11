@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'tmpdir'
@@ -8,6 +9,7 @@ SUBMISSION_PACKAGING_TIMEOUT_SECONDS = 10
 
 # Takes a submission zip and makes a tar file suitable for the sandbox
 class SubmissionPackager
+  extend T::Sig
   # Packages a submitted ZIP of the given exercise into a TAR or a ZIP with tests
   # added from the clone (to ensure they haven't been tampered with).
   #
@@ -23,6 +25,7 @@ class SubmissionPackager
   #   - no_tmc_run: does not include the tmc-run file
   #   - format: may be set to :zip to get a zip file. Defaults to :tar.
 
+  sig { params(submission: T.untyped).returns(String) }
   def get_full_zip(submission)
     Dir.mktmpdir do |tmpdir|
       zip_path = "#{tmpdir}/submission.zip"
@@ -30,7 +33,7 @@ class SubmissionPackager
       File.open(zip_path, 'wb') { |f| f.write(submission.return_file) }
       begin
         Timeout.timeout(SUBMISSION_PACKAGING_TIMEOUT_SECONDS) do
-          RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, return_zip_path, zip_path, submission.params,
+          RustLangsCliExecutor.prepare_submission(submission.exercise.clone_path, return_zip_path, zip_path, submission.params || {},
                                                   tests_from_stub: submission.exercise.stub_zip_file_path,
                                                   format: :zip,
                                                   no_archive_prefix: true)

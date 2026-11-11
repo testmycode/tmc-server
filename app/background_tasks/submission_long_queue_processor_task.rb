@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'submission_processor'
@@ -6,10 +7,13 @@ require 'submission_processor'
 # submissions to sandbox. This task uses reverse order in order to avoid
 # sending the same submission to sandbox multiple times
 class SubmissionLongQueueProcessorTask
+  extend T::Sig
+  sig { void }
   def initialize
-    @processor = SubmissionProcessor.new
+    @processor = T.let(SubmissionProcessor.new, SubmissionProcessor)
   end
 
+  sig { void }
   def run
     queue = Submission.to_be_reprocessed.where(processing_priority: 0).order(:created_at).reverse_order
     return if queue.length <= 10
@@ -21,6 +25,7 @@ class SubmissionLongQueueProcessorTask
     end
   end
 
+  sig { returns(Integer) }
   def wait_delay
     1
   end

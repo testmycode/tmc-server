@@ -1,16 +1,131 @@
+inherit_from: .rubocop_todo.yml
+
+plugins:
+  - rubocop-capybara
+  - rubocop-factory_bot
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-sorbet
+  - rubocop-thread_safety
+
 inherit_gem:
   rubocop-rails_config:
     - config/rails.yml
 
 AllCops:
   SuggestExtensions: false
-  TargetRubyVersion: 2.5
+  NewCops: enable
+  TargetRubyVersion: 4.0
+  TargetRailsVersion: 8.1
   Exclude:
     - 'ext/**/*'
     - 'db/**/*'
     - '**/vendor/**/*'
 
+# rails_config sets DisabledByDefault; enabling a department opts in its default
+# cops without turning off the rails_config ones.
+Lint:
+  Enabled: true
+
+Security:
+  Enabled: true
+
+Performance:
+  Enabled: true
+
+Rails:
+  Enabled: true
+
+# Swagger docs are public and must skip ApplicationController's filters.
+Rails/ApplicationController:
+  Exclude:
+    - 'app/controllers/api/v8/apidocs_controller.rb'
+
+# There is no ApplicationMailer to inherit from.
+Rails/ApplicationMailer:
+  Enabled: false
+
+# SessionsHelper and AuthorizeCollectionHelper are controller mixins that hold request state.
+Rails/HelperInstanceVariable:
+  Exclude:
+    - 'app/helpers/sessions_helper.rb'
+    - 'app/helpers/authorize_collection_helper.rb'
+
+# API v8 returns the not-found message, which find words differently from find_by!(id:).
+Rails/FindById:
+  Enabled: false
+
+# Each association needs a data-retention decision, not a lint fix.
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+# The UI is not localised.
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+# Each inverse_of needs testing against the association's callers.
+Rails/InverseOf:
+  Enabled: false
+
+# Console-run maintenance methods and the init script installer print progress for the operator.
+Rails/Output:
+  Exclude:
+    - 'app/models/kafka_batch_update_points.rb'
+    - 'lib/ruby_init_script.rb'
+
+# Brakeman's XSS checks cover html_safe and raw.
+Rails/OutputSafety:
+  Enabled: false
+
+# Rake tasks here don't use the app, and loading it would require a database config.
+Rails/RakeEnvironment:
+  Enabled: false
+
+# RemoteSandbox.all is a plain array of sandboxes, not a relation.
+Rails/RedundantActiveRecordAllMethod:
+  AllowedReceivers:
+    - RemoteSandbox
+
+# Dropping the validation changes the error messages API clients receive.
+Rails/RedundantPresenceValidationOnBelongsTo:
+  Enabled: false
+
+# Per-origin email templates live in config/email_templates, outside the view paths.
+Rails/RenderInline:
+  Exclude:
+    - 'app/mailers/user_mailer.rb'
+
+# update_column/update_all skip callbacks on purpose for counters and bulk updates.
+Rails/SkipsModelValidations:
+  Enabled: false
+
+# params.expect rejects shapes require/permit accept; each endpoint needs its own review.
+Rails/StrongParametersExpect:
+  Enabled: false
+
+# Time.zone.now formats differently from Time.now; each call site needs its own review.
+Rails/TimeZone:
+  Enabled: false
+
+# Needs unique indexes added in migrations, not a lint fix.
+Rails/UniqueValidationWithoutIndex:
+  Enabled: false
+
+# Decision tables of literal or constant results (Solution#visible_to?) read better unmerged.
+Lint/DuplicateBranch:
+  IgnoreLiteralBranches: true
+  IgnoreConstantBranches: true
+
+# Would rewrite the Swagger DSL's `key :'$ref'` to `key :$ref`.
+Lint/SymbolConversion:
+  Enabled: false
+
 # Style
+# Ruby 3.1+ shorthand (`{ x: }`) would rewrite ~600 hashes; not worth the churn.
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
+
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: single_quotes
@@ -47,5 +162,192 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Performance/RegexpMatch:
-  Enabled: false
+Style/MapToHash:
+  Enabled: true
+
+# Spec-only plugins: bug-finding cops on, style cops off.
+RSpec:
+  Include:
+    - 'spec/**/*.rb'
+
+Capybara:
+  Include:
+    - 'spec/**/*.rb'
+
+FactoryBot:
+  Include:
+    - 'spec/**/*.rb'
+
+RSpec/Be:
+  Enabled: true
+
+RSpec/BeNil:
+  Enabled: true
+
+RSpec/ChangeByZero:
+  Enabled: true
+
+RSpec/DuplicatedMetadata:
+  Enabled: true
+
+RSpec/EmptyExampleGroup:
+  Enabled: true
+
+RSpec/ExpectActual:
+  Enabled: true
+
+RSpec/ExpectOutput:
+  Enabled: true
+
+RSpec/Focus:
+  Enabled: true
+
+RSpec/HooksBeforeExamples:
+  Enabled: true
+
+RSpec/IdenticalEqualityAssertion:
+  Enabled: true
+
+RSpec/LeakyLocalVariable:
+  Enabled: true
+
+RSpec/MissingExampleGroupArgument:
+  Enabled: true
+
+RSpec/MissingExpectationTargetMethod:
+  Enabled: true
+
+RSpec/NoExpectationExample:
+  Enabled: true
+  # Shared helpers that hold the expectations.
+  AllowedPatterns:
+    - ^expect_
+    - ^assert_
+    - ^should_be_
+    - ^(all|users)_own_subs$
+    - ^no_other_
+    - ^two_(subs|courses)_by_
+    - ^course_from_different_template$
+
+RSpec/NotToNot:
+  Enabled: true
+
+RSpec/OverwritingSetup:
+  Enabled: true
+
+RSpec/PendingWithoutReason:
+  Enabled: true
+
+RSpec/RepeatedDescription:
+  Enabled: true
+
+RSpec/RepeatedExample:
+  Enabled: true
+
+RSpec/RepeatedExampleGroupBody:
+  Enabled: true
+
+RSpec/RepeatedExampleGroupDescription:
+  Enabled: true
+
+RSpec/RepeatedIncludeExample:
+  Enabled: true
+
+RSpec/RepeatedSubjectCall:
+  Enabled: true
+
+RSpec/ReturnFromStub:
+  Enabled: true
+
+RSpec/SkipBlockInsideExample:
+  Enabled: true
+
+RSpec/UnspecifiedException:
+  Enabled: true
+
+RSpec/VoidExpect:
+  Enabled: true
+
+Capybara/CurrentPathExpectation:
+  Enabled: true
+
+Capybara/RSpec/NegationMatcherAfterVisit:
+  Enabled: true
+
+Capybara/VisibilityMatcher:
+  Enabled: true
+
+FactoryBot/AttributeDefinedStatically:
+  Enabled: true
+
+FactoryBot/FactoryAssociationWithStrategy:
+  Enabled: true
+
+FactoryBot/FactoryClassName:
+  Enabled: true
+
+FactoryBot/RedundantFactoryOption:
+  Enabled: true
+
+# Specs and standalone scripts run single-threaded.
+ThreadSafety:
+  Enabled: true
+  Include:
+    - 'app/**/*.rb'
+    - 'lib/**/*.rb'
+    - 'config/**/*.rb'
+
+Sorbet/ValidSigil:
+  Enabled: true
+
+Sorbet/EnforceSigilOrder:
+  Enabled: true
+
+Sorbet/StrictSigil:
+  Enabled: true
+  Include:
+    - 'app/**/*.rb'
+    - 'lib/**/*.rb'
+    - 'config/**/*.rb'
+  Exclude:
+    # DSL files read with instance_eval; Sorbet ignores them.
+    - 'config/extra_fields/*'
+
+Sorbet/EnforceSignatures:
+  Enabled: true
+  Include:
+    - 'app/**/*.rb'
+    - 'lib/**/*.rb'
+    - 'config/**/*.rb'
+  Exclude:
+    - 'config/extra_fields/*'
+    # Sigs live in sorbet/rbi/shims/lib_natsort.rbi.
+    - 'lib/natsort.rb'
+
+Sorbet/SignatureBuildOrder:
+  Enabled: true
+
+Sorbet/ConstantsFromStrings:
+  Enabled: true
+
+# Cops that catch code a Rails upgrade breaks or deprecates.
+Rails/EnumSyntax:
+  Enabled: true
+
+Rails/EnumHash:
+  Enabled: true
+
+Rails/DeprecatedActiveModelErrorsMethods:
+  Enabled: true
+
+Rails/HttpPositionalArguments:
+  Enabled: true
+
+Rails/TransactionExitStatement:
+  Enabled: true
+
+Rails/ActionOrder:
+  Enabled: true
+
+Rails/ActiveRecordCallbacksOrder:
+  Enabled: true

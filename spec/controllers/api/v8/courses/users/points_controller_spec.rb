@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -129,10 +130,10 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
 
       describe 'when course ID given' do
-        it "shows only user's point information" do
+        it "lists none of another user's points" do
           get :index, params: { course_id: point.course_id, user_id: point.user_id }
           expect(response).to have_http_status(200)
-          expect(response.body).to include point.name
+          expect(response.parsed_body).to eq([])
           expect(response.body).not_to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
           expect(response.body).not_to include course_point.name
@@ -156,10 +157,10 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
 
       describe 'when course ID given' do
-        it "shows only user's point information" do
+        it "lists none of another user's points" do
           get :index, params: { course_id: point.course_id, user_id: point.user_id }
           expect(response).to have_http_status(200)
-          expect(response.body).to include point.name
+          expect(response.parsed_body).to eq([])
           expect(response.body).not_to include course_point.name
         end
       end
@@ -179,10 +180,10 @@ describe Api::V8::Courses::Users::PointsController, type: :controller do
       let(:token) { nil }
 
       describe 'when course ID given' do
-        it "shows only user's point information" do
+        it 'lists no points' do
           get :index, params: { course_id: point.course_id, user_id: point.user_id }
           expect(response).to have_http_status(200)
-          expect(response.body).to include point.name
+          expect(response.parsed_body).to eq([])
           expect(response.body).not_to include course_point.name
         end
       end

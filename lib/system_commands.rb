@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'shellwords'
@@ -7,14 +8,24 @@ require 'shellwords'
 # Ruby's standard methods "system" and the backtick operator are
 # bad at capturing output and errors.
 module SystemCommands
+  extend T::Sig
+  extend T::Helpers
+  requires_ancestor { Kernel }
+
+  # Raised by sh! when its timeout kills the command.
+  class TimeoutError < RuntimeError; end
+
   module_function
 
   # Prefer sh! instead
+  sig { params(cmd: String).void }
   def system!(cmd)
     ok = system(cmd)
     raise "Command `#{cmd}` failed with status #{$?.inspect}" unless ok
   end
 
+  # args: command words (escaped unless escape: false), optionally ending in an options hash.
+  sig { params(args: T.untyped).returns({ status: Process::Status, output: String }) }
   def sh!(*args)
     options = {
       assert_silent: false,
@@ -39,7 +50,7 @@ module SystemCommands
     output = `#{cmd} 2>&1`
     status = $?
 
-    raise "Command '#{cmd}' timed out, status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
+    raise TimeoutError, "Command '#{cmd}' timed out, status #{status.inspect}. The output follows:\n#{output}" if status.exitstatus == 124
     raise "Command `#{cmd}` failed with status #{status.inspect}. The output follows:\n#{output}" unless status.success?
     raise "Expected no output from `#{cmd}` but got: #{output}" if options[:assert_silent] && !output.empty?
 
@@ -49,11 +60,13 @@ module SystemCommands
     }
   end
 
+  sig { params(args: T.untyped).returns(String) }
   def mk_command(*args)
     cmd_parts = args.flatten
     cmd_parts.map { |arg| Shellwords.escape(arg.to_s) }.join(' ')
   end
 
+  sig { params(args: T.untyped).returns(String) }
   def make_bash_array(*args)
     '(' + mk_command(args) + ')'
   end

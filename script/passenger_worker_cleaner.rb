@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# typed: false
 # frozen_string_literal: true
 
 require 'open3'
@@ -60,8 +61,6 @@ class WorkerProcess
                   (value * 1024 * 1024).round(2)
                 when 'P'
                   (value * 1024 * 1024 * 1024).round(2)
-                else
-                  value.round(2)
     end
 
     debug_log("Parsed memory: Original='#{mem_str}', Parsed=#{memory_mb}MB")
@@ -126,7 +125,7 @@ class PassengerStatusParser
         end
 
         # Detect start of Application groups
-        if line =~ /^-+ Application groups -+$/
+        if /^-+ Application groups -+$/.match?(line)
           in_app_group = true
           debug_log('Entered Application groups section.')
           next

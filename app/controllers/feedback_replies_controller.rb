@@ -1,7 +1,9 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Handles replying to a feedback answer by e-mail.
 class FeedbackRepliesController < ApplicationController
+  sig { void }
   def create
     answer = FeedbackAnswer.find(params['answer_id'])
     authorize! :reply_feedback_answer, answer
@@ -17,7 +19,7 @@ class FeedbackRepliesController < ApplicationController
     if request.referer.present?
       redirect_to request.referer, params: { notice: 'Reply to a review was mailed' }
     else
-      redirect_back fallback_location: root_path
+      redirect_back_or_to(root_path)
     end
   end
 end

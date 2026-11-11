@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'git_test_actions.rb'))
@@ -24,7 +25,7 @@ class SubmissionTestSetup
     should_save = options[:save]
     @user = options[:verified_user] || create_user
 
-    @test_tmp_dir = "#{::Rails.root}/tmp/tests"
+    @test_tmp_dir = Rails.root.join('tmp/tests').to_s
     @repo_path = @test_tmp_dir + '/fake_remote_repo'
     create_bare_repo(@repo_path)
 

@@ -1,11 +1,13 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'submission_list'
 
 class ExercisesController < ApplicationController
+  sig { void }
   def show
     @exercise = Exercise.find(params[:id])
-    @course = Course.lock('FOR SHARE').find(@exercise.course_id)
+    @course = Course.lock('FOR SHARE').find(T.must(@exercise.course_id))
     @organization = @course.organization
     authorize! :read, @course
     authorize! :read, @exercise
@@ -17,18 +19,19 @@ class ExercisesController < ApplicationController
 
         Course.transaction(requires_new: true) do
           if !current_user.guest?
-            @submissions = @exercise.submissions.order('submissions.created_at DESC')
+            submissions = @exercise.submissions.order('submissions.created_at DESC')
 
-            @submissions = @submissions.where(user_id: current_user.id) unless can? :teach, @course
-            @submissions = @submissions.includes(:awarded_points).includes(:user).includes(:course)
-            @submissions = @submissions.limit(50) unless !!params[:view_all]
+            submissions = submissions.where(user_id: current_user.id) unless can? :teach, @course
+            submissions = submissions.includes(:awarded_points).includes(:user).includes(:course)
+            submissions = submissions.limit(50) unless !!params[:view_all]
+            @submissions = T.let(submissions, T.nilable(ActiveRecord::Relation))
           else
             @submissions = nil
           end
 
           authorize! :read, @submissions
 
-          @new_submission = Submission.new
+          @new_submission = T.let(Submission.new, T.nilable(Submission))
         end
       end
       format.zip do
@@ -60,6 +63,7 @@ class ExercisesController < ApplicationController
     end
   end
 
+  sig { void }
   def set_disabled_statuses
     @course = Course.find(params[:course_id])
     @organization = @course.organization
@@ -80,16 +84,15 @@ class ExercisesController < ApplicationController
                 notice: 'Exercises successfully updated.'
   end
 
+  sig { void }
   def toggle_submission_result_visibility
     @exercise = Exercise.find(params[:id])
     authorize! :toggle_submission_result_visibility, @exercise.course
     @exercise.toggle_submission_result_visiblity
-    status = @exercise.hide_submission_results ? '<b>hidden</b>' : '<b>visible</b>'
-    redirect_to exercise_path(@exercise), notice: "<h4>Exercise status update:</h4>
-    <ul>
-      <li>Submission results are now #{status}</li>
-      <li>Points are now #{status}</li>
-      <li>Model solutions is now #{status}</li>
-    </ul>"
+    status = helpers.tag.b(@exercise.hide_submission_results ? 'hidden' : 'visible')
+    changes = ['Submission results are now', 'Points are now', 'Model solutions is now'].map do |what|
+      helpers.tag.li(helpers.safe_join([what, ' ', status]))
+    end
+    redirect_to exercise_path(@exercise), notice: helpers.safe_join([helpers.tag.h4('Exercise status update:'), helpers.tag.ul(helpers.safe_join(changes))])
   end
 end

@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -27,6 +28,7 @@ module Api
 
           around_action :wrap_transaction
 
+          sig { void }
           def download
             unauthorize_guest!
             exercise = Exercise.find_by!(id: params[:exercise_id])

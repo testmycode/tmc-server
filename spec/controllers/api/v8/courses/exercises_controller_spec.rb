@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -55,7 +56,7 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
 
     def unlocked_flags
       get :index, params: { course_id: course.id }
-      JSON.parse(response.body).to_h { |ex| [ex['name'], ex['unlocked']] }
+      response.parsed_body.to_h { |ex| [ex['name'], ex['unlocked']] }
     end
 
     it 'marks a date-unlocked exercise as unlocked once the date has passed' do
@@ -64,7 +65,7 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
     end
 
     it 'marks a date-unlocked exercise as locked before the date' do
-      exercise.update!(unlock_spec: [(Time.zone.now + 1.day).strftime('%d.%m.%Y %H:%M')].to_json)
+      exercise.update!(unlock_spec: [1.day.from_now.strftime('%d.%m.%Y %H:%M')].to_json)
       expect(unlocked_flags['testexercise']).to be false
     end
   end

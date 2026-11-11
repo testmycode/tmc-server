@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -6,9 +7,13 @@ require 'fileutils'
 describe Api::V8::Organizations::Courses::ExercisesController, type: :controller do
   let!(:organization) { FactoryBot.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
-  repo_path = Dir.tmpdir + '/api/v8/organizations/courses/exercises/remote_repo'
-  FileUtils.rm_rf(repo_path)
-  create_bare_repo(repo_path)
+  let(:repo_path) { Dir.tmpdir + '/api/v8/organizations/courses/exercises/remote_repo' }
+
+  before do
+    FileUtils.rm_rf(repo_path)
+    create_bare_repo(repo_path)
+  end
+
   let!(:course) { FactoryBot.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
   let!(:exercise) { FactoryBot.create(:exercise, name: 'testexercise', course: course) }
   let!(:hidden_exercise) { FactoryBot.create(:exercise, name: 'hiddentestexercise', course: course, hidden: true) }
@@ -19,6 +24,9 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
     allow(controller).to receive(:doorkeeper_token) { token }
   end
 
+  after do
+    FileUtils.rm_rf(repo_path)
+  end
   describe 'As an admin' do
     let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
     describe 'when course name is given' do
@@ -103,9 +111,5 @@ describe Api::V8::Organizations::Courses::ExercisesController, type: :controller
         expect(page.status_code).to be(404)
       end
     end
-  end
-
-  after :all do
-    FileUtils.rm_rf(repo_path)
   end
 end

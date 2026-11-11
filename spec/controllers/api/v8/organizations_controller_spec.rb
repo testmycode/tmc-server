@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -10,7 +11,7 @@ describe Api::V8::OrganizationsController, type: :controller do
     it 'should show correct fields from the visible organizations' do
       get :index
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r[0]['name']).to eq(organization.name)
       expect(r[0]['information']).to eq(organization.information)
@@ -19,14 +20,22 @@ describe Api::V8::OrganizationsController, type: :controller do
       expect(r[0]['pinned']).to eq(organization.pinned)
     end
 
+    it 'lists missing information as an empty string, which tmc-langs requires' do
+      organization.update!(information: nil)
+      get :index
+      expect(response.parsed_body[0]['information']).to eq('')
+      get :show, params: { slug: organization.slug }
+      expect(response.parsed_body['information']).to eq('')
+    end
+
     it 'should not show hidden organizations' do
       get :index
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
-      expect(r).not_to have_content('"name"=>"' + unaccepted_organization.name + '"')
-      expect(r).not_to have_content('"information"=>"' + unaccepted_organization.information + '"')
-      expect(r).not_to have_content('"slug"=>"' + unaccepted_organization.slug + '"')
+      slugs = r.pluck('slug')
+      expect(slugs).to include(organization.slug)
+      expect(slugs).not_to include(unaccepted_organization.slug)
     end
   end
 end

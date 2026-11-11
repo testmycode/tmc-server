@@ -8,7 +8,7 @@
       <th>User</th>
       <th>Course</th>
       <th>Exercise name</th>
-      <th colspan="3"></th>
+      <th></th>
     </tr>
   </thead>
 
@@ -19,13 +19,7 @@
         <td><%= model_solution_token_used.course %></td>
         <td><%= model_solution_token_used.exercise_name %></td>
         <td><%= link_to 'Show', model_solution_token_used %></td>
-        <td><%= link_to 'Edit', edit_model_solution_token_used_path(model_solution_token_used) %></td>
-        <td><%= link_to 'Destroy', model_solution_token_used, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Model solution token used', new_model_solution_token_used_path %>

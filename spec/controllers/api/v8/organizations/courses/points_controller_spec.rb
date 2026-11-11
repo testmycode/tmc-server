@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -51,13 +52,13 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
       let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
 
       describe 'when course name given' do
-        it "shows only user's point information" do
+        it "shows only the caller's own points" do
           get :index, params: { organization_slug: organization.slug, course_name: course_name }
           expect(response).to have_http_status(200)
           expect(response.body).not_to include point.name
           expect(response.body).to include current_user_course_point.name
           expect(response.body).not_to include current_user_point.name
-          expect(response.body).to include course_point.name
+          expect(response.body).not_to include course_point.name
         end
       end
       describe 'when invalid course name given' do
@@ -78,11 +79,10 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
       let(:token) { nil }
 
       describe 'when course name given' do
-        it "shows only user's point information" do
+        it 'lists no points' do
           get :index, params: { organization_slug: organization.slug, course_name: course_name }
           expect(response).to have_http_status(200)
-          expect(response.body).not_to include point.name
-          expect(response.body).to include course_point.name
+          expect(response.parsed_body).to eq([])
         end
       end
       describe 'when invalid course name given' do

@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Shows the files of a submission.
@@ -8,6 +9,7 @@ class FilesController < ApplicationController
   # This exists just to provide comapatability with old files url format
   # Cannot be redirected in routes, as rack_base_uri cannot be used for redirects.
   # - Jamox / 12.7.2014
+  sig { void }
   def index
     redirect_to submission_path(params[:submission_id], anchor: 'files')
   end

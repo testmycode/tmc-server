@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -7,9 +8,13 @@ describe Api::V8::Core::ExercisesController, type: :controller do
   let!(:user) { FactoryBot.create(:user) }
   let!(:organization) { FactoryBot.create(:accepted_organization) }
   let(:course_name) { 'testcourse' }
-  repo_path = Dir.tmpdir + '/api/v8/core/exercises/remote_repo'
-  FileUtils.rm_rf(repo_path)
-  create_bare_repo(repo_path)
+  let(:repo_path) { Dir.tmpdir + '/api/v8/core/exercises/remote_repo' }
+
+  before do
+    FileUtils.rm_rf(repo_path)
+    create_bare_repo(repo_path)
+  end
+
   let!(:course) { FactoryBot.create(:course, name: "#{organization.slug}-#{course_name}", organization: organization, source_backend: 'git', source_url: repo_path) }
   let!(:exercise) { FactoryBot.create(:exercise, course: course) }
 
@@ -17,6 +22,9 @@ describe Api::V8::Core::ExercisesController, type: :controller do
     allow(controller).to receive(:doorkeeper_token) { token }
   end
 
+  after do
+    FileUtils.rm_rf(repo_path)
+  end
   describe 'Downloading an exercise zip' do
     describe 'as any user' do
       let(:current_user) { Guest.new }
@@ -59,7 +67,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
       it 'should show appropriate error' do
         get :show, params: { id: 741 }
         expect(response).to have_http_status :not_found
-        expect(response.body).to include "Couldn't find Exercise with 'id'=741"
+        expect(response.parsed_body['errors']).to eq(["Couldn't find Exercise with 'id'=\"741\""])
       end
     end
   end
@@ -72,9 +80,5 @@ describe Api::V8::Core::ExercisesController, type: :controller do
       expect(response).to have_http_status :unauthorized
       expect(response.body).to include 'Authentication required'
     end
-  end
-
-  after :all do
-    FileUtils.rm_rf(repo_path)
   end
 end

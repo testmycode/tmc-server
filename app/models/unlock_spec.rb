@@ -1,18 +1,31 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'date_and_time_utils'
 
 # Parses and abstracts specification in the "unlocked_after" field of a `metadata.yml` file.
 class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs when jumping to tests)
+  extend T::Sig
   class InvalidSyntaxError < StandardError; end
 
+  # Aliases so the per-instance T.lets below don't rebuild these types on every UnlockSpec.new.
+  Conditions = T.type_alias { T::Array[T.proc.params(user: User).returns(T::Boolean)] }
+  Describers = T.type_alias { T::Array[T.proc.params(user: User).returns(T.nilable(String))] }
+  OptionalTime = T.type_alias { T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime)) }
+  private_constant :Conditions, :Describers, :OptionalTime
+
+  # course may be nil while an exercise is being built; only progress conditions need it.
+  # conditions is a decoded JSON array.
+  sig { params(course: T.nilable(Course), conditions: T::Array[T.untyped]).void }
   def initialize(course, conditions)
     @course = course
     @raw_spec = conditions
-    @conditions = []
-    @universal_descriptions = []
-    @describers = []
-    @datetime_count = 0
+    @conditions = T.let([], Conditions)
+    @universal_descriptions = T.let([], T::Array[String])
+    @describers = T.let([], Describers)
+    @datetime_count = T.let(0, Integer)
+    @valid_after = T.let(nil, OptionalTime)
+    @depends_on_other_exercises = T.let(false, T::Boolean)
     conditions.each_with_index do |condition, i|
       parse_condition(condition.to_s.strip) if condition.to_s.present?
     rescue InvalidSyntaxError
@@ -22,41 +35,50 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     end
   end
 
+  sig { params(course: T.nilable(Course), string: T.nilable(String)).returns(T.attached_class) }
   def self.from_str(course, string)
     return new(course, []) if string.nil?
     new(course, ActiveSupport::JSON.decode(string))
   end
 
+  sig { returns(T::Boolean) }
   def empty? # No unlock conditions - no Unlock object required to be unlocked
     @conditions.empty? && @valid_after.nil?
   end
 
   # Whether the raw spec is only a date, so the clock alone decides the unlock.
   # Reads the JSON without parsing the spec, since parsing a progress condition queries the course's exercises.
+  sig { params(string: T.nilable(String)).returns(T::Boolean) }
   def self.date_only?(string)
     conditions = raw_conditions(string)
     conditions.any? && conditions.all? { |c| DateAndTimeUtils.looks_like_date_or_time(c) }
   end
 
   # The raw spec's conditions other than dates. Works on specs that no longer parse.
+  sig { params(string: T.nilable(String)).returns(T::Array[String]) }
   def self.non_date_conditions(string)
     raw_conditions(string).reject { |c| DateAndTimeUtils.looks_like_date_or_time(c) }
   end
 
+  sig { params(string: T.nilable(String)).returns(T::Array[String]) }
   def self.raw_conditions(string)
     return [] if string.nil?
     ActiveSupport::JSON.decode(string).map { |c| c.to_s.strip }.reject(&:empty?)
   end
   private_class_method :raw_conditions
 
+  sig { returns(T::Array[T.untyped]) }
   attr_reader :raw_spec
+  sig { returns(T.nilable(T.any(Time, ActiveSupport::TimeWithZone, DateTime))) }
   attr_reader :valid_after
+  sig { returns(T::Array[String]) }
   attr_reader :universal_descriptions
 
+  sig { params(user: User).returns(T.nilable(String)) }
   def description_for(user)
-    descrs = @describers.map { |d| d.call(user) }.reject(&:nil?)
+    descrs = @describers.filter_map { |d| d.call(user) }
     unless descrs.empty?
-      last = descrs.pop
+      last = T.must(descrs.pop)
       'To unlock this exercise, you must ' + if descrs.empty?
         last
       else
@@ -65,18 +87,31 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
     end
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def permits_unlock_for?(user)
     @conditions.all? { |c| c.call(user) }
   end
 
+  sig { returns(T::Boolean) }
   def depends_on_other_exercises?
     !!@depends_on_other_exercises
   end
 
+  sig { params(spec: String, exercise: Exercise).returns(T::Boolean) }
+  def self.parsable?(spec, exercise)
+    UnlockSpec.new(exercise.course, ActiveSupport::JSON.decode(spec)) # Parses spec and fails if invalid
+    true
+  rescue InvalidSyntaxError
+    raise
+  rescue StandardError
+    raise InvalidSyntaxError, $!
+  end
+
   private
+    sig { params(str: String).void }
     def parse_condition(str)
       if DateAndTimeUtils.looks_like_date_or_time(str)
-        time = DateAndTimeUtils.to_time(str)
+        time = T.must(DateAndTimeUtils.to_time(str))
         raise 'Date out of range' if time.year > 10_000 || time.year < 1 # Prevent database datetime overflow
         raise "You can't have multiple unlock dates for the same exercise" if @datetime_count > 0 # Multiple unlock dates don't work correctly
         @datetime_count += 1
@@ -87,31 +122,32 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
 
       # TODO: This does not work well with soft deadlines
       elsif str =~ /^points?\s+(\S+.*)$/
-        points = Regexp.last_match(1).split(' ').map(&:strip).reject(&:empty?)
+        points = T.must(Regexp.last_match(1)).split(' ').map(&:strip).reject(&:empty?)
         @depends_on_other_exercises = true
         @conditions << lambda do |u|
-          AwardedPoint.where(user_id: u.id, course_id: @course.id, name: points).count == points.count
+          AwardedPoint.where(user_id: u.id, course_id: T.must(@course).id, name: points).count == points.count
         end
         @universal_descriptions << "the following points: #{points.join('  ')}"
         @describers << lambda do |u|
-          awarded = AwardedPoint.where(user_id: u.id, course_id: @course.id, name: points).map(&:name)
+          awarded = AwardedPoint.where(user_id: u.id, course_id: T.must(@course).id, name: points).map(&:name)
           "get the following points: #{(points - awarded).join('  ')}"
         end
 
       elsif str =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
         percentage_str = Regexp.last_match(1)
         percentage = percentage_str.to_f / 100.0
-        group = Regexp.last_match(2)
-        check_group_or_exercise_exists(@course, group)
+        group = T.must(Regexp.last_match(2))
+        course = T.must(@course)
+        check_group_or_exercise_exists(course, group)
         @depends_on_other_exercises = true
         @conditions << lambda do |u|
-          available, awarded, late = available_and_awarded_and_awarded_late(@course, group, u)
-          (awarded.count.to_f + late.count.to_f * @course.soft_deadline_point_multiplier) / available.count.to_f >= percentage - 0.0001
+          available, awarded, late = available_and_awarded_and_awarded_late(course, group, u)
+          (awarded.count.to_f + (late.count.to_f * course.soft_deadline_point_multiplier)) / available.count.to_f >= percentage - 0.0001
         end
         @universal_descriptions << "#{percentage_str}% from #{group}"
         @describers << lambda do |u|
-          available, awarded, late = available_and_awarded_and_awarded_late(@course, group, u)
-          remaining = ((percentage - 0.0001) * available.count.to_f).ceil - (awarded.count.to_f + late.count.to_f * @course.soft_deadline_point_multiplier).round(2)
+          available, awarded, late = available_and_awarded_and_awarded_late(course, group, u)
+          remaining = ((percentage - 0.0001) * available.count.to_f).ceil - (awarded.count.to_f + (late.count.to_f * course.soft_deadline_point_multiplier)).round(2)
           if remaining > 0
             "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
           end
@@ -119,16 +155,17 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
 
       elsif str =~ /^(\d+)\s+exercises?\s+(?:in|of|from)\s+(\S+)$/
         num_exercises = Regexp.last_match(1).to_i
-        group = Regexp.last_match(2)
-        check_group_or_exercise_exists(@course, group)
+        group = T.must(Regexp.last_match(2))
+        course = T.must(@course)
+        check_group_or_exercise_exists(course, group)
         @depends_on_other_exercises = true
         @conditions << lambda do |u|
-          required_exercises = @course.exercises_by_name_or_group(group)
+          required_exercises = course.exercises_by_name_or_group(group)
           required_exercises.count { |ex| ex.completed_by?(u) } >= num_exercises
         end
         @universal_descriptions << "#{num_exercises} #{plural(num_exercises, 'exercise')} from #{group}"
         @describers << lambda do |u|
-          required_exercises = @course.exercises_by_name_or_group(group)
+          required_exercises = course.exercises_by_name_or_group(group)
           remaining = num_exercises - required_exercises.count { |ex| ex.completed_by?(u) }
           if remaining > 0
             "complete #{remaining} more #{plural(remaining, 'exercise')} from #{group}"
@@ -137,16 +174,17 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
 
       elsif str =~ /^(\d+)\s+points?\s+(?:in|of|from)\s+(\S+)$/
         num_points = Regexp.last_match(1).to_i
-        group = Regexp.last_match(2)
-        check_group_or_exercise_exists(@course, group)
+        group = T.must(Regexp.last_match(2))
+        course = T.must(@course)
+        check_group_or_exercise_exists(course, group)
         @depends_on_other_exercises = true
         @conditions << lambda do |u|
-          awarded = available_and_awarded_and_awarded_late(@course, group, u)[1]
+          awarded = available_and_awarded_and_awarded_late(course, group, u)[1]
           awarded.count >= num_points
         end
         @universal_descriptions << "#{num_points} #{plural(num_points, 'point')} from #{group}"
         @describers << lambda do |u|
-          awarded = available_and_awarded_and_awarded_late(@course, group, u)[1]
+          awarded = available_and_awarded_and_awarded_late(course, group, u)[1]
           remaining = num_points - awarded.count
           if remaining > 0
             "get #{remaining} more #{plural(remaining, 'point')} from #{group}"
@@ -157,12 +195,14 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       end
     end
 
+    sig { params(course: Course, group_or_exercise_name: String).void }
     def check_group_or_exercise_exists(course, group_or_exercise_name)
       if course.exercises_by_name_or_group(group_or_exercise_name, true).empty?
         raise "No such exercise or exercise group: #{group_or_exercise_name}. Remember that exercises need to be specified with their full name including their group."
       end
     end
 
+    sig { params(course: Course, group_or_exercise_name: String, user: User).returns([T::Array[String], T::Array[AwardedPoint], T::Array[AwardedPoint]]) }
     def available_and_awarded_and_awarded_late(course, group_or_exercise_name, user)
       required_exercises = course.exercises_by_name_or_group(group_or_exercise_name)
                                  .select { |e| e.hide_submission_results == false && e.enabled? }
@@ -175,20 +215,12 @@ class UnlockSpec # (the name of this class is unfortunate as it confuses IDEs wh
       [available, awarded, late]
     end
 
+    sig { params(n: Numeric, word: String).returns(String) }
     def plural(n, word)
       if n == 1
         word
       else
         word.pluralize
       end
-    end
-
-    def self.parsable?(spec, exercise)
-      UnlockSpec.new(exercise.course, ActiveSupport::JSON.decode(spec)) # Parses spec and fails if invalid
-      true
-    rescue InvalidSyntaxError
-      raise
-    rescue StandardError
-      raise InvalidSyntaxError, $!
     end
 end

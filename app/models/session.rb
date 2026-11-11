@@ -1,11 +1,11 @@
+# typed: strict
 # frozen_string_literal: true
 
 class Session < ActiveRecord::SessionStore::Session
-  def self.delete_expired
-    delete_all(['updated_at < ?', 1.month.ago])
-  end
+  extend T::Sig
 
+  sig { params(user: User).returns(T::Boolean) }
   def belongs_to?(user)
-    data['user_id'] == user.id
+    T.unsafe(data)['user_id'] == user.id
   end
 end

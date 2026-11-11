@@ -1,12 +1,16 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'tailoring'
 
 module ApplicationHelper
+  extend T::Sig
+  sig { returns(Tailoring) }
   def tailoring
     Tailoring.get
   end
 
+  sig { params(name: String, path: String, options: T::Hash[Symbol, T.untyped]).returns(ActiveSupport::SafeBuffer) }
   def navigation_link(name, path, options = {})
     class_name = options[:class] || ''
     class_addition = request.path.start_with?(path) ? 'nav-link active' : 'nav-link'
@@ -14,6 +18,7 @@ module ApplicationHelper
     link_to name, path, options
   end
 
+  sig { params(name: T.nilable(String), path: String, options: T::Hash[Symbol, T.untyped]).returns(ActiveSupport::SafeBuffer) }
   def active_on_current_path_link_to(name, path, options = {})
     if request.path == path
       classes = options[:class] || ''
@@ -23,6 +28,15 @@ module ApplicationHelper
     link_to(name, path, options)
   end
 
+  # `tags` may be omitted and the options hash passed in its place.
+  sig do
+    params(
+      label: String,
+      tags: T.nilable(T.any(String, T::Hash[Symbol, T.untyped])),
+      options: T::Hash[Symbol, T.untyped],
+      block: T.nilable(T.proc.returns(T.untyped))
+    ).returns(ActiveSupport::SafeBuffer)
+  end
   def labeled(label, tags = nil, options = {}, &block)
     if tags.is_a?(Hash) && options.empty?
       options = tags
@@ -38,7 +52,7 @@ module ApplicationHelper
     tags = tags.html_safe
 
     if tags =~ /id\s*=\s*"([^"]+)"/
-      target = ' for="' + Regexp.last_match(1) + '"'
+      target = " for=\"#{Regexp.last_match(1)}\""
     else
       raise 'Cannot label a tag without an id'
     end
@@ -62,6 +76,14 @@ module ApplicationHelper
     end
   end
 
+  sig do
+    params(
+      label: String,
+      tags: T.nilable(T.any(String, T::Hash[Symbol, T.untyped])),
+      options: T::Hash[Symbol, T.untyped],
+      block: T.nilable(T.proc.returns(T.untyped))
+    ).returns(ActiveSupport::SafeBuffer)
+  end
   def labeled_field(label, tags = nil, options = {}, &block)
     cls = ['field']
     cls << options[:super_class].split(' ') if options[:super_class]
@@ -69,6 +91,7 @@ module ApplicationHelper
     raw("<div #{cls} >" + labeled(label, tags, options, &block) + '</div>')
   end
 
+  sig { params(label: String, field: String, options: T::Hash[Symbol, T.untyped]).returns(ActiveSupport::SafeBuffer) }
   def bs_labeled_field(label, field, options = {})
     type = options[:type] || :text
 
@@ -87,6 +110,7 @@ module ApplicationHelper
     raw(str)
   end
 
+  sig { params(table_selector: String, options: T::Hash[Symbol, T.untyped]).returns(ActiveSupport::SafeBuffer) }
   def use_datatables(table_selector, options = {})
     options = {
       bJQueryUI: true,
@@ -104,10 +128,12 @@ module ApplicationHelper
     raw(script)
   end
 
+  sig { returns(ActiveSupport::SafeBuffer) }
   def link_back
     raw('<div class="link-back">' + link_to('Back', :back) + '</div>')
   end
 
+  sig { returns(T.nilable(String)) }
   def return_to_link
     return nil if request.path == '/'
     request.path

@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -66,6 +67,7 @@ module Api
 
         around_action :wrap_transaction
 
+        sig { void }
         def index
           unauthorize_guest!
 
@@ -73,7 +75,7 @@ module Api
           user = User.find(params[:user_id])
           authorize! :read, user
 
-          assisted_courses = user.assistantships.pluck(:course_id)
+          assisted_courses = T.let(user.assistantships.pluck(:course_id), T::Array[Integer])
           readable = Course.find(assisted_courses).map do |c|
             {
               'course_id': c.id,

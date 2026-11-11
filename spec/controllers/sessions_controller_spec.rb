@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -25,7 +26,7 @@ describe SessionsController, type: :controller do
   describe 'GET new' do
     context 'when logged in' do
       before :each do
-        allow(subject).to receive(:signed_in?) { true }
+        allow(subject).to receive(:signed_in?).and_return(true)
       end
 
       it 'should redirect the user away' do
@@ -38,6 +39,19 @@ describe SessionsController, type: :controller do
           session[:return_to] = '/important_path'
           get :new
           expect(response).to redirect_to('/important_path')
+        end
+      end
+
+      it 'should keep a return_to URL on this host' do
+        get :new, params: { return_to: 'http://test.host/oauth/authorize?client_id=1' }
+        expect(response).to redirect_to('http://test.host/oauth/authorize?client_id=1')
+      end
+
+      it 'should ignore a return_to that is not an absolute local path' do
+        ['courses', '//evil.example.com', 'https://evil.example.com'].each do |return_to|
+          session.delete(:return_to)
+          get :new, params: { return_to: return_to }
+          expect(response).to redirect_to('/')
         end
       end
     end
@@ -60,6 +74,17 @@ describe SessionsController, type: :controller do
         request.env['HTTP_REFERER'] = nil
         post_create
         expect(response).to redirect_to(root_path)
+      end
+    end
+
+    describe 'with stale sessions in the store' do
+      it 'does not delete them while logging in' do
+        stale = Session.create!(session_id: 'stale', data: {})
+        stale.update_column(:updated_at, 2.months.ago)
+
+        post_create
+
+        expect(Session.exists?(stale.id)).to be(true)
       end
     end
 

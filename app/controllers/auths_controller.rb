@@ -1,18 +1,21 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Provides an authentication service.
 class AuthsController < ApplicationController
+  extend T::Sig
   OK_MESSAGE = 'OK'
   FAIL_MESSAGE = 'FAIL'
 
   skip_authorization_check
   skip_before_action :verify_authenticity_token
 
+  sig { void }
   def show
     if params[:username].present? && params[:session_id].present?
-      user = User.find_by_login_or_email(params[:username])
+      user = User.find_by_login_or_email(params[:username].to_s)
       # Allows using oauth2 tokens of the new api for authenticating
-      res = if user && AccessTokenAuthentication.user_for(Doorkeeper::AccessToken.by_token(params[:session_id])) == user
+      res = if user && AccessTokenAuthentication.user_for(Doorkeeper::AccessToken.by_token(params[:session_id].to_s)) == user
         OK_MESSAGE
       elsif user && find_session_by_id(params[:session_id])&.belongs_to?(user)
         OK_MESSAGE
@@ -22,12 +25,13 @@ class AuthsController < ApplicationController
       return render plain: res
     end
 
-    user = User.find_by_login_or_email(params[:username])
-    msg = if user && params[:password].present? && user.has_password?(params[:password])
-      OK_MESSAGE
+    status = if params[:username].present? && params[:password].present?
+      User.authenticate_with_status(params[:username].to_s, params[:password].to_s).last
     else
-      FAIL_MESSAGE
+      :rejected
     end
+    PasswordFailureThrottle.record_failure(request) if status == :rejected
+    msg = status == :accepted ? OK_MESSAGE : FAIL_MESSAGE
 
     respond_to do |format|
       format.any(:html, :text) do # Work around bug in HTTP library used by tmc-comet and accept HTML mime type
@@ -40,6 +44,7 @@ class AuthsController < ApplicationController
   end
 
   private
+    sig { params(sid: T.untyped).returns(T.nilable(Session)) }
     def find_session_by_id(sid)
       # Can't say Session.find_by_session_id because of a nasty metaprogramming hax in AR's superclass.
       Session.where(session_id: sid).first

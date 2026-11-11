@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -155,7 +156,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
 
       get :index, params: { organization_slug: organization.slug, course_name: course_name }
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), 'incorrect submission or user id'
       expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
@@ -164,7 +165,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
     def all_own_subs(parameters)
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), 'incorrect submission or user id'
     end
@@ -178,7 +179,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end
@@ -191,7 +192,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end
@@ -202,7 +203,7 @@ describe Api::V8::Organizations::Courses::SubmissionsController, type: :controll
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end

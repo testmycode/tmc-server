@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -23,6 +24,16 @@ describe Solution, type: :model do
     expect(sol).not_to be_visible_to(user)
   end
 
+  it 'should not be visible to a non-admin if the course has no organization' do
+    user = FactoryBot.create(:verified_user)
+    ex = FactoryBot.create(:exercise)
+    sol = ex.solution
+    ex.course.organization = nil
+
+    ex.solution_visible_after = Time.now - 5.days
+    expect(sol).not_to be_visible_to(user)
+  end
+
   it 'should never be visible if exercise is still submittable and uncompleted by a non-admin user' do
     show_when_completed(true)
     show_when_expired(true)
@@ -33,6 +44,25 @@ describe Solution, type: :model do
 
     allow(ex).to receive(:submittable_by?).and_return(true)
     expect(sol).not_to be_visible_to(user)
+  end
+
+  describe 'when the course shows model solutions before completion' do
+    let(:user) { FactoryBot.create(:verified_user) }
+    let(:ex) { FactoryBot.create(:exercise) }
+
+    before :each do
+      ex.course.organization.verified = true
+      ex.course.model_solution_visible_before_completion = true
+    end
+
+    it 'should be visible' do
+      expect(ex.solution).to be_visible_to(user)
+    end
+
+    it 'should not be visible for a hidden exercise' do
+      ex.hidden = true
+      expect(ex.solution).not_to be_visible_to(user)
+    end
   end
 
   it 'should not be visible if the exercise is not visible to the user' do

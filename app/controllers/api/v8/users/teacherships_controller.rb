@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -66,6 +67,7 @@ module Api
 
         around_action :wrap_transaction
 
+        sig { void }
         def index
           unauthorize_guest!
 
@@ -73,17 +75,8 @@ module Api
           user = User.find(params[:user_id])
           authorize! :read, user
 
-          taught_organizations = user.teacherships.pluck(:organization_id)
-          readable = Organization.find(taught_organizations).map do |o|
-            {
-              'organization_id': o.id,
-              'name': o.name,
-              'information': o.information,
-              'slug': o.slug,
-              'logo_path': o.logo_path,
-              'pinned': o.pinned,
-            }
-          end
+          taught_organizations = T.let(user.teacherships.pluck(:organization_id), T::Array[Integer])
+          readable = Organization.find(taught_organizations).map { |o| o.org_as_json.merge(organization_id: o.id) }
 
           authorize! :read, readable
           present(readable)

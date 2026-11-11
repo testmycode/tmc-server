@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -45,21 +46,18 @@ module Api
         end
       end
 
+      sig { void }
       def index
-        orgs = Organization
-               .visible_organizations
-               .select { |org| org.visibility_allowed?(request, current_user) }
-
-        orgs = Organization.all if current_user.administrator?
-        orgs = orgs.map { |o| o.attributes.merge(logo_path: o.logo_path) } if current_user.administrator?
-
-        unless current_user.administrator?
-          orgs = orgs.map { |o| { name: o.name, information: o.information, slug: o.slug, logo_path: o.logo_path, pinned: o.pinned } }
+        orgs = if current_user.administrator?
+          Organization.all.map { |o| o.attributes.merge(o.org_as_json.stringify_keys) }
+        else
+          Organization.visible_organizations.filter_map { |org| org.org_as_json if org.visibility_allowed?(request, current_user) }
         end
         authorize! :read, orgs
         present(orgs)
       end
 
+      sig { void }
       def show
         org = Organization.find_by!(slug: params[:slug])
         authorize! :read, org

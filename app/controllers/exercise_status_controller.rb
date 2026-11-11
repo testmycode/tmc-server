@@ -1,24 +1,35 @@
+# typed: strict
 # frozen_string_literal: true
 
 class ExerciseStatusController < ApplicationController
   skip_authorization_check
 
+  sig { void }
   def show
     course_id = params[:course_id]
     user_id = params[:id]
+    return respond_unauthorized if current_user.guest?
 
     course = Course.where(id: course_id).first || Course.where(name: course_id).first
-    user = User.where(id: user_id).first || User.where(login: user_id).first
-
+    return respond_not_found('Course not found') if course.nil?
     return respond_forbidden unless course.visible_to?(Guest.new) || current_user.administrator?
 
+    can_teach = can?(:teach, course)
+    # A numeric login would otherwise resolve to the user with that id.
+    user = current_user if user_id == current_user.login
+    user ||= User.where(id: user_id).first || User.where(login: user_id).first
+    # Checked before the 404 so that students cannot probe which logins exist.
+    return respond_forbidden unless can_teach || user == current_user
+    return respond_not_found('User not found') if user.nil?
+
     user_subs = user.submissions.where(course_id: course.id).to_a.group_by(&:exercise_name)
-    user_subs.default = []
 
     results = {}
     course.exercises.each do |ex|
-      ex.set_submissions_by!(user, user_subs[ex.name]) # used by completed_by? and attempted_by?
-      results[ex.name] = if ex.completed_by?(user)
+      next unless can_teach || ex._fast_visible?
+      ex.set_submissions_by!(user, user_subs.fetch(T.must(ex.name), [])) # used by completed_by? and attempted_by?
+      results_hidden = !can_teach && (course.hide_submission_results? || ex.hide_submission_results?)
+      results[ex.name] = if !results_hidden && ex.completed_by?(user)
         'completed'
       elsif ex.attempted_by?(user)
         'attempted'

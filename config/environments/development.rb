@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 Rails.application.configure do
@@ -40,21 +41,10 @@ Rails.application.configure do
   config.action_cable.mount_path = '/cable'
   config.action_cable.allow_same_origin_as_host = true
 
-  # Adds additional error checking when serving assets at runtime.
-  # Checks for improperly declared sprockets dependencies.
-  # Raises helpful error messages.
-  config.assets.raise_runtime_errors = true
-
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-  # Use a different cache store in production.
   if ENV['REDIS_URL']
-    config.cache_store = :readthis_store, {
-      expires_in: 1.week.to_i, # default
-      namespace: 'cache',
-      redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
-    }
-    Readthis.fault_tolerant = true
+    config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_URL'), namespace: 'cache-v2', expires_in: 1.week }
   else
     config.cache_store = :memory_store, { size: 64.megabytes }
   end

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -43,8 +44,8 @@ describe Assistantship, type: :model do
     Assistantship.create! user: user, course: course2
     Assistantship.create! user: user, course: course3
     user.destroy!
-    expect(Course.all.count).to eq(3)
-    expect(Assistantship.all.count).to eq(0)
+    expect(Course.count).to eq(3)
+    expect(Assistantship.count).to eq(0)
     expect(course1.assistants).to eq([])
     expect(course2.assistants).to eq([])
     expect(course3.assistants).to eq([])
@@ -59,8 +60,8 @@ describe Assistantship, type: :model do
     Assistantship.create! user: user2, course: course
     Assistantship.create! user: user3, course: course
     course.destroy!
-    expect(User.all.count).to eq(3)
-    expect(Assistantship.all.count).to eq(0)
+    expect(User.count).to eq(3)
+    expect(Assistantship.count).to eq(0)
     expect(user1.assisted_courses).to eq([])
     expect(user2.assisted_courses).to eq([])
     expect(user3.assisted_courses).to eq([])

@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -51,6 +52,7 @@ module Api
               end
             end
 
+            sig { void }
             def index
               unauthorize_guest!
               course = Course.find_by!(name: "#{params[:organization_slug]}-#{params[:course_name]}")
@@ -64,7 +66,7 @@ module Api
                 {
                   group: group,
                   progress: info[:progress],
-                  n_points: info[:awarded] + info[:late],
+                  n_points: T.must(info[:awarded]) + T.must(info[:late]),
                   max_points: info[:available_points],
                 }
               end

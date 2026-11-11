@@ -1,9 +1,12 @@
+# typed: strict
 # frozen_string_literal: true
 
 require File.expand_path('boot', __dir__)
+require 'sorbet-runtime'
 require File.expand_path('../app/models/site_setting.rb', __dir__)
 
 require 'rails/all'
+require File.expand_path('sorbet_runtime', __dir__)
 
 # Require the gems listed in gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -14,7 +17,9 @@ module TmcServer
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
-    config.load_defaults 7.1
+    config.load_defaults 8.1
+    # YJIT raises each Passenger process's memory use.
+    config.yjit = false
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
@@ -27,18 +32,26 @@ module TmcServer
     # config.i18n.default_locale = :de
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log client_secret access_token refresh_token bearer_token id_token id_token_hint code_verifier] + [/\A(token|code)\z/]
+    config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log
+                                   token access_token refresh_token client_secret secret _key crypt otp salt code_verifier]
+    # Exact, so that other keys containing "code" stay readable.
+    config.filter_parameters << /\Acode\z/
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.eager_load_paths << Rails.root.join('lib')
 
     config.relative_url_root = SiteSetting.value('base_path')
 
+    # Bootstrap 4.6 has no @use version, so it and our @imports of it keep using what Dart Sass deprecates.
+    config.sass.quiet_deps = true
+    config.sass.silence_deprecations = %w[import global-builtin color-functions if-function abs-percent]
+
     config.x.accept_courses_mooc_fi_tokens = ENV['ACCEPT_COURSES_MOOC_FI_TOKENS'] == 'true'
     config.x.user_access_token_issuer_application_uids = ENV.fetch('USER_ACCESS_TOKEN_ISSUER_APPLICATION_UIDS', '').split(',').map(&:strip).reject(&:empty?)
     config.x.user_access_token_target_application_uid = ENV['USER_ACCESS_TOKEN_TARGET_APPLICATION_UID'].presence
 
-    config.middleware.insert_before 0, Rack::Cors, debug: true, logger: (-> { Rails.logger }) do
+    config.middleware.insert_before 0, Rack::Cors, debug: false, logger: (-> { Rails.logger }) do
+      T.bind(self, Rack::Cors)
       allow do
         origins '*'
         resource '/oauth*', headers: :any, methods: :any

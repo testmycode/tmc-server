@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -19,7 +20,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
       it 'shows a list of collections of course urls' do
         get :index, params: { organization_slug: organization.slug }
-        json = JSON.parse response.body
+        json = response.parsed_body
         expect(response).to have_http_status(200)
         expect(json[0]['id']).to eq(course.id)
         expect(json[0]['name']).to eq(course.name)
@@ -34,7 +35,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
       it 'shows a list of collections of course urls' do
         get :index, params: { organization_slug: organization.slug }
-        json = JSON.parse response.body
+        json = response.parsed_body
         expect(json[0]['id']).to eq(course.id)
         expect(json[0]['name']).to eq(course.name)
         expect(json[0]['title']).to eq(course.title)

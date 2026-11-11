@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -153,7 +154,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
 
       get :index, params: { course_id: course.id }
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e|  e['id'] == sub1.id && e['user_id'] == user1.id }).to be(true), 'incorrect submission or user id'
       expect(r.any? { |e|  e['id'] == sub2.id && e['user_id'] == user2.id }).to be(true), 'incorrect submission or user id'
@@ -162,7 +163,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
     def all_own_subs(parameters)
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e|  e['id'] == submission.id && e['user_id'] == user.id }).to be(true), 'incorrect submission or user id'
     end
@@ -176,7 +177,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end
@@ -189,7 +190,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end
@@ -200,7 +201,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
 
       get :index, params: parameters
 
-      r = JSON.parse response.body
+      r = response.parsed_body
 
       expect(r.any? { |e| e['id'] == other_guys_sub.id && e['user_id'] == other_user.id }).to be(false), "shouldn't contain other submission's id or other user's id"
     end

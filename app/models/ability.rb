@@ -1,14 +1,17 @@
+# typed: strict
 # frozen_string_literal: true
 
 # CanCan ability definitions.
 #
 # See: https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
 class Ability
+  extend T::Sig
   include CanCan::Ability
 
   # +auth_source+ restricts account changes for tokens that are not the user's own login:
   # :courses_mooc_fi_token denies all, administrators included; :handoff_token allows profile
   # edits but no +:update_credentials+ (email, password) and no account deletion.
+  sig { params(user: User, auth_source: T.nilable(Symbol)).void }
   def initialize(user, auth_source: nil)
     alias_action :update_credentials, to: :update
 
@@ -58,12 +61,12 @@ class Ability
           user.assistant?(c) ||
           (
             c.initial_refresh_ready? &&
-              (!c.disabled? && !c.hidden? &&
+              ((!c.disabled? && !c.hidden? &&
             (
               c.hidden_if_registered_after.nil? ||
               c.hidden_if_registered_after > Time.now ||
               (!user.guest? && c.hidden_if_registered_after > user.created_at)
-            ) || user.student_in_course?(c))
+            )) || user.student_in_course?(c))
           )
       end
 
@@ -114,11 +117,11 @@ class Ability
       end
 
       can :download, Submission do |sub|
-        !sub.course.hide_submission_results? && !sub.exercise.hide_submission_results? && (can?(:read, sub) || sub.paste_visible_for?(user))
+        !sub.course.hide_submission_results? && !sub.exercise&.hide_submission_results? && can?(:read, sub)
       end
 
       can :read_results, Submission do |sub|
-        (!sub.course.hide_submission_results? && !sub.exercise.hide_submission_results?) || (can? :teach, sub.course)
+        (!sub.course.hide_submission_results? && !sub.exercise&.hide_submission_results?) || (can? :teach, sub.course)
       end
 
       cannot :manage_feedback_questions, Course

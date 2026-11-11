@@ -1,10 +1,13 @@
+# typed: strict
 # frozen_string_literal: true
 
 # Resolves the local user behind a courses.mooc.fi access token sent to API v8.
 module CoursesMoocFiAuthentication
+  extend T::Sig
   # Returns the user the request's bearer token belongs to, or nil when there is no bearer token,
   # courses.mooc.fi rejects it, or it belongs to no local user. Raises
   # CoursesMoocFiTokenIntrospector::Unavailable when the token cannot be checked right now.
+  sig { params(request: ActionDispatch::Request).returns(T.nilable(User)) }
   def self.user_for(request)
     token = Doorkeeper::OAuth::Token.from_bearer_authorization(request)
     return nil if token.blank?
@@ -17,6 +20,7 @@ module CoursesMoocFiAuthentication
 
   # Binds the user with the TMC id courses.mooc.fi reports to the token's subject, unless that user
   # is already bound to another subject.
+  sig { params(result: CoursesMoocFiTokenIntrospector::Result).returns(T.nilable(User)) }
   def self.link_by_upstream_id(result)
     return nil if result.upstream_id.blank?
 

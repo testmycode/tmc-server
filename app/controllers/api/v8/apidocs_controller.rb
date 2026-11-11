@@ -1,8 +1,10 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
   module V8
     class ApidocsController < ActionController::Base
+      extend T::Sig
       include Swagger::Blocks
 
       swagger_root do
@@ -150,7 +152,7 @@ module Api
 
       # A list of all classes that have swagger_* declarations.
       # The order of the swagered_classes affects the order they are shown in swaggerUI
-      SWAGGERED_CLASSES = [
+      SWAGGERED_CLASSES = T.let([
         Api::V8::UsersController,
         Api::V8::CoursesController,
         Api::V8::Courses::PointsController,
@@ -198,8 +200,9 @@ module Api
         Submission,
         User,
         self
-      ].freeze
+      ].freeze, T::Array[T::Class[T.anything]])
 
+      sig { void }
       def index
         render json: Swagger::Blocks.build_root_json(SWAGGERED_CLASSES)
       end

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -126,14 +127,14 @@ RSpec.describe Api::V8::BaseController, type: :controller do
       it 'keeps an administrator an administrator' do
         FactoryBot.create(:admin, courses_mooc_fi_user_id: sub)
         get :index, params: { organization_id: organization.id }
-        expect(JSON.parse(response.body)).to include('administrator' => true, 'manage_all' => true)
+        expect(response.parsed_body).to include('administrator' => true, 'manage_all' => true)
       end
 
       it 'keeps a teacher a teacher' do
         teacher = FactoryBot.create(:user, courses_mooc_fi_user_id: sub)
         Teachership.create!(user: teacher, organization: organization)
         get :index, params: { organization_id: organization.id }
-        expect(JSON.parse(response.body)).to include('administrator' => false, 'teach' => true)
+        expect(response.parsed_body).to include('administrator' => false, 'teach' => true)
       end
     end
 

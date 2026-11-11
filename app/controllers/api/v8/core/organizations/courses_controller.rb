@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -27,6 +28,7 @@ module Api
             end
           end
 
+          sig { void }
           def index
             unauthorize_guest!
             organization = Organization.find_by!(slug: params[:organization_slug])
@@ -34,7 +36,7 @@ module Api
             courses = organization.courses.ongoing.order(ordering)
             courses = courses.select { |c| c.visible_to?(current_user) }
             authorize! :read, courses
-            present courses.map { |c| c.links_as_json(view_context) }
+            present(courses.map { |c| c.links_as_json(view_context) })
           end
         end
       end

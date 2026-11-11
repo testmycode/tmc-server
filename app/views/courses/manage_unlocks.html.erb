@@ -62,8 +62,7 @@
                param_array = "group[#{group.name}]"
              end
 
-             group_unlock_conditions = group.group_unlock_conditions
-             group_unlock_conditions = [''] if group_unlock_conditions.empty? # Always have at least one input field
+             group_unlock_conditions = group.group_unlock_conditions.presence || [''] # Always have at least one input field
           %>
           <script type="text/javascript">
             unlock_condition_counts["<%= param_array %>"] = <%= group_unlock_conditions.length %>

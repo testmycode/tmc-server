@@ -1,6 +1,9 @@
+# typed: strict
 # frozen_string_literal: true
 
 module CourseTimingsHelper
+  extend T::Sig
+  sig { params(condition: String).returns(T.nilable(Integer)) }
   def parse_percentage_from_unlock_condition(condition)
     if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
       percentage = Integer(Regexp.last_match(1))
@@ -8,15 +11,19 @@ module CourseTimingsHelper
     percentage
   end
 
+  sig { params(condition: String).returns(T.nilable(String)) }
   def parse_group_from_unlock_condition(condition)
-    condition.split.last if condition =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
+    condition.split.last if /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/.match?(condition)
   end
 
+  sig { params(group: ExerciseGroup).returns(T::Boolean) }
   def complex_unlock_conditions?(group)
-    return false if group.group_unlock_conditions.empty?
-    return true if group.group_unlock_conditions.length > 1
-    return false if group.group_unlock_conditions.first.empty?
-    return true unless group.group_unlock_conditions.first =~ /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/
+    # Nil for a parent group without exercises of its own.
+    conditions = group.group_unlock_conditions
+    return false if conditions.blank?
+    return true if conditions.length > 1
+    return false if conditions.first.empty?
+    return true unless /^(\d+)[%]\s+(?:in|of|from)\s+(\S+)$/.match?(conditions.first)
     false
   end
 end

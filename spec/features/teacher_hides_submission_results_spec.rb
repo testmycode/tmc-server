@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -42,7 +43,7 @@ describe 'Teacher can hide submission results from users', feature: true do
   scenario 'In course page user can not see results of submission and link to points page' do
     log_in_as(@user.login, 'foobar')
     visit_course
-    expect(page).to_not have_link('Points list')
+    expect(page).not_to have_link('Points list')
     expect(page.find_by_id('submissions').find('tr', text: @user.username)).to have_content('Hidden')
   end
 
@@ -62,8 +63,8 @@ describe 'Teacher can hide submission results from users', feature: true do
     visit_course
     click_link('Details')
     expect(page).to have_content('All tests done - results are hidden')
-    expect(page).to_not have_content('Got 1 out of 1 point')
-    expect(page).to_not have_link('View suggested solution')
+    expect(page).not_to have_content('Got 1 out of 1 point')
+    expect(page).not_to have_link('View suggested solution')
     click_link('Test Results')
     expect(page).to have_content('Test Cases')
     # expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
@@ -82,8 +83,8 @@ describe 'Teacher can hide submission results from users', feature: true do
     visit_course
     click_link('Details')
     expect(page).to have_content('All tests done - results are hidden')
-    expect(page).to_not have_content('Got 1 out of 1 point')
-    expect(page).to_not have_link('View suggested solution')
+    expect(page).not_to have_content('Got 1 out of 1 point')
+    expect(page).not_to have_link('View suggested solution')
   end
 
   scenario 'when c language exercise then in submission page user can not see results of submission' do
@@ -98,8 +99,8 @@ describe 'Teacher can hide submission results from users', feature: true do
     visit_course
     click_link('Details')
     expect(page).to have_content('All tests done - results are hidden')
-    expect(page).to_not have_content('Got 1 out of 1 point')
-    expect(page).to_not have_link('View suggested solution')
+    expect(page).not_to have_content('Got 1 out of 1 point')
+    expect(page).not_to have_link('View suggested solution')
     click_link('Test Results')
     expect(page).to have_content('Test Cases')
     # expect(find('tr', text: tcr.test_case_name)).to have_content('Hidden')
@@ -121,8 +122,8 @@ describe 'Teacher can hide submission results from users', feature: true do
       visit_course
       click_link('Details')
       expect(page).to have_content('All tests done - results are hidden')
-      expect(page).to_not have_content('Got 1 out of 1 point')
-      expect(page).to_not have_link('View suggested solution')
+      expect(page).not_to have_content('Got 1 out of 1 point')
+      expect(page).not_to have_link('View suggested solution')
       click_link('Test Results')
       expect(page).to have_content('Test Cases')
       expect(find('tr').all('td').count).to eq(0)

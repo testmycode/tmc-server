@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 if LogStasher.enabled?
@@ -5,8 +6,8 @@ if LogStasher.enabled?
     # This block is run in application_controller context,
     # so you have access to all controller methods
     begin
-      fields[:user] = if current_user&.login
-        current_user.login
+      fields[:user] = if T.unsafe(self).current_user&.login
+        T.unsafe(self).current_user.login
       else
         'guest'
       end
@@ -20,6 +21,7 @@ if LogStasher.enabled?
         fields[:client_version] = params[:client_version] if params[:client_version]
       end
     rescue NameError
+      # Not every logged request has params.
     end
 
     fields[:site] = /^\/api/.match?(request.path) ? 'api' : 'user'

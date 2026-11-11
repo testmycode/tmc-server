@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'app_secrets'
@@ -5,6 +6,7 @@ require 'digest'
 
 # Checks an opaque courses.mooc.fi (secret-project-331) access token via RFC 7662 introspection.
 class CoursesMoocFiTokenIntrospector
+  extend T::Sig
   # courses.mooc.fi could not answer: transport failure, non-200 (including 401 for our own client
   # credentials), unreadable body or missing configuration. Says nothing about the token.
   class Unavailable < StandardError; end
@@ -21,10 +23,12 @@ class CoursesMoocFiTokenIntrospector
 
   # Returns the Result for a token courses.mooc.fi vouches for, or nil when it rejects the token.
   # Raises Unavailable when it cannot answer; that is never cached.
+  sig { params(token: String).returns(T.nilable(Result)) }
   def self.introspect(token)
     new.introspect(token)
   end
 
+  sig { params(token: String).returns(T.nilable(Result)) }
   def introspect(token)
     return nil if token.blank?
 
@@ -53,10 +57,13 @@ class CoursesMoocFiTokenIntrospector
   private
     # sp331 serves introspection at "<issuer>/introspect" and stamps every active response with
     # this issuer.
+    sig { returns(String) }
     def issuer
-      @issuer ||= "#{SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/')}/api/v0/main-frontend/oauth"
+      @issuer ||= T.let("#{SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/')}/api/v0/main-frontend/oauth", T.nilable(String))
     end
 
+    # Returns the parsed JSON object of a 200 answer.
+    sig { params(token: String).returns(T::Hash[String, T.untyped]) }
     def request_introspection(token)
       client_id = AppSecrets.courses_mooc_fi_introspection_client_id
       client_secret = AppSecrets.courses_mooc_fi_introspection_secret
@@ -88,6 +95,7 @@ class CoursesMoocFiTokenIntrospector
     end
 
     # `aud` is not checked: sp331 mints every access token without an audience.
+    sig { params(body: T::Hash[String, T.untyped]).returns(T.nilable(String)) }
     def reject_reason(body)
       return 'inactive' unless body['active'] == true
       return "iss #{body['iss'].inspect} is not #{issuer.inspect}" unless body['iss'] == issuer
@@ -100,6 +108,8 @@ class CoursesMoocFiTokenIntrospector
       nil
     end
 
+    # In seconds; nil when the token has already expired.
+    sig { params(expires_at: T.nilable(Time)).returns(T.nilable(Integer)) }
     def cache_ttl(expires_at)
       return MAX_CACHE_TTL if expires_at.nil?
       remaining = (expires_at - Time.now).floor

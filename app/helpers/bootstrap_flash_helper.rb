@@ -1,8 +1,11 @@
+# typed: strict
 # frozen_string_literal: true
 
 module BootstrapFlashHelper
+  extend T::Sig
   ALERT_TYPES = %i[error info success danger].freeze
 
+  sig { returns(ActiveSupport::SafeBuffer) }
   def bootstrap_flash
     flash_messages = []
     flash.each do |type, message|
@@ -17,10 +20,10 @@ module BootstrapFlashHelper
       Array(message).each do |msg|
         text = content_tag(:div,
                            content_tag(:button, raw('&times;'), :class => 'close', 'data-dismiss' => 'alert') +
-                           msg.html_safe, class: "alert alert-#{type}")
+                           msg, class: "alert alert-#{type}")
         flash_messages << text if message
       end
     end
-    flash_messages.join("\n").html_safe
+    safe_join(flash_messages, "\n")
   end
 end

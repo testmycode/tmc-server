@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'natsort'
@@ -7,6 +8,7 @@ module Api
     module Core
       module Courses
         class ReviewsController < Api::V8::BaseController
+          extend T::Sig
           include Swagger::Blocks
 
           swagger_path '/api/v8/core/courses/{course_id}/reviews' do
@@ -53,6 +55,7 @@ module Api
             end
           end
 
+          sig { void }
           def index
             unauthorize_guest!
             course = Course.find_by!(id: params[:course_id])
@@ -60,14 +63,15 @@ module Api
             users_reviewed_submissions = course.submissions
                                                .where(user_id: current_user.id)
                                                .where('requests_review OR requires_review OR reviewed')
-                                               .order('created_at DESC')
+                                               .order(created_at: :desc)
 
             present Review.course_reviews_json(course, users_reviewed_submissions, view_context)
           end
 
+          sig { void }
           def update
-            fetch :review
-            authorize! :update, @review
+            review = fetch_review
+            authorize! :update, review
             if params[:review].present? && params[:review].has_key?(:review_body)
               update_review
             elsif params[:mark_as_read]
@@ -77,69 +81,63 @@ module Api
             end
           end
 
+          sig { void }
           def update_review
-            fetch :review
-            authorize! :update, @review
-            @review.review_body = params[:review][:review_body]
+            review = fetch_review
+            authorize! :update, review
+            review.review_body = params[:review][:review_body]
 
             begin
-              mark_as_reviewed
-              award_points
-              @review.submission.save!
-              @review.save!
+              mark_as_reviewed(review)
+              award_points(review)
+              T.must(review.submission).save!
+              review.save!
             rescue StandardError
               ::Rails.logger.error($!)
               respond_with_error('Failed to save code review.')
             else
-              present(status: 200) && return
+              present(status: 200)
             end
           end
 
+          sig { params(read: T::Boolean).void }
           def mark_as_read(read)
-            fetch :review
-            authorize!(read ? :mark_as_read : :mark_as_unread, @review)
+            review = fetch_review
+            authorize!(read ? :mark_as_read : :mark_as_unread, review)
 
-            @review.marked_as_read = read
-            present(status: 200) && return if @review.save
+            review.marked_as_read = read
+            present(status: 200) if review.save
           end
 
-          def fetch(*stuff)
-            if stuff.include? :course
-              @course = Course.find(params[:course_id])
-              authorize! :read, @course
-            end
-            if stuff.include? :submission
-              @submission = Submission.find(params[:submission_id])
-              authorize! :read, @submission
-            end
-            if stuff.include? :review
-              @review = Review.find(params[:id])
-              authorize! :read, @review
-            end
-            return unless stuff.include? :files
-            @files = SourceFileList.for_submission(@submission)
+          sig { returns(Review) }
+          def fetch_review
+            review = Review.find(params[:id])
+            authorize! :read, review
+            review
           end
 
-          def mark_as_reviewed
-            sub = @review.submission
+          sig { params(review: Review).void }
+          def mark_as_reviewed(review)
+            sub = T.must(review.submission)
             sub.reviewed = true
             sub.review_dismissed = false
             sub.of_same_kind
                .where('(requires_review OR requests_review) AND NOT reviewed')
-               .where(['created_at < ?', sub.created_at])
+               .where(created_at: ...sub.created_at)
                .update_all(newer_submission_reviewed: true)
           end
 
-          def award_points
-            submission = @review.submission
+          sig { params(review: Review).void }
+          def award_points(review)
+            submission = T.must(review.submission)
             exercise = submission.exercise
-            course = exercise.course
             raise 'Exercise of submission has been moved or deleted' unless exercise
+            course = T.must(exercise.course)
 
             available_points = exercise.available_points.where(requires_review: true).map(&:name)
             previous_points = course.awarded_points.where(user_id: submission.user_id, name: available_points).map(&:name)
 
-            new_points = []
+            new_points = T.let([], T::Array[String])
             if params[:review][:points].respond_to?(:keys)
               params[:review][:points].keys.each do |point_name|
                 unless exercise.available_points.where(name: point_name).any?
@@ -157,7 +155,7 @@ module Api
               end
             end
 
-            @review.points = (@review.points_list + new_points + previous_points).uniq.natsort.join(' ')
+            review.points = (review.points_list + new_points + previous_points).uniq.natsort.join(' ')
             submission.points = (submission.points_list + new_points + previous_points).uniq.natsort.join(' ')
           end
         end

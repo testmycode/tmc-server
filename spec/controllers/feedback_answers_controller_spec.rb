@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -48,7 +49,18 @@ describe FeedbackAnswersController, type: :controller do
       post :create, params: params
 
       expect(response).not_to be_successful
-      expect(FeedbackAnswer.all.count).to eq(0)
+      expect(FeedbackAnswer.count).to eq(0)
+    end
+
+    it "should not accept answers to another course's question" do
+      other_question = FactoryBot.create(:feedback_question, kind: 'text')
+      params = @valid_params.clone
+      params[:answers][0][:question_id] = other_question.id
+
+      post :create, params: params
+
+      expect(response).not_to be_successful
+      expect(FeedbackAnswer.count).to eq(0)
     end
 
     it 'should not allow answering on behalf of another user' do

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -81,5 +82,15 @@ describe Setup::CourseFinisherController, type: :controller do
       phase: 1,
       started: Time.now
     }
+  end
+
+  describe 'with a course of another organization in the URL' do
+    it 'does not let a teacher publish it' do
+      other_course = FactoryBot.create(:course, organization: FactoryBot.create(:accepted_organization), disabled_status: :disabled)
+      controller.current_user = @teacher
+      post :create, params: { organization_id: @organization.slug, course_id: other_course.id, commit: 'Publish now' }
+      expect(response.code.to_i).to eq(404)
+      expect(other_course.reload.disabled?).to be(true)
+    end
   end
 end

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -108,12 +109,12 @@ feature 'Teacher edits unlock dates', feature: true do
     click_link 'Add a condition'
 
     click_button 'Save changes'
-    expect(page).to_not have_field('empty_group_0', with: '1.1.2011')
+    expect(page).not_to have_field('empty_group_0', with: '1.1.2011')
     expect(page).to have_field('empty_group_0', with: '2.2.2012')
     expect(page).to have_field('empty_group_1', with: 'exercise MyExercise')
     expect(page).to have_field('empty_group_2', with: '50% of MyExercise')
-    expect(page).to_not have_field('empty_group_3')
-    expect(page).to_not have_field('empty_group_4')
+    expect(page).not_to have_field('empty_group_3')
+    expect(page).not_to have_field('empty_group_4')
   end
 
   scenario 'Non-teacher doesnt have access to editing unlock dates' do

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -10,10 +11,10 @@ describe CourseTimingsHelper, type: :helper do
     end
 
     it 'should return nil for other condition types' do
-      expect(parse_percentage_from_unlock_condition('')).to be(nil)
-      expect(parse_percentage_from_unlock_condition('12 exercises from Module_4')).to be(nil)
-      expect(parse_percentage_from_unlock_condition('12 Module_4')).to be(nil)
-      expect(parse_percentage_from_unlock_condition('14.7.2014')).to be(nil)
+      expect(parse_percentage_from_unlock_condition('')).to be_nil
+      expect(parse_percentage_from_unlock_condition('12 exercises from Module_4')).to be_nil
+      expect(parse_percentage_from_unlock_condition('12 Module_4')).to be_nil
+      expect(parse_percentage_from_unlock_condition('14.7.2014')).to be_nil
     end
   end
 

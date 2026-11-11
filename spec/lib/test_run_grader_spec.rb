@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -239,7 +240,7 @@ describe TestRunGrader do
     end
 
     it "should not award points for which all required tests passed but validations are failed and strategy is 'fail'" do
-      @submission.validations = failing_validations.to_json.to_s
+      @submission.validations = failing_validations.to_json
       TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
@@ -249,7 +250,7 @@ describe TestRunGrader do
       # Should not depend on result order, so let's try the same in reverse order
 
       @submission = FactoryBot.create(:submission, processed: false)
-      @submission.validations = failing_validations.to_json.to_s
+      @submission.validations = failing_validations.to_json
       half_successful_results['testResults'].reverse
       TestRunGrader.grade_results(@submission, half_successful_results)
 
@@ -259,7 +260,7 @@ describe TestRunGrader do
     end
 
     it "should award points for which all required tests passed and no validations are failed and strategy is 'fail'" do
-      @submission.validations = no_failures_in_validations.to_json.to_s
+      @submission.validations = no_failures_in_validations.to_json
       TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
@@ -268,7 +269,7 @@ describe TestRunGrader do
     end
 
     it "should award points for which all required tests passed but validations are failed and strategy is not 'fail'" do
-      @submission.validations = failures_but_no_fail.to_json.to_s
+      @submission.validations = failures_but_no_fail.to_json
       TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)
@@ -277,7 +278,7 @@ describe TestRunGrader do
     end
 
     it 'should award points for which all required tests passed but validations are failed and strategy is not set' do
-      @submission.validations = failures_but_no_strategy.to_json.to_s
+      @submission.validations = failures_but_no_strategy.to_json
       TestRunGrader.grade_results(@submission, half_successful_results)
 
       points = AwardedPoint.where(course_id: @submission.course_id, user_id: @submission.user_id).map(&:name)

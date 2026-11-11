@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 # This ensures any commands we invoke, especially javac, use UTF-8.

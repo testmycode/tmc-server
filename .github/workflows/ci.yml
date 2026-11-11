@@ -6,6 +6,40 @@ on:
     branches: [ master, bs4 ]
   workflow_dispatch:
 jobs:
+  sorbet:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres@localhost:5432/tmc-sorbet
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
+      - name: Type check
+        run: bundle exec srb tc
+      - name: Verify gem RBIs
+        run: bin/tapioca gem --verify
+      - name: Load database schema
+        run: bin/rake db:create db:schema:load
+      - name: Verify DSL RBIs
+        run: bin/tapioca dsl --verify
+
   spec_v8:
     runs-on: ubuntu-latest
     steps:
@@ -113,3 +147,43 @@ jobs:
         run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
       - name: Run spec_integration tests
         run: docker compose run web bin/spec_integration
+
+  client_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      clients: ${{ steps.manifest.outputs.clients }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Read the client manifest
+        id: manifest
+        run: echo "clients=$(jq -c . spec/client_compat/clients.json)" >> "$GITHUB_OUTPUT"
+
+  spec_clients:
+    needs: client_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client: ${{ fromJSON(needs.client_matrix.outputs.clients) }}
+    name: spec_clients (${{ matrix.client.client_name }} ${{ matrix.client.client_version }})
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+      - name: Setup git submodules
+        run: |
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          git submodule update --init --recursive
+      - name: Cache tmc-langs-cli
+        uses: actions/cache@v4
+        with:
+          path: vendor/tmc-langs-rust/clients
+          key: tmc-langs-cli-${{ matrix.client.langs_version }}-${{ matrix.client.sha256 }}
+      - name: Docker compose build
+        run: docker compose build
+      - name: Setup database & test env
+        run: docker compose run web bin/rake db:create db:schema:load RAILS_ENV=test
+      - name: Run spec_clients tests
+        run: docker compose run -e TMC_LANGS_CLIENT=${{ matrix.client.client_name }}@${{ matrix.client.client_version }} web bin/spec_clients

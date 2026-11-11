@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -31,9 +32,10 @@ module Api
           end
         end
 
+        sig { void }
         def index
           unauthorize_guest!
-          course = Course.find_by!(id: params[:course_id]) if params[:course_id]
+          course = Course.find_by!(id: params[:course_id])
           can_see_everything = current_user.administrator? || current_user.teacher?(course.organization) || current_user.assistant?(course)
           authorize! :read, course
 
@@ -59,7 +61,7 @@ module Api
             points_visible = ex.points_visible_to?(current_user)
             available_points = ex.available_points
             available_points_names = available_points.map(&:name)
-            awarded_points = all_awarded_points.select { |awp| available_points_names.include?(awp.name) }.map(&:name)
+            awarded_points = all_awarded_points.filter_map { |awp| awp.name if available_points_names.include?(awp.name) }
             {
               id: ex.id,
               available_points: points_visible ? available_points : [],

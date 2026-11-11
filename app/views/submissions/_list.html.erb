@@ -64,7 +64,7 @@
           </td>
         <% end %>
         <% if show_reviewer_column %>
-          <% reviewers = submission.reviews.sort_by(&:created_at).map {|r| r.reviewer.username }.uniq.join(', ') %>
+          <% reviewers = submission.reviews.sort_by(&:created_at).filter_map {|r| r.reviewer&.username }.uniq.join(', ') %>
           <td><%= link_to reviewers, submission_reviews_path(submission) %></td>
         <% end %>
         <% if show_details_column %>

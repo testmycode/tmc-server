@@ -1,9 +1,11 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'system_commands'
 require 'date_and_time_utils'
 
 class Course < ApplicationRecord
+  extend T::Sig
   include SystemCommands
   include Swagger::Blocks
 
@@ -66,6 +68,7 @@ class Course < ApplicationRecord
     end
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def course_as_json
     {
       name: name,
@@ -120,6 +123,7 @@ class Course < ApplicationRecord
     property :title, type: :string, example: 'testcourse'
   end
 
+  sig { params(view_context: ActionView::Base).returns(T::Hash[String, T.untyped]) }
   def links_as_json(view_context)
     {
       id: id,
@@ -149,9 +153,9 @@ class Course < ApplicationRecord
   validates :description, length: { maximum: 512 }
   validate :check_name_length
 
+  before_validation :save_template
   # If made from template, make sure cached_version is not out of sync.
   before_save :set_cached_version
-  before_validation :save_template
   validates :source_url, presence: true
   # validates :custom_points_url,
   #          format: {
@@ -187,9 +191,10 @@ class Course < ApplicationRecord
 
   scope :with_certificates_for, ->(user) { select { |c| c.visible_to?(user) && c.certificate_downloadable_for?(user) } }
 
-  enum disabled_status: %i[enabled disabled]
-  enum paste_visibility: %i[open secured no-tests-public everyone completed-only]
+  enum :disabled_status, { enabled: 0, disabled: 1 }
+  enum :paste_visibility, { open: 0, secured: 1, 'no-tests-public': 2, everyone: 3, 'completed-only': 4 }
 
+  sig { void }
   def destroy
     # Optimization: delete dependent objects quickly.
     # Rails' :dependent => :delete_all is very slow.
@@ -216,6 +221,7 @@ class Course < ApplicationRecord
       .group('courses.id')
   end
 
+  sig { params(course_template: CourseTemplate).returns(Course) }
   def self.new_from_template(course_template)
     Course.new(name: course_template.name,
                title: course_template.title,
@@ -239,31 +245,38 @@ class Course < ApplicationRecord
 
   delegate :source_backend=, to: :course_template_obj
 
+  sig { params(user: User).returns(T::Boolean) }
   def visible_to?(user)
+    hide_after = self.hide_after
+    hidden_if_registered_after = self.hidden_if_registered_after
     user.administrator? ||
       user.teacher?(organization) ||
       user.assistant?(self) || (
-      initial_refresh_ready? &&
-      !disabled? &&
-      !hidden &&
-      (hide_after.nil? || hide_after > Time.now) &&
-      (
-        hidden_if_registered_after.nil? ||
-        hidden_if_registered_after > Time.now ||
-        (!user.guest? && hidden_if_registered_after > user.created_at)
+        initial_refresh_ready? &&
+        !disabled? &&
+        !hidden &&
+        (hide_after.nil? || hide_after > Time.now) &&
+        (
+          hidden_if_registered_after.nil? ||
+          hidden_if_registered_after > Time.now ||
+          (!user.guest? && hidden_if_registered_after > user.created_at)
+        )
       )
-    )
   end
 
+  sig { params(x: T.untyped).void }
   def hide_after=(x)
-    super(DateAndTimeUtils.to_time(x, prefer_end_of_day: true))
+    # Active Record casts any Time to TimeWithZone; Tapioca types the writer as TimeWithZone only.
+    super(T.unsafe(DateAndTimeUtils.to_time(x, prefer_end_of_day: true)))
   end
 
+  sig { params(x: T.untyped).void }
   def hidden_if_registered_after=(x)
-    super(DateAndTimeUtils.to_time(x, prefer_end_of_day: false))
+    super(T.unsafe(DateAndTimeUtils.to_time(x, prefer_end_of_day: false)))
   end
 
   # This could eventually be made a hstore
+  sig { params(new_options: T::Hash[String, T.untyped]).void }
   def options=(new_options)
     self.hide_after = new_options['hide_after'].presence
 
@@ -286,11 +299,13 @@ class Course < ApplicationRecord
     self.certificate_unlock_spec = new_options['certificate_unlock_spec'].presence
   end
 
+  sig { params(exercises: T.nilable(T::Enumerable[Exercise])).returns(T::Array[String]) }
   def gdocs_sheets(exercises = nil)
     exercises ||= self.exercises.select { |ex| !ex.hidden? && ex.published? }
-    exercises.map(&:gdocs_sheet).reject(&:nil?).uniq
+    exercises.filter_map(&:gdocs_sheet).uniq
   end
 
+  sig { returns(String) }
   def self.cache_root
     "#{FileStore.root}/course"
   end
@@ -300,10 +315,12 @@ class Course < ApplicationRecord
   delegate :cache_path, to: :course_template_obj
 
   # Holds a clone of the course repository
+  sig { returns(String) }
   def clone_path
     "#{cache_path}/clone"
   end
 
+  sig { returns(T.nilable(String)) }
   def git_revision
     Dir.chdir clone_path do
       output = `git rev-parse --verify HEAD`
@@ -313,44 +330,51 @@ class Course < ApplicationRecord
     nil
   end
 
+  sig { returns(String) }
   def solution_path
     "#{cache_path}/solution"
   end
 
+  sig { returns(String) }
   def stub_path
     "#{cache_path}/stub"
   end
 
+  sig { returns(String) }
   def stub_zip_path
     "#{cache_path}/stub_zip"
   end
 
+  sig { returns(String) }
   def solution_zip_path
     "#{cache_path}/solution_zip"
   end
 
+  sig { params(force_reload: T::Boolean).returns(T::Array[ExerciseGroup]) }
   def exercise_groups(force_reload = false)
-    @groups = nil if force_reload
-    @groups ||= begin
+    @groups = T.let(nil, T.nilable(T::Array[ExerciseGroup])) if force_reload
+    @groups ||= T.let(begin
       result = exercises.all.map(&:exercise_group_name).uniq
                         .map { |gname| ExerciseGroup.new(self, gname) }
 
-      new_parents = []
-      begin
-        all_parents = result.map(&:parent_name).reject(&:nil?)
+      loop do
+        all_parents = result.filter_map(&:parent_name)
         new_parents = all_parents.reject { |pn| result.any? { |eg| eg.name == pn } }.uniq
+        break if new_parents.empty?
         result += new_parents.map { |pn| ExerciseGroup.new(self, pn) }
-      end until new_parents.empty?
+      end
 
       result.sort
-    end
+    end, T.nilable(T::Array[ExerciseGroup]))
   end
 
+  sig { params(name: String, force_reload: T::Boolean).returns(T.nilable(ExerciseGroup)) }
   def exercise_group_by_name(name, force_reload = false)
     exercise_groups(force_reload).find { |eg| eg.name == name }
   end
 
   # Returns exercises in group `name`, or whose full name is `name`.
+  sig { params(name: String, force_reload: T::Boolean).returns(T::Array[Exercise]) }
   def exercises_by_name_or_group(name, force_reload = false)
     group = exercise_group_by_name(name, force_reload)
     exercises.to_a.select { |ex| ex.name == name || (group && ex.belongs_to_exercise_group?(group)) }
@@ -358,6 +382,7 @@ class Course < ApplicationRecord
 
   # Set of names of the exercises in `exercises_to_check` the user may open, including those that need no unlock.
   # Batched form of Exercise#unlocked_for? without resolving pending unlocks.
+  sig { params(user: User, exercises_to_check: T::Enumerable[Exercise]).returns(T::Set[T.nilable(String)]) }
   def unlocked_exercise_names_for(user, exercises_to_check)
     from_rows = unlocks.where(user_id: user.id).where('valid_after IS NULL OR valid_after < ?', Time.now).pluck(:exercise_name).to_set
     exercises_to_check.select do |ex|
@@ -371,43 +396,66 @@ class Course < ApplicationRecord
     end.to_set(&:name)
   end
 
+  # The batched form of Exercise#visible_to? for exercises of this course, with a constant
+  # number of queries for exercises without unlock conditions.
+  sig { params(user: User, exercises_to_check: T::Array[Exercise]).returns(T::Array[Exercise]) }
+  def exercises_visible_to(user, exercises_to_check)
+    return exercises_to_check if user.administrator? || user.teacher?(organization) || user.assistant?(self)
+
+    UncomputedUnlock.resolve(self, user)
+    unlocked = unlocked_exercise_names_for(user, exercises_to_check)
+    exercises_to_check.select do |ex|
+      ex.visible_to_non_staff?(user) { unlocked.include?(ex.name) }
+    end
+  end
+
+  sig { params(user: User).returns(T::Array[Exercise]) }
   def unlockable_exercises_for(user)
     UncomputedUnlock.resolve(self, user)
     unlocked = unlocks.where(user_id: user.id).pluck(:exercise_name)
-    exercises.to_a.select { |ex| !unlocked.include?(ex.name) && ex.unlockable_for?(user) }
+    exercises.to_a.select { |ex| unlocked.exclude?(ex.name) && ex.unlockable_for?(user) }
   end
 
-  def reload
+  sig { params(options: T.nilable(T::Hash[Symbol, T.untyped])).returns(T.self_type) }
+  def reload(options = nil)
     super
     @groups = nil
+    self
   end
 
+  sig { params(current_user_id: Integer).returns(CourseTemplateRefresh) }
   def refresh(current_user_id)
     CourseTemplateRefresh.create!(user_id: current_user_id, course_template_id: self.course_template_id)
   end
 
+  sig { void }
   def delete_cache
     FileUtils.rm_rf cache_path if custom?
   end
 
+  sig { returns(T::Array[String]) }
   def self.valid_source_backends
     ['git']
   end
 
+  sig { returns(String) }
   def self.default_source_backend
     'git'
   end
 
+  sig { returns(T.nilable(ActiveSupport::TimeWithZone)) }
   def time_of_first_submission
-    sub = submissions.order('created_at ASC').limit(1).first
+    sub = submissions.order(:created_at).limit(1).first
     sub&.created_at
   end
 
+  sig { returns(T.nilable(ActiveSupport::TimeWithZone)) }
   def time_of_last_submission
-    sub = submissions.order('created_at DESC').limit(1).first
+    sub = submissions.order(created_at: :desc).limit(1).first
     sub&.created_at
   end
 
+  sig { returns(ActiveRecord::Relation) }
   def reviews_required
     submissions.where(
       requires_review: true,
@@ -417,6 +465,7 @@ class Course < ApplicationRecord
     )
   end
 
+  sig { returns(ActiveRecord::Relation) }
   def reviews_requested
     submissions.where(
       requests_review: true,
@@ -426,10 +475,12 @@ class Course < ApplicationRecord
     )
   end
 
+  sig { returns(ActiveRecord::Relation) }
   def submissions_to_review
     submissions.where('(requests_review OR requires_review) AND NOT reviewed AND NOT newer_submission_reviewed AND NOT review_dismissed')
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def certificate_downloadable_for?(user)
     user.administrator? ||
     user.teacher?(organization) || (
@@ -439,6 +490,7 @@ class Course < ApplicationRecord
         UnlockSpec.new(self, ActiveSupport::JSON.decode(certificate_unlock_spec)).permits_unlock_for?(user)))
   end
 
+  sig { void }
   def toggle_submission_result_visiblity
     self.hide_submission_results = !hide_submission_results
     save!
@@ -448,17 +500,17 @@ class Course < ApplicationRecord
   #   :available_points => number of available points,
   #   :points_by_user => {user_id => number_of_points}
   # }
+  sig { returns(T::Hash[String, T::Hash[Symbol, T.untyped]]) }
   def exercise_group_completion_by_user
     # TODO: clean up exercise group discovery
 
     groups = exercises
              .where(disabled_status: 0)
-             .select(&:_fast_visible?)
-             .map(&:name)
-             .map { |name| name =~ /^(.+)-[^-]+$/ ? Regexp.last_match(1) : '' }
+             .filter_map { |e| e.name if e._fast_visible? }
+             .map { |name| name =~ /^(.+)-[^-]+$/ ? T.must(Regexp.last_match(1)) : '' }
              .uniq
 
-    result = {}
+    result = T.let({}, T::Hash[String, T::Hash[Symbol, T.untyped]])
     for group in groups
       conn = ActiveRecord::Base.connection
 
@@ -485,13 +537,14 @@ class Course < ApplicationRecord
   # Returns a hash of exercise group => {
   #  { awarded: double, late: double }
   # }
+  sig { params(user: User).returns(T::Hash[String, T::Hash[Symbol, Numeric]]) }
   def exercise_group_completion_counts_for_user(user)
     # TODO: clean up exercise group discovery
 
-    groups = exercises.enabled.map(&:name).map { |name| name =~ /^(.+)-[^-]+$/ ? Regexp.last_match(1) : '' }.uniq.sort
+    groups = exercises.enabled.map(&:name).map { |name| name =~ /^(.+)-[^-]+$/ ? T.must(Regexp.last_match(1)) : '' }.uniq.sort
 
     conn = ActiveRecord::Base.connection
-    groups.each_with_object({}) do |group, result|
+    groups.each_with_object(T.let({}, T::Hash[String, T::Hash[Symbol, Numeric]])) do |group, result|
       available_points = ExerciseGroup.new(self, group).available_point_names
       next if available_points.empty?
 
@@ -507,7 +560,7 @@ class Course < ApplicationRecord
       res = conn.execute(sql).values.to_h
       awarded = res[false].nil? ? 0 : res[false].to_i
       late = res[true].nil? ? 0 : res[true].to_i
-      calculated_ratio = (awarded + late * self.soft_deadline_point_multiplier).to_f / available_points.length
+      calculated_ratio = (awarded + (late * self.soft_deadline_point_multiplier)).to_f / available_points.length
       result[group] = {
         awarded: awarded,
         late: late,
@@ -517,50 +570,68 @@ class Course < ApplicationRecord
     end
   end
 
+  sig { returns(T::Boolean) }
   def refreshed?
     !refreshed_at.nil?
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def taught_by?(user)
     user.teacher?(organization)
   end
 
+  sig { params(user: User).returns(T::Boolean) }
   def assistant?(user)
     assistants.exists?(user.id)
   end
 
+  sig { returns(T::Boolean) }
   def contains_unlock_deadlines?
     exercise_groups.any?(&:contains_unlock_deadlines?)
   end
 
+  sig { params(material: T.nilable(String)).void }
   def material_url=(material)
-    return super('') if material.blank?
-    return super("http://#{material}") unless /^https?:\/\//.match?(material)
-    super(material)
+    if material.blank?
+      super('')
+    elsif !/^https?:\/\//.match?(material)
+      super("http://#{material}")
+    else
+      super(material)
+    end
   end
 
+  sig { returns(T::Boolean) }
   def custom?
     course_template_obj.dummy?
   end
 
+  sig { params(url: T.nilable(String)).void }
   def external_scoreboard_url=(url)
-    return super("http://#{url}") unless url =~ /^(https?:\/\/|$)/
-    super(url)
+    if /^(https?:\/\/|$)/.match?(url)
+      super(url)
+    else
+      super("http://#{url}")
+    end
   end
 
+  sig { returns(T::Boolean) }
   def has_external_scoreboard_url?
     external_scoreboard_url.present?
   end
 
+  sig { params(organization: Organization, course: Course, user: User).returns(String) }
   def parsed_external_scoreboard_url(organization, course, user)
-    format(external_scoreboard_url, user: user.username, course: course.id.to_s, org: organization.slug)
+    format(T.must(external_scoreboard_url), user: user.username, course: course.id.to_s, org: organization.slug)
   end
 
   private
+    sig { void }
     def set_cached_version
       self.cached_version = course_template_obj.cached_version
     end
 
+    sig { void }
     def save_template
       course_template_obj.save!
     rescue StandardError => e
@@ -569,35 +640,42 @@ class Course < ApplicationRecord
       end
     end
 
+    sig { returns(CourseTemplate) }
     def course_template_obj
       self.course_template ||= CourseTemplate.new_dummy(self)
     end
 
+    sig { void }
     def check_name_length
+      name = self.name
+      slug = organization&.slug
       # If name starts with organization slug (org-course1), then check that
       # the actual name (course1) is within range (for backward compatibility).
-      test_range = if !name.nil? && name.start_with?("#{organization.slug}-")
-        name_range_with_slug
+      test_range = if name && slug && name.start_with?("#{slug}-")
+        name_range_with_slug(slug)
       else
         name_range
       end
 
-      unless !name.nil? && test_range.include?(name.length)
+      unless name && test_range.include?(name.length)
         errors.add(:name, "must be between #{name_range} characters")
       end
     end
 
+    sig { returns(T::Range[Integer]) }
     def name_range
       1..40
     end
 
-    def name_range_with_slug
-      add_length = organization.slug.length + 1
+    sig { params(slug: String).returns(T::Range[Integer]) }
+    def name_range_with_slug(slug)
+      add_length = slug.length + 1
       (name_range.first + add_length)..(name_range.last + add_length)
     end
 
+    sig { void }
     def check_external_scoreboard_url
-      format(external_scoreboard_url, user: '', course: '', org: '') if external_scoreboard_url.present?
+      format(T.must(external_scoreboard_url), user: '', course: '', org: '') if external_scoreboard_url.present?
     rescue StandardError
       errors.add(:external_scoreboard_url, 'contains invalid keys')
     end

@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -58,6 +59,7 @@ module Api
 
         skip_authorization_check
 
+        sig { void }
         def create
           return respond_forbidden unless current_user.administrator?
           users = if params[:extra_fields]
@@ -80,10 +82,10 @@ module Api
             }
             if user_id_to_extra_fields
               extra_fields = user_id_to_extra_fields[u.id] || []
-              d[:extra_fields] = extra_fields.map { |o| [o.field_name, o.value] }.to_h
+              d[:extra_fields] = extra_fields.to_h { |o| [o.field_name, o.value] }
             end
             if params[:user_fields]
-              user_fields = u.user_field_values.map { |o| [o.field_name, o.value] }.to_h
+              user_fields = u.user_field_values.to_h { |o| [o.field_name, o.value] }
               d[:user_fields] = user_fields
               d[:student_number] = user_fields['organizational_id']
               d[:first_name] = user_fields['first_name']

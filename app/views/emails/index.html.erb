@@ -28,10 +28,10 @@
         <%= mail_to(student.email) %>
       </td>
       <td>
-        <%= student.field_value(OpenStruct.new(name: 'first_name')) %>
+        <%= student.field_value_by_name('first_name') %>
       </td>
       <td>
-        <%= student.field_value(OpenStruct.new(name: 'last_name')) %>
+        <%= student.field_value_by_name('last_name') %>
       </td>
     </tr>
   <% end %>

@@ -1,9 +1,13 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
 
 describe SessionsHelper, type: :helper do
   let!(:user) { FactoryBot.create(:user) }
+
+  # Helper specs run without a controller, which is what defines reset_session.
+  before { allow(self).to receive(:reset_session) }
 
   describe '#sign_in' do
     it 'should assign user to @current_user' do

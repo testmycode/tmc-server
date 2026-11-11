@@ -1,7 +1,7 @@
+# typed: strict
 # frozen_string_literal: true
 
 class CourseNotification < ApplicationRecord
-  attr_accessor :topic, :message, :user, :course
   belongs_to :course
-  belongs_to :user
+  belongs_to :sender, class_name: 'User', inverse_of: :course_notifications
 end

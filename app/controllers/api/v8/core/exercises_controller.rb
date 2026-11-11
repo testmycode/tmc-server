@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'submission_list'
@@ -49,6 +50,7 @@ module Api
           end
         end
 
+        sig { void }
         def download
           exercise = Exercise.find(params[:id])
 
@@ -56,10 +58,11 @@ module Api
           send_file exercise.stub_zip_file_path
         end
 
+        sig { void }
         def show
           unauthorize_guest!
           exercise = Exercise.find(params[:id])
-          course = Course.find(exercise.course_id)
+          course = Course.find(T.must(exercise.course_id))
           authorize! :read, course
           authorize! :read, exercise
 

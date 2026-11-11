@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -53,6 +54,16 @@ describe ActionToken, type: :model do
         @user.reload
         expect(@user.password_reset_key.token).not_to eq(old_key.token)
       end
+    end
+  end
+
+  describe '#expired?' do
+    it 'is false for a token without an expiry time' do
+      expect(ActionToken.new(user: @user, action: :confirm_email)).not_to be_expired
+    end
+
+    it 'is true once the expiry time has passed' do
+      expect(ActionToken.new(user: @user, action: :reset_password, expires_at: @way_in_the_past)).to be_expired
     end
   end
 end

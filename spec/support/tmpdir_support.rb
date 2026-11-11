@@ -1,3 +1,4 @@
+# typed: false
 
 # frozen_string_literal: true
 
@@ -6,7 +7,7 @@
 
 RSpec.configure do |config|
   config.before(:each) do
-    @test_tmp_dir = "#{::Rails.root}/tmp/tests"
+    @test_tmp_dir = Rails.root.join('tmp/tests').to_s
     FileUtils.mkdir_p @test_tmp_dir
 
     # Deleting the tmp dir (the cwd) as well would mess up Capybara.
@@ -16,9 +17,9 @@ RSpec.configure do |config|
 
     FileUtils.cd @test_tmp_dir
 
-    @testdata_dir = "#{::Rails.root}/testdata"
+    @testdata_dir = Rails.root.join('testdata').to_s
 
-    @git_backend_cache_dir = "#{::Rails.root}/tmp/tests/cache/git_repos"
+    @git_backend_cache_dir = Rails.root.join('tmp/tests/cache/git_repos').to_s
     FileUtils.rm_rf @git_backend_cache_dir
     FileUtils.mkdir_p @git_backend_cache_dir
 

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'fileutils'
@@ -53,7 +54,7 @@ module IntegrationTestActions
     # expect(page).to have_content('teacher manual')
   end
 
-  def manually_refresh_course(coursename, organization_slug, course, user)
+  def manually_refresh_course(coursename, organization_slug, _course, _user)
     visit "/org/#{organization_slug}/courses"
     click_link coursename
     link = find(:link, 'Refresh')
@@ -67,15 +68,9 @@ module IntegrationTestActions
     # expect(page).to have_content('Refresh successful.')
   end
 
-  # Evil override fix for Capybara 1.1.2 + Selenium + Firefox 7.
-  # From http://how.itnig.net/facts/attach-file-in-capybara---selenium-webdriver
+  # Chromium resolves relative paths against its own working directory, not the spec's.
   def attach_file(field_locator, file_name)
-    case Capybara.current_driver
-    when :selenium
-      find_field(field_locator).native.send_keys(File.expand_path(file_name))
-    else
-      super
-    end
+    super(field_locator, File.expand_path(file_name))
   end
 
   def wait_for_submission_to_be_processed
@@ -109,13 +104,9 @@ module IntegrationTestActions
   end
 
   def screenshot_to_file(path)
-    page.driver.resize_window 1200, 1200
+    page.current_window.resize_to(1200, 1200)
     FileUtils.mkdir_p(File.dirname(path))
-    if page.driver.respond_to? :render
-      page.driver.render(path) # Webkit
-    else
-      page.driver.browser.save_screenshot(path) # Selenium
-    end
+    page.save_screenshot(path) # rubocop:disable Lint/Debugger
     trim_image_edges(path)
   end
 

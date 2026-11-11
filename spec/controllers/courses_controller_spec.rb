@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -33,7 +34,7 @@ describe CoursesController, type: :controller do
         }.merge options
         @request.env['HTTP_AUTHORIZATION'] = 'Basic ' + Base64.encode64("#{@user.login}:#{@user.password}")
         get :index, params: options
-        JSON.parse(response.body)
+        response.parsed_body
       end
 
       it 'renders all non-hidden courses in order by name' do
@@ -45,14 +46,14 @@ describe CoursesController, type: :controller do
 
         result = get_index_json
 
-        expect(result['courses'].map { |c| c['name'] }).to eq(%w[Course1 Course2 Course3])
+        expect(result['courses'].pluck('name')).to eq(%w[Course1 Course2 Course3])
       end
     end
   end
 
   describe 'GET show' do
     before :each do
-      @course = FactoryBot.create(:course)
+      @course = FactoryBot.create(:course, organization: @organization)
     end
 
     describe 'for administrators' do
@@ -106,7 +107,7 @@ describe CoursesController, type: :controller do
 
     describe 'in JSON format' do
       before :each do
-        @course = FactoryBot.create(:course, name: 'Course1')
+        @course = FactoryBot.create(:course, name: 'Course1', organization: @organization)
         @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: @course)
         @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise2', course: @course)
         @course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise3', course: @course)
@@ -122,7 +123,7 @@ describe CoursesController, type: :controller do
         @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
         get :show, params: options
         if parse_json
-          JSON.parse(response.body)
+          response.parsed_body
         else
           response.body
         end
@@ -146,7 +147,7 @@ describe CoursesController, type: :controller do
 
         result = get_show_json
 
-        names = result['course']['exercises'].map { |ex| ex['name'] }
+        names = result['course']['exercises'].pluck('name')
         expect(names).not_to include('Exercise1')
         expect(names).to include('Exercise2')
         expect(names).to include('Exercise3')
@@ -203,6 +204,25 @@ describe CoursesController, type: :controller do
     end
   end
 
+  describe 'GET show_json' do
+    def get_show_json(course)
+      @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(@user.login, @user.password)
+      get :show_json, params: { organization_id: @organization.slug, id: course.id, format: 'json', api_version: ApiVersion::API_VERSION }
+    end
+
+    it 'shows a readable course' do
+      course = FactoryBot.create(:course, organization: @organization)
+      get_show_json(course)
+      expect(response.parsed_body['courses'].pluck('id')).to eq([course.id])
+    end
+
+    it 'denies a hidden course' do
+      course = FactoryBot.create(:course, organization: @organization, hidden: true)
+      get_show_json(course)
+      expect(response.code.to_i).to eq(403)
+    end
+  end
+
   describe 'POST refresh' do
     before :each do
       controller.current_user = FactoryBot.create :user
@@ -219,7 +239,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST disable' do
     before :each do
-      @course = FactoryBot.create(:course)
+      @course = FactoryBot.create(:course, organization: @organization)
     end
 
     describe 'As a teacher' do
@@ -241,7 +261,7 @@ describe CoursesController, type: :controller do
 
   describe 'POST enable' do
     before :each do
-      @course = FactoryBot.create(:course)
+      @course = FactoryBot.create(:course, organization: @organization)
     end
 
     describe 'As a teacher' do
@@ -326,11 +346,27 @@ describe CoursesController, type: :controller do
         expect(e.unlock_deadline).to be_nil
       end
     end
+
+    it 'skips groups that no longer exist' do
+      @course.exercises.create(name: 'group1-e1')
+
+      post :save_deadlines, params: {
+           organization_id: @organization.slug,
+           id: @course.id,
+           group: {
+             removed: { soft: { static: '1.1.2000', unlock: '' }, hard: { static: '', unlock: '' } },
+             group1: { soft: { static: '2.2.2000', unlock: '' }, hard: { static: '', unlock: '' } }
+           }
+          }
+
+      expect(response).to redirect_to(manage_deadlines_organization_course_path(@organization, @course))
+      expect(@course.exercises.find_by(name: 'group1-e1').soft_static_deadline).to eq('2.2.2000')
+    end
   end
 
   describe 'GET manage_unlocks' do
     it 'when non-teacher should respond with a 403' do
-      @course = FactoryBot.create :course
+      @course = FactoryBot.create :course, organization: @organization
       @course.organization = @organization
       controller.current_user = @user
       get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
@@ -351,6 +387,14 @@ describe CoursesController, type: :controller do
       it 'does not warn when the exercises of a group share unlock conditions' do
         get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
         expect(response.body).not_to include('have different unlock conditions')
+      end
+
+      it 'renders parent groups that have no exercises of their own' do
+        @course.exercises.create!(name: 'part1-sub1-e1')
+        get :manage_unlocks, params: { organization_id: @organization.slug, id: @course.id }
+        expect(response).to be_successful
+        get :manage_deadlines, params: { organization_id: @organization.slug, id: @course.id }
+        expect(response).to be_successful
       end
 
       it 'warns when the exercises of a group have different unlock conditions' do
@@ -436,6 +480,15 @@ describe CoursesController, type: :controller do
 
         expect(@course.exercises.find_by(name: 'g-e1').unlock_spec).to eq(['1.2.2000'].to_json)
       end
+
+      it 'skips groups that no longer exist' do
+        @course.exercises.create(name: 'g-e1')
+
+        post :save_unlocks, params: { organization_id: @organization.slug, id: @course.id, group: { removed: { '0' => '1.1.2000' }, g: { '0' => '1.2.2000' } } }
+
+        expect(response).to redirect_to(manage_unlocks_organization_course_path(@organization, @course))
+        expect(@course.exercises.find_by(name: 'g-e1').unlock_spec).to eq(['1.2.2000'].to_json)
+      end
     end
 
     it 'when non-teacher should respond with a 403' do
@@ -478,6 +531,25 @@ describe CoursesController, type: :controller do
         @course.reload
         expect(response.code.to_i).to eq(403)
       end
+    end
+  end
+
+  describe 'with a course of another organization in the URL' do
+    before :each do
+      @other_course = FactoryBot.create(:course, organization: FactoryBot.create(:accepted_organization))
+      controller.current_user = @teacher
+    end
+
+    it 'does not let a teacher disable it' do
+      post :disable, params: { organization_id: @organization.slug, id: @other_course.id }
+      expect(response.code.to_i).to eq(404)
+      expect(@other_course.reload.disabled?).to be(false)
+    end
+
+    it 'does not let a teacher hide it' do
+      post :toggle_hidden, params: { organization_id: @organization.slug, id: @other_course.id }
+      expect(response.code.to_i).to eq(404)
+      expect(@other_course.reload.hidden).to be(false)
     end
   end
 end

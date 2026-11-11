@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -61,6 +62,7 @@ module Api
               end
             end
 
+            sig { void }
             def index
               unauthorize_guest!
               course = Course.find_by!(id: params[:course_id])
@@ -71,8 +73,8 @@ module Api
                                     course_id: course.id,
                                     user_id: params[:user_id])
 
-              authorize! :read, points
-              present(points.as_json_with_exercise_ids(course.exercises))
+              points = visible_awarded_points(course, points)
+              present(AwardedPoint.as_json_with_exercise_ids(points, course.exercises))
             end
           end
         end

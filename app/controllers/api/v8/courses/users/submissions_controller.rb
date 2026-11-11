@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -68,12 +69,13 @@ module Api
 
           around_action :wrap_transaction
 
+          sig { void }
           def index
             unauthorize_guest!
             course = Course.find_by!(id: params[:course_id])
             params[:user_id] = current_user.id if params[:user_id] == 'current'
             submissions = Submission.where(course_id: course.id, user_id: params[:user_id])
-            readable = Submission.filter_fields!(submissions.select { |sub| sub.readable_by?(current_user) })
+            readable = readable_submission_fields(submissions)
 
             authorize! :read, readable
             present(readable)

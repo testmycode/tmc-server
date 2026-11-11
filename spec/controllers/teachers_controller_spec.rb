@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -34,13 +35,13 @@ describe TeachersController, type: :controller do
         it "with a invalid username doesn't create a new teachership" do
           expect do
             post :create, params: { organization_id: @organization.slug, username: 'invalid' }
-          end.to change(Teachership, :count).by(0)
+          end.not_to change(Teachership, :count)
         end
 
         it 'with a username that already is a teacher in the organization' do
           expect do
             post :create, params: { organization_id: @organization.slug, username: @teacher.username }
-          end.to change(Teachership, :count).by(0)
+          end.not_to change(Teachership, :count)
         end
       end
 
@@ -80,6 +81,19 @@ describe TeachersController, type: :controller do
         delete :destroy, params: { organization_id: @organization.slug, id: @teachership.to_param }
         expect(response.code.to_i).to eq(403)
       end
+    end
+  end
+
+  describe 'with a teachership of another organization' do
+    it 'does not let a teacher remove it' do
+      organization = FactoryBot.create(:accepted_organization)
+      Teachership.create!(user: @teacher, organization: organization)
+      other_teachership = Teachership.create!(user: @user, organization: FactoryBot.create(:accepted_organization))
+      controller.current_user = @teacher
+      expect do
+        delete :destroy, params: { organization_id: organization.slug, id: other_teachership.id }
+      end.not_to change(Teachership, :count)
+      expect(response.code.to_i).to eq(404)
     end
   end
 end

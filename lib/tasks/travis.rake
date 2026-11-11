@@ -6,7 +6,7 @@ namespace :travis do
   desc 'Update vendor/bundle files to gem cache on tmc-server'
   task :gemcache do
     unless Dir.exist? 'vendor/bundle'
-      puts 'No vendor/bundle exists, create it with `bundle install --path vendor/bundle`'
+      puts 'No vendor/bundle exists, create it with `bundle config set path vendor/bundle && bundle install`'
       exit 1
     end
     puts 'Pushing new gems from local gem cache (vendor/bundle) to travis cache'

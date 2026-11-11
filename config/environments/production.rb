@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'uglifier'
@@ -29,9 +30,6 @@ Rails.application.configure do
   # For large-scale production use, consider using a caching reverse proxy like nginx, varnish or squid.
   # config.action_dispatch.rack_cache = true
 
-  # Disable Rails's static asset server (Apache or nginx will already do this).
-  config.serve_static_files = false
-
   # Compress JavaScripts and CSS.
   config.assets.configure do |env|
     env.js_compressor  = :uglifier
@@ -54,6 +52,9 @@ Rails.application.configure do
   # Which storage.yml to use
   config.active_storage.service = :local
 
+  # nginx terminates TLS and may not pass the scheme on; the secure session cookie relies on this.
+  config.assume_ssl = true
+
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
@@ -69,12 +70,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   if ENV['REDIS_URL']
-    config.cache_store = :readthis_store, {
-      expires_in: 1.week.to_i, # default
-      namespace: 'cache',
-      redis: { url: ENV.fetch('REDIS_URL'), driver: :hiredis }
-    }
-    Readthis.fault_tolerant = true
+    config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_URL'), namespace: 'cache-v2', expires_in: 1.week }
   else
     config.cache_store = :memory_store, { size: 64.megabytes }
   end
@@ -121,5 +117,5 @@ Rails.application.configure do
   config.hosts << URI.parse(SiteSetting.value('baseurl_for_remote_sandboxes')).host
 
   config.active_record.cache_versioning = false
-  config.active_storage.variant_processor = :mini_magick
+  config.active_storage.variant_processor = :vips
 end

@@ -1,8 +1,10 @@
+# typed: strict
 # frozen_string_literal: true
 
 class Api::Beta::CourseIdInformationController < Api::Beta::BaseController
   before_action :doorkeeper_authorize!, scopes: [:public]
 
+  sig { void }
   def index
     course_ids = Course.order(:id).where(hidden: false).enabled.pluck(:id)
     present(course_ids)

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -21,7 +22,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
 
       def show_course
         get :show, params: { id: course.id }
-        JSON.parse(response.body)
+        response.parsed_body
       end
 
       it 'should render the exercises for each course' do
@@ -42,7 +43,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
 
         result = show_course
 
-        names = result['course']['exercises'].map { |ex| ex['name'] }
+        names = result['course']['exercises'].pluck('name')
         expect(names).not_to include('Exercise1')
         expect(names).to include('Exercise2')
         expect(names).to include('Exercise3')
@@ -87,9 +88,9 @@ describe Api::V8::Core::CoursesController, type: :controller do
         end
 
         it 'does not list the exercise before the date' do
-          course.exercises[0].update!(unlock_spec: [(Time.zone.now + 1.day).strftime('%d.%m.%Y %H:%M')].to_json)
+          course.exercises[0].update!(unlock_spec: [1.day.from_now.strftime('%d.%m.%Y %H:%M')].to_json)
 
-          names = show_course['course']['exercises'].map { |e| e['name'] }
+          names = show_course['course']['exercises'].pluck('name')
           expect(names).not_to include('Exercise1')
         end
       end

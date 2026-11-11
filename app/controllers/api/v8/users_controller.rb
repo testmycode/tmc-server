@@ -1,8 +1,10 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
   module V8
     class UsersController < Api::V8::BaseController
+      extend T::Sig
       include Swagger::Blocks
 
       swagger_path '/api/v8/users/{user_id}' do
@@ -111,6 +113,7 @@ module Api
 
       skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi destroy]
 
+      sig { void }
       def show
         unauthorize_guest! if current_user.guest?
         user = current_user
@@ -125,7 +128,7 @@ module Api
         }
 
         if params[:show_user_fields]
-          user_field = {}
+          user_field = T.let({}, T::Hash[String, T.any(String, T::Boolean)])
           UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
             value_record = user.field_value_record(field)
             value = value_record.ruby_value
@@ -135,9 +138,9 @@ module Api
         end
 
         if params[:extra_fields]
-          extra_fields = {}
+          extra_fields = T.let({}, T::Hash[T.nilable(String), T.nilable(String)])
           namespace = params[:extra_fields]
-          UserAppDatum.where(namespace: namespace, user: user).each do |datum|
+          UserAppDatum.where(namespace: namespace, user: user).find_each do |datum|
             extra_fields[datum.field_name] = datum.value
           end
           data[:extra_fields] = extra_fields
@@ -145,71 +148,78 @@ module Api
         render json: data
       end
 
+      sig { void }
       def create
         authorize! :create, User
 
-        @user = User.new
+        user = User.new
 
-        @user.login = SecureRandom.uuid
+        user.login = SecureRandom.uuid
 
-        set_email
-        set_password
-        set_user_fields
-        set_extra_data
+        set_email(user)
+        set_password(user)
+        set_user_fields(user)
+        set_extra_data(user)
 
-        if BannedEmail.banned?(@user.email)
-          return render json: build_success_response(params[:include_id])
+        if BannedEmail.banned?(user.email)
+          return render json: build_success_response(user, params[:include_id])
         end
 
-        if @user.errors.empty? && @user.save
+        if user.errors.empty? && user.save
           # TODO: Whitelist origins
-          UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now
+          UserMailer.email_confirmation(user, params[:origin], params[:language]).deliver_now
 
           # Post the new user to courses.mooc.fi for password management
           if params[:user][:password].present?
-            @user.post_new_user_to_courses_mooc_fi(params[:user][:password])
+            user.post_new_user_to_courses_mooc_fi(params[:user][:password])
           end
 
-          render json: build_success_response(params[:include_id])
+          render json: build_success_response(user, params[:include_id])
         else
-          errors = @user.errors
-          errors[:username] = errors.delete(:login) if errors.key?(:login)
+          errors = user.errors
+          errors.delete(:login)&.each { |message| errors.add(:username, message) }
           render json: {
             success: false,
-            errors: @user.errors
+            errors: user.errors
           }
         end
       end
 
+      sig { void }
       def update
         unauthorize_guest! if current_user.guest?
 
-        User.transaction do
-          @user = current_user
-          @user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
-          @email_before = @user.email
-          authorize! :update, @user
-          set_user_fields
-          set_extra_data(true)
-          update_email
-          maybe_update_password
-          raise ActiveRecord::Rollback if !@user.errors.empty? || !@user.save
+        user = current_user
+        updated = User.transaction do
+          user = User.find_by!(id: params[:id]) unless params[:id] == 'current'
+          email_before = user.email
+          authorize! :update, user
+          set_user_fields(user)
+          set_extra_data(user, true)
+          update_email(user)
+          maybe_update_password(user)
+          raise ActiveRecord::Rollback if !user.errors.empty? || !user.save
           # Password changed locally: migrate the user to courses.mooc.fi
-          if params[:old_password].present? && params[:password].present? && !@user.managed_externally?
-            @user.post_new_user_to_courses_mooc_fi(params[:password])
+          if params[:old_password].present? && params[:password].present? && !user.managed_externally?
+            user.post_new_user_to_courses_mooc_fi(params[:password])
           end
-          RecentlyChangedUserDetail.email_changed.create!(old_value: @email_before, new_value: @user.email, username: @user.login, user_id: @user.id) unless @email_before.casecmp(@user.email).zero?
-          return render json: {
+          RecentlyChangedUserDetail.email_changed.create!(old_value: email_before, new_value: user.email, username: user.login, user_id: user.id) unless T.must(email_before.casecmp(user.email)).zero?
+          true
+        end
+        if updated
+          render json: {
             message: 'User details updated.'
           }
+        else
+          render json: {
+            errors: user.errors
+          }, status: :bad_request
         end
-        render json: {
-          errors: @user.errors
-        }, status: :bad_request
       end
 
       # courses.mooc.fi retries account deletion and keys off success/already_deleted/code, so a
       # user that is already gone must answer 200, never 404.
+      sig { void }
       def destroy
         return render_destroy_failure('not_authorized', 'Authentication required', :unauthorized) if current_user.guest?
 
@@ -238,6 +248,7 @@ module Api
         render_destroy_failure('internal_error', 'User deletion failed.', :internal_server_error)
       end
 
+      sig { void }
       def set_password_managed_by_courses_mooc_fi
         only_admins!
 
@@ -249,22 +260,27 @@ module Api
 
         user = User.find_by!(id: params[:id])
         authorize! :update, user
-        User.transaction do
+        updated = User.transaction do
           user.password_managed_by_courses_mooc_fi = true
           user.password_hash = nil
           user.salt = nil
           user.argon_hash = nil
           user.courses_mooc_fi_user_id = params[:courses_mooc_fi_user_id]
           raise ActiveRecord::Rollback if !user.errors.empty? || !user.save
-          return render json: {
+          true
+        end
+        if updated
+          render json: {
             status: 'Password managed by courses.mooc.fi set to true and password deleted.'
           }
+        else
+          render json: {
+            errors: user.errors
+          }, status: :bad_request
         end
-        render json: {
-          errors: user.errors
-        }, status: :bad_request
       end
 
+      sig { void }
       def get_user_with_email
         unauthorize_guest! if current_user.guest?
 
@@ -283,80 +299,86 @@ module Api
       end
 
       private
+        sig { params(code: String, messages: T.any(String, T::Array[String]), status: Symbol).void }
         def render_destroy_failure(code, messages, status)
           render json: { success: false, code: code, errors: [*messages] }, status: status
         end
 
-        def set_email
+        sig { params(user: User).void }
+        def set_email(user)
           user_params = params[:user]
 
-          return unless @user.new_record?
+          return unless user.new_record?
 
           if user_params[:email].blank?
-            @user.errors.add(:email, 'needed')
+            user.errors.add(:email, 'needed')
           else
-            @user.email = user_params[:email].strip
+            user.email = user_params[:email].strip
           end
         end
 
-        def update_email
+        sig { params(user: User).void }
+        def update_email(user)
           user_params = params[:user]
           return unless user_params[:email]
           new_email = user_params[:email].strip
           if new_email.blank?
-            @user.errors.add(:email, 'needed')
-          elsif @user.email.casecmp(new_email) != 0
-            authorize! :update_credentials, @user
-            @user.email = new_email
-            @user.email_verified = false
-            UserMailer.email_confirmation(@user, params[:origin], params[:language]).deliver_now
+            user.errors.add(:email, 'needed')
+          elsif user.email.casecmp(new_email) != 0
+            authorize! :update_credentials, user
+            user.email = new_email
+            user.email_verified = false
+            UserMailer.email_confirmation(user, params[:origin], params[:language]).deliver_now
           end
         end
 
-        def set_password
+        sig { params(user: User).void }
+        def set_password(user)
           user_params = params[:user]
           if user_params[:password].blank?
-            @user.errors.add(:password, 'needed')
+            user.errors.add(:password, 'needed')
           elsif user_params[:password].length > 1000
-            @user.errors.add(:password, 'cannot be over 1000 characters')
+            user.errors.add(:password, 'cannot be over 1000 characters')
           elsif user_params[:password] != user_params[:password_confirmation]
-            @user.errors.add(:password_confirmation, 'did not match')
+            user.errors.add(:password_confirmation, 'did not match')
           else
-            @user.password = user_params[:password]
+            user.password = user_params[:password]
           end
         end
 
-        def maybe_update_password
+        sig { params(user: User).void }
+        def maybe_update_password(user)
           if params[:old_password].present? && params[:password].present?
-            authorize! :update_credentials, @user
-            if @user.managed_externally?
-              unless @user.update_password_via_courses_mooc_fi(params[:old_password], params[:password])
-                @user.errors.add(:password, 'could not be changed. Please check your current password and try again.')
+            authorize! :update_credentials, user
+            if user.managed_externally?
+              unless user.update_password_via_courses_mooc_fi(params[:old_password], params[:password])
+                user.errors.add(:password, 'could not be changed. Please check your current password and try again.')
               end
               return
-            elsif @user.externally_managed_without_target?
-              @user.errors.add(:base, 'This account is being migrated; password changes are temporarily unavailable.')
+            elsif user.externally_managed_without_target?
+              user.errors.add(:base, 'This account is being migrated; password changes are temporarily unavailable.')
               return
             end
-            if !@user.has_password?(params[:old_password])
-              @user.errors.add(:old_password, 'incorrect')
+            if !user.has_password?(params[:old_password])
+              user.errors.add(:old_password, 'incorrect')
             elsif params[:password] != params[:password_repeat]
-              @user.errors.add(:password_repeat, 'did not match')
+              user.errors.add(:password_repeat, 'did not match')
             elsif params[:password].blank?
-              @user.errors.add(:password, 'cannot be empty')
+              user.errors.add(:password, 'cannot be empty')
             elsif params[:password].length > 1000
-              @user.errors.add(:password, 'cannot be over 1000 characters')
+              user.errors.add(:password, 'cannot be over 1000 characters')
             else
-              @user.password = params[:password]
+              user.password = params[:password]
             end
           end
         end
 
-        def set_user_fields
+        sig { params(user: User).returns(T.nilable(T::Hash[String, T::Hash[Symbol, T.any(String, T::Boolean)]])) }
+        def set_user_fields(user)
           return if params[:user_field].nil?
-          changes = {}
+          changes = T.let({}, T::Hash[String, T::Hash[Symbol, T.any(String, T::Boolean)]])
           UserField.all.select { |f| f.visible_to?(current_user) }.each do |field|
-            value_record = @user.field_value_record(field)
+            value_record = user.field_value_record(field)
             old_value = value_record.ruby_value
             value_record.set_from_form(params[:user_field][field.name])
             new_value = value_record.ruby_value
@@ -365,26 +387,28 @@ module Api
           changes
         end
 
-        def set_extra_data(eager_save = false)
+        sig { params(user: User, eager_save: T::Boolean).void }
+        def set_extra_data(user, eager_save = false)
           return unless params['user']
           extra_fields = params['user']['extra_fields']
           return if extra_fields.nil?
           namespace = extra_fields['namespace']
           raise 'Namespace not defined' unless namespace
           extra_fields['data'].each do |key, value|
-            datum = @user.user_app_data.find_or_initialize_by(namespace: namespace, field_name: key)
+            datum = user.user_app_data.find_or_initialize_by(namespace: namespace, field_name: key)
             datum.value = value
             datum.save! if eager_save
           end
         end
 
-        def build_success_response(include_id = false)
-          response = {
+        sig { params(user: User, include_id: T.untyped).returns(T::Hash[Symbol, T.untyped]) }
+        def build_success_response(user, include_id = false)
+          response = T.let({
             success: true,
             message: 'User created.',
-          }
+          }, T::Hash[Symbol, T.untyped])
           if include_id
-            response[:id] = @user.id
+            response[:id] = user.id
           end
           response
         end

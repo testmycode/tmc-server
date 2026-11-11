@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -35,11 +36,12 @@ module Api
           end
         end
 
+        sig { void }
         def index
           unauthorize_guest!
           course = Course.find_by!(id: params[:course_id])
-          courses = Course.where(course_template_id: course[:course_template_id])
-          authorize! :read, courses
+          authorize! :read, course
+          courses = Course.where(course_template_id: course[:course_template_id]).select { |c| can?(:read, c) }
           present(courses)
         end
       end

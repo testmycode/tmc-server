@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require 'test_run_grader'
@@ -7,6 +8,7 @@ require 'sandbox_results_saver'
 class ResultsController < ApplicationController
   skip_authorization_check
 
+  sig { void }
   def create
     submission = Submission.find(params[:submission_id])
 
@@ -17,7 +19,7 @@ class ResultsController < ApplicationController
     end
 
     SandboxResultsSaver.save_results(submission, filtered_params)
-    Rails.cache.delete("api_v8_core_submission_show_#{submission.id}_user_#{submission.user.id}")
+    Rails.cache.delete("api_v8_core_submission_show_#{submission.id}_user_#{submission.user_id}")
   rescue SandboxResultsSaver::InvalidTokenError
     respond_unauthorized('Invalid or expired token')
   else

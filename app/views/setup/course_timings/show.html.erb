@@ -112,8 +112,7 @@
                     param_array = "group[#{group.name}]"
                   end
 
-                  group_unlock_conditions = group.group_unlock_conditions
-                  group_unlock_conditions = [''] if group_unlock_conditions.empty? # Always have at least one input field
+                  group_unlock_conditions = group.group_unlock_conditions.presence || [''] # Always have at least one input field
                 %>
                 <div id="unlock-condition-<%= group.name %>">
                   <% condition = group_unlock_conditions.first %>
@@ -136,7 +135,7 @@
                 deadline_type = 'hard'
                 disabled = false
 
-                static_autofill = deadline.static_deadline_spec
+                static_autofill = deadline&.static_deadline_spec
                 #unlock_autofill = deadline.unlock_deadline_spec
               %>
 
