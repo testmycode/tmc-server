@@ -20,6 +20,16 @@ module AccessTokenAuthentication
     user unless user.nil? || (handoff?(token) && user.privileged?)
   end
 
+  # Revokes the user's handoff tokens, for when the user becomes privileged: endpoints such as
+  # /oauth/token/info only check revocation, not user_for.
+  sig { params(user: User).void }
+  def self.revoke_handoff_tokens(user)
+    Doorkeeper::AccessToken
+      .where(resource_owner_id: user.id, revoked_at: nil)
+      .where("? = ANY(string_to_array(scopes, ' '))", HANDOFF_SCOPE)
+      .update_all(revoked_at: Time.current)
+  end
+
   # Whether the token lets its client call UserAccessTokensController; the client still has to be
   # an allow-listed issuer.
   sig { params(token: Doorkeeper::AccessToken).returns(T::Boolean) }

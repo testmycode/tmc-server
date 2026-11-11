@@ -75,6 +75,7 @@ class User < ApplicationRecord
   sig { returns(T.nilable(String)) }
   attr_accessor :password
   before_save :encrypt_password
+  after_save :revoke_handoff_tokens, if: :saved_change_to_administrator?
 
   sig { params(course: Course).returns(ActiveRecord::Relation) }
   def self.course_students(course)
@@ -662,6 +663,11 @@ class User < ApplicationRecord
   end
 
   private
+    sig { void }
+    def revoke_handoff_tokens
+      AccessTokenAuthentication.revoke_handoff_tokens(self) if administrator?
+    end
+
     # Unchecked because specs stub Faraday.new with plain doubles.
     sig { returns(Faraday::Connection).checked(:never) }
     def courses_mooc_fi_connection

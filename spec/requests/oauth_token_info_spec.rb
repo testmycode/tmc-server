@@ -31,6 +31,36 @@ describe 'GET /oauth/token/info', type: :request do
     expect(response).to have_http_status(401)
   end
 
+  context 'when the owner of a handoff token becomes privileged' do
+    let!(:handoff_token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public handoff', expires_in: 86_400) }
+    let!(:login_token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public') }
+    let!(:other_users_handoff_token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: FactoryBot.create(:user).id, scopes: 'public handoff', expires_in: 86_400) }
+
+    {
+      'an administrator' => ->(user) { user.update!(administrator: true) },
+      'a teacher' => ->(user) { Teachership.create!(user: user, organization: FactoryBot.create(:organization)) },
+      'an assistant' => ->(user) { Assistantship.create!(user: user, course: FactoryBot.create(:course)) }
+    }.each do |role, grant|
+      it "refuses the handoff token once the user is #{role}" do
+        grant.call(user)
+
+        token_info(handoff_token.token)
+        expect(response).to have_http_status(401)
+        token_info(login_token.token)
+        expect(response).to have_http_status(200)
+        token_info(other_users_handoff_token.token)
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    it 'keeps the handoff token when an unrelated attribute changes' do
+      user.update!(email: 'renamed@example.com')
+
+      token_info(handoff_token.token)
+      expect(response).to have_http_status(200)
+    end
+  end
+
   context 'with a courses.mooc.fi token' do
     around :each do |example|
       original = Rails.configuration.x.accept_courses_mooc_fi_tokens
