@@ -29,7 +29,7 @@ class KafkaUpdater
       return true
     end
     course = Course.find_by!(id: task.course_id)
-    Rails.logger.info("Publishing progress for user #{user.id} with moocfi id: #{course.moocfi_id}.")
+    Rails.logger.debug { "Publishing progress for user #{user.id} with moocfi id: #{course.moocfi_id}." }
     if !course.moocfi_id || course.moocfi_id.blank?
       Rails.logger.error('Cannot publish progress because moocfi id is not specified')
       return finished_successfully
@@ -39,7 +39,7 @@ class KafkaUpdater
     available_points = AvailablePoint.course_sheet_points(course, parts)
     user_points = points_per_user[user.username]
     unless user_points
-      Rails.logger.info('No points found. Skipping')
+      Rails.logger.debug('No points found. Skipping')
       return true
     end
     progress = user_points.map do |group_name, awarded_points|
@@ -62,7 +62,7 @@ class KafkaUpdater
     }
     topic = task.realtime ? 'user-course-progress-realtime' : 'user-course-progress-batch'
     make_kafka_request(topic, message)
-    Rails.logger.info("Publishing progress finished for user #{user.id}")
+    Rails.logger.debug { "Publishing progress finished for user #{user.id}" }
     finished_successfully = true
     finished_successfully
   end
@@ -86,7 +86,7 @@ class KafkaUpdater
         Rails.logger.warn("KafkaUpdater#update_course_progress: no user for login=#{username.inspect} course_id=#{course.id}")
         next
       end
-      Rails.logger.info("Publishing progress for user #{current_user.id}")
+      Rails.logger.debug { "Publishing progress for user #{current_user.id}" }
       progress = points_by_group.map do |group_name, awarded_points|
         max_points = available_points[group_name] || 0
         stupid_name = "osa#{group_name.tr('^0-9', '').rjust(2, "0")}"
@@ -106,7 +106,7 @@ class KafkaUpdater
         message_format_version: 1
       }
       make_kafka_request('user-course-progress-batch', message)
-      Rails.logger.info("Publishing progress finished for user #{current_user.id}")
+      Rails.logger.debug { "Publishing progress finished for user #{current_user.id}" }
     end
     Rails.logger.info("Batch publishing progress finished for course #{course.name}")
     finished_successfully = true
@@ -122,7 +122,7 @@ class KafkaUpdater
       return true
     end
     course = Course.find_by!(id: task.course_id)
-    Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
+    Rails.logger.debug { "Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}." }
     if !course.moocfi_id
       Rails.logger.error('Cannot publish points because moocfi id is not specified. Removing extra task (this task never should have been created.)')
       task.destroy!
@@ -145,7 +145,7 @@ class KafkaUpdater
     }
     topic = task.realtime ? 'user-points-realtime' : 'user-points-batch'
     make_kafka_request(topic, message)
-    Rails.logger.info("Publishing points finished for user #{user.id}")
+    Rails.logger.debug { "Publishing points finished for user #{user.id}" }
     finished_successfully = true
     finished_successfully
   end
@@ -169,7 +169,7 @@ class KafkaUpdater
         Rails.logger.warn("KafkaUpdater#update_course_points: no user for login=#{username.inspect} course_id=#{course.id}")
         next
       end
-      Rails.logger.info("Publishing points for user #{current_user.id}")
+      Rails.logger.debug { "Publishing points for user #{current_user.id}" }
       exercises_data = []
       exercises.map do |exercise|
         awarded_points = exercise.points_for(current_user)
@@ -200,7 +200,7 @@ class KafkaUpdater
         message_format_version: 1
       }
       make_kafka_request('user-course-points-batch', message)
-      Rails.logger.info("Publishing points finished for user #{current_user.id}")
+      Rails.logger.debug { "Publishing points finished for user #{current_user.id}" }
     end
     Rails.logger.info("Batch publishing points finished for course #{course.name}")
     finished_successfully = true
@@ -254,7 +254,7 @@ class KafkaUpdater
       return true
     end
     course = Course.find_by!(id: task.course_id)
-    Rails.logger.info("Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}.")
+    Rails.logger.debug { "Publishing points for user #{user.id} with moocfi id: #{course.moocfi_id}." }
     if !course.moocfi_id
       Rails.logger.error('Cannot publish points because moocfi id is not specified')
       return finished_successfully
@@ -290,7 +290,7 @@ class KafkaUpdater
     }
     topic = task.realtime ? 'user-course-points-realtime' : 'user-course-points-batch'
     make_kafka_request(topic, message)
-    Rails.logger.info("Publishing points finished for user #{user.id}")
+    Rails.logger.debug { "Publishing points finished for user #{user.id}" }
     finished_successfully = true
     finished_successfully
   end
