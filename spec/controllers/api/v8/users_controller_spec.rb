@@ -179,6 +179,45 @@ describe Api::V8::UsersController, type: :controller do
     end
   end
 
+  describe 'PUT update extra fields' do
+    let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
+
+    def do_update(data)
+      put :update, params: { id: 'current', user: { email: user.email, extra_fields: { namespace: 'ns', data: data } } }
+    end
+
+    def app_data_values
+      UserAppDatum.where(user: user, namespace: 'ns').pluck(:field_name, :value).to_h
+    end
+
+    it 'updates existing fields and adds new ones' do
+      existing = UserAppDatum.create!(user: user, namespace: 'ns', field_name: 'a', value: 'old', created_at: 1.day.ago, updated_at: 1.day.ago)
+
+      do_update(a: 'new', b: 'added')
+
+      expect(response).to have_http_status(200)
+      expect(app_data_values).to eq('a' => 'new', 'b' => 'added')
+      expect(existing.reload.created_at).to be_within(1.second).of(1.day.ago)
+      expect(existing.updated_at).to be_within(1.minute).of(Time.current)
+    end
+
+    it 'overwrites a field that a concurrent request created after this one started' do
+      competitor_inserted = false
+      allow(UserAppDatum).to receive(:new).and_wrap_original do |original, *args, **kwargs, &block|
+        unless competitor_inserted
+          competitor_inserted = true
+          UserAppDatum.insert!({ user_id: user.id, namespace: 'ns', field_name: 'a', value: 'concurrent' })
+        end
+        original.call(*args, **kwargs, &block)
+      end
+
+      do_update(a: 'mine')
+
+      expect(response).to have_http_status(200)
+      expect(app_data_values).to eq('a' => 'mine')
+    end
+  end
+
   describe 'DELETE destroy' do
     before :each do
       controller.current_user = admin
