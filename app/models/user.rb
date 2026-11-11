@@ -453,7 +453,7 @@ class User < ApplicationRecord
   # nil means genuinely unknown (unconfigured, network error, unexpected response), not "not migrated".
   sig { returns(T.nilable(T::Hash[Symbol, T.untyped])) }
   def courses_mooc_fi_migration_status
-    return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
+    return nil unless User.courses_mooc_fi_base_url
 
     conn = courses_mooc_fi_connection
 
@@ -489,18 +489,22 @@ class User < ApplicationRecord
   sig { returns(T.nilable(String)) }
   def courses_mooc_fi_profile_url
     return nil if courses_mooc_fi_user_id.blank?
-    return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
+    return nil unless User.courses_mooc_fi_base_url
 
     courses_mooc_fi_url("/manage/users/#{courses_mooc_fi_user_id}")
+  end
+
+  # courses.mooc.fi's root URL without a trailing slash. Nil when it isn't configured.
+  sig { returns(T.nilable(String)) }
+  def self.courses_mooc_fi_base_url
+    SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/').presence
   end
 
   # Where users delete their account, which also deletes it here. Nil when courses.mooc.fi isn't configured.
   sig { returns(T.nilable(String)) }
   def self.courses_mooc_fi_account_deletion_url
-    base_url = SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/')
-    return nil if base_url.blank?
-
-    "#{base_url}/user-settings/permissions#delete-account"
+    base_url = courses_mooc_fi_base_url
+    "#{base_url}/user-settings/permissions#delete-account" if base_url
   end
 
   sig { returns(T.nilable(ActionToken)) }
@@ -520,7 +524,7 @@ class User < ApplicationRecord
 
     courses.sort_by do |course_id, name|
       latest_submission_at = submission_totals.dig(course_id, :latest)
-      [latest_submission_at ? 0 : 1, -latest_submission_at.to_r, name.to_s]
+      [latest_submission_at ? -latest_submission_at.to_r : Float::INFINITY, name.to_s]
     end.map do |course_id, name, title, moocfi_id|
       {
         id: course_id,
@@ -696,7 +700,7 @@ class User < ApplicationRecord
 
     sig { params(path: String).returns(String) }
     def courses_mooc_fi_url(path)
-      "#{SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/')}#{path}"
+      "#{User.courses_mooc_fi_base_url}#{path}"
     end
 
     sig { returns(Arel::SelectManager) }

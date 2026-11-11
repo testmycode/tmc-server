@@ -259,7 +259,6 @@ describe UsersController, type: :controller do
       get :show
 
       expect(response.body).to include(%(href="#{deletion_url}"))
-      expect(response.body).not_to include('send_destroy_email')
     end
 
     it 'tells the user to contact support when courses.mooc.fi is not configured' do

@@ -2,4 +2,4 @@
 
 <%= render :partial => 'users/form', :user => @user, locals: { hide_login: true } %>
 
-<%= render 'users/account_deletion' %>
+<%= render 'users/account_deletion', user: @user %>

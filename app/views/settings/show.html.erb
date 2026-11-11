@@ -2,9 +2,7 @@
 
 <%= render :partial => 'settings/form', :user => @user, locals: { hide_login: true } %>
 
-<% if @user == current_user %>
-  <%= render 'users/account_deletion' %>
-<% end %>
+<%= render 'users/account_deletion', user: @user %>
 
 <br>
 
