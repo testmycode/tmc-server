@@ -60,13 +60,25 @@ module Api
         def create
           issuer_token = doorkeeper_token
           return respond_unauthorized unless issuer_token&.accessible?
-          return respond_forbidden unless authorized_issuer?(issuer_token)
+
+          issuer_uid = issuer_token.application&.uid
+          unless authorized_issuer?(issuer_token)
+            log_refusal('not an allowed issuer', issuer_uid)
+            return respond_forbidden
+          end
 
           return respond_with_error('user_id must be an integer', 400) unless params[:user_id].to_s.match?(/\A\d+\z/)
 
-          user = User.find_by(id: params[:user_id].to_i)
-          return respond_not_found('User not found') unless user
-          return respond_forbidden('Tokens are not issued for administrators, teachers or assistants') if user.privileged?
+          user_id = params[:user_id].to_i
+          user = User.find_by(id: user_id)
+          unless user
+            log_refusal('unknown user', issuer_uid, user_id)
+            return respond_not_found('User not found')
+          end
+          if user.privileged?
+            log_refusal('privileged user', issuer_uid, user_id)
+            return respond_forbidden('Tokens are not issued for administrators, teachers or assistants')
+          end
 
           target_application = Doorkeeper::Application.find_by(uid: AccessTokenAuthentication.target_application_uid)
           return respond_with_error('Target application is not configured', 500) unless target_application
@@ -77,7 +89,7 @@ module Api
             scopes: "public #{AccessTokenAuthentication::HANDOFF_SCOPE}",
             expires_in: TOKEN_LIFETIME.to_i
           )
-          Rails.logger.info("Issued user access token: issuer application uid=#{issuer_token.application&.uid} user_id=#{user.id}")
+          Rails.logger.info("Issued user access token: issuer application uid=#{issuer_uid} user_id=#{user.id}")
 
           response.headers['Cache-Control'] = 'no-store'
           response.headers['Pragma'] = 'no-cache'
@@ -91,6 +103,11 @@ module Api
         end
 
         private
+          sig { params(reason: String, issuer_uid: T.nilable(String), user_id: T.nilable(Integer)).void }
+          def log_refusal(reason, issuer_uid, user_id = nil)
+            Rails.logger.warn("Refused to issue user access token (#{reason}): issuer application uid=#{issuer_uid} user_id=#{user_id}")
+          end
+
           # Their credentials are served publicly by the credentials endpoint.
           sig { returns(T::Array[String]) }
           def public_client_names

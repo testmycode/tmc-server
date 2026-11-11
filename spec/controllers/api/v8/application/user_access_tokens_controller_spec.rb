@@ -20,6 +20,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
   end
 
   before :each do
+    allow(Rails.logger).to receive(:warn).and_call_original
     Rails.configuration.x.user_access_token_issuer_application_uids = [issuer_app.uid]
     Rails.configuration.x.user_access_token_target_application_uid = target_app.uid
   end
@@ -72,6 +73,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     post_with(token, user.id)
 
     expect(response).to have_http_status(403)
+    expect(Rails.logger).to have_received(:warn).with("Refused to issue user access token (not an allowed issuer): issuer application uid=#{other_app.uid} user_id=")
   end
 
   it 'rejects a token without the scope' do
@@ -112,9 +114,11 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
   end
 
   it 'returns 404 for an unknown user' do
-    post_with(issuer_token, User.maximum(:id) + 1)
+    unknown_id = User.maximum(:id) + 1
+    post_with(issuer_token, unknown_id)
 
     expect(response).to have_http_status(404)
+    expect(Rails.logger).to have_received(:warn).with("Refused to issue user access token (unknown user): issuer application uid=#{issuer_app.uid} user_id=#{unknown_id}")
   end
 
   it 'refuses to issue tokens for administrators' do
@@ -123,6 +127,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     end.not_to(change { Doorkeeper::AccessToken.where(resource_owner_id: admin.id).count })
 
     expect(response).to have_http_status(403)
+    expect(Rails.logger).to have_received(:warn).with("Refused to issue user access token (privileged user): issuer application uid=#{issuer_app.uid} user_id=#{admin.id}")
   end
 
   it 'refuses to issue tokens for teachers' do
