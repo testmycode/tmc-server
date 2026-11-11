@@ -193,6 +193,9 @@ module GeneratedPathHelpersModule
   def course_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def course_progress_api_v8_user_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def course_template_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }

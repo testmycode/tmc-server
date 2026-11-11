@@ -289,6 +289,77 @@ describe Api::V8::UsersController, type: :controller do
     end
   end
 
+  describe 'GET course_progress' do
+    let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+
+    it 'lists each course the user has submissions or points in, latest submission first' do
+      submitted_course = FactoryBot.create(:course, name: 'submitted', moocfi_id: SecureRandom.uuid, hidden: true)
+      FactoryBot.create(:submission, user: user, course: submitted_course, created_at: Time.zone.parse('2026-10-01T12:00:00Z'))
+      FactoryBot.create(:submission, user: user, course: submitted_course, created_at: Time.zone.parse('2026-09-01T12:00:00Z'))
+      older_course = FactoryBot.create(:course, name: 'older', disabled_status: 1)
+      FactoryBot.create(:submission, user: user, course: older_course, created_at: Time.zone.parse('2025-01-01T00:00:00Z'))
+      points_only_course = FactoryBot.create(:course, name: 'points-only')
+      AwardedPoint.create!(user: user, course: points_only_course, name: 'point1')
+      AwardedPoint.create!(user: user, course: points_only_course, name: 'point2')
+      FactoryBot.create(:submission, user: other_user, course: FactoryBot.create(:course))
+
+      get :course_progress, params: { id: user.id }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body['courses']).to eq([
+        {
+          'id' => submitted_course.id, 'name' => 'submitted', 'title' => submitted_course.title,
+          'moocfi_id' => submitted_course.moocfi_id, 'awarded_points' => 0, 'submissions' => 2,
+          'last_submission_at' => '2026-10-01T12:00:00Z'
+        },
+        {
+          'id' => older_course.id, 'name' => 'older', 'title' => older_course.title, 'moocfi_id' => nil,
+          'awarded_points' => 0, 'submissions' => 1, 'last_submission_at' => '2025-01-01T00:00:00Z'
+        },
+        {
+          'id' => points_only_course.id, 'name' => 'points-only', 'title' => points_only_course.title,
+          'moocfi_id' => nil, 'awarded_points' => 2, 'submissions' => 0, 'last_submission_at' => nil
+        }
+      ])
+    end
+
+    it 'returns an empty list for a user without progress' do
+      get :course_progress, params: { id: user.id }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body).to eq('courses' => [])
+    end
+
+    it 'returns 404 for a missing user' do
+      get :course_progress, params: { id: User.maximum(:id) + 1 }
+
+      expect(response).to have_http_status(404)
+      expect(response.parsed_body['errors']).to be_present
+    end
+
+    context 'as a non-admin' do
+      let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+
+      it 'is forbidden, even for their own progress' do
+        get :course_progress, params: { id: user.id }
+
+        expect(response).to have_http_status(403)
+      end
+    end
+
+    context 'as a guest' do
+      let!(:token) { nil }
+
+      it 'requires authentication' do
+        controller.current_user = Guest.new
+
+        get :course_progress, params: { id: user.id }
+
+        expect(response).to have_http_status(401)
+      end
+    end
+  end
+
   describe 'with a courses.mooc.fi access token' do
     let(:token) { nil }
 

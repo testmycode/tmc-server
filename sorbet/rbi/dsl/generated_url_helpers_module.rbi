@@ -190,6 +190,9 @@ module GeneratedUrlHelpersModule
   def course_migrate_to_other_course_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def course_progress_api_v8_user_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def course_template_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }

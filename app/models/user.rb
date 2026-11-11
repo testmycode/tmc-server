@@ -499,6 +499,32 @@ class User < ApplicationRecord
     action_tokens.find { |t| t.action == 'reset_password' }
   end
 
+  # Submission and awarded point totals for every course the user has any of either in, hidden
+  # and disabled courses included. Sorted by latest submission (courses with none last), then name.
+  sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+  def course_progress
+    submission_totals = submissions.group(:course_id)
+                                   .pluck(:course_id, Arel.sql('COUNT(*)'), Arel.sql('MAX(submissions.created_at)'))
+                                   .to_h { |course_id, count, latest| [course_id, { count: count, latest: latest }] }
+    point_counts = awarded_points.group(:course_id).count
+    courses = Course.where(id: submission_totals.keys | point_counts.keys).pluck(:id, :name, :title, :moocfi_id)
+
+    courses.sort_by do |course_id, name|
+      latest_submission_at = submission_totals.dig(course_id, :latest)
+      [latest_submission_at ? 0 : 1, -latest_submission_at.to_r, name.to_s]
+    end.map do |course_id, name, title, moocfi_id|
+      {
+        id: course_id,
+        name: name,
+        title: title,
+        moocfi_id: moocfi_id,
+        awarded_points: point_counts.fetch(course_id, 0),
+        submissions: submission_totals.dig(course_id, :count) || 0,
+        last_submission_at: submission_totals.dig(course_id, :latest)&.utc&.iso8601
+      }
+    end
+  end
+
   sig { params(course: Course, point_name: String).returns(T::Boolean) }
   def has_point?(course, point_name)
     awarded_points.where(course_id: course.id, name: point_name).any?
