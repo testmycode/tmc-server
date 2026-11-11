@@ -22,7 +22,7 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
   describe 'GET points for a course' do
     describe 'as admin' do
       let(:current_user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course name given' do
         it "shows only user's point information" do
@@ -49,7 +49,7 @@ describe Api::V8::Organizations::Courses::PointsController, type: :controller do
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course name given' do
         it "shows only the caller's own points" do

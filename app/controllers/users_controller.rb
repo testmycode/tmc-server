@@ -109,7 +109,7 @@ class UsersController < ApplicationController
   sig { void }
   def confirm_email
     language = params[:language]
-    VerificationToken.unscoped.email.find_by!(user_id: params[:user_id], token: params[:id])
+    VerificationToken.unscoped.email.find_by!(user_id: params[:user_id], token: params[:token])
     redirect_path = root_url
     redirect_path = "https://course.elementsofai.com/#{language && language != "en" ? "#{language}/" : ''}email-verification" if params[:origin] && params[:origin].start_with?('elements_of_ai')
     redirect_path = "https://buildingai.elementsofai.com/#{language && language != "en" ? "#{language}/" : ''}email-verified" if params[:origin] && params[:origin].start_with?('building_ai')
@@ -130,7 +130,7 @@ class UsersController < ApplicationController
   sig { void }
   def verify_destroying_user
     @user = authenticate_current_user_destroy
-    VerificationToken.delete_user.find_by!(user: @user, token: params[:id])
+    VerificationToken.delete_user.find_by!(user: @user, token: params[:token])
   end
 
   sig { void }
@@ -146,7 +146,7 @@ class UsersController < ApplicationController
       redirect_to verify_destroying_user_url, alert: failed_authentication_alert(status)
       return
     end
-    VerificationToken.delete_user.find_by!(user: user, token: params[:id])
+    VerificationToken.delete_user.find_by!(user: user, token: params[:token])
     sign_out if current_user == user
     email = user.email
     username = user.login

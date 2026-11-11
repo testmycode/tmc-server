@@ -16,7 +16,7 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
   end
 
   describe 'As an admin' do
-    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
     describe 'when course id is given' do
       it 'should return successful response' do
         get :index, params: { course_id: course.id }
@@ -34,7 +34,7 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
   end
 
   describe 'As a student' do
-    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
     describe 'when course id is given' do
       it 'should return successful response' do
         get :index, params: { course_id: course.id }
@@ -52,7 +52,7 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
   end
 
   describe 'As a student without unlock rows' do
-    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
     def unlocked_flags
       get :index, params: { course_id: course.id }
@@ -82,7 +82,7 @@ describe Api::V8::Courses::ExercisesController, type: :controller do
   end
 
   describe 'As any user' do
-    let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
     describe 'when course id could not be found' do
       it 'should return error' do
         get :index, params: { course_id: '123' }

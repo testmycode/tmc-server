@@ -35,7 +35,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id
@@ -63,7 +63,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public') }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id
@@ -91,7 +91,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: assistant.id, scopes: 'public') }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id
@@ -119,7 +119,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
           it 'should show all courses with same template' do
             two_courses_by_template_id

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+RSPEC_PATTERN="spec/requests/**/*.rb,spec/services/**/*.rb,spec/background_tasks/**/*.rb"
+bundle exec rake spec SPEC_OPTS="--pattern $RSPEC_PATTERN --format documentation"

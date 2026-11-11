@@ -253,7 +253,7 @@ describe UsersController, type: :controller do
     end
 
     def do_destroy_user(password)
-      delete :destroy_user, params: { user_id: user.id, id: verification_token.token, im_sure: '1',
+      delete :destroy_user, params: { user_id: user.id, token: verification_token.token, im_sure: '1',
                                       user: { password: password } }
     end
 

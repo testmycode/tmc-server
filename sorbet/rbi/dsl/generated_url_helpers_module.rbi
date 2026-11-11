@@ -28,6 +28,9 @@ module GeneratedUrlHelpersModule
   def api_v8_application_credentials_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def api_v8_application_user_access_tokens_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def api_v8_core_course_review_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }

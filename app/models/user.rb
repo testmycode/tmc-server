@@ -75,6 +75,7 @@ class User < ApplicationRecord
   sig { returns(T.nilable(String)) }
   attr_accessor :password
   before_save :encrypt_password
+  after_save :revoke_handoff_tokens, if: :saved_change_to_administrator?
 
   sig { params(course: Course).returns(ActiveRecord::Relation) }
   def self.course_students(course)
@@ -188,6 +189,15 @@ class User < ApplicationRecord
     result
   end
 
+  # The user a typed username names, matched against login exactly and email case-insensitively.
+  sig { params(username: T.nilable(String)).returns(T.nilable(User)) }
+  def self.by_login_or_email(username)
+    username = username&.strip
+    return nil if username.blank?
+
+    find_by(login: username) || find_by('lower(email) = ?', username.downcase)
+  end
+
   # The user when the password is accepted, nil otherwise. Use .authenticate_with_status when the
   # outcome is shown to the user, so that a delegation failure is not reported as a wrong password.
   sig { params(login: T.nilable(String), submitted_password: T.nilable(String)).returns(T.nilable(User)) }
@@ -202,10 +212,7 @@ class User < ApplicationRecord
   # the status, so sign in only on :accepted.
   sig { params(login: T.nilable(String), submitted_password: T.nilable(String)).returns([T.nilable(User), Symbol]) }
   def self.authenticate_with_status(login, submitted_password)
-    return [nil, :rejected] unless login
-    login = login.strip
-    user = find_by(login: login)
-    user ||= find_by('lower(email) = ?', login.downcase)
+    user = by_login_or_email(login)
     return [nil, :rejected] if user.nil?
 
     return [user, user.courses_mooc_fi_authentication_status(submitted_password)] if user.managed_externally?
@@ -515,6 +522,12 @@ class User < ApplicationRecord
     login.downcase <=> other.login.downcase
   end
 
+  # Administrators, teachers and assistants, whose accounts handoff tokens must never act as.
+  sig { returns(T::Boolean) }
+  def privileged?
+    administrator? || teacherships.exists? || assistantships.exists?
+  end
+
   sig { params(organization: T.nilable(Organization)).returns(T::Boolean) }
   def teacher?(organization)
     organizations.include? organization
@@ -650,6 +663,11 @@ class User < ApplicationRecord
   end
 
   private
+    sig { void }
+    def revoke_handoff_tokens
+      AccessTokenAuthentication.revoke_handoff_tokens(self) if administrator?
+    end
+
     # Unchecked because specs stub Faraday.new with plain doubles.
     sig { returns(Faraday::Connection).checked(:never) }
     def courses_mooc_fi_connection

@@ -19,7 +19,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
   describe "GET reviews for a course for current user's submissions" do
     describe 'as admin' do
       let(:user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
       describe 'when course id given' do
         it "shows only user's submission's review information" do
@@ -47,7 +47,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
 
     describe 'as user' do
       let(:user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
       describe 'when course id given' do
         it "shows only user's submission's review information" do
@@ -101,7 +101,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
   describe 'Update review info' do
     describe 'As an admin' do
       let(:user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
       before :each do
         controller.current_user = user
       end
@@ -145,7 +145,7 @@ describe Api::V8::Core::Courses::ReviewsController, type: :controller do
     describe 'As an user' do
       describe 'when trying to edit review' do
         let(:user) { FactoryBot.create(:user) }
-        let(:token) { double resource_owner_id: user.id, acceptable?: true }
+        let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
         it 'should deny access' do
           other_review = FactoryBot.create(:review, submission: submission)
           exercise.reload

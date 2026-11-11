@@ -38,7 +38,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: admin.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
 
           it 'should show all of the submissions' do
             two_subs_by_id
@@ -62,7 +62,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public') }
 
           it 'should show all of the submissions in my organizations' do
             two_subs_by_id
@@ -90,7 +90,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: assistant.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: assistant.id, scopes: 'public') }
 
           it 'should show all of the submissions in my courses' do
             two_subs_by_id
@@ -118,7 +118,7 @@ describe Api::V8::Courses::SubmissionsController, type: :controller do
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: user.id, acceptable?: true }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
           it 'should show my own submissions' do
             all_own_subs(course_id: course.id)

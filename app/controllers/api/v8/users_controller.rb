@@ -325,6 +325,7 @@ module Api
           if new_email.blank?
             user.errors.add(:email, 'needed')
           elsif user.email.casecmp(new_email) != 0
+            authorize! :update_credentials, user
             user.email = new_email
             user.email_verified = false
             UserMailer.email_confirmation(user, params[:origin], params[:language]).deliver_now
@@ -348,6 +349,7 @@ module Api
         sig { params(user: User).void }
         def maybe_update_password(user)
           if params[:old_password].present? && params[:password].present?
+            authorize! :update_credentials, user
             if user.managed_externally?
               unless user.update_password_via_courses_mooc_fi(params[:old_password], params[:password])
                 user.errors.add(:password, 'could not be changed. Please check your current password and try again.')

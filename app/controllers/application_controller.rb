@@ -95,8 +95,15 @@ class ApplicationController < ActionController::Base
     # The request's Doorkeeper access token, or nil when it is missing, revoked or expired.
     sig { returns(T.nilable(Doorkeeper::AccessToken)) }
     def doorkeeper_token
-      token = super
+      token = presented_doorkeeper_token
       token if token&.accessible?
+    end
+
+    # The Doorkeeper access token the request presents, also when it is revoked or expired; nil when
+    # the request presents none or a token TMC did not issue. Authenticate with doorkeeper_token.
+    sig { returns(T.nilable(Doorkeeper::AccessToken)) }
+    def presented_doorkeeper_token
+      @presented_doorkeeper_token ||= T.let(Doorkeeper.authenticate(request), T.nilable(Doorkeeper::AccessToken))
     end
 
     sig { void }

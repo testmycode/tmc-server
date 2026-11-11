@@ -14,7 +14,7 @@ describe Api::V8::Exercises::ModelSolutionsController, type: :controller do
   end
 
   def sign_in(as)
-    allow(controller).to receive(:doorkeeper_token).and_return(double(resource_owner_id: as.id, acceptable?: true))
+    allow(controller).to receive(:doorkeeper_token).and_return(Doorkeeper::AccessToken.create!(resource_owner_id: as.id, scopes: 'public'))
   end
 
   def complete_exercises(count)
