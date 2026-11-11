@@ -392,10 +392,13 @@ module Api
           return if extra_fields.nil?
           namespace = extra_fields['namespace']
           raise 'Namespace not defined' unless namespace
+          data = extra_fields['data']
+          # Some clients encode an empty map as [].
+          return if data.blank?
           if eager_save
-            UserAppDatum.upsert_values(user_id: user.id, namespace: namespace, values_by_field_name: extra_fields['data'].to_unsafe_h)
+            UserAppDatum.upsert_values(user_id: user.id, namespace: namespace, values_by_field_name: data.to_unsafe_h)
           else
-            extra_fields['data'].each do |key, value|
+            data.each do |key, value|
               datum = user.user_app_data.find_or_initialize_by(namespace: namespace, field_name: key)
               datum.value = value
             end

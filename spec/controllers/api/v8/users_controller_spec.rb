@@ -203,18 +203,24 @@ describe Api::V8::UsersController, type: :controller do
 
     it 'overwrites a field that a concurrent request created after this one started' do
       competitor_inserted = false
-      allow(UserAppDatum).to receive(:new).and_wrap_original do |original, *args, **kwargs, &block|
-        unless competitor_inserted
-          competitor_inserted = true
-          UserAppDatum.insert!({ user_id: user.id, namespace: 'ns', field_name: 'a', value: 'concurrent' })
-        end
-        original.call(*args, **kwargs, &block)
+      allow(UserAppDatum).to receive(:upsert_all).and_wrap_original do |original, *args, **kwargs|
+        competitor_inserted = true
+        UserAppDatum.insert!({ user_id: user.id, namespace: 'ns', field_name: 'a', value: 'concurrent' })
+        original.call(*args, **kwargs)
       end
 
       do_update(a: 'mine')
 
+      expect(competitor_inserted).to be(true)
       expect(response).to have_http_status(200)
       expect(app_data_values).to eq('a' => 'mine')
+    end
+
+    it 'accepts an empty data list' do
+      put :update, params: { id: 'current', user: { email: user.email, extra_fields: { namespace: 'ns', data: [] } } }, as: :json
+
+      expect(response).to have_http_status(200)
+      expect(app_data_values).to be_empty
     end
   end
 
