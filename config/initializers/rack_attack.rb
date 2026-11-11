@@ -185,8 +185,18 @@ class Rack::Attack
   sig { params(req: Rack::Attack::Request, name: String).returns(T.nilable(String)) }
   def self.rails_param(req, name)
     value = req.GET[name]
-    value ||= Mime::Type.lookup(req.media_type.to_s).symbol == :json ? json_body_param(req, name) : req.POST[name]
+    value ||= json_body?(req) ? json_body_param(req, name) : req.POST[name]
     value&.to_s
+  end
+
+  sig { params(req: Rack::Attack::Request).returns(T::Boolean) }
+  private_class_method def self.json_body?(req)
+    media_type = req.media_type
+    return false if media_type.blank?
+
+    Mime::Type.lookup(media_type).symbol == :json
+  rescue Mime::Type::InvalidMimeType
+    false
   end
 
   sig { params(req: Rack::Attack::Request, name: String).returns(T.nilable(String)) }
