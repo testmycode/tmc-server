@@ -21,7 +21,7 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
   end
 
   describe 'As an admin' do
-    let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
     describe 'when searching for all users awarded points' do
       describe 'using course name' do
         it 'should return all users awarded points of the exercise' do
@@ -36,7 +36,7 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
   end
 
   describe 'As a student' do
-    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
     it "returns only the student's own points" do
       get :index, params: { course_id: course.id, exercise_name: exercise.name }
@@ -46,7 +46,7 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
 
   describe 'As a teacher' do
     let(:teacher) { FactoryBot.create(:user) }
-    let(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public') }
 
     before { Teachership.create!(user: teacher, organization: organization) }
 
@@ -68,7 +68,7 @@ describe Api::V8::Courses::Exercises::PointsController, type: :controller do
   end
 
   describe 'As any user' do
-    let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
     describe 'when searching awarded points' do
       describe 'and no points are found' do
         it 'should return an empty array' do

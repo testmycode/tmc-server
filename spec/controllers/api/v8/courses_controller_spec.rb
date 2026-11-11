@@ -16,7 +16,7 @@ describe Api::V8::CoursesController, type: :controller do
   describe 'GET course by id' do
     describe 'as admin' do
       let(:current_user) { admin }
-      let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course ID given' do
         it 'shows course information' do
@@ -46,7 +46,7 @@ describe Api::V8::CoursesController, type: :controller do
 
     describe 'as user' do
       let(:current_user) { user }
-      let(:token) { double resource_owner_id: current_user.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course ID given' do
         it 'shows course information' do

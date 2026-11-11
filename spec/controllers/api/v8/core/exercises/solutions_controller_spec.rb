@@ -24,7 +24,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
   end
   describe 'Downloading an exercise solution zip' do
     describe 'as an admin' do
-      let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
 
       it 'should succeed if the exercise exists' do
         repo = clone_course_repo(course)
@@ -38,7 +38,7 @@ describe Api::V8::Core::Exercises::SolutionsController, type: :controller do
     end
 
     describe 'as a student' do
-      let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
       describe 'if the course exists' do
         it 'should succeed if I have already solved it' do

@@ -35,7 +35,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
   end
   describe 'Downloading a submission as zip' do
     describe 'as an admin' do
-      let(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
 
       it "should allow to download everyone's submissions" do
         # pending("test that submission zip's content is correct")
@@ -48,7 +48,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       before :each do
         Teachership.create(user: teacher, organization: organization)
       end
-      let(:token) { double resource_owner_id: teacher.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public') }
 
       it "should allow to download own organization's submissions" do
         # pending("test that submission zip's content is correct")
@@ -71,7 +71,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       before :each do
         Assistantship.create(user: assistant, course: course)
       end
-      let(:token) { double resource_owner_id: assistant.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: assistant.id, scopes: 'public') }
 
       it "should allow to download own course's submissions" do
         # pending("test that submission zip's content is correct")
@@ -90,7 +90,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
       end
     end
     describe 'as a student' do
-      let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
       it 'should allow to download own submissions' do
         # pending("test that submission zip's content is correct")
@@ -120,7 +120,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
   end
 
   describe 'a submission whose exercise has been removed from the course' do
-    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
     before :each do
       exercise.update_column(:name, 'removed-by-refresh')
@@ -142,7 +142,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
   end
 
   describe 'a submission whose results are hidden' do
-    let(:token) { double resource_owner_id: user.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
     before :each do
       course.update!(hide_submission_results: true)

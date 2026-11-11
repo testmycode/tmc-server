@@ -29,7 +29,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
 
     context 'when logged in' do
       let(:user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
       it { expect(subject.id).to be user.id }
     end
   end
@@ -39,7 +39,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
       allow(controller).to receive(:doorkeeper_token) { token }
     end
     context 'with a valid token having invalid user ID' do
-      let(:token) { double resource_owner_id: -1, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: -1, scopes: 'public') }
       it 'request is not successful' do
         get :index
         expect(response).to have_http_status(401)
@@ -53,7 +53,7 @@ RSpec.describe Api::V8::BaseController, type: :controller do
         request.accept = 'application/json'
         get :index
         expect(response).to have_http_status(401)
-        expect(JSON.parse(response.body)).to eq('error' => 'Invalid token')
+        expect(response.parsed_body).to eq('error' => 'Invalid token')
       end
     end
     context 'with an expired token' do

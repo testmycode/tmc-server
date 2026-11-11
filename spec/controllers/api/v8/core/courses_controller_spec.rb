@@ -12,7 +12,7 @@ describe Api::V8::Core::CoursesController, type: :controller do
 
   describe 'GET course details show' do
     describe 'in JSON format with valid token' do
-      let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
       let(:course) { FactoryBot.create(:course, name: 'Course1') }
       before :each do
         course.exercises << FactoryBot.create(:returnable_exercise, name: 'Exercise1', course: course)

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -47,7 +48,7 @@ describe 'Tokens in emailed link paths', type: :request do
     end
 
     expect(response).to redirect_to("http://www.example.com/users/#{user.id}/destroy/#{token.token}")
-    expect(payloads.map { |payload| payload[:location] }).to eq(['[FILTERED]'])
+    expect(payloads.pluck(:location)).to eq(['[FILTERED]'])
   end
 
   it 'filters the token from Rack::Attack log lines' do

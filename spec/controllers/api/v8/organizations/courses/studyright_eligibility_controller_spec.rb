@@ -7,7 +7,7 @@ describe Api::V8::Organizations::Courses::StudyrightEligibilityController, type:
   let(:organization) { FactoryBot.create(:organization, slug: 'mooc') }
   let(:course) { FactoryBot.create(:course, organization: organization, name: 'mooc-2019-ohjelmointi') }
   let(:admin) { FactoryBot.create(:admin) }
-  let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+  let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
 
   before :each do
     allow(controller).to receive(:doorkeeper_token) { token }

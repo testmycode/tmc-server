@@ -53,7 +53,7 @@ describe Api::V8::Core::ExercisesController, type: :controller do
   end
 
   describe 'When logged in' do
-    let(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
     describe 'and correct exercise id is given' do
       it 'should return correct data' do
         submission = FactoryBot.create(:submission, course: course, user: user, exercise: exercise)

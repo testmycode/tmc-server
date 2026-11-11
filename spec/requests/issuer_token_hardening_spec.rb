@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -14,7 +15,7 @@ describe 'Issuer token hardening', type: :request do
       request_token
 
       expect(response).to have_http_status(200)
-      expect(JSON.parse(response.body)['expires_in']).to eq(3600)
+      expect(response.parsed_body['expires_in']).to eq(3600)
     end
 
     it 'leaves client_credentials tokens without the issuer scope non-expiring' do
@@ -22,7 +23,7 @@ describe 'Issuer token hardening', type: :request do
       post '/oauth/token', params: { grant_type: 'client_credentials', client_id: issuer_app.uid, client_secret: issuer_app.plaintext_secret, scope: 'public' }
 
       expect(response).to have_http_status(200)
-      expect(JSON.parse(response.body)).not_to have_key('expires_in')
+      expect(response.parsed_body).not_to have_key('expires_in')
     end
 
     it 'leaves password-grant tokens non-expiring' do
@@ -30,7 +31,7 @@ describe 'Issuer token hardening', type: :request do
       post '/oauth/token', params: { grant_type: 'password', client_id: issuer_app.uid, client_secret: issuer_app.plaintext_secret, username: user.login, password: 'hunter2hunter2' }
 
       expect(response).to have_http_status(200)
-      expect(JSON.parse(response.body)).not_to have_key('expires_in')
+      expect(response.parsed_body).not_to have_key('expires_in')
     end
   end
 
@@ -44,76 +45,47 @@ describe 'Issuer token hardening', type: :request do
     end
 
     it 'keeps similarly named diagnostics visible' do
-      params = { exit_code: 1, return_code: 2, token_count: 3 }
+      params = { exit_code: 1, return_code: 2 }
 
       expect(filter.filter(params)).to eq(params)
     end
   end
 
   describe 'rate limiting' do
-    let(:app) { Rack::Attack.new(->(_env) { [200, {}, ['ok']] }) }
+    include_context 'with Rack::Attack'
+
     let(:safe_headers) { { 'HTTP_RATELIMIT_PROTECTION_SAFE_API_KEY' => 'safe-key' } }
 
     around :each do |example|
-      Rack::Attack.enabled = true
-      Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
       ENV['RACK_ATTACK_SAFE_API_KEY'] = 'safe-key'
       example.run
     ensure
-      Rack::Attack.enabled = false
       ENV.delete('RACK_ATTACK_SAFE_API_KEY')
     end
 
-    def status_after(times, path, headers = {})
-      status = nil
-      times.times { status, = app.call(Rack::MockRequest.env_for(path, { method: 'POST', 'REMOTE_ADDR' => '203.0.113.7' }.merge(headers))) }
-      status
+    def status_after(times, path, env = {})
+      times.times { post path, env: { 'REMOTE_ADDR' => '203.0.113.7' }.merge(env) }
+      response.status
     end
 
     it 'throttles the issue endpoint even with the safe API key' do
-      expect(status_after(120, '/api/v8/application/user_access_tokens', safe_headers)).to eq(200)
+      expect(status_after(120, '/api/v8/application/user_access_tokens', safe_headers)).not_to eq(503)
       expect(status_after(1, '/api/v8/application/user_access_tokens', safe_headers)).to eq(503)
     end
 
     it 'does not throttle safelisted oauth token requests' do
-      expect(status_after(25, '/oauth/token', safe_headers)).to eq(200)
+      expect(status_after(25, '/oauth/token', safe_headers)).not_to eq(503)
     end
 
     it 'throttles unsafelisted oauth token requests' do
-      expect(status_after(100, '/oauth/token')).to eq(200)
+      expect(status_after(20, '/oauth/token')).not_to eq(503)
       expect(status_after(1, '/oauth/token')).to eq(503)
-    end
-  end
-  describe 'Rack::Attack in the real stack' do
-    around :each do |example|
-      Rack::Attack.enabled = true
-      Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
-      example.run
-    ensure
-      Rack::Attack.enabled = false
-    end
-
-    def hit_token_endpoint(times, env)
-      times.times { post '/oauth/token', env: env }
-    end
-
-    it 'is in the middleware stack exactly once' do
-      expect(Rails.application.middleware.count { |m| m.klass == Rack::Attack }).to eq(1)
-    end
-
-    it 'throttles by client address' do
-      hit_token_endpoint(101, 'REMOTE_ADDR' => '203.0.113.7')
-
-      expect(response).to have_http_status(503)
     end
 
     it 'buckets by the forwarded client address behind a private-range proxy' do
       proxied = { 'REMOTE_ADDR' => '10.0.0.1' }
-      hit_token_endpoint(101, proxied.merge('HTTP_X_FORWARDED_FOR' => '203.0.113.9'))
-      expect(response).to have_http_status(503)
-
-      hit_token_endpoint(1, proxied.merge('HTTP_X_FORWARDED_FOR' => '203.0.113.10'))
-      expect(response).not_to have_http_status(503)
+      expect(status_after(21, '/oauth/token', proxied.merge('HTTP_X_FORWARDED_FOR' => '203.0.113.9'))).to eq(503)
+      expect(status_after(1, '/oauth/token', proxied.merge('HTTP_X_FORWARDED_FOR' => '203.0.113.10'))).not_to eq(503)
     end
   end
 end

@@ -34,14 +34,14 @@ describe Api::V8::Core::Exercises::DetailsController, type: :controller do
     hidden_exercise = FactoryBot.create(:exercise, course: visible_exercise.course, hidden: true)
     teacher = FactoryBot.create(:user)
     Teachership.create!(user: teacher, organization: visible_exercise.course.organization)
-    allow(controller).to receive(:doorkeeper_token).and_return(double(resource_owner_id: teacher.id, acceptable?: true))
+    allow(controller).to receive(:doorkeeper_token).and_return(Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public'))
     get :show, params: { ids: "#{visible_exercise.id},#{hidden_exercise.id}" }
     expect(response.parsed_body['exercises'].pluck('id')).to contain_exactly(visible_exercise.id, hidden_exercise.id)
   end
 
   it 'runs the same number of queries for 2 and 6 exercises' do
     user = FactoryBot.create(:user)
-    allow(controller).to receive(:doorkeeper_token).and_return(double(resource_owner_id: user.id, acceptable?: true))
+    allow(controller).to receive(:doorkeeper_token).and_return(Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public'))
     course = visible_exercise.course
     exercises = [visible_exercise] + FactoryBot.create_list(:exercise, 5, course: course)
     exercises.last.update!(hidden: true)

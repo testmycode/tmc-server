@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -16,7 +17,7 @@ describe 'GET /oauth/token/info', type: :request do
     token_info(token.token)
 
     expect(response).to have_http_status(200)
-    body = JSON.parse(response.body)
+    body = response.parsed_body
     expect(body['application']).to eq('uid' => application.uid)
     expect(body['resource_owner_id']).to eq(user.id)
     expect(body['scope']).to eq(%w[public handoff])

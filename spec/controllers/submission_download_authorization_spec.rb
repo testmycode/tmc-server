@@ -54,7 +54,7 @@ describe Api::V8::Core::SubmissionsController, type: :controller do
   include_context 'a failing paste submission'
 
   def download_as(user)
-    token = user && double(resource_owner_id: user.id, acceptable?: true)
+    token = user && Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public')
     allow(controller).to receive(:doorkeeper_token) { token }
     get :download, params: { id: submission.id }
   end

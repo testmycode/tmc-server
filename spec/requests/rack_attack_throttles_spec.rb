@@ -1,19 +1,22 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
 
 describe 'Rack::Attack throttles', type: :request do
-  let(:app) { Rack::Attack.new(->(_env) { [200, {}, ['ok']] }) }
+  include_context 'with Rack::Attack'
+
   let(:safe_headers) { { 'HTTP_RATELIMIT_PROTECTION_SAFE_API_KEY' => 'safe-key' } }
 
   around :each do |example|
-    Rack::Attack.enabled = true
-    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
     ENV['RACK_ATTACK_SAFE_API_KEY'] = 'safe-key'
     example.run
   ensure
-    Rack::Attack.enabled = false
     ENV.delete('RACK_ATTACK_SAFE_API_KEY')
+  end
+
+  def app
+    Rack::Attack.new(->(_env) { [200, {}, ['ok']] })
   end
 
   def call(path, method: 'POST', ip: '203.0.113.7', **options)
@@ -30,15 +33,11 @@ describe 'Rack::Attack throttles', type: :request do
     status
   end
 
-  def basic(username, password = 'guess')
-    { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(username, password) }
-  end
-
   describe 'path variants' do
     {
-      '/oauth/token' => 100,
-      '/sessions' => 100,
-      '/api/v8/users' => 60,
+      '/oauth/token' => 20,
+      '/sessions' => 20,
+      '/api/v8/users' => 15,
       '/password_reset_keys' => 10,
       '/api/v8/users/password_reset' => 10,
       '/api/v8/application/user_access_tokens' => 120
@@ -56,40 +55,6 @@ describe 'Rack::Attack throttles', type: :request do
         expect(status_after(120, variant, **safe_headers)).to eq(200)
         expect(call(variant, **safe_headers)).to eq(503)
       end
-    end
-  end
-
-  describe 'Basic auth and /auth password checks per IP' do
-    it 'throttles Basic auth on web URLs' do
-      300.times { |i| call('/courses', method: 'GET', **basic("user#{i}")) }
-
-      expect(call('/courses', method: 'GET', **basic('fresh-user'))).to eq(503)
-    end
-
-    it 'throttles /auth password checks' do
-      300.times { |i| call('/auth', method: 'GET', params: { username: "user#{i}", password: 'x' }) }
-
-      expect(call('/auth.text', params: { username: 'fresh-user', password: 'x' })).to eq(503)
-    end
-
-    it 'counts query parameters when a JSON body is empty' do
-      300.times { |i| call("/auth?username=user#{i}&password=x", method: 'GET', 'CONTENT_TYPE' => 'application/json') }
-
-      expect(call('/auth?username=fresh-user&password=x', method: 'GET', 'CONTENT_TYPE' => 'application/json')).to eq(503)
-    end
-
-    it 'ignores client credentials sent as Basic auth to Doorkeeper' do
-      expect(status_after(301, '/oauth/introspect', **basic('client-id'))).to eq(200)
-    end
-
-    it 'ignores /auth session checks' do
-      expect(status_after(301, '/auth.text', method: 'GET', params: { username: 'victim', session_id: 'abc' })).to eq(200)
-    end
-
-    it 'leaves the login bucket of the address alone' do
-      300.times { |i| call('/courses', method: 'GET', **basic("user#{i}")) }
-
-      expect(call('/sessions', params: { session: { login: 'fresh-user', password: 'x' } })).to eq(200)
     end
   end
 

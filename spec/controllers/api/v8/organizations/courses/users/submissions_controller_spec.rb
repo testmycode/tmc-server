@@ -39,7 +39,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: admin.id, accessible?: true, includes_scope?: false }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
 
           it "should show given user's submissions" do
             users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
@@ -63,7 +63,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: teacher.id, accessible?: true, includes_scope?: false }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public') }
 
           it "should show given user's submissions in my organizations" do
             users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
@@ -91,7 +91,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: assistant.id, accessible?: true, includes_scope?: false }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: assistant.id, scopes: 'public') }
 
           it "should show given user's submissions in my courses" do
             users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
@@ -119,7 +119,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
           it 'should show my own submissions' do
             users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: user.id)
@@ -164,7 +164,7 @@ describe Api::V8::Organizations::Courses::Users::SubmissionsController, type: :c
         end
 
         describe 'when using access token' do
-          let!(:token) { double resource_owner_id: user.id, accessible?: true, includes_scope?: false }
+          let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
           it 'should show my own submissions' do
             users_own_subs(organization_slug: organization.slug, course_name: course_name, user_id: 'current')

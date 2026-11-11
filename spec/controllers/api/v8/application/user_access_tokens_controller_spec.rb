@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -32,7 +33,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     post_with(issuer_token, user.id)
 
     expect(response).to have_http_status(200)
-    body = JSON.parse(response.body)
+    body = response.parsed_body
     expect(body['token_type']).to eq('bearer')
     issued = Doorkeeper::AccessToken.find_by(token: body['access_token'])
     expect(issued.resource_owner_id).to eq(user.id)
@@ -106,7 +107,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     post_with(issuer_token, "0#{other_user.id}")
 
     expect(response).to have_http_status(200)
-    issued = Doorkeeper::AccessToken.find_by(token: JSON.parse(response.body)['access_token'])
+    issued = Doorkeeper::AccessToken.find_by(token: response.parsed_body['access_token'])
     expect(issued.resource_owner_id).to eq(other_user.id)
   end
 
@@ -119,7 +120,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
   it 'refuses to issue tokens for administrators' do
     expect do
       post_with(issuer_token, admin.id)
-    end.not_to change { Doorkeeper::AccessToken.where(resource_owner_id: admin.id).count }
+    end.not_to(change { Doorkeeper::AccessToken.where(resource_owner_id: admin.id).count })
 
     expect(response).to have_http_status(403)
   end
@@ -128,7 +129,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     Teachership.create!(user: user, organization: FactoryBot.create(:organization))
     expect do
       post_with(issuer_token, user.id)
-    end.not_to change { Doorkeeper::AccessToken.where(resource_owner_id: user.id).count }
+    end.not_to(change { Doorkeeper::AccessToken.where(resource_owner_id: user.id).count })
 
     expect(response).to have_http_status(403)
   end
@@ -137,7 +138,7 @@ describe Api::V8::Application::UserAccessTokensController, type: :controller do
     Assistantship.create!(user: user, course: FactoryBot.create(:course))
     expect do
       post_with(issuer_token, user.id)
-    end.not_to change { Doorkeeper::AccessToken.where(resource_owner_id: user.id).count }
+    end.not_to(change { Doorkeeper::AccessToken.where(resource_owner_id: user.id).count })
 
     expect(response).to have_http_status(403)
   end
