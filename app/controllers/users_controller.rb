@@ -5,6 +5,8 @@
 class UsersController < ApplicationController
   extend T::Sig
   skip_authorization_check
+  # Stale legacy deletion forms must still redirect, whatever the forgery protection strategy.
+  skip_forgery_protection only: :redirect_to_account_deletion
 
   after_action :remove_x_frame_options_header_when_bare_layout, only: %i[new create show]
 
@@ -129,11 +131,11 @@ class UsersController < ApplicationController
 
   sig { void }
   def redirect_to_account_deletion
-    deletion_url = current_user.courses_mooc_fi_account_deletion_url
+    deletion_url = User.courses_mooc_fi_account_deletion_url
     if deletion_url
       redirect_to deletion_url, allow_other_host: true
     else
-      redirect_to root_path, alert: 'Account deletion is not available right now. Please contact support to delete your account.'
+      redirect_to user_path
     end
   end
 

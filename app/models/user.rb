@@ -496,10 +496,11 @@ class User < ApplicationRecord
 
   # Where users delete their account, which also deletes it here. Nil when courses.mooc.fi isn't configured.
   sig { returns(T.nilable(String)) }
-  def courses_mooc_fi_account_deletion_url
-    return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
+  def self.courses_mooc_fi_account_deletion_url
+    base_url = SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/')
+    return nil if base_url.blank?
 
-    courses_mooc_fi_url('/user-settings/permissions#delete-account')
+    "#{base_url}/user-settings/permissions#delete-account"
   end
 
   sig { returns(T.nilable(ActionToken)) }
@@ -695,7 +696,7 @@ class User < ApplicationRecord
 
     sig { params(path: String).returns(String) }
     def courses_mooc_fi_url(path)
-      "#{SiteSetting.value('courses_mooc_fi_base_url')}#{path}"
+      "#{SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/')}#{path}"
     end
 
     sig { returns(Arel::SelectManager) }

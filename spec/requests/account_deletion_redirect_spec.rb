@@ -31,12 +31,22 @@ describe 'Self-service account deletion', type: :request do
     expect(response).to redirect_to(deletion_url)
   end
 
-  it 'asks the user to contact support when courses.mooc.fi is not configured' do
+  it 'redirects a stale deletion form when forgery protection is on' do
+    original = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+
+    post "/users/#{user.id}/send_destroy_email", params: { authenticity_token: 'stale' }
+
+    expect(response).to redirect_to(deletion_url)
+  ensure
+    ActionController::Base.allow_forgery_protection = original
+  end
+
+  it "sends the user to their account page, which says to contact support, when courses.mooc.fi isn't configured" do
     SiteSetting.all_settings['courses_mooc_fi_base_url'] = nil
 
     get "/users/#{user.id}/destroy/#{token.token}"
 
-    expect(response).to redirect_to(root_path)
-    expect(flash[:alert]).to include('contact support')
+    expect(response).to redirect_to(user_path)
   end
 end

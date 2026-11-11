@@ -144,7 +144,7 @@ module Api
         end
       end
 
-      skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi destroy]
+      skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi destroy course_progress]
 
       sig { void }
       def show
@@ -286,9 +286,7 @@ module Api
       def course_progress
         unauthorize_guest!
         only_admins!
-        user = User.find_by!(id: params[:id])
-        authorize! :read, user
-        render json: { courses: user.course_progress }
+        render json: { courses: User.find_by!(id: params[:id]).course_progress }
       end
 
       sig { void }

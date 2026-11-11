@@ -436,6 +436,29 @@
         77
       ],
       "note": "sh! Shellwords-escapes every word unless escape: false, which no caller passes."
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "6359af9828749190072deea63d61f76cd4ebf9c9987ef93c154d7da9e902aeaa",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/users_controller.rb",
+      "line": 136,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(User.courses_mooc_fi_account_deletion_url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "UsersController",
+        "method": "redirect_to_account_deletion"
+      },
+      "user_input": "User.courses_mooc_fi_account_deletion_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "The URL comes from the courses_mooc_fi_base_url site setting, not from request input."
     }
   ],
   "brakeman_version": "8.1.0"

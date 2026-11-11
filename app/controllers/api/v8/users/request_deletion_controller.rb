@@ -9,10 +9,10 @@ module Api
 
         sig { void }
         def create
-          render json: {
-            errors: ['Accounts are deleted on courses.mooc.fi.'],
-            account_deletion_url: current_user.courses_mooc_fi_account_deletion_url
-          }, status: :gone
+          unauthorize_guest!
+          deletion_url = User.courses_mooc_fi_account_deletion_url
+          message = deletion_url ? 'Accounts are deleted on courses.mooc.fi.' : 'Please contact support to delete your account.'
+          render json: { errors: [message], account_deletion_url: deletion_url }, status: :gone
         end
       end
     end

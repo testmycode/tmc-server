@@ -18,4 +18,22 @@ describe Api::V8::Users::RequestDeletionController, type: :controller do
     expect(response.parsed_body['account_deletion_url']).to eq('https://courses.mooc.fi/user-settings/permissions#delete-account')
     expect(User.find_by(id: user.id)).to eq(user)
   end
+
+  it "says to contact support when courses.mooc.fi isn't configured" do
+    SiteSetting.all_settings['courses_mooc_fi_base_url'] = nil
+
+    post :create, params: { user_id: 'current' }
+
+    expect(response).to have_http_status(410)
+    expect(response.parsed_body['errors']).to eq(['Please contact support to delete your account.'])
+    expect(response.parsed_body['account_deletion_url']).to be_nil
+  end
+
+  it 'requires authentication' do
+    allow(controller).to receive(:doorkeeper_token).and_return(nil)
+
+    post :create, params: { user_id: 'current' }
+
+    expect(response).to have_http_status(401)
+  end
 end
