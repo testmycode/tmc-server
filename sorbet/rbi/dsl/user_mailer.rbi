@@ -10,9 +10,6 @@ class UserMailer
   include GeneratedMountedHelpers
 
   class << self
-    sig { params(user: ::User).returns(::ActionMailer::MessageDelivery) }
-    def destroy_confirmation(user); end
-
     sig do
       params(
         user: ::User,

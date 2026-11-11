@@ -214,9 +214,6 @@ module GeneratedUrlHelpersModule
   def dangerously_destroy_user_participant_settings_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
-  def destroy_user_url(*args); end
-
-  sig { params(args: T.untyped).returns(String) }
   def disable_organization_course_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
@@ -655,9 +652,6 @@ module GeneratedUrlHelpersModule
   def save_unlocks_organization_course_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
-  def send_destroy_email_url(*args); end
-
-  sig { params(args: T.untyped).returns(String) }
   def send_verification_email_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
@@ -776,9 +770,6 @@ module GeneratedUrlHelpersModule
 
   sig { params(args: T.untyped).returns(String) }
   def verify_dangerously_destroying_user_participant_settings_url(*args); end
-
-  sig { params(args: T.untyped).returns(String) }
-  def verify_destroying_user_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
   def verify_organization_url(*args); end

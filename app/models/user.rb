@@ -494,6 +494,14 @@ class User < ApplicationRecord
     courses_mooc_fi_url("/manage/users/#{courses_mooc_fi_user_id}")
   end
 
+  # Where users delete their account, which also deletes it here. Nil when courses.mooc.fi isn't configured.
+  sig { returns(T.nilable(String)) }
+  def courses_mooc_fi_account_deletion_url
+    return nil if SiteSetting.value('courses_mooc_fi_base_url').blank?
+
+    courses_mooc_fi_url('/user-settings/permissions#delete-account')
+  end
+
   sig { returns(T.nilable(ActionToken)) }
   def password_reset_key
     action_tokens.find { |t| t.action == 'reset_password' }

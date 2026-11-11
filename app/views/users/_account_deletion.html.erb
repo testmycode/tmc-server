@@ -1,0 +1,5 @@
+<% if (deletion_url = current_user.courses_mooc_fi_account_deletion_url) %>
+  <%= link_to 'Delete account on courses.mooc.fi', deletion_url, class: 'btn btn-danger' %>
+<% else %>
+  <p>To delete your account, please contact support.</p>
+<% end %>

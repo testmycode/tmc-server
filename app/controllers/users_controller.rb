@@ -128,63 +128,16 @@ class UsersController < ApplicationController
   end
 
   sig { void }
-  def verify_destroying_user
-    @user = authenticate_current_user_destroy
-    VerificationToken.delete_user.find_by!(user: @user, token: params[:id])
-  end
-
-  sig { void }
-  def destroy_user
-    im_sure = params[:im_sure]
-    if im_sure != '1'
-      redirect_to verify_destroying_user_url, notice: 'Please check the checkbox after you have read the instructions.'
-      return
+  def redirect_to_account_deletion
+    deletion_url = current_user.courses_mooc_fi_account_deletion_url
+    if deletion_url
+      redirect_to deletion_url, allow_other_host: true
+    else
+      redirect_to root_path, alert: 'Account deletion is not available right now. Please contact support to delete your account.'
     end
-    user = authenticate_current_user_destroy
-    _authenticated_user, status = User.authenticate_with_status(user.login, params[:user][:password])
-    unless status == :accepted
-      redirect_to verify_destroying_user_url, alert: failed_authentication_alert(status)
-      return
-    end
-    VerificationToken.delete_user.find_by!(user: user, token: params[:id])
-    sign_out if current_user == user
-    email = user.email
-    username = user.login
-    id = user.id
-    user.destroy
-    RecentlyChangedUserDetail.where(username: username).delete_all
-    RecentlyChangedUserDetail.deleted.create!(new_value: true, email: email, username: username, user_id: id)
-    Doorkeeper::AccessToken.where(resource_owner_id: id).delete_all
-    redirect_to root_url, notice: 'Your account has been permanently destroyed.'
-  end
-
-  sig { void }
-  def send_destroy_email
-    user = authenticate_current_user_destroy
-    UserMailer.destroy_confirmation(user).deliver_now
-    redirect_to root_path, notice: "Verification email sent to #{user.email}."
   end
 
   private
-    sig { returns(User) }
-    def authenticate_current_user_destroy
-      user = User.find(params[:user_id])
-      authorize! :destroy, user
-      user
-    end
-
-    sig { params(status: T.anything).returns(String) }
-    def failed_authentication_alert(status)
-      case status
-      when :unavailable
-        'We could not reach the system that holds your password. Please try again in a few minutes, or contact support if this keeps happening.'
-      when :misconfigured
-        'Your account needs manual attention before it can be deleted. Please contact support.'
-      else
-        'The password was incorrect.'
-      end
-    end
-
     sig { void }
     def set_email
       user = T.must(@user)
