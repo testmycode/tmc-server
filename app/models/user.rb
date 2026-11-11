@@ -190,7 +190,7 @@ class User < ApplicationRecord
 
   # The user a typed username names, matched against login exactly and email case-insensitively.
   sig { params(username: T.nilable(String)).returns(T.nilable(User)) }
-  def self.find_by_login_or_email(username)
+  def self.by_login_or_email(username)
     username = username&.strip
     return nil if username.blank?
 
@@ -211,7 +211,7 @@ class User < ApplicationRecord
   # the status, so sign in only on :accepted.
   sig { params(login: T.nilable(String), submitted_password: T.nilable(String)).returns([T.nilable(User), Symbol]) }
   def self.authenticate_with_status(login, submitted_password)
-    user = find_by_login_or_email(login)
+    user = by_login_or_email(login)
     return [nil, :rejected] if user.nil?
 
     return [user, user.courses_mooc_fi_authentication_status(submitted_password)] if user.managed_externally?

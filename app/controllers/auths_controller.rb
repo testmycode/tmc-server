@@ -13,7 +13,7 @@ class AuthsController < ApplicationController
   sig { void }
   def show
     if params[:username].present? && params[:session_id].present?
-      user = User.find_by_login_or_email(params[:username].to_s)
+      user = User.by_login_or_email(params[:username].to_s)
       # Allows using oauth2 tokens of the new api for authenticating
       res = if user && AccessTokenAuthentication.user_for(Doorkeeper::AccessToken.by_token(params[:session_id].to_s)) == user
         OK_MESSAGE

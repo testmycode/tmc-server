@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module Api
@@ -6,9 +7,10 @@ module Api
       # Issues a login token for a user to a trusted backend after a sign-in handoff verified
       # elsewhere. Callable only by allow-listed client_credentials apps with the issuer scope.
       class UserAccessTokensController < Api::V8::BaseController
+        extend T::Sig
         include Swagger::Blocks
 
-        TOKEN_LIFETIME = 1.day
+        TOKEN_LIFETIME = T.let(1.day, ActiveSupport::Duration)
 
         swagger_path '/api/v8/application/user_access_tokens' do
           operation :post do
@@ -54,9 +56,11 @@ module Api
         skip_before_action :authenticate_user!
         skip_authorization_check
 
+        sig { void }
         def create
-          return respond_unauthorized unless doorkeeper_token&.accessible?
-          return respond_forbidden unless authorized_issuer?
+          issuer_token = doorkeeper_token
+          return respond_unauthorized unless issuer_token&.accessible?
+          return respond_forbidden unless authorized_issuer?(issuer_token)
 
           return respond_with_error('user_id must be an integer', 400) unless params[:user_id].to_s.match?(/\A\d+\z/)
 
@@ -64,7 +68,7 @@ module Api
           return respond_not_found('User not found') unless user
           return respond_forbidden('Tokens are not issued for administrators, teachers or assistants') if user.privileged?
 
-          target_application = Doorkeeper::Application.find_by(uid: Rails.configuration.x.user_access_token_target_application_uid)
+          target_application = Doorkeeper::Application.find_by(uid: AccessTokenAuthentication.target_application_uid)
           return respond_with_error('Target application is not configured', 500) unless target_application
 
           token = Doorkeeper::AccessToken.create_for(
@@ -73,7 +77,7 @@ module Api
             scopes: "public #{AccessTokenAuthentication::HANDOFF_SCOPE}",
             expires_in: TOKEN_LIFETIME.to_i
           )
-          Rails.logger.info("Issued user access token: issuer application uid=#{doorkeeper_token.application.uid} user_id=#{user.id}")
+          Rails.logger.info("Issued user access token: issuer application uid=#{issuer_token.application&.uid} user_id=#{user.id}")
 
           response.headers['Cache-Control'] = 'no-store'
           response.headers['Pragma'] = 'no-cache'
@@ -88,20 +92,26 @@ module Api
 
         private
           # Their credentials are served publicly by the credentials endpoint.
+          sig { returns(T::Array[String]) }
           def public_client_names
-            Array(SiteSetting.value('valid_clients')).filter_map { |client| client['name'] }
+            clients = SiteSetting.value('valid_clients')
+            return [] unless clients.is_a?(Array)
+
+            clients.filter_map { |client| client['name'].to_s if client.is_a?(Hash) }
           end
 
-          def authorized_issuer?
-            issuer_uids = Rails.configuration.x.user_access_token_issuer_application_uids
+          sig { params(issuer_token: Doorkeeper::AccessToken).returns(T::Boolean) }
+          def authorized_issuer?(issuer_token)
             # resource_owner_id is set on user tokens, which never qualify even from an allowed application.
-            return false unless AccessTokenAuthentication.issuer_token?(doorkeeper_token)
+            return false unless AccessTokenAuthentication.issuer_token?(issuer_token)
 
-            application = doorkeeper_token.application
+            application = issuer_token.application
+            return false unless application
+
             # The target is a frontend client, so its credentials must not be usable to issue tokens.
-            issuer_uids.include?(application&.uid) &&
+            AccessTokenAuthentication.issuer_application_uids.include?(application.uid) &&
               application.confidential? &&
-              application.uid != Rails.configuration.x.user_access_token_target_application_uid &&
+              application.uid != AccessTokenAuthentication.target_application_uid &&
               public_client_names.exclude?(application.name)
           end
       end

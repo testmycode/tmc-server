@@ -26,6 +26,9 @@ module SecretPathFilter
   end
 end
 
-ActionDispatch::Request.prepend(SecretPathFilter::RequestFilteredPath)
+ActiveSupport.on_load(:action_dispatch_request) do
+  T.bind(self, T.class_of(ActionDispatch::Request))
+  prepend SecretPathFilter::RequestFilteredPath
+end
 
 Rails.application.config.filter_redirect << SecretPathFilter::TOKEN_SEGMENT
