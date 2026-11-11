@@ -182,8 +182,8 @@ describe Api::V8::UsersController, type: :controller do
   describe 'PUT update extra fields' do
     let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
-    def do_update(data)
-      put :update, params: { id: 'current', user: { email: user.email, extra_fields: { namespace: 'ns', data: data } } }
+    def do_update(data, **request_options)
+      put :update, params: { id: 'current', user: { email: user.email, extra_fields: { namespace: 'ns', data: data } } }, **request_options
     end
 
     def app_data_values
@@ -193,7 +193,7 @@ describe Api::V8::UsersController, type: :controller do
     it 'updates existing fields and adds new ones' do
       existing = UserAppDatum.create!(user: user, namespace: 'ns', field_name: 'a', value: 'old', created_at: 1.day.ago, updated_at: 1.day.ago)
 
-      do_update(a: 'new', b: 'added')
+      do_update({ a: 'new', b: 'added' })
 
       expect(response).to have_http_status(200)
       expect(app_data_values).to eq('a' => 'new', 'b' => 'added')
@@ -209,7 +209,7 @@ describe Api::V8::UsersController, type: :controller do
         original.call(*args, **kwargs)
       end
 
-      do_update(a: 'mine')
+      do_update({ a: 'mine' })
 
       expect(competitor_inserted).to be(true)
       expect(response).to have_http_status(200)
@@ -217,7 +217,7 @@ describe Api::V8::UsersController, type: :controller do
     end
 
     it 'accepts an empty data list' do
-      put :update, params: { id: 'current', user: { email: user.email, extra_fields: { namespace: 'ns', data: [] } } }, as: :json
+      do_update([], as: :json)
 
       expect(response).to have_http_status(200)
       expect(app_data_values).to be_empty
