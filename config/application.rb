@@ -33,7 +33,7 @@ module TmcServer
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += %i[password session_id api_password submission_file return_file test_output stdout stderr vm_log
-                                   token access_token refresh_token client_secret secret _key crypt otp salt]
+                                   token access_token refresh_token client_secret secret _key crypt otp salt code_verifier]
     # Exact, so that other keys containing "code" stay readable.
     config.filter_parameters << /\Acode\z/
 
@@ -47,6 +47,8 @@ module TmcServer
     config.sass.silence_deprecations = %w[import global-builtin color-functions if-function abs-percent]
 
     config.x.accept_courses_mooc_fi_tokens = ENV['ACCEPT_COURSES_MOOC_FI_TOKENS'] == 'true'
+    config.x.user_access_token_issuer_application_uids = ENV.fetch('USER_ACCESS_TOKEN_ISSUER_APPLICATION_UIDS', '').split(',').map(&:strip).reject(&:empty?)
+    config.x.user_access_token_target_application_uid = ENV['USER_ACCESS_TOKEN_TARGET_APPLICATION_UID'].presence
 
     config.middleware.insert_before 0, Rack::Cors, debug: false, logger: (-> { Rails.logger }) do
       T.bind(self, Rack::Cors)

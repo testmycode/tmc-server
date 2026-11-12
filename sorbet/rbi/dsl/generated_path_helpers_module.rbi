@@ -28,6 +28,9 @@ module GeneratedPathHelpersModule
   def api_v8_application_credentials_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def api_v8_application_user_access_tokens_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def api_v8_core_course_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }

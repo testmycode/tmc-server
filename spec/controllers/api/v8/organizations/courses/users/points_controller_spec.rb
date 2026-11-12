@@ -23,7 +23,7 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
   describe "GET current user's points" do
     describe 'as admin' do
       let(:current_user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course name given' do
         it "shows only user's point information" do
@@ -50,7 +50,7 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course name given' do
         it "shows only user's point information" do
@@ -101,7 +101,7 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
   describe "GET user's points" do
     describe 'as admin' do
       let(:current_user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course name given' do
         it "shows only user's point information" do
@@ -128,7 +128,7 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course name given' do
         it "lists none of another user's points" do
@@ -155,7 +155,7 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
 
     describe 'as another user' do
       let(:current_user) { user2 }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course name given' do
         it "lists none of another user's points" do
@@ -202,7 +202,7 @@ describe Api::V8::Organizations::Courses::Users::PointsController, type: :contro
 
   describe "GET current user's points in exam mode" do
     let(:current_user) { FactoryBot.create(:user) }
-    let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
     it 'lists no points' do
       course.update!(hide_submission_results: true)

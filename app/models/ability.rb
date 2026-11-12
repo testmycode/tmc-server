@@ -8,10 +8,13 @@ class Ability
   extend T::Sig
   include CanCan::Ability
 
-  # +auth_source+ is :courses_mooc_fi_token when the user authenticated with a courses.mooc.fi
-  # access token; account changes are then denied to everyone, administrators included.
+  # +auth_source+ restricts account changes for tokens that are not the user's own login:
+  # :courses_mooc_fi_token denies all, administrators included; :handoff_token allows profile
+  # edits but no +:update_credentials+ (email, password) and no account deletion.
   sig { params(user: User, auth_source: T.nilable(Symbol)).void }
   def initialize(user, auth_source: nil)
+    alias_action :update_credentials, to: :update
+
     if user.administrator?
       can :manage, :all
       can :create, Course
@@ -294,10 +297,13 @@ class Ability
       end
     end
 
-    return unless auth_source == :courses_mooc_fi_token
-
-    # The token is scoped to exercise services; it must not take over or delete the account.
-    cannot :update, User
-    cannot :destroy, User
+    case auth_source
+    when :courses_mooc_fi_token
+      # The token is scoped to exercise services; it must not take over or delete the account.
+      cannot :update, User
+      cannot :destroy, User
+    when :handoff_token
+      cannot %i[update_credentials destroy], User
+    end
   end
 end

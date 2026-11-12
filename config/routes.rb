@@ -155,6 +155,10 @@ TmcServer::Application.routes.draw do
       resources :application, param: :name, only: [] do
         resources :credentials, module: :application, only: :index
       end
+
+      namespace :application do
+        resources :user_access_tokens, only: :create
+      end
     end
   end
 
@@ -282,7 +286,7 @@ TmcServer::Application.routes.draw do
     end
   end
 
-  get '/users/:user_id/verify/:id', to: 'users#confirm_email', as: 'confirm_email'
+  get '/users/:user_id/verify/:token', to: 'users#confirm_email', as: 'confirm_email'
   post '/users/:user_id/send_verification_email', to: 'users#send_verification_email', as: 'send_verification_email'
 
   resources :users, only: [:index]

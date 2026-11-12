@@ -9,7 +9,7 @@ describe Api::V8::Users::TeachershipsController, type: :controller do
 
   before do
     Teachership.create!(user: teacher, organization: organization)
-    allow(controller).to receive(:doorkeeper_token).and_return(double(resource_owner_id: teacher.id, acceptable?: true))
+    allow(controller).to receive(:doorkeeper_token).and_return(Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public'))
   end
 
   it "lists the user's organizations, with missing information as an empty string" do

@@ -19,7 +19,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
 
   describe 'POST create' do
     describe 'As an admin' do
-      let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
 
       it 'can make new review' do
         expect do
@@ -30,7 +30,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
     end
 
     describe 'As a teacher' do
-      let(:token) { double resource_owner_id: teacher.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: teacher.id, scopes: 'public') }
 
       it 'can make new review' do
         expect do
@@ -41,7 +41,7 @@ describe Api::V8::Core::Submissions::ReviewsController, type: :controller do
     end
 
     describe 'As a student' do
-      let(:token) { double resource_owner_id: student.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: student.id, scopes: 'public') }
 
       it "can't make new review" do
         expect do

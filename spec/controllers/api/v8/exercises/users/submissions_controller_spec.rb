@@ -8,7 +8,7 @@ describe Api::V8::Exercises::Users::SubmissionsController, type: :controller do
   let(:exercise) { FactoryBot.create(:exercise) }
 
   def sign_in(as)
-    allow(controller).to receive(:doorkeeper_token).and_return(as && double(resource_owner_id: as.id, acceptable?: true))
+    allow(controller).to receive(:doorkeeper_token).and_return(as && Doorkeeper::AccessToken.create!(resource_owner_id: as.id, scopes: 'public'))
   end
 
   def submission(owner, **attributes)

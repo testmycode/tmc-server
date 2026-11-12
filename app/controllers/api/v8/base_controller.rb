@@ -50,8 +50,11 @@ module Api
         def authenticate_user!
           return if @current_user
           if (token = doorkeeper_token)
-            @current_user = T.let(User.find_by(id: token.resource_owner_id), T.nilable(User))
-            raise 'Invalid token' unless @current_user
+            @current_user = T.let(AccessTokenAuthentication.user_for(token), T.nilable(User))
+            return respond_unauthorized('Invalid token') unless @current_user
+            @auth_source = T.let(:handoff_token, T.nilable(Symbol)) if AccessTokenAuthentication.handoff?(token)
+          elsif presented_doorkeeper_token
+            return respond_unauthorized('Invalid token')
           elsif Rails.configuration.x.accept_courses_mooc_fi_tokens
             @current_user = CoursesMoocFiAuthentication.user_for(request)
             @auth_source = T.let(:courses_mooc_fi_token, T.nilable(Symbol)) if @current_user

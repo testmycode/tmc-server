@@ -17,7 +17,7 @@ describe Api::V8::Core::Submissions::FeedbackController, type: :controller do
 
   describe 'POST create' do
     describe 'As a student' do
-      let(:token) { double resource_owner_id: student.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: student.id, scopes: 'public') }
 
       it 'can give feedback' do
         # pending 'Failing for some reason'

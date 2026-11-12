@@ -10,6 +10,7 @@ module Api
         sig { void }
         def create
           unauthorize_guest!
+          authorize! :destroy, current_user
           deletion_url = User.courses_mooc_fi_account_deletion_url
           message = deletion_url ? 'Accounts are deleted on courses.mooc.fi.' : 'Please contact support to delete your account.'
           render json: errors_json(message).merge(account_deletion_url: deletion_url), status: :gone

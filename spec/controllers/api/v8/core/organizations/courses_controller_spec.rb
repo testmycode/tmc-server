@@ -17,7 +17,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
 
   describe 'GET courses' do
     describe 'as admin' do
-      let(:token) { double resource_owner_id: admin.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
       it 'shows a list of collections of course urls' do
         get :index, params: { organization_slug: organization.slug }
         json = response.parsed_body
@@ -32,7 +32,7 @@ describe Api::V8::Core::Organizations::CoursesController, type: :controller do
       end
     end
     describe 'as user' do
-      let(:token) { double resource_owner_id: user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
       it 'shows a list of collections of course urls' do
         get :index, params: { organization_slug: organization.slug }
         json = response.parsed_body

@@ -21,7 +21,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
   describe 'GET points for a course by id' do
     describe 'as admin' do
       let(:current_user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course ID given' do
         it "shows only user's point information" do
@@ -48,7 +48,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       describe 'when course ID given' do
         it "shows only the caller's own points" do
@@ -101,7 +101,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       it 'lists no points' do
         get :index, params: { course_id: course.id }
@@ -123,7 +123,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
     describe 'as admin' do
       let(:current_user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       it 'lists the points' do
         get :index, params: { course_id: course.id }
@@ -139,7 +139,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       it 'is forbidden' do
         get :index, params: { course_id: course.id }
@@ -167,7 +167,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
       FactoryBot.create(:awarded_point, course: course, user: current_user, name: exercise.available_points.first.name)
     end
     let(:current_user) { FactoryBot.create(:user) }
-    let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+    let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
     it "leaves out the exercise's points" do
       get :index, params: { course_id: course.id }
@@ -186,7 +186,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
     describe 'as user' do
       let(:current_user) { FactoryBot.create(:user) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       it "leaves out the hidden exercise's points" do
         get :index, params: { course_id: course.id }
@@ -198,7 +198,7 @@ describe Api::V8::Courses::PointsController, type: :controller do
 
     describe 'as admin' do
       let(:current_user) { FactoryBot.create(:admin) }
-      let(:token) { double resource_owner_id: current_user.id, acceptable?: true }
+      let(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id, scopes: 'public') }
 
       it "includes the hidden exercise's points" do
         get :index, params: { course_id: course.id }

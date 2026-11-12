@@ -10,7 +10,7 @@ describe Api::V8::Courses::AllCoursesWithThisTemplateController, type: :controll
   let(:user) { FactoryBot.create(:user) }
 
   before :each do
-    allow(controller).to receive(:doorkeeper_token).and_return(double(resource_owner_id: user.id, acceptable?: true))
+    allow(controller).to receive(:doorkeeper_token).and_return(Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public'))
   end
 
   it 'lists only the courses the caller can read' do
