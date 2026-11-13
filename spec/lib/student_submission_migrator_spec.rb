@@ -66,6 +66,18 @@ describe StudentSubmissionMigrator do
     expect { expect(migrator.migration_is_allowed).to be(true) }.not_to output.to_stdout
   end
 
+  it 'sets the configured app data' do
+    UserAppDatum.create!(user: @user, namespace: 'ns', field_name: 'a', value: 'old')
+    allow(SiteSetting).to receive(:value).and_return([{
+      'from' => @course.id, 'to' => @other_course.id,
+      'update_app_data' => [{ 'namespace' => 'ns', 'set_values' => [{ 'field_name' => 'a', 'value' => 'new' }, { 'field_name' => 'b', 'value' => 'added' }] }]
+    }])
+
+    StudentSubmissionMigrator.new(@course, @other_course, @user).migrate!
+
+    expect(UserAppDatum.where(user: @user, namespace: 'ns').pluck(:field_name, :value).to_h).to eq('a' => 'new', 'b' => 'added')
+  end
+
   it 'throws exception if it cannot be migrated safely' do
     bad_course = FactoryBot.create(:course)
     allow(bad_course).to receive(:git_revision).and_return('other')

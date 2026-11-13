@@ -100,14 +100,8 @@ class StudentSubmissionMigrator
       return unless migration_entry['update_app_data']
       app_data_updates = migration_entry['update_app_data']
       app_data_updates.each do |adu|
-        namespace = adu['namespace']
-        adu['set_values'].each do |record|
-          field_name = record['field_name']
-          value = record['value']
-          db_record = UserAppDatum.find_or_initialize_by(namespace: namespace, field_name: field_name, user: @user)
-          db_record.value = value
-          db_record.save!
-        end
+        values_by_field_name = adu['set_values'].to_h { |record| [record['field_name'], record['value']] }
+        UserAppDatum.upsert_values(user_id: @user.id, namespace: adu['namespace'], values_by_field_name: values_by_field_name)
       end
     end
 end
