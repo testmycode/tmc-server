@@ -61,6 +61,7 @@ TmcServer::Application.routes.draw do
         resources :assistantships, module: :users, only: :index
         resources :teacherships, module: :users, only: :index
         post :set_password_managed_by_courses_mooc_fi, on: :member
+        get :course_progress, on: :member
         get :get_user_with_email, on: :collection
       end
 
@@ -290,9 +291,9 @@ TmcServer::Application.routes.draw do
 
   resources :users, only: [:index]
 
-  post '/users/:user_id/send_destroy_email', to: 'users#send_destroy_email', as: 'send_destroy_email'
-  get '/users/:user_id/destroy/:token', to: 'users#verify_destroying_user', as: 'verify_destroying_user'
-  delete '/users/:user_id/destroy/:token', to: 'users#destroy_user', as: 'destroy_user'
+  post '/users/:user_id/send_destroy_email', to: 'users#redirect_to_account_deletion'
+  # Deletion confirmation links already in users' inboxes land here too.
+  match '/users/:user_id/destroy/:id', to: 'users#redirect_to_account_deletion', via: %i[get delete]
 
   resources :certificates, only: %i[show create]
 

@@ -244,61 +244,30 @@ describe UsersController, type: :controller do
     end
   end
 
-  describe 'DELETE destroy_user' do
-    let!(:user) { FactoryBot.create(:user, password: 'secret123') }
-    let!(:verification_token) { VerificationToken.create!(user: user, type: :delete_user) }
+  describe 'GET show account deletion' do
+    render_views
+
+    let!(:user) { FactoryBot.create(:user) }
+    let(:deletion_url) { 'https://courses.mooc.fi/user-settings/permissions#delete-account' }
 
     before :each do
       controller.current_user = user
+      SiteSetting.all_settings['courses_mooc_fi_base_url'] = 'https://courses.mooc.fi'
     end
 
-    def do_destroy_user(password)
-      delete :destroy_user, params: { user_id: user.id, token: verification_token.token, im_sure: '1',
-                                      user: { password: password } }
+    it 'links to account deletion on courses.mooc.fi' do
+      get :show
+
+      expect(response.body).to include(%(href="#{deletion_url}"))
     end
 
-    it 'should destroy the account when the password is correct' do
-      allow_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi).and_return(true)
+    it 'tells the user to contact support when courses.mooc.fi is not configured' do
+      SiteSetting.all_settings['courses_mooc_fi_base_url'] = nil
 
-      do_destroy_user('secret123')
+      get :show
 
-      expect(User.find_by(id: user.id)).to be_nil
-    end
-
-    it 'should blame the password when it was actually rejected' do
-      do_destroy_user('wrongpassword')
-
-      expect(flash[:alert]).to eq('The password was incorrect.')
-      expect(User.find_by(id: user.id)).not_to be_nil
-    end
-
-    it 'should not blame the password when courses.mooc.fi could not be reached' do
-      user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
-      allow_any_instance_of(User).to receive(:courses_mooc_fi_authentication_status).and_return(:unavailable)
-
-      do_destroy_user('secret123')
-
-      expect(flash[:alert]).to include('could not reach')
-      expect(User.find_by(id: user.id)).not_to be_nil
-    end
-
-    it 'should tell the user to contact support when the courses.mooc.fi id is missing' do
-      user.update_columns(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: nil)
-
-      do_destroy_user('secret123')
-
-      expect(flash[:alert]).to include('contact support')
-      expect(flash[:alert]).not_to include('try again')
-      expect(User.find_by(id: user.id)).not_to be_nil
-    end
-
-    it 'should not destroy the account on a status this controller does not know' do
-      allow(User).to receive(:authenticate_with_status).and_return([user, :some_future_status])
-
-      do_destroy_user('secret123')
-
-      expect(User.find_by(id: user.id)).not_to be_nil
-      expect(flash[:alert]).to eq('The password was incorrect.')
+      expect(response.body).to include('contact support')
+      expect(response.body).not_to include('user-settings/permissions')
     end
   end
 end

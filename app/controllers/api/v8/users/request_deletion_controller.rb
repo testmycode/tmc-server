@@ -9,13 +9,11 @@ module Api
 
         sig { void }
         def create
-          user = current_user
-          user = User.find_by!(id: params[:user_id]) unless params[:user_id] == 'current'
-          authorize! :destroy, user
-          UserMailer.destroy_confirmation(user).deliver_now
-          render json: {
-            message: 'Verification email sent'
-          }
+          unauthorize_guest!
+          authorize! :destroy, current_user
+          deletion_url = User.courses_mooc_fi_account_deletion_url
+          message = deletion_url ? 'Accounts are deleted on courses.mooc.fi.' : 'Please contact support to delete your account.'
+          render json: errors_json(message).merge(account_deletion_url: deletion_url), status: :gone
         end
       end
     end

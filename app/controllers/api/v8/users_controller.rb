@@ -111,7 +111,40 @@ module Api
         end
       end
 
-      skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi destroy]
+      swagger_path '/api/v8/users/{user_id}/course_progress' do
+        operation :get do
+          key :description, 'Admin only. Lists every course where the user has submissions or awarded points, hidden and disabled courses included, latest submission first.'
+          key :operationId, 'findUsersCourseProgress'
+          key :produces, ['application/json']
+          key :tags, ['user']
+          parameter '$ref': '#/parameters/path_user_id'
+          response 200 do
+            key :description, "The user's progress per course"
+            schema do
+              key :title, :courses
+              key :required, [:courses]
+              property :courses do
+                key :type, :array
+                items do
+                  key :required, %i[id name title moocfi_id awarded_points submissions last_submission_at]
+                  property :id, type: :integer, example: 1
+                  property :name, type: :string, example: 'mooc-java-programming-i'
+                  property :title, type: :string, 'x-nullable': true, example: 'Java Programming I'
+                  property :moocfi_id, type: :string, 'x-nullable': true, example: '5b4a46e2-0ec4-4c4e-8a6c-3f8d9a3c1f2e'
+                  property :awarded_points, type: :integer, example: 12
+                  property :submissions, type: :integer, example: 34
+                  property :last_submission_at, type: :string, format: 'date-time', 'x-nullable': true, example: '2026-10-01T12:00:00Z'
+                end
+              end
+            end
+          end
+          response 401, '$ref': '#/responses/error'
+          response 403, '$ref': '#/responses/error'
+          response 404, '$ref': '#/responses/error'
+        end
+      end
+
+      skip_authorization_check only: %i[set_password_managed_by_courses_mooc_fi destroy course_progress]
 
       sig { void }
       def show
@@ -246,6 +279,14 @@ module Api
       rescue StandardError => e
         Rails.logger.error("Deleting user #{params[:id]} failed: #{e.class}: #{e.message}")
         render_destroy_failure('internal_error', 'User deletion failed.', :internal_server_error)
+      end
+
+      # courses.mooc.fi lists this to the user before deleting their account; keep the shape stable.
+      sig { void }
+      def course_progress
+        unauthorize_guest!
+        only_admins!
+        render json: { courses: User.find_by!(id: params[:id]).course_progress }
       end
 
       sig { void }

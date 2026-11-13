@@ -39,18 +39,6 @@ describe 'Tokens in emailed link paths', type: :request do
     expect(response.body).not_to include("key=#{key.token}")
   end
 
-  it 'keeps the account deletion token out of redirect logs' do
-    token = VerificationToken.create!(user: user, type: :delete_user)
-    post '/sessions', params: { session: { login: user.login, password: 'secret123' } }
-
-    payloads = instrumented('redirect_to.action_controller') do
-      delete "/users/#{user.id}/destroy/#{token.token}", params: { im_sure: '1', user: { password: 'wrong' } }
-    end
-
-    expect(response).to redirect_to("http://www.example.com/users/#{user.id}/destroy/#{token.token}")
-    expect(payloads.pluck(:location)).to eq(['[FILTERED]'])
-  end
-
   it 'filters the token from Rack::Attack log lines' do
     expect(SecretPathFilter.filter('//users/1/destroy/abc.json')).to eq('//users/1/destroy/[FILTERED]')
     expect(SecretPathFilter.filter('/reset_password')).to eq('/reset_password')

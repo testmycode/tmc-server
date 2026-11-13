@@ -2,9 +2,7 @@
 
 <%= render :partial => 'settings/form', :user => @user, locals: { hide_login: true } %>
 
-<% if can? :destroy, @user %>
-  <%= button_to 'Request deleting account', send_destroy_email_path(@user.id), method: :post, class: 'btn btn-danger' %>
-<% end %>
+<%= render 'users/account_deletion', user: @user %>
 
 <br>
 

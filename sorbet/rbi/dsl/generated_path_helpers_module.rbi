@@ -196,6 +196,9 @@ module GeneratedPathHelpersModule
   def course_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def course_progress_api_v8_user_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def course_template_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
@@ -212,9 +215,6 @@ module GeneratedPathHelpersModule
 
   sig { params(args: T.untyped).returns(String) }
   def dangerously_destroy_user_participant_settings_path(*args); end
-
-  sig { params(args: T.untyped).returns(String) }
-  def destroy_user_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
   def disable_organization_course_path(*args); end
@@ -655,9 +655,6 @@ module GeneratedPathHelpersModule
   def save_unlocks_organization_course_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
-  def send_destroy_email_path(*args); end
-
-  sig { params(args: T.untyped).returns(String) }
   def send_verification_email_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
@@ -776,9 +773,6 @@ module GeneratedPathHelpersModule
 
   sig { params(args: T.untyped).returns(String) }
   def verify_dangerously_destroying_user_participant_settings_path(*args); end
-
-  sig { params(args: T.untyped).returns(String) }
-  def verify_destroying_user_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
   def verify_organization_path(*args); end

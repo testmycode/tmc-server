@@ -60,14 +60,6 @@ class UserMailer < ActionMailer::Base
     mail(from: SiteSetting.value('emails')['from'], to: user.email, subject: subject)
   end
 
-  sig { params(user: User).void }
-  def destroy_confirmation(user)
-    @user = T.let(user, T.nilable(User))
-    token = user.verification_tokens.delete_user.create!
-    @url = T.let(verify_destroying_user_url(user.id, token.token), T.nilable(String))
-    mail(from: SiteSetting.value('emails')['from'], to: user.email, subject: 'Confirm deleting your mooc.fi account')
-  end
-
   private
     sig { returns(String) }
     def base_url
