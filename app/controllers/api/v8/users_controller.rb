@@ -134,7 +134,7 @@ module Api
                   property :awarded_points, type: :integer, example: 12
                   property :submissions, type: :integer, example: 34
                   property :last_submission_at, type: :string, format: 'date-time', 'x-nullable': true, example: '2026-10-01T12:00:00Z'
-                  property :url, type: :string, 'x-nullable': true, example: 'https://tmc.mooc.fi/org/mooc/courses/1'
+                  property :url, type: :string, 'x-nullable': true, description: 'The course page, when the user can open it', example: 'https://tmc.mooc.fi/org/mooc/courses/1'
                 end
               end
             end
@@ -287,9 +287,15 @@ module Api
       def course_progress
         unauthorize_guest!
         only_admins!
-        courses = User.find_by!(id: params[:id]).course_progress.map do |course|
-          slug = course.delete(:organization_slug)
-          course.merge(url: slug && organization_course_url(slug, course[:id]))
+        user = User.find_by!(id: params[:id])
+        ability = Ability.new(user)
+        progress = user.course_progress
+        courses_by_id = Course.includes(:organization).where(id: progress.pluck(:id)).index_by(&:id)
+        courses = progress.map do |entry|
+          course = courses_by_id.fetch(entry[:id])
+          # A link the user cannot open, e.g. to a hidden or disabled course, is worse than none.
+          url = organization_course_url(course.organization, course) if ability.can?(:read, course)
+          entry.merge(url: url)
         end
         render json: { courses: courses }
       end

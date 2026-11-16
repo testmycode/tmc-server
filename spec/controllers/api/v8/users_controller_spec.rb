@@ -341,7 +341,7 @@ describe Api::V8::UsersController, type: :controller do
       "http://test.host/org/#{course.organization.slug}/courses/#{course.id}"
     end
 
-    it 'lists each course the user has submissions or points in, latest submission first' do
+    it 'lists each course the user has submissions or points in, latest submission first, linking those they can open' do
       submitted_course = FactoryBot.create(:course, name: 'submitted', moocfi_id: SecureRandom.uuid, hidden: true)
       FactoryBot.create(:submission, user: user, course: submitted_course, created_at: Time.zone.parse('2026-10-01T12:00:00Z'))
       FactoryBot.create(:submission, user: user, course: submitted_course, created_at: Time.zone.parse('2026-09-01T12:00:00Z'))
@@ -359,12 +359,12 @@ describe Api::V8::UsersController, type: :controller do
         {
           'id' => submitted_course.id, 'name' => 'submitted', 'title' => submitted_course.title,
           'moocfi_id' => submitted_course.moocfi_id, 'awarded_points' => 0, 'submissions' => 2,
-          'last_submission_at' => '2026-10-01T12:00:00Z', 'url' => course_page(submitted_course)
+          'last_submission_at' => '2026-10-01T12:00:00Z', 'url' => nil
         },
         {
           'id' => older_course.id, 'name' => 'older', 'title' => older_course.title, 'moocfi_id' => nil,
           'awarded_points' => 0, 'submissions' => 1, 'last_submission_at' => '2025-01-01T00:00:00Z',
-          'url' => course_page(older_course)
+          'url' => nil
         },
         {
           'id' => points_only_course.id, 'name' => 'points-only', 'title' => points_only_course.title,
