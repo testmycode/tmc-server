@@ -527,17 +527,20 @@ class User < ApplicationRecord
                                    .pluck(:course_id, Arel.sql('COUNT(*)'), Arel.sql('MAX(submissions.created_at)'))
                                    .to_h { |course_id, count, latest| [course_id, { count: count, latest: latest }] }
     point_counts = awarded_points.group(:course_id).count
-    courses = Course.where(id: submission_totals.keys | point_counts.keys).pluck(:id, :name, :title, :moocfi_id)
+    courses = Course.where(id: submission_totals.keys | point_counts.keys)
+                    .left_joins(:organization)
+                    .pluck(:id, :name, :title, :moocfi_id, 'organizations.slug')
 
     courses.sort_by do |course_id, name|
       latest_submission_at = submission_totals.dig(course_id, :latest)
       [latest_submission_at ? -latest_submission_at.to_r : Float::INFINITY, name.to_s]
-    end.map do |course_id, name, title, moocfi_id|
+    end.map do |course_id, name, title, moocfi_id, organization_slug|
       {
         id: course_id,
         name: name,
         title: title,
         moocfi_id: moocfi_id,
+        organization_slug: organization_slug,
         awarded_points: point_counts.fetch(course_id, 0),
         submissions: submission_totals.dig(course_id, :count) || 0,
         last_submission_at: submission_totals.dig(course_id, :latest)&.utc&.iso8601
