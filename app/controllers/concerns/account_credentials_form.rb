@@ -16,14 +16,17 @@ module AccountCredentialsForm
     # a password change was requested.
     sig { params(user: User, user_params: T.untyped).returns(T::Boolean) }
     def apply_credentials(user, user_params)
-      refuse_managed_credential_changes(user, user_params)
+      if user.managed_externally?
+        refuse_managed_credential_changes(user, user_params)
+        return false
+      end
+
       set_email(user, user_params)
       maybe_update_password(user, user_params)
     end
 
     sig { params(user: User, user_params: T.untyped).void }
     def set_email(user, user_params)
-      return if user.managed_externally?
       return if !user.new_record? && user_params[:email_repeat].blank?
 
       if user_params[:email].blank?
@@ -38,7 +41,6 @@ module AccountCredentialsForm
     # A managed account's form has no credential fields, so any submitted come from a stale page.
     sig { params(user: User, user_params: T.untyped).void }
     def refuse_managed_credential_changes(user, user_params)
-      return unless user.managed_externally?
       return if CREDENTIAL_FIELDS.none? { |field| user_params[field].present? }
 
       user.errors.add(:base, User::MANAGED_CREDENTIALS_MESSAGE)
@@ -46,8 +48,6 @@ module AccountCredentialsForm
 
     sig { params(user: User, user_params: T.untyped).returns(T::Boolean) }
     def maybe_update_password(user, user_params)
-      return false if user.managed_externally?
-
       if user_params[:old_password].present? || user_params[:password].present?
         if user.externally_managed_without_target?
           user.errors.add(:base, 'This account is being migrated; password changes are temporarily unavailable.')
