@@ -21,7 +21,7 @@ class SettingsController < ApplicationController
     User.transaction do
       email_before = user.email
       @email_before = T.let(email_before, T.nilable(String))
-      password_changed = apply_credentials(user, params[:user])
+      password_changed = apply_credentials(user, params.fetch(:user, {}))
       set_user_fields
 
       if user.errors.empty? && user.save

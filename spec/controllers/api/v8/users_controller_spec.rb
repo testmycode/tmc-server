@@ -223,6 +223,7 @@ describe Api::V8::UsersController, type: :controller do
       it 'changes the name' do
         first_name = UserField.new(name: 'first_name', field_type: 'text')
         allow(UserField).to receive_messages(all: [first_name])
+        allow(ExtraField).to receive(:by_kind).with(:user).and_return([first_name])
 
         put :update, params: { id: user.id, user_field: { 'first_name' => 'Changed' } }, as: :json
 
