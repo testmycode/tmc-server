@@ -227,7 +227,7 @@ describe Api::V8::UsersController, type: :controller do
         put :update, params: { id: user.id, user_field: { 'first_name' => 'Changed' } }, as: :json
 
         expect(response).to have_http_status(200)
-        expect(user.field_value_record(first_name).value).to eq('Changed')
+        expect(user.reload.field_value_record(first_name).value).to eq('Changed')
       end
     end
   end
