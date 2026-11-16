@@ -230,12 +230,8 @@ module Api
           authorize! :update, user
           set_user_fields(user)
           set_extra_data(user, true)
-          if changes_own_managed_credentials?(user)
-            user.errors.add(:base, User::MANAGED_CREDENTIALS_MESSAGE)
-          else
-            update_email(user)
-            maybe_update_password(user)
-          end
+          update_email(user)
+          maybe_update_password(user)
           raise ActiveRecord::Rollback if !user.errors.empty? || !user.save
           # Password changed locally: migrate the user to courses.mooc.fi
           if params[:old_password].present? && params[:password].present? && !user.managed_externally?
@@ -371,17 +367,6 @@ module Api
           else
             user.email = user_params[:email].strip
           end
-        end
-
-        # Admins, courses.mooc.fi's admin token among them, still write a managed account's
-        # credentials here; its owner changes them on courses.mooc.fi.
-        sig { params(user: User).returns(T::Boolean) }
-        def changes_own_managed_credentials?(user)
-          return false if !user.managed_externally? || current_user.administrator?
-
-          new_email = params.dig(:user, :email)&.strip
-          email_changes = new_email.present? && user.email.casecmp(new_email) != 0
-          email_changes || params[:old_password].present? || params[:password].present?
         end
 
         sig { params(user: User).void }

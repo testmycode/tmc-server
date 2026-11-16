@@ -53,6 +53,8 @@ class Ability
       can :update, User do |u|
         u == user
       end
+      # Its owner changes a managed account's email and password on courses.mooc.fi.
+      cannot :update_credentials, User, &:managed_externally?
 
       cannot :read, Course
       can :read, Course do |c|

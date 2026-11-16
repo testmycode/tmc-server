@@ -506,14 +506,26 @@ class User < ApplicationRecord
   # This user's summary page in the mooc.fi admin tools. Nil when mooc.fi isn't configured.
   sig { returns(T.nilable(String)) }
   def moocfi_admin_url
-    base_url = SiteSetting.value('moocfi_base_url').to_s.chomp('/').presence
+    base_url = User.moocfi_base_url
     "#{base_url}/admin/users/#{id}/summary" if base_url
   end
 
   # courses.mooc.fi's root URL without a trailing slash. Nil when it isn't configured.
   sig { returns(T.nilable(String)) }
   def self.courses_mooc_fi_base_url
-    SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/').presence
+    site_base_url('courses_mooc_fi_base_url')
+  end
+
+  # mooc.fi's root URL without a trailing slash. Nil when it isn't configured.
+  sig { returns(T.nilable(String)) }
+  def self.moocfi_base_url
+    site_base_url('moocfi_base_url')
+  end
+
+  # The site setting `key` as a root URL without a trailing slash. Nil when it isn't configured.
+  sig { params(key: String).returns(T.nilable(String)) }
+  private_class_method def self.site_base_url(key)
+    SiteSetting.value(key).to_s.strip.chomp('/').presence
   end
 
   # Where users of a managed account change its email and password. Nil when courses.mooc.fi isn't configured.

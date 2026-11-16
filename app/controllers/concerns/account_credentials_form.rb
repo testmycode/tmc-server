@@ -12,6 +12,15 @@ module AccountCredentialsForm
   CREDENTIAL_FIELDS = T.let(%w[email email_repeat old_password password password_repeat].freeze, T::Array[String])
 
   private
+    # Applies the submitted email and password fields to an existing account and returns whether
+    # a password change was requested.
+    sig { params(user: User, user_params: T.untyped).returns(T::Boolean) }
+    def apply_credentials(user, user_params)
+      refuse_managed_credential_changes(user, user_params)
+      set_email(user, user_params)
+      maybe_update_password(user, user_params)
+    end
+
     sig { params(user: User, user_params: T.untyped).void }
     def set_email(user, user_params)
       return if user.managed_externally?

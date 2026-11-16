@@ -1,3 +1,4 @@
+<% visible_fields = UserField.all.select { |field| field.visible_to?(@user) } %>
 <%= form_for @user, url: { :action => :update, :class => "form-horizontal" }, autocomplete: "off" do |f| %>
   <%= render 'shared/error_messages', :target => @user %>
 
@@ -34,28 +35,20 @@
     </section>
   <% end %>
 
-  <% if !UserField.all.empty? %>
+  <% if visible_fields.any? %>
     <section>
-      <% for group in UserField.groups %>
-        <% if UserField.by_group(group).any? {|field| field.visible_to?(@user) } %>
-          <h2><%= group %></h2>
-          <% for field in UserField.by_group(group) %>
-            <% if field.visible_to?(@user) %>
-              <%= extra_field(@user.field_value_record(field), :form_scope => 'user_field') %>
-            <% end %>
-          <% end %>
+      <% visible_fields.group_by(&:group).each do |group, fields| %>
+        <h2><%= group %></h2>
+        <% fields.each do |field| %>
+          <%= extra_field(@user.field_value_record(field), :form_scope => 'user_field') %>
         <% end %>
       <% end %>
     </section>
   <% end %>
 
-  <% if @user.new_record? %>
+  <% if @user.new_record? || !@user.managed_externally? || visible_fields.any? %>
     <section>
-      <%= f.submit "Sign up", class: "btn btn-primary" %>
-    </section>
-  <% elsif !@user.managed_externally? || UserField.all.any? { |field| field.visible_to?(@user) } %>
-    <section>
-      <%= f.submit "Save", class: "btn btn-primary" %>
+      <%= f.submit(@user.new_record? ? "Sign up" : "Save", class: "btn btn-primary") %>
     </section>
   <% end %>
 <% end %>

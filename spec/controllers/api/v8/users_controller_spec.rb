@@ -180,7 +180,7 @@ describe Api::V8::UsersController, type: :controller do
       it 'refuses an email change' do
         put :update, params: { id: 'current', user: { email: 'changed@example.com' } }
 
-        expect(response).to have_http_status(400)
+        expect(response).to have_http_status(403)
         expect(user.reload.email).not_to eq('changed@example.com')
       end
 
@@ -191,7 +191,7 @@ describe Api::V8::UsersController, type: :controller do
         put :update, params: { id: 'current', user: { email: user.email },
                                old_password: 'oldpassword', password: 'newpassword', password_repeat: 'newpassword' }
 
-        expect(response).to have_http_status(400)
+        expect(response).to have_http_status(403)
       end
 
       it 'still saves other details with the unchanged email' do
@@ -209,6 +209,15 @@ describe Api::V8::UsersController, type: :controller do
 
         expect(response).to have_http_status(200)
         expect(user.reload.email).to eq('changed@example.com')
+      end
+
+      it 'changes the password through courses.mooc.fi' do
+        expect_any_instance_of(User).to receive(:update_password_via_courses_mooc_fi).with('oldpassword', 'newpassword').and_return(true)
+
+        put :update, params: { id: user.id, user: { email: user.email },
+                               old_password: 'oldpassword', password: 'newpassword', password_repeat: 'newpassword' }, as: :json
+
+        expect(response).to have_http_status(200)
       end
 
       it 'changes the name' do

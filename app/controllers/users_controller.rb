@@ -88,9 +88,7 @@ class UsersController < ApplicationController
       email_before = @user.email
       @email_before = T.let(email_before, T.nilable(String))
 
-      refuse_managed_credential_changes(@user, params[:user])
-      set_email(@user, params[:user])
-      password_changed = maybe_update_password(@user, params[:user])
+      password_changed = apply_credentials(@user, params[:user])
       set_user_fields
 
       if @user.errors.empty? && @user.save
