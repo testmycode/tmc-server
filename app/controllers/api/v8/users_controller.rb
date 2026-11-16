@@ -126,7 +126,7 @@ module Api
               property :courses do
                 key :type, :array
                 items do
-                  key :required, %i[id name title moocfi_id awarded_points submissions last_submission_at]
+                  key :required, %i[id name title moocfi_id awarded_points submissions last_submission_at url]
                   property :id, type: :integer, example: 1
                   property :name, type: :string, example: 'mooc-java-programming-i'
                   property :title, type: :string, 'x-nullable': true, example: 'Java Programming I'
@@ -134,6 +134,7 @@ module Api
                   property :awarded_points, type: :integer, example: 12
                   property :submissions, type: :integer, example: 34
                   property :last_submission_at, type: :string, format: 'date-time', 'x-nullable': true, example: '2026-10-01T12:00:00Z'
+                  property :url, type: :string, 'x-nullable': true, description: 'The course page, when the user can open it', example: 'https://tmc.mooc.fi/org/mooc/courses/1'
                 end
               end
             end
@@ -286,7 +287,17 @@ module Api
       def course_progress
         unauthorize_guest!
         only_admins!
-        render json: { courses: User.find_by!(id: params[:id]).course_progress }
+        user = User.find_by!(id: params[:id])
+        ability = Ability.new(user)
+        progress = user.course_progress
+        courses_by_id = Course.includes(:organization).where(id: progress.pluck(:id)).index_by(&:id)
+        courses = progress.map do |entry|
+          course = courses_by_id.fetch(entry[:id])
+          # A link the user cannot open, e.g. to a hidden or disabled course, is worse than none.
+          url = organization_course_url(course.organization, course) if ability.can?(:read, course)
+          entry.merge(url: url)
+        end
+        render json: { courses: courses }
       end
 
       sig { void }
