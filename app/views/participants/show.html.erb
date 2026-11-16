@@ -48,6 +48,9 @@
       <% if current_user.administrator? && @user.courses_mooc_fi_profile_url %>
         <li><%= link_to 'View on courses.mooc.fi', @user.courses_mooc_fi_profile_url, target: '_blank', rel: 'noopener', class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
       <% end %>
+      <% if current_user.administrator? %>
+        <li><%= link_to 'View on mooc.fi', @user.moocfi_admin_url, target: '_blank', rel: 'noopener', class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
+      <% end %>
       </ul>
   </section>
 </div>

@@ -501,6 +501,12 @@ class User < ApplicationRecord
     courses_mooc_fi_url("/manage/users/#{courses_mooc_fi_user_id}")
   end
 
+  # The mooc.fi admin tools identify users by their tmc-server id.
+  sig { returns(String) }
+  def moocfi_admin_url
+    "https://www.mooc.fi/admin/users/#{id}/summary"
+  end
+
   # courses.mooc.fi's root URL without a trailing slash. Nil when it isn't configured.
   sig { returns(T.nilable(String)) }
   def self.courses_mooc_fi_base_url
