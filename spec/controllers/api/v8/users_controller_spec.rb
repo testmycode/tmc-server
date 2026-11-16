@@ -167,15 +167,59 @@ describe Api::V8::UsersController, type: :controller do
       expect(response).to have_http_status(400)
       expect(user.reload).to have_password('oldpassword')
     end
+  end
 
-    it 'delegates to courses.mooc.fi without migrating for an already managed user' do
+  describe 'PUT update credentials of an account managed by courses.mooc.fi' do
+    before :each do
       user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
-      expect_any_instance_of(User).to receive(:update_password_via_courses_mooc_fi).with('oldpassword', 'newpassword').and_return(true)
-      expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+    end
 
-      do_update('oldpassword')
+    context "with the user's own token" do
+      let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'public') }
 
-      expect(response).to have_http_status(200)
+      it 'refuses an email change' do
+        put :update, params: { id: 'current', user: { email: 'changed@example.com' } }
+
+        expect(response).to have_http_status(400)
+        expect(user.reload.email).not_to eq('changed@example.com')
+      end
+
+      it 'refuses a password change' do
+        expect_any_instance_of(User).not_to receive(:update_password_via_courses_mooc_fi)
+        expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
+
+        put :update, params: { id: 'current', user: { email: user.email },
+                               old_password: 'oldpassword', password: 'newpassword', password_repeat: 'newpassword' }
+
+        expect(response).to have_http_status(400)
+      end
+
+      it 'still saves other details with the unchanged email' do
+        put :update, params: { id: 'current', user: { email: user.email } }
+
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'with an admin token, as courses.mooc.fi writes them' do
+      let!(:token) { Doorkeeper::AccessToken.create!(resource_owner_id: admin.id, scopes: 'public') }
+
+      it 'changes the email' do
+        put :update, params: { id: user.id, user: { email: 'changed@example.com' } }, as: :json
+
+        expect(response).to have_http_status(200)
+        expect(user.reload.email).to eq('changed@example.com')
+      end
+
+      it 'changes the name' do
+        first_name = UserField.new(name: 'first_name', field_type: 'text')
+        allow(UserField).to receive_messages(all: [first_name])
+
+        put :update, params: { id: user.id, user_field: { 'first_name' => 'Changed' } }, as: :json
+
+        expect(response).to have_http_status(200)
+        expect(user.field_value_record(first_name).value).to eq('Changed')
+      end
     end
   end
 

@@ -208,7 +208,7 @@ describe UsersController, type: :controller do
         expect(response.status).to eq(403)
       end
 
-      it 'should ignore email and password changes for a user managed by courses.mooc.fi' do
+      it 'should refuse email and password changes for a user managed by courses.mooc.fi' do
         @user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
         expect_any_instance_of(User).not_to receive(:update_password_via_courses_mooc_fi)
         expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
@@ -216,7 +216,8 @@ describe UsersController, type: :controller do
                                         old_password: 'oldpassword',
                                         password: 'newpassword',
                                         password_repeat: 'newpassword') }
-        expect(response).to redirect_to(user_path)
+        expect(response.status).to eq(403)
+        expect(flash[:notice]).to be_nil
         expect(@user.reload.email).not_to eq('newemail@valid.com')
       end
 

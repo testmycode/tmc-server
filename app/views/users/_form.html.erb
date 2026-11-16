@@ -49,13 +49,15 @@
     </section>
   <% end %>
 
-  <section>
-    <% if @user.new_record? %>
+  <% if @user.new_record? %>
+    <section>
       <%= f.submit "Sign up", class: "btn btn-primary" %>
-    <% else %>
+    </section>
+  <% elsif !@user.managed_externally? || UserField.all.any? { |field| field.visible_to?(@user) } %>
+    <section>
       <%= f.submit "Save", class: "btn btn-primary" %>
-    <% end %>
-  </section>
+    </section>
+  <% end %>
 <% end %>
 <br>
 

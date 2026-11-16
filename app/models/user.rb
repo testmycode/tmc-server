@@ -53,6 +53,8 @@ class User < ApplicationRecord
 
   COURSES_MOOC_FI_USER_ID_FORMAT = /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/
 
+  MANAGED_CREDENTIALS_MESSAGE = 'The email address and password of this account are changed on courses.mooc.fi.'
+
   # Lookups by courses.mooc.fi id (token authentication) match exactly, so store the canonical form.
   normalizes :courses_mooc_fi_user_id, with: ->(id) { id.strip.downcase }
 
@@ -501,10 +503,11 @@ class User < ApplicationRecord
     courses_mooc_fi_url("/manage/users/#{courses_mooc_fi_user_id}")
   end
 
-  # The mooc.fi admin tools identify users by their tmc-server id.
-  sig { returns(String) }
+  # This user's summary page in the mooc.fi admin tools. Nil when mooc.fi isn't configured.
+  sig { returns(T.nilable(String)) }
   def moocfi_admin_url
-    "https://www.mooc.fi/admin/users/#{id}/summary"
+    base_url = SiteSetting.value('moocfi_base_url').to_s.chomp('/').presence
+    "#{base_url}/admin/users/#{id}/summary" if base_url
   end
 
   # courses.mooc.fi's root URL without a trailing slash. Nil when it isn't configured.

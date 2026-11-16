@@ -311,6 +311,20 @@ describe User, type: :model do
     end
   end
 
+  describe 'moocfi_admin_url' do
+    it 'is nil when moocfi_base_url is not configured' do
+      user = User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
+      SiteSetting.all_settings['moocfi_base_url'] = nil
+      expect(user.moocfi_admin_url).to be_nil
+    end
+
+    it "builds the summary url from the configured base url and the user's id" do
+      user = User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')
+      SiteSetting.all_settings['moocfi_base_url'] = 'https://www.mooc.fi/'
+      expect(user.moocfi_admin_url).to eq("https://www.mooc.fi/admin/users/#{user.id}/summary")
+    end
+  end
+
   describe 'migrating to courses.mooc.fi on login' do
     it 'posts a locally-managed user on successful authentication' do
       user = User.create!(login: 'localuser', password: 'secret123', email: 'localuser@example.com')

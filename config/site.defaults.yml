@@ -144,3 +144,6 @@ teacher_manual_url: http://testmycode.github.io/tmc-server/usermanual/
 # Base URL for password management, admin lookups and access-token introspection via courses.mooc.fi,
 # e.g. https://courses.mooc.fi
 courses_mooc_fi_base_url:
+
+# Base URL for the mooc.fi admin tools linked from participant pages, e.g. https://www.mooc.fi
+moocfi_base_url:
