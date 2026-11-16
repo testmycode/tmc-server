@@ -89,6 +89,7 @@ class SettingsController < ApplicationController
       user = T.must(@user)
       user_params = params[:user]
 
+      return if user.managed_externally?
       return if !user.new_record? && user_params[:email_repeat].blank?
 
       if user_params[:email].blank?
@@ -102,14 +103,10 @@ class SettingsController < ApplicationController
 
     sig { params(user: User, user_params: T.untyped).returns(T::Boolean) }
     def maybe_update_password(user, user_params)
+      return false if user.managed_externally?
+
       if user_params[:old_password].present? || user_params[:password].present?
-        if user.managed_externally?
-          unless user.update_password_via_courses_mooc_fi(user_params[:old_password], user_params[:password])
-            user.errors.add(:password, 'could not be changed. Please check your current password and try again.')
-            return false
-          end
-          return true
-        elsif user.externally_managed_without_target?
+        if user.externally_managed_without_target?
           user.errors.add(:base, 'This account is being migrated; password changes are temporarily unavailable.')
           return false
         end

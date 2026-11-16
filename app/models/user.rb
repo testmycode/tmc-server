@@ -507,6 +507,13 @@ class User < ApplicationRecord
     SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/').presence
   end
 
+  # Where users of a managed account change its email and password. Nil when courses.mooc.fi isn't configured.
+  sig { returns(T.nilable(String)) }
+  def self.courses_mooc_fi_account_settings_url
+    base_url = courses_mooc_fi_base_url
+    "#{base_url}/user-settings/account" if base_url
+  end
+
   # Where users delete their account, which also deletes it here. Nil when courses.mooc.fi isn't configured.
   sig { returns(T.nilable(String)) }
   def self.courses_mooc_fi_account_deletion_url

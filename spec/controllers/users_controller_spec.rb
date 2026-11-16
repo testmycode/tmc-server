@@ -208,14 +208,16 @@ describe UsersController, type: :controller do
         expect(response.status).to eq(403)
       end
 
-      it 'should delegate to courses.mooc.fi without migrating for an already managed user' do
+      it 'should ignore email and password changes for a user managed by courses.mooc.fi' do
         @user.update!(password_managed_by_courses_mooc_fi: true, courses_mooc_fi_user_id: SecureRandom.uuid)
-        expect_any_instance_of(User).to receive(:update_password_via_courses_mooc_fi).with('oldpassword', 'newpassword').and_return(true)
+        expect_any_instance_of(User).not_to receive(:update_password_via_courses_mooc_fi)
         expect_any_instance_of(User).not_to receive(:post_new_user_to_courses_mooc_fi)
-        put :update, params: { user: params.merge(old_password: 'oldpassword',
+        put :update, params: { user: params.merge(email_repeat: 'newemail@valid.com',
+                                        old_password: 'oldpassword',
                                         password: 'newpassword',
                                         password_repeat: 'newpassword') }
         expect(response).to redirect_to(user_path)
+        expect(@user.reload.email).not_to eq('newemail@valid.com')
       end
 
       it 'should not change the password if the old password was wrong' do
