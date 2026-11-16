@@ -45,8 +45,15 @@
         end %>
         <li><%= button_to 'Force migrate to courses.mooc.fi', force_migrate_to_courses_mooc_fi_participant_path, method: :post, class: 'btn btn-primary', data: { confirm: confirm_text } %> (shown to you because you're an admin)</li>
       <% end %>
-      <% if current_user.administrator? && @user.courses_mooc_fi_profile_url %>
-        <li><%= link_to 'View on courses.mooc.fi', @user.courses_mooc_fi_profile_url, target: '_blank', rel: 'noopener', class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
+      <% if current_user.administrator? %>
+        <% profile_url = @user.courses_mooc_fi_profile_url %>
+        <% moocfi_url = @user.moocfi_admin_url %>
+        <% if profile_url %>
+          <li><%= link_to 'View on courses.mooc.fi', profile_url, target: '_blank', rel: 'noopener', class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
+        <% end %>
+        <% if moocfi_url %>
+          <li><%= link_to 'View on mooc.fi', moocfi_url, target: '_blank', rel: 'noopener', class: 'btn btn-primary' %> (shown to you because you're an admin)</li>
+        <% end %>
       <% end %>
       </ul>
   </section>

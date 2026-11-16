@@ -3,6 +3,7 @@
 
 class SettingsController < ApplicationController
   extend T::Sig
+  include AccountCredentialsForm
   skip_authorization_check
 
   before_action :set_user
@@ -20,13 +21,12 @@ class SettingsController < ApplicationController
     User.transaction do
       email_before = user.email
       @email_before = T.let(email_before, T.nilable(String))
-      set_email
-      password_changed = maybe_update_password(user, params[:user])
+      password_changed = apply_credentials(user, params.fetch(:user, {}))
       set_user_fields
 
       if user.errors.empty? && user.save
         # Password changed locally: migrate the user to courses.mooc.fi
-        user.post_new_user_to_courses_mooc_fi(params[:user][:password]) if password_changed && !user.managed_externally?
+        user.post_new_user_to_courses_mooc_fi(params[:user][:password]) if password_changed
         RecentlyChangedUserDetail.email_changed.create!(old_value: email_before, new_value: user.email, username: user.login, user_id: user.id) unless T.must(email_before.casecmp(user.email)).zero?
         flash[:notice] = if password_changed
           'Changes saved and password changed'
@@ -82,52 +82,6 @@ class SettingsController < ApplicationController
     sig { void }
     def set_user
       @user = T.let(User.find(params[:participant_id]), T.nilable(User))
-    end
-
-    sig { void }
-    def set_email
-      user = T.must(@user)
-      user_params = params[:user]
-
-      return if !user.new_record? && user_params[:email_repeat].blank?
-
-      if user_params[:email].blank?
-        user.errors.add(:email, 'needed')
-      elsif user_params[:email] != user_params[:email_repeat]
-        user.errors.add(:email_repeat, 'did not match')
-      else
-        user.email = user_params[:email].strip
-      end
-    end
-
-    sig { params(user: User, user_params: T.untyped).returns(T::Boolean) }
-    def maybe_update_password(user, user_params)
-      if user_params[:old_password].present? || user_params[:password].present?
-        if user.managed_externally?
-          unless user.update_password_via_courses_mooc_fi(user_params[:old_password], user_params[:password])
-            user.errors.add(:password, 'could not be changed. Please check your current password and try again.')
-            return false
-          end
-          return true
-        elsif user.externally_managed_without_target?
-          user.errors.add(:base, 'This account is being migrated; password changes are temporarily unavailable.')
-          return false
-        end
-        if !user.has_password?(user_params[:old_password])
-          user.errors.add(:old_password, 'incorrect')
-        elsif user_params[:password] != user_params[:password_repeat]
-          user.errors.add(:password_repeat, 'did not match')
-        elsif user_params[:password].blank?
-          user.errors.add(:password, 'cannot be empty')
-        elsif user_params[:password].length > 1000
-          user.errors.add(:password, 'cannot be over 1000 characters')
-        else
-          user.password = user_params[:password]
-        end
-        true
-      else
-        false
-      end
     end
 
     sig { returns(T.nilable(T::Hash[T.untyped, T.untyped])) }

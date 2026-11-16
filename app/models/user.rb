@@ -53,6 +53,8 @@ class User < ApplicationRecord
 
   COURSES_MOOC_FI_USER_ID_FORMAT = /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/
 
+  MANAGED_CREDENTIALS_MESSAGE = 'The email address and password of this account are changed on courses.mooc.fi.'
+
   # Lookups by courses.mooc.fi id (token authentication) match exactly, so store the canonical form.
   normalizes :courses_mooc_fi_user_id, with: ->(id) { id.strip.downcase }
 
@@ -501,10 +503,36 @@ class User < ApplicationRecord
     courses_mooc_fi_url("/manage/users/#{courses_mooc_fi_user_id}")
   end
 
+  # This user's summary page in the mooc.fi admin tools. Nil when mooc.fi isn't configured.
+  sig { returns(T.nilable(String)) }
+  def moocfi_admin_url
+    base_url = User.moocfi_base_url
+    "#{base_url}/admin/users/#{id}/summary" if base_url
+  end
+
   # courses.mooc.fi's root URL without a trailing slash. Nil when it isn't configured.
   sig { returns(T.nilable(String)) }
   def self.courses_mooc_fi_base_url
-    SiteSetting.value('courses_mooc_fi_base_url').to_s.chomp('/').presence
+    site_base_url('courses_mooc_fi_base_url')
+  end
+
+  # mooc.fi's root URL without a trailing slash. Nil when it isn't configured.
+  sig { returns(T.nilable(String)) }
+  def self.moocfi_base_url
+    site_base_url('moocfi_base_url')
+  end
+
+  # The site setting `key` as a root URL without a trailing slash. Nil when it isn't configured.
+  sig { params(key: String).returns(T.nilable(String)) }
+  private_class_method def self.site_base_url(key)
+    SiteSetting.value(key).to_s.strip.chomp('/').presence
+  end
+
+  # Where users of a managed account change its email and password. Nil when courses.mooc.fi isn't configured.
+  sig { returns(T.nilable(String)) }
+  def self.courses_mooc_fi_account_settings_url
+    base_url = courses_mooc_fi_base_url
+    "#{base_url}/user-settings/account" if base_url
   end
 
   # Where users delete their account, which also deletes it here. Nil when courses.mooc.fi isn't configured.
