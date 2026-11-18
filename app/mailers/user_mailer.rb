@@ -13,7 +13,7 @@ class UserMailer < ActionMailer::Base
 
     # The lock keeps concurrent requests from all passing the check before any token exists.
     token = user.with_lock do
-      next unless MailRateLimit.allowed?(user.verification_tokens.email.pluck(:created_at).compact)
+      next unless MailRateLimit.allowed?(user.verification_tokens.email.where(created_at: MailRateLimit::WINDOW.ago..).pluck(:created_at).compact)
 
       user.verification_tokens.email.create!
     end

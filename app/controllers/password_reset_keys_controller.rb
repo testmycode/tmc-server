@@ -5,7 +5,7 @@ class PasswordResetKeysController < ApplicationController
   extend T::Sig
   skip_authorization_check
 
-  add_breadcrumb 'Forgot password', ->(*_a) { }, only: %i[new show]
+  add_breadcrumb 'Forgot password', ->(*_a) { }, only: :show
 
   sig { void }
   def show
