@@ -11,9 +11,18 @@ class UserMailer < ActionMailer::Base
     # To protect our delivery rates we temporaily disable sending this email.
     return if origin && origin.downcase.include?('elements')
 
+    # Locks the row rather than `user`, which may carry an unsaved email change. The lock keeps
+    # concurrent requests from all passing the check before any token exists.
+    token = User.transaction do
+      User.lock.find(user.id)
+      next unless MailRateLimit.allowed?(user.verification_tokens.email.where(created_at: MailRateLimit::WINDOW.ago..).pluck(:created_at).compact)
+
+      user.verification_tokens.email.create!
+    end
+    return unless token
+
     @origin = T.let(origin, T.nilable(String))
     @user = T.let(user, T.nilable(User))
-    token = user.verification_tokens.email.create!
     @url = T.let(confirm_email_url(user.id, token.token, language: language), T.nilable(String))
     subject = 'Confirm your mooc.fi account email address' if language == 'en' || language == 'en-lu' || language == 'en-ie'
     subject = 'Vahvista mooc.fi-tilisi sähköpostiosoite' if language == 'fi'

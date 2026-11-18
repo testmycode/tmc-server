@@ -25,8 +25,7 @@ module Api
             }, status: :not_found
           end
 
-          key = ActionToken.generate_password_reset_key_for(user)
-          PasswordResetKeyMailer.reset_link_email(user, key).deliver_now
+          # Mail is sent only by courses.mooc.fi; the response is kept for existing clients.
           render json: {
             success: true
           }
