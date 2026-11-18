@@ -13,23 +13,13 @@ class PasswordResetKeysController < ApplicationController
   end
 
   sig { void }
-  def new; end
+  def new
+    redirect_to_courses_mooc_fi
+  end
 
   sig { void }
   def create
-    email = params['email'].to_s.strip
-    @email = T.let(email, T.nilable(String))
-    if email.empty?
-      return redirect_to(new_password_reset_key_path, alert: 'No e-mail address provided')
-    end
-
-    user = User.find_by('lower(email) = ?', email.downcase)
-    unless user
-      return redirect_to(new_password_reset_key_path, alert: 'No such e-mail address registered')
-    end
-
-    key = ActionToken.generate_password_reset_key_for(user)
-    PasswordResetKeyMailer.reset_link_email(user, key).deliver_now
+    redirect_to_courses_mooc_fi
   end
 
   sig { void }
@@ -84,6 +74,17 @@ class PasswordResetKeysController < ApplicationController
   end
 
   private
+    # Only courses.mooc.fi sends password reset mail.
+    sig { void }
+    def redirect_to_courses_mooc_fi
+      reset_url = User.courses_mooc_fi_password_reset_url
+      if reset_url
+        redirect_to reset_url, allow_other_host: true
+      else
+        render plain: 'Password reset is unavailable.', status: :service_unavailable
+      end
+    end
+
     sig { void }
     def find_key_and_user
       token = params['token']

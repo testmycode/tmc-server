@@ -535,6 +535,13 @@ class User < ApplicationRecord
     "#{base_url}/user-settings/account" if base_url
   end
 
+  # Where users reset a forgotten password. Nil when courses.mooc.fi isn't configured.
+  sig { returns(T.nilable(String)) }
+  def self.courses_mooc_fi_password_reset_url
+    base_url = courses_mooc_fi_base_url
+    "#{base_url}/reset-password" if base_url
+  end
+
   # Where users delete their account, which also deletes it here. Nil when courses.mooc.fi isn't configured.
   sig { returns(T.nilable(String)) }
   def self.courses_mooc_fi_account_deletion_url

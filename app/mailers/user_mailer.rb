@@ -11,6 +11,8 @@ class UserMailer < ActionMailer::Base
     # To protect our delivery rates we temporaily disable sending this email.
     return if origin && origin.downcase.include?('elements')
 
+    return unless MailRateLimit.allowed?(user.verification_tokens.email.pluck(:created_at).compact)
+
     @origin = T.let(origin, T.nilable(String))
     @user = T.let(user, T.nilable(User))
     token = user.verification_tokens.email.create!
