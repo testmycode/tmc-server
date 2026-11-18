@@ -7,6 +7,8 @@ class UserMailer < ActionMailer::Base
   extend T::Sig
   sig { params(user: User, origin: T.nilable(String), language: T.nilable(String)).void }
   def email_confirmation(user, origin = nil, language = nil)
+    return unless SiteSetting.value('send_account_confirmation_email')
+
     # For the Elements course, emails often bounce because the course does not mention mooc.fi handles the technical implementation of the course.
     # To protect our delivery rates we temporaily disable sending this email.
     return if origin && origin.downcase.include?('elements')

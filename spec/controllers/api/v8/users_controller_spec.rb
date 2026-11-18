@@ -135,6 +135,24 @@ describe Api::V8::UsersController, type: :controller do
       expect(json['success']).to eq(false)
       expect(json['errors']).to eq('username' => ['has already been taken'])
     end
+
+    before { allow_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi) }
+
+    it 'sends a confirmation mail by default' do
+      expect do
+        post :create, params: { user: { email: 'new@example.com', password: 'secret123', password_confirmation: 'secret123' } }
+      end.to change { ActionMailer::Base.deliveries.size }.by(1)
+    end
+
+    it 'sends no mail when account confirmation emails are off' do
+      allow(SiteSetting).to receive(:value).and_call_original
+      allow(SiteSetting).to receive(:value).with('send_account_confirmation_email').and_return(false)
+
+      expect do
+        post :create, params: { user: { email: 'new@example.com', password: 'secret123', password_confirmation: 'secret123' } }
+      end.not_to(change { ActionMailer::Base.deliveries.size })
+      expect(response.parsed_body['success']).to eq(true)
+    end
   end
 
   describe 'PUT update password' do
@@ -209,6 +227,16 @@ describe Api::V8::UsersController, type: :controller do
 
         expect(response).to have_http_status(200)
         expect(user.reload.email).to eq('changed@example.com')
+      end
+
+      it 'sends no mail when the email changes and account confirmation emails are off' do
+        allow(SiteSetting).to receive(:value).and_call_original
+        allow(SiteSetting).to receive(:value).with('send_account_confirmation_email').and_return(false)
+
+        expect do
+          put :update, params: { id: user.id, user: { email: 'changed@example.com' } }, as: :json
+        end.not_to(change { ActionMailer::Base.deliveries.size })
+        expect(user.reload.email_verified).to be(false)
       end
 
       it 'changes the password through courses.mooc.fi' do
