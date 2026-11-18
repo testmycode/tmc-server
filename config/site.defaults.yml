@@ -78,6 +78,9 @@ emails:
   from: noreply@example.com
   email_code_reviews_by_default: false
 
+# Send a confirmation email when an account is created or its email address changes.
+send_account_confirmation_email: true
+
 # Used for email notifications intended for site admins
 administrative_email: ""
 
