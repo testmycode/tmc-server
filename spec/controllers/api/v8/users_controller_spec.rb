@@ -126,6 +126,8 @@ describe Api::V8::UsersController, type: :controller do
   describe 'POST create' do
     let(:token) { nil }
 
+    before { allow_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi) }
+
     it 'reports login errors under username' do
       allow(SecureRandom).to receive(:uuid).and_return(other_user.login)
 
@@ -135,8 +137,6 @@ describe Api::V8::UsersController, type: :controller do
       expect(json['success']).to eq(false)
       expect(json['errors']).to eq('username' => ['has already been taken'])
     end
-
-    before { allow_any_instance_of(User).to receive(:post_new_user_to_courses_mooc_fi) }
 
     it 'sends a confirmation mail by default' do
       expect do
