@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-# Per-recipient cap for mail that anonymous or low-privilege requests can trigger. Callers skip
+# Per-user cap for mail that anonymous or low-privilege requests can trigger. Callers skip
 # the send silently when capped, so responses do not reveal whether mail was sent.
 module MailRateLimit
   extend T::Sig
