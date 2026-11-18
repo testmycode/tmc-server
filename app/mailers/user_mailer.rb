@@ -11,8 +11,10 @@ class UserMailer < ActionMailer::Base
     # To protect our delivery rates we temporaily disable sending this email.
     return if origin && origin.downcase.include?('elements')
 
-    # The lock keeps concurrent requests from all passing the check before any token exists.
-    token = user.with_lock do
+    # Locks the row rather than `user`, which may carry an unsaved email change. The lock keeps
+    # concurrent requests from all passing the check before any token exists.
+    token = User.transaction do
+      User.lock.find(user.id)
       next unless MailRateLimit.allowed?(user.verification_tokens.email.where(created_at: MailRateLimit::WINDOW.ago..).pluck(:created_at).compact)
 
       user.verification_tokens.email.create!
