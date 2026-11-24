@@ -12,4 +12,9 @@ module CoursesMoocFiRateLimitBypass
     key = ENV['RACK_ATTACK_SAFE_API_KEY']
     key.present? ? { HEADER => key } : {}
   end
+
+  sig { returns(T::Boolean) }
+  def self.configured?
+    headers.any?
+  end
 end
