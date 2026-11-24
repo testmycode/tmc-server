@@ -14,6 +14,43 @@ describe User, type: :model do
     end
   end
 
+  describe 'access tokens on password change' do
+    let(:user) { FactoryBot.create(:user, password: 'old password') }
+    let(:application) { Doorkeeper::Application.create!(name: 'vscode_plugin', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob') }
+    let!(:token) { Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: 'public') }
+
+    it 'revokes the user\'s editor client tokens when a new password is saved' do
+      user.update!(password: 'new password')
+      expect(token.reload).to be_revoked
+    end
+
+    it 'keeps them when the user is saved without a new password' do
+      User.find(user.id).update!(email: 'changed@example.com')
+      expect(token.reload).not_to be_revoked
+    end
+
+    it 'keeps the user\'s tokens of other applications' do
+      other_app = Doorkeeper::Application.create!(name: 'elements-of-ai', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob')
+      other = Doorkeeper::AccessToken.create!(application: other_app, resource_owner_id: user.id, scopes: 'public')
+      user.update!(password: 'new password')
+      expect(other.reload).not_to be_revoked
+    end
+
+    it 'keeps another user\'s tokens' do
+      other = Doorkeeper::AccessToken.create!(application: application, resource_owner_id: FactoryBot.create(:user).id, scopes: 'public')
+      user.update!(password: 'new password')
+      expect(other.reload).not_to be_revoked
+    end
+
+    it 'revokes them when the password is changed via courses.mooc.fi' do
+      conn = instance_double(Faraday::Connection, post: instance_double(Faraday::Response, body: true))
+      allow(user).to receive(:courses_mooc_fi_connection).and_return(conn)
+      allow(user).to receive(:courses_mooc_fi_url).and_return('https://courses.mooc.fi/change-password')
+      expect(user.update_password_via_courses_mooc_fi('old password', 'new password')).to be(true)
+      expect(token.reload).to be_revoked
+    end
+  end
+
   describe 'scopes' do
     before :each do
       @user1 = FactoryBot.create(:user)

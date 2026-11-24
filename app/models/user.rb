@@ -75,9 +75,17 @@ class User < ApplicationRecord
   scope :non_legitimate_students, -> { where(legitimate_student: false) }
 
   sig { returns(T.nilable(String)) }
-  attr_accessor :password
+  attr_reader :password
+
+  sig { params(new_password: T.nilable(String)).void }
+  def password=(new_password)
+    @password = T.let(new_password, T.nilable(String))
+    @password_assigned = T.let(true, T.nilable(T::Boolean))
+  end
+
   before_save :encrypt_password
   after_save :revoke_handoff_tokens, if: :saved_change_to_administrator?
+  after_save :revoke_access_tokens_after_password_change
 
   sig { params(course: Course).returns(ActiveRecord::Relation) }
   def self.course_students(course)
@@ -328,6 +336,7 @@ class User < ApplicationRecord
       end
 
       clear_stale_local_password
+      AccessTokenAuthentication.revoke_editor_tokens(self)
       true
 
     rescue Faraday::ClientError => e
@@ -740,6 +749,14 @@ class User < ApplicationRecord
     sig { void }
     def revoke_handoff_tokens
       AccessTokenAuthentication.revoke_handoff_tokens(self) if administrator?
+    end
+
+    sig { void }
+    def revoke_access_tokens_after_password_change
+      # The password is kept on the instance after saving, so only an assignment counts as a change.
+      assigned = @password_assigned
+      @password_assigned = nil
+      AccessTokenAuthentication.revoke_editor_tokens(self) if assigned && password.present? && !previously_new_record?
     end
 
     # Unchecked because specs stub Faraday.new with plain doubles.

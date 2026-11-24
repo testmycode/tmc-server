@@ -44,4 +44,20 @@ describe 'Password login of the TMC clients', type: :request do
     expect(response).to have_http_status(:bad_request)
     expect(response.parsed_body['error']).to eq('invalid_grant')
   end
+
+  describe 'token lifetime' do
+    def issued_token(app)
+      exchange_password(app, 'correct horse')
+      Doorkeeper::AccessToken.find_by!(token: response.parsed_body['access_token'])
+    end
+
+    it 'expires the token of an editor client' do
+      expect(issued_token(credentials('vscode_plugin')).expires_in).to eq(AccessTokenAuthentication::EDITOR_TOKEN_TTL.to_i)
+    end
+
+    it 'keeps the token of any other client non-expiring' do
+      other = Doorkeeper::Application.create!(name: 'elements-of-ai', redirect_uri: 'urn:ietf:wg:oauth:2.0:oob')
+      expect(issued_token('application_id' => other.uid, 'secret' => other.plaintext_secret || other.secret).expires_in).to be_nil
+    end
+  end
 end
