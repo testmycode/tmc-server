@@ -57,6 +57,7 @@ class CoursesMoocFiTokenIntrospector
     reason = reject_reason(body)
     if reason
       Rails.logger.warn("courses.mooc.fi token rejected: #{reason}")
+      Rails.cache.delete(stale_cache_key(cache_key))
       Rails.cache.write(cache_key, REJECTED, expires_in: REJECTION_CACHE_TTL)
       return nil
     end

@@ -187,6 +187,17 @@ RSpec.describe CoursesMoocFiTokenIntrospector do
       allow(Rails.logger).to receive(:warn)
       expect(introspect).to be_nil
     end
+
+    it 'does not fall back to the stale entry once the rejection has expired' do
+      introspect
+      status[:code] = 200
+      provider.post(introspection_path) { [200, { 'Content-Type' => 'application/json' }, { 'active' => false }.to_json] }
+      cache.delete("#{described_class::CACHE_NAMESPACE}:#{Digest::SHA256.hexdigest(token)}")
+      allow(Rails.logger).to receive(:warn)
+      expect(introspect).to be_nil
+      go_down
+      expect { introspect }.to raise_error(described_class::Unavailable)
+    end
   end
 
   describe 'caching' do
