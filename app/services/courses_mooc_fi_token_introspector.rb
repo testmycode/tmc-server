@@ -69,7 +69,7 @@ class CoursesMoocFiTokenIntrospector
     )
     ttl = cache_ttl(result.expires_at)
     Rails.cache.write(cache_key, result, expires_in: ttl) if ttl
-    stale_ttl = stale_cache_ttl(result.expires_at)
+    stale_ttl = cache_ttl(result.expires_at, STALE_TTL_CAP)
     Rails.cache.write(stale_cache_key(cache_key), result, expires_in: stale_ttl) if stale_ttl
     result
   end
@@ -142,18 +142,10 @@ class CoursesMoocFiTokenIntrospector
     end
 
     # In seconds; nil when the token has already expired.
-    sig { params(expires_at: T.nilable(Time)).returns(T.nilable(Integer)) }
-    def stale_cache_ttl(expires_at)
-      return STALE_TTL_CAP if expires_at.nil?
+    sig { params(expires_at: T.nilable(Time), cap: Integer).returns(T.nilable(Integer)) }
+    def cache_ttl(expires_at, cap = MAX_CACHE_TTL)
+      return cap if expires_at.nil?
       remaining = (expires_at - Time.now).floor
-      [remaining, STALE_TTL_CAP].min if remaining.positive?
-    end
-
-    # In seconds; nil when the token has already expired.
-    sig { params(expires_at: T.nilable(Time)).returns(T.nilable(Integer)) }
-    def cache_ttl(expires_at)
-      return MAX_CACHE_TTL if expires_at.nil?
-      remaining = (expires_at - Time.now).floor
-      [remaining, MAX_CACHE_TTL].min if remaining.positive?
+      [remaining, cap].min if remaining.positive?
     end
 end
