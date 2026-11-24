@@ -118,6 +118,11 @@ RSpec.describe CoursesMoocFiTokenIntrospector do
         end
       end
 
+      it 'names the bypass key when courses.mooc.fi rate-limits it' do
+        stub_provider(status: 429, body: 'Retry later', content_type: 'text/plain')
+        expect { introspect }.to raise_error(described_class::Unavailable, /RACK_ATTACK_SAFE_API_KEY/)
+      end
+
       it 'raises Unavailable without asking when the client credentials are not configured' do
         allow(AppSecrets).to receive(:courses_mooc_fi_introspection_secret).and_return('')
         expect { introspect }.to raise_error(described_class::Unavailable, /not set/)
@@ -129,6 +134,58 @@ RSpec.describe CoursesMoocFiTokenIntrospector do
         expect { introspect }.to raise_error(described_class::Unavailable, /not set/)
         expect(provider_requests).to be_empty
       end
+    end
+  end
+
+  describe 'during an outage' do
+    let(:status) { { code: 200 } }
+
+    before do
+      provider.post(introspection_path) do |env|
+        provider_requests << env
+        status[:code] == 200 ? [200, { 'Content-Type' => 'application/json' }, active_body.to_json] : [503, {}, '']
+      end
+    end
+
+    def go_down
+      status[:code] = 503
+      cache.delete("#{described_class::CACHE_NAMESPACE}:#{Digest::SHA256.hexdigest(token)}")
+    end
+
+    it 'accepts a token seen active before' do
+      introspect
+      go_down
+      expect(introspect).to have_attributes(sub: sub)
+    end
+
+    it 'retries courses.mooc.fi only every STALE_RETRY_INTERVAL' do
+      introspect
+      go_down
+      3.times { introspect }
+      expect(provider_requests.size).to eq(2)
+    end
+
+    it 'raises Unavailable for a token never seen' do
+      status[:code] = 503
+      expect { introspect }.to raise_error(described_class::Unavailable)
+    end
+
+    it 'raises Unavailable once the token has expired' do
+      allow(Time).to receive(:now).and_call_original
+      introspect
+      go_down
+      allow(Time).to receive(:now).and_return(Time.at(active_body['exp']) + 1)
+      cache.clear
+      expect { introspect }.to raise_error(described_class::Unavailable)
+    end
+
+    it 'does not accept a token courses.mooc.fi has rejected' do
+      introspect
+      status[:code] = 200
+      provider.post(introspection_path) { [200, { 'Content-Type' => 'application/json' }, { 'active' => false }.to_json] }
+      cache.clear
+      allow(Rails.logger).to receive(:warn)
+      expect(introspect).to be_nil
     end
   end
 
@@ -165,7 +222,7 @@ RSpec.describe CoursesMoocFiTokenIntrospector do
       allow(cache).to receive(:write).and_call_original
       stub_provider(status: 200, body: active_body.merge('exp' => (Time.now + 60).to_i))
       introspect
-      expect(cache).to have_received(:write).with(anything, anything, expires_in: be_between(1, 60))
+      expect(cache).to have_received(:write).with(anything, anything, expires_in: be_between(1, 60)).at_least(:once)
     end
 
     it 'does not cache an already-expired token' do
