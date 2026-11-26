@@ -30,6 +30,15 @@ module AccessTokenAuthentication
       .update_all(revoked_at: Time.current)
   end
 
+  # Revokes the user's tokens of the editor clients, for when their password changes. Tokens of
+  # other applications are left alone so that older clients keep working.
+  sig { params(user: User).void }
+  def self.revoke_editor_tokens(user)
+    Doorkeeper::AccessToken
+      .where(resource_owner_id: user.id, revoked_at: nil, application_id: Doorkeeper::Application.where(name: editor_client_names).select(:id))
+      .update_all(revoked_at: Time.current)
+  end
+
   # Whether the token lets its client call UserAccessTokensController; the client still has to be
   # an allow-listed issuer.
   sig { params(token: Doorkeeper::AccessToken).returns(T::Boolean) }
@@ -41,6 +50,24 @@ module AccessTokenAuthentication
   sig { params(token: Doorkeeper::AccessToken).returns(T::Boolean) }
   def self.handoff?(token)
     token.includes_scope?(HANDOFF_SCOPE)
+  end
+
+  # Password-grant tokens of editor clients carry no refresh token; the editor logs in again.
+  EDITOR_TOKEN_TTL = T.let(90.days, ActiveSupport::Duration)
+
+  # Names of the IDE clients in the valid_clients setting, which CredentialsController hands out by
+  # name. Other password-grant apps keep non-expiring tokens.
+  sig { returns(T::Array[String]) }
+  def self.editor_client_names
+    clients = SiteSetting.value('valid_clients')
+    return [] unless clients.is_a?(Enumerable)
+
+    clients.pluck('name')
+  end
+
+  sig { params(application: T.nilable(Doorkeeper::Application)).returns(T::Boolean) }
+  def self.editor_application?(application)
+    !application.nil? && editor_client_names.include?(application.name)
   end
 
   # Uids of the Doorkeeper applications allowed to issue tokens.

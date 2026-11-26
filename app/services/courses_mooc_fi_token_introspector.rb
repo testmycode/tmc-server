@@ -16,13 +16,20 @@ class CoursesMoocFiTokenIntrospector
   Result = Struct.new(:sub, :upstream_id, :expires_at, keyword_init: true)
 
   REQUIRED_SCOPE = 'exercise-services'
-  MAX_CACHE_TTL = 300 # seconds
+  # Bounds how long a token revoked on courses.mooc.fi is still honoured; a revocation is only
+  # noticed on the next introspection. Per token, so sp331 sees at most one request a minute each.
+  MAX_CACHE_TTL = 60 # seconds
+  # How long a token seen active before is honoured through an outage; its own expiry ends it sooner.
+  STALE_TTL_CAP = 3600 # seconds
+  # Between retries of a down courses.mooc.fi for a token served from the stale entry.
+  STALE_RETRY_INTERVAL = 15 # seconds
   REJECTION_CACHE_TTL = 30 # seconds
   CACHE_NAMESPACE = 'courses_mooc_fi_introspection'
   REJECTED = :rejected
 
   # Returns the Result for a token courses.mooc.fi vouches for, or nil when it rejects the token.
-  # Raises Unavailable when it cannot answer; that is never cached.
+  # When it cannot answer, a token it vouched for earlier and that has not expired is still
+  # accepted; for any other token this raises Unavailable, which is never cached.
   sig { params(token: String).returns(T.nilable(Result)) }
   def self.introspect(token)
     new.introspect(token)
@@ -36,10 +43,21 @@ class CoursesMoocFiTokenIntrospector
     cached = Rails.cache.read(cache_key)
     return (cached == REJECTED ? nil : cached) unless cached.nil?
 
-    body = request_introspection(token)
+    begin
+      body = request_introspection(token)
+    rescue Unavailable => e
+      stale = fresh_stale_result(cache_key)
+      raise unless stale
+
+      Rails.logger.warn("courses.mooc.fi token introspection unavailable, accepting a token seen active earlier: #{e.message}")
+      ttl = cache_ttl(stale.expires_at)
+      Rails.cache.write(cache_key, stale, expires_in: [ttl, STALE_RETRY_INTERVAL].min) if ttl
+      return stale
+    end
     reason = reject_reason(body)
     if reason
       Rails.logger.warn("courses.mooc.fi token rejected: #{reason}")
+      Rails.cache.delete(stale_cache_key(cache_key))
       Rails.cache.write(cache_key, REJECTED, expires_in: REJECTION_CACHE_TTL)
       return nil
     end
@@ -51,6 +69,8 @@ class CoursesMoocFiTokenIntrospector
     )
     ttl = cache_ttl(result.expires_at)
     Rails.cache.write(cache_key, result, expires_in: ttl) if ttl
+    stale_ttl = cache_ttl(result.expires_at, STALE_TTL_CAP)
+    Rails.cache.write(stale_cache_key(cache_key), result, expires_in: stale_ttl) if stale_ttl
     result
   end
 
@@ -87,6 +107,8 @@ class CoursesMoocFiTokenIntrospector
         response.body
       when 401
         raise Unavailable, "courses.mooc.fi rejected tmc-server's introspection client credentials; check COURSES_MOOC_FI_INTROSPECTION_CLIENT_ID and COURSES_MOOC_FI_INTROSPECTION_SECRET"
+      when 429
+        raise Unavailable, 'courses.mooc.fi rate-limited introspection (HTTP 429); check that RACK_ATTACK_SAFE_API_KEY matches its RATELIMIT_PROTECTION_SAFE_API_KEY'
       else
         raise Unavailable, "introspection answered HTTP #{response.status}"
       end
@@ -108,11 +130,22 @@ class CoursesMoocFiTokenIntrospector
       nil
     end
 
+    sig { params(cache_key: String).returns(String) }
+    def stale_cache_key(cache_key)
+      "#{cache_key}:stale"
+    end
+
+    sig { params(cache_key: String).returns(T.nilable(Result)) }
+    def fresh_stale_result(cache_key)
+      stale = Rails.cache.read(stale_cache_key(cache_key))
+      stale if stale.is_a?(Result) && (stale.expires_at.nil? || stale.expires_at > Time.now)
+    end
+
     # In seconds; nil when the token has already expired.
-    sig { params(expires_at: T.nilable(Time)).returns(T.nilable(Integer)) }
-    def cache_ttl(expires_at)
-      return MAX_CACHE_TTL if expires_at.nil?
+    sig { params(expires_at: T.nilable(Time), cap: Integer).returns(T.nilable(Integer)) }
+    def cache_ttl(expires_at, cap = MAX_CACHE_TTL)
+      return cap if expires_at.nil?
       remaining = (expires_at - Time.now).floor
-      [remaining, MAX_CACHE_TTL].min if remaining.positive?
+      [remaining, cap].min if remaining.positive?
     end
 end
